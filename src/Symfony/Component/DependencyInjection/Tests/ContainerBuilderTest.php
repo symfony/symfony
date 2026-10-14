@@ -22,6 +22,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
@@ -1572,6 +1573,21 @@ class ContainerBuilderTest extends TestCase
 
         $this->assertSame('reflection.BarClass', (string) $resources[0]);
         $this->assertSame(BarMissingClass::class, (string) end($resources));
+    }
+
+    public function testGetReflectionClassTracksPrivateProperties()
+    {
+        $container = new ContainerBuilder();
+        $container->setResourceTracking(true);
+
+        $container->getReflectionClass('BarClassWithPrivateProperty');
+
+        $resources = $container->getResources();
+        $this->assertCount(1, $resources);
+        $this->assertInstanceOf(ReflectionClassResource::class, $resources[0]);
+
+        $untracked = new ReflectionClassResource(new \ReflectionClass('BarClassWithPrivateProperty'));
+        $this->assertNotSame($untracked->__serialize()['hash'], $resources[0]->__serialize()['hash']);
     }
 
     public function testGetReflectionClassOnInternalTypes()

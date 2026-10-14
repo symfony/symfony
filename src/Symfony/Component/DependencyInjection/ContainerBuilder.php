@@ -439,7 +439,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $path = $classReflector->getFileName();
 
                 if (!$this->inVendors($path)) {
-                    $this->addResource(new ReflectionClassResource($classReflector, $this->vendors));
+                    $this->addResource(new ReflectionClassResource($classReflector, $this->vendors, true));
                 }
             }
             $this->classReflectors[$class] = $classReflector;

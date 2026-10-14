@@ -187,3 +187,8 @@ class BarCircular
         $this->foobar = $foobar;
     }
 }
+
+class BarClassWithPrivateProperty
+{
+    private $priv;
+}

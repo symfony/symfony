@@ -38,6 +38,21 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertSame((string) $res, (string) $ser);
     }
 
+    public function testSerializeUnserializeWithPrivateProperties()
+    {
+        $tracked = new ReflectionClassResource(new \ReflectionClass(ClassWithPrivateProperty::class), [], true);
+        $untracked = new ReflectionClassResource(new \ReflectionClass(ClassWithPrivateProperty::class));
+
+        $ser = unserialize(serialize($tracked));
+
+        $this->assertTrue($tracked->isFresh(0));
+        $this->assertTrue($ser->isFresh(0));
+        $this->assertSame((string) $tracked, (string) $ser);
+        $this->assertSame($tracked->__serialize()['hash'], $ser->__serialize()['hash']);
+
+        $this->assertNotSame($untracked->__serialize()['hash'], $ser->__serialize()['hash']);
+    }
+
     public function testIsFresh()
     {
         $res = new ReflectionClassResource(new \ReflectionClass(__CLASS__));
@@ -187,6 +202,56 @@ class ReflectionClassResourceTest extends TestCase
         yield [false, 17, null, ++$i, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
     }
 
+    #[DataProvider('providePrivatePropertyHashedSignature')]
+    public function testHashedSignatureWithPrivateProperties(bool $changeExpected, int $changedLine, ?string $changedCode, int $resourceClassNameSuffix)
+    {
+        $code = <<<'EOPHP'
+            /*0*/
+            /*1*/  class %s
+            /*2*/  {
+            /*3*/      private $priv;
+            /*4*/
+            /*5*/      private function priv() {}
+            /*6*/  }
+            EOPHP;
+
+        eval(\sprintf($code, $class = 'FooPriv'.$resourceClassNameSuffix));
+        $expectedHash = (new ReflectionClassResource(new \ReflectionClass($class), [], true))->__serialize()['hash'];
+
+        $changedLines = explode("\n", $code);
+        if (null !== $changedCode) {
+            $changedLines[$changedLine] = $changedCode;
+        }
+        eval(\sprintf(implode("\n", $changedLines), $class = 'BarPriv'.$resourceClassNameSuffix));
+        $hash = (new ReflectionClassResource(new \ReflectionClass($class), [], true))->__serialize()['hash'];
+
+        if ($changeExpected) {
+            $this->assertNotSame($expectedHash, $hash);
+        } else {
+            $this->assertSame($expectedHash, $hash);
+        }
+    }
+
+    public static function providePrivatePropertyHashedSignature(): iterable
+    {
+        $i = 0;
+
+        yield [true, 3, '/** priv docblock */', ++$i];
+        yield [true, 3, 'private $priv = 123;', ++$i];
+        yield [true, 3, '#[Foo] private $priv;', ++$i];
+        yield [false, 3, 'private string $priv;', ++$i];
+        yield [false, 5, '/** priv docblock */', ++$i];
+        yield [false, 5, '', ++$i];
+    }
+
+    public function testPrivatePropertyLabelInSignature()
+    {
+        $protectedHash = (new ReflectionClassResource(new \ReflectionClass(ClassWithProtectedProperty::class), [], true))->__serialize()['hash'];
+        $privateHash = (new ReflectionClassResource(new \ReflectionClass(ClassWithPrivatePropertySameName::class), [], true))->__serialize()['hash'];
+
+        $this->assertNotSame($protectedHash, $privateHash);
+    }
+
     public function testEventSubscriber()
     {
         $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
@@ -272,6 +337,21 @@ class TestServiceSubscriber implements ServiceSubscriberInterface
 class TestServiceWithStaticProperty
 {
     public static object $initializedObject;
+}
+
+class ClassWithPrivateProperty
+{
+    private $priv;
+}
+
+class ClassWithProtectedProperty
+{
+    protected $prop;
+}
+
+class ClassWithPrivatePropertySameName
+{
+    private $prop;
 }
 
 enum SomeEnum

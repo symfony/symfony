@@ -30,6 +30,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
     public function __construct(
         private \ReflectionClass $classReflector,
         array $excludedVendors = [],
+        private bool $trackPrivateProperties = false,
     ) {
         $this->className = $classReflector->name;
         $this->excludedVendors = $excludedVendors;
@@ -71,6 +72,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             'files' => $this->files,
             'className' => $this->className,
             'excludedVendors' => $this->excludedVendors,
+            'trackPrivateProperties' => $this->trackPrivateProperties,
             'hash' => $this->hash,
         ];
     }
@@ -148,7 +150,12 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         if (!$class->isInterface()) {
             $defaults = $class->getDefaultProperties();
 
-            foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED) as $p) {
+            $propertyFilter = \ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED;
+            if ($this->trackPrivateProperties) {
+                $propertyFilter |= \ReflectionProperty::IS_PRIVATE;
+            }
+
+            foreach ($class->getProperties($propertyFilter) as $p) {
                 foreach ($p->getAttributes() as $a) {
                     $attributes[] = [$a->getName(), (string) $a];
                 }
@@ -157,7 +164,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
 
                 yield $p->getDocComment() ?: '';
                 yield $p->isDefault() ? '<default>' : '';
-                yield $p->isPublic() ? 'public' : 'protected';
+                yield $p->isPublic() ? 'public' : ($p->isProtected() ? 'protected' : 'private');
                 yield $p->isStatic() ? 'static' : '';
                 yield '$'.$p->name;
                 yield print_r(isset($defaults[$p->name]) && !\is_object($defaults[$p->name]) ? $defaults[$p->name] : null, true);

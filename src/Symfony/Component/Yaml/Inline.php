@@ -298,11 +298,11 @@ class Inline
 
         if (null !== $output) {
             if (null !== $delimiters) {
-                $tmp = ltrim(substr($scalar, $i), " \n");
-                if ('' === $tmp) {
+                $j = $i + strspn($scalar, " \n", $i);
+                if (!isset($scalar[$j])) {
                     throw new ParseException(\sprintf('Unexpected end of line, expected one of "%s".', implode('', $delimiters)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                 }
-                if (!\in_array($tmp[0], $delimiters)) {
+                if (!\in_array($scalar[$j], $delimiters)) {
                     throw new ParseException(\sprintf('Unexpected characters (%s).', substr($scalar, $i)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                 }
             }
@@ -318,7 +318,7 @@ class Inline
                 if (Parser::preg_match('/[ \t]+#/', $output, $match, \PREG_OFFSET_CAPTURE)) {
                     $output = substr($output, 0, $match[0][1]);
                 }
-            } elseif (Parser::preg_match('/^(.*?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
+            } elseif (Parser::preg_match('/(.*?)('.implode('|', $delimiters).')/A', $scalar, $match, 0, $i)) {
                 $output = $match[1];
                 $i += \strlen($output);
                 $output = trim($output);
@@ -353,7 +353,7 @@ class Inline
             return null;
         }
 
-        if (!Parser::preg_match('/'.self::REGEX_QUOTED_STRING.'/A', substr($scalar, $i), $match)) {
+        if (!Parser::preg_match('/'.self::REGEX_QUOTED_STRING.'/A', $scalar, $match, 0, $i)) {
             throw new ParseException(\sprintf('Malformed inline YAML string: "%s".', substr($scalar, $i)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
         }
 
@@ -933,7 +933,7 @@ class Inline
             return null;
         }
 
-        if (!Parser::preg_match('/^&(?P<ref>[^ \t,\[\]\{\}\n]++)\s*+/A', substr($value, $i), $matches)) {
+        if (!Parser::preg_match('/&(?P<ref>[^ \t,\[\]\{\}\n]++)\s*+/A', $value, $matches, 0, $i)) {
             return null;
         }
 

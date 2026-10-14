@@ -518,7 +518,9 @@ class Inline
                     throw new ParseException('Missing mapping key.', self::$parsedLineNumber + 1, $mapping);
                 }
 
-                if ('!php/const' === $key || '!php/enum' === $key) {
+                $isKeyEvaluated = '!php/const' === $key || '!php/enum' === $key;
+
+                if ($isKeyEvaluated) {
                     $key .= ' '.self::parseScalar($mapping, $flags, ['(?<!:):(?!:)'], $i, false);
                     $key = self::evaluateScalar($state, $key, $flags);
 
@@ -535,7 +537,7 @@ class Inline
                     break;
                 }
 
-                if (!$isKeyQuoted) {
+                if (!$isKeyQuoted && !$isKeyEvaluated) {
                     $evaluatedKey = self::evaluateScalar($state, $key, $flags, $references);
 
                     if ('' !== $key && $evaluatedKey !== $key && (!\is_string($evaluatedKey) || '!' === $key[0]) && !\is_int($evaluatedKey)) {
@@ -547,7 +549,7 @@ class Inline
                     throw new ParseException('Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}").', self::$parsedLineNumber + 1, $mapping);
                 }
 
-                $isMergeKey = !$isKeyQuoted && '<<' === $key;
+                $isMergeKey = !$isKeyQuoted && !$isKeyEvaluated && '<<' === $key;
 
                 if ($isMergeKey) {
                     $allowOverwrite = true;

@@ -3069,6 +3069,13 @@ class ParserTest extends TestCase
         ], $this->parser->parse($yaml));
     }
 
+    public function testPhpConstantTagFlowMappingKeyUsesTheConstantValueAsIs()
+    {
+        $yaml = '{!php/const Symfony\Component\Yaml\Tests\B::TRUE_STRING: a, !php/const Symfony\Component\Yaml\Tests\B::ALIAS_STRING: b, !php/const Symfony\Component\Yaml\Tests\B::MERGE_KEY: {c: d}}';
+
+        $this->assertSame(['true' => 'a', '*foo' => 'b', '<<' => ['c' => 'd']], $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
+    }
+
     public function testMergeKeysWhenMappingsAreParsedAsObjects()
     {
         $yaml = <<<YAML
@@ -3910,4 +3917,7 @@ class B
     public const FOO = 'foo';
     public const BAR = 'bar';
     public const BAZ = 'baz';
+    public const TRUE_STRING = 'true';
+    public const ALIAS_STRING = '*foo';
+    public const MERGE_KEY = '<<';
 }

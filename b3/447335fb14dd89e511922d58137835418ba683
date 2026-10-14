@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-14T19:00:27Z
+
+I squashed one more change into your commit, so that the lookahead at the top of `getNextEmbedBlock()` also uses `getNextContentLineIndentation()`. The parser gives the same results as before on 1.6M generated documents with all parse flags, error lines and snippets included.

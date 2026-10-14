@@ -49,6 +49,9 @@ interface HttpClientInterface
         //   means redirects should not be followed; "Authorization" and "Cookie" headers MUST
         //   NOT follow except for the initial host name
         'max_redirects' => 20,
+        // bool - whether redirects to another scheme, host or port should be followed; when false,
+        //   the response of the first such redirect is returned instead
+        'follow_cross_origin_redirects' => true,
         // string - defaults to the best supported version, typically 1.1 or 2.0
         'http_version' => null,
         // string - the URI to resolve relative URLs, following rules in RFC 3986, section 2

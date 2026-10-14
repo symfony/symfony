@@ -21,6 +21,7 @@ CHANGELOG
  * Allow passing the `query` and `body` options as lists of single-entry arrays to repeat a field
  * Make `http_version: 2.0` use HTTP/2 with prior knowledge on `http://` URLs in `CurlHttpClient` and `AmpHttpClient`
  * Stop following redirects from `https://` to `http://` URLs
+ * Add support for the `follow_cross_origin_redirects` option
 
 8.1
 ---

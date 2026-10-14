@@ -387,6 +387,8 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     /**
      * Parses header lines as curl yields them to us.
      *
+     * @phpstan-param (callable(\CurlHandle, string, bool, bool &): ?string)|null $resolveRedirect
+     *
      * @param-immediately-invoked-callable $resolveRedirect
      */
     private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, array &$trailers, ?array $options, CurlClientState $multi, int $id, ?string &$location, ?callable $resolveRedirect, ?LoggerInterface $logger): int
@@ -454,7 +456,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             $noContent = 303 === $statusCode || ('POST' === $info['http_method'] && \in_array($statusCode, [301, 302], true));
 
             try {
-                $info['redirect_url'] = $resolveRedirect($ch, $location, $noContent);
+                $info['redirect_url'] = $resolveRedirect($ch, $location, $noContent, $follow);
             } catch (TransportException $e) {
                 // Exceptions must be reported through the response, they cannot escape a curl callback
                 $multi->handlesActivity[$id][] = null;
@@ -463,7 +465,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 return 0;
             }
 
-            if (null === $info['redirect_url'] || (str_starts_with($info['redirect_url'], 'http:') && str_starts_with(curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL), 'https:'))) {
+            if (null === $info['redirect_url'] || !$follow || (str_starts_with($info['redirect_url'], 'http:') && str_starts_with(curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL), 'https:'))) {
                 $options['max_redirects'] = curl_getinfo($ch, \CURLINFO_REDIRECT_COUNT);
                 curl_setopt($ch, \CURLOPT_FOLLOWLOCATION, false);
                 curl_setopt($ch, \CURLOPT_MAXREDIRS, $options['max_redirects']);

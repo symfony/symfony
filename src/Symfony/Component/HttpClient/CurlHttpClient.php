@@ -435,7 +435,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return static function ($ch, string $location, bool $noContent) use (&$redirectHeaders, $options, $noProxy) {
+        return static function ($ch, string $location, bool $noContent, ?bool &$follow = null) use (&$redirectHeaders, $options, $scheme, $authority, $noProxy) {
             try {
                 $location = self::parseUrl($location);
                 $url = self::parseUrl(curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL));
@@ -443,6 +443,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             } catch (InvalidArgumentException) {
                 return null;
             }
+
+            $follow = $options['follow_cross_origin_redirects'] || ($scheme === $url['scheme'] && $authority === $url['authority']);
 
             if ($noContent && $redirectHeaders) {
                 $filterContentHeaders = static fn ($h) => 0 !== stripos($h, 'Content-Length:') && 0 !== stripos($h, 'Content-Type:') && 0 !== stripos($h, 'Transfer-Encoding:');

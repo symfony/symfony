@@ -68,4 +68,9 @@ class HttpOptionsTest extends TestCase
     {
         $this->assertSame(5.0, (new HttpOptions())->setMaxConnectDuration(5.0)->toArray()['max_connect_duration']);
     }
+
+    public function testFollowCrossOriginRedirects()
+    {
+        $this->assertFalse((new HttpOptions())->followCrossOriginRedirects(false)->toArray()['follow_cross_origin_redirects']);
+    }
 }

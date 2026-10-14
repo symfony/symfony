@@ -467,6 +467,38 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame($expected, $filteredHeaders);
     }
 
+    public function testCrossOriginRedirectsCanBeDisabled()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://localhost:8057/302', [
+            'query' => ['location' => '/302/relative'],
+            'follow_cross_origin_redirects' => false,
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
+        $this->assertSame(2, $response->getInfo('redirect_count'));
+
+        $response = $client->request('GET', 'http://localhost:8057/302', [
+            'query' => ['location' => 'http://127.0.0.1:8057/'],
+            'follow_cross_origin_redirects' => false,
+        ]);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('http://127.0.0.1:8057/', $response->getInfo('redirect_url'));
+        $this->assertSame(0, $response->getInfo('redirect_count'));
+
+        $response = $client->request('GET', 'http://localhost:8057/302', [
+            'query' => ['location' => 'http://localhost:8058/'],
+            'follow_cross_origin_redirects' => false,
+        ]);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('http://localhost:8058/', $response->getInfo('redirect_url'));
+        $this->assertSame(0, $response->getInfo('redirect_count'));
+    }
+
     public function testStream()
     {
         $client = $this->getHttpClient(__FUNCTION__);

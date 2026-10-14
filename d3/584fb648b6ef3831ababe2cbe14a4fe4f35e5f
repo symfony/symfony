@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-10-14T14:17:15Z
+
+The Fabbot failure is a codespell false positive. It flags the author name "Max Grigorian" in the Table.php header, a line this PR does not change, so I left it as is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-14T16:29:15Z
+
+Thanks @lazerg. I squashed a fix into your commit. The escaping now runs after `setColumnMaxWidth()` wraps the cell. Before, `abcd|efgh` at width 5 gave `abcd\` on one row and `|efgh` on the next one. Wrapped lines now become `<br>` too, so a markdown cell never spans several rows.
+
+I kept your backslash case, but the backslash is now doubled. With `Line 1\<br>`, markdown reads `\<` as an escaped `<` and shows `<br>` as text. A lone `\r` also becomes `<br>` now.

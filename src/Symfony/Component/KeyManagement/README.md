@@ -3,7 +3,7 @@ KeyManagement Component
 
 The KeyManagement component provides a unified abstraction over Key Management
 Systems such as AWS KMS, Azure Key Vault, Google Cloud KMS, HashiCorp Vault
-Transit and KMIP servers. It exposes a small high-level API for
+Transit, Scaleway Key Manager and KMIP servers. It exposes a small high-level API for
 encrypting/decrypting payloads, generating data keys for envelope encryption,
 and is designed so that the secret material never leaves the underlying KMS. A
 client made of several providers keeps every ciphertext readable when one of

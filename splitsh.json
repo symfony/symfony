@@ -47,6 +47,7 @@
         "google-cloud-key-management": "src/Symfony/Component/KeyManagement/Bridge/GoogleCloudKms",
         "hashicorp-vault-key-management": "src/Symfony/Component/KeyManagement/Bridge/HashiCorpVault",
         "kmip-key-management": "src/Symfony/Component/KeyManagement/Bridge/Kmip",
+        "scaleway-key-management": "src/Symfony/Component/KeyManagement/Bridge/Scaleway",
         "ldap": "src/Symfony/Component/Ldap",
         "lock": {
             "prefixes": [{ "from": "src/Symfony/Component/Lock", "to": "", "excludes": ["Bridge"] }]

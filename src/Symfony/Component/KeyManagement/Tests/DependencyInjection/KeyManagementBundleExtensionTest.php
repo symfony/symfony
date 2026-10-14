@@ -44,6 +44,7 @@ use Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\GoogleCloudKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\HashiCorpVault\TransitKmsFactory;
 use Symfony\Component\KeyManagement\Bridge\Kmip\KmipKms;
 use Symfony\Component\KeyManagement\Bridge\Kmip\KmipKmsFactory;
+use Symfony\Component\KeyManagement\Bridge\Scaleway\ScalewayKmsFactory;
 use Symfony\Component\KeyManagement\CompositeKms;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DataKeyStoreInterface;
@@ -110,6 +111,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         yield 'azure' => ['key_management.factory.azure_key_vault'];
         yield 'google cloud' => ['key_management.factory.google_cloud_kms'];
         yield 'aws' => ['key_management.factory.aws_kms'];
+        yield 'scaleway' => ['key_management.factory.scaleway'];
     }
 
     #[DataProvider('provideOptionalServices')]
@@ -137,6 +139,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         yield 'aws' => ['key_management.factory.aws_kms', ['class' => AwsKmsFactory::class, 'package' => 'symfony/aws-key-management', 'parent_packages' => $parents]];
         yield 'azure' => ['key_management.factory.azure_key_vault', ['class' => AzureKeyVaultFactory::class, 'package' => 'symfony/azure-keyvault-key-management', 'parent_packages' => $parents]];
         yield 'google cloud' => ['key_management.factory.google_cloud_kms', ['class' => GoogleCloudKmsFactory::class, 'package' => 'symfony/google-cloud-key-management', 'parent_packages' => $parents]];
+        yield 'scaleway' => ['key_management.factory.scaleway', ['class' => ScalewayKmsFactory::class, 'package' => 'symfony/scaleway-key-management', 'parent_packages' => $parents]];
         yield 'kmip' => ['key_management.factory.kmip', ['class' => KmipKmsFactory::class, 'package' => 'symfony/kmip-key-management', 'parent_packages' => $parents]];
         yield 'blind index listener' => ['key_management.blind_index_listener', ['class' => BlindIndexListener::class, 'package' => 'symfony/doctrine-orm-key-management', 'parent_packages' => $parents]];
         yield 'encrypted column listener' => ['key_management.encrypted_column_listener', ['class' => EncryptedColumnListener::class, 'package' => 'symfony/doctrine-orm-key-management', 'parent_packages' => $parents]];

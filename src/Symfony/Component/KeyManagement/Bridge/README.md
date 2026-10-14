@@ -5,7 +5,7 @@ This directory hosts bridges that connect the KeyManagement component to
 specific backends. Each bridge is published as its own Composer package, named
 after the vendor or the protocol it targets followed by the component name,
 e.g. `symfony/aws-key-management`, `symfony/hashicorp-vault-key-management`,
-`symfony/kmip-key-management`, ... and typed `symfony-key-management-bridge`.
+`symfony/kmip-key-management`, `symfony/scaleway-key-management`, ... and typed `symfony-key-management-bridge`.
 
 A bridge typically contains:
 

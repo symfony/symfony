@@ -664,6 +664,49 @@ final class ConnectionTest extends TestCase
         $this->assertSame($id, $returnedId);
     }
 
+    public function testSendToAnotherTube()
+    {
+        $usedTubes = [];
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->exactly(5))->method('useTube')->willReturnCallback(static function (TubeName $tube) use (&$usedTubes) {
+            $usedTubes[] = (string) $tube;
+        });
+        $client->expects($this->exactly(6))->method('put')->willReturn(new Job(new JobId('110'), 'foobar'));
+
+        $connection = new Connection(['tube_name' => 'xyz'], $client);
+
+        $connection->send('foo', []);
+        $connection->send('foo', [], 0, null, 'abc');
+        $connection->send('foo', [], 0, null, 'abc');
+        $connection->send('foo', [], 0, null, 'xyz');
+        $connection->send('foo', [], 0, null, '0');
+        $connection->send('foo', []);
+
+        $this->assertSame(['xyz', 'abc', 'xyz', '0', 'xyz'], $usedTubes);
+    }
+
+    public function testSendToAnotherTubeOnReconnect()
+    {
+        $usedTubes = [];
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->exactly(3))->method('useTube')->willReturnCallback(static function (TubeName $tube) use (&$usedTubes) {
+            $usedTubes[] = (string) $tube;
+        });
+        $client->expects($this->exactly(3))->method('put')->willReturnOnConsecutiveCalls(
+            $this->throwException(new ConnectionException('123', 'foobar')),
+            new Job(new JobId('110'), 'foobar'),
+            new Job(new JobId('111'), 'foobar'),
+        );
+
+        $connection = new Connection(['tube_name' => 'xyz'], $client);
+
+        $this->assertSame('110', $connection->send('foo', [], 0, null, 'abc'));
+        $this->assertSame('111', $connection->send('foo', []));
+        $this->assertSame(['abc', 'abc', 'xyz'], $usedTubes);
+    }
+
     public function testSendWhenABeanstalkdExceptionOccurs()
     {
         $tube = 'xyz';

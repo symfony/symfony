@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `BeanstalkdTubeStamp` to put a message in another tube than the one of the transport
+
 7.3
 ---
 

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-14T13:07:01Z
+
+@tacman I applied @lyrixx's review and squashed it into your commit. The attribute is now `source_class`, because `definition_class` next to `definition_id` read like the class of the `Definition` service. The tag also exposes `support_strategy` now.
+
+@lyrixx your note that a consuming pass must run after `WorkflowAttributePass` (`TYPE_BEFORE_OPTIMIZATION`, priority 2) is for the doc PR.

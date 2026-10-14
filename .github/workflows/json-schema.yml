@@ -1,0 +1,58 @@
+name: JsonSchema on PHP 8.2
+
+on:
+  push:
+    branches: [ '*.*' ]
+    paths:
+      - 'src/Symfony/Component/JsonSchema/**'
+      - '.github/workflows/json-schema.yml'
+  pull_request:
+    paths:
+      - 'src/Symfony/Component/JsonSchema/**'
+      - '.github/workflows/json-schema.yml'
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: JsonSchema on PHP 8.2 (${{ matrix.deps }} deps)
+    runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        deps: [lowest, highest]
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          coverage: "none"
+          ini-values: date.timezone=UTC,memory_limit=-1,zend.assertions=1
+          php-version: "8.2"
+
+      - name: Run tests
+        working-directory: src/Symfony/Component/JsonSchema
+        env:
+          PREFER_LOWEST: ${{ matrix.deps == 'lowest' && '--prefer-lowest' || '' }}
+        run: |
+          # On PHP 8.2, the Symfony 7.4 components are installed, and PHPUnit 13 does not run
+          composer require --dev --no-update --no-progress --ansi phpunit/phpunit:^11.5
+          composer update --no-progress --ansi --prefer-stable $PREFER_LOWEST
+
+          # phpunit.xml.dist is written for PHPUnit 13, so PHPUnit 11 warns about it
+          vendor/bin/phpunit --do-not-fail-on-deprecation --do-not-fail-on-phpunit-warning

@@ -22,6 +22,7 @@ CHANGELOG
  * Wrap the descriptions in `TextDescriptor` output to the terminal width; pass the `terminal_width` describe option to control it
  * Allow union and intersection type-hints when autowiring arguments of invokable commands
  * Add the `$ttl` parameter to `LockableTrait::lock()`
+ * Exit with 128 + the signal number (e.g. `130` for a Ctrl+C) instead of `0` when a signal stops the application; `ConsoleSignalEvent::getExitCode()` and the `$previousExitCode` argument of `SignalableCommandInterface::handleSignal()` start with this code
 
 8.1
 ---

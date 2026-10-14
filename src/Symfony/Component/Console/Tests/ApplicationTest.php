@@ -89,6 +89,7 @@ class ApplicationTest extends TestCase
 
             // We reset all signals to their default value to avoid side effects
             pcntl_signal(\SIGINT, \SIG_DFL);
+            pcntl_signal(\SIGQUIT, \SIG_DFL);
             pcntl_signal(\SIGTERM, \SIG_DFL);
             pcntl_signal(\SIGUSR1, \SIG_DFL);
             pcntl_signal(\SIGUSR2, \SIG_DFL);
@@ -2554,13 +2555,55 @@ class ApplicationTest extends TestCase
         $this->assertSame(51, $tester->run(['signal']));
         $expected = <<<EOTXT
             Still processing...
-            ["handling event",2,0]
+            ["handling event",2,130]
             ["exit code",2,125]
             Wrapping up, wait a sec...
 
             EOTXT;
         $this->assertSame($expected, $tester->getDisplay(true));
         $this->assertTrue($terminateEventDispatched);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[DataProvider('provideSignalExitCodes')]
+    public function testSignalableCommandReceivesTheExitCodeOfTheSignal(string $signalName)
+    {
+        $signal = \constant($signalName);
+
+        foreach ([new EventDispatcher(), null] as $dispatcher) {
+            $command = new SignalExitCodeCommand($signal);
+
+            $application = new Application();
+            $application->setAutoExit(false);
+            if ($dispatcher) {
+                $application->setDispatcher($dispatcher);
+            }
+            $application->addCommand($command);
+            $application->run(new ArrayInput(['signal']));
+
+            $this->assertSame(128 + $signal, $command->previousExitCode);
+        }
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[DataProvider('provideSignalExitCodes')]
+    public function testSignalExitsWithTheExitCodeOfTheSignal(string $signalName)
+    {
+        $process = new Process([\PHP_BINARY, __DIR__.'/Fixtures/application_signal_exit_code.php', $signalName]);
+        $process->run();
+
+        $this->assertSame(128 + \constant($signalName), $process->getExitCode(), $process->getErrorOutput());
+        $this->assertStringNotContainsString('should not be displayed', $process->getOutput());
+    }
+
+    public static function provideSignalExitCodes(): iterable
+    {
+        yield 'SIGINT' => ['SIGINT'];
+        yield 'SIGQUIT' => ['SIGQUIT'];
+        yield 'SIGTERM' => ['SIGTERM'];
+        yield 'SIGUSR1' => ['SIGUSR1'];
+        yield 'SIGUSR2' => ['SIGUSR2'];
+        yield 'SIGALRM' => ['SIGALRM'];
     }
 
     #[Group('tty')]
@@ -3259,6 +3302,31 @@ class TerminatableCommand extends BaseSignableCommand
     {
         $this->signaled = true;
         $this->signalHandlers[] = __CLASS__;
+
+        return false;
+    }
+}
+
+#[AsCommand(name: 'signal')]
+class SignalExitCodeCommand extends BaseSignableCommand
+{
+    public int|false|null $previousExitCode = null;
+
+    public function __construct(
+        private int $subscribedSignal,
+    ) {
+        parent::__construct(true, $subscribedSignal);
+    }
+
+    public function getSubscribedSignals(): array
+    {
+        return [$this->subscribedSignal];
+    }
+
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    {
+        $this->signaled = true;
+        $this->previousExitCode = $previousExitCode;
 
         return false;
     }

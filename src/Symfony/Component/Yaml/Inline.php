@@ -521,6 +521,10 @@ class Inline
                 if ('!php/const' === $key || '!php/enum' === $key) {
                     $key .= ' '.self::parseScalar($mapping, $flags, ['(?<!:):(?!:)'], $i, false);
                     $key = self::evaluateScalar($state, $key, $flags);
+
+                    if (!\is_string($key) && !\is_int($key)) {
+                        throw new ParseException((is_numeric($key) ? 'Numeric' : 'Non-string').' keys are not supported. Quote your evaluable mapping keys instead.', self::$parsedLineNumber + 1, $mapping);
+                    }
                 }
 
                 if (self::$objectForMap && \is_string($key) && str_starts_with($key, "\0")) {

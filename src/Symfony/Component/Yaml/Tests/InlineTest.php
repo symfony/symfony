@@ -795,6 +795,14 @@ class InlineTest extends TestCase
         $this->assertSame(FooBackedEnum::BAR->value, Inline::parse("!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooBackedEnum::BAR->value", Yaml::PARSE_CONSTANT));
     }
 
+    public function testParseEnumAsMappingKeyThrowsException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Non-string keys are not supported. Quote your evaluable mapping keys instead');
+
+        Inline::parse("{!php/const Symfony\Component\Yaml\Tests\Fixtures\FooBackedEnum::BAR: 1}", Yaml::PARSE_CONSTANT);
+    }
+
     public static function getDateTimeDumpTests()
     {
         $tests = [];

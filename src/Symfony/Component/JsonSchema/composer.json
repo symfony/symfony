@@ -23,6 +23,9 @@
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^5.2|^6.0",
         "phpstan/phpdoc-parser": "^1.30|^2.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.2",
+        "symfony/filesystem": "^7.4|^8.0",
         "symfony/property-access": "^7.4|^8.0",
         "symfony/serializer": "^7.4|^8.0",
         "symfony/translation-contracts": "^2.5|^3",

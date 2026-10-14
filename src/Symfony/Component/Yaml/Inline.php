@@ -420,7 +420,9 @@ class Inline
                         $value = self::parseMapping($state, $sequence, $flags, $i, $references);
                         break;
                     default:
-                        $value = self::parseScalar($sequence, $flags, [',', ']'], $i, null === $tag, $references, $isQuoted, $state);
+                        // a !php/const or !php/enum key of an embedded mapping is evaluated by parseMapping()
+                        $evaluate = null === $tag && !Parser::preg_match('/!php\/(?:const|enum) [^ ,\]]+?(?<!:): +[^ ,\]]/A', substr($sequence, $i));
+                        $value = self::parseScalar($sequence, $flags, [',', ']'], $i, $evaluate, $references, $isQuoted, $state);
 
                         // the value can be an array if a reference has been resolved to an array var
                         if (\is_string($value) && !$isQuoted && str_contains($value, ': ')) {

@@ -803,6 +803,11 @@ class InlineTest extends TestCase
         Inline::parse("{!php/const Symfony\Component\Yaml\Tests\Fixtures\FooBackedEnum::BAR: 1}", Yaml::PARSE_CONSTANT);
     }
 
+    public function testParsePhpConstantAndEnumAsMappingKeysInSequence()
+    {
+        $this->assertSame([[\PHP_INT_MAX => 'foo'], ['bar' => 'baz']], Inline::parse("[!php/const PHP_INT_MAX: foo, !php/enum Symfony\Component\Yaml\Tests\Fixtures\FooBackedEnum::BAR->value: baz]", Yaml::PARSE_CONSTANT));
+    }
+
     public static function getDateTimeDumpTests()
     {
         $tests = [];

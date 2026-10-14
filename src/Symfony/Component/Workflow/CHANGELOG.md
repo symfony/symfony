@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `supports`, `support_strategy` and `source_class` attributes to the `workflow` service tag
  * Add the `#[AsWorkflow]`, `#[Place]` and `#[Transition]` attributes and the `WorkflowTrait` to define workflows and state machines in a class; these attributes have a `description` argument stored in their metadata, and can be extended to carry typed metadata
  * Make the `As*Listener` attributes listen to the workflow of their class by default when it uses `#[AsWorkflow]`
  * Add the `WorkflowType` enum

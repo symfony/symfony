@@ -55,6 +55,14 @@ class Connection
         'cluster' => false, // force use of cluster
     ];
 
+    private const CLAIM_DELAYED_MESSAGE_SCRIPT = <<<'LUA'
+        local message = redis.call('ZRANGEBYSCORE', KEYS[1], '-inf', ARGV[1], 'WITHSCORES', 'LIMIT', 0, 1)
+        if message[1] then
+            redis.call('ZADD', KEYS[1], 'XX', ARGV[2], message[1])
+        end
+        return message
+        LUA;
+
     private \Redis|Relay|\RedisCluster|null $redis = null;
     private \Closure $redisInitializer;
     private string $stream;
@@ -442,7 +450,10 @@ class Connection
             $this->setup();
         }
 
-        $this->handleDelayedMessages();
+        try {
+            $this->handleDelayedMessages();
+        } catch (TransportException $delayedMessagesFailure) {
+        }
 
         $messages = [];
 
@@ -462,36 +473,40 @@ class Connection
             $messages = [...$messages, ...$this->getNewMessages($fetchSize - \count($messages))];
         }
 
-        return $messages ?: null;
+        return $messages ?: (isset($delayedMessagesFailure) ? throw $delayedMessagesFailure : null);
     }
 
     private function handleDelayedMessages(): void
     {
         $now = microtime();
-        $now = substr($now, 11).substr($now, 2, 3);
+        $milliseconds = substr($now, 2, 3);
+        $seconds = (int) substr($now, 11);
+        $now = $seconds.$milliseconds;
+        $claimExpiry = ($seconds + intdiv(max($this->redeliverTimeout, 1000), 1000)).$milliseconds;
 
         $queuedMessageCount = $this->rawCommand('ZCOUNT', 0, $now) ?? 0;
 
         while ($queuedMessageCount--) {
-            if (!$message = $this->rawCommand('ZPOPMIN', 1)) {
+            if (!$message = $this->rawCommand('EVAL', self::CLAIM_DELAYED_MESSAGE_SCRIPT, $now, $claimExpiry)) {
                 break;
             }
 
             [$queuedMessage, $expiry] = $message;
 
-            if (\strlen($expiry) === \strlen($now) ? $expiry > $now : \strlen($expiry) < \strlen($now)) {
-                // if a future-placed message is popped because of a race condition with
-                // another running consumer, the message is re-added to the queue
+            $decodedQueuedMessage = json_decode($queuedMessage, true);
 
-                if (!$this->rawCommand('ZADD', 'NX', $expiry, $queuedMessage)) {
-                    throw new TransportException('Could not add a message to the redis stream.');
+            try {
+                $this->add(\is_array($decodedQueuedMessage) && \array_key_exists('body', $decodedQueuedMessage) ? $decodedQueuedMessage['body'] : $queuedMessage, $decodedQueuedMessage['headers'] ?? [], 0);
+            } catch (\Throwable $e) {
+                try {
+                    $this->rawCommand('ZADD', 'XX', $expiry, $queuedMessage);
+                } catch (TransportException) {
                 }
 
-                break;
+                throw $e;
             }
 
-            $decodedQueuedMessage = json_decode($queuedMessage, true);
-            $this->add(\array_key_exists('body', $decodedQueuedMessage) ? $decodedQueuedMessage['body'] : $queuedMessage, $decodedQueuedMessage['headers'] ?? [], 0);
+            $this->rawCommand('ZREM', $queuedMessage);
         }
     }
 
@@ -816,12 +831,13 @@ class Connection
     private function rawCommand(string $command, ...$arguments): mixed
     {
         $redis = $this->getRedis();
+        $arguments = 'EVAL' === $command ? [array_shift($arguments), 1, $this->queue, ...$arguments] : [$this->queue, ...$arguments];
 
         try {
             if ($redis instanceof \RedisCluster) {
-                $result = $redis->rawCommand($this->queue, $command, $this->queue, ...$arguments);
+                $result = $redis->rawCommand($this->queue, $command, ...$arguments);
             } else {
-                $result = $redis->rawCommand($command, $this->queue, ...$arguments);
+                $result = $redis->rawCommand($command, ...$arguments);
             }
         } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);

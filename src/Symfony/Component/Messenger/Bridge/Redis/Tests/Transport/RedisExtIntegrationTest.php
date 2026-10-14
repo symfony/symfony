@@ -144,6 +144,135 @@ class RedisExtIntegrationTest extends TestCase
         ], $message[0]['data']);
     }
 
+    public function testDelayedMessageIsNotLostWhenAddingItToTheStreamFails()
+    {
+        $body = '{"message": "Hi"}';
+        $headers = ['type' => DummyMessage::class];
+        $stream = $this->getConnectionStream($this->connection);
+
+        $this->connection->add($body, $headers, 500);
+        sleep(2);
+
+        // make XADD fail by exhausting the stream IDs, reading the stream still works
+        $this->redis->rawCommand('XSETID', $stream, '18446744073709551615-18446744073709551615');
+
+        try {
+            $this->connection->get();
+            $this->fail('Adding the message to the stream should have failed.');
+        } catch (TransportException) {
+        }
+
+        $this->redis->del($stream);
+        $this->connection->setup();
+
+        $message = $this->connection->get();
+        $this->assertNotNull($message, 'The delayed message has been lost.');
+        $this->assertSame(['message' => json_encode(['body' => $body, 'headers' => $headers])], $message[0]['data']);
+    }
+
+    public function testStreamIsConsumedWhenAddingDelayedMessagesToItFails()
+    {
+        $body = '{"message": "Hi"}';
+        $delayedBody = '{"message": "Delayed"}';
+        $headers = ['type' => DummyMessage::class];
+        $stream = $this->getConnectionStream($this->connection);
+
+        $this->connection->add($delayedBody, $headers, 500);
+        $this->connection->add($body, $headers);
+        sleep(2);
+
+        $this->redis->rawCommand('XSETID', $stream, '18446744073709551615-18446744073709551615');
+
+        $message = $this->connection->get();
+        $this->assertNotNull($message, 'The message already in the stream should have been consumed.');
+        $this->assertSame(['message' => json_encode(['body' => $body, 'headers' => $headers])], $message[0]['data']);
+
+        try {
+            $this->connection->get();
+            $this->fail('Adding the delayed message to the stream should have failed.');
+        } catch (TransportException) {
+        }
+
+        $this->assertSame(1, $this->redis->zCard($stream.'__queue'), 'The delayed message should still be in the sorted set.');
+
+        $this->redis->del($stream);
+        $this->connection->setup();
+
+        $message = $this->connection->get();
+        $this->assertNotNull($message, 'The delayed message has been lost.');
+        $this->assertSame(['message' => json_encode(['body' => $delayedBody, 'headers' => $headers])], $message[0]['data']);
+    }
+
+    public function testAbandonedDelayedMessageIsRetriedAfterRedeliverTimeout()
+    {
+        $body = '{"message": "Hi"}';
+        $headers = ['type' => DummyMessage::class];
+
+        $this->connection->add($body, $headers, 500);
+        sleep(2);
+
+        $redis = $this->getMockBuilder($this->redis::class)->onlyMethods(['xadd', 'rawCommand'])->getMock();
+        $connectionLost = false;
+        $redis->expects($this->once())->method('xadd')->willReturnCallback(static function () use (&$connectionLost) {
+            $connectionLost = true;
+
+            throw new \RedisException('Connection lost');
+        });
+        $redis->method('rawCommand')->willReturnCallback(function (...$args) use (&$connectionLost) {
+            if ($connectionLost) {
+                throw new \RedisException('Connection lost');
+            }
+
+            return $this->redis->rawCommand(...$args);
+        });
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['redeliver_timeout' => 1], $redis);
+
+        try {
+            $connection->get();
+            $this->fail('Adding the message to the stream should have failed.');
+        } catch (TransportException) {
+        }
+
+        $this->assertNull($this->connection->get(), 'The message should not be available before redeliver_timeout.');
+
+        sleep(2);
+
+        $message = $this->connection->get();
+        $this->assertNotNull($message, 'The delayed message has been lost.');
+        $this->assertSame(['message' => json_encode(['body' => $body, 'headers' => $headers])], $message[0]['data']);
+    }
+
+    public function testDelayedMessageIsNotMovedTwiceWithZeroRedeliverTimeout()
+    {
+        $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class], 500);
+        sleep(2);
+
+        $redis = $this->getMockBuilder($this->redis::class)->onlyMethods(['xadd'])->getMock();
+        $redis->expects($this->once())->method('xadd')->willReturnCallback(function ($key, $id, $values) {
+            $this->connection->get();
+
+            return $this->redis->xadd($key, $id, $values);
+        });
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), ['redeliver_timeout' => 0], $redis);
+
+        $connection->get();
+
+        $this->assertSame(1, $this->redis->xLen($this->getConnectionStream($this->connection)));
+    }
+
+    public function testMalformedDelayedMessageDoesNotBlockTheTransport()
+    {
+        $headers = ['type' => DummyMessage::class];
+        $this->connection->add('{"message": "Hi"}', $headers);
+        $this->redis->rawCommand('ZADD', $this->getConnectionStream($this->connection).'__queue', (string) (int) (microtime(true) * 1000), 'not json');
+
+        $message = $this->connection->get();
+        $this->assertSame(['message' => json_encode(['body' => '{"message": "Hi"}', 'headers' => $headers])], $message[0]['data']);
+
+        $message = $this->connection->get();
+        $this->assertSame(['message' => json_encode(['body' => 'not json', 'headers' => []])], $message[0]['data']);
+    }
+
     public function testConnectionBelowRedeliverTimeout()
     {
         // lower redeliver timeout and claim interval
@@ -303,6 +432,30 @@ class RedisExtIntegrationTest extends TestCase
         ], $message[0]['data']);
         $connection->reject($message[0]['id']);
         $connection->cleanup();
+    }
+
+    public function testDelayedMessageWithCluster()
+    {
+        $this->skipIfRedisClusterUnavailable();
+
+        $connection = new Connection(['host' => explode(' ', getenv('REDIS_CLUSTER_HOSTS'))]);
+        $connection->cleanup();
+
+        try {
+            $connection->add('1', [], 500);
+            $this->assertNull($connection->get());
+            sleep(2);
+            $this->assertNotEmpty($message = $connection->get());
+            $this->assertSame([
+                'message' => json_encode([
+                    'body' => '1',
+                    'headers' => [],
+                ]),
+            ], $message[0]['data']);
+            $connection->ack($message[0]['id']);
+        } finally {
+            $connection->cleanup();
+        }
     }
 
     public function testLazy()

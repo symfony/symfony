@@ -22,6 +22,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class NoPrivateNetworkHttpClientTest extends TestCase
 {
@@ -244,6 +245,18 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $this->assertSame('kept', $headers['x-custom']);
         $this->assertArrayNotHasKey('authorization', $headers);
         $this->assertArrayNotHasKey('cookie', $headers);
+    }
+
+    public function testRedirectDoesNotRepeatTheQueryOption()
+    {
+        TestHttpServer::start();
+        $client = new NoPrivateNetworkHttpClient(new NativeHttpClient(), '10.0.0.0/8');
+
+        $response = $client->request('GET', 'http://localhost:8057/302', [
+            'query' => ['location' => 'http://127.0.0.1:8057/', 'foo' => 'bar'],
+        ]);
+
+        $this->assertSame('/', $response->toArray()['REQUEST_URI']);
     }
 
     public function testHeadersArePassedOnRedirect()

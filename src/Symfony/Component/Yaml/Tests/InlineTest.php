@@ -988,6 +988,13 @@ class InlineTest extends TestCase
         Inline::parse("{abc: 'def'");
     }
 
+    public function testQuotedScalarFollowedByUnexpectedCharactersInSequence()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unexpected characters ( b]) at line 1 (near "[\'a\' b]").');
+        Inline::parse("['a' b]");
+    }
+
     #[DataProvider('getTestsForOctalNumbers')]
     public function testParseOctalNumbers($expected, $yaml)
     {

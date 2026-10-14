@@ -3274,6 +3274,28 @@ class ParserTest extends TestCase
         $this->parser->parse("<<:\n  - !foo bar\n", Yaml::PARSE_CUSTOM_TAGS);
     }
 
+    public function testParseMergeKeyWithSequenceStartingWithNullThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Merge items must be arrays');
+
+        $this->parser->parse("<<:\n  - ~\n  - {a: b}\n");
+    }
+
+    public function testParseMergeKeyWithFlowSequenceStartingWithNullThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Merge items must be arrays');
+
+        $this->parser->parse("<<: [~, {a: b}]\n");
+    }
+
+    public function testParseMergeKeyWithMappingThatHasZeroAsKey()
+    {
+        $this->assertSame([0 => 'a', 'b' => 'c'], $this->parser->parse("<<: {0: a}\nb: c\n"));
+        $this->assertSame([0 => ['a' => 'b']], $this->parser->parse("<<:\n  0: {a: b}\n"));
+    }
+
     public function testParseReferencesOnMergeKeysWithMappingsParsedAsObjects()
     {
         $yaml = <<<YAML

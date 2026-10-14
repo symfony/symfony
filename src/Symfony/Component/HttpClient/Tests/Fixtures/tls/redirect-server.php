@@ -9,8 +9,8 @@
  * file that was distributed with this source code.
  */
 
-// Serves both TLS and plain HTTP on one port: TLS requests are redirected to the
-// plain URL of the same host and port, plain requests echo their headers as JSON.
+// Serves both TLS and plain HTTP on one port.
+// TLS requests to "/" are redirected to the plain URL of the same host and port, plain requests to "/upgrade" are redirected to the TLS URL "/echo", other requests echo their headers as JSON.
 
 $port = (int) ($argv[1] ?? 8059);
 $context = stream_context_create(['ssl' => ['local_cert' => __DIR__.'/server.crt', 'local_pk' => __DIR__.'/server.key']]);
@@ -28,6 +28,7 @@ while (true) {
         continue;
     }
 
+    $path = explode(' ', (string) fgets($conn))[1] ?? '/';
     $headers = [];
     while (false !== ($line = fgets($conn)) && '' !== ($line = trim($line))) {
         if (false !== $i = strpos($line, ':')) {
@@ -35,8 +36,14 @@ while (true) {
         }
     }
 
-    if ($tls) {
+    if (0 < $length = (int) ($headers['content-length'] ?? 0)) {
+        stream_get_contents($conn, $length);
+    }
+
+    if ($tls && '/' === $path) {
         fwrite($conn, "HTTP/1.1 301 Moved Permanently\r\nLocation: http://127.0.0.1:$port/\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
+    } elseif (!$tls && '/upgrade' === $path) {
+        fwrite($conn, "HTTP/1.1 301 Moved Permanently\r\nLocation: https://127.0.0.1:$port/echo\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
     } else {
         $body = json_encode($headers);
         fwrite($conn, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: ".strlen($body)."\r\nConnection: close\r\n\r\n".$body);

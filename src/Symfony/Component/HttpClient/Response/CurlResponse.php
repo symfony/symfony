@@ -451,10 +451,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $info['redirect_url'] = null;
 
         if (300 <= $statusCode && $statusCode < 400 && null !== $location && null !== $options) {
-            if ($noContent = 303 === $statusCode || ('POST' === $info['http_method'] && \in_array($statusCode, [301, 302], true))) {
-                $info['http_method'] = 'HEAD' === $info['http_method'] ? 'HEAD' : 'GET';
-                curl_setopt($ch, \CURLOPT_CUSTOMREQUEST, $info['http_method']);
-            }
+            $noContent = 303 === $statusCode || ('POST' === $info['http_method'] && \in_array($statusCode, [301, 302], true));
 
             try {
                 $info['redirect_url'] = $resolveRedirect($ch, $location, $noContent);
@@ -466,10 +463,13 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 return 0;
             }
 
-            if (null === $info['redirect_url']) {
+            if (null === $info['redirect_url'] || (str_starts_with($info['redirect_url'], 'http:') && str_starts_with(curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL), 'https:'))) {
                 $options['max_redirects'] = curl_getinfo($ch, \CURLINFO_REDIRECT_COUNT);
                 curl_setopt($ch, \CURLOPT_FOLLOWLOCATION, false);
                 curl_setopt($ch, \CURLOPT_MAXREDIRS, $options['max_redirects']);
+            } elseif ($noContent) {
+                $info['http_method'] = 'HEAD' === $info['http_method'] ? 'HEAD' : 'GET';
+                curl_setopt($ch, \CURLOPT_CUSTOMREQUEST, $info['http_method']);
             }
         }
 

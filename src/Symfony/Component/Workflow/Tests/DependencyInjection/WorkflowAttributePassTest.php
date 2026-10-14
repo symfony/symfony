@@ -57,6 +57,10 @@ class WorkflowAttributePassTest extends TestCase
         $this->assertSame([['name' => 'task']], $workflow->getTag('workflow.state_machine'));
         $this->assertSame('task', $workflow->getTag('workflow')[0]['name']);
         $this->assertSame(['title' => 'Task'], $workflow->getTag('workflow')[0]['metadata']);
+        $this->assertSame([Task::class], $workflow->getTag('workflow')[0]['supports']);
+        $this->assertArrayHasKey('support_strategy', $workflow->getTag('workflow')[0]);
+        $this->assertNull($workflow->getTag('workflow')[0]['support_strategy']);
+        $this->assertSame(TaskWorkflow::class, $workflow->getTag('workflow')[0]['source_class']);
         $markingStore = $workflow->getArgument('index_1');
         $this->assertInstanceOf(ChildDefinition::class, $markingStore);
         $this->assertSame('workflow.marking_store.method', $markingStore->getParent());

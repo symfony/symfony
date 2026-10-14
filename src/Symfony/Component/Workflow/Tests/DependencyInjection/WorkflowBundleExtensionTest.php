@@ -38,6 +38,7 @@ use Symfony\Component\Workflow\EventListener\GuardListener;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
+use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
 use Symfony\Component\Workflow\Tests\Fixtures\DefinitionValidator;
 use Symfony\Component\Workflow\Tests\Subject;
 use Symfony\Component\Workflow\Transition;
@@ -71,6 +72,11 @@ class WorkflowBundleExtensionTest extends TestCase
         $this->assertArrayHasKey('workflow.workflow', $tags);
         $this->assertSame([['name' => 'article']], $tags['workflow.workflow']);
         $this->assertSame('article', $tags['workflow'][0]['name'] ?? null);
+        $this->assertSame([self::class], $tags['workflow'][0]['supports']);
+        $this->assertArrayHasKey('support_strategy', $tags['workflow'][0]);
+        $this->assertNull($tags['workflow'][0]['support_strategy']);
+        $this->assertArrayHasKey('source_class', $tags['workflow'][0]);
+        $this->assertNull($tags['workflow'][0]['source_class']);
         $this->assertSame([
             'title' => 'article workflow',
             'description' => 'workflow for articles',
@@ -256,6 +262,25 @@ class WorkflowBundleExtensionTest extends TestCase
         $argumentsB = $container->getDefinition('state_machine.workflow_b')->getArguments();
         $this->assertArrayHasKey('index_1', $argumentsB, 'workflow_b has a marking_store argument');
         $this->assertNull($argumentsB['index_1'], 'workflow_b marking_store argument is null');
+    }
+
+    public function testSupportStrategyIsExposedOnTheTag()
+    {
+        $container = $this->createContainer();
+        $container->register('article_support', InstanceOfSupportStrategy::class)->setArguments([\stdClass::class]);
+        $container->loadFromExtension('workflow', [
+            'article' => [
+                'type' => 'workflow',
+                'support_strategy' => 'article_support',
+                'places' => ['draft', 'published'],
+                'transitions' => ['publish' => ['from' => 'draft', 'to' => 'published']],
+            ],
+        ]);
+        $container->compile();
+
+        $tag = $container->getDefinition('workflow.article')->getTag('workflow')[0];
+        $this->assertSame([], $tag['supports']);
+        $this->assertSame('article_support', $tag['support_strategy']);
     }
 
     public function testWorkflowCannotHaveBothSupportsAndSupportStrategy()

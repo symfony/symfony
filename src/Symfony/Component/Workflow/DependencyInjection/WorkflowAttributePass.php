@@ -78,7 +78,7 @@ final class WorkflowAttributePass implements CompilerPassInterface
                 throw new LogicException(\sprintf('The workflow "%s" defined by "%s" is already defined by the "%s" service.', $name, $class, $workflowIds[$name]));
             }
             $workflowIds[$name] = $id;
-            $workflowId = $registrar->register($container, $name, $workflows[$name]);
+            $workflowId = $registrar->register($container, $name, $workflows[$name], $class);
 
             if (self::usesWorkflowTrait($reflection)) {
                 $definition->addMethodCall('setWorkflow', [new Reference($workflowId)]);

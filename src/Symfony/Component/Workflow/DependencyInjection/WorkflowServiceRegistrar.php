@@ -45,7 +45,7 @@ final class WorkflowServiceRegistrar
      *
      * @return string The id of the workflow service
      */
-    public function register(ContainerBuilder $container, string $name, array $workflow): string
+    public function register(ContainerBuilder $container, string $name, array $workflow, ?string $sourceClass = null): string
     {
         $registryDefinition = $container->getDefinition('workflow.registry');
 
@@ -153,6 +153,9 @@ final class WorkflowServiceRegistrar
 
         $workflowDefinition->addTag('workflow', [
             'name' => $name,
+            'supports' => $workflow['supports'],
+            'support_strategy' => $workflow['support_strategy'] ?? null,
+            'source_class' => $sourceClass,
             'metadata' => $workflow['metadata'],
             'definition_validators' => $workflow['definition_validators'],
             'definition_id' => $definitionDefinitionId,

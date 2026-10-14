@@ -126,6 +126,10 @@ trait HttpClientTrait
             throw new InvalidArgumentException('Option "crypto_method" must be one of "STREAM_CRYPTO_METHOD_TLSv1_*_CLIENT".');
         }
 
+        if (-1 === ($options['max_redirects'] ?? null)) {
+            trigger_deprecation('symfony/http-client', '8.2', 'Passing -1 to the "max_redirects" option is deprecated, pass 0 to not follow redirects.');
+        }
+
         // Validate on_progress
         if (isset($options['on_progress']) && !\is_callable($onProgress = $options['on_progress'])) {
             throw new InvalidArgumentException(\sprintf('Option "on_progress" must be callable, "%s" given.', get_debug_type($onProgress)));

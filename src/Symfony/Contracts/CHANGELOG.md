@@ -7,6 +7,7 @@ CHANGELOG
  * Add a `$priority` argument to the `Required` attribute to control the order in which required methods are called
  * Add support for the `trailers` info in `ResponseInterface`
  * Add `ItemInterface::METADATA_SAVE_FAILED` to report in the `$metadata` argument of `CacheInterface::get()` that the computed value could not be saved
+ * Add support for negative values of the `max_redirects` option in `HttpClientInterface`, to follow only the redirects that stay on the same origin
 
 3.7
 ---

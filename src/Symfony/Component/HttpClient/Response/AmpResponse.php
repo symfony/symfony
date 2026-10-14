@@ -284,7 +284,11 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
         $originRequest->setBody(new AmpBody($options['body'], $info, $onProgress));
         $response = $multi->request($options, $originRequest, $canceller, $info, $onProgress, $handle);
-        $previousUrl = null;
+        $previousUrl = $originUrl = null;
+
+        if ($sameOrigin = 0 > $maxRedirects = $options['max_redirects']) {
+            $maxRedirects = ~$maxRedirects;
+        }
 
         while (true) {
             self::addResponseHeaders($response, $info, $headers);
@@ -303,6 +307,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
             try {
                 $previousUrl ??= $urlResolver::parseUrl($info['url']);
+                $originUrl ??= $previousUrl;
                 $location = $urlResolver::parseUrl($location);
                 $location = $urlResolver::resolveUrl($location, $previousUrl);
                 $info['redirect_url'] = implode('', $location);
@@ -310,7 +315,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 return $response;
             }
 
-            if (0 >= $options['max_redirects'] || $info['redirect_count'] >= $options['max_redirects'] || ('http:' === $location['scheme'] && 'https:' === $previousUrl['scheme'])) {
+            if (0 >= $maxRedirects || $info['redirect_count'] >= $maxRedirects || ('http:' === $location['scheme'] && 'https:' === $previousUrl['scheme']) || ($sameOrigin && ($originUrl['scheme'] !== $location['scheme'] || $originUrl['authority'] !== $location['authority']))) {
                 return $response;
             }
 

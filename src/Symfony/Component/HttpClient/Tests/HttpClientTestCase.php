@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bridge\PhpUnit\DnsMock;
@@ -221,6 +222,67 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame('kept', $headers['x-custom']);
         $this->assertArrayNotHasKey('authorization', $headers);
         $this->assertArrayNotHasKey('cookie', $headers);
+    }
+
+    public function testNegativeMaxRedirectsFollowsSameOriginRedirects()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://localhost:8057/302', [
+            'query' => ['location' => '/302/relative'],
+            'max_redirects' => ~2,
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
+        $this->assertSame(2, $response->getInfo('redirect_count'));
+
+        $response = $client->request('GET', 'http://localhost:8057/302', [
+            'query' => ['location' => '/302/relative'],
+            'max_redirects' => ~1,
+        ]);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('http://localhost:8057/302/relative', $response->getInfo('url'));
+        $this->assertSame('http://localhost:8057/', $response->getInfo('redirect_url'));
+        $this->assertSame(1, $response->getInfo('redirect_count'));
+    }
+
+    public function testNegativeMaxRedirectsDoesNotFollowCrossOriginRedirects()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://localhost:8057/302', [
+            'query' => ['location' => 'http://127.0.0.1:8057/'],
+            'max_redirects' => ~2,
+        ]);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('http://127.0.0.1:8057/', $response->getInfo('redirect_url'));
+        $this->assertSame(0, $response->getInfo('redirect_count'));
+
+        $response = $client->request('GET', 'http://localhost:8057/302', [
+            'query' => ['location' => 'http://localhost:8058/'],
+            'max_redirects' => ~2,
+        ]);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('http://localhost:8058/', $response->getInfo('redirect_url'));
+        $this->assertSame(0, $response->getInfo('redirect_count'));
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testMinusOneMaxRedirectsIsDeprecated()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $this->expectUserDeprecationMessage('Since symfony/http-client 8.2: Passing -1 to the "max_redirects" option is deprecated, pass 0 to not follow redirects.');
+
+        $response = $client->request('GET', 'http://localhost:8057/302/relative', ['max_redirects' => -1]);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame(0, $response->getInfo('redirect_count'));
     }
 
     public function testAcceptHeader()

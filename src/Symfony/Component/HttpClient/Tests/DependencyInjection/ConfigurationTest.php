@@ -94,6 +94,17 @@ class ConfigurationTest extends TestCase
         $this->process(['default_options' => ['retry_failed' => ['enabled' => false, 'base_uris' => ['http://example.com']]]]);
     }
 
+    public function testMaxRedirectsAcceptsTheSameOriginNotation()
+    {
+        $config = $this->process([
+            'default_options' => ['max_redirects' => '~3'],
+            'scoped_clients' => ['foo' => ['base_uri' => 'http://example.com', 'max_redirects' => '~5']],
+        ]);
+
+        $this->assertSame(~3, $config['default_options']['max_redirects']);
+        $this->assertSame(~5, $config['scoped_clients']['foo']['max_redirects']);
+    }
+
     private function process(mixed ...$configs): array
     {
         return new Processor()->processConfiguration(new Configuration(new HttpClientBundle(), null, 'http_client'), $configs);

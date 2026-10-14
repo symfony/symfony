@@ -92,6 +92,11 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
+
+        if ($sameOrigin = 0 > $options['max_redirects']) {
+            $options['max_redirects'] = ~$options['max_redirects'];
+        }
+
         $scheme = $url['scheme'];
         $authority = $url['authority'];
         $host = parse_url($authority, \PHP_URL_HOST);
@@ -341,7 +346,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $scheme, $authority, $noProxy), CurlClientState::$curlVersion['version_number'], $url, $ntlmOriginKey);
+        return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $scheme, $authority, $noProxy, $sameOrigin), CurlClientState::$curlVersion['version_number'], $url, $ntlmOriginKey);
     }
 
     public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
@@ -422,7 +427,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
      *
      * Work around CVE-2018-1000007: Authorization and Cookie headers should not follow redirects - fixed in Curl 7.64
      */
-    private static function createRedirectResolver(array $options, string $scheme, string $authority, string $noProxy): \Closure
+    private static function createRedirectResolver(array $options, string $scheme, string $authority, string $noProxy, bool $sameOrigin): \Closure
     {
         $redirectHeaders = [];
         if (0 < $options['max_redirects']) {
@@ -435,7 +440,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return static function ($ch, string $location, bool $noContent) use (&$redirectHeaders, $options, $noProxy) {
+        return static function ($ch, string $location, bool $noContent, ?bool &$follow = null) use (&$redirectHeaders, $options, $scheme, $authority, $noProxy, $sameOrigin) {
             try {
                 $location = self::parseUrl($location);
                 $url = self::parseUrl(curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL));
@@ -443,6 +448,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             } catch (InvalidArgumentException) {
                 return null;
             }
+
+            $follow = !$sameOrigin || ($scheme === $url['scheme'] && $authority === $url['authority']);
 
             if ($noContent && $redirectHeaders) {
                 $filterContentHeaders = static fn ($h) => 0 !== stripos($h, 'Content-Length:') && 0 !== stripos($h, 'Content-Type:') && 0 !== stripos($h, 'Transfer-Encoding:');

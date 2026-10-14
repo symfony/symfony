@@ -731,6 +731,16 @@ class GuzzleHttpHandlerTest extends TestCase
     }
 
     #[RequiresPhpExtension('curl')]
+    public function testNegativeCurlOptMaxRedirsIsIgnored()
+    {
+        [$handler, $spy] = $this->makeHandler();
+
+        $handler(new Request('GET', 'https://example.com/'), ['allow_redirects' => ['max' => 3], 'curl' => [\CURLOPT_MAXREDIRS => -1]])->wait();
+
+        $this->assertSame(3, $spy->options['max_redirects']);
+    }
+
+    #[RequiresPhpExtension('curl')]
     public function testCurlOptSslCipherListIsMapped()
     {
         [$handler, $spy] = $this->makeHandler();

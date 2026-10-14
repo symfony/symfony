@@ -676,6 +676,11 @@ final class GuzzleHttpHandler
                 continue;
             }
 
+            // curl reads -1 as "no limit" and Symfony as "no redirects", so 'allow_redirects' decides instead
+            if (\CURLOPT_MAXREDIRS === $opt && 0 > $value) {
+                continue;
+            }
+
             match ($opt) {
                 \CURLOPT_CAINFO => $options['cafile'] = $value,
                 \CURLOPT_CAPATH => $options['capath'] = $value,

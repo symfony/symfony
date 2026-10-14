@@ -28,13 +28,13 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
  *     `transit/datakey/plaintext`);
  *   - generate the DEK locally with `random_bytes()` and round-trip it through
  *     the KMS using `wrapKey/unwrapKey` (Azure Key Vault, GCP Cloud KMS) or
- *     plain `encrypt` (this is what {@see Local\SodiumKms} and {@see Bridge\Kmip\KmipKms} do);
+ *     plain `encrypt` (this is what {@see Local\SodiumKms}, {@see Bridge\Kmip\KmipKms} and {@see Bridge\Scaleway\ScalewayKms} do);
  *   - decline support and not implement this interface, in which case callers
  *     detect the capability with `instanceof`.
  *
  * Supported `$length` values vary by bridge.
  * HashiCorp Vault Transit accepts only 16, 32 or 64 bytes.
- * AWS KMS, Azure Key Vault, Google Cloud KMS, KMIP and the local backends accept lengths of at least 16 bytes, subject to their payload limits.
+ * AWS KMS, Azure Key Vault, Google Cloud KMS, KMIP, Scaleway Key Manager and the local backends accept lengths of at least 16 bytes, subject to their payload limits.
  * The lengths supported by every shipped bridge are `{16, 32, 64}`.
  * {@see EnvelopeEncrypter} sticks to the `SelfContainedFormat` defaults (32 bytes
  * for V1) so users only hit bridge-specific limits when they call

@@ -92,6 +92,7 @@ class Process implements \IteratorAggregate
     private int $incrementalErrorOutputOffset = 0;
     private bool $tty = false;
     private bool $pty;
+    private bool $stdioInherited = false;
     private array $options = ['suppress_errors' => true, 'bypass_shell' => true];
     private array $ignoredSignals = [];
 
@@ -520,11 +521,15 @@ class Process implements \IteratorAggregate
      *                                                            output available on STDOUT or STDERR
      *
      * @throws RuntimeException         When process timed out
-     * @throws LogicException           When process is not yet started
+     * @throws LogicException           When process is not yet started or the standard streams are inherited
      * @throws ProcessTimedOutException In case the timeout was reached
      */
     public function waitUntil(callable $callback): bool
     {
+        if ($this->stdioInherited) {
+            throw new LogicException('The output cannot be read while the standard streams are inherited.');
+        }
+
         $this->requireProcessIsStarted(__FUNCTION__);
 
         $ready = false;
@@ -699,9 +704,14 @@ class Process implements \IteratorAggregate
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
+     * @throws LogicException In case the standard streams are inherited
      */
     public function getIterator(int $flags = 0): \Generator
     {
+        if ($this->stdioInherited) {
+            throw new LogicException('The output cannot be read while the standard streams are inherited.');
+        }
+
         $this->readPipesForOutput(__FUNCTION__, false);
 
         $clearOutput = !(self::ITER_KEEP_OUTPUT & $flags);
@@ -1081,13 +1091,16 @@ class Process implements \IteratorAggregate
      *
      * @return $this
      *
-     * @throws LogicException           if the output is disabled
+     * @throws LogicException           if the output is disabled or the standard streams are inherited
      * @throws InvalidArgumentException if the timeout is negative
      */
     public function setIdleTimeout(?float $timeout): static
     {
         if (null !== $timeout && $this->outputDisabled) {
             throw new LogicException('Idle timeout cannot be set while the output is disabled.');
+        }
+        if (null !== $timeout && $this->stdioInherited) {
+            throw new LogicException('Idle timeout cannot be set while the standard streams are inherited.');
         }
 
         $this->idleTimeout = $this->validateTimeout($timeout);
@@ -1101,11 +1114,16 @@ class Process implements \IteratorAggregate
      * @return $this
      *
      * @throws RuntimeException In case the TTY mode is not supported
+     * @throws LogicException   In case the standard streams are inherited
      */
     public function setTty(bool $tty): static
     {
         if ('\\' === \DIRECTORY_SEPARATOR && $tty) {
             throw new RuntimeException('TTY mode is not supported on Windows platform.');
+        }
+
+        if ($tty && $this->stdioInherited) {
+            throw new LogicException('TTY mode cannot be enabled while the standard streams are inherited.');
         }
 
         if ($tty && !self::isTtySupported()) {
@@ -1143,6 +1161,44 @@ class Process implements \IteratorAggregate
     public function isPty(): bool
     {
         return $this->pty;
+    }
+
+    /**
+     * Makes the process inherit the standard input, output and error of the current process, like a command run from a shell script.
+     *
+     * The output is neither captured nor passed to callbacks, and the process sees the terminal the current process is attached to, if any.
+     * When an input is set, it is written to the standard input of the process instead of inheriting it.
+     *
+     * The process runs in the process group of the current process: signals sent by the terminal (e.g. Ctrl+C) reach both processes.
+     *
+     * @return $this
+     *
+     * @throws RuntimeException In case the process is already running
+     * @throws LogicException   In case the TTY mode is enabled or an idle timeout is set
+     */
+    public function inheritStdio(): static
+    {
+        if ($this->isRunning()) {
+            throw new RuntimeException('Inheriting the standard streams while the process is running is not possible.');
+        }
+        if ($this->tty) {
+            throw new LogicException('The standard streams cannot be inherited while the TTY mode is enabled.');
+        }
+        if (null !== $this->idleTimeout) {
+            throw new LogicException('The standard streams cannot be inherited while an idle timeout is set.');
+        }
+
+        $this->stdioInherited = true;
+
+        return $this;
+    }
+
+    /**
+     * Checks if the process inherits the standard input, output and error of the current process.
+     */
+    public function isStdioInherited(): bool
+    {
+        return $this->stdioInherited;
     }
 
     /**
@@ -1343,9 +1399,9 @@ class Process implements \IteratorAggregate
             $this->input->rewind();
         }
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->processPipes = new WindowsPipes($this->input, !$this->outputDisabled || $hasCallback);
+            $this->processPipes = new WindowsPipes($this->input, !$this->outputDisabled || $hasCallback, $this->stdioInherited);
         } else {
-            $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $hasCallback);
+            $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $hasCallback, $this->stdioInherited);
         }
 
         return $this->processPipes->getDescriptors();

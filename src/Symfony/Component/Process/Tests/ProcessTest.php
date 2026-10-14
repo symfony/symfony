@@ -623,6 +623,162 @@ class ProcessTest extends TestCase
         $process->setTty(true);
     }
 
+    public function testInheritStdio()
+    {
+        $process = $this->getProcess([self::$phpBin, __DIR__.'/InheritStdioProcess.php', '-e', self::$phpBin, '-c', 'echo "out: ".stream_get_contents(STDIN); fwrite(STDERR, "err"); exit(3);'], null, null, 'stdin of the parent');
+        $process->run();
+
+        $this->assertSame('out: stdin of the parent'.\PHP_EOL.'exit code: 3'.\PHP_EOL.'captured output: ""', $process->getOutput());
+        $this->assertSame('err', $process->getErrorOutput());
+    }
+
+    public function testInheritStdioWithInput()
+    {
+        $process = $this->getProcess([self::$phpBin, __DIR__.'/InheritStdioProcess.php', '-e', self::$phpBin, '-c', 'echo "out: ".stream_get_contents(STDIN);', '-i', 'input of the child'], null, null, 'stdin of the parent');
+        $process->run();
+
+        $this->assertSame('out: input of the child'.\PHP_EOL.'exit code: 0'.\PHP_EOL.'captured output: ""', $process->getOutput());
+    }
+
+    public function testInheritStdioKeepsTheTerminal()
+    {
+        if (!Process::isPtySupported()) {
+            $this->markTestSkipped('PTY is not supported on this operating system.');
+        }
+
+        $process = $this->getProcess([self::$phpBin, __DIR__.'/InheritStdioProcess.php', '-e', self::$phpBin, '-c', 'echo stream_isatty(STDOUT) ? "STDOUT is a TTY" : "STDOUT is not a TTY";']);
+        $process->setPty(true);
+        $process->run();
+
+        $this->assertStringContainsString('STDOUT is a TTY', $process->getOutput());
+    }
+
+    public function testInheritStdioWritesAfterWhatTheCurrentProcessWroteToAFile()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_process_');
+
+        try {
+            $process = $this->getProcess('"${:php}" "${:script}" -e "${:php}" -c "echo 1;" -c "echo 2;" > "${:file}"');
+            $process->run(null, ['php' => self::$phpBin, 'script' => __DIR__.'/InheritStdioProcess.php', 'file' => $file]);
+
+            $this->assertSame('1'.\PHP_EOL.'exit code: 0'.\PHP_EOL.'captured output: ""2'.\PHP_EOL.'exit code: 0'.\PHP_EOL.'captured output: ""', file_get_contents($file));
+        } finally {
+            unlink($file);
+        }
+    }
+
+    public function testInheritStdioDoesNotReadAnInputFileTwice()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_process_');
+        file_put_contents($file, 'input file');
+
+        try {
+            $process = $this->getProcess('"${:php}" "${:script}" -e "${:php}" -c "echo stream_get_contents(STDIN);" -c "echo stream_get_contents(STDIN);" < "${:file}"');
+            $process->run(null, ['php' => self::$phpBin, 'script' => __DIR__.'/InheritStdioProcess.php', 'file' => $file]);
+
+            $this->assertSame('input file'.\PHP_EOL.'exit code: 0'.\PHP_EOL.'captured output: ""'.\PHP_EOL.'exit code: 0'.\PHP_EOL.'captured output: ""', $process->getOutput());
+        } finally {
+            unlink($file);
+        }
+    }
+
+    public function testStdioIsNotInheritedByDefault()
+    {
+        $process = $this->getProcess('foo');
+        $this->assertFalse($process->isStdioInherited());
+        $this->assertSame($process, $process->inheritStdio());
+        $this->assertTrue($process->isStdioInherited());
+    }
+
+    public function testInheritStdioWhileRunning()
+    {
+        $process = $this->getProcessForCode('sleep(30);');
+        $process->start();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Inheriting the standard streams while the process is running is not possible.');
+
+        $process->inheritStdio();
+    }
+
+    public function testGetIteratorWhileStdioIsInherited()
+    {
+        $process = $this->getProcessForCode('sleep(30);');
+        $process->inheritStdio();
+        $process->start();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The output cannot be read while the standard streams are inherited.');
+
+        foreach ($process as $output) {
+        }
+    }
+
+    public function testWaitUntilWhileStdioIsInherited()
+    {
+        $process = $this->getProcessForCode('sleep(30);');
+        $process->inheritStdio();
+        $process->start();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The output cannot be read while the standard streams are inherited.');
+
+        $process->waitUntil(static fn (): bool => true);
+    }
+
+    public function testInheritStdioWhileTtyIsEnabled()
+    {
+        if (!Process::isTtySupported()) {
+            $this->markTestSkipped('There is no TTY support');
+        }
+
+        $process = $this->getProcess('foo');
+        $process->setTty(true);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The standard streams cannot be inherited while the TTY mode is enabled.');
+
+        $process->inheritStdio();
+    }
+
+    public function testTtyWhileStdioIsInherited()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows does not have /dev/tty support');
+        }
+
+        $process = $this->getProcess('foo');
+        $process->inheritStdio();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('TTY mode cannot be enabled while the standard streams are inherited.');
+
+        $process->setTty(true);
+    }
+
+    public function testInheritStdioWhileIdleTimeoutIsSet()
+    {
+        $process = $this->getProcess('foo');
+        $process->setIdleTimeout(1);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The standard streams cannot be inherited while an idle timeout is set.');
+
+        $process->inheritStdio();
+    }
+
+    public function testSetIdleTimeoutWhileStdioIsInherited()
+    {
+        $process = $this->getProcess('foo');
+        $process->inheritStdio();
+        $this->assertSame($process, $process->setIdleTimeout(null));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Idle timeout cannot be set while the standard streams are inherited.');
+
+        $process->setIdleTimeout(1);
+    }
+
     public function testExitCodeTextIsNullWhenExitCodeIsNull()
     {
         $process = $this->getProcess('');

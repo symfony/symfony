@@ -124,6 +124,29 @@ class TableTest extends TestCase
                     TABLE,
             ],
             [
+                ['Name', 'Description'],
+                [
+                    ['pipe', 'A | B'],
+                    ['newline', "Line 1\nLine 2"],
+                    ['crlf', "Line 1\r\nLine 2"],
+                    ['cr', "Line 1\rLine 2"],
+                    ['backslash', "Line 1\\\nLine 2"],
+                    [new TableCell('A | B', ['colspan' => 2])],
+                ],
+                'markdown',
+                <<<'TABLE'
+                    | Name      | Description        |
+                    |-----------|--------------------|
+                    | pipe      | A \| B             |
+                    | newline   | Line 1<br>Line 2   |
+                    | crlf      | Line 1<br>Line 2   |
+                    | cr        | Line 1<br>Line 2   |
+                    | backslash | Line 1\\<br>Line 2 |
+                    | A \| B                         |
+
+                    TABLE,
+            ],
+            [
                 ['ISBN', 'Title', 'Author'],
                 $books,
                 'compact',
@@ -1595,6 +1618,28 @@ class TableTest extends TestCase
                 TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthsWithMarkdownStyle()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setStyle('markdown')
+            ->setHeaders(['Name', 'Value'])
+            ->setColumnMaxWidth(1, 5)
+            ->setRows([['pipe', 'abcd|efgh'], ['newline', "abc\ndefgh"]])
+            ->render()
+        ;
+
+        $expected =
+            <<<'TABLE'
+                | Name    | Value          |
+                |---------|----------------|
+                | pipe    | abcd\|<br>efgh |
+                | newline | abc<br>defgh   |
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
     }
 
     public function testBoxedStyleWithColspan()

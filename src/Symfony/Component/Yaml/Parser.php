@@ -633,11 +633,7 @@ class Parser
 
     private function getCurrentLineIndentation(): int
     {
-        if (' ' !== ($this->currentLine[0] ?? '')) {
-            return 0;
-        }
-
-        return \strlen($this->currentLine) - \strlen(ltrim($this->currentLine, ' '));
+        return strspn($this->currentLine, ' ');
     }
 
     /**
@@ -657,27 +653,8 @@ class Parser
         }
 
         if (null === $indentation) {
-            $newIndent = null;
-            $movements = 0;
-
-            do {
-                $EOF = false;
-
-                // empty and comment-like lines do not influence the indentation depth
-                if ($this->isCurrentLineEmpty() || $this->isCurrentLineComment()) {
-                    $EOF = !$this->moveToNextLine();
-
-                    if (!$EOF) {
-                        ++$movements;
-                    }
-                } else {
-                    $newIndent = $this->getCurrentLineIndentation();
-                }
-            } while (!$EOF && null === $newIndent);
-
-            for ($i = 0; $i < $movements; ++$i) {
-                $this->moveToPreviousLine();
-            }
+            // empty and comment-like lines do not influence the indentation depth
+            $newIndent = $this->isCurrentLineEmpty() ? $this->getNextContentLineIndentation() : $this->getCurrentLineIndentation();
 
             $unindentedEmbedBlock = $this->isStringUnIndentedCollectionItem();
 
@@ -711,36 +688,39 @@ class Parser
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
         $isItComment = $this->isCurrentLineComment();
 
-        while ($this->moveToNextLine()) {
+        // the lines are read directly instead of through moveToNextLine() and the isCurrentLine*() helpers
+        // because this loop runs for every line of every nested block
+        $lastLineNb = $this->numberOfParsedLines - 1;
+
+        while ($this->currentLineNb < $lastLineNb) {
+            $line = $this->lines[++$this->currentLineNb];
+            $indent = strspn($line, ' ');
+            $firstChar = $line[$indent] ?? '';
+
             if ($isItComment && !$isItUnindentedCollection) {
-                $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
-                $isItComment = $this->isCurrentLineComment();
+                $isItUnindentedCollection = self::isUnIndentedCollectionItem($line);
+                $isItComment = '#' === $firstChar;
             }
 
-            $indent = $this->getCurrentLineIndentation();
-
-            if ($isItUnindentedCollection && !$this->isCurrentLineEmpty() && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
-                $this->moveToPreviousLine();
+            if ($isItUnindentedCollection && '' !== $firstChar && '#' !== $firstChar && $newIndent === $indent && !self::isUnIndentedCollectionItem($line)) {
+                --$this->currentLineNb;
                 break;
             }
 
-            if ($this->isCurrentLineBlank()) {
-                $data[] = substr($this->currentLine, $newIndent ?? 0);
-                continue;
-            }
-
-            if ($indent >= $newIndent) {
-                $data[] = substr($this->currentLine, $newIndent ?? 0);
-            } elseif ($this->isCurrentLineComment()) {
-                $data[] = $this->currentLine;
-            } elseif (0 == $indent) {
-                $this->moveToPreviousLine();
+            if ('' === $firstChar || $indent >= $newIndent) {
+                $data[] = substr($line, $newIndent ?? 0);
+            } elseif ('#' === $firstChar) {
+                $data[] = $line;
+            } elseif (0 === $indent) {
+                --$this->currentLineNb;
 
                 break;
             } else {
-                throw new ParseException('Indentation problem.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+                throw new ParseException('Indentation problem.', $this->getRealCurrentLineNb() + 1, $line, $this->filename);
             }
         }
+
+        $this->currentLine = $this->lines[$this->currentLineNb];
 
         return implode("\n", $data);
     }
@@ -1047,50 +1027,46 @@ class Parser
      */
     private function isNextLineIndented(): bool
     {
-        $currentIndentation = $this->getCurrentLineIndentation();
-        $movements = 0;
+        return null !== ($indent = $this->getNextContentLineIndentation()) && $indent > $this->getCurrentLineIndentation();
+    }
 
-        do {
-            $EOF = !$this->moveToNextLine();
+    /**
+     * Returns the indentation of the next line that is not empty or a comment, or null if there is none.
+     *
+     * @param-out string|null $line The next line that is not empty or a comment
+     */
+    private function getNextContentLineIndentation(?string &$line = null): ?int
+    {
+        for ($i = $this->currentLineNb + 1; $i < $this->numberOfParsedLines; ++$i) {
+            $line = $this->lines[$i];
+            $indent = strspn($line, ' ');
+            $firstChar = $line[$indent] ?? '';
 
-            if (!$EOF) {
-                ++$movements;
+            if ('' !== $firstChar && '#' !== $firstChar) {
+                return $indent;
             }
-        } while (!$EOF && ($this->isCurrentLineEmpty() || $this->isCurrentLineComment()));
-
-        if ($EOF) {
-            for ($i = 0; $i < $movements; ++$i) {
-                $this->moveToPreviousLine();
-            }
-
-            return false;
         }
 
-        $ret = $this->getCurrentLineIndentation() > $currentIndentation;
+        $line = null;
 
-        for ($i = 0; $i < $movements; ++$i) {
-            $this->moveToPreviousLine();
-        }
-
-        return $ret;
+        return null;
     }
 
     private function isCurrentLineEmpty(): bool
     {
-        return $this->isCurrentLineBlank() || $this->isCurrentLineComment();
+        $firstChar = $this->currentLine[strspn($this->currentLine, ' ')] ?? '';
+
+        return '' === $firstChar || '#' === $firstChar;
     }
 
     private function isCurrentLineBlank(): bool
     {
-        return '' === $this->currentLine || '' === trim($this->currentLine, ' ');
+        return strspn($this->currentLine, ' ') === \strlen($this->currentLine);
     }
 
     private function isCurrentLineComment(): bool
     {
-        // checking explicitly the first char of the trim is faster than loops or strpos
-        $ltrimmedLine = '' !== $this->currentLine && ' ' === $this->currentLine[0] ? ltrim($this->currentLine, ' ') : $this->currentLine;
-
-        return '' !== $ltrimmedLine && '#' === $ltrimmedLine[0];
+        return '#' === ($this->currentLine[strspn($this->currentLine, ' ')] ?? '');
     }
 
     private function isCurrentLineLastLineInDocument(): bool
@@ -1175,29 +1151,18 @@ class Parser
 
     private function isNextLineUnIndentedCollection(): bool
     {
-        $currentIndentation = $this->getCurrentLineIndentation();
-        $movements = 0;
-
-        do {
-            $EOF = !$this->moveToNextLine();
-
-            if (!$EOF) {
-                ++$movements;
-            }
-        } while (!$EOF && ($this->isCurrentLineEmpty() || $this->isCurrentLineComment()));
-
-        $ret = !$EOF && $this->getCurrentLineIndentation() === $currentIndentation && $this->isStringUnIndentedCollectionItem();
-
-        for ($i = 0; $i < $movements; ++$i) {
-            $this->moveToPreviousLine();
-        }
-
-        return $ret;
+        return $this->getCurrentLineIndentation() === $this->getNextContentLineIndentation($line)
+            && self::isUnIndentedCollectionItem($line);
     }
 
     private function isStringUnIndentedCollectionItem(): bool
     {
-        return '-' === rtrim($this->currentLine) || str_starts_with($this->currentLine, '- ');
+        return self::isUnIndentedCollectionItem($this->currentLine);
+    }
+
+    private static function isUnIndentedCollectionItem(string $line): bool
+    {
+        return '-' === rtrim($line) || str_starts_with($line, '- ');
     }
 
     /**

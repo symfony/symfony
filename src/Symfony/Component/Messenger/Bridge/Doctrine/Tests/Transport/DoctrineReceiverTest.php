@@ -362,6 +362,46 @@ class DoctrineReceiverTest extends TestCase
         $receiver->reject($envelope);
     }
 
+    public function testAckRetriesADeadlockReportedByTheConnection()
+    {
+        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection->expects($this->exactly(2))->method('delete')->with('messenger_messages', ['id' => '1'])->willReturnOnConsecutiveCalls(
+            $this->throwException($this->createDeadlockException()),
+            1,
+        );
+
+        $receiver = new DoctrineReceiver(new Connection([], $driverConnection), $this->createSerializer());
+        $receiver->ack(new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]));
+    }
+
+    public function testRejectRetriesADeadlockReportedByTheConnection()
+    {
+        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection->expects($this->exactly(2))->method('delete')->with('messenger_messages', ['id' => '1'])->willReturnOnConsecutiveCalls(
+            $this->throwException($this->createDeadlockException()),
+            1,
+        );
+
+        $receiver = new DoctrineReceiver(new Connection([], $driverConnection), $this->createSerializer());
+        $receiver->reject(new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]));
+    }
+
+    public function testAckThrowsWhenTheConnectionKeepsDeadlocking()
+    {
+        $deadlockException = $this->createDeadlockException();
+        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection->expects($this->exactly(4))->method('delete')->willThrowException($deadlockException);
+
+        $receiver = new DoctrineReceiver(new Connection([], $driverConnection), $this->createSerializer());
+
+        try {
+            $receiver->ack(new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]));
+            $this->fail('A TransportException should have been thrown.');
+        } catch (TransportException $e) {
+            $this->assertSame($deadlockException, $e->getPrevious());
+        }
+    }
+
     private function createDoctrineEnvelope(): array
     {
         return [
@@ -395,5 +435,17 @@ class DoctrineReceiverTest extends TestCase
         return new Serializer(
             new SerializerComponent\Serializer([new DateTimeNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
+    }
+
+    private function createDeadlockException(): DeadlockException
+    {
+        $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
+
+        if (!class_exists(Version::class)) {
+            // This is doctrine/dbal 3.x
+            return new DeadlockException($driverException, null);
+        }
+
+        return new DeadlockException('Deadlock', $driverException);
     }
 }

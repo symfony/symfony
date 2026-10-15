@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-14T11:54:59Z
+
+I think there are enough advantages to the monorepo past the lowest php version to keep it here.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-14T12:01:23Z
+
+Absolutely, like the JsonSchemaBundle PR you created.

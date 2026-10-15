@@ -107,7 +107,6 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
             if (!isset($result[$messageId])) {
                 $message['count'] = 1;
                 $message['parameters'] = !empty($message['parameters']) ? [$message['parameters']] : [];
-                $messages[$key]['translation'] = $this->sanitizeString($message['translation']);
                 $result[$messageId] = $message;
             } else {
                 if (!empty($message['parameters'])) {
@@ -136,20 +135,5 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
         }
 
         return $count;
-    }
-
-    private function sanitizeString(string $string, int $length = 80): string
-    {
-        $string = trim(preg_replace('/\s+/', ' ', $string));
-
-        if (false !== $encoding = mb_detect_encoding($string, null, true)) {
-            if (mb_strlen($string, $encoding) > $length) {
-                return mb_substr($string, 0, $length - 3, $encoding).'...';
-            }
-        } elseif (\strlen($string) > $length) {
-            return substr($string, 0, $length - 3).'...';
-        }
-
-        return $string;
     }
 }

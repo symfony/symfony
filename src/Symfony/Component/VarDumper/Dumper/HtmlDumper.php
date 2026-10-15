@@ -1010,7 +1010,7 @@ class HtmlDumper extends CliDumper
             1 === \count($dumpClasses) ? '' : '"',
             implode(' ', $dumpClasses),
             $dumpTitle ? ' title="'.$dumpTitle.'"' : '',
-            preg_replace_callback(static::$controlCharsRx, static function ($c) use ($map) {
+            !preg_match(static::$controlCharsRx, $v) ? $v : preg_replace_callback(static::$controlCharsRx, static function ($c) use ($map) {
                 $s = $b = '<span class="sf-dump-default';
                 $c = $c[$i = 0];
                 if ($ns = "\r" === $c[$i] || "\n" === $c[$i]) {
@@ -1033,7 +1033,7 @@ class HtmlDumper extends CliDumper
             }, $v)
         );
 
-        if (!($attr['binary'] ?? false)) {
+        if (!($attr['binary'] ?? false) && preg_match('/[\x80-\xFF]/', $v)) {
             $v = preg_replace_callback(static::$unicodeCharsRx, static fn ($c) => '<span class=sf-dump-default>\u{'.strtoupper(dechex(mb_ord($c[0]))).'}</span>', $v);
         }
 
@@ -1080,7 +1080,9 @@ class HtmlDumper extends CliDumper
         }
         $this->lastDepth = $depth;
 
-        $this->line = mb_encode_numericentity($this->line, [0x80, 0x10FFFF, 0, 0x1FFFFF], 'UTF-8');
+        if (preg_match('/[\x80-\xFF]/', $this->line)) {
+            $this->line = mb_encode_numericentity($this->line, [0x80, 0x10FFFF, 0, 0x1FFFFF], 'UTF-8');
+        }
 
         if (-1 === $depth) {
             AbstractDumper::dumpLine(0);

@@ -24,15 +24,18 @@ class ConsoleSectionOutputTest extends TestCase
 {
     /** @var resource */
     private $stream;
+    private string|false $colSize;
 
     protected function setUp(): void
     {
         $this->stream = fopen('php://memory', 'r+', false);
+        $this->colSize = getenv('COLUMNS');
     }
 
     protected function tearDown(): void
     {
         unset($this->stream);
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
     public function testClearAll()
@@ -75,6 +78,19 @@ class ConsoleSectionOutputTest extends TestCase
 
         rewind($output->getStream());
         $this->assertSame($expected, stream_get_contents($output->getStream()));
+    }
+
+    public function testClearLineAsWideAsTheTerminal()
+    {
+        putenv('COLUMNS=10');
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->writeln('0123456789');
+        $output->clear();
+
+        rewind($output->getStream());
+        $this->assertSame('0123456789'.\PHP_EOL."\x1b[1A\x1b[0J", stream_get_contents($output->getStream()));
     }
 
     public function testClearNumberOfLinesWithMultipleSections()

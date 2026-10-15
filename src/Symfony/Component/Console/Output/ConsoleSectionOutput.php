@@ -171,7 +171,8 @@ class ConsoleSectionOutput extends StreamOutput
                 $this->content[] = $lineContent;
             }
 
-            $linesAdded += (int) ceil($this->getDisplayLength($lineContent) / $width) ?: 1;
+            // the line break must not count as a column, or a line as wide as the terminal would count as two
+            $linesAdded += (int) ceil($this->getDisplayLength(str_ends_with($lineContent, \PHP_EOL) ? substr($lineContent, 0, -\strlen(\PHP_EOL)) : $lineContent) / $width) ?: 1;
         }
 
         $this->lines += $linesAdded;

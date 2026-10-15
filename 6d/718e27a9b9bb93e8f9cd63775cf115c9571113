@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T11:52:23Z
+
+I pushed a small update: with the `u` modifier, one `preg_match()` now tells ASCII (0), other UTF-8 (1) and invalid UTF-8 (false) apart, so non-ASCII strings don't need a second call. They are now ~8% faster than before this PR instead of ~4% slower, for ~6ns more on ASCII strings. I also added test cases for `"\r\n"`, since nothing covered it.

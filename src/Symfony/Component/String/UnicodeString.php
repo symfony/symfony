@@ -73,6 +73,10 @@ class UnicodeString extends AbstractUnicodeString
             return [];
         }
 
+        if (\strlen($this->string) <= $length) {
+            return [clone $this];
+        }
+
         $rx = '/(';
         while (65535 < $length) {
             $rx .= '\X{65535}';
@@ -175,7 +179,7 @@ class UnicodeString extends AbstractUnicodeString
         if (0 > $offset) {
             // workaround https://bugs.php.net/74264
             if (0 > $offset += grapheme_strlen($needle)) {
-                $string = grapheme_substr($string, 0, $offset);
+                $string = grapheme_substr($string, 0, max(-2147483648, $offset));
             }
             $offset = 0;
         }
@@ -278,7 +282,10 @@ class UnicodeString extends AbstractUnicodeString
     {
         $str = clone $this;
 
-        $str->string = (string) grapheme_substr($this->string, $start, $length ?? 2147483647);
+        // grapheme_substr() accepts only 32-bit offsets and lengths
+        $start = max(-2147483648, min($start, 2147483647));
+        $length = max(-2147483648, min($length ?? 2147483647, 2147483647));
+        $str->string = (string) grapheme_substr($this->string, $start, $length);
 
         return $str;
     }
@@ -287,8 +294,8 @@ class UnicodeString extends AbstractUnicodeString
     {
         $str = clone $this;
 
-        $start = $start ? \strlen(grapheme_substr($this->string, 0, $start)) : 0;
-        $length = $length ? \strlen(grapheme_substr(substr($this->string, $start), 0, $length)) : $length;
+        $start = $start ? \strlen(grapheme_substr($this->string, 0, max(-2147483648, min($start, 2147483647)))) : 0;
+        $length = $length ? \strlen(grapheme_substr(substr($this->string, $start), 0, max(-2147483648, min($length, 2147483647)))) : $length;
         $str->string = substr_replace($this->string, $replacement, $start, $length ?? 2147483647);
 
         if (normalizer_is_normalized($str->string)) {

@@ -323,6 +323,7 @@ abstract class AbstractAsciiTestCase extends TestCase
             [22, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, amet sagittis felis.', 'amet', -30],
             [null, 'abc', 'b', 10],
             [null, 'abc', 'b', -10],
+            [null, 'abc', 'b', \PHP_INT_MIN],
         ];
     }
 
@@ -558,6 +559,13 @@ abstract class AbstractAsciiTestCase extends TestCase
                 ],
                 65536,
             ],
+            [
+                'hell',
+                [
+                    static::createFromString('hell'),
+                ],
+                \PHP_INT_MAX,
+            ],
         ];
     }
 
@@ -660,6 +668,10 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['S', 'Symfony is awesome', -42, 1],
             ['', 'Symfony is awesome', 42, 1],
             ['', 'Symfony is awesome', 0, -42],
+            ['is awesome', 'Symfony is awesome', 8, \PHP_INT_MAX],
+            ['Symfony is awesome', 'Symfony is awesome', \PHP_INT_MIN, null],
+            ['', 'Symfony is awesome', \PHP_INT_MAX, 1],
+            ['', 'Symfony is awesome', 0, \PHP_INT_MIN],
         ];
     }
 
@@ -688,6 +700,10 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['Xymfony is awesome', -42, 1],
             ['Symfony is awesomeX', 42, 1],
             ['XSymfony is awesome', 0, -42],
+            ['Symfony X', 8, \PHP_INT_MAX],
+            ['X', \PHP_INT_MIN, null],
+            ['Symfony is awesomeX', \PHP_INT_MAX, 1],
+            ['XSymfony is awesome', 0, \PHP_INT_MIN],
         ];
     }
 

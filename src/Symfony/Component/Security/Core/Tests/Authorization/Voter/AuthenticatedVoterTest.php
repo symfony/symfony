@@ -254,7 +254,10 @@ class AuthenticatedVoterTest extends TestCase
     {
         yield 'recently' => ['fully', AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY, AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY];
         yield 'very recently' => ['fully', AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY, AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY];
-        yield 'fully' => ['remembered', AuthenticatedVoter::IS_AUTHENTICATED_FULLY, null];
+        yield 'fully when remembered' => ['remembered', AuthenticatedVoter::IS_AUTHENTICATED_FULLY, AuthenticatedVoter::IS_AUTHENTICATED_FULLY];
+        yield 'fully when anonymous' => ['none', AuthenticatedVoter::IS_AUTHENTICATED_FULLY, null];
+        yield 'fully when a guest' => ['offline', AuthenticatedVoter::IS_AUTHENTICATED_FULLY, null];
+        yield 'remembered when anonymous' => ['none', AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED, null];
         yield 'impersonator' => ['fully', AuthenticatedVoter::IS_IMPERSONATOR, null];
     }
 

@@ -31,6 +31,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -299,6 +300,11 @@ class ExceptionListenerTest extends TestCase
 
     private function decide(array $attributes, NestingVoter ...$voters): AccessDeniedException
     {
+        return $this->decideFor($this->createTokenStorageWithAToken()->getToken(), $attributes, ...$voters);
+    }
+
+    private function decideFor(TokenInterface $token, array $attributes, NestingVoter ...$voters): AccessDeniedException
+    {
         $decisionManager = new AccessDecisionManager([new AuthenticatedVoter(new AuthenticationTrustResolver()), new RoleVoter(), ...$voters]);
 
         foreach ($voters as $voter) {
@@ -306,7 +312,7 @@ class ExceptionListenerTest extends TestCase
         }
 
         $accessDecision = new AccessDecision();
-        $accessDecision->isGranted = $decisionManager->decide($this->createTokenStorageWithAToken()->getToken(), $attributes, null, $accessDecision, true);
+        $accessDecision->isGranted = $decisionManager->decide($token, $attributes, null, $accessDecision, true);
 
         $exception = new AccessDeniedException($accessDecision->getMessage());
         $exception->setAttributes($attributes);
@@ -539,6 +545,88 @@ class ExceptionListenerTest extends TestCase
     {
         yield 'allow_if' => [static fn () => new Expression("is_granted('ROLE_USER') and is_recently_authenticated()")];
         yield 'closure' => [static fn () => static fn (IsGrantedContext $context): bool => $context->isGranted('ROLE_USER') && $context->isAuthenticatedRecently()];
+    }
+
+    #[DataProvider('provideDenialsARememberedUserCanReAuthenticateFor')]
+    public function testARememberedUserIsAskedToReAuthenticateWhenTheVoteAsksForIt(string $attribute, NestingVoter ...$voters)
+    {
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token = new RememberMeToken(new InMemoryUser('wouter', 'password', ['ROLE_USER']), 'key'));
+        $event = $this->createEvent($this->decideFor($token, [$attribute], ...$voters), null, $session = new Session(new MockArraySessionStorage()));
+
+        $entryPoint = $this->createMock(ReAuthenticatingEntryPoint::class);
+        $entryPoint->method('start')->willReturn(new Response('Log in', 302));
+        $entryPoint->expects($this->once())
+            ->method('startReAuthentication')
+            ->with($this->anything(), $this->identicalTo($token))
+            ->willReturnCallback(function (Request $request) use ($attribute): Response {
+                $this->assertSame($attribute, $request->attributes->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+
+                return new Response('Confirm your password', 200);
+            });
+
+        $this->createExceptionListener($tokenStorage, new AuthenticationTrustResolver(), null, $entryPoint)->onKernelException($event);
+
+        $this->assertSame('Confirm your password', $event->getResponse()->getContent());
+        $this->assertSame('http://localhost/', $session->get('_security.key.target_path'));
+    }
+
+    public static function provideDenialsARememberedUserCanReAuthenticateFor(): iterable
+    {
+        yield 'fully' => [AuthenticatedVoter::IS_AUTHENTICATED_FULLY];
+        yield 'recently' => [AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY];
+        yield 'an attribute of the application' => ['IS_PASSKEY', new NestingVoter('IS_PASSKEY', static function (AccessDecisionManagerInterface $decisionManager, TokenInterface $token, Vote $vote): bool {
+            $vote->requestReAuthentication('IS_PASSKEY');
+
+            return false;
+        })];
+    }
+
+    #[DataProvider('provideDenialsOnlyALoginCanCure')]
+    public function testTheLoginStartsWhenNoReAuthenticationCanCureTheDenial(?TokenInterface $token, string $attribute)
+    {
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token);
+        $event = $this->createEvent($this->decideFor($token ?? new NullToken(), [$attribute]));
+
+        $entryPoint = $this->createMock(ReAuthenticatingEntryPoint::class);
+        $entryPoint->expects($this->never())->method('startReAuthentication');
+        $entryPoint->expects($this->once())->method('start')->willReturn(new Response('Log in', 302));
+
+        $this->createExceptionListener($tokenStorage, new AuthenticationTrustResolver(), null, $entryPoint)->onKernelException($event);
+
+        $this->assertSame('Log in', $event->getResponse()->getContent());
+    }
+
+    public static function provideDenialsOnlyALoginCanCure(): iterable
+    {
+        $rememberMeToken = new RememberMeToken(new InMemoryUser('wouter', 'password', ['ROLE_USER']), 'key');
+
+        yield 'a role the remembered user lacks' => [$rememberMeToken, 'ROLE_ADMIN'];
+        yield 'fully when anonymous' => [null, AuthenticatedVoter::IS_AUTHENTICATED_FULLY];
+        yield 'recently when anonymous' => [null, AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY];
+    }
+
+    public function testOnlyARememberMeTokenIsAskedToReAuthenticateAmongTheTokensThatAreNotFullFledged()
+    {
+        $tokenStorage = $this->createTokenStorageWithAToken();
+        $event = $this->createEvent($this->decide([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY]));
+
+        // such as a token waiting for a second factor, which proving the password again does not cure
+        $trustResolver = new class extends AuthenticationTrustResolver {
+            public function isFullFledged(?TokenInterface $token = null): bool
+            {
+                return false;
+            }
+        };
+
+        $entryPoint = $this->createMock(ReAuthenticatingEntryPoint::class);
+        $entryPoint->expects($this->never())->method('startReAuthentication');
+        $entryPoint->expects($this->once())->method('start')->willReturn(new Response('Log in', 302));
+
+        $this->createExceptionListener($tokenStorage, $trustResolver, null, $entryPoint)->onKernelException($event);
+
+        $this->assertSame('Log in', $event->getResponse()->getContent());
     }
 
     public function testReAuthenticationEntryPointIsNotStartedWithoutTheDecision()

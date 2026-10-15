@@ -139,7 +139,30 @@ class ExceptionListener
         $event->setThrowable(new AccessDeniedHttpException($exception->getMessage(), $exception));
 
         $token = $this->tokenStorage->getToken();
-        if (!$this->authenticationTrustResolver->isFullFledged($token)) {
+        $isFullFledged = $this->authenticationTrustResolver->isFullFledged($token);
+
+        // a firewall entry point that already knows how to force a fresh proof is used
+        // without any configuration; one that only starts an ordinary login cannot be,
+        // which is exactly what implementing the interface asserts
+        $reAuthenticationEntryPoint = $this->reAuthenticationEntryPoint
+            ?? ($this->authenticationEntryPoint instanceof ReAuthenticationEntryPointInterface ? $this->authenticationEntryPoint : null);
+
+        // a remembered user is known too, so a re-authentication is enough when a vote asks for one
+        if (null !== $token && ($isFullFledged || $this->authenticationTrustResolver->isRememberMe($token)) && null !== $reAuthenticationEntryPoint && null !== $attribute = self::getReAuthenticationAttribute($exception)) {
+            $this->logger?->debug('Starting a re-authentication for "{attribute}".', ['attribute' => $attribute, 'entry_point' => $reAuthenticationEntryPoint]);
+
+            if (!$this->stateless) {
+                $this->setTargetPath($event->getRequest());
+            }
+
+            $event->getRequest()->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, $attribute);
+
+            $event->setResponse($reAuthenticationEntryPoint->startReAuthentication($event->getRequest(), $token));
+
+            return;
+        }
+
+        if (!$isFullFledged) {
             $this->logger?->debug('Access denied, the user is not fully authenticated; redirecting to authentication entry point.', ['exception' => $exception]);
 
             try {
@@ -152,26 +175,6 @@ class ExceptionListener
             } catch (\Exception $e) {
                 $event->setThrowable($e);
             }
-
-            return;
-        }
-
-        // a firewall entry point that already knows how to force a fresh proof is used
-        // without any configuration; one that only starts an ordinary login cannot be,
-        // which is exactly what implementing the interface asserts
-        $reAuthenticationEntryPoint = $this->reAuthenticationEntryPoint
-            ?? ($this->authenticationEntryPoint instanceof ReAuthenticationEntryPointInterface ? $this->authenticationEntryPoint : null);
-
-        if (null !== $token && null !== $reAuthenticationEntryPoint && null !== $attribute = self::getReAuthenticationAttribute($exception)) {
-            $this->logger?->debug('Starting a re-authentication for "{attribute}".', ['attribute' => $attribute, 'entry_point' => $reAuthenticationEntryPoint]);
-
-            if (!$this->stateless) {
-                $this->setTargetPath($event->getRequest());
-            }
-
-            $event->getRequest()->attributes->set(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE, $attribute);
-
-            $event->setResponse($reAuthenticationEntryPoint->startReAuthentication($event->getRequest(), $token));
 
             return;
         }

@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\Group;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
@@ -116,6 +118,41 @@ class FormLoginTest extends AbstractWebTestCase
         $client->submit($form);
 
         $this->assertRedirect($client->getResponse(), '/profile');
+    }
+
+    #[DataProvider('provideRememberedUserDenials')]
+    public function testARememberedUserConfirmsTheirPasswordToReachADeniedResource(string $path, string $attribute)
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => ['re_authentication.yml', 'remember_me.yml']]);
+
+        $form = $client->request('GET', '/login')->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
+        $client->submit($form);
+        $client->getCookieJar()->expire('MOCKSESSID');
+
+        $client->request('GET', $path);
+
+        $this->assertRedirect($client->getResponse(), '/login');
+        $this->assertInstanceOf(RememberMeToken::class, static::getContainer()->get('security.token_storage')->getToken());
+        $this->assertSame($attribute, $client->getRequest()->getSession()->get(SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE));
+
+        $form = $client->followRedirect()->selectButton('login')->form();
+        $this->assertSame('johannes', $form['_username']->getValue());
+        $form['_password'] = 'test';
+        $client->submit($form);
+
+        $this->assertRedirect($client->getResponse(), $path);
+
+        $client->followRedirect();
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertInstanceOf(UsernamePasswordToken::class, static::getContainer()->get('security.token_storage')->getToken());
+    }
+
+    public static function provideRememberedUserDenials(): iterable
+    {
+        yield 'fully' => ['/profile', AuthenticatedVoter::IS_AUTHENTICATED_FULLY];
+        yield 'recently' => ['/protected_resource', AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY];
     }
 
     #[DataProvider('provideClientOptions')]

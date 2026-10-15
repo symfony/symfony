@@ -72,6 +72,21 @@ class TerminalTest extends TestCase
         $this->assertSame(0, $terminal->getHeight());
     }
 
+    public function testDimensionsAreProbedOnlyOnce()
+    {
+        putenv('COLUMNS');
+        putenv('LINES');
+
+        $terminal = new Terminal();
+        $width = $terminal->getWidth();
+        $height = $terminal->getHeight();
+
+        $this->assertNotNull((new \ReflectionProperty(Terminal::class, 'width'))->getValue());
+        $this->assertNotNull((new \ReflectionProperty(Terminal::class, 'height'))->getValue());
+        $this->assertSame($width, $terminal->getWidth());
+        $this->assertSame($height, $terminal->getHeight());
+    }
+
     public function testSttyOnWindows()
     {
         if ('\\' !== \DIRECTORY_SEPARATOR) {

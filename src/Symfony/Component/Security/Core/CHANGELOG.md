@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecate not implementing `isAuthenticatedRecently()` and `isAuthenticatedVeryRecently()` in a custom authentication trust resolver
  * Add `Vote::requestReAuthentication()` and `Vote::$reAuthenticationAttribute`, for a voter to tell that a fresh authentication could grant the attribute it denies
  * Make `ExpressionVoter` and `ClosureVoter` request a re-authentication when a check the expression or the closure made requested one
+ * Make `AuthenticatedVoter` request a re-authentication when it denies `IS_AUTHENTICATED_FULLY` to a remember-me user
  * Add `TokenInterface::getAuthenticationProofs()` and `setAuthenticationProofs()`, implemented by `AbstractToken`, mapping the authentication methods the user proved to the time of the last proof of each
  * Deprecate not implementing `getAuthenticationProofs()` and `setAuthenticationProofs()` in a custom token
  * Add `AuthenticationMethod`, the RFC 8176 names of the authentication methods a token can hold a proof of

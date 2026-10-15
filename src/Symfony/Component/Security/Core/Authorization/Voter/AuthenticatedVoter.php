@@ -138,9 +138,12 @@ class AuthenticatedVoter implements CacheableVoterInterface
                 }
             }
 
-            foreach ([self::IS_AUTHENTICATED_VERY_RECENTLY, self::IS_AUTHENTICATED_RECENTLY] as $attribute) {
+            foreach ([self::IS_AUTHENTICATED_VERY_RECENTLY, self::IS_AUTHENTICATED_RECENTLY, self::IS_AUTHENTICATED_FULLY] as $attribute) {
                 if (null !== $vote && \in_array($attribute, $attributes, true)) {
-                    $vote->requestReAuthentication($attribute);
+                    // a remembered user only has to prove their credentials again, while anyone else has to log in
+                    if (self::IS_AUTHENTICATED_FULLY !== $attribute || $this->authenticationTrustResolver->isRememberMe($token)) {
+                        $vote->requestReAuthentication($attribute);
+                    }
 
                     break;
                 }

@@ -116,6 +116,23 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                     ],
                     null,
                 ],
+                [
+                    "ab\u{200B}é",
+                    "\u{200B}",
+                    [
+                        static::createFromString('ab'),
+                        static::createFromString('é'),
+                    ],
+                    null,
+                ],
+                [
+                    'café',
+                    "\u{200B}",
+                    [
+                        static::createFromString('café'),
+                    ],
+                    null,
+                ],
             ]
         );
     }
@@ -277,6 +294,12 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 ['Das Innenministerium', 1, 'Das Außenministerium', 'Auß', 'Inn'],
                 ['दछेच्नुद-दछेच्नु-ददछेच्नु', 2, 'दछेच्नुअ-दछेच्नु-अदछेच्नु', 'अ', 'द'],
+                ['abXé', 1, "ab\u{200B}é", "\u{200B}", 'X'],
+                ['café', 0, 'café', "\u{200B}", 'X'],
+                ['caféX', 1, "café\0", "\0", 'X'],
+                ["a\u{00AD}bé X", 1, "a\u{00AD}bé ab", 'ab', 'X'],
+                ['می خواهم', 1, "می\u{200C}خواهم", "\u{200C}", ' '],
+                ["X q\u{0303}", 1, "q q\u{0303}", 'q', 'X'],
             ]
         );
     }
@@ -288,6 +311,9 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 ['Das Aussenministerium', 1, 'Das Außenministerium', 'auß', 'Auss'],
                 ['दछेच्नुद-दछेच्नु-ददछेच्नु', 2, 'दछेच्नुअ-दछेच्नु-अदछेच्नु', 'अ', 'द'],
+                ['abXé', 1, "ab\u{200B}é", "\u{200B}", 'X'],
+                ["A\u{00AD}Bé X", 1, "A\u{00AD}Bé AB", 'ab', 'X'],
+                ['STRAXEé', 1, 'STRAẞEé', 'ß', 'X'],
             ]
         );
     }

@@ -24,6 +24,7 @@ CHANGELOG
  * Instantiate on demand the bundles that have nothing to do when the kernel boots, and add `AbstractKernel::instantiateBundle()` to control how they are created
  * Dump the container's compiler log in all environments, not only when debug mode is enabled
  * Add `#[AsCallable]` to expose a public method of a service as a service of its own
+ * Reset the container in `AbstractKernel::shutdown()`, so that its services are released even when something still references the container
 
 8.1
 ---

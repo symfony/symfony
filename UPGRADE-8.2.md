@@ -63,6 +63,8 @@ DependencyInjection
    instance, can still be given the `event_dispatcher` service explicitly
  * `AsDecorator::$priority` and `AsTagDecorator::$priority` are now `?int` and default to `null`, which means "no priority declared".
    Code that read the properties as an `int` should read `$attribute->priority ?? 0`
+ * `AbstractKernel::shutdown()` now resets the container. Code that keeps a reference to the container of a kernel
+   that was shut down gets new service instances from it
 
 DoctrineBridge
 --------------

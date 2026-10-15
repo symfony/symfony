@@ -215,6 +215,29 @@ class AbstractKernelTest extends TestCase
         }
     }
 
+    public function testShutdownDestroysServicesWhileTheContainerIsStillReferenced()
+    {
+        $kernel = new ContainerReferencingKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $container->get('container_referencing');
+        ContainerReferencingService::$destructed = false;
+
+        $gcEnabled = gc_enabled();
+        gc_disable();
+
+        try {
+            $kernel->shutdown();
+
+            $this->assertTrue(ContainerReferencingService::$destructed);
+            $this->assertFalse($container->initialized('container_referencing'));
+        } finally {
+            if ($gcEnabled) {
+                gc_enable();
+            }
+        }
+    }
+
     public function testShutdownCallsShutdownOnBundles()
     {
         $bundle = $this->createMock(BundleInterface::class);

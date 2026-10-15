@@ -344,6 +344,11 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $handle = fopen($file, 'r');
 
         if ($offset = is_file($file.'.offset') ? (int) file_get_contents($file.'.offset') : 0) {
+            if ($offset > fstat($handle)['size']) {
+                // the index was recreated after the offset was saved
+                $offset = 0;
+            }
+
             fseek($handle, $offset);
         }
 
@@ -358,7 +363,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
             [$csvToken, , , , $csvTime] = $values;
 
-            if ($csvTime >= $minimalProfileTimestamp) {
+            if ((int) $csvTime >= $minimalProfileTimestamp) {
                 break;
             }
 

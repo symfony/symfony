@@ -486,6 +486,17 @@ class FileProfilerStorageTest extends TestCase
             '96',
         ];
 
+        yield 'Expired profiles around a non-numeric time' => [
+            <<<CSV
+                token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,
+                token1,127.0.0.1,,http://foo.bar/1,abc,,
+                token2,127.0.0.2,,http://foo.bar/2,{$threeDaysAgo->getTimestamp()},,
+                token3,127.0.0.3,,http://foo.bar/3,{$oneHourAgo->getTimestamp()},,
+
+                CSV,
+            '137',
+        ];
+
         yield 'Multiple expired profiles with virtual type' => [
             <<<CSV
                 token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,virtual
@@ -539,6 +550,19 @@ class FileProfilerStorageTest extends TestCase
 
         $this->assertEquals('line2', $r->invoke($this->storage, $h));
         $this->assertEquals('line1', $r->invoke($this->storage, $h));
+    }
+
+    public function testRemoveExpiredProfilesIgnoresOffsetPastTheEndOfTheIndex()
+    {
+        $threeDaysAgo = new \DateTimeImmutable('-3 days');
+        $file = $this->tmpDir.'/index.csv';
+        file_put_contents($file, "token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,\n");
+        file_put_contents($file.'.offset', '1000');
+
+        $r = new \ReflectionMethod($this->storage, 'removeExpiredProfiles');
+        $r->invoke($this->storage);
+
+        $this->assertSame('48', file_get_contents($file.'.offset'));
     }
 
     protected function cleanDir()

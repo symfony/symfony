@@ -437,8 +437,15 @@ class UnicodeString extends AbstractUnicodeString
 
         // On non-ASCII strings, grapheme_strpos() ignores characters like U+200B.
         // Its match can then differ from $needle, or start after the first characters of $needle.
+        // Without ext-intl, a match that starts inside a grapheme is reported at the next grapheme.
         if (!$this->ignoreCase) {
-            return $needle === $match ? $offset : strpos($haystack, $needle, max(0, $offset + 1 - $length));
+            if ($needle === $match) {
+                return $offset;
+            }
+
+            $previous = $i ? \strlen(grapheme_substr($haystack, 0, $i - 1)) : 0;
+
+            return strpos($haystack, $needle, max(0, min($offset + 1 - $length, $previous + 1)));
         }
 
         if (0 === strcasecmp($needle, $match) || (preg_match('//u', $match) && (
@@ -448,9 +455,10 @@ class UnicodeString extends AbstractUnicodeString
             return $offset;
         }
 
+        $previous = $i ? mb_strlen(grapheme_substr($haystack, 0, $i - 1), 'UTF-8') : 0;
         $i = mb_strlen(substr($haystack, 0, $offset), 'UTF-8');
 
-        if (false === $i = mb_stripos($haystack, $needle, max(0, $i + 1 - mb_strlen($needle, 'UTF-8')), 'UTF-8')) {
+        if (false === $i = mb_stripos($haystack, $needle, max(0, min($i + 1 - mb_strlen($needle, 'UTF-8'), $previous + 1)), 'UTF-8')) {
             return false;
         }
 

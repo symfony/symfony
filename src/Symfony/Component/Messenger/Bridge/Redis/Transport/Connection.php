@@ -74,6 +74,7 @@ class Connection
     private string $group;
     private string $consumer;
     private bool $autoSetup;
+    private bool $recreateMissingGroup;
     private int $maxEntries;
     private int $redeliverTimeout;
     private float $nextClaim = 0.0;
@@ -183,7 +184,7 @@ class Connection
         $this->group = $options['group'];
         $this->consumer = $options['consumer'];
         $this->queue = $this->stream.'__queue';
-        $this->autoSetup = $options['auto_setup'];
+        $this->autoSetup = $this->recreateMissingGroup = $options['auto_setup'];
         $this->maxEntries = $options['stream_max_entries'];
         $this->deleteAfterAck = $options['delete_after_ack'];
         $this->deleteAfterReject = $options['delete_after_reject'];
@@ -565,7 +566,7 @@ class Connection
         return $result;
     }
 
-    private function xReadGroup(string $messageId, int $count = 1): array
+    private function xReadGroup(string $messageId, int $count = 1, bool $retry = true): array
     {
         $redis = $this->getRedis();
 
@@ -584,6 +585,13 @@ class Connection
         if (!\is_array($messages)) {
             if ($error = $redis->getLastError() ?: null) {
                 $redis->clearLastError();
+            }
+
+            // the stream or its group is gone, like after a restart of Redis without persistence
+            if ($retry && $this->recreateMissingGroup && str_starts_with($error ?? '', 'NOGROUP')) {
+                $this->setup();
+
+                return $this->xReadGroup($messageId, $count, false);
             }
 
             throw new TransportException($error ?? 'Could not read messages from the redis stream.');

@@ -18,7 +18,8 @@
     },
     "require-dev": {
         "symfony/property-access": "^7.4|^8.0",
-        "symfony/serializer": "^7.4|^8.0"
+        "symfony/serializer": "^7.4|^8.0",
+        "symfony/service-contracts": "^2.5|^3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\Beanstalkd\\": "" },

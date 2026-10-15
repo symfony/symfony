@@ -41,6 +41,20 @@ class OptionsResolverWrapper extends OptionsResolver
     /**
      * @return $this
      */
+    public function addNormalizer(string $option, \Closure $normalizer, bool $forcePrepend = false): static
+    {
+        try {
+            parent::addNormalizer($option, $normalizer, $forcePrepend);
+        } catch (UndefinedOptionsException) {
+            $this->undefined[$option] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function setAllowedValues(string $option, mixed $allowedValues): static
     {
         try {
@@ -96,6 +110,43 @@ class OptionsResolverWrapper extends OptionsResolver
         }
 
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setDeprecated(string $option, string $package = '', string $version = '', string|\Closure $message = 'The option "%name%" is deprecated.'): static
+    {
+        try {
+            parent::setDeprecated(...\func_get_args());
+        } catch (UndefinedOptionsException) {
+            $this->undefined[$option] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setInfo(string $option, string $info): static
+    {
+        try {
+            parent::setInfo($option, $info);
+        } catch (UndefinedOptionsException) {
+            $this->undefined[$option] = true;
+        }
+
+        return $this;
+    }
+
+    public function getInfo(string $option): ?string
+    {
+        try {
+            return parent::getInfo($option);
+        } catch (UndefinedOptionsException) {
+            return null;
+        }
     }
 
     public function resolve(array $options = []): array

@@ -63,4 +63,32 @@ final class RetryDecider
 
         return null;
     }
+
+    /**
+     * Returns the delay in milliseconds that the exception asks to wait before a retry, or null when it asks for none.
+     *
+     * When several handlers failed, the shortest delay wins.
+     */
+    public static function getDelayFromException(\Throwable $e): ?int
+    {
+        $delay = null;
+        if ($e instanceof RecoverableExceptionInterface) {
+            $delay = $e->getRetryDelay();
+        }
+
+        if ($e instanceof HandlerFailedException) {
+            foreach ($e->getWrappedExceptions() as $nestedException) {
+                if (!$nestedException instanceof RecoverableExceptionInterface
+                    || 0 > $retryDelay = $nestedException->getRetryDelay() ?? -1
+                ) {
+                    continue;
+                }
+                if ($retryDelay < ($delay ?? \PHP_INT_MAX)) {
+                    $delay = $retryDelay;
+                }
+            }
+        }
+
+        return $delay;
+    }
 }

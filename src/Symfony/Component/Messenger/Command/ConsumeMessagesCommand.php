@@ -63,6 +63,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
         private ?ContainerInterface $rateLimiterLocator = null,
         private ?array $signals = null,
         private string $console = '',
+        private ?ContainerInterface $cooldownStrategyLocator = null,
     ) {
         parent::__construct();
     }
@@ -123,7 +124,8 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
                 Use the <info>--stop-when-empty</info> option to handle the messages that are already in the
                 transports and exit instead of waiting for new ones. Delayed messages, including failed
-                messages that wait for their retry delay, are left in the transports:
+                messages that wait for their retry delay, are left in the transports, and so are the
+                messages of the transports cooling down after failures:
 
                     <info>php %command.full_name% <receiver-name> --stop-when-empty</info>
 
@@ -219,6 +221,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
         $receivers = [];
         $rateLimiters = [];
+        $cooldownStrategies = [];
         if ($input->getOption('all')) {
             $receiverNames = $this->receiverNames;
         } else {
@@ -263,6 +266,10 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             $receivers[$receiverName] = $receiver;
             if ($this->rateLimiterLocator?->has($receiverName)) {
                 $rateLimiters[$receiverName] = $this->rateLimiterLocator->get($receiverName);
+            }
+
+            if ($this->cooldownStrategyLocator?->has($receiverName)) {
+                $cooldownStrategies[$receiverName] = $this->cooldownStrategyLocator->get($receiverName);
             }
         }
 
@@ -363,7 +370,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             }
         }
 
-        $this->worker = new Worker($receivers, $bus, $eventDispatcher, $this->logger, $rateLimiters, new Clock(), $messageExecutionStrategy);
+        $this->worker = new Worker($receivers, $bus, $eventDispatcher, $this->logger, $rateLimiters, new Clock(), $messageExecutionStrategy, $cooldownStrategies);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
             'time_limit' => null !== $timeLimit ? (int) $timeLimit : null,

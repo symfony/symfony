@@ -23,7 +23,7 @@ class DummyReceiver implements ReceiverInterface
     private array $fetchSizes = [];
 
     /**
-     * @param Envelope[][] $deliveriesOfEnvelopes
+     * @param array<iterable<Envelope>|\Throwable> $deliveriesOfEnvelopes
      */
     public function __construct(
         private array $deliveriesOfEnvelopes,
@@ -38,6 +38,10 @@ class DummyReceiver implements ReceiverInterface
         $this->fetchSizes[] = \func_num_args() > 0 ? func_get_arg(0) : 1;
 
         $val = array_shift($this->deliveriesOfEnvelopes);
+
+        if ($val instanceof \Throwable) {
+            throw $val;
+        }
 
         return $val ?? [];
     }

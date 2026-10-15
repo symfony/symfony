@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
@@ -33,6 +34,7 @@ use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Attribute\AsMessageMiddleware;
 use Symfony\Component\Messenger\Bridge\Doctrine\Inbox\DoctrineInbox;
+use Symfony\Component\Messenger\Cooldown\MultiplierCooldownStrategy;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Messenger\Failure\FailedMessageRepository;
@@ -199,6 +201,29 @@ class MessengerBundle extends AbstractBundle
                                     ->floatNode('multiplier')->defaultValue(2)->min(1)->info('If greater than 1, delay will grow exponentially for each retry: this delay = (delay * (multiple ^ retries)).')->end()
                                     ->integerNode('max_delay')->defaultValue(0)->min(0)->info('Max time in ms that a retry should ever be delayed (0 = infinite).')->end()
                                     ->floatNode('jitter')->defaultValue(0.1)->min(0)->max(1)->info('Randomness to apply to the delay (between 0 and 1).')->end()
+                                ->end()
+                            ->end()
+                            ->arrayNode('cooldown_strategy')
+                                ->info('Stops consuming this transport for a while after its messages fail. With the default strategy, each worker counts its own failures.')
+                                ->acceptAndWrap(['string'], 'service')
+                                ->canBeEnabled()
+                                ->beforeNormalization()
+                                    ->ifArray()
+                                    ->then(static function ($v) {
+                                        if (isset($v['service']) && (isset($v['failure_threshold']) || isset($v['delay']) || isset($v['multiplier']) || isset($v['max_delay']) || isset($v['jitter']))) {
+                                            throw new \InvalidArgumentException('The "service" cannot be used along with the other "cooldown_strategy" options.');
+                                        }
+
+                                        return $v;
+                                    })
+                                ->end()
+                                ->children()
+                                    ->scalarNode('service')->defaultNull()->info('Service id to override the cooldown strategy entirely.')->end()
+                                    ->integerNode('failure_threshold')->defaultValue(5)->min(1)->info('Number of failures in a row that start a cooldown.')->end()
+                                    ->integerNode('delay')->defaultValue(1000)->min(0)->info('Duration in ms of the first cooldown (or the initial value when multiplier is used).')->end()
+                                    ->floatNode('multiplier')->defaultValue(2)->min(1)->info('If greater than 1, the cooldown will grow exponentially for each further failure in a row: this delay = (delay * (multiplier ^ (failures - failure_threshold))).')->end()
+                                    ->integerNode('max_delay')->defaultValue(60000)->min(0)->info('Max duration in ms of a cooldown (0 = infinite).')->end()
+                                    ->floatNode('jitter')->defaultValue(0.1)->min(0)->max(1)->info('Randomness to apply to the duration (between 0 and 1).')->end()
                                 ->end()
                             ->end()
                             ->scalarNode('rate_limiter')
@@ -579,6 +604,7 @@ class MessengerBundle extends AbstractBundle
                 'outbox' => null,
                 'inbox' => ['enabled' => false],
                 'retry_strategy' => $transport['retry_strategy'],
+                'cooldown_strategy' => ['enabled' => false],
                 'rate_limiter' => null,
                 'priority' => 0,
             ];
@@ -621,6 +647,7 @@ class MessengerBundle extends AbstractBundle
 
         $senderAliases = [];
         $transportRetryReferences = [];
+        $transportCooldownReferences = [];
         $transportRateLimiterReferences = [];
         $serializerReferencesByTransport = [];
         foreach ($config['transports'] as $name => $transport) {
@@ -692,6 +719,28 @@ class MessengerBundle extends AbstractBundle
                 $container->setDefinition($retryServiceId, $retryDefinition);
 
                 $transportRetryReferences[$name] = new Reference($retryServiceId);
+            }
+
+            if ($transport['cooldown_strategy']['enabled']) {
+                $cooldown = $transport['cooldown_strategy'];
+
+                if (null !== $cooldown['service']) {
+                    $transportCooldownReferences[$name] = new Reference($cooldown['service']);
+                } else {
+                    // not a child definition: it would not inherit the tag that sets the channel of the logger
+                    $container->setDefinition($cooldownServiceId = \sprintf('messenger.cooldown.multiplier_cooldown_strategy.%s', $name), (new Definition(MultiplierCooldownStrategy::class))
+                        ->setArguments([
+                            $cooldown['failure_threshold'],
+                            $cooldown['delay'],
+                            $cooldown['multiplier'],
+                            $cooldown['max_delay'],
+                            $cooldown['jitter'],
+                            new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+                        ])
+                        ->addTag('monolog.logger', ['channel' => 'messenger']));
+
+                    $transportCooldownReferences[$name] = new Reference($cooldownServiceId);
+                }
             }
 
             if ($transport['rate_limiter']) {
@@ -766,6 +815,9 @@ class MessengerBundle extends AbstractBundle
 
         $container->getDefinition('messenger.retry_strategy_locator')
             ->replaceArgument(0, $transportRetryReferences);
+
+        $container->getDefinition('messenger.cooldown_strategy_locator')
+            ->replaceArgument(0, $transportCooldownReferences);
 
         $failureTransportsByTransportNameServiceLocator = ServiceLocatorTagPass::register($container, $failureTransportReferencesByTransportName);
         $container->getDefinition('messenger.transport.sync.factory')

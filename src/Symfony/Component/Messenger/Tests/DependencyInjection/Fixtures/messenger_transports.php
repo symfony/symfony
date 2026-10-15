@@ -26,6 +26,12 @@ $container->loadFromExtension('messenger', [
                 'multiplier' => 3,
                 'max_delay' => 100,
             ],
+            'cooldown_strategy' => [
+                'failure_threshold' => 3,
+                'delay' => 500,
+                'multiplier' => 3,
+                'max_delay' => 30000,
+            ],
             'rate_limiter' => 'customised_worker',
         ],
         'prioritized' => [

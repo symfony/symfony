@@ -21,6 +21,9 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Messenger\Cooldown\CooldownStatus;
+use Symfony\Component\Messenger\Cooldown\CooldownStrategyInterface;
+use Symfony\Component\Messenger\Cooldown\MultiplierCooldownStrategy;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
@@ -29,6 +32,7 @@ use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
+use Symfony\Component\Messenger\Event\WorkerTransportCoolingDownEvent;
 use Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnIdleListener;
@@ -56,6 +60,7 @@ use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\SentForRetryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
@@ -1082,6 +1087,323 @@ class WorkerTest extends TestCase
 
         $this->assertSame(4, $receiver->getAcknowledgeCount());
         $this->assertSame(3, $rateLimitCount);
+    }
+
+    public function testWorkerKeepsConsumingOtherTransportsWhileOneCoolsDown()
+    {
+        $failingReceiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('fails'))],
+            [new Envelope(new DummyMessage('fails'))],
+            [new Envelope(new DummyMessage('succeeds'))],
+        ]);
+        $otherReceiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('other 1'))],
+            [new Envelope(new DummyMessage('other 2'))],
+        ]);
+
+        $bus = $this->createStub(MessageBusInterface::class);
+        $bus->method('dispatch')->willReturnCallback(static function (Envelope $envelope) {
+            if ('fails' === $envelope->getMessage()->getMessage()) {
+                throw new \RuntimeException('Failure.');
+            }
+
+            return $envelope;
+        });
+
+        $cooldownEvents = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(5));
+        $dispatcher->addListener(WorkerTransportCoolingDownEvent::class, static function (WorkerTransportCoolingDownEvent $event) use (&$cooldownEvents) {
+            $cooldownEvents[] = [$event->getTransportName(), $event->getStatus()->getEnd()];
+        });
+
+        $clock = new MockClock('2026-10-14 10:00:00+00:00');
+        $cooldownStrategy = new MultiplierCooldownStrategy(1, 10000, 2, 60000, 0, null, $clock);
+        $worker = new Worker(['failing' => $failingReceiver, 'other' => $otherReceiver], $bus, $dispatcher, null, null, $clock, null, ['failing' => $cooldownStrategy]);
+        $worker->run(['sleep' => 20000000]);
+
+        // the failing transport is fetched again as soon as each cooldown ends, not after the 20s of the sleep option,
+        // and the second cooldown lasts twice as long as the first
+        $this->assertEquals(new \DateTimeImmutable('2026-10-14 10:00:30+00:00'), $clock->now());
+        $this->assertCount(3, $failingReceiver->getFetchSizes());
+        $this->assertSame(2, $failingReceiver->getRejectCount());
+        $this->assertSame(1, $failingReceiver->getAcknowledgeCount());
+        $this->assertSame(2, $otherReceiver->getAcknowledgeCount());
+
+        $this->assertEquals([
+            ['failing', new \DateTimeImmutable('2026-10-14 10:00:10+00:00')],
+            ['failing', new \DateTimeImmutable('2026-10-14 10:00:30+00:00')],
+        ], $cooldownEvents);
+    }
+
+    public function testWorkerReportsOutcomesToTheCooldownStrategy()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('fails'))],
+            [new Envelope(new DummyMessage('succeeds'))],
+        ]);
+
+        $exception = new \RuntimeException('Failure.');
+        $bus = $this->createStub(MessageBusInterface::class);
+        $bus->method('dispatch')->willReturnCallback(static function (Envelope $envelope) use ($exception) {
+            if ('fails' === $envelope->getMessage()->getMessage()) {
+                throw $exception;
+            }
+
+            return $envelope;
+        });
+
+        $cooldownStrategy = new class implements CooldownStrategyInterface {
+            public array $calls = [];
+
+            public function checkStatus(string $transportName): CooldownStatus
+            {
+                $this->calls[] = ['checkStatus', $transportName];
+
+                return CooldownStatus::inactive();
+            }
+
+            public function recordSuccess(string $transportName, Envelope $envelope): void
+            {
+                $this->calls[] = ['recordSuccess', $transportName, $envelope->getMessage()->getMessage()];
+            }
+
+            public function recordFailure(string $transportName, ?Envelope $envelope, \Throwable $throwable): void
+            {
+                $this->calls[] = ['recordFailure', $transportName, $envelope->getMessage()->getMessage(), $envelope->last(SentForRetryStamp::class)?->isSent, $throwable];
+            }
+        };
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) {
+            $event->addStamps(new SentForRetryStamp(true));
+        });
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher, null, null, new MockClock(), null, ['transport' => $cooldownStrategy]);
+        $worker->run();
+
+        // the failure is recorded after the listeners of the failed event, so the strategy sees the retry stamps
+        $this->assertSame([
+            ['checkStatus', 'transport'],
+            ['recordFailure', 'transport', 'fails', true, $exception],
+            ['checkStatus', 'transport'],
+            ['recordSuccess', 'transport', 'succeeds'],
+        ], $cooldownStrategy->calls);
+    }
+
+    public function testWorkerSleepsAsUsualDuringACooldownWithoutAKnownEnd()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Hello'))],
+        ]);
+
+        $cooldownStrategy = new class implements CooldownStrategyInterface {
+            private int $checks = 0;
+
+            public function checkStatus(string $transportName): CooldownStatus
+            {
+                return 3 >= ++$this->checks ? CooldownStatus::indefinite() : CooldownStatus::inactive();
+            }
+
+            public function recordSuccess(string $transportName, Envelope $envelope): void
+            {
+            }
+
+            public function recordFailure(string $transportName, ?Envelope $envelope, \Throwable $throwable): void
+            {
+            }
+        };
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $clock = new MockClock('2026-10-14 10:00:00+00:00');
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, $clock, null, ['transport' => $cooldownStrategy]);
+        $worker->run(['sleep' => 1000000]);
+
+        // one regular idle sleep for each of the three checks that found the transport cooling down
+        $this->assertEquals(new \DateTimeImmutable('2026-10-14 10:00:03+00:00'), $clock->now());
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+    }
+
+    public function testWorkerStoppingWhenEmptyTreatsATransportCoolingDownAsEmpty()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('fails'))],
+            [new Envelope(new DummyMessage('waits for the next run'))],
+        ]);
+
+        $bus = $this->createStub(MessageBusInterface::class);
+        $bus->method('dispatch')->willThrowException(new \RuntimeException('Failure.'));
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
+            ->method('info')
+            ->with('Worker stopped because no message was available outside of the transports that are cooling down: {transports}', ['transports' => 'transport']);
+
+        $clock = new MockClock('2026-10-14 10:00:00+00:00');
+        $cooldownStrategy = new MultiplierCooldownStrategy(1, 10000, 2, 60000, 0, null, $clock);
+        $worker = new Worker(['transport' => $receiver], $bus, null, $logger, null, $clock, null, ['transport' => $cooldownStrategy]);
+        $worker->run(['stop_when_empty' => true]);
+
+        $this->assertEquals(new \DateTimeImmutable('2026-10-14 10:00:00+00:00'), $clock->now());
+        $this->assertCount(1, $receiver->getFetchSizes());
+    }
+
+    public function testWorkerSkipsATransportWhileFetchingFromItFails()
+    {
+        $failure = new TransportException('Connection refused.');
+        $receiver = new DummyReceiver([
+            $failure,
+            $failure,
+            $failure,
+            [new Envelope(new DummyMessage('Hello'))],
+        ]);
+
+        $cooldownEvents = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerTransportCoolingDownEvent::class, static function (WorkerTransportCoolingDownEvent $event) use (&$cooldownEvents) {
+            $cooldownEvents[] = [$event->getTransportName(), $event->getStatus()->getEnd()];
+        });
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->exactly(3))
+            ->method('warning')
+            ->with('Fetching messages from transport {transport} failed: {error}', ['transport' => 'transport', 'error' => 'Connection refused.', 'exception' => $failure]);
+
+        $clock = new MockClock('2026-10-14 10:00:00+00:00');
+        $cooldownStrategy = new MultiplierCooldownStrategy(2, 10000, 2, 60000, 0, null, $clock);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, $logger, null, $clock, null, ['transport' => $cooldownStrategy]);
+        $worker->run(['sleep' => 1000000]);
+
+        // fetches at 10:00:00 and 10:00:01, a cooldown of 10s, a fetch at 10:00:11, a cooldown of 20s
+        $this->assertEquals(new \DateTimeImmutable('2026-10-14 10:00:31+00:00'), $clock->now());
+        $this->assertCount(4, $receiver->getFetchSizes());
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+
+        $this->assertEquals([
+            ['transport', new \DateTimeImmutable('2026-10-14 10:00:11+00:00')],
+            ['transport', new \DateTimeImmutable('2026-10-14 10:00:31+00:00')],
+        ], $cooldownEvents);
+    }
+
+    public function testWorkerKeepsConsumingOtherTransportsWhileFetchingFromOneFails()
+    {
+        $failingReceiver = new DummyReceiver([
+            new TransportException('Connection refused.'),
+            new TransportException('Connection refused.'),
+        ]);
+        $otherReceiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('other 1'))],
+            [new Envelope(new DummyMessage('other 2'))],
+            [new Envelope(new DummyMessage('other 3'))],
+        ]);
+
+        $cooldownEvents = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(3));
+        $dispatcher->addListener(WorkerTransportCoolingDownEvent::class, static function (WorkerTransportCoolingDownEvent $event) use (&$cooldownEvents) {
+            $cooldownEvents[] = [$event->getTransportName(), $event->getStatus()->getEnd()];
+        });
+
+        $clock = new MockClock('2026-10-14 10:00:00+00:00');
+        $cooldownStrategy = new MultiplierCooldownStrategy(2, 10000, 2, 60000, 0, null, $clock);
+        $worker = new Worker(['failing' => $failingReceiver, 'other' => $otherReceiver], new MessageBus(), $dispatcher, null, null, $clock, null, ['failing' => $cooldownStrategy]);
+        $worker->run();
+
+        $this->assertEquals(new \DateTimeImmutable('2026-10-14 10:00:00+00:00'), $clock->now());
+        $this->assertCount(2, $failingReceiver->getFetchSizes());
+        $this->assertSame(3, $otherReceiver->getAcknowledgeCount());
+        $this->assertEquals([['failing', new \DateTimeImmutable('2026-10-14 10:00:10+00:00')]], $cooldownEvents);
+    }
+
+    public function testWorkerStopsWhenFetchingFailsFromATransportWithoutCooldownStrategy()
+    {
+        $exception = new TransportException('Connection refused.');
+        $failingReceiver = new DummyReceiver([$exception]);
+        $otherReceiver = new DummyReceiver([[new Envelope(new DummyMessage('other'))]]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $clock = new MockClock('2026-10-14 10:00:00+00:00');
+        $cooldownStrategy = new MultiplierCooldownStrategy(1, 1000, 2, 60000, 0, null, $clock);
+        $worker = new Worker(['failing' => $failingReceiver, 'other' => $otherReceiver], new MessageBus(), $dispatcher, null, null, $clock, null, ['other' => $cooldownStrategy]);
+        $failure = null;
+
+        try {
+            $worker->run();
+        } catch (TransportException $failure) {
+        }
+
+        $this->assertSame($exception, $failure);
+        $this->assertSame(0, $otherReceiver->getAcknowledgeCount());
+    }
+
+    public function testWorkerReportsTheFetchFailuresOfLazyReceiversToTheCooldownStrategy()
+    {
+        $receiver = new DummyQueueReceiver([
+            (static function () {
+                yield new Envelope(new DummyMessage('first'));
+
+                throw new TransportException('Connection lost.');
+            })(),
+            [new Envelope(new DummyMessage('second'))],
+        ]);
+
+        $cooldownStrategy = new class implements CooldownStrategyInterface {
+            public array $calls = [];
+
+            public function checkStatus(string $transportName): CooldownStatus
+            {
+                $this->calls[] = ['checkStatus', $transportName];
+
+                return CooldownStatus::inactive();
+            }
+
+            public function recordSuccess(string $transportName, Envelope $envelope): void
+            {
+                $this->calls[] = ['recordSuccess', $transportName, $envelope->getMessage()->getMessage()];
+            }
+
+            public function recordFailure(string $transportName, ?Envelope $envelope, \Throwable $throwable): void
+            {
+                $this->calls[] = ['recordFailure', $transportName, $envelope, $throwable->getMessage()];
+            }
+        };
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
+
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), null, ['transport' => $cooldownStrategy]);
+        $worker->run(['queues' => ['foo'], 'fetch_size' => 2]);
+
+        $this->assertSame([
+            ['checkStatus', 'transport'],
+            ['recordSuccess', 'transport', 'first'],
+            ['recordFailure', 'transport', null, 'Connection lost.'],
+            ['checkStatus', 'transport'],
+            ['recordSuccess', 'transport', 'second'],
+        ], $cooldownStrategy->calls);
+        $this->assertSame([['foo'], ['foo']], $receiver->queueNames);
+    }
+
+    public function testWorkerStoppingWhenEmptyTreatsATransportFailingToFetchAsEmpty()
+    {
+        $receiver = new DummyReceiver([
+            new TransportException('Connection refused.'),
+            [new Envelope(new DummyMessage('waits for the next run'))],
+        ]);
+
+        $clock = new MockClock('2026-10-14 10:00:00+00:00');
+        $cooldownStrategy = new MultiplierCooldownStrategy(5, 1000, 2, 60000, 0, null, $clock);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), null, null, null, $clock, null, ['transport' => $cooldownStrategy]);
+        $worker->run(['stop_when_empty' => true]);
+
+        $this->assertCount(1, $receiver->getFetchSizes());
+        $this->assertSame(0, $receiver->getAcknowledgeCount());
     }
 
     public function testWorkerShouldLogOnStop()

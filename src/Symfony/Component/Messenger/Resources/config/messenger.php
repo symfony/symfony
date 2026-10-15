@@ -302,6 +302,11 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('jitter'),
             ])
 
+        // cooldown
+        ->set('messenger.cooldown_strategy_locator', ServiceLocator::class)
+            ->args([[]])
+            ->tag('container.service_locator')
+
         // rate limiter
         ->set('messenger.rate_limiter_locator', ServiceLocator::class)
             ->args([[]])

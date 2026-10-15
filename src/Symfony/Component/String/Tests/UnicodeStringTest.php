@@ -302,6 +302,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
         return array_merge(
             parent::provideReplace(),
             [
+                ['cafX', 1, 'café', 'é', 'X', UnicodeString::NFD],
                 ['Das Innenministerium', 1, 'Das Außenministerium', 'Auß', 'Inn'],
                 ['दछेच्नुद-दछेच्नु-ददछेच्नु', 2, 'दछेच्नुअ-दछेच्नु-अदछेच्नु', 'अ', 'द'],
             ]

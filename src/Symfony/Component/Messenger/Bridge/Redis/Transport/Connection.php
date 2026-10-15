@@ -62,7 +62,8 @@ class Connection
         return message
         LUA;
 
-    private \Redis|Relay|\RedisCluster|\Closure $redis;
+    private \Redis|Relay|\RedisCluster|null $redis = null;
+    private \Closure $redisInitializer;
     private string $stream;
     private string $queue;
     private string $group;
@@ -116,9 +117,9 @@ class Connection
 
         if ((\is_array($host) && null === $sentinelMaster) || $redis instanceof \RedisCluster) {
             $hosts = \is_string($host) ? [$host.':'.$port] : $host; // Always ensure we have an array
-            $this->redis = static fn () => self::initializeRedisCluster($redis, $hosts, $auth, $options);
+            $this->redisInitializer = static fn () => self::initializeRedisCluster($redis, $hosts, $auth, $options);
         } else {
-            $this->redis = static function () use ($redis, $sentinelMaster, $host, $port, $options, $auth) {
+            $this->redisInitializer = static function () use ($redis, $sentinelMaster, $host, $port, $options, $auth) {
                 if (null !== $sentinelMaster) {
                     $sentinelClass = \extension_loaded('redis') ? \RedisSentinel::class : Sentinel::class;
                     $hostIndex = 0;
@@ -170,7 +171,7 @@ class Connection
         }
 
         if (!$options['lazy']) {
-            $this->getRedis();
+            $this->redis = ($this->redisInitializer)();
         }
 
         foreach (['stream', 'group', 'consumer'] as $key) {
@@ -375,7 +376,9 @@ class Connection
 
         try {
             $pendingMessages = $redis->xpending($this->stream, $this->group, '-', '+', 1) ?: [];
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|\RedisClusterException|\Relay\Exception $e) {
+            $this->redis = null;
+
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -410,7 +413,9 @@ class Connection
             );
 
             $this->lastPendingMessageId = '0';
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|\RedisClusterException|\Relay\Exception $e) {
+            $this->redis = null;
+
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }
@@ -535,7 +540,9 @@ class Connection
                 1,
                 1
             );
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|\RedisClusterException|\Relay\Exception $e) {
+            $this->redis = null;
+
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -561,7 +568,9 @@ class Connection
             if ($acknowledged && $this->deleteAfterAck && false === $redis->xdel($this->stream, [$id])) {
                 $redis->clearLastError();
             }
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|\RedisClusterException|\Relay\Exception $e) {
+            $this->redis = null;
+
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -586,7 +595,9 @@ class Connection
             if ($rejected && $this->deleteAfterReject && false === $redis->xdel($this->stream, [$id])) {
                 $redis->clearLastError();
             }
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|\RedisClusterException|\Relay\Exception $e) {
+            $this->redis = null;
+
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -651,7 +662,9 @@ class Connection
 
                 $id = $added;
             }
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|\RedisClusterException|\Relay\Exception $e) {
+            $this->redis = null;
+
             if ($error = $redis->getLastError() ?: null) {
                 $redis->clearLastError();
             }
@@ -674,7 +687,9 @@ class Connection
 
         try {
             $redis->xgroup('CREATE', $this->stream, $this->group, 0, true);
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|\RedisClusterException|\Relay\Exception $e) {
+            $this->redis = null;
+
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -773,7 +788,9 @@ class Connection
             } else {
                 $result = $redis->rawCommand($command, ...$arguments);
             }
-        } catch (\RedisException|\Relay\Exception $e) {
+        } catch (\RedisException|\RedisClusterException|\Relay\Exception $e) {
+            $this->redis = null;
+
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -789,8 +806,12 @@ class Connection
 
     private function getRedis(): \Redis|Relay|\RedisCluster
     {
-        if ($this->redis instanceof \Closure) {
-            $this->redis = ($this->redis)();
+        if (!$this->redis) {
+            try {
+                $this->redis = ($this->redisInitializer)();
+            } catch (\RedisException|\RedisClusterException|\Relay\Exception|InvalidArgumentException $e) {
+                throw new TransportException($e->getMessage(), 0, $e);
+            }
         }
 
         return $this->redis;

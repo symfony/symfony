@@ -24,15 +24,18 @@ class ConsoleSectionOutputTest extends TestCase
 {
     /** @var resource */
     private $stream;
+    private string|false $colSize;
 
     protected function setUp(): void
     {
         $this->stream = fopen('php://memory', 'r+', false);
+        $this->colSize = getenv('COLUMNS');
     }
 
     protected function tearDown(): void
     {
         unset($this->stream);
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
     public function testClearAll()
@@ -75,6 +78,36 @@ class ConsoleSectionOutputTest extends TestCase
 
         rewind($output->getStream());
         $this->assertSame($expected, stream_get_contents($output->getStream()));
+    }
+
+    public function testClearNumberOfLinesWithMaxHeightRedrawsHiddenLines()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+        $output->setMaxHeight(2);
+
+        $output->writeln('One');
+        $output->writeln('Two');
+        $output->writeln('Three');
+        $output->clear(1);
+
+        $expected = 'One'.\PHP_EOL.'Two'.\PHP_EOL."\x1b[2A\x1b[0J".'Two'.\PHP_EOL.'Three'.\PHP_EOL."\x1b[2A\x1b[0J".'One'.\PHP_EOL.'Two'.\PHP_EOL;
+
+        rewind($output->getStream());
+        $this->assertSame($expected, stream_get_contents($output->getStream()));
+    }
+
+    public function testClearLineAsWideAsTheTerminal()
+    {
+        putenv('COLUMNS=10');
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->writeln('0123456789');
+        $output->clear();
+
+        rewind($output->getStream());
+        $this->assertSame('0123456789'.\PHP_EOL."\x1b[1A\x1b[0J", stream_get_contents($output->getStream()));
     }
 
     public function testClearNumberOfLinesWithMultipleSections()
@@ -204,6 +237,32 @@ class ConsoleSectionOutputTest extends TestCase
 
         rewind($output->getStream());
         $this->assertEquals($expected, stream_get_contents($output->getStream()));
+    }
+
+    public function testMaxHeightWithSeveralLinesInOneWrite()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+        $output->setMaxHeight(3);
+
+        $output->writeln('One');
+        $output->writeln('Two'.\PHP_EOL.'Three'.\PHP_EOL.'Four'.\PHP_EOL.'Five');
+
+        rewind($output->getStream());
+        $this->assertSame('One'.\PHP_EOL."\x1b[1A\x1b[0J".'Three'.\PHP_EOL.'Four'.\PHP_EOL.'Five'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
+    public function testSetMaxHeightAfterWriteWithoutNewLine()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->write('One');
+        $output->setMaxHeight(2);
+        $output->writeln('Two');
+
+        rewind($output->getStream());
+        $this->assertSame('One'.\PHP_EOL."\x1b[1A\x1b[0J".'One'.\PHP_EOL."\x1b[1A\x1b[0J".'OneTwo'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
     public function testOverwriteFormatsMessage()
@@ -346,5 +405,30 @@ class ConsoleSectionOutputTest extends TestCase
 
         rewind($output->getStream());
         $this->assertEquals(escapeshellcmd('Foo'.\PHP_EOL.'Bar'.\PHP_EOL), escapeshellcmd(stream_get_contents($output->getStream())));
+    }
+
+    public function testWriteWithoutNewLineContinuesWrappedLine()
+    {
+        putenv('COLUMNS=10');
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->write('012345678901234');
+        $output->write('5');
+
+        rewind($output->getStream());
+        $this->assertSame('012345678901234'.\PHP_EOL."\x1b[2A\x1b[0J".'0123456789012345'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
+    public function testWriteEmptyString()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->write('');
+        $output->overwrite('One');
+
+        rewind($output->getStream());
+        $this->assertSame('One'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 }

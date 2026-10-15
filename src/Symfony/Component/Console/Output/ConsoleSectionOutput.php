@@ -77,10 +77,21 @@ class ConsoleSectionOutput extends StreamOutput
             $this->content = [];
         }
 
+        $previousLines = $this->lines;
+
         // callers may ask to clear more lines than this section tracks (e.g. ProgressBar
         // counts "\n"-separated lines while addContent() splits on PHP_EOL), so keep the
         // counter from going negative, which would break the max-height bookkeeping
         $this->lines = max(0, $this->lines - $lines);
+
+        if ($this->maxHeight && $previousLines > $this->maxHeight) {
+            // the section was scrolled: redraw it to show the lines that are visible again
+            $erasedContent = $this->popStreamContentUntilCurrentSection($this->maxHeight);
+            parent::doWrite($this->getVisibleContent(), false);
+            parent::doWrite($erasedContent, false);
+
+            return;
+        }
 
         parent::doWrite($this->popStreamContentUntilCurrentSection($this->maxHeight ? min($this->maxHeight, $lines) : $lines), false);
     }

@@ -80,6 +80,23 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertSame($expected, stream_get_contents($output->getStream()));
     }
 
+    public function testClearNumberOfLinesWithMaxHeightRedrawsHiddenLines()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+        $output->setMaxHeight(2);
+
+        $output->writeln('One');
+        $output->writeln('Two');
+        $output->writeln('Three');
+        $output->clear(1);
+
+        $expected = 'One'.\PHP_EOL.'Two'.\PHP_EOL."\x1b[2A\x1b[0J".'Two'.\PHP_EOL.'Three'.\PHP_EOL."\x1b[2A\x1b[0J".'One'.\PHP_EOL.'Two'.\PHP_EOL;
+
+        rewind($output->getStream());
+        $this->assertSame($expected, stream_get_contents($output->getStream()));
+    }
+
     public function testClearLineAsWideAsTheTerminal()
     {
         putenv('COLUMNS=10');

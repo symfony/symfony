@@ -7,6 +7,129 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+## 5.4.54 (2026-10-15)
+
+### Cache
+
+ * bug #65684 [Cache][HttpFoundation] Do not unmarshall values that SodiumMarshaller cannot decrypt (nicolas-grekas)
+
+### Console
+
+ * bug #65692 [Console][MonologBridge][VarDumper] Escape context strings written to the terminal (nicolas-grekas)
+
+### ExpressionLanguage
+
+ * security #cve-2026-109449 [ExpressionLanguage] Bound the nesting level of parsed expressions (nicolas-grekas, lazerg)
+ * bug #66723 [ExpressionLanguage] Bound the depth of the parsed node tree (nicolas-grekas)
+ * bug #66720 [ExpressionLanguage] Fix nesting level of chained ternaries (lazerg)
+ * bug #65690 [ExpressionLanguage] Bound the nesting level of parsed expressions (nicolas-grekas)
+
+### Filesystem
+
+ * bug #65745 [Filesystem] Keep tempnam() files private when a suffix is given (iliaal)
+ * bug #65726 [Filesystem] preserve source mode when copying files (nicolas-grekas)
+
+### HttpClient
+
+ * bug #66938 [HttpClient] Don't add the `query` option again to redirect targets in `NoPrivateNetworkHttpClient` (nicolas-grekas)
+ * bug #66270 [HttpClient] Don't reject highly compressed responses (nicolas-grekas)
+ * bug #66080 [HttpClient] Add missing non-routable ranges to NoPrivateNetworkHttpClient (nicolas-grekas)
+ * bug #65751 [HttpClient] Reject decompression bombs (nicolas-grekas)
+ * bug #65740 [HttpClient] Reject https:// proxies that curl would connect to in cleartext (nicolas-grekas)
+ * bug #65731 [HttpClient] Don't send the original Host header on cross-authority redirects (nicolas-grekas)
+ * bug #65742 [HttpClient] Reject 3xx pushed responses (nicolas-grekas)
+ * bug #65704 [HttpClient] Drop credentials when a redirect changes the scheme (nicolas-grekas)
+
+### HttpFoundation
+
+ * security #cve-2026-108082 [HttpFoundation] Remove the ambiguity that makes HeaderUtils::split() backtrack (nicolas-grekas)
+ * bug #66491 [HttpFoundation] Fix HeaderUtils::split() when a separator is a whitespace character (nicolas-grekas)
+ * bug #66251 [HttpFoundation] Make session handlers non-serializable (mcdruid)
+ * bug #66078 [HttpFoundation] Fix port stripping on IPv4-mapped IPv6 forwarded addresses (nicolas-grekas)
+ * bug #66048 [HttpFoundation] Remove the ambiguity that makes HeaderUtils::split() backtrack (nicolas-grekas)
+ * bug #65775 [HttpFoundation] Match paths with the DOTALL modifier (nicolas-grekas)
+ * bug #65753 [HttpFoundation] Combine trusted host patterns into a single regexp (nicolas-grekas)
+ * bug #65743 [HttpFoundation] Encode the path in the X-Accel-Redirect header (Athorcis)
+ * bug #65729 [HttpFoundation] Reject reserved characters in the cookie path and domain (nicolas-grekas)
+ * bug #65741 [HttpFoundation] Reject invalid paths (nicolas-grekas)
+ * bug #65725 [HttpFoundation] Fix parsing hosts and schemes in URLs (nicolas-grekas)
+ * bug #65683 [HttpFoundation] Allow-list the values of the "X-Sendfile-Type" header (nicolas-grekas)
+ * bug #65682 [HttpFoundation] Ignore session ids that are not usable as file names in MockFileSessionStorage (nicolas-grekas)
+ * minor #65836 [HttpFoundation] Fix hitting the PCRE size limit with many trusted host patterns (nicolas-grekas)
+
+### HttpKernel
+
+ * bug #65737 [HttpKernel][Security] Add allowed_classes => false to unserialize() in CacheWarmerAggregate, LoggerDataCollector, and HttpCache Store (XananasX7)
+ * bug #65736 [HttpKernel] Ignore the session id that PHP kept from a previous request (nicolas-grekas)
+ * bug #65730 [HttpKernel] Fix TypeError in UriSigner when the hash parameter is not a string (nicolas-grekas)
+ * bug #65687 [HttpKernel] Validate the profiler token before using it as a file name (nicolas-grekas)
+ * bug #65681 [HttpKernel] Strip cache-internal headers from backend responses in HttpCache (nicolas-grekas)
+
+### Lock
+
+ * bug #65721 [Lock] Never take the reserved "__write__" member as a Redis lock token (nicolas-grekas)
+
+### Messenger
+
+ * bug #66509 [Messenger] Reject decoded messages that carry non-sendable stamps and validate the stamps of unserialized envelopes (nicolas-grekas)
+ * bug #65746 [Messenger] Drop trace args from FlattenException normalization (ousamabenyounes, nicolas-grekas)
+ * bug #65693 [Messenger] Restrict what "X-Message-Stamp-*" headers can put in an envelope (nicolas-grekas)
+
+### Mime
+
+ * bug #65844 [Mime] Reject header names containing non-printable or non-ASCII characters (nicolas-grekas)
+ * bug #65778 [Mime] Never emit a raw control character in a header (Spomky)
+ * bug #65777 [Mime] Do not treat an "@" inside the domain as the addr-spec separator (Spomky)
+ * bug #65744 [Mime] Reject an unquoted "@" in the local part of an email address (nicolas-grekas)
+
+### Process
+
+ * bug #65784 [Process] Use an absolute path for the cmd.exe fallback on Windows (nicolas-grekas)
+ * bug #65739 [Process] Ignore invalid env var names and non-scalar env values (nicolas-grekas, dionisvl)
+ * bug #65738 [Process] Stop leaking CGI/FastCGI request-context vars to subprocesses (nicolas-grekas)
+
+### RateLimiter
+
+ * bug #65747 [RateLimiter] Cap the burst size and the duration computed from it (cs278, nicolas-grekas)
+
+### Routing
+
+ * bug #65728 [Routing] Fix matching the "0" URL (cs278)
+
+### Security
+
+ * bug #66629 [Security] Don't copy the security token of the session into logs (nicolas-grekas)
+ * bug #65735 [Security] Avoid failing when PersistentRememberMeHandler handles a malformed cookie (Seldaek)
+ * bug #65734 [Security] Reject malformed login link parameters instead of throwing a TypeError (davidszkiba, nicolas-grekas)
+ * bug #65733 [Security] Remove the legacy nested unserialize() call from token and exception classes (nicolas-grekas)
+ * bug #65685 [Security] Narrow the race that lets a login link exceed max_uses (nicolas-grekas)
+
+### SecurityBundle
+
+ * bug #65732 [SecurityBundle] Restrict redirections to the current host when sessions are disabled (nicolas-grekas)
+ * bug #65689 [SecurityBundle] Use a lock for login throttling by default (nicolas-grekas)
+
+### Serializer
+
+ * bug #66387 [Serializer] Fix the cache key of MetadataAwareNameConverter when the context can't be serialized (nicolas-grekas)
+ * bug #66079 [Serializer] Make MetadataAwareNameConverter caches per instance (nicolas-grekas)
+ * bug #65686 [Serializer] Check the denormalized class is a Mime part in MimeMessageNormalizer (nicolas-grekas)
+
+### VarDumper
+
+ * bug #65718 [VarDumper] Escape UTF-8 encoded C1 control characters (nicolas-grekas)
+ * bug #65691 [VarDumper] Escape context strings in HtmlDescriptor (nicolas-grekas)
+
+### Yaml
+
+ * security #cve-2026-109413 [Yaml] Bound recursion depth in the inline lexer (nicolas-grekas)
+ * bug #65727 [Yaml] Fix a TypeError when "!!binary" is given an unparsable value (nicolas-grekas)
+ * bug #65688 [Yaml] Bound recursion depth in the inline lexer (nicolas-grekas)
+
+### Other
+
+ * minor #65724  Declare the polyfills needed by the code on PHP 7.2 (nicolas-grekas)
+
 * 5.4.53 (2026-05-27)
 
  * security #cve-2026-48736 [HttpClient] Block IPv6 transition forms in NoPrivateNetworkHttpClient (nicolas-grekas)

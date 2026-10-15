@@ -244,12 +244,10 @@ class UnicodeString extends AbstractUnicodeString
         if ('' !== $from && false !== $from) {
             $tail = $str->string;
             $result = '';
-            $indexOf = $this->ignoreCase ? 'grapheme_stripos' : 'grapheme_strpos';
 
-            while ('' !== $tail && false !== $i = $indexOf($tail, $from)) {
-                $slice = grapheme_substr($tail, 0, $i);
-                $result .= $slice.$to;
-                $tail = substr($tail, \strlen($slice) + \strlen($from));
+            while ('' !== $tail && false !== $i = $this->search($tail, $from, $length)) {
+                $result .= substr($tail, 0, $i).$to;
+                $tail = substr($tail, $i + $length);
             }
 
             $str->string = $result.$tail;
@@ -329,12 +327,11 @@ class UnicodeString extends AbstractUnicodeString
         $str = clone $this;
         $tail = $this->string;
         $chunks = [];
-        $indexOf = $this->ignoreCase ? 'grapheme_stripos' : 'grapheme_strpos';
 
-        while (1 < $limit && false !== $i = $indexOf($tail, $delimiter)) {
-            $str->string = grapheme_substr($tail, 0, $i);
+        while (1 < $limit && false !== $i = $this->search($tail, $delimiter, $length)) {
+            $str->string = substr($tail, 0, $i);
             $chunks[] = clone $str;
-            $tail = substr($tail, \strlen($str->string) + \strlen($delimiter));
+            $tail = substr($tail, $i + $length);
             --$limit;
         }
 
@@ -423,5 +420,42 @@ class UnicodeString extends AbstractUnicodeString
         }
 
         $this->ignoreCase = false;
+    }
+
+    /**
+     * Returns the byte offset of the first occurrence of $needle in $haystack and sets $length to its length in bytes.
+     */
+    private function search(string $haystack, string $needle, ?int &$length = null): int|false
+    {
+        if (false === $i = $this->ignoreCase ? grapheme_stripos($haystack, $needle) : grapheme_strpos($haystack, $needle)) {
+            return false;
+        }
+
+        $offset = \strlen(grapheme_substr($haystack, 0, $i));
+        $length = \strlen($needle);
+        $match = substr($haystack, $offset, $length);
+
+        // On non-ASCII strings, grapheme_strpos() ignores characters like U+200B.
+        // Its match can then differ from $needle, or start after the first characters of $needle.
+        if (!$this->ignoreCase) {
+            return $needle === $match ? $offset : strpos($haystack, $needle, max(0, $offset + 1 - $length));
+        }
+
+        if (0 === strcasecmp($needle, $match) || (preg_match('//u', $match) && (
+            mb_convert_case($needle, \MB_CASE_FOLD_SIMPLE, 'UTF-8') === mb_convert_case($match, \MB_CASE_FOLD_SIMPLE, 'UTF-8')
+            || (0 === grapheme_stripos($needle, $match) && 0 === grapheme_stripos($match, $needle))
+        ))) {
+            return $offset;
+        }
+
+        $i = mb_strlen(substr($haystack, 0, $offset), 'UTF-8');
+
+        if (false === $i = mb_stripos($haystack, $needle, max(0, $i + 1 - mb_strlen($needle, 'UTF-8')), 'UTF-8')) {
+            return false;
+        }
+
+        $length = \strlen(mb_substr($haystack, $i, mb_strlen($needle, 'UTF-8'), 'UTF-8'));
+
+        return \strlen(mb_substr($haystack, 0, $i, 'UTF-8'));
     }
 }

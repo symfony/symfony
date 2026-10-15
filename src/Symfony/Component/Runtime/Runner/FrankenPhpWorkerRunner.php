@@ -14,6 +14,7 @@ namespace Symfony\Component\Runtime\Runner;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\Runtime\RunnerInterface;
 
@@ -23,8 +24,8 @@ use Symfony\Component\Runtime\RunnerInterface;
  * Loops up to $loopMax times; pass 0 or a negative integer to loop indefinitely.
  *
  * When the application is an HttpKernelInterface and "FRANKENPHP_RESET_KERNEL" is truthy,
- * the kernel is cloned after each request to mitigate cross-request state leaks; subclasses
- * keeping non-resettable state should override __clone accordingly.
+ * the kernel is shut down and cloned after each request to mitigate cross-request state leaks;
+ * subclasses keeping non-resettable state should override __clone accordingly.
  *
  * "APP_RUNTIME_MODE" is set to "web=1&worker=1", or "web=1&worker=2" when FRANKENPHP_RESET_KERNEL
  * is active.
@@ -75,10 +76,15 @@ class FrankenPhpWorkerRunner implements RunnerInterface
                 $this->application->terminate($sfRequest, $sfResponse);
             }
             if ($resetKernel) {
+                if ($this->application instanceof KernelInterface) {
+                    $this->application->shutdown();
+                }
                 $this->application = clone $this->application;
+                gc_collect_cycles();
+            } elseif (($gc = gc_status())['roots'] >= $gc['threshold'] / 2) {
+                // Collect cycles between requests, before PHP does it in the middle of one
+                gc_collect_cycles();
             }
-
-            gc_collect_cycles();
         } while ($ret && (0 >= $this->loopMax || ++$loops < $this->loopMax));
 
         return 0;

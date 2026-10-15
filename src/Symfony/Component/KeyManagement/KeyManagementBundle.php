@@ -40,6 +40,7 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\Regis
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\DependencyInjection\RegisterFlysystemStoragesPass;
 use Symfony\Component\KeyManagement\DependencyInjection\KeyManagementPass;
+use Symfony\Component\KeyManagement\DependencyInjection\RegisterDoctrineDbalTypesPass;
 use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
 
 /**
@@ -70,7 +71,9 @@ class KeyManagementBundle extends AbstractBundle
     }
 
     /**
-     * Declares the encrypted Doctrine DBAL types, which must be known before any entry point runs its first query.
+     * Declares the encrypted Doctrine DBAL types when no DoctrineBundle connection declares them.
+     *
+     * They must be known before any entry point runs its first query.
      */
     public function boot(): void
     {
@@ -95,6 +98,9 @@ class KeyManagementBundle extends AbstractBundle
         if (class_exists(RegisterEncryptedColumnsPass::class)) {
             $container->addCompilerPass(new RegisterEncryptedColumnsPass());
         }
+
+        // after RegisterEncryptedColumnsPass, which adds the types of the encrypted columns
+        $container->addCompilerPass(new RegisterDoctrineDbalTypesPass());
     }
 
     public function configure(DefinitionConfigurator $definition): void
@@ -227,7 +233,7 @@ class KeyManagementBundle extends AbstractBundle
                 ->arrayNode('doctrine_dbal')
                     ->children()
                         ->arrayNode('types', 'type')
-                            ->info('Encrypted Doctrine DBAL types by name, declared when the kernel boots.')
+                            ->info('Encrypted Doctrine DBAL types by name.')
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('name')
                             ->arrayPrototype()
@@ -470,10 +476,12 @@ class KeyManagementBundle extends AbstractBundle
     }
 
     /**
-     * Registers the encrypted Doctrine DBAL types that boot() declares.
+     * Registers the service that declares the encrypted Doctrine DBAL types.
      *
+     * Each DoctrineBundle connection declares the types when it's created, see RegisterDoctrineDbalTypesPass.
+     * Without DoctrineBundle, boot() declares them.
      * They encrypt with the encrypter the envelope interfaces resolve to: the store-backed one when a store is configured, the default client's otherwise.
-     * They get a lazy proxy of that encrypter, so that booting the kernel doesn't create the store and its database connection.
+     * They get a lazy proxy of that encrypter, so that declaring the types doesn't create the store and its database connection.
      *
      * With the Doctrine ORM bridge, they are registered even when none is configured.
      * RegisterEncryptedColumnsPass then adds the types of the columns marked with #[Encrypted], and removes the service when there is none.

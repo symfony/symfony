@@ -54,7 +54,7 @@ $eventManager->addEventListener(Events::loadClassMetadata, new EncryptedColumnLi
 Loading the metadata of a class fails when no encrypted type is registered for the key and the type of a column.
 It also fails when the attribute is on a property that is not a mapped column.
 
-In a Symfony application, the `KeyManagementBundle` registers the types when the kernel boots.
+In a Symfony application, the `KeyManagementBundle` registers the types when DoctrineBundle creates a connection.
 When the container is compiled, the bundle finds the `#[Encrypted]` columns and registers one type per key and type.
 It looks for these columns in the entities, embeddables and mapped superclasses found in the `resource` directories of your services.
 With the default `App\:` resource, this covers `src/Entity/`.

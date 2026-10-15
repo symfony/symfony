@@ -12,6 +12,7 @@
 namespace Symfony\Component\KeyManagement\Bridge\DoctrineDbal;
 
 use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
@@ -49,6 +50,9 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  * kernel. Nothing is opened by doing so, since a DBAL connection only reaches the database on its
  * first query.
  *
+ * KeyManagementBundle calls register() when DoctrineBundle creates a connection instead. The types
+ * can then wrap the ones DoctrineBundle registers at that time.
+ *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
  * @experimental
@@ -65,17 +69,21 @@ final class EncryptedTypes
     }
 
     /**
-     * Replaces a type whose name is taken rather than refusing to add it.
+     * Declares the types on the global type registry.
      *
+     * When a connection is given, the parent types are the ones this connection resolves, so that a type registered on this connection can be wrapped too.
+     *
+     * Replaces a type whose name is taken rather than refusing to add it.
      * That is what a rebooted kernel needs: the type registry is global and outlives the
      * container, so the types of the previous one are still there, pointing at encrypters nothing
      * else uses any more.
      *
      * @throws InvalidArgumentException If a declaration names no Doctrine type or no key
      */
-    public function register(): void
+    public function register(?Connection $connection = null): void
     {
         $registry = method_exists(Configuration::class, 'getTypeProvider') ? (new Configuration())->getTypeProvider() : Type::getTypeRegistry();
+        $parents = $connection && method_exists(Configuration::class, 'getTypeProvider') ? $connection->getConfiguration()->getTypeProvider() : $registry;
 
         foreach ($this->types as $name => $definition) {
             foreach (['type', 'key'] as $required) {
@@ -84,7 +92,7 @@ final class EncryptedTypes
                 }
             }
 
-            $type = new EncryptedType($registry->get($definition['type']), $this->envelopes, $definition['key']);
+            $type = new EncryptedType($parents->get($definition['type']), $this->envelopes, $definition['key']);
 
             $registry->has($name) ? $registry->override($name, $type) : $registry->register($name, $type);
         }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Tests\DependencyInjection;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\Entity;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -889,6 +890,27 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertTrue($definition->isPublic(), 'the bundle fetches it when the kernel boots.');
         $this->assertEquals(new LazyProxyArgument(new Reference('key_management.envelope_encrypter.app')), $definition->getArgument(0));
         $this->assertSame(['encrypted_phone' => ['type' => 'string', 'key' => 'app']], $definition->getArgument(1));
+    }
+
+    public function testDoctrineDbalTypesAreRegisteredWhenDoctrineBundleCreatesAConnection()
+    {
+        if (!class_exists(Type::class) || !class_exists(EncryptedTypes::class)) {
+            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->setParameter('doctrine.connections', ['default' => 'doctrine.dbal.default_connection', 'replica' => 'doctrine.dbal.replica_connection']);
+            $container->register('doctrine.dbal.default_connection', Connection::class);
+            $container->register('doctrine.dbal.replica_connection', Connection::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=AAAA'],
+                'doctrine_dbal' => ['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'app']]],
+            ]);
+        });
+
+        $this->assertFalse($container->getDefinition('key_management.doctrine_dbal.encrypted_types')->isPublic(), 'the kernel does not register them when it boots.');
+        $this->assertEquals([new Reference('key_management.doctrine_dbal.encrypted_types'), 'register'], $container->getDefinition('doctrine.dbal.default_connection')->getConfigurator());
+        $this->assertEquals([new Reference('key_management.doctrine_dbal.encrypted_types'), 'register'], $container->getDefinition('doctrine.dbal.replica_connection')->getConfigurator());
     }
 
     public function testWithoutDoctrineDbalTypesNothingIsRegisteredForThem()

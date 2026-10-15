@@ -28,6 +28,38 @@ class FormRendererTest extends TestCase
         $this->assertEquals('Is active', $renderer->humanize('isActive'));
     }
 
+    public function testSearchAndRenderBlockResumesEachRecursiveCallFromTheLevelOfTheCallingBlock()
+    {
+        $engine = new class extends AbstractRendererEngine {
+            public FormRenderer $renderer;
+
+            public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []): string
+            {
+                if (str_starts_with($blockName, '_')) {
+                    return $this->renderer->searchAndRenderBlock($view, 'label').$this->renderer->searchAndRenderBlock($view, 'label');
+                }
+
+                return '['.$blockName.']';
+            }
+
+            protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName): bool
+            {
+                $this->resources[$cacheKey][$blockName] = true;
+
+                return true;
+            }
+        };
+        $engine->renderer = $renderer = new FormRenderer($engine);
+
+        $view = new FormView();
+        $view->vars = ['name' => 'email', 'unique_block_prefix' => '_profile_email', 'block_prefixes' => ['form', 'text', '_profile_email'], 'cache_key' => '_profile_email_text'];
+        $this->assertSame('[text_label][text_label]', $renderer->searchAndRenderBlock($view, 'label'));
+
+        $view = new FormView();
+        $view->vars = ['name' => 'name', 'unique_block_prefix' => '_profile_name', 'block_prefixes' => ['form', '_profile_name'], 'cache_key' => '_profile_name_form'];
+        $this->assertSame('[form_label][form_label]', $renderer->searchAndRenderBlock($view, 'label'));
+    }
+
     public function testRenderARenderedField()
     {
         $this->expectException(BadMethodCallException::class);

@@ -161,6 +161,7 @@ Form
    designating the same choice, but reading it back returns the offered identifier
  * `TimezoneType` now resolves `UTC` and `Etc/UTC` to each other, the `intl` option deciding which one is
    offered, where submitting the one the option does not offer used to be rejected
+ * Deprecate not implementing `collectRenderingTrace()` in classes implementing `FormDataCollectorInterface`; the method will be added to the interface in 9.0
 
 FrameworkBundle
 ---------------

@@ -200,6 +200,23 @@
             color: inherit;
             text-decoration: inherit;
         }
+        .form-not-rendered {
+            color: var(--color-muted);
+            font-style: italic;
+        }
+        .form-prototype-badge {
+            margin-left: 5px;
+        }
+        .form-theme-candidates .matched {
+            font-weight: bold;
+        }
+        .form-theme-candidates .skipped {
+            color: var(--color-muted);
+        }
+        .form-theme-candidates .form-theme-group {
+            background-color: var(--table-header);
+            font-weight: bold;
+        }
     </style>
 {% endblock %}
 
@@ -491,7 +508,7 @@
 
             <div id="tree-details-container">
                 {% for formName, formData in collector.data.forms %}
-                    {{ _self.form_tree_details(formName, formData, collector.data.forms_by_hash, loop.first) }}
+                    {{ _self.form_tree_details(formName, formData, collector.data.forms_by_hash, loop.first, true) }}
                 {% endfor %}
             </div>
         </div>
@@ -502,27 +519,32 @@
     {% endif %}
 {% endblock %}
 
-{% macro form_tree_entry(name, data, is_root, level, setsize, posinset, is_first) %}
+{% macro form_tree_entry(name, data, is_root, level, setsize, posinset, is_first, form_is_traced = false, is_prototype = false) %}
     {% set has_error = data.errors is defined and data.errors|length > 0 %}
     {% set has_descendant_error = data.has_children_error|default(false) %}
     {% set is_expanded_initially = is_root or has_descendant_error %}
+    {% set has_prototype = data.prototype is defined %}
+    {% set has_children = data.children is not empty or has_prototype %}
+    {% set form_is_traced = is_root ? data.rendering is defined : form_is_traced %}
+    {% set is_not_rendered = form_is_traced and not is_root and data.children is empty and data.rendering.blocks.row is not defined and data.rendering.blocks.widget is not defined %}
+    {% set label_class = [has_error or has_descendant_error ? 'has-error', is_not_rendered ? 'form-not-rendered']|filter(c => c)|join(' ') %}
     <li role="none">
         <div class="tree-inner"
             role="treeitem"
             tabindex="{{ is_first ? '0' : '-1' }}"
             aria-selected="{{ is_first ? 'true' : 'false' }}"
-            {% if data.children is not empty %}aria-expanded="{{ is_expanded_initially ? 'true' : 'false' }}"{% endif %}
+            {% if has_children %}aria-expanded="{{ is_expanded_initially ? 'true' : 'false' }}"{% endif %}
             data-tab-target-id="{{ data.id }}-details"
-            title="{{ name|default('(no name)') }}"
+            title="{{ name|default('(no name)') }}{% if is_prototype %} (prototype){% elseif is_not_rendered %} (not rendered){% endif %}"
             aria-level="{{ level }}"
             aria-setsize="{{ setsize }}"
             aria-posinset="{{ posinset }}"
-            aria-label="{{ name|default('(no name)') }}{% if has_error %}, {{ data.errors|length }} error{{ data.errors|length > 1 ? 's' }}{% elseif has_descendant_error %}, contains errors{% endif %}">
+            aria-label="{{ name|default('(no name)') }}{% if is_prototype %}, prototype{% endif %}{% if has_error %}, {{ data.errors|length }} error{{ data.errors|length > 1 ? 's' }}{% elseif has_descendant_error %}, contains errors{% endif %}{% if is_not_rendered %}, not rendered{% endif %}">
             {% if has_error %}
                 <div class="badge-error">{{ data.errors|length }}</div>
             {% endif %}
 
-            {% if data.children is not empty %}
+            {% if has_children %}
                 <button class="toggle-button" data-toggle-target-id="{{ data.id }}-children" tabindex="-1" aria-hidden="true">
                     {{ source('@WebProfiler/Icon/chevron-down.svg') }}
                 </button>
@@ -530,22 +552,29 @@
                 <div class="toggle-icon empty"></div>
             {% endif %}
 
-            <span {% if has_error or has_descendant_error %}class="has-error"{% endif %}>
+            <span{% if label_class %} class="{{ label_class }}"{% endif %}>
                 {{ name|default('(no name)') }}
             </span>
+            {% if is_prototype %}
+                <span class="badge form-prototype-badge">prototype</span>
+            {% endif %}
         </div>
 
-        {% if data.children is not empty %}
+        {% if has_children %}
+            {% set children_count = data.children|length + (has_prototype ? 1 : 0) %}
             <ul role="group" id="{{ data.id }}-children" {% if not is_expanded_initially %}class="hidden"{% endif %}>
                 {% for childName, childData in data.children %}
-                    {{ _self.form_tree_entry(childName, childData, false, level + 1, data.children|length, loop.index, false) }}
+                    {{ _self.form_tree_entry(childName, childData, false, level + 1, children_count, loop.index, false, form_is_traced) }}
                 {% endfor %}
+                {% if has_prototype %}
+                    {{ _self.form_tree_entry(data.prototype.name, data.prototype, false, level + 1, children_count, children_count, false, false, true) }}
+                {% endif %}
             </ul>
         {% endif %}
     </li>
 {% endmacro %}
 
-{% macro form_tree_details(name, data, forms_by_hash, show) %}
+{% macro form_tree_details(name, data, forms_by_hash, show = false, is_root = false) %}
     <div class="tree-details{% if not show|default(false) %} hidden{% endif %}" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
         <h2>{{ name|default('(no name)') }}</h2>
         {% if data.type_class is defined %}
@@ -604,12 +633,24 @@
                     {{ _self.render_form_view_variables(data) }}
                 </div>
             </div>
+
+            <div class="tab {{ data.rendering is not defined ? 'disabled' }}">
+                <h3 class="tab-title">Theme</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_theme(data, is_root) }}
+                </div>
+            </div>
         </div>
     </div>
 
     {% for childName, childData in data.children %}
         {{ _self.form_tree_details(childName, childData, forms_by_hash) }}
     {% endfor %}
+
+    {% if data.prototype is defined %}
+        {{ _self.form_tree_details(data.prototype.name ~ ' (prototype)', data.prototype, forms_by_hash) }}
+    {% endif %}
 {% endmacro %}
 
 {% macro render_form_errors(data) %}
@@ -818,4 +859,105 @@
         {% endfor %}
         </tbody>
     </table>
+{% endmacro %}
+
+{% macro render_form_theme(data, is_root) %}
+    {% if data.rendering is not defined %}
+        <div class="empty">
+            <p>Not rendered by Twig.</p>
+        </div>
+    {% else %}
+        {% set rendering = data.rendering.getValue(true) %}
+        {% set built_in_parts = ['row', 'label', 'widget', 'help', 'errors', 'rest', 'form_start', 'form_end', 'form'] %}
+
+        {% set parts = ['row', 'label', 'widget', 'help', 'errors'] %}
+        {% if data.view_vars.compound ?? false %}
+            {% set parts = parts|merge(['rest']) %}
+        {% endif %}
+        {% if is_root %}
+            {% set parts = parts|merge(['form_start', 'form_end', 'form']) %}
+        {% endif %}
+        {% set custom_parts = [] %}
+        {% for part in (rendering.blocks ?? [])|keys %}
+            {% if part not in built_in_parts %}
+                {% set custom_parts = custom_parts|merge([part]) %}
+            {% elseif part not in parts %}
+                {% set parts = parts|merge([part]) %}
+            {% endif %}
+        {% endfor %}
+
+        <table class="form-theme-candidates">
+            <thead>
+            <tr>
+                <th scope="col">Part</th>
+                <th scope="col">Candidate blocks</th>
+                <th scope="col">Defined in</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if custom_parts is not empty %}
+                <tr>
+                    <th colspan="3" class="form-theme-group font-normal">Built-in parts</th>
+                </tr>
+            {% endif %}
+            {% for part in parts %}
+                {{ _self.render_form_theme_part(part, rendering.blocks[part] ?? null) }}
+            {% endfor %}
+            </tbody>
+            {% if custom_parts is not empty %}
+                <tbody>
+                <tr>
+                    <th colspan="3" class="form-theme-group font-normal">Custom parts</th>
+                </tr>
+                {% for part in custom_parts %}
+                    {{ _self.render_form_theme_part(part, rendering.blocks[part]) }}
+                {% endfor %}
+                </tbody>
+            {% endif %}
+        </table>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_form_theme_part(part, block) %}
+    {% if block is null %}
+        <tr>
+            <th scope="row">{{ part }}</th>
+            <td colspan="2" class="text-muted">Not rendered</td>
+        </tr>
+    {% else %}
+        {% set matched_blocks = block.matched|column('block') %}
+        {% for matched in block.matched %}
+            <tr>
+                {% if loop.first %}
+                    <th scope="row" rowspan="{{ loop.length }}">{{ part }}</th>
+                    <td rowspan="{{ loop.length }}">
+                        {% for candidate in block.hierarchy -%}
+                            <code class="{{ candidate in matched_blocks ? 'matched' : 'skipped' }}">{{ candidate }}</code>{% if not loop.last %}<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                {% endif %}
+                <td>
+                    {% if loop.length > 1 %}<code>{{ matched.block }}</code>:{% endif %}
+                    {% if matched.template is null %}
+                        <em>Unknown</em>
+                    {% else %}
+                        {% set link = matched.path ? matched.path|file_link(matched.line ?: 1) : false %}
+                        {% set label = matched.template ~ (matched.line ? ':' ~ matched.line : '') %}
+                        {% set relative_path = matched.path ? (matched.path|file_relative ?: matched.path) : null %}
+                        {% if link %}
+                            <a href="{{ link }}" title="{{ relative_path }}">{{ label }}</a>
+                        {% else %}
+                            <span{% if relative_path %} title="{{ relative_path }}"{% endif %}>{{ label }}</span>
+                        {% endif %}
+                        {% if relative_path %}
+                            <button type="button" class="icon-copy hidden" aria-label="Copy file path" data-clipboard-text="{{ relative_path ~ (matched.line ? ':' ~ matched.line) }}">
+                                <span class="icon-copy-default">{{ source('@WebProfiler/Icon/copy.svg') }}</span>
+                                <span class="icon-copy-success">{{ source('@WebProfiler/Icon/copy-check.svg') }}</span>
+                            </button>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    {% endif %}
 {% endmacro %}

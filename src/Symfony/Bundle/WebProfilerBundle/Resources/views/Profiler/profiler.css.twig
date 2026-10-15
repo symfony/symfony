@@ -543,6 +543,28 @@ time[data-render-as-time] {
 .btn-link:hover {
     text-decoration: underline;
 }
+.icon-copy {
+    background: none;
+    border: 0;
+    color: var(--color-muted);
+    cursor: pointer;
+    display: inline-flex;
+    padding: 0 0 0 5px;
+    vertical-align: middle;
+}
+.icon-copy:hover, .icon-copy.is-copied {
+    color: inherit;
+}
+.icon-copy .icon-copy-success, .icon-copy.is-copied .icon-copy-default {
+    display: none;
+}
+.icon-copy.is-copied .icon-copy-success {
+    display: inline-flex;
+}
+.icon-copy svg {
+    height: 16px;
+    width: 16px;
+}
 {# Tables
    ------------------------------------------------------------------------- #}
 table, tr, th, td {

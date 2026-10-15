@@ -22,6 +22,8 @@ CHANGELOG
  * Add the `entry_name` option to `CollectionType` and `PolymorphicCollectionType` to name the entry forms after a property of the entries instead of their keys
  * Pass the data of the fields to the constructor of the `data_class` when it has required arguments or promoted readonly properties
  * Replace the data of a form with a new instance when a field mapped to one of its promoted readonly properties changes
+ * Add `FormDataCollectorInterface::collectRenderingTrace()` to store the form theme blocks rendered for a view
+ * Deprecate not implementing `collectRenderingTrace()` in a custom form data collector
 
 8.1
 ---

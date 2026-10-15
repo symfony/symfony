@@ -12,8 +12,11 @@
 namespace Symfony\Component\KeyManagement\Bridge\DoctrineDbal\Tests;
 
 use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
+use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\TypeRegistry;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
@@ -84,6 +87,22 @@ class EncryptedTypesTest extends TestCase
 
         $this->assertNotSame($first, self::type($name));
         $this->assertSame('x', self::type($name)->convertToPHPValue(self::type($name)->convertToDatabaseValue('x', new SQLitePlatform()), new SQLitePlatform()));
+    }
+
+    public function testTheParentTypeIsTheOneTheConnectionResolves()
+    {
+        if (!method_exists(Configuration::class, 'setTypeProvider')) {
+            $this->markTestSkipped('doctrine/dbal < 4.6 has no type provider per connection.');
+        }
+
+        $parent = self::uniqueName();
+        $name = self::uniqueName();
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], (new Configuration())->setTypeProvider(new TypeRegistry([$parent => new StringType()])));
+
+        (new EncryptedTypes($this->envelopes, [$name => ['type' => $parent, 'key' => 'app']]))->register($connection);
+
+        $type = self::type($name);
+        $this->assertSame('x', $type->convertToPHPValue($type->convertToDatabaseValue('x', new SQLitePlatform()), new SQLitePlatform()));
     }
 
     public function testADeclarationWithoutAKeyIsReported()

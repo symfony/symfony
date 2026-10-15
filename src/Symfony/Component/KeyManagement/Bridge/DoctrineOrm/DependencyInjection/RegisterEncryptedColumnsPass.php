@@ -24,7 +24,7 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\Encrypted;
 /**
  * Registers an encrypted type for each key and type of the columns marked with {@see Encrypted}.
  *
- * The types must be registered when the kernel boots, before any metadata is loaded, so they are collected when the container is compiled.
+ * The types must be registered before the first query, even when the metadata comes from the cache, so they are collected when the container is compiled.
  * {@see self::autoconfigure()} tags the entities, embeddables and mapped superclasses that the container loads with their encrypted columns.
  * This pass then adds one type per key and type to the types declared in "key_management.doctrine_dbal.types".
  * A declared type is used for the columns of its key and type, instead of registering another one.

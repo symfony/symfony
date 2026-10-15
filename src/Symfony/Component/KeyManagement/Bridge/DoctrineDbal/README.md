@@ -78,24 +78,20 @@ key_management:
 The types encrypt with the envelope encrypter that `EnvelopeEncrypterInterface` resolves to.
 When `key_management.store` is configured, this is the store-backed encrypter, and `key` names a scope.
 Otherwise, this is the encrypter of the default client, and `key` names a master key.
-The bundle declares the types when the kernel boots.
+The bundle declares the types when DoctrineBundle creates a connection.
+DoctrineBundle registers the types of its own configuration at that time, so `type` can name one of them.
 
 With the Doctrine ORM, you don't need to declare these types.
 Mark the property with the `#[Encrypted]` attribute of `symfony/doctrine-orm-key-management` instead, and the bundle registers the type of the column for you.
 
-Booting is early enough for every entry point at once, the front controller,
-the console with its schema tool and its migrations, and the test kernel, and
-it costs nothing: a DBAL connection only reaches the database on its first
-query. Registering later is what does not work.
+Every entry point creates a connection before its first query: the front controller, the console with its schema tool and its migrations, and the test kernel.
+A request that doesn't use the database doesn't declare the types.
 
-In particular, do not defer it to Doctrine ORM's `loadClassMetadata` event: the
+Do not defer the registration to Doctrine ORM's `loadClassMetadata` event: the
 event does not fire when metadata comes from the cache, which DoctrineBundle
 enables in production, so a cached field mapping would reference a type name
 that is missing from the registry and every read of the column would fail with
-`UnknownColumnType`. A connection cannot do it either, however tempting
-`doctrine.dbal.connection_factory` looks: a store-backed encrypter needs a
-connection, so asking a connection for the types closes a circle the container
-refuses to compile.
+`UnknownColumnType`.
 
 Without the bundle, the application declares the types itself.
 `doctrine.dbal.types` is not the place for them, and cannot be: it names a class that DoctrineBundle instantiates with no argument, while an `EncryptedType` takes an encrypter, which is a service.
@@ -124,6 +120,9 @@ public function boot(): void
     $this->container->get('app.encrypted_types')->register();
 }
 ```
+
+When the kernel boots, DoctrineBundle has not registered the types of its configuration yet.
+The types declared this way can only wrap the types that are registered before, such as the built-in ones.
 
 Which encrypter a type is given is what decides the regime of the column.
 The configured types all share one encrypter, so an entity holding both regimes declares the types of the other one with such a service.

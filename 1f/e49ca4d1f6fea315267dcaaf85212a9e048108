@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T08:51:31Z
+
+Thanks Javier, I pushed a small fix. After `fclose(STDIN)`, `stream_isatty(\STDIN)` throws a TypeError, so `getWidth()` failed where it returned 80 before. An `is_resource()` check fixes that. I also added two phpt tests. The first closes STDIN. The second puts a fake `stty` on the PATH and checks that we don't run it when STDIN is a pipe.

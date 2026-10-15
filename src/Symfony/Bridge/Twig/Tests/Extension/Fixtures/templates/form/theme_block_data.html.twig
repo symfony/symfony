@@ -1,0 +1,7 @@
+{% use 'form_div_layout.html.twig' %}
+
+{% block form_widget_simple %}
+    {%- guard function block_data -%}
+        {{- block_data('widget_attributes')|json_encode|raw -}}
+    {%- endguard -%}
+{%- endblock form_widget_simple %}

@@ -69,4 +69,35 @@ final class SevenIoTransportTest extends TransportTestCase
 
         $transport->send(new SmsMessage('0611223344', 'Hello!'));
     }
+
+    public function testSendWithNoRecipientAcceptedThrows()
+    {
+        $response = new MockResponse(json_encode([
+            'success' => '101',
+            'messages' => [['id' => null, 'recipient' => '4917612345678', 'success' => false, 'error' => '101', 'error_text' => 'failed']],
+        ]));
+
+        $transport = self::createTransport(new MockHttpClient($response));
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Unable to send the SMS: "101".');
+
+        $transport->send(new SmsMessage('0611223344', 'Hello!'));
+    }
+
+    public function testSendWithSomeRecipientsAccepted()
+    {
+        $response = new MockResponse(json_encode([
+            'success' => '101',
+            'messages' => [
+                ['id' => null, 'recipient' => '4917612345678', 'success' => false, 'error' => '101', 'error_text' => 'failed'],
+                ['id' => '1234567890', 'recipient' => '4917687654321', 'success' => true, 'error' => null, 'error_text' => null],
+            ],
+        ]));
+
+        $transport = self::createTransport(new MockHttpClient($response));
+        $sentMessage = $transport->send(new SmsMessage('4917612345678,4917687654321', 'Hello!'));
+
+        $this->assertSame('1234567890', $sentMessage->getMessageId());
+    }
 }

@@ -69,7 +69,7 @@ abstract class Descriptor implements DescriptorInterface
 
         $type->getInnerType()->configureOptions($ownOptionsResolver = new OptionsResolverWrapper());
         $this->ownOptions = array_diff($ownOptionsResolver->getDefinedOptions(), $optionsResolver->getDefinedOptions());
-        $overriddenOptions = array_intersect(array_merge($ownOptionsResolver->getDefinedOptions(), $ownOptionsResolver->getUndefinedOptions()), $optionsResolver->getDefinedOptions());
+        $overriddenOptions = array_intersect(array_unique(array_merge($ownOptionsResolver->getDefinedOptions(), $ownOptionsResolver->getUndefinedOptions())), $optionsResolver->getDefinedOptions());
 
         $this->parentOptions = [];
         foreach ($this->parents as $class => $parentOptions) {

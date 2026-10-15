@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T15:21:22Z
+
+I added `getInfo()` too. A type calling it on an inherited option crashed `debug:form` in the same way.

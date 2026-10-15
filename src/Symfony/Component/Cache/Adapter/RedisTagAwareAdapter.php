@@ -193,27 +193,31 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         // the scan, it means we're in cluster mode and that the linked items
         // are on other nodes: we move the links to a temporary set and we
         // garbage collect that set from the client side.
+        // With Relay, the client deletes the linked items itself. When the script
+        // deletes them, Relay can keep serving them from memory for a short time.
 
         $lua = <<<'EOLUA'
                         redis.replicate_commands()
 
-                        local cursor = '0'
                         local id = KEYS[1]
-                        repeat
-                            local result = redis.call('SSCAN', id, cursor, 'COUNT', 5000);
-                            cursor = result[1];
-                            local rems = {}
+                        if '1' == ARGV[2] then
+                            local cursor = '0'
+                            repeat
+                                local result = redis.call('SSCAN', id, cursor, 'COUNT', 5000);
+                                cursor = result[1];
+                                local rems = {}
 
-                            for _, v in ipairs(result[2]) do
-                                local ok, _ = pcall(redis.call, 'DEL', ARGV[1]..v)
-                                if ok then
-                                    table.insert(rems, v)
+                                for _, v in ipairs(result[2]) do
+                                    local ok, _ = pcall(redis.call, 'DEL', ARGV[1]..v)
+                                    if ok then
+                                        table.insert(rems, v)
+                                    end
                                 end
-                            end
-                            if 0 < #rems then
-                                redis.call('SREM', id, unpack(rems))
-                            end
-                        until '0' == cursor;
+                                if 0 < #rems then
+                                    redis.call('SREM', id, unpack(rems))
+                                end
+                            until '0' == cursor;
+                        end
 
                         redis.call('SUNIONSTORE', '{'..id..'}'..id, id)
                         redis.call('DEL', id)
@@ -222,14 +226,16 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
             EOLUA;
 
         $results = $this->pipeline(function () use ($tagIds, $lua) {
+            $isRelay = $this->redis instanceof Relay;
+
             if ($this->redis instanceof \Predis\ClientInterface) {
                 $prefix = $this->redis->getOptions()->prefix ? $this->redis->getOptions()->prefix->getPrefix() : '';
-            } elseif (\is_array($prefix = $this->redis->getOption($this->redis instanceof Relay ? Relay::OPT_PREFIX : \Redis::OPT_PREFIX) ?? '')) {
+            } elseif (\is_array($prefix = $this->redis->getOption($isRelay ? Relay::OPT_PREFIX : \Redis::OPT_PREFIX) ?? '')) {
                 $prefix = current($prefix);
             }
 
             foreach ($tagIds as $id) {
-                yield 'eval' => $this->redis instanceof \Predis\ClientInterface ? [$lua, 1, $id, $prefix] : [$lua, [$id, $prefix], 1];
+                yield 'eval' => $this->redis instanceof \Predis\ClientInterface ? [$lua, 1, $id, $prefix, '1'] : [$lua, [$id, $prefix, $isRelay ? '0' : '1'], 1];
             }
         });
 

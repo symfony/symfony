@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
+use Doctrine\DBAL\Exception as DBALException;
+
 /**
  * Uses PostgreSQL LISTEN/NOTIFY to push messages to workers.
  *
@@ -45,7 +47,11 @@ final class PostgreSqlConnection extends Connection
 
     public function __destruct()
     {
-        $this->unlisten();
+        try {
+            $this->unlisten();
+        } catch (DBALException) {
+            // a broken connection does not keep its LISTEN
+        }
     }
 
     public function isListening(): bool
@@ -97,7 +103,11 @@ final class PostgreSqlConnection extends Connection
             return;
         }
 
-        $this->executeStatement(\sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
         $this->listening = false;
+
+        // when the connection is closed, its LISTEN is gone too: do not reconnect just to UNLISTEN
+        if ($this->driverConnection->isConnected()) {
+            $this->executeStatement(\sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
+        }
     }
 }

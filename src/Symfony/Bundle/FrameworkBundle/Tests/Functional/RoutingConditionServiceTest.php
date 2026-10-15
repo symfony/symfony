@@ -40,6 +40,49 @@ class RoutingConditionServiceTest extends AbstractWebTestCase
         $this->assertSame('en', $context->getParameter('_locale'));
     }
 
+    public function testContextPortsAreResetBetweenRequests()
+    {
+        $client = static::createClient(['test_case' => 'RoutingConditionService']);
+        $client->disableReboot();
+        $context = $client->getContainer()->get('router')->getContext();
+
+        $client->request('GET', 'http://localhost:8080/allowed/manually-tagged');
+        $client->request('GET', 'https://localhost:8443/allowed/manually-tagged');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(80, $context->getHttpPort());
+        $this->assertSame(8443, $context->getHttpsPort());
+
+        $client->request('GET', 'http://localhost/allowed/manually-tagged');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(80, $context->getHttpPort());
+        $this->assertSame(443, $context->getHttpsPort());
+    }
+
+    public function testContextIsResetOutsideOfRequests()
+    {
+        static::bootKernel(['test_case' => 'RoutingConditionService']);
+        $container = static::getContainer();
+        $context = $container->get('router')->getContext();
+        $initialContext = clone $context;
+
+        $context
+            ->setBaseUrl('/tenant')
+            ->setPathInfo('/foo')
+            ->setMethod('POST')
+            ->setHost('tenant.example.com')
+            ->setScheme('https')
+            ->setHttpPort(8080)
+            ->setHttpsPort(8443)
+            ->setQueryString('foo=bar')
+            ->setParameter('tenant', 'acme');
+
+        $container->get('services_resetter')->reset();
+
+        $this->assertEquals($initialContext, $context);
+    }
+
     public static function provideRoutes(): iterable
     {
         yield 'allowed by an autoconfigured service' => [

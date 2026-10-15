@@ -586,6 +586,26 @@ class PropertyNormalizerTest extends TestCase
         );
     }
 
+    public function testSupportsAndNormalizeDiscriminatedObjectWithoutProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, $discriminator);
+
+        $this->assertTrue($normalizer->supportsNormalization(new PropertyDiscriminatedDummyThree()));
+        $this->assertSame(['type' => 'three'], $normalizer->normalize(new PropertyDiscriminatedDummyThree()));
+    }
+
+    public function testSupportsAndDenormalizeDiscriminatedObjectWithoutProperties()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, $discriminator);
+
+        $this->assertTrue($normalizer->supportsDenormalization(['type' => 'three'], PropertyDiscriminatedDummyThree::class));
+        $this->assertInstanceOf(PropertyDiscriminatedDummyThree::class, $normalizer->denormalize(['type' => 'three'], PropertyDiscriminatedDummyThree::class));
+    }
+
     public function testDiscriminatorWithAllowExtraAttributesFalse()
     {
         // Discriminator type property should be allowed with allow_extra_attributes=false
@@ -793,6 +813,7 @@ class RootDummy
 #[DiscriminatorMap(typeProperty: 'type', mapping: [
     'one' => PropertyDiscriminatedDummyOne::class,
     'two' => PropertyDiscriminatedDummyTwo::class,
+    'three' => PropertyDiscriminatedDummyThree::class,
 ])]
 interface PropertyDummyInterface
 {
@@ -806,6 +827,10 @@ class PropertyDiscriminatedDummyOne implements PropertyDummyInterface
 class PropertyDiscriminatedDummyTwo implements PropertyDummyInterface
 {
     public $url = 'URL_TWO';
+}
+
+class PropertyDiscriminatedDummyThree implements PropertyDummyInterface
+{
 }
 
 #[DiscriminatorMap(typeProperty: 'type', mapping: [

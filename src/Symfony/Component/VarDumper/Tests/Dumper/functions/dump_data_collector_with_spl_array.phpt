@@ -4,6 +4,9 @@ Test integration with Symfony's DumpDataCollector
 <?php
 putenv('NO_COLOR=1');
 
+// old versions of symfony/http-kernel trigger deprecations on recent PHP versions
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {
     $vendor = dirname($vendor);

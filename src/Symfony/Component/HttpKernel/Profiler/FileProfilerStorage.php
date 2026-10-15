@@ -50,11 +50,19 @@ class FileProfilerStorage implements ProfilerStorageInterface
             return [];
         }
 
+        // the lines before this offset belong to expired profiles, whose files were already removed
+        $offset = is_file($file.'.offset') ? (int) file_get_contents($file.'.offset') : 0;
+
         $file = fopen($file, 'r');
         fseek($file, 0, \SEEK_END);
 
+        if (ftell($file) < $offset) {
+            // the index was recreated after the offset was saved
+            $offset = 0;
+        }
+
         $result = [];
-        while (\count($result) < $limit && $line = $this->readLineFromFile($file)) {
+        while (\count($result) < $limit && ftell($file) > $offset && $line = $this->readLineFromFile($file)) {
             $values = str_getcsv($line, ',', '"', '\\');
 
             if (7 > \count($values)) {
@@ -326,6 +334,11 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $handle = fopen($file, 'r');
 
         if ($offset = is_file($file.'.offset') ? (int) file_get_contents($file.'.offset') : 0) {
+            if ($offset > fstat($handle)['size']) {
+                // the index was recreated after the offset was saved
+                $offset = 0;
+            }
+
             fseek($handle, $offset);
         }
 
@@ -340,7 +353,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
             [$csvToken, , , , $csvTime] = $values;
 
-            if ($csvTime >= $minimalProfileTimestamp) {
+            if ((int) $csvTime >= $minimalProfileTimestamp) {
                 break;
             }
 

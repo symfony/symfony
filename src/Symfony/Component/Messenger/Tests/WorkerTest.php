@@ -389,6 +389,31 @@ class WorkerTest extends TestCase
         $this->assertTrue($timeLimitLogged ?? false);
     }
 
+    public function testWorkerReachesTheTimeLimitWhenOneMicrosecondRemains()
+    {
+        $clock = new MockClock('2023-03-19 14:00:00+00:00');
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('API'))],
+        ]);
+
+        $idleCount = 0;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($clock, &$idleCount) {
+            if (!$event->isWorkerIdle()) {
+                $clock->sleep(59.999999);
+            } elseif (10 < ++$idleCount) {
+                // the worker would loop forever without sleeping otherwise
+                $event->getWorker()->stop();
+            }
+        });
+
+        $worker = new Worker([$receiver], new MessageBus(), $dispatcher, null, null, $clock);
+        $worker->run(['sleep' => 1000000, 'time_limit' => 60]);
+
+        $this->assertEquals(new \DateTimeImmutable('2023-03-19 14:01:00+00:00'), $clock->now());
+        $this->assertSame(1, $idleCount);
+    }
+
     public function testWorkerWithMultipleReceivers()
     {
         // envelopes, in their expected delivery order

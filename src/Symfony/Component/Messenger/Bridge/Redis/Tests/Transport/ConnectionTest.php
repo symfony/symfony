@@ -147,6 +147,36 @@ class ConnectionTest extends TestCase
         $this->assertInstanceOf(Connection::class, new Connection([], $redis));
     }
 
+    public function testRedisClusterExceptionsAreWrapped()
+    {
+        $exception = new \RedisClusterException('Unable to send command to the specified node');
+        $redis = $this->createStub(\RedisCluster::class);
+        foreach (['xgroup', 'xreadgroup', 'xack', 'xclaim', 'xadd', 'rawCommand'] as $method) {
+            $redis->method($method)->willThrowException($exception);
+        }
+
+        $connection = new Connection(['auto_setup' => false], $redis);
+
+        $operations = [
+            'setup' => static fn () => $connection->setup(),
+            'get' => static fn () => $connection->get(),
+            'ack' => static fn () => $connection->ack('1-0'),
+            'reject' => static fn () => $connection->reject('1-0'),
+            'keepalive' => static fn () => $connection->keepalive('1-0'),
+            'add' => static fn () => $connection->add('body', []),
+            'add delayed' => static fn () => $connection->add('body', [], 1000),
+        ];
+
+        foreach ($operations as $name => $operation) {
+            try {
+                $operation();
+                $this->fail(\sprintf('"%s" should have thrown a TransportException.', $name));
+            } catch (TransportException $e) {
+                $this->assertSame($exception, $e->getPrevious(), $name);
+            }
+        }
+    }
+
     public function testPendingScanAdvancesCursorWithoutDuplicates()
     {
         $redis = $this->createRedisMock();
@@ -441,6 +471,57 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false], $redis);
         $connection->get();
+    }
+
+    public function testReconnectsAfterConnectionLoss()
+    {
+        $connected = false;
+        $calls = 0;
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->exactly(2))->method('connect')->willReturnCallback(static function () use (&$connected) {
+            return $connected = true;
+        });
+        $redis->method('isConnected')->willReturnCallback(static function () use (&$connected) {
+            return $connected;
+        });
+        // like phpredis, the client stays broken until it connects again
+        $redis->expects($this->exactly(2))->method('xadd')->willReturnCallback(static function () use (&$connected, &$calls) {
+            if (1 === ++$calls) {
+                $connected = false;
+
+                throw new \RedisException('Connection lost');
+            }
+
+            return $connected ? '1-0' : throw new \RedisException('Redis server localhost:6379 went away');
+        });
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false], $redis);
+
+        try {
+            $connection->add('1', []);
+            $this->fail('A TransportException should have been thrown.');
+        } catch (TransportException $e) {
+            $this->assertSame('Connection lost', $e->getMessage());
+        }
+
+        $this->assertSame('1-0', $connection->add('2', []));
+    }
+
+    public function testFailedConnectionThrowsTransportException()
+    {
+        $exception = new \RedisException('Connection refused');
+        $redis = $this->createMock(\Redis::class);
+        $redis->method('isConnected')->willReturn(false);
+        $redis->expects($this->once())->method('connect')->willThrowException($exception);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['lazy' => true, 'auto_setup' => false], $redis);
+
+        try {
+            $connection->add('1', []);
+            $this->fail('A TransportException should have been thrown.');
+        } catch (TransportException $e) {
+            $this->assertSame($exception, $e->getPrevious());
+        }
     }
 
     public function testMaxEntries()

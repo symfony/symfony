@@ -50,10 +50,10 @@ class Stub
         static $noDefault = new \stdClass();
 
         if (self::class === static::class) {
+            $defaults = self::$propertyDefaults[self::class] ??= get_class_vars(self::class);
             $data = [];
             foreach ($this as $k => $v) {
-                $default = self::$propertyDefaults[$this::class][$k] ??= ($p = new \ReflectionProperty($this, $k))->hasDefaultValue() ? $p->getDefaultValue() : ($p->hasType() ? $noDefault : null);
-                if ($noDefault === $default || $default !== $v) {
+                if (($defaults[$k] ?? null) !== $v) {
                     $data[$k] = $v;
                 }
             }

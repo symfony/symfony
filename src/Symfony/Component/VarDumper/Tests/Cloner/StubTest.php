@@ -26,6 +26,18 @@ final class StubTest extends TestCase
         self::assertNull($stub->value);
     }
 
+    public function testUnserializeValuesLooselyEqualToTheirDefault()
+    {
+        $stub = new Stub();
+        $stub->class = null;
+        $stub->value = false;
+
+        $stub = unserialize(serialize($stub));
+
+        self::assertNull($stub->class);
+        self::assertFalse($stub->value);
+    }
+
     public function testUnserializeNullInTypedProperty()
     {
         $stub = new MyStub();

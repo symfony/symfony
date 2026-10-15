@@ -419,4 +419,16 @@ class ConsoleSectionOutputTest extends TestCase
         rewind($output->getStream());
         $this->assertSame('012345678901234'.\PHP_EOL."\x1b[2A\x1b[0J".'0123456789012345'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
+
+    public function testWriteEmptyString()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->write('');
+        $output->overwrite('One');
+
+        rewind($output->getStream());
+        $this->assertSame('One'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
 }

@@ -175,6 +175,26 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         foreach ($view->children as $child) {
             $this->collectViewVariables($child);
         }
+
+        if (($view->vars['prototype'] ?? null) instanceof FormView) {
+            $this->collectViewVariables($view->vars['prototype']);
+        }
+    }
+
+    /**
+     * @param array{blocks: array<string, array{hierarchy: list<string>, matched: list<array{block: string, template: ?string, path: ?string, line: ?int}>}>} $trace
+     */
+    public function collectRenderingTrace(FormView $view, array $trace): void
+    {
+        $hash = $this->formsByView[spl_object_id($view)] ?? null;
+
+        if (null === $hash || !isset($this->data['forms_by_hash'][$hash])) {
+            return;
+        }
+
+        foreach ($trace['blocks'] as $part => $block) {
+            $this->data['forms_by_hash'][$hash]['rendering']['blocks'][$part] ??= $block;
+        }
     }
 
     public function buildPreliminaryFormTree(FormInterface $form): void
@@ -251,7 +271,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         return $output;
     }
 
-    private function &recursiveBuildFinalFormTree(?FormInterface $form, FormView $view, array &$outputByHash): array
+    private function &recursiveBuildFinalFormTree(?FormInterface $form, FormView $view, array &$outputByHash, bool $inPrototype = false): array
     {
         $viewHash = spl_object_id($view);
         $formHash = null;
@@ -279,6 +299,11 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             );
         }
 
+        // A prototype form is configured before it gets its parent, so only its view knows the full id
+        if ($inPrototype && isset($view->vars['id'])) {
+            $output['id'] = $view->vars['id'];
+        }
+
         $output['children'] = [];
 
         foreach ($view->children as $name => $childView) {
@@ -286,7 +311,11 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             // It is only present in the view.
             $childForm = $form?->has($name) ? $form->get($name) : null;
 
-            $output['children'][$name] = &$this->recursiveBuildFinalFormTree($childForm, $childView, $outputByHash);
+            $output['children'][$name] = &$this->recursiveBuildFinalFormTree($childForm, $childView, $outputByHash, $inPrototype);
+        }
+
+        if (($view->vars['prototype'] ?? null) instanceof FormView) {
+            $output['prototype'] = &$this->recursiveBuildFinalFormTree($form?->getConfig()->getAttribute('prototype'), $view->vars['prototype'], $outputByHash, true);
         }
 
         return $output;

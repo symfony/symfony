@@ -79,7 +79,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
      */
     private function supports(string $class, bool $readAttributes): bool
     {
-        if ($this->classDiscriminatorResolver?->getMappingForClass($class)) {
+        if ($this->classDiscriminatorResolver?->getMappingForMappedObject($class)) {
             return true;
         }
 

@@ -52,7 +52,8 @@ class ConsoleSectionOutput extends StreamOutput
         $this->maxHeight = $maxHeight;
         $existingContent = $this->popStreamContentUntilCurrentSection($previousMaxHeight ? min($previousMaxHeight, $this->lines) : $this->lines);
 
-        parent::doWrite($this->getVisibleContent(), false);
+        $visibleContent = $this->getVisibleContent();
+        parent::doWrite($visibleContent, '' !== $visibleContent && !str_ends_with($visibleContent, \PHP_EOL));
         parent::doWrite($existingContent, false);
     }
 

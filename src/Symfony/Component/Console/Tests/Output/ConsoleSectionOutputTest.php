@@ -235,6 +235,19 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertSame('One'.\PHP_EOL."\x1b[1A\x1b[0J".'Three'.\PHP_EOL.'Four'.\PHP_EOL.'Five'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
+    public function testSetMaxHeightAfterWriteWithoutNewLine()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->write('One');
+        $output->setMaxHeight(2);
+        $output->writeln('Two');
+
+        rewind($output->getStream());
+        $this->assertSame('One'.\PHP_EOL."\x1b[1A\x1b[0J".'One'.\PHP_EOL."\x1b[1A\x1b[0J".'OneTwo'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
     public function testOverwriteFormatsMessage()
     {
         $sections = [];

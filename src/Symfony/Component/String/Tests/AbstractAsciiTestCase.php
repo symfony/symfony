@@ -1027,9 +1027,10 @@ abstract class AbstractAsciiTestCase extends TestCase
     }
 
     #[DataProvider('provideReplace')]
-    public function testReplace(string $expectedString, int $expectedCount, string $origin, string $from, string $to)
+    public function testReplace(string $expectedString, int $expectedCount, string $origin, string $from, string $to, ?int $form = null)
     {
         $origin = static::createFromString($origin);
+        $origin = $form ? $origin->normalize($form) : $origin;
         $result = $origin->replace($from, $to);
 
         $this->assertEquals(static::createFromString($expectedString), $result);

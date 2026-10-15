@@ -636,6 +636,49 @@ class ConnectionTest extends TestCase
         $this->assertSame('xack error', $e->getMessage());
     }
 
+    public function testGetRunsSetupAgainWhenTheGroupIsGone()
+    {
+        $groupExists = false;
+        $redis = $this->createRedisMock();
+        $redis->expects($this->exactly(2))->method('xgroup')
+            ->with('CREATE', 'queue', 'symfony', 0, true)
+            ->willReturnCallback(static function () use (&$groupExists) {
+                return $groupExists = true;
+            });
+        $redis->method('getLastError')->willReturnCallback(static function () use (&$groupExists) {
+            return $groupExists ? null : "NOGROUP No such key 'queue' or consumer group 'symfony' in XREADGROUP with GROUP option";
+        });
+        $redis->method('xreadgroup')->willReturnCallback(static function ($group, $consumer, $streams) use (&$groupExists) {
+            if (!$groupExists) {
+                return false;
+            }
+
+            return '>' === $streams['queue'] ? ['queue' => ['1-0' => ['message' => '{"body":"1","headers":[]}']]] : [];
+        });
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+        $this->assertSame('1-0', $connection->get()[0]['id']);
+
+        // the stream and its group are lost, like when Redis restarts without persistence
+        $groupExists = false;
+
+        $this->assertSame('1-0', $connection->get()[0]['id']);
+    }
+
+    public function testGetDoesNotRunSetupWhenTheGroupIsGoneWithoutAutoSetup()
+    {
+        $redis = $this->createRedisMock();
+        $redis->expects($this->never())->method('xgroup');
+        $redis->expects($this->once())->method('xreadgroup')->willReturn(false);
+        $redis->method('getLastError')->willReturn("NOGROUP No such key 'queue' or consumer group 'symfony' in XREADGROUP with GROUP option");
+
+        $connection = Connection::fromDsn('redis://localhost/queue', ['auto_setup' => false], $redis);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('NOGROUP');
+        $connection->get();
+    }
+
     #[DataProvider('provideIdPatterns')]
     public function testAddReturnId(string $expected, int $delay, string $method, string $return)
     {

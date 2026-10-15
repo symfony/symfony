@@ -375,6 +375,25 @@ class ConnectionTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testGetSendsANewRequestAfterANetworkFailure()
+    {
+        $httpClient = new MockHttpClient([
+            new MockResponse('', ['error' => 'Connection timed out']),
+            $this->getMockedReceiveMessageResponse(),
+        ]);
+        $client = new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => 'key', 'accessKeySecret' => 'secret'], null, $httpClient);
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client, 'https://sqs.eu-west-1.amazonaws.com/123456789012/queue');
+
+        try {
+            $connection->get();
+            $this->fail('The receive should have failed.');
+        } catch (NetworkException) {
+        }
+
+        $this->assertNotNull($connection->get());
+        $this->assertSame(2, $httpClient->getRequestsCount());
+    }
+
     /**
      * Simulates an in-flight ReceiveMessage long-poll: the first stream() call times out,
      * leaving the response pending, and any later attempt to resume it throws, like

@@ -3201,6 +3201,13 @@ class ParserTest extends TestCase
         ], $this->parser->parse($yaml));
     }
 
+    public function testPhpConstantTagFlowMappingKeyUsesTheConstantValueAsIs()
+    {
+        $yaml = '{!php/const Symfony\Component\Yaml\Tests\B::TRUE_STRING: a, !php/const Symfony\Component\Yaml\Tests\B::ALIAS_STRING: b, !php/const Symfony\Component\Yaml\Tests\B::MERGE_KEY: {c: d}}';
+
+        $this->assertSame(['true' => 'a', '*foo' => 'b', '<<' => ['c' => 'd']], $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
+    }
+
     public function testMergeKeysWhenMappingsAreParsedAsObjects()
     {
         $yaml = <<<YAML
@@ -3390,6 +3397,36 @@ class ParserTest extends TestCase
                 b: bar
             EOF
         ));
+    }
+
+    public function testParseMergeKeyWithSequenceOfTaggedValuesThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Merge items must be arrays');
+
+        $this->parser->parse("<<:\n  - !foo bar\n", Yaml::PARSE_CUSTOM_TAGS);
+    }
+
+    public function testParseMergeKeyWithSequenceStartingWithNullThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Merge items must be arrays');
+
+        $this->parser->parse("<<:\n  - ~\n  - {a: b}\n");
+    }
+
+    public function testParseMergeKeyWithFlowSequenceStartingWithNullThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Merge items must be arrays');
+
+        $this->parser->parse("<<: [~, {a: b}]\n");
+    }
+
+    public function testParseMergeKeyWithMappingThatHasZeroAsKey()
+    {
+        $this->assertSame([0 => 'a', 'b' => 'c'], $this->parser->parse("<<: {0: a}\nb: c\n"));
+        $this->assertSame([0 => ['a' => 'b']], $this->parser->parse("<<:\n  0: {a: b}\n"));
     }
 
     public function testParseReferencesOnMergeKeysWithMappingsParsedAsObjects()
@@ -4033,4 +4070,7 @@ class B
     public const FOO = 'foo';
     public const BAR = 'bar';
     public const BAZ = 'baz';
+    public const TRUE_STRING = 'true';
+    public const ALIAS_STRING = '*foo';
+    public const MERGE_KEY = '<<';
 }

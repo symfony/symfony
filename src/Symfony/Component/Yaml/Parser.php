@@ -335,7 +335,7 @@ class Parser
                             throw new ParseException('YAML merge keys used with a scalar value instead of an array.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
                         }
 
-                        if (isset($parsed[0])) {
+                        if (self::preg_match('/^(?:[ \t]*+(?:#.*+)?\n)*+[ \t]*+(?:\[|-(?:\s|$))/', $value)) {
                             // If the value associated with the merge key is a sequence, then this sequence is expected to contain mapping nodes
                             // and each of these nodes is merged in turn according to its order in the sequence. Keys in mapping nodes earlier
                             // in the sequence override keys specified in later mapping nodes.
@@ -345,7 +345,7 @@ class Parser
                                 }
 
                                 if (!\is_array($parsedItem)) {
-                                    throw new ParseException('Merge items must be arrays.', $this->getRealCurrentLineNb() + 1, $parsedItem, $this->filename);
+                                    throw new ParseException('Merge items must be arrays.', $this->getRealCurrentLineNb() + 1, \is_scalar($parsedItem) ? $parsedItem : null, $this->filename);
                                 }
 
                                 $data += $parsedItem; // array union

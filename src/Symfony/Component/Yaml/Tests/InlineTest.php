@@ -785,6 +785,19 @@ class InlineTest extends TestCase
         $this->assertSame(FooBackedEnum::BAR->value, Inline::parse("!php/enum Symfony\Component\Yaml\Tests\Fixtures\FooBackedEnum::BAR->value", Yaml::PARSE_CONSTANT));
     }
 
+    public function testParseEnumAsMappingKeyThrowsException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Non-string keys are not supported. Quote your evaluable mapping keys instead');
+
+        Inline::parse("{!php/const Symfony\Component\Yaml\Tests\Fixtures\FooBackedEnum::BAR: 1}", Yaml::PARSE_CONSTANT);
+    }
+
+    public function testParsePhpConstantAndEnumAsMappingKeysInSequence()
+    {
+        $this->assertSame([[\PHP_INT_MAX => 'foo'], ['bar' => 'baz']], Inline::parse("[!php/const PHP_INT_MAX: foo, !php/enum Symfony\Component\Yaml\Tests\Fixtures\FooBackedEnum::BAR->value: baz]", Yaml::PARSE_CONSTANT));
+    }
+
     public static function getDateTimeDumpTests()
     {
         $tests = [];
@@ -854,6 +867,22 @@ class InlineTest extends TestCase
         $this->expectExceptionMessage('Malformed inline YAML string: "{foo: !bar"');
 
         Inline::parse('{foo: !bar', Yaml::PARSE_CUSTOM_TAGS);
+    }
+
+    public function testUnterminatedSequenceEndingWithAnchor()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Malformed inline YAML string: "[&:"');
+
+        Inline::parse('[&:');
+    }
+
+    public function testUnterminatedMappingEndingWithAnchor()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Malformed inline YAML string: "{foo: &bar"');
+
+        Inline::parse('{foo: &bar');
     }
 
     public function testVeryLongQuotedStrings()

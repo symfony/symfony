@@ -426,7 +426,9 @@ class Inline
                         $value = self::parseMapping($state, $sequence, $flags, $i, $references);
                         break;
                     default:
-                        $value = self::parseScalar($sequence, $flags, [',', ']'], $i, null === $tag, $references, $isQuoted, $state);
+                        // a !php/const or !php/enum key of an embedded mapping is evaluated by parseMapping()
+                        $evaluate = null === $tag && !Parser::preg_match('/!php\/(?:const|enum) [^ ,\]]+?(?<!:): +[^ ,\]]/A', substr($sequence, $i));
+                        $value = self::parseScalar($sequence, $flags, [',', ']'], $i, $evaluate, $references, $isQuoted, $state);
 
                         // the value can be an array if a reference has been resolved to an array var
                         if (\is_string($value) && !$isQuoted && str_contains($value, ': ')) {
@@ -524,9 +526,15 @@ class Inline
                     throw new ParseException('Missing mapping key.', self::$parsedLineNumber + 1, $mapping);
                 }
 
-                if ('!php/const' === $key || '!php/enum' === $key) {
+                $isKeyEvaluated = '!php/const' === $key || '!php/enum' === $key;
+
+                if ($isKeyEvaluated) {
                     $key .= ' '.self::parseScalar($mapping, $flags, ['(?<!:):(?!:)'], $i, false);
                     $key = self::evaluateScalar($state, $key, $flags);
+
+                    if (!\is_string($key) && !\is_int($key)) {
+                        throw new ParseException((is_numeric($key) ? 'Numeric' : 'Non-string').' keys are not supported. Quote your evaluable mapping keys instead.', self::$parsedLineNumber + 1, $mapping);
+                    }
                 }
 
                 if (self::$objectForMap && \is_string($key) && str_starts_with($key, "\0")) {
@@ -537,7 +545,7 @@ class Inline
                     break;
                 }
 
-                if (!$isKeyQuoted) {
+                if (!$isKeyQuoted && !$isKeyEvaluated) {
                     $evaluatedKey = self::evaluateScalar($state, $key, $flags, $references);
 
                     if ('' !== $key && $evaluatedKey !== $key && (!\is_string($evaluatedKey) || '!' === $key[0]) && !\is_int($evaluatedKey)) {
@@ -549,7 +557,7 @@ class Inline
                     throw new ParseException('Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}").', self::$parsedLineNumber + 1, $mapping);
                 }
 
-                $isMergeKey = !$isKeyQuoted && '<<' === $key;
+                $isMergeKey = !$isKeyQuoted && !$isKeyEvaluated && '<<' === $key;
 
                 if ($isMergeKey) {
                     $allowOverwrite = true;
@@ -910,7 +918,7 @@ class Inline
 
     private static function parseTag(string $value, int &$i, int $flags): ?string
     {
-        if ('!' !== $value[$i]) {
+        if (!isset($value[$i]) || '!' !== $value[$i]) {
             return null;
         }
 

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `GrantingVoter` and `DenyingVoter`, abstract voters that vote in a single direction, granting or denying access, and abstain otherwise
+
 8.2
 ---
 

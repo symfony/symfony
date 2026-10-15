@@ -18,6 +18,7 @@ CHANGELOG
  * Register `ContextListener::onKernelResponse()` on the `kernel.response` event instead of on the event dispatcher at runtime
  * Add `ReAuthenticationEntryPointInterface`, started by `ExceptionListener` when the vote denying an attribute requests a re-authentication for it
  * Make `ExceptionListener` start a re-authentication instead of a login when the vote denying a remember-me user requests one
+ * Make `CheckRememberMeConditionsListener` keep a remember-me user remembered when they log in again as the same user, without the remember-me parameter
  * Add `IsGrantedContext::isAuthenticatedRecently()` and `IsGrantedContext::isAuthenticatedVeryRecently()`
  * Add `AuthenticationProofsListener`, which records an interactive authentication as an authentication proof of the token, under the methods its `AuthenticationMethodBadge` states
  * Add `AuthenticationMethodBadge`, for an authenticator to state which authentication methods it verified; `form_login`, `json_login` and `http_basic` state `AuthenticationMethod::PASSWORD`

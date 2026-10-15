@@ -1,6 +1,11 @@
 security:
+    providers:
+        in_memory:
+            memory:
+                users:
+                    bernhard: { password: test, roles: [ROLE_USER] }
+
     firewalls:
         default:
             remember_me:
-                always_remember_me: true
                 secret: key

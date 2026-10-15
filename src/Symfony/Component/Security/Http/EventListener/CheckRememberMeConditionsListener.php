@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\ParameterBagUtils;
@@ -27,7 +28,7 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  *      done by having a _remember_me checkbox in your form, but
  *      can be configured by the "always_remember_me" and "remember_me_parameter"
  *      parameters under the "remember_me" firewall key (or "always_remember_me"
- *      is enabled)
+ *      is enabled), or the user logging in was already remembered
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
@@ -55,7 +56,12 @@ class CheckRememberMeConditionsListener implements EventSubscriberInterface
         $badge = $passport->getBadge(RememberMeBadge::class);
         if (!$this->options['always_remember_me']) {
             $parameter = ParameterBagUtils::getRequestParameterValue($event->getRequest(), $this->options['remember_me_parameter'], $badge->parameters);
-            if (!filter_var($parameter, \FILTER_VALIDATE_BOOL)) {
+            $previousToken = $event->getPreviousToken();
+
+            // a remembered user logging in again stays remembered, unless the request opts out
+            $wasRemembered = null === $parameter && $previousToken instanceof RememberMeToken && $previousToken->getUserIdentifier() === $event->getUser()->getUserIdentifier();
+
+            if (!$wasRemembered && !filter_var($parameter, \FILTER_VALIDATE_BOOL)) {
                 $this->logger?->debug('Remember me disabled; request does not contain remember me parameter ("{parameter}").', ['parameter' => $this->options['remember_me_parameter']]);
 
                 return;

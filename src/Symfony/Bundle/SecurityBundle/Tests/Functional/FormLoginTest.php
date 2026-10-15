@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Clock\ClockInterface;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
@@ -125,10 +126,7 @@ class FormLoginTest extends AbstractWebTestCase
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => ['re_authentication.yml', 'remember_me.yml']]);
 
-        $form = $client->request('GET', '/login')->selectButton('login')->form();
-        $form['_username'] = 'johannes';
-        $form['_password'] = 'test';
-        $client->submit($form);
+        $client->request('POST', '/login_check', ['_username' => 'johannes', '_password' => 'test', '_remember_me' => 'on']);
         $client->getCookieJar()->expire('MOCKSESSID');
 
         $client->request('GET', $path);
@@ -143,6 +141,7 @@ class FormLoginTest extends AbstractWebTestCase
         $client->submit($form);
 
         $this->assertRedirect($client->getResponse(), $path);
+        $this->assertFalse($client->getResponse()->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY)['']['/']['REMEMBERME']->isCleared());
 
         $client->followRedirect();
         $this->assertSame(200, $client->getResponse()->getStatusCode());
@@ -153,6 +152,30 @@ class FormLoginTest extends AbstractWebTestCase
     {
         yield 'fully' => ['/profile', AuthenticatedVoter::IS_AUTHENTICATED_FULLY];
         yield 'recently' => ['/protected_resource', AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY];
+    }
+
+    #[DataProvider('provideReAuthenticationsThatForgetTheRememberedUser')]
+    public function testARememberedUserIsForgottenWhenTheReAuthenticationDoesNotProveTheirPassword(string $username, string $password)
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => ['re_authentication.yml', 'remember_me.yml']]);
+
+        $client->request('POST', '/login_check', ['_username' => 'johannes', '_password' => 'test', '_remember_me' => 'on']);
+        $client->getCookieJar()->expire('MOCKSESSID');
+        $client->request('GET', '/profile');
+
+        $form = $client->followRedirect()->selectButton('login')->form();
+        $this->assertNotNull($client->getCookieJar()->get('REMEMBERME'));
+        $form['_username'] = $username;
+        $form['_password'] = $password;
+        $client->submit($form);
+
+        $this->assertNull($client->getCookieJar()->get('REMEMBERME'));
+    }
+
+    public static function provideReAuthenticationsThatForgetTheRememberedUser(): iterable
+    {
+        yield 'a wrong password' => ['johannes', 'wrong'];
+        yield 'another user' => ['bernhard', 'test'];
     }
 
     #[DataProvider('provideClientOptions')]

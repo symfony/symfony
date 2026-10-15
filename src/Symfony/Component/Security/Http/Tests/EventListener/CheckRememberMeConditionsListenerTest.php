@@ -16,6 +16,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -66,6 +69,46 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
 
         $this->assertFalse($passport->getBadge(RememberMeBadge::class)->isEnabled());
+    }
+
+    public function testSuccessfulLoginOfTheRememberedUserOptingOut()
+    {
+        $this->request = Request::create('/login', 'POST', ['_remember_me' => '0']);
+        $this->response = new Response();
+        $passport = $this->createPassport([new RememberMeBadge()]);
+
+        $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport, new RememberMeToken(new InMemoryUser('test', null), 'main_firewall')));
+
+        $this->assertFalse($passport->getBadge(RememberMeBadge::class)->isEnabled());
+    }
+
+    public function testSuccessfulLoginOfTheRememberedUserWithoutRequestParameter()
+    {
+        $this->request = Request::create('/login');
+        $this->response = new Response();
+        $passport = $this->createPassport([new RememberMeBadge()]);
+
+        $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport, new RememberMeToken(new InMemoryUser('test', null), 'main_firewall')));
+
+        $this->assertTrue($passport->getBadge(RememberMeBadge::class)->isEnabled());
+    }
+
+    #[DataProvider('providePreviousTokensNotRememberingTheUser')]
+    public function testSuccessfulLoginReplacingAnotherTokenWithoutRequestParameter(TokenInterface $previousToken)
+    {
+        $this->request = Request::create('/login');
+        $this->response = new Response();
+        $passport = $this->createPassport([new RememberMeBadge()]);
+
+        $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport, $previousToken));
+
+        $this->assertFalse($passport->getBadge(RememberMeBadge::class)->isEnabled());
+    }
+
+    public static function providePreviousTokensNotRememberingTheUser(): iterable
+    {
+        yield 'another remembered user' => [new RememberMeToken(new InMemoryUser('other', null), 'main_firewall')];
+        yield 'the same user, not remembered' => [new UsernamePasswordToken(new InMemoryUser('test', null), 'main_firewall')];
     }
 
     public function testSuccessfulHttpLoginWhenRememberMeAlwaysIsTrue()
@@ -138,9 +181,9 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->response = new Response();
     }
 
-    private function createLoginSuccessfulEvent(Passport $passport)
+    private function createLoginSuccessfulEvent(Passport $passport, ?TokenInterface $previousToken = null)
     {
-        return new LoginSuccessEvent(new DummyAuthenticator(), $passport, new NullToken(), $this->request, $this->response, 'main_firewall');
+        return new LoginSuccessEvent(new DummyAuthenticator(), $passport, new NullToken(), $this->request, $this->response, 'main_firewall', $previousToken);
     }
 
     private function createPassport(?array $badges = null)

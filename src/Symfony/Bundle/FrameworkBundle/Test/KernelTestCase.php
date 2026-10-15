@@ -163,6 +163,10 @@ abstract class KernelTestCase extends TestCase
                 $container->get('services_resetter');
             }
 
+            if ($container instanceof ResetInterface) {
+                $container->reset();
+            }
+
             static::$kernel->shutdown();
             static::$booted = false;
 
@@ -178,10 +182,6 @@ abstract class KernelTestCase extends TestCase
                 } catch (\ReflectionException) {
                     // ignore if the property doesn't exist
                 }
-            }
-
-            if ($container instanceof ResetInterface) {
-                $container->reset();
             }
 
             if (null !== $httpCacheDir && is_dir($httpCacheDir)) {

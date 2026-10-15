@@ -45,9 +45,38 @@ final class StubTest extends TestCase
         $r = new \ReflectionProperty(MyStub::class, 'myProp');
         self::assertFalse($r->isInitialized($stub));
     }
+
+    public function testUnserializePrivatePropertyOfParentClass()
+    {
+        $stub = new MyChildStub();
+        $stub->setMyPrivateProp('foo');
+
+        $stub = unserialize(serialize($stub));
+
+        self::assertSame('foo', $stub->getMyPrivateProp());
+    }
 }
 
 final class MyStub extends Stub
 {
     public mixed $myProp;
+}
+
+class MyParentStub extends Stub
+{
+    private mixed $myPrivateProp = null;
+
+    public function setMyPrivateProp(mixed $value): void
+    {
+        $this->myPrivateProp = $value;
+    }
+
+    public function getMyPrivateProp(): mixed
+    {
+        return $this->myPrivateProp;
+    }
+}
+
+final class MyChildStub extends MyParentStub
+{
 }

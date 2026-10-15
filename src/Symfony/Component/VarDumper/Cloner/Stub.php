@@ -70,6 +70,19 @@ class Stub
                 }
             }
 
+            // Private properties of parent classes are not visible from the scope of the child class
+            $ownPrivatePrefix = "\0".$this::class."\0";
+            foreach ((array) $this as $k => $v) {
+                if ("\0" !== ($k[0] ?? '') || '*' === $k[1] || str_starts_with($k, $ownPrivatePrefix)) {
+                    continue;
+                }
+                $i = strrpos($k, "\0");
+                $default = self::$propertyDefaults[$this::class][$k] ??= ($p = new \ReflectionProperty(substr($k, 1, $i - 1), substr($k, 1 + $i)))->hasDefaultValue() ? $p->getDefaultValue() : ($p->hasType() ? $noDefault : null);
+                if ($noDefault === $default || $default !== $v) {
+                    $data[$k] = $v;
+                }
+            }
+
             return $data;
         }, $this, $this::class)();
     }

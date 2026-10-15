@@ -210,21 +210,21 @@ class ConsoleSectionOutput extends StreamOutput
         // (i.e. does not end with a line break). In which case, it needs to be erased first.
         $deleteLastLine = ($lastLine = end($this->content) ?: '') && !str_ends_with($lastLine, \PHP_EOL);
         $linesToClear = $deleteLastLine ? ((int) ceil($this->getDisplayLength($lastLine) / $this->terminal->getWidth()) ?: 1) : 0;
+        $previousLines = $this->lines;
 
-        $linesAdded = $this->addContent($message, $newline);
+        $this->addContent($message, $newline);
 
-        if ($lineOverflow = $this->maxHeight > 0 && $this->lines > $this->maxHeight) {
-            // on overflow, clear the whole section and redraw again (to remove the first lines)
-            $linesToClear = $this->maxHeight;
+        if ($this->maxHeight > 0 && $this->lines > $this->maxHeight) {
+            // on overflow, clear the lines displayed so far and redraw the section (to remove the first lines)
+            $erasedContent = $this->popStreamContentUntilCurrentSection(min($this->maxHeight, $previousLines));
+            $visibleContent = $this->getVisibleContent();
+            parent::doWrite($visibleContent, !str_ends_with($visibleContent, \PHP_EOL));
+            parent::doWrite($erasedContent, false);
+
+            return;
         }
 
         $erasedContent = $this->popStreamContentUntilCurrentSection($linesToClear);
-
-        if ($lineOverflow) {
-            // redraw existing lines of the section
-            $previousLinesOfSection = \array_slice($this->content, $this->lines - $this->maxHeight, $this->maxHeight - $linesAdded);
-            parent::doWrite(implode('', $previousLinesOfSection), false);
-        }
 
         // if the last line was removed, re-print its content together with the new content.
         // otherwise, just print the new content.

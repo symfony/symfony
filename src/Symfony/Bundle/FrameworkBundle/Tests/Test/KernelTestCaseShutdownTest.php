@@ -44,13 +44,22 @@ class KernelTestCaseShutdownTest extends KernelTestCase
 
     public function testEnsureKernelShutdownDestroysServicesThatAreInAReferenceCycle()
     {
-        static::bootKernel()->getContainer()->get('self_referencing');
-        SelfReferencingService::$destructed = false;
-
         $gcEnabled = gc_enabled();
         gc_disable();
 
         try {
+            $kernel = static::createKernel();
+            $kernel->boot();
+            $kernel->getContainer()->get('self_referencing');
+            SelfReferencingService::$destructed = false;
+            $kernel->shutdown();
+
+            if (!SelfReferencingService::$destructed) {
+                $this->markTestSkipped('This version of symfony/http-kernel does not collect garbage cycles when the kernel shuts down.');
+            }
+
+            static::bootKernel()->getContainer()->get('self_referencing');
+            SelfReferencingService::$destructed = false;
             static::ensureKernelShutdown();
 
             $this->assertTrue(SelfReferencingService::$destructed);

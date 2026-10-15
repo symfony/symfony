@@ -195,9 +195,14 @@ class Terminal
                 self::$width = (int) $dimensions[0];
                 self::$height = (int) $dimensions[1];
             }
-        } else {
+        } elseif (!\defined('STDIN') || (\is_resource(\STDIN) && @stream_isatty(\STDIN))) {
+            // stty reads the size of the terminal on the STDIN it inherits, so it always fails when STDIN is not a TTY
             self::initDimensionsUsingStty();
         }
+
+        // remember a failed probe too, so that the next call doesn't run it again
+        self::$width ??= 0;
+        self::$height ??= 0;
     }
 
     private static function initDimensionsUsingStty(): void

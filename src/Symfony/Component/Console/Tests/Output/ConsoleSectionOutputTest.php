@@ -347,4 +347,17 @@ class ConsoleSectionOutputTest extends TestCase
         rewind($output->getStream());
         $this->assertEquals(escapeshellcmd('Foo'.\PHP_EOL.'Bar'.\PHP_EOL), escapeshellcmd(stream_get_contents($output->getStream())));
     }
+
+    public function testWriteWithoutNewLineContinuesLastLine()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->writeln('Foo');
+        $output->write('Bar');
+        $output->write('Baz');
+        $output->writeln('Qux');
+
+        $this->assertSame('Foo'.\PHP_EOL.'BarBazQux'.\PHP_EOL, $output->getContent());
+    }
 }

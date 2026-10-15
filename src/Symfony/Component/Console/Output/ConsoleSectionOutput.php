@@ -161,7 +161,7 @@ class ConsoleSectionOutput extends StreamOutput
                 // concatenate previous and new line
                 $lineContent = $lastLine.$lineContent;
                 // replace last entry of `$this->content` with the new expanded line
-                array_splice($this->content, -1, 1, $lineContent);
+                $this->content[array_key_last($this->content)] = $lineContent;
             } else {
                 // otherwise just add the new content
                 $this->content[] = $lineContent;

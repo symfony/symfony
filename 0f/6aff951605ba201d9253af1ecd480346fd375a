@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T08:39:40Z
+
+I reworded the note to say that the listener should still pass the attributes when it runs after -10000, as you did in your app.
+Without them, `#[Cache]` no longer applies to the new response, and on 8.2 a `#[Lock]` stays acquired after the response.

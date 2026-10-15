@@ -41,6 +41,7 @@ class BeanstalkdSender implements SenderInterface
             $encodedMessage['headers'] ?? [],
             $envelope->last(DelayStamp::class)?->getDelay() ?? 0,
             $envelope->last(BeanstalkdPriorityStamp::class)?->priority,
+            $envelope->last(BeanstalkdTubeStamp::class)?->tube,
         );
 
         return $envelope->with(new TransportMessageIdStamp($id));

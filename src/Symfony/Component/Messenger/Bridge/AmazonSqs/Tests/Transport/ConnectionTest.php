@@ -364,6 +364,36 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
+    public function testGetKeepsBufferedMessagesWhenTheReceiveFails()
+    {
+        $client = $this->createMock(SqsClient::class);
+        $client->expects($this->exactly(2))
+            ->method('receiveMessage')
+            ->willReturnOnConsecutiveCalls(
+                ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
+                    new Message(['MessageId' => 1, 'ReceiptHandle' => 'handle-1', 'Body' => 'this is a test']),
+                    new Message(['MessageId' => 2, 'ReceiptHandle' => 'handle-2', 'Body' => 'this is a test']),
+                ]]),
+                ResultMockFactory::createFailing(ReceiveMessageResult::class, 500, 'SQS is unavailable'),
+            );
+        $client->expects($this->once())
+            ->method('changeMessageVisibility')
+            ->with(['QueueUrl' => 'https://sqs.eu-west-1.amazonaws.com/123456789012/queue', 'ReceiptHandle' => 'handle-2', 'VisibilityTimeout' => 0])
+            ->willReturn(ResultMockFactory::create(Result::class));
+
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client, 'https://sqs.eu-west-1.amazonaws.com/123456789012/queue');
+
+        $this->assertSame('handle-1', $connection->get()[0]['id']);
+
+        try {
+            $connection->get(2);
+            $this->fail('The receive should have failed.');
+        } catch (HttpException) {
+        }
+
+        $connection->reset();
+    }
+
     public function testDestructDoesNotThrowWhenTheInFlightReceiveCannotBeResumed()
     {
         $httpClient = $this->createPollingClientThatCannotResume();

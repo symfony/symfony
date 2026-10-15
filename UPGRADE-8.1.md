@@ -104,7 +104,7 @@ HttpKernel
  * Deprecate `MergeExtensionConfigurationPass`, use the one from the DependencyInjection component instead
  * Deprecate `FileLocator`, use the one from the DependencyInjection component instead
  * Deprecate `ServicesResetter`, `ServicesResetterInterface`, and `ResettableServicePass`, use the ones from the DependencyInjection component instead
- * Deprecate passing a non-flat list of attributes to `Controller::setController()`
+ * Deprecate passing a non-flat list of attributes to `ControllerEvent::setController()` and `ControllerArgumentsEvent::setController()`
  * Deprecate the `Symfony\Component\HttpKernel\DependencyInjection\Extension` class, use the parent `Symfony\Component\DependencyInjection\Extension\Extension` class instead:
 
    ```diff

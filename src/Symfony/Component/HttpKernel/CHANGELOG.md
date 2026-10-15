@@ -19,7 +19,7 @@ CHANGELOG
  * Allow using closures with the `Cache` attribute
  * Allow setting a condition when the `Cache` attribute should be applied
  * Add `ControllerEvent::evaluate()` et al. to help with evaluating expressions or closures in controller attributes
- * Deprecate passing a non-flat list of attributes to `Controller::setController()`
+ * Deprecate passing a non-flat list of attributes to `ControllerEvent::setController()` and `ControllerArgumentsEvent::setController()`
  * Deprecate the `Symfony\Component\HttpKernel\DependencyInjection\Extension` class, use the parent `Symfony\Component\DependencyInjection\Extension\Extension` class instead
  * Allow using Expression or \Closure for `validationGroups` in `#[MapRequestPayload]` and `#[MapQueryString]`
  * Deprecate passing a `ControllerArgumentsEvent` to the `ViewEvent` constructor; pass a `ControllerArgumentsMetadata` instead

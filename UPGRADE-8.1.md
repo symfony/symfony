@@ -125,6 +125,17 @@ HttpKernel
    $event->setController($controller, $event->getAttributes('*'));
    ```
 
+   The subject of `#[IsGranted]` is then read from the arguments of the new controller.
+   If the new controller has other parameters, register the listener with a priority below -10000, and still pass the attributes.
+   The attributes are then checked against the original controller and its arguments, before the listener runs:
+
+   ```php
+   public static function getSubscribedEvents(): array
+   {
+       return [KernelEvents::CONTROLLER_ARGUMENTS => ['onControllerArguments', -10010]];
+   }
+   ```
+
 Messenger
 ---------
 

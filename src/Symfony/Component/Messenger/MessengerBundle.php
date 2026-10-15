@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Messenger;
 
+use Symfony\Bridge\Doctrine\SchemaListener\MessengerInboxDoctrineSchemaListener;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\ConsoleBundle;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -30,6 +32,7 @@ use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Attribute\AsMessageMiddleware;
+use Symfony\Component\Messenger\Bridge\Doctrine\Inbox\DoctrineInbox;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Messenger\Failure\FailedMessageRepository;
@@ -166,6 +169,15 @@ class MessengerBundle extends AbstractBundle
                             ->scalarNode('outbox')
                                 ->defaultNull()
                                 ->info('Name or DSN of the transport that stores the messages inside the current database transaction; consume that transport to forward them to this one. A value that is not the name of a configured transport is a DSN, used to create the "orders.outbox" transport for an "orders" transport.')
+                            ->end()
+                            ->arrayNode('inbox')
+                                ->info('Records the handled messages in a database table, in the transaction of their handlers, so that a redelivered message is not handled twice. Needs the "identity_stamps" option and a middleware that runs the handlers in a transaction.')
+                                ->canBeEnabled()
+                                ->children()
+                                    ->scalarNode('connection')->defaultNull()->info('Name of the Doctrine DBAL connection of that transaction, the default connection when not set.')->end()
+                                    ->scalarNode('table_name')->defaultValue('messenger_inbox')->cannotBeEmpty()->end()
+                                    ->integerNode('retention')->defaultValue(604800)->min(1)->info('Number of seconds a record is kept, which must exceed the time the transport can take to redeliver a message.')->end()
+                                ->end()
                             ->end()
                             ->arrayNode('retry_strategy')
                                 ->addDefaultsIfNotSet()
@@ -427,6 +439,24 @@ class MessengerBundle extends AbstractBundle
             $defaultMiddleware['before'][] = ['id' => 'deduplicate_middleware'];
         }
 
+        $inboxTransportNames = array_keys(array_filter($config['transports'], static fn (array $transport) => $transport['inbox']['enabled']));
+
+        if ($inboxTransportNames) {
+            if (!$config['identity_stamps']) {
+                throw new LogicException(\sprintf('Invalid Messenger configuration: the inbox of the "%s" transport records messages by id, enable the "identity_stamps" option.', $inboxTransportNames[0]));
+            }
+
+            if (!class_exists(DoctrineInbox::class)) {
+                throw new LogicException(\sprintf('The inbox of the "%s" transport cannot be enabled as the Doctrine Messenger bridge is not installed. Try running "composer require symfony/doctrine-messenger".', $inboxTransportNames[0]));
+            }
+
+            // after the middleware listed by the bus, so that it runs inside the transaction they open,
+            // and after send_message, which forwards outbox messages without handling them
+            array_splice($defaultMiddleware['after'], 1, 0, [['id' => 'inbox']]);
+        } else {
+            $container->removeDefinition('messenger.middleware.inbox');
+        }
+
         if ($lockFactory = $config['deduplication']['lock_factory']) {
             foreach (['messenger.middleware.deduplicate_middleware', 'messenger.failure.release_deduplication_lock_on_failure_listener'] as $id) {
                 $container->getDefinition($id)
@@ -446,7 +476,7 @@ class MessengerBundle extends AbstractBundle
 
             if ($bus['default_middleware']['enabled']) {
                 $defaultMiddleware['after'][0]['arguments'] = [$bus['default_middleware']['allow_no_senders']];
-                $defaultMiddleware['after'][2]['arguments'] = ['index_1' => $bus['default_middleware']['allow_no_handlers']];
+                $defaultMiddleware['after'][array_key_last($defaultMiddleware['after'])]['arguments'] = ['index_1' => $bus['default_middleware']['allow_no_handlers']];
 
                 $middleware = array_merge($defaultMiddleware['before'], $middleware, $defaultMiddleware['after']);
             }
@@ -547,6 +577,7 @@ class MessengerBundle extends AbstractBundle
                 'options' => [],
                 'failure_transport' => $transport['failure_transport'],
                 'outbox' => null,
+                'inbox' => ['enabled' => false],
                 'retry_strategy' => $transport['retry_strategy'],
                 'rate_limiter' => null,
                 'priority' => 0,
@@ -770,6 +801,39 @@ class MessengerBundle extends AbstractBundle
             $container->removeDefinition('console.command.messenger_failed_messages_retry');
             $container->removeDefinition('console.command.messenger_failed_messages_show');
             $container->removeDefinition('console.command.messenger_failed_messages_remove');
+        }
+
+        if ($inboxTransportNames) {
+            $inboxReferences = [];
+            foreach ($inboxTransportNames as $name) {
+                $inbox = $config['transports'][$name]['inbox'];
+                $container->setDefinition($inboxId = '.messenger.transport.'.$name.'.inbox', new Definition(DoctrineInbox::class, [
+                    new Reference(null === $inbox['connection'] ? 'database_connection' : 'doctrine.dbal.'.$inbox['connection'].'_connection'),
+                    $inbox['table_name'],
+                    $inbox['retention'],
+                ]));
+                $inboxReferences[$name] = new Reference($inboxId);
+            }
+
+            $inboxLocator = ServiceLocatorTagPass::register($container, $inboxReferences);
+
+            $container->getDefinition('messenger.middleware.inbox')
+                ->replaceArgument(0, $inboxLocator)
+                ->replaceArgument(1, array_values(array_unique($failureTransports)));
+
+            $container->getDefinition('messenger.middleware.dispatch_after_current_bus')
+                ->setArguments([new Reference('messenger.senders_locator'), new Reference('messenger.middleware.inbox')]);
+
+            if ($container->hasDefinition('console.command.messenger_setup_transports')) {
+                $container->getDefinition('console.command.messenger_setup_transports')->setArgument(2, $inboxLocator);
+            }
+
+            // DoctrineBundle registers the schema listener of the Doctrine transport, and knows nothing of this table
+            if (class_exists(MessengerInboxDoctrineSchemaListener::class)) {
+                $container->register('messenger.inbox.doctrine_schema_listener', MessengerInboxDoctrineSchemaListener::class)
+                    ->setArguments([new IteratorArgument(array_values($inboxReferences))])
+                    ->addTag('doctrine.event_listener', ['event' => 'postGenerateSchema']);
+            }
         }
     }
 }

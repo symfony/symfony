@@ -14,15 +14,25 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Constraint\Callback;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
+use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
+use Symfony\Component\Messenger\Middleware\InboxMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
+use Symfony\Component\Messenger\Stamp\MessageIdStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyInbox;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\Sender\OutboxSender;
+use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 
 class DispatchAfterCurrentBusMiddlewareTest extends TestCase
 {
@@ -389,6 +399,91 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $messageBus->dispatch($message);
     }
 
+    public function testAMessageForAnOutboxIsStoredAtOnceWhileTheInboxRecordsTheCurrentMessage()
+    {
+        $outbox = new InMemoryTransport();
+        $sendersLocator = new SendersLocator([DummyEvent::class => ['orders']], new ServiceLocator(['orders' => static fn () => new OutboxSender(new InMemoryTransport(), $outbox, 'orders', 'outbox')]));
+        $middleware = new DispatchAfterCurrentBusMiddleware($sendersLocator, new InboxMiddleware(new ServiceLocator(['orders' => static fn () => new DummyInbox()])));
+        $eventBus = new MessageBus([$middleware, new SendMessageMiddleware($sendersLocator)]);
+
+        $storedDuringTheHandling = null;
+        $messageBus = new MessageBus([
+            $middleware,
+            new DispatchingMiddleware($eventBus, [new Envelope(new DummyEvent('Event'), [new DispatchAfterCurrentBusStamp()])]),
+            new CallbackMiddleware(static function () use ($outbox, &$storedDuringTheHandling) {
+                $storedDuringTheHandling = \count($outbox->getSent());
+            }),
+        ]);
+
+        $messageBus->dispatch(new Envelope(new DummyMessage('Hello'), [new ReceivedStamp('orders'), new MessageIdStamp('id-1')]));
+
+        $this->assertSame(1, $storedDuringTheHandling);
+        $this->assertNull($outbox->getSent()[0]->last(DispatchAfterCurrentBusStamp::class));
+    }
+
+    public function testAMessageForAnOutboxIsDelayedWhenTheInboxDoesNotRecordTheCurrentMessage()
+    {
+        $outbox = new InMemoryTransport();
+        $sendersLocator = new SendersLocator([DummyEvent::class => ['orders']], new ServiceLocator(['orders' => static fn () => new OutboxSender(new InMemoryTransport(), $outbox, 'orders', 'outbox')]));
+        $middleware = new DispatchAfterCurrentBusMiddleware($sendersLocator, new InboxMiddleware(new ServiceLocator(['orders' => static fn () => new DummyInbox()])));
+        $eventBus = new MessageBus([$middleware, new SendMessageMiddleware($sendersLocator)]);
+
+        $storedDuringTheHandling = null;
+        $messageBus = new MessageBus([
+            $middleware,
+            new DispatchingMiddleware($eventBus, [new Envelope(new DummyEvent('Event'), [new DispatchAfterCurrentBusStamp()])]),
+            new CallbackMiddleware(static function () use ($outbox, &$storedDuringTheHandling) {
+                $storedDuringTheHandling = \count($outbox->getSent());
+            }),
+        ]);
+
+        $messageBus->dispatch(new Envelope(new DummyMessage('Hello'), [new ReceivedStamp('orders')]));
+
+        $this->assertSame(0, $storedDuringTheHandling);
+        $this->assertCount(1, $outbox->getSent());
+    }
+
+    public function testAMessageForATransportWithoutOutboxIsRefusedWhileTheInboxRecordsTheCurrentMessage()
+    {
+        $invoices = new InMemoryTransport();
+        $sendersLocator = new SendersLocator([DummyEvent::class => ['invoices']], new ServiceLocator(['invoices' => static fn () => $invoices]));
+        $middleware = new DispatchAfterCurrentBusMiddleware($sendersLocator, new InboxMiddleware(new ServiceLocator(['orders' => static fn () => new DummyInbox()])));
+        $eventBus = new MessageBus([$middleware, new SendMessageMiddleware($sendersLocator)]);
+        $messageBus = new MessageBus([
+            $middleware,
+            new DispatchingMiddleware($eventBus, [new Envelope(new DummyEvent('Event'), [new DispatchAfterCurrentBusStamp()])]),
+        ]);
+
+        try {
+            $messageBus->dispatch(new Envelope(new DummyMessage('Hello'), [new ReceivedStamp('orders'), new MessageIdStamp('id-1')]));
+            $this->fail('An exception should have been thrown.');
+        } catch (LogicException $e) {
+            $this->assertSame('Cannot dispatch message "Symfony\Component\Messenger\Tests\Middleware\DummyEvent" after the current message. The inbox of the "orders" transport records the current message in a database transaction. A message dispatched after that transaction would be lost if its dispatch failed. Send that message to a transport that has an outbox. Or dispatch the message without "Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp", to handle it in the same transaction.', $e->getMessage());
+        }
+
+        $this->assertSame([], $invoices->getSent());
+
+        $eventBus->dispatch(new DummyEvent('Event'), [new DispatchAfterCurrentBusStamp()]);
+
+        $this->assertCount(1, $invoices->getSent(), 'the refused dispatch ended the root dispatch');
+    }
+
+    public function testAMessageHandledInTheProcessIsRefusedWhileTheInboxRecordsTheCurrentMessage()
+    {
+        $sendersLocator = new SendersLocator([], new ServiceLocator([]));
+        $middleware = new DispatchAfterCurrentBusMiddleware($sendersLocator, new InboxMiddleware(new ServiceLocator(['orders' => static fn () => new DummyInbox()])));
+        $eventBus = new MessageBus([$middleware, new SendMessageMiddleware($sendersLocator)]);
+        $messageBus = new MessageBus([
+            $middleware,
+            new DispatchingMiddleware($eventBus, [new Envelope(new DummyEvent('Event'), [new DispatchAfterCurrentBusStamp()])]),
+        ]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The inbox of the "orders" transport records the current message');
+
+        $messageBus->dispatch(new Envelope(new DummyMessage('Hello'), [new ReceivedStamp('orders'), new MessageIdStamp('id-1')]));
+    }
+
     private function expectHandledMessage($message): Callback
     {
         return $this->callback(static fn (Envelope $envelope) => $envelope->getMessage() === $message);
@@ -448,6 +543,21 @@ class FailingDispatchingMiddleware implements MiddlewareInterface
             $this->bus->dispatch($this->message);
         } catch (\RuntimeException $e) {
         }
+
+        return $stack->next()->handle($envelope, $stack);
+    }
+}
+
+class CallbackMiddleware implements MiddlewareInterface
+{
+    public function __construct(
+        private \Closure $callback,
+    ) {
+    }
+
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
+    {
+        ($this->callback)($envelope);
 
         return $stack->next()->handle($envelope, $stack);
     }

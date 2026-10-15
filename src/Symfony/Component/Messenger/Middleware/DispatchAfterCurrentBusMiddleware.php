@@ -14,8 +14,11 @@ namespace Symfony\Component\Messenger\Middleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Transport\Sender\OutboxSender;
+use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
 
 /**
  * Allow to configure messages to be handled after the current bus is finished.
@@ -27,6 +30,12 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  * For instance, using this middleware before the DoctrineTransactionMiddleware
  * means sub-dispatched messages with a DispatchAfterCurrentBus stamp would be
  * handled after the Doctrine transaction has been committed.
+ *
+ * While an inbox records the current message, a message sent only to outboxes is dispatched at once.
+ * The outbox forwards it after the transaction is committed.
+ * Any other message is refused.
+ * The inbox commits its record before such a message is dispatched.
+ * When that dispatch fails, a retry skips the handlers and the message is lost.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
@@ -43,13 +52,32 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
      */
     private bool $isRootDispatchCallRunning = false;
 
+    /**
+     * The name of the transport whose inbox records the message of the root dispatch.
+     */
+    private ?string $inboxTransportName = null;
+    private ?SendersLocatorInterface $sendersLocator = null;
+    private ?InboxMiddleware $inboxMiddleware = null;
+
+    public function __construct(?SendersLocatorInterface $sendersLocator = null, ?InboxMiddleware $inboxMiddleware = null)
+    {
+        $this->sendersLocator = $sendersLocator;
+        $this->inboxMiddleware = $inboxMiddleware;
+    }
+
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         if (null !== $envelope->last(DispatchAfterCurrentBusStamp::class)) {
             if ($this->isRootDispatchCallRunning) {
-                $this->queue[] = new QueuedEnvelope($envelope, $stack);
+                if (null === $this->inboxTransportName) {
+                    $this->queue[] = new QueuedEnvelope($envelope, $stack);
 
-                return $envelope;
+                    return $envelope;
+                }
+
+                if (!$this->isSentToOutboxesOnly($envelope)) {
+                    throw new LogicException(\sprintf('Cannot dispatch message "%s" after the current message. The inbox of the "%s" transport records the current message in a database transaction. A message dispatched after that transaction would be lost if its dispatch failed. Send that message to a transport that has an outbox. Or dispatch the message without "%s", to handle it in the same transaction.', $envelope->getMessage()::class, $this->inboxTransportName, DispatchAfterCurrentBusStamp::class));
+                }
             }
 
             $envelope = $envelope->withoutAll(DispatchAfterCurrentBusStamp::class);
@@ -73,6 +101,7 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
 
         // First time we get here, mark as inside a "root dispatch" call:
         $this->isRootDispatchCallRunning = true;
+        $this->inboxTransportName = $this->inboxMiddleware?->getConsumer($envelope);
         try {
             // Execute the whole middleware stack & message handling for main dispatch:
             $returnedEnvelope = $stack->next()->handle($envelope, $stack);
@@ -86,6 +115,7 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
             $hasDroppedMessages = (bool) $this->queue;
             $this->queue = [];
             $this->isRootDispatchCallRunning = false;
+            $this->inboxTransportName = null;
 
             if ($hasDroppedMessages && $e instanceof HandlerFailedException) {
                 // a retry must run again the handlers that succeeded, so that they dispatch the dropped messages again
@@ -94,6 +124,8 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
 
             throw $e;
         }
+
+        $this->inboxTransportName = null;
 
         // "Root dispatch" call is finished, dispatch stored messages.
         $exceptions = [];
@@ -117,6 +149,21 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
         }
 
         return $returnedEnvelope;
+    }
+
+    private function isSentToOutboxesOnly(Envelope $envelope): bool
+    {
+        $hasSenders = false;
+
+        foreach ($this->sendersLocator?->getSenders($envelope) ?? [] as $sender) {
+            if (!$sender instanceof OutboxSender) {
+                return false;
+            }
+
+            $hasSenders = true;
+        }
+
+        return $hasSenders;
     }
 }
 

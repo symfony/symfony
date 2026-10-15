@@ -73,6 +73,40 @@ class SetupTransportsCommandTest extends TestCase
         $tester->execute(['transport' => 'amqp']);
     }
 
+    public function testInboxesAreSetUpWithTheirTransport()
+    {
+        $inbox = $this->createMock(SetupableTransportInterface::class);
+        $inbox->expects($this->once())->method('setup');
+
+        $command = new SetupTransportsCommand(new ServiceLocator([
+            'orders' => fn () => $this->createStub(TransportInterface::class),
+            'invoices' => fn () => $this->createStub(SetupableTransportInterface::class),
+        ]), ['orders', 'invoices'], new ServiceLocator(['orders' => static fn () => $inbox]));
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+        $display = $tester->getDisplay();
+
+        $this->assertStringContainsString('The "orders" transport does not support setup.', $display);
+        $this->assertStringContainsString('The inbox of the "orders" transport was set up successfully.', $display);
+        $this->assertStringContainsString('The "invoices" transport was set up successfully.', $display);
+        $this->assertStringNotContainsString('The inbox of the "invoices" transport', $display);
+    }
+
+    public function testThrowsExceptionOnInboxSetup()
+    {
+        $inbox = $this->createMock(SetupableTransportInterface::class);
+        $inbox->expects($this->once())
+            ->method('setup')
+            ->willThrowException(new \RuntimeException('Table is locked'));
+
+        $command = new SetupTransportsCommand(new ServiceLocator(['orders' => fn () => $this->createStub(SetupableTransportInterface::class)]), ['orders'], new ServiceLocator(['orders' => static fn () => $inbox]));
+        $tester = new CommandTester($command);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('An error occurred while setting up the inbox of the "orders" transport: Table is locked');
+        $tester->execute(['transport' => 'orders']);
+    }
+
     #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {

@@ -14,6 +14,7 @@ CHANGELOG
  * Add the `EntityExists` constraint for validating that a value references an existing entity
  * Add `CollectionDenormalizer` to denormalize arrays into Doctrine collections
  * Add `before` and `after` to the `doctrine.event_listener` tag to order listeners
+ * Add `MessengerInboxDoctrineSchemaListener` to add the tables of the Messenger inboxes to the Doctrine schema
 
 8.1
 ---

@@ -28,9 +28,13 @@ use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 #[AsCommand(name: 'messenger:setup-transports', description: 'Prepare the required infrastructure for the transport')]
 class SetupTransportsCommand extends Command
 {
+    /**
+     * @param ContainerInterface|null $inboxLocator The inboxes, by name of the transport they record the messages of
+     */
     public function __construct(
         private ContainerInterface $transportLocator,
         private array $transportNames = [],
+        private ?ContainerInterface $inboxLocator = null,
     ) {
         parent::__construct();
     }
@@ -69,14 +73,24 @@ class SetupTransportsCommand extends Command
             $transport = $this->transportLocator->get($transportName);
             if (!$transport instanceof SetupableTransportInterface) {
                 $io->note(\sprintf('The "%s" transport does not support setup.', $transportName));
+            } else {
+                try {
+                    $transport->setup();
+                    $io->success(\sprintf('The "%s" transport was set up successfully.', $transportName));
+                } catch (\Exception $e) {
+                    throw new \RuntimeException(\sprintf('An error occurred while setting up the "%s" transport: ', $transportName).$e->getMessage(), 0, $e);
+                }
+            }
+
+            if (!$this->inboxLocator?->has($transportName) || !($inbox = $this->inboxLocator->get($transportName)) instanceof SetupableTransportInterface) {
                 continue;
             }
 
             try {
-                $transport->setup();
-                $io->success(\sprintf('The "%s" transport was set up successfully.', $transportName));
+                $inbox->setup();
+                $io->success(\sprintf('The inbox of the "%s" transport was set up successfully.', $transportName));
             } catch (\Exception $e) {
-                throw new \RuntimeException(\sprintf('An error occurred while setting up the "%s" transport: ', $transportName).$e->getMessage(), 0, $e);
+                throw new \RuntimeException(\sprintf('An error occurred while setting up the inbox of the "%s" transport: ', $transportName).$e->getMessage(), 0, $e);
             }
         }
 

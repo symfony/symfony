@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Make `DoctrineSender` and `DoctrineTransport` implement `BatchSenderInterface`, inserting several messages per statement
+ * Add `DoctrineInbox` to record the handled messages in a database table
 
 8.1
 ---

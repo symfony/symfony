@@ -181,11 +181,12 @@ class ProcessTest extends TestCase
             usleep(10000);
         }
         $this->assertFileExists($marker);
-        unlink($marker);
 
         $this->assertTrue($p->waitUntil(static fn (string $type, string $output): bool => str_contains($output, 'ready')));
 
         $p->stop();
+        // touch() creates the file before setting its times, so removing the file in between can fail
+        unlink($marker);
     }
 
     public function testWaitUntilSeesOutputWrittenWhileItsCallbackRuns()

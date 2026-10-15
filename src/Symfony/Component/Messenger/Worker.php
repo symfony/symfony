@@ -236,7 +236,7 @@ class Worker
 
                 if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->now() - $envelopeHandledStart))) {
                     if (null !== $endTime) {
-                        $sleep = min($sleep, (int) (1e6 * ($endTime - $this->now())));
+                        $sleep = min($sleep, (int) ceil(1e6 * ($endTime - $this->now())));
                     }
 
                     foreach ($this->coolingDownTransports as $status) {

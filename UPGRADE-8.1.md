@@ -104,7 +104,7 @@ HttpKernel
  * Deprecate `MergeExtensionConfigurationPass`, use the one from the DependencyInjection component instead
  * Deprecate `FileLocator`, use the one from the DependencyInjection component instead
  * Deprecate `ServicesResetter`, `ServicesResetterInterface`, and `ResettableServicePass`, use the ones from the DependencyInjection component instead
- * Deprecate passing a non-flat list of attributes to `Controller::setController()`
+ * Deprecate passing a non-flat list of attributes to `ControllerEvent::setController()` and `ControllerArgumentsEvent::setController()`
  * Deprecate the `Symfony\Component\HttpKernel\DependencyInjection\Extension` class, use the parent `Symfony\Component\DependencyInjection\Extension\Extension` class instead:
 
    ```diff
@@ -123,6 +123,17 @@ HttpKernel
 
    ```php
    $event->setController($controller, $event->getAttributes('*'));
+   ```
+
+   The subject of `#[IsGranted]` is then read from the arguments of the new controller.
+   If the new controller has other parameters, register the listener with a priority below -10000, and still pass the attributes.
+   The attributes are then checked against the original controller and its arguments, before the listener runs:
+
+   ```php
+   public static function getSubscribedEvents(): array
+   {
+       return [KernelEvents::CONTROLLER_ARGUMENTS => ['onControllerArguments', -10010]];
+   }
    ```
 
 Messenger

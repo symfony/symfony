@@ -42,6 +42,19 @@ class SourceContextProviderTest extends TestCase
         );
     }
 
+    public function testTwigFileExcerptWithCrlfLineEndings()
+    {
+        $source = "<div>\n{{ dump(1) }}\n</div>\n";
+        $expected = '<ol start="1"><li><code>&lt;div&gt;</code></li>'."\n"
+            .'<li class="selected"><code>{{ dump(1) }}</code></li>'."\n"
+            .'<li><code>&lt;/div&gt;</code></li>'."\n"
+            .'<li><code></code></li></ol>';
+
+        $this->assertSame($expected, $this->render(new SourceContextProvider(), $source)[0]['file_excerpt']);
+        $this->assertSame($expected, $this->render(new SourceContextProvider(), str_replace("\n", "\r\n", $source))[0]['file_excerpt']);
+        $this->assertSame($expected, $this->render(new SourceContextProvider(), str_replace("\n", "\r", $source))[0]['file_excerpt']);
+    }
+
     #[DataProvider('provideLines')]
     public function testFileExcerptLineMatchesHtmlDumper(string $line)
     {
@@ -55,7 +68,7 @@ class SourceContextProviderTest extends TestCase
         yield 'printable ASCII' => [implode('', array_map('chr', range(0x20, 0x7E)))];
         yield 'HTML' => ['<a href="#" title=\'x\'>&amp;</a>'];
         yield 'tab' => ["\t<p>{{ foo }}</p>"];
-        yield 'carriage return' => ["<p>{{ foo }}</p>\r"];
+        yield 'DEL' => ["<p>{{ foo }}</p>\x7F"];
         yield 'UTF-8' => ['<p>Café ☕</p>'];
         yield 'invisible Unicode' => ["<p>a\u{200B}b</p>"];
     }

@@ -112,6 +112,8 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $extendedParent = new ResolvedFormType(new ExtendedParentType(), [$sharedExtension]);
 
         yield [new ResolvedFormType(new ExtendedChildType(), [$sharedExtension], $extendedParent), ['decorated' => false, 'show_deprecated' => false], 'resolved_form_type_with_shared_type_extension'];
+
+        yield [new ResolvedFormType(new NormalizedOptionChildType(), [], new ResolvedFormType(new ExtendedParentType())), ['decorated' => false, 'show_deprecated' => false], 'resolved_form_type_with_normalized_overridden_option'];
     }
 
     public static function getDescribeOptionTestData()
@@ -223,5 +225,19 @@ class SharedTypeExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined('shared_extension_option');
+    }
+}
+
+class NormalizedOptionChildType extends AbstractType
+{
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setNormalizer('parent_option', static fn (Options $options, $value) => $value);
+        $resolver->setDefault('parent_option', 'foo');
+    }
+
+    public function getParent(): string
+    {
+        return ExtendedParentType::class;
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -332,6 +333,21 @@ class ContainerTest extends TestCase
         $this->assertSame(1, $bar->resetCounter);
     }
 
+    public function testResetDoesNotInitializeLazyServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', LazyResettableService::class)
+            ->setPublic(true)
+            ->setLazy(true);
+        $container->compile();
+
+        LazyResettableService::$instances = 0;
+        $container->get('foo');
+        $container->reset();
+
+        $this->assertSame(0, LazyResettableService::$instances);
+    }
+
     public function testGetThrowsException()
     {
         $this->expectException(\Exception::class);
@@ -566,5 +582,22 @@ class ProjectServiceContainer extends Container
         $instance->internal = $this->privates['internal'] ?? $this->getInternalService();
 
         return $instance;
+    }
+}
+
+class LazyResettableService implements ResetInterface
+{
+    public static int $instances = 0;
+
+    private array $state = [];
+
+    public function __construct()
+    {
+        ++self::$instances;
+    }
+
+    public function reset(): void
+    {
+        $this->state = [];
     }
 }

@@ -170,6 +170,29 @@ class PhpArrayAdapterTest extends AdapterTestCase
         $this->assertFalse($adapter->deleteItems(['foo']), 'A stored key cannot be deleted.');
         $this->assertTrue($fallback->hasItem('foo'), 'A stored key must not be deleted from the fallback pool.');
     }
+
+    public function testWarmUpWhenTheDirectoryIsCreatedConcurrently()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Creating symlinks requires extra privileges on Windows.');
+        }
+
+        $dir = sys_get_temp_dir().'/symfony-cache';
+        (new Filesystem())->mkdir($dir);
+        symlink($dir.'/target', $dir.'/link');
+
+        // mkdir() fails with "File exists" on the dangling link, and the error handler then creates its target, as a concurrent process would
+        set_error_handler(static fn () => mkdir($dir.'/target'));
+
+        try {
+            $adapter = new PhpArrayAdapter($dir.'/link/cache.php', new NullAdapter());
+            $adapter->warmUp(['foo' => 'bar']);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame('bar', $adapter->getItem('foo')->get());
+    }
 }
 
 class PhpArrayAdapterWrapper extends PhpArrayAdapter

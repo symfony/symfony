@@ -14,23 +14,32 @@ namespace Symfony\Component\Routing\DependencyInjection;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * Restores the parameters that the request context had when the container created it.
+ * Restores the state that the request context had when the container created it.
  *
  * @internal
  */
 final class RequestContextResetter
 {
     private RequestContext $context;
-    private array $parameters;
+    private RequestContext $initialContext;
 
     public function __invoke(RequestContext $context): void
     {
         $this->context = $context;
-        $this->parameters = $context->getParameters();
+        $this->initialContext = clone $context;
     }
 
     public function reset(): void
     {
-        $this->context->setParameters($this->parameters);
+        $this->context
+            ->setBaseUrl($this->initialContext->getBaseUrl())
+            ->setPathInfo($this->initialContext->getPathInfo())
+            ->setMethod($this->initialContext->getMethod())
+            ->setHost($this->initialContext->getHost())
+            ->setScheme($this->initialContext->getScheme())
+            ->setHttpPort($this->initialContext->getHttpPort())
+            ->setHttpsPort($this->initialContext->getHttpsPort())
+            ->setQueryString($this->initialContext->getQueryString())
+            ->setParameters($this->initialContext->getParameters());
     }
 }

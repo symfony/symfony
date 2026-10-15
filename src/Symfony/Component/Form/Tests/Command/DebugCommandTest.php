@@ -206,6 +206,15 @@ class DebugCommandTest extends TestCase
         $this->createCommandTester()->execute(['class' => 'test']);
     }
 
+    public function testDebugCustomFormTypeConfiguringInheritedOptions()
+    {
+        $tester = $this->createCommandTester([], [InheritedOptionsType::class]);
+        $ret = $tester->execute(['class' => InheritedOptionsType::class], ['decorated' => false]);
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringMatchesFormat('%AOverridden options%AFormType%Aby_reference%Aempty_data%Alabel%A', $tester->getDisplay(true));
+    }
+
     public function testDebugCustomFormTypeOption()
     {
         $tester = $this->createCommandTester([], [FooType::class]);
@@ -361,5 +370,20 @@ class FooType extends AbstractType
         $resolver->setAllowedValues('foo', ['bar', 'baz']);
         $resolver->setNormalizer('foo', static fn (Options $options, $value) => (string) $value);
         $resolver->setInfo('foo', 'Info');
+    }
+}
+
+class InheritedOptionsType extends AbstractType
+{
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->addNormalizer('by_reference', static fn (Options $options, $value) => $value);
+        $resolver->setDeprecated('empty_data', 'vendor/package', '1.1');
+        $resolver->setInfo('label', 'Info');
+    }
+
+    public function getParent(): string
+    {
+        return TextType::class;
     }
 }

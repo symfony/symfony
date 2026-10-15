@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use ProxyManager\Proxy\LazyLoadingInterface;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
@@ -24,6 +25,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBa
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 // Help opcache.preload discover always-needed symbols
@@ -281,7 +283,7 @@ class Container implements ContainerInterface, ResetInterface
 
         foreach ($services as $service) {
             try {
-                if ($service instanceof ResetInterface) {
+                if ($service instanceof ResetInterface && !self::isUninitializedLazyObject($service)) {
                     $service->reset();
                 }
             } catch (\Throwable) {
@@ -433,6 +435,19 @@ class Container implements ContainerInterface, ResetInterface
     final protected function getResetMap(): \WeakMap
     {
         return $this->resetMap ??= new \WeakMap();
+    }
+
+    private static function isUninitializedLazyObject(object $service): bool
+    {
+        if ($service instanceof LazyObjectInterface && !$service->isLazyObjectInitialized(true)) {
+            return true;
+        }
+
+        if ($service instanceof LazyLoadingInterface && !$service->isProxyInitialized()) {
+            return true;
+        }
+
+        return (new \ReflectionClass($service))->isUninitializedLazyObject($service);
     }
 
     private function __clone()

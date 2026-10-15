@@ -333,6 +333,37 @@ class ExceptionCasterTest extends TestCase
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
+    public function testFrameWithCrlfLineEndings()
+    {
+        $crlf = tempnam(sys_get_temp_dir(), 'sf_crlf');
+        $cr = tempnam(sys_get_temp_dir(), 'sf_cr');
+
+        try {
+            file_put_contents($crlf, "    foo\r\n        bar\r\n    baz\r\n");
+            file_put_contents($cr, "    foo\r        bar\r    baz\r");
+
+            $expectedDump = <<<'EODUMP'
+                array:1 [
+                  0 => {
+                    src: {
+                      %s:2 {
+                        › foo
+                        ›     bar
+                        › baz
+                      }
+                    }
+                  }
+                ]
+                EODUMP;
+
+            $this->assertDumpMatchesFormat($expectedDump, [new FrameStub(['file' => $crlf, 'line' => 2])]);
+            $this->assertDumpMatchesFormat($expectedDump, [new FrameStub(['file' => $cr, 'line' => 2])]);
+        } finally {
+            unlink($crlf);
+            unlink($cr);
+        }
+    }
+
     public function testFrameWithTwig()
     {
         require_once \dirname(__DIR__).'/Fixtures/Twig.php';

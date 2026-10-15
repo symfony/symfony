@@ -52,6 +52,8 @@ final class Color
     private string $foreground;
     private string $background;
     private array $options = [];
+    private string $setSequence;
+    private string $unsetSequence;
 
     public function __construct(string $foreground = '', string $background = '', array $options = [])
     {
@@ -69,7 +71,7 @@ final class Color
 
     public function apply(string $text): string
     {
-        return $this->set().$text.$this->unset();
+        return ($this->setSequence ??= $this->set()).$text.($this->unsetSequence ??= $this->unset());
     }
 
     public function set(): string

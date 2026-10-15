@@ -171,7 +171,8 @@ class FormRenderer implements FormRendererInterface
             // If a block recursively calls searchAndRenderBlock() again, resume rendering
             // using the parent type in the hierarchy.
             $blockNameHierarchy = $this->blockNameHierarchyMap[$viewAndSuffixCacheKey];
-            $hierarchyLevel = $this->hierarchyLevelMap[$viewAndSuffixCacheKey] - 1;
+            $previousHierarchyLevel = $this->hierarchyLevelMap[$viewAndSuffixCacheKey];
+            $hierarchyLevel = $previousHierarchyLevel - 1;
 
             $hierarchyInit = false;
         }
@@ -251,6 +252,9 @@ class FormRenderer implements FormRendererInterface
             // this function call
             if ($hierarchyInit) {
                 unset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey], $this->hierarchyLevelMap[$viewAndSuffixCacheKey]);
+            } else {
+                // Let the calling block resume from its own level if it renders the same block again
+                $this->hierarchyLevelMap[$viewAndSuffixCacheKey] = $previousHierarchyLevel;
             }
 
             if ($varInit) {

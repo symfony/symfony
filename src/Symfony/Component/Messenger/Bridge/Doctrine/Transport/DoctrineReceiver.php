@@ -173,7 +173,12 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
         retry:
         try {
             $callable();
-        } catch (RetryableException $exception) {
+        } catch (RetryableException|TransportException $exception) {
+            // Connection::ack() and reject() wrap DBAL exceptions in a TransportException
+            if ($exception instanceof TransportException && !$exception->getPrevious() instanceof RetryableException) {
+                throw $exception;
+            }
+
             if (++$retries <= self::MAX_RETRIES) {
                 $delay *= $multiplier;
 
@@ -185,7 +190,7 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
                 goto retry;
             }
 
-            throw new TransportException($exception->getMessage(), 0, $exception);
+            throw $exception instanceof TransportException ? $exception : new TransportException($exception->getMessage(), 0, $exception);
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }

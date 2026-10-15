@@ -240,8 +240,17 @@ class Connection
             ]);
         }
 
-        if (!$this->fetchPendingMessages()) {
-            return false;
+        try {
+            if (!$this->fetchPendingMessages()) {
+                return false;
+            }
+        } catch (\Throwable $e) {
+            // a failed response keeps throwing, discard it so that the next call sends a new request
+            $response = $this->currentResponse;
+            $this->currentResponse = null;
+            $response->cancel();
+
+            throw $e;
         }
 
         return true;

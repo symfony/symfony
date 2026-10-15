@@ -1115,4 +1115,39 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($array, $path, 'updated');
         $this->assertSame(['foo.bar' => ['baz' => 'updated']], $array);
     }
+
+    public function testCustomPropertyPathOnArrayAccessObject()
+    {
+        $object = new \ArrayObject(['foo' => 'value']);
+        $path = new CustomPropertyPath(['foo']);
+
+        $this->assertSame('value', $this->propertyAccessor->getValue($object, $path));
+        $this->assertTrue($this->propertyAccessor->isReadable($object, $path));
+        $this->assertTrue($this->propertyAccessor->isWritable($object, $path));
+
+        $this->propertyAccessor->setValue($object, $path, 'updated');
+        $this->assertSame(['foo' => 'updated'], $object->getArrayCopy());
+    }
+
+    public function testCustomPropertyPathDoesNotUseStdClassPropertyWithDot()
+    {
+        $object = new \stdClass();
+        $object->{'foo.bar'} = 'value';
+        $path = new CustomPropertyPath(['foo.bar']);
+
+        $this->assertFalse($this->propertyAccessor->isReadable($object, $path));
+        $this->assertFalse($this->propertyAccessor->isWritable($object, $path));
+
+        try {
+            $this->propertyAccessor->setValue($object, $path, 'updated');
+        } catch (NoSuchIndexException) {
+        }
+
+        $this->assertSame('value', $object->{'foo.bar'});
+
+        $this->expectException(NoSuchIndexException::class);
+        $this->expectExceptionMessage('Cannot read index "foo.bar" from object of type "stdClass" because it doesn\'t implement \ArrayAccess.');
+
+        $this->propertyAccessor->getValue($object, $path);
+    }
 }

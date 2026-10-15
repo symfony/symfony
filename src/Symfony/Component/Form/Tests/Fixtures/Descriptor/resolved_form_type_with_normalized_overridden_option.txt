@@ -1,0 +1,17 @@
+
+Symfony\Component\Form\Tests\Console\Descriptor\NormalizedOptionChildType (Block prefix: "normalized_option_child")
+===================================================================================================================
+
+ -------------------- 
+  Overridden options  
+ -------------------- 
+  ExtendedParentType  
+ -------------------- 
+  parent_option       
+ -------------------- 
+
+Parent types
+------------
+
+ * Symfony\Component\Form\Tests\Console\Descriptor\ExtendedParentType
+

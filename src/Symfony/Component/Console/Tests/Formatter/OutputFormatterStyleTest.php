@@ -78,6 +78,13 @@ class OutputFormatterStyleTest extends TestCase
         $style->setOption('bold');
         $this->assertEquals("\033[8;1mfoo\033[28;22m", $style->apply('foo'));
 
+        $style->unsetOption('bold');
+        $this->assertEquals("\033[8mfoo\033[28m", $style->apply('foo'));
+
+        $style->setOptions(['bold', 'bold']);
+        $style->unsetOption('bold');
+        $this->assertEquals('foo', $style->apply('foo'));
+
         $style->setOptions(['bold']);
         $this->assertEquals("\033[1mfoo\033[22m", $style->apply('foo'));
 
@@ -88,6 +95,29 @@ class OutputFormatterStyleTest extends TestCase
             $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->setOption() throws an \InvalidArgumentException when the option does not exist in the available options');
             $this->assertStringContainsString('Invalid option specified: "foo"', $e->getMessage(), '->setOption() throws an \InvalidArgumentException when the option does not exist in the available options');
         }
+    }
+
+    public function testInvalidValuesLeaveTheStyleUnchanged()
+    {
+        $style = new OutputFormatterStyle('red', null, ['bold']);
+
+        foreach ([
+            static fn () => $style->setForeground('undefined-color'),
+            static fn () => $style->setBackground('undefined-color'),
+            static fn () => $style->setOption('foo'),
+            static fn () => $style->setOptions(['foo']),
+        ] as $setter) {
+            try {
+                $setter();
+                $this->fail('An \InvalidArgumentException should have been thrown');
+            } catch (\InvalidArgumentException) {
+            }
+        }
+
+        $this->assertSame("\033[31;1mfoo\033[39;22m", $style->apply('foo'));
+
+        $style->setOption('underscore');
+        $this->assertSame("\033[31;1;4mfoo\033[39;22;24m", $style->apply('foo'));
     }
 
     public function testHref()

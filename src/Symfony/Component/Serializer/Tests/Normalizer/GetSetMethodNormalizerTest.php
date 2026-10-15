@@ -595,6 +595,26 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals($denormalized, $normalizer->denormalize(['type' => 'two', 'url' => 'url'], GetSetMethodDummyInterface::class));
     }
 
+    public function testSupportsAndNormalizeDiscriminatedObjectWithoutAccessors()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $normalizer = new GetSetMethodNormalizer($classMetadataFactory, null, null, $discriminator);
+
+        $this->assertTrue($normalizer->supportsNormalization(new GetSetMethodDiscriminatedDummyThree()));
+        $this->assertSame(['type' => 'three'], $normalizer->normalize(new GetSetMethodDiscriminatedDummyThree()));
+    }
+
+    public function testSupportsAndDenormalizeDiscriminatedObjectWithoutAccessors()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $normalizer = new GetSetMethodNormalizer($classMetadataFactory, null, null, $discriminator);
+
+        $this->assertTrue($normalizer->supportsDenormalization(['type' => 'three'], GetSetMethodDiscriminatedDummyThree::class));
+        $this->assertInstanceOf(GetSetMethodDiscriminatedDummyThree::class, $normalizer->denormalize(['type' => 'three'], GetSetMethodDiscriminatedDummyThree::class));
+    }
+
     public function testSupportsAndNormalizeWithOnlyParentGetter()
     {
         $obj = new GetSetDummyChild();
@@ -1012,6 +1032,7 @@ class ObjectWithMagicMethod
 #[DiscriminatorMap(typeProperty: 'type', mapping: [
     'one' => GetSetMethodDiscriminatedDummyOne::class,
     'two' => GetSetMethodDiscriminatedDummyTwo::class,
+    'three' => GetSetMethodDiscriminatedDummyThree::class,
 ])]
 interface GetSetMethodDummyInterface
 {
@@ -1045,6 +1066,10 @@ class GetSetMethodDiscriminatedDummyTwo implements GetSetMethodDummyInterface
     {
         $this->url = $url;
     }
+}
+
+class GetSetMethodDiscriminatedDummyThree implements GetSetMethodDummyInterface
+{
 }
 
 class GetSetDummyChild extends GetSetDummyParent

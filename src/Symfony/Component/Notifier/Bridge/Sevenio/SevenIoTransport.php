@@ -80,13 +80,19 @@ final class SevenIoTransport extends AbstractTransport
         }
 
         $success = $response->toArray(false);
+        $messages = $success['messages'] ?? [];
 
-        if (!\in_array((int) $success['success'], [100, 101], true)) {
+        if (101 === (int) $success['success']) {
+            // 101 means that sending to at least one recipient failed
+            $messages = array_values(array_filter($messages, static fn (array $message): bool => filter_var($message['success'] ?? false, \FILTER_VALIDATE_BOOL)));
+        }
+
+        if (!\in_array((int) $success['success'], [100, 101], true) || !$messages) {
             throw new TransportException(\sprintf('Unable to send the SMS: "%s".', $success['success']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);
-        $sentMessage->setMessageId((int) $success['messages'][0]['id']);
+        $sentMessage->setMessageId((int) $messages[0]['id']);
 
         return $sentMessage;
     }

@@ -66,7 +66,7 @@ final class SourceContextProvider implements ContextProviderInterface
                             $file = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getPath() : null;
 
                             if ($src) {
-                                $src = explode("\n", $src);
+                                $src = explode("\n", str_replace(["\r\n", "\r"], "\n", $src));
                                 $fileExcerpt = [];
 
                                 for ($i = max($line - 3, 1), $max = min($line + 3, \count($src)); $i <= $max; ++$i) {

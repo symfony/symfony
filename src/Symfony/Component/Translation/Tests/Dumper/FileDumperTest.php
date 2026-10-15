@@ -74,6 +74,39 @@ class FileDumperTest extends TestCase
         @unlink($file);
         @rmdir($translationsDir);
     }
+
+    public function testDumpWhenTheDirectoryIsCreatedConcurrently()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Creating symlinks requires extra privileges on Windows.');
+        }
+
+        $tempDir = sys_get_temp_dir().'/sf_file_dumper_'.uniqid();
+        mkdir($tempDir);
+        symlink($tempDir.'/target', $tempDir.'/link');
+
+        $catalogue = new MessageCatalogue('en');
+        $catalogue->add(['foo' => 'bar']);
+
+        $dumper = new ConcreteFileDumper();
+        $dumper->setRelativePathTemplate('link/%domain%.%locale%.%extension%');
+
+        // mkdir() fails with "File exists" on the dangling link, and the error handler then creates its target, as a concurrent process would
+        set_error_handler(static fn () => mkdir($tempDir.'/target'));
+
+        try {
+            $dumper->dump($catalogue, ['path' => $tempDir]);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertStringEqualsFile($tempDir.'/target/messages.en.concrete', 'foo=bar');
+
+        @unlink($tempDir.'/target/messages.en.concrete');
+        @rmdir($tempDir.'/target');
+        @unlink($tempDir.'/link');
+        @rmdir($tempDir);
+    }
 }
 
 class ConcreteFileDumper extends FileDumper

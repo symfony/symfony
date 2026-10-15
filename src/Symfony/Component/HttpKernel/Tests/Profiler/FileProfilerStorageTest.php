@@ -520,6 +520,17 @@ class FileProfilerStorageTest extends TestCase
             '96',
         ];
 
+        yield 'Expired profiles around a non-numeric time' => [
+            <<<CSV
+                token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,
+                token1,127.0.0.1,,http://foo.bar/1,abc,,
+                token2,127.0.0.2,,http://foo.bar/2,{$threeDaysAgo->getTimestamp()},,
+                token3,127.0.0.3,,http://foo.bar/3,{$oneHourAgo->getTimestamp()},,
+
+                CSV,
+            '137',
+        ];
+
         yield 'Multiple expired profiles with virtual type' => [
             <<<CSV
                 token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,virtual
@@ -529,6 +540,37 @@ class FileProfilerStorageTest extends TestCase
                 CSV,
             '110',
         ];
+    }
+
+    public function testFindSkipsExpiredProfiles()
+    {
+        foreach (['token0' => '-4 days', 'token1' => '-3 days', 'token2' => '-1 hour'] as $token => $time) {
+            $profile = new Profile($token);
+            $profile->setTime((new \DateTimeImmutable($time))->getTimestamp());
+            $this->storage->write($profile);
+        }
+
+        $r = new \ReflectionMethod($this->storage, 'removeExpiredProfiles');
+        $r->invoke($this->storage);
+
+        $this->assertSame(['token2'], array_column($this->storage->find(null, null, 10, null), 'token'));
+    }
+
+    public function testFindIgnoresOffsetPastTheEndOfTheIndex()
+    {
+        foreach (['token0' => '-4 days', 'token1' => '-3 days'] as $token => $time) {
+            $profile = new Profile($token);
+            $profile->setTime((new \DateTimeImmutable($time))->getTimestamp());
+            $this->storage->write($profile);
+        }
+
+        $r = new \ReflectionMethod($this->storage, 'removeExpiredProfiles');
+        $r->invoke($this->storage);
+
+        unlink($this->tmpDir.'/index.csv');
+        $this->storage->write(new Profile('token2'));
+
+        $this->assertSame(['token2'], array_column($this->storage->find(null, null, 10, null), 'token'));
     }
 
     public function testReadLineFromFile()
@@ -542,6 +584,19 @@ class FileProfilerStorageTest extends TestCase
 
         $this->assertEquals('line2', $r->invoke($this->storage, $h));
         $this->assertEquals('line1', $r->invoke($this->storage, $h));
+    }
+
+    public function testRemoveExpiredProfilesIgnoresOffsetPastTheEndOfTheIndex()
+    {
+        $threeDaysAgo = new \DateTimeImmutable('-3 days');
+        $file = $this->tmpDir.'/index.csv';
+        file_put_contents($file, "token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,\n");
+        file_put_contents($file.'.offset', '1000');
+
+        $r = new \ReflectionMethod($this->storage, 'removeExpiredProfiles');
+        $r->invoke($this->storage);
+
+        $this->assertSame('48', file_get_contents($file.'.offset'));
     }
 
     protected function cleanDir()

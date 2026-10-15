@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Shut the kernel down before cloning it when `FRANKENPHP_RESET_KERNEL` is set in `FrankenPhpWorkerRunner`
+ * Collect garbage cycles in `FrankenPhpWorkerRunner` only when the root buffer of PHP is half full
+
 8.1
 ---
 

@@ -21,6 +21,7 @@ CHANGELOG
  * Add a `current_user()` function to `ExpressionLanguageProvider` and optional authorization checker, token storage and request stack arguments to its constructor
  * Accept a list of secrets in `SignatureHasher::__construct()` to rotate them
  * Add argument `$clock` to `SignatureHasher::__construct()`
+ * Add `GrantingVoter` and `DenyingVoter`, abstract voters that vote in a single direction, granting or denying access, and abstain otherwise
 
 8.1
 ---

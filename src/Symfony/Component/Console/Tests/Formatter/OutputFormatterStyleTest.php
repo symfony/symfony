@@ -78,6 +78,13 @@ class OutputFormatterStyleTest extends TestCase
         $style->setOption('bold');
         $this->assertEquals("\033[8;1mfoo\033[28;22m", $style->apply('foo'));
 
+        $style->unsetOption('bold');
+        $this->assertEquals("\033[8mfoo\033[28m", $style->apply('foo'));
+
+        $style->setOptions(['bold', 'bold']);
+        $style->unsetOption('bold');
+        $this->assertEquals('foo', $style->apply('foo'));
+
         $style->setOptions(['bold']);
         $this->assertEquals("\033[1mfoo\033[22m", $style->apply('foo'));
 

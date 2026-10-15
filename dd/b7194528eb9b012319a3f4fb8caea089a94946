@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-14T19:32:45Z
+
+Thanks for the PR. What's your use case? When the tubes are known in advance, the usual way is one transport per tube, plus `TransportNamesStamp` to pick the tube per message:
+
+```php
+$bus->dispatch($message, [new TransportNamesStamp(['beanstalkd_foo'])]);
+```
+
+The stamp makes sense to me if the tube names are only known at runtime, like one tube per tenant. Is that your case?
+
+If yes, I'd push two changes on top. The stamp should contain a string instead of pheanstalk's `TubeName`, and implement `SenderStampInterface`. Without that, an outbox sends the message to the tube of the transport. And the connection shouldn't switch back to its tube after each put. When the connection drops during the switch back, the message is put twice in the tube.
+
+(fabbot needs the leading `|` on each line of the table in the description)
+
+---------------------------------------------------------------------------
+
+by Nikolay-Kurdoglo at 2026-10-14T20:42:13Z
+
+> Thanks for the PR. What's your use case? When the tubes are known in advance, the usual way is one transport per tube, plus `TransportNamesStamp` to pick the tube per message:
+>
+> ```
+> $bus->dispatch($message, [new TransportNamesStamp(['beanstalkd_foo'])]);
+> ```
+>
+> The stamp makes sense to me if the tube names are only known at runtime, like one tube per tenant. Is that your case?
+>
+> If yes, I'd push two changes on top. The stamp should contain a string instead of pheanstalk's `TubeName`, and implement `SenderStampInterface`. Without that, an outbox sends the message to the tube of the transport. And the connection shouldn't switch back to its tube after each put. When the connection drops during the switch back, the message is put twice in the tube.
+>
+> (fabbot needs the leading `|` on each line of the table in the description)
+
+@nicolas-grekas  Thanks for the feedback!
+
+The main motivation for this change is to avoid opening a separate TCP connection for each tube. With the current approach, each transport is configured with a single tube, so using multiple tubes means creating multiple transports and, consequently, multiple connections. I'd like to reuse a single connection to send messages to different tubes.
+
+Additionally, although tube names can be known in advance, in some cases the target tube is determined at runtime, based on the message or application logic.
+
+This is why I'd prefer to support selecting the target tube per message rather than requiring a separate transport for each tube.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T07:56:27Z
+
+Thanks for the update. Tubes computed at runtime are a good reason for the stamp. Connections are opened lazily, so a transport per tube costs a connection only for the tubes a process actually uses. The worker side needs a transport per tube anyway.
+
+I squashed a few changes into your commit. The connection now switches tubes only when the next put needs another tube. Switching back after each put cost two more commands per message, and a put could be sent twice when the connection dropped. I also added tests for the connection and the changelog line, and a "0" tube isn't ignored anymore.

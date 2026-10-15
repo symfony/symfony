@@ -32,7 +32,7 @@ class TerminalTest extends TestCase
     protected function tearDown(): void
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
-        putenv($this->lineSize ? 'LINES' : 'LINES='.$this->lineSize);
+        putenv($this->lineSize ? 'LINES='.$this->lineSize : 'LINES');
         putenv($this->ansiCon ? 'ANSICON='.$this->ansiCon : 'ANSICON');
         $this->resetStatics();
     }

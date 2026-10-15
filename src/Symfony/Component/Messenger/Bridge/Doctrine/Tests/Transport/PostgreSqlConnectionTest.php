@@ -13,10 +13,12 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Cache\ArrayStatement;
 use Doctrine\DBAL\Driver\Result as DriverResult;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Table;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
@@ -124,6 +126,42 @@ class PostgreSqlConnectionTest extends TestCase
         $this->assertFalse($connection->isListening());
     }
 
+    public function testDestructDoesNotThrowWhenTheConnectionIsLost()
+    {
+        $driverConnection = $this->createStub(\Doctrine\DBAL\Connection::class);
+        $driverConnection->method('isConnected')->willReturn(true);
+        $driverConnection->method('executeStatement')->willReturnCallback(function (string $sql) {
+            if (str_starts_with($sql, 'UNLISTEN')) {
+                throw $this->createStub(DBALException::class);
+            }
+
+            return 0;
+        });
+
+        $connection = $this->createListeningConnection($driverConnection);
+        $connection->__destruct();
+
+        $this->assertFalse($connection->isListening());
+    }
+
+    public function testResetDoesNotReconnectToUnlistenWhenTheConnectionIsClosed()
+    {
+        $statements = [];
+        $driverConnection = $this->createStub(\Doctrine\DBAL\Connection::class);
+        $driverConnection->method('isConnected')->willReturn(false);
+        $driverConnection->method('executeStatement')->willReturnCallback(static function (string $sql) use (&$statements) {
+            $statements[] = $sql;
+
+            return 0;
+        });
+
+        $connection = $this->createListeningConnection($driverConnection);
+        $connection->reset();
+
+        $this->assertFalse($connection->isListening());
+        $this->assertSame(['LISTEN "queue_table"'], $statements);
+    }
+
     public function testGetExtraSetupSqlWrongTable()
     {
         $driverConnection = $this->createStub(\Doctrine\DBAL\Connection::class);
@@ -141,5 +179,40 @@ class PostgreSqlConnectionTest extends TestCase
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
         $this->assertFalse($connection->isListening());
+    }
+
+    private function createListeningConnection(\Doctrine\DBAL\Connection&Stub $driverConnection): PostgreSqlConnection
+    {
+        $driverConnection->method('getDatabasePlatform')->willReturn(new PostgreSQLPlatform());
+        $driverConnection->method('createQueryBuilder')->willReturn(new QueryBuilder($driverConnection));
+
+        $wrappedConnection = new class {
+            public function pgsqlGetNotify()
+            {
+                return false;
+            }
+
+            public function getNotify()
+            {
+                return false;
+            }
+        };
+
+        if (interface_exists(Result::class)) {
+            $driverConnection->method('getWrappedConnection')->willReturn($wrappedConnection);
+            $driverConnection->method('executeQuery')->willReturn(new ArrayStatement([]));
+        } else {
+            $driverConnection->method('getNativeConnection')->willReturn($wrappedConnection);
+            $driverResult = $this->createStub(DriverResult::class);
+            $driverResult->method('fetchAssociative')->willReturn(false);
+            $driverConnection->method('executeQuery')->willReturn(new Result($driverResult, $driverConnection));
+        }
+
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
+        $connection->get();
+        $connection->get();
+        $this->assertTrue($connection->isListening());
+
+        return $connection;
     }
 }

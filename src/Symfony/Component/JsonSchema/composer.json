@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=8.4.1",
+        "php": ">=8.2",
+        "symfony/polyfill-php84": "^1.30",
         "symfony/property-info": "^7.4|^8.0",
         "symfony/type-info": "^7.4.6|^8.0.6"
     },

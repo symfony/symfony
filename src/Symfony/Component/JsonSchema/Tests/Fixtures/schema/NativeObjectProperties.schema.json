@@ -47,9 +47,6 @@
                     "type": "string",
                     "format": "binary"
                 },
-                "amount": {
-                    "type": "string"
-                },
                 "timezone": {
                     "type": "string"
                 },

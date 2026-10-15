@@ -13,6 +13,7 @@ namespace Symfony\Component\JsonSchema\Tests;
 
 use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonSchema\ClassSchemaResolver\NativeClassSchemaResolver;
@@ -150,6 +151,13 @@ class SchemaGeneratorTest extends TestCase
     public function testGmpIsAString()
     {
         $this->assertSame(['type' => 'string'], SchemaGenerator::create()->generate(Type::object(\GMP::class))->getRoot());
+    }
+
+    #[RequiresPhp('>=8.4.0')]
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberIsAString()
+    {
+        $this->assertSame(['type' => 'string'], SchemaGenerator::create()->generate(Type::object(\BcMath\Number::class))->getRoot());
     }
 
     public function testDifferentShapesNamedAlikeThrow()

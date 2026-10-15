@@ -244,8 +244,13 @@ class UnicodeString extends AbstractUnicodeString
 
     public function replace(string $from, string $to): static
     {
-        $str = clone $this;
         normalizer_is_normalized($from) ?: $from = normalizer_normalize($from);
+
+        if (!$this->ignoreCase && \is_string($from) && !str_contains($this->string, $from)) {
+            return clone $this;
+        }
+
+        $str = clone $this;
 
         if ('' !== $from && false !== $from) {
             $tail = $str->string;

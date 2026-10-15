@@ -363,4 +363,17 @@ class ConsoleSectionOutputTest extends TestCase
         rewind($output->getStream());
         $this->assertEquals(escapeshellcmd('Foo'.\PHP_EOL.'Bar'.\PHP_EOL), escapeshellcmd(stream_get_contents($output->getStream())));
     }
+
+    public function testWriteWithoutNewLineContinuesWrappedLine()
+    {
+        putenv('COLUMNS=10');
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->write('012345678901234');
+        $output->write('5');
+
+        rewind($output->getStream());
+        $this->assertSame('012345678901234'.\PHP_EOL."\x1b[2A\x1b[0J".'0123456789012345'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
 }

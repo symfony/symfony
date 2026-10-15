@@ -208,7 +208,8 @@ class ConsoleSectionOutput extends StreamOutput
 
         // Check if the previous line (last entry of `$this->content`) needs to be continued
         // (i.e. does not end with a line break). In which case, it needs to be erased first.
-        $linesToClear = $deleteLastLine = ($lastLine = end($this->content) ?: '') && !str_ends_with($lastLine, \PHP_EOL) ? 1 : 0;
+        $deleteLastLine = ($lastLine = end($this->content) ?: '') && !str_ends_with($lastLine, \PHP_EOL);
+        $linesToClear = $deleteLastLine ? ((int) ceil($this->getDisplayLength($lastLine) / $this->terminal->getWidth()) ?: 1) : 0;
 
         $linesAdded = $this->addContent($message, $newline);
 

@@ -289,7 +289,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
 
     public static function provideReplace(): array
     {
-        return array_merge(
+        $tests = array_merge(
             parent::provideReplace(),
             [
                 ['Das Innenministerium', 1, 'Das Außenministerium', 'Auß', 'Inn'],
@@ -299,9 +299,14 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                 ['caféX', 1, "café\0", "\0", 'X'],
                 ["a\u{00AD}bé X", 1, "a\u{00AD}bé ab", 'ab', 'X'],
                 ['می خواهم', 1, "می\u{200C}خواهم", "\u{200C}", ' '],
-                ["X q\u{0303}", 1, "q q\u{0303}", 'q', 'X'],
             ]
         );
+
+        if (\extension_loaded('intl')) {
+            $tests[] = ["X q\u{0303}", 1, "q q\u{0303}", 'q', 'X'];
+        }
+
+        return $tests;
     }
 
     public static function provideReplaceIgnoreCase(): array
@@ -314,6 +319,7 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
                 ['abXé', 1, "ab\u{200B}é", "\u{200B}", 'X'],
                 ["A\u{00AD}Bé X", 1, "A\u{00AD}Bé AB", 'ab', 'X'],
                 ['STRAXEé', 1, 'STRAẞEé', 'ß', 'X'],
+                ['می خواهم', 1, "می\u{200C}خواهم", "\u{200C}", ' '],
             ]
         );
     }

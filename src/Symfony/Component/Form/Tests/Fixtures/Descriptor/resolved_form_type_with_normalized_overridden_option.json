@@ -1,0 +1,19 @@
+{
+    "class": "Symfony\\Component\\Form\\Tests\\Console\\Descriptor\\NormalizedOptionChildType",
+    "block_prefix": "normalized_option_child",
+    "options": {
+        "own": [],
+        "overridden": {
+            "Symfony\\Component\\Form\\Tests\\Console\\Descriptor\\ExtendedParentType": [
+                "parent_option"
+            ]
+        },
+        "parent": [],
+        "extension": [],
+        "required": []
+    },
+    "parent_types": [
+        "Symfony\\Component\\Form\\Tests\\Console\\Descriptor\\ExtendedParentType"
+    ],
+    "type_extensions": []
+}

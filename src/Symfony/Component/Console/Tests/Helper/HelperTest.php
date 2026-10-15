@@ -62,6 +62,34 @@ class HelperTest extends TestCase
         ];
     }
 
+    public static function lengthProvider(): iterable
+    {
+        yield [0, null];
+        yield [0, ''];
+        yield [3, 'abc'];
+        yield [5, "a\0\t\e\x7F"];
+        yield [3, "a\r\nb"];
+        yield [4, "a\n\rb"];
+        yield [2, "\r\r"];
+        yield [4, 'déjà'];
+        yield [1, "e\u{301}"];
+        yield [4, "abc\xFF"];
+    }
+
+    public static function substrProvider(): iterable
+    {
+        yield ['', null, 0, null];
+        yield ['bc', 'abc', 1, null];
+        yield ['b', 'abc', 1, 1];
+        yield ['c', 'abc', -1, null];
+        yield ['', 'abc', 5, null];
+        yield ["\r\n", "a\r\nb", 1, 1];
+        yield ['b', "a\r\nb", 2, null];
+        yield ["\n", "a\n\rb", 1, 1];
+        yield ['é', 'déjà', 1, 1];
+        yield ['bc', "abc\xFF", 1, 2];
+    }
+
     #[DataProvider('formatTimeProvider')]
     public function testFormatTime(int|float $secs, string $expectedFormat, int $precision)
     {
@@ -72,5 +100,32 @@ class HelperTest extends TestCase
     public function testRemoveDecoration(string $decoratedText, string $undecoratedText)
     {
         $this->assertEquals($undecoratedText, Helper::removeDecoration(new OutputFormatter(), $decoratedText));
+    }
+
+    #[DataProvider('lengthProvider')]
+    public function testLength(int $expected, ?string $string)
+    {
+        $this->assertSame($expected, Helper::length($string));
+    }
+
+    #[DataProvider('substrProvider')]
+    public function testSubstr(string $expected, ?string $string, int $from, ?int $length)
+    {
+        $this->assertSame($expected, Helper::substr($string, $from, $length));
+    }
+
+    public function testLengthAndSubstrOfALegacyMultibyteEncoding()
+    {
+        $detectOrder = mb_detect_order();
+        mb_detect_order(['SJIS', 'UTF-8']);
+
+        try {
+            $string = "\x82\xA0\x82\xA2";
+
+            $this->assertSame(2, Helper::length($string));
+            $this->assertSame("\x82\xA2", Helper::substr($string, 1, 1));
+        } finally {
+            mb_detect_order($detectOrder);
+        }
     }
 }

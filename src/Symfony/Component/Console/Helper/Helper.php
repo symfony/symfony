@@ -70,7 +70,12 @@ abstract class Helper implements HelperInterface
     {
         $string ??= '';
 
-        if (preg_match('//u', $string)) {
+        // every ASCII byte is a grapheme, except "\r\n" which is a single one; false means invalid UTF-8
+        if (0 === $match = preg_match('/[^\x00-\x0C\x0E-\x7F]/u', $string)) {
+            return \strlen($string);
+        }
+
+        if ($match) {
             return (new UnicodeString($string))->length();
         }
 
@@ -88,7 +93,11 @@ abstract class Helper implements HelperInterface
     {
         $string ??= '';
 
-        if (preg_match('//u', $string)) {
+        if (0 === $match = preg_match('/[^\x00-\x0C\x0E-\x7F]/u', $string)) {
+            return substr($string, $from, $length);
+        }
+
+        if ($match) {
             return (new UnicodeString($string))->slice($from, $length);
         }
 

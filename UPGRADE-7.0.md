@@ -277,7 +277,7 @@ HttpFoundation
  * Calling `ParameterBag::filter()` on an invalid value throws an `UnexpectedValueException` instead of returning `false`.
    The exception is more specific for `InputBag` which throws a `BadRequestException` when invalid value is found.
    The flag `FILTER_NULL_ON_FAILURE` can be used to return `null` instead of throwing an exception.
- * The methods `ParameterBag::getInt()` and `ParameterBag::getBool()` no longer fallback to `0` or `false`
+ * The methods `ParameterBag::getInt()` and `ParameterBag::getBoolean()` no longer fallback to `0` or `false`
    when the value cannot be converted to the expected type. They throw a `UnexpectedValueException` instead.
  * Remove `RequestMatcher`, use `ChainRequestMatcher` instead
  * Remove `ExpressionRequestMatcher`, use `RequestMatcher\ExpressionRequestMatcher` instead

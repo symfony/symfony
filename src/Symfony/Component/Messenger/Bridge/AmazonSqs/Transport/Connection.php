@@ -205,15 +205,12 @@ class Connection
             }
 
             $fetchSize = max(1, $fetchSize);
-            $messages = $this->getPendingMessages($fetchSize);
 
-            if (\count($messages) < $fetchSize
-                && $this->fetchMessages(max($fetchSize, $this->configuration['buffer_size']))
-            ) {
-                $messages = [...$messages, ...$this->getPendingMessages($fetchSize - \count($messages))];
+            if (\count($this->buffer) < $fetchSize) {
+                $this->fetchMessages(max($fetchSize, $this->configuration['buffer_size']));
             }
 
-            return $messages ?: null;
+            return $this->getPendingMessages($fetchSize) ?: null;
         });
     }
 

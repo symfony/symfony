@@ -31,4 +31,12 @@ class ParseExceptionTest extends TestCase
 
         $this->assertEquals($message, $exception->getMessage());
     }
+
+    public function testGettersReturnNullWhenNoFileOrSnippetIsSet()
+    {
+        $exception = new ParseException('Error message');
+
+        $this->assertNull($exception->getParsedFile());
+        $this->assertNull($exception->getSnippet());
+    }
 }

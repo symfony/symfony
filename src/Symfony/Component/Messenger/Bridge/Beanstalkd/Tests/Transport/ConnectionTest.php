@@ -201,6 +201,29 @@ final class ConnectionTest extends TestCase
         $this->assertSame($beanstalkdEnvelope['headers'], $envelope['headers']);
     }
 
+    public function testGetAfterAFailedReconnect()
+    {
+        $tube = new TubeName('baz');
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->exactly(3))->method('watch')->with($tube)->willReturn(1);
+        $client->expects($this->exactly(3))->method('reserveWithTimeout')->willReturnOnConsecutiveCalls(
+            $this->throwException(new ConnectionException('123', 'foobar')),
+            $this->throwException(new ConnectionException('123', 'foobar')),
+            new Job(new JobId('1234'), json_encode(['body' => 'foo', 'headers' => []])),
+        );
+
+        $connection = new Connection(['tube_name' => 'baz'], $client);
+
+        try {
+            $connection->get();
+            $this->fail('The second connection failure should not be retried.');
+        } catch (TransportException) {
+        }
+
+        $this->assertSame('1234', $connection->get()['id']);
+    }
+
     public function testGetWhenThereIsNoJobInTheTube()
     {
         $tube = 'baz';
@@ -583,6 +606,27 @@ final class ConnectionTest extends TestCase
         $returnedId = $connection->send($body, $headers, $delay);
 
         $this->assertSame($id, $returnedId);
+    }
+
+    public function testSendAfterAFailedReconnect()
+    {
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->exactly(3))->method('useTube')->with(new TubeName('xyz'));
+        $client->expects($this->exactly(3))->method('put')->willReturnOnConsecutiveCalls(
+            $this->throwException(new ConnectionException('123', 'foobar')),
+            $this->throwException(new ConnectionException('123', 'foobar')),
+            new Job(new JobId('110'), 'foobar'),
+        );
+
+        $connection = new Connection(['tube_name' => 'xyz'], $client);
+
+        try {
+            $connection->send('foo', []);
+            $this->fail('The second connection failure should not be retried.');
+        } catch (TransportException) {
+        }
+
+        $this->assertSame('110', $connection->send('foo', []));
     }
 
     public function testSendWithPriority()

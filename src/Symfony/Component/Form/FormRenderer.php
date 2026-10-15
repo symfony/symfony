@@ -67,8 +67,6 @@ class FormRenderer implements FormRendererInterface
         // The variables are cached globally for a view (instead of for the
         // current suffix)
         if (!isset($this->variableStack[$viewCacheKey])) {
-            $this->variableStack[$viewCacheKey] = [];
-
             // The default variable scope contains all view variables, merged with
             // the variables passed explicitly to the helper
             $scopeVariables = $view->vars;
@@ -97,14 +95,16 @@ class FormRenderer implements FormRendererInterface
 
         $this->variableStack[$viewCacheKey][] = $variables;
 
-        // Do the rendering
-        $html = $this->engine->renderBlock($view, $resource, $blockName, $variables);
+        try {
+            // Do the rendering
+            $html = $this->engine->renderBlock($view, $resource, $blockName, $variables);
+        } finally {
+            // Clear the stack, even if the rendering failed
+            array_pop($this->variableStack[$viewCacheKey]);
 
-        // Clear the stack
-        array_pop($this->variableStack[$viewCacheKey]);
-
-        if ($varInit) {
-            unset($this->variableStack[$viewCacheKey]);
+            if ($varInit) {
+                unset($this->variableStack[$viewCacheKey]);
+            }
         }
 
         return $html;
@@ -166,7 +166,8 @@ class FormRenderer implements FormRendererInterface
             // If a block recursively calls searchAndRenderBlock() again, resume rendering
             // using the parent type in the hierarchy.
             $blockNameHierarchy = $this->blockNameHierarchyMap[$viewAndSuffixCacheKey];
-            $hierarchyLevel = $this->hierarchyLevelMap[$viewAndSuffixCacheKey] - 1;
+            $previousHierarchyLevel = $this->hierarchyLevelMap[$viewAndSuffixCacheKey];
+            $hierarchyLevel = $previousHierarchyLevel - 1;
 
             $hierarchyInit = false;
         }
@@ -174,8 +175,6 @@ class FormRenderer implements FormRendererInterface
         // The variables are cached globally for a view (instead of for the
         // current suffix)
         if (!isset($this->variableStack[$viewCacheKey])) {
-            $this->variableStack[$viewCacheKey] = [];
-
             // The default variable scope contains all view variables, merged with
             // the variables passed explicitly to the helper
             $scopeVariables = $view->vars;
@@ -237,20 +236,25 @@ class FormRenderer implements FormRendererInterface
         // blocks for the same view using the same variables as in the outer block.
         $this->variableStack[$viewCacheKey][] = $variables;
 
-        // Do the rendering
-        $html = $this->engine->renderBlock($view, $resource, $blockName, $variables);
+        try {
+            // Do the rendering
+            $html = $this->engine->renderBlock($view, $resource, $blockName, $variables);
+        } finally {
+            // Clear the stack, even if the rendering failed
+            array_pop($this->variableStack[$viewCacheKey]);
 
-        // Clear the stack
-        array_pop($this->variableStack[$viewCacheKey]);
+            // Clear the caches if they were filled for the first time within
+            // this function call
+            if ($hierarchyInit) {
+                unset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey], $this->hierarchyLevelMap[$viewAndSuffixCacheKey]);
+            } else {
+                // Let the calling block resume from its own level if it renders the same block again
+                $this->hierarchyLevelMap[$viewAndSuffixCacheKey] = $previousHierarchyLevel;
+            }
 
-        // Clear the caches if they were filled for the first time within
-        // this function call
-        if ($hierarchyInit) {
-            unset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey], $this->hierarchyLevelMap[$viewAndSuffixCacheKey]);
-        }
-
-        if ($varInit) {
-            unset($this->variableStack[$viewCacheKey]);
+            if ($varInit) {
+                unset($this->variableStack[$viewCacheKey]);
+            }
         }
 
         if ($renderOnlyOnce) {

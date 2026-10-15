@@ -301,6 +301,12 @@ class Connection
                     return $command();
                 }
             } catch (Exception $exception) {
+                if ($exception instanceof ConnectionException) {
+                    // the next command opens a new session, which uses and watches the "default" tube
+                    $this->usingTube = false;
+                    $this->watchingTube = false;
+                }
+
                 throw new TransportException($exception->getMessage(), 0, $exception);
             } finally {
                 $this->busy = false;

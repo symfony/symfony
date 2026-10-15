@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T08:39:38Z
+
+Nice one! You mention APIs answering 429 as a use case. A handler that reads `Retry-After` can already throw a `RecoverableMessageHandlingException` with that delay, and the retry listener uses it. But the default cooldown strategy ignores this delay. After 5 failures, the worker sends a trial message after 1s, then 2s, 4s... even when the API said to wait for 2 minutes. What about cooling down for at least `getRetryDelay()` when the exception provides it? WDYT?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-10-15T08:41:47Z
+
+@nicolas-grekas Yes, that was one of the things I considered, but I decided to leave it out initially. Since you've brought it up as well, I agree it makes sense to include it.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-10-15T10:45:01Z
+
+@nicolas-grekas [Done](https://github.com/symfony/symfony/compare/ca446c14ccdc8177c0c4227354c4680f2e6bed37..93af44e647232b72eb2d3e3a87549774f495aa66). The cooldown now respects `RecoverableExceptionInterface::getRetryDelay()`, using the same logic as the retry listener via the shared `RetryDecider::getDelayFromException()`.
+
+The first four consecutive 429s still don't trigger a cooldown. The fifth does, and the cooldown lasts at least as long as the requested retry delay.
+
+This can exceed `max_delay`, which defaults to 60s. The trade-off is that a message-specific retry delay now pauses the entire transport, potentially for a long time. Such messages are better handled by a separate transport.
+
+If `max_delay` should remain a hard cap, that's easy to adjust, but your 2-minute example would then require increasing it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T13:03:41Z
+
+I made `max_delay` a hard cap, also for `getRetryDelay()`, because that delay is about one message and isn't always a rate limit. I also made the worker catch the `TransportException` thrown by `get()` when the transport has a cooldown strategy. The worker logs it, counts it as a failure and keeps consuming the other transports. #66962 can build on this /cc @neothone

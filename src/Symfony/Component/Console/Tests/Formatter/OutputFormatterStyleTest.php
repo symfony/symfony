@@ -97,6 +97,29 @@ class OutputFormatterStyleTest extends TestCase
         }
     }
 
+    public function testInvalidValuesLeaveTheStyleUnchanged()
+    {
+        $style = new OutputFormatterStyle('red', null, ['bold']);
+
+        foreach ([
+            static fn () => $style->setForeground('undefined-color'),
+            static fn () => $style->setBackground('undefined-color'),
+            static fn () => $style->setOption('foo'),
+            static fn () => $style->setOptions(['foo']),
+        ] as $setter) {
+            try {
+                $setter();
+                $this->fail('An \InvalidArgumentException should have been thrown');
+            } catch (\InvalidArgumentException) {
+            }
+        }
+
+        $this->assertSame("\033[31;1mfoo\033[39;22m", $style->apply('foo'));
+
+        $style->setOption('underscore');
+        $this->assertSame("\033[31;1;4mfoo\033[39;22;24m", $style->apply('foo'));
+    }
+
     public function testHref()
     {
         $prevTerminalEmulator = getenv('TERMINAL_EMULATOR');

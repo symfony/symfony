@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T15:12:54Z
+
+The AssetMapper failure is fixed by #67009 (6.4). I'll rebase once it's merged up.

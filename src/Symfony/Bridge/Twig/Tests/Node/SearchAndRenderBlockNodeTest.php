@@ -307,6 +307,40 @@ class SearchAndRenderBlockNodeTest extends TestCase
         );
     }
 
+    public function testCompileLabelWithLabelAndAttributesInVariable()
+    {
+        if (class_exists(Nodes::class)) {
+            $arguments = new Nodes([
+                new ContextVariable('form', 0),
+                new ConstantExpression('value in argument', 0),
+                new ContextVariable('attributes', 0),
+            ]);
+        } else {
+            $arguments = new Node([
+                new NameExpression('form', 0),
+                new ConstantExpression('value in argument', 0),
+                new NameExpression('attributes', 0),
+            ]);
+        }
+
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
+        } else {
+            $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+        }
+
+        $compiler = new Compiler(new Environment(new ArrayLoader()));
+
+        $this->assertEquals(
+            \sprintf(
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["label" => "value in argument"] + %s)',
+                $this->getVariableGetter('form'),
+                $this->getVariableGetter('attributes')
+            ),
+            trim($compiler->compile($node)->getSource())
+        );
+    }
+
     public function testCompileLabelWithLabelThatEvaluatesToNull()
     {
         if (class_exists(ConditionalTernary::class)) {

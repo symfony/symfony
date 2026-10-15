@@ -20,6 +20,8 @@ use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Twig\Environment;
+use Twig\Loader\ArrayLoader;
+use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
@@ -293,6 +295,31 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"][.="[trans]<b>Bolded label</b>[/trans]"]', 0);
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"]/b[.="Bolded label"]');
+    }
+
+    public function testLabelWithLabelArgumentAndVariablesFromTemplateVariable()
+    {
+        $environment = new Environment(new ChainLoader([
+            new ArrayLoader(['label.html.twig' => "{{ form_label(form, 'Label in argument', variables) }}"]),
+            new FilesystemLoader(__DIR__.'/../../Resources/views/Form'),
+        ]), ['strict_variables' => true]);
+        $environment->addExtension(new TranslationExtension(new StubTranslator()));
+        $environment->addExtension(new FormExtension());
+
+        $rendererEngine = new TwigRendererEngine(['form_div_layout.html.twig'], $environment);
+        $this->registerTwigRuntimeLoader($environment, new FormRenderer($rendererEngine, new CsrfTokenManager()));
+
+        $view = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType')->createView();
+
+        $html = $environment->render('label.html.twig', [
+            'form' => $view,
+            'variables' => [
+                'label' => 'Label in variables',
+                'label_attr' => ['class' => 'my&class'],
+            ],
+        ]);
+
+        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"][.="[trans]Label in argument[/trans]"]');
     }
 
     protected function renderForm(FormView $view, array $vars = []): string

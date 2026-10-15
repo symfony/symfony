@@ -15,6 +15,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Messenger\Cooldown\CooldownStatus;
+use Symfony\Component\Messenger\Cooldown\CooldownStrategyInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
@@ -22,10 +24,12 @@ use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
+use Symfony\Component\Messenger\Event\WorkerTransportCoolingDownEvent;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\EnvelopeAwareExceptionInterface;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
 use Symfony\Component\Messenger\Execution\MessageExecutionStrategyInterface;
 use Symfony\Component\Messenger\Execution\SyncMessageExecutionStrategy;
@@ -58,11 +62,16 @@ class Worker
      * @var \SplObjectStorage<object, array{0: string, 1: Envelope}>
      */
     private \SplObjectStorage $keepalives;
+    /**
+     * @var array<string, CooldownStatus> The statuses of the transports the worker skips because they are cooling down
+     */
+    private array $coolingDownTransports = [];
 
     private readonly MessageExecutionStrategyInterface $messageExecutionStrategy;
 
     /**
-     * @param ReceiverInterface[] $receivers Where the key is the transport name
+     * @param ReceiverInterface[]         $receivers          Where the key is the transport name
+     * @param CooldownStrategyInterface[] $cooldownStrategies Where the key is the transport name
      */
     public function __construct(
         private array $receivers,
@@ -72,6 +81,7 @@ class Worker
         private ?array $rateLimiters = null,
         private ClockInterface $clock = new Clock(),
         ?MessageExecutionStrategyInterface $messageExecutionStrategy = null,
+        private array $cooldownStrategies = [],
     ) {
         $this->metadata = new WorkerMetadata([
             'transportNames' => array_keys($receivers),
@@ -86,7 +96,7 @@ class Worker
      * Valid options are:
      *  * sleep (default: 1000000): Time in microseconds to sleep after no messages are found
      *  * time_limit: The time limit in seconds the worker can handle new messages
-     *  * stop_when_empty (default: false): Whether to stop once the receivers have no message left, after handling the messages in flight and the pending batches
+     *  * stop_when_empty (default: false): Whether to stop once the receivers have no message left (a receiver cooling down or failing to fetch counts as having none), after handling the messages in flight and the pending batches
      *  * queues: The queue names to consume from, instead of consuming from all queues. When this is used, all receivers must implement the QueueReceiverInterface
      */
     public function run(array $options = []): void
@@ -149,14 +159,21 @@ class Worker
                         continue 2;
                     }
                 } else {
-                    if ($queueNames) {
-                        /** @var QueueReceiverInterface $receiver */
-                        $envelopes = $receiver->getFromQueues($queueNames, $fetchSize);
-                    } else {
-                        $envelopes = $receiver->get($fetchSize);
+                    $status = ($this->cooldownStrategies[$transportName] ?? null)?->checkStatus($transportName);
+
+                    if ($status?->isCoolingDown()) {
+                        if (!isset($this->coolingDownTransports[$transportName])) {
+                            $this->eventDispatcher?->dispatch(new WorkerTransportCoolingDownEvent($transportName, $status));
+                        }
+
+                        $this->coolingDownTransports[$transportName] = $status;
+
+                        continue;
                     }
 
-                    $envelopes = (static fn () => yield from $envelopes)();
+                    unset($this->coolingDownTransports[$transportName]);
+
+                    $envelopes = $this->fetch($transportName, $receiver, $queueNames, $fetchSize);
                     $envelopes->rewind();
                 }
 
@@ -202,7 +219,12 @@ class Worker
                         continue;
                     }
 
-                    $this->logger?->info('Worker stopped because no message was available');
+                    if ($this->coolingDownTransports) {
+                        $this->logger?->info('Worker stopped because no message was available outside of the transports that are cooling down: {transports}', ['transports' => implode(', ', array_keys($this->coolingDownTransports))]);
+                    } else {
+                        $this->logger?->info('Worker stopped because no message was available');
+                    }
+
                     break;
                 }
 
@@ -215,6 +237,12 @@ class Worker
                 if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->now() - $envelopeHandledStart))) {
                     if (null !== $endTime) {
                         $sleep = min($sleep, (int) (1e6 * ($endTime - $this->now())));
+                    }
+
+                    foreach ($this->coolingDownTransports as $status) {
+                        if ($end = $status->getEnd()) {
+                            $sleep = (int) min($sleep, ceil(1e6 * ((float) $end->format('U.u') - $this->now())));
+                        }
                     }
 
                     if (0 < $sleep) {
@@ -235,6 +263,30 @@ class Worker
 
         $this->flush(true);
         $this->eventDispatcher?->dispatch(new WorkerStoppedEvent($this));
+    }
+
+    /**
+     * @return \Generator<Envelope>
+     */
+    private function fetch(string $transportName, ReceiverInterface $receiver, ?array $queueNames, int $fetchSize): \Generator
+    {
+        try {
+            if ($queueNames) {
+                /** @var QueueReceiverInterface $receiver */
+                $envelopes = $receiver->getFromQueues($queueNames, $fetchSize);
+            } else {
+                $envelopes = $receiver->get($fetchSize);
+            }
+
+            yield from $envelopes;
+        } catch (TransportException $e) {
+            if (!$cooldownStrategy = $this->cooldownStrategies[$transportName] ?? null) {
+                throw $e;
+            }
+
+            $this->logger?->warning('Fetching messages from transport {transport} failed: {error}', ['transport' => $transportName, 'error' => $e->getMessage(), 'exception' => $e]);
+            $cooldownStrategy->recordFailure($transportName, null, $e);
+        }
     }
 
     private function handleMessage(Envelope $envelope, string $transportName, ?string $busName = null): void
@@ -312,6 +364,9 @@ class Worker
                     $receiver->reject($envelope);
                 }
 
+                // the strategy gets the envelope stamped by the listeners of the failed event, the retry listener included
+                ($this->cooldownStrategies[$transportName] ?? null)?->recordFailure($transportName, $envelope, $e);
+
                 continue;
             }
 
@@ -330,6 +385,7 @@ class Worker
 
             unset($this->keepalives[$envelope->getMessage()]);
             $receiver->ack($envelope);
+            ($this->cooldownStrategies[$transportName] ?? null)?->recordSuccess($transportName, $envelope);
         }
 
         return (bool) $acks;

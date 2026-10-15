@@ -534,6 +534,12 @@ class MessengerBundleExtensionTest extends TestCase
         $this->assertSame(3, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(2));
         $this->assertSame(100, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(3));
 
+        $cooldownStrategy = $container->getDefinition('messenger.cooldown.multiplier_cooldown_strategy.customised');
+        $this->assertSame([3, 500, 3, 30000, 0.1], \array_slice($cooldownStrategy->getArguments(), 0, 5));
+        $this->assertEquals(new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE), $cooldownStrategy->getArgument(5));
+        $this->assertSame([['channel' => 'messenger']], $cooldownStrategy->getTag('monolog.logger'));
+        $this->assertEquals(['customised' => new Reference('messenger.cooldown.multiplier_cooldown_strategy.customised')], $container->getDefinition('messenger.cooldown_strategy_locator')->getArgument(0));
+
         $failureTransportsByTransportNameServiceLocator = $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0);
         $failureTransports = $container->getDefinition((string) $failureTransportsByTransportNameServiceLocator)->getArgument(0);
         $expectedTransportsByFailureTransports = [
@@ -565,6 +571,72 @@ class MessengerBundleExtensionTest extends TestCase
             'customised' => new Reference('limiter.customised_worker'),
         ];
         $this->assertEquals($expectedRateLimitersByRateLimitedTransports, $rateLimitedTransports);
+    }
+
+    public function testEachTransportGetsItsConfiguredCooldownStrategy()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', [
+                'transports' => [
+                    'api' => [
+                        'dsn' => 'in-memory://',
+                        'cooldown_strategy' => 'app.cooldown_strategy',
+                    ],
+                    'orders' => [
+                        'dsn' => 'in-memory://',
+                        'outbox' => 'in-memory://',
+                        'cooldown_strategy' => null,
+                    ],
+                ],
+            ]);
+        });
+
+        // like the rate limiter, the cooldown strategy paces the consumption of its own transport, so the outbox does not inherit it
+        $this->assertEquals([
+            'api' => new Reference('app.cooldown_strategy'),
+            'orders' => new Reference('messenger.cooldown.multiplier_cooldown_strategy.orders'),
+        ], $container->getDefinition('messenger.cooldown_strategy_locator')->getArgument(0));
+        $this->assertSame([5, 1000, 2, 60000, 0.1], \array_slice($container->getDefinition('messenger.cooldown.multiplier_cooldown_strategy.orders')->getArguments(), 0, 5));
+        $this->assertEquals(new Reference('messenger.cooldown_strategy_locator'), $container->getDefinition('console.command.messenger_consume_messages')->getArgument(10));
+    }
+
+    public function testCooldownStrategyCanBeTurnedOffByALaterConfiguration()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', [
+                'transports' => [
+                    'api' => [
+                        'dsn' => 'in-memory://',
+                        'cooldown_strategy' => ['failure_threshold' => 3],
+                    ],
+                ],
+            ]);
+            $container->loadFromExtension('messenger', [
+                'transports' => [
+                    'api' => ['cooldown_strategy' => false],
+                ],
+            ]);
+        });
+
+        $this->assertSame([], $container->getDefinition('messenger.cooldown_strategy_locator')->getArgument(0));
+        $this->assertFalse($container->hasDefinition('messenger.cooldown.multiplier_cooldown_strategy.api'));
+    }
+
+    public function testMessengerTransportCooldownStrategyServiceCannotBeUsedWithOtherOptions()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "service" cannot be used along with the other "cooldown_strategy" options.');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('messenger', [
+                'transports' => [
+                    'api' => [
+                        'dsn' => 'in-memory://',
+                        'cooldown_strategy' => ['service' => 'app.cooldown_strategy', 'failure_threshold' => 3],
+                    ],
+                ],
+            ]);
+        });
     }
 
     public function testMessengerTransportsThatCanBeInMemoryKeepTheirStateUntilTheEndOfATest()

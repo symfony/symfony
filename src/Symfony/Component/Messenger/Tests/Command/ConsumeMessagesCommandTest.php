@@ -28,6 +28,8 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
+use Symfony\Component\Messenger\Cooldown\CooldownStatus;
+use Symfony\Component\Messenger\Cooldown\CooldownStrategyInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
@@ -195,6 +197,45 @@ class ConsumeMessagesCommandTest extends TestCase
         $tester->execute(['receivers' => ['dummy-receiver'], '--limit' => 2]);
 
         $this->assertSame(3, $handledMessages);
+    }
+
+    public function testRunUsesTheCooldownStrategyOfTheReceiver()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver->expects($this->once())->method('get')->willReturn([$envelope]);
+        $receiver->expects($this->once())->method('reject');
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', $receiver);
+
+        $exception = new \RuntimeException('Failure.');
+        $bus = $this->createStub(MessageBusInterface::class);
+        $bus->method('dispatch')->willThrowException($exception);
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', $bus);
+
+        $cooldownStrategy = $this->createMock(CooldownStrategyInterface::class);
+        $cooldownStrategy->expects($this->once())->method('checkStatus')->with('dummy-receiver')->willReturn(CooldownStatus::inactive());
+        $cooldownStrategy->expects($this->once())->method('recordFailure')->with('dummy-receiver', $this->isInstanceOf(Envelope::class), $exception);
+        $cooldownStrategy->expects($this->never())->method('recordSuccess');
+
+        $cooldownStrategyLocator = new Container();
+        $cooldownStrategyLocator->set('dummy-receiver', $cooldownStrategy);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher(), null, [], null, [], null, null, '', $cooldownStrategyLocator);
+
+        $application = new Application();
+        $application->addCommand($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--limit' => 1,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
     }
 
     #[DataProvider('getInvalidOptions')]

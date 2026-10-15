@@ -18,8 +18,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageRetriedEvent;
-use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Retry\RetryDecider;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
@@ -115,25 +113,7 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
 
     private function getWaitingTime(Envelope $envelope, \Throwable $throwable, RetryStrategyInterface $retryStrategy): int
     {
-        $delay = null;
-        if ($throwable instanceof RecoverableExceptionInterface) {
-            $delay = $throwable->getRetryDelay();
-        }
-
-        if ($throwable instanceof HandlerFailedException) {
-            foreach ($throwable->getWrappedExceptions() as $nestedException) {
-                if (!$nestedException instanceof RecoverableExceptionInterface
-                    || 0 > $retryDelay = $nestedException->getRetryDelay() ?? -1
-                ) {
-                    continue;
-                }
-                if ($retryDelay < ($delay ?? \PHP_INT_MAX)) {
-                    $delay = $retryDelay;
-                }
-            }
-        }
-
-        return $delay ?? $retryStrategy->getWaitingTime($envelope, $throwable);
+        return RetryDecider::getDelayFromException($throwable) ?? $retryStrategy->getWaitingTime($envelope, $throwable);
     }
 
     private function getRetryStrategyForTransport(string $alias): ?RetryStrategyInterface

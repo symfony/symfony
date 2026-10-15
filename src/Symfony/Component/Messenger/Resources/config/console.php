@@ -35,6 +35,7 @@ return static function (ContainerConfigurator $container) {
                 service('messenger.rate_limiter_locator')->nullOnInvalid(),
                 null,
                 param('kernel.project_dir').'/bin/console',
+                service('messenger.cooldown_strategy_locator'),
             ])
             ->tag('console.command')
             ->tag('monolog.logger', ['channel' => 'messenger'])

@@ -11,8 +11,10 @@
 
 namespace Symfony\Bridge\Twig\NodeVisitor;
 
+use Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Environment;
+use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\Binary\ConcatBinary;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
@@ -93,6 +95,8 @@ final class TranslationNodeVisitor implements NodeVisitorInterface
                 $message,
                 $this->getReadDomainFromArguments($node->getNode('arguments'), 'trans_html' === $filter ? 2 : 1),
             ];
+        } elseif ($node instanceof SearchAndRenderBlockNode) {
+            array_push($this->messages, ...$this->getFormMessagesFromNode($node));
         }
 
         return $node;
@@ -166,6 +170,59 @@ final class TranslationNodeVisitor implements NodeVisitorInterface
         }
 
         return self::UNDEFINED_DOMAIN;
+    }
+
+    private function getFormMessagesFromNode(SearchAndRenderBlockNode $node): array
+    {
+        $names = match ($node->getAttribute('name')) {
+            'form_label', 'form_widget' => ['label'],
+            'form_help' => ['help'],
+            'form_row' => ['label', 'help'],
+            default => [],
+        };
+
+        if (!$names) {
+            return [];
+        }
+
+        $arguments = $node->getNode('arguments');
+        $isFormLabel = 'form_label' === $node->getAttribute('name');
+        $variablesIndex = $isFormLabel ? 2 : 1;
+        $variables = [];
+
+        if ($arguments->hasNode($variablesIndex) && ($variablesNode = $arguments->getNode($variablesIndex)) instanceof ArrayExpression) {
+            foreach ($variablesNode->getKeyValuePairs() as $pair) {
+                if ($pair['key'] instanceof ConstantExpression) {
+                    $variables[$pair['key']->getAttribute('value')] = $pair['value'];
+                }
+            }
+        }
+
+        // SearchAndRenderBlockNode keeps the "label" variable unless the label argument is a non-empty constant
+        if ($isFormLabel && $arguments->hasNode(1) && ($label = $arguments->getNode(1)) instanceof ConstantExpression && !\in_array($label->getAttribute('value'), [null, false, ''], true)) {
+            $variables['label'] = $label;
+        }
+
+        // without a "translation_domain" variable, the theme uses the option of the form, which is not known here
+        $domain = null;
+
+        if (isset($variables['translation_domain'])) {
+            if ($variables['translation_domain'] instanceof ConstantExpression && false === $variables['translation_domain']->getAttribute('value')) {
+                return [];
+            }
+
+            $domain = $this->getReadDomainFromNode($variables['translation_domain']);
+        }
+
+        $messages = [];
+
+        foreach ($names as $name) {
+            if (($variables[$name] ?? null) instanceof ConstantExpression && \is_string($message = $variables[$name]->getAttribute('value')) && '' !== $message) {
+                $messages[] = [$message, $domain];
+            }
+        }
+
+        return $messages;
     }
 
     private function getConcatValueFromNode(Node $node, ?string $value): ?string

@@ -18,6 +18,7 @@ CHANGELOG
  * Add the `trans_html` filter to translate messages whose tags are replaced by HTML elements while everything else is escaped
  * Declare the functions and filters of the extensions that provide nothing else with the `#[AsTwigFunction]` and `#[AsTwigFilter]` attributes
  * Make `RoutingExtension::isUrlGenerationSafe()` static
+ * Add support for extracting the labels and help messages passed to the `form_label()`, `form_widget()`, `form_help()` and `form_row()` functions
 
 8.1
 ---

@@ -13,7 +13,9 @@ namespace Symfony\Bridge\Twig\Tests\Translation;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -97,6 +99,60 @@ class TwigExtractorTest extends TestCase
             ['{% trans_default_domain "domain" %}{{ "new key" | trans_html({b: {tag: "strong"}}) }}', ['new key' => 'domain']],
             ['{{ ("new" ~ " key") | trans_html({}, domain="domain") }}', ['new key' => 'domain']],
         ];
+    }
+
+    #[DataProvider('getExtractFormLabelsAndHelpData')]
+    public function testExtractFormLabelsAndHelp(string $template, array $messages)
+    {
+        $twig = new Environment(new ArrayLoader(), [
+            'strict_variables' => true,
+            'debug' => true,
+            'cache' => false,
+            'autoescape' => false,
+        ]);
+        $twig->addExtension(new TranslationExtension(new IdentityTranslator()));
+        $twig->addExtension(new FormExtension());
+
+        $extractor = new TwigExtractor($twig);
+        $catalogue = new MessageCatalogue('en');
+
+        $m = new \ReflectionMethod($extractor, 'extractTemplate');
+        $m->invoke($extractor, $template, $catalogue);
+
+        $this->assertSame($messages, $catalogue->all());
+    }
+
+    public static function getExtractFormLabelsAndHelpData(): iterable
+    {
+        yield ['{{ form_label(form.name, "new key", {label_attr: {class: "form-label"}}) }}', ['messages' => ['new key' => 'new key']]];
+        yield ['{{ form_label(form.name, "new key", {translation_domain: "domain"}) }}', ['domain' => ['new key' => 'new key']]];
+        yield ['{{ form_label(form.name, "new key", {translation_domain: null}) }}', ['messages' => ['new key' => 'new key']]];
+        yield ['{{ form_label(form.name, "new key", {translation_domain: domain}) }}', [TranslationNodeVisitor::UNDEFINED_DOMAIN => ['new key' => 'new key']]];
+        yield ['{{ form_label(form.name, "new key", {translation_domain: false}) }}', []];
+        yield ['{% trans_default_domain "domain" %}{{ form_label(form.name, "new key") }}', ['messages' => ['new key' => 'new key']]];
+        yield ['{{ form_label(form.name, null, {label: "new key"}) }}', ['messages' => ['new key' => 'new key']]];
+        yield ['{{ form_label(form.name, "", {label: "new key"}) }}', ['messages' => ['new key' => 'new key']]];
+        yield ['{{ form_label(form.name, label, {label: "new key"}) }}', ['messages' => ['new key' => 'new key']]];
+        yield ['{{ form_label(form.name, "new key", {label: "other key"}) }}', ['messages' => ['new key' => 'new key']]];
+        yield ['{{ form_label(form.name, label) }}', []];
+        yield ['{{ form_label(form.name, false) }}', []];
+        yield ['{{ form_row(form.name, {label: "new key"}) }}', ['messages' => ['new key' => 'new key']]];
+        yield ['{{ form_row(form.name, {label: "new key", translation_domain: "domain"}) }}', ['domain' => ['new key' => 'new key']]];
+        yield ['{{ form_row(form.name, {label: false}) }}', []];
+        yield ['{{ form_row(form.name, options|merge({label: "new key"})) }}', []];
+        yield ['{{ form_widget(form.save, {label: "new key"}) }}', ['messages' => ['new key' => 'new key']]];
+        yield ['{{ form_help(form.name, {label: "new key"}) }}', []];
+        yield ['{{ form_help(form.name, {help: "new key"}) }}', ['messages' => ['new key' => 'new key']]];
+        yield ['{{ form_help(form.name, {help: "new key", translation_domain: "domain"}) }}', ['domain' => ['new key' => 'new key']]];
+        yield ['{{ form_help(form.name, {help: "new key", translation_domain: false}) }}', []];
+        yield ['{% trans_default_domain "domain" %}{{ form_help(form.name, {help: "new key"}) }}', ['messages' => ['new key' => 'new key']]];
+        yield ['{{ form_help(form.name, {help: help}) }}', []];
+        yield ['{{ form_row(form.name, {label: "new key", help: "another key"}) }}', ['messages' => ['new key' => 'new key', 'another key' => 'another key']]];
+        yield ['{{ form_row(form.name, {label: "new key", help: "another key", translation_domain: "domain"}) }}', ['domain' => ['new key' => 'new key', 'another key' => 'another key']]];
+        yield ['{{ form_row(form.name, {help: "new key", translation_domain: false}) }}', []];
+        yield ['{{ form_label(form.name, null, {help: "new key"}) }}', []];
+        yield ['{{ form_widget(form.name, {help: "new key"}) }}', []];
+        yield ['{{ form_errors(form.name, {label: "new key", help: "another key"}) }}', []];
     }
 
     #[DataProvider('resourcesWithSyntaxErrorsProvider')]

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T11:52:25Z
+
+I added a guard for an offset that is larger than the index. This happens when `index.csv` is deleted by hand and `index.csv.offset` is not. Without the guard, the search listed nothing in this case.

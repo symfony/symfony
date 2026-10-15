@@ -12,9 +12,13 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Driver\PDO\Exception;
+use Doctrine\DBAL\Exception\ConnectionException;
+use Doctrine\DBAL\Exception\ConnectionLost;
 use Doctrine\DBAL\Exception\DeadlockException;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceivedStamp;
@@ -403,6 +407,122 @@ class DoctrineReceiverTest extends TestCase
         } catch (TransportException $e) {
             $this->assertSame($deadlockException, $e->getPrevious());
         }
+    }
+
+    public function testGetClosesALostConnectionBeforeThrowing()
+    {
+        $exception = $this->createConnectionLoss();
+        $connection = $this->createMock(Connection::class);
+        $connection->method('get')->willThrowException($exception);
+        $connection->expects($this->once())->method('closeIfDisconnected')->willReturn(true);
+
+        $receiver = new DoctrineReceiver($connection, $this->createSerializer());
+
+        try {
+            $receiver->get();
+            $this->fail('The lost connection must be reported.');
+        } catch (TransportException $e) {
+            $this->assertSame($exception, $e->getPrevious());
+        }
+    }
+
+    #[Group('time-sensitive')]
+    public function testAckIsReplayedOnceTheDatabaseIsBack()
+    {
+        ClockMock::withClockMock(1000000000.0);
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->exactly(2))->method('ack')->with('1')->willReturnOnConsecutiveCalls(
+            $this->throwException(new TransportException('Connection lost', 0, $this->createConnectionLoss())),
+            true,
+        );
+        // Lost, still down after one second, back after two.
+        $connection->expects($this->exactly(3))->method('closeIfDisconnected')->willReturn(true, true, false);
+
+        $receiver = new DoctrineReceiver($connection, $this->createSerializer());
+        $receiver->ack(new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]));
+
+        $this->assertSame(1000000002.0, microtime(true));
+    }
+
+    public function testAckIsReplayedWhenDbalAlreadyReopenedTheLostConnection()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->exactly(2))->method('ack')->with('1')->willReturnOnConsecutiveCalls(
+            $this->throwException(new TransportException('Connection lost', 0, $this->createDbalClosedConnectionLoss())),
+            true,
+        );
+        $connection->expects($this->once())->method('closeIfDisconnected')->willReturn(false);
+
+        $receiver = new DoctrineReceiver($connection, $this->createSerializer());
+        $receiver->ack(new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]));
+    }
+
+    public function testAckIsNotReplayedOnAConnectionErrorWhenTheDatabaseStillAnswers()
+    {
+        $exception = new TransportException('Access denied', 0, $this->createAccessDenied());
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('ack')->willThrowException($exception);
+        $connection->method('closeIfDisconnected')->willReturn(false);
+
+        $receiver = new DoctrineReceiver($connection, $this->createSerializer());
+
+        try {
+            $receiver->ack(new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]));
+            $this->fail('The acknowledgement failure must be surfaced.');
+        } catch (TransportException $e) {
+            $this->assertSame($exception, $e);
+        }
+    }
+
+    #[Group('time-sensitive')]
+    public function testAckThrowsWhenTheDatabaseDoesNotComeBack()
+    {
+        ClockMock::withClockMock(1000000000.0);
+        $exception = new TransportException('Connection lost', 0, $this->createConnectionLoss());
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('ack')->willThrowException($exception);
+        $connection->method('closeIfDisconnected')->willReturn(true);
+
+        $receiver = new DoctrineReceiver($connection, $this->createSerializer());
+
+        try {
+            $receiver->ack(new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]));
+            $this->fail('The acknowledgement failure must be surfaced.');
+        } catch (TransportException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        $this->assertSame(1000000005.0, microtime(true));
+    }
+
+    #[Group('time-sensitive')]
+    public function testRejectIsReplayedOnceTheDatabaseIsBack()
+    {
+        ClockMock::withClockMock(1000000000.0);
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->exactly(2))->method('reject')->with('1')->willReturnOnConsecutiveCalls(
+            $this->throwException(new TransportException('Connection lost', 0, $this->createConnectionLoss())),
+            true,
+        );
+        $connection->expects($this->exactly(2))->method('closeIfDisconnected')->willReturn(true, false);
+
+        $receiver = new DoctrineReceiver($connection, $this->createSerializer());
+        $receiver->reject(new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]));
+    }
+
+    private function createConnectionLoss(): ConnectionException
+    {
+        return new ConnectionException(Exception::new(new \PDOException('SQLSTATE[08006] [7] connection to server failed: Connection refused')), null);
+    }
+
+    private function createDbalClosedConnectionLoss(): ConnectionLost
+    {
+        return new ConnectionLost(Exception::new(new \PDOException('SQLSTATE[HY000]: General error: 7 FATAL:  terminating connection due to administrator command')), null);
+    }
+
+    private function createAccessDenied(): ConnectionException
+    {
+        return new ConnectionException(Exception::new(new \PDOException("SQLSTATE[42000]: Syntax error or access violation: 1142 SELECT command denied to user 'app'@'localhost' for table 'messenger_messages'")), null);
     }
 
     private function createDoctrineEnvelope(): array

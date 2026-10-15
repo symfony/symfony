@@ -12,8 +12,10 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\PDO\Exception as PDODriverException;
 use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Exception\ConnectionException;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -71,6 +73,24 @@ class PostgreSqlConnectionTest extends TestCase
         $connection->__destruct();
 
         $this->assertFalse($connection->isListening());
+    }
+
+    public function testListenIsForgottenWhenTheConnectionIsLost()
+    {
+        $driverConnection = $this->createMock(Connection::class);
+        $driverConnection->method('executeStatement')->willReturn(1);
+        $driverConnection->method('getDatabasePlatform')->willReturn(new PostgreSQLPlatform());
+        $driverConnection->method('executeQuery')->willThrowException(new ConnectionException(PDODriverException::new(new \PDOException('server closed the connection unexpectedly')), null));
+        $driverConnection->expects($this->once())->method('close');
+
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
+        $connection->listen();
+
+        $this->assertTrue($connection->closeIfDisconnected());
+        $this->assertFalse($connection->isListening());
+
+        $driverConnection->expects($this->never())->method('executeStatement');
+        $connection->__destruct();
     }
 
     public function testWaitForNotifyCallsListenAndGetNotify()

@@ -68,6 +68,18 @@ final class PostgreSqlConnection extends Connection
         $this->unlisten();
     }
 
+    public function closeIfDisconnected(): bool
+    {
+        if (!parent::closeIfDisconnected()) {
+            return false;
+        }
+
+        // The LISTEN died with the connection: it is registered again by the next get() or waitForNotify(), and unlisten() must not try to reach a server that may still be down
+        $this->listening = false;
+
+        return true;
+    }
+
     public function get(int $fetchSize = 1): ?array
     {
         if ($this->notifyHandledExternally || null === $this->queueEmptiedAt) {

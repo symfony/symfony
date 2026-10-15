@@ -180,6 +180,28 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
+    public function testCloseIfDisconnectedClosesADeadConnection()
+    {
+        $driverConnection = $this->getDBALConnection(true);
+        $driverConnection->method('executeQuery')->willThrowException($this->createStub(DBALException::class));
+        $driverConnection->expects($this->once())->method('close');
+
+        $connection = new Connection([], $driverConnection);
+
+        $this->assertTrue($connection->closeIfDisconnected());
+    }
+
+    public function testCloseIfDisconnectedKeepsAWorkingConnection()
+    {
+        $driverConnection = $this->getDBALConnection(true);
+        $driverConnection->expects($this->once())->method('executeQuery')->willReturn($this->createStub(Result::class));
+        $driverConnection->expects($this->never())->method('close');
+
+        $connection = new Connection([], $driverConnection);
+
+        $this->assertFalse($connection->closeIfDisconnected());
+    }
+
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
         $this->expectException(TransportException::class);

@@ -93,6 +93,27 @@ class Connection implements ResetInterface
         $this->queueEmptiedAt = null;
     }
 
+    /**
+     * Checks that the database still answers, and closes the DBAL connection when it does not.
+     *
+     * DBAL only closes the connection by itself on errors it reports as ConnectionLost.
+     * After any other loss, every query fails on the dead connection until it is closed. The next query then opens a fresh one.
+     *
+     * @return bool Whether the connection was lost and has been closed
+     */
+    public function closeIfDisconnected(): bool
+    {
+        try {
+            $this->driverConnection->executeQuery($this->driverConnection->getDatabasePlatform()->getDummySelectSQL());
+
+            return false;
+        } catch (DBALException) {
+            $this->driverConnection->close();
+
+            return true;
+        }
+    }
+
     public function getConfiguration(): array
     {
         return $this->configuration;

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Exception\ConnectionLost;
 use Doctrine\DBAL\Exception\RetryableException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
@@ -30,6 +31,8 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareInterface, KeepaliveReceiverInterface
 {
     private const MAX_RETRIES = 3;
+    // How long, in seconds, ack() and reject() wait for a lost connection to come back: less than the 10 seconds supervisor gives a worker to stop by default
+    private const RECONNECT_TIMEOUT = 5;
     private int $retryingSafetyCounter = 0;
     private SerializerInterface $serializer;
 
@@ -67,6 +70,9 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
 
             return [];
         } catch (DBALException $exception) {
+            // Closing a lost connection lets the next call open a fresh one, instead of failing on the dead one
+            $this->connection->closeIfDisconnected();
+
             throw new TransportException($exception->getMessage(), 0, $exception);
         } finally {
             if ($asyncSignals) {
@@ -169,17 +175,16 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
         $multiplier = 2;
         $jitter = 0.1;
         $retries = 0;
+        $reconnected = false;
 
         retry:
         try {
             $callable();
-        } catch (RetryableException|TransportException $exception) {
+        } catch (DBALException|TransportException $exception) {
             // Connection::ack() and reject() wrap DBAL exceptions in a TransportException
-            if ($exception instanceof TransportException && !$exception->getPrevious() instanceof RetryableException) {
-                throw $exception;
-            }
+            $dbalException = $exception instanceof TransportException ? $exception->getPrevious() : $exception;
 
-            if (++$retries <= self::MAX_RETRIES) {
+            if ($dbalException instanceof RetryableException && ++$retries <= self::MAX_RETRIES) {
                 $delay *= $multiplier;
 
                 $randomness = (int) ($delay * $jitter);
@@ -190,9 +195,33 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
                 goto retry;
             }
 
+            // Losing an acknowledgement or a rejection to a database restart would get the message redelivered and handled again
+            if (!$dbalException instanceof RetryableException && !$reconnected && $dbalException instanceof DBALException && $this->waitForReconnection($dbalException)) {
+                $reconnected = true;
+
+                goto retry;
+            }
+
             throw $exception instanceof TransportException ? $exception : new TransportException($exception->getMessage(), 0, $exception);
-        } catch (DBALException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
         }
+    }
+
+    /**
+     * Waits for the database to come back, up to the timeout, and tells whether the failed call can be replayed.
+     */
+    private function waitForReconnection(DBALException $exception): bool
+    {
+        $deadline = microtime(true) + self::RECONNECT_TIMEOUT;
+
+        for ($attempts = 0; $this->connection->closeIfDisconnected(); ++$attempts) {
+            if (microtime(true) >= $deadline) {
+                return false;
+            }
+
+            sleep(1);
+        }
+
+        // The database answered at once: replay the call only if DBAL already closed the lost connection
+        return 0 < $attempts || $exception instanceof ConnectionLost;
     }
 }

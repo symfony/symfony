@@ -6,6 +6,7 @@ CHANGELOG
 
  * Make `DoctrineSender` and `DoctrineTransport` implement `BatchSenderInterface`, inserting several messages per statement
  * Add `DoctrineInbox` to record the handled messages in a database table
+ * Make the Doctrine transport reconnect on the next poll after losing its database connection, and replay `ack()` and `reject()` when the connection comes back within 5 seconds
 
 8.1
 ---

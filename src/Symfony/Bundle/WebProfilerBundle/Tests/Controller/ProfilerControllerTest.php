@@ -28,6 +28,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 use Twig\Loader\LoaderInterface;
@@ -108,6 +109,43 @@ class ProfilerControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/_profiler/latest?panel=router');
 
         $this->assertSame('_', $crawler->filter('.metrics .metric .value')->eq(0)->text());
+    }
+
+    #[DataProvider('provideDumpNonceRendering')]
+    public function testStoredDumpsUseTheCurrentResponseNonces(bool $toolbar, bool $withCsp)
+    {
+        $collector = new DumpDataCollector();
+        $collector->setNonce('old-script', 'old-style');
+        $collector->dump((new VarCloner())->cloneVar('dumped value'));
+        $profile = new Profile('token');
+        $profile->addCollector(unserialize(serialize($collector)));
+        $profiler = $this->createStub(Profiler::class);
+        $profiler->method('loadProfile')->willReturn($profile);
+        $profiler->method('has')->willReturn(true);
+        $template = '{{ profile.getCollector("dump").dumps("html")[0].data|raw }}';
+        $twig = new Environment(new ArrayLoader([
+            '@WebProfiler/Profiler/toolbar.html.twig' => $template,
+            'dump.html.twig' => $template,
+        ]));
+        $controller = $this->createController($profiler, $twig, $withCsp, [['dump', 'dump.html.twig']]);
+        $request = new Request();
+        $request->headers->set('X-SymfonyProfiler-Script-Nonce', 'current-script');
+        $request->headers->set('X-SymfonyProfiler-Style-Nonce', 'current-style');
+
+        $response = $toolbar ? $controller->toolbarAction($request, 'token') : $controller->panelAction($request, 'token', 'dump');
+
+        self::assertStringContainsString($withCsp ? '<script nonce="current-script">' : '<script>', $response->getContent());
+        self::assertStringContainsString($withCsp ? '<style nonce="current-style">' : '<style>', $response->getContent());
+        self::assertStringNotContainsString('old-script', $response->getContent());
+        self::assertStringNotContainsString('old-style', $response->getContent());
+    }
+
+    public static function provideDumpNonceRendering(): iterable
+    {
+        yield [true, true];
+        yield [false, true];
+        yield [true, false];
+        yield [false, false];
     }
 
     public function testToolbarActionWithProfilerDisabled()

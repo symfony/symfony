@@ -28,6 +28,102 @@ class HtmlErrorRendererTest extends TestCase
         $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception)->getAsString());
     }
 
+    #[DataProvider('provideNonceDebugModes')]
+    public function testNoncesApplyOnlyToRendererAssets(bool $debug)
+    {
+        $buffer = '<script id="untrusted">alert(1)</script><style id="untrusted">body {color: red}</style>';
+        $renderer = new HtmlErrorRenderer($debug, null, null, null, $buffer);
+        $renderer->setNonce('script"&', 'style"&');
+        $exception = new NonceTestException('Failure');
+
+        $html = $renderer->render($exception)->getAsString();
+        preg_match_all('/<(script|style)\b[^>]*>/', $html, $tags, \PREG_SET_ORDER);
+
+        self::assertNotEmpty($tags);
+        foreach ($tags as $tag) {
+            if (str_contains($tag[0], 'id="untrusted"')) {
+                self::assertStringNotContainsString('nonce=', $tag[0]);
+            } else {
+                self::assertStringContainsString('nonce="'.$tag[1].'&quot;&amp;"', $tag[0]);
+            }
+        }
+        if ($debug) {
+            self::assertStringContainsString('Sfdump(', $html);
+            self::assertStringContainsString($buffer, $html);
+        }
+    }
+
+    public static function provideNonceDebugModes(): iterable
+    {
+        yield [false];
+        yield [true];
+    }
+
+    public function testNonceProviderIsResolvedOncePerRender()
+    {
+        $generation = 0;
+        $renderer = new HtmlErrorRenderer(true);
+        $renderer->setNonce(static function () use (&$generation): string { return 'nonce-'.++$generation; });
+
+        $first = $renderer->render(new \RuntimeException())->getAsString();
+        self::assertSame(1, $generation);
+        self::assertStringContainsString('<script nonce="nonce-1">', $first);
+        self::assertStringContainsString('<style nonce="nonce-1">', $first);
+
+        $second = $renderer->render(new \RuntimeException())->getAsString();
+        self::assertSame(2, $generation);
+        self::assertStringContainsString('<script nonce="nonce-2">', $second);
+        self::assertStringNotContainsString('<script nonce="nonce-1">', $second);
+
+        $renderer->setNonce(null);
+        self::assertStringNotContainsString('<script nonce=', $renderer->render(new \RuntimeException())->getAsString());
+    }
+
+    #[DataProvider('provideHighlightColors')]
+    public function testCodeExcerptsDoNotUseInlineStyles(array $colors)
+    {
+        $previousColors = [];
+        foreach ($colors as $name => $color) {
+            $previousColors[$name] = ini_set($name, $color);
+        }
+
+        try {
+            $renderer = new HtmlErrorRenderer(true);
+            $exception = new \ErrorException('Failure', 0, \E_ERROR, __DIR__.'/../Fixtures/highlight.php', 6);
+            $html = $renderer->render($exception)->getAsString();
+
+            self::assertDoesNotMatchRegularExpression('/<[^>]+\sstyle=/', $html);
+            self::assertStringContainsString('data-ln-chars="2"', $html);
+            foreach (['comment', 'default', 'keyword', 'string'] as $token) {
+                self::assertStringContainsString('class="trace-code-'.$token.'"', $html);
+            }
+        } finally {
+            foreach ($previousColors as $name => $color) {
+                ini_set($name, $color);
+            }
+        }
+    }
+
+    public static function provideHighlightColors(): iterable
+    {
+        yield 'default colors' => [[]];
+        yield 'custom colors' => [[
+            'highlight.comment' => '#123456',
+            'highlight.default' => '#234567',
+            'highlight.html' => '#345678',
+            'highlight.keyword' => '#456789',
+            'highlight.string' => '#56789a',
+        ]];
+    }
+
+    public function testCodeExcerptsKeepSourceColorsAsText()
+    {
+        $renderer = new HtmlErrorRenderer(true);
+        $exception = new \ErrorException('Failure', 0, \E_ERROR, __DIR__.'/../Fixtures/highlight.php', 6);
+
+        self::assertStringContainsString("'#FF8000'", $renderer->render($exception)->getAsString());
+    }
+
     public static function getRenderData(): iterable
     {
         $expectedDebug = <<<HTML
@@ -185,4 +281,9 @@ class HtmlErrorRendererTest extends TestCase
     {
         return new \RuntimeException($message);
     }
+}
+
+class NonceTestException extends \RuntimeException
+{
+    public array $details = ['nested' => ['value']];
 }

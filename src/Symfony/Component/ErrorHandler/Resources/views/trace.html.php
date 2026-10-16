@@ -25,11 +25,6 @@
 </div>
 <?php if ($trace['file']) { ?>
     <div id="trace-html-<?= $prefix.'-'.$i; ?>" class="trace-code sf-toggle-content <?= $displayCodeSnippet ? 'sf-toggle-visible' : 'sf-toggle-hidden'; ?>">
-        <div class="trace-code-inner"><?= strtr($this->fileExcerpt($trace['file'], $trace['line'], 5), [
-            '#DD0000' => 'var(--code-syntax-string)',
-            '#007700' => 'var(--code-syntax-keyword)',
-            '#0000BB' => 'var(--code-foreground)',
-            '#FF8000' => 'var(--code-syntax-comment)',
-        ]); ?></div>
+        <div class="trace-code-inner"><?= $this->fileExcerpt($trace['file'], $trace['line'], 5); ?></div>
     </div>
 <?php } ?>

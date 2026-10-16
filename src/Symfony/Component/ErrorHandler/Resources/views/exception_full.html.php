@@ -9,10 +9,10 @@
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title><?= $_message; ?></title>
         <link rel="icon" type="image/png" href="<?= $this->include('assets/images/favicon.png.base64'); ?>" />
-        <style><?= $this->include('assets/css/exception.css'); ?></style>
+        <style<?= null !== $styleNonce ? ' nonce="'.$this->escape($styleNonce).'"' : ''; ?>><?= $this->include('assets/css/exception.css'); ?></style>
     </head>
     <body>
-        <script>
+        <script<?= null !== $scriptNonce ? ' nonce="'.$this->escape($scriptNonce).'"' : ''; ?>>
             (function () {
                 var root = document.documentElement;
                 var query = matchMedia('(prefers-color-scheme: dark)');
@@ -70,7 +70,7 @@
             </div>
         </main>
 
-        <script>
+        <script<?= null !== $scriptNonce ? ' nonce="'.$this->escape($scriptNonce).'"' : ''; ?>>
             <?= $this->include('assets/js/exception.js'); ?>
         </script>
     </body>

@@ -597,6 +597,14 @@
                 </div>
             </div>
 
+            <div class="tab {{ (data.type_extensions ?? []) is empty ? 'disabled' }}">
+                <h3 class="tab-title">Type Extensions</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_type_extensions(data) }}
+                </div>
+            </div>
+
             <div class="tab {{ (data.view_vars ?? []) is empty ? 'disabled' }}">
                 <h3 class="tab-title">View Vars</h3>
 
@@ -795,6 +803,25 @@
             <tr>
                 <th scope="row">{{ option }}</th>
                 <td>{{ profiler_dump(value) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% macro render_form_type_extensions(data) %}
+    <table>
+        <thead>
+        <tr>
+            <th>Extension</th>
+            <th>Extended Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for type_extension in data.type_extensions ?? [] %}
+            <tr>
+                <td>{{ profiler_dump(type_extension.extension) }}</td>
+                <td>{{ profiler_dump(type_extension.type) }}</td>
             </tr>
         {% endfor %}
         </tbody>

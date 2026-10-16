@@ -109,6 +109,27 @@ class UrlMatcherTest extends TestCase
         $this->assertIsArray($matcher->match('/foo'));
     }
 
+    public function testHeadAllowedWhenRequirementContainsHead()
+    {
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('/foo', [], [], [], '', [], ['HEAD']));
+
+        $matcher = $this->getUrlMatcher($routes, new RequestContext('', 'HEAD'));
+
+        $this->assertSame(['_route' => 'foo'], $matcher->match('/foo'));
+    }
+
+    public function testGetNotAllowedWhenRequirementContainsHead()
+    {
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('/foo', [], [], [], '', [], ['HEAD']));
+
+        $matcher = $this->getUrlMatcher($routes, new RequestContext('', 'GET'));
+        $this->expectException(MethodNotAllowedException::class);
+
+        $matcher->match('/foo');
+    }
+
     public function testMethodNotAllowedAggregatesAllowedMethods()
     {
         $coll = new RouteCollection();

@@ -125,13 +125,18 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function matchCollection(string $pathinfo, RouteCollection $routes): array
     {
         // HEAD and GET are equivalent as per RFC
-        if ('HEAD' === $method = $this->context->getMethod()) {
+        if ('HEAD' === $method = $requestMethod = $this->context->getMethod()) {
             $method = 'GET';
         }
+        $redirectPath = null;
         $supportsTrailingSlash = 'GET' === $method && $this instanceof RedirectableUrlMatcherInterface;
         $trimmedPathinfo = '' === ($trimmedPathinfo = rtrim($pathinfo, '/')) ? '/' : $trimmedPathinfo;
 
         foreach ($routes as $name => $route) {
+            if (null !== $redirectPath && $route->getPath() !== $redirectPath && $route->getPath() !== $redirectPath.'/') {
+                continue;
+            }
+
             $compiledRoute = $route->compile();
             $staticPrefix = rtrim($compiledRoute->getStaticPrefix(), '/');
             $requiredMethods = $route->getMethods();
@@ -175,7 +180,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 
             if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
                 if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods))) {
-                    return $this->allow = $this->allowSchemes = [];
+                    $redirectPath = rtrim($route->getPath(), '/');
                 }
                 continue;
             }
@@ -185,12 +190,16 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            if ($requiredMethods && !\in_array($method, $requiredMethods)) {
+            if ($requiredMethods && !\in_array($method, $requiredMethods) && !\in_array($requestMethod, $requiredMethods)) {
                 $this->allow = array_merge($this->allow, $requiredMethods);
                 continue;
             }
 
             return array_replace($attributes, $status[1] ?? []);
+        }
+
+        if (null !== $redirectPath) {
+            $this->allow = $this->allowSchemes = [];
         }
 
         return [];

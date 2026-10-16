@@ -21,6 +21,7 @@ use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Tests\Matcher\RedirectableUrlMatcherTest;
 
 class CompiledUrlMatcherDumperTest extends TestCase
 {
@@ -38,6 +39,51 @@ class CompiledUrlMatcherDumperTest extends TestCase
         parent::tearDown();
 
         @unlink($this->dumpPath);
+    }
+
+    /**
+     * @dataProvider provideExplicitTrailingSlashRoutes
+     */
+    public function testExplicitTrailingSlashRoutes(string $firstPath, string $secondPath, string $path, string $expectedRoute, array $secondMethods = [], string $requestMethod = 'GET')
+    {
+        $routes = new RouteCollection();
+        $routes->add('first', new Route($firstPath));
+        $routes->add('second', new Route($secondPath, [], [], [], '', [], $secondMethods));
+
+        $matcher = $this->generateDumpedMatcher($routes);
+        $matcher->setContext(new RequestContext('', $requestMethod));
+        $matcher->expects($this->never())->method('redirect');
+
+        $this->assertSame($expectedRoute, $matcher->match($path)['_route']);
+    }
+
+    public static function provideExplicitTrailingSlashRoutes(): iterable
+    {
+        yield from RedirectableUrlMatcherTest::provideExplicitTrailingSlashRoutes();
+    }
+
+    /**
+     * @dataProvider provideRepeatedTrailingSlashes
+     */
+    public function testRepeatedTrailingSlashes(string $routePath, string $requestPath, bool $withSlashRoute, string $method, string $condition = 'false')
+    {
+        $routes = new RouteCollection();
+        $routes->add('first', new Route($routePath));
+        if ($withSlashRoute) {
+            $routes->add('rejected', new Route($routePath.'/', [], [], [], '', [], [], $condition));
+        }
+        $routes->add('repeated', new Route($routePath.'//'));
+
+        $matcher = $this->generateDumpedMatcher($routes);
+        $matcher->setContext(new RequestContext('', $method));
+        $matcher->expects($this->once())->method('redirect')->with(rtrim($requestPath, '/'), 'first')->willReturn([]);
+
+        $this->assertSame('first', $matcher->match($requestPath)['_route']);
+    }
+
+    public static function provideRepeatedTrailingSlashes(): iterable
+    {
+        yield from RedirectableUrlMatcherTest::provideRepeatedTrailingSlashes();
     }
 
     public function testRedirectPreservesUrlEncoding()

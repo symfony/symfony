@@ -28,6 +28,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
 {
     private ExpressionLanguage $expressionLanguage;
     private ?\Exception $signalingException = null;
+    private array $trailingSlashRoutes = [];
 
     /**
      * @var ExpressionFunctionProviderInterface[]
@@ -63,6 +64,17 @@ class CompiledUrlMatcherDumper extends MatcherDumper
      */
     public function getCompiledRoutes(bool $forDump = false): array
     {
+        $paths = [];
+        $this->trailingSlashRoutes = [];
+        foreach ($this->getRoutes()->all() as $route) {
+            $path = $route->getPath();
+            $paths[$path] = true;
+            $trimmedPath = rtrim($path, '/');
+            if (isset($paths[$trimmedPath], $paths[$trimmedPath.'/'])) {
+                $this->trailingSlashRoutes[$trimmedPath] = $this->trailingSlashRoutes[$trimmedPath.'/'] = $trimmedPath;
+            }
+        }
+
         // Group hosts by same-suffix, re-order when possible
         $matchHost = false;
         $routes = new StaticPrefixCollection();
@@ -139,7 +151,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
         foreach ($staticRoutes as $path => $routes) {
             $code .= \sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
-                $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
+                $code .= '        ['.implode(', ', array_map([__CLASS__, 'export'], $route))."],\n";
             }
             $code .= "    ],\n";
         }
@@ -151,7 +163,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
         foreach ($dynamicRoutes as $path => $routes) {
             $code .= \sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
-                $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
+                $code .= '        ['.implode(', ', array_map([__CLASS__, 'export'], $route))."],\n";
             }
             $code .= "    ],\n";
         }
@@ -437,7 +449,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
             $condition = null;
         }
 
-        return [
+        $compiledRoute = [
             ['_route' => $name] + $defaults,
             $vars,
             array_flip($route->getMethods()) ?: null,
@@ -446,6 +458,11 @@ class CompiledUrlMatcherDumper extends MatcherDumper
             $hasTrailingVar,
             $condition,
         ];
+        if (isset($this->trailingSlashRoutes[$path = $route->getPath()])) {
+            $compiledRoute[] = $this->trailingSlashRoutes[$path];
+        }
+
+        return $compiledRoute;
     }
 
     private function getExpressionLanguage(): ExpressionLanguage

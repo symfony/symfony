@@ -20,6 +20,20 @@ use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
 class BrevoRequestParserTest extends AbstractRequestParserTestCase
 {
+    public function testRejectsMissingIdentifiers()
+    {
+        $request = $this->createRequest(json_encode([
+            'event' => 'click',
+            'email' => 'example@gmail.com',
+            'ts_event' => 1734082566,
+        ]));
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Payload is malformed.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
     protected function createRequestParser(): RequestParserInterface
     {
         return new BrevoRequestParser(new BrevoPayloadConverter());

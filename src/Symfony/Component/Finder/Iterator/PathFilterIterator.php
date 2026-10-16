@@ -51,6 +51,6 @@ class PathFilterIterator extends MultiplePcreFilterIterator
      */
     protected function toRegex(string $str): string
     {
-        return $this->isRegex($str) ? $str : '/'.preg_quote($str, '/').'/';
+        return $this->isRegex($str) && false !== @preg_match($str, '') ? $str : '/'.preg_quote($str, '/').'/';
     }
 }

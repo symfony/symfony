@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
 use Symfony\Component\Form\Extension\DataCollector\FormDataExtractor;
 use Symfony\Component\Form\FormError;
@@ -24,6 +25,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 class FormDataCollectorTest extends TestCase
 {
@@ -60,6 +62,7 @@ class FormDataCollectorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => self::removeClosures($this->childForm->getConfig()->getOptions()),
+            'type_extensions' => [['type' => FormType::class, 'extension' => TransformationFailureExtension::class]],
             'default_data' => [
                 'norm' => null,
                 'view' => '',
@@ -79,6 +82,7 @@ class FormDataCollectorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => self::removeClosures($this->form->getConfig()->getOptions()),
+            'type_extensions' => [['type' => FormType::class, 'extension' => TransformationFailureExtension::class]],
             'default_data' => [
                 'norm' => null,
             ],
@@ -120,6 +124,7 @@ class FormDataCollectorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => self::removeClosures($form1->getConfig()->getOptions()),
+            'type_extensions' => [['type' => FormType::class, 'extension' => TransformationFailureExtension::class]],
             'children' => [],
         ];
 
@@ -142,6 +147,7 @@ class FormDataCollectorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => self::removeClosures($form2->getConfig()->getOptions()),
+            'type_extensions' => [['type' => FormType::class, 'extension' => TransformationFailureExtension::class]],
             'children' => [],
         ];
 
@@ -170,6 +176,7 @@ class FormDataCollectorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => self::removeClosures($this->form->getConfig()->getOptions()),
+            'type_extensions' => [['type' => FormType::class, 'extension' => TransformationFailureExtension::class]],
             'children' => [],
         ];
 
@@ -193,6 +200,7 @@ class FormDataCollectorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => self::removeClosures($this->form->getConfig()->getOptions()),
+            'type_extensions' => [['type' => FormType::class, 'extension' => TransformationFailureExtension::class]],
             'default_data' => [
                 'norm' => null,
             ],
@@ -248,6 +256,7 @@ class FormDataCollectorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => self::removeClosures($this->childForm->getConfig()->getOptions()),
+            'type_extensions' => [['type' => FormType::class, 'extension' => TransformationFailureExtension::class]],
             'default_data' => [
                 'norm' => null,
                 'view' => '',
@@ -271,6 +280,7 @@ class FormDataCollectorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => self::removeClosures($this->form->getConfig()->getOptions()),
+            'type_extensions' => [['type' => FormType::class, 'extension' => TransformationFailureExtension::class]],
             'default_data' => [
                 'norm' => null,
             ],
@@ -298,6 +308,41 @@ class FormDataCollectorTest extends TestCase
             ],
             'nb_errors' => 0,
         ], self::removeClosures($this->dataCollector->getData()));
+    }
+
+    public function testSerializeLinksTypeExtensionsToTheirSource()
+    {
+        $this->dataCollector->collectConfiguration($this->form);
+        $this->dataCollector->buildPreliminaryFormTree($this->form);
+
+        $dataCollector = unserialize(serialize($this->dataCollector));
+        $typeExtension = $dataCollector->getData()->seek('forms')->seek('name')->seek('type_extensions')->seek(0);
+
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('');
+        $dumper->setDisplayOptions(['fileLinkFormat' => '%f:%l']);
+
+        $this->assertStringContainsString('TransformationFailureExtension.php', $dumper->dump($typeExtension->seek('extension'), true));
+        $this->assertStringContainsString('FormType.php', $dumper->dump($typeExtension->seek('type'), true));
+    }
+
+    public function testSerializeStoresTypeExtensionsSharedByFormsOnce()
+    {
+        $this->form->add($this->childForm);
+        $this->dataCollector->collectConfiguration($this->form);
+        $this->dataCollector->buildPreliminaryFormTree($this->form);
+
+        $serialized = serialize($this->dataCollector);
+
+        $this->assertSame(1, substr_count($serialized, 'TransformationFailureExtension.php'));
+
+        $typeExtension = unserialize($serialized)->getData()->seek('forms')->seek('name')->seek('children')->seek('child')->seek('type_extensions')->seek(0);
+
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('');
+        $dumper->setDisplayOptions(['fileLinkFormat' => '%f:%l']);
+
+        $this->assertStringContainsString('TransformationFailureExtension.php', $dumper->dump($typeExtension->seek('extension'), true));
     }
 
     public function testSerializeWithFormAddedMultipleTimes()
@@ -416,6 +461,7 @@ class FormDataCollectorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => self::removeClosures($this->form->getConfig()->getOptions()),
+            'type_extensions' => [['type' => FormType::class, 'extension' => TransformationFailureExtension::class]],
             'children' => [
                 'child' => $childFormData,
             ],
@@ -455,6 +501,7 @@ class FormDataCollectorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => self::removeClosures($this->childForm->getConfig()->getOptions()),
+            'type_extensions' => [['type' => FormType::class, 'extension' => TransformationFailureExtension::class]],
             'children' => [],
         ];
 
@@ -465,6 +512,7 @@ class FormDataCollectorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => self::removeClosures($this->form->getConfig()->getOptions()),
+            'type_extensions' => [['type' => FormType::class, 'extension' => TransformationFailureExtension::class]],
             'children' => [
                 'child' => $childFormData,
             ],

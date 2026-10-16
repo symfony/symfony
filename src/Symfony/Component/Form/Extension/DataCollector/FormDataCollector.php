@@ -199,10 +199,29 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     public function __serialize(): array
     {
+        $typeExtensions = [];
+
         foreach ($this->data['forms_by_hash'] as &$form) {
             if (isset($form['type_class']) && !$form['type_class'] instanceof ClassStub) {
                 $form['type_class'] = new ClassStub($form['type_class']);
             }
+
+            if (!($form['type_extensions'] ?? [])) {
+                continue;
+            }
+
+            $listKey = serialize($form['type_extensions']);
+
+            if (!isset($typeExtensions[$listKey])) {
+                foreach ($form['type_extensions'] as $i => $typeExtension) {
+                    foreach ($typeExtension as $key => $class) {
+                        $typeExtensions[$listKey][$i][$key] = $class instanceof ClassStub ? $class : new ClassStub($class);
+                    }
+                }
+            }
+
+            // Identical lists are shared by reference so that the cloned data stores each of them once
+            $form['type_extensions'] = &$typeExtensions[$listKey];
         }
 
         return ['data' => $this->data = $this->cloneVar($this->data)];

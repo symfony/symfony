@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Show the type extensions applied to each form in the Form panel
  * Add dump indicator to profiler list view for profiles with dumped content
  * Log the profiler URL of each request at debug level on the `profiler` channel
  * Add a Key Management panel

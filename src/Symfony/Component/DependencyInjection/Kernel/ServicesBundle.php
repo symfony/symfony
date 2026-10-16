@@ -89,7 +89,7 @@ class ServicesBundle extends AbstractBundle
         $container->registerForAutoconfiguration(EventDispatcherInterface::class)
             ->addTag('event_dispatcher.dispatcher');
         $container->registerForAutoconfiguration(ResetInterface::class)
-            ->addTag('kernel.reset', [static fn (string $class) => ['method' => 'reset', 'with_shutdown' => is_a($class, Container::class, true) || is_a($class, ShutdownInterface::class, true)]]);
+            ->addTag('kernel.reset', [static fn (string $class) => ['method' => 'reset', 'on_shutdown' => is_a($class, Container::class, true) || is_a($class, ShutdownInterface::class, true) ? 'flag' : null]]);
         $container->registerForAutoconfiguration(ServiceSubscriberInterface::class)
             ->addTag('container.service_subscriber');
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)

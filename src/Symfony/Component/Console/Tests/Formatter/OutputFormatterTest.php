@@ -373,6 +373,33 @@ class OutputFormatterTest extends TestCase
         );
     }
 
+    public function testFormatAndWrapPreservesAnsiSequences()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertSame("\e]8;;https://example.com\e\\foo\nbar\e]8;;\e\\", $formatter->formatAndWrap("\e]8;;https://example.com\e\\foo bar\e]8;;\e\\", 3));
+        $this->assertSame("\e[31mfoo\nbar\nbaz\e[0m", $formatter->formatAndWrap("\e[31mfoo bar baz\e[0m", 5));
+        $this->assertSame("fo\e[31mo\nbar\e[0m", $formatter->formatAndWrap("fo\e[31mobar\e[0m", 3));
+        $this->assertSame("\e[0;38;5;208m  foo\e[m", $formatter->formatAndWrap("\e[0;38;5;208m  foo\e[m", 8));
+        $this->assertSame("\e[31mfoo\e[0m\n\e[32mbar\e[0m", $formatter->formatAndWrap("\e[31mfoo\e[0m\n\e[32mbar\e[0m", 3));
+        $this->assertSame("\e[31m👩‍🌾f\noo\e[0m", $formatter->formatAndWrap("\e[31m👩‍🌾foo\e[0m", 2));
+        $this->assertSame("\e[32mabc\e[39m\e[0m", $formatter->formatAndWrap("<info>abc</info>\e[0m", 3));
+        $this->assertSame("\e[32mab\e[39m\e[31mcd\e[0m", $formatter->formatAndWrap("<info>ab</info>\e[31mcd\e[0m", 4));
+        $this->assertSame("\e[32mab\e[39m\e[31mcd\nef\e[0m", $formatter->formatAndWrap("<info>ab</info>\e[31mcdef\e[0m", 4));
+        $this->assertSame("\e[32mab\e[39m\e[31m\e[0m", $formatter->formatAndWrap("<info>ab</info>\e[31m\n\e[0m", 5));
+        $this->assertSame("a\n\nb", preg_replace('/\e\[[0-9;]*m/', '', $formatter->formatAndWrap("a\n<info>\e[31m\n\e[0m</info>b", 5)));
+    }
+
+    public function testFormatAndWrapLongRunsOfAnsiSequencesAndWhitespace()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $message = "\e[31mfoo\e[0m".str_repeat("\n", 20000).'bar';
+        $this->assertSame($message, $formatter->formatAndWrap($message, 5));
+        $this->assertSame("\e[32mabcde\e[39m\n\e[31mbar", $formatter->formatAndWrap("<info>abcde</info>\e[31m".str_repeat(' ', 20000).'bar', 5));
+        $this->assertSame("\e[31mfoo".str_repeat("\e[0m", 20000)."\n", $formatter->formatAndWrap("\e[31mfoo\n".str_repeat("\e[0m", 20000), 5));
+    }
+
     public function testFormatAndWrap()
     {
         $formatter = new OutputFormatter(true);

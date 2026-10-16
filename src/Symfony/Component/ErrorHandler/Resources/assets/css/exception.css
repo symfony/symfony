@@ -540,7 +540,7 @@ header .container { display: flex; align-items: center; justify-content: space-b
 .trace-code-inner { min-height: 0; overflow: hidden; overflow-x: auto; font-size: 12px; line-height: 1.8; margin: 0 10px; white-space: nowrap; }
 .trace-code-lines { margin: 15px 0; }
 .trace-code-line { display: grid; grid-template-columns: 1fr; border-radius: 4px; }
-/* --ln-chars is set inline per excerpt from the widest line number, so the gutter fits every line number */
+/* JavaScript sets --ln-chars from the excerpt's widest line number. */
 .trace-code-ln { display: none; width: calc(var(--ln-chars, 2) * 1ch + 16px); color: var(--muted-foreground); font-family: var(--font-mono); text-align: right; user-select: none; -webkit-user-select: none; padding: 0 12px 0 4px; border-right: 1px solid var(--border); }
 @media (min-width: 640px) {
     .trace-code-line { grid-template-columns: max-content 1fr; }
@@ -548,6 +548,10 @@ header .container { display: flex; align-items: center; justify-content: space-b
 }
 
 .trace-code-line > code { color: var(--code-foreground); display: block; min-height: 1lh; white-space: pre-wrap; overflow-wrap: anywhere;  padding-left: 10px; }
+.trace-code-comment { color: var(--code-syntax-comment); }
+.trace-code-default, .trace-code-html { color: var(--code-foreground); }
+.trace-code-keyword { color: var(--code-syntax-keyword); }
+.trace-code-string { color: var(--code-syntax-string); }
 .trace-code-line.selected { background: var(--line-highlight); box-shadow: inset 0 0 0 1px var(--line-highlight-border); }
 .trace-code-line.selected .trace-code-ln { border-right-color: transparent; }
 @media (prefers-reduced-motion: reduce) { .trace-code { transition: none; } }

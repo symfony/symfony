@@ -4,6 +4,10 @@
 (function() {
     "use strict";
 
+    document.querySelectorAll('.trace-code-lines[data-ln-chars]').forEach(function(element) {
+        element.style.setProperty('--ln-chars', element.getAttribute('data-ln-chars'));
+    });
+
     if ('classList' in document.documentElement) {
         var hasClass = function (el, cssClass) { return el.classList.contains(cssClass); };
         var removeClass = function(el, cssClass) { el.classList.remove(cssClass); };

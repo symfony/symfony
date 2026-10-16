@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `HtmlErrorRenderer::setNonce()` to configure CSP nonces for error pages
  * Serve the problem documents of `SerializerErrorRenderer` as `application/problem+json`, and render them as JSON when the `problem` format is requested
 
 8.1

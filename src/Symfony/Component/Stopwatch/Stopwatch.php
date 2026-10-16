@@ -144,6 +144,14 @@ class Stopwatch implements ResetInterface
     }
 
     /**
+     * Gets the active section.
+     */
+    public function getCurrentSection(): Section
+    {
+        return end($this->activeSections);
+    }
+
+    /**
      * Gets all events for the root section.
      *
      * @return StopwatchEvent[]

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,6 +24,8 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\ServicesResetter;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ShutdownAwareService;
 use Symfony\Contracts\Service\ResetInterface;
 
 class ContainerTest extends TestCase
@@ -331,6 +334,176 @@ class ContainerTest extends TestCase
 
         $this->assertNull($c->get('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE));
         $this->assertSame(1, $bar->resetCounter);
+    }
+
+    public function testResetWithShutdownFlag()
+    {
+        $container = new Container();
+        $service = new ShutdownAwareService();
+        $container->set('service', $service);
+        $container->reset();
+        $this->assertSame([false], $service->calls);
+
+        $resettable = new class implements ResetInterface {
+            public array $calls = [];
+
+            public function reset(): void
+            {
+                $this->calls[] = \func_num_args();
+            }
+        };
+        $lazy = (new \ReflectionClass(ShutdownAwareService::class))->newLazyGhost(static function () {
+            self::fail('The lazy service should not be initialized.');
+        });
+        $container->set('service', $service);
+        $container->set('resettable', $resettable);
+        $container->set('lazy', $lazy);
+        $container->reset(true);
+        $container->reset();
+
+        $this->assertSame([false, true], $service->calls);
+        $this->assertSame([0], $resettable->calls);
+        $this->assertTrue((new \ReflectionClass($lazy))->isUninitializedLazyObject($lazy));
+        $this->assertFalse($container->initialized('service'));
+    }
+
+    public function testShutdownWithNestedContainerResetOverride()
+    {
+        $nested = new class extends Container {
+            public array $calls = [];
+
+            /**
+             * @param bool $shutdown
+             */
+            public function reset(/* bool $shutdown = false */): void
+            {
+                $this->calls[] = \func_get_args();
+                parent::reset(...\func_get_args());
+            }
+        };
+        $service = new ShutdownAwareService();
+        $nested->set('service', $service);
+        $container = new Container();
+        $container->set('nested', $nested);
+
+        $container->reset(true);
+
+        $this->assertSame([[true]], $nested->calls);
+        $this->assertSame([true], $service->calls);
+        $this->assertFalse($nested->initialized('service'));
+    }
+
+    #[TestWith([false, false])]
+    #[TestWith([false, true])]
+    #[TestWith([true, false])]
+    #[TestWith([true, true])]
+    public function testResetUsesServicesResetterOnly(bool $shutdown, bool $initialized)
+    {
+        $tagged = new ShutdownAwareService();
+        $disabled = new ShutdownAwareService();
+        $untagged = new ShutdownAwareService();
+        $custom = new class {
+            public array $calls = [];
+
+            public function clear(bool $shutdown = false): void
+            {
+                $this->calls[] = $shutdown;
+            }
+        };
+        $resetter = new ServicesResetter(new \ArrayIterator(['tagged' => $tagged, 'disabled' => $disabled, 'custom' => $custom]), ['tagged' => [['reset' => true]], 'disabled' => [['reset' => false]], 'custom' => [['clear' => true]]]);
+        $container = new class($resetter) extends Container {
+            public function __construct(private ServicesResetter $resetter)
+            {
+                parent::__construct();
+                $this->methodMap['services_resetter'] = 'getServicesResetterService';
+            }
+
+            protected function getServicesResetterService(): ServicesResetter
+            {
+                return $this->services['services_resetter'] = $this->resetter;
+            }
+        };
+        $container->set('tagged', $tagged);
+        $container->set('disabled', $disabled);
+        $container->set('untagged', $untagged);
+        $container->set('custom', $custom);
+        if ($initialized) {
+            $container->get('services_resetter');
+        }
+
+        $container->reset($shutdown);
+
+        $this->assertSame([$shutdown], $tagged->calls);
+        $this->assertSame([false], $disabled->calls);
+        $this->assertSame([$shutdown], $custom->calls);
+        $this->assertSame([], $untagged->calls);
+        $this->assertFalse($container->initialized('services_resetter'));
+        $this->assertFalse($container->initialized('tagged'));
+        $this->assertFalse($container->initialized('untagged'));
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testResetInitializesLazyServicesResetter(bool $shutdown)
+    {
+        $service = new ShutdownAwareService();
+        $resetter = new ServicesResetter(new \ArrayIterator(['service' => $service]), ['service' => [['reset' => true]]]);
+        $lazyResetter = (new \ReflectionClass(ServicesResetter::class))->newLazyProxy(static fn () => $resetter);
+        $container = new Container();
+        $container->set('services_resetter', $lazyResetter);
+
+        $container->reset($shutdown);
+
+        $this->assertSame([$shutdown], $service->calls);
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testResetContinuesAfterFailure(bool $shutdown)
+    {
+        $container = new class extends Container {
+            public function __construct()
+            {
+                parent::__construct();
+                $this->services['scalar'] = 42;
+                $this->privates['null'] = null;
+            }
+        };
+        $first = new class extends ShutdownAwareService {
+            public function reset(bool $shutdown = false): void
+            {
+                parent::reset($shutdown);
+                throw new \RuntimeException('Reset failed.');
+            }
+        };
+        $second = new ShutdownAwareService();
+        $resetter = new ServicesResetter(new \ArrayIterator(['first' => $first, 'second' => $second]), ['first' => [['reset' => true]], 'second' => [['reset' => true]]]);
+        $container->set('services_resetter', $resetter);
+        $container->set('first', $first);
+        $container->set('second', $second);
+        $caught = null;
+        try {
+            $container->reset($shutdown);
+        } catch (\RuntimeException $e) {
+            $caught = $e;
+        }
+
+        if ($shutdown) {
+            $this->assertNotNull($caught);
+            $this->assertSame('Reset failed.', $caught->getMessage());
+        } else {
+            $this->assertNull($caught);
+        }
+        $this->assertSame([$shutdown], $first->calls);
+        $this->assertSame([$shutdown], $second->calls);
+        $this->assertFalse($container->initialized('first'));
+        $this->assertFalse($container->initialized('second'));
+        $this->assertFalse($container->initialized('scalar'));
+        if ($shutdown) {
+            $resetter->reset();
+            $this->assertSame([true], $first->calls);
+            $this->assertSame([true], $second->calls);
+        }
     }
 
     public function testResetDoesNotInitializeLazyServices()

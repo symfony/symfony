@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(RewindableGenerator::class);
@@ -277,25 +278,41 @@ class Container implements ContainerInterface, ResetInterface
         return isset($this->services[$id]);
     }
 
-    public function reset(): void
+    /**
+     * @param bool $shutdown Whether the container is being shut down
+     */
+    public function reset(/* bool $shutdown = false */): void
     {
-        $services = $this->services + $this->privates;
+        $shutdown = \func_num_args() && func_get_arg(0);
+        $throwable = null;
 
-        foreach ($services as $service) {
-            try {
-                if ($service instanceof ResetInterface && !self::isUninitializedLazyObject($service)) {
-                    $service->reset();
+        try {
+            $services = ($resetter = $this->get('services_resetter', self::NULL_ON_INVALID_REFERENCE)) ? [$resetter] : $this->services + $this->privates;
+            foreach ($services as $service) {
+                try {
+                    if ($service === $this || !$service instanceof ResetInterface || ($service !== $resetter && self::isUninitializedLazyObject($service))) {
+                        continue;
+                    }
+
+                    if ($shutdown && ($service instanceof self || $service instanceof ShutdownInterface)) {
+                        $service->reset(true);
+                    } else {
+                        $service->reset();
+                    }
+                } catch (\Throwable $e) {
+                    $throwable ??= $e;
                 }
-            } catch (\Throwable) {
-                continue;
             }
+        } catch (\Throwable $e) {
+            $throwable = $e;
+        } finally {
+            $this->envCache = $this->services = $this->factories = $this->privates = [];
+            $this->resetMap = null;
         }
 
-        $this->envCache = $this->services = $this->factories = $this->privates = [];
-        // Non-shared tracked instances are not reset here because Container::reset()
-        // tears down the entire container. ServicesResetter::reset() handles calling
-        // reset methods on tracked instances during the request lifecycle.
-        $this->resetMap = null;
+        if ($shutdown && null !== $throwable) {
+            throw $throwable;
+        }
     }
 
     /**
@@ -415,7 +432,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Registers an instance of a non-shared service for reset tracking.
      *
-     * @param list<string> $resetMethods
+     * @param list<string|array<string, bool>> $resetMethods
      *
      * @internal
      */

@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
@@ -23,6 +25,8 @@ use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 class AbstractKernelTest extends TestCase
 {
@@ -236,6 +240,22 @@ class AbstractKernelTest extends TestCase
                 gc_enable();
             }
         }
+    }
+
+    #[TestWith([ResettableKernelContainer::class, false])]
+    #[TestWith([ShutdownAwareKernelContainer::class, true])]
+    #[TestWith([Container::class, true])]
+    public function testShutdownPassesFlagOnlyToSupportedContainers(string $containerClass, bool $shutdownAware)
+    {
+        $container = $this->createMock($containerClass);
+        $container->expects($this->once())->method('reset')->willReturnCallback(static function (...$arguments) use ($shutdownAware) {
+            self::assertSame($shutdownAware ? [true] : [], $arguments);
+        });
+        $kernel = $this->createKernel();
+        $kernel->boot();
+        (new \ReflectionProperty(AbstractKernel::class, 'container'))->setValue($kernel, $container);
+
+        $kernel->shutdown();
     }
 
     public function testShutdownCallsShutdownOnBundles()
@@ -913,4 +933,12 @@ class RequiredBundleKernel extends TestKernel
     {
         return $this->bundlesDefinition;
     }
+}
+
+interface ResettableKernelContainer extends ContainerInterface, ResetInterface
+{
+}
+
+interface ShutdownAwareKernelContainer extends ContainerInterface, ShutdownInterface
+{
 }

@@ -12,11 +12,13 @@
 namespace Symfony\Component\DependencyInjection\Tests\Kernel;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ShutdownAwareService;
 
 class KernelTest extends TestCase
 {
@@ -40,6 +42,48 @@ class KernelTest extends TestCase
         }
 
         rmdir($this->projectDir);
+    }
+
+    public function testShutdownFlagInDumpedContainer()
+    {
+        mkdir($this->projectDir.'/config', 0o777, true);
+        file_put_contents($this->projectDir.'/config/bundles.php', '<?php return '.var_export([ServicesBundle::class => ['all' => true]], true).';');
+        $kernel = new ShutdownFlagKernel($this->projectDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $shared = $container->get('shared');
+        $first = $container->get('non_shared');
+        $second = $container->get('non_shared');
+        $custom = $container->get('custom');
+        $disabled = $container->get('disabled');
+        $manual = $container->get('manual');
+        $tagged = $container->get('tagged');
+        $lazy = $container->get('lazy');
+        $nested = $container->get('nested');
+        $nested->set('service', $nestedService = new ShutdownAwareService());
+        $discarded = \WeakReference::create($container->get('non_shared'));
+        $this->assertNull($discarded->get());
+
+        $container->get('services_resetter')->reset();
+        foreach ([$shared, $first, $second, $custom, $disabled, $tagged] as $service) {
+            $this->assertSame([false], $service->calls);
+        }
+        $this->assertSame([], $manual->calls);
+        $this->assertSame([false], $nestedService->calls);
+        $nested->set('service', $nestedService);
+
+        $kernel->shutdown();
+        $kernel->shutdown();
+
+        foreach ([$shared, $first, $second, $custom] as $service) {
+            $this->assertSame([false, true], $service->calls);
+        }
+        $this->assertSame([false, false], $disabled->calls);
+        $this->assertSame([false, false], $tagged->calls);
+        $this->assertSame([], $manual->calls);
+        $this->assertSame([false, true], $nestedService->calls);
+        $this->assertTrue((new \ReflectionClass($lazy))->isUninitializedLazyObject($lazy));
+        $this->assertFalse($container->initialized('unused'));
     }
 
     public function testBuildContainerWritesCachedirTag()
@@ -189,5 +233,31 @@ class BrokenKernel extends TestKernel
     protected function build(ContainerBuilder $container): void
     {
         throw new \LogicException('Broken build.');
+    }
+}
+
+class ShutdownFlagKernel extends TestKernel
+{
+    protected function build(ContainerBuilder $container): void
+    {
+        foreach (['shared', 'non_shared', 'lazy', 'unused'] as $id) {
+            $container->register($id, ShutdownAwareService::class)
+                ->setPublic(true)
+                ->setAutoconfigured(true)
+                ->setShared('non_shared' !== $id)
+                ->setLazy('lazy' === $id);
+        }
+        $container->register('manual', ShutdownAwareService::class)->setPublic(true);
+        $container->register('nested', Container::class)->setPublic(true)->setAutoconfigured(true);
+        $container->register('tagged', ShutdownAwareService::class)
+            ->setPublic(true)
+            ->addTag('kernel.reset', ['method' => 'reset']);
+        $container->register('custom', ShutdownAwareService::class)
+            ->setPublic(true)
+            ->setShared(false)
+            ->addTag('kernel.reset', ['method' => 'clear', 'with_shutdown' => true]);
+        $container->register('disabled', ShutdownAwareService::class)
+            ->setPublic(true)
+            ->addTag('kernel.reset', ['method' => 'reset', 'with_shutdown' => false]);
     }
 }

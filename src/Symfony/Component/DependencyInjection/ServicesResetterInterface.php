@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 /**
- * Resets the services tagged with "kernel.reset", e.g. between two requests or messages.
+ * Resets the services tagged with "kernel.reset", between requests or messages and on shutdown.
  */
-interface ServicesResetterInterface extends ResetInterface
+interface ServicesResetterInterface extends ShutdownInterface
 {
 }

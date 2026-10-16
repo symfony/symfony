@@ -69,6 +69,16 @@ parameters:
         -
             message: '#^PHPDoc tag @param references unknown parameter\: \$regexp$#'
             path: src/Symfony/Component/String/*
+        # reset() keeps its optional argument virtual for subclasses
+        -
+            message: '#^PHPDoc tag @param references unknown parameter\: \$shutdown$#'
+            paths:
+                - src/Symfony/Component/DependencyInjection/Container.php
+                - src/Symfony/Bundle/FrameworkBundle/Test/TestContainer.php
+        # The deprecated HttpKernel wrapper keeps its parent class for BC.
+        -
+            identifier: class.extendsFinalByPhpDoc
+            path: src/Symfony/Component/HttpKernel/DependencyInjection/ServicesResetter.php
         # the schema-API guards every DBAL integration carries, kept in step with Cache, Lock and
         # Messenger; they go away together, once doctrine/dbal ^4.5 and doctrine/orm >= 3.6.8 are the minimum
         -

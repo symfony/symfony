@@ -18,6 +18,7 @@ namespace Symfony\Contracts\Service;
  * initial state. This usually means clearing any internal buffers and forwarding
  * the call to internal dependencies. All properties of the object should be put
  * back to the same state it had when it was first ready to use.
+ * The object must remain usable after the call.
  *
  * This method could be called, for example, to recycle objects that are used as
  * services, so that they can be used to handle several requests in the same

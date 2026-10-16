@@ -4,6 +4,11 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `with_shutdown` attribute on `kernel.reset` tags to pass a shutdown flag to reset methods
+ * Add argument `$shutdown` to `Container::reset()`, `ServicesResetter::reset()` and `ServicesResetterInterface::reset()`
+ * Add return type `void` to `ServicesResetterInterface::reset()`
+ * Mark `ServicesResetter` as `@final`
+ * Make `Container::reset()` use only `services_resetter` when available
  * Add an autowiring alias for `Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface`
  * Deprecate the `Symfony\Component\EventDispatcher\EventDispatcherInterface` autowiring alias, type the one from the EventDispatcher contracts instead
  * Resolve env vars while the container is compiled for the configuration nodes declared with `NodeDefinition::resolvesAtCompileTime()`

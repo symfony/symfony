@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResettableServicePass;
@@ -23,6 +24,7 @@ use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ClearableService;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\MultiResettableService;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ResettableService;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ShutdownAwareService;
 
 class ResettableServicePassTest extends TestCase
 {
@@ -57,13 +59,44 @@ class ResettableServicePassTest extends TestCase
                     'three' => new Reference('three', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
                 ]),
                 [
-                    'one' => ['reset'],
-                    'two' => ['clear'],
-                    'three' => ['resetFirst', 'resetSecond'],
+                    'one' => [['reset' => false]],
+                    'two' => [['clear' => false]],
+                    'three' => [['resetFirst' => false], ['resetSecond' => false]],
                 ],
             ],
             $definition->getArguments()
         );
+    }
+
+    #[TestWith([true, true])]
+    #[TestWith([false, true])]
+    #[TestWith([true, false])]
+    #[TestWith([false, false])]
+    #[TestWith([true, null])]
+    #[TestWith([false, null])]
+    public function testShutdownFlagMetadata(bool $shared, ?bool $withShutdown)
+    {
+        $container = new ContainerBuilder();
+        $attributes = ['method' => 'reset'];
+        if (null !== $withShutdown) {
+            $attributes['with_shutdown'] = $withShutdown;
+        }
+        $container->register('service', ShutdownAwareService::class)
+            ->setPublic(true)
+            ->setShared($shared)
+            ->addTag('kernel.reset', $attributes);
+        $container->register('services_resetter', ServicesResetter::class)
+            ->setPublic(true)
+            ->setArguments([null, []]);
+        $container->addCompilerPass(new ResettableServicePass());
+        $container->compile();
+
+        $method = ['reset' => $withShutdown ?? false];
+        if ($shared) {
+            $this->assertSame(['service' => [$method]], $container->getDefinition('services_resetter')->getArgument(1));
+        } else {
+            $this->assertSame([['method' => $method]], $container->getDefinition('service')->getTag('container.tracked_for_reset'));
+        }
     }
 
     public function testMissingMethod()
@@ -93,7 +126,7 @@ class ResettableServicePassTest extends TestCase
 
         $container->compile();
 
-        $this->assertSame([ResettableService::class => ['?missingMethod']], $container->getDefinition('services_resetter')->getArgument(1));
+        $this->assertSame([ResettableService::class => [['?missingMethod' => false]]], $container->getDefinition('services_resetter')->getArgument(1));
 
         $resettable = $container->get(ResettableService::class);
         $resetter = $container->get('services_resetter');
@@ -130,7 +163,7 @@ class ResettableServicePassTest extends TestCase
 
         // Methods should only contain shared services
         $this->assertSame(
-            ['shared' => ['reset']],
+            ['shared' => [['reset' => false]]],
             $definition->getArgument(1)
         );
 
@@ -142,7 +175,7 @@ class ResettableServicePassTest extends TestCase
 
         // Non-shared service should have container.tracked_for_reset tag
         $this->assertSame(
-            [['method' => 'clear']],
+            [['method' => ['clear' => false]]],
             $container->getDefinition('non_shared')->getTag('container.tracked_for_reset')
         );
     }
@@ -196,7 +229,7 @@ class ResettableServicePassTest extends TestCase
         $container->compile();
 
         $this->assertSame(
-            [['method' => 'reset'], ['method' => 'clear']],
+            [['method' => ['reset' => false]], ['method' => ['clear' => false]]],
             $container->getDefinition('non_shared')->getTag('container.tracked_for_reset')
         );
     }
@@ -217,7 +250,7 @@ class ResettableServicePassTest extends TestCase
         $container->compile();
 
         $this->assertSame(
-            [['method' => '?reset']],
+            [['method' => ['?reset' => false]]],
             $container->getDefinition('non_shared')->getTag('container.tracked_for_reset')
         );
     }

@@ -60,6 +60,16 @@ class AbstractFactoryTest extends TestCase
         }
     }
 
+    public function testDefaultFailureHandlerReceivesRefererOptionsAndFirewallName()
+    {
+        $this->callFactory('main', ['use_referer' => true], 'user_provider', 'entry_point');
+
+        $handler = $this->container->getDefinition('security.authentication.failure_handler.main.stub');
+
+        $this->assertSame('main', $handler->getArgument(4));
+        $this->assertSame([['setOptions', [['use_referer' => true]]]], $handler->getMethodCalls());
+    }
+
     public static function getFailureHandlers()
     {
         return [

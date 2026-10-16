@@ -126,6 +126,7 @@ return static function (ContainerConfigurator $container) {
                 service('security.http_utils'),
                 [], // Options
                 service('logger')->nullOnInvalid(),
+                null,
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 

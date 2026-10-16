@@ -60,6 +60,43 @@ class WebDebugToolbarListenerTest extends TestCase
         ];
     }
 
+    #[DataProvider('provideApplicationScripts')]
+    public function testAjaxInterceptorRunsBeforeApplicationScripts(string $content)
+    {
+        $twig = $this->createStub(Environment::class);
+        $twig->method('render')->willReturnCallback(function (string $template, array $context): string {
+            if ('@WebProfiler/Profiler/ajax_interceptor.html.twig' === $template) {
+                $this->assertSame('scripto', $context['csp_script_nonce']);
+
+                return 'AJAX';
+            }
+
+            return 'WDT';
+        });
+        $response = new Response($content);
+        $listener = new WebDebugToolbarListener($twig);
+        $method = new \ReflectionMethod($listener, 'injectToolbar');
+        $method->invoke($listener, $response, Request::create('/'), ['csp_script_nonce' => 'scripto']);
+
+        $this->assertStringContainsString('AJAX<script>app()', $response->getContent());
+    }
+
+    public static function provideApplicationScripts(): iterable
+    {
+        yield 'head' => ['<html><head><script>app()</script></head><body></body></html>'];
+        yield 'no head' => ['<html><body><script>app()</script></body></html>'];
+        yield 'textarea' => ['<html><body><textarea><script>example()</script></textarea><script>app()</script></body></html>'];
+        yield 'comment' => ['<html><head><!-- <script>ignored()</script> --><script>app()</script></head><body></body></html>'];
+        yield 'double quoted attribute' => ['<html><head><meta content="before > <script>example()</script>"><script>app()</script></head><body></body></html>'];
+        yield 'single quoted attribute' => ["<html><head><meta content='before > <script>example()</script>'><script>app()</script></head><body></body></html>"];
+        yield 'title' => ['<html><head><title><script>example()</script></title><script>app()</script></head><body></body></html>'];
+        yield 'nested template' => ['<html><head><template><template></template><script>inert()</script></template><script>app()</script></head><body></body></html>'];
+        yield 'script in nested template' => ['<html><head><template><script>"</template>"</script></template><script>app()</script></head><body></body></html>'];
+        yield 'style' => ['<html><head><style>h1::after { content: "<script>example()</script>"; }</style><script>app()</script></head><body></body></html>'];
+        yield 'noscript' => ['<html><head><noscript><script>example()</script></noscript><script>app()</script></head><body></body></html>'];
+        yield 'long unquoted attribute' => ['<html><head><meta name="x" content='.str_repeat('a', 50000).'><script>app()</script></head><body></body></html>'];
+    }
+
     #[DataProvider('provideRedirects')]
     public function testHtmlRedirectionIsIntercepted(int $statusCode)
     {

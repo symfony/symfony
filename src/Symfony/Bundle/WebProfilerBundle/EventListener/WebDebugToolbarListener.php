@@ -172,10 +172,17 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected function injectToolbar(Response $response, Request $request, array $nonces): void
     {
         $debugToken = $response->headers->get('X-Debug-Token');
-        $injectToolbar = function (string $buffer) use ($request, $debugToken, $nonces): string {
+        // a chunk of a streamed response can start inside a script or a comment, where "<script" is not a tag
+        $findScripts = !$response instanceof StreamedResponse;
+        $injectToolbar = function (string $buffer) use ($request, $debugToken, $nonces, $findScripts): string {
             if (false !== $pos = strripos($buffer, '</body>')) {
                 $toolbar = "\n".str_replace("\n", '', $this->getToolbarHTML($request, $debugToken, $nonces))."\n";
-                $buffer = substr($buffer, 0, $pos).$toolbar.substr($buffer, $pos);
+                $scriptPos = $findScripts ? $this->findScriptPosition($buffer) : null;
+                $buffer = substr_replace($buffer, $toolbar, $pos, 0);
+
+                if (null !== $scriptPos && $scriptPos < $pos) {
+                    $buffer = substr_replace($buffer, $this->getAjaxInterceptorHTML($request, $nonces), $scriptPos, 0);
+                }
             }
 
             return $buffer;
@@ -219,5 +226,53 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             // needs the X-Debug-Token header
             KernelEvents::RESPONSE => ['method' => 'onKernelResponse', 'priority' => -2048, 'after' => ProfilerListener::class],
         ];
+    }
+
+    private function findScriptPosition(string $content): ?int
+    {
+        $tagPattern = '~<!--.*?(?:--!?>|$)|<![^>]*+>|<(/?)([a-z][a-z0-9:-]*+)(?=[\s/>])(?:[^>"\']++|"[^"]*+"|\'[^\']*+\')*+>~is';
+        $offset = 0;
+        $templateDepth = 0;
+
+        while (preg_match($tagPattern, $content, $matches, \PREG_OFFSET_CAPTURE, $offset)) {
+            $offset = $matches[0][1] + \strlen($matches[0][0]);
+            if (!isset($matches[2])) {
+                continue;
+            }
+
+            $name = strtolower($matches[2][0]);
+            if ('/' === $matches[1][0]) {
+                if ('template' === $name && $templateDepth) {
+                    --$templateDepth;
+                }
+
+                continue;
+            }
+
+            if ('script' === $name && !$templateDepth) {
+                return $matches[0][1];
+            }
+
+            if ('template' === $name) {
+                ++$templateDepth;
+            } elseif (\in_array($name, ['script', 'title', 'textarea', 'style', 'xmp', 'iframe', 'noembed', 'noframes', 'noscript'], true)) {
+                if (!preg_match('~</'.$name.'(?=[\s/>])(?:[^>"\']++|"[^"]*+"|\'[^\']*+\')*+>~i', $content, $matches, \PREG_OFFSET_CAPTURE, $offset)) {
+                    return null;
+                }
+
+                $offset = $matches[0][1] + \strlen($matches[0][0]);
+            }
+        }
+
+        return null;
+    }
+
+    private function getAjaxInterceptorHTML(Request $request, array $nonces): string
+    {
+        return str_replace("\n", '', $this->twig->render('@WebProfiler/Profiler/ajax_interceptor.html.twig', [
+            'excluded_ajax_paths' => $this->excludedAjaxPaths,
+            'request' => $request,
+            'csp_script_nonce' => $nonces['csp_script_nonce'] ?? null,
+        ]));
     }
 }

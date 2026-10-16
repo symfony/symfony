@@ -30,6 +30,7 @@ use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
@@ -1504,6 +1505,68 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame([
             'foo' => 'hasFoo',
         ], $normalizedSwappedHasserIsser);
+    }
+
+    public function testSerializedNamesOnPropertiesNamedLikeAccessors()
+    {
+        $object = new class {
+            #[SerializedName('get_ready')]
+            private bool $getReady = false;
+
+            #[SerializedName('has_answers')]
+            private bool $hasAnswers = true;
+
+            #[SerializedName('can_subscribe')]
+            private bool $canSubscribe = false;
+
+            #[SerializedName('is_active')]
+            private bool $isActive = true;
+
+            public function getReady(): bool
+            {
+                return $this->getReady;
+            }
+
+            public function hasAnswers(): bool
+            {
+                return $this->hasAnswers;
+            }
+
+            public function canSubscribe(): bool
+            {
+                return $this->canSubscribe;
+            }
+
+            public function isActive(): bool
+            {
+                return $this->isActive;
+            }
+        };
+        $metadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($metadataFactory, new MetadataAwareNameConverter($metadataFactory));
+
+        $this->assertSame([
+            'get_ready' => false,
+            'has_answers' => true,
+            'can_subscribe' => false,
+            'is_active' => true,
+        ], $normalizer->normalize($object));
+    }
+
+    public function testSerializedPathOnPropertyNamedLikeItsAccessor()
+    {
+        $object = new class {
+            #[SerializedPath('[flags][active]')]
+            private bool $isActive = true;
+
+            public function isActive(): bool
+            {
+                return $this->isActive;
+            }
+        };
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $this->assertSame(['flags' => ['active' => true]], $normalizer->normalize($object));
     }
 
     public function testIsserPrefersBaseNameWhenNoCollision()

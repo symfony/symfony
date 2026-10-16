@@ -40,6 +40,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Cost;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceAndAutoMappedView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Event;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\EventView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ExtensibleTargetChild;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ExtensibleTargetParent;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Invoice;
@@ -1012,6 +1014,42 @@ final class ObjectMapperTest extends TestCase
         $this->assertEquals('bar', $costRequestView->foo, 'Explicit mapping should work');
         $this->assertEquals(10, $costRequestView->amount, 'Auto-mapping should also work for properties with the same name');
         $this->assertEquals(20, $costRequestView->tax);
+    }
+
+    public function testClassMapWithSourcePropertyPath()
+    {
+        $classMap = [
+            ExplicitSourceNestedSource::class => ExplicitSourceNestedTarget::class,
+        ];
+
+        $mapper = new ObjectMapper(
+            new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap),
+            PropertyAccess::createPropertyAccessor(),
+        );
+
+        $target = $mapper->map(new ExplicitSourceNestedSource());
+
+        $this->assertInstanceOf(ExplicitSourceNestedTarget::class, $target);
+        $this->assertSame('from-nested-description', $target->reason);
+    }
+
+    public function testClassMapAppliesOnlyTheSourceTransformWhenBothSidesDeclareOne()
+    {
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), [
+            Event::class => EventView::class,
+            EventView::class => Event::class,
+        ]));
+
+        $event = new Event();
+        $event->date = new \DateTimeImmutable('2024-01-15');
+
+        $view = $mapper->map($event, EventView::class);
+
+        $this->assertSame('2024-01-15', $view->date);
+
+        $event = $mapper->map($view, Event::class);
+
+        $this->assertEquals(new \DateTimeImmutable('2024-01-15'), $event->date);
     }
 
     #[DataProvider('provideAccessor')]

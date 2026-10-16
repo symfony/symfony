@@ -76,15 +76,20 @@ final class ReverseClassObjectMapperMetadataFactory implements ObjectMapperMetad
             return $this->attributesCache[$key] = $mappings;
         }
 
+        $hasSourceMappings = (bool) $mappings;
         foreach ($targetClasses as $targetClass) {
             foreach ($this->getAllProperties(new \ReflectionClass($targetClass)) as $reflProperty) {
                 foreach ($reflProperty->getAttributes(Map::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                     $map = $attribute->newInstance();
-                    if (($map->source ?? $reflProperty->getName()) !== $property) {
+                    if (null === $map->source) {
+                        if ($hasSourceMappings || $reflProperty->getName() !== $property) {
+                            continue;
+                        }
+                    } elseif (substr($map->source, 0, strcspn($map->source, '.[')) !== $property) {
                         continue;
                     }
 
-                    $mappings[] = new Mapping($reflProperty->getName(), $property, $map->if, $map->transform, $targetClass);
+                    $mappings[] = new Mapping($reflProperty->getName(), $map->source ?? $property, $map->if, $map->transform, $targetClass);
                 }
             }
         }

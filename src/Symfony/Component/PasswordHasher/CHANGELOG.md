@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Deprecate `migrate_from` configurations that target built-in legacy hashers
+
 8.1
 ---
 

@@ -73,12 +73,12 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
                 return $config['instance'];
             }
 
-            $config = $this->getMigratingPasswordConfig($config);
+            $config = $this->getMigratingPasswordConfig($config, $isExtra);
         }
 
         if (isset($config['algorithm'])) {
             $rawConfig = $config;
-            $config = $this->getHasherConfigFromAlgorithm($config);
+            $config = $this->getHasherConfigFromAlgorithm($config, $isExtra);
         }
         if (!isset($config['class'])) {
             throw new \InvalidArgumentException('"class" must be set in '.json_encode($config));
@@ -106,7 +106,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
         return new MigratingPasswordHasher($hasher, ...$extrapasswordHashers);
     }
 
-    private function getHasherConfigFromAlgorithm(array $config): array
+    private function getHasherConfigFromAlgorithm(array $config, bool $isExtra): array
     {
         if ('auto' === $config['algorithm']) {
             // "plaintext" is not listed as any leaked hashes could then be used to authenticate directly
@@ -133,7 +133,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
         }
 
         if ($config['migrate_from'] ?? false) {
-            return $this->getMigratingPasswordConfig($config);
+            return $this->getMigratingPasswordConfig($config, $isExtra);
         }
 
         switch ($config['algorithm']) {
@@ -158,7 +158,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
                 $config['algorithm'] = 'native';
                 $config['native_algorithm'] = \PASSWORD_BCRYPT;
 
-                return $this->getHasherConfigFromAlgorithm($config);
+                return $this->getHasherConfigFromAlgorithm($config, $isExtra);
 
             case 'native':
                 return [
@@ -189,7 +189,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
                     throw new LogicException(\sprintf('Algorithm "argon2i" is not available. Use "%s" instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? 'argon2id" or "auto' : 'auto'));
                 }
 
-                return $this->getHasherConfigFromAlgorithm($config);
+                return $this->getHasherConfigFromAlgorithm($config, $isExtra);
 
             case 'argon2id':
                 if (($hasSodium = SodiumPasswordHasher::isSupported()) && \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
@@ -201,7 +201,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
                     throw new LogicException(\sprintf('Algorithm "argon2id" is not available; use "%s" or libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
                 }
 
-                return $this->getHasherConfigFromAlgorithm($config);
+                return $this->getHasherConfigFromAlgorithm($config, $isExtra);
         }
 
         return [
@@ -214,11 +214,15 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
         ];
     }
 
-    private function getMigratingPasswordConfig(array $config): array
+    private function getMigratingPasswordConfig(array $config, bool $isExtra): array
     {
         $frompasswordHashers = $config['migrate_from'];
         unset($config['migrate_from']);
         $hasherChain = [$this->createHasher($config, true)];
+
+        if (!$isExtra && $frompasswordHashers && \in_array($class = $hasherChain[0]::class, [MessageDigestPasswordHasher::class, Pbkdf2PasswordHasher::class, PlaintextPasswordHasher::class], true)) {
+            trigger_deprecation('symfony/password-hasher', '8.2', 'Using "%s" as the target of a password migration is deprecated because it never needs rehashing. Use "auto" or a custom hasher instead.', $class);
+        }
 
         foreach ($frompasswordHashers as $name) {
             if ($hasher = $this->passwordHashers[$name] ?? false) {

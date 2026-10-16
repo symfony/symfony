@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by mahono at 2026-10-16T11:01:39Z
+
+I wonder why not introducing a shutdown() method instead? For BC?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-16T11:19:06Z
+
+Because that'd create an ambiguity: is reset() called when shutdown() is? Having one method makes the answer trivial.

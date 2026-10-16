@@ -40,6 +40,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Cost;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceAndAutoMappedView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\DateEntity;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\DateView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ExtensibleTargetChild;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ExtensibleTargetParent;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Invoice;
@@ -1083,6 +1085,38 @@ final class ObjectMapperTest extends TestCase
         $this->assertInstanceOf(PostView::class, $view);
         $this->assertSame('hello', $view->title);
         $this->assertSame('none', $view->summary);
+    }
+
+    #[DataProvider('provideDateMappers')]
+    public function testSourcePropertyTransformTakesPrecedenceWhenMappingToView(ObjectMapper $mapper)
+    {
+        $entity = new DateEntity();
+        $entity->date = new \DateTimeImmutable('2024-01-15');
+
+        $view = $mapper->map($entity, DateView::class);
+
+        $this->assertSame('2024-01-15', $view->date);
+    }
+
+    #[DataProvider('provideDateMappers')]
+    public function testSourcePropertyTransformTakesPrecedenceWhenMappingFromView(ObjectMapper $mapper)
+    {
+        $view = new DateView();
+        $view->date = '2024-01-15';
+
+        $entity = $mapper->map($view, DateEntity::class);
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $entity->date);
+        $this->assertSame('2024-01-15', $entity->date->format('Y-m-d'));
+    }
+
+    public static function provideDateMappers(): iterable
+    {
+        yield 'reflection metadata' => [new ObjectMapper()];
+        yield 'reverse class map' => [new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(
+            new ReflectionObjectMapperMetadataFactory(),
+            [DateEntity::class => DateView::class, DateView::class => DateEntity::class],
+        ))];
     }
 
     public function testClassMapWithMultipleTargetsSharingOneSourceAppliesEachTargetsTransform()

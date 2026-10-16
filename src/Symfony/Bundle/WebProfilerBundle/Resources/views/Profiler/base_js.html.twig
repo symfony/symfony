@@ -296,6 +296,15 @@
 
                     navigator.clipboard.writeText(copyToClipboardElement.getAttribute('data-clipboard-text'));
 
+                    /* icon buttons have no text to replace: they swap their icon for a while instead */
+                    if (copyToClipboardElement.classList.contains('icon-copy')) {
+                        copyToClipboardElement.classList.add('is-copied');
+                        clearTimeout(copyToClipboardElement.copiedTimeout);
+                        copyToClipboardElement.copiedTimeout = setTimeout(() => copyToClipboardElement.classList.remove('is-copied'), 1500);
+
+                        return;
+                    }
+
                     let oldContent = copyToClipboardElement.textContent;
 
                     copyToClipboardElement.textContent = `✅ Copied!`;

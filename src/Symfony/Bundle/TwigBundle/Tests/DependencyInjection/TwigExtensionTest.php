@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Bridge\Twig\Form\TraceableTwigRendererEngine;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\SafeClassPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
@@ -27,6 +28,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -37,6 +39,34 @@ use Twig\Runtime\EscaperRuntime;
 
 class TwigExtensionTest extends TestCase
 {
+    public function testFormEngineIsTracedWhenTheFormDataCollectorIsRegistered()
+    {
+        if (!class_exists(TraceableTwigRendererEngine::class)) {
+            $this->markTestSkipped('The TwigBridge form renderer engine cannot be traced.');
+        }
+
+        $container = $this->createContainer();
+        $container->register('data_collector.form', FormDataCollector::class);
+        $container->registerExtension(new TwigExtension());
+        $container->loadFromExtension('twig');
+        $this->compileContainer($container);
+
+        $definition = $container->getDefinition('debug.twig.form.engine');
+        $this->assertSame(TraceableTwigRendererEngine::class, $definition->getClass());
+        $this->assertSame(['twig.form.engine', null, 0], $definition->getDecoratedService());
+    }
+
+    public function testFormEngineIsNotTracedWithoutTheFormDataCollector()
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $container->loadFromExtension('twig');
+        $this->compileContainer($container);
+
+        $this->assertFalse($container->hasDefinition('debug.twig.form.engine'));
+        $this->assertTrue($container->hasDefinition('twig.form.engine'));
+    }
+
     public function testLoadEmptyConfiguration()
     {
         $container = $this->createContainer();

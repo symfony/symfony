@@ -16,14 +16,17 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\DataCollector\DataCollectorExtension;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
 use Symfony\Component\Form\Extension\DataCollector\FormDataExtractor;
+use Symfony\Component\Form\Extension\DataCollector\Proxy\ResolvedTypeFactoryDataCollectorProxy;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
+use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 
 class FormDataCollectorTest extends TestCase
 {
@@ -537,6 +540,123 @@ class FormDataCollectorTest extends TestCase
         $this->assertArrayNotHasKey('has_children_error', $child21Data, 'The leaf data does not contains "has_children_error" property.');
     }
 
+    public function testCollectionPrototypeIsCollectedAsASeparateNode()
+    {
+        $form = $this->createCollectingFactory()->createNamedBuilder('root')
+            ->add('items', CollectionType::class, [
+                'entry_type' => TextType::class,
+                'allow_add' => true,
+            ])
+            ->getForm();
+
+        $form->createView();
+
+        $data = $this->dataCollector->getData();
+        $items = $data['forms']['root']['children']['items'];
+
+        $this->assertSame(['root'], array_keys($data['forms']));
+        $this->assertSame([], $items['children']);
+        $this->assertSame('root_items___name__', $items['prototype']['id']);
+        $this->assertSame(TextType::class, $items['prototype']['type_class']);
+        $this->assertSame('__name__', $items['prototype']['view_vars']['name']);
+        $this->assertArrayHasKey('default_data', $items['prototype']);
+        $this->assertSame([], $items['prototype']['children']);
+    }
+
+    public function testNodesInsideACompoundPrototypeUseTheirViewIds()
+    {
+        $form = $this->createCollectingFactory()->createNamedBuilder('root')
+            ->add('authors', CollectionType::class, [
+                'entry_type' => AuthorType::class,
+                'allow_add' => true,
+            ])
+            ->getForm();
+
+        $form->createView();
+
+        $prototype = $this->dataCollector->getData()['forms']['root']['children']['authors']['prototype'];
+        $this->assertSame('root_authors___name___firstName', $prototype['children']['firstName']['id']);
+    }
+
+    public function testCollectionWithoutPrototypeHasNoPrototypeNode()
+    {
+        $form = $this->createCollectingFactory()->createNamedBuilder('root')
+            ->add('items', CollectionType::class, [
+                'entry_type' => TextType::class,
+            ])
+            ->getForm();
+
+        $form->createView();
+
+        $this->assertArrayNotHasKey('prototype', $this->dataCollector->getData()['forms']['root']['children']['items']);
+    }
+
+    public function testCollectRenderingTraceMergesIntoTheNodeOfTheView()
+    {
+        $this->form->add($this->childForm);
+        $this->view->children['child'] = $this->childView;
+        $this->dataCollector->associateFormWithView($this->form, $this->view);
+        $this->dataCollector->associateFormWithView($this->childForm, $this->childView);
+        $this->dataCollector->buildFinalFormTree($this->form, $this->view);
+
+        $this->dataCollector->collectRenderingTrace($this->childView, ['blocks' => ['widget' => self::createBlock('form_widget')]]);
+        $this->dataCollector->collectRenderingTrace($this->childView, ['blocks' => [
+            'widget' => self::createBlock('text_widget'),
+            'label' => self::createBlock('form_label'),
+        ]]);
+
+        $expected = ['blocks' => [
+            'widget' => self::createBlock('form_widget'),
+            'label' => self::createBlock('form_label'),
+        ]];
+
+        $data = $this->dataCollector->getData();
+        $this->assertSame($expected, $data['forms']['name']['children']['child']['rendering']);
+        $this->assertSame($expected, $data['forms_by_hash'][spl_object_id($this->childForm)]['rendering']);
+        $this->assertArrayNotHasKey('rendering', $data['forms']['name']);
+    }
+
+    public function testCollectRenderingTraceOfAViewWithoutChildForm()
+    {
+        $this->view->children['child'] = $this->childView;
+        $this->dataCollector->associateFormWithView($this->form, $this->view);
+        $this->dataCollector->associateFormWithView($this->childForm, $this->childView);
+        $this->dataCollector->buildFinalFormTree($this->form, $this->view);
+
+        $this->dataCollector->collectRenderingTrace($this->childView, ['blocks' => ['row' => self::createBlock('form_row')]]);
+
+        $this->assertSame(['blocks' => ['row' => self::createBlock('form_row')]], $this->dataCollector->getData()['forms']['name']['children']['child']['rendering']);
+    }
+
+    public function testCollectRenderingTraceIgnoresUnknownViews()
+    {
+        $this->dataCollector->associateFormWithView($this->form, $this->view);
+        $this->dataCollector->buildFinalFormTree($this->form, $this->view);
+        $data = $this->dataCollector->getData();
+
+        $this->dataCollector->collectRenderingTrace(new FormView(), ['blocks' => ['row' => self::createBlock('form_row')]]);
+
+        $this->assertSame($data, $this->dataCollector->getData());
+    }
+
+    public function testRenderingTraceAndPrototypeSurviveSerialization()
+    {
+        $form = $this->createCollectingFactory()->createNamedBuilder('root')
+            ->add('items', CollectionType::class, [
+                'entry_type' => TextType::class,
+                'allow_add' => true,
+            ])
+            ->getForm();
+
+        $view = $form->createView();
+        $this->dataCollector->collectRenderingTrace($view['items']->vars['prototype'], ['blocks' => ['row' => self::createBlock('form_row')]]);
+
+        $collector = unserialize(serialize($this->dataCollector));
+        $data = $collector->getData()->getValue(true);
+
+        $this->assertSame(['blocks' => ['row' => self::createBlock('form_row')]], $data['forms']['root']['children']['items']['prototype']['rendering']);
+    }
+
     public function testReset()
     {
         $form = $this->createForm('my_form');
@@ -606,6 +726,14 @@ class FormDataCollectorTest extends TestCase
         }
     }
 
+    private function createCollectingFactory(): FormFactory
+    {
+        return new FormFactory(new FormRegistry(
+            [new CoreExtension(), new DataCollectorExtension($this->dataCollector)],
+            new ResolvedTypeFactoryDataCollectorProxy(new ResolvedFormTypeFactory(), $this->dataCollector),
+        ));
+    }
+
     private function createForm(string $name): FormInterface
     {
         return $this->factory->createNamedBuilder($name)->getForm();
@@ -614,6 +742,11 @@ class FormDataCollectorTest extends TestCase
     private function createChildForm(string $name, bool $compound = false): FormInterface
     {
         return $this->factory->createNamedBuilder($name, FormType::class, null, ['auto_initialize' => false, 'compound' => $compound])->getForm();
+    }
+
+    private static function createBlock(string $name): array
+    {
+        return ['hierarchy' => [$name], 'matched' => [['block' => $name, 'template' => 'form_div_layout.html.twig', 'path' => null, 'line' => 1]]];
     }
 
     private static function removeClosures(array $data): array

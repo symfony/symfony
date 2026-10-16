@@ -610,6 +610,11 @@ Webhook
  * Deprecate the `Symfony\Component\Webhook\Client\RequestParser` alias.
    Reference the `webhook.request_parser` service in the `service` option of the webhook routing instead, and use `#[Target('webhook')]` with `RequestParserInterface` to autowire it
 
+WebProfilerBundle
+-----------------
+
+ * The web debug toolbar now captures fetch and XMLHttpRequest calls made before toolbar initialization in buffered HTML responses
+
 Workflow
 --------
 

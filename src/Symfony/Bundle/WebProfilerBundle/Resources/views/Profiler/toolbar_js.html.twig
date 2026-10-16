@@ -1,4 +1,5 @@
 <!-- START of Symfony Web Debug Toolbar -->
+{{ include('@WebProfiler/Profiler/ajax_interceptor.html.twig') }}
 {# The stylesheet is loaded before the toolbar markup, and the empty script below makes
    the parser wait for it, so the toolbar is never painted unstyled. #}
 <link rel="stylesheet"{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %} href="{{ url('_wdt_stylesheet') }}" />
@@ -115,24 +116,6 @@
                 };
 
                 var requestStack = [];
-
-                var extractHeaders = function(xhr, stackElement) {
-                    /* Here we avoid to call xhr.getResponseHeader in order to */
-                    /* prevent polluting the console with CORS security errors */
-                    var allHeaders = xhr.getAllResponseHeaders();
-                    var ret;
-
-                    if (ret = allHeaders.match(/^x-debug-token:\s+(.*)$/im)) {
-                        stackElement.profile = ret[1];
-                    }
-                    if (ret = allHeaders.match(/^x-debug-token-link:\s+(.*)$/im)) {
-                        stackElement.profilerUrl = ret[1];
-                    }
-                    if (ret = allHeaders.match(/^Symfony-Debug-Toolbar-Replace:\s+(.*)$/im)) {
-                        stackElement.toolbarReplaceFinished = false;
-                        stackElement.toolbarReplace = '1' === ret[1];
-                    }
-                };
 
                 var successStreak = 4;
                 var pendingRequests = 0;
@@ -375,105 +358,21 @@
                     Object.defineProperties(patchedEventSource, Object.getOwnPropertyDescriptors(oldEventSource));
                     window.EventSource = patchedEventSource;
                 }
-                if (window.fetch && window.fetch.polyfill === undefined) {
-                    var oldFetch = window.fetch;
-                    window.fetch = function () {
-                        var promise = oldFetch.apply(this, arguments);
-                        var url = arguments[0];
-                        var params = arguments[1];
-                        var paramType = Object.prototype.toString.call(arguments[0]);
-                        if (paramType === '[object Request]') {
-                            url = arguments[0].url;
-                            params = {
-                                method: arguments[0].method,
-                                credentials: arguments[0].credentials,
-                                headers: arguments[0].headers,
-                                mode: arguments[0].mode,
-                                redirect: arguments[0].redirect
-                            };
-                        } else {
-                            url = String(url);
-                        }
-                        if (!url.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
-                            var method = 'GET';
-                            if (params && params.method !== undefined) {
-                                method = params.method;
-                            }
-
-                            var stackElement = {
-                                error: false,
-                                url: url,
-                                method: method,
-                                type: 'fetch',
-                                start: new Date()
-                            };
-
-                            var idx = requestStack.push(stackElement) - 1;
-                            promise.then(function (r) {
-                                stackElement.duration = new Date() - stackElement.start;
-                                stackElement.error = r.status < 200 || r.status >= 400;
-                                stackElement.statusCode = r.status;
-                                stackElement.profile = r.headers.get('x-debug-token');
-                                stackElement.profilerUrl = r.headers.get('x-debug-token-link');
-                                stackElement.toolbarReplaceFinished = false;
-                                stackElement.toolbarReplace = '1' === r.headers.get('Symfony-Debug-Toolbar-Replace');
-                                finishAjaxRequest(idx);
-                            }, function (e){
-                                stackElement.error = true;
-                                finishAjaxRequest(idx);
-                            });
-                            startAjaxRequest(idx);
-                        }
-
-                        return promise;
-                    };
-                }
-                if (window.XMLHttpRequest && XMLHttpRequest.prototype.addEventListener) {
-                    var proxied = XMLHttpRequest.prototype.open;
-
-                    XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
-                        var self = this;
-                        url = String(url);
-
-                        /* prevent logging AJAX calls to static and inline files, like templates */
-                        var path = url;
-                        if (url.slice(0, 1) === '/') {
-                            if (0 === url.indexOf('{{ request.basePath|e('js') }}')) {
-                                path = url.slice({{ request.basePath|length }});
-                            }
-                        }
-                        else if (0 === url.indexOf('{{ (request.schemeAndHttpHost ~ request.basePath)|e('js') }}')) {
-                            path = url.slice({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
-                        }
-
-                        if (!path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
-                            var stackElement = {
-                                error: false,
-                                url: url,
-                                method: method,
-                                type: 'xhr',
-                                start: new Date()
-                            };
-
-                            var idx = requestStack.push(stackElement) - 1;
-
-                            this.addEventListener('readystatechange', function() {
-                                if (self.readyState == 4) {
-                                    stackElement.duration = new Date() - stackElement.start;
-                                    stackElement.error = self.status < 200 || self.status >= 400;
-                                    stackElement.statusCode = self.status;
-                                    extractHeaders(self, stackElement);
-
-                                    finishAjaxRequest(idx);
-                                }
-                            }, false);
-
-                            startAjaxRequest(idx);
-                        }
-
-                        proxied.apply(this, Array.prototype.slice.call(arguments));
-                    };
-                }
+                var ajaxStack = window.SfjsRequestStack;
+                ajaxStack.start = function(stackElement) {
+                    var idx = requestStack.push(stackElement) - 1;
+                    startAjaxRequest(idx);
+                    if (stackElement.duration !== undefined || stackElement.error) {
+                        finishAjaxRequest(idx);
+                    }
+                };
+                ajaxStack.finish = function(stackElement) {
+                    var idx = requestStack.indexOf(stackElement);
+                    if (idx !== -1) {
+                        finishAjaxRequest(idx);
+                    }
+                };
+                ajaxStack.requests.splice(0).forEach(ajaxStack.start);
                 {% endif %}
 
                 return {
@@ -512,7 +411,7 @@
                                     var pending = pendingRequests;
                                     for (var i = 0; i < requestStack.length; i++) {
                                         startAjaxRequest(i);
-                                        if (requestStack[i].duration || requestStack[i].error) {
+                                        if (requestStack[i].duration !== undefined || requestStack[i].error) {
                                             finishAjaxRequest(i);
                                         }
                                     }

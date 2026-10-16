@@ -89,6 +89,13 @@ class CachePoolPass implements CompilerPassInterface
             }
             unset($tags[0]['clearer'], $tags[0]['name']);
 
+            if (\in_array($class, [ArrayAdapter::class, NullAdapter::class], true)) {
+                unset($tags[0]['provider']);
+            }
+            if (NullAdapter::class === $class) {
+                unset($tags[0]['default_lifetime']);
+            }
+
             if (isset($tags[0]['provider'])) {
                 $tags[0]['provider'] = new Reference(static::getServiceProvider($container, $tags[0]['provider']));
             }
@@ -121,7 +128,7 @@ class CachePoolPass implements CompilerPassInterface
 
                     $i = 0;
 
-                    if (isset($chainedTags[0]['provider'])) {
+                    if (isset($chainedTags[0]['provider']) && !\in_array($chainedClass, [ArrayAdapter::class, NullAdapter::class], true)) {
                         $chainedPool->replaceArgument($i++, new Reference(static::getServiceProvider($container, $chainedTags[0]['provider'])));
                     }
 
@@ -129,7 +136,7 @@ class CachePoolPass implements CompilerPassInterface
                         $chainedPool->replaceArgument($i++, $tags[0]['namespace']);
                     }
 
-                    if (isset($tags[0]['default_lifetime'])) {
+                    if (isset($tags[0]['default_lifetime']) && NullAdapter::class !== $chainedClass) {
                         $defaultLifetime = $tags[0]['default_lifetime'];
 
                         if (!is_numeric($defaultLifetime)) {

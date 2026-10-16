@@ -51,6 +51,14 @@ class RateTest extends TestCase
         yield 'product just above the cap' => [new Rate(new \DateInterval('PT2S'), 1), 1073741824];
     }
 
+    public function testRejectSubsecondInterval()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The refill interval must be at least one second.');
+
+        new Rate(\DateInterval::createFromDateString('200 milliseconds'));
+    }
+
     public function testCalculateTimeForTokensBelowTheCapIsNotChanged()
     {
         self::assertSame(2147483647, Rate::perSecond(1)->calculateTimeForTokens(2147483647));

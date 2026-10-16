@@ -34,6 +34,8 @@ CHANGELOG
  * Add `path`, `enable_csrf`, `csrf_token_id`, `csrf_parameter` and `csrf_token_manager` options to the `switch_user` firewall configuration to restrict user switching to a dedicated (POST-only) route protected by a CSRF token
  * Deprecate configuring an access control rule with many `roles`, use `allow_if` or role hierarchy instead
  * Deprecate configuring both an access control rule `allow_if` and `roles`, update `allow_if` instead
+ * Add the `is_granted` option to access control rules and deprecate their `roles` option
+ * Add the `request_attributes` option to access control rules and deprecate their `attributes` option
  * Add support for decorating custom authentication failure and success handlers
  * Add role hierarchy graph to the profiler security panel
  * Add the `oidc_login` authenticator for the OpenID Connect Authorization Code Flow, and the `oidc` user provider for the users it builds from the OIDC claims

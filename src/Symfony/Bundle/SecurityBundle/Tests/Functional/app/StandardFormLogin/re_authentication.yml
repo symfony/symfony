@@ -31,5 +31,5 @@ security:
                 path: /second/logout
 
     access_control:
-        - { path: ^/protected_resource$, roles: IS_AUTHENTICATED_RECENTLY }
-        - { path: .*, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/protected_resource$, is_granted: IS_AUTHENTICATED_RECENTLY }
+        - { path: .*, is_granted: IS_AUTHENTICATED_FULLY }

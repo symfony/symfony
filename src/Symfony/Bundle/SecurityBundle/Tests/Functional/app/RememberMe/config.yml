@@ -18,4 +18,4 @@ security:
                 check_path: login
 
     access_control:
-        - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/profile, is_granted: ROLE_USER }

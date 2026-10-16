@@ -49,7 +49,7 @@ final class ReverseClassObjectMapperMetadataFactory implements ObjectMapperMetad
         $mappings = $this->objectMapperMetadataFactory->create($object, $property, $context);
         $targetClasses = (array) ($this->classMap[$class] ?? []);
 
-        if (!$targetClasses) {
+        if (!$targetClasses || ($property && $mappings)) {
             return $mappings;
         }
 

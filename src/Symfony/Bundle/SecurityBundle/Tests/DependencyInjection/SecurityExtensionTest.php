@@ -13,6 +13,8 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use Jose\Component\Core\JWK;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
@@ -872,10 +874,76 @@ class SecurityExtensionTest extends TestCase
         yield 'Invalid configuration with port' => [['port' => 80]];
         yield 'Invalid configuration with methods' => [['methods' => ['POST']]];
         yield 'Invalid configuration with ips' => [['ips' => ['0.0.0.0']]];
-        yield 'Invalid configuration with attributes' => [['attributes' => ['_route' => 'foo_route']]];
+        yield 'Invalid configuration with request_attributes' => [['request_attributes' => ['_route' => 'foo_route']]];
         yield 'Invalid configuration with route' => [['route' => 'foo_route']];
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testRegisterAccessControlWithRequestMatcherAndAttributesThrowsInvalidException()
+    {
+        $container = $this->getRawContainer();
+
+        $requestMatcherId = 'My\Test\RequestMatcher';
+        $requestMatcher = new PathRequestMatcher('/');
+        $container->set($requestMatcherId, $requestMatcher);
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['request_matcher' => $requestMatcherId, 'attributes' => ['_route' => 'foo_route']],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "request_matcher" option should not be specified alongside other options. Consider integrating your constraints inside your RequestMatcher directly.');
+
+        $container->compile();
+    }
+
+    public function testRegisterAccessControlWithSpecifiedRequestAttributes()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['request_attributes' => ['_route' => 'foo_route']],
+            ],
+        ]);
+
+        $container->compile();
+
+        $calls = $container->getDefinition('security.access_map')->getMethodCalls();
+        $this->assertCount(1, $calls);
+
+        [[$method, [$requestMatcher]]] = $calls;
+        $this->assertSame('add', $method);
+
+        [$matchers] = $container->getDefinition((string) $requestMatcher)->getArguments();
+        $this->assertCount(1, $matchers);
+
+        [$attributesRequestMatcher] = $matchers;
+        $this->assertSame(['_route' => 'foo_route'], $container->getDefinition((string) $attributesRequestMatcher)->getArgument(0));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testRegisterAccessControlWithSpecifiedAttributes()
     {
         $container = $this->getRawContainer();
@@ -946,6 +1014,32 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('foo_route', $attributesRequestMatcher->getArgument(0)['_route']);
     }
 
+    public function testRegisterAccessControlWithSpecifiedRequestAttributesThrowsException()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['route' => 'anything', 'request_attributes' => ['_route' => 'foo_route']],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "route" option should not be specified alongside "request_attributes._route" option. Use just one of the options.');
+
+        $container->compile();
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testRegisterAccessControlWithSpecifiedAttributesThrowsException()
     {
         $container = $this->getRawContainer();
@@ -968,6 +1062,71 @@ class SecurityExtensionTest extends TestCase
         $this->expectExceptionMessage('The "route" option should not be specified alongside "attributes._route" option. Use just one of the options.');
 
         $container->compile();
+    }
+
+    public function testRegisterAccessControlWithIsGranted()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['path' => '^/admin', 'is_granted' => 'ROLE_ADMIN'],
+            ],
+        ]);
+
+        $container->compile();
+
+        $calls = $container->getDefinition('security.access_map')->getMethodCalls();
+        $this->assertCount(1, $calls);
+
+        [[$method, [$requestMatcher, $attributes]]] = $calls;
+        $this->assertSame('add', $method);
+        $this->assertInstanceOf(Reference::class, $requestMatcher);
+        $this->assertSame(['ROLE_ADMIN'], $attributes);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testRegisterAccessControlWithRoleAndAttributesMergedWithRoute()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['role' => 'ROLE_ADMIN', 'attributes' => ['_controller' => 'AdminController::index'], 'route' => 'admin'],
+            ],
+        ]);
+
+        $container->compile();
+
+        $calls = $container->getDefinition('security.access_map')->getMethodCalls();
+        $this->assertCount(1, $calls);
+
+        [[$method, [$requestMatcher, $attributes]]] = $calls;
+        $this->assertSame('add', $method);
+        $this->assertSame(['ROLE_ADMIN'], $attributes);
+
+        [$matchers] = $container->getDefinition((string) $requestMatcher)->getArguments();
+        $this->assertCount(1, $matchers);
+
+        [$attributesRequestMatcher] = $matchers;
+        $this->assertSame(['_controller' => 'AdminController::index', '_route' => 'admin'], $container->getDefinition((string) $attributesRequestMatcher)->getArgument(0));
     }
 
     public function testRegisterTheUserProviderAlias()

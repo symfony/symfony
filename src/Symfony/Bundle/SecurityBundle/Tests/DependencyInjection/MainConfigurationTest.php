@@ -14,11 +14,13 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Security\Http\Authentication\ExposeSecurityLevel;
 
@@ -390,5 +392,182 @@ class MainConfigurationTest extends TestCase
         $this->expectUserDeprecationMessage('Since symfony/security-bundle 8.2: Configuring both an access control rule "allow_if" and "roles" is deprecated, update "allow_if" instead.');
 
         $processor->processConfiguration($configuration, [$config]);
+    }
+
+    public function testAccessControlRuleIsGranted()
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [['path' => '/', 'is_granted' => 'ROLE_ADMIN']],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
+
+        $this->assertSame('ROLE_ADMIN', $processedConfig['access_control'][0]['is_granted']);
+    }
+
+    public function testAccessControlRuleIsGrantedRejectsManyAttributes()
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [['path' => '/', 'is_granted' => ['ROLE_ADMIN', 'ROLE_USER']]],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessage('Expected "string", but got "array".');
+
+        $processor->processConfiguration($configuration, [$config]);
+    }
+
+    public function testAccessControlRuleIsGrantedRejectsCommaSeparatedAttributes()
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [['path' => '/', 'is_granted' => 'ROLE_ADMIN, ROLE_USER']],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "is_granted" option of an access control rule takes a single attribute (got "ROLE_ADMIN, ROLE_USER"), use "allow_if" or role hierarchy for many.');
+
+        $processor->processConfiguration($configuration, [$config]);
+    }
+
+    #[TestWith([null])]
+    #[TestWith([''])]
+    public function testAccessControlRuleIsGrantedCannotBeEmpty(?string $isGranted)
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [['path' => '/', 'is_granted' => $isGranted]],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The path "security.access_control.0.is_granted" cannot contain an empty value, but got "".');
+
+        $processor->processConfiguration($configuration, [$config]);
+    }
+
+    public function testAccessControlRuleIsGrantedAndAllowIfAreExclusive()
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [['path' => '/', 'is_granted' => 'ROLE_ADMIN', 'allow_if' => 'request.isSecure()']],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "is_granted" and "allow_if" options of an access control rule cannot be used together, call "is_granted()" in the "allow_if" expression instead.');
+
+        $processor->processConfiguration($configuration, [$config]);
+    }
+
+    public function testAccessControlRuleRequestAttributes()
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [['request_attributes' => ['_route' => 'admin', '_format' => 'json'], 'is_granted' => 'ROLE_ADMIN']],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
+
+        $this->assertSame(['_route' => 'admin', '_format' => 'json'], $processedConfig['access_control'][0]['request_attributes']);
+    }
+
+    public function testAccessControlRuleRequestAttributesKeepDashesInNames()
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [['request_attributes' => ['x-tenant' => 'acme'], 'is_granted' => 'ROLE_ADMIN']],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
+
+        $this->assertSame(['x-tenant' => 'acme'], $processedConfig['access_control'][0]['request_attributes']);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('provideAccessControlRuleRolesKeys')]
+    public function testConfiguringAccessControlRuleRolesIsDeprecated(string $key)
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [['path' => '/', $key => 'ROLE_USER']],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $this->expectUserDeprecationMessage('Since symfony/security-bundle 8.2: Configuring an access control rule with "roles" is deprecated, use "is_granted" for a single attribute, or "allow_if" otherwise.');
+
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
+
+        $this->assertSame(['ROLE_USER'], $processedConfig['access_control'][0]['roles']);
+    }
+
+    public static function provideAccessControlRuleRolesKeys(): iterable
+    {
+        yield ['roles'];
+        yield ['role'];
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testConfiguringAccessControlRuleAttributesIsDeprecated()
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [['attributes' => ['_route' => 'admin'], 'is_granted' => 'ROLE_ADMIN']],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $this->expectUserDeprecationMessage('Since symfony/security-bundle 8.2: Configuring an access control rule with "attributes" is deprecated, use "request_attributes" instead.');
+
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
+
+        $this->assertSame(['_route' => 'admin'], $processedConfig['access_control'][0]['attributes']);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('provideAccessControlRuleRenamedOptions')]
+    public function testAccessControlRuleRejectsRenamedOptionAlongsideItsReplacement(array $rule, string $message)
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [['path' => '/'] + $rule],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($message);
+
+        $processor->processConfiguration($configuration, [$config]);
+    }
+
+    public static function provideAccessControlRuleRenamedOptions(): iterable
+    {
+        yield 'is_granted and roles' => [
+            ['is_granted' => 'ROLE_ADMIN', 'roles' => 'ROLE_USER'],
+            'The "is_granted" and "roles" options of an access control rule cannot be used together, use "is_granted" only.',
+        ];
+        yield 'request_attributes and attributes' => [
+            ['request_attributes' => ['_format' => 'json'], 'attributes' => ['_route' => 'admin']],
+            'The "request_attributes" and "attributes" options of an access control rule cannot be used together, use "request_attributes" only.',
+        ];
     }
 }

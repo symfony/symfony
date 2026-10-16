@@ -35,6 +35,58 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider provideLargeIntegersOutsideRange
+     */
+    public function testLargeIntegersOutsideRange(string $value, $limit, bool $minimum)
+    {
+        $constraint = new Range([$minimum ? 'min' : 'max' => $limit]);
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($minimum ? $constraint->minMessage : $constraint->maxMessage)
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ limit }}', \is_string($limit) ? '"'.$limit.'"' : (string) $limit)
+            ->setCode($minimum ? Range::TOO_LOW_ERROR : Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    public static function provideLargeIntegersOutsideRange(): iterable
+    {
+        yield [\PHP_INT_SIZE > 4 ? '9223372036854775808' : '2147483648', \PHP_INT_MAX, false];
+        yield ['9223372036854775808', '9223372036854775807', false];
+        yield ['9223372036854775809', '9223372036854775808', false];
+        yield ['-9223372036854775809', '-9223372036854775808', true];
+        yield ['-9223372036854775810', '-9223372036854775809', true];
+        yield ['+009223372036854775808', '9223372036854775807', false];
+        yield [' 9223372036854775808 ', '9223372036854775807', false];
+    }
+
+    /**
+     * @dataProvider provideNumericValuesWithinRange
+     */
+    public function testNumericValuesWithinRange($value, $min, $max)
+    {
+        $this->validator->validate($value, new Range(['min' => $min, 'max' => $max]));
+
+        $this->assertNoViolation();
+    }
+
+    public static function provideNumericValuesWithinRange(): iterable
+    {
+        yield [(string) \PHP_INT_MAX, 0, \PHP_INT_MAX];
+        yield ['9223372036854775808', '9223372036854775808', '9223372036854775808'];
+        yield ['-9223372036854775809', '-9223372036854775809', 0];
+        yield ['+000', '-0', 0];
+        yield ['-000', 0, '+0'];
+        yield [' 20 ', 10, 20];
+        yield ['2e1', 10, 20];
+        yield ['20.0', 10, 20];
+        yield [20.0, 10, 20];
+        yield [\NAN, 10, 20];
+        yield [\INF, 10, \INF];
+        yield [-\INF, -\INF, 20];
+    }
+
     public static function getTenToTwenty(): array
     {
         return [

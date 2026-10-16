@@ -89,7 +89,7 @@ class RangeValidator extends ConstraintValidator
         $hasLowerLimit = null !== $min;
         $hasUpperLimit = null !== $max;
 
-        if ($hasLowerLimit && $hasUpperLimit && ($value < $min || $value > $max)) {
+        if ($hasLowerLimit && $hasUpperLimit && ($this->isGreaterThan($min, $value) || $this->isGreaterThan($value, $max))) {
             $message = $constraint->notInRangeMessage;
             $code = Range::NOT_IN_RANGE_ERROR;
 
@@ -112,7 +112,7 @@ class RangeValidator extends ConstraintValidator
             return;
         }
 
-        if ($hasUpperLimit && $value > $max) {
+        if ($hasUpperLimit && $this->isGreaterThan($value, $max)) {
             $violationBuilder = $this->context->buildViolation($constraint->maxMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setParameter('{{ limit }}', $this->formatValue($max, self::PRETTY_DATE))
@@ -131,7 +131,7 @@ class RangeValidator extends ConstraintValidator
             return;
         }
 
-        if ($hasLowerLimit && $value < $min) {
+        if ($hasLowerLimit && $this->isGreaterThan($min, $value)) {
             $violationBuilder = $this->context->buildViolation($constraint->minMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setParameter('{{ limit }}', $this->formatValue($min, self::PRETTY_DATE))
@@ -147,6 +147,33 @@ class RangeValidator extends ConstraintValidator
 
             $violationBuilder->addViolation();
         }
+    }
+
+    private function isGreaterThan(mixed $value, mixed $limit): bool
+    {
+        if ((!\is_int($value) && !\is_string($value)) || (!\is_int($limit) && !\is_string($limit))) {
+            return $value > $limit;
+        }
+
+        $valueString = trim((string) $value);
+        $limitString = trim((string) $limit);
+
+        if (!preg_match('/^[+-]?[0-9]+$/D', $valueString) || !preg_match('/^[+-]?[0-9]+$/D', $limitString)) {
+            return $value > $limit;
+        }
+
+        $valueDigits = ltrim(ltrim($valueString, '+-'), '0');
+        $limitDigits = ltrim(ltrim($limitString, '+-'), '0');
+        $valueNegative = '' !== $valueDigits && '-' === $valueString[0];
+        $limitNegative = '' !== $limitDigits && '-' === $limitString[0];
+
+        if ($valueNegative !== $limitNegative) {
+            return $limitNegative;
+        }
+
+        $comparison = strnatcmp($valueDigits, $limitDigits);
+
+        return $valueNegative ? $comparison < 0 : $comparison > 0;
     }
 
     private function getLimit(?string $propertyPath, mixed $default, Constraint $constraint): mixed

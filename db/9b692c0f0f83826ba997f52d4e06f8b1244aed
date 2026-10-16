@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T08:34:27Z
+
+Thanks for the PR, the use case is real. I pushed two changes:
+
+- the worker still stopped on a PostgreSQL restart. `PostgreSqlNotifyOnIdleListener` queries the database right after the empty poll, and it threw `ConnectionException: Connection refused` (reproduced with `pg_ctl stop -m fast` on PostgreSQL 16). The listener now skips its wait when the connection is lost.
+- `instanceof ConnectionException` became `instanceof ConnectionLost`. DBAL also uses `ConnectionException` for MySQL errors like 1142 "command denied", and those were hidden for 60 seconds.
+
+About your questions: I'd keep the 60 seconds private for now. Two points are still open IMHO. Nothing is logged while the receiver hides the error, so a wrong database path or password takes 60 seconds to show up. And `ack()` keeps sleeping for up to 60 seconds after a SIGTERM. WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T09:30:29Z
+
+Thinking more about it: `get()` throwing on a lost connection isn't specific to Doctrine. A Redis, AMQP or SQS restart stops the worker the same way. #66964 adds a way for the worker to skip a transport for a while. What about using it here? The worker would catch the `TransportException` thrown by `get()`, skip that transport while it is down, keep consuming the other ones, and still stop when it stays down for too long. This PR would then keep what is specific to Doctrine: closing the dead connection, the PostgreSQL listener, and replaying `ack()`/`reject()`. It would also settle the two open points above: the delay could become an option, and the worker would log the error.
+
+WDYT @neothone? /cc @HypeMC
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-10-15T10:11:09Z
+
+Makes sense to me. The worker already has most of what's needed: it skips a transport while it's cooling down, continues consuming from the others, and resumes consuming from it once the cooldown ends. The only thing missing is catching the `TransportException`.
+
+---------------------------------------------------------------------------
+
+by neothone at 2026-10-15T10:15:25Z
+
+Thanks a lot for the fixes @nicolas-grekas, both are right. I had missed the listener: my integration test only terminated the session, it never stopped the server.
+
+Agreed on the two open points, and I like the #66964 direction better than what I did: a worker skipping a transport that is down is not specific to Doctrine, and it gives logging and a configurable delay for free.
+
+So here is what I would do, tell me if that works for you:
+- DoctrineReceiver::get() goes back to throwing a TransportException, after closing the dead connection so that the next poll reconnects. The 60 seconds and $disconnectedSince go away.
+- Kept here: closeIfDisconnected(), the PostgreSQL listener change and the ack()/reject() replay.
+- For ack()/reject(), I would cap the wait to a few seconds (below the 10s supervisor gives a worker to stop by default) instead of 60, and let redelivery handle longer outages. That also bounds the SIGTERM delay.
+
+On the worker side, #66964 currently reacts to handler failures. Should catching the TransportException thrown by get() be added there, or in a follow-up PR on top of it? @HypeMC , happy to help with it if useful.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T13:03:43Z
+
+Your plan works for me @neothone. #66964 now does the worker side. When a transport has a `cooldown_strategy`, the worker catches the `TransportException` thrown by `get()`, logs it and skips that transport for a while. So this PR can drop the `get()` part and keep `closeIfDisconnected()`, the PostgreSQL listener and the `ack()`/`reject()` replay, capped to a few seconds. Longer outages end in a redelivery, and the inbox from #66957 then skips the handlers of the messages that were already handled.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T13:44:34Z
+
+I pushed the plan we agreed on @neothone. `get()` throws again after closing the lost connection, so a worker with a `cooldown_strategy` skips the transport and reconnects once the database is back. `ack()` and `reject()` now wait up to 5 seconds, below the 10 seconds supervisor gives a worker to stop. I checked it with `pg_ctl stop -m fast` on PostgreSQL 16.
+
+---------------------------------------------------------------------------
+
+by neothone at 2026-10-15T17:16:45Z
+
+Thanks a lot @nicolas-grekas, and thanks @HypeMC for #66964. The split makes much more sense than what I started with, and checking it with `pg_ctl stop -m fast` covers the case my integration test missed. I also ran the bridge tests and the integration test against PostgreSQL 16 on your last push: all green!
+
+---------------------------------------------------------------------------
+
+by neothone at 2026-10-15T17:34:47Z
+
+Rebased on 8.2 after #66973. Heads up on the conflict in `DoctrineReceiver::withRetryableExceptionRetry()`: since #66973 catches every `TransportException` in the first block and rethrows the non retryable ones right away, keeping both sides as is would have made the reconnection replay unreachable. Both are now in a single `catch (DBALException|TransportException)`: deadlocks (raw or wrapped) are retried up to 3 times as before, a lost connection waits up to 5 seconds and is replayed once, anything else is rethrown. The deadlock tests from #66973 and the reconnection ones both pass, as does the integration test against PostgreSQL 16.

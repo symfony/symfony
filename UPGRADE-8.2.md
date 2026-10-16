@@ -65,6 +65,12 @@ DependencyInjection
    Code that read the properties as an `int` should read `$attribute->priority ?? 0`
  * `AbstractKernel::shutdown()` now resets the container. Code that keeps a reference to the container of a kernel
    that was shut down gets new service instances from it
+ * Add argument `$shutdown` to `Container::reset()`
+ * [BC BREAK] Add optional argument `bool $shutdown = false` to `ServicesResetter::reset()` and `ServicesResetterInterface::reset()`
+ * [BC BREAK] Add return type `void` to `ServicesResetterInterface::reset()`
+ * Deprecate extending `ServicesResetter`, implement `ServicesResetterInterface` instead
+ * When a `services_resetter` service exists, `Container::reset()` now uses only its configured callbacks.
+   Add a `kernel.reset` tag to services that still need to be reset
 
 DoctrineBridge
 --------------

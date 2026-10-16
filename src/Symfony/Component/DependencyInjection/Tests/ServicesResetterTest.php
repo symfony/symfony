@@ -11,13 +11,16 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ClearableService;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LazyResettableService;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\MultiResettableService;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ResettableService;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ShutdownAwareService;
 use Symfony\Component\VarExporter\ProxyHelper;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 class ServicesResetterTest extends TestCase
 {
@@ -47,6 +50,77 @@ class ServicesResetterTest extends TestCase
         $this->assertSame(1, ClearableService::$counter);
         $this->assertSame(1, MultiResettableService::$resetFirstCounter);
         $this->assertSame(1, MultiResettableService::$resetSecondCounter);
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testResetPassesShutdownFlagOnlyToOptedInMethods(bool $nonShared)
+    {
+        $service = new class {
+            public array $calls = [];
+
+            public function reset(bool $shutdown = false): void
+            {
+                $this->calls[] = [$shutdown, \func_num_args()];
+            }
+
+            public function clear(): void
+            {
+                $this->calls[] = ['clear', \func_num_args()];
+            }
+        };
+        $methods = [['reset' => true], '?missing', ['?missingWithFlag' => true], ['clear' => false], ['reset' => false], 'clear'];
+        $resetMap = null;
+        $services = ['service' => $service];
+        $resetMethods = ['service' => $methods];
+        if ($nonShared) {
+            $resetMap = new \WeakMap();
+            $resetMap[$service] = $methods;
+            $services = $resetMethods = [];
+        }
+        $resetter = new ServicesResetter(new \ArrayIterator($services), $resetMethods, $resetMap);
+
+        $resetter->reset();
+        $resetter->reset(true);
+        $resetter->reset();
+
+        $this->assertSame([[false, 0], ['clear', 0], [false, 0], ['clear', 0], [true, 1], ['clear', 0], [false, 0], ['clear', 0]], $service->calls);
+    }
+
+    public function testShutdownThroughContract()
+    {
+        $service = new ShutdownAwareService();
+        $resetter = new ServicesResetter(new \ArrayIterator(['service' => $service]), ['service' => [['reset' => true]]]);
+
+        (static function (ShutdownInterface $resetter) {
+            $resetter->reset(true);
+        })($resetter);
+
+        $this->assertSame([true], $service->calls);
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testResetSameInstanceWithDifferentMethods(bool $shutdown)
+    {
+        $service = new class {
+            public array $calls = [];
+
+            public function reset(): void
+            {
+                $this->calls[] = 'reset';
+            }
+
+            public function clear(): void
+            {
+                $this->calls[] = 'clear';
+            }
+        };
+        $resetter = new ServicesResetter(new \ArrayIterator(['first' => $service, 'second' => $service]), ['first' => [['reset' => false]], 'second' => [['clear' => false]]]);
+
+        $resetter->reset($shutdown);
+
+        $this->assertSame(['reset', 'clear'], $service->calls);
     }
 
     public function testResetLazyServices()

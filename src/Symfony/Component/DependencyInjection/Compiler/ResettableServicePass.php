@@ -49,11 +49,13 @@ class ResettableServicePass implements CompilerPassInterface
                     $attributes['method'] = '?'.$attributes['method'];
                 }
 
+                $method = [$attributes['method'] => $attributes['with_shutdown'] ?? false];
+
                 if ($isShared) {
-                    $methods[$id][] = $attributes['method'];
+                    $methods[$id][] = $method;
                 } else {
                     $hasNonShared = true;
-                    $def->addTag('container.tracked_for_reset', ['method' => $attributes['method']]);
+                    $def->addTag('container.tracked_for_reset', ['method' => $method]);
                 }
             }
         }

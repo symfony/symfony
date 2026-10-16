@@ -116,7 +116,10 @@ class TestContainer extends Container
         return $this->getPublicContainer()->initialized($id);
     }
 
-    public function reset(): void
+    /**
+     * @param bool $shutdown Whether the container is being shut down
+     */
+    public function reset(/* bool $shutdown = false */): void
     {
         // ignore the call
     }

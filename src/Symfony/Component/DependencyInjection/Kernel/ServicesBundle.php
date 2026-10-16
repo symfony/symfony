@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ResettableServicePass;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
@@ -39,6 +40,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEvent
 use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 /**
  * Provides core DI infrastructure services (event dispatcher, filesystem, clock, etc.).
@@ -87,7 +89,7 @@ class ServicesBundle extends AbstractBundle
         $container->registerForAutoconfiguration(EventDispatcherInterface::class)
             ->addTag('event_dispatcher.dispatcher');
         $container->registerForAutoconfiguration(ResetInterface::class)
-            ->addTag('kernel.reset', ['method' => 'reset']);
+            ->addTag('kernel.reset', [static fn (string $class) => ['method' => 'reset', 'with_shutdown' => is_a($class, Container::class, true) || is_a($class, ShutdownInterface::class, true)]]);
         $container->registerForAutoconfiguration(ServiceSubscriberInterface::class)
             ->addTag('container.service_subscriber');
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)

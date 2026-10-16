@@ -430,7 +430,7 @@
     </li>
 {% endmacro %}
 
-{% macro form_tree_details(name, data, forms_by_hash, show) %}
+{% macro form_tree_details(name, data, forms_by_hash, show = false) %}
     <div class="tree-details{% if not show|default(false) %} hidden{% endif %}" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
         <h2>{{ name|default('(no name)') }}</h2>
         {% if data.type_class is defined %}

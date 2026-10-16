@@ -302,6 +302,8 @@ class Container implements ContainerInterface, ResetInterface
         }
 
         $this->services = $this->factories = $this->privates = [];
+        // the closures that reference the container itself are created again when needed
+        unset($this->getEnv, $this->getService);
     }
 
     /**

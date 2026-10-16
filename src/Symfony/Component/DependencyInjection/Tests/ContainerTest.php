@@ -336,6 +336,38 @@ class ContainerTest extends TestCase
         $this->assertSame(1, $bar->resetCounter);
     }
 
+    public function testResetReleasesTheClosuresThatReferenceTheContainer()
+    {
+        $container = new class extends Container {
+            public function env(string $name): mixed
+            {
+                return $this->getEnv($name);
+            }
+        };
+        $_ENV['SF_CONTAINER_RESET_TEST'] = 'foo';
+
+        try {
+            $this->assertSame('foo', $container->env('SF_CONTAINER_RESET_TEST'));
+        } finally {
+            unset($_ENV['SF_CONTAINER_RESET_TEST']);
+        }
+
+        $gcEnabled = gc_enabled();
+        gc_disable();
+
+        try {
+            $container->reset();
+            $ref = \WeakReference::create($container);
+            unset($container);
+
+            $this->assertNull($ref->get());
+        } finally {
+            if ($gcEnabled) {
+                gc_enable();
+            }
+        }
+    }
+
     public function testResetDoesNotInitializeLazyServices()
     {
         $container = new ContainerBuilder();

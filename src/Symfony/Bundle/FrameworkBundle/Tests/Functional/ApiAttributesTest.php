@@ -27,6 +27,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ApiAttributesTest extends AbstractWebTestCase
 {
+    public function testVoidReturnTypeController()
+    {
+        $client = self::createClient(['test_case' => 'ApiAttributesTest']);
+        $client->catchExceptions(false);
+
+        $client->request('GET', '/void-return-type-controller.json');
+
+        $response = $client->getResponse();
+
+        self::assertSame(204, $response->getStatusCode());
+        self::assertSame('', $response->getContent());
+    }
+
     #[DataProvider('mapQueryStringProvider')]
     public function testMapQueryString(string $uri, array $query, string $expectedResponse, int $expectedStatusCode)
     {
@@ -1081,6 +1094,13 @@ class WithMapQueryStringToNullableAttributeController
         return new JsonResponse(
             ['filter' => ['status' => $query->filter->status, 'quantity' => $query->filter->quantity]],
         );
+    }
+}
+
+class WithVoidReturnTypeController
+{
+    public function __invoke(): void
+    {
     }
 }
 

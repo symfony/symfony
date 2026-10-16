@@ -332,10 +332,67 @@ class HttpKernelTest extends TestCase
         $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
     }
 
-    public function testHandleWhenTheControllerDoesNotReturnAResponse()
+    #[DataProvider('provideVoidControllers')]
+    public function testHandleWhenTheControllerReturnsVoid(callable $controller)
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getHttpKernel($dispatcher, static fn () => null);
+        $responseEventDispatched = false;
+        $dispatcher->addListener(KernelEvents::RESPONSE, static function () use (&$responseEventDispatched) {
+            $responseEventDispatched = true;
+        });
+        $kernel = $this->getHttpKernel($dispatcher, $controller);
+
+        $response = $kernel->handle(new Request());
+
+        $this->assertSame(204, $response->getStatusCode());
+        $this->assertSame('', $response->getContent());
+        $this->assertTrue($responseEventDispatched);
+    }
+
+    public static function provideVoidControllers(): iterable
+    {
+        yield 'closure' => [static function (): void {}];
+        yield 'invokable' => [new VoidController()];
+        yield 'method' => [[new VoidController(), '__invoke']];
+        yield 'static method' => [[VoidController::class, 'controller']];
+        yield 'function' => [__NAMESPACE__.'\\void_controller_func'];
+    }
+
+    #[DataProvider('provideControllerReplacementEvents')]
+    public function testHandleWhenTheControllerIsReplacedWithAVoidController(string $eventName)
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener($eventName, static function ($event) {
+            $event->setController(static function (): void {});
+        });
+        $kernel = $this->getHttpKernel($dispatcher);
+
+        $this->assertSame(204, $kernel->handle(new Request())->getStatusCode());
+    }
+
+    public static function provideControllerReplacementEvents(): iterable
+    {
+        yield [KernelEvents::CONTROLLER];
+        yield [KernelEvents::CONTROLLER_ARGUMENTS];
+    }
+
+    public function testHandleWhenTheControllerReturnsVoidButAViewIsRegistered()
+    {
+        $dispatcher = new EventDispatcher();
+        $response = new Response('foo');
+        $dispatcher->addListener(KernelEvents::VIEW, static function ($event) use ($response) {
+            $event->setResponse($response);
+        });
+        $kernel = $this->getHttpKernel($dispatcher, static function (): void {});
+
+        $this->assertSame($response, $kernel->handle(new Request()));
+    }
+
+    #[DataProvider('provideNullControllers')]
+    public function testHandleWhenTheControllerDoesNotReturnAResponse(callable $controller)
+    {
+        $dispatcher = new EventDispatcher();
+        $kernel = $this->getHttpKernel($dispatcher, $controller);
 
         try {
             $kernel->handle(new Request());
@@ -348,6 +405,15 @@ class HttpKernelTest extends TestCase
             $line = file($first['file'])[$first['line'] - 2];
             $this->assertStringContainsString('// call controller', $line);
         }
+    }
+
+    public static function provideNullControllers(): iterable
+    {
+        yield 'untyped' => [static fn () => null];
+        yield 'null' => [static fn (): null => null];
+        yield 'nullable' => [static fn (): ?Response => null];
+        yield 'union' => [static fn (): Response|string|null => null];
+        yield 'mixed' => [static fn (): mixed => null];
     }
 
     public function testHandleWhenTheControllerDoesNotReturnAResponseButAViewIsRegistered()
@@ -681,4 +747,19 @@ class TestController
 function controller_func()
 {
     return new Response('foo');
+}
+
+class VoidController
+{
+    public function __invoke(): void
+    {
+    }
+
+    public static function controller(): void
+    {
+    }
+}
+
+function void_controller_func(): void
+{
 }

@@ -463,6 +463,7 @@ Scheduler
 Security
 --------
 
+ * The `use_referer` login option now preserves the referer after failed authentication. An existing target path still takes precedence
  * [BC BREAK] A failing `#[IsCsrfTokenValid]` attribute now throws
    `Symfony\Component\Security\Http\Exception\InvalidCsrfTokenException`, which extends `HttpException` and
    carries a 403 status, instead of `Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException`, which

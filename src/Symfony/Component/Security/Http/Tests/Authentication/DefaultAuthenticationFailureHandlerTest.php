@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -20,8 +21,10 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
+use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
@@ -38,6 +41,131 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->request->attributes->replace(['_stateless' => false]);
         $this->request->setSession($this->session);
         $this->exception = new AuthenticationException();
+    }
+
+    #[DataProvider('provideLegacyDefaultOptions')]
+    public function testSubclassWithLegacyDefaultOptions(array $options, ?string $expectedTarget)
+    {
+        $handler = new class($this->createStub(HttpKernelInterface::class), new HttpUtils(), $options, null, 'main') extends DefaultAuthenticationFailureHandler {
+            protected array $defaultOptions = [
+                'failure_path' => null,
+                'failure_forward' => false,
+                'login_path' => '/custom-login',
+                'failure_path_parameter' => '_failure_path',
+            ];
+        };
+        $this->request->headers->set('Referer', 'https://localhost/test');
+
+        $response = $handler->onAuthenticationFailure($this->request, $this->exception);
+
+        $this->assertSame('https://localhost/custom-login', $response->getTargetUrl());
+        $this->assertSame($expectedTarget, $this->session->get('_security.main.target_path'));
+    }
+
+    public static function provideLegacyDefaultOptions(): iterable
+    {
+        yield 'missing use_referer' => [[], null];
+        yield 'missing always_use_default_target_path' => [['use_referer' => true], 'https://localhost/test'];
+    }
+
+    public function testExplicitSuccessTargetPrecedesRetainedReferer()
+    {
+        $httpUtils = new HttpUtils();
+        $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), $httpUtils, ['use_referer' => true], null, 'main');
+        $this->request->headers->set('Referer', 'https://localhost/test');
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+        $this->request->query->set('_target_path', '/chosen');
+        $successHandler = new DefaultAuthenticationSuccessHandler($httpUtils);
+        $successHandler->setFirewallName('main');
+
+        $response = $successHandler->onAuthenticationSuccess($this->request, $this->createStub(TokenInterface::class));
+
+        $this->assertSame('https://localhost/chosen', $response->getTargetUrl());
+        $this->assertSame('https://localhost/test', $this->session->get('_security.main.target_path'));
+    }
+
+    public function testRetainedExternalRefererIsRejectedByDomainRestriction()
+    {
+        $httpUtils = new HttpUtils(null, null, '{^https?://%s$}i');
+        $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), $httpUtils, ['use_referer' => true], null, 'main');
+        $this->request->headers->set('Referer', 'https://external.example/test');
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+        $successHandler = new DefaultAuthenticationSuccessHandler($httpUtils);
+        $successHandler->setFirewallName('main');
+
+        $response = $successHandler->onAuthenticationSuccess($this->request, $this->createStub(TokenInterface::class));
+
+        $this->assertSame('https://localhost/', $response->getTargetUrl());
+        $this->assertFalse($this->session->has('_security.main.target_path'));
+    }
+
+    public function testRefererIsRetainedAfterFailedLogin()
+    {
+        $httpUtils = new HttpUtils();
+        $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), $httpUtils, ['use_referer' => true], null, 'main');
+        $this->request->headers->set('Referer', 'https://localhost/test?filter=value');
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+
+        $this->request->headers->set('Referer', 'https://localhost/login');
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+        $successHandler = new DefaultAuthenticationSuccessHandler($httpUtils, ['use_referer' => true]);
+        $successHandler->setFirewallName('main');
+
+        $response = $successHandler->onAuthenticationSuccess($this->request, $this->createStub(TokenInterface::class));
+
+        $this->assertSame('https://localhost/test', $response->getTargetUrl());
+        $this->assertFalse($this->session->has('_security.main.target_path'));
+    }
+
+    public function testRefererDoesNotReplaceStoredTargetPath()
+    {
+        $this->session->set('_security.main.target_path', 'https://localhost/protected');
+        $this->request->headers->set('Referer', 'https://localhost/test');
+        $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), ['use_referer' => true], null, 'main');
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+
+        $this->assertSame('https://localhost/protected', $this->session->get('_security.main.target_path'));
+    }
+
+    public function testRefererIsNotStoredWhenDisabledOrStateless()
+    {
+        $this->request->headers->set('Referer', 'https://localhost/test');
+        $kernel = $this->createStub(HttpKernelInterface::class);
+
+        $handler = new DefaultAuthenticationFailureHandler($kernel, new HttpUtils(), [], null, 'main');
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+        $this->assertFalse($this->session->has('_security.main.target_path'));
+
+        $handler = new DefaultAuthenticationFailureHandler($kernel, new HttpUtils(), ['use_referer' => true, 'always_use_default_target_path' => true], null, 'main');
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+        $this->assertFalse($this->session->has('_security.main.target_path'));
+
+        $this->request->attributes->set('_stateless', true);
+        $handler = new DefaultAuthenticationFailureHandler($kernel, new HttpUtils(), ['use_referer' => true], null, 'main');
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+        $this->assertFalse($this->session->has('_security.main.target_path'));
+    }
+
+    public function testLoginRefererIsNotStored()
+    {
+        $this->request->headers->set('Referer', 'https://localhost/login?error=1');
+        $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), ['use_referer' => true], null, 'main');
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+
+        $this->assertFalse($this->session->has('_security.main.target_path'));
+    }
+
+    public function testForwardWithRefererAndNoSession()
+    {
+        $request = Request::create('https://localhost/login_check');
+        $request->headers->set('Referer', 'https://localhost/test');
+        $response = new Response();
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $kernel->method('handle')->willReturn($response);
+        $handler = new DefaultAuthenticationFailureHandler($kernel, new HttpUtils(), ['failure_forward' => true, 'use_referer' => true], null, 'main');
+
+        $this->assertSame($response, $handler->onAuthenticationFailure($request, $this->exception));
+        $this->assertFalse($request->hasSession());
     }
 
     public function testForward()

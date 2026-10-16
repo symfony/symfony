@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add a `$firewallName` argument to `DefaultAuthenticationFailureHandler` to retain the referer after failed authentication
  * Allow the issuers announced by the discovery documents when `OidcTokenHandler` is given an empty list of issuers
  * Log the access tokens rejected by `OidcTokenHandler` at the `debug` level instead of `error`
  * Make `FormLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, sending the user back to the login form with their identifier filled in

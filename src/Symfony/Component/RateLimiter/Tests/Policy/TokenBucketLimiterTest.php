@@ -68,6 +68,40 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertFalse($limiter2->consume()->isAccepted());
     }
 
+    public function testChangedRateIsAppliedToStoredBucket()
+    {
+        $limiter = $this->createLimiter(100, Rate::perMinute(20));
+        $limiter->consume(100);
+        sleep(30);
+
+        $limiter = $this->createLimiter(100, Rate::perMinute(1));
+        sleep(30);
+
+        $this->assertSame(1, $limiter->consume(0)->getRemainingTokens());
+    }
+
+    public function testIncreasedBurstSizeIsAppliedToStoredBucket()
+    {
+        $limiter = $this->createLimiter(10, Rate::perMinute(20));
+        $limiter->consume();
+
+        $limiter = $this->createLimiter(20, Rate::perSecond(20));
+        sleep(1);
+
+        $this->assertSame(20, $limiter->consume(0)->getRemainingTokens());
+    }
+
+    public function testChangedConfigurationPreservesReservationDebt()
+    {
+        $limiter = $this->createLimiter(10, Rate::perMinute(10));
+        $limiter->consume(10);
+        $limiter->reserve(10);
+
+        $limiter = $this->createLimiter(10, Rate::perMinute(1));
+
+        $this->assertEquals(660, $limiter->reserve()->getWaitDuration());
+    }
+
     public function testReserveMaxWaitingTime()
     {
         $this->expectException(MaxWaitDurationExceededException::class);

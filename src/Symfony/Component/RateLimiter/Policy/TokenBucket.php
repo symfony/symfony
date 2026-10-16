@@ -92,6 +92,12 @@ final class TokenBucket implements LimiterStateInterface
         return $this->rate->calculateTimeForTokens(max($this->burstSize, $this->burstSize - $this->tokens));
     }
 
+    public function configure(int $burstSize, Rate $rate): void
+    {
+        $this->burstSize = min($burstSize, self::MAX_BURST_SIZE);
+        $this->rate = $rate;
+    }
+
     public function __serialize(): array
     {
         return [

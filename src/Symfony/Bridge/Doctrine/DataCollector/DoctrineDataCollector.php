@@ -19,6 +19,7 @@ use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
@@ -27,10 +28,12 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DoctrineDataCollector extends DataCollector
+class DoctrineDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private array $connections;
     private array $managers;
+    private ?\stdClass $collectState = null;
+    private int $collectIndex = 0;
 
     /**
      * @var array<string, DebugStack>
@@ -68,11 +71,20 @@ class DoctrineDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
+        $this->collectState ??= (object) ['index' => 0];
+        $this->collectIndex = ++$this->collectState->index;
         $this->data = [
             'queries' => $this->collectQueries(),
             'connections' => $this->connections,
             'managers' => $this->managers,
         ];
+    }
+
+    public function lateCollect(): void
+    {
+        if ($this->collectState && $this->collectIndex === $this->collectState->index) {
+            $this->data['queries'] = $this->collectQueries();
+        }
     }
 
     private function collectQueries(): array
@@ -99,6 +111,11 @@ class DoctrineDataCollector extends DataCollector
      */
     public function reset()
     {
+        if ($this->collectState) {
+            $this->collectState->index = 0;
+        }
+        $this->collectState = null;
+        $this->collectIndex = 0;
         $this->data = [];
 
         if (null !== $this->debugDataHolder) {

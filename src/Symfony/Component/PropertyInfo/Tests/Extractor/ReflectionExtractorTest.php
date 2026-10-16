@@ -473,6 +473,40 @@ class ReflectionExtractorTest extends TestCase
         $this->assertEquals(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class));
     }
 
+    public function testExtractTypeFromCamelCaseMutatorForSnakeCaseProperty()
+    {
+        $object = new class {
+            public function setUpdatedAt(\DateTimeInterface $date): void
+            {
+            }
+        };
+
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeInterface::class)], $this->extractor->getTypes($object::class, 'updated_at'));
+    }
+
+    public function testExtractTypeFromCamelCaseAccessorForSnakeCaseProperty()
+    {
+        $object = new class {
+            public function getUpdatedAt(): \DateTimeInterface
+            {
+                return new \DateTimeImmutable();
+            }
+        };
+
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeInterface::class)], $this->extractor->getTypes($object::class, 'updated_at'));
+    }
+
+    public function testExtractTypeFromCamelCaseAdderForSnakeCaseProperty()
+    {
+        $object = new class {
+            public function addImportantDate(\DateTimeInterface $date): void
+            {
+            }
+        };
+
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeInterface::class))], $this->extractor->getTypes($object::class, 'important_dates'));
+    }
+
     public function testPrivatePropertyExtractor()
     {
         $privateExtractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PRIVATE | ReflectionExtractor::ALLOW_PROTECTED);

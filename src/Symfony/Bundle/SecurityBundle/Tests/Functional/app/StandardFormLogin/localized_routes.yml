@@ -22,4 +22,4 @@ security:
                 target: localized_logout_target_path
 
     access_control:
-        - { path: '^/(?:[a-z]{2})/secure/.*', roles: ROLE_USER }
+        - { path: '^/(?:[a-z]{2})/secure/.*', is_granted: ROLE_USER }

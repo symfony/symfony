@@ -19,7 +19,7 @@ security:
                 failure_handler: access_token.failure_handler
 
     access_control:
-        - { path: ^/foo, roles: ROLE_USER }
+        - { path: ^/foo, is_granted: ROLE_USER }
 
 services:
     access_token.success_handler:

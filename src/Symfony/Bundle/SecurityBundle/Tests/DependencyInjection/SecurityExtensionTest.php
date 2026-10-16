@@ -1227,8 +1227,8 @@ class SecurityExtensionTest extends TestCase
                 'main' => ['pattern' => '^/', 'http_basic' => []],
             ],
             'access_control' => [
-                ['path' => '^/admin', 'roles' => 'ROLE_ADMIN', 'methods' => ['GET']],
-                ['path' => '^/upload', 'roles' => 'ROLE_USER', 'methods' => ['POST']],
+                ['path' => '^/admin', 'is_granted' => 'ROLE_ADMIN', 'methods' => ['GET']],
+                ['path' => '^/upload', 'is_granted' => 'ROLE_USER', 'methods' => ['POST']],
             ],
         ]);
         $container->compile();
@@ -1324,7 +1324,7 @@ class SecurityExtensionTest extends TestCase
                 ],
             ],
             'access_control' => [
-                ['ips' => $ips, 'path' => '/somewhere', 'roles' => 'IS_AUTHENTICATED_FULLY'],
+                ['ips' => $ips, 'path' => '/somewhere', 'is_granted' => 'IS_AUTHENTICATED_FULLY'],
             ],
         ]);
 
@@ -1562,7 +1562,7 @@ class SecurityExtensionTest extends TestCase
             ],
             'access_control' => [
                 [],
-                ['path' => '/admin', 'roles' => 'ROLE_ADMIN'],
+                ['path' => '/admin', 'is_granted' => 'ROLE_ADMIN'],
             ],
         ]);
 
@@ -1587,7 +1587,7 @@ class SecurityExtensionTest extends TestCase
             ],
             'access_control' => [
                 ['path' => '^/login'],
-                ['path' => '^/', 'roles' => 'ROLE_USER'],
+                ['path' => '^/', 'is_granted' => 'ROLE_USER'],
             ],
         ]);
 

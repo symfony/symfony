@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `is_granted` option to access control rules and deprecate their `roles` option
+ * Add the `request_attributes` option to access control rules and deprecate their `attributes` option
+
 8.2
 ---
 

@@ -12,12 +12,18 @@
 namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware;
+use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
@@ -59,6 +65,53 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
 
         $middleware = new DoctrineTransactionMiddleware($managerRegistry);
         $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());
+    }
+
+    public function testFailedHandlerDoesNotLeaveEntitiesForLaterTransactions()
+    {
+        $entityManager = DoctrineTestHelper::createTestEntityManager();
+        $connection = $entityManager->getConnection();
+        (new SchemaTool($entityManager))->createSchema([$entityManager->getClassMetadata(SingleIntIdEntity::class)]);
+        $registry = $this->createStub(ManagerRegistry::class);
+        $registry->method('getManager')->willReturn($entityManager);
+        $next = $this->createMock(MiddlewareInterface::class);
+        $failure = new \RuntimeException('Failed handler.');
+        $next->method('handle')->willReturnCallback(static function () use ($entityManager, $failure) {
+            $entityManager->persist(new SingleIntIdEntity(1, 'failed'));
+
+            throw $failure;
+        });
+
+        try {
+            (new DoctrineTransactionMiddleware($registry))->handle(new Envelope(new \stdClass()), new StackMiddleware($next));
+            self::fail('The handler should fail.');
+        } catch (\RuntimeException $e) {
+            self::assertSame($failure, $e);
+        }
+
+        self::assertFalse($entityManager->isOpen());
+        self::assertSame([], $entityManager->getUnitOfWork()->getScheduledEntityInsertions());
+
+        $nextManager = new EntityManager($connection, $entityManager->getConfiguration());
+        $nextManager->persist(new SingleIntIdEntity(2, 'successful'));
+        $nextManager->flush();
+
+        self::assertSame([['id' => 2]], $connection->fetchAllAssociative('SELECT id FROM SingleIntIdEntity'));
+    }
+
+    public function testManagerIsClosedWhenTheTransactionIsAlreadyRolledBack()
+    {
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->method('getConnection')->willReturn($this->connection);
+        $entityManager->expects($this->once())->method('close');
+        $this->connection->method('isTransactionActive')->willReturn(false);
+        $this->connection->expects($this->never())->method('rollBack');
+        $registry = $this->createStub(ManagerRegistry::class);
+        $registry->method('getManager')->willReturn($entityManager);
+
+        $this->expectException(\RuntimeException::class);
+
+        (new DoctrineTransactionMiddleware($registry))->handle(new Envelope(new \stdClass()), $this->getThrowingStackMock());
     }
 
     public function testTransactionIsRolledBackOnException()

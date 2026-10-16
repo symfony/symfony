@@ -69,7 +69,7 @@ class ServicesResetterTest extends TestCase
                 $this->calls[] = ['clear', \func_num_args()];
             }
         };
-        $methods = [['reset' => true], '?missing', ['?missingWithFlag' => true], ['clear' => false], ['reset' => false], 'clear'];
+        $methods = [['reset' => 'flag'], '?missing', ['?missingWithFlag' => 'flag'], ['clear' => null], ['reset' => null], 'clear'];
         $resetMap = null;
         $services = ['service' => $service];
         $resetMethods = ['service' => $methods];
@@ -87,10 +87,42 @@ class ServicesResetterTest extends TestCase
         $this->assertSame([[false, 0], ['clear', 0], [false, 0], ['clear', 0], [true, 1], ['clear', 0], [false, 0], ['clear', 0]], $service->calls);
     }
 
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testShutdownOnlyMethods(bool $nonShared)
+    {
+        $service = new class {
+            public array $calls = [];
+
+            public function close(): void
+            {
+                $this->calls[] = \func_num_args();
+            }
+        };
+        $methods = [['close' => 'only'], ['?missing' => 'only']];
+        $resetMap = null;
+        $services = ['service' => $service];
+        $resetMethods = ['service' => $methods];
+        if ($nonShared) {
+            $resetMap = new \WeakMap();
+            $resetMap[$service] = $methods;
+            $services = $resetMethods = [];
+        }
+        $resetter = new ServicesResetter(new \ArrayIterator($services), $resetMethods, $resetMap);
+
+        $resetter->reset();
+        $resetter->reset();
+        $this->assertSame([], $service->calls);
+
+        $resetter->reset(true);
+        $resetter->reset(true);
+        $this->assertSame([0], $service->calls);
+    }
+
     public function testShutdownThroughContract()
     {
         $service = new ShutdownAwareService();
-        $resetter = new ServicesResetter(new \ArrayIterator(['service' => $service]), ['service' => [['reset' => true]]]);
+        $resetter = new ServicesResetter(new \ArrayIterator(['service' => $service]), ['service' => [['reset' => 'flag']]]);
 
         (static function (ShutdownInterface $resetter) {
             $resetter->reset(true);
@@ -116,7 +148,7 @@ class ServicesResetterTest extends TestCase
                 $this->calls[] = 'clear';
             }
         };
-        $resetter = new ServicesResetter(new \ArrayIterator(['first' => $service, 'second' => $service]), ['first' => [['reset' => false]], 'second' => [['clear' => false]]]);
+        $resetter = new ServicesResetter(new \ArrayIterator(['first' => $service, 'second' => $service]), ['first' => [['reset' => null]], 'second' => [['clear' => null]]]);
 
         $resetter->reset($shutdown);
 

@@ -55,6 +55,7 @@ class KernelTest extends TestCase
         $first = $container->get('non_shared');
         $second = $container->get('non_shared');
         $custom = $container->get('custom');
+        $shutdownOnly = $container->get('shutdown_only');
         $disabled = $container->get('disabled');
         $manual = $container->get('manual');
         $tagged = $container->get('tagged');
@@ -69,6 +70,7 @@ class KernelTest extends TestCase
             $this->assertSame([false], $service->calls);
         }
         $this->assertSame([], $manual->calls);
+        $this->assertSame([], $shutdownOnly->calls);
         $this->assertSame([false], $nestedService->calls);
         $nested->set('service', $nestedService);
 
@@ -78,6 +80,7 @@ class KernelTest extends TestCase
         foreach ([$shared, $first, $second, $custom] as $service) {
             $this->assertSame([false, true], $service->calls);
         }
+        $this->assertSame([false], $shutdownOnly->calls);
         $this->assertSame([false, false], $disabled->calls);
         $this->assertSame([false, false], $tagged->calls);
         $this->assertSame([], $manual->calls);
@@ -255,9 +258,13 @@ class ShutdownFlagKernel extends TestKernel
         $container->register('custom', ShutdownAwareService::class)
             ->setPublic(true)
             ->setShared(false)
-            ->addTag('kernel.reset', ['method' => 'clear', 'with_shutdown' => true]);
+            ->addTag('kernel.reset', ['method' => 'clear', 'on_shutdown' => 'flag']);
+        $container->register('shutdown_only', ShutdownAwareService::class)
+            ->setPublic(true)
+            ->setShared(false)
+            ->addTag('kernel.reset', ['method' => 'clear', 'on_shutdown' => 'only']);
         $container->register('disabled', ShutdownAwareService::class)
             ->setPublic(true)
-            ->addTag('kernel.reset', ['method' => 'reset', 'with_shutdown' => false]);
+            ->addTag('kernel.reset', ['method' => 'reset', 'on_shutdown' => null]);
     }
 }

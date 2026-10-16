@@ -4,7 +4,7 @@ CHANGELOG
 8.2
 ---
 
- * Add the `with_shutdown` attribute on `kernel.reset` tags to pass a shutdown flag to reset methods
+ * Add the `on_shutdown` attribute on `kernel.reset` tags to pass a shutdown flag or call a method only on shutdown
  * Add argument `$shutdown` to `Container::reset()`, `ServicesResetter::reset()` and `ServicesResetterInterface::reset()`
  * Add return type `void` to `ServicesResetterInterface::reset()`
  * Mark `ServicesResetter` as `@final`

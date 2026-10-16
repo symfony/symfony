@@ -49,7 +49,12 @@ class ResettableServicePass implements CompilerPassInterface
                     $attributes['method'] = '?'.$attributes['method'];
                 }
 
-                $method = [$attributes['method'] => $attributes['with_shutdown'] ?? false];
+                $onShutdown = $attributes['on_shutdown'] ?? null;
+                if (null !== $onShutdown && !\in_array($onShutdown, ['flag', 'only'], true)) {
+                    throw new RuntimeException(\sprintf('The "on_shutdown" attribute of tag "kernel.reset" on service "%s" must be "flag" or "only".', $id));
+                }
+
+                $method = [$attributes['method'] => $onShutdown];
 
                 if ($isShared) {
                     $methods[$id][] = $method;

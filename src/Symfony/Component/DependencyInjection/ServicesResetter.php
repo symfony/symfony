@@ -25,8 +25,8 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
 class ServicesResetter implements ServicesResetterInterface
 {
     /**
-     * @param \Traversable<string, object>                           $resettableServices
-     * @param array<string, string|list<string|array<string, bool>>> $resetMethods
+     * @param \Traversable<string, object>                                         $resettableServices
+     * @param array<string, string|list<string|array<string, 'flag'|'only'|null>>> $resetMethods
      */
     public function __construct(
         private \Traversable $resettableServices,
@@ -72,10 +72,14 @@ class ServicesResetter implements ServicesResetterInterface
         }
 
         foreach ($methods as $resetMethod) {
-            $withShutdown = false;
+            $onShutdown = null;
             if (\is_array($resetMethod)) {
-                $withShutdown = reset($resetMethod);
+                $onShutdown = reset($resetMethod);
                 $resetMethod = key($resetMethod);
+            }
+
+            if (!$shutdown && 'only' === $onShutdown) {
+                continue;
             }
 
             if ('?' === $resetMethod[0] && !method_exists($service, $resetMethod = substr($resetMethod, 1))) {
@@ -83,7 +87,7 @@ class ServicesResetter implements ServicesResetterInterface
             }
 
             try {
-                if ($shutdown && $withShutdown) {
+                if ($shutdown && 'flag' === $onShutdown) {
                     $service->$resetMethod(true);
                 } else {
                     $service->$resetMethod();
@@ -95,13 +99,13 @@ class ServicesResetter implements ServicesResetterInterface
         }
     }
 
+    /** @psalm-suppress UndefinedClass */
     private function isUninitializedLazyObject(object $service): bool
     {
         if ($service instanceof LazyObjectInterface && !$service->isLazyObjectInitialized(true)) {
             return true;
         }
 
-        /** @psalm-suppress UndefinedClass */
         if ($service instanceof LazyLoadingInterface && !$service->isProxyInitialized()) {
             return true;
         }

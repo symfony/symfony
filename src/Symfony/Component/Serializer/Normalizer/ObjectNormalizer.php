@@ -82,6 +82,8 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
         // methods
         $class = ($this->objectClassResolver)($object);
         $reflClass = new \ReflectionClass($class);
+        $attributesMetadata = $this->classMetadataFactory?->getMetadataFor($class)->getAttributesMetadata() ?? [];
+        $groups = $this->getGroups($context);
 
         foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
             $name = $reflMethod->name;
@@ -91,7 +93,7 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
                 ? $this->propertyInfoExtractor->getPropertyName($class, $name)
                 : $this->getAttributeNameFromAccessor($reflClass, $reflMethod, false);
 
-            if ($this->hasPropertyForAccessor($reflMethod->getDeclaringClass(), $name) && (null === $attributeName || $this->hasAttributeNameCollision($reflClass, $attributeName, $name))) {
+            if ($this->hasPropertyForAccessor($reflMethod->getDeclaringClass(), $name) && (null === $attributeName || $this->hasAttributeNameCollision($reflClass, $attributeName, $name) || null !== ($attributesMetadata[$name] ?? null)?->getSerializedName($groups))) {
                 $attributeName = $name;
             }
 

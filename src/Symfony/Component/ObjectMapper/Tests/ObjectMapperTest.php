@@ -26,6 +26,9 @@ use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\A;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\CacheKeyCollision\Foo as CacheKeyCollisionFoo;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\CacheKeyCollision\Foobar as CacheKeyCollisionFoobar;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\CacheKeyCollision\Target as CacheKeyCollisionTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassWithoutTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ConditionalConstructorArgument\InputSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ConditionalSourceMap\Address as ConditionalSourceMapAddress;
@@ -1167,5 +1170,13 @@ final class ObjectMapperTest extends TestCase
         $input = (new ObjectMapper())->map(new DirectionlessTransformProduct(), DirectionlessTransformProductInput::class);
 
         $this->assertSame('SF-1', $input->reference);
+    }
+
+    public function testPropertyMetadataDoesNotLeakIntoAClassWhoseNameStartsWithTheSameClass()
+    {
+        $mapper = new ObjectMapper();
+
+        $this->assertSame('foo', $mapper->map(new CacheKeyCollisionFoo(), CacheKeyCollisionTarget::class)->name);
+        $this->assertSame('foobar', $mapper->map(new CacheKeyCollisionFoobar())->name);
     }
 }

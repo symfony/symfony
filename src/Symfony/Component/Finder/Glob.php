@@ -104,6 +104,8 @@ class Glob
                 }
 
                 continue;
+            } elseif ($escaping && ('[' === $car || ']' === $car)) {
+                $regex .= '\\'.$car;
             } else {
                 $regex .= $car;
             }

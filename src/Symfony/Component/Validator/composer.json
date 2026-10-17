@@ -40,6 +40,7 @@
         "symfony/process": "^7.4|^8.0",
         "symfony/property-access": "^7.4|^8.0",
         "symfony/property-info": "^7.4|^8.0",
+        "symfony/routing": "^7.4|^8.0",
         "symfony/string": "^7.4|^8.0",
         "symfony/translation": "^7.4|^8.0",
         "symfony/type-info": "^7.4|^8.0",

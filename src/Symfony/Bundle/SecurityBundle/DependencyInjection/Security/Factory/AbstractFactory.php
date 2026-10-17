@@ -42,6 +42,8 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
         'failure_forward' => false,
         'login_path' => '/login',
         'failure_path_parameter' => '_failure_path',
+        'use_referer' => false,
+        'always_use_default_target_path' => false,
     ];
 
     final public function addOption(string $name, mixed $default = null): void
@@ -93,6 +95,7 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
 
     protected function createAuthenticationFailureHandler(ContainerBuilder $container, string $id, array $config): string
     {
+        $firewallName = $id;
         $id = $this->getFailureHandlerId($id);
         $options = array_intersect_key($config, $this->defaultFailureHandlerOptions);
 
@@ -103,6 +106,7 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
         } else {
             $failureHandler = $container->setDefinition($id, new ChildDefinition('security.authentication.failure_handler'));
             $failureHandler->addMethodCall('setOptions', [$options]);
+            $failureHandler->replaceArgument(4, $firewallName);
         }
 
         return $id;

@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 /**
  * Class with the default authentication failure handling logic.
@@ -32,12 +33,16 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  */
 class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandlerInterface
 {
+    use TargetPathTrait;
+
     protected array $options;
     protected array $defaultOptions = [
         'failure_path' => null,
         'failure_forward' => false,
         'login_path' => '/login',
         'failure_path_parameter' => '_failure_path',
+        'use_referer' => false,
+        'always_use_default_target_path' => false,
     ];
 
     public function __construct(
@@ -45,6 +50,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
         protected HttpUtils $httpUtils,
         array $options = [],
         protected ?LoggerInterface $logger = null,
+        private readonly ?string $firewallName = null,
     ) {
         $this->setOptions($options);
     }
@@ -65,6 +71,16 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         $options = $this->options;
+
+        if (($options['use_referer'] ?? false) && !($options['always_use_default_target_path'] ?? false) && null !== $this->firewallName && !$request->attributes->getBoolean('_stateless') && $request->hasSession() && !$this->getTargetPath($request->getSession(), $this->firewallName)) {
+            $referer = $request->headers->get('Referer');
+            if (null !== $referer && false !== $pos = strpos($referer, '?')) {
+                $referer = substr($referer, 0, $pos);
+            }
+            if ($referer && $referer !== $this->httpUtils->generateUri($request, $options['login_path'])) {
+                $this->saveTargetPath($request->getSession(), $this->firewallName, $referer);
+            }
+        }
 
         if ($options['failure_forward']) {
             $options['failure_path'] ??= $options['login_path'];

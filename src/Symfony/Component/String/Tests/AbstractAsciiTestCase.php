@@ -803,6 +803,11 @@ abstract class AbstractAsciiTestCase extends TestCase
                 "    Symfony     IS GREAT\t!!!  \n",
                 ' ',
             ],
+            [
+                '[+|]',
+                '[+|]',
+                '',
+            ],
         ];
     }
 
@@ -850,6 +855,11 @@ abstract class AbstractAsciiTestCase extends TestCase
                 "\n\t<span>Symfony is a PHP framework</span>\n",
                 "\n",
             ],
+            [
+                '[+|]',
+                '[+|]',
+                '',
+            ],
         ];
     }
 
@@ -883,6 +893,11 @@ abstract class AbstractAsciiTestCase extends TestCase
                 "\n\t<span>Symfony is a PHP framework</span>  \n",
                 "\n\t<span>Symfony is a PHP framework</span>  \n",
                 ' ',
+            ],
+            [
+                '[+|]',
+                '[+|]',
+                '',
             ],
         ];
     }

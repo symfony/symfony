@@ -374,6 +374,9 @@ abstract class AbstractUnicodeString extends AbstractString
 
     public function trim(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}"): static
     {
+        if ('' === $chars) {
+            return clone $this;
+        }
         if (" \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}" === $chars) {
             $chars = preg_quote($chars);
         } elseif (false === $ranges = preg_match('/\.\./u', $chars)) {
@@ -390,6 +393,9 @@ abstract class AbstractUnicodeString extends AbstractString
 
     public function trimEnd(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}"): static
     {
+        if ('' === $chars) {
+            return clone $this;
+        }
         if (" \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}" === $chars) {
             $chars = preg_quote($chars);
         } elseif (false === $ranges = preg_match('/\.\./u', $chars)) {
@@ -426,6 +432,9 @@ abstract class AbstractUnicodeString extends AbstractString
 
     public function trimStart(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}"): static
     {
+        if ('' === $chars) {
+            return clone $this;
+        }
         if (" \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}" === $chars) {
             $chars = preg_quote($chars);
         } elseif (false === $ranges = preg_match('/\.\./u', $chars)) {

@@ -175,7 +175,7 @@ class WebDebugToolbarStreamedResponseListenerTest extends TestCase
     {
         $templating = $this->createStub(Environment::class);
         $templating->method('render')
-            ->willReturn($render);
+            ->willReturnCallback(static fn (string $template) => '@WebProfiler/Profiler/ajax_interceptor.html.twig' === $template ? '' : $render);
 
         return $templating;
     }

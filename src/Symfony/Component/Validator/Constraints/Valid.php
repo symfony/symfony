@@ -31,6 +31,8 @@ class Valid extends Constraint
      * @param bool|null     $restrictGroups Whether $groups also restrict the groups the nested object is validated
      *                                      against; when false they only decide when to cascade, and the nested
      *                                      object is validated against the groups being validated (defaults to true)
+     *
+     * @stable-parameter-names
      */
     public function __construct(?array $options = null, ?array $groups = null, $payload = null, ?bool $traverse = null, ?bool $restrictGroups = null)
     {

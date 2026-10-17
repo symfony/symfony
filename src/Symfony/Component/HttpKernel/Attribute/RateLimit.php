@@ -40,6 +40,8 @@ final class RateLimit
      * @param string[]|string                 $methods       HTTP methods to rate limit; empty means all methods
      * @param bool                            $exposeHeaders Whether this limiter's state may be exposed via the `X-RateLimit-*` response headers, opt-in
      * @param bool|Expression|\Closure        $if            Whether the rate limit applies: a boolean, or an Expression or a Closure evaluating to one
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly string $limiter,

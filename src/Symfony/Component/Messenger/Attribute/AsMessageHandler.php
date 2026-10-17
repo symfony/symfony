@@ -19,6 +19,9 @@ namespace Symfony\Component\Messenger\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class AsMessageHandler
 {
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         /**
          * Name of the bus from which this handler can receive messages, by default all buses.

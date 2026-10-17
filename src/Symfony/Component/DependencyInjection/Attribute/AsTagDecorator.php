@@ -27,6 +27,8 @@ class AsTagDecorator
      * @param ContainerInterface::*_REFERENCE $onInvalid The behavior to adopt when no services have the tag; must be one of the {@see ContainerInterface} constants
      * @param string|list<string>|null        $within    Decorators of the tagged services that wrap this one, as service ids or classes
      * @param string|list<string>|null        $around    Decorators of the tagged services that this one wraps, as service ids or classes
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $tag,

@@ -28,6 +28,8 @@ class ServerEvent implements \IteratorAggregate
      *                                         before reconnecting in case of network failure
      * @param string|null             $id      The event ID to set the EventSource object's last event ID value
      * @param string|null             $comment The event comment
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         private string|iterable $data,

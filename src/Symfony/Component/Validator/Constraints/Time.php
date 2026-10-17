@@ -36,6 +36,8 @@ class Time extends Constraint
     /**
      * @param string[]|null $groups
      * @param bool|null     $withSeconds Whether to allow seconds in the given value (defaults to true)
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

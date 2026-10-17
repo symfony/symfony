@@ -28,6 +28,9 @@ abstract class AbstractComparison extends Constraint
     public mixed $value = null;
     public ?string $propertyPath = null;
 
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(mixed $value = null, ?string $propertyPath = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
         parent::__construct(null, $groups, $payload);

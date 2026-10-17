@@ -23,6 +23,8 @@ class FormField
      * @param class-string|null    $type    The form type of the field, guessed when null
      * @param array<string, mixed> $options The options of the field
      * @param string|null          $name    The name of the field, defaults to the property name
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public ?string $type = null,

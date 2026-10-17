@@ -38,6 +38,8 @@ class Locale extends Constraint
     /**
      * @param bool|null     $canonicalize Whether to canonicalize the value before validation (defaults to true) (see {@see https://www.php.net/manual/en/locale.canonicalize.php})
      * @param string[]|null $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

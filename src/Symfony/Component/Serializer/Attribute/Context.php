@@ -28,6 +28,8 @@ class Context
      * @param string|string[]      $groups                 The groups to use when serializing or deserializing
      *
      * @throws InvalidArgumentException
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly array $context = [],

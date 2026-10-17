@@ -71,6 +71,8 @@ class Cookie
      * @see self::__construct
      *
      * @param self::SAMESITE_*|''|null $sameSite
+     *
+     * @stable-parameter-names
      */
     public static function create(string $name, ?string $value = null, int|string|\DateTimeInterface $expire = 0, ?string $path = '/', ?string $domain = null, ?bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX, bool $partitioned = false): self
     {
@@ -89,6 +91,8 @@ class Cookie
      * @param self::SAMESITE_*|''|null      $sameSite Whether the cookie will be available for cross-site requests
      *
      * @throws \InvalidArgumentException
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         protected string $name,

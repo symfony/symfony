@@ -42,6 +42,8 @@ class AsRoutingConditionService
     /**
      * @param string|null $alias    The alias of the service to use it in routing condition expressions
      * @param int         $priority Defines a priority that allows the routing condition service to override a service with the same alias
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public ?string $alias = null,

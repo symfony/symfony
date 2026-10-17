@@ -47,6 +47,8 @@ class Timezone extends Constraint
      * @param string[]|null $groups
      *
      * @see \DateTimeZone
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?int $zone = null,

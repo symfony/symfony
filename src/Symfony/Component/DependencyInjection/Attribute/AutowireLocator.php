@@ -32,6 +32,8 @@ class AutowireLocator extends Autowire
      * @param string|null                                     $indexAttribute The name of the attribute that defines the key referencing each service in the locator
      * @param string|string[]                                 $exclude        A service id or a list of service ids to exclude
      * @param bool                                            $excludeSelf    Whether to automatically exclude the referencing service from the locator
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         string|array $services,

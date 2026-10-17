@@ -24,6 +24,8 @@ class SerializedName
     /**
      * @param string       $serializedName The name of the property as it will be serialized
      * @param string|array $groups         The groups to use when serializing or deserializing
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly string $serializedName,

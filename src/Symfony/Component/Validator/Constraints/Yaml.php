@@ -30,6 +30,8 @@ class Yaml extends Constraint
     /**
      * @param int-mask-of<\Symfony\Component\Yaml\Yaml::PARSE_*> $flags
      * @param string[]|null                                      $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $message = 'This value is not valid YAML.',

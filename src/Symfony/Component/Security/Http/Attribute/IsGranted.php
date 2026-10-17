@@ -34,6 +34,8 @@ class IsGranted
      * @param int|null                                                                           $statusCode    If set, will throw HttpKernel's HttpException with the given $statusCode; if null, Security\Core's AccessDeniedException will be used
      * @param int|null                                                                           $exceptionCode If set, will add the exception code to thrown exception
      * @param string[]|string                                                                    $methods       HTTP methods to apply validation to. Empty array means all methods are allowed
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string|Expression|\Closure $attribute,

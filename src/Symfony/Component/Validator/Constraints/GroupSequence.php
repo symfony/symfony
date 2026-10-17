@@ -83,6 +83,8 @@ class GroupSequence
      * @param array<string|string[]|GroupSequence> $groups              The groups in the sequence
      * @param bool                                 $cascadeCurrentGroup Whether to also cascade the current sequence
      *                                                                  group to referenced objects, on top of "Default"
+     *
+     * @stable-parameter-names
      */
     public function __construct(array $groups, bool $cascadeCurrentGroup = false)
     {

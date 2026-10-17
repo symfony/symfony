@@ -119,6 +119,8 @@ class Audio extends File
      * @param string[]|null            $groups
      *
      * @see https://www.iana.org/assignments/media-types/media-types.xhtml Existing media types
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         int|string|null $maxSize = null,

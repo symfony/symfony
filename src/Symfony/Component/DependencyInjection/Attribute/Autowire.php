@@ -36,6 +36,8 @@ class Autowire
      * @param string|null                         $env        Environment variable name (ie 'SOME_ENV_VARIABLE')
      * @param string|null                         $param      Parameter name (ie 'some.parameter.name')
      * @param bool|class-string|class-string[]    $lazy       Whether to use lazy-loading for this argument
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         string|array|ArgumentInterface|null $value = null,

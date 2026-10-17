@@ -16,6 +16,9 @@ use Symfony\Component\PropertyInfo\Exception\LogicException;
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class WithAccessors
 {
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         public readonly ?string $getter = null,
         public readonly ?string $setter = null,

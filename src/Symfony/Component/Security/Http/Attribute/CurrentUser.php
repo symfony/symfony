@@ -23,6 +23,8 @@ class CurrentUser extends ValueResolver
     /**
      * @param bool   $disabled Whether this value resolver is disabled, which allows to enable a value resolver globally while disabling it in specific cases
      * @param string $resolver The class name of the resolver to use
+     *
+     * @stable-parameter-names
      */
     public function __construct(bool $disabled = false, string $resolver = UserValueResolver::class)
     {

@@ -42,6 +42,8 @@ final class Configuration
      * @param string|null                                                 $format            The serializer format (e.g. "json"), unrelated to the dialect
      * @param Direction|null                                              $direction         Null to describe both the input and the output with readOnly and writeOnly keywords
      * @param array<string, mixed>                                        $context           Options for the extensions and the PropertyInfo extractors, for example the API operation being documented
+     *
+     * @optional-arguments-by-name
      */
     public function __construct(
         ?Dialect $dialect = null,

@@ -125,6 +125,8 @@ class Video extends File
      * @param string[]|null            $allowedContainers           Allowed container names
      *
      * @see https://www.iana.org/assignments/media-types/media-types.xhtml Existing media types
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         int|string|null $maxSize = null,

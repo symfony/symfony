@@ -48,6 +48,8 @@ class Email extends Constraint
     /**
      * @param self::VALIDATION_MODE_*|null $mode   The pattern used to validate the email address; pass null to use the default mode configured for the EmailValidator
      * @param string[]|null                $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

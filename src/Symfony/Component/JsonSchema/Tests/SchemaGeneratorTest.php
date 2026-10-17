@@ -236,7 +236,7 @@ class SchemaGeneratorTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The definitions of this document are referenced as "#/$defs/", they cannot also be referenced as "#/components/schemas/".');
 
-        SchemaGenerator::create()->generate(Type::object(Author::class), new Configuration(Dialect::openApi31()), $document);
+        SchemaGenerator::create()->generate(Type::object(Author::class), new Configuration(dialect: Dialect::openApi31()), $document);
     }
 
     public function testExtensionsDescribeOtherTypesInTheDocument()
@@ -259,7 +259,13 @@ class SchemaGeneratorTest extends TestCase
 
     public function testCreateAddsTheGivenExtensions()
     {
-        $generator = SchemaGenerator::create(new ConstantNameDefinitionPolicy('Shape'), [new IriReferenceClassSchemaResolver(Author::class)], [new FixedPropertySchemaProvider(BookWithAuthors::class, 'title', ['type' => 'string', 'format' => 'isbn'])], [new MarkingPropertySchemaEnricher()], [new RecordingDefinitionProcessor('custom')]);
+        $generator = SchemaGenerator::create(
+            definitionPolicy: new ConstantNameDefinitionPolicy('Shape'),
+            classSchemaResolvers: [new IriReferenceClassSchemaResolver(Author::class)],
+            propertySchemaProviders: [new FixedPropertySchemaProvider(BookWithAuthors::class, 'title', ['type' => 'string', 'format' => 'isbn'])],
+            propertySchemaEnrichers: [new MarkingPropertySchemaEnricher()],
+            definitionProcessors: [new RecordingDefinitionProcessor('custom')],
+        );
 
         $schema = $generator->generate(Type::object(BookWithAuthors::class));
         $definition = $schema->getDefinitions()['Shape'];
@@ -272,7 +278,7 @@ class SchemaGeneratorTest extends TestCase
 
     public function testCreateRunsTheGivenEnrichersAfterTheBuiltInOnes()
     {
-        $generator = SchemaGenerator::create(null, [], [], [new FixedSchemaPropertySchemaEnricher(['type' => 'string'])]);
+        $generator = SchemaGenerator::create(propertySchemaEnrichers: [new FixedSchemaPropertySchemaEnricher(['type' => 'string'])]);
 
         $definition = $generator->generate(Type::object(DocumentedArticle::class))->getDefinitions()['DocumentedArticle'];
 
@@ -281,7 +287,7 @@ class SchemaGeneratorTest extends TestCase
 
     public function testCreateRunsTheGivenResolversBeforeTheBuiltInOnes()
     {
-        $generator = SchemaGenerator::create(null, [new IriReferenceClassSchemaResolver(\DateTimeImmutable::class)]);
+        $generator = SchemaGenerator::create(classSchemaResolvers: [new IriReferenceClassSchemaResolver(\DateTimeImmutable::class)]);
 
         $properties = $generator->generate(Type::object(NativeObjectProperties::class))->getDefinitions()['NativeObjectProperties']['properties'];
 
@@ -381,7 +387,7 @@ class SchemaGeneratorTest extends TestCase
 
     public function testReferenceSiblingsAreWrappedInAllOfForOpenApi30()
     {
-        $definition = SchemaGenerator::create()->generate(Type::object(AuthorSpotlight::class), new Configuration(Dialect::openApi30()))->getDefinitions()['AuthorSpotlight'];
+        $definition = SchemaGenerator::create()->generate(Type::object(AuthorSpotlight::class), new Configuration(dialect: Dialect::openApi30()))->getDefinitions()['AuthorSpotlight'];
 
         $this->assertSameSchema([
             'allOf' => [['$ref' => '#/components/schemas/Author']],
@@ -392,7 +398,7 @@ class SchemaGeneratorTest extends TestCase
 
     public function testReferenceSiblingsAreKeptForOpenApi31()
     {
-        $definition = SchemaGenerator::create()->generate(Type::object(AuthorSpotlight::class), new Configuration(Dialect::openApi31()))->getDefinitions()['AuthorSpotlight'];
+        $definition = SchemaGenerator::create()->generate(Type::object(AuthorSpotlight::class), new Configuration(dialect: Dialect::openApi31()))->getDefinitions()['AuthorSpotlight'];
 
         $this->assertSameSchema([
             '$ref' => '#/components/schemas/Author',
@@ -523,7 +529,15 @@ class SchemaGeneratorTest extends TestCase
 
     public function testUnsupportedNullSyntaxDropsNullability()
     {
-        $schema = SchemaGenerator::create()->generate(Type::object(BookWithAuthors::class), new Configuration(new Dialect('#/definitions/', NullSyntax::Unsupported, false, false, false, false)));
+        $dialect = new Dialect(
+            '#/definitions/',
+            NullSyntax::Unsupported,
+            supportsConst: false,
+            supportsNumericExclusiveBounds: false,
+            supportsExamples: false,
+            supportsRefSiblings: false,
+        );
+        $schema = SchemaGenerator::create()->generate(Type::object(BookWithAuthors::class), new Configuration(dialect: $dialect));
 
         $this->assertSameSchema(['$ref' => '#/definitions/Author'], $schema->getDefinitions()['BookWithAuthors']['properties']['coAuthor']);
     }
@@ -920,7 +934,7 @@ class SchemaGeneratorTest extends TestCase
 
     public function testDiscriminatorBranchesWrapTheReferenceForOpenApi30()
     {
-        $schema = SchemaGenerator::create()->generate(Type::object(Shape::class), new Configuration(Dialect::openApi30()));
+        $schema = SchemaGenerator::create()->generate(Type::object(Shape::class), new Configuration(dialect: Dialect::openApi30()));
 
         $this->assertSameSchema(['allOf' => [['$ref' => '#/components/schemas/Circle']], 'required' => ['kind']], $schema->getRoot()['anyOf'][0]);
         $this->assertSameSchema(['type' => 'string', 'enum' => ['circle']], $schema->getDefinitions()['Circle']['properties']['kind']);

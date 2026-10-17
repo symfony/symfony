@@ -26,6 +26,9 @@ final class Charset extends Constraint
         self::BAD_ENCODING_ERROR => 'BAD_ENCODING_ERROR',
     ];
 
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         public array|string $encodings = [],
         public string $message = 'The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.',

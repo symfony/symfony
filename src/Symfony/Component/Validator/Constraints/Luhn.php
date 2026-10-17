@@ -38,6 +38,8 @@ class Luhn extends Constraint
 
     /**
      * @param string[]|null $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

@@ -49,6 +49,8 @@ class Ulid extends Constraint
     /**
      * @param string[]|null       $groups
      * @param self::FORMAT_*|null $format
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

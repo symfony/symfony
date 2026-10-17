@@ -32,6 +32,8 @@ final class MapQueryParameter extends ValueResolver
      * @param int-mask-of<(FILTER_FLAG_*)|FILTER_NULL_ON_FAILURE> $flags
      * @param array{min_range?: int|float, max_range?: int|float, regexp?: string, ...} $options
      * @param class-string<ValueResolverInterface>|string         $resolver The name of the resolver to use
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public ?string $name = null,

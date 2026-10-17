@@ -37,6 +37,8 @@ class When extends Composite
      * @param array<string,mixed>|null     $values      The values of the custom variables used in the expression (defaults to [])
      * @param string[]|null                $groups
      * @param Constraint[]|Constraint      $otherwise   One or multiple constraints that are applied if the expression returns false
+     *
+     * @stable-parameter-names
      */
     public function __construct(string|Expression|\Closure $expression, array|Constraint|null $constraints = null, ?array $values = null, ?array $groups = null, $payload = null, ?array $options = null, array|Constraint $otherwise = [])
     {

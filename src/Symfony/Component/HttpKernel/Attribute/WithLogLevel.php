@@ -23,6 +23,8 @@ final class WithLogLevel
 {
     /**
      * @param LogLevel::* $level The level to use to log the exception
+     *
+     * @stable-parameter-names
      */
     public function __construct(public readonly string $level)
     {

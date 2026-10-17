@@ -34,6 +34,9 @@ class Xml extends Constraint
         self::TOO_LARGE_ERROR => 'TOO_LARGE_ERROR',
     ];
 
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         public string $formatMessage = 'This value is not valid XML.',
         public string $schemaMessage = 'This value does not conform to the expected XSD schema.',

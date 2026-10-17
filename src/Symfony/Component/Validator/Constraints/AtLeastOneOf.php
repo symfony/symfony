@@ -39,6 +39,8 @@ class AtLeastOneOf extends Composite
      * @param string|null            $message                 Intro of the failure message that will be followed by the failed constraint(s) message(s)
      * @param string|null            $messageCollection       Failure message for All and Collection inner constraints
      * @param bool|null              $includeInternalMessages Whether to include inner constraint messages (defaults to true)
+     *
+     * @stable-parameter-names
      */
     public function __construct(array|Constraint|null $constraints = null, ?array $groups = null, mixed $payload = null, ?string $message = null, ?string $messageCollection = null, ?bool $includeInternalMessages = null)
     {

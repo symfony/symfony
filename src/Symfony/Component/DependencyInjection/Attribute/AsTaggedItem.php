@@ -24,6 +24,8 @@ class AsTaggedItem
      * @param int|null                 $priority The priority of the service, higher first; null lets "before"/"after" decide it, else they only reorder within that priority
      * @param string|list<string>|null $before   Service ids or classes this service must be placed before
      * @param string|list<string>|null $after    Service ids or classes this service must be placed after
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public ?string $index = null,

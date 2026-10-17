@@ -32,6 +32,8 @@ final class WordCount extends Constraint
     /**
      * @param int<0, max>|null  $min
      * @param positive-int|null $max
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public ?int $min = null,

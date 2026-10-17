@@ -39,6 +39,8 @@ class Unique extends Constraint
     /**
      * @param string[]|null        $groups
      * @param string[]|string|null $fields Defines the key or keys in the collection that should be checked for uniqueness (defaults to null, which ensure uniqueness for all keys)
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

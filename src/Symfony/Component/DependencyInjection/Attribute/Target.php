@@ -24,6 +24,8 @@ final class Target
 {
     /**
      * @param string|null $name The name of the target autowiring alias
+     *
+     * @stable-parameter-names
      */
     public function __construct(public ?string $name = null)
     {

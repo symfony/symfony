@@ -25,6 +25,9 @@ namespace Symfony\Bridge\PhpUnit\Attribute;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS)]
 final class UseRecord
 {
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         public readonly ?string $record = null,
     ) {

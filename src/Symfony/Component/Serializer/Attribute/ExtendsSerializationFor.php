@@ -24,6 +24,8 @@ final class ExtendsSerializationFor
 {
     /**
      * @param class-string $class
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $class,

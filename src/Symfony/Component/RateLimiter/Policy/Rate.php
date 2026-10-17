@@ -30,6 +30,10 @@ final class Rate
 
     public function __construct(\DateInterval $refillTime, int $refillAmount = 1)
     {
+        if (TimeUtil::dateIntervalToSeconds($refillTime) < 1) {
+            throw new \InvalidArgumentException('The refill interval must be at least one second.');
+        }
+
         $this->refillTime = $refillTime;
         $this->refillAmount = $refillAmount;
     }

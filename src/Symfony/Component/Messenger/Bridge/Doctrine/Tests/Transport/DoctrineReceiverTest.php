@@ -13,6 +13,8 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\DBAL\Exception\DeadlockException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresFunction;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
@@ -436,6 +438,30 @@ class DoctrineReceiverTest extends TestCase
                 'Content-Type' => 'application/json',
             ],
         ];
+    }
+
+    #[DataProvider('provideFetchResultsWithoutSignalDispatch')]
+    #[RequiresFunction('pcntl_async_signals')]
+    #[RequiresFunction('proc_open')]
+    public function testItFetchesWhenSignalDispatchIsDisabled(string $result, bool $asyncSignals)
+    {
+        $process = proc_open([\PHP_BINARY, '-d', 'disable_functions=pcntl_signal_dispatch', __DIR__.'/../Fixtures/receive_without_signal_dispatch.php', $result, (string) (int) $asyncSignals], [1 => ['pipe', 'w'], 2 => ['redirect', 1]], $pipes);
+        $this->assertIsResource($process);
+
+        $output = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+
+        $this->assertSame(0, proc_close($process), $output);
+        $this->assertSame("Signal dispatch disabled\n".$result."\nSignal state preserved\n", $output);
+    }
+
+    public static function provideFetchResultsWithoutSignalDispatch(): iterable
+    {
+        foreach ([false, true] as $asyncSignals) {
+            foreach (['empty', 'message', 'retryable', 'exception'] as $result) {
+                yield $result.($asyncSignals ? ' with async signals' : ' without async signals') => [$result, $asyncSignals];
+            }
+        }
     }
 
     #[RequiresPhpExtension('pcntl')]

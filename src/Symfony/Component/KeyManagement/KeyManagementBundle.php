@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping\MappedSuperclass;
 use Symfony\Bridge\Doctrine\SchemaListener\AbstractSchemaListener;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -34,7 +35,7 @@ use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
-use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterBlindIndexesPass;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterEncryptedColumnsPass;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener;
@@ -70,18 +71,6 @@ class KeyManagementBundle extends AbstractBundle
         return $this->path ??= __DIR__;
     }
 
-    /**
-     * Declares the encrypted Doctrine DBAL types when no DoctrineBundle connection declares them.
-     *
-     * They must be known before any entry point runs its first query.
-     */
-    public function boot(): void
-    {
-        if ($this->container->has('key_management.doctrine_dbal.encrypted_types')) {
-            $this->container->get('key_management.doctrine_dbal.encrypted_types')->register();
-        }
-    }
-
     public function build(ContainerBuilder $container): void
     {
         // the container can drop the data collector this pass looks for, so run after it
@@ -99,8 +88,8 @@ class KeyManagementBundle extends AbstractBundle
             $container->addCompilerPass(new RegisterEncryptedColumnsPass());
         }
 
-        // after RegisterEncryptedColumnsPass, which adds the types of the encrypted columns
-        $container->addCompilerPass(new RegisterDoctrineDbalTypesPass());
+        // after RegisterEncryptedColumnsPass and the passes that add mapping drivers, before the pass of DoctrineBundle that reads the "doctrine.dbal.type" tag at priority -10
+        $container->addCompilerPass(new RegisterDoctrineDbalTypesPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -5);
     }
 
     public function configure(DefinitionConfigurator $definition): void
@@ -476,27 +465,27 @@ class KeyManagementBundle extends AbstractBundle
     }
 
     /**
-     * Registers the service that declares the encrypted Doctrine DBAL types.
+     * Registers the encrypted Doctrine DBAL types, which RegisterDoctrineDbalTypesPass declares on the connections of DoctrineBundle.
      *
-     * Each DoctrineBundle connection declares the types when it's created, see RegisterDoctrineDbalTypesPass.
-     * Without DoctrineBundle, boot() declares them.
+     * The types are listed in the ".key_management.doctrine_dbal.types" parameter, and each one is built from the ".key_management.doctrine_dbal.encrypted_type" definition.
      * They encrypt with the encrypter the envelope interfaces resolve to: the store-backed one when a store is configured, the default client's otherwise.
-     * They get a lazy proxy of that encrypter, so that declaring the types doesn't create the store and its database connection.
+     * They get a lazy proxy of that encrypter, so that building a type doesn't create the store and its database connection.
      *
-     * With the Doctrine ORM bridge, they are registered even when none is configured.
-     * RegisterEncryptedColumnsPass then adds the types of the columns marked with #[Encrypted], and removes the service when there is none.
+     * With the Doctrine ORM bridge, the parameter is registered even when no type is configured.
+     * RegisterEncryptedColumnsPass then adds the types of the columns marked with #[Encrypted].
      *
      * @param array<string, array{type: string, key: string}> $types
      */
     private function registerDoctrineDbalTypes(array $types, ?string $encrypter, ContainerBuilder $container): void
     {
         if ($types) {
-            if (!ContainerBuilder::willBeAvailable('symfony/doctrine-dbal-key-management', EncryptedTypes::class, ['symfony/key-management'])) {
-                throw new LogicException('Configuring "key_management.doctrine_dbal.types" requires the "symfony/doctrine-dbal-key-management" package. Try running "composer require symfony/doctrine-dbal-key-management".');
-            }
-
+            // EncryptedType extends a class of doctrine/dbal, so loading it without that package is a fatal error
             if (!ContainerBuilder::willBeAvailable('doctrine/dbal', Type::class, ['symfony/doctrine-dbal-key-management', 'symfony/key-management'])) {
                 throw new LogicException('Configuring "key_management.doctrine_dbal.types" requires the "doctrine/dbal" package. Try running "composer require doctrine/dbal".');
+            }
+
+            if (!ContainerBuilder::willBeAvailable('symfony/doctrine-dbal-key-management', EncryptedType::class, ['symfony/key-management'])) {
+                throw new LogicException('Configuring "key_management.doctrine_dbal.types" requires the "symfony/doctrine-dbal-key-management" package. Try running "composer require symfony/doctrine-dbal-key-management".');
             }
 
             if (null === $encrypter) {
@@ -506,8 +495,9 @@ class KeyManagementBundle extends AbstractBundle
             return;
         }
 
-        $container->register('key_management.doctrine_dbal.encrypted_types', EncryptedTypes::class)
-            ->setArguments([new LazyProxyArgument(new Reference($encrypter)), $types])
-            ->setPublic(true);
+        $container->register('.key_management.doctrine_dbal.encrypted_type', EncryptedType::class)
+            ->setAbstract(true)
+            ->setArguments([new AbstractArgument('the parent type'), new LazyProxyArgument(new Reference($encrypter)), new AbstractArgument('the key')]);
+        $container->setParameter('.key_management.doctrine_dbal.types', $types);
     }
 }

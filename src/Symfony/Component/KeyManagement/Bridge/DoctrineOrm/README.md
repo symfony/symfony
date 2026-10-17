@@ -39,23 +39,29 @@ The listener gets the names of the types, by key and by the type they wrap:
 
 ```php
 use Doctrine\DBAL\Types\StringType;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\TypeRegistry;
 use Doctrine\ORM\Events;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 
-Type::getTypeRegistry()->register('app_speaker_contact', new EncryptedType(new StringType(), $encrypter, 'speaker.contact'));
+$connectionConfiguration->setTypeProvider(new TypeRegistry([
+    'app_speaker_contact' => new EncryptedType(new StringType(), $encrypter, 'speaker.contact'),
+]));
 
 $eventManager->addEventListener(Events::loadClassMetadata, new EncryptedColumnListener([
     'speaker.contact' => ['string' => 'app_speaker_contact'],
 ]));
 ```
 
+The ORM resolves the types through the connection since doctrine/orm 3.8.
+With an older version, register them on the global type registry instead.
+
 Loading the metadata of a class fails when no encrypted type is registered for the key and the type of a column.
 It also fails when the attribute is on a property that is not a mapped column.
 
-In a Symfony application, the `KeyManagementBundle` registers the types when DoctrineBundle creates a connection.
+In a Symfony application, the `KeyManagementBundle` registers the types for you.
 When the container is compiled, the bundle finds the `#[Encrypted]` columns and registers one type per key and type.
+DoctrineBundle then declares each type on the connections of the entity managers that map its columns.
 It looks for these columns in the entities, embeddables and mapped superclasses found in the `resource` directories of your services.
 With the default `App\:` resource, this covers `src/Entity/`.
 The types encrypt with the encrypter `EnvelopeEncrypterInterface` resolves to, like the ones of `key_management.doctrine_dbal.types`.

@@ -11,18 +11,21 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests;
 
+use Doctrine\DBAL\Configuration as DbalConfiguration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Types\StringType;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\TypeRegistry;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Internal\TypeProviderLocator;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Tools\SchemaTool;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -40,6 +43,8 @@ use Symfony\Component\KeyManagement\Test\InMemoryKms;
  * back with it.
  */
 #[RequiresPhpExtension('pdo_sqlite')]
+#[RequiresMethod(DbalConfiguration::class, 'setTypeProvider')]
+#[RequiresMethod(TypeProviderLocator::class, 'fromConnection')]
 class EncryptedColumnTest extends TestCase
 {
     private Connection $connection;
@@ -49,11 +54,14 @@ class EncryptedColumnTest extends TestCase
     protected function setUp(): void
     {
         $this->kms = new InMemoryKms();
-        $this->connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
 
-        $registry = method_exists($this->connection->getConfiguration(), 'getTypeProvider') ? $this->connection->getConfiguration()->getTypeProvider() : Type::getTypeRegistry();
-        $type = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter($this->store()), 'user.email');
-        $registry->has(EncryptedColumnEntity::TYPE) ? $registry->override(EncryptedColumnEntity::TYPE, $type) : $registry->register(EncryptedColumnEntity::TYPE, $type);
+        $registry = new TypeRegistry();
+        $dbal = new DbalConfiguration();
+        $dbal->setTypeProvider($registry);
+
+        $this->connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $dbal);
+
+        $registry->register(EncryptedColumnEntity::TYPE, new EncryptedType(new StringType(), new StoredEnvelopeEncrypter($this->store()), 'user.email'));
 
         $this->config = ORMSetup::createConfiguration(true);
         $this->config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/Fixtures'], true));

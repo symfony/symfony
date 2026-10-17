@@ -451,6 +451,22 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertFalse($response->headers->has('Content-Type'));
     }
 
+    public function testPrepareNotAddingContentLengthHeaderIfNotSuccessfulResponse()
+    {
+        $request = Request::create('/');
+        $request->headers->set('Range', 'bytes=0-10');
+
+        $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 404);
+        $response->prepare($request);
+
+        $this->expectOutputString('');
+        $response->sendContent();
+
+        $this->assertSame(404, $response->getStatusCode());
+        $this->assertFalse($response->headers->has('Content-Length'));
+        $this->assertFalse($response->headers->has('Content-Range'));
+    }
+
     public function testContentTypeIsCorrectlyDetected()
     {
         $file = new File(__DIR__.'/File/Fixtures/test.gif');

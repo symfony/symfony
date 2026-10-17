@@ -30,16 +30,16 @@ final class ReflectionObjectMapperMetadataFactory implements ObjectMapperMetadat
     public function create(object $object, ?string $property = null, array $context = []): array
     {
         try {
-            $key = $object::class.($property ?? '');
+            $key = $property ?? '';
 
-            if (isset($this->attributesCache[$key])) {
-                return $this->attributesCache[$key];
+            if (isset($this->attributesCache[$object::class][$key])) {
+                return $this->attributesCache[$object::class][$key];
             }
 
             $refl = $this->reflectionClassCache[$object::class] ??= new \ReflectionClass($object);
             $target = $refl;
             if ($property && null === $target = $this->getPropertyFromHierarchy($refl, $property)) {
-                return $this->attributesCache[$key] = [];
+                return $this->attributesCache[$object::class][$key] = [];
             }
             $attributes = $target->getAttributes(Map::class, \ReflectionAttribute::IS_INSTANCEOF);
             $mappings = [];
@@ -48,7 +48,7 @@ final class ReflectionObjectMapperMetadataFactory implements ObjectMapperMetadat
                 $mappings[] = new Mapping($map->target, $map->source, $map->if, $map->transform);
             }
 
-            return $this->attributesCache[$key] = $mappings;
+            return $this->attributesCache[$object::class][$key] = $mappings;
         } catch (\ReflectionException $e) {
             throw new MappingException($e->getMessage(), $e->getCode(), $e);
         }

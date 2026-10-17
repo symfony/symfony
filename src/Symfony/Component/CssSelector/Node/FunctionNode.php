@@ -28,12 +28,14 @@ class FunctionNode extends AbstractNode
     private string $name;
 
     /**
-     * @param Token[] $arguments
+     * @param Token[]        $arguments
+     * @param SelectorNode[] $selectorList
      */
     public function __construct(
         private NodeInterface $selector,
         string $name,
         private array $arguments = [],
+        private array $selectorList = [],
     ) {
         $this->name = strtolower($name);
     }
@@ -56,15 +58,32 @@ class FunctionNode extends AbstractNode
         return $this->arguments;
     }
 
+    /**
+     * @return SelectorNode[]
+     */
+    public function getSelectorList(): array
+    {
+        return $this->selectorList;
+    }
+
     public function getSpecificity(): Specificity
     {
-        return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0));
+        $argumentsSpecificity = new Specificity(0, 0, 0);
+        foreach ($this->selectorList as $selector) {
+            if (1 === $selector->getSpecificity()->compareTo($argumentsSpecificity)) {
+                $argumentsSpecificity = $selector->getSpecificity();
+            }
+        }
+
+        return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0))->plus($argumentsSpecificity);
     }
 
     public function __toString(): string
     {
         $arguments = implode(', ', array_map(static fn (Token $token) => "'".$token->getValue()."'", $this->arguments));
 
-        return \sprintf('%s[%s:%s(%s)]', $this->getNodeName(), $this->selector, $this->name, $arguments ? '['.$arguments.']' : '');
+        $selectorList = $this->selectorList ? ' of '.implode(', ', $this->selectorList) : '';
+
+        return \sprintf('%s[%s:%s(%s%s)]', $this->getNodeName(), $this->selector, $this->name, $arguments ? '['.$arguments.']' : '', $selectorList);
     }
 }

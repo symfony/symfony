@@ -93,13 +93,17 @@ class Parser implements ParserInterface
         ];
     }
 
-    private function parseSelectorList(TokenStream $stream, bool $isArgument = false): array
+    private function parseSelectorList(TokenStream $stream, bool $isArgument = false, bool $strict = false): array
     {
         $stream->skipWhitespace();
         $selectors = [];
 
         while (true) {
             if ($isArgument && $stream->getPeek()->isDelimiter([')'])) {
+                if ($strict) {
+                    throw SyntaxErrorException::unexpectedToken('selector', $stream->getPeek());
+                }
+
                 break;
             }
 
@@ -325,6 +329,10 @@ class Parser implements ParserInterface
                     $result = new Node\SpecificityAdjustmentNode($result, $selectors);
                 } elseif ('has' === strtolower($identifier)) {
                     $result = new Node\RelationNode($result, $this->parseRelativeSelector($stream));
+                } elseif (\in_array(strtolower($identifier), ['nth-child', 'nth-last-child'], true)) {
+                    [$arguments, $selectorList] = $this->parseNthFunctionArguments($stream, strtolower($identifier));
+
+                    $result = new Node\FunctionNode($result, $identifier, $arguments, $selectorList);
                 } else {
                     $arguments = [];
                     $next = null;
@@ -369,7 +377,7 @@ class Parser implements ParserInterface
      *
      * @throws SyntaxErrorException
      */
-    private function parseNestedSelectorList(TokenStream $stream, string $identifier): array
+    private function parseNestedSelectorList(TokenStream $stream, string $identifier, bool $strict = false): array
     {
         if ($this->nestingDepth >= self::NESTING_LIMIT) {
             throw new SyntaxErrorException(\sprintf('Got too deeply nested :%s().', $identifier));
@@ -378,10 +386,75 @@ class Parser implements ParserInterface
         ++$this->nestingDepth;
 
         try {
-            return $this->parseSelectorList($stream, true);
+            return $this->parseSelectorList($stream, true, $strict);
         } finally {
             --$this->nestingDepth;
         }
+    }
+
+    /**
+     * @return array{0: Token[], 1: Node\SelectorNode[]}
+     *
+     * @throws SyntaxErrorException
+     * @throws InternalErrorException
+     */
+    private function parseNthFunctionArguments(TokenStream $stream, string $identifier): array
+    {
+        $arguments = [];
+        $selectorList = [];
+        $whitespace = false;
+        $closingToken = null;
+
+        while (true) {
+            $next = $stream->getNext();
+
+            if ($next->isWhitespace()) {
+                $whitespace = true;
+
+                continue;
+            }
+
+            if ($next->isDelimiter([')'])) {
+                $closingToken = $next;
+
+                break;
+            }
+
+            if ($arguments && $whitespace && $next->isIdentifier() && 'of' === strtolower($next->getValue())) {
+                $selectorList = $this->parseNestedSelectorList($stream, $identifier, true);
+                $closingToken = $stream->getNext();
+                if (!$closingToken->isDelimiter([')'])) {
+                    throw SyntaxErrorException::unexpectedToken('")"', $closingToken);
+                }
+
+                if (!$selectorList) {
+                    throw SyntaxErrorException::unexpectedToken('selector', $closingToken);
+                }
+
+                foreach ($selectorList as $selector) {
+                    if (null !== $pseudoElement = $selector->getPseudoElement()) {
+                        throw SyntaxErrorException::pseudoElementFound($pseudoElement, \sprintf('inside :%s()', $identifier));
+                    }
+                }
+
+                break;
+            }
+
+            if ($next->isIdentifier() || $next->isString() || $next->isNumber() || $next->isDelimiter(['+', '-'])) {
+                $arguments[] = $next;
+                $whitespace = false;
+
+                continue;
+            }
+
+            throw SyntaxErrorException::unexpectedToken('an argument', $next);
+        }
+
+        if (!$arguments) {
+            throw SyntaxErrorException::unexpectedToken('at least one argument', $closingToken);
+        }
+
+        return [$arguments, $selectorList];
     }
 
     private function parseElementNode(TokenStream $stream): Node\ElementNode

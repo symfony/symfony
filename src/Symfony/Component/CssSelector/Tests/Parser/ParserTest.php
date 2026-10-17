@@ -92,6 +92,34 @@ class ParserTest extends TestCase
         Parser::parseSeries($function->getArguments());
     }
 
+    public function testNthFunctionSelectorList()
+    {
+        $selectors = (new Parser())->parse(':nth-child(2n + 1 OF.foo, ul > li.bar)');
+        $function = $selectors[0]->getTree();
+
+        $this->assertInstanceOf(FunctionNode::class, $function);
+        $this->assertSame([2, 1], Parser::parseSeries($function->getArguments()));
+        $this->assertCount(2, $function->getSelectorList());
+        $this->assertSame('Class[Element[*].foo]', (string) $function->getSelectorList()[0]->getTree());
+        $this->assertSame('CombinedSelector[Element[ul] > Class[Element[li].bar]]', (string) $function->getSelectorList()[1]->getTree());
+    }
+
+    #[DataProvider('getInvalidNthSelectorListTestData')]
+    public function testInvalidNthSelectorList(string $selector)
+    {
+        $this->expectException(SyntaxErrorException::class);
+
+        (new Parser())->parse($selector);
+    }
+
+    public function testNthSelectorListNestingDepthLimit()
+    {
+        $this->expectException(SyntaxErrorException::class);
+        $this->expectExceptionMessage('Got too deeply nested :nth-child().');
+
+        (new Parser())->parse(str_repeat(':nth-child(1 of ', 17).'*'.str_repeat(')', 17));
+    }
+
     public static function getParserTestData()
     {
         return [
@@ -305,6 +333,7 @@ class ParserTest extends TestCase
             [':before', 1],
             ['*:before', 1],
             [':nth-child(2)', 10],
+            [':nth-child(2 of .foo, #bar)', 110],
             ['.bar', 10],
             ['[baz]', 10],
             ['[baz="4"]', 10],
@@ -376,5 +405,14 @@ class ParserTest extends TestCase
             ['foo'],
             ['n+'],
         ];
+    }
+
+    public static function getInvalidNthSelectorListTestData(): iterable
+    {
+        yield 'empty selector list' => [':nth-child(2 of )'];
+        yield 'trailing selector comma' => [':nth-child(2 of .foo,)'];
+        yield 'pseudo-element selector' => [':nth-child(2 of ::before)'];
+        yield 'missing whitespace before of' => [':nth-child(2nof .foo)'];
+        yield 'missing selector after of' => [':nth-child(2n of)'];
     }
 }

@@ -195,6 +195,76 @@ class TranslatorTest extends TestCase
         $this->assertSame('A', $nodeList->item(0)->textContent);
     }
 
+    public function testNthChildWithSelectorListFiltersSiblingsBeforeIndexing()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $document = new \DOMDocument();
+        $document->loadHTML(<<<'HTML'
+            <ul id="list">
+              <li id="outside"></li>
+              <li id="one" class="active"><span></span></li>
+              <li id="two" class="special"></li>
+              <li id="both" class="active special"></li>
+              <li id="tail" class="special"></li>
+              <li id="other"></li>
+            </ul>
+            HTML
+        );
+        $xpath = new \DOMXPath($document);
+
+        $this->assertSame(['two'], $this->getElementIds($xpath, $translator, 'li:nth-child(2 of .active, .special)'));
+        $this->assertSame(['both'], $this->getElementIds($xpath, $translator, 'li:nth-last-child(2 of .active, .special)'));
+        $this->assertSame(['two'], $this->getElementIds($xpath, $translator, 'li:nth-child(2 of ul > li.active, #list li.special)'));
+        $this->assertSame(['both'], $this->getElementIds($xpath, $translator, 'li:nth-child(2 of li.active + li, li.special)'));
+        $this->assertSame(['one', 'both'], $this->getElementIds($xpath, $translator, 'li:nth-child(-2n+5 of .active, .special)'));
+        $this->assertSame(['two', 'tail'], $this->getElementIds($xpath, $translator, 'li:nth-last-child(-2n+5 of .active, .special)'));
+        $this->assertSame(['two'], $this->getElementIds($xpath, $translator, 'li:nth-child(2 OF .active, .special)'));
+        $this->assertSame(['two'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of li:nth-child(2 of .active, .special))'));
+        $this->assertSame(['one'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of li:has(> span).active)'));
+        $this->assertSame(['one'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of [CLASS~="active"])'));
+        $this->assertSame([], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of :is(::before))'));
+        $this->assertSame(['one'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of :is(.active, ::before))'));
+        $this->assertSame([], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of :is())'));
+        $this->assertSame([], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of :where())'));
+        $this->assertSame(['outside', 'one', 'two', 'both', 'tail', 'other'], $this->getElementIds($xpath, $translator, 'li:nth-child(n of *)'));
+    }
+
+    #[DataProvider('getUntypedOfTypeInSelectorListTestData')]
+    public function testUntypedOfTypeInSelectorList(string $css, string $message)
+    {
+        $this->expectException(ExpressionErrorException::class);
+        $this->expectExceptionMessage($message);
+
+        (new Translator())->cssToXPath($css);
+    }
+
+    public static function getUntypedOfTypeInSelectorListTestData(): iterable
+    {
+        yield [':nth-child(1 of :first-of-type)', '"*:first-of-type" is not implemented.'];
+        yield [':nth-child(1 of .a:only-of-type)', '"*:only-of-type" is not implemented.'];
+        yield [':nth-child(1 of :nth-last-of-type(2))', '"*:nth-last-of-type()" is not implemented.'];
+    }
+
+    public function testTranslatorIsFreedWithoutTheGarbageCollector()
+    {
+        $translator = new Translator();
+        $translator->cssToXPath('li:nth-child(2 of .active)');
+        $reference = \WeakReference::create($translator);
+
+        $gcEnabled = gc_enabled();
+        gc_disable();
+
+        try {
+            unset($translator);
+            $this->assertNull($reference->get());
+        } finally {
+            if ($gcEnabled) {
+                gc_enable();
+            }
+        }
+    }
+
     public function testDisabledAndEnabledInsideFieldsets()
     {
         $translator = new Translator();
@@ -626,5 +696,15 @@ class TranslatorTest extends TestCase
             [':scope > div div', 242],
             ['div:is(div#test .dialog) .direction', 4],
         ];
+    }
+
+    private function getElementIds(\DOMXPath $xpath, Translator $translator, string $selector): array
+    {
+        $ids = [];
+        foreach ($xpath->query($translator->cssToXPath($selector)) as $element) {
+            $ids[] = $element->getAttribute('id');
+        }
+
+        return $ids;
     }
 }

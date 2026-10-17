@@ -132,6 +132,44 @@ class CachePoolPassTest extends TestCase
         yield [TagAwareAdapter::class];
     }
 
+    /**
+     * @dataProvider provideAdaptersWithoutProvider
+     */
+    public function testUnusedProviderIsIgnored(string $adapterClass, bool $chained)
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('cache.prefix.seed', 'test');
+        $container->register('cache.adapter', $adapterClass)
+            ->setAbstract(true)
+            ->setArguments(ArrayAdapter::class === $adapterClass ? [0] : [])
+            ->addTag('cache.pool');
+
+        if ($chained) {
+            $container->register('cache.adapter.chain', ChainAdapter::class)->setAbstract(true)->setArguments([[], 0]);
+            $pool = new ChildDefinition('cache.adapter.chain');
+            $pool->addArgument(['unused.provider' => 'cache.adapter']);
+        } else {
+            $pool = new ChildDefinition('cache.adapter');
+        }
+
+        $pool->setPublic(true)->addTag('cache.pool', ['provider' => 'unused.provider', 'default_lifetime' => 30]);
+        $container->setDefinition('cache.pool', $pool);
+        $container->addCompilerPass($this->cachePoolPass);
+        $container->compile();
+
+        $cache = $container->get('cache.pool');
+        $this->assertInstanceOf($chained ? ChainAdapter::class : $adapterClass, $cache);
+        $this->assertFalse($cache->getItem('missing')->isHit());
+    }
+
+    public static function provideAdaptersWithoutProvider(): iterable
+    {
+        yield [ArrayAdapter::class, false];
+        yield [ArrayAdapter::class, true];
+        yield [NullAdapter::class, false];
+        yield [NullAdapter::class, true];
+    }
+
     public function testArgsAreReplaced()
     {
         $container = new ContainerBuilder();

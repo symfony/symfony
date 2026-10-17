@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Stopwatch\Section;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
@@ -24,6 +25,8 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class TimeDataCollector extends DataCollector implements LateDataCollectorInterface
 {
+    private ?Section $section = null;
+
     public function __construct(
         private readonly ?KernelInterface $kernel = null,
         private readonly ?Stopwatch $stopwatch = null,
@@ -39,8 +42,14 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
             $startTime = $request->server->get('REQUEST_TIME_FLOAT');
         }
 
+        $this->section = null;
+        $token = $request->attributes->get('_stopwatch_token');
+        if (null !== $this->stopwatch && null !== $token) {
+            $this->section = $this->stopwatch->getSections()[$token] ?? $this->stopwatch->getCurrentSection();
+        }
+
         $this->data = [
-            'token' => $request->attributes->get('_stopwatch_token'),
+            'token' => $token,
             'start_time' => $startTime * 1000,
             'events' => [],
             'stopwatch_installed' => class_exists(Stopwatch::class, false),
@@ -50,6 +59,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     public function reset(): void
     {
         $this->data = ['events' => [], 'stopwatch_installed' => false, 'start_time' => 0];
+        $this->section = null;
 
         $this->stopwatch?->reset();
     }
@@ -57,8 +67,13 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     public function lateCollect(): void
     {
         if (null !== $this->stopwatch && isset($this->data['token'])) {
-            $this->setEvents($this->stopwatch->getSectionEvents($this->data['token']));
+            $events = $this->stopwatch->getSectionEvents($this->data['token']);
+            if (null !== $this->section && (Stopwatch::ROOT === $this->data['token'] || $this->section->getId() === $this->data['token'])) {
+                $events = $this->section->getEvents();
+            }
+            $this->setEvents($events);
         }
+        $this->section = null;
         unset($this->data['token']);
     }
 

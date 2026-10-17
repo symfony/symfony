@@ -72,6 +72,30 @@ class TimeDataCollectorTest extends TestCase
         $this->assertFalse($collector->isStopwatchInstalled());
     }
 
+    public function testLateCollectAfterTheStopwatchWasReset()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->openSection();
+        $event = $stopwatch->start('controller');
+        $collector = new TimeDataCollector(null, $stopwatch);
+        $request = new Request();
+        $request->attributes->set('_stopwatch_token', 'main-request');
+        $collector->collect($request, new Response());
+        $profileCollector = clone $collector;
+        $stopwatch->stop('controller');
+        $stopwatch->stopSection('main-request');
+
+        $collector->reset();
+        $stopwatch->openSection();
+        $stopwatch->start('fragment');
+        $profileCollector->lateCollect();
+
+        self::assertSame($event, $profileCollector->getEvents()['controller'] ?? null);
+        self::assertArrayHasKey('__section__', $profileCollector->getEvents());
+        self::assertArrayNotHasKey('fragment', $profileCollector->getEvents());
+        self::assertFalse($event->isStarted());
+    }
+
     public function testLateCollect()
     {
         $stopwatch = new Stopwatch();
@@ -86,6 +110,140 @@ class TimeDataCollectorTest extends TestCase
         $collector->lateCollect();
 
         $this->assertEquals(['test'], array_keys($collector->getEvents()));
+    }
+
+    public function testCollectClosedRequestWhileAnotherSectionIsActive()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->openSection();
+        $ownEvent = $stopwatch->start('own');
+        $stopwatch->stop('own');
+        $stopwatch->stopSection('request');
+        $stopwatch->openSection();
+        $otherEvent = $stopwatch->start('other');
+        $request = new Request();
+        $request->attributes->set('_stopwatch_token', 'request');
+        $collector = new TimeDataCollector(null, $stopwatch);
+
+        $collector->collect($request, new Response());
+        $collector->lateCollect();
+
+        self::assertSame($ownEvent, $collector->getEvents()['own']);
+        self::assertArrayNotHasKey('other', $collector->getEvents());
+        self::assertTrue($otherEvent->isStarted());
+        self::assertSame($otherEvent, $stopwatch->stop('other'));
+    }
+
+    public function testCollectMissingRequestWhileAnotherSectionIsActive()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->openSection();
+        $otherEvent = $stopwatch->start('other');
+        $request = new Request();
+        $request->attributes->set('_stopwatch_token', 'missing');
+        $collector = new TimeDataCollector(null, $stopwatch);
+
+        $collector->collect($request, new Response());
+        $collector->lateCollect();
+
+        self::assertSame([], $collector->getEvents());
+        self::assertTrue($otherEvent->isStarted());
+        self::assertSame($otherEvent, $stopwatch->stop('other'));
+    }
+
+    public function testRetainEventsStartedAfterCollectionBeforeReset()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->openSection();
+        $request = new Request();
+        $request->attributes->set('_stopwatch_token', 'request');
+        $collector = new TimeDataCollector(null, $stopwatch);
+        $collector->collect($request, new Response());
+        $profileCollector = clone $collector;
+        $event = $stopwatch->start('late');
+        $stopwatch->stop('late');
+        $stopwatch->stopSection('request');
+        $collector->reset();
+
+        $profileCollector->lateCollect();
+
+        self::assertSame($event, $profileCollector->getEvents()['late'] ?? null);
+    }
+
+    public function testRetainClosedRequestWhenAnotherSectionIsReset()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->openSection();
+        $ownEvent = $stopwatch->start('own');
+        $stopwatch->stop('own');
+        $stopwatch->stopSection('request');
+        $stopwatch->openSection();
+        $otherEvent = $stopwatch->start('other');
+        $request = new Request();
+        $request->attributes->set('_stopwatch_token', 'request');
+        $collector = new TimeDataCollector(null, $stopwatch);
+        $collector->collect($request, new Response());
+        $profileCollector = clone $collector;
+        $stopwatch->stop('other');
+        $stopwatch->stopSection('other-request');
+        $collector->reset();
+
+        $profileCollector->lateCollect();
+
+        self::assertSame($ownEvent, $profileCollector->getEvents()['own'] ?? null);
+        self::assertArrayNotHasKey('other', $profileCollector->getEvents());
+        self::assertFalse($otherEvent->isStarted());
+    }
+
+    public function testRetainRootSectionAfterReset()
+    {
+        $stopwatch = new Stopwatch();
+        $event = $stopwatch->start('own');
+        $request = new Request();
+        $request->attributes->set('_stopwatch_token', Stopwatch::ROOT);
+        $collector = new TimeDataCollector(null, $stopwatch);
+        $collector->collect($request, new Response());
+        $profileCollector = clone $collector;
+        $stopwatch->stop('own');
+        $collector->reset();
+
+        $profileCollector->lateCollect();
+
+        self::assertSame($event, $profileCollector->getEvents()['own'] ?? null);
+    }
+
+    public function testRetainEventsFromReopenedSectionAfterReset()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->openSection();
+        $request = new Request();
+        $request->attributes->set('_stopwatch_token', 'request');
+        $collector = new TimeDataCollector(null, $stopwatch);
+        $collector->collect($request, new Response());
+        $profileCollector = clone $collector;
+        $stopwatch->stopSection('request');
+        $stopwatch->openSection('request');
+        $event = $stopwatch->start('terminate');
+        $stopwatch->stop('terminate');
+        $stopwatch->stopSection('request');
+        $collector->reset();
+
+        $profileCollector->lateCollect();
+
+        self::assertSame($event, $profileCollector->getEvents()['terminate'] ?? null);
+    }
+
+    public function testLateCollectWithoutTokenKeepsManuallySetEvents()
+    {
+        $stopwatch = new Stopwatch();
+        $collector = new TimeDataCollector(null, $stopwatch);
+        $collector->collect(new Request(), new Response());
+        $event = $stopwatch->start('manual');
+        $collector->setEvents(['manual' => $event]);
+
+        $collector->lateCollect();
+
+        self::assertSame(['manual' => $event], $collector->getEvents());
     }
 
     public function testSetEvents()

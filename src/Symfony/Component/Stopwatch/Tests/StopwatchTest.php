@@ -27,6 +27,35 @@ class StopwatchTest extends TestCase
 {
     private const DELTA = 20;
 
+    public function testCurrentSection()
+    {
+        $stopwatch = new Stopwatch();
+        $root = $stopwatch->start('root');
+        $rootSection = $stopwatch->getCurrentSection();
+        self::assertSame($stopwatch->getSections()[Stopwatch::ROOT], $rootSection);
+        self::assertSame(['root' => $root], $rootSection->getEvents());
+
+        $stopwatch->openSection();
+        $child = $stopwatch->start('child');
+        $section = $stopwatch->getCurrentSection();
+        $events = $section->getEvents();
+        self::assertNull($section->getId());
+        self::assertSame($child, $events['child']);
+        self::assertArrayNotHasKey('root', $events);
+        self::assertTrue($child->isStarted());
+
+        $stopwatch->stop('child');
+        $stopwatch->stopSection('child-section');
+        self::assertSame('child-section', $section->getId());
+        self::assertSame($rootSection, $stopwatch->getCurrentSection());
+        $stopwatch->reset();
+
+        self::assertFalse($events['child']->isStarted());
+        self::assertSame([], $stopwatch->getCurrentSection()->getEvents());
+        self::assertNotSame($rootSection, $stopwatch->getCurrentSection());
+        self::assertSame('child-section', $section->getId());
+    }
+
     public function testStart()
     {
         $stopwatch = new Stopwatch();

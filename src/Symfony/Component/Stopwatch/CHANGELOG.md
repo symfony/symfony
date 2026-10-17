@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `Stopwatch::getCurrentSection()` to access the active section
+
 7.2
 ---
 

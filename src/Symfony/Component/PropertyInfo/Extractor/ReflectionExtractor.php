@@ -474,7 +474,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     private function extractFromMutator(string $class, string $property): ?array
     {
-        [$reflectionMethod, $prefix] = $this->getMutatorMethod($class, $property);
+        [$reflectionMethod, $prefix] = $this->getMutatorMethod($class, $property) ?? $this->getMutatorMethod($class, $this->camelize($property));
         if (null === $reflectionMethod) {
             return null;
         }
@@ -501,7 +501,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     private function extractFromAccessor(string $class, string $property, array $allowedPrefixes): ?array
     {
-        [$reflectionMethod, $prefix] = $this->getAccessorMethod($class, $property);
+        [$reflectionMethod, $prefix] = $this->getAccessorMethod($class, $property) ?? $this->getAccessorMethod($class, $this->camelize($property));
         if (null === $reflectionMethod) {
             return null;
         }

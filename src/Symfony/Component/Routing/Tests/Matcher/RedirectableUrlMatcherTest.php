@@ -19,6 +19,75 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RedirectableUrlMatcherTest extends UrlMatcherTest
 {
+    /**
+     * @dataProvider provideExplicitTrailingSlashRoutes
+     */
+    public function testExplicitTrailingSlashRoutes(string $firstPath, string $secondPath, string $path, string $expectedRoute, array $secondMethods = [], string $requestMethod = 'GET')
+    {
+        $routes = new RouteCollection();
+        $routes->add('first', new Route($firstPath));
+        $routes->add('second', new Route($secondPath, [], [], [], '', [], $secondMethods));
+
+        $matcher = $this->getUrlMatcher($routes, new RequestContext('', $requestMethod), true);
+        $matcher->expects($this->never())->method('redirect');
+
+        $this->assertSame($expectedRoute, $matcher->match($path)['_route']);
+    }
+
+    public static function provideExplicitTrailingSlashRoutes(): iterable
+    {
+        yield ['/test', '/test/', '/test/', 'second'];
+        yield ['/test/', '/test', '/test', 'second'];
+        yield ['/test/{id}', '/test/{id}/', '/test/123/', 'second'];
+        yield ['/test/{id}/', '/test/{id}', '/test/123', 'second'];
+        yield ['/test', '/test/', '/test/', 'second', ['HEAD'], 'HEAD'];
+        yield ['/test/', '/test', '/test', 'second', ['HEAD'], 'HEAD'];
+        yield ['/test/{id}', '/test/{id}/', '/test/123/', 'second', ['HEAD'], 'HEAD'];
+        yield ['/test/{id}/', '/test/{id}', '/test/123', 'second', ['HEAD'], 'HEAD'];
+    }
+
+    /**
+     * @dataProvider provideRepeatedTrailingSlashes
+     */
+    public function testRepeatedTrailingSlashes(string $routePath, string $requestPath, bool $withSlashRoute, string $method, string $condition = 'false')
+    {
+        $routes = new RouteCollection();
+        $routes->add('first', new Route($routePath));
+        if ($withSlashRoute) {
+            $routes->add('rejected', new Route($routePath.'/', [], [], [], '', [], [], $condition));
+        }
+        $routes->add('repeated', new Route($routePath.'//'));
+
+        $matcher = $this->getUrlMatcher($routes, new RequestContext('', $method), true);
+        $matcher->expects($this->once())->method('redirect')->with(rtrim($requestPath, '/'), 'first')->willReturn([]);
+
+        $this->assertSame('first', $matcher->match($requestPath)['_route']);
+    }
+
+    public static function provideRepeatedTrailingSlashes(): iterable
+    {
+        foreach (['GET', 'HEAD'] as $method) {
+            foreach ([false, true] as $withSlashRoute) {
+                yield ['/test', '/test/', $withSlashRoute, $method];
+                yield ['/test/{id}', '/test/123/', $withSlashRoute, $method];
+            }
+            yield ['/test', '/test///', true, $method, ''];
+            yield ['/test/{id}', '/test/123///', true, $method, ''];
+        }
+    }
+
+    public function testExplicitTrailingSlashWithOverlappingHosts()
+    {
+        $routes = new RouteCollection();
+        $routes->add('first', new Route('/test/{id}', [], [], [], '{subdomain}.example.com'));
+        $routes->add('second', new Route('/test/{id}/', [], [], [], 'www.example.com'));
+
+        $matcher = $this->getUrlMatcher($routes, new RequestContext('', 'GET', 'www.example.com'), true);
+        $matcher->expects($this->never())->method('redirect');
+
+        $this->assertSame('second', $matcher->match('/test/123/')['_route']);
+    }
+
     public function testMissingTrailingSlash()
     {
         $coll = new RouteCollection();

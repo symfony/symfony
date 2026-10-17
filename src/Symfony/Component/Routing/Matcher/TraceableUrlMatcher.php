@@ -59,7 +59,7 @@ class TraceableUrlMatcher extends UrlMatcher
     protected function matchCollection(string $pathinfo, RouteCollection $routes): array
     {
         // HEAD and GET are equivalent as per RFC
-        if ('HEAD' === $method = $this->context->getMethod()) {
+        if ('HEAD' === $method = $requestMethod = $this->context->getMethod()) {
             $method = 'GET';
         }
         $supportsTrailingSlash = 'GET' === $method && $this instanceof RedirectableUrlMatcherInterface;
@@ -146,7 +146,7 @@ class TraceableUrlMatcher extends UrlMatcher
                 continue;
             }
 
-            if ($requiredMethods && !\in_array($method, $requiredMethods)) {
+            if ($requiredMethods && !\in_array($method, $requiredMethods) && !\in_array($requestMethod, $requiredMethods)) {
                 $this->allow = array_merge($this->allow, $requiredMethods);
                 $this->addTrace(\sprintf('Method "%s" does not match any of the required methods (%s)', $this->context->getMethod(), implode(', ', $requiredMethods)), self::ROUTE_ALMOST_MATCHES, $name, $route);
                 continue;

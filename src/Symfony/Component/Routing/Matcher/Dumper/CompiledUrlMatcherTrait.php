@@ -85,9 +85,14 @@ trait CompiledUrlMatcherTrait
         if ('HEAD' === $requestMethod) {
             $canonicalMethod = 'GET';
         }
+        $redirectPath = null;
         $supportsRedirections = 'GET' === $canonicalMethod && $this instanceof RedirectableUrlMatcherInterface;
 
-        foreach ($this->staticRoutes[$trimmedPathinfo] ?? [] as [$ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, , $condition]) {
+        foreach ($this->staticRoutes[$trimmedPathinfo] ?? [] as $route) {
+            [$ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, , $condition] = $route;
+            if (null !== $redirectPath && ($route[7] ?? null) !== $redirectPath) {
+                continue;
+            }
             if ($requiredHost) {
                 if ('{' !== $requiredHost[0] ? $requiredHost !== $host : !preg_match($requiredHost, $host, $hostMatches)) {
                     continue;
@@ -104,7 +109,10 @@ trait CompiledUrlMatcherTrait
 
             if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
                 if ($supportsRedirections && (!$requiredMethods || isset($requiredMethods['GET']))) {
-                    return $allow = $allowSchemes = [];
+                    $redirectPath = $trimmedPathinfo === $pathinfo || $trimmedPathinfo.'/' === $pathinfo ? $route[7] ?? null : null;
+                    if (null === $redirectPath) {
+                        return $allow = $allowSchemes = [];
+                    }
                 }
                 continue;
             }
@@ -127,7 +135,11 @@ trait CompiledUrlMatcherTrait
 
         foreach ($this->regexpList as $offset => $regex) {
             while (preg_match($regex, $matchedPathinfo, $matches)) {
-                foreach ($this->dynamicRoutes[$m = (int) $matches['MARK']] as [$ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar, $condition]) {
+                foreach ($this->dynamicRoutes[$m = (int) $matches['MARK']] as $route) {
+                    [$ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar, $condition] = $route;
+                    if (null !== $redirectPath && ($route[7] ?? null) !== $redirectPath) {
+                        continue;
+                    }
                     if (0 === $condition) { // marks the last route in the regexp
                         continue 3;
                     }
@@ -154,7 +166,9 @@ trait CompiledUrlMatcherTrait
 
                     if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
                         if ($supportsRedirections && (!$requiredMethods || isset($requiredMethods['GET']))) {
-                            return $allow = $allowSchemes = [];
+                            if (null === $redirectPath = $route[7] ?? null) {
+                                return $allow = $allowSchemes = [];
+                            }
                         }
                         continue;
                     }
@@ -175,6 +189,10 @@ trait CompiledUrlMatcherTrait
                 $regex = substr_replace($regex, 'F', $m - $offset, 1 + \strlen($m));
                 $offset += \strlen($m);
             }
+        }
+
+        if (null !== $redirectPath) {
+            return $allow = $allowSchemes = [];
         }
 
         if ('/' === $pathinfo && !$allow && !$allowSchemes) {

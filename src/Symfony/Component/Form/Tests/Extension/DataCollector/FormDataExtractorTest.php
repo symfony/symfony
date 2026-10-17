@@ -17,8 +17,11 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\DataClassType;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
 use Symfony\Component\Form\Extension\DataCollector\FormDataExtractor;
+use Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactory;
@@ -27,6 +30,8 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
+use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
+use Symfony\Component\Form\Tests\Fixtures\FooTypeBazExtension;
 use Symfony\Component\Validator\Constraints\WordCount;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -58,6 +63,7 @@ class FormDataExtractorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => [],
+            'type_extensions' => [],
         ], $this->dataExtractor->extractConfiguration($form));
     }
 
@@ -87,6 +93,7 @@ class FormDataExtractorTest extends TestCase
                 'c' => 'baz',
             ],
             'resolved_options' => [],
+            'type_extensions' => [],
         ], $this->dataExtractor->extractConfiguration($form));
     }
 
@@ -113,6 +120,7 @@ class FormDataExtractorTest extends TestCase
                 'b' => 'foo',
                 'c' => 'baz',
             ],
+            'type_extensions' => [],
         ], $this->dataExtractor->extractConfiguration($form));
     }
 
@@ -140,7 +148,24 @@ class FormDataExtractorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => [],
+            'type_extensions' => [],
         ], $this->dataExtractor->extractConfiguration($form));
+    }
+
+    public function testExtractConfigurationListsTypeExtensions()
+    {
+        $parentType = new ResolvedFormType(new FormType(), [
+            new FooTypeBarExtension(),
+            new DataCollectorTypeExtension(new FormDataCollector($this->dataExtractor)),
+        ]);
+        $form = $this->createBuilder('name')
+            ->setType(new ResolvedFormType(new HiddenType(), [new FooTypeBazExtension()], $parentType))
+            ->getForm();
+
+        $this->assertSame([
+            ['type' => FormType::class, 'extension' => FooTypeBarExtension::class],
+            ['type' => HiddenType::class, 'extension' => FooTypeBazExtension::class],
+        ], $this->dataExtractor->extractConfiguration($form)['type_extensions']);
     }
 
     public function testExtractDefaultData()
@@ -429,7 +454,21 @@ class FormDataExtractorTest extends TestCase
             'synchronized' => true,
             'passed_options' => [],
             'resolved_options' => [],
+            'type_extensions' => [],
         ], $this->dataExtractor->extractConfiguration($form));
+    }
+
+    public function testTypeExtensionsOfDataClassType()
+    {
+        $parentType = new ResolvedFormType(new FormType(), [new FooTypeBarExtension()]);
+        $form = $this->createBuilder('name')
+            ->setType(new ResolvedFormType(new DataClassType('App\\SomeData', 'App\\ParentType', 'some_data', [], []), [new FooTypeBazExtension()], $parentType))
+            ->getForm();
+
+        $this->assertSame([
+            ['type' => FormType::class, 'extension' => FooTypeBarExtension::class],
+            ['type' => 'App\\SomeData', 'extension' => FooTypeBazExtension::class],
+        ], $this->dataExtractor->extractConfiguration($form)['type_extensions']);
     }
 
     private function createBuilder(string $name, array $options = []): FormBuilder

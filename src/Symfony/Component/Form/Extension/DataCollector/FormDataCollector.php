@@ -203,6 +203,14 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             if (isset($form['type_class']) && !$form['type_class'] instanceof ClassStub) {
                 $form['type_class'] = new ClassStub($form['type_class']);
             }
+
+            foreach ($form['type_extensions'] ?? [] as $i => $typeExtension) {
+                foreach ($typeExtension as $key => $class) {
+                    if (!$class instanceof ClassStub) {
+                        $form['type_extensions'][$i][$key] = new ClassStub($class);
+                    }
+                }
+            }
         }
 
         return ['data' => $this->data = $this->cloneVar($this->data)];

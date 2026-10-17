@@ -162,6 +162,15 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             return self::$isReadableCache[$cacheKey] ??= $this->propertyInfoExtractor->isReadable($class, $attribute, $context) || $this->hasAttributeAccessorMethod($class, $attribute) || (\is_object($classOrObject) && $this->propertyAccessor->isReadable($classOrObject, $attribute));
         }
 
+        $ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES];
+        if ($ignoredAttributes && null !== $writeMethod = $this->getWriteMethod($class, $attribute, $context)) {
+            foreach ($ignoredAttributes as $ignoredAttribute) {
+                if ($writeMethod === $this->getWriteMethod($class, $ignoredAttribute, $context)) {
+                    return false;
+                }
+            }
+        }
+
         $context = array_intersect_key($context, ['enable_getter_setter_extraction' => true, 'enable_magic_methods_extraction' => true, 'enable_constructor_extraction' => true, 'enable_adder_remover_extraction' => true]);
         $cacheKey = $class.$attribute.hash('xxh128', serialize($context));
 
@@ -193,5 +202,17 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             && !$method->getAttributes(Ignore::class)
             && !$method->getNumberOfRequiredParameters()
             && !\in_array((string) $method->getReturnType(), ['void', 'never'], true);
+    }
+
+    private function getWriteMethod(string $class, string $attribute, array $context): ?string
+    {
+        $writeInfo = $this->writeInfoExtractor->getWriteInfo($class, $attribute, ['enable_constructor_extraction' => false] + $context);
+        $method = match ($writeInfo?->getType()) {
+            PropertyWriteInfo::TYPE_METHOD => $writeInfo->getName(),
+            PropertyWriteInfo::TYPE_ADDER_AND_REMOVER => $writeInfo->getAdderInfo()->getName(),
+            default => null,
+        };
+
+        return null !== $method && '__set' !== $method && method_exists($class, $method) ? strtolower($method) : null;
     }
 }

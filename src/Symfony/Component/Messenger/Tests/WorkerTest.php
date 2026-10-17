@@ -16,6 +16,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Envelope;
@@ -27,7 +28,9 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
+use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
@@ -37,6 +40,7 @@ use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
@@ -49,6 +53,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\ResettableDummyReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Reservation;
@@ -124,6 +129,63 @@ class WorkerTest extends TestCase
 
         $this->assertSame(1, $receiver->getRejectCount());
         $this->assertSame(0, $receiver->getAcknowledgeCount());
+    }
+
+    /**
+     * @dataProvider provideRetriedMessageErrors
+     */
+    public function testRetriedMessageIsAcknowledged(\Throwable $error, int $acknowledgements, int $rejections)
+    {
+        $receiver = new DummyReceiver([[new Envelope(new DummyMessage('Hello'))]]);
+        $bus = $this->createStub(MessageBusInterface::class);
+        $bus->method('dispatch')->willThrowException($error);
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->once())->method('send')->willReturnArgument(0);
+        $senders = new Container();
+        $senders->set('transport', $sender);
+        $strategies = new Container();
+        $strategies->set('transport', new MultiplierRetryStrategy());
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($senders, $strategies));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+
+        $this->assertSame($acknowledgements, $receiver->getAcknowledgeCount());
+        $this->assertSame($rejections, $receiver->getRejectCount());
+    }
+
+    public static function provideRetriedMessageErrors(): iterable
+    {
+        yield 'failed handler' => [new \RuntimeException('Retry me.'), 1, 0];
+        yield 'redelivered message' => [new RejectRedeliveredMessageException('Redelivered.'), 0, 1];
+    }
+
+    public function testFailedRetrySendDoesNotAcknowledgeMessage()
+    {
+        $receiver = new DummyReceiver([[new Envelope(new DummyMessage('Hello'))]]);
+        $bus = $this->createStub(MessageBusInterface::class);
+        $bus->method('dispatch')->willThrowException(new \RuntimeException('Retry me.'));
+        $sender = $this->createStub(SenderInterface::class);
+        $sender->method('send')->willThrowException(new \LogicException('Send failed.'));
+        $senders = new Container();
+        $senders->set('transport', $sender);
+        $strategies = new Container();
+        $strategies->set('transport', new MultiplierRetryStrategy());
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener($senders, $strategies));
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher, null, null, new MockClock());
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Send failed.');
+
+        try {
+            $worker->run();
+        } finally {
+            $this->assertSame(0, $receiver->getAcknowledgeCount());
+            $this->assertSame(0, $receiver->getRejectCount());
+        }
     }
 
     public function testWorkerResetsConnectionIfReceiverIsResettable()

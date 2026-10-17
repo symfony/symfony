@@ -221,7 +221,11 @@ class Worker
                 $envelope = $failedEvent->getEnvelope();
 
                 if (!$rejectFirst) {
-                    $receiver->reject($envelope);
+                    if ($failedEvent->willRetry()) {
+                        $receiver->ack($envelope);
+                    } else {
+                        $receiver->reject($envelope);
+                    }
                 }
 
                 continue;

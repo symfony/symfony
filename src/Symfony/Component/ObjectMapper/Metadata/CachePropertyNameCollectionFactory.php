@@ -25,7 +25,7 @@ final class CachePropertyNameCollectionFactory implements PropertyNameCollection
     use CacheKeyTrait;
 
     /**
-     * @var array<string, list<string>>
+     * @var array<class-string, list<string>>
      */
     private array $loaded = [];
 
@@ -37,20 +37,22 @@ final class CachePropertyNameCollectionFactory implements PropertyNameCollection
 
     public function create(object $object): array
     {
-        $key = 'property_names__'.$this->encodeClass($object::class);
+        return $this->loaded[$object::class] ??= $this->load($object);
+    }
 
-        if (isset($this->loaded[$key])) {
-            return $this->loaded[$key];
-        }
-
-        $item = $this->cacheItemPool->getItem($key);
+    /**
+     * @return list<string>
+     */
+    private function load(object $object): array
+    {
+        $item = $this->cacheItemPool->getItem('property_names__'.$this->encodeClass($object::class));
         if ($item->isHit()) {
-            return $this->loaded[$key] = $item->get();
+            return $item->get();
         }
 
         $names = $this->decorated->create($object);
         $this->cacheItemPool->save($item->set($names));
 
-        return $this->loaded[$key] = $names;
+        return $names;
     }
 }

@@ -27,7 +27,7 @@ final class CacheClassMetadataFactory implements ClassMetadataFactoryInterface
     use CacheKeyTrait;
 
     /**
-     * @var array<string, ClassMetadata>
+     * @var array<class-string, array<class-string, ClassMetadata>>
      */
     private array $loaded = [];
 
@@ -39,20 +39,22 @@ final class CacheClassMetadataFactory implements ClassMetadataFactoryInterface
 
     public function create(object $source, object $target): array
     {
-        $key = 'class_metadata__'.$this->encodeClass($source::class).'__'.$this->encodeClass($target::class);
+        return $this->loaded[$source::class][$target::class] ??= $this->load($source, $target);
+    }
 
-        if (isset($this->loaded[$key])) {
-            return $this->loaded[$key];
-        }
-
-        $item = $this->cacheItemPool->getItem($key);
+    /**
+     * @return ClassMetadata
+     */
+    private function load(object $source, object $target): array
+    {
+        $item = $this->cacheItemPool->getItem('class_metadata__'.$this->encodeClass($source::class).'__'.$this->encodeClass($target::class));
         if ($item->isHit()) {
-            return $this->loaded[$key] = $item->get();
+            return $item->get();
         }
 
         $metadata = $this->decorated->create($source, $target);
         $this->cacheItemPool->save($item->set($metadata));
 
-        return $this->loaded[$key] = $metadata;
+        return $metadata;
     }
 }

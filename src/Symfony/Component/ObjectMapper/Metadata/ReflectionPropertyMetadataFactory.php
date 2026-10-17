@@ -44,6 +44,7 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
 
     private readonly ?PropertyReadInfoExtractorInterface $readInfoExtractor;
     private readonly ?PropertyWriteInfoExtractorInterface $writeInfoExtractor;
+    private readonly bool $isPropertyAccessor;
 
     /**
      * @param ?PropertyReadInfoExtractorInterface  $readInfoExtractor  The extractor that the property accessor uses to read
@@ -57,9 +58,9 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
         ?PropertyWriteInfoExtractorInterface $writeInfoExtractor = null,
     ) {
         // the extractors describe what the accessor does only when it is not decorated or extended
-        $isPropertyAccessor = null !== $propertyAccessor && PropertyAccessor::class === $propertyAccessor::class;
-        $this->readInfoExtractor = $isPropertyAccessor ? $readInfoExtractor : null;
-        $this->writeInfoExtractor = $isPropertyAccessor ? $writeInfoExtractor : null;
+        $this->isPropertyAccessor = null !== $propertyAccessor && PropertyAccessor::class === $propertyAccessor::class;
+        $this->readInfoExtractor = $this->isPropertyAccessor ? $readInfoExtractor : null;
+        $this->writeInfoExtractor = $this->isPropertyAccessor ? $writeInfoExtractor : null;
     }
 
     public function create(object $source, object $target, string $property): array
@@ -105,6 +106,7 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
         $declared = $this->getPropertyFromHierarchy($sourceRefl, $property);
         $iteratedProperty = $readMetadataFromTarget ? $this->getPropertyFromHierarchy($targetRefl, $property) : $declared;
         $readability = $this->getReadability($sourceRefl, $sourceRefl, $property, $declared, $hasMagicGet);
+        $targetWritable = $this->isWritable($targetRefl, $property);
 
         return [
             'name' => $property,
@@ -116,7 +118,8 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
             'initializedKey' => $iteratedProperty && $iteratedRefl->isInstance($source) ? $this->getArrayCastKey($iteratedProperty) : null,
             'sameNameMapping' => $targetHasProperty && !$readMetadataFromTarget ? $this->getSameNameTargetMapping($target, $property) : null,
             'targetPropertyClass' => $this->getPropertyClass($targetRefl, $property),
-            'targetWritable' => $this->isWritable($targetRefl, $property),
+            'targetWritable' => $targetWritable,
+            'targetAccessorWritable' => $targetWritable ? null : $this->isWritableByAccessor($target, $property),
         ];
     }
 
@@ -207,6 +210,21 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
         }
 
         return $targetRefl->hasProperty($property) && $targetRefl->getProperty($property)->isPublic();
+    }
+
+    /**
+     * Tells whether the property accessor can write the property of any instance of the target class.
+     *
+     * The answer of PropertyAccessor depends only on the class, except for stdClass and for property paths,
+     * which read the instance. Null means that the mapper must ask the accessor for each instance.
+     */
+    private function isWritableByAccessor(object $target, string $property): ?bool
+    {
+        if (!$this->isPropertyAccessor || $target instanceof \stdClass || strpbrk($property, '.[')) {
+            return null;
+        }
+
+        return $this->propertyAccessor->isWritable($target, $property);
     }
 
     /**

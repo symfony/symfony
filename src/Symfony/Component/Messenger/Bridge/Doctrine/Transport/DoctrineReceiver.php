@@ -46,7 +46,7 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
         // the engine when that wait ends by throwing, which is what a lock timeout does. Holding
         // them here and dispatching them once the call is over keeps the keepalive alarm armed,
         // since it is rescheduled by its own handler, and keeps workers stoppable.
-        $asyncSignals = \function_exists('pcntl_async_signals') && pcntl_async_signals(false);
+        $asyncSignals = \function_exists('pcntl_async_signals') && \function_exists('pcntl_signal_dispatch') && pcntl_async_signals(false);
 
         try {
             $doctrineEnvelope = $this->connection->get();

@@ -48,8 +48,11 @@ class DoctrineTransactionMiddleware extends AbstractDoctrineMiddleware
         } finally {
             $connection = $entityManager->getConnection();
 
-            if (!$success && $connection->isTransactionActive()) {
-                $connection->rollBack();
+            if (!$success) {
+                $entityManager->close();
+                if ($connection->isTransactionActive()) {
+                    $connection->rollBack();
+                }
             }
         }
     }

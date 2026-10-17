@@ -373,6 +373,40 @@ class OutputFormatterTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider provideAnsiWrapping
+     */
+    public function testWrapAnsiSequences(string $message, int $width, string $expected)
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertSame($expected, $formatter->formatAndWrap($message, $width));
+    }
+
+    public static function provideAnsiWrapping(): iterable
+    {
+        yield ["\e]8;;https://example.com\e\\foo bar\e]8;;\e\\", 3, "\e]8;;https://example.com\e\\foo\nbar\e]8;;\e\\"];
+        yield ["\e[31mfoo bar baz\e[0m", 5, "\e[31mfoo\nbar\nbaz\e[0m"];
+        yield ["fo\e[31mobar\e[0m", 3, "fo\e[31mo\nbar\e[0m"];
+        yield ["\e[0;38;5;208m  foo\e[m", 8, "\e[0;38;5;208m  foo\e[m"];
+        yield ["\e[31mfoo\e[0m\n\e[32mbar\e[0m", 3, "\e[31mfoo\e[0m\n\e[32mbar\e[0m"];
+        yield ["\e[31m👩‍🌾foo\e[0m", 2, "\e[31m👩‍🌾f\noo\e[0m"];
+        yield ["<info>abc</info>\e[0m", 3, "\e[32mabc\e[39m\e[0m"];
+        yield ["<info>ab</info>\e[31mcd\e[0m", 4, "\e[32mab\e[39m\e[31mcd\e[0m"];
+        yield ["<info>ab</info>\e[31mcdef\e[0m", 4, "\e[32mab\e[39m\e[31mcd\nef\e[0m"];
+    }
+
+    public function testAnsiWhitespacePreservesLineBreaks()
+    {
+        $formatter = new OutputFormatter(true);
+        $message = "<info>ab</info>\e[31m\n\e[0m";
+
+        $this->assertSame("\e[32mab\e[39m\e[31m\e[0m", $formatter->formatAndWrap($message, 5));
+        $message = "a\n<info>\e[31m\n\e[0m</info>b";
+        $result = $formatter->formatAndWrap($message, 5);
+        $this->assertSame("a\n\nb", preg_replace('/\\e\\[[0-9;]*m/', '', $result));
+    }
+
     public function testFormatAndWrap()
     {
         $formatter = new OutputFormatter(true);

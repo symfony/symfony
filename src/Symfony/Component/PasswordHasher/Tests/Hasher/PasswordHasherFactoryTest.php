@@ -11,12 +11,17 @@
 
 namespace Symfony\Component\PasswordHasher\Tests\Hasher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\MigratingPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
+use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -189,6 +194,76 @@ class PasswordHasherFactoryTest extends TestCase
         $this->expectExceptionMessage('"arguments" must be set in {"class":"stdClass"}');
 
         (new PasswordHasherFactory([SomeUser::class => ['class' => \stdClass::class]]))->getPasswordHasher(SomeUser::class);
+    }
+
+    #[DataProvider('provideLegacyMigrationTargets')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyMigrationTargetIsDeprecated(array $config, string $class)
+    {
+        $factory = new PasswordHasherFactory([SomeUser::class => $config + ['migrate_from' => ['sha1']]]);
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/password-hasher 8.2: Using "%s" as the target of a password migration is deprecated because it never needs rehashing. Use "auto" or a custom hasher instead.', $class));
+
+        $hasher = $factory->getPasswordHasher(SomeUser::class);
+
+        $this->assertInstanceOf(MigratingPasswordHasher::class, $hasher);
+        $this->assertTrue($hasher->verify($hasher->hash('password'), 'password'));
+    }
+
+    public static function provideLegacyMigrationTargets(): iterable
+    {
+        yield 'message digest algorithm' => [['algorithm' => 'sha512'], MessageDigestPasswordHasher::class];
+        yield 'PBKDF2 algorithm' => [['algorithm' => 'pbkdf2'], Pbkdf2PasswordHasher::class];
+        yield 'plaintext algorithm' => [['algorithm' => 'plaintext'], PlaintextPasswordHasher::class];
+        yield 'message digest instance' => [['instance' => new MessageDigestPasswordHasher()], MessageDigestPasswordHasher::class];
+        yield 'PBKDF2 instance' => [['instance' => new Pbkdf2PasswordHasher()], Pbkdf2PasswordHasher::class];
+        yield 'plaintext instance' => [['instance' => new PlaintextPasswordHasher()], PlaintextPasswordHasher::class];
+    }
+
+    public function testLegacyTargetWithoutMigrationSources()
+    {
+        $target = new MessageDigestPasswordHasher();
+        $factory = new PasswordHasherFactory([
+            SomeUser::class => ['instance' => $target, 'migrate_from' => []],
+        ]);
+
+        $hasher = $factory->getPasswordHasher(SomeUser::class);
+
+        $this->assertTrue($hasher->verify($target->hash('password'), 'password'));
+    }
+
+    public function testMigrateFromWithAutoHasher()
+    {
+        $legacy = new MessageDigestPasswordHasher('sha1');
+        $factory = new PasswordHasherFactory([
+            SomeUser::class => ['algorithm' => 'auto', 'hash_algorithm' => 'sha512', 'migrate_from' => ['legacy']],
+            'legacy' => $legacy,
+        ]);
+
+        $hasher = $factory->getPasswordHasher(SomeUser::class);
+
+        $this->assertTrue($hasher->verify($legacy->hash('password'), 'password'));
+    }
+
+    public function testMigrationToCustomLegacyHasher()
+    {
+        $target = new class extends MessageDigestPasswordHasher {
+            public function needsRehash(string $hashedPassword): bool
+            {
+                return true;
+            }
+        };
+        $legacy = new PlaintextPasswordHasher();
+        $factory = new PasswordHasherFactory([
+            SomeUser::class => ['instance' => $target, 'migrate_from' => ['legacy']],
+            'legacy' => $legacy,
+        ]);
+
+        $hasher = $factory->getPasswordHasher(SomeUser::class);
+
+        $this->assertTrue($hasher->verify($legacy->hash('password'), 'password'));
+        $this->assertSame($target->hash('password'), $hasher->hash('password'));
     }
 
     public function testDefaultMigratingHashers()

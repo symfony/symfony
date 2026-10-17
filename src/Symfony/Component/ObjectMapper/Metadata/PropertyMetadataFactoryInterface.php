@@ -38,6 +38,7 @@ namespace Symfony\Component\ObjectMapper\Metadata;
  *     sameNameMapping: ?Mapping,
  *     targetPropertyClass: ?string,
  *     targetWritable: bool,
+ *     targetAccessorWritable: ?bool,
  * }
  *
  * @internal

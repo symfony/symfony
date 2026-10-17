@@ -36,6 +36,8 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
 /**
  * Object to object mapper.
  *
+ * @phpstan-import-type PropertyMetadata from PropertyMetadataFactoryInterface
+ *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInterface
@@ -58,6 +60,18 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
      * Lazy ghosts created by this mapper whose constructor has not run yet.
      */
     private ?\WeakMap $pendingConstruction = null;
+
+    /**
+     * @var array<class-string, array<class-string, Mapping[]>>
+     */
+    private array $classMappingsByTarget = [];
+
+    /**
+     * Saves a call to the property metadata factory for each property of each mapped object.
+     *
+     * @var array<class-string, array<class-string, array<string, PropertyMetadata>>>
+     */
+    private array $propertyMetadata = [];
 
     public function __construct(
         private readonly ObjectMapperMetadataFactoryInterface $metadataFactory = new PropertyTypeMappingMetadataFactory(new EnumMappingMetadataFactory(new ReflectionObjectMapperMetadataFactory())),
@@ -113,10 +127,11 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         $targetRefl = $this->getReflectionClass($target);
         $declaredTarget = $mappedTarget = $mappingToObject ? $target : $targetRefl->newInstanceWithoutConstructor();
         $classMetadata = $this->classMetadataFactory->create($source, $declaredTarget);
+        $pairMetadata = &$this->propertyMetadata[$source::class][$declaredTarget::class];
 
         if (null === $metadata) {
             $metadata = $classMetadata['classMappings'];
-            $map = $this->getMapTarget($this->filterMetadataByTarget($metadata, $target), null, $source, null, false);
+            $map = $this->getMapTarget($this->classMappingsByTarget[$source::class][$targetRefl->name] ??= $this->filterMetadataByTarget($metadata, $target), null, $source, null, false);
         }
 
         if (!$metadata && $classMetadata['classMappingsFromTarget']) {
@@ -148,7 +163,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                $propertyMetadata = $this->propertyMetadataFactory->create($source, $declaredTarget, $parameterName);
+                $propertyMetadata = $pairMetadata[$parameterName] ??= $this->propertyMetadataFactory->create($source, $declaredTarget, $parameterName);
                 if ($this->isReadable($source, $parameterName, $propertyMetadata['readability'], $sourceVars)) {
                     $ctorArguments[$parameterName] = $this->getRawValue($source, $parameterName, $propertyMetadata['sourceDeclared'], $propertyMetadata['readability']);
                 } else {
@@ -162,7 +177,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         $explicitTargets = [];
         $implicitValues = [];
         foreach ($this->propertyNameCollectionFactory->create($classMetadata['readMetadataFromTarget'] ? $declaredTarget : $source) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($source, $declaredTarget, $propertyName);
+            $propertyMetadata = $pairMetadata[$propertyName] ??= $this->propertyMetadataFactory->create($source, $declaredTarget, $propertyName);
             foreach ($propertyMetadata['mappings'] as $propertyMapping) {
                 $mapping = $propertyMapping['mapping'];
                 $sourcePropertyName = $propertyMapping['sourceProperty'];
@@ -254,7 +269,10 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
         foreach ($mapToProperties as $property => [$value, $writable]) {
             if (!$writable) {
-                if ($this->propertyAccessor->isWritable($mappedTarget, $property)) {
+                // the metadata of the declared target cannot tell for the child class a transform returned
+                $accessorWritable = $mappedTarget::class === $declaredTarget::class ? ($pairMetadata[$property] ??= $this->propertyMetadataFactory->create($source, $declaredTarget, $property))['targetAccessorWritable'] : null;
+
+                if ($accessorWritable ?? $this->propertyAccessor->isWritable($mappedTarget, $property)) {
                     $this->propertyAccessor->setValue($mappedTarget, $property, $value);
                 }
 

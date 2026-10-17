@@ -42,5 +42,5 @@ security:
             provider: main
 
     access_control:
-        - { path: '^/main/logged-in$', roles: IS_AUTHENTICATED_FULLY }
-        - { path: '^/main/force-logout$', roles: IS_AUTHENTICATED_FULLY }
+        - { path: '^/main/logged-in$', is_granted: IS_AUTHENTICATED_FULLY }
+        - { path: '^/main/force-logout$', is_granted: IS_AUTHENTICATED_FULLY }

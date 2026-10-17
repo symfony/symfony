@@ -23,8 +23,8 @@ security:
                 token_extractors: 'security.access_token_extractor.header'
 
     access_control:
-        - { path: ^/foo, roles: ROLE_USER }
-        - { path: ^/bar, roles: PUBLIC_ACCESS }
+        - { path: ^/foo, is_granted: ROLE_USER }
+        - { path: ^/bar, is_granted: PUBLIC_ACCESS }
 
 services:
     access_token.access_token_handler:

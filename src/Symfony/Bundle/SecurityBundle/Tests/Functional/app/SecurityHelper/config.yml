@@ -49,7 +49,7 @@ security:
             provider: main
 
     access_control:
-        - { path: '^/main/login/check$', roles: IS_AUTHENTICATED_FULLY }
-        - { path: '^/main/logged-in$', roles: IS_AUTHENTICATED_FULLY }
-        - { path: '^/second/login/check$', roles: IS_AUTHENTICATED_FULLY }
-        - { path: '^/second/logged-in$', roles: IS_AUTHENTICATED_FULLY }
+        - { path: '^/main/login/check$', is_granted: IS_AUTHENTICATED_FULLY }
+        - { path: '^/main/logged-in$', is_granted: IS_AUTHENTICATED_FULLY }
+        - { path: '^/second/login/check$', is_granted: IS_AUTHENTICATED_FULLY }
+        - { path: '^/second/logged-in$', is_granted: IS_AUTHENTICATED_FULLY }

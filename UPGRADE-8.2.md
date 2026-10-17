@@ -509,8 +509,43 @@ SecurityBundle
  * Deprecate the `remember_me` option of the `form_login`, `json_login`, `login_link`, and `access_token` authenticators, as it has no effect
  * Deprecate not setting the `enforce_at_jwt_type` option of the `oidc` token handler; it defaults to `false`
    in 8.2 and will default to `true` in 9.0
- * Deprecate configuring an access control rule with many `roles`, use `allow_if` or role hierarchy instead
- * Deprecate configuring both an access control rule `allow_if` and `roles`, update `allow_if` instead
+ * Deprecate the `roles` option of access control rules:
+   - a rule with a single role or attribute uses `is_granted` instead
+   - a rule with many roles, in a list or comma-separated, uses `allow_if` or role hierarchy instead
+   - a rule with both `roles` and `allow_if` checks its roles in the `allow_if` expression instead
+
+   ```yaml
+   # config/packages/security.yaml
+
+   # before
+   security:
+       access_control:
+           - { path: ^/admin, roles: ROLE_ADMIN }
+           - { path: ^/reports, roles: [ROLE_ACCOUNTANT, ROLE_AUDITOR] }
+
+   # after
+   security:
+       access_control:
+           - { path: ^/admin, is_granted: ROLE_ADMIN }
+           - { path: ^/reports, allow_if: "is_granted('ROLE_ACCOUNTANT') or is_granted('ROLE_AUDITOR')" }
+   ```
+
+ * Deprecate the `attributes` option of access control rules, use `request_attributes` instead
+
+   ```yaml
+   # config/packages/security.yaml
+
+   # before
+   security:
+       access_control:
+           - { route: export, attributes: { _format: csv }, is_granted: ROLE_EXPORT }
+
+   # after
+   security:
+       access_control:
+           - { route: export, request_attributes: { _format: csv }, is_granted: ROLE_EXPORT }
+   ```
+
  * A service used as a firewall `success_handler` or `failure_handler` is now wired as-is, so decorating it
    takes effect where it used to be silently ignored. Such a decorator must forward `setOptions()`, and
    `setFirewallName()` for success handlers, to the service it decorates whenever that service relies on them,

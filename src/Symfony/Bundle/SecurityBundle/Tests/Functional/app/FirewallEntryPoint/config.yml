@@ -25,7 +25,7 @@ security:
             http_basic: { realm: "Secure Gateway API" }
             entry_point: firewall_entry_point.entry_point.stub
     access_control:
-        - { path: ^/secure/, roles: ROLE_SECURE }
+        - { path: ^/secure/, is_granted: ROLE_SECURE }
     providers:
         in_memory:
             memory:

@@ -329,6 +329,21 @@ class CurlHttpClientTest extends HttpClientTestCase
         self::assertSame(401, $response->getStatusCode());
     }
 
+    public function testResponseDebugBufferClosesOnDestruct()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('HEAD', 'http://127.0.0.1:8057/head');
+
+        $r = new \ReflectionProperty($response, 'debugBuffer');
+        $debugBuffer = $r->getValue($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        $response->getContent();
+        unset($response);
+
+        self::assertFalse(\is_resource($debugBuffer));
+    }
+
     /**
      * @group integration
      */

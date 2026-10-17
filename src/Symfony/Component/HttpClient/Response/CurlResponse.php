@@ -36,7 +36,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     private ?string $ntlmOriginKey;
 
     /**
-     * @var resource
+     * @var resource|null
      */
     private $debugBuffer;
 
@@ -50,12 +50,15 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
         if ($ch instanceof \CurlHandle) {
             $this->handle = $ch;
-            $this->debugBuffer = fopen('php://temp', 'w+');
-            if (0x074000 === $curlVersion) {
-                fwrite($this->debugBuffer, 'Due to a bug in curl 7.64.0, the debug log is disabled; use another version to work around the issue.');
-            } else {
-                curl_setopt($ch, \CURLOPT_VERBOSE, true);
-                curl_setopt($ch, \CURLOPT_STDERR, $this->debugBuffer);
+            if ($this->debugBuffer = @fopen('php://temp', 'w+') ?: null) {
+                if (0x074000 === $curlVersion) {
+                    fwrite($this->debugBuffer, 'Due to a bug in curl 7.64.0, the debug log is disabled; use another version to work around the issue.');
+                } elseif (curl_setopt($ch, \CURLOPT_STDERR, $this->debugBuffer)) {
+                    curl_setopt($ch, \CURLOPT_VERBOSE, true);
+                } else {
+                    fclose($this->debugBuffer);
+                    $this->debugBuffer = null;
+                }
             }
         } else {
             $this->info['url'] = $ch;
@@ -124,8 +127,12 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             curl_setopt($ch, \CURLOPT_NOPROGRESS, false);
             curl_setopt($ch, \CURLOPT_PROGRESSFUNCTION, static function ($ch, $dlSize, $dlNow) use ($onProgress, &$info, $url, $multi, $debugBuffer) {
                 try {
-                    rewind($debugBuffer);
-                    $debug = ['debug' => stream_get_contents($debugBuffer)];
+                    if (\is_resource($debugBuffer)) {
+                        rewind($debugBuffer);
+                        $debug = ['debug' => stream_get_contents($debugBuffer)];
+                    } else {
+                        $debug = ['debug' => ''];
+                    }
                     $onProgress($dlNow, $dlSize, $url + curl_getinfo($ch) + $info + $debug);
                 } catch (\Throwable $e) {
                     $multi->handlesActivity[(int) $ch][] = null;
@@ -206,14 +213,20 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 $info['starttransfer_time'] = 0.0;
             }
 
-            rewind($this->debugBuffer);
-            $info['debug'] = stream_get_contents($this->debugBuffer);
+            if ($this->debugBuffer) {
+                rewind($this->debugBuffer);
+                $info['debug'] = stream_get_contents($this->debugBuffer);
+            } else {
+                $info['debug'] = '';
+            }
             $waitFor = curl_getinfo($this->handle, \CURLINFO_PRIVATE);
 
             if ('H' !== $waitFor[0] && 'C' !== $waitFor[0]) {
                 curl_setopt($this->handle, \CURLOPT_VERBOSE, false);
-                rewind($this->debugBuffer);
-                ftruncate($this->debugBuffer, 0);
+                if ($this->debugBuffer) {
+                    rewind($this->debugBuffer);
+                    ftruncate($this->debugBuffer, 0);
+                }
                 $this->finalInfo = $info;
             }
         }
@@ -244,6 +257,12 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         } finally {
             if ($this->handle instanceof \CurlHandle) {
                 curl_setopt($this->handle, \CURLOPT_VERBOSE, false);
+                curl_setopt($this->handle, \CURLOPT_STDERR, null);
+            }
+
+            if ($this->debugBuffer) {
+                fclose($this->debugBuffer);
+                $this->debugBuffer = null;
             }
         }
     }

@@ -308,13 +308,28 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         foreach ($hosts as $host) {
             $info = $host->info('Memory');
 
-            if (false === $info || null === $info || $info instanceof ErrorInterface) {
-                continue;
+            $info = \is_array($info) ? ($info['Memory'] ?? $info) : [];
+            if (isset($info['maxmemory_policy'])) {
+                return $this->redisEvictionPolicy = $info['maxmemory_policy'];
             }
 
-            $info = $info['Memory'] ?? $info;
+            $info = $host->info();
+            if (!\is_array($info)) {
+                continue;
+            }
+            $memory = $info['Memory'] ?? $info;
+            if (isset($memory['maxmemory_policy'])) {
+                return $this->redisEvictionPolicy = $memory['maxmemory_policy'];
+            }
 
-            return $this->redisEvictionPolicy = $info['maxmemory_policy'] ?? '';
+            $server = $info['Server'] ?? $info;
+            $replication = $info['Replication'] ?? $info;
+            // ElastiCache Serverless uses a fixed volatile-lru policy and omits the Memory section.
+            if ('cluster' === ($server['redis_mode'] ?? null) && '0' === (string) ($server['run_id'] ?? '')
+                && ('Amazon ElastiCache' === ($server['os'] ?? null) || preg_match('~^ip=[a-z0-9.-]+\.serverless\.[a-z0-9-]+\.cache\.amazonaws\.com(?:\.cn)?(?:,|$)~iD', $replication['slave0'] ?? ''))
+            ) {
+                return $this->redisEvictionPolicy = 'volatile-lru';
+            }
         }
 
         return $this->redisEvictionPolicy = '';

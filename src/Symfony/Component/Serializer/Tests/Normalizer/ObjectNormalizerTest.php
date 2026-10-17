@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -1042,6 +1043,24 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame(['inner_foo' => 'foo'], $normalizer->normalize($dummy, 'json', ['groups' => 'read']));
     }
 
+    public function testNormalizeWithPropertyPathDoesNotDependOnTheFirstNormalizedObject()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping.yaml'));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        try {
+            $normalizer->normalize(new ObjectWithNullableInner(), 'json', ['groups' => 'read']);
+            $this->fail(\sprintf('Expected a "%s".', UnexpectedTypeException::class));
+        } catch (UnexpectedTypeException) {
+        }
+
+        $dummy = new ObjectWithNullableInner();
+        $dummy->inner = new ObjectInner();
+        $dummy->inner->foo = 'foo';
+
+        $this->assertSame(['inner_foo' => 'foo'], $normalizer->normalize($dummy, 'json', ['groups' => 'read']));
+    }
+
     public function testDenormalizeWithPropertyPath()
     {
         $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping.yaml'));
@@ -1760,6 +1779,11 @@ class ObjectInner
 class ObjectWithArrayProperty
 {
     public array $values = [];
+}
+
+class ObjectWithNullableInner
+{
+    public ?ObjectInner $inner = null;
 }
 
 class LazyObjectInner extends ObjectInner

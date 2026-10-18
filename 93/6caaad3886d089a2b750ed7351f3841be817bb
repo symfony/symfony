@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Koc at 2026-10-17T12:14:11Z
+
+@nicolas-grekas thank you for taking care of that (even after 12 years since issue has been opened) :pray:.
+
+The main question: how did you found it? Do you have any kind of agent that checks old closed issues and re-validates them?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-17T15:25:36Z
+
+I asked an agent to look at stalled issues for things that were closed but still had value. 🎣

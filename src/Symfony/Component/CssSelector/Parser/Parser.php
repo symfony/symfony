@@ -82,7 +82,7 @@ class Parser implements ParserInterface
         $first = $split[0] ?? null;
 
         return [
-            $first ? ('-' === $first || '+' === $first ? $int($first.'1') : $int($first)) : 1,
+            '' !== $first ? ('-' === $first || '+' === $first ? $int($first.'1') : $int($first)) : 1,
             isset($split[1]) && $split[1] ? $int($split[1]) : 0,
         ];
     }

@@ -371,6 +371,8 @@ class TranslatorTest extends TestCase
             ['li:nth-child(-n-1)', []],
             ['li:nth-child(-n+1)', ['first-li']],
             ['li:nth-child(-n+3)', ['first-li', 'second-li', 'third-li']],
+            ['li:nth-child(0n+1)', ['first-li']],
+            ['li:nth-child(0n)', []],
             ['li:nth-last-child(0)', []],
             ['li:nth-last-child(2n)', ['second-li', 'fourth-li', 'sixth-li']],
             ['li:nth-last-child(even)', ['second-li', 'fourth-li', 'sixth-li']],

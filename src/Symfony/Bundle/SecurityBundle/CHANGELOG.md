@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Register the methods and invokable classes marked with `#[AsVoter]` as voters
+ * Show the name of the voters that implement `\Stringable` in the security profiler panel
+
 8.2
 ---
 

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Deprecate configuring `migrate_from` for the `plaintext`, `pbkdf2` and message digest hashers
+
 8.1
 ---
 

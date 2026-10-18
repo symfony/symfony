@@ -287,7 +287,7 @@
                         statusCodeElem.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
                     }
 
-                    if (request.duration) {
+                    if (request.duration !== undefined) {
                         durationCell.textContent = request.duration + ' ms';
                     }
 
@@ -351,6 +351,9 @@
                                 finishAjaxRequest(idx);
                             });
                             startAjaxRequest(idx);
+
+                            /* The handlers above mark the promise as handled. Return a new one so that the browser still reports the rejections that the app doesn't catch. */
+                            promise = promise.then();
                         }
 
                         return promise;
@@ -440,7 +443,7 @@
                                     var pending = pendingRequests;
                                     for (var i = 0; i < requestStack.length; i++) {
                                         startAjaxRequest(i);
-                                        if (requestStack[i].duration || requestStack[i].error) {
+                                        if (requestStack[i].duration !== undefined || requestStack[i].error) {
                                             finishAjaxRequest(i);
                                         }
                                     }

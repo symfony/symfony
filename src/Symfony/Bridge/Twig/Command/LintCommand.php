@@ -180,6 +180,7 @@ class LintCommand extends Command
             'txt' => $this->displayTxt($output, $io, $files),
             'json' => $this->displayJson($output, $files),
             'github' => $this->displayTxt($output, $io, $files, true),
+            'junit' => $this->displayJunit($output, $files),
             default => throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
     }
@@ -229,6 +230,48 @@ class LintCommand extends Command
         $output->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         return min($errors, 1);
+    }
+
+    private function displayJunit(OutputInterface $output, array $filesInfo): int
+    {
+        $failures = 0;
+        $testCases = '';
+
+        foreach ($filesInfo as $info) {
+            $file = $this->escapeXml((string) $info['file']);
+            $testCases .= \sprintf('    <testcase name="%s" classname="lint:twig" file="%s"', $file, $file);
+
+            if (!$info['valid']) {
+                $type = 'error';
+                $message = $info['exception']->getRawMessage();
+                $details = $info['exception']->getMessage();
+            } elseif ($info['deprecations']) {
+                $type = 'deprecation';
+                $message = \sprintf('%d deprecation(s) found', \count($info['deprecations']));
+                $details = implode("\n", array_map(static fn (array $deprecation) => \sprintf('Line %d: %s', $deprecation['line'], $deprecation['message']), $info['deprecations']));
+            } else {
+                $testCases .= "/>\n";
+
+                continue;
+            }
+
+            ++$failures;
+            $testCases .= \sprintf(">\n      <failure type=\"%s\" message=\"%s\">%s</failure>\n    </testcase>\n", $type, $this->escapeXml($message), $this->escapeXml($details));
+        }
+
+        $output->writeln('<?xml version="1.0" encoding="UTF-8"?>', OutputInterface::OUTPUT_RAW);
+        $output->writeln('<testsuites>', OutputInterface::OUTPUT_RAW);
+        $output->writeln(\sprintf('  <testsuite name="lint:twig" tests="%d" failures="%d" errors="0">', \count($filesInfo), $failures), OutputInterface::OUTPUT_RAW);
+        $output->write($testCases, false, OutputInterface::OUTPUT_RAW);
+        $output->writeln('  </testsuite>', OutputInterface::OUTPUT_RAW);
+        $output->writeln('</testsuites>', OutputInterface::OUTPUT_RAW);
+
+        return min($failures, 1);
+    }
+
+    private function escapeXml(string $value): string
+    {
+        return htmlspecialchars($value, \ENT_XML1 | \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
     }
 
     private function renderDeprecation(SymfonyStyle $output, int $line, string $message, string $file, ?GithubActionReporter $githubReporter): void
@@ -303,6 +346,6 @@ class LintCommand extends Command
     /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
-        return ['txt', 'json', 'github'];
+        return ['txt', 'json', 'github', 'junit'];
     }
 }

@@ -150,6 +150,71 @@ class LintCommandTest extends TestCase
         }
     }
 
+    public function testLintCorrectFileWithJunitFormat()
+    {
+        $filename = $this->createFile('{{ foo }}');
+        $tester = $this->createCommandTester();
+        $tester->execute(['filename' => [$filename], '--format' => 'junit'], ['decorated' => false]);
+
+        self::assertSame(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+
+        $xml = simplexml_load_string($tester->getDisplay());
+        self::assertNotFalse($xml, 'Outputs valid XML');
+        self::assertSame('1', (string) $xml->testsuite['tests']);
+        self::assertSame('0', (string) $xml->testsuite['failures']);
+        self::assertSame($filename, (string) $xml->testsuite->testcase['file']);
+        self::assertCount(0, $xml->testsuite->testcase->failure);
+    }
+
+    public function testLintIncorrectFileWithJunitFormat()
+    {
+        $valid = $this->createFile('{{ foo }}');
+        $invalid = $this->createFile('{{ foo');
+        $tester = $this->createCommandTester();
+        $tester->execute(['filename' => [$valid, $invalid], '--format' => 'junit'], ['decorated' => false]);
+
+        self::assertSame(1, $tester->getStatusCode(), 'Returns 1 in case of error');
+
+        $xml = simplexml_load_string($tester->getDisplay());
+        self::assertNotFalse($xml, 'Outputs valid XML');
+        self::assertSame('2', (string) $xml->testsuite['tests']);
+        self::assertSame('1', (string) $xml->testsuite['failures']);
+
+        $failure = $xml->testsuite->testcase[1]->failure;
+        self::assertSame('error', (string) $failure['type']);
+        self::assertSame('Unexpected token "end of template" ("end of print statement" expected).', (string) $failure['message']);
+        self::assertStringStartsWith(\sprintf('Unexpected token "end of template" ("end of print statement" expected) in "%s" at line 1', $invalid), (string) $failure);
+    }
+
+    public function testLintFileWithReportedDeprecationWithJunitFormat()
+    {
+        $filename = $this->createFile("{{ foo|deprecated_filter }}\n{{ bar|deprecated_filter }}");
+        $tester = $this->createCommandTester();
+        $tester->execute(['filename' => [$filename], '--format' => 'junit', '--show-deprecations' => true], ['decorated' => false]);
+
+        self::assertSame(1, $tester->getStatusCode(), 'Returns 1 in case of deprecation');
+
+        $xml = simplexml_load_string($tester->getDisplay());
+        self::assertNotFalse($xml, 'Outputs valid XML');
+        self::assertSame('1', (string) $xml->testsuite['failures']);
+
+        $failure = $xml->testsuite->testcase->failure;
+        self::assertSame('deprecation', (string) $failure['type']);
+        self::assertSame('2 deprecation(s) found', (string) $failure['message']);
+        self::assertStringContainsString('Line 1: Since foo/bar 1.1: Twig Filter "deprecated_filter" is deprecated', (string) $failure);
+        self::assertStringContainsString('Line 2: Since foo/bar 1.1: Twig Filter "deprecated_filter" is deprecated', (string) $failure);
+    }
+
+    public function testLintEscapesXmlWithJunitFormat()
+    {
+        $filename = $this->createFile('{{ foo <> & "bar" ');
+        $tester = $this->createCommandTester();
+        $tester->execute(['filename' => [$filename], '--format' => 'junit'], ['decorated' => false]);
+
+        self::assertSame(1, $tester->getStatusCode(), 'Returns 1 in case of error');
+        self::assertNotFalse(simplexml_load_string($tester->getDisplay()), 'Outputs valid XML even when the message contains special characters');
+    }
+
     #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
@@ -160,7 +225,7 @@ class LintCommandTest extends TestCase
 
     public static function provideCompletionSuggestions(): iterable
     {
-        yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
+        yield 'option' => [['--format', ''], ['txt', 'json', 'github', 'junit']];
     }
 
     private function createCommandTester(): CommandTester

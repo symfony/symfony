@@ -22,6 +22,7 @@
     "require-dev": {
         "symfony/console": "^7.4|^8.0",
         "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/messenger": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",
         "symfony/uid": "^7.4|^8.0",
         "twig/twig": "^3.12|^4.0"

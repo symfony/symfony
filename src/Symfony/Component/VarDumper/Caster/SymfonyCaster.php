@@ -12,6 +12,9 @@
 namespace Symfony\Component\VarDumper\Caster;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Uid\TimeBasedUidInterface;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
@@ -117,6 +120,53 @@ class SymfonyCaster
 
         if ($ulid instanceof TimeBasedUidInterface) {
             $a[Caster::PREFIX_VIRTUAL.'time'] = $ulid->getDateTime()->format('Y-m-d H:i:s.v \U\T\C');
+        }
+
+        return $a;
+    }
+
+    public static function castHandledStamp(HandledStamp $stamp, array $a, Stub $stub, bool $isNested): array
+    {
+        $key = "\0".HandledStamp::class."\0handlerName";
+        if (!isset($a[$key])) {
+            return $a;
+        }
+
+        $name = $a[$key];
+        $alias = '';
+
+        // Handlers registered with an alias are named "Class::method@alias", strip the alias to link to the method
+        if (false !== ($i = strpos($name, '::')) && false !== $j = strpos($name, '@', $i)) {
+            $alias = substr($name, $j);
+            $name = substr($name, 0, $j);
+        }
+
+        $a[$key] = new ClassStub($name);
+        if ('' !== $alias) {
+            $a[$key]->value .= $alias;
+            if (isset($a[$key]->attr['ellipsis'])) {
+                $a[$key]->attr['ellipsis'] += \strlen($alias);
+            }
+        }
+
+        return $a;
+    }
+
+    public static function castErrorDetailsStamp(ErrorDetailsStamp $stamp, array $a, Stub $stub, bool $isNested): array
+    {
+        $key = "\0".ErrorDetailsStamp::class."\0exceptionClass";
+        if (isset($a[$key])) {
+            $a[$key] = new ClassStub($a[$key]);
+        }
+
+        return $a;
+    }
+
+    public static function castSentStamp(SentStamp $stamp, array $a, Stub $stub, bool $isNested): array
+    {
+        $key = "\0".SentStamp::class."\0senderClass";
+        if (isset($a[$key])) {
+            $a[$key] = new ClassStub($a[$key]);
         }
 
         return $a;

@@ -187,14 +187,13 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
     {
         $delay = new DeferredFuture();
         $id = EventLoop::delay($timeout, $delay->complete(...));
+        $futures = [$delay->getFuture()];
 
-        awaitFirst((static function () use ($delay, $multi) {
-            yield $delay->getFuture();
+        foreach ($multi->openHandles as $deferred) {
+            $futures[] = $deferred->getFuture();
+        }
 
-            foreach ($multi->openHandles as $deferred) {
-                yield $deferred->getFuture();
-            }
-        })());
+        awaitFirst($futures);
 
         if ($delay->isComplete()) {
             return 0;
@@ -229,7 +228,6 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
             if ('HEAD' === $response->getRequest()->getMethod() || \in_array($info['http_code'], [204, 304], true)) {
                 $multi->handlesActivity[$id][] = null;
                 $multi->handlesActivity[$id][] = null;
-                $multi->openHandles[$id]->complete();
 
                 return;
             }
@@ -267,6 +265,11 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
             $multi->handlesActivity[$id][] = $e;
         } finally {
             $info['download_content_length'] = $info['size_download'];
+
+            if (isset($multi->openHandles[$id])) {
+                $multi->openHandles[$id]->complete();
+                $multi->openHandles[$id] = new DeferredFuture();
+            }
         }
     }
 

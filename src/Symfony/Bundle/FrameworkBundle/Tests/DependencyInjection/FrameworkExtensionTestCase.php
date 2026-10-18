@@ -1713,6 +1713,25 @@ abstract class FrameworkExtensionTestCase extends TestCase
         }
     }
 
+    #[TestWith(['true', true])]
+    #[TestWith(['false', false])]
+    public function testTheEnvVarOfTheRobotsTagOptionIsResolvedWhenTheContainerIsCompiled(string $env, bool $enabled)
+    {
+        $_ENV['FRAMEWORK_DISALLOW_SEARCH_ENGINE_INDEX'] = $env;
+
+        try {
+            $container = $this->createContainerFromClosure(static function ($container) {
+                $container->loadFromExtension('framework', [
+                    'disallow_search_engine_index' => '%env(bool:FRAMEWORK_DISALLOW_SEARCH_ENGINE_INDEX)%',
+                ]);
+            }, ['kernel.debug' => !$enabled]);
+        } finally {
+            unset($_ENV['FRAMEWORK_DISALLOW_SEARCH_ENGINE_INDEX']);
+        }
+
+        $this->assertSame($enabled, $container->has('disallow_search_engine_index_response_listener'));
+    }
+
     public function testSessionCookieSecureAuto()
     {
         $container = $this->createContainerFromFile('session_cookie_secure_auto');

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\CssSelector\XPath\Extension;
 
+use Symfony\Component\CssSelector\Exception\ExpressionErrorException;
 use Symfony\Component\CssSelector\Node;
 use Symfony\Component\CssSelector\XPath\Translator;
 use Symfony\Component\CssSelector\XPath\XPathExpr;
@@ -113,14 +114,15 @@ class NodeExtension extends AbstractExtension
     private function translateMatchingOrSpecificityAdjustment(Node\NodeInterface $selector, array $arguments, Translator $translator): XPathExpr
     {
         $xpath = $translator->nodeToXPath($selector);
+        $type = $this->getElementType($selector);
 
         $conditions = [];
         foreach ($arguments as $argument) {
-            $expr = $translator->nodeToXPath($argument);
-            $expr->addNameTest();
-            if ('' !== $condition = $expr->getCondition()) {
-                $conditions[] = $condition;
+            if ('' === $condition = $this->selectorCondition($argument, $translator, $type)) {
+                return $xpath;
             }
+
+            $conditions[] = $condition;
         }
 
         if ($conditions) {
@@ -217,8 +219,109 @@ class NodeExtension extends AbstractExtension
         return 'node';
     }
 
+    private function hasNthOfType(Node\NodeInterface $node): bool
+    {
+        while ($node instanceof Node\FunctionNode || $node instanceof Node\PseudoNode || $node instanceof Node\ClassNode || $node instanceof Node\HashNode || $node instanceof Node\AttributeNode || $node instanceof Node\NegationNode || $node instanceof Node\MatchingNode || $node instanceof Node\SpecificityAdjustmentNode) {
+            if ($node instanceof Node\FunctionNode && 'nth-of-type' === $node->getName()) {
+                return true;
+            }
+
+            $node = $node instanceof Node\MatchingNode || $node instanceof Node\SpecificityAdjustmentNode ? $node->selector : $node->getSelector();
+        }
+
+        return false;
+    }
+
+    private function getElementType(Node\NodeInterface $node): string
+    {
+        while ($node instanceof Node\NegationNode || $node instanceof Node\FunctionNode || $node instanceof Node\PseudoNode || $node instanceof Node\ClassNode || $node instanceof Node\HashNode || $node instanceof Node\AttributeNode || $node instanceof Node\MatchingNode || $node instanceof Node\SpecificityAdjustmentNode) {
+            $node = $node instanceof Node\MatchingNode || $node instanceof Node\SpecificityAdjustmentNode ? $node->selector : $node->getSelector();
+        }
+
+        return $node instanceof Node\ElementNode ? $this->translateElement($node)->getElement() : '*';
+    }
+
+    /**
+     * Replaces position() and last() by tests on the siblings of the context node.
+     */
+    private function positionsToSiblings(string $condition, string $element): string
+    {
+        // [1] stops at the first sibling found: count() is used only when An+B needs it
+        $first = \sprintf('not(preceding-sibling::%s[1])', $element);
+        $last = \sprintf('not(following-sibling::%s[1])', $element);
+        $depth = 0;
+        $result = '';
+
+        foreach (preg_split('/(\'[^\']*+\'|"[^"]*+"|[\[\]]|position\(\) = (?:1|last\(\)(?: - 0)?)(?![\d-]| -)|last\(\) = 1(?!\d)|last\(\) - position\(\)|position\(\)|last\(\))/', $condition, -1, \PREG_SPLIT_DELIM_CAPTURE) as $part) {
+            if ('[' === $part) {
+                ++$depth;
+            } elseif (']' === $part) {
+                --$depth;
+            } elseif (!$depth) {
+                $part = match ($part) {
+                    'position() = 1' => $first,
+                    'position() = last()', 'position() = last() - 0' => $last,
+                    'last() = 1' => $first.' and '.$last,
+                    'last() - position()' => \sprintf('count(following-sibling::%s)', $element),
+                    'position()' => \sprintf('(count(preceding-sibling::%s) + 1)', $element),
+                    'last()' => \sprintf('(count(preceding-sibling::%1$s) + count(following-sibling::%1$s) + 1)', $element),
+                    default => $part,
+                };
+            }
+
+            $result .= $part;
+        }
+
+        return $result;
+    }
+
     private function isSafeName(string $name): bool
     {
         return 0 < preg_match('~^[a-zA-Z_][a-zA-Z0-9_.-]*$~', $name);
+    }
+
+    /**
+     * Returns the condition for the context node to match the selector, using reverse axes for its combinators.
+     */
+    private function selectorCondition(Node\NodeInterface $node, Translator $translator, string $type = '*'): string
+    {
+        if ($node instanceof Node\SelectorNode) {
+            $node = $node->getTree();
+        }
+
+        if ($node instanceof Node\CombinedSelectorNode) {
+            if ('' !== $condition = $this->selectorCondition($node->getSelector(), $translator)) {
+                $condition = '['.$condition.']';
+            }
+
+            // a predicate on a sibling axis is evaluated on every sibling unless [1] is the last one
+            $axis = match ($node->getCombinator()) {
+                '>' => 'parent::*'.$condition,
+                ' ' => 'ancestor::*'.$condition,
+                '+' => 'preceding-sibling::*[1]'.('' !== $condition ? '/self::*'.$condition : ''),
+                '~' => 'preceding-sibling::*'.$condition.'[1]',
+                default => throw new ExpressionErrorException(\sprintf('Combiner "%s" not supported.', $node->getCombinator())),
+            };
+
+            if ('' === $condition = $this->selectorCondition($node->getSubSelector(), $translator, $type)) {
+                return $axis;
+            }
+
+            return \sprintf('(%s) and (%s)', $condition, $axis);
+        }
+
+        $xpath = $translator->nodeToXPath($node);
+
+        if (str_starts_with($xpath, '*/')) {
+            $siblings = $xpath->getElement();
+
+            if ('*' === $siblings && $this->hasNthOfType($node)) {
+                $siblings = $type;
+            }
+
+            $xpath = new XPathExpr('', $xpath->getElement(), $this->positionsToSiblings($xpath->getCondition(), $siblings));
+        }
+
+        return $xpath->addNameTest()->getCondition();
     }
 }

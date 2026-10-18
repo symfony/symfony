@@ -175,6 +175,17 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertEquals('baz', $sessions[0]->_id);
     }
 
+    public function testUpdateTimestampWithEmptyDataDoesNotReviveExpiredSession()
+    {
+        $this->insertSession('foo', 'bar', -100_000);
+
+        $this->storage->open('test', 'test');
+        $this->assertSame('', $this->storage->read('foo'));
+
+        $this->assertTrue($this->storage->updateTimestamp('foo', ''));
+        $this->assertSame('', $this->storage->read('foo'));
+    }
+
     public function testGc()
     {
         $this->insertSession('foo', 'bar', -100_000);

@@ -112,6 +112,17 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->assertGreaterThan($lowTtl, $this->redisClient->ttl(self::PREFIX.'id'));
     }
 
+    public function testUpdateTimestampWithEmptyDataDestroysSession()
+    {
+        $this->redisClient->del(self::PREFIX.'id');
+
+        $this->storage->open('', 'test');
+        $this->assertSame('', $this->storage->read('id'));
+
+        $this->assertTrue($this->storage->updateTimestamp('id', ''));
+        $this->assertFalse((bool) $this->redisClient->exists(self::PREFIX.'id'));
+    }
+
     /**
      * @dataProvider getOptionFixtures
      */

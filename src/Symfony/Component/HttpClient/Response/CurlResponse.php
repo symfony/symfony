@@ -170,25 +170,10 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $this->canary = new Canary(static function () use ($ch, $multi, $id) {
             unset($multi->pauseExpiries[$id], $multi->openHandles[$id], $multi->handlesActivity[$id]);
             curl_setopt($ch, \CURLOPT_PRIVATE, '_0');
+            $multi->handlesToRemove[$id] = $ch;
 
-            if ($multi->performing) {
-                return;
-            }
-
-            curl_multi_remove_handle($multi->handle, $ch);
-            curl_setopt_array($ch, [
-                \CURLOPT_NOPROGRESS => true,
-                \CURLOPT_PROGRESSFUNCTION => null,
-                \CURLOPT_HEADERFUNCTION => null,
-                \CURLOPT_WRITEFUNCTION => null,
-                \CURLOPT_READFUNCTION => null,
-                \CURLOPT_INFILE => null,
-            ]);
-
-            if (!$multi->openHandles) {
-                // Schedule DNS cache eviction for the next request
-                $multi->dnsCache->evictions = $multi->dnsCache->evictions ?: $multi->dnsCache->removals;
-                $multi->dnsCache->removals = $multi->dnsCache->hostnames = [];
+            if (!$multi->performing) {
+                self::removeHandles($multi);
             }
         });
     }
@@ -230,6 +215,10 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             return $this->doGetContent($throw);
         } finally {
             $this->multi->performing = $performing;
+
+            if (!$performing) {
+                self::removeHandles($this->multi);
+            }
         }
     }
 
@@ -331,6 +320,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             }
         } finally {
             $multi->performing = false;
+            self::removeHandles($multi);
         }
     }
 
@@ -512,5 +502,35 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         curl_setopt($ch, \CURLOPT_FRESH_CONNECT, true);
 
         return 0 === curl_multi_add_handle($multi->handle, $ch);
+    }
+
+    /**
+     * Removes the handles of closed responses from the multi handle.
+     *
+     * Closing a response while performing defers this until performing ends.
+     */
+    private static function removeHandles(CurlClientState $multi): void
+    {
+        $handles = $multi->handlesToRemove;
+        $multi->handlesToRemove = [];
+
+        foreach ($handles as $id => $ch) {
+            curl_multi_remove_handle($multi->handle, $ch);
+            curl_setopt_array($ch, [
+                \CURLOPT_NOPROGRESS => true,
+                \CURLOPT_PROGRESSFUNCTION => null,
+                \CURLOPT_HEADERFUNCTION => null,
+                \CURLOPT_WRITEFUNCTION => null,
+                \CURLOPT_READFUNCTION => null,
+                \CURLOPT_INFILE => null,
+            ]);
+            unset($multi->handlesActivity[$id]);
+        }
+
+        if ($handles && !$multi->openHandles) {
+            // Schedule DNS cache eviction for the next request
+            $multi->dnsCache->evictions = $multi->dnsCache->evictions ?: $multi->dnsCache->removals;
+            $multi->dnsCache->removals = $multi->dnsCache->hostnames = [];
+        }
     }
 }

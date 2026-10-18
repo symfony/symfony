@@ -1662,6 +1662,22 @@ class OptionsResolverTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $this->resolver->resolve());
     }
 
+    public function testRemoveNestedOption()
+    {
+        $this->resolver->setDefault('database', static function (OptionsResolver $resolver) {
+            $resolver->setDefault('host', 'localhost');
+        });
+        $this->resolver->remove('database');
+
+        $this->assertFalse($this->resolver->isNested('database'));
+
+        $this->resolver->setDefault('database', static function (OptionsResolver $resolver) {
+            $resolver->setDefault('port', 3306);
+        });
+
+        $this->assertSame(['database' => ['port' => 3306]], $this->resolver->resolve());
+    }
+
     public function testFailIfRemoveFromLazyOption()
     {
         $this->expectException(AccessException::class);

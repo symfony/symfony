@@ -22,6 +22,8 @@ use Symfony\Bridge\Doctrine\Middleware\Debug\Query;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
@@ -134,6 +136,50 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertTrue($collectedQueries['default'][0]['runnable']);
     }
 
+    public function testQueriesDuringTerminationAreCollectedOnlyForTheLatestProfile()
+    {
+        $holder = new DebugDataHolder();
+        $profiler = $this->createProfiler($holder);
+
+        $holder->addQuery('default', new Query('SELECT 1'));
+        $childProfile = $profiler->collect(new Request(), new Response());
+        $holder->addQuery('default', new Query('SELECT 2'));
+        $mainProfile = $profiler->collect(new Request(), new Response());
+        $holder->addQuery('default', new Query('SELECT 3'));
+
+        $profiler->saveProfile($childProfile);
+        $profiler->saveProfile($mainProfile);
+
+        $this->assertSame(1, $childProfile->getCollector('db')->getQueryCount());
+        $this->assertSame(3, $mainProfile->getCollector('db')->getQueryCount());
+        $this->assertSame(['SELECT 1', 'SELECT 2', 'SELECT 3'], array_column($mainProfile->getCollector('db')->getQueries()['default'], 'sql'));
+
+        $profiler->reset();
+        $holder->addQuery('default', new Query('SELECT 4'));
+        $nextProfile = $profiler->collect(new Request(), new Response());
+        $profiler->saveProfile($nextProfile);
+
+        $this->assertSame(1, $nextProfile->getCollector('db')->getQueryCount());
+    }
+
+    public function testResetBeforeSavingKeepsThePreviousProfileQueries()
+    {
+        $holder = new DebugDataHolder();
+        $profiler = $this->createProfiler($holder);
+
+        $holder->addQuery('default', new Query('SELECT 1'));
+        $firstProfile = $profiler->collect(new Request(), new Response());
+
+        $profiler->reset();
+        $holder->addQuery('default', new Query('SELECT 2'));
+        $secondProfile = $profiler->collect(new Request(), new Response());
+        $profiler->saveProfile($firstProfile);
+        $profiler->saveProfile($secondProfile);
+
+        $this->assertSame('SELECT 1', $firstProfile->getCollector('db')->getQueries()['default'][0]['sql']);
+        $this->assertSame('SELECT 2', $secondProfile->getCollector('db')->getQueries()['default'][0]['sql']);
+    }
+
     public static function paramProvider(): array
     {
         return [
@@ -185,6 +231,19 @@ class DoctrineDataCollectorTest extends TestCase
         }
 
         return $collector;
+    }
+
+    private function createProfiler(DebugDataHolder $holder): Profiler
+    {
+        $registry = $this->createStub(ManagerRegistry::class);
+        $registry->method('getConnectionNames')->willReturn([]);
+        $registry->method('getManagerNames')->willReturn([]);
+        $registry->method('getConnection')->willReturn($this->createStub(Connection::class));
+
+        $profiler = new Profiler($this->createStub(ProfilerStorageInterface::class));
+        $profiler->add(new DoctrineDataCollector($registry, $holder));
+
+        return $profiler;
     }
 }
 

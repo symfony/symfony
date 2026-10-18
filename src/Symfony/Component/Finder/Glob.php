@@ -76,6 +76,8 @@ class Glob
 
             if ($delimiter === $car || '.' === $car || '(' === $car || ')' === $car || '|' === $car || '+' === $car || '^' === $car || '$' === $car) {
                 $regex .= "\\$car";
+            } elseif ('[' === $car && !$escaping && null !== $class = self::bracketExpressionToRegex($glob, $i, $delimiter)) {
+                $regex .= $class;
             } elseif ('*' === $car) {
                 if ($escaping || $strictWildcardSlash || !str_ends_with($regex, '.*')) {
                     // ".*.*" matches the same as ".*" but backtracks quadratically
@@ -117,5 +119,43 @@ class Glob
         }
 
         return $delimiter.'^'.$regex.'$'.$delimiter;
+    }
+
+    /**
+     * Returns null when the "[" at position $i does not start a bracket expression.
+     */
+    private static function bracketExpressionToRegex(string $glob, int &$i, string $delimiter): ?string
+    {
+        $class = '[';
+
+        for ($j = $i + 1, $sizeGlob = \strlen($glob); $j < $sizeGlob; ++$j) {
+            $car = $glob[$j];
+
+            if (']' === $car && $j > $i + 1) {
+                $i = $j;
+
+                return $class.']';
+            }
+
+            if ('/' === $car || '{' === $car || '}' === $car || ',' === $car) {
+                return null;
+            }
+
+            if ('[' === $car && preg_match('/\[:[a-z]++:\]/A', $glob, $m, 0, $j)) {
+                $class .= $m[0];
+                $j += \strlen($m[0]) - 1;
+            } elseif ('\\' === $car) {
+                if (!isset($glob[++$j]) || '/' === $glob[$j]) {
+                    return null;
+                }
+                $class .= preg_quote($glob[$j], $delimiter);
+            } elseif ($delimiter === $car || str_contains('.()|+^$', $car)) {
+                $class .= '\\'.$car;
+            } else {
+                $class .= $car;
+            }
+        }
+
+        return null;
     }
 }

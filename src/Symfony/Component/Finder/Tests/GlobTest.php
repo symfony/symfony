@@ -25,6 +25,25 @@ class GlobTest extends TestCase
         $this->assertEquals('/^\.[^/]*$/', Glob::toRegex('.*', true, true, '/'));
     }
 
+    public function testGlobToRegexBracketExpressions()
+    {
+        $regex = Glob::toRegex('a[*?]');
+
+        $this->assertSame(1, preg_match($regex, 'a*'));
+        $this->assertSame(1, preg_match($regex, 'a?'));
+        $this->assertSame(0, preg_match($regex, 'ab'));
+        $this->assertSame(0, preg_match($regex, 'a]'));
+
+        $regex = Glob::toRegex('[a\-c]');
+
+        $this->assertSame(1, preg_match($regex, '-'));
+        $this->assertSame(1, preg_match($regex, 'c'));
+        $this->assertSame(0, preg_match($regex, 'b'));
+
+        $this->assertSame('#^(?=[^\.])file[0-9]\.txt$#', Glob::toRegex('file[0-9].txt'));
+        $this->assertSame('#^(?=[^\.])[[:alpha:]]$#', Glob::toRegex('[[:alpha:]]'));
+    }
+
     public function testGlobToRegexDoubleStarStrictDots()
     {
         $finder = new Finder();

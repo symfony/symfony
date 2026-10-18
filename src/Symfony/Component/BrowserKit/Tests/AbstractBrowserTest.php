@@ -222,6 +222,26 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('http://www.example.com/foo?', $client->getRequest()->getUri(), '->request() uses the previous request for ?');
         $client->request('GET', '?foo=bar');
         $this->assertSame('http://www.example.com/foo?foo=bar', $client->getRequest()->getUri(), '->request() uses the previous request for ?');
+
+        $client = $this->getBrowser();
+        $client->request('GET', 'http://www.example.com');
+        $client->request('GET', 'bar');
+        $this->assertSame('http://www.example.com/bar', $client->getRequest()->getUri(), '->request() uses the previous request without path for relative URLs');
+
+        $client = $this->getBrowser();
+        $client->request('GET', 'http://www.example.com:8080?foo=bar');
+        $client->request('GET', 'bar');
+        $this->assertSame('http://www.example.com:8080/bar', $client->getRequest()->getUri(), '->request() uses the previous request without path for relative URLs');
+
+        $client = $this->getBrowser();
+        $client->request('GET', 'http://www.example.com#foo');
+        $client->request('GET', '/bar');
+        $this->assertSame('http://www.example.com/bar', $client->getRequest()->getUri(), '->request() uses the previous request without path for absolute paths');
+
+        $client = $this->getBrowser();
+        $client->request('GET', 'http://www.example.com/foo/');
+        $client->request('GET', 'HTTPS://www.example.org/bar');
+        $this->assertSame('https://www.example.org/bar', $client->getRequest()->getUri(), '->request() lowercases the scheme of absolute URIs');
     }
 
     public function testRequestReferer()
@@ -491,6 +511,16 @@ class AbstractBrowserTest extends TestCase
         $client->setNextResponse(new Response('', 302, ['Location' => '/redirected:1234']));
         $client->request('GET', 'http://www.example.com/foo/foobar');
         $this->assertSame('http://www.example.com/redirected:1234', $client->getRequest()->getUri(), '->followRedirect() follows relative urls');
+    }
+
+    public function testFollowRedirectWithMixedCaseScheme()
+    {
+        $client = $this->getBrowser();
+        $client->setNextResponse(new Response('', 301, ['Location' => 'Https://www.example.org/']));
+        $client->request('GET', 'http://www.example.com/');
+
+        $this->assertSame('https://www.example.org/', $client->getRequest()->getUri());
+        $this->assertTrue($client->getRequest()->getServer()['HTTPS']);
     }
 
     public function testFollowRedirectWithMaxRedirects()

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-18T07:44:34Z
+
+PR updated to keep the current behavior on intersection types. Today, `#[Lazy(FooInterface::class)] FooInterface&BarInterface $foo` gets a proxy for both interfaces. With the patch as submitted, the proxy implements only `FooInterface` and the constructor throws a TypeError. That would break working apps in a patch release. 8.2 has the same issue since #65103, I'll fix it when merging up.

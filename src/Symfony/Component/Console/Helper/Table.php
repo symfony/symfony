@@ -395,9 +395,13 @@ class Table
         $rowGroups = $this->buildTableRows($rows);
         $this->calculateColumnsWidth($rowGroups);
 
+        $isMarkdown = self::$styles['markdown'] === $this->style;
+        // a markdown table must start with a header row, so one is added when the table has none
+        $needsMarkdownHeader = $isMarkdown && ($horizontal || $vertical || !array_filter($this->headers));
         $isHeader = !$horizontal;
         $isFirstRow = $horizontal;
-        $hasTitle = (bool) $this->headerTitle;
+        // a title would break the delimiter row of a markdown table
+        $hasTitle = (bool) $this->headerTitle && !$isMarkdown;
         $previousRow = null;
         $pendingSeparators = 0;
 
@@ -421,6 +425,13 @@ class Table
 
                 if (!$row) {
                     continue;
+                }
+
+                if ($needsMarkdownHeader) {
+                    $this->renderRow(array_fill(0, $this->numberOfColumns, ''), $this->style->getCellHeaderFormat());
+                    $this->renderRowSeparator(self::SEPARATOR_TOP_BOTTOM);
+                    $needsMarkdownHeader = false;
+                    $isFirstRow = false;
                 }
 
                 for (; $pendingSeparators > 0; --$pendingSeparators) {
@@ -464,6 +475,11 @@ class Table
 
                 $previousRow = $row;
             }
+        }
+
+        // a markdown table that only has headers still needs its delimiter row
+        if ($isMarkdown && $isFirstRow && null !== $previousRow) {
+            $this->renderRowSeparator(self::SEPARATOR_TOP_BOTTOM);
         }
 
         for (; $pendingSeparators > 0; --$pendingSeparators) {

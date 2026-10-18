@@ -147,6 +147,31 @@ class TableTest extends TestCase
                     TABLE,
             ],
             [
+                [],
+                [
+                    ['Divine Comedy', 'Dante Alighieri'],
+                    ['A Tale of Two Cities', 'Charles Dickens'],
+                ],
+                'markdown',
+                <<<'TABLE'
+                    |                      |                 |
+                    |----------------------|-----------------|
+                    | Divine Comedy        | Dante Alighieri |
+                    | A Tale of Two Cities | Charles Dickens |
+
+                    TABLE,
+            ],
+            [
+                ['ISBN', 'Title'],
+                [],
+                'markdown',
+                <<<'TABLE'
+                    | ISBN | Title |
+                    |------|-------|
+
+                    TABLE,
+            ],
+            [
                 ['ISBN', 'Title', 'Author'],
                 $books,
                 'compact',
@@ -1462,6 +1487,20 @@ class TableTest extends TestCase
 
                     TABLE,
             ],
+            'markdown style' => [
+                'Books',
+                'Page 1/2',
+                'markdown',
+                <<<'TABLE'
+                    | ISBN          | Title                    | Author           |
+                    |---------------|--------------------------|------------------|
+                    | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
+                    | 9971-5-0210-0 | A Tale of Two Cities     | Charles Dickens  |
+                    | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
+                    | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
+
+                    TABLE,
+            ],
             'header contains multiple lines' => [
                 'Multiline'."\n".'header'."\n".'here',
                 'footer',
@@ -1729,6 +1768,29 @@ class TableTest extends TestCase
         $table->render();
 
         $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testRenderHorizontalWithMarkdownStyle()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setStyle('markdown')
+            ->setHeaders(['foo', 'bar', 'baz'])
+            ->setRows([['one', 'two', 'tree'], ['1', '2', '3']])
+            ->setHorizontal()
+            ->render()
+        ;
+
+        $expected =
+            <<<'TABLE'
+                |     |      |   |
+                |-----|------|---|
+                | foo | one  | 1 |
+                | bar | two  | 2 |
+                | baz | tree | 3 |
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
     }
 
     protected function getOutputStream($decorated = false)
@@ -2062,6 +2124,26 @@ class TableTest extends TestCase
             ['ISBN', 'Title', 'Author', 'Price'],
             $books,
             'compact',
+        ];
+
+        yield 'Markdown style' => [
+            <<<EOTXT
+                |                              |
+                |------------------------------|
+                |   ISBN: 99921-58-10-7        |
+                |  Title: Divine Comedy        |
+                | Author: Dante Alighieri      |
+                |  Price: 9.95                 |
+                |------------------------------|
+                |   ISBN: 9971-5-0210-0        |
+                |  Title: A Tale of Two Cities |
+                | Author: Charles Dickens      |
+                |  Price: 139.25               |
+
+                EOTXT,
+            ['ISBN', 'Title', 'Author', 'Price'],
+            $books,
+            'markdown',
         ];
 
         yield 'symfony-style-guide style' => [

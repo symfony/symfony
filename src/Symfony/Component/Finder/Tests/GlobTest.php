@@ -120,4 +120,21 @@ class GlobTest extends TestCase
         $this->assertSame('#^(?=[^\.]).*$#', Glob::toRegex('**', true, false));
         $this->assertSame('#^(?=[^\.])a\*.*$#', Glob::toRegex('a\**', true, false));
     }
+
+    public function testGlobToRegexEscapedBrackets()
+    {
+        $regex = Glob::toRegex('file\[1\].txt');
+
+        $this->assertSame('#^(?=[^\.])file\[1\]\.txt$#', $regex);
+        $this->assertSame(1, preg_match($regex, 'file[1].txt'));
+        $this->assertSame(0, preg_match($regex, 'file1.txt'));
+
+        $this->assertSame(1, preg_match(Glob::toRegex('a\[b'), 'a[b'));
+        $this->assertSame(1, preg_match(Glob::toRegex('file[0-9].txt'), 'file1.txt'));
+
+        $regex = Glob::toRegex('[a\]]');
+
+        $this->assertSame(1, preg_match($regex, ']'));
+        $this->assertSame(0, preg_match($regex, 'a]'));
+    }
 }

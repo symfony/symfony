@@ -112,7 +112,7 @@ class Gitignore
             // escaped characters are written in hex so that the replacements below leave them alone
             $regex .= $i % 2 ? \sprintf('\x%02X', \ord($part)) : preg_quote($part, '~');
         }
-        $regex = preg_replace_callback('~\\\\\[((?:\\\\!)?)([^\[\]]*)\\\\\]~', static fn (array $matches): string => '['.('' !== $matches[1] ? '^' : '').str_replace('\\-', '-', $matches[2]).']', $regex);
+        $regex = preg_replace_callback('~\\\\\[((?:\\\\[!^])?+)((?:\\\\\])?+[^\]]*)\\\\\]~', static fn (array $matches): string => ('' !== $matches[1] ? '(?!/)[^' : '[').self::rangesToRegex($matches[2]).']', $regex);
         $regex = preg_replace('~(?:(?:\\\\\*){2,}(/?))+~', '(?:(?:(?!//).(?<!//))+$1)?', $regex);
         $regex = preg_replace('~\\\\\*~', '[^/]*', $regex);
         $regex = preg_replace('~\\\\\?~', '[^/]', $regex);
@@ -120,5 +120,17 @@ class Gitignore
         return ($isAbsolute ? '' : '(?:[^/]+/)*')
             .$regex
             .(!str_ends_with($gitignoreLine, '/') ? '(?:$|/)' : '');
+    }
+
+    /**
+     * Unescapes the "-" of each range. A range that ends before its start only matches its start, as in git.
+     */
+    private static function rangesToRegex(string $class): string
+    {
+        return preg_replace_callback('~(\\\\x[0-9A-F]{2}|\\\\?.)\\\\-(\\\\x[0-9A-F]{2}|\\\\?.)~', static function (array $m): string {
+            [$from, $to] = array_map(static fn (string $c): int => 4 === \strlen($c) ? hexdec(substr($c, 2)) : \ord($c[-1]), [$m[1], $m[2]]);
+
+            return $from <= $to ? $m[1].'-'.$m[2] : $m[1];
+        }, $class) ?? $class;
     }
 }

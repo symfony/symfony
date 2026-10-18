@@ -363,6 +363,36 @@ class GitignoreTest extends TestCase
                 ['debug0.log', 'debug1.log', 'debug01.log'],
             ],
             [
+                ['debug[^01].log'],
+                ['debug2.log', 'debug^.log'],
+                ['debug0.log', 'debug1.log', 'debug01.log'],
+            ],
+            [
+                ['a[!b]c', 'd[^e]f', 'x/g[!h]i'],
+                ['axc', 'dxf', 'y/axc', 'x/gxi'],
+                ['abc', 'def', 'a/c', 'd/f', 'y/a/c', 'x/g/i', 'x/ghi'],
+            ],
+            [
+                ['k[z-a]', 'l[a--z]', 'm[b-a-c]', 'n[!z-a]'],
+                ['kz', 'la', 'lz', 'mb', 'm-', 'mc', 'nx', 'na'],
+                ['ka', 'kb', 'lb', 'l-', 'ma', 'nz'],
+            ],
+            [
+                ['a[]b]c', 'd[!]e]f', 'g[^]h]i'],
+                ['a]c', 'abc', 'dxf', 'gxi'],
+                ['axc', 'd]f', 'def', 'g]i', 'ghi', 'd/f', 'g/i'],
+            ],
+            [
+                ['[!]', '[^]', 'x[]'],
+                [],
+                ['!', '^', ']', 'a', 'x', 'x]'],
+            ],
+            [
+                ['j[k[]l'],
+                ['jkl', 'j[l'],
+                ['j[k[]l', 'jk[]l', 'j]l', 'jxl'],
+            ],
+            [
                 ['debug[a-z].log'],
                 ['debuga.log', 'debugb.log'],
                 ['debug1.log'],

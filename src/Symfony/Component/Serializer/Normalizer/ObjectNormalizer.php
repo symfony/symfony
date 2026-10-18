@@ -157,9 +157,9 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
         if ($context['_read_attributes'] ?? true) {
             $context = array_intersect_key($context, ['enable_getter_setter_extraction' => true, 'enable_magic_methods_extraction' => true]);
-            $cacheKey = $class.$attribute.hash('xxh128', serialize($context));
+            $cacheKey = $class.'::'.$attribute.hash('xxh128', serialize($context));
 
-            return self::$isReadableCache[$cacheKey] ??= $this->propertyInfoExtractor->isReadable($class, $attribute, $context) || $this->hasAttributeAccessorMethod($class, $attribute) || (\is_object($classOrObject) && $this->propertyAccessor->isReadable($classOrObject, $attribute));
+            return self::$isReadableCache[$cacheKey] ??= $this->isPropertyPath($attribute) || $this->propertyInfoExtractor->isReadable($class, $attribute, $context) || $this->hasAttributeAccessorMethod($class, $attribute) || (\is_object($classOrObject) && $this->propertyAccessor->isReadable($classOrObject, $attribute));
         }
 
         if ($ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES]) {
@@ -172,13 +172,13 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         }
 
         $context = array_intersect_key($context, ['enable_getter_setter_extraction' => true, 'enable_magic_methods_extraction' => true, 'enable_constructor_extraction' => true, 'enable_adder_remover_extraction' => true]);
-        $cacheKey = $class.$attribute.hash('xxh128', serialize($context));
+        $cacheKey = $class.'::'.$attribute.hash('xxh128', serialize($context));
 
         if (isset(self::$isWritableCache[$cacheKey])) {
             return self::$isWritableCache[$cacheKey];
         }
 
-        if (str_contains($attribute, '.') || str_contains($attribute, '[') || $this->propertyInfoExtractor->isWritable($class, $attribute, $context)) {
+        if ($this->isPropertyPath($attribute) || $this->propertyInfoExtractor->isWritable($class, $attribute, $context)) {
             return self::$isWritableCache[$cacheKey] = true;
         }
 
@@ -213,5 +213,10 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             PropertyWriteInfo::TYPE_ADDER_AND_REMOVER => true,
             default => false,
         };
+    }
+
+    private function isPropertyPath(string $attribute): bool
+    {
+        return str_contains($attribute, '.') || str_contains($attribute, '[');
     }
 }

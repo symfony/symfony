@@ -105,6 +105,10 @@ final class LazyExtensionPass implements CompilerPassInterface
      */
     private static function declaresOnlyAttributeCallables(\ReflectionClass $r): bool
     {
+        if ($r->isSubclassOf(AttributeExtension::class)) {
+            return true;
+        }
+
         if (!$r->isSubclassOf(AbstractExtension::class) || $r->implementsInterface(GlobalsInterface::class)) {
             return false;
         }

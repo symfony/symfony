@@ -27,6 +27,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
     private string|false $prefetchData;
     private ?\Throwable $prefetchError = null;
     private ?string $newSessionId = null;
+    private ?string $readSessionId = null;
     private string $igbinaryEmptyData;
 
     public function __serialize(): array
@@ -80,6 +81,8 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
 
     public function read(#[\SensitiveParameter] string $sessionId): string|false
     {
+        $this->readSessionId = $sessionId;
+
         if (isset($this->prefetchId)) {
             $prefetchId = $this->prefetchId;
             $prefetchData = $this->prefetchData;
@@ -127,7 +130,8 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
 
     public function destroy(#[\SensitiveParameter] string $sessionId): bool
     {
-        if (!headers_sent() && filter_var(\ini_get('session.use_cookies'), \FILTER_VALIDATE_BOOL)) {
+        // only the handler that read the session manages its cookie, e.g. not the write-only handler of MigratingSessionHandler
+        if ($this->readSessionId === $sessionId && !headers_sent() && filter_var(\ini_get('session.use_cookies'), \FILTER_VALIDATE_BOOL)) {
             if (!isset($this->sessionName)) {
                 throw new \LogicException(\sprintf('Session name cannot be empty, did you forget to call "parent::open()" in "%s"?.', static::class));
             }

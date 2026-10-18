@@ -64,6 +64,11 @@ class XPathExpr
     public function addNameTest(): static
     {
         if ('*' !== $this->element) {
+            if ('*/' === $this->path) {
+                // after the name test, position() and last() would count the siblings of any type
+                $this->condition = self::positionsToSiblings($this->condition, $this->element);
+            }
+
             // name() returns the prefix used by the document, which may not be the prefix of the selector
             $this->addCondition(str_contains($this->element, ':') ? 'self::'.$this->element : 'name() = '.Translator::getXpathLiteral($this->element));
             $this->element = '*';

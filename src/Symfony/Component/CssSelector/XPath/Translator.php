@@ -12,6 +12,7 @@
 namespace Symfony\Component\CssSelector\XPath;
 
 use Symfony\Component\CssSelector\Exception\ExpressionErrorException;
+use Symfony\Component\CssSelector\Node\CombinedSelectorNode;
 use Symfony\Component\CssSelector\Node\FunctionNode;
 use Symfony\Component\CssSelector\Node\NodeInterface;
 use Symfony\Component\CssSelector\Node\SelectorNode;
@@ -177,11 +178,8 @@ class Translator implements TranslatorInterface
      */
     public function addRelativeCombination(string $combiner, NodeInterface $xpath, NodeInterface $combinedXpath): XPathExpr
     {
-        if (!isset($this->relativeCombinationTranslators[$combiner])) {
-            throw new ExpressionErrorException(\sprintf('Combiner "%s" not supported.', $combiner));
-        }
-
-        return $this->relativeCombinationTranslators[$combiner]($this->nodeToXPath($xpath), $this->nodeToXPath($combinedXpath));
+        // [1] stops at the first match, which matters on sibling axes
+        return $this->nodeToXPath($xpath)->addCondition($this->relativeToXPath($combiner, $combinedXpath).'[1]');
     }
 
     /**
@@ -218,6 +216,36 @@ class Translator implements TranslatorInterface
         }
 
         return $this->attributeMatchingTranslators[$operator]($xpath, $attribute, $value);
+    }
+
+    /**
+     * Returns the path from the element that :has() applies to, to the subject of the relative selector.
+     *
+     * @throws ExpressionErrorException
+     */
+    private function relativeToXPath(string $combiner, NodeInterface $node): XPathExpr
+    {
+        if ($node instanceof SelectorNode) {
+            $node = $node->getTree();
+        }
+
+        if ($node instanceof CombinedSelectorNode) {
+            if (!isset($this->combinationTranslators[$node->getCombinator()])) {
+                throw new ExpressionErrorException(\sprintf('Combiner "%s" not supported.', $node->getCombinator()));
+            }
+
+            return $this->combinationTranslators[$node->getCombinator()]($this->relativeToXPath($combiner, $node->getSelector()), $this->nodeToXPath($node->getSubSelector()));
+        }
+
+        if (' ' === $combiner && 'Pseudo[Element[*]:scope]' === (string) $node) {
+            return new XPathExpr('', 'self::*');
+        }
+
+        if (!isset($this->relativeCombinationTranslators[$combiner])) {
+            throw new ExpressionErrorException(\sprintf('Combiner "%s" not supported.', $combiner));
+        }
+
+        return $this->relativeCombinationTranslators[$combiner](new XPathExpr('', ''), $this->nodeToXPath($node));
     }
 
     /**

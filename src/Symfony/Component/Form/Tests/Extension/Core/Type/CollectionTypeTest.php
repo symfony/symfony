@@ -530,6 +530,43 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
     }
 
+    public function testPrototypeBlockPrefixesWithoutTheCustomBlockPrefixOfTheEntries()
+    {
+        $options = [
+            'allow_add' => true,
+            'entry_options' => ['block_prefix' => 'field'],
+            'prototype_options' => ['block_prefix' => null],
+        ];
+        $expectedBlockPrefixes = ['form', 'collection_entry', 'text', '_fields_entry'];
+
+        $collectionView = $this->factory->createNamed('fields', static::TESTED_TYPE, [''], $options)->createView();
+
+        $this->assertSame(['form', 'collection_entry', 'text', 'field', '_fields_entry'], $collectionView[0]->vars['block_prefixes']);
+        $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
+
+        $collectionView = $this->factory->createNamed('fields', static::TESTED_TYPE, [], $options)->createView();
+
+        $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
+    }
+
+    public function testPrototypeBlockPrefixesWithACustomBlockPrefixNotSetOnTheEntries()
+    {
+        $options = [
+            'allow_add' => true,
+            'prototype_options' => ['block_prefix' => 'field'],
+        ];
+        $expectedBlockPrefixes = ['form', 'collection_entry', 'text', 'field', '_fields_entry'];
+
+        $collectionView = $this->factory->createNamed('fields', static::TESTED_TYPE, [''], $options)->createView();
+
+        $this->assertSame(['form', 'collection_entry', 'text', '_fields_entry'], $collectionView[0]->vars['block_prefixes']);
+        $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
+
+        $collectionView = $this->factory->createNamed('fields', static::TESTED_TYPE, [], $options)->createView();
+
+        $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
+    }
+
     public function testPrototypeBlockPrefixesWithCustomBlockPrefix()
     {
         $collectionView = $this->factory->createNamed('fields', static::TESTED_TYPE, [], [

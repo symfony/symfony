@@ -64,9 +64,9 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         $fetchSize = \func_num_args() > 0 ? max(1, func_get_arg(0)) : 1;
         $envelopes = [];
         $now = $this->clock?->now() ?? new \DateTimeImmutable();
-        foreach ($this->decodeQueue($this->queue) as $id => $envelope) {
+        foreach ($this->queue as $id => $encodedEnvelope) {
             if (!isset($this->availableAt[$id]) || $now > $this->availableAt[$id]) {
-                $envelopes[] = $envelope;
+                $envelopes[] = $this->decodeQueue([$id => $encodedEnvelope])[$id];
                 if (\count($envelopes) >= $fetchSize) {
                     break;
                 }

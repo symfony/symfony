@@ -442,7 +442,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
         $this->assertStringContainsString('The worker will automatically exit once it has exceeded 1.5M of memory', $tester->getDisplay());
 
-        $this->assertSame(1572864, $logger->logs[1][2]['limit']);
+        $this->assertSame(1572864, $logger->logs[2][2]['limit']);
     }
 
     public function testRunWithAllOption()

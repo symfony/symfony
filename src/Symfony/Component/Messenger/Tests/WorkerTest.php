@@ -1262,10 +1262,11 @@ class WorkerTest extends TestCase
         $bus = $this->createStub(MessageBusInterface::class);
         $bus->method('dispatch')->willThrowException(new \RuntimeException('Failure.'));
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('info')
-            ->with('Worker stopped because no message was available outside of the transports that are cooling down: {transports}', ['transports' => 'transport']);
+        $logs = [];
+        $logger = $this->createStub(LoggerInterface::class);
+        $logger->method('info')->willReturnCallback(static function (string $message, array $context = []) use (&$logs) {
+            $logs[] = [$message, $context];
+        });
 
         $clock = new MockClock('2026-10-14 10:00:00+00:00');
         $cooldownStrategy = new MultiplierCooldownStrategy(1, 10000, 2, 60000, 0, null, $clock);
@@ -1274,6 +1275,10 @@ class WorkerTest extends TestCase
 
         $this->assertEquals(new \DateTimeImmutable('2026-10-14 10:00:00+00:00'), $clock->now());
         $this->assertCount(1, $receiver->getFetchSizes());
+        $this->assertSame([
+            ['Starting worker.', ['transport_names' => ['transport']]],
+            ['Worker stopped because no message was available outside of the transports that are cooling down: {transports}', ['transports' => 'transport']],
+        ], $logs);
     }
 
     public function testWorkerSkipsATransportWhileFetchingFromItFails()
@@ -1429,6 +1434,23 @@ class WorkerTest extends TestCase
 
         $this->assertCount(1, $receiver->getFetchSizes());
         $this->assertSame(0, $receiver->getAcknowledgeCount());
+    }
+
+    public function testWorkerShouldLogOnStart()
+    {
+        $logs = [];
+        $logger = $this->createStub(LoggerInterface::class);
+        $logger->method('info')->willReturnCallback(static function (string $message, array $context = []) use (&$logs) {
+            $logs[] = [$message, $context];
+        });
+
+        $worker = new Worker(['transport1' => new DummyReceiver([]), 'transport2' => new DummyReceiver([])], new MessageBus(), null, $logger, null, new MockClock());
+        $worker->run(['stop_when_empty' => true]);
+
+        $this->assertSame([
+            ['Starting worker.', ['transport_names' => ['transport1', 'transport2']]],
+            ['Worker stopped because no message was available', []],
+        ], $logs);
     }
 
     public function testWorkerShouldLogOnStop()

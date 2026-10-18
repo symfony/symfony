@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
+use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
 use Symfony\Component\RateLimiter\Util\TimeUtil;
 
 /**
@@ -30,6 +31,10 @@ final class Rate
 
     public function __construct(\DateInterval $refillTime, int $refillAmount = 1)
     {
+        if (TimeUtil::dateIntervalToSeconds($refillTime) < 1) {
+            throw new InvalidIntervalException('The refill interval must be at least one second.');
+        }
+
         $this->refillTime = $refillTime;
         $this->refillAmount = $refillAmount;
     }

@@ -22,6 +22,7 @@
     "require-dev": {
         "symfony/css-selector": "^5.4|^6.0|^7.0",
         "symfony/http-client": "^5.4|^6.0|^7.0",
+        "symfony/http-foundation": "^5.4|^6.0|^7.0",
         "symfony/mime": "^5.4|^6.0|^7.0",
         "symfony/process": "^5.4|^6.0|^7.0"
     },

@@ -39,6 +39,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\OptionalParameter;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetAndServiceClosure;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetAnonymous;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -1365,6 +1366,26 @@ class AutowirePassTest extends TestCase
 
         $this->assertSame('my friend %s has %d dogs', $service->required);
         $this->assertSame('50%% off', $service->optional);
+    }
+
+    public function testTargetWithAutowireServiceClosure()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(BarInterface::class, BarInterface::class);
+        $container->register('image.storage', BarInterface::class);
+        $container->registerAliasForArgument('image.storage', BarInterface::class);
+        $container->register('bar', BarInterface::class);
+        $container->register('with_target', WithTargetAndServiceClosure::class)
+            ->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('with_target');
+
+        $this->assertSame($container->getDefinition('image.storage'), $container->findDefinition((string) $definition->getArgument(0)->getValues()[0]));
+        $this->assertEquals(new Reference(BarInterface::class), $definition->getArgument(1)->getValues()[0]);
+        $this->assertEquals(new Reference('bar'), $definition->getArgument(2)->getValues()[0]);
     }
 
     public function testAsDecoratorAttribute()

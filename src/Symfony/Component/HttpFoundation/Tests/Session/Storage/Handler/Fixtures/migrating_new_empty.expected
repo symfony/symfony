@@ -1,0 +1,18 @@
+open
+open
+read
+doRead: 
+
+write
+destroy
+write
+destroy
+doDestroy
+close
+close
+Array
+(
+    [0] => Content-Type: text/plain; charset=utf-8
+    [1] => Cache-Control: max-age=10800, private, must-revalidate
+)
+shutdown

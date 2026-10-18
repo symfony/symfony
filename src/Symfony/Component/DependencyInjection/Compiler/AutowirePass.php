@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
@@ -119,6 +120,9 @@ class AutowirePass extends AbstractRecursivePass
             foreach ($value->getAttributes() as $attribute) {
                 if ($attribute === $v = $this->processValue($attribute)) {
                     continue;
+                }
+                if ($v instanceof ServiceClosureArgument && ($r = $v->getValues()[0]) instanceof Reference && $target = array_values(array_filter($value->getAttributes(), static fn ($a) => $a instanceof Target))) {
+                    return new ServiceClosureArgument($this->getAutowiredReference(new TypedReference($r, $r, $r->getInvalidBehavior(), $value->getName(), $target), true) ?? $r);
                 }
                 if (!$attribute instanceof Autowire || !$v instanceof Reference) {
                     return $v;
@@ -346,8 +350,14 @@ class AutowirePass extends AbstractRecursivePass
 
                         $value ??= $getValue();
 
+                        if (!$value instanceof Reference || ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior() && !$this->container->has((string) $value)) {
+                            $arguments[$index] = $value;
+
+                            continue 2;
+                        }
+
                         if (!\is_array($lazy)) {
-                            $lazy = str_contains($type, '&') && !str_contains($type, '|') ? explode('&', $type) : (\is_string($lazy) ? [$lazy] : []);
+                            $lazy = str_contains($type, '&') && !str_contains($type, '|') ? explode('&', trim($type, '()')) : (\is_string($lazy) ? [$lazy] : []);
                         }
 
                         if (!$lazy && $value instanceof Reference && $this->container->has($value) && $this->container->findDefinition($value)->isLazy()) {

@@ -70,6 +70,11 @@ class MemcachedSessionHandler extends AbstractSessionHandler
 
     public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
+        // PHP 8.6 calls updateTimestamp() instead of write() for a session that is still empty
+        if ('' === $data || (\function_exists('igbinary_serialize') && igbinary_serialize([]) === $data)) {
+            return $this->destroy($sessionId);
+        }
+
         $this->memcached->touch($this->prefix.$sessionId, $this->getCompatibleTtl());
 
         return true;

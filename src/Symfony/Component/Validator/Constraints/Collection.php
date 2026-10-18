@@ -78,7 +78,8 @@ class Collection extends Composite
             }
 
             if (!$field instanceof Optional && !$field instanceof Required) {
-                $this->fields[$fieldName] = new Required($field);
+                // when the collection has explicit groups, nested constraints without groups inherit them
+                $this->fields[$fieldName] = new Required($field, isset(get_object_vars($this)['groups']) ? $this->groups : null);
             }
         }
     }

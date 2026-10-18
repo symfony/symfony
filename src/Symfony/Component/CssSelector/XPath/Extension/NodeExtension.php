@@ -88,10 +88,29 @@ class NodeExtension extends AbstractExtension
     public function translateNegation(Node\NegationNode $node, Translator $translator): XPathExpr
     {
         $xpath = $translator->nodeToXPath($node->getSelector());
-        $subXpath = $translator->nodeToXPath($node->getSubSelector());
+        $subSelector = $node->getSubSelector();
+        $element = $this->getElementNode($node->getSelector());
+
+        // without a type, *-of-type pseudo-classes refer to the siblings that have the type of the element
+        if ($ofType = null !== $element?->getElement() && $this->hasUntypedOfType($subSelector)) {
+            $subSelector = $this->withElement($subSelector, $element);
+        }
+
+        $subXpath = $translator->nodeToXPath($subSelector);
+
+        if (str_starts_with($subXpath, '*/')) {
+            // position() and last() are relative to the step of the negated selector, which is not the step of the element
+            $subXpath = new XPathExpr('', $subXpath->getElement(), XPathExpr::positionsToSiblings($subXpath->getCondition(), $subXpath->getElement()));
+        }
+
+        if ($ofType) {
+            // the type is already tested on the element
+            $subXpath = new XPathExpr('', '*', $subXpath->getCondition());
+        }
+
         $subXpath->addNameTest();
 
-        if ($subXpath->getCondition()) {
+        if ('' !== $subXpath->getCondition()) {
             return $xpath->addCondition(\sprintf('not(%s)', $subXpath->getCondition()));
         }
 
@@ -205,13 +224,11 @@ class NodeExtension extends AbstractExtension
             $safe = $safe && $this->isSafeName($node->getNamespace());
         }
 
-        $xpath = new XPathExpr('', $element);
-
-        if (!$safe) {
-            $xpath->addNameTest();
+        if (!$safe && '*' !== $element) {
+            return new XPathExpr('', '*', 'name() = '.Translator::getXpathLiteral($element));
         }
 
-        return $xpath;
+        return new XPathExpr('', $element);
     }
 
     public function getName(): string
@@ -241,38 +258,40 @@ class NodeExtension extends AbstractExtension
         return $node instanceof Node\ElementNode ? $this->translateElement($node)->getElement() : '*';
     }
 
-    /**
-     * Replaces position() and last() by tests on the siblings of the context node.
-     */
-    private function positionsToSiblings(string $condition, string $element): string
+    private function hasUntypedOfType(Node\NodeInterface $node): bool
     {
-        // [1] stops at the first sibling found: count() is used only when An+B needs it
-        $first = \sprintf('not(preceding-sibling::%s[1])', $element);
-        $last = \sprintf('not(following-sibling::%s[1])', $element);
-        $depth = 0;
-        $result = '';
+        $ofType = false;
 
-        foreach (preg_split('/(\'[^\']*+\'|"[^"]*+"|[\[\]]|position\(\) = (?:1|last\(\)(?: - 0)?)(?![\d-]| -)|last\(\) = 1(?!\d)|last\(\) - position\(\)|position\(\)|last\(\))/', $condition, -1, \PREG_SPLIT_DELIM_CAPTURE) as $part) {
-            if ('[' === $part) {
-                ++$depth;
-            } elseif (']' === $part) {
-                --$depth;
-            } elseif (!$depth) {
-                $part = match ($part) {
-                    'position() = 1' => $first,
-                    'position() = last()', 'position() = last() - 0' => $last,
-                    'last() = 1' => $first.' and '.$last,
-                    'last() - position()' => \sprintf('count(following-sibling::%s)', $element),
-                    'position()' => \sprintf('(count(preceding-sibling::%s) + 1)', $element),
-                    'last()' => \sprintf('(count(preceding-sibling::%1$s) + count(following-sibling::%1$s) + 1)', $element),
-                    default => $part,
-                };
+        while ($node instanceof Node\FunctionNode || $node instanceof Node\PseudoNode || $node instanceof Node\ClassNode || $node instanceof Node\HashNode || $node instanceof Node\AttributeNode) {
+            if ($node instanceof Node\FunctionNode && str_ends_with($node->getName(), '-of-type') || $node instanceof Node\PseudoNode && str_ends_with($node->getIdentifier(), '-of-type')) {
+                $ofType = true;
             }
 
-            $result .= $part;
+            $node = $node->getSelector();
         }
 
-        return $result;
+        return $ofType && $node instanceof Node\ElementNode && null === $node->getElement() && null === $node->getNamespace();
+    }
+
+    private function getElementNode(Node\NodeInterface $node): ?Node\ElementNode
+    {
+        while ($node instanceof Node\NegationNode || $node instanceof Node\FunctionNode || $node instanceof Node\PseudoNode || $node instanceof Node\ClassNode || $node instanceof Node\HashNode || $node instanceof Node\AttributeNode) {
+            $node = $node->getSelector();
+        }
+
+        return $node instanceof Node\ElementNode ? $node : null;
+    }
+
+    private function withElement(Node\NodeInterface $node, Node\ElementNode $element): Node\NodeInterface
+    {
+        return match (true) {
+            $node instanceof Node\FunctionNode => new Node\FunctionNode($this->withElement($node->getSelector(), $element), $node->getName(), $node->getArguments()),
+            $node instanceof Node\PseudoNode => new Node\PseudoNode($this->withElement($node->getSelector(), $element), $node->getIdentifier()),
+            $node instanceof Node\ClassNode => new Node\ClassNode($this->withElement($node->getSelector(), $element), $node->getName()),
+            $node instanceof Node\HashNode => new Node\HashNode($this->withElement($node->getSelector(), $element), $node->getId()),
+            $node instanceof Node\AttributeNode => new Node\AttributeNode($this->withElement($node->getSelector(), $element), $node->getNamespace(), $node->getAttribute(), $node->getOperator(), $node->getValue()),
+            default => $element,
+        };
     }
 
     private function isSafeName(string $name): bool
@@ -319,7 +338,7 @@ class NodeExtension extends AbstractExtension
                 $siblings = $type;
             }
 
-            $xpath = new XPathExpr('', $xpath->getElement(), $this->positionsToSiblings($xpath->getCondition(), $siblings));
+            $xpath = new XPathExpr('', $xpath->getElement(), XPathExpr::positionsToSiblings($xpath->getCondition(), $siblings));
         }
 
         return $xpath->addNameTest()->getCondition();

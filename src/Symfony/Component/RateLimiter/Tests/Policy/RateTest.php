@@ -13,6 +13,7 @@ namespace Symfony\Component\RateLimiter\Tests\Policy;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
 use Symfony\Component\RateLimiter\Policy\Rate;
 
 class RateTest extends TestCase
@@ -46,6 +47,14 @@ class RateTest extends TestCase
         yield 'product rounding to exactly the int range bound' => [new Rate(new \DateInterval('PT10S'), 10), \PHP_INT_MAX];
         // the token count stays within the int range on 32-bit platforms, only the product exceeds the cap
         yield 'product just above the cap' => [new Rate(new \DateInterval('PT2S'), 1), 1073741824];
+    }
+
+    public function testRejectSubsecondInterval()
+    {
+        $this->expectException(InvalidIntervalException::class);
+        $this->expectExceptionMessage('The refill interval must be at least one second.');
+
+        new Rate(\DateInterval::createFromDateString('200 milliseconds'));
     }
 
     public function testCalculateTimeForTokensBelowTheCapIsNotChanged()

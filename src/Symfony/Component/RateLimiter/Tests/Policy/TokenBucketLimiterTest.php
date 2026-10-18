@@ -68,6 +68,43 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertFalse($limiter2->consume()->isAccepted());
     }
 
+    public function testChangedRateIsAppliedToStoredBucket()
+    {
+        $this->createLimiter(100, Rate::perMinute(20))->consume(100);
+        sleep(60);
+
+        $this->assertSame(1, $this->createLimiter(100, Rate::perMinute(1))->consume(0)->getRemainingTokens());
+    }
+
+    public function testIncreasedBurstSizeIsAppliedToStoredBucket()
+    {
+        $this->createLimiter(10, Rate::perSecond(1))->consume();
+        sleep(5);
+
+        $this->assertSame(14, $this->createLimiter(20, Rate::perSecond(1))->consume(0)->getRemainingTokens());
+    }
+
+    public function testChangedConfigurationPreservesReservationDebt()
+    {
+        $limiter = $this->createLimiter(10, Rate::perMinute(10));
+        $limiter->consume(10);
+        $limiter->reserve(10);
+
+        $limiter = $this->createLimiter(10, Rate::perMinute(1));
+
+        $this->assertEquals(660, $limiter->reserve()->getWaitDuration());
+    }
+
+    public function testRaisingBurstSizeBackDoesNotRefillStoredBucket()
+    {
+        $this->createLimiter(100, Rate::perMinute(10))->consume(100);
+        sleep(60);
+        $this->createLimiter(10, Rate::perMinute(10))->consume(10);
+        sleep(61);
+
+        $this->assertSame(10, $this->createLimiter(100, Rate::perMinute(10))->consume(0)->getRemainingTokens());
+    }
+
     public function testReserveMaxWaitingTime()
     {
         $limiter = $this->createLimiter(10, Rate::perMinute());

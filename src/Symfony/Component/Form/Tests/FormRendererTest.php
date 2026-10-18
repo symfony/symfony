@@ -20,6 +20,25 @@ use Symfony\Component\Form\Tests\Fixtures\DummyFormRendererEngine;
 
 class FormRendererTest extends TestCase
 {
+    public function testViewsSharingACacheKeyCanHaveDifferentBlockHierarchies()
+    {
+        $entry = ['form', 'collection_entry', 'task', '_task'];
+        $prototype = ['form', 'task', '_task'];
+
+        $this->assertSame(['[task_widget]', '[task_widget]'], $this->renderWidgets(['task_widget' => true], $entry, $prototype));
+        $this->assertSame(['[task_widget]', '[task_widget]'], $this->renderWidgets(['task_widget' => true], $prototype, $entry));
+    }
+
+    public function testViewsSharingACacheKeyFallBackAlongTheirOwnBlockHierarchy()
+    {
+        $entry = ['form', 'collection_entry', 'task', '_task'];
+        $prototype = ['form', 'task', '_task'];
+        $blocks = ['form_widget' => true, 'collection_entry_widget' => true];
+
+        $this->assertSame(['[collection_entry_widget]', '[form_widget]'], $this->renderWidgets($blocks, $entry, $prototype));
+        $this->assertSame(['[form_widget]', '[collection_entry_widget]'], $this->renderWidgets($blocks, $prototype, $entry));
+    }
+
     public function testHumanize()
     {
         $renderer = new FormRenderer(new DummyFormRendererEngine());
@@ -176,5 +195,35 @@ class FormRendererTest extends TestCase
                 return true;
             }
         };
+    }
+
+    private function renderWidgets(array $blocks, array ...$blockPrefixes): array
+    {
+        $engine = new class($blocks) extends AbstractRendererEngine {
+            public function __construct(private array $blocks)
+            {
+                parent::__construct();
+            }
+
+            public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []): string
+            {
+                return '['.$blockName.']';
+            }
+
+            protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName): bool
+            {
+                return $this->resources[$cacheKey][$blockName] = isset($this->blocks[$blockName]);
+            }
+        };
+        $renderer = new FormRenderer($engine);
+
+        $html = [];
+        foreach ($blockPrefixes as $prefixes) {
+            $view = new FormView();
+            $view->vars = ['name' => 'task', 'unique_block_prefix' => '_task', 'cache_key' => '_task_task', 'block_prefixes' => $prefixes];
+            $html[] = $renderer->searchAndRenderBlock($view, 'widget');
+        }
+
+        return $html;
     }
 }

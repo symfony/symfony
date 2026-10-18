@@ -140,6 +140,11 @@ class MongoDbSessionHandler extends AbstractSessionHandler
 
     public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
+        // PHP 8.6 calls updateTimestamp() instead of write() for a session that is still empty
+        if ('' === $data || (\function_exists('igbinary_serialize') && igbinary_serialize([]) === $data)) {
+            return $this->destroy($sessionId);
+        }
+
         $ttl = ($this->ttl instanceof \Closure ? ($this->ttl)() : $this->ttl) ?? \ini_get('session.gc_maxlifetime');
         $expiry = $this->getUTCDateTime($ttl);
 

@@ -53,6 +53,29 @@ class NullSessionHandlerTest extends TestCase
         $this->assertNull($session->get('something'));
     }
 
+    public function testUpdateTimestampWithEmptyDataDestroysSession()
+    {
+        $handler = new class extends NullSessionHandler {
+            public array $destroyedIds = [];
+
+            public function destroy(#[\SensitiveParameter] string $sessionId): bool
+            {
+                $this->destroyedIds[] = $sessionId;
+
+                return parent::destroy($sessionId);
+            }
+        };
+
+        $handler->open('', 'sid');
+        $this->assertSame('', $handler->read('id'));
+
+        $this->assertTrue($handler->updateTimestamp('id', 'data'));
+        $this->assertSame([], $handler->destroyedIds);
+
+        $this->assertTrue($handler->updateTimestamp('id', ''));
+        $this->assertSame(['id'], $handler->destroyedIds);
+    }
+
     public function getStorage()
     {
         return new NativeSessionStorage([], new NullSessionHandler());

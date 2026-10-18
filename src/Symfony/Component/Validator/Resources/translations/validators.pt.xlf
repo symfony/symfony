@@ -56,19 +56,19 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
-                <target>O arquivo não pôde ser encontrado.</target>
+                <target>O ficheiro não pôde ser encontrado.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable.</source>
-                <target>O arquivo não pôde ser lido.</target>
+                <target>O ficheiro não é legível.</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>O arquivo é muito grande ({{ size }} {{ suffix }}). O tamanho máximo permitido é de {{ limit }} {{ suffix }}.</target>
+                <target>O ficheiro é muito grande ({{ size }} {{ suffix }}). O tamanho máximo permitido é de {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>O tipo mime do arquivo é inválido ({{ type }}). Os tipos mime permitidos são {{ types }}.</target>
+                <target>O tipo mime do ficheiro é inválido ({{ type }}). Os tipos mime permitidos são {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
-                <target>O valor é muito longo. Deveria ter {{ limit }} caracteres ou menos.</target>
+                <target>O valor é demasiado longo. Deve ter {{ limit }} carácter ou menos.|O valor é demasiado longo. Deve ter {{ limit }} carateres ou menos.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
@@ -84,7 +84,7 @@
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
-                <target>O valor é muito curto. Deveria de ter {{ limit }} caractere ou mais.|O valor é muito curto. Deveria de ter {{ limit }} caracteres ou mais.</target>
+                <target>O valor é demasiado curto. Deve ter {{ limit }} carácter ou mais.|O valor é demasiado curto. Deve ter {{ limit }} carateres ou mais.</target>
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>
@@ -116,15 +116,15 @@
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>O arquivo é muito grande. O tamanho máximo permitido é de {{ limit }} {{ suffix }}.</target>
+                <target>O ficheiro é muito grande. O tamanho máximo permitido é de {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
-                <target>O arquivo é muito grande.</target>
+                <target>O ficheiro é muito grande.</target>
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>Não foi possível enviar o arquivo.</target>
+                <target>Não foi possível enviar o ficheiro.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -132,7 +132,7 @@
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>Este arquivo não é uma imagem.</target>
+                <target>Este ficheiro não é uma imagem.</target>
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
@@ -140,7 +140,7 @@
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Este valor não é uma linguagem válida.</target>
+                <target>Este valor não é um idioma válido.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
@@ -176,7 +176,7 @@
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
-                <target>Este valor deveria ser a senha atual do usuário.</target>
+                <target>Este valor deveria ser a palvra-passe atual do usuário.</target>
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
@@ -184,11 +184,11 @@
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>Só foi enviada uma parte do arquivo.</target>
+                <target>Só foi enviada uma parte do ficheiro.</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
-                <target>Nenhum arquivo foi enviado.</target>
+                <target>Nenhum ficheiro foi enviado.</target>
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
@@ -196,7 +196,7 @@
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
-                <target>Não foi possível escrever os arquivos temporários no disco.</target>
+                <target>Não foi possível escrever os ficheiros temporários no disco.</target>
             </trans-unit>
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
@@ -300,7 +300,7 @@
             </trans-unit>
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
-                <target>Um arquivo vazio não é permitido.</target>
+                <target>Um ficheiro vazio não é permitido.</target>
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
@@ -360,7 +360,7 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>Esta senha foi divulgada durante um vazamento de dados, não deve ser usada de novamente. Por favor usar uma senha outra.</target>
+                <target>Esta palavra-passe foi exposta numa fuga de dados e não deve ser usada novamente. Por favor, utilize outra palavra-passe.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
@@ -404,11 +404,11 @@
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target>O nome do arquivo é muito grande. Deveria ter {{ filename_max_length }} caractere ou menos.|O nome do arquivo é muito grande. Deveria ter {{ filename_max_length }} caracteres ou menos.</target>
+                <target>O nome do ficheiro é muito grande. Deveria ter {{ filename_max_length }} caractere ou menos.|O nome do ficheiro é muito grande. Deveria ter {{ filename_max_length }} caracteres ou menos.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
-                <target>A força da senha é muito baixa. Por favor utilize uma senha mais forte.</target>
+                <target>A força da palvra-passe é muito baixa. Por favor utilize uma palvra-passe mais forte.</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
@@ -428,7 +428,7 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target>A extensão do arquivo é inválida ({{ extension }}). As extensões permitidas são {{ extensions }}.</target>
+                <target>A extensão do ficheiro é inválida ({{ extension }}). As extensões permitidas são {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>

@@ -309,14 +309,25 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
 
         foreach ($hosts as $host) {
             $info = $host->info('Memory');
+            $info = \is_array($info) ? ($info['Memory'] ?? $info) : [];
 
-            if (false === $info || null === $info || $info instanceof ErrorInterface) {
+            if (isset($info['maxmemory_policy'])) {
+                return $this->redisEvictionPolicy = $info['maxmemory_policy'];
+            }
+
+            // ElastiCache Serverless doesn't report its maxmemory-policy, which is always volatile-lru
+            $info = $host->info();
+            if (!\is_array($info)) {
                 continue;
             }
 
-            $info = $info['Memory'] ?? $info;
-
-            return $this->redisEvictionPolicy = $info['maxmemory_policy'] ?? '';
+            $server = $info['Server'] ?? $info;
+            $replication = $info['Replication'] ?? $info;
+            if ('cluster' === ($server['redis_mode'] ?? null) && '0' === (string) ($server['run_id'] ?? '')
+                && ('Amazon ElastiCache' === ($server['os'] ?? null) || preg_match('~^ip=[a-z0-9.-]+\.serverless\.[a-z0-9-]+\.cache\.amazonaws\.com(?:\.cn)?(?:,|$)~iD', $replication['slave0'] ?? ''))
+            ) {
+                return $this->redisEvictionPolicy = 'volatile-lru';
+            }
         }
 
         return $this->redisEvictionPolicy = '';

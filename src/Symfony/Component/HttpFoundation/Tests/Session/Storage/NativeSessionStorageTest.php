@@ -390,4 +390,15 @@ class NativeSessionStorageTest extends TestCase
             'trans_sid_tags' => 'foo',
         ]);
     }
+
+    public function testCreatingManyInstancesDoesNotLeakMemory()
+    {
+        new NativeSessionStorage();
+        $start = memory_get_usage();
+        for ($i = 0; $i < 100; ++$i) {
+            new NativeSessionStorage();
+        }
+
+        $this->assertSame(0, memory_get_usage() - $start);
+    }
 }

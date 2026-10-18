@@ -59,6 +59,8 @@ final class FixedWindowLimiter implements LimiterInterface
                 $window = new Window($this->id, $this->interval, $this->limit);
             }
 
+            $window->configure($this->interval, $this->limit);
+
             $now = microtime(true);
             $availableTokens = $window->getAvailableTokens($now);
 

@@ -234,7 +234,12 @@ class Worker
 
                 if (!$rejectFirst) {
                     unset($this->keepalives[$envelope->getMessage()]);
-                    $receiver->reject($envelope);
+
+                    if ($failedEvent->willRetry()) {
+                        $receiver->ack($envelope);
+                    } else {
+                        $receiver->reject($envelope);
+                    }
                 }
 
                 continue;

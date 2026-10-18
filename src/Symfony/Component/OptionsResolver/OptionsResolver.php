@@ -834,7 +834,7 @@ class OptionsResolver implements Options
 
         foreach ((array) $optionNames as $option) {
             unset($this->defined[$option], $this->defaults[$option], $this->required[$option], $this->resolved[$option]);
-            unset($this->lazy[$option], $this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option], $this->info[$option], $this->deprecated[$option]);
+            unset($this->lazy[$option], $this->nested[$option], $this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option], $this->info[$option], $this->deprecated[$option], $this->deprecatedNestedOptions[$option]);
         }
 
         return $this;
@@ -864,6 +864,7 @@ class OptionsResolver implements Options
         $this->allowedValues = [];
         $this->deprecated = [];
         $this->info = [];
+        $this->deprecatedNestedOptions = [];
 
         return $this;
     }

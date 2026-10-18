@@ -517,6 +517,24 @@ class ProgressBarTest extends TestCase
         putenv('COLUMNS=120');
     }
 
+    public function testOverwriteWithSectionOutputAndMessageTwiceAsWideAsTheTerminal()
+    {
+        putenv('COLUMNS=20');
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+
+        $bar = new ProgressBar($output, 50, 0);
+        $bar->setFormat('%message%');
+        $bar->setMessage(str_repeat('x', 40));
+        $bar->start();
+        $bar->setMessage(str_repeat('y', 40));
+        $bar->advance();
+
+        rewind($output->getStream());
+        $this->assertStringContainsString("\x1b[2A\x1b[0J".str_repeat('y', 40), stream_get_contents($output->getStream()));
+    }
+
     public function testOverwriteMultipleProgressBarsWithSectionOutputs()
     {
         $sections = [];

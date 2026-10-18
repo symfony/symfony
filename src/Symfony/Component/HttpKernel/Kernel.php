@@ -143,6 +143,18 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             return;
         }
 
+        if (!$this->handlingHttpCache && $this->container->has('http_cache') && ($httpCache = $this->container->get('http_cache')) instanceof TerminableInterface) {
+            $this->handlingHttpCache = true;
+
+            try {
+                $httpCache->terminate($request, $response);
+            } finally {
+                $this->handlingHttpCache = false;
+            }
+
+            return;
+        }
+
         if ($this->getHttpKernel() instanceof TerminableInterface) {
             $this->getHttpKernel()->terminate($request, $response);
         }

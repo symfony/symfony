@@ -21,6 +21,8 @@ final class BrevoPayloadConverter implements PayloadConverterInterface
 {
     public function convert(array $payload): AbstractMailerEvent
     {
+        $id = $payload['message-id'] ?? (string) $payload['camp_id'];
+
         if (\in_array($payload['event'], ['request', 'deferred', 'delivered', 'soft_bounce', 'hard_bounce', 'invalid_email', 'blocked', 'error'], true)) {
             $name = match ($payload['event']) {
                 'request' => MailerDeliveryEvent::RECEIVED,
@@ -33,19 +35,19 @@ final class BrevoPayloadConverter implements PayloadConverterInterface
                 'error' => MailerDeliveryEvent::DROPPED,
             };
 
-            $event = new MailerDeliveryEvent($name, $payload['message-id'], $payload);
+            $event = new MailerDeliveryEvent($name, $id, $payload);
         } else {
             $name = match ($payload['event']) {
                 'click' => MailerEngagementEvent::CLICK,
-                'unsubscribed' => MailerEngagementEvent::UNSUBSCRIBE,
+                'unsubscribed', 'unsubscribe' => MailerEngagementEvent::UNSUBSCRIBE,
                 'unique_opened' => MailerEngagementEvent::OPEN,
                 'opened' => MailerEngagementEvent::OPEN,
                 'proxy_open' => MailerEngagementEvent::OPEN,
                 'unique_proxy_open' => MailerEngagementEvent::OPEN,
-                'complaint' => MailerEngagementEvent::SPAM,
+                'complaint', 'spam' => MailerEngagementEvent::SPAM,
                 default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['event'])),
             };
-            $event = new MailerEngagementEvent($name, $payload['message-id'], $payload);
+            $event = new MailerEngagementEvent($name, $id, $payload);
         }
 
         if (!$date = \DateTimeImmutable::createFromFormat('U', $payload['ts_event'])) {

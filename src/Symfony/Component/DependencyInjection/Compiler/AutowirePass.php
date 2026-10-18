@@ -345,7 +345,7 @@ class AutowirePass extends AbstractRecursivePass
                             if (str_contains($type, '|')) {
                                 throw new AutowiringFailedException($this->currentId, \sprintf('Cannot use #[Autowire] with option "lazy: true" on union types for service "%s"; set the option to the interface(s) that should be proxied instead.', $this->currentId));
                             }
-                            $lazy = str_contains($type, '&') ? explode('&', $type) : [];
+                            $lazy = str_contains($type, '&') ? explode('&', trim($type, '()')) : [];
                         }
 
                         if ($lazy) {

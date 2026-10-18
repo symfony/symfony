@@ -47,6 +47,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer;
+use Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceImplementation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\EInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\EnvAutowireWithMissingArgument;
@@ -56,6 +57,7 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\FooAnnotation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable;
+use Symfony\Component\DependencyInjection\Tests\Compiler\NullableIntersectionLazyConsumer;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Compiler\WitherAnnotation;
@@ -2329,6 +2331,35 @@ class PhpDumperTest extends TestCase
         $this->assertNull($container->get('bar')->foo);
         $this->assertNull($container->get('bar')->bar);
         $this->assertNull($container->get('bar')->baz);
+    }
+
+    /**
+     * @requires PHP 8.2
+     */
+    public function testLazyAutowireAttributeWithNullableIntersection()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', AAndIInterfaceImplementation::class)
+            ->setPublic(true);
+        $container->setAlias(AInterface::class, 'foo');
+        $container->setAlias(IInterface::class, 'foo');
+        $container->register('bar', NullableIntersectionLazyConsumer::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+        $container->compile();
+
+        $this->assertInstanceOf(AInterface::class, $container->get('bar')->foo);
+        $this->assertInstanceOf(IInterface::class, $container->get('bar')->foo);
+        $this->assertNotSame($container->get('foo'), $container->get('bar')->foo);
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute_With_Nullable_Intersection']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute_With_Nullable_Intersection();
+
+        $this->assertInstanceOf(AInterface::class, $container->get('bar')->foo);
+        $this->assertInstanceOf(IInterface::class, $container->get('bar')->foo);
+        $this->assertNotSame($container->get('foo'), $container->get('bar')->foo);
     }
 
     public function testCallableAdapterConsumer()

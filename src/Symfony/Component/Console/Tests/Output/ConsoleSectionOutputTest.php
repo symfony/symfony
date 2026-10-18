@@ -168,6 +168,20 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertSame('Foo'.\PHP_EOL."abc\tdefg".\PHP_EOL."\x1b[2A\x1b[0J", stream_get_contents($output->getStream()));
     }
 
+    public function testClearWithZeroColumns()
+    {
+        putenv('COLUMNS=0');
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->writeln('Foo');
+        $output->writeln('0123456789abcde');
+        $output->clear();
+
+        rewind($output->getStream());
+        $this->assertSame('Foo'.\PHP_EOL.'0123456789abcde'.\PHP_EOL."\x1b[2A\x1b[0J", stream_get_contents($output->getStream()));
+    }
+
     public function testClearNumberOfLinesWithMultipleSections()
     {
         $output = new StreamOutput($this->stream);

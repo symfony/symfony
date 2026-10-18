@@ -285,6 +285,10 @@ class ConsoleSectionOutput extends StreamOutput
 
     private function getDisplayHeight(string $line, int $width): int
     {
+        if ($width <= 0) {
+            return 1;
+        }
+
         // the line break must not count as a column, or a line as wide as the terminal would count as two
         if (str_ends_with($line, \PHP_EOL)) {
             $line = substr($line, 0, -\strlen(\PHP_EOL));

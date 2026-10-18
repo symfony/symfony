@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-18T10:22:28Z
+
+Thanks! Nullsafe paths like `address?.city` were still dropped. I pushed a small fix that also splits the path on `?`.
+
+I also made the source's own `#[Map]` win over a target's `#[Map(source: ...)]` for the same property, as the docs say. On 8.1.9, `#[JsonStreamable]` DTOs got the target's transform instead, or a TypeError.

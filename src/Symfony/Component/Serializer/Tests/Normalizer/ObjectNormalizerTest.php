@@ -1485,6 +1485,133 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('value', $normalized['normalProperty']);
     }
 
+    public function testIgnoredAttributesCannotBeWrittenThroughSetterAliases()
+    {
+        $object = new class {
+            private int $barData = 0;
+            public int $bazData = 0;
+
+            public function setBarData(int $value): void
+            {
+                $this->barData = $value;
+            }
+
+            public function getBarData(): int
+            {
+                return $this->barData;
+            }
+        };
+        $normalizer = new ObjectNormalizer();
+        $normalizer->denormalize(['bArDaTa' => 42, 'bar_data' => 43, 'bar data' => 44, 'bazData' => 21], $object::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $object,
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['barData'],
+        ]);
+
+        $this->assertSame(0, $object->getBarData());
+        $this->assertSame(21, $object->bazData);
+    }
+
+    public function testIgnoredAttributesCannotBeWrittenThroughAdderAliases()
+    {
+        $object = new class {
+            private array $lineItems = [];
+
+            public function addLineItem(string $item): void
+            {
+                $this->lineItems[] = $item;
+            }
+
+            public function removeLineItem(string $item): void
+            {
+            }
+
+            public function getLineItems(): array
+            {
+                return $this->lineItems;
+            }
+        };
+        $normalizer = new ObjectNormalizer();
+        $normalizer->denormalize(['lInEiTeMs' => ['item']], $object::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $object,
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['lineItems'],
+        ]);
+
+        $this->assertSame([], $object->getLineItems());
+    }
+
+    public function testIgnoredAttributesKeepOtherMagicProperties()
+    {
+        $object = new class {
+            public array $values = [];
+
+            public function __set(string $name, mixed $value): void
+            {
+                $this->values[$name] = $value;
+            }
+        };
+        $normalizer = new ObjectNormalizer();
+        $normalizer->denormalize(['barData' => 42, 'BarData' => 43, 'bazData' => 21], $object::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $object,
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['barData'],
+        ]);
+
+        $this->assertSame(['BarData' => 43, 'bazData' => 21], $object->values);
+    }
+
+    public function testIgnoredAttributesKeepCaseSensitiveProperties()
+    {
+        $object = new class {
+            public int $barData = 0;
+            public int $bArDaTa = 0;
+        };
+        $normalizer = new ObjectNormalizer();
+        $normalizer->denormalize(['barData' => 42, 'bArDaTa' => 21], $object::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $object,
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['barData'],
+        ]);
+
+        $this->assertSame(0, $object->barData);
+        $this->assertSame(21, $object->bArDaTa);
+    }
+
+    public function testIgnoredAttributesKeepSingularAndPluralProperties()
+    {
+        $object = new class {
+            public ?string $category = null;
+            public array $categories = [];
+
+            public function setCategory(?string $category): void
+            {
+                $this->category = $category;
+            }
+
+            public function addCategory(string $category): void
+            {
+                $this->categories[] = $category;
+            }
+
+            public function removeCategory(string $category): void
+            {
+            }
+        };
+        $normalizer = new ObjectNormalizer();
+        $normalizer->denormalize(['category' => 'main', 'categories' => ['a']], $object::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $object,
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['category'],
+        ]);
+
+        $this->assertNull($object->category);
+        $this->assertSame(['a'], $object->categories);
+
+        $normalizer->denormalize(['category' => 'main', 'categories' => ['b']], $object::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $object,
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['categories'],
+        ]);
+
+        $this->assertSame('main', $object->category);
+        $this->assertSame(['a'], $object->categories);
+    }
+
     public function testMetadataIsAppliedToTheRightValue()
     {
         $obj = new ObjectWithMetadata();

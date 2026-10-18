@@ -328,9 +328,17 @@ class AutowirePass extends AbstractRecursivePass
                     if ($attribute instanceof AutowireCallable) {
                         $value = $attribute->buildDefinition($value, $type, $parameter);
                     } elseif ($lazy = $attribute->lazy) {
+                        $value ??= $getValue();
+
+                        if (!$value instanceof Reference || ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $value->getInvalidBehavior() && !$this->container->has((string) $value)) {
+                            $arguments[$index] = $value;
+
+                            continue 2;
+                        }
+
                         $definition = (new Definition($type))
                             ->setFactory('current')
-                            ->setArguments([[$value ??= $getValue()]])
+                            ->setArguments([[$value]])
                             ->setLazy(true);
 
                         if (!\is_array($lazy)) {

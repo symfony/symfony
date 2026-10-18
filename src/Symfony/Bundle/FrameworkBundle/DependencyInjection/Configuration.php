@@ -641,6 +641,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('disallow_search_engine_index')
                     ->info('Enabled by default when debug is enabled.')
                     ->defaultNull()
+                    ->resolvesAtCompileTime()
                 ->end()
             ->end()
         ;

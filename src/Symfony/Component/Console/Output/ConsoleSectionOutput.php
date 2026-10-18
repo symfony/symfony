@@ -283,11 +283,6 @@ class ConsoleSectionOutput extends StreamOutput
         return implode('', array_reverse($erasedContent));
     }
 
-    private function getDisplayLength(string $text): int
-    {
-        return Helper::width(Helper::removeDecoration($this->getFormatter(), str_replace("\t", '        ', $text)));
-    }
-
     private function getDisplayHeight(string $line, int $width): int
     {
         // the line break must not count as a column, or a line as wide as the terminal would count as two
@@ -295,6 +290,27 @@ class ConsoleSectionOutput extends StreamOutput
             $line = substr($line, 0, -\strlen(\PHP_EOL));
         }
 
-        return (int) ceil($this->getDisplayLength($line) / $width) ?: 1;
+        $line = Helper::removeDecoration($this->getFormatter(), str_replace("\t", '        ', $line));
+        $lineWidth = Helper::width($line);
+
+        if ($lineWidth <= $width || !preg_match('/[\x80-\xFF]/', $line) || !preg_match('//u', $line)) {
+            return (int) ceil($lineWidth / $width) ?: 1;
+        }
+
+        // a wide character that does not fit at the end of a row is moved to the next one
+        $rows = 1;
+        $column = 0;
+        $offset = 0;
+        $widths = [];
+        while (false !== $char = grapheme_extract($line, 1, \GRAPHEME_EXTR_COUNT, $offset, $offset)) {
+            $charWidth = $widths[$char] ??= Helper::width($char);
+            if ($column + $charWidth > $width) {
+                ++$rows;
+                $column = 0;
+            }
+            $column += $charWidth;
+        }
+
+        return $rows;
     }
 }

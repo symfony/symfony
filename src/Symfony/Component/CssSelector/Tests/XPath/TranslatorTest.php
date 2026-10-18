@@ -213,6 +213,22 @@ class TranslatorTest extends TestCase
         $this->assertSame(['first-legend-input', 'standalone', 'standalone-input'], $enabled);
     }
 
+    public function testCheckedMatchesSelectedOptions()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $document = new \DOMDocument();
+        $document->loadHTML('<select><option id="a">A</option><option id="b" selected>B</option></select><input type="radio" id="c" checked>');
+        $xpath = new \DOMXPath($document);
+
+        $checked = [];
+        foreach ($xpath->query($translator->cssToXPath(':checked')) as $node) {
+            $checked[] = $node->getAttribute('id');
+        }
+
+        $this->assertSame(['b', 'c'], $checked);
+    }
+
     public function testNamespacedElementWithStructuralPseudoClass()
     {
         $document = new \DOMDocument();
@@ -266,6 +282,7 @@ class TranslatorTest extends TestCase
             ['e:last-child', "*/*[(name() = 'e') and (position() = last())]"],
             ['e:first-child:last-child', "*/*[((name() = 'e') and (position() = 1)) and (position() = last())]"],
             ['f > e:first-of-type:nth-last-of-type(1)', 'f/e[(position() = 1) and (position() = last() - 0)]'],
+            ['e:first-of-type:nth-child(2)', "*/*[((not(preceding-sibling::e[1])) and (name() = 'e')) and (position() = 2)]"],
             ['e:first-of-type', '*/e[position() = 1]'],
             ['e:last-of-type', '*/e[position() = last()]'],
             ['e:only-child', "*/*[(name() = 'e') and (last() = 1)]"],
@@ -287,6 +304,8 @@ class TranslatorTest extends TestCase
             ['e:not([foo="position()"]:first-child)', "e[not((@foo = 'position()') and (not(preceding-sibling::*[1])))]"],
             ['e:not(:nth-of-type(2))', 'e[not((count(preceding-sibling::e) + 1) = 2)]'],
             ['e:first-child:not(:nth-of-type(2))', "*/*[((name() = 'e') and (position() = 1)) and (not((count(preceding-sibling::e) + 1) = 2))]"],
+            ['e:not(:first-of-type)', 'e[not(not(preceding-sibling::e[1]))]'],
+            ['e:not(:only-of-type)', 'e[not(count(preceding-sibling::e)=0 and count(following-sibling::e)=0)]'],
             ['e:nOT(*)', 'e[0]'],
             ['e f', 'e/descendant-or-self::*/f'],
             ['e > f', 'e/f'],
@@ -295,8 +314,11 @@ class TranslatorTest extends TestCase
             ['e + *', 'e/following-sibling::*[1]/self::*'],
             ['e + f + g', 'e/following-sibling::*[1]/self::f/following-sibling::*[1]/self::g'],
             ['e|f + e|g', 'e:f/following-sibling::*[1]/self::e:g'],
-            ['e + f:last-child', "e/following-sibling::*[((name() = 'f') and (position() = last())) and (position() = 1)]"],
+            ['e + f:last-child', "e/following-sibling::*[1]/self::*[(name() = 'f') and (not(following-sibling::*[1]))]"],
+            ['e + f:nth-child(3)', "e/following-sibling::*[1]/self::*[(name() = 'f') and ((count(preceding-sibling::*) + 1) = 3)]"],
             ['e ~ f', 'e/following-sibling::f'],
+            ['e ~ f:first-child', "e/following-sibling::*[(name() = 'f') and (not(preceding-sibling::*[1]))]"],
+            ['e ~ f:first-of-type', 'e/following-sibling::f[not(preceding-sibling::f[1])]'],
             ['div#container p', "div[@id = 'container']/descendant-or-self::*/p"],
             [':scope > div[dataimg="<testmessage>"]', "*[1]/div[@dataimg = '<testmessage>']"],
             [':scope', '*[1]'],
@@ -371,6 +393,8 @@ class TranslatorTest extends TestCase
             ['li:nth-child(-n-1)', []],
             ['li:nth-child(-n+1)', ['first-li']],
             ['li:nth-child(-n+3)', ['first-li', 'second-li', 'third-li']],
+            ['li:nth-child(0n+1)', ['first-li']],
+            ['li:nth-child(0n)', []],
             ['li:nth-last-child(0)', []],
             ['li:nth-last-child(2n)', ['second-li', 'fourth-li', 'sixth-li']],
             ['li:nth-last-child(even)', ['second-li', 'fourth-li', 'sixth-li']],
@@ -391,6 +415,8 @@ class TranslatorTest extends TestCase
             ['span:only-child', ['foobar-span', 'no-siblings-of-any-type']],
             ['div > span:first-child:last-child', ['foobar-span']],
             ['ol > li:first-child:nth-child(1)', ['first-li']],
+            ['em:first-of-type:nth-child(2)', ['p-em']],
+            ['b:last-of-type:nth-child(3)', ['p-b2']],
             ['li div:only-child', ['li-div']],
             ['div *:only-child', ['li-div', 'foobar-span']],
             ['p:only-of-type', ['paragraph']],
@@ -433,6 +459,11 @@ class TranslatorTest extends TestCase
             ['a + .a', ['first-ol']],
             ['li + li.c', ['third-li', 'fourth-li']],
             ['li + :last-child', ['seventh-li']],
+            ['li + li:nth-child(3)', ['third-li']],
+            ['li ~ li:first-child', []],
+            ['li ~ li:nth-last-child(2)', ['sixth-li']],
+            ['ol ~ ol:first-of-type', []],
+            ['a ~ :nth-child(4)', ['first-ol']],
             ['a ~ a', ['tag-anchor', 'nofollow-anchor']],
             ['a[rel="tag"] ~ a', ['nofollow-anchor']],
             ['ol#first-ol li:last-child', ['seventh-li']],
@@ -446,6 +477,11 @@ class TranslatorTest extends TestCase
             ['div:not(div:last-of-type)', ['outer-div']],
             ['div:not(:nth-of-type(1))', ['foobar-div']],
             ['ol:nth-child(4):not(:nth-of-type(1))', []],
+            ['li:not(:first-of-type)', ['second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['ol:not(:last-of-type)', ['first-ol']],
+            ['ol:not(:nth-last-of-type(1))', ['first-ol']],
+            ['em:not(:only-of-type)', []],
+            ['b:not(:only-of-type)', ['p-b', 'p-b2']],
             ['a:not(*):first-child', []],
             ['a:hover[name]', []],
             ['a:not(:hover)', ['name-anchor', 'tag-anchor', 'nofollow-anchor']],

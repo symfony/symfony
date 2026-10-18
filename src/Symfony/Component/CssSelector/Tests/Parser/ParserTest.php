@@ -259,6 +259,8 @@ class ParserTest extends TestCase
             ['Even', 2, 0],
             ['2N+1', 2, 1],
             ['-N+3', -1, 3],
+            ['0n+1', 0, 1],
+            ['0n', 0, 0],
         ];
     }
 

@@ -12,8 +12,10 @@
 namespace Symfony\Component\Form\Extension\DataCollector;
 
 use Symfony\Component\Form\DataClassType;
+use Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
@@ -25,15 +27,14 @@ class FormDataExtractor implements FormDataExtractorInterface
 {
     public function extractConfiguration(FormInterface $form): array
     {
-        $innerType = $form->getConfig()->getType()->getInnerType();
-
         $data = [
             'id' => $this->buildId($form),
             'name' => $form->getName(),
-            'type_class' => $innerType instanceof DataClassType ? $innerType->getDataClass() : $innerType::class,
+            'type_class' => $this->getTypeClass($form->getConfig()->getType()),
             'synchronized' => $form->isSynchronized(),
             'passed_options' => [],
             'resolved_options' => [],
+            'type_extensions' => $this->extractTypeExtensions($form),
         ];
 
         foreach ($form->getConfig()->getAttribute('data_collector/passed_options', []) as $option => $value) {
@@ -139,6 +140,39 @@ class FormDataExtractor implements FormDataExtractorInterface
         ksort($data['view_vars']);
 
         return $data;
+    }
+
+    /**
+     * Lists the type extensions applied to a form, from the root type down to its own type.
+     *
+     * @return list<array{type: class-string, extension: class-string}>
+     */
+    private function extractTypeExtensions(FormInterface $form): array
+    {
+        $extensions = [];
+
+        for ($type = $form->getConfig()->getType(); null !== $type; $type = $type->getParent()) {
+            $typeExtensions = [];
+            foreach ($type->getTypeExtensions() as $extension) {
+                // registered by the profiler itself on every form
+                if ($extension instanceof DataCollectorTypeExtension) {
+                    continue;
+                }
+
+                $typeExtensions[] = ['type' => $this->getTypeClass($type), 'extension' => $extension::class];
+            }
+
+            array_unshift($extensions, ...$typeExtensions);
+        }
+
+        return $extensions;
+    }
+
+    private function getTypeClass(ResolvedFormTypeInterface $type): string
+    {
+        $innerType = $type->getInnerType();
+
+        return $innerType instanceof DataClassType ? $innerType->getDataClass() : $innerType::class;
     }
 
     /**

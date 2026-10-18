@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -1142,6 +1143,60 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_12_0.php',
             'qux_2_0.php',
         ]), $finder->in(self::$tmpDir)->getIterator());
+    }
+
+    public function testFollowLinksDoesNotLoopOnCircularSymlinks()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('symlinks are not supported on Windows');
+        }
+
+        $tmpDir = realpath(sys_get_temp_dir()).'/symfony_finder_symlink_loop';
+        $fs = new Filesystem();
+        $fs->remove($tmpDir);
+        $fs->mkdir([$tmpDir.'/a', $tmpDir.'/b']);
+        $fs->touch([$tmpDir.'/a/f.txt', $tmpDir.'/b/g.txt']);
+        symlink('../b', $tmpDir.'/a/b');
+        symlink('../a', $tmpDir.'/b/a');
+
+        try {
+            $finder = $this->buildFinder()->followLinks()->in($tmpDir.'/a');
+
+            $this->assertIterator([
+                $tmpDir.'/a/f.txt',
+                $tmpDir.'/a/b',
+                $tmpDir.'/a/b/g.txt',
+                $tmpDir.'/a/b/a',
+            ], $finder->getIterator());
+        } finally {
+            $fs->remove($tmpDir);
+        }
+    }
+
+    public function testFollowLinksDoesNotLoopOnSymlinkToAParentOfTheSearchedDirectory()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('symlinks are not supported on Windows');
+        }
+
+        $tmpDir = realpath(sys_get_temp_dir()).'/symfony_finder_symlink_loop';
+        $fs = new Filesystem();
+        $fs->remove($tmpDir);
+        $fs->mkdir($tmpDir.'/x/y');
+        $fs->touch($tmpDir.'/x/y/f.txt');
+        symlink('..', $tmpDir.'/x/y/up');
+
+        try {
+            $finder = $this->buildFinder()->followLinks()->in($tmpDir.'/x/y');
+
+            $this->assertIterator([
+                $tmpDir.'/x/y/f.txt',
+                $tmpDir.'/x/y/up',
+                $tmpDir.'/x/y/up/y',
+            ], $finder->getIterator());
+        } finally {
+            $fs->remove($tmpDir);
+        }
     }
 
     public function testIn()

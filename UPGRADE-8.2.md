@@ -571,6 +571,7 @@ String
 
  * Add argument `$regexp` to `AbstractString::lower()`, `AbstractString::upper()`, `AbstractString::title()`,
    `AbstractUnicodeString::localeLower()`, `AbstractUnicodeString::localeUpper()` and `AbstractUnicodeString::localeTitle()`
+ * `UnicodeString::trim()`, `trimStart()`, `trimEnd()`, `trimPrefix()`, `trimSuffix()` and `endsWith()` now match whole grapheme clusters only. For example, `u("a\r\n")->trimEnd("\n")` now keeps the CRLF. Use `CodePointString` to work on code points
 
 Translation
 -----------

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add argument `$regexp` to `lower()`, `upper()`, `title()`, `localeLower()`, `localeUpper()` and `localeTitle()` to convert only the matching parts
+ * Make `UnicodeString::trim()`, `trimStart()`, `trimEnd()`, `trimPrefix()`, `trimSuffix()` and `endsWith()` match whole grapheme clusters only
 
 8.0
 ---

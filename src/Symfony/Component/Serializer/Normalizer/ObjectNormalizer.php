@@ -87,12 +87,13 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
 
         foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
             $name = $reflMethod->name;
-            // getProperty() is only advertised through @method on PropertyInfoExtractorInterface, so an
-            // extractor predating it keeps the previous resolution instead of fataling
-            $attributeName = $this->propertyInfoExtractor instanceof PropertyNameExtractorInterface
-                ? $this->propertyInfoExtractor->getPropertyName($class, $name)
-                : $this->getAttributeNameFromAccessor($reflClass, $reflMethod, false);
+            $attributeName = $this->getAttributeNameFromAccessor($reflClass, $reflMethod, false);
             $propertyMetadata = $attributesMetadata[$name] ?? null;
+
+            // getPropertyName() also maps setters, adders and removers and keeps acronyms like "URL", so only the method that reads a declared property can rename the attribute
+            if ($this->propertyInfoExtractor instanceof PropertyNameExtractorInterface && null !== ($propertyName = $this->propertyInfoExtractor->getPropertyName($class, $name)) && $this->hasPropertyForAccessor($reflClass, $propertyName) && $name === $this->writeInfoExtractor->getReadInfo($class, $propertyName)?->getName()) {
+                $attributeName = $propertyName;
+            }
 
             if ($this->hasPropertyForAccessor($reflMethod->getDeclaringClass(), $name) && (null === $attributeName || $this->hasAttributeNameCollision($reflClass, $attributeName, $name) || null !== $propertyMetadata?->getSerializedName($groups) || null !== $propertyMetadata?->getSerializedPath($groups))) {
                 $attributeName = $name;

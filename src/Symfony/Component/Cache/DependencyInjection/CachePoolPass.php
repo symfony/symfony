@@ -12,10 +12,14 @@
 namespace Symfony\Component\Cache\DependencyInjection;
 
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\ParameterNormalizer;
+use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Messenger\EarlyExpirationDispatcher;
 use Symfony\Component\Cache\PruneableInterface;
@@ -31,6 +35,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CachePoolPass implements CompilerPassInterface
 {
+    private const ADAPTERS_WITHOUT_PROVIDER = [ApcuAdapter::class, ArrayAdapter::class, FilesystemAdapter::class, FilesystemTagAwareAdapter::class, NullAdapter::class, PhpFilesAdapter::class];
+
     /**
      * @return void
      */
@@ -61,10 +67,12 @@ class CachePoolPass implements CompilerPassInterface
                 continue;
             }
             $class = $adapter->getClass();
+            $factory = $adapter->getFactory();
             $providers = $adapter->getArguments();
             while ($adapter instanceof ChildDefinition) {
                 $adapter = $container->findDefinition($adapter->getParent());
                 $class = $class ?: $adapter->getClass();
+                $factory = $factory ?: $adapter->getFactory();
                 $providers += $adapter->getArguments();
                 if ($t = $adapter->getTag('cache.pool')) {
                     $tags[0] += $t[0];
@@ -88,6 +96,16 @@ class CachePoolPass implements CompilerPassInterface
                 $clearer = null;
             }
             unset($tags[0]['clearer'], $tags[0]['name']);
+
+            // count the env vars of ignored attributes, so that the dumper doesn't report them as unused
+            if (\in_array($class, self::ADAPTERS_WITHOUT_PROVIDER, true) || [AbstractAdapter::class, 'createSystemCache'] === $factory) {
+                $container->resolveEnvPlaceholders($tags[0]['provider'] ?? null);
+                unset($tags[0]['provider']);
+            }
+            if (NullAdapter::class === $class) {
+                $container->resolveEnvPlaceholders($tags[0]['default_lifetime'] ?? null);
+                unset($tags[0]['default_lifetime']);
+            }
 
             if (isset($tags[0]['provider'])) {
                 $tags[0]['provider'] = new Reference(static::getServiceProvider($container, $tags[0]['provider']));
@@ -121,7 +139,7 @@ class CachePoolPass implements CompilerPassInterface
 
                     $i = 0;
 
-                    if (isset($chainedTags[0]['provider'])) {
+                    if (isset($chainedTags[0]['provider']) && !\in_array($chainedClass, self::ADAPTERS_WITHOUT_PROVIDER, true)) {
                         $chainedPool->replaceArgument($i++, new Reference(static::getServiceProvider($container, $chainedTags[0]['provider'])));
                     }
 
@@ -129,7 +147,7 @@ class CachePoolPass implements CompilerPassInterface
                         $chainedPool->replaceArgument($i++, $tags[0]['namespace']);
                     }
 
-                    if (isset($tags[0]['default_lifetime'])) {
+                    if (isset($tags[0]['default_lifetime']) && NullAdapter::class !== $chainedClass) {
                         $defaultLifetime = $tags[0]['default_lifetime'];
 
                         if (!is_numeric($defaultLifetime)) {

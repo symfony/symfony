@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-18T13:53:44Z
+
+Thanks for picking this up again @natitech. I'd keep every stamp. At -vv this section is the raw view, and hiding some stamps would make people wonder what else is missing.
+
+What about dumping a flat list, as the profiler does? Each stamp already shows its class:
+```diff
+-$stamps = $envelope->withoutStampsOfType(NonSendableStampInterface::class)->withoutAll(ErrorDetailsStamp::class)->all();
++$stamps = array_merge([], ...array_values($envelope->withoutStampsOfType(NonSendableStampInterface::class)->withoutAll(ErrorDetailsStamp::class)->all()));
+```
+
+---------------------------------------------------------------------------
+
+by natitech at 2026-10-18T14:13:10Z
+
+Makes perfect sense to match the profiler, much more readable. Done in a separate commit so you can see the change, feel free to squash.

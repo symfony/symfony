@@ -773,6 +773,11 @@ abstract class AbstractAsciiTestCase extends TestCase
     public static function provideTrim()
     {
         return [
+            ['xyz', 'abcxyzcba', 'a..c'],
+            ['abc', "\x01\x1Fabc\x00\x10", "\0..\x1F"],
+            ['abc', '[\\]^abc^]', '[..^'],
+            ['xyz', './AZ_axyz`a', '...a'],
+            ['.bxyz', '-a.bxyzc-', 'a..c-'],
             [
                 "Symfony     IS GREAT\t!!!",
                 "    Symfony     IS GREAT\t!!!\n",
@@ -833,6 +838,8 @@ abstract class AbstractAsciiTestCase extends TestCase
     public static function provideTrimStart()
     {
         return [
+            ['xyzcba', 'abcxyzcba', 'a..c'],
+            ['xyzb.', '.bxyzb.', '.a..c'],
             [
                 "<span>Symfony is a PHP framework</span>\n",
                 "\n\t<span>Symfony is a PHP framework</span>\n",
@@ -860,6 +867,8 @@ abstract class AbstractAsciiTestCase extends TestCase
     public static function provideTrimEnd()
     {
         return [
+            ['abcxyz', 'abcxyzcba', 'a..c'],
+            ['[\\]^abc', '[\\]^abc^]', '[..^'],
             [
                 "\n\t<span>Symfony is a PHP framework</span>",
                 "\n\t<span>Symfony is a PHP framework</span>  \n",

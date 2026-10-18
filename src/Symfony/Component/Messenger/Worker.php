@@ -112,6 +112,7 @@ class Worker
 
         $this->metadata->set(['queueNames' => $queueNames]);
 
+        $this->logger?->info('Starting worker.', ['transport_names' => $this->metadata->getTransportNames()]);
         $this->eventDispatcher?->dispatch(new WorkerStartedEvent($this, null === $endTime ? null : (float) $endTime, $options['sleep']));
 
         if ($queueNames) {

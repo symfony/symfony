@@ -68,6 +68,7 @@ CHANGELOG
  * Make the `messenger:setup-transports` command set up the inboxes of the transports
  * Add the `cooldown_strategy` option of transports, `CooldownStrategyInterface`, `CooldownStatus`, `MultiplierCooldownStrategy` and `WorkerTransportCoolingDownEvent` to stop consuming a transport for a while after messages received from it fail or fetching from it fails
  * Add the `$cooldownStrategies` argument to `Worker` and the `$cooldownStrategyLocator` argument to `ConsumeMessagesCommand`
+ * Log the names of the consumed transports when a worker starts
 
 8.1
 ---

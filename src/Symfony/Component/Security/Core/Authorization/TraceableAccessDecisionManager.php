@@ -77,7 +77,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
             'vote' => $vote,
             'reasons' => $reasons,
         ];
-        $this->voters[$voter::class] = $voter;
+        $this->voters[$voter instanceof \Stringable ? (string) $voter : $voter::class] = $voter;
     }
 
     public function getStrategy(): string

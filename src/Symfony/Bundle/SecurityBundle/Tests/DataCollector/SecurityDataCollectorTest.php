@@ -28,13 +28,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\CallableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -355,6 +358,30 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertCount(1, $collector->getListeners());
         $collector->lateCollect();
         $this->assertSame(1, $listener->callCount);
+    }
+
+    public function testCollectShowsTheNameOfStringableVoters()
+    {
+        $isAuthor = new CallableVoter(static fn () => true, [], ['view'], null, 'App\PostRules::isAuthor');
+        $isPublic = new CallableVoter(static fn () => null, [], ['view'], null, 'App\PostRules::isPublic');
+
+        $decoratedAccessDecisionManager = $this->createStub(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = new TraceableAccessDecisionManager($decoratedAccessDecisionManager);
+        $decoratedAccessDecisionManager->method('decide')->willReturnCallback(static function (TokenInterface $token, array $attributes) use ($accessDecisionManager, $isAuthor, $isPublic) {
+            $accessDecisionManager->addVoterVote($isAuthor, $attributes, VoterInterface::ACCESS_GRANTED);
+            $accessDecisionManager->addVoterVote($isPublic, $attributes, VoterInterface::ACCESS_ABSTAIN);
+
+            return true;
+        });
+        $accessDecisionManager->decide(new NullToken(), ['view'], new \stdClass());
+
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null);
+
+        $dataCollector->collect(new Request(), new Response());
+        $dataCollector->lateCollect();
+
+        $this->assertSame(['App\PostRules::isAuthor', 'App\PostRules::isPublic'], $dataCollector->getVoters()->getValue(true));
+        $this->assertSame(['App\PostRules::isAuthor', 'App\PostRules::isPublic'], array_column($dataCollector->getAccessDecisionLog()->getValue(true)[0]['voter_details'], 'class'));
     }
 
     public function testCollectCollectsDecisionLogWhenStrategyIsAffirmative()

@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPass;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -46,11 +47,15 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\Security\CheckLdapCredentialsListener;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\Attribute\AsVoter;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\CallableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -518,6 +523,77 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
+    }
+
+    public function testCallableVotersAreRegisteredFromTheirAttributes()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                ],
+            ],
+        ]);
+
+        $container->register('app.post_rules', TestPostRules::class)->setAutoconfigured(true);
+        $container->register('app.can_delete_post', TestCanDeletePost::class)->setAutoconfigured(true);
+
+        $container->compile();
+
+        $voters = array_map('strval', $container->getDefinition('security.access.decision_manager')->getArgument(0)->getValues());
+        $isPublished = array_search('.security.voter.app.post_rules.isPublished', $voters, true);
+        $isAuthor = array_search('.security.voter.app.post_rules.isAuthor', $voters, true);
+
+        $this->assertIsInt($isPublished);
+        $this->assertIsInt($isAuthor);
+        $this->assertLessThan($isAuthor, $isPublished, 'The priority of the attribute orders the voters.');
+        $this->assertContains('.security.voter.app.can_delete_post.__invoke', $voters);
+
+        $this->assertSame(CallableVoter::class, $container->getDefinition('.security.voter.app.post_rules.isAuthor')->getClass());
+        $this->assertSame(['subject', 'token'], $container->getDefinition('.security.voter.app.post_rules.isAuthor')->getArgument(1));
+        $this->assertSame(['POST_VIEW', 'POST_EDIT'], $container->getDefinition('.security.voter.app.post_rules.isAuthor')->getArgument(2));
+        $this->assertSame(CallableVoter::class, $container->getDefinition('.security.voter.app.post_rules.isPublished')->getClass());
+        $this->assertSame(['POST_EDIT'], $container->getDefinition('.security.voter.app.post_rules.isPublished')->getArgument(2));
+        $this->assertNull($container->getDefinition('.security.voter.app.can_delete_post.__invoke')->getArgument(3));
+    }
+
+    #[DataProvider('provideVotersMarkedWithAsVoter')]
+    public function testAsVoterCannotBeUsedOnAServiceThatIsAlreadyAVoter(string $class)
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                ],
+            ],
+        ]);
+
+        $container->register('app.voter', $class)->setAutoconfigured(true);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot use "#[AsVoter]" on "%s": the service "app.voter" is already a voter. To set its priority, use "#[AsTaggedItem]".', $class));
+
+        $container->compile();
+    }
+
+    public static function provideVotersMarkedWithAsVoter(): iterable
+    {
+        yield 'on the class' => [TestVoterMarkedWithAsVoter::class];
+        yield 'on a method' => [TestVoterWithAMethodMarkedWithAsVoter::class];
     }
 
     public function testCsrfTokenManagersAreRegisteredForTheirTokenId()
@@ -2674,5 +2750,57 @@ class TestFirewallListenerFactory implements AuthenticatorFactoryInterface, Fire
 
     public function addConfiguration(NodeDefinition $builder): void
     {
+    }
+}
+
+class TestPostRules
+{
+    #[AsVoter(['POST_VIEW', 'POST_EDIT'])]
+    public function isAuthor(\stdClass $post, TokenInterface $token): ?true
+    {
+        return true;
+    }
+
+    #[AsVoter('POST_EDIT', priority: 10)]
+    public function isPublished(\stdClass $post): ?false
+    {
+        return null;
+    }
+}
+
+#[AsVoter('POST_DELETE')]
+class TestCanDeletePost
+{
+    public function __invoke(): ?bool
+    {
+        return true;
+    }
+}
+
+#[AsVoter('POST_EDIT')]
+class TestVoterMarkedWithAsVoter implements VoterInterface
+{
+    public function __invoke(): ?true
+    {
+        return true;
+    }
+
+    public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
+    {
+        return self::ACCESS_ABSTAIN;
+    }
+}
+
+class TestVoterWithAMethodMarkedWithAsVoter implements VoterInterface
+{
+    #[AsVoter('POST_EDIT')]
+    public function isAuthor(): ?true
+    {
+        return true;
+    }
+
+    public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
+    {
+        return self::ACCESS_ABSTAIN;
     }
 }

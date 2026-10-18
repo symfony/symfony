@@ -442,6 +442,34 @@ class HttpKernelTest extends TestCase
         $this->assertNull($requestStack->getCurrentRequest());
     }
 
+    public function testTerminateWithExceptionThrownByTerminateListener()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::TERMINATE, static fn () => throw new \RuntimeException('boo'));
+        $dispatcher->addListener(KernelEvents::EXCEPTION, static function (ExceptionEvent $event) use (&$isKernelTerminating) {
+            $isKernelTerminating[] = $event->isKernelTerminating();
+        });
+        $kernel = $this->getHttpKernel($dispatcher);
+        $request = Request::create('/');
+
+        try {
+            $kernel->terminate($request, new Response());
+        } catch (\RuntimeException $e) {
+        }
+
+        try {
+            $kernel->terminateWithException($e, $request);
+        } catch (\RuntimeException) {
+        }
+
+        try {
+            $kernel->terminateWithException(new \RuntimeException('bar'), $request);
+        } catch (\RuntimeException) {
+        }
+
+        $this->assertSame([true, false], $isKernelTerminating);
+    }
+
     #[RunInSeparateProcess]
     #[DataProvider('provideHeadersSent')]
     public function testTerminateWithExceptionSendsHeadersUnlessAlreadySent(bool $headersSent)

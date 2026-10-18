@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-18T08:23:17Z
+
+Thanks for the PR. I pushed a few changes.
+
+Closing the buffer in the `finally` block of the destructor broke two cases. When a response is destructed before its body arrived, removing the handle makes curl call the progress function one last time. `on_progress` then got an empty `debug`: that's the failure on the Windows job. And when the destructor throws a `ClientException`, the response lives on in the exception, so its debug info must stay available. Both cases have a test now.
+
+The handle leak you saw comes from `getContent()` on a HEAD, 204 or 304 response, after `getStatusCode()`. In this case `getContent()` sets `$multi->performing` to skip `curl_multi_exec()`, so the canary never removes the handle from the multi handle. Your test hits exactly this case, and #67085 fixes it.

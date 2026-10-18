@@ -143,6 +143,44 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertTrue($sessionHandler->destroy('id'));
     }
 
+    public function testUpdateTimestamp()
+    {
+        $memcached = $this->getMemcachedMock();
+        $memcached
+            ->expects($this->once())
+            ->method('touch')
+            ->with(self::PREFIX.'id', $this->equalTo(self::TTL, 2))
+            ->willReturn(true)
+        ;
+
+        $this->assertTrue($this->getSessionHandler($memcached)->updateTimestamp('id', 'data'));
+    }
+
+    public function testUpdateTimestampWithEmptyDataDestroysSession()
+    {
+        $memcached = $this->getMemcachedMock();
+        $memcached
+            ->expects($this->once())
+            ->method('get')
+            ->with(self::PREFIX.'id')
+            ->willReturn(false)
+        ;
+        $memcached
+            ->method('getResultCode')
+            ->willReturn(\Memcached::RES_NOTFOUND)
+        ;
+        $memcached
+            ->expects($this->never())
+            ->method('touch')
+        ;
+
+        $sessionHandler = $this->getSessionHandler($memcached);
+        $sessionHandler->open('', 'sid');
+        $this->assertSame('', $sessionHandler->read('id'));
+
+        $this->assertTrue($sessionHandler->updateTimestamp('id', ''));
+    }
+
     public function testGcSession()
     {
         $this->assertIsInt($this->getSessionHandler()->gc(123));

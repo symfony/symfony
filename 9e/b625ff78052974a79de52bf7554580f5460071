@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-18T10:35:15Z
+
+Thanks @HypeMC. I'm fine with the behavior change. A path that crosses null throws again, as it did until 6.4.6, and `company?.name` gives null instead.
+
+Note that a single object with a null `company` now throws. Since 6.4.9, the path was silently skipped in this case.
+
+I also added a separator to the static cache keys. `Order` + `Lineid` and `OrderLine` + `id` used the same key before.

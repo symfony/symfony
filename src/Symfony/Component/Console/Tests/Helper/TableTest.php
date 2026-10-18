@@ -143,7 +143,7 @@ class TableTest extends TestCase
                     | crlf      | Line 1<br>Line 2   |
                     | cr        | Line 1<br>Line 2   |
                     | backslash | Line 1\\<br>Line 2 |
-                    | A \| B                         |
+                    | A \| B    |                    |
 
                     TABLE,
             ],
@@ -169,6 +169,73 @@ class TableTest extends TestCase
                 <<<'TABLE'
                     | ISBN | Title |
                     |------|-------|
+
+                    TABLE,
+            ],
+            [
+                [new TableCell('Books', ['colspan' => 2])],
+                [
+                    ['Divine Comedy', 'Dante Alighieri'],
+                    ['A Tale of Two Cities', 'Charles Dickens'],
+                ],
+                'markdown',
+                <<<'TABLE'
+                    | Books                |                 |
+                    |----------------------|-----------------|
+                    | Divine Comedy        | Dante Alighieri |
+                    | A Tale of Two Cities | Charles Dickens |
+
+                    TABLE,
+            ],
+            [
+                ['Col 1', 'Col 2', 'Col 3'],
+                [
+                    [new TableCell('spans two', ['colspan' => 2]), 'c'],
+                    ['a', new TableCell('spans two', ['colspan' => 2])],
+                    [new TableCell('two by two', ['rowspan' => 2, 'colspan' => 2]), 'c'],
+                    ['c'],
+                ],
+                'markdown',
+                <<<'TABLE'
+                    | Col 1      | Col 2     | Col 3 |
+                    |------------|-----------|-------|
+                    | spans two  |           | c     |
+                    | a          | spans two |       |
+                    | two by two |           | c     |
+                    |            |           | c     |
+
+                    TABLE,
+            ],
+            [
+                [
+                    [new TableCell('Books', ['colspan' => 2])],
+                    ['Title', 'Author'],
+                ],
+                [
+                    ['Divine Comedy', 'Dante Alighieri'],
+                    ['A Tale of Two Cities', 'Charles Dickens'],
+                ],
+                'markdown',
+                <<<'TABLE'
+                    | Books                |                 |
+                    |----------------------|-----------------|
+                    | Title                | Author          |
+                    | Divine Comedy        | Dante Alighieri |
+                    | A Tale of Two Cities | Charles Dickens |
+
+                    TABLE,
+            ],
+            [
+                [
+                    [new TableCell('Main title', ['colspan' => 3])],
+                    ['ISBN', 'Title', 'Author'],
+                ],
+                [],
+                'markdown',
+                <<<'TABLE'
+                    | Main title |       |        |
+                    |------------|-------|--------|
+                    | ISBN       | Title | Author |
 
                     TABLE,
             ],

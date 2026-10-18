@@ -213,6 +213,22 @@ class TranslatorTest extends TestCase
         $this->assertSame(['first-legend-input', 'standalone', 'standalone-input'], $enabled);
     }
 
+    public function testCheckedMatchesSelectedOptions()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $document = new \DOMDocument();
+        $document->loadHTML('<select><option id="a">A</option><option id="b" selected>B</option></select><input type="radio" id="c" checked>');
+        $xpath = new \DOMXPath($document);
+
+        $checked = [];
+        foreach ($xpath->query($translator->cssToXPath(':checked')) as $node) {
+            $checked[] = $node->getAttribute('id');
+        }
+
+        $this->assertSame(['b', 'c'], $checked);
+    }
+
     public function testNamespacedElementWithStructuralPseudoClass()
     {
         $document = new \DOMDocument();

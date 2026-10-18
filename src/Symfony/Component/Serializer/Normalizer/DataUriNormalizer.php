@@ -143,11 +143,19 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
      */
     private function getMimeType(\SplFileInfo $object): string
     {
-        if ($object instanceof File) {
-            return $object->getMimeType();
-        }
+        try {
+            if ($object instanceof File) {
+                return $object->getMimeType();
+            }
 
-        return $this->mimeTypeGuesser?->guessMimeType($object->getPathname()) ?: 'application/octet-stream';
+            return $this->mimeTypeGuesser?->guessMimeType($object->getPathname()) ?: 'application/octet-stream';
+        } catch (\LogicException $e) {
+            if (!preg_match('{^data:(?://)?([^,]*?)(?:;base64)?,}', $object->getPathname(), $m)) {
+                throw $e;
+            }
+
+            return $m[1] ?: 'text/plain';
+        }
     }
 
     /**

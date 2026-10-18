@@ -58,6 +58,7 @@ CHANGELOG
  * Add support for the `stream` option of the `#[Serialize]` attribute when the JsonStreamer component is installed
  * Register `RateLimitValueResolver` when the rate limiter is enabled
  * Close the lazy Redis connection of the session handler created from `framework.session.handler_id` when the kernel shuts down
+ * Add the `debug:autoconfiguration` command to list the classes, interfaces and attributes used for autoconfiguration
 
 8.1
 ---

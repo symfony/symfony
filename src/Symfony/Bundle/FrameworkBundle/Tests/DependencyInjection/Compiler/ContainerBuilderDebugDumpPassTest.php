@@ -136,6 +136,27 @@ class ContainerBuilderDebugDumpPassTest extends TestCase
         $this->assertSame($a->getArgument(0), $a->getInstanceofConditionals()['AInterface']->getArgument(0));
     }
 
+    public function testSerializedDumpListsAutoconfigurationRules()
+    {
+        $container = $this->createContainer();
+        $container->registerForAutoconfiguration(\Countable::class)
+            ->addTag('app.countable', [static fn (string $class) => ['class' => $class]])
+            ->addTag('app.%sized%')
+            ->addMethodCall('setFoo', [new Reference('foo')])
+            ->setBindings(['$bar' => 'bar']);
+        $container->registerAttributeForAutoconfiguration(\SensitiveParameter::class, static function () {});
+
+        $dump = $this->dump($container);
+        $dump->compile(true);
+
+        $expected = [
+            'instanceof' => [\Countable::class => ['tags' => ['app.countable', 'app.%sized%'], 'calls' => ['setFoo'], 'bindings' => ['$bar']]],
+            'attributes' => [\SensitiveParameter::class],
+        ];
+        $this->assertSame($expected, $dump->getParameter('.debug.container.autoconfiguration'));
+        $this->assertFalse($container->hasParameter('.debug.container.autoconfiguration'));
+    }
+
     public function testEnvVarsResolvedWhileCompilingAreReportedAsInlined()
     {
         $_ENV['DUMP_NODE'] = 'a';

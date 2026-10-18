@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerLintCommand;
+use Symfony\Bundle\FrameworkBundle\Command\DebugAutoconfigurationCommand;
 use Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand;
 use Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
@@ -100,6 +101,9 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('expression languages, set in RegisterCompiledExpressionLanguagesPass'),
                 service('expression_language.collector'),
             ])
+            ->tag('console.command')
+
+        ->set('console.command.debug_autoconfiguration', DebugAutoconfigurationCommand::class)
             ->tag('console.command')
 
         ->set('console.command.debug_autowiring', DebugAutowiringCommand::class)

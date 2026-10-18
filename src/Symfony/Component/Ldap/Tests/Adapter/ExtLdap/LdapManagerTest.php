@@ -119,6 +119,72 @@ class LdapManagerTest extends LdapTestCase
     }
 
     #[Group('functional')]
+    public function testLdapUpdateSendsOnlyChangedAttributes()
+    {
+        $em = $this->adapter->getEntryManager();
+        $entry = $this->executeSearchQuery(1)[0];
+        $dn = $entry->getDn();
+
+        $em->applyOperations($dn, [new UpdateOperation(\LDAP_MODIFY_BATCH_REPLACE, 'description', ['Changed by someone else'])]);
+
+        try {
+            $entry->setAttribute('givenName', ['Fabien']);
+            $em->update($entry);
+
+            $entry = $this->executeSearchQuery(1)[0];
+            $this->assertSame(['Fabien'], $entry->getAttribute('givenName', false));
+            $this->assertSame(['Changed by someone else'], $entry->getAttribute('description', false));
+        } finally {
+            $em->update(new Entry($dn, [
+                'givenName' => ['Fabien Potencier'],
+                'description' => ['Founder and project lead @Symfony'],
+            ]));
+        }
+    }
+
+    #[Group('functional')]
+    public function testLdapUpdateSameEntryTwice()
+    {
+        $em = $this->adapter->getEntryManager();
+        $dn = $this->executeSearchQuery(1)[0]->getDn();
+        $entry = new Entry($dn, ['description' => ['Written by the app']]);
+
+        try {
+            $em->update($entry);
+            $em->applyOperations($dn, [new UpdateOperation(\LDAP_MODIFY_BATCH_REPLACE, 'description', ['Changed by someone else'])]);
+            $em->update($entry);
+
+            $this->assertSame(['Written by the app'], $this->executeSearchQuery(1)[0]->getAttribute('description', false));
+        } finally {
+            $em->update(new Entry($dn, ['description' => ['Founder and project lead @Symfony']]));
+        }
+    }
+
+    #[Group('functional')]
+    public function testLdapUpdateAfterAdd()
+    {
+        $em = $this->adapter->getEntryManager();
+        $entry = new Entry('cn=Charles Sarrazin,dc=symfony,dc=com', [
+            'sn' => ['csarrazi'],
+            'objectclass' => [
+                'inetOrgPerson',
+            ],
+        ]);
+
+        $em->add($entry);
+
+        try {
+            $em->applyOperations($entry->getDn(), [new UpdateOperation(\LDAP_MODIFY_BATCH_REPLACE, 'sn', ['Changed by someone else'])]);
+            $em->update($entry);
+
+            $result = $this->adapter->createQuery('dc=symfony,dc=com', '(cn=Charles Sarrazin)')->execute();
+            $this->assertSame(['csarrazi'], $result[0]->getAttribute('sn', false));
+        } finally {
+            $em->remove($entry);
+        }
+    }
+
+    #[Group('functional')]
     public function testLdapUnboundAdd()
     {
         $this->adapter = new Adapter($this->getLdapConfig());

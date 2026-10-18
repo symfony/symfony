@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add the `$ldapUsersOnly` argument to `CheckLdapCredentialsListener`, to bind only `LdapUser` instances against the LDAP server
+ * Make `EntryManager::update()` send only the attributes that changed since the entry was fetched
 
 8.0
 ---

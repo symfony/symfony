@@ -278,6 +278,11 @@ JsonStreamer
 
  * Deprecate the `JsonStreamWriter` and `JsonStreamReader` autowiring aliases, type `StreamWriterInterface` and `StreamReaderInterface` instead
 
+Ldap
+----
+
+ * [BC BREAK] `EntryManager::update()` now sends only the attributes that were set since the entry was fetched. Updating a fetched entry that was not modified does nothing. To write all the attributes of a fetched entry, pass `new Entry($entry->getDn(), $entry->getAttributes())` instead
+
 Lock
 ----
 

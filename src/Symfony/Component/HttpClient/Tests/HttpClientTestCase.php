@@ -833,6 +833,11 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame('/', $body['REQUEST_URI']);
     }
 
+    public function testCrossOriginRedirectsCanBeDisabled()
+    {
+        $this->markTestSkipped('The "follow_cross_origin_redirects" option is not supported in this version of the HttpClient component.');
+    }
+
     public function testResponseCanBeProcessedAfterClientReset()
     {
         $client = $this->getHttpClient(__FUNCTION__);

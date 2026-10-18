@@ -14,6 +14,7 @@ CHANGELOG
  * Add argument `$skipValidationDirs` to `XliffFileLoader` to load the XLIFF files of these directories without validating them against the schema
  * Add `HtmlTranslator` to translate messages whose tags are replaced by HTML elements while everything else is escaped
  * Add `getGlobalParameters()` to `LoggingTranslator` and `PseudoLocalizationTranslator`
+ * Add `TranslatableMoney` to format an amount in a given currency with the locale of the translation
 
 8.1
 ---

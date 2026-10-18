@@ -471,6 +471,7 @@ Scheduler
 Security
 --------
 
+ * When `use_referer` is enabled, a failed login now saves the referer as the target path of the firewall, unless a target path is already saved. The next successful login redirects there, even when it is submitted from another page
  * [BC BREAK] A failing `#[IsCsrfTokenValid]` attribute now throws
    `Symfony\Component\Security\Http\Exception\InvalidCsrfTokenException`, which extends `HttpException` and
    carries a 403 status, instead of `Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException`, which

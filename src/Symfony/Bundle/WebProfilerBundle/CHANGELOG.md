@@ -9,6 +9,8 @@ CHANGELOG
  * Add a Key Management panel
  * Display the duration and the transferred sizes of each request in the HTTP Client panel
  * Show the descriptions of workflows, places and transitions in the Workflow panel
+ * Add a Theme tab to the Form panel, listing the candidate blocks of each form part, the block rendered and the template defining it
+ * Show the prototype of collections in the Form panel
 
 8.1
 ---

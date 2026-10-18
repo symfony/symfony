@@ -84,3 +84,7 @@ parameters:
         -
             message: '#^Call to function method_exists\(\) with .+ will always evaluate to true\.$#'
             path: src/Symfony/Component/KeyManagement/Bridge/Doctrine*
+        # $entry is assigned in a finally block, which always runs before the code that follows the try
+        -
+            message: '#^Variable \$entry might not be defined\.$#'
+            path: src/Symfony/Bridge/Twig/Form/TraceableTwigRendererEngine.php

@@ -20,6 +20,8 @@ use Symfony\Component\VarDumper\Cloner\Data;
  * Collects and structures information about forms.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @method void collectRenderingTrace(FormView $view, array $trace) Stores the blocks rendered for the given view; not implementing it is deprecated since Symfony 8.2
  */
 interface FormDataCollectorInterface extends DataCollectorInterface
 {

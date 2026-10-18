@@ -283,18 +283,45 @@ class ConsoleSectionOutput extends StreamOutput
         return implode('', array_reverse($erasedContent));
     }
 
-    private function getDisplayLength(string $text): int
-    {
-        return Helper::width(Helper::removeDecoration($this->getFormatter(), str_replace("\t", '        ', $text)));
-    }
-
     private function getDisplayHeight(string $line, int $width): int
     {
+        if ($width <= 0) {
+            return 1;
+        }
+
         // the line break must not count as a column, or a line as wide as the terminal would count as two
         if (str_ends_with($line, \PHP_EOL)) {
             $line = substr($line, 0, -\strlen(\PHP_EOL));
         }
 
-        return (int) ceil($this->getDisplayLength($line) / $width) ?: 1;
+        // formatting the line again would remove literal tags, so only the ANSI sequences are removed
+        $line = preg_replace(['/\e\[[^m]*m/', '/\e]8;[^;]*;[^\e]*\e\\\\/'], '', $line);
+        $lineWidth = Helper::width(str_replace("\t", '        ', $line));
+
+        if ($lineWidth <= $width || !preg_match('/[\t\x80-\xFF]/', $line) || !preg_match('//u', $line)) {
+            return (int) ceil($lineWidth / $width) ?: 1;
+        }
+
+        // a wide character that does not fit at the end of a row is moved to the next one
+        $rows = 1;
+        $column = 0;
+        $offset = 0;
+        $widths = [];
+        while (false !== $char = grapheme_extract($line, 1, \GRAPHEME_EXTR_COUNT, $offset, $offset)) {
+            if ("\t" === $char) {
+                // a tab moves the cursor to the next multiple of 8 columns, but never past the last column
+                $column = min($column - $column % 8 + 8, $width - 1);
+                continue;
+            }
+
+            $charWidth = $widths[$char] ??= Helper::width($char);
+            if ($column + $charWidth > $width) {
+                ++$rows;
+                $column = 0;
+            }
+            $column += $charWidth;
+        }
+
+        return $rows;
     }
 }

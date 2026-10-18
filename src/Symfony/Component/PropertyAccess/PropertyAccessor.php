@@ -59,6 +59,8 @@ class PropertyAccessor implements PropertyAccessorInterface
     private const CACHE_PREFIX_PROPERTY_PATH = 'p';
     private const RESULT_PROTO = [self::VALUE => null];
 
+    private static array $dynamicPropertiesCache = [];
+
     private int $magicMethodsFlags;
     private bool $ignoreInvalidIndices;
     private bool $ignoreInvalidProperty;
@@ -547,7 +549,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 } elseif (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $type) {
                     $this->writeCollection($zval, $property, $value, $mutator->getAdderInfo(), $mutator->getRemoverInfo());
                 }
-            } elseif ($object instanceof \stdClass && property_exists($object, $property)) {
+            } elseif ($object instanceof \stdClass ? property_exists($object, $property) : $this->isDynamicPropertyWritable($object, $class, $property)) {
                 $object->$property = $value;
             } elseif (!$this->ignoreInvalidProperty) {
                 if ($mutator->hasErrors()) {
@@ -645,7 +647,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             return true;
         }
 
-        $mutatorForArray = $this->getWriteInfo($object::class, $property, []);
+        $class = $object::class;
+        $mutatorForArray = $this->getWriteInfo($class, $property, []);
         if (PropertyWriteInfo::TYPE_PROPERTY === $mutatorForArray->getType()) {
             return 'public' === $mutatorForArray->getVisibility();
         }
@@ -654,9 +657,9 @@ class PropertyAccessor implements PropertyAccessorInterface
             return true;
         }
 
-        $mutator = $this->getWriteInfo($object::class, $property, '');
+        $mutator = $this->getWriteInfo($class, $property, '');
 
-        return PropertyWriteInfo::TYPE_NONE !== $mutator->getType();
+        return PropertyWriteInfo::TYPE_NONE !== $mutator->getType() || $this->isDynamicPropertyWritable($object, $class, $property);
     }
 
     /**
@@ -712,5 +715,36 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         return $apcu;
+    }
+
+    /**
+     * Returns whether a property that the class doesn't declare can be written like a public one.
+     */
+    private function isDynamicPropertyWritable(object $object, string $class, string $property): bool
+    {
+        if ($object instanceof \SimpleXMLElement) {
+            // Several children that have the same name can't be written at once, and count() returns 0 for an attribute
+            return !property_exists($class, $property) && property_exists($object, $property) && 2 > \count($object->$property);
+        }
+
+        return (self::$dynamicPropertiesCache[$class] ??= self::allowsDynamicProperties($class)) && !property_exists($class, $property) && property_exists($object, $property);
+    }
+
+    /**
+     * Returns whether the class or one of its parents has the #[AllowDynamicProperties] attribute.
+     *
+     * Internal classes are ignored: stdClass is handled separately, and the properties of __PHP_Incomplete_Class can't be accessed.
+     */
+    private static function allowsDynamicProperties(string $class): bool
+    {
+        $r = new \ReflectionClass($class);
+
+        do {
+            if (!$r->isInternal() && $r->getAttributes(\AllowDynamicProperties::class)) {
+                return true;
+            }
+        } while ($r = $r->getParentClass());
+
+        return false;
     }
 }

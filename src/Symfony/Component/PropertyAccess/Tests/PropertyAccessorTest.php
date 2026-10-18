@@ -972,6 +972,176 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
     }
 
+    public function testSetSimpleXmlElementChild()
+    {
+        $xml = new \SimpleXMLElement('<root><message></message></root>');
+
+        $this->assertTrue($this->propertyAccessor->isWritable($xml, 'message'));
+        $this->assertFalse($this->propertyAccessor->isWritable($xml, 'missing'));
+
+        $this->propertyAccessor->setValue($xml, 'message', 123);
+
+        $this->assertSame('123', (string) $xml->message);
+
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage('Could not determine access type for property "missing" in class "SimpleXMLElement".');
+
+        $this->propertyAccessor->setValue($xml, 'missing', 123);
+    }
+
+    public function testSetChildOfSimpleXmlElementSubclass()
+    {
+        $xml = new class('<root><message>Hello</message></root>') extends \SimpleXMLElement {
+        };
+
+        $this->assertTrue($this->propertyAccessor->isWritable($xml, 'message'));
+
+        $this->propertyAccessor->setValue($xml, 'message', 123);
+
+        $this->assertSame('123', (string) $xml->message);
+    }
+
+    public function testSetSimpleXmlElementAttribute()
+    {
+        $xml = new \SimpleXMLElement('<root message="Hello"/>');
+        $attributes = $xml->attributes();
+
+        $this->assertTrue($this->propertyAccessor->isWritable($attributes, 'message'));
+
+        $this->propertyAccessor->setValue($attributes, 'message', 123);
+
+        $this->assertSame('123', (string) $xml['message']);
+    }
+
+    public function testSimpleXmlElementChildrenWithSameNameAreNotWritable()
+    {
+        $xml = new \SimpleXMLElement('<root><message>a</message><message>b</message></root>');
+
+        $this->assertFalse($this->propertyAccessor->isWritable($xml, 'message'));
+
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage('Could not determine access type for property "message" in class "SimpleXMLElement".');
+
+        $this->propertyAccessor->setValue($xml, 'message', 'c');
+    }
+
+    public function testSetDynamicPropertyOfClassWithAllowDynamicProperties()
+    {
+        $object = new TestPublicPropertyDynamicallyCreated('Bar');
+
+        $this->assertTrue($this->propertyAccessor->isWritable($object, 'foo'));
+
+        $this->propertyAccessor->setValue($object, 'foo', 'Baz');
+
+        $this->assertSame('Baz', $object->foo);
+    }
+
+    public function testSetDynamicPropertyOfChildOfClassWithAllowDynamicProperties()
+    {
+        $object = new class('Bar') extends TestPublicPropertyDynamicallyCreated {
+        };
+
+        $this->assertTrue($this->propertyAccessor->isWritable($object, 'foo'));
+
+        $this->propertyAccessor->setValue($object, 'foo', 'Baz');
+
+        $this->assertSame('Baz', $object->foo);
+    }
+
+    public function testPrivatePropertyOfClassWithAllowDynamicPropertiesIsNotWritable()
+    {
+        $object = new #[\AllowDynamicProperties] class {
+            private $foo = 'Bar';
+        };
+
+        $this->assertFalse($this->propertyAccessor->isWritable($object, 'foo'));
+
+        $this->expectException(NoSuchPropertyException::class);
+
+        $this->propertyAccessor->setValue($object, 'foo', 'Baz');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDynamicPropertyOfClassWithoutAllowDynamicPropertiesIsNotWritable()
+    {
+        $object = new class {
+        };
+        $object->foo = 'Bar';
+
+        $this->assertFalse($this->propertyAccessor->isWritable($object, 'foo'));
+
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage('Could not determine access type for property "foo"');
+
+        $this->propertyAccessor->setValue($object, 'foo', 'Baz');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDynamicPropertyOfChildOfInternalClassIsNotWritable()
+    {
+        $object = new class extends \Exception {
+        };
+        $object->foo = 'Bar';
+
+        $this->assertFalse($this->propertyAccessor->isWritable($object, 'foo'));
+
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage('Could not determine access type for property "foo"');
+
+        $this->propertyAccessor->setValue($object, 'foo', 'Baz');
+    }
+
+    /**
+     * @requires extension pdo_sqlite
+     */
+    public function testPdoRowColumnIsNotWritable()
+    {
+        $row = (new \PDO('sqlite::memory:'))->query('SELECT 1 AS foo')->fetch(\PDO::FETCH_LAZY);
+
+        $this->assertFalse($this->propertyAccessor->isWritable($row, 'foo'));
+
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage('Could not determine access type for property "foo" in class "PDORow".');
+
+        $this->propertyAccessor->setValue($row, 'foo', 'Baz');
+    }
+
+    public function testPropertyOfIncompleteClassIsNotWritable()
+    {
+        $object = unserialize('O:16:"NotExistingClass":1:{s:3:"foo";s:3:"Bar";}');
+
+        $this->assertFalse($this->propertyAccessor->isWritable($object, 'foo'));
+
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage('Could not determine access type for property "foo" in class "__PHP_Incomplete_Class".');
+
+        $this->propertyAccessor->setValue($object, 'foo', 'Baz');
+    }
+
+    public function testSetValueCallsMagicSetForNonPublicPropertyOfStdClassSubclass()
+    {
+        $object = new class extends \stdClass {
+            public array $calls = [];
+            protected $foo;
+
+            public function __set(string $name, mixed $value): void
+            {
+                $this->calls[] = [$name, $value];
+            }
+        };
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS);
+
+        $this->assertTrue($propertyAccessor->isWritable($object, 'foo'));
+
+        $propertyAccessor->setValue($object, 'foo', 'Baz');
+
+        $this->assertSame([['foo', 'Baz']], $object->calls);
+    }
+
     public function testSetValueWrongTypeShouldThrowWrappedException()
     {
         $object = new TestClassTypedProperty();
@@ -1067,6 +1237,33 @@ class PropertyAccessorTest extends TestCase
         $lazyGhost = $this->createUninitializedObjectPropertyGhost();
 
         $this->assertFalse($this->propertyAccessor->isReadable($lazyGhost, 'dummy'));
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testIsWritableDoesNotInitializeLazyGhost()
+    {
+        $class = new \ReflectionClass(TypeHinted::class);
+        $lazyGhost = $class->newLazyGhost(static fn () => null);
+
+        $this->assertTrue($this->propertyAccessor->isWritable($lazyGhost, 'dateMutable'));
+        $this->assertFalse($this->propertyAccessor->isWritable($lazyGhost, 'dummy'));
+        $this->assertTrue($class->isUninitializedLazyObject($lazyGhost));
+    }
+
+    /**
+     * @requires PHP 8.4
+     */
+    public function testSetValueOfMissingPropertyDoesNotInitializeLazyGhost()
+    {
+        $class = new \ReflectionClass(TypeHinted::class);
+        $lazyGhost = $class->newLazyGhost(static fn () => null);
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET, PropertyAccessor::DO_NOT_THROW);
+
+        $propertyAccessor->setValue($lazyGhost, 'dummy', 'Baz');
+
+        $this->assertTrue($class->isUninitializedLazyObject($lazyGhost));
     }
 
     private function createUninitializedObjectPropertyGhost(): UninitializedObjectProperty

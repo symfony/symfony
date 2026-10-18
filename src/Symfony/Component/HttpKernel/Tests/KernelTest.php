@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
@@ -31,10 +32,13 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
+use Symfony\Component\HttpKernel\HttpCache\HttpCache;
+use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTestWithLoadClassCache;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
@@ -757,6 +761,50 @@ class KernelTest extends TestCase
         $this->assertSame('cached: /worker-second', $secondResponse->getContent());
     }
 
+    public function testTerminateGoesThroughHttpCache()
+    {
+        $httpKernel = new RoutingTerminableHttpKernel();
+
+        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container) {
+            $container->register('kernel', CustomProjectDirKernel::class)
+                ->setSynthetic(true)
+                ->setPublic(true);
+            $container->register('http_cache', HttpCache::class)
+                ->setPublic(true)
+                ->setArguments([new Reference('kernel'), new Definition(Store::class, [__DIR__.'/Fixtures/var/http_cache']), null, ['terminate_on_cache_hit' => false]]);
+        }, $httpKernel, 'http_cache_terminate');
+
+        $request = Request::create('/page');
+        $kernel->terminate($request, $kernel->handle($request));
+
+        $this->assertSame(1, $httpKernel->handleCount);
+        $this->assertSame(['page'], $httpKernel->terminatedRoutes);
+
+        $request = Request::create('/page');
+        $kernel->terminate($request, $kernel->handle($request));
+
+        $this->assertSame(1, $httpKernel->handleCount);
+        $this->assertSame(['page'], $httpKernel->terminatedRoutes);
+    }
+
+    public function testTerminateFallsBackToHttpKernelWhenHttpCacheIsNotTerminable()
+    {
+        $httpKernel = new RoutingTerminableHttpKernel();
+
+        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container) {
+            $container->register('http_cache', RecordingHttpCache::class)
+                ->setPublic(true);
+        }, $httpKernel, 'http_cache_not_terminable');
+
+        $kernel->boot();
+
+        $request = Request::create('/page');
+        $kernel->terminate($request, $kernel->handle($request));
+
+        $this->assertSame(0, $httpKernel->handleCount);
+        $this->assertSame([null], $httpKernel->terminatedRoutes);
+    }
+
     /**
      * @group time-sensitive
      */
@@ -1166,6 +1214,25 @@ class ThrowingHttpKernel implements HttpKernelInterface
     public function handle(Request $request, int $type = self::MAIN_REQUEST, bool $catch = true): Response
     {
         throw new \LogicException('The worker HTTP kernel should not be reached when the http_cache service handles the request.');
+    }
+}
+
+class RoutingTerminableHttpKernel implements HttpKernelInterface, TerminableInterface
+{
+    public int $handleCount = 0;
+    public array $terminatedRoutes = [];
+
+    public function handle(Request $request, int $type = self::MAIN_REQUEST, bool $catch = true): Response
+    {
+        ++$this->handleCount;
+        $request->attributes->set('_route', 'page');
+
+        return (new Response('page'))->setPublic()->setSharedMaxAge(60);
+    }
+
+    public function terminate(Request $request, Response $response): void
+    {
+        $this->terminatedRoutes[] = $request->attributes->get('_route');
     }
 }
 

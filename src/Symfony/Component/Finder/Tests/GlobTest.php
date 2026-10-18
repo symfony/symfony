@@ -156,4 +156,57 @@ class GlobTest extends TestCase
         $this->assertSame(1, preg_match($regex, ']'));
         $this->assertSame(0, preg_match($regex, 'a]'));
     }
+
+    public function testGlobToRegexUnclosedBrackets()
+    {
+        $this->assertSame('#^(?=[^\.])a\[b$#', Glob::toRegex('a[b'));
+        $this->assertSame('#^(?=[^\.])\[]$#', Glob::toRegex('[]'));
+        $this->assertSame('#^(?=[^\.])\[a\]$#', Glob::toRegex('[a\]'));
+        $this->assertSame('#^(?=[^\.])\[a\[b$#', Glob::toRegex('[a[b'));
+        $this->assertSame('#^(?=[^\.])\[[^/]*\.txt$#', Glob::toRegex('[*.txt'));
+
+        $this->assertSame(1, preg_match(Glob::toRegex('a[b'), 'a[b'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[]'), '[]'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[*.txt'), '[foo.txt'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[*.txt'), '^.txt'));
+
+        $this->assertSame('#^(?=[^\.])[]]$#', Glob::toRegex('[]]'));
+        $this->assertSame('#^(?=[^\.])[a[]$#', Glob::toRegex('[a[]'));
+    }
+
+    public function testGlobToRegexBracketsAfterAnUnclosedOne()
+    {
+        $this->assertSame('#^(?=[^\.])\[\[:alpha:]$#', Glob::toRegex('[[:alpha:]'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[[:alpha:]'), '[[:alpha:]'));
+    }
+
+    public function testGlobToRegexUnclosedCurlies()
+    {
+        $this->assertSame('#^(?=[^\.])a\{b$#', Glob::toRegex('a{b'));
+        $this->assertSame('#^(?=[^\.])\{a,b$#', Glob::toRegex('{a,b'));
+        $this->assertSame('#^(?=[^\.])\{a,(b|c)$#', Glob::toRegex('{a,{b,c}'));
+        $this->assertSame('#^(?=[^\.])\{a(b|c)$#', Glob::toRegex('{a{b,c}'));
+        $this->assertSame('#^(?=[^\.])\{(a)$#', Glob::toRegex('{{a}'));
+        $this->assertSame('#^(?=[^\.])\{[^/]*$#', Glob::toRegex('{*'));
+
+        $this->assertSame(1, preg_match(Glob::toRegex('a{b'), 'a{b'));
+        $this->assertSame(1, preg_match(Glob::toRegex('{a,{b,c}'), '{a,c'));
+
+        $this->assertSame('#^(?=[^\.])(a|b)}$#', Glob::toRegex('{a,b}}'));
+        $this->assertSame('#^(?=[^\.])a,b$#', Glob::toRegex('a,b'));
+    }
+
+    public function testGlobToRegexCurliesInsideBrackets()
+    {
+        $this->assertSame('#^(?=[^\.])[{]$#', Glob::toRegex('[{]'));
+        $this->assertSame('#^(?=[^\.])[{}]$#', Glob::toRegex('[{}]'));
+        $this->assertSame('#^(?=[^\.])(a|[{])$#', Glob::toRegex('{a,[{]}'));
+        $this->assertSame('#^(?=[^\.])([a{]a)$#', Glob::toRegex('{[a{]a}'));
+        $this->assertSame('#^(?=[^\.])(a|[,])$#', Glob::toRegex('{a,[,]}'));
+        $this->assertSame('#^(?=[^\.])(a|\[b)$#', Glob::toRegex('{a,[b}'));
+
+        $this->assertSame(1, preg_match(Glob::toRegex('[{}]'), '}'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[{}]'), '('));
+        $this->assertSame(1, preg_match(Glob::toRegex('[{-}]'), '|'));
+    }
 }

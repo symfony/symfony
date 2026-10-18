@@ -1,0 +1,16 @@
+{
+    "id": 1239108,
+    "camp_id": 960,
+    "email": "example@domain.com",
+    "campaign_name": "My First Campaign",
+    "date_sent": "2020-10-09 00:00:00",
+    "date_event": "2020-10-09 00:00:00",
+    "event": "unsubscribe",
+    "tag": "",
+    "sending_ip": "127.0.0.1",
+    "list_id": [3, 42],
+    "segment_ids": [1, 10],
+    "ts_sent": 1604933619,
+    "ts_event": 1604933737,
+    "ts": 1604937337
+}

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Return an HTTP 204 response for controllers with a `void` return type
  * Add `Store::clear()` to remove all the entries of the HTTP cache store
  * Add the `lint:expressions` command to lint the expressions of controller attributes and the ones listed in the configuration
  * Log exceptions whose HTTP status code is below 500 (client errors) at the `warning` level instead of `error`

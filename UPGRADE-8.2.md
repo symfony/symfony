@@ -245,6 +245,7 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * Controllers with a `void` return type now return an empty HTTP 204 response when no `kernel.view` listener provides a response
  * [BC BREAK] When a route matches the request path but declares a `scheme` the request does not use,
    `RouterListener` now returns the redirect response itself at priority 32, instead of setting
    `_route` and `_controller` and letting the request continue to `RedirectController`. The response

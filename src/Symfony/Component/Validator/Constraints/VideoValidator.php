@@ -52,7 +52,7 @@ class VideoValidator extends FileValidator
             'ffprobe',
             '-v', 'error',
             '-select_streams', 'v',
-            '-show_entries', 'stream=index,codec_type,codec_name,width,height',
+            '-show_entries', 'stream=index,codec_type,codec_name,width,height:stream_side_data_list:stream_tags=rotate:stream_disposition=attached_pic',
             '-show_entries', 'format=format_name',
             '-of', 'json',
             '--',
@@ -69,8 +69,18 @@ class VideoValidator extends FileValidator
         }
 
         $meta = json_decode($process->getOutput(), true) ?: [];
-        $streams = $meta['streams'] ?? [];
         $formats = explode(',', strtolower($meta['format']['format_name'] ?? 'unknown'));
+
+        // An attached picture, like a cover art, is a still image, not a video
+        $streams = array_values(array_filter($meta['streams'] ?? [], static fn (array $stream) => !($stream['disposition']['attached_pic'] ?? false)));
+
+        if (!$streams && ($meta['streams'] ?? false)) {
+            $this->context->buildViolation($constraint->thumbnailNotAllowedMessage)
+                ->setCode(Video::THUMBNAIL_NOT_ALLOWED_ERROR)
+                ->addViolation();
+
+            return;
+        }
 
         if (!($streams[0]['width'] ?? false) || !($streams[0]['height'] ?? false)) {
             $this->context->buildViolation($constraint->sizeNotDetectedMessage)
@@ -82,6 +92,19 @@ class VideoValidator extends FileValidator
 
         $width = $streams[0]['width'];
         $height = $streams[0]['height'];
+
+        // Players rotate the video for display, so validate the displayed dimensions
+        $rotation = (int) ($streams[0]['tags']['rotate'] ?? 0);
+        foreach ($streams[0]['side_data_list'] ?? [] as $sideData) {
+            if (isset($sideData['rotation'])) {
+                $rotation = (int) $sideData['rotation'];
+                break;
+            }
+        }
+
+        if (90 === abs($rotation) % 180) {
+            [$width, $height] = [$height, $width];
+        }
 
         if (1 !== \count($streams)) {
             $this->context->buildViolation($constraint->multipleVideoStreamsMessage)

@@ -259,6 +259,60 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertSame(30, $window->getExpirationTime());
     }
 
+    public function testLoweredLimitIsAppliedToStoredWindow()
+    {
+        $limiter = new FixedWindowLimiter('test', 20, new \DateInterval('PT1M'), $this->storage);
+        $limiter->consume(5);
+        sleep(30);
+        $limiter->consume(10);
+
+        $limiter = $this->createLimiter();
+        $this->assertFalse($limiter->consume()->isAccepted());
+
+        sleep(31);
+
+        $this->assertTrue($limiter->consume(10)->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testLoweredLimitKeepsReservationDebt()
+    {
+        $limiter = new FixedWindowLimiter('test', 20, new \DateInterval('PT1M'), $this->storage);
+        $limiter->reserve(20);
+        $limiter->reserve(20);
+
+        $limiter = $this->createLimiter();
+        $this->assertEquals(120, $limiter->reserve()->getWaitDuration());
+        $this->assertEquals(180, $limiter->reserve(10)->getWaitDuration());
+    }
+
+    public function testRaisedLimitKeepsReservationDebt()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->reserve(10);
+        $limiter->reserve(10);
+        $limiter->reserve(5);
+
+        $limiter = new FixedWindowLimiter('test', 20, new \DateInterval('PT1M'), $this->storage);
+        $this->assertEquals(120, $limiter->reserve()->getWaitDuration());
+
+        sleep(121);
+
+        $this->assertSame(14, $limiter->consume(0)->getRemainingTokens());
+    }
+
+    public function testChangedIntervalIsAppliedToStoredWindow()
+    {
+        (new FixedWindowLimiter('test', 10, new \DateInterval('PT1H'), $this->storage))->consume(10);
+
+        $limiter = $this->createLimiter();
+        $this->assertFalse($limiter->consume()->isAccepted());
+
+        sleep(61);
+
+        $this->assertTrue($limiter->consume(10)->isAccepted());
+    }
+
     public function testPeekConsume()
     {
         $limiter = $this->createLimiter();

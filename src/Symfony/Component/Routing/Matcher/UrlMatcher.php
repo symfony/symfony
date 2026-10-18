@@ -43,6 +43,14 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      * @internal
      */
     protected array $allowSchemes = [];
+
+    /**
+     * Collects URI schemes that would be allowed for the request before a trailing slash redirection took precedence.
+     *
+     * @internal
+     */
+    protected array $trailingSlashSchemes = [];
+
     protected ?Request $request = null;
     protected ExpressionLanguage $expressionLanguage;
 
@@ -69,7 +77,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 
     public function match(string $pathinfo): array
     {
-        $this->allow = $this->allowSchemes = [];
+        $this->allow = $this->allowSchemes = $this->trailingSlashSchemes = [];
         $pathinfo = '' === ($pathinfo = rawurldecode($pathinfo)) ? '/' : $pathinfo;
 
         if ($ret = $this->matchCollection($pathinfo, $this->routes)) {
@@ -114,7 +122,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function matchCollection(string $pathinfo, RouteCollection $routes): array
     {
         // HEAD and GET are equivalent as per RFC
-        if ('HEAD' === $method = $this->context->getMethod()) {
+        if ('HEAD' === $method = $requestMethod = $this->context->getMethod()) {
             $method = 'GET';
         }
         $supportsTrailingSlash = 'GET' === $method && $this instanceof RedirectableUrlMatcherInterface;
@@ -164,6 +172,8 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 
             if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
                 if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods, true))) {
+                    $this->trailingSlashSchemes = $this->allowSchemes;
+
                     return $this->allow = $this->allowSchemes = [];
                 }
                 continue;
@@ -174,7 +184,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            if ($requiredMethods && !\in_array($method, $requiredMethods, true)) {
+            if ($requiredMethods && !\in_array($method, $requiredMethods, true) && !\in_array($requestMethod, $requiredMethods, true)) {
                 $this->allow = array_merge($this->allow, $requiredMethods);
                 continue;
             }

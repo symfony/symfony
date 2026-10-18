@@ -46,6 +46,11 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface, Re
     private array $resourceHierarchyLevels = [];
 
     /**
+     * @var array<string, array<string, string[]>>
+     */
+    private array $resourceHierarchies = [];
+
+    /**
      * @var array<string, array<string, bool>>
      */
     private array $resourceInheritability = [];
@@ -72,7 +77,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface, Re
         // Unset instead of resetting to an empty array, in order to allow
         // implementations (like TwigRendererEngine) to check whether $cacheKey
         // is set at all.
-        unset($this->resources[$cacheKey], $this->resourceHierarchyLevels[$cacheKey], $this->resourceInheritability[$cacheKey]);
+        unset($this->resources[$cacheKey], $this->resourceHierarchyLevels[$cacheKey], $this->resourceHierarchies[$cacheKey], $this->resourceInheritability[$cacheKey]);
     }
 
     protected function setResourceInheritability(string $cacheKey, string $blockName, bool $inheritable): void
@@ -99,6 +104,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface, Re
     public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): mixed
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
+        $this->prepareCacheForBlockHierarchy($cacheKey, $blockNameHierarchy);
         $blockName = $blockNameHierarchy[$hierarchyLevel];
 
         if (!isset($this->resources[$cacheKey][$blockName])) {
@@ -111,6 +117,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface, Re
     public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): int|false
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
+        $this->prepareCacheForBlockHierarchy($cacheKey, $blockNameHierarchy);
         $blockName = $blockNameHierarchy[$hierarchyLevel];
 
         if (!isset($this->resources[$cacheKey][$blockName])) {
@@ -202,6 +209,18 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface, Re
         $this->useDefaultThemes = [];
         $this->resources = [];
         $this->resourceHierarchyLevels = [];
+        $this->resourceHierarchies = [];
         $this->resourceInheritability = [];
+    }
+
+    private function prepareCacheForBlockHierarchy(string $cacheKey, array $blockNameHierarchy): void
+    {
+        $rootBlockName = $blockNameHierarchy[0];
+
+        if (isset($this->resourceHierarchies[$cacheKey][$rootBlockName]) && $this->resourceHierarchies[$cacheKey][$rootBlockName] !== $blockNameHierarchy) {
+            unset($this->resources[$cacheKey], $this->resourceHierarchyLevels[$cacheKey], $this->resourceHierarchies[$cacheKey], $this->resourceInheritability[$cacheKey]);
+        }
+
+        $this->resourceHierarchies[$cacheKey][$rootBlockName] = $blockNameHierarchy;
     }
 }

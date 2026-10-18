@@ -82,6 +82,8 @@ final class FixedWindowLimiter implements LimiterInterface
                 }
             } elseif (!$window instanceof Window) {
                 $window = new Window($this->id, $this->intervalInSeconds, $this->limit);
+            } else {
+                $window->configure($this->intervalInSeconds, $this->limit);
             }
 
             $availableTokens = $window->getAvailableTokens($now);

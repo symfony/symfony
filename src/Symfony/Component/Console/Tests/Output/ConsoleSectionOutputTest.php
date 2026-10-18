@@ -110,6 +110,78 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertSame('0123456789'.\PHP_EOL."\x1b[1A\x1b[0J", stream_get_contents($output->getStream()));
     }
 
+    public function testClearNumberOfLinesWiderThanTheTerminal()
+    {
+        putenv('COLUMNS=10');
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->writeln('Foo');
+        $output->writeln('0123456789abcde');
+        $output->clear(1);
+        $output->clear();
+
+        rewind($output->getStream());
+        $this->assertSame('Foo'.\PHP_EOL.'0123456789abcde'.\PHP_EOL."\x1b[2A\x1b[0J\x1b[1A\x1b[0J", stream_get_contents($output->getStream()));
+    }
+
+    public function testClearLineWithWideCharacters()
+    {
+        putenv('COLUMNS=5');
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->writeln('Foo');
+        $output->writeln('中中中中中');
+        $output->clear(1);
+        $output->clear();
+
+        rewind($output->getStream());
+        $this->assertSame('Foo'.\PHP_EOL.'中中中中中'.\PHP_EOL."\x1b[3A\x1b[0J\x1b[1A\x1b[0J", stream_get_contents($output->getStream()));
+    }
+
+    public function testClearLineWithEscapedTag()
+    {
+        putenv('COLUMNS=10');
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->writeln(OutputFormatter::escape('<info>').'xxxxxxx');
+        $output->clear();
+        $output->writeln('Foo');
+
+        rewind($output->getStream());
+        $this->assertSame('<info>xxxxxxx'.\PHP_EOL."\x1b[2A\x1b[0J".'Foo'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
+    public function testClearLineWithTab()
+    {
+        putenv('COLUMNS=12');
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->writeln('Foo');
+        $output->writeln("abc\tdefg");
+        $output->clear();
+
+        rewind($output->getStream());
+        $this->assertSame('Foo'.\PHP_EOL."abc\tdefg".\PHP_EOL."\x1b[2A\x1b[0J", stream_get_contents($output->getStream()));
+    }
+
+    public function testClearWithZeroColumns()
+    {
+        putenv('COLUMNS=0');
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->writeln('Foo');
+        $output->writeln('0123456789abcde');
+        $output->clear();
+
+        rewind($output->getStream());
+        $this->assertSame('Foo'.\PHP_EOL.'0123456789abcde'.\PHP_EOL."\x1b[2A\x1b[0J", stream_get_contents($output->getStream()));
+    }
+
     public function testClearNumberOfLinesWithMultipleSections()
     {
         $output = new StreamOutput($this->stream);

@@ -99,4 +99,19 @@ class BrevoRequestParserTest extends AbstractRequestParserTestCase
         $this->expectExceptionMessage('Invalid credentials.');
         $parser->parse($request, ':top-secret');
     }
+
+    public function testRejectMissingMessageIdAndCampaignId()
+    {
+        $request = $this->createRequest(json_encode([
+            'id' => 814119,
+            'event' => 'click',
+            'email' => 'example@gmail.com',
+            'ts_event' => 1734082566,
+        ]));
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Payload is malformed.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
 }

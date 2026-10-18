@@ -296,6 +296,8 @@ class Container implements ContainerInterface, ResetInterface
         // tears down the entire container. ServicesResetter::reset() handles calling
         // reset methods on tracked instances during the request lifecycle.
         $this->resetMap = null;
+        // the closures that reference the container itself are created again when needed
+        unset($this->getEnv, $this->getService);
     }
 
     /**

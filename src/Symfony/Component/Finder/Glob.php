@@ -42,7 +42,8 @@ class Glob
     {
         $firstByte = true;
         $escaping = false;
-        $inCurlies = 0;
+        $curlies = [];
+        $bracketScanEnd = 0;
         $regex = '';
         if ($unanchored = str_starts_with($glob, '**/')) {
             $glob = '/'.$glob;
@@ -76,6 +77,8 @@ class Glob
 
             if ($delimiter === $car || '.' === $car || '(' === $car || ')' === $car || '|' === $car || '+' === $car || '^' === $car || '$' === $car) {
                 $regex .= "\\$car";
+            } elseif ('[' === $car && !$escaping && null !== $class = self::bracketExpressionToRegex($glob, $i, $delimiter, $bracketScanEnd)) {
+                $regex .= $class;
             } elseif ('*' === $car) {
                 if ($escaping || $strictWildcardSlash || !str_ends_with($regex, '.*')) {
                     // ".*.*" matches the same as ".*" but backtracks quadratically
@@ -84,16 +87,19 @@ class Glob
             } elseif ('?' === $car) {
                 $regex .= $escaping ? '\\?' : ($strictWildcardSlash ? '[^/]' : '.');
             } elseif ('{' === $car) {
-                $regex .= $escaping ? '\\{' : '(';
                 if (!$escaping) {
-                    ++$inCurlies;
+                    $curlies[] = [\strlen($regex)];
                 }
-            } elseif ('}' === $car && $inCurlies) {
+                $regex .= $escaping ? '\\{' : '(';
+            } elseif ('}' === $car && $curlies) {
                 $regex .= $escaping ? '}' : ')';
                 if (!$escaping) {
-                    --$inCurlies;
+                    array_pop($curlies);
                 }
-            } elseif (',' === $car && $inCurlies) {
+            } elseif (',' === $car && $curlies) {
+                if (!$escaping) {
+                    $curlies[\count($curlies) - 1][] = \strlen($regex);
+                }
                 $regex .= $escaping ? ',' : '|';
             } elseif ('\\' === $car) {
                 if ($escaping) {
@@ -104,16 +110,76 @@ class Glob
                 }
 
                 continue;
+            } elseif ($escaping && ('[' === $car || ']' === $car)) {
+                $regex .= '\\'.$car;
             } else {
                 $regex .= $car;
             }
             $escaping = false;
         }
 
+        // A "{" that no "}" closes is a literal character, and so are the "," it contains
+        $prefix = '';
+        $start = 0;
+        foreach (array_merge(...$curlies) as $offset) {
+            $prefix .= substr($regex, $start, $offset - $start).('(' === $regex[$offset] ? '\\{' : ',');
+            $start = $offset + 1;
+        }
+        $regex = $prefix.substr($regex, $start);
+
         if ($unanchored) {
             $regex = substr_replace($regex, '?', 1 + ('/' === $delimiter) + ($strictLeadingDot ? \strlen('(?=[^\.])') : 0), 0);
         }
 
         return $delimiter.'^'.$regex.'$'.$delimiter;
+    }
+
+    /**
+     * Returns null when a "/" comes before the closing "]", and "\[" when no "]" closes the "[" at position $i.
+     *
+     * $scanEnd is where the last scan stopped without finding a "]": every "[" before that position gets the same result.
+     */
+    private static function bracketExpressionToRegex(string $glob, int &$i, string $delimiter, int &$scanEnd): ?string
+    {
+        $sizeGlob = \strlen($glob);
+
+        if ($i < $scanEnd) {
+            return $scanEnd < $sizeGlob ? null : '\\[';
+        }
+
+        $class = '[';
+
+        for ($j = $i + 1; $j < $sizeGlob; ++$j) {
+            $car = $glob[$j];
+
+            if (']' === $car && $j > $i + 1) {
+                $i = $j;
+
+                return $class.']';
+            }
+
+            if ('/' === $car || ('\\' === $car && '/' === ($glob[$j + 1] ?? ''))) {
+                $scanEnd = $j;
+
+                return null;
+            }
+
+            if ('[' === $car && preg_match('/\[:[a-z]++:\]/A', $glob, $m, 0, $j)) {
+                $class .= $m[0];
+                $j += \strlen($m[0]) - 1;
+            } elseif ('\\' === $car) {
+                if (!isset($glob[++$j])) {
+                    break;
+                }
+                $class .= preg_quote($glob[$j], $delimiter);
+            } elseif ($delimiter === $car || str_contains('.()|+^$', $car)) {
+                $class .= '\\'.$car;
+            } else {
+                $class .= $car;
+            }
+        }
+        $scanEnd = $sizeGlob;
+
+        return '\\[';
     }
 }

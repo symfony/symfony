@@ -231,6 +231,35 @@ class TranslatorTest extends TestCase
         $this->assertSame(['first-legend-input', 'standalone', 'standalone-input'], $enabled);
     }
 
+    public function testCheckedMatchesSelectedOptions()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $document = new \DOMDocument();
+        $document->loadHTML('<select><option id="a">A</option><option id="b" selected>B</option></select><input type="radio" id="c" checked>');
+        $xpath = new \DOMXPath($document);
+
+        $checked = [];
+        foreach ($xpath->query($translator->cssToXPath(':checked')) as $node) {
+            $checked[] = $node->getAttribute('id');
+        }
+
+        $this->assertSame(['b', 'c'], $checked);
+    }
+
+    public function testNamespacedElementWithStructuralPseudoClass()
+    {
+        $document = new \DOMDocument();
+        $document->loadXML('<feed xmlns="http://www.w3.org/2005/Atom"><title/><entry id="first"/><entry id="last"/></feed>');
+        $xpath = new \DOMXPath($document);
+        $xpath->registerNamespace('atom', 'http://www.w3.org/2005/Atom');
+        $translator = new Translator();
+
+        $this->assertSame('first', $xpath->query($translator->cssToXPath('atom|entry:nth-child(2)'))->item(0)?->getAttribute('id'));
+        $this->assertSame('first', $xpath->query($translator->cssToXPath('atom|title + atom|entry'))->item(0)?->getAttribute('id'));
+        $this->assertSame('last', $xpath->query($translator->cssToXPath('atom|feed > :not(atom|title):last-child'))->item(0)?->getAttribute('id'));
+    }
+
     public static function getXpathLiteralTestData()
     {
         return [
@@ -248,6 +277,9 @@ class TranslatorTest extends TestCase
             ['e', 'e'],
             ['*|e', 'e'],
             ['e|f', 'e:f'],
+            ['e|f:first-child', '*/*[(self::e:f) and (position() = 1)]'],
+            ['e|*:nth-child(2)', '*/*[(self::e:*) and (position() = 2)]'],
+            ['e + f|g', 'e/following-sibling::*[1]/self::f:g'],
             ['e[foo]', 'e[@foo]'],
             ['e[foo|bar]', 'e[@foo:bar]'],
             ['e[foo="bar"]', "e[@foo = 'bar']"],
@@ -266,6 +298,9 @@ class TranslatorTest extends TestCase
             ['div e:nth-last-of-type(1) .aclass', "div/descendant-or-self::*/e[position() = last() - 0]/descendant-or-self::*/*[@class and contains(concat(' ', normalize-space(@class), ' '), ' aclass ')]"],
             ['e:first-child', "*/*[(name() = 'e') and (position() = 1)]"],
             ['e:last-child', "*/*[(name() = 'e') and (position() = last())]"],
+            ['e:first-child:last-child', "*/*[((name() = 'e') and (position() = 1)) and (position() = last())]"],
+            ['f > e:first-of-type:nth-last-of-type(1)', 'f/e[(position() = 1) and (position() = last() - 0)]'],
+            ['e:first-of-type:nth-child(2)', "*/*[((not(preceding-sibling::e[1])) and (name() = 'e')) and (position() = 2)]"],
             ['e:first-of-type', '*/e[position() = 1]'],
             ['e:last-of-type', '*/e[position() = last()]'],
             ['e:only-child', "*/*[(name() = 'e') and (last() = 1)]"],
@@ -274,19 +309,42 @@ class TranslatorTest extends TestCase
             ['e:EmPTY', 'e[not(*) and not(string-length())]'],
             ['e:root', 'e[not(parent::*)]'],
             ['e:hover', 'e[0]'],
+            ['e:hover.foo', "e[(0) and (@class and contains(concat(' ', normalize-space(@class), ' '), ' foo '))]"],
+            ['e:not(:hover)', 'e[not(0)]'],
             ['e:contains("foo")', "e[contains(string(.), 'foo')]"],
             ['e:ConTains(foo)', "e[contains(string(.), 'foo')]"],
             ['e.warning', "e[@class and contains(concat(' ', normalize-space(@class), ' '), ' warning ')]"],
             ['e#myid', "e[@id = 'myid']"],
-            ['e:not(:nth-child(odd))', 'e[not(position() - 1 >= 0 and (position() - 1) mod 2 = 0)]'],
+            ['e:not(:nth-child(odd))', 'e[not((count(preceding-sibling::*) + 1) - 1 >= 0 and ((count(preceding-sibling::*) + 1) - 1) mod 2 = 0)]'],
+            ['e:not(e:last-of-type)', "e[not((not(following-sibling::e[1])) and (name() = 'e'))]"],
+            ['e:not(:only-child)', 'e[not(not(preceding-sibling::*[1]) and not(following-sibling::*[1]))]'],
+            ['e:not(:nth-last-child(2n+1))', 'e[not(count(following-sibling::*) >= 0 and (count(following-sibling::*)) mod 2 = 0)]'],
+            ['e:not([foo="position()"]:first-child)', "e[not((@foo = 'position()') and (not(preceding-sibling::*[1])))]"],
+            ['e:not(:nth-of-type(2))', 'e[not((count(preceding-sibling::e) + 1) = 2)]'],
+            ['e:first-child:not(:nth-of-type(2))', "*/*[((name() = 'e') and (position() = 1)) and (not((count(preceding-sibling::e) + 1) = 2))]"],
+            ['e:not(:first-of-type)', 'e[not(not(preceding-sibling::e[1]))]'],
+            ['e:not(:only-of-type)', 'e[not(count(preceding-sibling::e)=0 and count(following-sibling::e)=0)]'],
             ['e:nOT(*)', 'e[0]'],
             ['e f', 'e/descendant-or-self::*/f'],
             ['e > f', 'e/f'],
-            ['e + f', "e/following-sibling::*[(name() = 'f') and (position() = 1)]"],
+            ['e + f', 'e/following-sibling::*[1]/self::f'],
+            ['e + f.c', "e/following-sibling::*[1]/self::f[@class and contains(concat(' ', normalize-space(@class), ' '), ' c ')]"],
+            ['e + *', 'e/following-sibling::*[1]/self::*'],
+            ['e + f + g', 'e/following-sibling::*[1]/self::f/following-sibling::*[1]/self::g'],
+            ['e|f + e|g', 'e:f/following-sibling::*[1]/self::e:g'],
+            ['e + f:last-child', "e/following-sibling::*[1]/self::*[(name() = 'f') and (not(following-sibling::*[1]))]"],
+            ['e + f:nth-child(3)', "e/following-sibling::*[1]/self::*[(name() = 'f') and ((count(preceding-sibling::*) + 1) = 3)]"],
             ['e ~ f', 'e/following-sibling::f'],
+            ['e ~ f:first-child', "e/following-sibling::*[(name() = 'f') and (not(preceding-sibling::*[1]))]"],
+            ['e ~ f:first-of-type', 'e/following-sibling::f[not(preceding-sibling::f[1])]'],
             ['div#container p', "div[@id = 'container']/descendant-or-self::*/p"],
             [':scope > div[dataimg="<testmessage>"]', "*[1]/div[@dataimg = '<testmessage>']"],
             [':scope', '*[1]'],
+            ['e:is(f > e)', "e[(name() = 'e') and (parent::*[name() = 'f'])]"],
+            ['e:where(f e, f + e, f ~ *, * + e)', "e[((name() = 'e') and (ancestor::*[name() = 'f'])) or ((name() = 'e') and (preceding-sibling::*[1]/self::*[name() = 'f'])) or (preceding-sibling::*[name() = 'f'][1]) or ((name() = 'e') and (preceding-sibling::*[1]))]"],
+            ['e:is(:first-child)', 'e[not(preceding-sibling::*[1])]'],
+            ['e:is(f:last-child > :nth-child(2n))', "e[((count(preceding-sibling::*) + 1) >= 0 and ((count(preceding-sibling::*) + 1)) mod 2 = 0) and (parent::*[(name() = 'f') and (not(following-sibling::*[1]))])]"],
+            ['e:is(*, .foo)', 'e'],
             ['e:is(section, article) h1', "e[(name() = 'section') or (name() = 'article')]/descendant-or-self::*/h1"],
             ['e:where(section, article) h1', "e[(name() = 'section') or (name() = 'article')]/descendant-or-self::*/h1"],
             ['[hidden]:where(:is(span))', "*[(@hidden) and (name() = 'span')]"],
@@ -370,6 +428,8 @@ class TranslatorTest extends TestCase
             ['li:nth-child(2n+0)', ['second-li', 'fourth-li', 'sixth-li']],
             ['li:nth-child(+2n+1)', ['first-li', 'third-li', 'fifth-li', 'seventh-li']],
             ['li:nth-child(odd)', ['first-li', 'third-li', 'fifth-li', 'seventh-li']],
+            ['li:nth-child(ODD)', ['first-li', 'third-li', 'fifth-li', 'seventh-li']],
+            ['li:nth-last-child(2N+1)', ['first-li', 'third-li', 'fifth-li', 'seventh-li']],
             ['li:nth-child(2n+4)', ['fourth-li', 'sixth-li']],
             ['li:nth-child(3n+1)', ['first-li', 'fourth-li', 'seventh-li']],
             ['li:nth-child(n)', ['first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
@@ -380,6 +440,8 @@ class TranslatorTest extends TestCase
             ['li:nth-child(-n-1)', []],
             ['li:nth-child(-n+1)', ['first-li']],
             ['li:nth-child(-n+3)', ['first-li', 'second-li', 'third-li']],
+            ['li:nth-child(0n+1)', ['first-li']],
+            ['li:nth-child(0n)', []],
             ['li:nth-last-child(0)', []],
             ['li:nth-last-child(2n)', ['second-li', 'fourth-li', 'sixth-li']],
             ['li:nth-last-child(even)', ['second-li', 'fourth-li', 'sixth-li']],
@@ -398,6 +460,10 @@ class TranslatorTest extends TestCase
             ['ol:nth-of-type(2)', ['second-ol']],
             ['ol:nth-last-of-type(1)', ['second-ol']],
             ['span:only-child', ['foobar-span', 'no-siblings-of-any-type']],
+            ['div > span:first-child:last-child', ['foobar-span']],
+            ['ol > li:first-child:nth-child(1)', ['first-li']],
+            ['em:first-of-type:nth-child(2)', ['p-em']],
+            ['b:last-of-type:nth-child(3)', ['p-b2']],
             ['li div:only-child', ['li-div']],
             ['div *:only-child', ['li-div', 'foobar-span']],
             ['p:only-of-type', ['paragraph']],
@@ -435,6 +501,16 @@ class TranslatorTest extends TestCase
             ['div>.c', ['first-ol']],
             ['div > .c', ['first-ol']],
             ['div + div', ['foobar-div']],
+            ['a + a', ['tag-anchor', 'nofollow-anchor']],
+            ['a + a + a', ['nofollow-anchor']],
+            ['a + .a', ['first-ol']],
+            ['li + li.c', ['third-li', 'fourth-li']],
+            ['li + :last-child', ['seventh-li']],
+            ['li + li:nth-child(3)', ['third-li']],
+            ['li ~ li:first-child', []],
+            ['li ~ li:nth-last-child(2)', ['sixth-li']],
+            ['ol ~ ol:first-of-type', []],
+            ['a ~ :nth-child(4)', ['first-ol']],
             ['a ~ a', ['tag-anchor', 'nofollow-anchor']],
             ['a[rel="tag"] ~ a', ['nofollow-anchor']],
             ['ol#first-ol li:last-child', ['seventh-li']],
@@ -444,7 +520,29 @@ class TranslatorTest extends TestCase
             ['a[href]', ['tag-anchor', 'nofollow-anchor']],
             [':not(*)', []],
             ['a:not([href])', ['name-anchor']],
+            ['div:not(:first-child)', ['foobar-div']],
+            ['div:not(div:last-of-type)', ['outer-div']],
+            ['div:not(:nth-of-type(1))', ['foobar-div']],
+            ['ol:nth-child(4):not(:nth-of-type(1))', []],
+            ['li:not(:first-of-type)', ['second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['ol:not(:last-of-type)', ['first-ol']],
+            ['ol:not(:nth-last-of-type(1))', ['first-ol']],
+            ['em:not(:only-of-type)', []],
+            ['b:not(:only-of-type)', ['p-b', 'p-b2']],
+            ['a:not(*):first-child', []],
+            ['a:hover[name]', []],
+            ['a:not(:hover)', ['name-anchor', 'tag-anchor', 'nofollow-anchor']],
             ['ol :Not(li[class])', ['first-li', 'second-li', 'li-div', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['li:is(ul > li)', []],
+            ['a:is(div > a ~ a)', ['tag-anchor', 'nofollow-anchor']],
+            ['div:is(:first-child)', ['outer-div', 'li-div']],
+            ['li:is(*, #first-li)', ['first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['input:is(:nth-of-type(1))', ['checkbox-unchecked', 'checkbox-fieldset-disabled']],
+            ['input:is(:nth-of-type(1):not([disabled]))', ['checkbox-unchecked', 'checkbox-fieldset-disabled']],
+            ['input:where(:nth-of-type(1):is([type]))', ['checkbox-unchecked', 'checkbox-fieldset-disabled']],
+            ['ol:nth-child(4):is(:nth-of-type(1))', ['first-ol']],
+            ['ol:where(:not(.a)):nth-last-child(2):is(:nth-of-type(2))', ['second-ol']],
+            ['ol:is(.a):where(:nth-of-type(1))', ['first-ol']],
             [':is(#first-li, #second-li)', ['first-li', 'second-li']],
             ['a:is(#name-anchor, #tag-anchor)', ['name-anchor', 'tag-anchor']],
             [':is(.c)', ['first-ol', 'third-li', 'fourth-li']],

@@ -94,6 +94,13 @@ final class TokenBucket implements LimiterStateInterface
         return $this->rate->calculateTimeForTokens(max($this->burstSize, $this->burstSize - $this->tokens));
     }
 
+    public function configure(int $burstSize, Rate $rate): void
+    {
+        // TokenBucketLimiter enforces a lower burst size. A larger burst size keeps the bucket in storage long enough for limiters that still use that size.
+        $this->burstSize = max($this->burstSize, min($burstSize, self::MAX_BURST_SIZE));
+        $this->rate = $rate;
+    }
+
     public function __serialize(): array
     {
         return [

@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\TestWithJson;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -113,6 +115,35 @@ class CollectionTest extends TestCase
 
         $this->assertTrue($constraint->allowExtraFields);
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
+    }
+
+    public function testFieldConstraintsWithoutGroupsGetTheGroupsOfTheCollection()
+    {
+        $constraint = new Collection(
+            fields: [
+                'foo' => new NotBlank(),
+                'bar' => [new NotBlank(), new Length(min: 2)],
+                'baz' => [],
+            ],
+            groups: ['my-group'],
+        );
+
+        $this->assertSame(['my-group'], $constraint->groups);
+
+        foreach ($constraint->fields as $field) {
+            $this->assertSame(['my-group'], $field->groups);
+
+            foreach ($field->constraints as $nestedConstraint) {
+                $this->assertSame(['my-group'], $nestedConstraint->groups);
+            }
+        }
+    }
+
+    public function testExplicitGroupsOfFieldConstraintsArePreserved()
+    {
+        $constraint = new Collection(fields: ['foo' => new NotBlank(groups: ['inner'])], groups: ['outer', 'inner']);
+
+        $this->assertSame(['inner'], $constraint->fields['foo']->constraints[0]->groups);
     }
 
     public function testEmptyFields()

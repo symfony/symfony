@@ -88,11 +88,7 @@ class CollectionType extends AbstractType
                 $view->vars['multipart'] = true;
             }
 
-            if ($prefixOffset > -3 && $prototype->getConfig()->getOption('block_prefix')) {
-                --$prefixOffset;
-            }
-
-            array_splice($view->vars['prototype']->vars['block_prefixes'], $prefixOffset, 0, 'collection_entry');
+            array_splice($view->vars['prototype']->vars['block_prefixes'], $prototype->getConfig()->getOption('block_prefix') ? -3 : -2, 0, 'collection_entry');
         }
     }
 

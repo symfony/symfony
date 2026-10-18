@@ -65,6 +65,8 @@ final class TokenBucketLimiter implements LimiterInterface
                 $bucket = new TokenBucket($this->id, $this->maxBurst, $this->rate);
             }
 
+            $bucket->configure($this->maxBurst, $this->rate);
+
             $now = microtime(true);
             $availableTokens = $bucket->getAvailableTokens($now);
 

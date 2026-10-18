@@ -16,6 +16,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Formatter\WrappableOutputFormatterInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -51,7 +52,7 @@ class Table
     private array $columnWidths = [];
     private array $configuredColumnWidths = [];
     private array $columnMaxWidths = [];
-    private bool $rendered = false;
+    private array $renderedLines = [];
     private string $displayOrientation = self::DISPLAY_ORIENTATION_DEFAULT;
 
     private static array $styles;
@@ -236,16 +237,40 @@ class Table
      */
     public function appendRow(TableSeparator|array $row): static
     {
-        if (!$this->output instanceof ConsoleSectionOutput) {
+        $output = $this->output;
+        if (!$output instanceof ConsoleSectionOutput) {
             throw new RuntimeException(\sprintf('Output should be an instance of "%s" when calling "%s".', ConsoleSectionOutput::class, __METHOD__));
         }
 
-        if ($this->rendered) {
-            $this->output->clear($this->calculateRowCount());
+        if (!$output->isDecorated()) {
+            $this->addRow($row);
+            $this->render();
+
+            return $this;
+        }
+
+        $previous = $this->renderedLines;
+        if ($previous && !str_ends_with($output->getContent(), implode('', $previous))) {
+            // the section was cleared or written to since the table was rendered: keep its content and render the whole table again
+            $previous = [];
         }
 
         $this->addRow($row);
-        $this->render();
+        $lines = $this->renderLines();
+
+        // Only rewrite the lines after the part both renderings have in common.
+        // While no column gets wider, that is just the bottom border, so lines that scrolled out of the terminal, which can't be cleared, are not touched.
+        $common = 0;
+        $max = min(\count($previous), \count($lines));
+        while ($common < $max && $previous[$common] === $lines[$common]) {
+            ++$common;
+        }
+
+        if (\count($previous) > $common) {
+            $output->clear(\count($previous) - $common);
+        }
+        $output->write(implode('', \array_slice($lines, $common)), false, OutputInterface::OUTPUT_RAW);
+        $this->renderedLines = $lines;
 
         return $this;
     }
@@ -315,6 +340,15 @@ class Table
      */
     public function render(): void
     {
+        if ($this->output instanceof ConsoleSectionOutput && $this->output->isDecorated()) {
+            // remember the lines on screen, so that appendRow() can rewrite only the ones that change
+            $lines = $this->renderLines();
+            $this->output->write(implode('', $lines), false, OutputInterface::OUTPUT_RAW);
+            $this->renderedLines = $lines;
+
+            return;
+        }
+
         $divider = new TableSeparator();
         $isCellWithColspan = static fn ($cell) => $cell instanceof TableCell && $cell->getColspan() >= 2;
 
@@ -476,7 +510,6 @@ class Table
         }
 
         $this->cleanup();
-        $this->rendered = true;
     }
 
     /**
@@ -763,21 +796,6 @@ class Table
         });
     }
 
-    private function calculateRowCount(): int
-    {
-        $numberOfRows = \count(iterator_to_array($this->buildTableRows(array_merge($this->headers, [new TableSeparator()], $this->rows))));
-
-        if ($this->headers) {
-            ++$numberOfRows; // Add row for header separator
-        }
-
-        if ($this->rows) {
-            ++$numberOfRows; // Add row for footer separator
-        }
-
-        return $numberOfRows;
-    }
-
     /**
      * fill rows that contains rowspan > 1.
      *
@@ -1037,5 +1055,23 @@ class Table
         }
 
         return self::$styles[$name] ?? throw new InvalidArgumentException(\sprintf('Style "%s" is not defined.', $name));
+    }
+
+    /**
+     * @return string[]
+     */
+    private function renderLines(): array
+    {
+        $output = $this->output;
+        $buffer = new BufferedOutput($output->getVerbosity(), true, $output->getFormatter());
+        $this->output = $buffer;
+
+        try {
+            $this->render();
+        } finally {
+            $this->output = $output;
+        }
+
+        return preg_split('/(?<=\n)/', $buffer->fetch(), -1, \PREG_SPLIT_NO_EMPTY) ?: [];
     }
 }

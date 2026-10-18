@@ -276,6 +276,28 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('', $data, 'Destroyed session returns empty string');
     }
 
+    public function testUpdateTimestampWithEmptyDataDoesNotReviveExpiredSession()
+    {
+        $pdo = $this->getMemorySqlitePdo();
+        $storage = new PdoSessionHandler($pdo);
+
+        $storage->open('', 'sid');
+        $storage->read('id');
+        $storage->write('id', 'data');
+        $storage->close();
+        $pdo->exec('UPDATE sessions SET sess_lifetime = '.(time() - 1));
+
+        $storage->open('', 'sid');
+        $this->assertSame('', $storage->read('id'), 'Expired session returns empty string');
+        $this->assertTrue($storage->updateTimestamp('id', ''));
+        $storage->close();
+
+        $storage->open('', 'sid');
+        $data = $storage->read('id');
+        $storage->close();
+        $this->assertSame('', $data, 'Expired session is not revived by updateTimestamp()');
+    }
+
     #[RunInSeparateProcess]
     public function testSessionGC()
     {

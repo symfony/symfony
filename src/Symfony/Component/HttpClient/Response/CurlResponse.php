@@ -33,7 +33,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     use TransportResponseTrait;
 
     /**
-     * @var resource
+     * @var resource|null
      */
     private $debugBuffer;
 
@@ -56,9 +56,10 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             $this->debugBuffer = fopen('php://temp', 'w+');
             if (0x074000 === $curlVersion) {
                 fwrite($this->debugBuffer, 'Due to a bug in curl 7.64.0, the debug log is disabled; use another version to work around the issue.');
-            } else {
+            } elseif (curl_setopt($ch, \CURLOPT_STDERR, $this->debugBuffer)) {
                 curl_setopt($ch, \CURLOPT_VERBOSE, true);
-                curl_setopt($ch, \CURLOPT_STDERR, $this->debugBuffer);
+            } else {
+                $this->debugBuffer = null;
             }
         } else {
             $this->info['url'] = $ch;
@@ -129,11 +130,13 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             curl_setopt($ch, \CURLOPT_PROGRESSFUNCTION, static function ($ch, $dlSize, $dlNow) use ($onProgress, &$info, $url, $multi, $debugBuffer) {
                 try {
                     $info['debug'] ??= '';
-                    rewind($debugBuffer);
-                    if (fstat($debugBuffer)['size']) {
-                        $info['debug'] .= stream_get_contents($debugBuffer);
+                    if (\is_resource($debugBuffer)) {
                         rewind($debugBuffer);
-                        ftruncate($debugBuffer, 0);
+                        if (fstat($debugBuffer)['size']) {
+                            $info['debug'] .= stream_get_contents($debugBuffer);
+                            rewind($debugBuffer);
+                            ftruncate($debugBuffer, 0);
+                        }
                     }
                     $onProgress($dlNow, $dlSize, $url + curl_getinfo($ch) + $info);
                 } catch (\Throwable $e) {
@@ -179,25 +182,10 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $this->canary = new Canary(static function () use ($ch, $multi, $id) {
             unset($multi->pauseExpiries[$id], $multi->openHandles[$id], $multi->handlesActivity[$id]);
             curl_setopt($ch, \CURLOPT_PRIVATE, '_0');
+            $multi->handlesToRemove[$id] = $ch;
 
-            if ($multi->performing) {
-                return;
-            }
-
-            curl_multi_remove_handle($multi->handle, $ch);
-            curl_setopt_array($ch, [
-                \CURLOPT_NOPROGRESS => true,
-                \CURLOPT_PROGRESSFUNCTION => null,
-                \CURLOPT_HEADERFUNCTION => null,
-                \CURLOPT_WRITEFUNCTION => null,
-                \CURLOPT_READFUNCTION => null,
-                \CURLOPT_INFILE => null,
-            ]);
-
-            if (!$multi->openHandles) {
-                // Schedule DNS cache eviction for the next request
-                $multi->dnsCache->evictions = $multi->dnsCache->evictions ?: $multi->dnsCache->removals;
-                $multi->dnsCache->removals = $multi->dnsCache->hostnames = [];
+            if (!$multi->performing) {
+                self::removeHandles($multi);
             }
         });
     }
@@ -215,11 +203,13 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             }
 
             $info['debug'] ??= '';
-            rewind($this->debugBuffer);
-            if (fstat($this->debugBuffer)['size']) {
-                $info['debug'] .= stream_get_contents($this->debugBuffer);
+            if ($this->debugBuffer) {
                 rewind($this->debugBuffer);
-                ftruncate($this->debugBuffer, 0);
+                if (fstat($this->debugBuffer)['size']) {
+                    $info['debug'] .= stream_get_contents($this->debugBuffer);
+                    rewind($this->debugBuffer);
+                    ftruncate($this->debugBuffer, 0);
+                }
             }
             $this->info = array_merge($this->info, $info);
             $waitFor = curl_getinfo($this->handle, \CURLINFO_PRIVATE);
@@ -242,21 +232,35 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             return $this->doGetContent($throw);
         } finally {
             $this->multi->performing = $performing;
+
+            if (!$performing) {
+                self::removeHandles($this->multi);
+            }
         }
     }
 
     public function __destruct()
     {
         try {
-            if (null === $this->timeout) {
-                return; // Unused pushed response
+            if (null !== $this->timeout) { // null on unused pushed responses
+                $this->doDestruct();
             }
-
-            $this->doDestruct();
         } finally {
             if ($this->handle instanceof \CurlHandle) {
                 curl_setopt($this->handle, \CURLOPT_VERBOSE, false);
             }
+        }
+
+        // Not reached when doDestruct() throws, as the exception can keep the response alive
+        if ($this->debugBuffer) {
+            if (isset($this->canary)) {
+                // Removing an unfinished handle calls the progress function one last time
+                $this->canary->cancel();
+            }
+
+            curl_setopt($this->handle, \CURLOPT_STDERR, null);
+            fclose($this->debugBuffer);
+            $this->debugBuffer = null;
         }
     }
 
@@ -343,6 +347,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             }
         } finally {
             $multi->performing = false;
+            self::removeHandles($multi);
         }
     }
 
@@ -526,5 +531,35 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         curl_setopt($ch, \CURLOPT_FRESH_CONNECT, true);
 
         return 0 === curl_multi_add_handle($multi->handle, $ch);
+    }
+
+    /**
+     * Removes the handles of closed responses from the multi handle.
+     *
+     * Closing a response while performing defers this until performing ends.
+     */
+    private static function removeHandles(CurlClientState $multi): void
+    {
+        $handles = $multi->handlesToRemove;
+        $multi->handlesToRemove = [];
+
+        foreach ($handles as $id => $ch) {
+            curl_multi_remove_handle($multi->handle, $ch);
+            curl_setopt_array($ch, [
+                \CURLOPT_NOPROGRESS => true,
+                \CURLOPT_PROGRESSFUNCTION => null,
+                \CURLOPT_HEADERFUNCTION => null,
+                \CURLOPT_WRITEFUNCTION => null,
+                \CURLOPT_READFUNCTION => null,
+                \CURLOPT_INFILE => null,
+            ]);
+            unset($multi->handlesActivity[$id]);
+        }
+
+        if ($handles && !$multi->openHandles) {
+            // Schedule DNS cache eviction for the next request
+            $multi->dnsCache->evictions = $multi->dnsCache->evictions ?: $multi->dnsCache->removals;
+            $multi->dnsCache->removals = $multi->dnsCache->hostnames = [];
+        }
     }
 }

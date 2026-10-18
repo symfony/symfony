@@ -47,19 +47,41 @@ class CombinationExtension extends AbstractExtension
 
     public function translateDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
-        return $xpath
-            ->join('/following-sibling::', $combinedXpath)
-            ->addNameTest()
-            ->addCondition('position() = 1');
+        $combinedXpath = $this->positionsToSiblings($combinedXpath);
+
+        // position() and last() are evaluated on the following-sibling step, keep it
+        if (preg_match('/\b(?:position|last)\(\)/', $combinedXpath->getCondition())) {
+            return $xpath
+                ->join('/following-sibling::', $combinedXpath)
+                ->addNameTest()
+                ->addCondition('position() = 1');
+        }
+
+        // libxml stops at the first sibling only when [1] is the last predicate of the step
+        return $xpath->join('/following-sibling::*[1]/self::', $combinedXpath);
     }
 
     public function translateIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
-        return $xpath->join('/following-sibling::', $combinedXpath);
+        return $xpath->join('/following-sibling::', $this->positionsToSiblings($combinedXpath));
     }
 
     public function getName(): string
     {
         return 'combination';
+    }
+
+    /**
+     * Replaces position() and last() by tests on the siblings.
+     *
+     * On the following-sibling axis, position() and last() don't count the preceding siblings.
+     */
+    private function positionsToSiblings(XPathExpr $xpath): XPathExpr
+    {
+        if (!str_starts_with($xpath, '*/')) {
+            return $xpath;
+        }
+
+        return new XPathExpr('', $xpath->getElement(), XPathExpr::positionsToSiblings($xpath->getCondition(), $xpath->getElement()));
     }
 }

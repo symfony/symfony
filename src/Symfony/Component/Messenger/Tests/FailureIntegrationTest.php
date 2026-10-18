@@ -717,9 +717,10 @@ class FailureIntegrationTest extends TestCase
         $this->assertSame([], $failureTransport->getSent());
 
         $acknowledged = $transport->getAcknowledged();
-        $this->assertCount(1, $acknowledged);
-        $this->assertSame(1, RedeliveryStamp::getRetryCountFromEnvelope($acknowledged[0]));
-        $this->assertSame('Failure from call 1', $acknowledged[0]->last(ErrorDetailsStamp::class)->getExceptionMessage());
+        $this->assertCount(2, $acknowledged);
+        $this->assertSame([], $transport->getRejected());
+        $this->assertSame(1, RedeliveryStamp::getRetryCountFromEnvelope($acknowledged[1]));
+        $this->assertSame('Failure from call 1', $acknowledged[1]->last(ErrorDetailsStamp::class)->getExceptionMessage());
     }
 
     #[DataProvider('provideUndecodableMessages')]
@@ -974,8 +975,9 @@ class FailureIntegrationTest extends TestCase
         $this->assertSame(['a' => 1, 'b' => 2], $calls);
 
         $acknowledged = $transport->getAcknowledged();
-        $this->assertCount(1, $acknowledged);
-        $this->assertSame(['Closure@a', 'Closure@b'], array_map(static fn (HandledStamp $stamp) => $stamp->getHandlerName(), $acknowledged[0]->all(HandledStamp::class)));
+        $this->assertCount(2, $acknowledged);
+        $this->assertSame([], $transport->getRejected());
+        $this->assertSame(['Closure@a', 'Closure@b'], array_map(static fn (HandledStamp $stamp) => $stamp->getHandlerName(), $acknowledged[1]->all(HandledStamp::class)));
     }
 
     public function testFailedMessageMovesFromJsonToXmlFailureTransport()

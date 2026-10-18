@@ -425,6 +425,13 @@ class ProfilerController
         $variables['csp_script_nonce'] = $nonces['csp_script_nonce'] ?? null;
         $variables['csp_style_nonce'] = $nonces['csp_style_nonce'] ?? null;
 
+        if (($variables['profile'] ?? null)?->hasCollector('dump')) {
+            $collector = $variables['profile']->getCollector('dump');
+            if ($collector instanceof DumpDataCollector) {
+                $collector->setNonce($variables['csp_script_nonce'], $variables['csp_style_nonce']);
+            }
+        }
+
         $response->setContent($this->twig->render($template, $variables));
 
         return $response;

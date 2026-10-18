@@ -865,14 +865,4 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $info = $response->getInfo();
         $this->assertSame('/run/docker.sock', $info['primary_ip']);
     }
-
-    public function testMaxConnectDurationInfo()
-    {
-        $this->markTestSkipped('The "max_connect_duration" option is not supported in this version of the HttpClient component.');
-    }
-
-    public function testMaxConnectDuration()
-    {
-        $this->markTestSkipped('The "max_connect_duration" option is not supported in this version of the HttpClient component.');
-    }
 }

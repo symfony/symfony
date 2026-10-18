@@ -2263,6 +2263,66 @@ class PhpDumperTest extends TestCase
         $this->assertSame(1, (new \ReflectionFunction($container->get('closure2')))->getNumberOfParameters());
     }
 
+    public function testLazyClosureInCircularReference()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', \ArrayObject::class)
+            ->setPublic(true)
+            ->addArgument([new ServiceClosureArgument(new Reference('bar'))]);
+        $container->register('bar', \ArrayObject::class)
+            ->setPublic(true)
+            ->addArgument([(new Definition('Closure'))
+                ->setFactory(['Closure', 'fromCallable'])
+                ->setLazy(true)
+                ->setArguments([[new Reference('foo'), 'count']]),
+            ]);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Closure_In_Circular_Reference']));
+
+        $container->get('bar');
+        $this->assertFalse($container->initialized('foo'));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Lazy_Closure_In_Circular_Reference();
+
+        $bar = $container->get('bar');
+        $this->assertFalse($container->initialized('foo'));
+        $this->assertSame(1, $bar[0]());
+        $this->assertTrue($container->initialized('foo'));
+    }
+
+    public function testLazyClosureInConstructorCircularReference()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', \ArrayObject::class)
+            ->setPublic(true)
+            ->addArgument([(new Definition('Closure'))
+                ->setFactory(['Closure', 'fromCallable'])
+                ->setLazy(true)
+                ->setArguments([[new Reference('bar'), 'count']]),
+            ]);
+        $container->register('bar', \ArrayObject::class)
+            ->setPublic(true)
+            ->addArgument([new Reference('foo')]);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Closure_In_Constructor_Circular_Reference']));
+
+        $foo = $container->get('foo');
+        $this->assertFalse($container->initialized('bar'));
+        $this->assertSame(1, $foo[0]());
+        $this->assertSame($foo, $container->get('bar')[0]);
+
+        $container = new \Symfony_DI_PhpDumper_Test_Lazy_Closure_In_Constructor_Circular_Reference();
+
+        $foo = $container->get('foo');
+        $this->assertFalse($container->initialized('bar'));
+        $this->assertSame(1, $foo[0]());
+        $this->assertSame($foo, $container->get('bar')[0]);
+    }
+
     public function testLazyAutowireAttribute()
     {
         $container = new ContainerBuilder();

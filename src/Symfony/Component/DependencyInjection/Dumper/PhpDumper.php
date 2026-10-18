@@ -1095,7 +1095,7 @@ class PhpDumper extends Dumper
             return $code;
         }
 
-        $arguments = [$inlineDef->getArguments(), $inlineDef->getFactory()];
+        $arguments = [$this->isLazyClosureOfService($inlineDef) ? [] : $inlineDef->getArguments(), $inlineDef->getFactory()];
 
         $code .= $this->addInlineVariables($id, $definition, $arguments, $forConstructor);
 
@@ -1850,7 +1850,7 @@ class PhpDumper extends Dumper
                 $definitions[$argument] = 1 + $definitions[$argument];
             } else {
                 $definitions[$argument] = 1;
-                $arguments = [$argument->getArguments(), $argument->getFactory()];
+                $arguments = [$this->isLazyClosureOfService($argument) ? [] : $argument->getArguments(), $argument->getFactory()];
                 $this->getDefinitionsFromArguments($arguments, $definitions, $calls, null === $byConstructor || $byConstructor);
                 $arguments = [$argument->getProperties(), $argument->getMethodCalls(), $argument->getConfigurator()];
                 $this->getDefinitionsFromArguments($arguments, $definitions, $calls, null !== $byConstructor && $byConstructor);
@@ -1858,6 +1858,20 @@ class PhpDumper extends Dumper
         }
 
         return $definitions;
+    }
+
+    /**
+     * Checks if the definition is a closure that gets its service only when it is called.
+     */
+    private function isLazyClosureOfService(Definition $definition): bool
+    {
+        if (['Closure', 'fromCallable'] !== $definition->getFactory() || ('Closure' === ($definition->getClass() ?: 'Closure') && !$definition->isLazy())) {
+            return false;
+        }
+
+        $callable = $definition->getArguments()[0] ?? null;
+
+        return $callable instanceof Reference || (\is_array($callable) && ($callable[0] ?? null) instanceof Reference);
     }
 
     /**

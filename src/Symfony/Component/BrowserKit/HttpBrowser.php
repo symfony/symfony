@@ -85,8 +85,12 @@ class HttpBrowser extends AbstractBrowser
 
         if ($uploadedFiles = $this->getUploadedFiles($request->getFiles())) {
             $part = new FormDataPart(array_replace_recursive($fields, $uploadedFiles));
+            $length = 0;
+            foreach ($part->bodyToIterable() as $chunk) {
+                $length += \strlen($chunk);
+            }
 
-            return [$part->bodyToIterable(), $part->getPreparedHeaders()->toArray()];
+            return [$part->bodyToIterable(), [...$part->getPreparedHeaders()->toArray(), 'Content-Length: '.$length]];
         }
 
         if (!$fields) {

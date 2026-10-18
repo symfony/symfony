@@ -39,6 +39,7 @@ class Video extends File
     public const MULTIPLE_VIDEO_STREAMS_ERROR = '2d1b2b2e-3f37-4fdd-9a2a-8b6b77b2a6a3';
     public const UNSUPPORTED_VIDEO_CODEC_ERROR = 'a9f2f6f7-2b5a-4f3c-b746-d3e2e9d1b2a1';
     public const UNSUPPORTED_VIDEO_CONTAINER_ERROR = 'b7c9d2a4-5e1f-4aa0-8f9d-1c3e2b4a6d7e';
+    public const THUMBNAIL_NOT_ALLOWED_ERROR = 'b51c7662-cb8d-41b4-9abe-7f907911ab00';
 
     // Include the mapping from the base class
 
@@ -65,6 +66,7 @@ class Video extends File
         self::MULTIPLE_VIDEO_STREAMS_ERROR => 'MULTIPLE_VIDEO_STREAMS_ERROR',
         self::UNSUPPORTED_VIDEO_CODEC_ERROR => 'UNSUPPORTED_VIDEO_CODEC_ERROR',
         self::UNSUPPORTED_VIDEO_CONTAINER_ERROR => 'UNSUPPORTED_VIDEO_CONTAINER_ERROR',
+        self::THUMBNAIL_NOT_ALLOWED_ERROR => 'THUMBNAIL_NOT_ALLOWED_ERROR',
     ];
 
     public array|string $mimeTypes = 'video/*';
@@ -100,6 +102,7 @@ class Video extends File
     public string $multipleVideoStreamsMessage = 'The video contains multiple streams. Only one stream is allowed.';
     public string $unsupportedCodecMessage = 'Unsupported video codec "{{ codec }}".';
     public string $unsupportedContainerMessage = 'Unsupported video container "{{ container }}".';
+    public string $thumbnailNotAllowedMessage = 'The video stream is a thumbnail, not a video.';
 
     /**
      * @param positive-int|string|null $maxSize                     The max size of the underlying file
@@ -187,6 +190,7 @@ class Video extends File
         ?string $filenameCharset = null,
         ?string $filenameCountUnit = null,
         ?string $filenameCharsetMessage = null,
+        ?string $thumbnailNotAllowedMessage = null,
     ) {
         static $hasFfprobe;
         if (!$hasFfprobe) {
@@ -256,6 +260,7 @@ class Video extends File
         $this->multipleVideoStreamsMessage = $multipleVideoStreamsMessage ?? $this->multipleVideoStreamsMessage;
         $this->unsupportedCodecMessage = $unsupportedCodecMessage ?? $this->unsupportedCodecMessage;
         $this->unsupportedContainerMessage = $unsupportedContainerMessage ?? $this->unsupportedContainerMessage;
+        $this->thumbnailNotAllowedMessage = $thumbnailNotAllowedMessage ?? $this->thumbnailNotAllowedMessage;
 
         if (!\in_array('video/*', (array) $this->mimeTypes, true) && null === $mimeTypesMessage) {
             $this->mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';

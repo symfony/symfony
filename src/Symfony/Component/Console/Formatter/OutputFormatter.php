@@ -176,7 +176,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
 
         $output .= $this->applyCurrentStyle(substr($message, $offset), $current, $width, $currentLineLength);
 
-        return strtr($output, ["\0" => '\\', '\\<' => '<', '\\>' => '>']);
+        return str_replace("\0", '\\', $output);
     }
 
     public function getStyleStack(): OutputFormatterStyleStack
@@ -233,6 +233,8 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         }
 
         if (!$width || str_contains($text, "\e") && '' === preg_replace(self::ANSI_REGEX, '', $text)) {
+            $text = str_replace(['\\<', '\\>'], ['<', '>'], $text);
+
             return $this->isDecorated() ? $this->styleStack->getCurrent()->apply($text) : $text;
         }
 
@@ -299,6 +301,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
 
         $currentLines = [];
         foreach ($lines as $i => $line) {
+            $lines[$i] = $line = str_replace(['\\<', '\\>'], ['<', '>'], $line);
             $currentLine = str_contains($line, "\e") ? preg_replace(self::ANSI_REGEX, '', $line) : $line;
             if ($this->isDecorated()) {
                 $lines[$i] = $this->styleStack->getCurrent()->apply($line);

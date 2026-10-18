@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\CountValidator;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Validation;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -304,10 +305,31 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
         $this->expectValidateValue(0, 3, [new DivisibleBy([
             'value' => 123,
             'message' => 'foo {{ compared_value }}',
+            'groups' => ['Default'],
         ])], $this->group);
 
         $this->validator->validate(['foo', 'bar', 'ccc'], $constraint);
 
         $this->assertNoViolation();
+    }
+
+    public function testDivisibleByIsValidatedInNonDefaultGroup()
+    {
+        $validator = Validation::createValidator();
+
+        $violations = $validator->validate($this->createCollection([1, 2]), new Count(divisibleBy: 3, groups: ['foo']), 'foo');
+
+        $this->assertCount(1, $violations);
+        $this->assertSame(DivisibleBy::NOT_DIVISIBLE_BY, $violations[0]->getCode());
+    }
+
+    public function testDivisibleByViolationKeepsThePayload()
+    {
+        $validator = Validation::createValidator();
+
+        $violations = $validator->validate($this->createCollection([1, 2]), new Count(divisibleBy: 3, payload: ['severity' => 'warning']));
+
+        $this->assertCount(1, $violations);
+        $this->assertSame(['severity' => 'warning'], $violations[0]->getConstraint()->payload);
     }
 }

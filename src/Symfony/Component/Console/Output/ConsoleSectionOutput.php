@@ -71,7 +71,10 @@ class ConsoleSectionOutput extends StreamOutput
         }
 
         if ($lines) {
-            array_splice($this->content, -$lines);
+            $width = $this->terminal->getWidth();
+            foreach (array_splice($this->content, -$lines) as $line) {
+                $lines += $this->getDisplayHeight($line, $width) - 1;
+            }
         } else {
             $lines = $this->lines;
             $this->content = [];
@@ -173,7 +176,7 @@ class ConsoleSectionOutput extends StreamOutput
                 && !str_ends_with($lastLine, \PHP_EOL)
             ) {
                 // deduct the line count of the previous line
-                $this->lines -= (int) ceil($this->getDisplayLength($lastLine) / $width) ?: 1;
+                $this->lines -= $this->getDisplayHeight($lastLine, $width);
                 // concatenate previous and new line
                 $lineContent = $lastLine.$lineContent;
                 // replace last entry of `$this->content` with the new expanded line
@@ -183,8 +186,7 @@ class ConsoleSectionOutput extends StreamOutput
                 $this->content[] = $lineContent;
             }
 
-            // the line break must not count as a column, or a line as wide as the terminal would count as two
-            $linesAdded += (int) ceil($this->getDisplayLength(str_ends_with($lineContent, \PHP_EOL) ? substr($lineContent, 0, -\strlen(\PHP_EOL)) : $lineContent) / $width) ?: 1;
+            $linesAdded += $this->getDisplayHeight($lineContent, $width);
         }
 
         $this->lines += $linesAdded;
@@ -225,7 +227,7 @@ class ConsoleSectionOutput extends StreamOutput
         // Check if the previous line (last entry of `$this->content`) needs to be continued
         // (i.e. does not end with a line break). In which case, it needs to be erased first.
         $deleteLastLine = ($lastLine = end($this->content) ?: '') && !str_ends_with($lastLine, \PHP_EOL);
-        $linesToClear = $deleteLastLine ? ((int) ceil($this->getDisplayLength($lastLine) / $this->terminal->getWidth()) ?: 1) : 0;
+        $linesToClear = $deleteLastLine ? $this->getDisplayHeight($lastLine, $this->terminal->getWidth()) : 0;
         $previousLines = $this->lines;
 
         $this->addContent($message, $newline);
@@ -284,5 +286,15 @@ class ConsoleSectionOutput extends StreamOutput
     private function getDisplayLength(string $text): int
     {
         return Helper::width(Helper::removeDecoration($this->getFormatter(), str_replace("\t", '        ', $text)));
+    }
+
+    private function getDisplayHeight(string $line, int $width): int
+    {
+        // the line break must not count as a column, or a line as wide as the terminal would count as two
+        if (str_ends_with($line, \PHP_EOL)) {
+            $line = substr($line, 0, -\strlen(\PHP_EOL));
+        }
+
+        return (int) ceil($this->getDisplayLength($line) / $width) ?: 1;
     }
 }

@@ -186,7 +186,14 @@ class ContainerAwareEventManager extends EventManager
                 unset($this->listeners[$eventName][$hash]);
 
                 if (\is_string($listener)) {
-                    $listener = $this->container->get($listener);
+                    try {
+                        $listener = $this->container->get($listener);
+                    } catch (\Throwable $e) {
+                        unset($this->initialized[$eventName]);
+                        $this->listeners[$eventName] = $listeners + [$hash => $listener] + $this->listeners[$eventName];
+
+                        throw $e;
+                    }
                     $newHash = $this->getHash($listener);
 
                     $this->initializedHashMapping[$eventName][$hash] = $newHash;

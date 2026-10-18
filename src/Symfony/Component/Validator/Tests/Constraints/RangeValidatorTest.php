@@ -35,6 +35,42 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testIntegerStringsBeyondIntRangeOutsideRange()
+    {
+        $this->validator->validate('9223372036854775808', new Range(max: \PHP_INT_MAX));
+        $this->validator->validate("\f9223372036854775808", new Range(max: \PHP_INT_MAX));
+        $this->validator->validate('10000000000000000000', new Range(max: '9999999999999999999'));
+        $this->validator->validate('-9223372036854775810', new Range(min: '-9223372036854775809'));
+
+        $this->buildViolation('This value should be {{ limit }} or less.')
+            ->setParameter('{{ value }}', '"9223372036854775808"')
+            ->setParameter('{{ limit }}', (string) \PHP_INT_MAX)
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->buildNextViolation('This value should be {{ limit }} or less.')
+            ->setParameter('{{ value }}', "\"\f9223372036854775808\"")
+            ->setParameter('{{ limit }}', (string) \PHP_INT_MAX)
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->buildNextViolation('This value should be {{ limit }} or less.')
+            ->setParameter('{{ value }}', '"10000000000000000000"')
+            ->setParameter('{{ limit }}', '"9999999999999999999"')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->buildNextViolation('This value should be {{ limit }} or more.')
+            ->setParameter('{{ value }}', '"-9223372036854775810"')
+            ->setParameter('{{ limit }}', '"-9223372036854775809"')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    public function testIntegerStringsBeyondIntRangeWithinRange()
+    {
+        $this->validator->validate('9999999999999999999', new Range(max: '+10000000000000000000'));
+        $this->validator->validate('9223372036854775808 ', new Range(min: \PHP_INT_MAX, max: '09223372036854775808'));
+        $this->validator->validate('-0', new Range(min: 0, max: '+0'));
+        $this->validator->validate('2e1', new Range(min: 10, max: 20));
+
+        $this->assertNoViolation();
+    }
+
     public static function getTenToTwenty(): array
     {
         return [

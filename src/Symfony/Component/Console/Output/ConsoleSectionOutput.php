@@ -291,10 +291,10 @@ class ConsoleSectionOutput extends StreamOutput
         }
 
         // formatting the line again would remove literal tags, so only the ANSI sequences are removed
-        $line = preg_replace(['/\e\[[^m]*m/', '/\e]8;[^;]*;[^\e]*\e\\\\/'], '', str_replace("\t", '        ', $line));
-        $lineWidth = Helper::width($line);
+        $line = preg_replace(['/\e\[[^m]*m/', '/\e]8;[^;]*;[^\e]*\e\\\\/'], '', $line);
+        $lineWidth = Helper::width(str_replace("\t", '        ', $line));
 
-        if ($lineWidth <= $width || !preg_match('/[\x80-\xFF]/', $line) || !preg_match('//u', $line)) {
+        if ($lineWidth <= $width || !preg_match('/[\t\x80-\xFF]/', $line) || !preg_match('//u', $line)) {
             return (int) ceil($lineWidth / $width) ?: 1;
         }
 
@@ -304,6 +304,12 @@ class ConsoleSectionOutput extends StreamOutput
         $offset = 0;
         $widths = [];
         while (false !== $char = grapheme_extract($line, 1, \GRAPHEME_EXTR_COUNT, $offset, $offset)) {
+            if ("\t" === $char) {
+                // a tab moves the cursor to the next multiple of 8 columns, but never past the last column
+                $column = min($column - $column % 8 + 8, $width - 1);
+                continue;
+            }
+
             $charWidth = $widths[$char] ??= Helper::width($char);
             if ($column + $charWidth > $width) {
                 ++$rows;

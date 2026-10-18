@@ -290,7 +290,8 @@ class ConsoleSectionOutput extends StreamOutput
             $line = substr($line, 0, -\strlen(\PHP_EOL));
         }
 
-        $line = Helper::removeDecoration($this->getFormatter(), str_replace("\t", '        ', $line));
+        // formatting the line again would remove literal tags, so only the ANSI sequences are removed
+        $line = preg_replace(['/\e\[[^m]*m/', '/\e]8;[^;]*;[^\e]*\e\\\\/'], '', str_replace("\t", '        ', $line));
         $lineWidth = Helper::width($line);
 
         if ($lineWidth <= $width || !preg_match('/[\x80-\xFF]/', $line) || !preg_match('//u', $line)) {

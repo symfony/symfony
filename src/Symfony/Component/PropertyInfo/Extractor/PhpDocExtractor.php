@@ -131,33 +131,12 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             self::MUTATOR => 'param',
         };
 
-        $parentClass = null;
         $types = [];
         /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
         foreach ($docBlock->getTagsByName($tag) as $tag) {
             if ($tag && !$tag instanceof InvalidTag && null !== $tag->getType()) {
                 foreach ($this->phpDocTypeHelper->getTypes($tag->getType()) as $type) {
-                    switch ($type->getClassName()) {
-                        case 'self':
-                            $resolvedClass = $declaringClass ?? $class;
-                            break;
-
-                        case 'static':
-                            $resolvedClass = $class;
-                            break;
-
-                        case 'parent':
-                            if (false !== $resolvedClass = $parentClass ??= get_parent_class($declaringClass ?? $class)) {
-                                break;
-                            }
-                            // no break
-
-                        default:
-                            $types[] = $type;
-                            continue 2;
-                    }
-
-                    $types[] = new Type(Type::BUILTIN_TYPE_OBJECT, $type->isNullable(), $resolvedClass, $type->isCollection(), $type->getCollectionKeyTypes(), $type->getCollectionValueTypes());
+                    $types[] = $this->resolveClassKeywords($type, $class, $declaringClass);
                 }
             }
         }
@@ -374,5 +353,23 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $this->contexts[$cacheKey] = $this->contextFactory->createFromReflector($reflector);
 
         return $this->contexts[$cacheKey];
+    }
+
+    private function resolveClassKeywords(Type $type, string $class, ?string $declaringClass): Type
+    {
+        $resolvedClass = match ($type->getClassName()) {
+            'self' => $declaringClass ?? $class,
+            'static' => $class,
+            'parent' => get_parent_class($declaringClass ?? $class) ?: 'parent',
+            default => $type->getClassName(),
+        };
+
+        if (!$type->isCollection() && $resolvedClass === $type->getClassName()) {
+            return $type;
+        }
+
+        $resolve = fn (Type $type) => $this->resolveClassKeywords($type, $class, $declaringClass);
+
+        return new Type($type->getBuiltinType(), $type->isNullable(), $resolvedClass, $type->isCollection(), array_map($resolve, $type->getCollectionKeyTypes()), array_map($resolve, $type->getCollectionValueTypes()));
     }
 }

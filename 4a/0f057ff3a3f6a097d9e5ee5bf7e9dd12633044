@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-18T07:53:23Z
+
+Thanks @wfatih. I also passed the payload of `Count` to the inner `DivisibleBy`. Before, a `divisibleBy` violation had no payload, while `min`/`max` violations kept it.

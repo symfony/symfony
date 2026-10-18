@@ -48,7 +48,7 @@ class XPathExpr
      */
     public function addCondition(string $condition): static
     {
-        $this->condition = $this->condition ? \sprintf('(%s) and (%s)', $this->condition, $condition) : $condition;
+        $this->condition = '' !== $this->condition ? \sprintf('(%s) and (%s)', $this->condition, $condition) : $condition;
 
         return $this;
     }
@@ -64,7 +64,8 @@ class XPathExpr
     public function addNameTest(): static
     {
         if ('*' !== $this->element) {
-            $this->addCondition('name() = '.Translator::getXpathLiteral($this->element));
+            // name() returns the prefix used by the document, which may not be the prefix of the selector
+            $this->addCondition(str_contains($this->element, ':') ? 'self::'.$this->element : 'name() = '.Translator::getXpathLiteral($this->element));
             $this->element = '*';
         }
 
@@ -76,7 +77,9 @@ class XPathExpr
      */
     public function addStarPrefix(): static
     {
-        $this->path .= '*/';
+        if ('*/' !== $this->path) {
+            $this->path .= '*/';
+        }
 
         return $this;
     }

@@ -88,9 +88,22 @@ class NodeExtension extends AbstractExtension
     {
         $xpath = $translator->nodeToXPath($node->getSelector());
         $subXpath = $translator->nodeToXPath($node->getSubSelector());
+
+        if (str_starts_with($subXpath, '*/')) {
+            $siblings = $subXpath->getElement();
+
+            if ('*' === $siblings && $this->hasNthOfType($node->getSubSelector())) {
+                // without a type, :nth-of-type() refers to the siblings that have the type of the element
+                $siblings = $this->getElementType($node->getSelector());
+            }
+
+            // position() and last() are relative to the step of the negated selector, which is not the step of the element
+            $subXpath = new XPathExpr('', $subXpath->getElement(), $this->positionsToSiblings($subXpath->getCondition(), $siblings));
+        }
+
         $subXpath->addNameTest();
 
-        if ($subXpath->getCondition()) {
+        if ('' !== $subXpath->getCondition()) {
             return $xpath->addCondition(\sprintf('not(%s)', $subXpath->getCondition()));
         }
 
@@ -170,18 +183,72 @@ class NodeExtension extends AbstractExtension
             $safe = $safe && $this->isSafeName($node->getNamespace());
         }
 
-        $xpath = new XPathExpr('', $element);
-
-        if (!$safe) {
-            $xpath->addNameTest();
+        if (!$safe && '*' !== $element) {
+            return new XPathExpr('', '*', 'name() = '.Translator::getXpathLiteral($element));
         }
 
-        return $xpath;
+        return new XPathExpr('', $element);
     }
 
     public function getName(): string
     {
         return 'node';
+    }
+
+    private function hasNthOfType(Node\NodeInterface $node): bool
+    {
+        while ($node instanceof Node\FunctionNode || $node instanceof Node\PseudoNode || $node instanceof Node\ClassNode || $node instanceof Node\HashNode || $node instanceof Node\AttributeNode) {
+            if ($node instanceof Node\FunctionNode && 'nth-of-type' === $node->getName()) {
+                return true;
+            }
+
+            $node = $node->getSelector();
+        }
+
+        return false;
+    }
+
+    private function getElementType(Node\NodeInterface $node): string
+    {
+        while ($node instanceof Node\NegationNode || $node instanceof Node\FunctionNode || $node instanceof Node\PseudoNode || $node instanceof Node\ClassNode || $node instanceof Node\HashNode || $node instanceof Node\AttributeNode) {
+            $node = $node->getSelector();
+        }
+
+        return $node instanceof Node\ElementNode ? $this->translateElement($node)->getElement() : '*';
+    }
+
+    /**
+     * Replaces position() and last() by tests on the siblings of the context node.
+     */
+    private function positionsToSiblings(string $condition, string $element): string
+    {
+        // [1] stops at the first sibling found: count() is used only when An+B needs it
+        $first = \sprintf('not(preceding-sibling::%s[1])', $element);
+        $last = \sprintf('not(following-sibling::%s[1])', $element);
+        $depth = 0;
+        $result = '';
+
+        foreach (preg_split('/(\'[^\']*+\'|"[^"]*+"|[\[\]]|position\(\) = (?:1|last\(\)(?: - 0)?)(?![\d-]| -)|last\(\) = 1(?!\d)|last\(\) - position\(\)|position\(\)|last\(\))/', $condition, -1, \PREG_SPLIT_DELIM_CAPTURE) as $part) {
+            if ('[' === $part) {
+                ++$depth;
+            } elseif (']' === $part) {
+                --$depth;
+            } elseif (!$depth) {
+                $part = match ($part) {
+                    'position() = 1' => $first,
+                    'position() = last()', 'position() = last() - 0' => $last,
+                    'last() = 1' => $first.' and '.$last,
+                    'last() - position()' => \sprintf('count(following-sibling::%s)', $element),
+                    'position()' => \sprintf('(count(preceding-sibling::%s) + 1)', $element),
+                    'last()' => \sprintf('(count(preceding-sibling::%1$s) + count(following-sibling::%1$s) + 1)', $element),
+                    default => $part,
+                };
+            }
+
+            $result .= $part;
+        }
+
+        return $result;
     }
 
     private function isSafeName(string $name): bool

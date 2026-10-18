@@ -407,6 +407,13 @@ Notifier
  * Deprecate the Firebase `AndroidNotification`, `IOSNotification` and `WebNotification` classes, use `FirebaseOptions` instead
  * Deprecate the autowiring aliases named after the webhook request parsers of the bridges, type `Symfony\Component\Webhook\Client\RequestParserInterface` and select the parser with `#[Target('notifier.twilio')]` for instance
 
+PasswordHasher
+--------------
+
+ * Deprecate configuring `migrate_from` for the `plaintext` and `pbkdf2` algorithms, for message digest algorithms like `sha512`, and for the `PlaintextPasswordHasher`, `Pbkdf2PasswordHasher` and `MessageDigestPasswordHasher` classes.
+   These hashers never need rehashing, so the hashers listed in `migrate_from` are never used.
+   Use `auto` or a custom hasher whose `needsRehash()` method can return `true` instead
+
 RateLimiter
 -----------
 

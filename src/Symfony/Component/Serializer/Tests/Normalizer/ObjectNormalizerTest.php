@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\Attribute\WithAccessors;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -1228,7 +1229,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testNormalizeWithAnExtractorThatDoesNotExtractPropertyNames()
     {
-        // an extractor written against PropertyInfoExtractorInterface before getProperty() was added to it
+        // an extractor written before PropertyNameExtractorInterface existed
         $extractor = new class implements PropertyInfoExtractorInterface {
             public function getTypes(string $class, string $property, array $context = []): ?array
             {
@@ -1601,6 +1602,60 @@ class ObjectNormalizerTest extends TestCase
             'isPublished' => true,
             'published' => 'live',
         ], $normalizer->normalize($object));
+    }
+
+    public function testNormalizeDoesNotAddAttributesForSetters()
+    {
+        $normalizer = new ObjectNormalizer();
+
+        $object = new ObjectWithIsPrefixedPropertiesAndSetters(true, false);
+
+        $this->assertSame(['published' => true, 'children' => false], $normalizer->normalize($object));
+    }
+
+    public function testNormalizeDoesNotAddAttributesForWithAccessorsSetters()
+    {
+        $normalizer = new ObjectNormalizer();
+
+        $this->assertSame(['enabled' => true], $normalizer->normalize(new ObjectWithAccessorsSetterOnIsPrefixedProperty()));
+    }
+
+    public function testNormalizeWithAPropertyInfoExtractorWithoutPropertyNameExtractors()
+    {
+        $reflectionExtractor = new ReflectionExtractor();
+        $propertyInfoExtractor = new PropertyInfoExtractor([$reflectionExtractor], [$reflectionExtractor], [], [$reflectionExtractor], [$reflectionExtractor]);
+        $normalizer = new ObjectNormalizer(null, null, null, null, null, null, [], $propertyInfoExtractor);
+
+        $object = new ObjectWithIsPrefixedPropertiesAndSetters(true, false);
+
+        $this->assertSame(['published' => true, 'children' => false], $normalizer->normalize($object));
+    }
+
+    public function testNormalizeKeepsTheConventionalNamesOfGettersWithAcronyms()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $object = new ObjectWithAcronymGetters();
+
+        $this->assertSame(['uRL' => 'https://symfony.com', 'iD' => 42], (new ObjectNormalizer())->normalize($object));
+        $this->assertSame(['uRL' => 'https://symfony.com', 'identifier' => 42], (new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory)))->normalize($object));
+    }
+
+    public function testNormalizeIgnoresMethodsWithUppercaseAccessorPrefixes()
+    {
+        $normalizer = new ObjectNormalizer();
+
+        $this->assertSame([], $normalizer->normalize(new ObjectWithUppercaseAccessorPrefixes()));
+    }
+
+    public function testNormalizeWithAccessorsOnGettersWithUppercaseLetters()
+    {
+        if (!interface_exists(PropertyNameExtractorInterface::class)) {
+            $this->markTestSkipped('Test requires symfony/property-info 8.2+');
+        }
+
+        $normalizer = new ObjectNormalizer();
+
+        $this->assertSame(['url' => 'https://symfony.com', 'isbn' => '978-2-1234-5680-3'], $normalizer->normalize(new ObjectWithAccessorsOnGettersWithUppercaseLetters()));
     }
 
     public function testIsserWithPublicPropertyCollision()
@@ -2532,6 +2587,106 @@ class ObjectWithIsserAndPublicPropertyNoGetter
     public function isPublished(): bool
     {
         return $this->isPublished;
+    }
+}
+
+class ObjectWithIsPrefixedPropertiesAndSetters
+{
+    public function __construct(
+        private bool $isPublished,
+        private bool $hasChildren,
+    ) {
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->isPublished;
+    }
+
+    public function setIsPublished(bool $isPublished): void
+    {
+        $this->isPublished = $isPublished;
+    }
+
+    public function hasChildren(): bool
+    {
+        return $this->hasChildren;
+    }
+
+    public function setHasChildren(bool $hasChildren = true): static
+    {
+        $this->hasChildren = $hasChildren;
+
+        return $this;
+    }
+}
+
+class ObjectWithAccessorsSetterOnIsPrefixedProperty
+{
+    #[WithAccessors(setter: 'enable')]
+    private bool $isEnabled = true;
+
+    public function isEnabled(): bool
+    {
+        return $this->isEnabled;
+    }
+
+    public function enable(bool $enabled = true): static
+    {
+        $this->isEnabled = $enabled;
+
+        return $this;
+    }
+}
+
+class ObjectWithAcronymGetters
+{
+    private string $url = 'https://symfony.com';
+    private int $id = 42;
+
+    public function getURL(): string
+    {
+        return $this->url;
+    }
+
+    #[SerializedName('identifier')]
+    public function getID(): int
+    {
+        return $this->id;
+    }
+}
+
+class ObjectWithUppercaseAccessorPrefixes
+{
+    private string $foo = 'foo';
+
+    public function GetFoo(): string
+    {
+        return $this->foo;
+    }
+
+    public function ISBN(): string
+    {
+        return '978-2-1234-5680-3';
+    }
+}
+
+class ObjectWithAccessorsOnGettersWithUppercaseLetters
+{
+    #[WithAccessors(getter: 'getURL')]
+    private string $url = 'https://symfony.com';
+
+    #[WithAccessors(getter: 'ISBN')]
+    private string $isbn = '978-2-1234-5680-3';
+
+    public function getURL(): string
+    {
+        return $this->url;
+    }
+
+    public function ISBN(): string
+    {
+        return $this->isbn;
     }
 }
 

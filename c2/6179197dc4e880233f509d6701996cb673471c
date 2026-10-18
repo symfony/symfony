@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2026-10-18T12:59:26Z
+
+A note on testing: only the Redis change has been tested in the real world, in production on PHP 8.6.0RC3, where it stopped the warnings completely. The Memcached, MongoDb and Pdo changes are covered by the new regression tests, but have not run against real traffic on PHP 8.6. If anyone using those handlers could try this branch before it is merged, that testing would be very welcome and valued.

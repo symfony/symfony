@@ -170,6 +170,37 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo');
     }
 
+    public function testExtraTrailingSlashForHeadOnlyRoute()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', [], [], [], '', [], ['HEAD']));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'HEAD'), true);
+        $matcher->expects($this->once())->method('redirect')->with('/foo', 'foo')->willReturn([]);
+        $this->assertSame(['_route' => 'foo'], $matcher->match('/foo/'));
+    }
+
+    public function testMissingTrailingSlashAndSchemeWhenBothVariantsExist()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', (new Route('/foo/'))->setSchemes(['https']));
+        $coll->add('b', new Route('/foo'));
+
+        $matcher = $this->getUrlMatcher($coll, null, true);
+        $matcher->expects($this->exactly(2))->method('redirect')->with('/foo/', 'a', 'https')->willReturn([]);
+        $this->assertSame(['_route' => 'a'], $matcher->match('/foo'));
+        $this->assertSame(['_route' => 'a'], $matcher->match('/foo/'));
+
+        $coll = new RouteCollection();
+        $coll->add('a', (new Route('/foo/{bar}/'))->setSchemes(['https']));
+        $coll->add('b', new Route('/foo/{bar}'));
+
+        $matcher = $this->getUrlMatcher($coll, null, true);
+        $matcher->expects($this->exactly(2))->method('redirect')->with('/foo/baz/', 'a', 'https')->willReturn([]);
+        $this->assertEquals(['_route' => 'a', 'bar' => 'baz'], $matcher->match('/foo/baz'));
+        $this->assertEquals(['_route' => 'a', 'bar' => 'baz'], $matcher->match('/foo/baz/'));
+    }
+
     public function testSlashAndVerbPrecedenceWithRedirection()
     {
         $coll = new RouteCollection();

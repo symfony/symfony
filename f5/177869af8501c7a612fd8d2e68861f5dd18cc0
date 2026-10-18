@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-18T10:37:36Z
+
+A question for reviewers: `*:only-of-type` is translated like `:only-child` today, so in `<div><p/><span/></div>` it doesn't match the `p`. XPath 1.0 cannot compare the names of two elements, which is why `*:first-of-type` throws "not implemented". Should `*:only-of-type` throw too? It works on elements without siblings today, so I left it as is.

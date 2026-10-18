@@ -25,6 +25,8 @@ use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
  */
 class SendersLocator implements SendersLocatorInterface
 {
+    private array $senderAliasesByClass = [];
+
     /**
      * @param array<string, list<string>> $sendersMap     An array, keyed by "type", set to an array of sender aliases
      * @param ContainerInterface          $sendersLocator Locator of senders, keyed by sender alias
@@ -40,7 +42,7 @@ class SendersLocator implements SendersLocatorInterface
         if ($envelope->all(TransportNamesStamp::class)) {
             $senderAliases = $envelope->last(TransportNamesStamp::class)->getTransportNames();
         } else {
-            $senderAliases = self::getSenderAliases($envelope->getMessage()::class, $this->sendersMap);
+            $senderAliases = $this->senderAliasesByClass[$envelope->getMessage()::class] ??= self::getSenderAliases($envelope->getMessage()::class, $this->sendersMap);
         }
 
         foreach ($senderAliases as $senderAlias) {

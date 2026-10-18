@@ -196,6 +196,26 @@ class InMemoryTransportTest extends TestCase
         $this->assertSame([$envelope1, $envelope2], $this->transport->get(2));
     }
 
+    public function testGetDecodesOnlyTheEnvelopesItReturns()
+    {
+        $decoded = 0;
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn(['body' => 'foo']);
+        $serializer->method('decode')->willReturnCallback(static function () use (&$decoded) {
+            ++$decoded;
+
+            return new Envelope(new DummyMessage('Hello'));
+        });
+
+        $transport = new InMemoryTransport($serializer);
+        for ($i = 0; $i < 3; ++$i) {
+            $transport->send(new Envelope(new \stdClass()));
+        }
+
+        $this->assertCount(1, $transport->get());
+        $this->assertSame(1, $decoded);
+    }
+
     public function testAcknowledgeSameMessageWithDifferentStamps()
     {
         $envelope1 = new Envelope(new \stdClass(), [new AnEnvelopeStamp()]);

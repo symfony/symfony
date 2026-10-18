@@ -156,9 +156,8 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             $mappings = $this->metadataFactory->create($readMetadataFrom, $propertyName);
             $mappings = array_filter($mappings, static fn (Mapping $m): bool => !$m->targetClass || is_a($targetName, $m->targetClass, true));
             foreach ($mappings as $mapping) {
-                // when metadata is read from the source, $mapping->source describes the
-                // reverse mapping and must not be resolved against $source
-                $sourcePropertyName = $readMetadataFromTarget ? $mapping->source ?? $propertyName : $propertyName;
+                // when metadata is read from the source, $mapping->source describes the reverse mapping and must not be resolved against $source, unless the mapping comes from a target class
+                $sourcePropertyName = $readMetadataFromTarget || $mapping->targetClass ? $mapping->source ?? $propertyName : $propertyName;
 
                 $targetPropertyName = $mapping->target ?? $propertyName;
                 if (false === $if = $mapping->if) {

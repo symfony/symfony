@@ -310,6 +310,8 @@ class OutputFormatterTest extends TestCase
             ['<fg=red>some text with inline style</>', 'some text with inline style', "\033[31msome text with inline style\033[39m"],
             ['<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', "\033]8;;idea://open/?file=/path/SomeFile.php&line=12\033\\some URL\033]8;;\033\\"],
             ['<href=https://example.com/\<woohoo\>>some URL with \<woohoo\></>', 'some URL with <woohoo>', "\033]8;;https://example.com/<woohoo>\033\\some URL with <woohoo>\033]8;;\033\\"],
+            ['<href=mailto:foo@example.com><foo@example.com></>', '<foo@example.com>', "\033]8;;mailto:foo@example.com\033\\<foo@example.com>\033]8;;\033\\"],
+            ['<href=https://example.com>some URL</>> <foo>', 'some URL> <foo>', "\033]8;;https://example.com\033\\some URL\033]8;;\033\\> <foo>"],
             ['<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', 'some URL', true],
         ];
     }

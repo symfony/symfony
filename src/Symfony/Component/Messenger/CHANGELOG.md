@@ -69,6 +69,7 @@ CHANGELOG
  * Add the `cooldown_strategy` option of transports, `CooldownStrategyInterface`, `CooldownStatus`, `MultiplierCooldownStrategy` and `WorkerTransportCoolingDownEvent` to stop consuming a transport for a while after messages received from it fail or fetching from it fails
  * Add the `$cooldownStrategies` argument to `Worker` and the `$cooldownStrategyLocator` argument to `ConsumeMessagesCommand`
  * Log the names of the consumed transports when a worker starts
+ * Display the stamps of failed messages with `-vv` in the `messenger:failed:show`, `messenger:failed:retry` and `messenger:failed:remove` commands
 
 8.1
 ---

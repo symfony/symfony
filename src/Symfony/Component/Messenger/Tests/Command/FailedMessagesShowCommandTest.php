@@ -22,9 +22,13 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
@@ -358,6 +362,86 @@ class FailedMessagesShowCommandTest extends TestCase
             %%A
             EOF,
             __FILE__, $exceptionLine),
+            $tester->getDisplay(true));
+    }
+
+    public function testVeryVerboseOutputForSingleMessageContainsStamps()
+    {
+        $envelope = new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp(15),
+            new SentToFailureTransportStamp('async'),
+            new RedeliveryStamp(2, new \DateTimeImmutable('2026-01-02 03:04:05 UTC')),
+            new BusNameStamp('messenger.bus.default'),
+            new HandledStamp('result', 'App\Handler\OrderHandler::__invoke'),
+            new ReceivedStamp('failure_receiver'),
+            new SerializedMessageStamp('{"serialized": "body"}'),
+            ErrorDetailsStamp::create(new \RuntimeException('Things are bad!')),
+        ]);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('find')->with(42)->willReturn($envelope);
+
+        $failureTransportName = 'failure_receiver';
+
+        $command = new FailedMessagesShowCommand($failureTransportName, new ServiceLocator([$failureTransportName => static fn () => $receiver]));
+        $tester = new CommandTester($command);
+        $tester->execute(['id' => 42], ['verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE]);
+        $this->assertStringMatchesFormat(<<<'EOF'
+            %A
+            Stamps:
+            =======
+
+            [
+              Symfony\Component\Messenger\Stamp\TransportMessageIdStamp {
+                -id: 15
+              },
+              Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp {
+                -originalReceiverName: "async"
+              },
+              Symfony\Component\Messenger\Stamp\RedeliveryStamp {
+                -redeliveredAt: DateTimeImmutable @1767323045 {%A}
+                -retryCount: 2
+              },
+              Symfony\Component\Messenger\Stamp\BusNameStamp {
+                -busName: "messenger.bus.default"
+              },
+              Symfony\Component\Messenger\Stamp\HandledStamp {
+                -result: "result"
+                -handlerName: "App\Handler\OrderHandler::__invoke"
+              }
+            ]
+
+            Exception:
+            ==========
+            %A
+            EOF,
+            $tester->getDisplay(true));
+    }
+
+    public function testVeryVerboseOutputForSingleMessageWithoutStampsToDisplay()
+    {
+        $envelope = new Envelope(new \stdClass(), [
+            new ReceivedStamp('failure_receiver'),
+            ErrorDetailsStamp::create(new \RuntimeException('Things are bad!')),
+        ]);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('find')->with(42)->willReturn($envelope);
+
+        $failureTransportName = 'failure_receiver';
+
+        $command = new FailedMessagesShowCommand($failureTransportName, new ServiceLocator([$failureTransportName => static fn () => $receiver]));
+        $tester = new CommandTester($command);
+        $tester->execute(['id' => 42], ['verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE]);
+        $this->assertStringMatchesFormat(<<<'EOF'
+            %A
+            Stamps:
+            =======
+
+            (no data)
+
+            Exception:
+            ==========
+            %A
+            EOF,
             $tester->getDisplay(true));
     }
 

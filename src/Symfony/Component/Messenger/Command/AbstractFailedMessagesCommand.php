@@ -29,6 +29,7 @@ use Symfony\Component\Messenger\Failure\FailedMessageFilter;
 use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -115,6 +116,9 @@ abstract class AbstractFailedMessagesCommand extends Command
             }
             $dump = new Dumper($io, null, $this->createCloner());
             $io->writeln($dump($envelope->getMessage()));
+            $io->title('Stamps:');
+            $stamps = array_merge([], ...array_values($envelope->withoutStampsOfType(NonSendableStampInterface::class)->withoutAll(ErrorDetailsStamp::class)->all()));
+            $io->writeln($stamps ? $dump($stamps) : '(no data)');
             $io->title('Exception:');
             $flattenException = $lastErrorDetailsStamp?->getFlattenException();
             $io->writeln(null === $flattenException ? '(no data)' : $dump($flattenException));

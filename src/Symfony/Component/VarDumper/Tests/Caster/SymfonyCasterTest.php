@@ -11,11 +11,19 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV6;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
+use Symfony\Component\VarDumper\Tests\Fixtures\MessengerHandlerFixture;
 
 final class SymfonyCasterTest extends TestCase
 {
@@ -59,5 +67,71 @@ final class SymfonyCasterTest extends TestCase
             EODUMP;
 
         $this->assertDumpEquals($expectedDump, $ulid);
+    }
+
+    public function testCastMessengerStamps()
+    {
+        $handler = new class extends MessengerHandlerFixture {
+        };
+        $envelope = new Envelope(new \stdClass(), [
+            new HandledStamp(null, $handler::class.'::__invoke@my_alias'),
+            new HandledStamp(null, 'Closure'),
+            new HandledStamp(null, 'App\NotExisting::__invoke'),
+            new SentStamp(MessengerHandlerFixture::class, 'async'),
+        ]);
+
+        $expectedDump = <<<'EODUMP'
+            Symfony\Component\Messenger\Envelope {
+              -stamps: array:2 [
+                "Symfony\Component\Messenger\Stamp\HandledStamp" => array:3 [
+                  0 => Symfony\Component\Messenger\Stamp\HandledStamp {
+                    -result: null
+                    -handlerName: "Symfony\Component\VarDumper\Tests\Fixtures\MessengerHandlerFixture@anonymous::__invoke@my_alias"
+                  }
+                  1 => Symfony\Component\Messenger\Stamp\HandledStamp {
+                    -result: null
+                    -handlerName: "Closure"
+                  }
+                  2 => Symfony\Component\Messenger\Stamp\HandledStamp {
+                    -result: null
+                    -handlerName: "App\NotExisting::__invoke"
+                  }
+                ]
+                "Symfony\Component\Messenger\Stamp\SentStamp" => array:1 [
+                  0 => Symfony\Component\Messenger\Stamp\SentStamp {
+                    -senderClass: "Symfony\Component\VarDumper\Tests\Fixtures\MessengerHandlerFixture"
+                    -senderAlias: "async"
+                  }
+                ]
+              ]
+              -message: {}
+            }
+            EODUMP;
+
+        $this->assertDumpEquals($expectedDump, $envelope);
+    }
+
+    #[DataProvider('provideMessengerObjects')]
+    public function testMessengerCastersLinkToSource(object $object, int $line, string $tail)
+    {
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('');
+        $dumper->setDisplayOptions(['fileLinkFormat' => '%f:%l']);
+        $dump = $dumper->dump((new VarCloner())->cloneVar($object), true);
+
+        $this->assertStringContainsString('<a href="'.(new \ReflectionClass(MessengerHandlerFixture::class))->getFileName().':'.$line.'"', $dump);
+        $this->assertStringContainsString('<span class="sf-dump-ellipsis-tail">'.$tail.'</span>', $dump);
+    }
+
+    public static function provideMessengerObjects(): iterable
+    {
+        $class = new \ReflectionClass(MessengerHandlerFixture::class);
+        $method = $class->getMethod('__invoke');
+
+        yield 'HandledStamp' => [new HandledStamp(null, $class->name.'::__invoke'), $method->getStartLine(), 'MessengerHandlerFixture::__invoke'];
+        yield 'HandledStamp with alias' => [new HandledStamp(null, $class->name.'::__invoke@my_alias'), $method->getStartLine(), 'MessengerHandlerFixture::__invoke@my_alias'];
+        yield 'HandledStamp with alias containing ::' => [new HandledStamp(null, $class->name.'::__invoke@app.handler::foo'), $method->getStartLine(), 'MessengerHandlerFixture::__invoke@app.handler::foo'];
+        yield 'SentStamp' => [new SentStamp($class->name), $class->getStartLine(), 'MessengerHandlerFixture'];
+        yield 'ErrorDetailsStamp' => [new ErrorDetailsStamp($class->name, 0, 'boom'), $class->getStartLine(), 'MessengerHandlerFixture'];
     }
 }

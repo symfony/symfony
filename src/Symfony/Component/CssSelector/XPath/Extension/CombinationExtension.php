@@ -47,10 +47,16 @@ class CombinationExtension extends AbstractExtension
 
     public function translateDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
-        return $xpath
-            ->join('/following-sibling::', $combinedXpath)
-            ->addNameTest()
-            ->addCondition('position() = 1');
+        // position() and last() are evaluated on the following-sibling step, keep it
+        if (preg_match('/\b(?:position|last)\(\)/', $combinedXpath->getCondition())) {
+            return $xpath
+                ->join('/following-sibling::', $combinedXpath)
+                ->addNameTest()
+                ->addCondition('position() = 1');
+        }
+
+        // libxml stops at the first sibling only when [1] is the last predicate of the step
+        return $xpath->join('/following-sibling::*[1]/self::', $combinedXpath);
     }
 
     public function translateIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr

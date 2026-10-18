@@ -329,6 +329,35 @@ class CurlHttpClientTest extends HttpClientTestCase
         self::assertSame(401, $response->getStatusCode());
     }
 
+    public function testHandleIsReleasedAfterGettingTheContentOfAHeadResponse()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('HEAD', 'http://127.0.0.1:8057/head');
+        $handle = \WeakReference::create((new \ReflectionProperty($response, 'handle'))->getValue($response));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('', $response->getContent());
+        unset($response);
+
+        self::assertNull($handle->get());
+    }
+
+    public function testHandleIsReleasedWhenTheResponseIsDestructedByACallback()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://127.0.0.1:8057/');
+        $handle = \WeakReference::create((new \ReflectionProperty($response, 'handle'))->getValue($response));
+
+        self::assertSame(200, $response->getStatusCode());
+
+        $client->request('GET', 'http://127.0.0.1:8057/', ['on_progress' => static function () use (&$response) {
+            $response = null;
+        }])->getContent();
+
+        self::assertNull($response);
+        self::assertNull($handle->get());
+    }
+
     /**
      * @group integration
      */

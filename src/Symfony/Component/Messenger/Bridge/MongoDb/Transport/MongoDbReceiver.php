@@ -124,7 +124,7 @@ class MongoDbReceiver implements MessageCountAwareInterface, ListableReceiverInt
             $envelope = MessageDecodingFailedException::wrap($encodedEnvelope, $exception->getMessage(), $exception->getCode(), $exception);
         }
 
-        return $envelope->with(
+        return $envelope->withoutAll(TransportMessageIdStamp::class)->with(
             new MongoDbReceivedStamp($documentId, $document['queueName'] ?? null),
             new TransportMessageIdStamp($documentId)
         );

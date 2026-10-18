@@ -50,6 +50,20 @@ class MongoDbReceiverTest extends TestCase
         $this->assertSame((string) $document->_id, $envelope->last(TransportMessageIdStamp::class)->getId());
     }
 
+    public function testGetReplacesExistingTransportMessageIdStamps()
+    {
+        $serializer = new PhpSerializer();
+        $document = $this->createDocument($serializer->encode(new Envelope(new DummyMessage('Hi'), [new TransportMessageIdStamp('1'), new TransportMessageIdStamp('2')])));
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('get')->willReturn($document);
+
+        $receiver = new MongoDbReceiver($connection, $serializer);
+        $envelopes = iterator_to_array($receiver->get());
+
+        $this->assertEquals([new TransportMessageIdStamp((string) $document->_id)], $envelopes[0]->all(TransportMessageIdStamp::class));
+    }
+
     public function testItReturnsEmptyWhenThereAreNoMessages()
     {
         $connection = $this->createStub(Connection::class);

@@ -469,16 +469,22 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $extraAttributesException = null;
         $missingConstructorArgumentsException = null;
         $isNullable = false;
+        $originalData = $data;
         foreach ($types as $type) {
+            // each type of a union gets the data as given, not as changed for the previous type
+            $data = $originalData;
+
             if (null === $data && $type->isNullable()) {
                 return null;
             }
 
             $collectionValueType = $type->isCollection() ? $type->getCollectionValueTypes()[0] ?? null : null;
+            $collectionKeyTypes = array_map(static fn (Type $t) => $t->getBuiltinType(), $type->getCollectionKeyTypes());
 
             // Fix a collection that contains the only one element
             // This is special to xml format only
-            if ('xml' === $format && null !== $collectionValueType && (!\is_array($data) || !\is_int(key($data)))) {
+            // When the keys cannot be int, an array with other keys is the collection itself, not its only element
+            if ('xml' === $format && null !== $collectionValueType && (!\is_array($data) || (!\is_int(key($data)) && (!$collectionKeyTypes || \in_array(Type::BUILTIN_TYPE_INT, $collectionKeyTypes, true))))) {
                 $data = [$data];
             }
 

@@ -2309,6 +2309,28 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/'.$legacy.'lazy_autowire_attribute_with_intersection.php', $dumper->dump());
     }
 
+    public function testLazyAutowireAttributeWithMissingNullableService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', NullableLazyServiceConsumer::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+        $container->compile();
+
+        $this->assertNull($container->get('bar')->foo);
+        $this->assertNull($container->get('bar')->bar);
+        $this->assertNull($container->get('bar')->baz);
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute_With_Missing_Nullable_Service']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute_With_Missing_Nullable_Service();
+
+        $this->assertNull($container->get('bar')->foo);
+        $this->assertNull($container->get('bar')->bar);
+        $this->assertNull($container->get('bar')->baz);
+    }
+
     public function testCallableAdapterConsumer()
     {
         $container = new ContainerBuilder();
@@ -2719,6 +2741,19 @@ class LazyServiceConsumer
     public function __construct(
         #[Autowire(lazy: true)]
         public Foo $foo,
+    ) {
+    }
+}
+
+class NullableLazyServiceConsumer
+{
+    public function __construct(
+        #[Autowire(lazy: true)]
+        public ?Foo $foo,
+        #[Autowire(service: 'missing', lazy: true)]
+        public ?Foo $bar,
+        #[Autowire(lazy: true)]
+        public ?Foo $baz = null,
     ) {
     }
 }

@@ -55,6 +55,23 @@ class WebDebugToolbarStreamedResponseListenerTest extends TestCase
         ];
     }
 
+    public function testAjaxInterceptorIsNotInjectedInStreamedResponses()
+    {
+        $twig = $this->createStub(Environment::class);
+        $twig->method('render')->willReturnCallback(static fn (string $template) => '@WebProfiler/Profiler/ajax_interceptor.html.twig' === $template ? 'AJAX' : 'WDT');
+        $listener = new WebDebugToolbarListener($twig);
+        $m = new \ReflectionMethod($listener, 'injectToolbar');
+
+        $response = new StreamedResponse(static function () {
+            echo '<html><body><script>var config = ';
+            echo '{"debug": true}';
+            echo ";\nvar tpl = '<script>x()</' + 'script>';\n</script></body></html>";
+        });
+
+        $m->invoke($listener, $response, Request::create('/'), []);
+        $this->assertSame("<html><body><script>var config = {\"debug\": true};\nvar tpl = '<script>x()</' + 'script>';\n</script>\nWDT\n</body></html>", $this->getContentFromStreamedResponse($response));
+    }
+
     #[DataProvider('provideRedirects')]
     public function testHtmlRedirectionIsIntercepted(int $statusCode)
     {

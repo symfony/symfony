@@ -55,4 +55,25 @@ class CodePointStringTest extends AbstractUnicodeTestCase
             ]
         );
     }
+
+    public static function provideEndsWith(): array
+    {
+        return array_merge(
+            parent::provideEndsWith(),
+            [
+                [true, "a\r\n", "\n"],
+            ]
+        );
+    }
+
+    public static function provideTrimStart(): array
+    {
+        return array_merge(
+            parent::provideTrimStart(),
+            [
+                ["\u{0301}a", "q\u{0301}a", 'q'],
+                ["\u{0301}x", "  \u{0301}x", null],
+            ]
+        );
+    }
 }

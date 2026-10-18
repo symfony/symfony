@@ -456,6 +456,11 @@ class ByteString extends AbstractString
 
     public function trim(string $chars = " \t\n\r\0\x0B\x0C"): static
     {
+        if (" \t\n\r\0\x0B\x0C" !== $chars && str_contains($chars, '..')) {
+            // trim() reads "a..c" as the range from "a" to "c"
+            $chars = preg_replace('/\.{2,}/', '.', $chars);
+        }
+
         $str = clone $this;
         $str->string = trim($str->string, $chars);
 
@@ -464,6 +469,10 @@ class ByteString extends AbstractString
 
     public function trimEnd(string $chars = " \t\n\r\0\x0B\x0C"): static
     {
+        if (" \t\n\r\0\x0B\x0C" !== $chars && str_contains($chars, '..')) {
+            $chars = preg_replace('/\.{2,}/', '.', $chars);
+        }
+
         $str = clone $this;
         $str->string = rtrim($str->string, $chars);
 
@@ -472,6 +481,10 @@ class ByteString extends AbstractString
 
     public function trimStart(string $chars = " \t\n\r\0\x0B\x0C"): static
     {
+        if (" \t\n\r\0\x0B\x0C" !== $chars && str_contains($chars, '..')) {
+            $chars = preg_replace('/\.{2,}/', '.', $chars);
+        }
+
         $str = clone $this;
         $str->string = ltrim($str->string, $chars);
 

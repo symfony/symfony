@@ -164,7 +164,6 @@ class ContainerAwareEventManager extends EventManager
     private function initializeListeners(string $eventName): void
     {
         $removedListeners = $this->removedListeners[$eventName] ?? null;
-        unset($this->removedListeners[$eventName]);
 
         do {
             $this->initialized[$eventName] = true;
@@ -179,7 +178,14 @@ class ContainerAwareEventManager extends EventManager
                 unset($this->listeners[$eventName][$hash]);
 
                 if (\is_string($listener)) {
-                    $listener = $this->container->get($listener);
+                    try {
+                        $listener = $this->container->get($listener);
+                    } catch (\Throwable $e) {
+                        unset($this->initialized[$eventName]);
+                        $this->listeners[$eventName] = $listeners + [$hash => $listener] + $this->listeners[$eventName];
+
+                        throw $e;
+                    }
 
                     if (isset($removedListeners[$listener])) {
                         continue;
@@ -201,6 +207,8 @@ class ContainerAwareEventManager extends EventManager
             // What is left in $this->listeners[$eventName] is what it added.
             $this->listeners[$eventName] = $listeners + $this->listeners[$eventName];
         } while (!isset($this->initialized[$eventName]));
+
+        unset($this->removedListeners[$eventName]);
     }
 
     private function initializeSubscribers(): void

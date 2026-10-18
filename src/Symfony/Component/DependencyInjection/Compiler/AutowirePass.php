@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
@@ -121,6 +122,9 @@ class AutowirePass extends AbstractRecursivePass
             foreach ($value->getAttributes() as $attribute) {
                 if ($attribute === $v = $this->processValue($attribute)) {
                     continue;
+                }
+                if ($v instanceof ServiceClosureArgument && ($r = $v->getValues()[0]) instanceof Reference && $target = array_values(array_filter($value->getAttributes(), static fn ($a) => $a instanceof Target))) {
+                    return new ServiceClosureArgument($this->getAutowiredReference(new TypedReference($r, $r, $r->getInvalidBehavior(), $value->getName(), $target), true) ?? $r);
                 }
                 if (!$attribute instanceof Autowire || !$v instanceof Reference) {
                     return $v;
@@ -371,7 +375,14 @@ class AutowirePass extends AbstractRecursivePass
                         }
 
                         $value ??= $getValue();
-                        $value = new LazyProxyArgument(new TypedReference((string) $value, $type, $value->getInvalidBehavior()), true === $lazy ? [] : $lazy);
+
+                        if (!$value instanceof Reference) {
+                            $arguments[$index] = $value;
+
+                            continue 2;
+                        }
+
+                        $value = new LazyProxyArgument(new TypedReference((string) $value, $type, $value->getInvalidBehavior()), true === $lazy || \is_string($lazy) && str_contains($type, '&') && !str_contains($type, '|') ? [] : $lazy);
                     }
                     $arguments[$index] = $value;
 

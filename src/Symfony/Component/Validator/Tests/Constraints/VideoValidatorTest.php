@@ -140,6 +140,45 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testRotatedVideoUsesDisplayedDimensions()
+    {
+        $constraint = new Video(maxWidth: 1, maxWidthMessage: 'myMessage');
+
+        $this->validator->validate(__DIR__.'/Fixtures/test_rotated.mp4', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ width }}', 2)
+            ->setParameter('{{ max_width }}', 1)
+            ->setCode(Video::TOO_WIDE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testVideoRotatedClockwiseUsesDisplayedDimensions()
+    {
+        $constraint = new Video(maxWidth: 1, maxWidthMessage: 'myMessage');
+
+        $this->validator->validate(__DIR__.'/Fixtures/test_rotated_clockwise.mp4', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ width }}', 2)
+            ->setParameter('{{ max_width }}', 1)
+            ->setCode(Video::TOO_WIDE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testRotatedVideoIsLandscape()
+    {
+        $constraint = new Video(allowLandscape: false, allowLandscapeMessage: 'myMessage');
+
+        $this->validator->validate(__DIR__.'/Fixtures/test_rotated.mp4', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ width }}', 2)
+            ->setParameter('{{ height }}', 1)
+            ->setCode(Video::LANDSCAPE_NOT_ALLOWED_ERROR)
+            ->assertRaised();
+    }
+
     public function testPixelsTooFew()
     {
         $constraint = new Video(minPixels: 5, minPixelsMessage: 'myMessage');
@@ -317,6 +356,44 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('myMessage')
             ->setParameter('{{ container }}', 'mov, mp4, m4a, 3gp, 3g2, mj2')
             ->setCode(Video::UNSUPPORTED_VIDEO_CONTAINER_ERROR)
+            ->assertRaised();
+    }
+
+    public function testThumbnailNotAllowed()
+    {
+        $constraint = new Video(thumbnailNotAllowedMessage: 'myMessage');
+        $this->validator->validate(__DIR__.'/Fixtures/test_thumbnail.mp4', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setCode(Video::THUMBNAIL_NOT_ALLOWED_ERROR)
+            ->assertRaised();
+    }
+
+    public function testThumbnailNotAllowedWithAllowedCodec()
+    {
+        $constraint = new Video(allowedCodecs: ['mjpeg'], thumbnailNotAllowedMessage: 'myMessage');
+        $this->validator->validate(__DIR__.'/Fixtures/test_thumbnail.mp4', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setCode(Video::THUMBNAIL_NOT_ALLOWED_ERROR)
+            ->assertRaised();
+    }
+
+    public function testCoverArtIsIgnored()
+    {
+        $this->validator->validate(__DIR__.'/Fixtures/test_with_cover_art.mp4', new Video());
+
+        $this->assertNoViolation();
+    }
+
+    public function testCoverArtIsNotValidatedAsTheVideo()
+    {
+        $constraint = new Video(allowedCodecs: ['mjpeg'], unsupportedCodecMessage: 'myMessage');
+        $this->validator->validate(__DIR__.'/Fixtures/test_with_cover_art.mp4', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ codec }}', 'h264')
+            ->setCode(Video::UNSUPPORTED_VIDEO_CODEC_ERROR)
             ->assertRaised();
     }
 }

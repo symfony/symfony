@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\HttpClient\CurlHttpClient;
+use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
@@ -400,6 +401,74 @@ class CurlHttpClientTest extends HttpClientTestCase
         ]);
 
         self::assertSame(401, $response->getStatusCode());
+    }
+
+    public function testHandleIsReleasedAfterGettingTheContentOfAHeadResponse()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('HEAD', 'http://127.0.0.1:8057/head');
+        $handle = \WeakReference::create((new \ReflectionProperty($response, 'handle'))->getValue($response));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('', $response->getContent());
+        unset($response);
+
+        self::assertNull($handle->get());
+    }
+
+    public function testHandleIsReleasedWhenTheResponseIsDestructedByACallback()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://127.0.0.1:8057/');
+        $handle = \WeakReference::create((new \ReflectionProperty($response, 'handle'))->getValue($response));
+
+        self::assertSame(200, $response->getStatusCode());
+
+        $client->request('GET', 'http://127.0.0.1:8057/', ['on_progress' => static function () use (&$response) {
+            $response = null;
+        }])->getContent();
+
+        self::assertNull($response);
+        self::assertNull($handle->get());
+    }
+
+    public function testResponseDebugBufferClosesOnDestruct()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('HEAD', 'http://127.0.0.1:8057/head');
+
+        $r = new \ReflectionProperty($response, 'debugBuffer');
+        $debugBuffer = (int) $r->getValue($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        $response->getContent();
+        unset($response);
+
+        self::assertArrayNotHasKey($debugBuffer, get_resources('stream'));
+    }
+
+    public function testDebugInfoOnDestructWhileTheBodyIsInFlight()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $traceInfo = [];
+        $client->request('GET', 'http://localhost:8057/timeout-body', ['on_progress' => static function (int $dlNow, int $dlSize, array $info) use (&$traceInfo) {
+            $traceInfo = $info;
+        }]);
+
+        self::assertNotEmpty($traceInfo['debug']);
+    }
+
+    public function testDebugInfoAfterDestructThrew()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        try {
+            $client->request('GET', 'http://localhost:8057/404');
+            $this->fail(ClientException::class.' expected');
+        } catch (ClientException $e) {
+            self::assertNotEmpty($e->getResponse()->getInfo('debug'));
+        }
     }
 
     #[Group('integration')]

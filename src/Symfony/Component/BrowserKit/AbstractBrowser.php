@@ -621,8 +621,8 @@ abstract class AbstractBrowser
     protected function getAbsoluteUri(string $uri): string
     {
         // already absolute?
-        if (str_starts_with($uri, 'http://') || str_starts_with($uri, 'https://')) {
-            return $uri;
+        if (preg_match('{^https?://}i', $uri, $m)) {
+            return strtolower($m[0]).substr($uri, \strlen($m[0]));
         }
 
         if (!$this->history->isEmpty()) {
@@ -645,7 +645,7 @@ abstract class AbstractBrowser
         }
 
         if ('/' !== $uri[0]) {
-            $path = parse_url($currentUri, \PHP_URL_PATH);
+            $path = parse_url($currentUri, \PHP_URL_PATH) ?? '/';
 
             if (!str_ends_with($path, '/')) {
                 $path = substr($path, 0, strrpos($path, '/') + 1);
@@ -654,7 +654,7 @@ abstract class AbstractBrowser
             $uri = $path.$uri;
         }
 
-        return preg_replace('#^(.*?//[^/?]+)[/?].*$#', '$1', $currentUri).$uri;
+        return preg_replace('{^(.*?//[^/?#]+)[/?#].*$}', '$1', $currentUri).$uri;
     }
 
     /**

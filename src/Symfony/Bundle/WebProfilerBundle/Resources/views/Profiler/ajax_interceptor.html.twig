@@ -78,6 +78,9 @@
                     ajaxStack.finish(stackElement);
                 });
                 ajaxStack.start(stackElement);
+
+                /* The handlers above mark the promise as handled. Return a new one so that the browser still reports the rejections that the app doesn't catch. */
+                promise = promise.then();
             }
 
             return promise;

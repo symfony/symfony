@@ -63,7 +63,7 @@ class Parser implements ParserInterface
             }
         }
 
-        $joined = trim(implode('', array_map(static fn (Token $token) => $token->getValue(), $tokens)));
+        $joined = strtolower(trim(implode('', array_map(static fn (Token $token) => $token->getValue(), $tokens))));
 
         $int = static function ($string) {
             if (!is_numeric($string)) {
@@ -88,7 +88,7 @@ class Parser implements ParserInterface
         $first = $split[0] ?? null;
 
         return [
-            $first ? ('-' === $first || '+' === $first ? $int($first.'1') : $int($first)) : 1,
+            '' !== $first ? ('-' === $first || '+' === $first ? $int($first.'1') : $int($first)) : 1,
             isset($split[1]) && $split[1] ? $int($split[1]) : 0,
         ];
     }

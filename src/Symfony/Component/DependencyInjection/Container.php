@@ -308,6 +308,8 @@ class Container implements ContainerInterface, ResetInterface
         } finally {
             $this->envCache = $this->services = $this->factories = $this->privates = [];
             $this->resetMap = null;
+            // the closures that reference the container itself are created again when needed
+            unset($this->getEnv, $this->getService);
         }
 
         if ($shutdown && null !== $throwable) {

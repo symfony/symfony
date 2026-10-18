@@ -141,7 +141,7 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
         // attributes are written once the object exists, so the constructor is not a write target
         $context = ['enable_constructor_extraction' => false] + array_intersect_key($context, ['enable_getter_setter_extraction' => true, 'enable_magic_methods_extraction' => true, 'enable_adder_remover_extraction' => true]);
 
-        return self::$acceptsArrayCache[$class.$attribute.hash('xxh128', serialize($context))] ??= $this->writeTargetAcceptsArray($class, $attribute, $context);
+        return self::$acceptsArrayCache[$class.'::'.$attribute.hash('xxh128', serialize($context))] ??= $this->writeTargetAcceptsArray($class, $attribute, $context);
     }
 
     protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
@@ -158,20 +158,29 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
 
         if ($context['_read_attributes'] ?? true) {
             $context = array_intersect_key($context, ['enable_getter_setter_extraction' => true, 'enable_magic_methods_extraction' => true]);
-            $cacheKey = $class.$attribute.hash('xxh128', serialize($context));
+            $cacheKey = $class.'::'.$attribute.hash('xxh128', serialize($context));
 
-            return self::$isReadableCache[$cacheKey] ??= $this->propertyInfoExtractor->isReadable($class, $attribute, $context) || $this->hasAttributeAccessorMethod($class, $attribute) || (\is_object($classOrObject) && $this->propertyAccessor->isReadable($classOrObject, $attribute));
+            return self::$isReadableCache[$cacheKey] ??= $this->isPropertyPath($attribute) || $this->propertyInfoExtractor->isReadable($class, $attribute, $context) || $this->hasAttributeAccessorMethod($class, $attribute) || (\is_object($classOrObject) && $this->propertyAccessor->isReadable($classOrObject, $attribute));
+        }
+
+        if ($ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES]) {
+            $foldedAttribute = strtolower(str_replace(['_', ' '], '', $attribute));
+            foreach ($ignoredAttributes as $ignoredAttribute) {
+                if ($foldedAttribute === strtolower(str_replace(['_', ' '], '', $ignoredAttribute)) && $this->isWrittenByMethod($class, $attribute, $context)) {
+                    return false;
+                }
+            }
         }
 
         $context = array_intersect_key($context, ['enable_getter_setter_extraction' => true, 'enable_magic_methods_extraction' => true, 'enable_constructor_extraction' => true, 'enable_adder_remover_extraction' => true]);
-        $cacheKey = $class.$attribute.hash('xxh128', serialize($context));
+        $cacheKey = $class.'::'.$attribute.hash('xxh128', serialize($context));
 
         if (isset(self::$isWritableCache[$cacheKey])) {
             return self::$isWritableCache[$cacheKey];
         }
 
         // constructor parameters can be set when instantiating, even when property info reports them as not writable
-        if (str_contains($attribute, '.') || str_contains($attribute, '[')
+        if ($this->isPropertyPath($attribute)
             || (($context['enable_constructor_extraction'] ?? true) && $this->isConstructorParameter($class, $attribute))
             || $this->propertyInfoExtractor->isWritable($class, $attribute, $context)
         ) {
@@ -235,5 +244,21 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
         }
 
         return false;
+    }
+
+    private function isWrittenByMethod(string $class, string $attribute, array $context): bool
+    {
+        $writeInfo = $this->writeInfoExtractor->getWriteInfo($class, $attribute, ['enable_constructor_extraction' => false] + $context);
+
+        return match ($writeInfo?->getType()) {
+            PropertyWriteInfo::TYPE_METHOD => method_exists($class, $writeInfo->getName()),
+            PropertyWriteInfo::TYPE_ADDER_AND_REMOVER => true,
+            default => false,
+        };
+    }
+
+    private function isPropertyPath(string $attribute): bool
+    {
+        return str_contains($attribute, '.') || str_contains($attribute, '[');
     }
 }

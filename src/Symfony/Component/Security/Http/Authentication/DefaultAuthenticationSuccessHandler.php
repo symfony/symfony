@@ -109,7 +109,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
             if (false !== $pos = strpos($targetUrl, '?')) {
                 $targetUrl = substr($targetUrl, 0, $pos);
             }
-            if ($targetUrl && $targetUrl !== $this->httpUtils->generateUri($request, $this->options['login_path'])) {
+            if ($targetUrl && $targetUrl !== $this->httpUtils->generateUri($request, $this->options['login_path']) && $targetUrl !== $request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo()) {
                 return $targetUrl;
             }
         }

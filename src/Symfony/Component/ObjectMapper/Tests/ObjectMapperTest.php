@@ -34,7 +34,13 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\Bundle\NestedEntityResource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Bundle\ParentEntity;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Bundle\ParentEntityResource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\CacheKeyCollision\Foo as CacheKeyCollisionFoo;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\CacheKeyCollision\Foobar as CacheKeyCollisionFoobar;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\CacheKeyCollision\Target as CacheKeyCollisionTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Amount;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Article;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ArticleTeaser;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ArticleView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedFlatTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedInnerSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedOtherTarget;
@@ -44,6 +50,9 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Cost;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceAndAutoMappedView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Event;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\EventView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\EventWithSourceView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ExtensibleTargetChild;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ExtensibleTargetParent;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Invoice;
@@ -88,6 +97,7 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\User as UserEm
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\UserDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\NestedSource as ExplicitSourceNestedSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\NestedTarget as ExplicitSourceNestedTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\NullsafeNestedTarget as ExplicitSourceNullsafeNestedTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\Source as ExplicitSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\Target as ExplicitSourceTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitTargetPriority\ChildSource as ExplicitTargetPriorityChildSource;
@@ -1067,6 +1077,74 @@ final class ObjectMapperTest extends TestCase
         $this->assertEquals(20, $costRequestView->tax);
     }
 
+    #[DataProvider('provideSourcePropertyPathTargets')]
+    public function testClassMapWithSourcePropertyPath(string $targetClass)
+    {
+        $classMap = [
+            ExplicitSourceNestedSource::class => $targetClass,
+        ];
+
+        $mapper = new ObjectMapper(
+            new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap),
+            PropertyAccess::createPropertyAccessor(),
+        );
+
+        $target = $mapper->map(new ExplicitSourceNestedSource());
+
+        $this->assertInstanceOf($targetClass, $target);
+        $this->assertSame('from-nested-description', $target->reason);
+    }
+
+    public static function provideSourcePropertyPathTargets(): iterable
+    {
+        yield 'property path' => [ExplicitSourceNestedTarget::class];
+        yield 'nullsafe property path' => [ExplicitSourceNullsafeNestedTarget::class];
+    }
+
+    #[DataProvider('provideEventViews')]
+    public function testClassMapAppliesOnlyTheSourceTransformWhenBothSidesDeclareOne(string $viewClass)
+    {
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), [
+            Event::class => $viewClass,
+            $viewClass => Event::class,
+        ]));
+
+        $event = new Event();
+        $event->date = new \DateTimeImmutable('2024-01-15');
+
+        $view = $mapper->map($event, $viewClass);
+
+        $this->assertSame('2024-01-15', $view->date);
+
+        $event = $mapper->map($view, Event::class);
+
+        $this->assertEquals(new \DateTimeImmutable('2024-01-15'), $event->date);
+    }
+
+    public static function provideEventViews(): iterable
+    {
+        yield 'target transform without source' => [EventView::class];
+        yield 'target transform with explicit source' => [EventWithSourceView::class];
+    }
+
+    public function testClassMapGivesPrecedenceToTheSourceMappingOfTheSameTargetProperty()
+    {
+        $mapper = new ObjectMapper(
+            new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), [Article::class => [ArticleView::class, ArticleTeaser::class]]),
+            PropertyAccess::createPropertyAccessor(),
+        );
+
+        $view = $mapper->map(new Article(), ArticleView::class);
+
+        $this->assertSame('HELLO', $view->headline);
+        $this->assertSame('PARIS', $view->city);
+        $this->assertNull($view->note);
+        $this->assertSame('news', $view->slug);
+        $this->assertSame('NEWS', $view->name);
+        $this->assertSame('lorem ipsum', $view->excerpt);
+        $this->assertSame('LOREM IPSUM', $mapper->map(new Article(), ArticleTeaser::class)->excerpt);
+    }
+
     #[DataProvider('provideAccessor')]
     public function testClassMapIgnoresUnreadableSourcePropertyAbsentFromTarget(?PropertyAccessorInterface $accessor)
     {
@@ -1912,5 +1990,13 @@ final class ObjectMapperTest extends TestCase
         $input = (new ObjectMapper())->map(new DirectionlessTransformProduct(), DirectionlessTransformProductInput::class);
 
         $this->assertSame('SF-1', $input->reference);
+    }
+
+    public function testPropertyMetadataDoesNotLeakIntoAClassWhoseNameStartsWithTheSameClass()
+    {
+        $mapper = new ObjectMapper();
+
+        $this->assertSame('foo', $mapper->map(new CacheKeyCollisionFoo(), CacheKeyCollisionTarget::class)->name);
+        $this->assertSame('foobar', $mapper->map(new CacheKeyCollisionFoobar())->name);
     }
 }

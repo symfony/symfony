@@ -130,7 +130,7 @@ class SymfonyTestsListenerTrait
         }
 
         if (-1 === $this->state) {
-            echo "Testing $suiteName\n";
+            $this->write("Testing $suiteName\n");
             $this->state = 0;
 
             if ($this->skippedFile = getenv('SYMFONY_PHPUNIT_SKIPPED_TESTS')) {
@@ -140,7 +140,7 @@ class SymfonyTestsListenerTrait
                     $this->state = 2;
 
                     if (!$this->wasSkipped = require $this->skippedFile) {
-                        echo "All tests already ran successfully.\n";
+                        $this->write("All tests already ran successfully.\n");
                         $suite->setTests([]);
                     }
                 }
@@ -346,6 +346,15 @@ class SymfonyTestsListenerTrait
         self::$gatheredDeprecations[] = $msg;
 
         return true;
+    }
+
+    private function write(string $message): void
+    {
+        if (\in_array('--stderr', $_SERVER['argv'] ?? [], true)) {
+            file_put_contents('php://stderr', $message);
+        } else {
+            echo $message;
+        }
     }
 
     private function willBeIsolated(TestCase $test): bool

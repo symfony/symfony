@@ -44,6 +44,8 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
             } elseif ('' === $trimmedPathinfo = rtrim($pathinfo, '/')) {
                 throw $e;
             } else {
+                $fallbackSchemes = $this->trailingSlashSchemes;
+                $fallbackPathinfo = $pathinfo;
                 try {
                     $pathinfo = $trimmedPathinfo === $pathinfo ? $pathinfo.'/' : $trimmedPathinfo;
                     $ret = parent::match($pathinfo);
@@ -51,6 +53,13 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
                     return $this->redirect($pathinfo, $ret['_route'] ?? null) + $ret;
                 } catch (ExceptionInterface) {
                     if ($this->allowSchemes) {
+                        goto redirect_scheme;
+                    }
+                    if ($this->allowSchemes = $this->trailingSlashSchemes) {
+                        goto redirect_scheme;
+                    }
+                    if ($this->allowSchemes = $fallbackSchemes) {
+                        $pathinfo = $fallbackPathinfo;
                         goto redirect_scheme;
                     }
                     throw $e;

@@ -73,6 +73,8 @@ class CountValidator extends ConstraintValidator
                     new DivisibleBy(
                         value: $constraint->divisibleBy,
                         message: $constraint->divisibleByMessage,
+                        groups: $constraint->groups,
+                        payload: $constraint->payload,
                     ),
                 ], $this->context->getGroup());
         }

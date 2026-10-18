@@ -136,6 +136,21 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
                 ['use_referer' => true, 'login_path' => 'login_route'],
                 '/',
             ],
+            'target path should be different than the current URL' => [
+                Request::create('/login_check', 'POST', [], [], [], ['HTTP_REFERER' => 'http://localhost/login_check']),
+                ['use_referer' => true],
+                '/',
+            ],
+            'target path should be different than the current URL (query string does not matter)' => [
+                Request::create('/login_check?a=1', 'POST', [], [], [], ['HTTP_REFERER' => 'http://localhost/login_check?t=1&p=2']),
+                ['use_referer' => true],
+                '/',
+            ],
+            'target path should be different than the current URL (base URL is taken into account)' => [
+                Request::create('/app/login_check', 'POST', [], [], [], ['SCRIPT_FILENAME' => '/var/www/app/index.php', 'SCRIPT_NAME' => '/app/index.php', 'HTTP_REFERER' => 'http://localhost/app/login_check']),
+                ['use_referer' => true],
+                '/app/',
+            ],
         ];
     }
 

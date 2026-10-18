@@ -24,6 +24,9 @@ use function Symfony\Component\String\b;
  */
 class OutputFormatter implements WrappableOutputFormatterInterface
 {
+    private const ANSI_PATTERN = '\\x1B(?:\\[[0-9;:]*m|\\]8;[^;]*;[^\\x1B]*\\x1B\\\\)';
+    private const ANSI_REGEX = '/'.self::ANSI_PATTERN.'/';
+
     private array $styles = [];
     private OutputFormatterStyleStack $styleStack;
 
@@ -124,7 +127,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         }
 
         $offset = 0;
-        $output = '';
+        $output = $current = '';
         $openTagRegex = '[a-z](?:[^\\\\<>]*+ | \\\\.)*';
         $closeTagRegex = '[a-z][^<>]*+';
         $currentLineLength = 0;
@@ -139,7 +142,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
 
             // tags are delimited by "<" and ">", which are ASCII, so a tag offset can never
             // fall inside a multibyte sequence: slicing by bytes is safe here
-            $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset), $output, $width, $currentLineLength);
+            $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset), $current, $width, $currentLineLength);
             $offset = $pos + \strlen($text);
 
             // opening tag?
@@ -153,7 +156,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
                 // </>
                 $this->styleStack->pop();
             } elseif (null === $style = $this->createStyleFromString($tag)) {
-                $output .= $this->applyCurrentStyle($text, $output, $width, $currentLineLength);
+                $output .= $this->applyCurrentStyle($text, $current, $width, $currentLineLength);
             } elseif ($open) {
                 $this->styleStack->push($style);
             } else {
@@ -161,9 +164,9 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             }
         }
 
-        $output .= $this->applyCurrentStyle(substr($message, $offset), $output, $width, $currentLineLength);
+        $output .= $this->applyCurrentStyle(substr($message, $offset), $current, $width, $currentLineLength);
 
-        return strtr($output, ["\0" => '\\', '\\<' => '<', '\\>' => '>']);
+        return str_replace("\0", '\\', $output);
     }
 
     public function getStyleStack(): OutputFormatterStyleStack
@@ -213,24 +216,34 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     /**
      * Applies current style from stack to text, if must be applied.
      */
-    private function applyCurrentStyle(string $text, string $current, int $width, int &$currentLineLength): string
+    private function applyCurrentStyle(string $text, string &$current, int $width, int &$currentLineLength): string
     {
         if ('' === $text) {
             return '';
         }
 
-        if (!$width) {
+        if (!$width || str_contains($text, "\e") && '' === preg_replace(self::ANSI_REGEX, '', $text)) {
+            $text = str_replace(['\\<', '\\>'], ['<', '>'], $text);
+
             return $this->isDecorated() ? $this->styleStack->getCurrent()->apply($text) : $text;
         }
 
         if (!$currentLineLength && '' !== $current) {
-            $text = ltrim($text);
+            if (str_contains($text, "\e")) {
+                $text = preg_replace_callback('/^(?:[\\x00\\x09-\\x0B\\x0D\\x20]|'.self::ANSI_PATTERN.')++/', static function ($match) {
+                    preg_match_all(self::ANSI_REGEX, $match[0], $ansi);
+
+                    return implode('', $ansi[0]);
+                }, $text);
+            } else {
+                $text = ltrim($text);
+            }
         }
 
         if ($currentLineLength) {
             $lines = explode("\n", $text, 2);
-            $prefix = Helper::substr($lines[0], 0, $i = $width - $currentLineLength)."\n";
-            $text = Helper::substr($lines[0], $i);
+            $prefix = $this->substr($lines[0], 0, $i = $width - $currentLineLength)."\n";
+            $text = $this->substr($lines[0], $i);
 
             if (isset($lines[1])) {
                 // $prefix may contain the full first line in which the \n is already a part of $prefix.
@@ -244,9 +257,23 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             $prefix = '';
         }
 
-        preg_match('~(\\n)$~', $text, $matches);
+        preg_match('/(\\n)(?:'.self::ANSI_PATTERN.')*+$/', $text, $matches);
         $text = $prefix.$this->addLineBreaks($text, $width);
-        $text = rtrim($text, "\n").($matches[1] ?? '');
+        if (str_contains($text, "\e")) {
+            $parts = preg_split('/('.self::ANSI_PATTERN.')/', $text, -1, \PREG_SPLIT_DELIM_CAPTURE);
+            $sequences = '';
+            for ($i = \count($parts) - 1; $i >= 0; --$i) {
+                if ($i % 2) {
+                    $sequences = $parts[$i].$sequences;
+                } elseif ('' !== $parts[$i] = rtrim($parts[$i], "\n")) {
+                    break;
+                }
+            }
+            $text = implode('', \array_slice($parts, 0, $i + 1)).$sequences;
+        } else {
+            $text = rtrim($text, "\n");
+        }
+        $text .= $matches[1] ?? '';
 
         if (!$currentLineLength && '' !== $current && !str_ends_with($current, "\n")) {
             $text = "\n".$text;
@@ -255,17 +282,24 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         $lines = explode("\n", $text);
 
         foreach ($lines as $i => $line) {
-            $currentLineLength = 0 === $i ? $currentLineLength + Helper::length($line) : Helper::length($line);
+            $lineLength = Helper::length(str_contains($line, "\e") ? preg_replace(self::ANSI_REGEX, '', $line) : $line);
+            $currentLineLength = 0 === $i ? $currentLineLength + $lineLength : $lineLength;
             if ($width <= $currentLineLength) {
                 $currentLineLength = 0;
             }
         }
 
-        if ($this->isDecorated()) {
-            foreach ($lines as $i => $line) {
+        $currentLines = [];
+        foreach ($lines as $i => $line) {
+            $lines[$i] = $line = str_replace(['\\<', '\\>'], ['<', '>'], $line);
+            $currentLine = str_contains($line, "\e") ? preg_replace(self::ANSI_REGEX, '', $line) : $line;
+            if ($this->isDecorated()) {
                 $lines[$i] = $this->styleStack->getCurrent()->apply($line);
+                $currentLine = $currentLine === $line ? $lines[$i] : $this->styleStack->getCurrent()->apply($currentLine);
             }
+            $currentLines[] = $currentLine;
         }
+        $current .= implode("\n", $currentLines);
 
         return implode("\n", $lines);
     }
@@ -274,6 +308,78 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     {
         $encoding = mb_detect_encoding($text, null, true) ?: 'UTF-8';
 
-        return b($text)->toUnicodeString($encoding)->wordwrap($width, "\n", true)->toByteString($encoding);
+        if (!str_contains($text, "\e")) {
+            return b($text)->toUnicodeString($encoding)->wordwrap($width, "\n", true)->toByteString($encoding);
+        }
+
+        $chars = [];
+        $mask = $pending = '';
+        foreach ($this->getTokens($text) as $token) {
+            if (preg_match(self::ANSI_REGEX, $token)) {
+                $pending .= $token;
+                continue;
+            }
+            $chars[] = [$pending, $token];
+            $pending = '';
+            $mask .= "\n" === $token ? '#' : (' ' === $token ? ' ' : '?');
+        }
+
+        if (!$chars) {
+            return $pending;
+        }
+
+        $wrapped = rtrim($mask, '#');
+        $mask = wordwrap($wrapped, $width, '#', true).substr($mask, \strlen($wrapped));
+        $result = '';
+        $j = 0;
+        foreach (str_split($mask) as $char) {
+            if ('#' === $char) {
+                if (isset($chars[$j]) && ("\n" === $chars[$j][1] || ' ' === $chars[$j][1])) {
+                    $result .= $chars[$j++][0];
+                }
+                $result .= "\n";
+            } else {
+                $result .= implode('', $chars[$j++]);
+            }
+        }
+
+        return $result.$pending;
+    }
+
+    private function substr(string $text, int $from, ?int $length = null): string
+    {
+        if (!str_contains($text, "\e")) {
+            return Helper::substr($text, $from, $length);
+        }
+
+        $result = '';
+        $position = 0;
+        foreach ($this->getTokens($text) as $token) {
+            $isAnsi = preg_match(self::ANSI_REGEX, $token);
+            if ($position >= $from && (null === $length || $position < $from + $length || $isAnsi && $position === $from + $length)
+                && (!$isAnsi || !$from || $position > $from)
+            ) {
+                $result .= $token;
+            }
+            if (!$isAnsi) {
+                ++$position;
+            }
+        }
+
+        return $result;
+    }
+
+    private function getTokens(string $text): iterable
+    {
+        $encoding = mb_detect_encoding($text, null, true) ?: 'UTF-8';
+        foreach (preg_split('/('.self::ANSI_PATTERN.')/', $text, -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY) as $part) {
+            if (preg_match(self::ANSI_REGEX, $part)) {
+                yield $part;
+                continue;
+            }
+            foreach (b($part)->toUnicodeString($encoding)->chunk() as $char) {
+                yield (string) $char->toByteString($encoding);
+            }
+        }
     }
 }

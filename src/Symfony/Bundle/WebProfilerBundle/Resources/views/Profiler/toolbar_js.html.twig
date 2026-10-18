@@ -69,6 +69,10 @@
 
                     xhr.open(options.method || 'GET', url, true);
                     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                    {% if csp_script_nonce is defined and csp_script_nonce and csp_style_nonce is defined and csp_style_nonce %}
+                    xhr.setRequestHeader('X-SymfonyProfiler-Script-Nonce', '{{ csp_script_nonce|e('js') }}');
+                    xhr.setRequestHeader('X-SymfonyProfiler-Style-Nonce', '{{ csp_style_nonce|e('js') }}');
+                    {% endif %}
                     xhr.onreadystatechange = function(state) {
                         if (4 !== xhr.readyState) {
                             return null;
@@ -277,7 +281,7 @@
                         statusCodeElem.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
                     }
 
-                    if (request.duration) {
+                    if (request.duration !== undefined) {
                         durationCell.textContent = request.duration + ' ms';
                     }
 
@@ -514,11 +518,16 @@
                                 /* Replace the ID, it has to match the new token */
                                 toolbarContent.parentElement.id = 'sfwdt' + newToken;
 
-                                /* Evaluate in global scope scripts embedded inside the toolbar */
-                                var i, scripts = [].slice.call(el.querySelectorAll('script'));
+                                /* Run the scripts embedded in the toolbar with the CSP nonce of the page, since eval() would need 'unsafe-eval' */
+                                var i, script, scripts = [].slice.call(el.querySelectorAll('script'));
                                 for (i = 0; i < scripts.length; ++i) {
                                     if (scripts[i].firstChild) {
-                                        eval.call({}, scripts[i].firstChild.nodeValue);
+                                        script = document.createElement('script');
+                                        {% if csp_script_nonce is defined and csp_script_nonce %}
+                                        script.nonce = '{{ csp_script_nonce|e('js') }}';
+                                        {% endif %}
+                                        script.textContent = scripts[i].firstChild.nodeValue;
+                                        scripts[i].parentNode.replaceChild(script, scripts[i]);
                                     }
                                 }
 

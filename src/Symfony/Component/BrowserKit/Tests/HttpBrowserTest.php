@@ -17,6 +17,7 @@ use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\HttpBrowser;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -163,6 +164,27 @@ class HttpBrowserTest extends AbstractBrowserTest
         ]);
     }
 
+    public function testMultiPartRequestWithInvalidItemFirst()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $this->expectClientToSendRequestWithFiles($client, ['file2_content']);
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', [], [
+            'file1' => 'INVALID',
+            'file2' => $this->getUploadedFile('file2'),
+        ]);
+    }
+
+    public function testMultiPartRequestWithUploadedFileObject()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $this->expectClientToSendRequestWithFiles($client, ['Content-Type: text/csv', 'name="foo[file]"; filename="file1_name"', 'file1_content']);
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', [], ['foo' => ['file' => new UploadedFile($this->uploadFile('file1_content'), 'file1_name', 'text/csv')]]);
+    }
+
     public function testMultiPartRequestWithAdditionalParameters()
     {
         $client = $this->createMock(HttpClientInterface::class);
@@ -236,6 +258,15 @@ class HttpBrowserTest extends AbstractBrowserTest
 
         $browser = new HttpBrowser($client);
         $browser->request('POST', '/', [], ['file' => ['tmp_name' => '', 'name' => 'file']]);
+    }
+
+    public function testEmptyUploadWithUploadedFileObject()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $this->expectClientToSendRequestWithFiles($client, ['name="file"; filename=""']);
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', [], ['file' => new UploadedFile('', 'file', null, \UPLOAD_ERR_NO_FILE)]);
     }
 
     private function uploadFile(string $data): string

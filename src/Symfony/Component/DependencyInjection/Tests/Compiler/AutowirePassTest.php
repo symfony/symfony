@@ -40,6 +40,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\OptionalParameter;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithoutTarget;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetAndServiceClosure;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetAnonymous;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -1445,6 +1446,26 @@ class AutowirePassTest extends TestCase
         $this->assertSame('50%% off', $service->optional);
     }
 
+    public function testTargetWithAutowireServiceClosure()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(BarInterface::class, BarInterface::class);
+        $container->register('image.storage', BarInterface::class);
+        $container->registerAliasForArgument('image.storage', BarInterface::class);
+        $container->register('bar', BarInterface::class);
+        $container->register('with_target', WithTargetAndServiceClosure::class)
+            ->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('with_target');
+
+        $this->assertSame($container->getDefinition('image.storage'), $container->findDefinition((string) $definition->getArgument(0)->getValues()[0]));
+        $this->assertEquals(new Reference(BarInterface::class), $definition->getArgument(1)->getValues()[0]);
+        $this->assertEquals(new Reference('bar'), $definition->getArgument(2)->getValues()[0]);
+    }
+
     public function testAsDecoratorAttribute()
     {
         $container = new ContainerBuilder();
@@ -1726,6 +1747,40 @@ class AutowirePassTest extends TestCase
 
         $this->assertTrue($definition->isLazy());
         $this->assertSame([['interface' => LazyProxyTestInterface::class]], $definition->getTag('proxy'));
+    }
+
+    public function testLazyServiceAttributeWithInterfaceProxiesUnionType()
+    {
+        $container = new ContainerBuilder();
+        $container->register('impl', FinalLazyProxyImplementation::class);
+        $container->setAlias(LazyProxyTestInterface::class, 'impl');
+        $container->setAlias(AInterface::class, 'impl');
+        $container->register('foo', LazyServiceAttributeWithInterfaceOnUnionTypeAutowiring::class)->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+        (new ResolveLazyProxyPass())->process($container);
+
+        $definition = $container->getDefinition((string) $container->getDefinition('foo')->getArgument(0)->getValues()[2]);
+
+        $this->assertTrue($definition->isLazy());
+        $this->assertSame([['interface' => LazyProxyTestInterface::class]], $definition->getTag('proxy'));
+    }
+
+    public function testLazyServiceAttributeWithInterfaceProxiesWholeIntersectionType()
+    {
+        $container = new ContainerBuilder();
+        $container->register('impl', FinalLazyProxyImplementation::class);
+        $container->setAlias(LazyProxyTestInterface::class, 'impl');
+        $container->setAlias(AInterface::class, 'impl');
+        $container->register('foo', LazyServiceAttributeWithInterfaceOnIntersectionTypeAutowiring::class)->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+        (new ResolveLazyProxyPass())->process($container);
+
+        $definition = $container->getDefinition((string) $container->getDefinition('foo')->getArgument(0)->getValues()[2]);
+
+        $this->assertTrue($definition->isLazy());
+        $this->assertSame([['interface' => AInterface::class], ['interface' => LazyProxyTestInterface::class]], $definition->getTag('proxy'));
     }
 
     public function testLazyNotCompatibleWithAutowire()

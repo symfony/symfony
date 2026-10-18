@@ -47,6 +47,20 @@ final class Window implements LimiterStateInterface
         return $this->intervalInSeconds * max(1, (int) ceil($this->hitCount / $this->maxSize));
     }
 
+    public function configure(int $intervalInSeconds, int $windowSize): void
+    {
+        $this->intervalInSeconds = $intervalInSeconds;
+
+        if ($windowSize !== $this->maxSize && $this->hitCount > 0) {
+            // Full windows stay full and the last one is capped at the new size.
+            // So a lower size doesn't turn accepted hits into debt, and a larger one doesn't free reserved windows.
+            $fullWindows = intdiv($this->hitCount - 1, $this->maxSize);
+            $this->hitCount = $fullWindows * $windowSize + min($this->hitCount - $fullWindows * $this->maxSize, $windowSize);
+        }
+
+        $this->maxSize = $windowSize;
+    }
+
     public function add(int $hits = 1, ?float $now = null): void
     {
         $now ??= microtime(true);

@@ -60,7 +60,7 @@ class InteropSerializerIntegrationTest extends TestCase
         $this->consumeInAppB($transport);
 
         $this->assertSame([], $this->attempts);
-        $this->assertSame([], $transport->getAcknowledged());
+        $this->assertCount(1, $transport->getRejected());
     }
 
     public function testConsumerRetriesAreCountedAndStop()

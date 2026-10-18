@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableCellStyle;
@@ -1304,6 +1305,294 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    public function testAppendRowOnlyRewritesTheLinesThatChanged()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $table = new Table($output);
+        $table->setHeaders(['ISBN', 'Title']);
+
+        $table->appendRow(['1', 'aa']);
+        $table->appendRow(['2', 'bb']);
+
+        $expected =
+            <<<TABLE
+                +------+-------+
+                |\033[32m ISBN \033[39m|\033[32m Title \033[39m|
+                +------+-------+
+                | 1    | aa    |
+                +------+-------+
+                \x1b[1A\x1b[0J| 2    | bb    |
+                +------+-------+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testAppendRowRewritesTheTableWhenAColumnGetsWider()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $table = new Table($output);
+        $table->setHeaders(['ISBN', 'Title']);
+
+        $table->appendRow(['1', 'aa']);
+        $table->appendRow(['2', 'bbbbbb']);
+
+        $expected =
+            <<<TABLE
+                +------+-------+
+                |\033[32m ISBN \033[39m|\033[32m Title \033[39m|
+                +------+-------+
+                | 1    | aa    |
+                +------+-------+
+                \x1b[5A\x1b[0J+------+--------+
+                |\033[32m ISBN \033[39m|\033[32m Title  \033[39m|
+                +------+--------+
+                | 1    | aa     |
+                | 2    | bbbbbb |
+                +------+--------+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testAppendRowAfterRenderOnlyRewritesTheLinesThatChanged()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $table = new Table($output);
+        $table
+            ->setHeaders(['ISBN', 'Title'])
+            ->setRows([['0', 'zz']]);
+
+        $table->render();
+        $table->appendRow(['1', 'aa']);
+        $table->appendRow(['2', 'bb']);
+
+        $expected =
+            <<<TABLE
+                +------+-------+
+                |\033[32m ISBN \033[39m|\033[32m Title \033[39m|
+                +------+-------+
+                | 0    | zz    |
+                +------+-------+
+                \x1b[1A\x1b[0J| 1    | aa    |
+                +------+-------+
+                \x1b[1A\x1b[0J| 2    | bb    |
+                +------+-------+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testAppendRowAfterRenderingAgainUpdatesTheLastRendering()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $table = new Table($output);
+        $table->setHeaders(['ID']);
+
+        $table->appendRow(['1']);
+        $table->render();
+        $table->appendRow(['2']);
+
+        $expected =
+            <<<TABLE
+                +----+
+                |\033[32m ID \033[39m|
+                +----+
+                | 1  |
+                +----+
+                +----+
+                |\033[32m ID \033[39m|
+                +----+
+                | 1  |
+                +----+
+                \x1b[1A\x1b[0J| 2  |
+                +----+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testAppendRowKeepsWhatIsAboveTheTable()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $output->writeln('My Table');
+        $table = new Table($output);
+        $table->setHeaders(['ID']);
+
+        $table->appendRow(['1']);
+        $table->appendRow(['2']);
+
+        $expected =
+            <<<TABLE
+                My Table
+                +----+
+                |\033[32m ID \033[39m|
+                +----+
+                | 1  |
+                | 2  |
+                +----+
+
+                TABLE;
+
+        $this->assertSame($expected, str_replace(\PHP_EOL, "\n", $output->getContent()));
+    }
+
+    public function testAppendRowKeepsTheSectionContentInSync()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $output->setMaxHeight(3);
+        $table = new Table($output);
+        $table->setHeaders(['ID']);
+
+        foreach (['1', '2', '3', '4', '5'] as $id) {
+            $table->appendRow([$id]);
+        }
+
+        $expected =
+            <<<TABLE
+                +----+
+                |\033[32m ID \033[39m|
+                +----+
+                | 1  |
+                | 2  |
+                | 3  |
+                | 4  |
+                | 5  |
+                +----+
+
+                TABLE;
+
+        $this->assertSame($expected, str_replace(\PHP_EOL, "\n", $output->getContent()));
+    }
+
+    public function testAppendRowAfterTheSectionWasClearedRendersTheWholeTable()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $table = new Table($output);
+        $table->setHeaders(['ID']);
+
+        $table->appendRow(['1']);
+        $output->clear();
+        $table->appendRow(['2']);
+
+        $expected =
+            <<<TABLE
+                +----+
+                |\033[32m ID \033[39m|
+                +----+
+                | 1  |
+                +----+
+                \x1b[5A\x1b[0J+----+
+                |\033[32m ID \033[39m|
+                +----+
+                | 1  |
+                | 2  |
+                +----+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testAppendRowAfterRenderWithARowspan()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $table = new Table($output);
+        $table->setRows([[new TableCell('a', ['rowspan' => 2]), 'b'], ['c']]);
+
+        $table->render();
+        $table->appendRow(['d', 'e']);
+
+        $expected =
+            <<<TABLE
+                +---+---+
+                | a | b |
+                |   | c |
+                | d | e |
+                +---+---+
+
+                TABLE;
+
+        $this->assertSame($expected, str_replace(\PHP_EOL, "\n", $output->getContent()));
+    }
+
+    public function testAppendRowAfterRenderKeepsWhatIsAboveAVerticalTable()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $output->writeln('My Table');
+        $table = new Table($output);
+        $table->setVertical()->setHeaders(['ID', 'Name'])->setRows([['1', 'one']]);
+
+        $table->render();
+        $table->appendRow(['2', 'two']);
+
+        $expected =
+            <<<TABLE
+                My Table
+                +-----------+
+                | \033[33m  ID\033[39m: 1   |
+                | \033[33mName\033[39m: one |
+                |-----------|
+                | \033[33m  ID\033[39m: 2   |
+                | \033[33mName\033[39m: two |
+                +-----------+
+
+                TABLE;
+
+        $this->assertSame($expected, str_replace(\PHP_EOL, "\n", $output->getContent()));
+    }
+
+    public function testAppendRowAfterRenderKeepsWhatIsAboveTheTableWhenRowsWereAddedInBetween()
+    {
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+        $output->writeln('My Table');
+        $table = new Table($output);
+        $table->setHeaders(['ID'])->setRows([['1']]);
+
+        $table->render();
+        $table->addRow(['2']);
+        $table->appendRow(['3']);
+
+        $expected =
+            <<<TABLE
+                My Table
+                +----+
+                |\033[32m ID \033[39m|
+                +----+
+                | 1  |
+                | 2  |
+                | 3  |
+                +----+
+
+                TABLE;
+
+        $this->assertSame($expected, str_replace(\PHP_EOL, "\n", $output->getContent()));
+    }
+
     public function testSectionOutputDoesntClearIfTableIsntRendered()
     {
         $sections = [];
@@ -1534,6 +1823,19 @@ class TableTest extends TestCase
             TABLE;
 
         $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthPreservesAnsiSequences()
+    {
+        $output = new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, true);
+        $table = new Table($output);
+        $table->setColumnMaxWidth(0, 5);
+        $table->setRows([["\e[0;38;5;208mhello world\e[m"]]);
+        $table->render();
+        $result = $this->getOutputContent($output);
+
+        $this->assertStringContainsString("\e[0;38;5;208m", $result);
+        $this->assertSame("+-------+\n| hello |\n| world |\n+-------+\n", Helper::removeDecoration($output->getFormatter(), $result));
     }
 
     public function testColumnMaxWidths()

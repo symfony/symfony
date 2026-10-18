@@ -1,0 +1,14 @@
+{
+    "id": 1239108,
+    "camp_id": 960,
+    "email": "test@example.com",
+    "campaign name": "Name of campaign",
+    "date_sent": "2024-11-13 17:03:03",
+    "date_event": "2024-12-13 10:36:06",
+    "tag": "",
+    "URL": "https://example.com/clickclick",
+    "event": "click",
+    "ts": 1734082566,
+    "ts_event": 1734082566,
+    "ts_sent": 1731513783
+}

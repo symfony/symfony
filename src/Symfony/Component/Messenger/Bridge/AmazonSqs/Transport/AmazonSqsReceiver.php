@@ -61,7 +61,7 @@ class AmazonSqsReceiver implements KeepaliveReceiverInterface, MessageCountAware
                 yield $this->serializer->decode($sqsEnvelope = [
                     'body' => $sqsEnvelope['body'],
                     'headers' => $sqsEnvelope['headers'],
-                ])->with(...$stamps);
+                ])->withoutAll(TransportMessageIdStamp::class)->with(...$stamps);
             } catch (MessageDecodingFailedException $e) {
                 yield MessageDecodingFailedException::wrap($sqsEnvelope, $e->getMessage(), $e->getCode(), $e)->with(...$stamps);
             }

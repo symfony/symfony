@@ -192,7 +192,7 @@ class BinaryFileResponse extends Response
 
     public function prepare(Request $request): static
     {
-        if ($this->isInformational() || $this->isEmpty()) {
+        if (!$this->isSuccessful() || $this->isEmpty()) {
             parent::prepare($request);
 
             $this->maxlen = 0;

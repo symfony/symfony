@@ -67,7 +67,8 @@ class HtmlExtension extends AbstractExtension
     public function translateChecked(XPathExpr $xpath): XPathExpr
     {
         return $xpath->addCondition(
-            '(@checked '
+            "(@selected and name(.) = 'option') or "
+            .'(@checked '
             ."and (name(.) = 'input' or name(.) = 'command')"
             ."and (@type = 'checkbox' or @type = 'radio'))"
         );

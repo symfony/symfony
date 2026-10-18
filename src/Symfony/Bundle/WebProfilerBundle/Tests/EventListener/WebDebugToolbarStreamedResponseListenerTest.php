@@ -185,7 +185,7 @@ class WebDebugToolbarStreamedResponseListenerTest extends TestCase
         $events = WebDebugToolbarListener::getSubscribedEvents();
 
         $this->assertArrayHasKey(KernelEvents::RESPONSE, $events);
-        $this->assertSame(['method' => 'onKernelResponse', 'priority' => -2048, 'after' => ProfilerListener::class], $events[KernelEvents::RESPONSE]);
+        $this->assertSame([['method' => 'applyCspNoncesToDumps', 'priority' => -1023, 'before' => ProfilerListener::class], ['method' => 'onKernelResponse', 'priority' => -2048, 'after' => ProfilerListener::class]], $events[KernelEvents::RESPONSE]);
     }
 
     private function getTwigStub(string $render = 'WDT'): Environment

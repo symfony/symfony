@@ -37,28 +37,31 @@ class RelationExtension extends AbstractExtension
 
     public function translateRelationDescendant(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
-        return $xpath->join('[descendant-or-self::', $combinedXpath, ']', true);
+        return $xpath->join('descendant-or-self::*/', $combinedXpath);
     }
 
     public function translateRelationChild(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
-        return $xpath->join('[./', $combinedXpath, ']', true);
+        return $xpath->join('./', $combinedXpath);
     }
 
     public function translateRelationDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
-        // position() = 1 must apply to the sibling, not the outer element, so it goes on $combinedXpath before the join
-        $combinedXpath
-            ->addNameTest()
-            ->addCondition('position() = 1');
+        // position() and last() are evaluated on the following-sibling step, keep it
+        if (preg_match('/\b(?:position|last)\(\)/', $combinedXpath->getCondition())) {
+            return $xpath
+                ->join('following-sibling::', $combinedXpath)
+                ->addNameTest()
+                ->addCondition('position() = 1');
+        }
 
-        return $xpath
-            ->join('[following-sibling::', $combinedXpath, ']', true);
+        // libxml stops at the first sibling only when [1] is the last predicate of the step
+        return $xpath->join('following-sibling::*[1]/self::', $combinedXpath);
     }
 
     public function translateRelationIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
-        return $xpath->join('[following-sibling::', $combinedXpath, ']', true);
+        return $xpath->join('following-sibling::', $combinedXpath);
     }
 
     public function getName(): string

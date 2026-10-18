@@ -31,6 +31,8 @@ class MultiplePcreFilterIteratorTest extends TestCase
         yield ['\\foo\\', false, '"\\" is not a valid delimiter'];
         yield ['afooa', false, '"a" is not a valid delimiter'];
         yield ['//', false, 'the pattern should contain at least 1 character'];
+        yield ['/foo/bar/', false, 'the pattern does not compile'];
+        yield ['{*.php,*.twig}', false, 'the pattern does not compile'];
         yield ['/a/', true, 'valid regex'];
         yield ['/foo/', true, 'valid regex'];
         yield ['/foo/i', true, 'valid regex with a single modifier'];

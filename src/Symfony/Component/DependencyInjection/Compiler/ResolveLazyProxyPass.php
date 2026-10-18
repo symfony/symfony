@@ -81,7 +81,7 @@ class ResolveLazyProxyPass extends AbstractRecursivePass
             if (str_contains($type, '|')) {
                 throw new RuntimeException(\sprintf('Cannot lazily proxy union type "%s" for service "%s"; configure the interface(s) that should be proxied instead.', $type, $currentId));
             }
-            $interfaces = str_contains($type, '&') ? explode('&', $type) : [];
+            $interfaces = str_contains($type, '&') ? explode('&', trim($type, '()')) : [];
         }
 
         if (!$interfaces && $hasService && $container->findDefinition($id)->isLazy()) {

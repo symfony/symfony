@@ -217,6 +217,11 @@ Check the rest with `gh pr view <N> --json reviews,milestone,baseRefName`.
     This is the only force-push in the whole process, and it never targets
     the upstream repository. If it fails, restore the PR base.
 
+    Before this push, `git log --oneline $REMOTE/$TARGET..pull/$N` must
+    list only the commits of the PR. GitHub lists every commit the new head
+    brings as a commit of the PR, and that list can't be fixed once the PR
+    is merged.
+
 13. **Clean up and push:**
 
     ```bash
@@ -245,6 +250,10 @@ Check the rest with `gh pr view <N> --json reviews,milestone,baseRefName`.
 - When step 7 conflicts and the PR is editable, abort the merge and rebase
   `pull/<N>` onto the target instead: conflicts get resolved in the PR's
   own commits, and the recorded merge stays conflict-free. Then redo step 7.
+- Rebase onto `$REMOTE/$TARGET`, never onto a local merge that is not
+  pushed yet. When you merge several PRs in a row and one conflicts with an
+  earlier merge of the same series, push the earlier merges first (step
+  13), then rebase onto the updated remote branch.
 - When the PR is not editable, resolve inside the merge by hand and
   continue.
 - Amendments follow `pr-review-merge-prep`: keep the contributor's

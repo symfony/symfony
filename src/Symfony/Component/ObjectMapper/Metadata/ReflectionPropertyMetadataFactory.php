@@ -86,9 +86,8 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
                 continue;
             }
 
-            // when metadata is read from the source, $mapping->source describes the
-            // reverse mapping and must not be resolved against $source
-            $sourceProperty = $readMetadataFromTarget ? $mapping->source ?? $property : $property;
+            // when metadata is read from the source, $mapping->source describes the reverse mapping and must not be resolved against $source, unless the mapping comes from a target class
+            $sourceProperty = $readMetadataFromTarget || $mapping->targetClass ? $mapping->source ?? $property : $property;
             $targetProperty = $mapping->target ?? $property;
             $declaredSourceProperty = $this->getPropertyFromHierarchy($sourceRefl, $sourceProperty);
             $mappings[] = [

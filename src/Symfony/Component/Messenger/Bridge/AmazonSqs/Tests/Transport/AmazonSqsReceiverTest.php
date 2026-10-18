@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;
@@ -79,6 +80,20 @@ class AmazonSqsReceiverTest extends TestCase
         $this->assertCount(2, $actualEnvelopes);
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
         $this->assertEquals(new DummyMessage('Hello'), $actualEnvelopes[1]->getMessage());
+    }
+
+    public function testGetReplacesExistingTransportMessageIdStamps()
+    {
+        $serializer = new PhpSerializer();
+        $encodedEnvelope = $serializer->encode(new Envelope(new DummyMessage('Hi'), [new TransportMessageIdStamp('1'), new TransportMessageIdStamp('2')]));
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('get')->willReturn([['id' => '3', 'body' => $encodedEnvelope['body'], 'headers' => []]]);
+
+        $receiver = new AmazonSqsReceiver($connection, $serializer);
+        $envelopes = iterator_to_array($receiver->get());
+
+        $this->assertEquals([new TransportMessageIdStamp('3')], $envelopes[0]->all(TransportMessageIdStamp::class));
     }
 
     public function testItReturnsSerializedEnvelopeWhenDecodingFails()

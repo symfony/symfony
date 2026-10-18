@@ -250,6 +250,20 @@ class LazyServiceAttributeWithInterfaceAutowiring
     }
 }
 
+class LazyServiceAttributeWithInterfaceOnUnionTypeAutowiring
+{
+    public function __construct(#[Lazy(LazyProxyTestInterface::class)] LazyProxyTestInterface|AInterface $impl)
+    {
+    }
+}
+
+class LazyServiceAttributeWithInterfaceOnIntersectionTypeAutowiring
+{
+    public function __construct(#[Lazy(LazyProxyTestInterface::class)] LazyProxyTestInterface&AInterface $impl)
+    {
+    }
+}
+
 class LazyAutowireServiceAttributesAutowiring
 {
     public function __construct(#[Lazy, Autowire(lazy: true)] A $a)

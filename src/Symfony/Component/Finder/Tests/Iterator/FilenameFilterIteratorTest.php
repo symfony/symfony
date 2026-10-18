@@ -35,6 +35,7 @@ class FilenameFilterIteratorTest extends IteratorTestCase
             [['*.php', '*.py'], ['foo.*'], ['test.php', 'test.py']],
             [['/\.php$/'], [], ['test.php', 'foo.php']],
             [[], ['/\.php$/'], ['test.py']],
+            [['{*.php,*.py}'], [], ['test.php', 'test.py', 'foo.php']],
         ];
     }
 }

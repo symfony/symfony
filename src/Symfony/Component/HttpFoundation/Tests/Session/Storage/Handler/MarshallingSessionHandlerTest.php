@@ -151,6 +151,38 @@ class MarshallingSessionHandlerTest extends TestCase
         $marshallingSessionHandler->write('session_id', 'data');
     }
 
+    public function testWriteDoesNotMarshallEmptyData()
+    {
+        $marshaller = $this->createMock(MarshallerInterface::class);
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $marshaller);
+
+        $marshaller->expects($this->never())->method('marshall');
+
+        $this->handler->expects($this->once())->method('write')
+            ->with('session_id', '')
+            ->willReturn(true);
+
+        $this->assertTrue($marshallingSessionHandler->write('session_id', ''));
+    }
+
+    public function testWriteDoesNotMarshallIgbinaryEmptyData()
+    {
+        if (!\function_exists('igbinary_serialize')) {
+            $this->markTestSkipped('The "igbinary" extension is required.');
+        }
+
+        $marshaller = $this->createMock(MarshallerInterface::class);
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $marshaller);
+
+        $marshaller->expects($this->never())->method('marshall');
+
+        $this->handler->expects($this->once())->method('write')
+            ->with('session_id', igbinary_serialize([]))
+            ->willReturn(true);
+
+        $this->assertTrue($marshallingSessionHandler->write('session_id', igbinary_serialize([])));
+    }
+
     public function testValidateId()
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));

@@ -165,6 +165,45 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame($expected, array_values($evm->getListeners('foo')));
     }
 
+    public function testDispatchEventAfterALazyListenerFailedToInitialize()
+    {
+        $listener1 = new MyListener();
+        $listener2 = new MyListener();
+        $listener3 = new MyListener();
+        $fail = true;
+        $container = new ServiceLocator([
+            'lazy1' => static fn () => $listener1,
+            'lazy2' => static function () use (&$fail, $listener2) {
+                if ($fail) {
+                    throw new \RuntimeException('Cannot build lazy2.');
+                }
+
+                return $listener2;
+            },
+            'lazy3' => static fn () => $listener3,
+        ]);
+        $evm = new ContainerAwareEventManager($container);
+
+        $evm->addEventListener('foo', 'lazy1');
+        $evm->addEventListener('foo', 'lazy2');
+        $evm->addEventListener('foo', 'lazy3');
+
+        try {
+            $evm->dispatchEvent('foo');
+            $this->fail('An exception should have been thrown.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Cannot build lazy2.', $e->getMessage());
+        }
+
+        $fail = false;
+        $evm->dispatchEvent('foo');
+
+        $this->assertSame([$listener1, $listener2, $listener3], array_values($evm->getListeners('foo')));
+        $this->assertSame(1, $listener1->calledByEventNameCount);
+        $this->assertSame(1, $listener2->calledByEventNameCount);
+        $this->assertSame(1, $listener3->calledByEventNameCount);
+    }
+
     public function testRemoveEventListener()
     {
         $this->container->set('lazy', $listener1 = new MyListener());

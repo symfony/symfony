@@ -917,6 +917,38 @@ class DumperTest extends TestCase
         $this->assertSame($data, $this->parser->parse($expected));
     }
 
+    public function testLiteralBlockIsNotUsedForCharactersItCannotContain()
+    {
+        $data = [
+            'nul' => "a\0b\nc",
+            'bell' => "a\x07b\nc",
+            'escape' => "a\x1b[31m\nb",
+            'del' => "a\x7fb\nc",
+            'next-line' => "a\xc2\x85b\nc",
+            'line-separator' => "a\xe2\x80\xa8b\nc",
+            'list' => ["a\x0bb\nc"],
+            'tagged' => new TaggedValue('foo', "a\x0cb\nc"),
+        ];
+        $expected = <<<'YAML'
+            nul: "a\0b\nc"
+            bell: "a\ab\nc"
+            escape: "a\e[31m\nb"
+            del: "a\x7fb\nc"
+            next-line: "a\Nb\nc"
+            line-separator: "a\Lb\nc"
+            list:
+                - "a\vb\nc"
+            tagged: !foo "a\fb\nc"
+
+            YAML;
+        $this->assertSame($expected, $this->dumper->dump($data, 4, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
+
+        $this->assertSame("!foo \"a\\bb\\nc\"\n", $this->dumper->dump(new TaggedValue('foo', "a\x08b\nc"), 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        $this->assertSame("k: !!binary /wpmb28=\n", $this->dumper->dump(['k' => "\xff\nfoo"], 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        $this->assertSame("a: |-\n    a\tb\n    c\xc2\xa0d", $this->dumper->dump(['a' => "a\tb\nc\xc2\xa0d"], 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
+
     public function testNoExtraTrailingNewlineWhenDumpingAsMultiLineLiteralBlock()
     {
         $data = [

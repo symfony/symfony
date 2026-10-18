@@ -15,17 +15,25 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
+use Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator;
 use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\EventStreamResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ServerEvent;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Twig\Environment;
 
 class WebDebugToolbarListenerTest extends TestCase
@@ -394,6 +402,34 @@ class WebDebugToolbarListenerTest extends TestCase
         $listener->onKernelResponse($event);
 
         $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
+    }
+
+    public function testDumpsWrittenWhileProfilingGetTheCspNoncesOfTheResponse()
+    {
+        $request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $dumpDataCollector = new DumpDataCollector(null, null, null, $requestStack);
+        $dumpDataCollector->dump((new VarCloner())->cloneVar('foo'));
+        $profiler = new Profiler($this->createStub(ProfilerStorageInterface::class));
+        $profiler->add($dumpDataCollector);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ProfilerListener($profiler, $requestStack));
+        $dispatcher->addSubscriber(new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', new ContentSecurityPolicyHandler(new NonceGenerator()), $dumpDataCollector));
+
+        $response = new Response('<h1>No body tag, so the dumps are written to the output</h1>', 200, ['Content-Type' => 'text/html', 'Content-Security-Policy' => "default-src 'self'"]);
+        ob_start();
+        $dispatcher->dispatch(new ResponseEvent($this->createStub(KernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response), KernelEvents::RESPONSE);
+        // the profile is never saved here, so the collector would write the dumps again when destructed
+        $dumpDataCollector->reset();
+        $output = ob_get_clean();
+
+        $this->assertSame(1, preg_match('/<script nonce="([^"]+)">/', $output, $scriptNonce));
+        $this->assertSame(1, preg_match('/<style nonce="([^"]+)">/', $output, $styleNonce));
+        $this->assertStringContainsString("script-src 'self' 'unsafe-inline' 'nonce-".$scriptNonce[1]."'", $response->headers->get('Content-Security-Policy'));
+        $this->assertStringContainsString("style-src 'self' 'unsafe-inline' 'nonce-".$styleNonce[1]."'", $response->headers->get('Content-Security-Policy'));
+        $this->assertFalse($response->headers->has('X-SymfonyProfiler-Script-Nonce'));
     }
 
     public function testNullContentTypeWithNoDebugEnv()

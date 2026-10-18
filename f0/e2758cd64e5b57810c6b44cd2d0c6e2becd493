@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-18T10:35:17Z
+
+Thanks @semx, I pushed two fixes on top.
+
+When the section was cleared or written to between two calls, `appendRow()` wrote only the last lines, so the table lost its header. Now the whole table is rendered again in that case.
+
+`render()` on a section now remembers the lines it wrote, so the first `appendRow()` after it also rewrites only what changed. This removes `calculateRowCount()`, which crashed on rowspans and erased the line above vertical tables, horizontal tables, or rows added with `addRow()`.
+
+Tables wider than the terminal still leave a piece of the old border on each append: that comes from `ConsoleSectionOutput::clear()`, fixed in #67099.
+
+---------------------------------------------------------------------------
+
+by semx at 2026-10-18T10:57:25Z
+
+Thanks! Checked 889e5e0 here: the Console suite passes, appends still clear just the bottom border, and a table with a line written into the section in between now comes back whole.

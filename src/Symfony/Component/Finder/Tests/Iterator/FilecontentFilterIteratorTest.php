@@ -81,6 +81,7 @@ class FilecontentFilterIteratorTest extends IteratorTestCase
             [$inner, ['.'], [], ['a.txt', 'b.yml', 'some/other/dir/third.php']],
             [$inner, ['ipsum'], [], ['a.txt']],
             [$inner, ['i', 'amet'], ['Lorem', 'amet'], ['b.yml']],
+            [$inner, ['...'], [], ['a.txt', 'b.yml', 'some/other/dir/third.php']],
         ];
     }
 }

@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-10-17T21:27:12Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-17T21:32:10Z
+
+Thanks @mindaugasvcs for raising these two problems in #59042.
+
+The display rotation is now read from the display matrix, so the width, height, pixel and ratio checks use the dimensions as they are displayed. A portrait video encoded as 1920x1080 with a 90 degree rotation is no longer reported as landscape.
+
+Streams that are attached pictures, like a thumbnail or a cover art, are now rejected instead of being validated as a video.
+
+A file whose only video stream is a single frame is still accepted for now, since the existing test fixtures are single frame videos.
+
+---------------------------------------------------------------------------
+
+by mindaugasvcs at 2026-10-18T08:51:53Z
+
+Not sure if attached_pic is really enough:
+<img width="755" height="508" alt="Untitled" src="https://github.com/user-attachments/assets/54cdc89c-144b-436b-b7b7-773cd22e3101" />
+
+_Dispositions are only hints. Muxers and tools often don’t set them, so files with plain single-frame video streams and no flag still exist. Keep the packet-count heuristic as a fallback._
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-18T09:10:17Z
+
+PR updated. ffprobe only knows `stream_side_data` since FFmpeg 5.1, and older versions fail on the whole option. On Ubuntu 22.04 (FFmpeg 4.4), every video would have been reported as corrupted. `stream_side_data_list` works with all versions.
+
+Attached pictures are now also ignored when counting streams. Before, a video with a cover art was rejected for having multiple streams, or as a thumbnail when the cover came first.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-18T10:37:34Z
+
+@mindaugasvcs counting packets means ffprobe reads the whole file, which is costly for a validator that runs on uploads, and `nb_frames` is not reported by every container. As GromNaN said, single-frame streams without the flag are left out of this PR.

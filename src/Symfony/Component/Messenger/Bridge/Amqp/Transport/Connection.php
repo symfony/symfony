@@ -658,7 +658,7 @@ class Connection
      */
     private function holdSignals(callable $fetch): mixed
     {
-        $asyncSignals = \function_exists('pcntl_async_signals') && pcntl_async_signals(false);
+        $asyncSignals = \function_exists('pcntl_async_signals') && \function_exists('pcntl_signal_dispatch') && pcntl_async_signals(false);
 
         try {
             return $fetch();

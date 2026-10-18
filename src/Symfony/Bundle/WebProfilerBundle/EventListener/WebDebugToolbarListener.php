@@ -70,6 +70,17 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->mode = $mode;
     }
 
+    /**
+     * @internal
+     */
+    public function applyCspNoncesToDumps(ResponseEvent $event): void
+    {
+        if ($this->cspHandler && $event->isMainRequest() && $this->dumpDataCollector?->getDumpsCount() > 0) {
+            $nonces = $this->cspHandler->getNonces($event->getRequest(), $event->getResponse());
+            $this->dumpDataCollector->setNonce($nonces['csp_script_nonce'], $nonces['csp_style_nonce']);
+        }
+    }
+
     public function onKernelResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
@@ -215,8 +226,12 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            // Run after ProfilerListener::onKernelResponse since we need the X-Debug-Token header
-            KernelEvents::RESPONSE => ['onKernelResponse', -2048],
+            KernelEvents::RESPONSE => [
+                // Run before ProfilerListener::onKernelResponse since the dump collector can write dumps to the output there
+                ['applyCspNoncesToDumps', -1023],
+                // Run after ProfilerListener::onKernelResponse since we need the X-Debug-Token header
+                ['onKernelResponse', -2048],
+            ],
         ];
     }
 }

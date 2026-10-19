@@ -60,7 +60,7 @@ final class SlidingWindow implements LimiterStateInterface
      */
     public function getExpirationTime(): int
     {
-        return (int) ($this->windowEndAt + $this->intervalInSeconds - microtime(true));
+        return (int) ceil($this->windowEndAt + $this->intervalInSeconds - microtime(true));
     }
 
     public function isExpired(): bool

@@ -189,6 +189,19 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
+    public function testStorageKeepsTheStateUntilTheHitsOfThePreviousWindowHaveFadedOut()
+    {
+        $limiter = new SlidingWindowLimiter('test', 100, new \DateInterval('PT10S'), $this->storage);
+        $limiter->consume();
+        usleep(500000);
+        $limiter->consume(99);
+
+        usleep(19250000);
+        $rateLimit = $limiter->consume(100);
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(98, $rateLimit->getRemainingTokens());
+    }
+
     private function createLimiter(): SlidingWindowLimiter
     {
         return new SlidingWindowLimiter('test', 10, new \DateInterval('PT12S'), $this->storage);

@@ -51,7 +51,7 @@ class RedisListableIntegrationTest extends TestCase
 
     protected function tearDown(): void
     {
-        if ($this->redis) {
+        if ($this->connection) {
             $this->redis->del($this->streamName);
             $this->redis->close();
         }

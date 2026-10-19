@@ -51,7 +51,7 @@ final class AmpSqlEventLoopIntegrationTest extends TestCase
         $connector = new SqliteConnector(new ProcessContextFactory(childConnectTimeout: 30));
         $transportPool = new SqliteConnectionPool($config, 1, connector: $connector, transactionIsolation: SqliteTransactionMode::Immediate);
         $lockerPool = new SqliteConnectionPool($config, 1, connector: $connector, transactionIsolation: SqliteTransactionMode::Immediate);
-        $transport = new AmpSqlTransport(new Connection($transportPool, new SqliteBackend()), new PhpSerializer());
+        $transport = new AmpSqlTransport(new Connection(static fn () => $transportPool, new SqliteBackend()), new PhpSerializer());
 
         try {
             $transport->setup();

@@ -37,7 +37,7 @@ final class ConnectionTest extends TestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('AMPHP SQL requires SQLite 3.42 or newer.');
 
-        (new Connection($connection, new SqliteBackend()))->setup();
+        (new Connection(static fn () => $connection, new SqliteBackend()))->setup();
     }
 
     #[DataProvider('provideBackendWithInvalidVersion')]
@@ -68,7 +68,7 @@ final class ConnectionTest extends TestCase
         $connection->method('query')->willThrowException($error);
 
         try {
-            (new Connection($connection, new SqliteBackend(), ['auto_setup' => false]))->getMessageCount();
+            (new Connection(static fn () => $connection, new SqliteBackend(), ['auto_setup' => false]))->getMessageCount();
             self::fail('Expected version validation to fail.');
         } catch (TransportException $e) {
             self::assertInstanceOf(SqlConnectionException::class, $e->getPrevious());
@@ -139,7 +139,7 @@ final class ConnectionTest extends TestCase
             ->with($transaction, 'messages', [[base64_encode('body a'), '{"type":"A"}', 0], [base64_encode('body b'), '[]', 500]], 'queue')
             ->willReturn([15, '16']);
 
-        $ids = (new Connection($connection, $backend, ['auto_setup' => false, 'table_name' => 'messages', 'queue_name' => 'queue']))->sendBatch(['a' => ['body a', ['type' => 'A'], 0], 'b' => ['body b', [], 500]]);
+        $ids = (new Connection(static fn () => $connection, $backend, ['auto_setup' => false, 'table_name' => 'messages', 'queue_name' => 'queue']))->sendBatch(['a' => ['body a', ['type' => 'A'], 0], 'b' => ['body b', [], 500]]);
 
         self::assertSame(['a' => 15, 'b' => '16'], $ids);
     }
@@ -162,7 +162,7 @@ final class ConnectionTest extends TestCase
         $messages[] = [str_repeat('a', 600000), [], 0];
         $messages[] = [str_repeat('b', 600000), [], 0];
 
-        self::assertSame([], (new Connection($connection, $backend, ['auto_setup' => false]))->sendBatch($messages));
+        self::assertSame([], (new Connection(static fn () => $connection, $backend, ['auto_setup' => false]))->sendBatch($messages));
         self::assertSame([100, 100, 51, 1], $rows);
     }
 
@@ -186,7 +186,7 @@ final class ConnectionTest extends TestCase
         });
 
         try {
-            (new Connection($connection, $backend, ['auto_setup' => false]))->sendBatch(array_fill(0, 150, ['body', [], 0]));
+            (new Connection(static fn () => $connection, $backend, ['auto_setup' => false]))->sendBatch(array_fill(0, 150, ['body', [], 0]));
             self::fail('Expected sending to fail.');
         } catch (TransportException $e) {
             self::assertSame('Could not send the messages to AMPHP SQL.', $e->getMessage());

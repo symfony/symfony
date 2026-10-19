@@ -1835,6 +1835,21 @@ b'])]
         $this->assertTrue($request->hasPreviousSession());
     }
 
+    public function testHasPreviousSessionDoesNotCreateTheSessionWithoutCookies()
+    {
+        $request = new Request();
+        $request->setSessionFactory(static fn () => new Session(new MockArraySessionStorage()));
+
+        $this->assertFalse($request->hasPreviousSession());
+        $this->assertFalse($request->hasSession(true));
+
+        $request->cookies->set('foo', 'bar');
+        $this->assertFalse($request->hasPreviousSession());
+
+        $request->cookies->set('MOCKSESSID', 'foo');
+        $this->assertTrue($request->hasPreviousSession());
+    }
+
     public function testToString()
     {
         $request = new Request();

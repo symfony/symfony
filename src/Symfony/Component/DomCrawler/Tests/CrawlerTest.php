@@ -261,6 +261,33 @@ class CrawlerTest extends TestCase
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a \DOMNode');
     }
 
+    public function testAddingNodesPreservesIdentityAndOrder()
+    {
+        $doc = $this->createDomDocument();
+        $nodes = [$doc->createElement('test'), $doc->createElement('test'), $doc->createElement('test')];
+        $crawler = $this->createCrawler($nodes);
+        $crawler->addNodes(array_reverse($nodes));
+        $this->assertSame($nodes, iterator_to_array($crawler));
+
+        $clone = clone $crawler;
+        $node = $doc->createElement('test');
+        $clone->addNode($node);
+        $crawler->addNode($node);
+        $this->assertSame([...$nodes, $node], iterator_to_array($crawler));
+        $this->assertSame([...$nodes, $node], iterator_to_array($clone));
+
+        $clone->clear();
+        $clone->addNode($nodes[0]);
+        $this->assertSame([$nodes[0]], iterator_to_array($clone));
+        $this->assertCount(4, $crawler);
+
+        $crawler->clear();
+        $otherDoc = $this->createDomDocument();
+        $other = $otherDoc->createElement('test');
+        $crawler->addNode($other);
+        $this->assertSame([$other], iterator_to_array($crawler));
+    }
+
     public function testClear()
     {
         $doc = $this->createDomDocument();

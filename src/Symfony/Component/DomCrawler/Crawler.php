@@ -51,6 +51,11 @@ class Crawler implements \Countable, \IteratorAggregate
     private array $nodes = [];
 
     /**
+     * @var array<int, true>
+     */
+    private array $nodeIds = [];
+
+    /**
      * Whether the Crawler contains HTML or XML content (used when converting CSS to XPath).
      */
     private bool $isHtml = true;
@@ -91,6 +96,7 @@ class Crawler implements \Countable, \IteratorAggregate
     public function clear(): void
     {
         $this->nodes = [];
+        $this->nodeIds = [];
         $this->document = null;
         $this->cachedNamespaces = new \ArrayObject();
     }
@@ -273,10 +279,12 @@ class Crawler implements \Countable, \IteratorAggregate
         $this->document ??= $node->ownerDocument;
 
         // Don't add duplicate nodes in the Crawler
-        if (\in_array($node, $this->nodes, true)) {
+        $id = spl_object_id($node);
+        if (isset($this->nodeIds[$id])) {
             return;
         }
 
+        $this->nodeIds[$id] = true;
         $this->nodes[] = $node;
     }
 

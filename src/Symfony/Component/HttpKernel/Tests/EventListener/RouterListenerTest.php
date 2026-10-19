@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -226,6 +227,61 @@ class RouterListenerTest extends TestCase
             [['_route' => 'foo'], 'Matched route "{route}".', ['route' => 'foo', 'route_parameters' => ['_route' => 'foo'], 'request_uri' => 'http://localhost/', 'method' => 'GET']],
             [[], 'Matched route "{route}".', ['route' => 'n/a', 'route_parameters' => [], 'request_uri' => 'http://localhost/', 'method' => 'GET']],
         ];
+    }
+
+    #[DataProvider('provideLoggedRequestUris')]
+    public function testLoggedRequestUriIsTheUriOfTheRequest(Request $request, array $trustedProxies = [])
+    {
+        $logger = new class extends AbstractLogger {
+            public array $contexts = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->contexts[] = $context;
+            }
+        };
+
+        $requestMatcher = $this->createStub(RequestMatcherInterface::class);
+        $requestMatcher->method('matchRequest')->willReturn(['_route' => 'foo']);
+        $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext(), $logger);
+
+        Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
+
+        try {
+            $listener->onKernelRequest(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+
+            $this->assertSame($request->getUri(), $logger->contexts[0]['request_uri']);
+        } finally {
+            Request::setTrustedProxies([], -1);
+        }
+    }
+
+    public static function provideLoggedRequestUris(): iterable
+    {
+        yield 'http' => [Request::create('http://localhost/foo')];
+        yield 'https' => [Request::create('https://Example.COM/foo')];
+        yield 'http on a custom port' => [Request::create('http://localhost:8080/foo')];
+        yield 'https on a custom port' => [Request::create('https://localhost:8443/foo')];
+        yield 'http on port 443' => [Request::create('http://localhost:443/foo')];
+        yield 'https on port 80' => [Request::create('https://localhost:80/foo')];
+        yield 'IPv6 host' => [Request::create('http://[::1]:8080/foo')];
+        yield 'query string' => [Request::create('http://localhost/foo?b=2&a=1&c')];
+        yield 'encoded path' => [Request::create('http://localhost/f%20o%2Fo')];
+        yield 'base URL' => [Request::create('http://localhost/app.php/foo', 'GET', [], [], [], ['SCRIPT_FILENAME' => '/var/www/app.php', 'SCRIPT_NAME' => '/app.php', 'PHP_SELF' => '/app.php/foo'])];
+
+        $request = Request::create('http://localhost/foo', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
+        $request->headers->set('X-Forwarded-Proto', 'https');
+        $request->headers->set('X-Forwarded-Host', 'example.com');
+        $request->headers->set('X-Forwarded-Port', '8443');
+        yield 'trusted proxy' => [$request, ['10.0.0.1']];
+
+        $request = Request::create('http://localhost/foo', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
+        $request->headers->set('X-Forwarded-Proto', 'https');
+        yield 'trusted proxy without forwarded port' => [$request, ['10.0.0.1']];
+
+        $request = Request::create('http://localhost/foo', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.2']);
+        $request->headers->set('X-Forwarded-Host', 'example.com');
+        yield 'untrusted proxy' => [$request, ['10.0.0.1']];
     }
 
     public function testWithBadRequest()

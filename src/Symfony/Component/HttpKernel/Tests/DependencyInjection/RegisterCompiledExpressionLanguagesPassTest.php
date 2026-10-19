@@ -54,7 +54,7 @@ class RegisterCompiledExpressionLanguagesPassTest extends TestCase
         $this->assertSame(CompiledExpressionLanguage::class, $decorator->getClass());
         $this->assertSame(['app.expression_language', null, 0], $decorator->getDecoratedService());
         $this->assertEquals([new Reference('.inner'), $file], $decorator->getArguments());
-        $this->assertFalse($decorator->isLazy());
+        $this->assertTrue($decorator->isLazy());
         $this->assertSame($hashedFile, $container->getDefinition('.App\ExpressionLanguage.compiled')->getArgument(1));
         $this->assertTrue($container->getDefinition('.App\ExpressionLanguage.compiled')->isLazy());
         $this->assertFalse($container->hasDefinition('.app.untagged_expression_language.compiled'));

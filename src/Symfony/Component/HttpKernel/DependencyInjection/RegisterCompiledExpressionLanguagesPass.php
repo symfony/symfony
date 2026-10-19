@@ -50,11 +50,12 @@ final class RegisterCompiledExpressionLanguagesPass implements CompilerPassInter
             }
 
             // decorating in debug mode too keeps the class of the service the same in every environment
+            // the decorator is lazy so that the expression language and its providers are created only when an expression is used
             $file = $debug ? null : '%kernel.build_dir%/expression_language/'.(preg_match('/^[\w.]++$/', $id) ? $id : ContainerBuilder::hash($id)).'.php';
             $container->register('.'.$id.'.compiled', CompiledExpressionLanguage::class)
                 ->setDecoratedService($id)
                 ->setArguments([new Reference('.inner'), $file])
-                ->setLazy($container->getDefinition($id)->isLazy());
+                ->setLazy(true);
 
             $expressionLanguages[$id] = new Reference($id);
 

@@ -30,6 +30,8 @@ class ImportMapGenerator
 
     private const INTEGRITY_HASH_ALGORITHMS = ['sha256', 'sha384', 'sha512'];
 
+    private array $importMapData = [];
+
     /**
      * @param self::ENTRIES_* $entries
      */
@@ -83,11 +85,29 @@ class ImportMapGenerator
     public function getImportMapData(array $entrypointNames, ?string $polyfillImportName = null): array
     {
         $rawImportMapData = $this->getRawImportMapData();
+        $eagerImports = [];
+        $reachableImports = [];
+        foreach ($entrypointNames as $i => $entrypointName) {
+            $eagerImports[$i] = $this->findEagerEntrypointImports($entrypointName);
+        }
+        if (self::ENTRIES_REACHABLE === $this->entries) {
+            foreach ($entrypointNames as $entrypointName) {
+                $reachableImports[] = $this->findReachableEntrypointImports($entrypointName);
+            }
+        }
+
+        // with compiled files, the inputs are the same arrays on each call, which makes this comparison cheap
+        $inputs = [$entrypointNames, $polyfillImportName, $rawImportMapData, $eagerImports, $reachableImports];
+        $key = implode("\n", $entrypointNames);
+
+        if (($this->importMapData[$key][0] ?? null) === $inputs) {
+            return $this->importMapData[$key][1];
+        }
+
         $finalImportMapData = [];
-        foreach ($entrypointNames as $entrypointName) {
-            $entrypointImports = $this->findEagerEntrypointImports($entrypointName);
+        foreach ($entrypointNames as $i => $entrypointName) {
             // Entrypoint modules must be preloaded before their dependencies
-            foreach ([$entrypointName, ...$entrypointImports] as $import) {
+            foreach ([$entrypointName, ...$eagerImports[$i]] as $import) {
                 if (isset($finalImportMapData[$import])) {
                     continue;
                 }
@@ -104,17 +124,20 @@ class ImportMapGenerator
         }
 
         if (self::ENTRIES_REACHABLE === $this->entries) {
-            $reachableImports = null === $polyfillImportName ? [] : [$polyfillImportName => true];
-            foreach ($entrypointNames as $entrypointName) {
-                foreach ($this->findReachableEntrypointImports($entrypointName) as $import) {
-                    $reachableImports[$import] = true;
+            $reachable = null === $polyfillImportName ? [] : [$polyfillImportName => true];
+            foreach ($reachableImports as $imports) {
+                foreach ($imports as $import) {
+                    $reachable[$import] = true;
                 }
             }
 
-            $rawImportMapData = array_intersect_key($rawImportMapData, $reachableImports);
+            $rawImportMapData = array_intersect_key($rawImportMapData, $reachable);
         }
 
-        return array_merge($finalImportMapData, $rawImportMapData);
+        $finalImportMapData = array_merge($finalImportMapData, $rawImportMapData);
+        $this->importMapData[$key] = [$inputs, $finalImportMapData];
+
+        return $finalImportMapData;
     }
 
     /**

@@ -152,6 +152,75 @@ class ImportMapGeneratorTest extends TestCase
         ], $manager->getImportMapData(['app']));
     }
 
+    public function testGetImportMapDataFollowsTheChangesOfTheCompiledFiles()
+    {
+        $compiled = [
+            'importmap.json' => [
+                'app' => ['path' => '/assets/app-d1g35t.js', 'type' => 'js'],
+                'dependency' => ['path' => '/assets/dependency-d1g35t.js', 'type' => 'js'],
+            ],
+            'entrypoint.app.json' => ['dependency'],
+            'entrypoint.other.json' => [],
+        ];
+        $this->compiledConfigReader = $this->createStub(CompiledAssetMapperConfigReader::class);
+        $this->compiledConfigReader->method('configExists')->willReturnCallback(static function (string $file) use (&$compiled) {
+            return isset($compiled[$file]);
+        });
+        $this->compiledConfigReader->method('loadConfig')->willReturnCallback(static function (string $file) use (&$compiled) {
+            return $compiled[$file];
+        });
+        $manager = $this->createImportMapGenerator();
+
+        $importMapData = [
+            'app' => ['path' => '/assets/app-d1g35t.js', 'type' => 'js', 'preload' => true],
+            'dependency' => ['path' => '/assets/dependency-d1g35t.js', 'type' => 'js', 'preload' => true],
+        ];
+        $this->assertSame($importMapData, $manager->getImportMapData(['app']));
+        $this->assertSame($importMapData, $manager->getImportMapData(['app']));
+
+        $compiled['entrypoint.app.json'] = [];
+        unset($importMapData['dependency']['preload']);
+        $this->assertSame($importMapData, $manager->getImportMapData(['app']));
+
+        $compiled['importmap.json']['dependency']['path'] = '/assets/dependency-n3wh4sh.js';
+        $importMapData['dependency']['path'] = '/assets/dependency-n3wh4sh.js';
+        $this->assertSame($importMapData, $manager->getImportMapData(['app']));
+
+        unset($importMapData['app']['preload']);
+        $this->assertSame($importMapData, $manager->getImportMapData(['other']));
+    }
+
+    public function testGetImportMapDataFollowsTheChangesOfTheReachableEntries()
+    {
+        $compiled = [
+            'importmap.json' => [
+                'app' => ['path' => '/assets/app-d1g35t.js', 'type' => 'js'],
+                'lazy' => ['path' => '/assets/lazy-d1g35t.js', 'type' => 'js'],
+            ],
+            'entrypoint.app.json' => [],
+            'entrypoint.reachable.app.json' => ['lazy'],
+        ];
+        $this->compiledConfigReader = $this->createStub(CompiledAssetMapperConfigReader::class);
+        $this->compiledConfigReader->method('configExists')->willReturnCallback(static function (string $file) use (&$compiled) {
+            return isset($compiled[$file]);
+        });
+        $this->compiledConfigReader->method('loadConfig')->willReturnCallback(static function (string $file) use (&$compiled) {
+            return $compiled[$file];
+        });
+        $manager = $this->createImportMapGenerator([], ImportMapGenerator::ENTRIES_REACHABLE);
+
+        $importMapData = [
+            'app' => ['path' => '/assets/app-d1g35t.js', 'type' => 'js', 'preload' => true],
+            'lazy' => ['path' => '/assets/lazy-d1g35t.js', 'type' => 'js'],
+        ];
+        $this->assertSame($importMapData, $manager->getImportMapData(['app']));
+
+        $compiled['entrypoint.reachable.app.json'] = [];
+        $this->assertSame(['app' => $importMapData['app']], $manager->getImportMapData(['app']));
+
+        $this->assertSame($importMapData, $manager->getImportMapData(['app'], 'lazy'));
+    }
+
     public function testInvalidEntries()
     {
         $this->expectException(LogicException::class);

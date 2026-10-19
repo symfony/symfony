@@ -176,6 +176,11 @@ abstract class KernelTestCase extends TestCase
             if ($container instanceof ResetInterface) {
                 $container->reset();
             }
+
+            if (($gc = gc_status())['roots'] >= $gc['threshold'] / 2) {
+                // Collect cycles between tests, before PHP does it in the middle of one
+                gc_collect_cycles();
+            }
         }
     }
 }

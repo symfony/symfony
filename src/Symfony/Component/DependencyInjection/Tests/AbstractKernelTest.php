@@ -198,7 +198,7 @@ class AbstractKernelTest extends TestCase
         $kernel->boot();
     }
 
-    public function testShutdownDestroysServicesThatAreInAReferenceCycle()
+    public function testShutdownDestroysServicesThatReferenceTheContainer()
     {
         $kernel = new ContainerReferencingKernel('test', true, $this->varDir);
         $kernel->boot();
@@ -212,6 +212,31 @@ class AbstractKernelTest extends TestCase
             $kernel->shutdown();
 
             $this->assertTrue(ContainerReferencingService::$destructed);
+        } finally {
+            if ($gcEnabled) {
+                gc_enable();
+            }
+        }
+    }
+
+    public function testShutdownDoesNotCollectCycles()
+    {
+        $kernel = new SelfReferencingKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $kernel->getContainer()->get('self_referencing');
+        SelfReferencingService::$destructed = false;
+
+        $gcEnabled = gc_enabled();
+        gc_disable();
+
+        try {
+            $kernel->shutdown();
+
+            $this->assertFalse(SelfReferencingService::$destructed);
+
+            gc_collect_cycles();
+
+            $this->assertTrue(SelfReferencingService::$destructed);
         } finally {
             if ($gcEnabled) {
                 gc_enable();
@@ -765,6 +790,31 @@ class ContainerReferencingService
     public function __construct(
         private ContainerInterface $container,
     ) {
+    }
+
+    public function __destruct()
+    {
+        self::$destructed = true;
+    }
+}
+
+class SelfReferencingKernel extends TestKernel
+{
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->register('self_referencing', SelfReferencingService::class)->setPublic(true);
+    }
+}
+
+class SelfReferencingService
+{
+    public static bool $destructed = false;
+
+    public self $self;
+
+    public function __construct()
+    {
+        $this->self = $this;
     }
 
     public function __destruct()

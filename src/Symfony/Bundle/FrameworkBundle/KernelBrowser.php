@@ -272,6 +272,11 @@ class KernelBrowser extends HttpKernelBrowser
                 $this->kernel->boot();
                 $this->kernel->shutdown();
 
+                if (($gc = gc_status())['roots'] >= $gc['threshold'] / 2) {
+                    // Collect cycles between requests, before PHP does it in the middle of one
+                    gc_collect_cycles();
+                }
+
                 if ($keptState) {
                     $this->kernel->boot();
                     $container = $this->getContainer();

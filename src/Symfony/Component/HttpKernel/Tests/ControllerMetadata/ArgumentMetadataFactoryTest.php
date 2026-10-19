@@ -12,12 +12,15 @@
 namespace Symfony\Component\HttpKernel\Tests\ControllerMetadata;
 
 use Fake\ImportedAndFake;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Counted;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\AttributeController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\BasicTypesController;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\CountedAttributeController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 
@@ -149,6 +152,52 @@ class ArgumentMetadataFactoryTest extends TestCase
             new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')], controllerName: AttributeController::class.'::issue41478'),
             new ArgumentMetadata('bat', 'string', false, false, null, false, [], controllerName: AttributeController::class.'::issue41478'),
         ], $arguments);
+    }
+
+    #[DataProvider('provideControllers')]
+    public function testAttributesAreInstantiatedOncePerController(\Closure $createArgumentMetadata)
+    {
+        Counted::$instances = 0;
+
+        for ($i = 0; $i < 3; ++$i) {
+            $arguments = $createArgumentMetadata($this->factory);
+
+            $this->assertSame(['argument'], array_map(static fn (Counted $attribute) => $attribute->value, $arguments[0]->getAttributes()));
+        }
+
+        $this->assertSame(1, Counted::$instances);
+    }
+
+    public static function provideControllers(): iterable
+    {
+        yield 'method' => [static fn (ArgumentMetadataFactory $factory) => $factory->createArgumentMetadata([new CountedAttributeController(), 'action'])];
+        yield 'method with its reflector' => [static fn (ArgumentMetadataFactory $factory) => $factory->createArgumentMetadata([new CountedAttributeController(), 'action'], new \ReflectionMethod(CountedAttributeController::class, 'action'))];
+        yield 'invokable' => [static fn (ArgumentMetadataFactory $factory) => $factory->createArgumentMetadata(new CountedAttributeController())];
+        yield 'first-class callable' => [static fn (ArgumentMetadataFactory $factory) => $factory->createArgumentMetadata((new CountedAttributeController())->action(...))];
+    }
+
+    public function testEachCallGetsItsOwnInstances()
+    {
+        $first = $this->factory->createArgumentMetadata([new CountedAttributeController(), 'action']);
+        $second = $this->factory->createArgumentMetadata([new CountedAttributeController(), 'action']);
+
+        $this->assertEquals($first, $second);
+        $this->assertNotSame($first[0], $second[0]);
+        $this->assertNotSame($first[0]->getAttributes()[0], $second[0]->getAttributes()[0]);
+        $this->assertNotSame($first[0]->getDefaultValue(), $second[0]->getDefaultValue());
+    }
+
+    public function testClosuresGetTheirOwnMetadata()
+    {
+        $arguments = [];
+
+        foreach ([static fn (int $foo) => null, static fn (string $bar) => null] as $closure) {
+            foreach ([$this->factory->createArgumentMetadata($closure), $this->factory->createArgumentMetadata([$closure, '__invoke'], new \ReflectionMethod($closure, '__invoke'))] as [$argument]) {
+                $arguments[] = [$argument->getName(), $argument->getType()];
+            }
+        }
+
+        $this->assertSame([['foo', 'int'], ['foo', 'int'], ['bar', 'string'], ['bar', 'string']], $arguments);
     }
 
     public function signature1(self $foo, array $bar, callable $baz)

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fixtures\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 
 #[Cache(smaxage: 20)]
@@ -26,5 +27,11 @@ class CacheAttributeController
 
     public function bar()
     {
+    }
+
+    #[Cache(etag: 'id')]
+    public function etag()
+    {
+        return new Response();
     }
 }

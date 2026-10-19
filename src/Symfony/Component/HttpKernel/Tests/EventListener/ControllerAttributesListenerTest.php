@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -24,9 +25,12 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Bar;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Buz;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Counted;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Qux;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ControllerAttributesController;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\CountedAttributeController;
 
 class ControllerAttributesListenerTest extends TestCase
 {
@@ -252,6 +256,95 @@ class ControllerAttributesListenerTest extends TestCase
         $this->createListener()->beforeController($event, KernelEvents::CONTROLLER, $dispatcher);
 
         $this->assertSame(\PHP_VERSION, $result);
+    }
+
+    #[DataProvider('provideControllers')]
+    public function testAttributesAreInstantiatedOncePerController(\Closure $createController)
+    {
+        $listener = $this->createListener([KernelEvents::CONTROLLER => [Counted::class => true]]);
+        Counted::$instances = 0;
+
+        for ($i = 0; $i < 3; ++$i) {
+            $event = new ControllerEvent($this->createStub(HttpKernelInterface::class), $createController(), new Request(), HttpKernelInterface::MAIN_REQUEST);
+            $listener->beforeController($event, KernelEvents::CONTROLLER, new EventDispatcher());
+
+            $this->assertSame(['class', 'method'], array_map(static fn (Counted $attribute) => $attribute->value, $event->getAttributes('*')));
+        }
+
+        $this->assertSame(2, Counted::$instances);
+    }
+
+    public static function provideControllers(): iterable
+    {
+        yield 'method' => [static fn () => [new CountedAttributeController(), 'action']];
+        yield 'invokable' => [static fn () => new CountedAttributeController()];
+        yield 'first-class callable' => [static fn () => (new CountedAttributeController())->action(...)];
+    }
+
+    public function testEachRequestGetsItsOwnAttributeInstances()
+    {
+        $values = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::CONTROLLER.'.'.Counted::class, static function (ControllerAttributeEvent $event) use (&$values) {
+            $values[] = $event->attribute->value;
+            $event->attribute->value = 'changed';
+        });
+
+        $listener = $this->createListener([KernelEvents::CONTROLLER => [Counted::class => true]]);
+        $attributes = [];
+
+        for ($i = 0; $i < 2; ++$i) {
+            $event = new ControllerEvent($this->createStub(HttpKernelInterface::class), [new CountedAttributeController(), 'action'], new Request(), HttpKernelInterface::MAIN_REQUEST);
+            $listener->beforeController($event, KernelEvents::CONTROLLER, $dispatcher);
+            $attributes[] = $event->getAttributes('*');
+        }
+
+        $this->assertSame(['class', 'method', 'class', 'method'], $values);
+        $this->assertNotSame($attributes[0][0], $attributes[1][0]);
+        $this->assertNotSame($attributes[0][1], $attributes[1][1]);
+    }
+
+    public function testClosuresGetTheirOwnAttributes()
+    {
+        $listener = $this->createListener([]);
+        $attributes = [];
+
+        foreach ([#[Bar('a')] static fn () => null, #[Bar('b')] static fn () => null] as $closure) {
+            foreach ([$closure, [$closure, '__invoke']] as $controller) {
+                $event = new ControllerEvent($this->createStub(HttpKernelInterface::class), $controller, new Request(), HttpKernelInterface::MAIN_REQUEST);
+                $listener->beforeController($event, KernelEvents::CONTROLLER, new EventDispatcher());
+                $attributes[] = $event->getAttributes('*');
+            }
+        }
+
+        $this->assertEquals([[new Bar('a')], [new Bar('a')], [new Bar('b')], [new Bar('b')]], $attributes);
+    }
+
+    public function testAttributesPassedWithTheControllerDoNotReplaceTheDeclaredOnes()
+    {
+        $dispatchedEvents = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::CONTROLLER.'.'.Buz::class, static function ($event, $name) use (&$dispatchedEvents) {
+            $dispatchedEvents[] = $name;
+        });
+        $dispatcher->addListener(KernelEvents::CONTROLLER.'.'.Qux::class, static function ($event, $name) use (&$dispatchedEvents) {
+            $dispatchedEvents[] = $name;
+        });
+
+        $listener = $this->createListener();
+
+        $event = new ControllerEvent($this->createStub(HttpKernelInterface::class), static fn () => null, new Request(), HttpKernelInterface::MAIN_REQUEST);
+        $event->setController([new ControllerAttributesController(), 'buzAction'], [new Qux()]);
+        $listener->beforeController($event, KernelEvents::CONTROLLER, $dispatcher);
+
+        $event = new ControllerEvent($this->createStub(HttpKernelInterface::class), [new ControllerAttributesController(), 'buzAction'], new Request(), HttpKernelInterface::MAIN_REQUEST);
+        $listener->beforeController($event, KernelEvents::CONTROLLER, $dispatcher);
+
+        $this->assertSame([
+            KernelEvents::CONTROLLER.'.'.Qux::class,
+            KernelEvents::CONTROLLER.'.'.Buz::class,
+            KernelEvents::CONTROLLER.'.'.Buz::class,
+        ], $dispatchedEvents);
     }
 
     private function createListener(?array $attributesWithListenersByEvent = null): ControllerAttributesListener

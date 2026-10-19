@@ -702,6 +702,21 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame('max-age=60, public', $response->headers->get('Cache-Control'));
     }
 
+    public function testKernelEvaluatesTheAttributeForEachRequest()
+    {
+        $kernel = $this->createKernel();
+        $etags = [];
+
+        foreach (['1', '2'] as $id) {
+            $request = new Request();
+            $request->attributes->set('_controller', [new CacheAttributeController(), 'etag']);
+            $request->attributes->set('id', $id);
+            $etags[] = $kernel->handle($request)->getEtag();
+        }
+
+        $this->assertSame(['"'.hash('sha256', '1').'"', '"'.hash('sha256', '2').'"'], $etags);
+    }
+
     private function createKernel(): HttpKernel
     {
         $dispatcher = new EventDispatcher();

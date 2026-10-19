@@ -44,10 +44,17 @@ class ControllerAttributesListener implements EventSubscriberInterface
 
     private static array $attributeHierarchyCache = [];
 
+    /**
+     * Attributes are cloned for each request, since listeners can change them.
+     *
+     * @var array<string, list<object>>
+     */
+    private array $attributesCache = [];
+
     public function beforeController(ControllerEvent|ControllerArgumentsEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         $controller = $event->getController();
-        $attributes = $event->getAttributes('*');
+        $attributes = $this->getAttributes($event, $controller);
         $swapBudget = \count($attributes) << 3;
 
         dispatch_attributes:
@@ -70,7 +77,7 @@ class ControllerAttributesListener implements EventSubscriberInterface
                     throw new \LogicException(\sprintf('Controller swap loop detected while dispatching attributes for event "%s"; a listener keeps changing the controller.', $eventName));
                 }
                 $controller = $c;
-                $attributes = $event->getAttributes('*');
+                $attributes = $this->getAttributes($event, $c);
                 goto dispatch_attributes;
             }
         }
@@ -92,6 +99,36 @@ class ControllerAttributesListener implements EventSubscriberInterface
                 }
             }
         }
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function getAttributes(ControllerEvent|ControllerArgumentsEvent $event, callable $controller): array
+    {
+        $request = $event->getRequest();
+
+        // anonymous closures and Closure::__invoke() have no name that tells them apart, so they are not cached
+        $key = match (true) {
+            null !== $request->attributes->get('_controller_attributes') => null,
+            \is_array($controller) => $controller[0] instanceof \Closure ? null : (\is_object($controller[0]) ? $controller[0]::class : $controller[0]).'::'.$controller[1],
+            \is_string($controller) => $controller,
+            $controller instanceof \Closure => ($r = new \ReflectionFunction($controller))->isAnonymous() ? null : $r->getClosureCalledClass()?->name.'::'.$r->name.'@'.$r->getClosureScopeClass()?->name,
+            \is_object($controller) => $controller::class.'::__invoke',
+            default => null,
+        };
+
+        if (null === $key) {
+            return $event->getAttributes('*');
+        }
+
+        $attributes = [];
+        foreach ($this->attributesCache[$key] ??= $event->getAttributes('*') as $attribute) {
+            $attributes[] = clone $attribute;
+        }
+        $request->attributes->set('_controller_attributes', $attributes);
+
+        return $attributes;
     }
 
     private function getAttributeEventNames(object $attribute, string $eventName): array

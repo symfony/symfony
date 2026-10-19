@@ -56,6 +56,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         try {
             return $accessDecision->isGranted = $this->manager->decide($token, $attributes, $object, $accessDecision, $allowMultipleAttributes);
         } finally {
+            array_pop($this->accessDecisionStack);
             $this->strategy = $accessDecision->strategy;
             $currentLog = array_pop($this->currentLog);
             if (isset($accessDecision->isGranted)) {

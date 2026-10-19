@@ -692,6 +692,7 @@ class MessengerBundle extends AbstractBundle
                 ->setFactory([new Reference('messenger.transport_factory'), 'createTransport'])
                 ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($transportSerializerId)])
                 ->addTag('messenger.receiver', $tags)
+                ->addTag('kernel.reset', ['method' => 'close', 'on_invalid' => 'ignore', 'on_shutdown' => 'only'])
             ;
 
             $usedEnvs = [];

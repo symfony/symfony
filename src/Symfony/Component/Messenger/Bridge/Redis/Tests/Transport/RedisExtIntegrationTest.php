@@ -705,6 +705,21 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
+    public function testTheTransportConnectsAgainAfterBeingClosed()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'));
+        $transport = new RedisTransport($connection, new Serializer());
+        $transport->send(new Envelope(new DummyMessage('Hi')));
+        $redis = \WeakReference::create((new \ReflectionProperty(Connection::class, 'redis'))->getValue($connection));
+
+        $transport->close();
+        $this->assertNull($redis->get());
+
+        $received = [...$transport->get()];
+        $this->assertCount(1, $received);
+        $this->assertEquals(new DummyMessage('Hi'), $received[0]->getMessage());
+    }
+
     private function getConnectionGroup(Connection $connection): string
     {
         $property = (new \ReflectionClass(Connection::class))->getProperty('group');

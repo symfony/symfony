@@ -24,9 +24,21 @@ class ResponseHeaderBag extends HeaderBag
     public const DISPOSITION_ATTACHMENT = 'attachment';
     public const DISPOSITION_INLINE = 'inline';
 
+    private const LOWERCASE_TOKEN_CHARS = '!#$%&\'*-.^_`|~0123456789abcdefghijklmnopqrstuvwxyz';
+    private const TOKEN_CHARS = self::LOWERCASE_TOKEN_CHARS.'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    private const DEFAULT_CACHE_CONTROL = [
+        'no-cache, private' => ['no-cache' => true, 'private' => true],
+        'private, must-revalidate' => ['private' => true, 'must-revalidate' => true],
+    ];
+
     protected array $computedCacheControl = [];
     protected array $cookies = [];
     protected array $headerNames = [];
+
+    /**
+     * The last sorted directives made of tokens only, and their header.
+     */
+    private array $tokenCacheControl = [[], ''];
 
     public function __construct(array $headers = [])
     {
@@ -240,7 +252,7 @@ class ResponseHeaderBag extends HeaderBag
     protected function computeCacheControlValue(): string
     {
         if (!$this->cacheControl) {
-            if ($this->has('Last-Modified') || $this->has('Expires')) {
+            if (\array_key_exists('last-modified', $this->headers) || \array_key_exists('expires', $this->headers)) {
                 return 'private, must-revalidate'; // allows for heuristic expiration (RFC 7234 Section 4.2.2) in the case of "Last-Modified"
             }
 
@@ -259,6 +271,46 @@ class ResponseHeaderBag extends HeaderBag
         }
 
         return $header;
+    }
+
+    protected function getCacheControlHeader(): string
+    {
+        if ($this->cacheControl === $this->tokenCacheControl[0]) {
+            return $this->tokenCacheControl[1];
+        }
+
+        ksort($this->cacheControl);
+        $header = '';
+
+        foreach ($this->cacheControl as $name => $value) {
+            // Lowercase names and values made of token chars are written as is and parse back to themselves
+            if ('' === $name || \strlen($name) !== strspn($name, self::LOWERCASE_TOKEN_CHARS) || true !== $value && (!\is_string($value) || '' === $value || \strlen($value) !== strspn($value, self::TOKEN_CHARS))) {
+                return parent::getCacheControlHeader();
+            }
+
+            $header .= ', '.(true === $value ? $name : $name.'='.$value);
+        }
+
+        $this->tokenCacheControl = [$this->cacheControl, $header = substr($header, 2)];
+
+        return $header;
+    }
+
+    protected function parseCacheControl(string $header): array
+    {
+        [$directives, $tokenHeader] = $this->tokenCacheControl;
+
+        if ($header === $tokenHeader) {
+            return $directives;
+        }
+
+        if ($header === $tokenHeader.', private') {
+            $directives['private'] = true;
+
+            return $directives;
+        }
+
+        return self::DEFAULT_CACHE_CONTROL[$header] ?? parent::parseCacheControl($header);
     }
 
     private function initDate(): void

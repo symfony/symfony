@@ -601,7 +601,10 @@ class Connection
         $this->inFlightMessages = 0;
     }
 
-    private function getDefaultPublishRoutingKey(): ?string
+    /**
+     * @internal
+     */
+    public function getDefaultPublishRoutingKey(): ?string
     {
         return $this->exchangeOptions['default_publish_routing_key'] ?? null;
     }

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for root-relative excludes in `Finder::exclude()` by prefixing paths with `/`
+ * Make glob patterns treat `!` and `^` at the start of a bracket expression as a negation: `[!a]` and `[^a]` match the same characters as `?`, except `a`
 
 8.1
 ---

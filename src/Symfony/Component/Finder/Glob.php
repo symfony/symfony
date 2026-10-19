@@ -77,7 +77,7 @@ class Glob
 
             if ($delimiter === $car || '.' === $car || '(' === $car || ')' === $car || '|' === $car || '+' === $car || '^' === $car || '$' === $car) {
                 $regex .= "\\$car";
-            } elseif ('[' === $car && !$escaping && null !== $class = self::bracketExpressionToRegex($glob, $i, $delimiter, $bracketScanEnd)) {
+            } elseif ('[' === $car && !$escaping && null !== $class = self::bracketExpressionToRegex($glob, $i, $strictWildcardSlash, $delimiter, $bracketScanEnd)) {
                 $regex .= $class;
             } elseif ('*' === $car) {
                 if ($escaping || $strictWildcardSlash || !str_ends_with($regex, '.*')) {
@@ -139,7 +139,7 @@ class Glob
      *
      * $scanEnd is where the last scan stopped without finding a "]": every "[" before that position gets the same result.
      */
-    private static function bracketExpressionToRegex(string $glob, int &$i, string $delimiter, int &$scanEnd): ?string
+    private static function bracketExpressionToRegex(string $glob, int &$i, bool $strictWildcardSlash, string $delimiter, int &$scanEnd): ?string
     {
         $sizeGlob = \strlen($glob);
 
@@ -148,11 +148,17 @@ class Glob
         }
 
         $class = '[';
+        $start = $i + 1;
 
-        for ($j = $i + 1; $j < $sizeGlob; ++$j) {
+        if (isset($glob[$start]) && ('!' === $glob[$start] || '^' === $glob[$start])) {
+            $class = ($strictWildcardSlash ? ('/' === $delimiter ? '(?!\/)' : '(?!/)') : '').'[^';
+            ++$start;
+        }
+
+        for ($j = $start; $j < $sizeGlob; ++$j) {
             $car = $glob[$j];
 
-            if (']' === $car && $j > $i + 1) {
+            if (']' === $car && $j > $start) {
                 $i = $j;
 
                 return $class.']';

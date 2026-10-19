@@ -44,6 +44,39 @@ class GlobTest extends TestCase
         $this->assertSame('#^(?=[^\.])[[:alpha:]]$#', Glob::toRegex('[[:alpha:]]'));
     }
 
+    public function testGlobToRegexNegatedBracketExpressions()
+    {
+        foreach (['[!a].php', '[^a].php'] as $glob) {
+            $regex = Glob::toRegex($glob);
+
+            $this->assertSame(1, preg_match($regex, 'b.php'));
+            $this->assertSame(1, preg_match($regex, '!.php'));
+            $this->assertSame(1, preg_match($regex, '^.php'));
+            $this->assertSame(0, preg_match($regex, 'a.php'));
+        }
+
+        $regex = Glob::toRegex('a[!b]c');
+
+        $this->assertSame(1, preg_match($regex, 'a-c'));
+        $this->assertSame(0, preg_match($regex, 'abc'));
+        $this->assertSame(0, preg_match($regex, 'a/c'));
+        $this->assertSame(1, preg_match(Glob::toRegex('a[!b]c', true, false), 'a/c'));
+
+        $regex = Glob::toRegex('[!]a-]');
+
+        $this->assertSame(1, preg_match($regex, 'b'));
+        $this->assertSame(0, preg_match($regex, ']'));
+        $this->assertSame(0, preg_match($regex, 'a'));
+        $this->assertSame(0, preg_match($regex, '-'));
+
+        $this->assertSame(1, preg_match(Glob::toRegex('[!]'), '[!]'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[!]'), '!'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[^]'), '^'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[\!a]'), '!'));
+        $this->assertSame('/^(?!\/)[^a-c]$/', Glob::toRegex('[!a-c]', false, true, '/'));
+        $this->assertSame('#^[^\^]$#', Glob::toRegex('[^^]', false, false));
+    }
+
     public function testGlobToRegexDoubleStarStrictDots()
     {
         $finder = new Finder();

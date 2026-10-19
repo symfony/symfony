@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-19T07:34:26Z
+
+I pushed a fix. The entry point now builds the URL with `HttpUtils::generateUri()`, as `login_path` does. `createRedirectResponse()` applies the domain check meant for targets read from the request, so in a real app `entry_point_path: https://sso.example.com/login` redirected to `/`.
+
+BTW, I removed the known limitation from the description. Route parameters are filled from the current request, as for `login_path`.

@@ -175,6 +175,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         $mapToProperties = [];
         $targetName = $targetRefl->getName();
         $explicitTargets = [];
+        $mergeTargets = [];
         $implicitValues = [];
         foreach ($this->propertyNameCollectionFactory->create($classMetadata['readMetadataFromTarget'] ? $declaredTarget : $source) as $propertyName) {
             $propertyMetadata = $pairMetadata[$propertyName] ??= $this->propertyMetadataFactory->create($source, $declaredTarget, $propertyName);
@@ -210,7 +211,10 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 }
 
                 $writable = $writeDirectly && $propertyMapping['targetWritable'];
-                $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping, $propertyMapping['targetPropertyClass'], $declaredTarget, $targetPropertyName, $ctorArguments, $writable);
+                $sourceValue = $value;
+                $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping, $propertyMapping['targetPropertyClass'], $declaredTarget, $targetPropertyName, $ctorArguments, $writable, $mergeTargets[$targetPropertyName] ?? null);
+                // a later mapping of the same property must not write into an object copied as is from the source
+                $mergeTargets[$targetPropertyName] = \is_object($value) && $value !== $sourceValue ? $value : null;
                 $explicitTargets[$targetPropertyName] = true;
                 $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value, $writable);
             }
@@ -332,7 +336,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     /**
      * @param array<string, mixed> $ctorArguments
      */
-    private function getSourceValue(object $source, object $target, mixed $value, \WeakMap $objectMap, ?Mapping $mapping, ?string $targetPropertyClass, object $declaredTarget, string $targetPropertyName, array $ctorArguments, bool $targetWritable): mixed
+    private function getSourceValue(object $source, object $target, mixed $value, \WeakMap $objectMap, ?Mapping $mapping, ?string $targetPropertyClass, object $declaredTarget, string $targetPropertyName, array $ctorArguments, bool $targetWritable, ?object $mergeInto = null): mixed
     {
         if ($mapping?->transform) {
             $value = $this->applyTransforms($mapping, $value, $source, $target);
@@ -359,6 +363,14 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
                 $refl = $this->getReflectionClass($mapTo->target);
                 $mapper = $this->objectMapper ?? $this;
+
+                // readonly properties cannot be written after the constructor ran, so an object with readonly properties is replaced instead
+                if ($mergeInto instanceof $mapTo->target && !array_any($this->getReflectionClass($mergeInto)->getProperties(), static fn (\ReflectionProperty $p): bool => $p->isReadOnly())) {
+                    // mapping the previous source first lets a reference to the previous source resolve to the merged object
+                    $this->initializeLazyObject($mergeInto);
+
+                    return $mapper->map($value, $mergeInto);
+                }
 
                 return $refl->newLazyGhost(function ($target) use ($mapper, $value, $objectMap) {
                     $previousMap = $this->objectMap;

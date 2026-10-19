@@ -221,6 +221,18 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\Item
 use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\SelfSource as RecursionCacheSelfSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\SelfSummaryTarget as RecursionCacheSelfSummaryTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\SelfTarget as RecursionCacheSelfTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\CopiedObjectTarget as RepeatedMapCopiedObjectTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\LastWinsTarget as RepeatedMapLastWinsTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\NestedTarget as RepeatedMapNestedTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\Profile as RepeatedMapProfile;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\PromotedTarget as RepeatedMapPromotedTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\ReadonlyTarget as RepeatedMapReadonlyTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\ReplacingTransformTarget as RepeatedMapReplacingTransformTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\SkippedTarget as RepeatedMapSkippedTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\Source as RepeatedMapSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\Target as RepeatedMapTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\ThreeSourcesTarget as RepeatedMapThreeSourcesTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\TransformTarget as RepeatedMapTransformTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfReferencing\Category;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfReferencing\CategoryDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLoadedValue\LoadedValueService;
@@ -1998,5 +2010,120 @@ final class ObjectMapperTest extends TestCase
 
         $this->assertSame('foo', $mapper->map(new CacheKeyCollisionFoo(), CacheKeyCollisionTarget::class)->name);
         $this->assertSame('foobar', $mapper->map(new CacheKeyCollisionFoobar())->name);
+    }
+
+    #[DataProvider('provideAccessor')]
+    public function testRepeatedMapsMergeTheirObjectsIntoTheSameProperty(?PropertyAccessorInterface $accessor)
+    {
+        $profile = (new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor))->map(new RepeatedMapSource(), RepeatedMapTarget::class)->profile;
+
+        $this->assertSame('Jane', $profile->name);
+        $this->assertSame('jane@example.com', $profile->email);
+    }
+
+    public function testRepeatedMapsMergeThreeSources()
+    {
+        $profile = (new ObjectMapper())->map(new RepeatedMapSource(), RepeatedMapThreeSourcesTarget::class)->profile;
+
+        $this->assertSame('Jane', $profile->name);
+        $this->assertSame('jane@example.com', $profile->email);
+        $this->assertSame('fr', $profile->locale);
+    }
+
+    public function testRepeatedMapSkippedByItsConditionDoesNotMerge()
+    {
+        $profile = (new ObjectMapper())->map(new RepeatedMapSource(), RepeatedMapSkippedTarget::class)->profile;
+
+        $this->assertSame('Jane', $profile->name);
+        $this->assertNull($profile->email);
+    }
+
+    public function testRepeatedMapsOfNonObjectValuesKeepTheLastOne()
+    {
+        $target = (new ObjectMapper())->map(new RepeatedMapSource(), RepeatedMapLastWinsTarget::class);
+
+        $this->assertSame('jdoe', $target->username);
+        $this->assertSame(['admin'], $target->permissions);
+    }
+
+    public function testRepeatedMapsMergeIntoAPromotedConstructorProperty()
+    {
+        $profile = (new ObjectMapper())->map(new RepeatedMapSource(), RepeatedMapPromotedTarget::class)->profile;
+
+        $this->assertSame('Jane', $profile->name);
+        $this->assertSame('jane@example.com', $profile->email);
+    }
+
+    public function testRepeatedMapMergesTheObjectReturnedByItsTransform()
+    {
+        $profile = (new ObjectMapper())->map(new RepeatedMapSource(), RepeatedMapTransformTarget::class)->profile;
+
+        $this->assertSame('Jane', $profile->name);
+        $this->assertSame('JANE@EXAMPLE.COM', $profile->email);
+    }
+
+    public function testRepeatedMapTransformReturningAnUnmappedObjectReplacesThePreviousOne()
+    {
+        $profile = (new ObjectMapper())->map(new RepeatedMapSource(), RepeatedMapReplacingTransformTarget::class)->profile;
+
+        $this->assertNull($profile->name);
+        $this->assertSame('jane@example.com', $profile->email);
+    }
+
+    public function testRepeatedMapsMergeNestedObjects()
+    {
+        $profile = (new ObjectMapper())->map(new RepeatedMapSource(), RepeatedMapNestedTarget::class)->profile;
+
+        $this->assertSame('Jane', $profile->name);
+        $this->assertSame('1 Main Street', $profile->address->street);
+        $this->assertSame('Lyon', $profile->address->city);
+    }
+
+    #[DataProvider('provideAccessor')]
+    public function testRepeatedMapsDoNotMergeIntoAnObjectWithReadonlyProperties(?PropertyAccessorInterface $accessor)
+    {
+        $profile = (new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor))->map(new RepeatedMapSource(), RepeatedMapReadonlyTarget::class)->profile;
+
+        $this->assertNull($profile->name);
+        $this->assertSame('jane@example.com', $profile->email);
+    }
+
+    public function testRepeatedMapsDoNotMergeIntoThePropertyValueOfAnExistingTarget()
+    {
+        $existing = new RepeatedMapProfile();
+        $existing->locale = 'en';
+        $target = new RepeatedMapTarget();
+        $target->profile = $existing;
+
+        (new ObjectMapper())->map(new RepeatedMapSource(), $target);
+
+        $this->assertNotSame($existing, $target->profile);
+        $this->assertNull($target->profile->locale);
+        $this->assertSame('Jane', $target->profile->name);
+        $this->assertSame('jane@example.com', $target->profile->email);
+    }
+
+    public function testRepeatedMapsDoNotMergeIntoAnObjectCopiedFromTheSource()
+    {
+        $source = new RepeatedMapSource();
+        $source->current = new RepeatedMapProfile();
+        $source->current->name = 'John';
+
+        $profile = (new ObjectMapper())->map($source, RepeatedMapCopiedObjectTarget::class)->profile;
+
+        $this->assertNotSame($source->current, $profile);
+        $this->assertNull($source->current->email);
+        $this->assertSame('jane@example.com', $profile->email);
+    }
+
+    public function testRepeatedMapsResolveAReferenceToAPreviousSourceToTheMergedObject()
+    {
+        $source = new RepeatedMapSource();
+        $source->contact->owner = $source->identity;
+
+        $profile = (new ObjectMapper())->map($source, RepeatedMapTarget::class)->profile;
+
+        $this->assertSame('Jane', $profile->name);
+        $this->assertSame($profile, $profile->owner);
     }
 }

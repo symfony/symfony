@@ -9,6 +9,7 @@ CHANGELOG
  * Add a `MappingAwareTransformCallableInterface` to pass the `Map` attribute being applied to transformers
  * Add `PropertyTypeMappingMetadataFactory` to map a nested object to the class typing the property it is written into
  * Add `ObjectMapperCacheWarmer` to store the mapping metadata of every `#[Map]` class pair in a PHP file at cache warmup
+ * Merge the objects that repeated `#[Map]` attributes map to the same property instead of keeping the last one
 
 8.1
 ---

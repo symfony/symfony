@@ -175,6 +175,17 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
+    public function testPeekConsumeWhenReservationsExceedTheLimit()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+        $limiter->reserve(5);
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertSame(-5, $rateLimit->getRemainingTokens());
+        $this->assertGreaterThan(microtime(true), $rateLimit->getRetryAfter()->getTimestamp());
+    }
+
     private function createLimiter(): SlidingWindowLimiter
     {
         return new SlidingWindowLimiter('test', 10, new \DateInterval('PT12S'), $this->storage);

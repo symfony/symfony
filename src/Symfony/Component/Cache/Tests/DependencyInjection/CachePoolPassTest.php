@@ -27,6 +27,7 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -240,6 +241,49 @@ class CachePoolPassTest extends TestCase
         $this->assertSame(3, $cachePool->getArgument(2));
     }
 
+    public function testResetAttributePassesTheShutdownFlagToReset()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('cache.prefix.seed', 'foo');
+        $container->register('app.cache_pool', ArrayAdapter::class)->addTag('cache.pool', ['reset' => 'reset']);
+        $container->register('app.custom_pool', ArrayAdapter::class)->addTag('cache.pool', ['reset' => 'clear']);
+
+        $this->cachePoolPass->process($container);
+
+        $this->assertSame([['method' => 'reset', 'on_shutdown' => 'flag']], $container->getDefinition('app.cache_pool')->getTag('kernel.reset'));
+        $this->assertSame([['method' => 'clear']], $container->getDefinition('app.custom_pool')->getTag('kernel.reset'));
+    }
+
+    public function testChainedAdaptersAreResetOnTheirOwn()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('cache.prefix.seed', 'foo');
+        $container->register('cache.adapter.array', ArrayAdapter::class)->setAbstract(true)->addTag('cache.pool', ['reset' => 'reset']);
+        $container->register('cache.adapter.filesystem', FilesystemAdapter::class)->setAbstract(true)->setArguments([null, 0, null])->addTag('cache.pool', ['reset' => 'reset']);
+        $container->setDefinition('app.public_pool', new ChildDefinition('cache.adapter.filesystem'))->setPublic(true)->addTag('cache.pool');
+        $container->register('app.chain', ChainAdapter::class)->setArguments([['cache.adapter.array', 'app.public_pool'], 0])->addTag('cache.pool', ['reset' => 'reset']);
+        $container->register('app.chain_without_reset', ChainAdapter::class)->setArguments([['cache.adapter.array'], 0])->addTag('cache.pool');
+        $container->register('console.command.cache_pool_list')->addArgument([]);
+
+        $this->cachePoolPass->process($container);
+        (new ResolveChildDefinitionsPass())->process($container);
+
+        $this->assertEquals([new Reference('.app.chain.chained.0'), new Reference('.app.chain.chained.1')], $container->getDefinition('app.chain')->getArgument(0));
+        $this->assertSame([['method' => 'reset', 'on_shutdown' => 'flag']], $container->getDefinition('app.chain')->getTag('kernel.reset'));
+
+        foreach (['.app.chain.chained.0' => ArrayAdapter::class, '.app.chain.chained.1' => FilesystemAdapter::class] as $id => $class) {
+            $adapter = $container->getDefinition($id);
+            $this->assertSame($class, $adapter->getClass());
+            $this->assertFalse($adapter->isPublic());
+            $this->assertSame(['kernel.reset' => [['method' => 'reset', 'on_shutdown' => 'flag']]], $adapter->getTags());
+        }
+
+        $this->assertSame([], $container->getDefinition('.app.chain_without_reset.chained.0')->getTags());
+        $this->assertSame(['app.public_pool', 'app.chain', 'app.chain_without_reset'], $container->getDefinition('console.command.cache_pool_list')->getArgument(0));
+    }
+
     public function testWithNameAttribute()
     {
         $container = new ContainerBuilder();
@@ -308,10 +352,10 @@ class CachePoolPassTest extends TestCase
         $chainCachePool = $container->getDefinition('cache.chain');
         $this->assertInstanceOf(ChildDefinition::class, $chainCachePool);
         $this->assertCount(2, $chainCachePool->getArgument(0));
-        $this->assertInstanceOf(ChildDefinition::class, $chainCachePool->getArgument(0)[0]);
-        $this->assertSame('cache.adapter.array', $chainCachePool->getArgument(0)[0]->getParent());
-        $this->assertInstanceOf(ChildDefinition::class, $chainCachePool->getArgument(0)[1]);
-        $this->assertSame('cache.adapter.apcu', $chainCachePool->getArgument(0)[1]->getParent());
+        $this->assertInstanceOf(ChildDefinition::class, $arrayAdapter = $container->getDefinition((string) $chainCachePool->getArgument(0)[0]));
+        $this->assertSame('cache.adapter.array', $arrayAdapter->getParent());
+        $this->assertInstanceOf(ChildDefinition::class, $apcuAdapter = $container->getDefinition((string) $chainCachePool->getArgument(0)[1]));
+        $this->assertSame('cache.adapter.apcu', $apcuAdapter->getParent());
 
         $doctrineCachePool = $container->getDefinition('doctrine.result_cache_pool');
         $this->assertInstanceOf(ChildDefinition::class, $doctrineCachePool);
@@ -341,8 +385,8 @@ class CachePoolPassTest extends TestCase
         $parentChain = $container->getDefinition('cache.parent.chain');
         $childChain = $container->getDefinition('foobar.chained.cache');
 
-        $parentNamespace = $parentChain->getArgument(0)[0]->getArgument(0);
-        $childNamespace = $childChain->getArgument(0)[0]->getArgument(0);
+        $parentNamespace = $container->getDefinition((string) $parentChain->getArgument(0)[0])->getArgument(0);
+        $childNamespace = $container->getDefinition((string) $childChain->getArgument(0)[0])->getArgument(0);
 
         $this->assertNotSame($parentNamespace, $childNamespace);
     }
@@ -387,9 +431,9 @@ class CachePoolPassTest extends TestCase
         $this->assertEquals($expectedMarshallerRef, $container->getDefinition('cache.with_marshaller')->getArgument(3));
         $this->assertEquals($expectedMarshallerRef, $container->getDefinition('cache.apcu_with_marshaller')->getArgument(3));
 
-        $adapters = $container->getDefinition('cache.chain_with_marshaller')->getArgument(0);
-        $this->assertArrayNotHasKey('index_3', $adapters[0]->getArguments());
-        $this->assertEquals($expectedMarshallerRef, $adapters[1]->getArgument(3));
+        [$arrayAdapter, $filesystemAdapter] = $container->getDefinition('cache.chain_with_marshaller')->getArgument(0);
+        $this->assertArrayNotHasKey('index_3', $container->getDefinition((string) $arrayAdapter)->getArguments());
+        $this->assertEquals($expectedMarshallerRef, $container->getDefinition((string) $filesystemAdapter)->getArgument(3));
     }
 
     public function testChainAdapterNormalizesDefaultLifetimeDurationString()
@@ -412,7 +456,7 @@ class CachePoolPassTest extends TestCase
 
         $chainPool = $container->getDefinition('cache.chain');
         foreach ($chainPool->getArgument(0) as $innerAdapter) {
-            $this->assertInstanceOf(Definition::class, $innerAdapter);
+            $this->assertInstanceOf(Definition::class, $innerAdapter = $container->getDefinition((string) $innerAdapter));
             $arguments = $innerAdapter->getArguments();
             $lifetimeArg = $arguments[array_key_last($arguments)];
             $this->assertSame([ParameterNormalizer::class, 'normalizeDuration'], $lifetimeArg->getFactory());

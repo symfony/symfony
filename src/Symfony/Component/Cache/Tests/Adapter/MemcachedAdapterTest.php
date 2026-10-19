@@ -267,4 +267,30 @@ class MemcachedAdapterTest extends AdapterTestCase
         self::assertTrue($pool->deleteItem($key));
         self::assertFalse($pool->hasItem($key));
     }
+
+    public function testShutdownResetClosesTheConnections()
+    {
+        $client = new class extends \Memcached {
+            public int $quits = 0;
+
+            public function quit(): bool
+            {
+                ++$this->quits;
+
+                return parent::quit();
+            }
+        };
+        [$host, $port] = explode(':', getenv('MEMCACHED_HOST')) + [1 => 11211];
+        $client->addServer($host, (int) $port);
+        $cache = new MemcachedAdapter($client, str_replace('\\', '.', __CLASS__));
+        $cache->save($cache->getItem('foo')->set('bar'));
+
+        $cache->reset();
+        $this->assertSame(0, $client->quits);
+
+        $cache->reset(true);
+        $this->assertSame(1, $client->quits);
+
+        $this->assertSame('bar', $cache->getItem('foo')->get());
+    }
 }

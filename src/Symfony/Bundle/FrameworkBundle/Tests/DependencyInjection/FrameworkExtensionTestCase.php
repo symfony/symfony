@@ -1528,25 +1528,23 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertSame(ChainAdapter::class, $chain->getClass());
 
-        $this->assertCount(2, $chain->getArguments());
-        $this->assertCount(3, $chain->getArguments()[0]);
+        $this->assertEquals([[new Reference('.cache.chain.chained.0'), new Reference('.cache.chain.chained.1'), new Reference('.cache.chain.chained.2')], 12], $chain->getArguments());
 
-        $expectedSeed = $chain->getArgument(0)[1]->getArgument(0);
+        $expectedSeed = $container->getDefinition('.cache.chain.chained.1')->getArgument(0);
         $expected = [
-            [
-                (new ChildDefinition('cache.adapter.array'))
-                    ->replaceArgument(0, 12),
-                (new ChildDefinition('cache.adapter.filesystem'))
-                    ->replaceArgument(0, $expectedSeed)
-                    ->replaceArgument(1, 12),
-                (new ChildDefinition('cache.adapter.redis'))
-                    ->replaceArgument(0, new Reference('.cache_connection.'.(\count((new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()) > 2 ? 'U5HliuY' : 'kYdiLgf')))
-                    ->replaceArgument(1, $expectedSeed)
-                    ->replaceArgument(2, 12),
-            ],
-            12,
+            '.cache.chain.chained.0' => (new ChildDefinition('cache.adapter.array'))
+                ->replaceArgument(0, 12),
+            '.cache.chain.chained.1' => (new ChildDefinition('cache.adapter.filesystem'))
+                ->replaceArgument(0, $expectedSeed)
+                ->replaceArgument(1, 12),
+            '.cache.chain.chained.2' => (new ChildDefinition('cache.adapter.redis'))
+                ->replaceArgument(0, new Reference('.cache_connection.'.(\count((new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()) > 2 ? 'U5HliuY' : 'kYdiLgf')))
+                ->replaceArgument(1, $expectedSeed)
+                ->replaceArgument(2, 12),
         ];
-        $this->assertEquals($expected, $chain->getArguments());
+        foreach ($expected as $id => $adapter) {
+            $this->assertEquals($adapter->setPublic(false)->setShared(true)->addTag('kernel.reset', ['method' => 'reset', 'on_shutdown' => 'flag']), $container->getDefinition($id));
+        }
 
         // Test "tags: true" wrapping logic
         $tagAwareDefinition = $container->getDefinition('cache.ccc');

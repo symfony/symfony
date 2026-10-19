@@ -24,4 +24,12 @@ class PdoAdapterTest extends AbstractPdoAdapterTestCase
     {
         return new PdoAdapter('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
     }
+
+    public function testShutdownResetKeepsAConnectionPassedToTheConstructor()
+    {
+        $cache = new PdoAdapter($pdo = new \PDO('sqlite:'.self::$dbFile));
+        $cache->reset(true);
+
+        $this->assertSame($pdo, (new \ReflectionMethod($cache, 'getConnection'))->invoke($cache));
+    }
 }

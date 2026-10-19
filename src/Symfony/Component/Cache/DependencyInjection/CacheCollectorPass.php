@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\DependencyInjection;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\Adapter\TraceableAdapter;
 use Symfony\Component\Cache\Adapter\TraceableTagAwareAdapter;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -61,7 +62,7 @@ class CacheCollectorPass implements CompilerPassInterface
             }
         }
 
-        $definition->setTags([]);
+        $definition->setTags(array_intersect_key($definition->getTags(), ['kernel.reset' => true]));
         $definition->setPublic(false);
 
         $container->setDefinition($innerId, $definition);
@@ -69,5 +70,31 @@ class CacheCollectorPass implements CompilerPassInterface
 
         // Tell the collector to add the new instance
         $collectorDefinition->addMethodCall('addInstance', [$name, new Reference($id)]);
+
+        $this->addToResetter($id, $innerId, $container);
+    }
+
+    /**
+     * Registers the inner pool with the services resetter, as the recorder forwards the shutdown flag only to pools that implement ShutdownInterface.
+     *
+     * ResettableServicePass ran before this pass, so this updates what it produced.
+     */
+    private function addToResetter(string $id, string $innerId, ContainerBuilder $container): void
+    {
+        if (!$container->has('services_resetter')) {
+            return;
+        }
+
+        $resetter = $container->findDefinition('services_resetter');
+        $services = $resetter->getArguments()[0] ?? null;
+        $methods = $resetter->getArguments()[1] ?? null;
+
+        if (!$services instanceof IteratorArgument || !isset($methods[$id])) {
+            return;
+        }
+
+        $services->setValues($services->getValues() + [$innerId => new Reference($innerId, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE)]);
+        $methods[$innerId] = $methods[$id];
+        $resetter->replaceArgument(1, $methods);
     }
 }

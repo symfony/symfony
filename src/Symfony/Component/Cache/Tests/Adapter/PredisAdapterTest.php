@@ -148,4 +148,19 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
 
         $this->assertFalse($cache->hasItem('foo'));
     }
+
+    public function testShutdownResetDisconnects()
+    {
+        $cache = $this->createCachePool();
+        $cache->save($cache->getItem('foo')->set('bar'));
+        $this->assertTrue(self::$redis->getConnection()->isConnected());
+
+        $cache->reset();
+        $this->assertTrue(self::$redis->getConnection()->isConnected());
+
+        $cache->reset(true);
+        $this->assertFalse(self::$redis->getConnection()->isConnected());
+
+        $this->assertSame('bar', $cache->getItem('foo')->get());
+    }
 }

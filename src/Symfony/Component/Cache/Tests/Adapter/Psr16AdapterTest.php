@@ -17,6 +17,8 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Symfony\Component\Cache\Psr16Cache;
+use Symfony\Component\Cache\Tests\Fixtures\ResettableAdapter;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 #[Group('time-sensitive')]
 class Psr16AdapterTest extends AdapterTestCase
@@ -40,5 +42,27 @@ class Psr16AdapterTest extends AdapterTestCase
         $cache->save($item);
 
         $this->assertTrue($cache->getItem('my_key')->isHit(), 'Stored item is successfully retrieved.');
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwarePoolsOnly()
+    {
+        $inner = new class(new ArrayAdapter()) extends Psr16Cache implements ShutdownInterface {
+            public array $resets = [];
+
+            public function reset(bool $shutdown = false): void
+            {
+                $this->resets[] = $shutdown;
+            }
+        };
+        $pool = new Psr16Adapter($inner);
+        $pool->reset();
+        $pool->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $pool = new Psr16Adapter(new Psr16Cache($inner = new ResettableAdapter()));
+        $pool->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

@@ -86,6 +86,18 @@ trait PdoTrait
     }
 
     /**
+     * @param bool $shutdown Whether the pool is being shut down
+     */
+    public function reset(/* bool $shutdown = false */): void
+    {
+        parent::reset(...\func_get_args());
+
+        if (0 < \func_num_args() && func_get_arg(0) && isset($this->dsn)) {
+            unset($this->conn);
+        }
+    }
+
+    /**
      * Creates the table to store cache items which can be called once for setup.
      *
      * Cache IDs are saved in a column of maximum length 255. Cache data is

@@ -18,6 +18,8 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Tests\Fixtures\ResettableAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ShutdownAwareAdapter;
 
 #[Group('time-sensitive')]
 class ProxyAdapterTest extends AdapterTestCase
@@ -51,6 +53,20 @@ class ProxyAdapterTest extends AdapterTestCase
         $this->expectExceptionMessage('OK bar');
 
         $pool->save($proxyItem->set('bar'));
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwarePoolsOnly()
+    {
+        $pool = new ProxyAdapter($inner = new ShutdownAwareAdapter());
+        $pool->reset();
+        $pool->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $pool = new ProxyAdapter($inner = new ResettableAdapter());
+        $pool->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }
 

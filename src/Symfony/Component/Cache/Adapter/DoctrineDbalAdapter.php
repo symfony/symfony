@@ -44,6 +44,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
     private MarshallerInterface $marshaller;
     private Connection $conn;
+    private bool $closeOnShutdown = false;
     private string $platformName;
     private string $table = 'cache_items';
     private string $idCol = 'item_id';
@@ -104,6 +105,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
             $this->conn = DriverManager::getConnection($params, $config);
+            $this->closeOnShutdown = true;
         }
 
         $this->maxIdLength = self::MAX_KEY_LENGTH;
@@ -168,6 +170,18 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         return true;
+    }
+
+    /**
+     * @param bool $shutdown Whether the pool is being shut down
+     */
+    public function reset(/* bool $shutdown = false */): void
+    {
+        parent::reset(...\func_get_args());
+
+        if (0 < \func_num_args() && func_get_arg(0) && $this->closeOnShutdown) {
+            $this->conn->close();
+        }
     }
 
     protected function doFetch(array $ids): iterable

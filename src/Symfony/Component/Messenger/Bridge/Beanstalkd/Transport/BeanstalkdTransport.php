@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Transport;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -21,7 +22,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  */
-class BeanstalkdTransport implements TransportInterface, KeepaliveReceiverInterface, MessageCountAwareInterface
+class BeanstalkdTransport implements TransportInterface, KeepaliveReceiverInterface, MessageCountAwareInterface, CloseableTransportInterface
 {
     private SerializerInterface $serializer;
     private BeanstalkdReceiver $receiver;
@@ -67,6 +68,11 @@ class BeanstalkdTransport implements TransportInterface, KeepaliveReceiverInterf
     public function send(Envelope $envelope): Envelope
     {
         return $this->getSender()->send($envelope);
+    }
+
+    public function close(): void
+    {
+        $this->connection->close();
     }
 
     private function getReceiver(): BeanstalkdReceiver

@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdReceivedSt
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransport;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
@@ -61,6 +62,19 @@ final class BeanstalkdTransportTest extends TestCase
         $connection->expects($this->once())->method('keepalive')->with(1);
 
         $transport->keepalive(new Envelope(new DummyMessage('foo'), [new BeanstalkdReceivedStamp(1, 'bar')]));
+    }
+
+    public function testClose()
+    {
+        $transport = $this->getTransport(
+            null,
+            $connection = $this->createMock(Connection::class),
+        );
+
+        $connection->expects($this->once())->method('close');
+
+        $this->assertInstanceOf(CloseableTransportInterface::class, $transport);
+        $transport->close();
     }
 
     private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null): BeanstalkdTransport

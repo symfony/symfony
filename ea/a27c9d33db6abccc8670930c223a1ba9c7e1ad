@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by dalerazimov at 2026-10-19T09:59:08Z
+
+Yes, i think your version is better. There is no point in keeping the #59161 fallback if it breaks after a retry anyway 🤷‍♂️ I would prefer this approach

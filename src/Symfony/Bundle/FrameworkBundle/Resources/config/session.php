@@ -100,6 +100,7 @@ return static function (ContainerConfigurator $container) {
         ->set('session.abstract_handler', AbstractSessionHandler::class)
             ->factory([SessionHandlerFactory::class, 'createHandler'])
             ->args([abstract_arg('A string or a connection object'), []])
+            ->tag('kernel.reset', ['method' => 'shutdown', 'on_invalid' => 'ignore', 'on_shutdown' => 'only'])
 
         ->set('session_listener', SessionListener::class)
             ->args([

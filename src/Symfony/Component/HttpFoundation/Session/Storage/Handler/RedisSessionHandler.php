@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 use Predis\Response\ErrorInterface;
 use Relay\Relay;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Redis based session storage handler based on the Redis class
@@ -158,5 +159,15 @@ class RedisSessionHandler extends AbstractSessionHandler implements ClearableSes
                 $this->redis->del(...$keys);
             }
         } while ($cursor);
+    }
+
+    /**
+     * Closes the connection when it reconnects lazily on next use.
+     */
+    public function shutdown(): void
+    {
+        if ($this->redis instanceof ResetInterface) {
+            $this->redis->reset();
+        }
     }
 }

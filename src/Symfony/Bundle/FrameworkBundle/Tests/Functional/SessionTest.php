@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 
 class SessionTest extends AbstractWebTestCase
@@ -228,6 +229,29 @@ class SessionTest extends AbstractWebTestCase
 
         $this->assertSame($created, $metadataBag->getCreated());
         $this->assertSame($created + 3600, $metadataBag->getLastUsed());
+    }
+
+    #[RequiresPhpExtension('redis')]
+    #[Group('integration')]
+    public function testShutdownClosesTheRedisConnectionOfTheSessionHandler()
+    {
+        try {
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
+
+        self::bootKernel(['test_case' => 'Session', 'root_config' => 'config_redis.yml']);
+        $handler = self::getContainer()->get('session.handler');
+        $handler->read('id');
+        $redis = (new \ReflectionProperty($handler, 'redis'))->getValue($handler);
+
+        $this->assertTrue($redis->isLazyObjectInitialized());
+
+        self::ensureKernelShutdown();
+
+        $this->assertFalse($redis->isLazyObjectInitialized());
+        $this->assertSame('', $handler->read('id'));
     }
 
     public static function getConfigs()

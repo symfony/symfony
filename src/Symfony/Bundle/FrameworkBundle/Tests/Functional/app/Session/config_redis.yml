@@ -1,0 +1,9 @@
+imports:
+    - { resource: config.yml }
+
+parameters:
+    env(REDIS_HOST): 'localhost'
+
+framework:
+    session:
+        handler_id: 'redis://%env(REDIS_HOST)%'

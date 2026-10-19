@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mime\RawMessage;
 
 /**
@@ -69,6 +70,15 @@ class RoundRobinTransport implements TransportInterface
     public function __toString(): string
     {
         return $this->getNameSymbol().'('.implode(' ', array_map('strval', $this->transports)).')';
+    }
+
+    public function stop(): void
+    {
+        foreach ($this->transports as $transport) {
+            if ($transport instanceof SmtpTransport || $transport instanceof SendmailTransport || $transport instanceof self) {
+                $transport->stop();
+            }
+        }
     }
 
     /**

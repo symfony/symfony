@@ -22,6 +22,8 @@ CHANGELOG
  * Add `TrackingHeader` and the `mailer.tracking` option to set open and click tracking per message or for every message, mapped to the settings of the AhaSend, Azure, Brevo, Infobip, Mailchimp/Mandrill, MailerSend, Mailgun, Mailjet, Postmark and Sendgrid transports
  * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0
  * Use the global clock of symfony/clock, when installed, for the throttling of `AbstractTransport::setMaxPerSecond()` and the retry period of `RoundRobinTransport` and `FailoverTransport`
+ * Add `Transports::close()`, `RoundRobinTransport::stop()` and `SendmailTransport::stop()`
+ * Stop the SMTP transports when the kernel shuts down
 
 8.0
 ---

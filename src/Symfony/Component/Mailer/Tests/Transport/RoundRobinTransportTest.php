@@ -14,10 +14,16 @@ namespace Symfony\Component\Mailer\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Tests\Transport\Smtp\DummyStream;
+use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\RoundRobinTransport;
+use Symfony\Component\Mailer\Transport\SendmailTransport;
+use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
@@ -222,6 +228,36 @@ class RoundRobinTransportTest extends TestCase
         }
 
         $this->fail('Expected exception was not thrown!');
+    }
+
+    public function testStopStopsTheTransportsThatHoldAConnection()
+    {
+        $sendmail = $this->createMock(SendmailTransport::class);
+        $sendmail->expects($this->once())->method('stop');
+
+        $transport = new RoundRobinTransport([
+            new SmtpTransport($stream = new DummyStream()),
+            new FailoverTransport([new SmtpTransport($nestedStream = new DummyStream())]),
+            $sendmail,
+            $this->createStub(TransportInterface::class),
+        ]);
+        $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);
+
+        for ($i = 0; $i < 4; ++$i) {
+            $transport->send(new RawMessage('Message'), $envelope);
+        }
+        $this->assertFalse($stream->isClosed());
+        $this->assertFalse($nestedStream->isClosed());
+
+        $transport->stop();
+        $this->assertTrue($stream->isClosed());
+        $this->assertTrue($nestedStream->isClosed());
+
+        for ($i = 0; $i < 4; ++$i) {
+            $transport->send(new RawMessage('Message'), $envelope);
+        }
+        $this->assertFalse($stream->isClosed());
+        $this->assertFalse($nestedStream->isClosed());
     }
 
     private function assertTransports(RoundRobinTransport $transport, int $cursor, array $deadTransports)

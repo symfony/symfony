@@ -115,6 +115,35 @@ class LocaleAwareListenerTest extends TestCase
         $this->listener->onKernelFinishRequest($event);
     }
 
+    public function testLocaleAwareServicesAreIteratedOnce()
+    {
+        $this->localeAwareService->expects($this->exactly(2))->method('setLocale');
+
+        $services = new class([$this->localeAwareService]) implements \IteratorAggregate {
+            public int $iterations = 0;
+
+            public function __construct(private array $services)
+            {
+            }
+
+            public function getIterator(): \Iterator
+            {
+                ++$this->iterations;
+
+                return new \ArrayIterator($this->services);
+            }
+        };
+        $listener = new LocaleAwareListener($services, $this->requestStack);
+        $kernel = $this->createStub(HttpKernelInterface::class);
+
+        $this->requestStack->push($request = $this->createRequest('fr'));
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+        $listener->onKernelFinishRequest(new FinishRequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+        $this->requestStack->pop();
+
+        $this->assertSame(1, $services->iterations);
+    }
+
     public function testLocaleSetOutsideOfTheListenerIsRestoredAfterASubRequest()
     {
         $this->localeAwareService->expects($this->never())->method('setLocale');

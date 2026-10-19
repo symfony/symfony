@@ -21,6 +21,7 @@ use Symfony\Component\Filesystem\Path;
 class CompiledAssetMapperConfigReader
 {
     private readonly Filesystem $filesystem;
+    private array $configs = [];
 
     public function __construct(
         private readonly string $directory,
@@ -39,16 +40,20 @@ class CompiledAssetMapperConfigReader
             return false;
         }
 
-        return is_file(Path::join($this->directory, $filename));
+        return isset($this->configs[$filename]) || is_file(Path::join($this->directory, $filename));
     }
 
     public function loadConfig(string $filename): array
     {
+        if (isset($this->configs[$filename])) {
+            return $this->configs[$filename];
+        }
+
         $path = Path::join($this->directory, $filename);
 
         // modification times are in seconds: a file written during the current second could be written again without changing its key
         if (!$this->cache || false === ($mtime = @filemtime($path)) || $mtime >= time()) {
-            return $this->decode($path);
+            return $this->configs[$filename] = $this->decode($path);
         }
 
         $item = $this->cache->getItem(hash('xxh128', $path).'.'.filesize($path).'.'.$mtime);
@@ -57,11 +62,12 @@ class CompiledAssetMapperConfigReader
             $this->cache->save($item->set($this->decode($path)));
         }
 
-        return $item->get();
+        return $this->configs[$filename] = $item->get();
     }
 
     public function saveConfig(string $filename, array $data): string
     {
+        unset($this->configs[$filename]);
         $path = Path::join($this->directory, $filename);
         $this->filesystem->dumpFile($path, json_encode($data, \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR));
 
@@ -70,6 +76,7 @@ class CompiledAssetMapperConfigReader
 
     public function removeConfig(string $filename): void
     {
+        unset($this->configs[$filename]);
         $path = Path::join($this->directory, $filename);
 
         if (is_file($path)) {

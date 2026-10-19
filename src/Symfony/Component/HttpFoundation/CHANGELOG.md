@@ -22,6 +22,7 @@ CHANGELOG
  * Accept the 308 status code in `Response::isCacheable()`
  * Stop adding a default `Cache-Control: no-cache, private` header to 308 `RedirectResponse` instances
  * Add argument `$clock` to `MetadataBag::__construct()`
+ * Add `RedisSessionHandler::shutdown()` to close lazy connections
 
 8.1
 ---

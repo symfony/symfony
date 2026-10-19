@@ -834,6 +834,14 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('%kernel.runtime_mode.web%', $container->getDefinition('debug.debug_handlers_listener')->getArgument(1));
     }
 
+    public function testDebugHandlersListenerIsReset()
+    {
+        $container = $this->createContainer();
+        (new FrameworkExtension())->load([], $container);
+
+        $this->assertSame([['method' => 'reset']], $container->getDefinition('debug.debug_handlers_listener')->getTag('kernel.reset'));
+    }
+
     public function testExceptionsConfig()
     {
         $container = $this->createContainerFromFile('exceptions');

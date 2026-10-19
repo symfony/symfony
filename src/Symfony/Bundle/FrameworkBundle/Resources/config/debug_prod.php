@@ -34,6 +34,7 @@ return static function (ContainerConfigurator $container) {
         ->set('debug.debug_handlers_listener', DebugHandlersListener::class)
             ->args([null, param('kernel.runtime_mode.web')])
             ->tag('kernel.event_subscriber')
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('debug.file_link_formatter', FileLinkFormatter::class)
             ->args([param('debug.file_link_format')])

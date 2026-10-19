@@ -22,6 +22,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterGlobalSec
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterLdapLocatorPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterTokenUsageTrackingPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RemoveSecurityDataCollectorListenerPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RemoveUnusedChannelListenerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\ReplaceDecoratedRememberMeHandlerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\SortFirewallListenersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\CasTokenHandlerFactory;
@@ -103,6 +104,8 @@ class SecurityBundle extends Bundle
         $container->addCompilerPass(new RegisterGlobalSecurityEventListenersPass(), PassConfig::TYPE_BEFORE_REMOVING, -200);
         // execute after ResolveChildDefinitionsPass optimization pass, to ensure class names are set
         $container->addCompilerPass(new SortFirewallListenersPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        // execute after DecoratorServicePass, so that a decorated access map is seen
+        $container->addCompilerPass(new RemoveUnusedChannelListenerPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new ReplaceDecoratedRememberMeHandlerPass(), PassConfig::TYPE_OPTIMIZE);
         $container->addCompilerPass(new RegisterDebugRoleHierarchyPass(), PassConfig::TYPE_OPTIMIZE);
 

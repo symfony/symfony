@@ -18,6 +18,8 @@ use Symfony\Component\Finder\Gitignore;
  */
 final class VcsIgnoredFilterIterator extends \FilterIterator
 {
+    private string $searchDir;
+    private string $realSearchDir;
     private string $baseDir;
     private ?string $gitInfoExcludeFile = null;
 
@@ -36,8 +38,9 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
      */
     public function __construct(\Iterator $iterator, string $baseDir)
     {
-        // paths are compared to the real path of each file, so the base directory needs the same treatment
+        $this->searchDir = rtrim($this->normalizePath($baseDir), '/').'/';
         $this->baseDir = $this->normalizePath(realpath($baseDir) ?: $baseDir);
+        $this->realSearchDir = rtrim($this->baseDir, '/').'/';
 
         foreach ([$this->baseDir, ...$this->parentDirectoriesUpwards($this->baseDir)] as $directory) {
             if (@file_exists("{$directory}/.git")) {
@@ -52,21 +55,24 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
 
     public function accept(): bool
     {
-        $file = $this->current();
+        $path = $this->normalizePath($this->current()->getPathname());
 
-        $fileRealPath = $this->normalizePath($file->getRealPath());
+        // git matches a symlink by its own path, so only the search directory is resolved
+        if (str_starts_with($path, $this->searchDir)) {
+            $path = $this->realSearchDir.substr($path, \strlen($this->searchDir));
+        }
 
-        return !$this->isIgnored($fileRealPath);
+        return !$this->isIgnored($path);
     }
 
-    private function isIgnored(string $fileRealPath): bool
+    private function isIgnored(string $path): bool
     {
-        if (isset($this->ignoredPathsCache[$fileRealPath])) {
-            return $this->ignoredPathsCache[$fileRealPath];
+        if (isset($this->ignoredPathsCache[$path])) {
+            return $this->ignoredPathsCache[$path];
         }
 
         $ignored = false;
-        $parentDirectories = $this->parentDirectoriesDownwards($fileRealPath);
+        $parentDirectories = $this->parentDirectoriesDownwards($path);
 
         if ($parentDirectories && $this->baseDir !== $parentDirectory = $parentDirectories[\count($parentDirectories) - 1]) {
             // paths inside an ignored directory are ignored and cannot be re-included
@@ -74,7 +80,7 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
         }
 
         if (!$ignored) {
-            $isDir = is_dir($fileRealPath);
+            $isDir = !is_link($path) && is_dir($path);
             $gitignoreFiles = [];
 
             foreach (array_reverse($parentDirectories) as $parentDirectory) {
@@ -91,7 +97,7 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
                     continue;
                 }
 
-                $fileRelativePath = substr($fileRealPath, \strlen($parentDirectory) + 1);
+                $fileRelativePath = substr($path, \strlen($parentDirectory) + 1);
 
                 foreach ($rules as [$regex, $isNegated, $isDirOnly]) {
                     if ($isDirOnly && !$isDir) {
@@ -107,7 +113,7 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
             }
         }
 
-        return $this->ignoredPathsCache[$fileRealPath] = $ignored;
+        return $this->ignoredPathsCache[$path] = $ignored;
     }
 
     /**

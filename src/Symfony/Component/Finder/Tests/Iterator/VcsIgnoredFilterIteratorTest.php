@@ -501,7 +501,7 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
         touch("{$this->tmpDir}/b.txt");
         file_put_contents("{$this->tmpDir}/.gitignore", "a/\n");
 
-        $link = "{$this->tmpDir}_link";
+        $link = \dirname($this->tmpDir).'/symfony_finder_vcs_link';
         symlink($this->tmpDir, $link);
 
         try {
@@ -711,6 +711,48 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
         }
     }
 
+    public function testAcceptMatchesSymlinksAgainstTheirOwnPath()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('symlinks are not supported on Windows');
+        }
+
+        file_put_contents("{$this->tmpDir}/.gitignore", "/build/\n/vendor/\n/dir-link/\n*.lnk\n");
+        mkdir("{$this->tmpDir}/build");
+        mkdir("{$this->tmpDir}/src");
+        mkdir("{$this->tmpDir}/vendor");
+        touch("{$this->tmpDir}/build/generated.php");
+        touch("{$this->tmpDir}/src/app.php");
+        symlink('../src/app.php', "{$this->tmpDir}/build/app.php");
+        symlink('../build/generated.php', "{$this->tmpDir}/src/generated.php");
+        symlink('../build', "{$this->tmpDir}/src/build");
+        symlink(__DIR__, "{$this->tmpDir}/vendor/outside");
+        symlink('src', "{$this->tmpDir}/dir-link");
+        symlink('src/app.php', "{$this->tmpDir}/app.lnk");
+
+        $inner = new InnerNameIterator($this->toAbsolute([
+            'build/app.php',
+            'src/generated.php',
+            'src/build',
+            'src/build/generated.php',
+            'vendor/outside',
+            'vendor/outside/InnerNameIterator.php',
+            'dir-link',
+            'dir-link/app.php',
+            'app.lnk',
+        ]));
+
+        $iterator = new VcsIgnoredFilterIterator($inner, $this->tmpDir);
+
+        $this->assertIterator($this->toAbsolute([
+            'src/generated.php',
+            'src/build',
+            'src/build/generated.php',
+            'dir-link',
+            'dir-link/app.php',
+        ]), $iterator);
+    }
+
     private function toAbsolute(array $files): array
     {
         foreach ($files as &$path) {
@@ -723,12 +765,10 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
     private function removeDirectory(string $dir): void
     {
         foreach ((new Finder())->in($dir)->ignoreDotFiles(false)->ignoreVCS(false)->depth('< 1') as $file) {
-            $path = $file->getRealPath();
-
-            if ($file->isDir()) {
-                $this->removeDirectory($path);
+            if ($file->isLink() || !$file->isDir()) {
+                unlink($file->getPathname());
             } else {
-                unlink($path);
+                $this->removeDirectory($file->getRealPath());
             }
         }
 

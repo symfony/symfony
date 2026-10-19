@@ -91,7 +91,7 @@ class FormRenderer implements FormRendererInterface
 
         // Do not use array_replace_recursive(), otherwise array variables
         // cannot be overwritten
-        $variables = array_replace($scopeVariables, $variables);
+        $variables = $variables ? array_replace($scopeVariables, $variables) : $scopeVariables;
 
         $this->variableStack[$viewCacheKey][] = $variables;
 
@@ -220,7 +220,7 @@ class FormRenderer implements FormRendererInterface
 
         // Do not use array_replace_recursive(), otherwise array variables
         // cannot be overwritten
-        $variables = array_replace($scopeVariables, $variables);
+        $variables = $variables ? array_replace($scopeVariables, $variables) : $scopeVariables;
 
         // In order to make recursive calls possible, we need to store the block hierarchy,
         // the current level of the hierarchy and the variables so that this method can

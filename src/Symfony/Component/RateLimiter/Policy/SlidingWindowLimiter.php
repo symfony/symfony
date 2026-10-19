@@ -83,7 +83,8 @@ final class SlidingWindowLimiter implements LimiterInterface
             } else {
                 $waitDuration = $window->calculateTimeForTokens($this->limit, $tokens);
 
-                if (null !== $maxTime && $waitDuration > $maxTime) {
+                // the tokens are not available yet, even when the computed wait is 0 at the end of a window
+                if (null !== $maxTime && (0.0 === $maxTime || $waitDuration > $maxTime)) {
                     // process needs to wait longer than set interval
                     throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
                 }

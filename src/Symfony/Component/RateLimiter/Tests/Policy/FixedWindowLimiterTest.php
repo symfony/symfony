@@ -359,6 +359,22 @@ class FixedWindowLimiterTest extends TestCase
         }
     }
 
+    public function testConsumeRefusedAtTheEndOfTheWindowDoesNotRecordTheHits()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(5);
+        sleep(30);
+        $limiter->consume(5);
+        sleep(30);
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+
+        sleep(1);
+        $this->assertTrue($limiter->consume(10)->isAccepted());
+    }
+
     public static function provideConsumeOutsideInterval(): \Generator
     {
         yield ['PT15S'];

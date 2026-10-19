@@ -161,6 +161,20 @@ class SlidingWindowLimiterTest extends TestCase
         }
     }
 
+    public function testConsumeRefusedAtTheEndOfTheWindowDoesNotRecordTheHits()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+        sleep(12);
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+
+        sleep(1);
+        $this->assertTrue($limiter->consume()->isAccepted());
+    }
+
     private function createLimiter(): SlidingWindowLimiter
     {
         return new SlidingWindowLimiter('test', 10, new \DateInterval('PT12S'), $this->storage);

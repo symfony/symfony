@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-19T05:56:24Z
+
+Thanks @chr-hertel. I pushed a change that also checks the key type. A collapsed node always gets key 0. So when keys must be strings, the array is the map itself. This fixes `array<string, list<int>>` too, and `array<string, Foo>`, which never worked from XML. A list still wraps a node with attributes. So `<ints id="1">2</ints>` still fails, like two such nodes do. Before, it gave `['@id' => 1, '#' => 2]`.

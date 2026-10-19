@@ -23,6 +23,11 @@ use Symfony\Component\ErrorHandler\ErrorHandler;
  */
 class ErrorHandlerConfigurator
 {
+    /**
+     * @var \WeakMap<ErrorHandler, array<LoggerInterface>>
+     */
+    private static \WeakMap $installedLoggers;
+
     private array|int|null $levels;
     private ?int $throwAt;
 
@@ -77,6 +82,18 @@ class ErrorHandlerConfigurator
 
     private function setDefaultLoggers(ErrorHandler $handler): void
     {
+        // Release the loggers that the configurator of a previous container installed
+        $installedLoggers = (self::$installedLoggers ??= new \WeakMap())[$handler] ?? [];
+        $releasedLoggers = [];
+        foreach ($handler->setLoggers([]) as $type => [$logger]) {
+            if (null !== $logger && $logger === ($installedLoggers[$type] ?? null)) {
+                $releasedLoggers[$type] = [null];
+            }
+        }
+        if ($releasedLoggers) {
+            $handler->setLoggers($releasedLoggers);
+        }
+
         if (\is_array($this->levels)) {
             $levelsDeprecatedOnly = [];
             $levelsWithoutDeprecated = [];
@@ -101,5 +118,13 @@ class ErrorHandlerConfigurator
         if ($this->logger && $defaultLoggerLevels) {
             $handler->setDefaultLogger($this->logger, $defaultLoggerLevels);
         }
+
+        $installedLoggers = [];
+        foreach ($handler->setLoggers([]) as $type => [$logger]) {
+            if ($logger instanceof LoggerInterface && ($logger === $this->logger || $logger === $this->deprecationLogger)) {
+                $installedLoggers[$type] = $logger;
+            }
+        }
+        self::$installedLoggers[$handler] = $installedLoggers;
     }
 }

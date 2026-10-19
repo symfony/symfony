@@ -523,7 +523,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             default => [$type],
         };
 
+        $originalData = $data;
         foreach ($types as $t) {
+            // each type of a union gets the data as given, not as changed for the previous type
+            $data = $originalData;
+
             if (null === $data && $type->isNullable()) {
                 return null;
             }
@@ -546,7 +550,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             // Fix a collection that contains the only one element
             // This is special to xml format only
-            if ('xml' === $format && $collectionValueType && (!\is_array($data) || !\is_int(key($data))) && !$collectionValueType->isIdentifiedBy(TypeIdentifier::MIXED)) {
+            // An array with non-int keys is such an element only when the collection accepts int keys, and either rejects string keys or accepts array or object elements
+            if ('xml' === $format && $collectionValueType && (!\is_array($data) || (!\is_int(key($data)) && $collectionKeyType->isIdentifiedBy(TypeIdentifier::INT) && (!$collectionKeyType->isIdentifiedBy(TypeIdentifier::STRING) || $collectionValueType->isIdentifiedBy(TypeIdentifier::ARRAY, TypeIdentifier::ITERABLE, TypeIdentifier::OBJECT)))) && !$collectionValueType->isIdentifiedBy(TypeIdentifier::MIXED)) {
                 $data = [$data];
             }
 

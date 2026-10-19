@@ -17,9 +17,12 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -179,6 +182,33 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertNull(static::getContainer()->get('security.helper')->getUser());
         $this->assertSame(['message' => 'Logout successful'], json_decode($response->getContent(), true));
+    }
+
+    public function testExpressionsDecideForTheTokenPassedToTheAccessDecisionManager()
+    {
+        $kernel = self::createKernel(['test_case' => 'SecurityHelper', 'root_config' => 'config.yml']);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $tokenStorage = $container->get('functional.test.security.token_storage');
+        $accessDecisionManager = $container->get('functional.test.security.access_decision_manager');
+
+        $authorizationChecker = new AuthorizationChecker($tokenStorage, $accessDecisionManager);
+        $checks = [];
+        $decoratedAuthorizationChecker = $this->createStub(AuthorizationCheckerInterface::class);
+        $decoratedAuthorizationChecker->method('isGranted')->willReturnCallback(static function (...$args) use (&$checks, $authorizationChecker) {
+            $checks[] = $args[0];
+
+            return $authorizationChecker->isGranted(...$args);
+        });
+        $container->get('test.service_container')->set('security.authorization_checker', $decoratedAuthorizationChecker);
+
+        $admin = new UsernamePasswordToken(new InMemoryUser('admin', null, ['ROLE_ADMIN']), 'main', ['ROLE_ADMIN']);
+        $tokenStorage->setToken($admin);
+        $user = new UsernamePasswordToken(new InMemoryUser('user', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
+
+        $this->assertTrue($accessDecisionManager->decide($admin, [new Expression('is_granted("ROLE_ADMIN")')]));
+        $this->assertFalse($accessDecisionManager->decide($user, [new Expression('is_granted("ROLE_ADMIN")')]));
+        $this->assertSame(['ROLE_ADMIN'], $checks);
     }
 }
 

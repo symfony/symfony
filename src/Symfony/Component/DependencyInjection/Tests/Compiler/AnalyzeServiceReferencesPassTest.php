@@ -109,6 +109,32 @@ class AnalyzeServiceReferencesPassTest extends TestCase
         $this->assertTrue($edges[1]->isLazy());
     }
 
+    public function testProcessMarksEdgesLazyWhenReferencedFromLazyClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a');
+        $container->register('b');
+        $container->register('c');
+
+        $container
+            ->register('d')
+            ->addArgument((new Definition('Closure'))->setFactory(['Closure', 'fromCallable'])->setArguments([[$ref1 = new Reference('a'), 'foo']]))
+            ->addArgument((new Definition('Closure'))->setFactory(['Closure', 'fromCallable'])->setArguments([[$ref2 = new Reference('b'), 'foo']])->setLazy(true))
+            ->addArgument((new Definition('Countable'))->setFactory(['Closure', 'fromCallable'])->setArguments([[$ref3 = new Reference('c'), 'foo']]))
+        ;
+
+        $graph = $this->process($container);
+
+        $this->assertCount(3, $edges = $graph->getNode('d')->getOutEdges());
+
+        $this->assertSame($ref1, $edges[0]->getValue());
+        $this->assertFalse($edges[0]->isLazy());
+        $this->assertSame($ref2, $edges[1]->getValue());
+        $this->assertTrue($edges[1]->isLazy());
+        $this->assertSame($ref3, $edges[2]->getValue());
+        $this->assertTrue($edges[2]->isLazy());
+    }
+
     public function testProcessDetectsReferencesFromInlinedDefinitions()
     {
         $container = new ContainerBuilder();

@@ -243,6 +243,10 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\A as ServiceLoc
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\B as ServiceLocatorB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\ConditionCallable;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\TransformCallable;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SkippedPromotedMap\MappedThenRejectedTarget as SkippedPromotedMapMappedThenRejectedTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SkippedPromotedMap\MappedThenSkippedTarget as SkippedPromotedMapMappedThenSkippedTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SkippedPromotedMap\SkippedTarget as SkippedPromotedMapSkippedTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SkippedPromotedMap\Source as SkippedPromotedMapSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\Lead as SourceCarriesMetadataLead;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\LeadDto as SourceCarriesMetadataLeadDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\TypeDto as SourceCarriesMetadataTypeDto;
@@ -1601,6 +1605,29 @@ final class ObjectMapperTest extends TestCase
         $target = $mapper->map(new ExplicitTargetPriorityChildSource());
 
         $this->assertSame('from-customerEmail', $target->email);
+    }
+
+    #[DataProvider('provideTargetsWithASkippedSecondMapOfAPromotedProperty')]
+    public function testSkippedMapKeepsTheValueOfAnEarlierMapOfAPromotedProperty(string $targetClass)
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new SkippedPromotedMapSource(), $targetClass);
+        $this->assertSame('one', $target->value);
+    }
+
+    public static function provideTargetsWithASkippedSecondMapOfAPromotedProperty(): iterable
+    {
+        yield 'if false' => [SkippedPromotedMapMappedThenSkippedTarget::class];
+        yield 'failing condition' => [SkippedPromotedMapMappedThenRejectedTarget::class];
+    }
+
+    public function testSkippedMapOfAPromotedPropertyFallsBackToTheConstructorDefault()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new SkippedPromotedMapSource(), SkippedPromotedMapSkippedTarget::class);
+        $this->assertSame('default', $target->one);
     }
 
     public function testConditionalMappingAppliedToConstructorArguments()

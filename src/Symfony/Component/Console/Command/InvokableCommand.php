@@ -38,6 +38,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class InvokableCommand implements SignalableCommandInterface
 {
+    /**
+     * @var list<array{?object, Command}>
+     */
+    private static array $running = [];
+
     private readonly ?SignalableCommandInterface $signalableCommand;
     private readonly \ReflectionFunction $invokable;
     /**
@@ -64,7 +69,13 @@ class InvokableCommand implements SignalableCommandInterface
      */
     public function __invoke(InputInterface $input, OutputInterface $output): int
     {
-        $statusCode = $this->invokable->invoke(...$this->getParameters($this->invokable, $input, $output));
+        self::$running[] = [$this->invokable->getClosureThis(), $this->command];
+
+        try {
+            $statusCode = $this->invokable->invoke(...$this->getParameters($this->invokable, $input, $output));
+        } finally {
+            array_pop(self::$running);
+        }
 
         if (!\is_int($statusCode)) {
             throw new \TypeError(\sprintf('The command "%s" must return an integer value in the "%s" method, but "%s" was returned.', $this->command->getName(), $this->invokable->getName(), get_debug_type($statusCode)));
@@ -125,6 +136,20 @@ class InvokableCommand implements SignalableCommandInterface
     public function getCode(): callable
     {
         return $this->code;
+    }
+
+    /**
+     * Returns the command that is currently running the given object, if any.
+     */
+    public static function getRunningCommand(object $code): ?Command
+    {
+        for ($i = \count(self::$running) - 1; 0 <= $i; --$i) {
+            if ($code === self::$running[$i][0]) {
+                return self::$running[$i][1];
+            }
+        }
+
+        return null;
     }
 
     private function getClosure(callable $code): \Closure

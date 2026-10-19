@@ -1483,6 +1483,26 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals('', $actual->value->value);
     }
 
+    public function testDenormalizeStringKeyedCollectionDecodedFromXml()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), new BackedEnumNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $actual = $serializer->denormalize(['children' => ['a' => ['bar' => 'first']], 'enums' => ['a' => 'a'], 'strings' => ['a' => 'first']], StringKeyedCollectionsDummy::class, 'xml');
+
+        $child = new DummyChild();
+        $child->bar = 'first';
+        $this->assertEquals(['a' => $child], $actual->children);
+        $this->assertSame(['a' => EnumA::A], $actual->enums);
+        $this->assertSame(['a' => 'first'], $actual->strings);
+    }
+
+    public function testDenormalizeUnionOfCollectionAndScalarDecodedFromXml()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $actual = $serializer->denormalize(['children' => 'plain'], DummyWithChildrenOrString::class, 'xml');
+
+        $this->assertSame('plain', $actual->children);
+    }
+
     public function testDebugTraceIdDoesNotChangeContextCacheKey()
     {
         $normalizer = new class extends AbstractObjectNormalizerDummy {
@@ -1708,6 +1728,41 @@ class AbstractObjectNormalizerTest extends TestCase
         $dummy = $normalizer->denormalize(['ints' => ['1', '2']], ScalarCollectionsDummy::class, 'xml');
 
         $this->assertSame([1, 2], $dummy->ints);
+    }
+
+    public function testDenormalizeNestedScalarCollectionDecodedFromXml()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $episodes = [['@system' => 'xmltv_ns', '#' => '3.4.0/1'], ['@system' => 'onscreen', '#' => 'S04E05']];
+        $dummy = $normalizer->denormalize(['stringMaps' => $episodes], ScalarCollectionsDummy::class, 'xml');
+        $this->assertSame($episodes, $dummy->stringMaps);
+
+        // a single node is decoded as the element itself instead of a list
+        $dummy = $normalizer->denormalize(['stringMaps' => $episodes[1]], ScalarCollectionsDummy::class, 'xml');
+        $this->assertSame([$episodes[1]], $dummy->stringMaps);
+    }
+
+    public function testDenormalizeStringKeyedScalarCollectionDecodedFromXml()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $dummy = $normalizer->denormalize(['bools' => ['a' => 'true'], 'intsByName' => ['a' => ['1', '2'], 'b' => '3']], ScalarCollectionsDummy::class, 'xml', [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => true]);
+
+        $this->assertSame(['a' => true], $dummy->bools);
+        $this->assertSame(['a' => [1, 2], 'b' => [3]], $dummy->intsByName);
+    }
+
+    public function testDenormalizeEnforcesScalarListElementTypeOnSingleNodeDecodedFromXml()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        try {
+            $normalizer->denormalize(['ints' => ['@id' => '1', '#' => '2']], ScalarCollectionsDummy::class, 'xml');
+            $this->fail(\sprintf('A "%s" should have been thrown.', NotNormalizableValueException::class));
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame('ints[0]', $e->getPath());
+        }
     }
 
     public function testDenormalizeEnforcesScalarCollectionElementType()
@@ -2628,6 +2683,31 @@ class DummyChild
     public $bar;
 }
 
+class StringKeyedCollectionsDummy
+{
+    /** @var array<string, DummyChild> */
+    public array $children = [];
+
+    /** @var array<string, EnumA> */
+    public array $enums = [];
+
+    /** @var array<string, string> */
+    public array $strings = [];
+}
+
+class DummyChildWithConstructor
+{
+    public function __construct(public string $bar)
+    {
+    }
+}
+
+class DummyWithChildrenOrString
+{
+    /** @var DummyChildWithConstructor[]|string */
+    public array|string $children = [];
+}
+
 class XmlScalarDummy
 {
     #[SerializedName('#')]
@@ -2892,6 +2972,9 @@ class ScalarCollectionsDummy
 
     /** @var array<string, list<int>> */
     public array $intsByName = [];
+
+    /** @var array<string, string>[] */
+    public array $stringMaps = [];
 }
 
 class UnionCollectionDocBlockDummy

@@ -211,12 +211,16 @@ return static function (ContainerConfigurator $container) {
                 service('security.authentication.trust_resolver'),
                 service('security.authorization_checker'),
                 service('security.role_hierarchy')->nullOnInvalid(),
+                service('security.access.decision_manager'),
+                service('security.token_storage'),
             ])
             ->tag('security.voter', ['priority' => 245])
 
         ->set('security.access.closure_voter', ClosureVoter::class)
             ->args([
                 service('security.authorization_checker'),
+                service('security.access.decision_manager'),
+                service('security.token_storage'),
             ])
             ->tag('security.voter', ['priority' => 245])
 

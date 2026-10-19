@@ -17,12 +17,16 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Tests\Fixtures\DummyVoter;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class TraceableAccessDecisionManagerTest extends TestCase
 {
@@ -257,6 +261,18 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 'result' => true,
             ],
         ], $sut->getDecisionLog());
+    }
+
+    public function testAFinishedAccessDecisionIsNotReused()
+    {
+        $sut = new TraceableAccessDecisionManager(new AccessDecisionManager([new RoleVoter()]));
+        $token = new UsernamePasswordToken(new InMemoryUser('john', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
+
+        $this->assertTrue($sut->decide($token, ['ROLE_USER'], null, $accessDecision = new AccessDecision()));
+        $this->assertFalse($sut->decide($token, ['ROLE_ADMIN']));
+
+        $this->assertTrue($accessDecision->isGranted);
+        $this->assertCount(1, $accessDecision->votes);
     }
 
     public function testCustomAccessDecisionManagerReturnsEmptyStrategy()

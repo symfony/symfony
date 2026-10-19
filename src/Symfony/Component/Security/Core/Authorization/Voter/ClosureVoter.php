@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\NestedAuthorizationChecker;
+use Symfony\Component\Security\Core\Authorization\TokenAuthorizationChecker;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Attribute\IsGrantedContext;
 
@@ -28,6 +31,8 @@ final class ClosureVoter implements CacheableVoterInterface
 {
     public function __construct(
         private AuthorizationCheckerInterface $authorizationChecker,
+        private ?AccessDecisionManagerInterface $accessDecisionManager = null,
+        private ?TokenStorageInterface $tokenStorage = null,
     ) {
     }
 
@@ -53,7 +58,7 @@ final class ClosureVoter implements CacheableVoterInterface
 
             $name = (new \ReflectionFunction($attribute))->name;
             $result = VoterInterface::ACCESS_DENIED;
-            $authorizationChecker = new NestedAuthorizationChecker($this->authorizationChecker);
+            $authorizationChecker = new NestedAuthorizationChecker($this->accessDecisionManager ? new TokenAuthorizationChecker($token, $this->accessDecisionManager, $this->authorizationChecker, $this->tokenStorage) : $this->authorizationChecker);
 
             if ($attribute(new IsGrantedContext($token, $token->getUser(), $authorizationChecker), $subject)) {
                 if ($vote) {

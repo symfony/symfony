@@ -106,4 +106,22 @@ class ClosureVoterTest extends TestCase
         yield 'stale admin' => ['ROLE_ADMIN', AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY];
         yield 'not an admin' => ['ROLE_USER', null];
     }
+
+    public function testChecksDecideForTheVotedToken()
+    {
+        $tokenStorage = new TokenStorage();
+        $accessDecisionManager = new AccessDecisionManager([new RoleVoter()]);
+        $voter = new ClosureVoter(new AuthorizationChecker($tokenStorage, $accessDecisionManager), $accessDecisionManager, $tokenStorage);
+
+        $admin = new UsernamePasswordToken(new InMemoryUser('admin', null, ['ROLE_ADMIN']), 'main', ['ROLE_ADMIN']);
+        $user = new UsernamePasswordToken(new InMemoryUser('user', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
+        $isAdmin = static fn (IsGrantedContext $context) => $context->isGranted('ROLE_ADMIN');
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($admin, null, [$isAdmin]));
+
+        $tokenStorage->setToken($admin);
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($admin, null, [$isAdmin]));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($user, null, [$isAdmin]));
+    }
 }

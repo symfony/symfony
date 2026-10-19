@@ -34,9 +34,11 @@ class FrankenPhpWorkerRunnerTest extends TestCase
 {
     public static ?array $gcStatus = null;
     public static int $gcCollections = 0;
+    public static ?int $requests = null;
 
     protected function tearDown(): void
     {
+        self::$requests = null;
         unset($_SERVER['FRANKENPHP_RESET_KERNEL'], $_SERVER['APP_RUNTIME_MODE']);
         self::$gcStatus = null;
         self::$gcCollections = 0;
@@ -186,5 +188,17 @@ class FrankenPhpWorkerRunnerTest extends TestCase
         $runner = new FrankenPhpWorkerRunner($application, 500);
         $this->assertSame(0, $runner->run());
         $this->assertSame(1, self::$gcCollections);
+    }
+
+    public function testRunDoesNotTerminateTheLastRequestAgainWhenTheWorkerStops()
+    {
+        $application = $this->createMock(TestAppInterface::class);
+        $application->expects($this->exactly(2))->method('handle')->willReturn(new Response());
+        $application->expects($this->exactly(2))->method('terminate');
+
+        self::$requests = 2;
+
+        $runner = new FrankenPhpWorkerRunner($application, 500);
+        $this->assertSame(0, $runner->run());
     }
 }

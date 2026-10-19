@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -91,6 +92,57 @@ class ExpressionVoterTest extends TestCase
         $voter = new ExpressionVoter(new ExpressionLanguage(), new AuthenticationTrustResolver(300), $this->createNestedAuthorizationChecker($token));
 
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($token, new InMemoryUser('jane', 'password', ['ROLE_ADMIN']), [new Expression("auth_checker.isGrantedForUser(subject, 'ROLE_ADMIN')")]));
+    }
+
+    public function testChecksDecideForTheVotedToken()
+    {
+        $tokenStorage = new TokenStorage();
+        $trustResolver = new AuthenticationTrustResolver();
+        $accessDecisionManager = new AccessDecisionManager([new RoleVoter(), new AuthenticatedVoter($trustResolver)]);
+        $voter = new ExpressionVoter(new ExpressionLanguage(), $trustResolver, new AuthorizationChecker($tokenStorage, $accessDecisionManager), null, $accessDecisionManager);
+
+        $admin = new UsernamePasswordToken(new InMemoryUser('admin', null, ['ROLE_ADMIN']), 'main', ['ROLE_ADMIN']);
+        $user = new UsernamePasswordToken(new InMemoryUser('user', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
+        $rememberedUser = new RememberMeToken(new InMemoryUser('user', null, ['ROLE_USER']), 'main');
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($admin, null, [new Expression('is_granted("ROLE_ADMIN")')]));
+
+        $tokenStorage->setToken($admin);
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($user, null, [new Expression('is_granted("ROLE_ADMIN")')]));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($rememberedUser, null, [new Expression('is_fully_authenticated()')]));
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($rememberedUser, null, [new Expression('is_remember_me()')]));
+    }
+
+    public function testChecksOfTheLoggedInTokenGoThroughTheAuthorizationChecker()
+    {
+        $tokenStorage = new TokenStorage();
+        $accessDecisionManager = new AccessDecisionManager([new RoleVoter()]);
+        $authorizationChecker = new AuthorizationChecker($tokenStorage, $accessDecisionManager);
+        $checks = [];
+        $decoratedAuthorizationChecker = $this->createStub(AuthorizationCheckerInterface::class);
+        $decoratedAuthorizationChecker->method('isGranted')->willReturnCallback(static function (...$args) use (&$checks, $authorizationChecker) {
+            $checks[] = $args[0];
+
+            return $authorizationChecker->isGranted(...$args);
+        });
+        $voter = new ExpressionVoter(new ExpressionLanguage(), new AuthenticationTrustResolver(), $decoratedAuthorizationChecker, null, $accessDecisionManager, $tokenStorage);
+
+        $admin = new UsernamePasswordToken(new InMemoryUser('admin', null, ['ROLE_ADMIN']), 'main', ['ROLE_ADMIN']);
+        $user = new UsernamePasswordToken(new InMemoryUser('user', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
+        $tokenWithoutUser = new class(['ROLE_ADMIN']) extends AbstractToken {};
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(new NullToken(), null, [new Expression('is_granted("ROLE_USER")')]));
+
+        $tokenStorage->setToken($admin);
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($admin, null, [new Expression('is_granted("ROLE_ADMIN")')]));
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($user, null, [new Expression('is_granted("ROLE_ADMIN")')]));
+
+        $tokenStorage->setToken($tokenWithoutUser);
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($tokenWithoutUser, null, [new Expression('is_granted("ROLE_ADMIN")')]));
+        $this->assertSame(['ROLE_USER', 'ROLE_ADMIN', 'ROLE_ADMIN'], $checks);
     }
 
     protected function getTokenWithRoleNames(array $roles, $tokenExpectsGetRoles = true)

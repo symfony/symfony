@@ -49,6 +49,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('transports'),
             ])
+            ->tag('kernel.reset', ['method' => 'close', 'on_shutdown' => 'only'])
 
         ->set('mailer.transport_factory', Transport::class)
             ->args([

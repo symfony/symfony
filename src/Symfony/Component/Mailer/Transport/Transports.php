@@ -15,6 +15,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
@@ -71,5 +72,17 @@ final class Transports implements TransportInterface
     public function __toString(): string
     {
         return '['.implode(',', array_keys($this->transports)).']';
+    }
+
+    /**
+     * Stops the SMTP transports, which reconnect on the next message.
+     */
+    public function close(): void
+    {
+        foreach ($this->transports as $transport) {
+            if ($transport instanceof SmtpTransport || $transport instanceof SendmailTransport || $transport instanceof RoundRobinTransport) {
+                $transport->stop();
+            }
+        }
     }
 }

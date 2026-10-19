@@ -12,13 +12,20 @@
 namespace Symfony\Component\Mailer\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Tests\DummyTransport;
+use Symfony\Component\Mailer\Tests\Transport\Smtp\DummyStream;
+use Symfony\Component\Mailer\Transport\RoundRobinTransport;
+use Symfony\Component\Mailer\Transport\SendmailTransport;
+use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mailer\Transport\Transports;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\TextPart;
+use Symfony\Component\Mime\RawMessage;
 
 class TransportsTest extends TestCase
 {
@@ -88,5 +95,27 @@ class TransportsTest extends TestCase
         } finally {
             $this->assertSame('foo', $email->getHeaders()->getHeaderBody('X-Transport'));
         }
+    }
+
+    public function testCloseStopsTheTransportsThatHoldAConnection()
+    {
+        $sendmail = $this->createMock(SendmailTransport::class);
+        $sendmail->expects($this->once())->method('stop');
+
+        $transports = new Transports([
+            'smtp' => $smtp = new SmtpTransport($smtpStream = new DummyStream()),
+            'roundrobin' => new RoundRobinTransport([$roundRobinSmtp = new SmtpTransport($roundRobinStream = new DummyStream())]),
+            'sendmail' => $sendmail,
+            'dummy' => new DummyTransport('localhost'),
+        ]);
+        $smtp->start();
+        $roundRobinSmtp->start();
+
+        $transports->close();
+        $this->assertTrue($smtpStream->isClosed());
+        $this->assertTrue($roundRobinStream->isClosed());
+
+        $transports->send(new RawMessage('Message'), new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]));
+        $this->assertFalse($smtpStream->isClosed());
     }
 }

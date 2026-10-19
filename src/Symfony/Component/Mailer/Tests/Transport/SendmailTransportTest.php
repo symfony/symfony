@@ -16,6 +16,7 @@ use Symfony\Component\Mailer\DelayedEnvelope;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Tests\Transport\Smtp\DummyStream;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\ProcessStream;
@@ -149,6 +150,22 @@ class SendmailTransportTest extends TestCase
         $sendmailTransport->send($mail, $envelope);
 
         $this->assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-failing-sendmail.php -bs');
+    }
+
+    public function testStopStopsTheInteractiveTransport()
+    {
+        [$mail, $envelope] = $this->defaultMailAndEnvelope();
+
+        $sendmailTransport = new SendmailTransport(self::FAKE_INTERACTIVE_SENDMAIL);
+        new \ReflectionProperty(SendmailTransport::class, 'transport')->setValue($sendmailTransport, new SmtpTransport($stream = new DummyStream()));
+        $sendmailTransport->send($mail, $envelope);
+        $this->assertFalse($stream->isClosed());
+
+        $sendmailTransport->stop();
+        $this->assertTrue($stream->isClosed());
+
+        $sendmailTransport->send($mail, $envelope);
+        $this->assertFalse($stream->isClosed());
     }
 
     private function skipOnWindows()

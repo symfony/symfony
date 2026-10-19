@@ -79,6 +79,33 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class ContainerBuilderTest extends TestCase
 {
+    #[DataProvider('provideConditionalReferences')]
+    public function testConditionalReferences(string $method, mixed $value, array $expected)
+    {
+        $this->assertSame($expected, ContainerBuilder::$method($value));
+    }
+
+    public static function provideConditionalReferences(): iterable
+    {
+        foreach ([
+            'getServiceConditionals' => ContainerInterface::IGNORE_ON_INVALID_REFERENCE,
+            'getInitializedConditionals' => ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE,
+        ] as $method => $behavior) {
+            $reference = static fn (string $id) => new Reference($id, $behavior);
+
+            yield $method.' empty' => [$method, [], []];
+            yield $method.' scalar' => [$method, 'ignored', []];
+            yield $method.' reference' => [$method, $reference('a'), ['a']];
+            yield $method.' other behavior' => [$method, new Reference('a'), []];
+            yield $method.' flat duplicates' => [$method, [$reference('a'), $reference('a'), $reference('b')], ['a', 'b']];
+            yield $method.' last child overlap' => [$method, [$reference('a'), [$reference('a'), $reference('b')]], ['a', 'b']];
+            yield $method.' nested overlap' => [$method, [[$reference('a'), $reference('a'), $reference('b')], [$reference('b'), $reference('c')]], ['a', 'b', 'c']];
+            yield $method.' input keys' => [$method, ['first' => $reference('a'), 42 => [$reference('a'), $reference('b')]], ['a', 'b']];
+            yield $method.' numeric strings' => [$method, array_map($reference, ['1', '01', '+1', '1.0', '0', '-0', '', '1']), ['1', '01', '+1', '1.0', '0', '-0', '']];
+            yield $method.' arguments' => [$method, [new ServiceClosureArgument($reference('a')), new IteratorArgument([$reference('b')])], []];
+        }
+    }
+
     public function testDefaultRegisteredDefinitions()
     {
         $builder = new ContainerBuilder();

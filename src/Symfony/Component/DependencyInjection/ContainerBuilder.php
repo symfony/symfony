@@ -1778,8 +1778,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (\is_array($value)) {
             foreach ($value as $v) {
-                $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
+                foreach (self::getServiceConditionals($v) as $service) {
+                    $services[$service] = $service;
+                }
             }
+
+            return array_values($services);
         } elseif ($value instanceof Reference && ContainerInterface::IGNORE_ON_INVALID_REFERENCE === $value->getInvalidBehavior()) {
             $services[] = (string) $value;
         }
@@ -1798,8 +1802,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (\is_array($value)) {
             foreach ($value as $v) {
-                $services = array_unique(array_merge($services, self::getInitializedConditionals($v)));
+                foreach (self::getInitializedConditionals($v) as $service) {
+                    $services[$service] = $service;
+                }
             }
+
+            return array_values($services);
         } elseif ($value instanceof Reference && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $value->getInvalidBehavior()) {
             $services[] = (string) $value;
         }

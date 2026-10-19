@@ -52,6 +52,8 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             yield 'unique booleans' => [[true, false]],
             yield 'unique integers' => [[1, 2, 3, 4, 5, 6]],
             yield 'unique floats' => [[0.1, 0.2, 0.3]],
+            yield 'strict scalar types' => [[0, '0', 0.0, false, null, '', 1, '1', 1.0, true, '01', '+1', '1.0', 's1']],
+            yield 'special floats' => [[\NAN, \NAN, \INF, -\INF]],
             yield 'unique strings' => [['a', 'b', 'c']],
             yield 'unique arrays' => [[[1, 2], [2, 4], [4, 6]]],
             yield 'unique objects' => [[new \stdClass(), new \stdClass()]],
@@ -136,6 +138,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
         return [
             yield 'not unique booleans' => [[true, true], 'true'],
+            yield 'integer after numeric string' => [['1', 1, 1], 1],
+            yield 'numeric string after integer' => [[1, '1', '1'], '"1"'],
+            yield 'signed zero' => [[0.0, -0.0], '-0'],
             yield 'not unique integers' => [[1, 2, 3, 3], 3],
             yield 'not unique floats' => [[0.1, 0.2, 0.1], 0.1],
             yield 'not unique string' => [['a', 'b', 'a'], '"a"'],

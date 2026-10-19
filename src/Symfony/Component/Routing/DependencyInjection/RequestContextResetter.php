@@ -20,26 +20,28 @@ use Symfony\Component\Routing\RequestContext;
  */
 final class RequestContextResetter
 {
-    private RequestContext $context;
-    private RequestContext $initialContext;
+    private \Closure $reset;
 
     public function __invoke(RequestContext $context): void
     {
-        $this->context = $context;
-        $this->initialContext = clone $context;
+        $initialContext = clone $context;
+
+        // the properties are written directly, which is several times faster than going through the getters and setters
+        $this->reset = \Closure::bind(static function () use ($context, $initialContext) {
+            $context->baseUrl = $initialContext->baseUrl;
+            $context->pathInfo = $initialContext->pathInfo;
+            $context->method = $initialContext->method;
+            $context->host = $initialContext->host;
+            $context->scheme = $initialContext->scheme;
+            $context->httpPort = $initialContext->httpPort;
+            $context->httpsPort = $initialContext->httpsPort;
+            $context->queryString = $initialContext->queryString;
+            $context->parameters = $initialContext->parameters;
+        }, null, RequestContext::class);
     }
 
     public function reset(): void
     {
-        $this->context
-            ->setBaseUrl($this->initialContext->getBaseUrl())
-            ->setPathInfo($this->initialContext->getPathInfo())
-            ->setMethod($this->initialContext->getMethod())
-            ->setHost($this->initialContext->getHost())
-            ->setScheme($this->initialContext->getScheme())
-            ->setHttpPort($this->initialContext->getHttpPort())
-            ->setHttpsPort($this->initialContext->getHttpsPort())
-            ->setQueryString($this->initialContext->getQueryString())
-            ->setParameters($this->initialContext->getParameters());
+        ($this->reset)();
     }
 }

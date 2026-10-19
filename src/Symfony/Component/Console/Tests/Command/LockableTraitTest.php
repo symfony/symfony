@@ -30,6 +30,7 @@ class LockableTraitTest extends TestCase
         require_once self::$fixturesPath.'/FooLock2Command.php';
         require_once self::$fixturesPath.'/FooLock3Command.php';
         require_once self::$fixturesPath.'/FooLock4InvokableCommand.php';
+        require_once self::$fixturesPath.'/FooLockAliasedInvokableCommand.php';
     }
 
     public function testLockIsReleased()
@@ -101,6 +102,21 @@ class LockableTraitTest extends TestCase
         $this->assertSame(Command::FAILURE, $tester->execute([]));
 
         $lock->release();
+        $this->assertSame(Command::SUCCESS, $tester->execute([]));
+    }
+
+    public function testInvokableCommandIsLockedOnItsNameAloneNotOnItsAliases()
+    {
+        $lockFactory = $this->createMock(LockFactory::class);
+        $command = new Command('foo:lock-aliased');
+        $command->setCode(new \FooLockAliasedInvokableCommand($lockFactory));
+
+        $tester = new CommandTester($command);
+
+        $lock = $this->createStub(SharedLockInterface::class);
+        $lock->method('acquire')->willReturn(true);
+
+        $lockFactory->expects(static::once())->method('createLock')->with('foo:lock-aliased')->willReturn($lock);
         $this->assertSame(Command::SUCCESS, $tester->execute([]));
     }
 }

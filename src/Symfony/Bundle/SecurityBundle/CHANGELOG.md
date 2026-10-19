@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `entry_point_path` firewall option, redirecting anonymous users to a path or a route when they need to authenticate
  * Retain the referer after failed authentication when `use_referer` is enabled
  * Default the `cost`, `time_cost` and `memory_cost` options of password hashers to the lowest values bcrypt and argon2 accept when `framework.test` is enabled
  * Default the `issuers` option of the `oidc` token handler to the issuers announced by the discovery documents when `discovery` is set

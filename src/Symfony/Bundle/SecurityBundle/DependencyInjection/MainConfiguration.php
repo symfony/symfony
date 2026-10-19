@@ -241,6 +241,9 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('entry_point')
                 ->info(\sprintf('An enabled authenticator name or a service id that implements "%s".', AuthenticationEntryPointInterface::class))
             ->end()
+            ->scalarNode('entry_point_path')
+                ->info('A path, an absolute URL or a route name to redirect anonymous users to when they need to authenticate.')
+            ->end()
             ->scalarNode('re_authentication_entry_point')
                 ->info(\sprintf('An enabled authenticator name or a service id implementing "%s", started when the vote denying access asks for a re-authentication. Defaults to the firewall entry point when it implements this interface.', ReAuthenticationEntryPointInterface::class))
             ->end()
@@ -389,6 +392,10 @@ class MainConfiguration implements ConfigurationInterface
 
                     return $firewall;
                 })
+            ->end()
+            ->validate()
+                ->ifTrue(static fn ($v) => isset($v['entry_point'], $v['entry_point_path']))
+                ->thenInvalid('"entry_point" and "entry_point_path" cannot be used together.')
             ->end()
         ;
     }

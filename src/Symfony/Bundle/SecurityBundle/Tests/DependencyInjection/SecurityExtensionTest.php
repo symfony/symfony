@@ -64,6 +64,7 @@ use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\FallbackAuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\EntryPoint\RedirectAuthenticationEntryPoint;
 use Symfony\Component\Security\Http\Event\CheckRefreshedUserEvent;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretBasic;
@@ -214,6 +215,34 @@ class SecurityExtensionTest extends TestCase
         $this->expectExceptionMessage('Using "ldap_users_only" on the "main" firewall requires a user provider that returns "Symfony\Component\Ldap\Security\LdapUser" instances, but none of the providers it uses does.');
 
         $container->compile();
+    }
+
+    public function testEntryPointPathIsWiredToTheFirewall()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]]],
+            'firewalls' => ['main' => ['form_login' => true, 'http_basic' => true, 'entry_point_path' => 'app_login']],
+        ]);
+        $container->compile();
+
+        $entryPointId = 'security.authentication.redirect_entry_point.main';
+        $this->assertSame(RedirectAuthenticationEntryPoint::class, $container->getDefinition($entryPointId)->getClass());
+        $this->assertSame('app_login', $container->getDefinition($entryPointId)->getArgument(1));
+        $this->assertSame($entryPointId, (string) $container->getDefinition('security.exception_listener.main')->getArgument(4));
+        $this->assertSame($entryPointId, $container->getDefinition('security.firewall.map.config.main')->getArgument(7));
+    }
+
+    public function testEntryPointPathIsWiredToAFirewallWithoutAuthenticators()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]]],
+            'firewalls' => ['main' => ['entry_point_path' => '/login']],
+        ]);
+        $container->compile();
+
+        $this->assertSame('security.authentication.redirect_entry_point.main', (string) $container->getDefinition('security.exception_listener.main')->getArgument(4));
     }
 
     public function testReAuthenticationEntryPointIsWiredToTheExceptionListener()

@@ -23,6 +23,7 @@ use Twig\Template;
 class TwigRendererEngine extends AbstractRendererEngine
 {
     private bool $useBlockChain;
+    private bool $useChainLookup;
     private Template $template;
 
     /**
@@ -39,6 +40,8 @@ class TwigRendererEngine extends AbstractRendererEngine
         parent::__construct($defaultThemes);
 
         $this->useBlockChain = class_exists(BlockChain::class);
+        // a child class that loads resources its own way keeps the cached lookups of the parent class
+        $this->useChainLookup = $this->useBlockChain && self::class === (new \ReflectionMethod($this, 'loadResourceForBlockName'))->class;
     }
 
     public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true): void
@@ -53,6 +56,26 @@ class TwigRendererEngine extends AbstractRendererEngine
         $this->chains = [];
 
         parent::reset();
+    }
+
+    public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): mixed
+    {
+        if (!$this->useChainLookup) {
+            return parent::getResourceForBlockNameHierarchy($view, $blockNameHierarchy, $hierarchyLevel);
+        }
+
+        $chain = $this->getChain($view->vars[self::CACHE_KEY_VAR], $view);
+
+        return false !== $this->findHierarchyLevel($chain, $blockNameHierarchy, $hierarchyLevel) ? $chain : false;
+    }
+
+    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): int|false
+    {
+        if (!$this->useChainLookup) {
+            return parent::getResourceHierarchyLevel($view, $blockNameHierarchy, $hierarchyLevel);
+        }
+
+        return $this->findHierarchyLevel($this->getChain($view->vars[self::CACHE_KEY_VAR], $view), $blockNameHierarchy, $hierarchyLevel);
     }
 
     public function renderBlock(FormView $view, mixed $resource, string $blockName, array $variables = []): string
@@ -244,5 +267,23 @@ class TwigRendererEngine extends AbstractRendererEngine
                 }
             }
         } while (false !== $currentTheme = $currentTheme->getParent($context));
+    }
+
+    /**
+     * Finds the closest level of a block hierarchy that the chain defines a block for.
+     */
+    private function findHierarchyLevel(?BlockChain $chain, array $blockNameHierarchy, int $hierarchyLevel): int|false
+    {
+        if (null === $chain) {
+            return false;
+        }
+
+        for (; $hierarchyLevel >= 0; --$hierarchyLevel) {
+            if ($chain->hasBlock($blockNameHierarchy[$hierarchyLevel])) {
+                return $hierarchyLevel;
+            }
+        }
+
+        return false;
     }
 }

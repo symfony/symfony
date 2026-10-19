@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
+use Symfony\Component\ErrorHandler\BufferingLogger;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\HttpKernel\Debug\ErrorHandlerConfigurator;
 
@@ -32,6 +33,53 @@ class ErrorHandlerConfiguratorTest extends TestCase
 
         $this->assertArrayHasKey(\E_DEPRECATED, $loggers);
         $this->assertSame([$logger, LogLevel::INFO], $loggers[\E_DEPRECATED]);
+    }
+
+    public function testConfigureReplacesTheLoggersOfAPreviousConfigurator()
+    {
+        $bootstrappingLogger = new BufferingLogger();
+        $handler = new ErrorHandler($bootstrappingLogger);
+        $handler->handleError(\E_USER_DEPRECATED, 'Before boot', __FILE__, __LINE__);
+
+        $firstLogger = new BufferingLogger();
+        $firstDeprecationLogger = new BufferingLogger();
+        (new ErrorHandlerConfigurator($firstLogger, \E_ALL, 0, true, true, $firstDeprecationLogger))->configure($handler);
+
+        $this->assertSame([], $bootstrappingLogger->cleanLogs());
+        $this->assertSame('User Deprecated: Before boot', $firstDeprecationLogger->cleanLogs()[0][1] ?? null);
+
+        $secondLogger = new BufferingLogger();
+        $secondDeprecationLogger = new BufferingLogger();
+        (new ErrorHandlerConfigurator($secondLogger, \E_ALL, 0, true, true, $secondDeprecationLogger))->configure($handler);
+
+        $handler->handleError(\E_USER_WARNING, 'Foo', __FILE__, __LINE__);
+        $handler->handleError(\E_USER_DEPRECATED, 'Bar', __FILE__, __LINE__);
+
+        $this->assertSame([], $firstLogger->cleanLogs());
+        $this->assertSame([], $firstDeprecationLogger->cleanLogs());
+        $this->assertSame('User Warning: Foo', $secondLogger->cleanLogs()[0][1] ?? null);
+        $this->assertSame('User Deprecated: Bar', $secondDeprecationLogger->cleanLogs()[0][1] ?? null);
+    }
+
+    public function testConfigureKeepsTheLoggersSetOnTheHandler()
+    {
+        $appLogger = new NullLogger();
+        $handler = new ErrorHandler();
+        $handler->setLoggers([\E_NOTICE => [$appLogger, LogLevel::ERROR]]);
+
+        (new ErrorHandlerConfigurator(new NullLogger()))->configure($handler);
+
+        $otherAppLogger = new NullLogger();
+        $handler->setLoggers([\E_USER_NOTICE => [$otherAppLogger, LogLevel::ERROR]]);
+
+        $logger = new NullLogger();
+        (new ErrorHandlerConfigurator($logger))->configure($handler);
+
+        $loggers = $handler->setLoggers([]);
+
+        $this->assertSame([$appLogger, LogLevel::ERROR], $loggers[\E_NOTICE]);
+        $this->assertSame([$otherAppLogger, LogLevel::ERROR], $loggers[\E_USER_NOTICE]);
+        $this->assertSame($logger, $loggers[\E_WARNING][0]);
     }
 
     #[DataProvider('provideLevelsAssignedToLoggers')]

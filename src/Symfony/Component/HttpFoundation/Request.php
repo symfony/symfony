@@ -116,7 +116,9 @@ class Request
      */
     public ParameterBag $attributes {
         set {
-            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "attributes" of "%s" is deprecated; pass attributes as a constructor argument or call "initialize()" instead.', static::class);
+            if (!self::$writingBags) {
+                trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "attributes" of "%s" is deprecated; pass attributes as a constructor argument or call "initialize()" instead.', static::class);
+            }
 
             $this->attributes = $value;
         }
@@ -129,7 +131,9 @@ class Request
      */
     public InputBag $request {
         set {
-            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "request" of "%s" is deprecated; pass the POST data as a constructor argument or call "initialize()" instead.', static::class);
+            if (!self::$writingBags) {
+                trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "request" of "%s" is deprecated; pass the POST data as a constructor argument or call "initialize()" instead.', static::class);
+            }
 
             $this->request = $value;
         }
@@ -142,7 +146,9 @@ class Request
      */
     public InputBag $query {
         set {
-            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "query" of "%s" is deprecated; pass query parameters as a constructor argument or call "initialize()" instead.', static::class);
+            if (!self::$writingBags) {
+                trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "query" of "%s" is deprecated; pass query parameters as a constructor argument or call "initialize()" instead.', static::class);
+            }
 
             $this->query = $value;
         }
@@ -153,7 +159,9 @@ class Request
      */
     public ServerBag $server {
         set {
-            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "server" of "%s" is deprecated; pass server parameters as a constructor argument or call "initialize()" instead.', static::class);
+            if (!self::$writingBags) {
+                trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "server" of "%s" is deprecated; pass server parameters as a constructor argument or call "initialize()" instead.', static::class);
+            }
 
             $this->server = $value;
         }
@@ -164,7 +172,9 @@ class Request
      */
     public FileBag $files {
         set {
-            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "files" of "%s" is deprecated; pass files as a constructor argument or call "initialize()" instead.', static::class);
+            if (!self::$writingBags) {
+                trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "files" of "%s" is deprecated; pass files as a constructor argument or call "initialize()" instead.', static::class);
+            }
 
             $this->files = $value;
         }
@@ -177,7 +187,9 @@ class Request
      */
     public InputBag $cookies {
         set {
-            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "cookies" of "%s" is deprecated; pass cookies as a constructor argument or call "initialize()" instead.', static::class);
+            if (!self::$writingBags) {
+                trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "cookies" of "%s" is deprecated; pass cookies as a constructor argument or call "initialize()" instead.', static::class);
+            }
 
             $this->cookies = $value;
         }
@@ -188,7 +200,9 @@ class Request
      */
     public HeaderBag $headers {
         set {
-            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "headers" of "%s" is deprecated; pass header parameters as a constructor argument or call "initialize()" instead.', static::class);
+            if (!self::$writingBags) {
+                trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "headers" of "%s" is deprecated; pass header parameters as a constructor argument or call "initialize()" instead.', static::class);
+            }
 
             $this->headers = $value;
         }
@@ -284,6 +298,8 @@ class Request
 
     private bool $isIisRewrite = false;
 
+    private static bool $writingBags = false;
+
     /**
      * @param array                $query      The GET parameters
      * @param array                $request    The POST parameters
@@ -313,13 +329,18 @@ class Request
      */
     public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): void
     {
-        self::setProperty($this, 'request', new InputBag($request));
-        self::setProperty($this, 'query', new InputBag($query));
-        self::setProperty($this, 'attributes', new ParameterBag($attributes));
-        self::setProperty($this, 'cookies', new InputBag($cookies));
-        self::setProperty($this, 'files', new FileBag($files));
-        self::setProperty($this, 'server', new ServerBag($server));
-        self::setProperty($this, 'headers', new HeaderBag($this->server->getHeaders()));
+        self::$writingBags = true;
+        try {
+            $this->request = new InputBag($request);
+            $this->query = new InputBag($query);
+            $this->attributes = new ParameterBag($attributes);
+            $this->cookies = new InputBag($cookies);
+            $this->files = new FileBag($files);
+            $this->server = new ServerBag($server);
+            $this->headers = new HeaderBag($this->server->getHeaders());
+        } finally {
+            self::$writingBags = false;
+        }
 
         $this->content = $content;
         $this->languages = null;
@@ -520,24 +541,29 @@ class Request
     public function duplicate(?array $query = null, ?array $request = null, ?array $attributes = null, ?array $cookies = null, ?array $files = null, ?array $server = null): static
     {
         $dup = clone $this;
-        if (null !== $query) {
-            self::setProperty($dup, 'query', new InputBag($query));
-        }
-        if (null !== $request) {
-            self::setProperty($dup, 'request', new InputBag($request));
-        }
-        if (null !== $attributes) {
-            self::setProperty($dup, 'attributes', new ParameterBag($attributes));
-        }
-        if (null !== $cookies) {
-            self::setProperty($dup, 'cookies', new InputBag($cookies));
-        }
-        if (null !== $files) {
-            self::setProperty($dup, 'files', new FileBag($files));
-        }
-        if (null !== $server) {
-            self::setProperty($dup, 'server', new ServerBag($server));
-            self::setProperty($dup, 'headers', new HeaderBag($dup->server->getHeaders()));
+        self::$writingBags = true;
+        try {
+            if (null !== $query) {
+                $dup->query = new InputBag($query);
+            }
+            if (null !== $request) {
+                $dup->request = new InputBag($request);
+            }
+            if (null !== $attributes) {
+                $dup->attributes = new ParameterBag($attributes);
+            }
+            if (null !== $cookies) {
+                $dup->cookies = new InputBag($cookies);
+            }
+            if (null !== $files) {
+                $dup->files = new FileBag($files);
+            }
+            if (null !== $server) {
+                $dup->server = new ServerBag($server);
+                $dup->headers = new HeaderBag($dup->server->getHeaders());
+            }
+        } finally {
+            self::$writingBags = false;
         }
         $dup->languages = null;
         $dup->charsets = null;
@@ -569,13 +595,18 @@ class Request
      */
     public function __clone()
     {
-        self::setProperty($this, 'query', clone $this->query);
-        self::setProperty($this, 'request', clone $this->request);
-        self::setProperty($this, 'attributes', clone $this->attributes);
-        self::setProperty($this, 'cookies', clone $this->cookies);
-        self::setProperty($this, 'files', clone $this->files);
-        self::setProperty($this, 'server', clone $this->server);
-        self::setProperty($this, 'headers', clone $this->headers);
+        self::$writingBags = true;
+        try {
+            $this->query = clone $this->query;
+            $this->request = clone $this->request;
+            $this->attributes = clone $this->attributes;
+            $this->cookies = clone $this->cookies;
+            $this->files = clone $this->files;
+            $this->server = clone $this->server;
+            $this->headers = clone $this->headers;
+        } finally {
+            self::$writingBags = false;
+        }
     }
 
     public function __toString(): string
@@ -2303,15 +2334,6 @@ class Request
 
         // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
         return '' === preg_replace('/[-a-zA-Z0-9_]++\.?/', '', $host);
-    }
-
-    private static function setProperty(self $request, string $name, mixed $value): void
-    {
-        static $cache;
-
-        $r = $cache[$name] ??= new \ReflectionProperty(self::class, $name);
-
-        $r->setRawValue($request, $value);
     }
 
     /**

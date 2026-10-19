@@ -168,12 +168,21 @@ class AppVariable
     public function getFlashes(string|array|null $types = null): array
     {
         try {
-            $session = $this->getSession();
+            $request = $this->getRequest();
         } catch (\RuntimeException) {
             return [];
         }
 
-        if (!$session instanceof FlashBagAwareSessionInterface) {
+        if (!$request?->hasSession()) {
+            return [];
+        }
+
+        // A session with no cookie and no id is new, so it has no flash messages and there is no need to start it
+        if ((!$request->hasSession(true) || '' === $request->getSession()->getId()) && !$request->hasPreviousSession()) {
+            return [];
+        }
+
+        if (!($session = $request->getSession()) instanceof FlashBagAwareSessionInterface) {
             return [];
         }
 

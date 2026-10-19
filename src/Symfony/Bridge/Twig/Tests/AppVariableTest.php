@@ -193,6 +193,52 @@ class AppVariableTest extends TestCase
         $this->assertEquals($flashMessages, $this->appVariable->getFlashes());
     }
 
+    public function testGetFlashesDoesNotStartANewSession()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $request = new Request();
+        $request->setSession($session);
+        $this->setRequestStack($request);
+
+        $this->assertSame([], $this->appVariable->getFlashes());
+        $this->assertFalse($session->isStarted());
+    }
+
+    public function testGetFlashesOfAPreviousSessionNotCreatedYet()
+    {
+        $storage = new MockArraySessionStorage();
+        $storage->setSessionData(['_symfony_flashes' => ['notice' => ['Notice #1 message']]]);
+        $request = new Request([], [], [], [$storage->getName() => 'session-id']);
+        $request->setSessionFactory(static fn () => new Session($storage));
+        $this->setRequestStack($request);
+
+        $this->assertSame(['notice' => ['Notice #1 message']], $this->appVariable->getFlashes());
+    }
+
+    public function testGetFlashesAddedToANewSession()
+    {
+        $request = new Request();
+        $request->setSessionFactory(static fn () => new Session(new MockArraySessionStorage()));
+        $this->setRequestStack($request);
+
+        $request->getSession()->getFlashBag()->add('notice', 'Notice #1 message');
+
+        $this->assertSame(['notice' => ['Notice #1 message']], $this->appVariable->getFlashes());
+    }
+
+    public function testGetFlashesAddedToANewSessionThatWasSaved()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $request = new Request();
+        $request->setSession($session);
+        $this->setRequestStack($request);
+
+        $session->getFlashBag()->add('notice', 'Notice #1 message');
+        $session->save();
+
+        $this->assertSame(['notice' => ['Notice #1 message']], $this->appVariable->getFlashes());
+    }
+
     #[RunInSeparateProcess]
     public function testGetFlashes()
     {
@@ -335,7 +381,7 @@ class AppVariableTest extends TestCase
             $session->start();
         }
 
-        $request = new Request();
+        $request = new Request([], [], [], [$session->getName() => 'session-id']);
         $request->setSession($session);
         $this->setRequestStack($request);
 

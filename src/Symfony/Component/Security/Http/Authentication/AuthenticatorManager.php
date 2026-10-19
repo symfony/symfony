@@ -90,22 +90,10 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
     public function supports(Request $request): ?bool
     {
-        if (null !== $this->logger) {
-            $context = ['firewall_name' => $this->firewallName];
-
-            if (is_countable($this->authenticators)) {
-                $context['authenticators'] = \count($this->authenticators);
-            }
-
-            $this->logger->debug('Checking for authenticator support.', $context);
-        }
-
         $authenticators = [];
         $skippedAuthenticators = [];
         $lazy = true;
         foreach ($this->authenticators as $authenticator) {
-            $this->logger?->debug('Checking support on authenticator.', ['firewall_name' => $this->firewallName, 'authenticator' => $authenticator::class]);
-
             if (!$authenticator instanceof AuthenticatorInterface) {
                 throw new \InvalidArgumentException(\sprintf('Authenticator "%s" must implement "%s".', get_debug_type($authenticator), AuthenticatorInterface::class));
             }
@@ -114,10 +102,15 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
                 $authenticators[] = $authenticator;
                 $lazy = $lazy && null === $supports;
             } else {
-                $this->logger?->debug('Authenticator does not support the request.', ['firewall_name' => $this->firewallName, 'authenticator' => $authenticator::class]);
                 $skippedAuthenticators[] = $authenticator;
             }
         }
+
+        $this->logger?->debug('Checked for authenticator support.', [
+            'firewall_name' => $this->firewallName,
+            'supporting_authenticators' => array_map(get_class(...), $authenticators),
+            'skipped_authenticators' => array_map(get_class(...), $skippedAuthenticators),
+        ]);
 
         $request->attributes->set('_security_skipped_authenticators', $skippedAuthenticators);
         $request->attributes->set('_security_authenticators', $authenticators);

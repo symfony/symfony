@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `SemaphoreBundle`, which provides the `semaphore` configuration and the services previously provided by `FrameworkBundle` under `framework.semaphore`
+ * Add `RedisStore::close()`, called when the kernel shuts down
 
 8.1
 ---

@@ -19,6 +19,7 @@ use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
 use Symfony\Component\Semaphore\Exception\SemaphoreStorageException;
 use Symfony\Component\Semaphore\Key;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
 /**
  * RedisStore is a PersistingStoreInterface implementation using Redis as store engine.
@@ -158,6 +159,16 @@ class RedisStore implements PersistingStoreInterface
     public function exists(Key $key): bool
     {
         return (bool) $this->redis->zScore(\sprintf('{%s}:weight', $key), $this->getUniqueToken($key));
+    }
+
+    /**
+     * Resets a lazy connection, so that it connects again when used next.
+     */
+    public function close(): void
+    {
+        if ($this->redis instanceof LazyObjectInterface) {
+            $this->redis->resetLazyObject();
+        }
     }
 
     private function evaluate(string $script, string $resource, array $args): mixed

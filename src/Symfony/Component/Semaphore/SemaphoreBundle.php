@@ -92,6 +92,7 @@ class SemaphoreBundle extends AbstractBundle
                 !str_contains($resourceStore, '://') => new Reference($resourceStore),
                 default => $resourceStore,
             }]);
+            $storeDefinition->addTag('kernel.reset', ['method' => 'close', 'on_invalid' => 'ignore', 'on_shutdown' => 'only']);
 
             $container->setDefinition($storeDefinitionId = '.semaphore.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
 

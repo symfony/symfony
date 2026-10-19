@@ -87,6 +87,29 @@ class ServicesResetterTest extends TestCase
         $this->assertSame([[false, 0], ['clear', 0], [false, 0], ['clear', 0], [true, 1], ['clear', 0], [false, 0], ['clear', 0]], $service->calls);
     }
 
+    public function testResetAcceptsTheMethodsOfContainersCompiledBeforeTheirNormalization()
+    {
+        $service = new class {
+            public array $calls = [];
+
+            public function reset(bool $shutdown = false): void
+            {
+                $this->calls[] = [$shutdown, \func_num_args()];
+            }
+
+            public function close(): void
+            {
+                $this->calls[] = ['close', \func_num_args()];
+            }
+        };
+        $resetter = new ServicesResetter(new \ArrayIterator(['service' => $service]), ['service' => [['reset' => 'flag'], ['?missing' => null], ['close' => 'only']]]);
+
+        $resetter->reset();
+        $resetter->reset(true);
+
+        $this->assertSame([[false, 0], [true, 1], ['close', 0]], $service->calls);
+    }
+
     #[TestWith([false])]
     #[TestWith([true])]
     public function testShutdownOnlyMethods(bool $nonShared)

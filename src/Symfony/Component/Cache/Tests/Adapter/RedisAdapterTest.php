@@ -161,4 +161,19 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
 
         $this->assertFalse($cache->hasItem('foo'));
     }
+
+    public function testShutdownResetClosesTheLazyConnection()
+    {
+        $cache = $this->createCachePool();
+        $cache->save($cache->getItem('foo')->set('bar'));
+        $connection = \WeakReference::create(self::$redis->initializeLazyObject());
+
+        $cache->reset();
+        $this->assertNotNull($connection->get());
+
+        $cache->reset(true);
+        $this->assertNull($connection->get());
+
+        $this->assertSame('bar', $cache->getItem('foo')->get());
+    }
 }

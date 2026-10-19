@@ -23,6 +23,8 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ResettableAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ShutdownAwareAdapter;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -420,5 +422,15 @@ class ChainAdapterTest extends AdapterTestCase
 
         $this->assertTrue($callbackWrapperCalled);
         $this->assertSame('computed-value', $result);
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwarePoolsOnly()
+    {
+        $pool = new ChainAdapter([$shutdownAware = new ShutdownAwareAdapter(), $resettable = new ResettableAdapter()]);
+        $pool->reset();
+        $pool->reset(true);
+
+        $this->assertSame([false, true], $shutdownAware->resets);
+        $this->assertSame([[], []], $resettable->resets);
     }
 }

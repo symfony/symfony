@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TraceableAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ResettableAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ShutdownAwareAdapter;
 
 #[Group('time-sensitive')]
 class TraceableAdapterTest extends AdapterTestCase
@@ -187,5 +189,19 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwarePoolsOnly()
+    {
+        $pool = new TraceableAdapter($inner = new ShutdownAwareAdapter());
+        $pool->reset();
+        $pool->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $pool = new TraceableAdapter($inner = new ResettableAdapter());
+        $pool->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

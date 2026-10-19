@@ -231,6 +231,18 @@ class MemcachedAdapter extends AbstractAdapter
         }
     }
 
+    /**
+     * @param bool $shutdown Whether the pool is being shut down
+     */
+    public function reset(/* bool $shutdown = false */): void
+    {
+        parent::reset(...\func_get_args());
+
+        if (0 < \func_num_args() && func_get_arg(0) && isset($this->client) && !$this->client->isPersistent()) {
+            $this->client->quit();
+        }
+    }
+
     protected function doSave(array $values, int $lifetime): array|bool
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {

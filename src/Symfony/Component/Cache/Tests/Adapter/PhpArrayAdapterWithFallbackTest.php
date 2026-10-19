@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ResettableAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ShutdownAwareAdapter;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('time-sensitive')]
@@ -50,5 +52,19 @@ class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new PhpArrayAdapter(self::$file, new FilesystemAdapter('php-array-fallback', $defaultLifetime));
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwarePoolsOnly()
+    {
+        $pool = new PhpArrayAdapter(self::$file, $inner = new ShutdownAwareAdapter());
+        $pool->reset();
+        $pool->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $pool = new PhpArrayAdapter(self::$file, $inner = new ResettableAdapter());
+        $pool->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

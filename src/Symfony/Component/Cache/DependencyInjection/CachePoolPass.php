@@ -117,7 +117,8 @@ class CachePoolPass implements CompilerPassInterface
                     if ($adapter instanceof ChildDefinition) {
                         $chainedPool = clone $adapter;
                     } else {
-                        $chainedPool = $adapter = new ChildDefinition($adapter);
+                        // a parent chain lists its adapters as references
+                        $chainedPool = $adapter = new ChildDefinition((string) $adapter);
                     }
 
                     $chainedTags = [\is_int($provider) ? [] : ['provider' => $provider]];
@@ -164,7 +165,12 @@ class CachePoolPass implements CompilerPassInterface
                         }
                     }
 
-                    $adapters[] = $chainedPool;
+                    if ($tags[0]['reset'] ?? false) {
+                        $this->addResetTag($chainedPool, $chainedTags[0]['reset'] ?? null);
+                    }
+
+                    $container->setDefinition($chainedId = '.'.$id.'.chained.'.\count($adapters), $chainedPool->setPublic(false)->setShared($pool->isShared()));
+                    $adapters[] = new Reference($chainedId);
                 }
 
                 $pool->replaceArgument(0, $adapters);
@@ -178,9 +184,7 @@ class CachePoolPass implements CompilerPassInterface
                 if (!isset($tags[0][$attr])) {
                     // no-op
                 } elseif ('reset' === $attr) {
-                    if ($tags[0][$attr]) {
-                        $pool->addTag('kernel.reset', ['method' => $tags[0][$attr]]);
-                    }
+                    $this->addResetTag($pool, $tags[0][$attr]);
                 } elseif ('early_expiration_message_bus' === $attr) {
                     $needsMessageHandler = true;
                     $pool->addMethodCall('setCallbackWrapper', [(new Definition(EarlyExpirationDispatcher::class))
@@ -263,6 +267,15 @@ class CachePoolPass implements CompilerPassInterface
 
         if ($container->hasDefinition('console.command.cache_pool_delete')) {
             $container->getDefinition('console.command.cache_pool_delete')->addArgument($allPoolsKeys);
+        }
+    }
+
+    private function addResetTag(Definition $definition, mixed $method): void
+    {
+        if ('reset' === $method) {
+            $definition->addTag('kernel.reset', ['method' => 'reset', 'on_shutdown' => 'flag']);
+        } elseif ($method) {
+            $definition->addTag('kernel.reset', ['method' => $method]);
         }
     }
 

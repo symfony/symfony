@@ -283,7 +283,10 @@ trait AbstractAdapterTrait
         return $wasEnabled;
     }
 
-    public function reset(): void
+    /**
+     * @param bool $shutdown Whether the pool is being shut down
+     */
+    public function reset(/* bool $shutdown = false */): void
     {
         if ($this->deferred) {
             $this->commit();

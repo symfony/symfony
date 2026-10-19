@@ -19,6 +19,7 @@ use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\NamespacedPoolInterface;
 use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 /**
  * An adapter that collects data about all cache calls.
@@ -233,9 +234,14 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, NamespacedPo
         }
     }
 
-    public function reset(): void
+    /**
+     * @param bool $shutdown Whether the pool is being shut down
+     */
+    public function reset(/* bool $shutdown = false */): void
     {
-        if ($this->pool instanceof ResetInterface) {
+        if ($this->pool instanceof ShutdownInterface) {
+            $this->pool->reset(...\func_get_args());
+        } elseif ($this->pool instanceof ResetInterface) {
             $this->pool->reset();
         }
 

@@ -236,4 +236,28 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
         return $config;
     }
+
+    public function testShutdownResetClosesTheConnectionCreatedFromADsn()
+    {
+        $cache = new DoctrineDbalAdapter('sqlite://localhost/'.self::$dbFile);
+        $cache->save($cache->getItem('foo')->set('bar'));
+        $connection = (new \ReflectionProperty($cache, 'conn'))->getValue($cache);
+
+        $cache->reset();
+        $this->assertTrue($connection->isConnected());
+
+        $cache->reset(true);
+        $this->assertFalse($connection->isConnected());
+
+        $this->assertSame('bar', $cache->getItem('foo')->get());
+    }
+
+    public function testShutdownResetKeepsAConnectionPassedToTheConstructor()
+    {
+        $cache = new DoctrineDbalAdapter($connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig()));
+        $cache->save($cache->getItem('foo')->set('bar'));
+        $cache->reset(true);
+
+        $this->assertTrue($connection->isConnected());
+    }
 }

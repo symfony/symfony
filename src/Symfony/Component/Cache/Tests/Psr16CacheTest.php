@@ -22,6 +22,8 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ResettableAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ShutdownAwareAdapter;
 
 #[Group('time-sensitive')]
 class Psr16CacheTest extends SimpleCacheTest
@@ -233,6 +235,20 @@ class Psr16CacheTest extends SimpleCacheTest
     {
         yield 'adapter' => [new ArrayAdapter()];
         yield 'external pool' => [new ExternalAdapter()];
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwarePoolsOnly()
+    {
+        $pool = new Psr16Cache($inner = new ShutdownAwareAdapter());
+        $pool->reset();
+        $pool->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $pool = new Psr16Cache($inner = new ResettableAdapter());
+        $pool->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }
 

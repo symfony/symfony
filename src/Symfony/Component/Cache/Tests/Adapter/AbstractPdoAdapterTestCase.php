@@ -132,4 +132,19 @@ abstract class AbstractPdoAdapterTestCase extends AdapterTestCase
 
         return 1 !== (int) $select->fetch(\PDO::FETCH_COLUMN);
     }
+
+    public function testShutdownResetClosesTheConnectionCreatedFromADsn()
+    {
+        $cache = $this->createCachePool();
+        $cache->save($cache->getItem('foo')->set('bar'));
+        $connection = \WeakReference::create((new \ReflectionMethod($cache, 'getConnection'))->invoke($cache));
+
+        $cache->reset();
+        $this->assertNotNull($connection->get());
+
+        $cache->reset(true);
+        $this->assertNull($connection->get());
+
+        $this->assertSame('bar', $cache->getItem('foo')->get());
+    }
 }

@@ -20,10 +20,13 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
 use Symfony\Component\Cache\Adapter\TraceableTagAwareAdapter;
 use Symfony\Component\Cache\DataCollector\CacheDataCollector;
 use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass;
+use Symfony\Component\Cache\Tests\Fixtures\ResettableAdapter;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Compiler\ResettableServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServicesResetter;
 
 class CacheCollectorPassTest extends TestCase
 {
@@ -71,6 +74,44 @@ class CacheCollectorPassTest extends TestCase
 
         $innerFs = $container->getDefinition('fs.recorder_inner');
         $this->assertEquals([new Reference('fs.recorder_inner'), 'setCallbackWrapper'], $innerFs->getMethodCalls()[0][1][0]->getArgument(2)->getFactory());
+    }
+
+    public function testTheInnerPoolKeepsItsResetTag()
+    {
+        $container = new ContainerBuilder();
+        $container->register('data_collector.cache', CacheDataCollector::class);
+        $container->register('fs', FilesystemAdapter::class)
+            ->addTag('cache.pool')
+            ->addTag('kernel.reset', ['method' => 'reset', 'on_shutdown' => 'flag'])
+            ->addTag('monolog.logger', ['channel' => 'cache']);
+
+        (new CacheCollectorPass())->process($container);
+
+        $this->assertSame(['cache.pool', 'kernel.reset', 'monolog.logger'], array_keys($container->getDefinition('fs')->getTags()));
+        $this->assertSame(['kernel.reset' => [['method' => 'reset', 'on_shutdown' => 'flag']]], $container->getDefinition('fs.recorder_inner')->getTags());
+    }
+
+    public function testTheInnerPoolGetsTheShutdownFlagFromTheResetter()
+    {
+        $container = new ContainerBuilder();
+        $container->register('data_collector.cache', CacheDataCollector::class);
+        $container->register('services_resetter', ServicesResetter::class)->setPublic(true);
+        $container->register('pool', ResettableAdapter::class)
+            ->setPublic(true)
+            ->addTag('cache.pool')
+            ->addTag('kernel.reset', ['method' => 'reset', 'on_shutdown' => 'flag']);
+        $container->addCompilerPass(new ResettableServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
+        $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->compile();
+
+        $pool = $container->get('pool');
+        $this->assertInstanceOf(TraceableAdapter::class, $pool);
+        $inner = (new \ReflectionProperty(TraceableAdapter::class, 'pool'))->getValue($pool);
+
+        $container->get('services_resetter')->reset();
+        $container->get('services_resetter')->reset(true);
+
+        $this->assertSame([[], [], [], [true]], $inner->resets);
     }
 
     public function testProcessCacheObjectsAreDecorated()

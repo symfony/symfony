@@ -21,6 +21,8 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ResettableAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ShutdownAwareAdapter;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('time-sensitive')]
@@ -258,5 +260,15 @@ class TagAwareAdapterTest extends AdapterTestCase
         $propertyDeferred = new \ReflectionProperty($adapter, 'deferred');
         $this->assertEmpty($propertyDeferred->getValue($adapter), 'The deferred items must be cleared even if commit fails.');
         $this->assertEmpty($propertyTags->getValue($adapter), 'The known tag versions must be cleared even if commit fails.');
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwarePoolsOnly()
+    {
+        $pool = new TagAwareAdapter($items = new ShutdownAwareAdapter(), $tags = new ResettableAdapter());
+        $pool->reset();
+        $pool->reset(true);
+
+        $this->assertSame([false, true], $items->resets);
+        $this->assertSame([[], []], $tags->resets);
     }
 }

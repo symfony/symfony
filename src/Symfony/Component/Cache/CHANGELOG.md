@@ -14,6 +14,8 @@ CHANGELOG
  * Add `PdoTagAwareAdapter` and the `cache.adapter.pdo_tag_aware` adapter
  * Make `AbstractAdapter::createSystemCache()` skip APCu when OPcache is enabled and the cache directory is writable
  * Set `ItemInterface::METADATA_SAVE_FAILED` in the `$metadata` argument of `get()` when the computed value could not be saved
+ * Add argument `$shutdown` to `reset()` in `AbstractAdapter`, `AbstractTagAwareAdapter`, `ChainAdapter`, `PhpArrayAdapter`, `ProxyAdapter`, `Psr16Adapter`, `Psr16Cache`, `TagAwareAdapter` and `TraceableAdapter`
+ * Close the connections of `DoctrineDbalAdapter`, `MemcachedAdapter`, `PdoAdapter`, `PdoTagAwareAdapter`, `RedisAdapter` and `RedisTagAwareAdapter` when `reset(true)` is called at shutdown, if they can open them again
 
 8.0
 ---

@@ -26,6 +26,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
     /** @var \Traversable<EnvVarLoaderInterface> */
     private \Traversable $originalLoaders;
     private array $loadedVars = [];
+    private ?bool $resolvesPlainEnvVars = null;
 
     /**
      * @param \Traversable<EnvVarLoaderInterface>|null $loaders
@@ -132,10 +133,12 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
             }
 
             try {
-                $env = $getEnv($next);
+                if (str_contains($next, ':') || !$this->isUndefined($next)) {
+                    $env = $getEnv($next);
 
-                if ('' !== $env && null !== $env) {
-                    return $env;
+                    if ('' !== $env && null !== $env) {
+                        return $env;
+                    }
                 }
             } catch (EnvNotFoundException) {
                 // no-op
@@ -387,5 +390,31 @@ class EnvVarProcessor implements EnvVarProcessorInterface, ResetInterface
         if ($this->container instanceof Container) {
             $this->container->resetEnvCache();
         }
+    }
+
+    /**
+     * Tells whether resolving the plain env var would throw an EnvNotFoundException, without throwing it.
+     */
+    private function isUndefined(string $name): bool
+    {
+        if (!$this->resolvesPlainEnvVars ??= $this->container->has($id = 'container.env_var_processors_locator') && ($locator = $this->container->get($id))->has('string') && $this === $locator->get('string')) {
+            return false;
+        }
+
+        if (null !== ($_ENV[$name] ?? (str_starts_with($name, 'HTTP_') ? null : ($_SERVER[$name] ?? null))) || false !== getenv($name)) {
+            return false;
+        }
+
+        foreach ($this->loadedVars as $vars) {
+            if (\array_key_exists($name, $vars)) {
+                return false;
+            }
+        }
+
+        if (!$this->loaders instanceof \Countable || \count($this->loadedVars) < $this->loaders->count()) {
+            return false;
+        }
+
+        return !$this->container->hasParameter("env($name)");
     }
 }

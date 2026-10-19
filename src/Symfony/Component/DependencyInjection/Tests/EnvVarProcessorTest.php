@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\IntBackedEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 
@@ -656,6 +657,58 @@ class EnvVarProcessorTest extends TestCase
             ['Null', 'Null'],
             ['NULL', 'NULL'],
         ];
+    }
+
+    public function testGetEnvDefaultSkipsUndefinedEnvVars()
+    {
+        $container = new Container();
+        $container->setParameter('fallback', 'bar');
+        $processor = new EnvVarProcessor($container);
+        $container->set('container.env_var_processors_locator', new ServiceLocator(['string' => static fn () => $processor, 'default' => static fn () => $processor]));
+
+        $result = $processor->getEnv('default', 'fallback:DEFAULT_UNDEFINED', function () {
+            $this->fail('Should not be called');
+        });
+
+        $this->assertSame('bar', $result);
+    }
+
+    #[DataProvider('provideGetEnvDefaultResolvesEnvVarsDefinedElsewhere')]
+    public function testGetEnvDefaultResolvesEnvVarsDefinedElsewhere(bool $hasParameter, array $loaders, bool $loaded, bool $otherProcessor)
+    {
+        $container = new Container();
+        if ($hasParameter) {
+            $container->setParameter('env(DEFAULT_UNDEFINED)', 'foo');
+        }
+        $processor = new EnvVarProcessor($container, new \ArrayIterator($loaders));
+        $stringProcessor = $otherProcessor ? new EnvVarProcessor($container) : $processor;
+        $container->set('container.env_var_processors_locator', new ServiceLocator(['string' => static fn () => $stringProcessor, 'default' => static fn () => $processor]));
+        if ($loaded) {
+            $this->assertSame('foo', $processor->getEnv('', 'DEFAULT_UNDEFINED', static fn () => null));
+        }
+
+        $result = $processor->getEnv('default', ':DEFAULT_UNDEFINED', function ($name) {
+            $this->assertSame('DEFAULT_UNDEFINED', $name);
+
+            return 'foo';
+        });
+
+        $this->assertSame('foo', $result);
+    }
+
+    public static function provideGetEnvDefaultResolvesEnvVarsDefinedElsewhere(): iterable
+    {
+        $loader = new class implements EnvVarLoaderInterface {
+            public function loadEnvVars(): array
+            {
+                return ['DEFAULT_UNDEFINED' => 'foo'];
+            }
+        };
+
+        yield 'env() parameter' => [true, [], false, false];
+        yield 'loader' => [false, [$loader], false, false];
+        yield 'loaded var' => [false, [$loader], true, false];
+        yield 'other processor' => [false, [], false, true];
     }
 
     public function testRequireMissingFile()

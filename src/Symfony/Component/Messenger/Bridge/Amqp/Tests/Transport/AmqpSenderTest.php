@@ -226,6 +226,74 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
+    public function testItRetriesToTheOriginalQueueOfTheTransportTheMessageWasReceivedFrom()
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getRoutingKey')->willReturn('original_routing_key');
+
+        $envelope = new Envelope(new DummyMessage('Oy'), [
+            new AmqpReceivedStamp($amqpEnvelope, 'original_queue'),
+            new RedeliveryStamp(1),
+            new DelayStamp(1000),
+        ]);
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['other_queue', 'original_queue']);
+        $connection->expects($this->once())->method('publish')
+            ->with($encoded['body'], $encoded['headers'], 1000, $this->callback(function (AmqpStamp $stamp) {
+                $this->assertSame('original_queue', $stamp->getRoutingKey());
+                $this->assertTrue($stamp->isRetryAttempt());
+
+                return true;
+            }));
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    public function testItKeepsTheReceivedRoutingKeyWhenSendingToTheTransportTheMessageWasReceivedFrom()
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getRoutingKey')->willReturn('original_routing_key');
+
+        $envelope = new Envelope(new DummyMessage('Oy'), [new AmqpReceivedStamp($amqpEnvelope, 'original_queue')]);
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['original_queue']);
+        $connection->expects($this->once())->method('publish')
+            ->with($encoded['body'], $encoded['headers'], 0, $this->callback(function (AmqpStamp $stamp) {
+                $this->assertSame('original_routing_key', $stamp->getRoutingKey());
+                $this->assertFalse($stamp->isRetryAttempt());
+
+                return true;
+            }));
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    public function testItDoesNotReuseTheReceivedRoutingKeyWhenSendingToAnotherTransport()
+    {
+        $this->assertRoutingKeyWhenSendingToAnotherTransport(null);
+        $this->assertRoutingKeyWhenSendingToAnotherTransport(null, [new RedeliveryStamp(1)]);
+        $this->assertRoutingKeyWhenSendingToAnotherTransport(null, [new RedeliveryStamp(0), new SentToFailureTransportStamp('async')]);
+    }
+
+    public function testAnExplicitRoutingKeyIsUsedWhenSendingAReceivedMessageToAnotherTransport()
+    {
+        $this->assertRoutingKeyWhenSendingToAnotherTransport('explicit_routing_key', [new AmqpStamp('explicit_routing_key')]);
+        $this->assertRoutingKeyWhenSendingToAnotherTransport('explicit_routing_key', [new AmqpStamp('explicit_routing_key'), new RedeliveryStamp(1)]);
+        $this->assertRoutingKeyWhenSendingToAnotherTransport('explicit_routing_key', [new AmqpStamp('explicit_routing_key'), new RedeliveryStamp(0), new SentToFailureTransportStamp('async')]);
+    }
+
     public function testItDoesNotRepublishAReceivedZeroPriorityOnRetry()
     {
         $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
@@ -241,6 +309,7 @@ class AmqpSenderTest extends TestCase
         $serializer->method('encode')->willReturn($encoded);
 
         $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['original_queue']);
         $connection->expects($this->once())->method('publish')
             ->with($encoded['body'], $encoded['headers'], 0, $this->callback(function (AmqpStamp $stamp) {
                 $this->assertSame('original_queue', $stamp->getRoutingKey());
@@ -270,10 +339,38 @@ class AmqpSenderTest extends TestCase
         $serializer->method('encode')->willReturn($encoded);
 
         $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['original_queue']);
         $connection->expects($this->once())->method('publish')
             ->with($encoded['body'], $encoded['headers'], 0, $this->callback(function (AmqpStamp $stamp) {
                 $this->assertTrue($stamp->isRetryAttempt());
                 $this->assertSame(0, $stamp->getAttributes()['priority']);
+
+                return true;
+            }));
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    private function assertRoutingKeyWhenSendingToAnotherTransport(?string $expectedRoutingKey, array $stamps = []): void
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getRoutingKey')->willReturn('original_routing_key');
+        $amqpEnvelope->method('getContentType')->willReturn('application/x-original');
+
+        $envelope = new Envelope(new DummyMessage('Oy'), [new AmqpReceivedStamp($amqpEnvelope, 'original_queue'), ...$stamps]);
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['other_queue']);
+        $connection->expects($this->once())->method('publish')
+            ->with($encoded['body'], $encoded['headers'], 0, $this->callback(function (AmqpStamp $stamp) use ($expectedRoutingKey) {
+                $this->assertSame($expectedRoutingKey, $stamp->getRoutingKey());
+                $this->assertFalse($stamp->isRetryAttempt());
+                $this->assertSame('application/x-original', $stamp->getAttributes()['content_type']);
 
                 return true;
             }));

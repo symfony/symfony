@@ -194,7 +194,7 @@ class AbstractKernelTest extends TestCase
         $kernel->boot();
     }
 
-    public function testShutdownDestroysServicesThatAreInAReferenceCycle()
+    public function testShutdownDoesNotCollectCycles()
     {
         $kernel = new ContainerReferencingKernel('test', true, $this->varDir);
         $kernel->boot();
@@ -206,6 +206,10 @@ class AbstractKernelTest extends TestCase
 
         try {
             $kernel->shutdown();
+
+            $this->assertFalse(ContainerReferencingService::$destructed);
+
+            gc_collect_cycles();
 
             $this->assertTrue(ContainerReferencingService::$destructed);
         } finally {

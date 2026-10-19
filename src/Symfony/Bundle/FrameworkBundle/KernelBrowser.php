@@ -174,6 +174,7 @@ class KernelBrowser extends HttpKernelBrowser
         if ($this->hasPerformedRequest && $this->reboot) {
             $this->kernel->boot();
             $this->kernel->shutdown();
+            gc_collect_cycles();
         } else {
             $this->hasPerformedRequest = true;
         }

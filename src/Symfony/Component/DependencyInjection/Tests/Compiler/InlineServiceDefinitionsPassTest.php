@@ -282,6 +282,26 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($ref, $arguments[0]);
     }
 
+    public function testProcessDoesNotInlineServiceOfLazyClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo');
+        $container->register('bar');
+
+        $container
+            ->register('service')
+            ->setPublic(true)
+            ->addArgument((new Definition('Closure'))->setFactory(['Closure', 'fromCallable'])->setArguments([[new Reference('foo'), 'baz']]))
+            ->addArgument((new Definition('Closure'))->setFactory(['Closure', 'fromCallable'])->setArguments([[$ref = new Reference('bar'), 'baz']])->setLazy(true))
+        ;
+
+        $this->process($container);
+
+        $arguments = $container->getDefinition('service')->getArguments();
+        $this->assertInstanceOf(Definition::class, $arguments[0]->getArgument(0)[0]);
+        $this->assertSame($ref, $arguments[1]->getArgument(0)[0]);
+    }
+
     public function testProcessDoesNotInlineWhenServiceReferencesItself()
     {
         $container = new ContainerBuilder();

@@ -62,11 +62,18 @@ class AmqpSender implements SenderInterface
         }
 
         if ($amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class)) {
+            $isSameTransport = \in_array($amqpReceivedStamp->getQueueName(), $this->connection->getQueueNames(), true);
+            $routingKey = $amqpStamp?->getRoutingKey();
+
             $amqpStamp = AmqpStamp::createFromAmqpEnvelope(
                 $amqpReceivedStamp->getAmqpEnvelope(),
                 $amqpStamp,
-                $envelope->last(RedeliveryStamp::class) && !$envelope->last(SentToFailureTransportStamp::class) ? $amqpReceivedStamp->getQueueName() : null
+                $isSameTransport && $envelope->last(RedeliveryStamp::class) && !$envelope->last(SentToFailureTransportStamp::class) ? $amqpReceivedStamp->getQueueName() : null
             );
+
+            if (!$isSameTransport) {
+                $amqpStamp = new AmqpStamp($routingKey, $amqpStamp->getFlags(), $amqpStamp->getAttributes());
+            }
         }
 
         try {

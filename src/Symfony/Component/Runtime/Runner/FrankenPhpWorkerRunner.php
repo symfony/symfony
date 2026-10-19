@@ -77,6 +77,7 @@ class FrankenPhpWorkerRunner implements RunnerInterface
             if ($resetKernel) {
                 $this->application = clone $this->application;
             }
+            $sfRequest = $sfResponse = null;
 
             gc_collect_cycles();
         } while ($ret && (0 >= $this->loopMax || ++$loops < $this->loopMax));

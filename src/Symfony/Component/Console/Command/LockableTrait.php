@@ -55,19 +55,21 @@ trait LockableTrait
         if (!$name) {
             if ($this instanceof Command) {
                 $name = $this->getName();
+            } elseif ($command = InvokableCommand::getRunningCommand($this)) {
+                $name = $command->getName();
             } elseif ($attribute = (new \ReflectionClass($this::class))->getAttributes(AsCommand::class)) {
-                $name = $attribute[0]->newInstance()->name;
+                $name = explode('|', ltrim($attribute[0]->newInstance()->name, '|'), 2)[0];
             } else {
                 throw new LogicException(\sprintf('Lock name missing: provide it via "%s()", #[AsCommand] attribute, or by extending Command class.', __METHOD__));
             }
         }
 
-        $this->lock = $this->lockFactory->createLock($name);
-        if (!$this->lock->acquire($blocking)) {
-            $this->lock = null;
-
+        $lock = $this->lockFactory->createLock($name);
+        if (!$lock->acquire($blocking)) {
             return false;
         }
+
+        $this->lock = $lock;
 
         return true;
     }
@@ -77,9 +79,9 @@ trait LockableTrait
      */
     private function release(): void
     {
-        if ($this->lock) {
-            $this->lock->release();
+        if ($lock = $this->lock) {
             $this->lock = null;
+            $lock->release();
         }
     }
 }

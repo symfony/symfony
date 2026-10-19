@@ -430,9 +430,13 @@ class Table
         $rowGroups = $this->buildTableRows($rows);
         $this->calculateColumnsWidth($rowGroups);
 
+        $isMarkdown = self::$styles['markdown'] === $this->style;
+        // a markdown table must start with a header row, so one is added when the table has none
+        $needsMarkdownHeader = $isMarkdown && ($horizontal || $vertical || !array_filter($this->headers));
         $isHeader = !$horizontal;
         $isFirstRow = $horizontal;
-        $hasTitle = (bool) $this->headerTitle;
+        // a title would break the delimiter row of a markdown table
+        $hasTitle = (bool) $this->headerTitle && !$isMarkdown;
         $previousRow = null;
         $pendingSeparators = 0;
 
@@ -442,7 +446,8 @@ class Table
             foreach ($rowGroup as $row) {
                 if ($divider === $row) {
                     $isHeader = false;
-                    $isFirstRow = true;
+                    // the delimiter row of a markdown table is written after its first header row
+                    $isFirstRow = !$isMarkdown;
 
                     continue;
                 }
@@ -456,6 +461,13 @@ class Table
 
                 if (!$row) {
                     continue;
+                }
+
+                if ($needsMarkdownHeader) {
+                    $this->renderRow(array_fill(0, $this->numberOfColumns, ''), $this->style->getCellHeaderFormat());
+                    $this->renderRowSeparator(self::SEPARATOR_TOP_BOTTOM);
+                    $needsMarkdownHeader = false;
+                    $isFirstRow = false;
                 }
 
                 for (; $pendingSeparators > 0; --$pendingSeparators) {
@@ -495,6 +507,12 @@ class Table
                     $this->renderRow($row, $this->style->getCellRowFormat(), $this->style->getCellHeaderFormat());
                 } else {
                     $this->renderRow($row, $isHeader ? $this->style->getCellHeaderFormat() : $this->style->getCellRowFormat());
+                }
+
+                if ($isMarkdown && $isHeader) {
+                    // a markdown table has a single header row, so the next header rows are rendered as body rows
+                    $this->renderRowSeparator(self::SEPARATOR_TOP_BOTTOM);
+                    $isHeader = false;
                 }
 
                 $previousRow = $row;
@@ -863,6 +881,10 @@ class Table
         foreach ($row as $column => $cell) {
             $newRow[] = $cell;
             if ($cell instanceof TableCell && $cell->getColspan() > 1) {
+                if (self::$styles['markdown'] === $this->style) {
+                    // markdown has no colspan and needs one cell per column, so the cell only fills the first column it spans
+                    $newRow[array_key_last($newRow)] = new TableCell((string) $cell, ['style' => $cell->getStyle()]);
+                }
                 foreach (range($column + 1, $column + $cell->getColspan() - 1) as $position) {
                     // insert empty value at column position
                     $newRow[] = '';

@@ -33,7 +33,7 @@
         "symfony/polyfill-php85": "^1.33",
         "symfony/routing": "^7.4|^8.0",
         "symfony/service-contracts": "^3.7.1",
-        "symfony/var-exporter": "^8.1"
+        "symfony/var-exporter": "^8.1.1"
     },
     "require-dev": {
         "dragonmantank/cron-expression": "^3.1",

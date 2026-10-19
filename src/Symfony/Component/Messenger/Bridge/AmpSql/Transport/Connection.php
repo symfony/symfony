@@ -45,13 +45,14 @@ final class Connection
     private int $redeliverTimeout;
     private string $tableName;
     private bool $versionValidated = false;
+    private ?SqlConnection $connection = null;
 
     /**
-     * @param SqlConnection|MysqlConnectionPool|PostgresConnectionPool|SqliteConnectionPool $connection
-     * @param array<string, mixed>                                                          $configuration
+     * @param \Closure(): (SqlConnection|MysqlConnectionPool|PostgresConnectionPool|SqliteConnectionPool) $connectionFactory Creates the connection on first use and after close()
+     * @param array<string, mixed>                                                                        $configuration
      */
     public function __construct(
-        private SqlConnection $connection,
+        private \Closure $connectionFactory,
         private BackendInterface $backend,
         array $configuration = [],
     ) {
@@ -69,7 +70,7 @@ final class Connection
         $transaction = null;
 
         try {
-            $transaction = $this->connection->beginTransaction();
+            $transaction = $this->getConnection()->beginTransaction();
             $id = self::normalizeId($this->backend->insert($transaction, $this->tableName, base64_encode($body), json_encode($headers, \JSON_THROW_ON_ERROR), $this->queueName, $delay));
             $transaction->commit();
 
@@ -113,7 +114,7 @@ final class Connection
 
             $batches[] = $batch;
             $ids = [];
-            $transaction = $this->connection->beginTransaction();
+            $transaction = $this->getConnection()->beginTransaction();
 
             foreach ($batches as $batch) {
                 if ($batchIds = $this->backend->insertBatch($transaction, $this->tableName, array_values($batch), $this->queueName)) {
@@ -137,7 +138,7 @@ final class Connection
         $transaction = null;
 
         try {
-            $transaction = $this->connection->beginTransaction();
+            $transaction = $this->getConnection()->beginTransaction();
             $now = $this->backend->getNowExpression();
             [$criteria, $params] = $this->getAvailabilityCriteria($now);
             $result = $transaction->execute(
@@ -186,7 +187,7 @@ final class Connection
 
         $this->ensureSetup();
         try {
-            $this->connection->execute(
+            $this->getConnection()->execute(
                 \sprintf('UPDATE %s SET delivered_at = %s WHERE id = ? AND queue_name = ?', $this->tableName, $this->backend->getNowExpression()),
                 [$id, $this->queueName],
             );
@@ -199,7 +200,7 @@ final class Connection
     {
         try {
             $this->ensureSupportedVersion();
-            $this->backend->setup($this->connection, $this->tableName);
+            $this->backend->setup($this->getConnection(), $this->tableName);
             $this->autoSetup = false;
         } catch (\Throwable $e) {
             throw $this->createTransportException('Could not set up the AMPHP SQL transport.', $e);
@@ -212,7 +213,7 @@ final class Connection
 
         try {
             [$criteria, $params] = $this->getAvailabilityCriteria($this->backend->getNowExpression());
-            $count = $this->connection->execute(
+            $count = $this->getConnection()->execute(
                 \sprintf('SELECT COUNT(id) AS message_count FROM %s WHERE %s', $this->tableName, $criteria),
                 $params,
             )->fetchRow()['message_count'] ?? 0;
@@ -244,7 +245,7 @@ final class Connection
             }
 
             $rows = [];
-            foreach ($this->connection->execute($sql, $params) as $row) {
+            foreach ($this->getConnection()->execute($sql, $params) as $row) {
                 $rows[] = self::normalizeRow($row);
             }
 
@@ -263,7 +264,7 @@ final class Connection
 
         $this->ensureSetup();
         try {
-            $row = $this->connection->execute(
+            $row = $this->getConnection()->execute(
                 \sprintf('SELECT id, body, headers FROM %s WHERE id = ? AND queue_name = ?', $this->tableName),
                 [$id, $this->queueName],
             )->fetchRow();
@@ -276,14 +277,20 @@ final class Connection
 
     public function close(): void
     {
-        $this->connection->close();
+        $this->connection?->close();
+        $this->connection = null;
+    }
+
+    private function getConnection(): SqlConnection
+    {
+        return $this->connection ??= ($this->connectionFactory)();
     }
 
     private function delete(int|string $id, string $operation): void
     {
         $this->ensureSetup();
         try {
-            $this->connection->execute(\sprintf('DELETE FROM %s WHERE id = ? AND queue_name = ?', $this->tableName), [$id, $this->queueName]);
+            $this->getConnection()->execute(\sprintf('DELETE FROM %s WHERE id = ? AND queue_name = ?', $this->tableName), [$id, $this->queueName]);
         } catch (\Throwable $e) {
             throw $this->createTransportException(\sprintf('Could not %s the AMPHP SQL message.', $operation), $e);
         }
@@ -316,7 +323,7 @@ final class Connection
     private function ensureSupportedVersion(): void
     {
         if (!$this->versionValidated) {
-            $this->backend->validateVersion($this->connection);
+            $this->backend->validateVersion($this->getConnection());
             $this->versionValidated = true;
         }
     }

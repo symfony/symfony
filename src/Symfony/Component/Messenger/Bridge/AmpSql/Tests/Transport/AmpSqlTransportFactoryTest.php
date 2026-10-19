@@ -13,8 +13,10 @@ namespace Symfony\Component\Messenger\Bridge\AmpSql\Tests\Transport;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Bridge\AmpSql\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\AmpSqlTransport;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\AmpSqlTransportFactory;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
@@ -100,6 +102,26 @@ final class AmpSqlTransportFactoryTest extends TestCase
         } finally {
             $transport->close();
             @unlink($path);
+        }
+    }
+
+    public function testTheTransportCanBeUsedAgainAfterBeingClosed()
+    {
+        $path = sys_get_temp_dir().'/symfony-amp-sql-messenger-'.bin2hex(random_bytes(8)).'.db';
+        $transport = (new AmpSqlTransportFactory())->createTransport('amp-sqlite:///'.ltrim(str_replace('\\', '/', $path), '/'), [], new PhpSerializer());
+
+        try {
+            $transport->send(new Envelope(new DummyMessage('first')));
+            $transport->close();
+            $transport->send(new Envelope(new DummyMessage('second')));
+
+            self::assertSame(2, $transport->getMessageCount());
+        } finally {
+            $transport->close();
+
+            foreach ([$path, $path.'-shm', $path.'-wal'] as $file) {
+                @unlink($file);
+            }
         }
     }
 

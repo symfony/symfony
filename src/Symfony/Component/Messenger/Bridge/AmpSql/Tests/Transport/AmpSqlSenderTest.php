@@ -32,7 +32,7 @@ final class AmpSqlSenderTest extends TestCase
         $serializer = $this->createStub(SerializerInterface::class);
         $serializer->method('encode')->willReturn(['body' => $serializedBody]);
         $connection = (new SqliteConnector(new ProcessContextFactory(childConnectTimeout: 30)))->connect(new SqliteConfig(':memory:'));
-        $sender = new AmpSqlSender(new Connection($connection, new SqliteBackend(), ['auto_setup' => false]), $serializer);
+        $sender = new AmpSqlSender(new Connection(static fn () => $connection, new SqliteBackend(), ['auto_setup' => false]), $serializer);
 
         try {
             $sender->send(new Envelope(new \stdClass()));
@@ -58,7 +58,7 @@ final class AmpSqlSenderTest extends TestCase
         $serializer = $this->createStub(SerializerInterface::class);
         $serializer->method('encode')->willThrowException(new \RuntimeException($serializedBody));
         $connection = (new SqliteConnector(new ProcessContextFactory(childConnectTimeout: 30)))->connect(new SqliteConfig(':memory:'));
-        $sender = new AmpSqlSender(new Connection($connection, new SqliteBackend()), $serializer);
+        $sender = new AmpSqlSender(new Connection(static fn () => $connection, new SqliteBackend()), $serializer);
 
         try {
             $sender->send(new Envelope(new \stdClass()));
@@ -77,7 +77,7 @@ final class AmpSqlSenderTest extends TestCase
         $serializer = $this->createStub(SerializerInterface::class);
         $serializer->method('encode')->willReturn(['body' => $serializedBody]);
         $connection = (new SqliteConnector(new ProcessContextFactory(childConnectTimeout: 30)))->connect(new SqliteConfig(':memory:'));
-        $sender = new AmpSqlSender(new Connection($connection, new SqliteBackend(), ['auto_setup' => false]), $serializer);
+        $sender = new AmpSqlSender(new Connection(static fn () => $connection, new SqliteBackend(), ['auto_setup' => false]), $serializer);
 
         try {
             $sender->sendBatch([new Envelope(new \stdClass()), new Envelope(new \stdClass())]);
@@ -103,7 +103,7 @@ final class AmpSqlSenderTest extends TestCase
         $serializedBody = 'serialized-secret-body';
         $serializer = $this->createStub(SerializerInterface::class);
         $serializer->method('encode')->willThrowException(new \RuntimeException($serializedBody));
-        $sender = new AmpSqlSender(new Connection($this->createStub(SqlConnection::class), new SqliteBackend()), $serializer);
+        $sender = new AmpSqlSender(new Connection(fn () => $this->createStub(SqlConnection::class), new SqliteBackend()), $serializer);
 
         try {
             $sender->sendBatch([new Envelope(new \stdClass())]);

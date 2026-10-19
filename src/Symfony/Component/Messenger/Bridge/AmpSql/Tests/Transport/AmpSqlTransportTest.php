@@ -340,6 +340,6 @@ final class AmpSqlTransportTest extends TestCase
         $connector = new SqliteConnector(new ProcessContextFactory(childConnectTimeout: 30));
         $pool = new SqliteConnectionPool($config, 2, connector: $connector, transactionIsolation: SqliteTransactionMode::Immediate);
 
-        return new AmpSqlTransport(new Connection($pool, new SqliteBackend(), $options), $serializer ?? new PhpSerializer());
+        return new AmpSqlTransport(new Connection(static fn () => $pool, new SqliteBackend(), $options), $serializer ?? new PhpSerializer());
     }
 }

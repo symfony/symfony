@@ -19,6 +19,7 @@ use Symfony\Component\Finder\Gitignore;
 final class VcsIgnoredFilterIterator extends \FilterIterator
 {
     private string $baseDir;
+    private ?string $gitInfoExcludeFile = null;
 
     /**
      * @var array<string, list<array{0: string, 1: bool, 2: bool}>|null>
@@ -41,6 +42,7 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
         foreach ([$this->baseDir, ...$this->parentDirectoriesUpwards($this->baseDir)] as $directory) {
             if (@file_exists("{$directory}/.git")) {
                 $this->baseDir = $directory;
+                $this->gitInfoExcludeFile = $this->getGitInfoExcludePath();
                 break;
             }
         }
@@ -73,10 +75,19 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
 
         if (!$ignored) {
             $isDir = is_dir($fileRealPath);
+            $gitignoreFiles = [];
 
-            // the last matching rule of the deepest .gitignore file decides
             foreach (array_reverse($parentDirectories) as $parentDirectory) {
-                if (null === $rules = $this->readGitignoreFile("{$parentDirectory}/.gitignore")) {
+                $gitignoreFiles["{$parentDirectory}/.gitignore"] = $parentDirectory;
+            }
+
+            if (null !== $this->gitInfoExcludeFile && $this->baseDir === ($parentDirectories[0] ?? null)) {
+                $gitignoreFiles[$this->gitInfoExcludeFile] = $this->baseDir;
+            }
+
+            // the last matching rule of the deepest .gitignore file decides, and the exclude file of the repository comes after the root one
+            foreach ($gitignoreFiles as $gitignoreFile => $parentDirectory) {
+                if (null === $rules = $this->readGitignoreFile($gitignoreFile)) {
                     continue;
                 }
 
@@ -138,6 +149,32 @@ final class VcsIgnoredFilterIterator extends \FilterIterator
         return array_reverse(
             $this->parentDirectoriesUpTo($fileRealPath, $this->baseDir)
         );
+    }
+
+    private function getGitInfoExcludePath(): ?string
+    {
+        $gitDir = "{$this->baseDir}/.git";
+
+        // worktrees and submodules have a .git file that points to their git directory, which can be outside of open_basedir
+        if (!is_dir($gitDir)) {
+            if (!preg_match('~^gitdir:\s*(.+)~i', (string) @file_get_contents($gitDir), $matches)) {
+                return null;
+            }
+
+            $gitDir = $this->resolveGitPath(trim($matches[1]), $this->baseDir);
+
+            // the git directory of a worktree points to the common directory, where the exclude file is
+            if (false !== $commonDir = @file_get_contents("{$gitDir}/commondir")) {
+                $gitDir = $this->resolveGitPath(trim($commonDir), $gitDir);
+            }
+        }
+
+        return @is_file("{$gitDir}/info/exclude") ? "{$gitDir}/info/exclude" : null;
+    }
+
+    private function resolveGitPath(string $path, string $from): string
+    {
+        return preg_match('~^(?:[a-zA-Z]:)?[/\\\\]~', $path) ? $path : "{$from}/{$path}";
     }
 
     /**

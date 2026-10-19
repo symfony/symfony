@@ -515,6 +515,202 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
         }
     }
 
+    public function testIgnoreGitInfoExclude()
+    {
+        mkdir($this->tmpDir.'/.git/info', 0o777, true);
+        file_put_contents($this->tmpDir.'/.git/info/exclude', "excluded.txt\n");
+        touch($this->tmpDir.'/excluded.txt');
+        touch($this->tmpDir.'/visible.txt');
+
+        $finder = Finder::create()
+            ->files()
+            ->in($this->tmpDir)
+            ->ignoreVCSIgnored(true);
+
+        $this->assertIterator($this->toAbsolute(['visible.txt']), $finder->getIterator());
+    }
+
+    public function testGitignoreRulesTakePrecedenceOverGitInfoExclude()
+    {
+        mkdir($this->tmpDir.'/.git/info', 0o777, true);
+        file_put_contents($this->tmpDir.'/.git/info/exclude', "excluded.txt\n");
+        file_put_contents($this->tmpDir.'/.gitignore', "!excluded.txt\n");
+        touch($this->tmpDir.'/excluded.txt');
+        touch($this->tmpDir.'/visible.txt');
+
+        $finder = Finder::create()
+            ->files()
+            ->in($this->tmpDir)
+            ->ignoreVCSIgnored(true);
+
+        $this->assertIterator($this->toAbsolute(['excluded.txt', 'visible.txt']), $finder->getIterator());
+    }
+
+    public function testGitignoreRulesCanOverrideNegatedGitInfoExcludeRules()
+    {
+        mkdir($this->tmpDir.'/.git/info', 0o777, true);
+        file_put_contents($this->tmpDir.'/.git/info/exclude', "!excluded.txt\n");
+        file_put_contents($this->tmpDir.'/.gitignore', "excluded.txt\n");
+        touch($this->tmpDir.'/excluded.txt');
+        touch($this->tmpDir.'/visible.txt');
+
+        $finder = Finder::create()
+            ->files()
+            ->in($this->tmpDir)
+            ->ignoreVCSIgnored(true);
+
+        $this->assertIterator($this->toAbsolute(['visible.txt']), $finder->getIterator());
+    }
+
+    public function testGitInfoExcludePatternsAreRelativeToRepositoryRoot()
+    {
+        mkdir($this->tmpDir.'/.git/info', 0o777, true);
+        mkdir($this->tmpDir.'/nested');
+        file_put_contents($this->tmpDir.'/.git/info/exclude', "nested/excluded.txt\n");
+        touch($this->tmpDir.'/nested/excluded.txt');
+        touch($this->tmpDir.'/nested/visible.txt');
+        touch($this->tmpDir.'/visible.txt');
+
+        $finder = Finder::create()
+            ->files()
+            ->in($this->tmpDir)
+            ->ignoreVCSIgnored(true);
+
+        $this->assertIterator($this->toAbsolute(['nested/visible.txt', 'visible.txt']), $finder->getIterator());
+    }
+
+    public function testGitInfoExcludeLastMatchingRuleWins()
+    {
+        mkdir($this->tmpDir.'/.git/info', 0o777, true);
+        file_put_contents($this->tmpDir.'/.git/info/exclude', "*.txt\n!visible.txt\nvisible.txt\n");
+        touch($this->tmpDir.'/excluded.txt');
+        touch($this->tmpDir.'/visible.txt');
+        touch($this->tmpDir.'/other.log');
+
+        $finder = Finder::create()
+            ->files()
+            ->in($this->tmpDir)
+            ->ignoreVCSIgnored(true);
+
+        $this->assertIterator($this->toAbsolute(['other.log']), $finder->getIterator());
+    }
+
+    public function testGitInfoExcludeDirectoryPatternsAreAppliedToContents()
+    {
+        mkdir($this->tmpDir.'/.git/info', 0o777, true);
+        mkdir($this->tmpDir.'/build');
+        file_put_contents($this->tmpDir.'/.git/info/exclude', "build/\n");
+        touch($this->tmpDir.'/build/generated.php');
+        touch($this->tmpDir.'/build.txt');
+        touch($this->tmpDir.'/visible.txt');
+
+        $finder = Finder::create()
+            ->files()
+            ->in($this->tmpDir)
+            ->ignoreVCSIgnored(true);
+
+        $this->assertIterator($this->toAbsolute(['build.txt', 'visible.txt']), $finder->getIterator());
+    }
+
+    public function testNestedGitignoreRulesTakePrecedenceOverGitInfoExclude()
+    {
+        mkdir($this->tmpDir.'/.git/info', 0o777, true);
+        mkdir($this->tmpDir.'/nested');
+        file_put_contents($this->tmpDir.'/.git/info/exclude', "nested/excluded.txt\n");
+        file_put_contents($this->tmpDir.'/nested/.gitignore', "!excluded.txt\n");
+        touch($this->tmpDir.'/nested/excluded.txt');
+        touch($this->tmpDir.'/nested/visible.txt');
+
+        $finder = Finder::create()
+            ->files()
+            ->in($this->tmpDir)
+            ->ignoreVCSIgnored(true);
+
+        $this->assertIterator($this->toAbsolute(['nested/excluded.txt', 'nested/visible.txt']), $finder->getIterator());
+    }
+
+    public function testGitInfoExcludeSupportsWorktrees()
+    {
+        mkdir($this->tmpDir.'/.git-data/worktrees/main', 0o777, true);
+        mkdir($this->tmpDir.'/.git-data/info', 0o777, true);
+        file_put_contents($this->tmpDir.'/.git', "gitdir: .git-data/worktrees/main\n");
+        file_put_contents($this->tmpDir.'/.git-data/worktrees/main/commondir', "../..\n");
+        file_put_contents($this->tmpDir.'/.git-data/info/exclude', "excluded.txt\n");
+        touch($this->tmpDir.'/excluded.txt');
+        touch($this->tmpDir.'/visible.txt');
+
+        $finder = Finder::create()
+            ->files()
+            ->in($this->tmpDir)
+            ->ignoreVCSIgnored(true);
+
+        $this->assertIterator($this->toAbsolute(['visible.txt']), $finder->getIterator());
+    }
+
+    public function testGitInfoExcludeIsAppliedWhenFinderStartsInSubdirectory()
+    {
+        mkdir($this->tmpDir.'/.git/info', 0o777, true);
+        mkdir($this->tmpDir.'/nested');
+        file_put_contents($this->tmpDir.'/.git/info/exclude', "nested/excluded.txt\n");
+        touch($this->tmpDir.'/nested/excluded.txt');
+        touch($this->tmpDir.'/nested/visible.txt');
+
+        $finder = Finder::create()
+            ->files()
+            ->in($this->tmpDir.'/nested')
+            ->ignoreVCSIgnored(true);
+
+        $this->assertIterator($this->toAbsolute(['nested/visible.txt']), $finder->getIterator());
+    }
+
+    public function testGitInfoExcludeSupportsSubmodules()
+    {
+        $gitDir = $this->tmpDir.'_git';
+        mkdir($gitDir.'/modules/submodule/info', 0o777, true);
+        file_put_contents($this->tmpDir.'/.git', 'gitdir: '.$gitDir."/modules/submodule\n");
+        file_put_contents($gitDir.'/modules/submodule/info/exclude', "excluded.txt\n");
+        touch($this->tmpDir.'/excluded.txt');
+        touch($this->tmpDir.'/visible.txt');
+
+        try {
+            $finder = Finder::create()
+                ->files()
+                ->in($this->tmpDir)
+                ->ignoreVCSIgnored(true);
+
+            $this->assertIterator($this->toAbsolute(['visible.txt']), $finder->getIterator());
+        } finally {
+            $this->removeDirectory($gitDir);
+        }
+    }
+
+    public function testGitInfoExcludeIsNotMatchedAgainstSymlinkTargetsOutsideTheRepository()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('symlinks are not supported on Windows');
+        }
+
+        $outsideDir = \dirname($this->tmpDir).'/symfony_finder_vcs_outside';
+        mkdir($outsideDir);
+        touch($outsideDir.'/target.txt');
+        mkdir($this->tmpDir.'/.git/info', 0o777, true);
+        file_put_contents($this->tmpDir.'/.git/info/exclude', "target.txt\n");
+        symlink($outsideDir.'/target.txt', $this->tmpDir.'/link.txt');
+        touch($this->tmpDir.'/target.txt');
+
+        try {
+            $finder = Finder::create()
+                ->files()
+                ->in($this->tmpDir)
+                ->ignoreVCSIgnored(true);
+
+            $this->assertIterator($this->toAbsolute(['link.txt']), $finder->getIterator());
+        } finally {
+            unlink($this->tmpDir.'/link.txt');
+            $this->removeDirectory($outsideDir);
+        }
+    }
+
     private function toAbsolute(array $files): array
     {
         foreach ($files as &$path) {

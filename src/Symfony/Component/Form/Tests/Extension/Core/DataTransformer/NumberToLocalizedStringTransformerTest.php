@@ -96,6 +96,34 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $this->assertSame($to, $transformer->transform($from));
     }
 
+    public function testTransformFollowsTheDefaultLocale()
+    {
+        IntlTestHelper::requireFullIntl($this);
+
+        $transformer = new NumberToLocalizedStringTransformer(2);
+
+        \Locale::setDefault('en');
+        $this->assertSame('1234.50', $transformer->transform(1234.5));
+
+        \Locale::setDefault('de_AT');
+        $this->assertSame('1234,50', $transformer->transform(1234.5));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testTransformUsesTheFormatterOfChildClasses()
+    {
+        (new NumberToLocalizedStringTransformer())->transform(12);
+
+        $transformer = new class extends NumberToLocalizedStringTransformer {
+            protected function getNumberFormatter(): \NumberFormatter
+            {
+                return new \NumberFormatter('en', \NumberFormatter::SPELLOUT);
+            }
+        };
+
+        $this->assertSame('twelve', $transformer->transform(12));
+    }
+
     public function testTransformWithScale()
     {
         // Since we test against "de_AT", we need the full implementation

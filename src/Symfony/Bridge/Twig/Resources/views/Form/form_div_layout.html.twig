@@ -377,7 +377,7 @@
 {%- endblock form_row -%}
 
 {%- block form_row_render -%}
-    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+    <div{% if row_attr %}{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}>
         {{- form_label(form) -}}
         {{- form_errors(form) -}}
         {{- form_widget(form, widget_attr) -}}
@@ -386,7 +386,7 @@
 {%- endblock form_row_render -%}
 
 {%- block button_row -%}
-    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+    <div{% if row_attr %}{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}>
         {{- form_widget(form) -}}
     </div>
 {%- endblock button_row -%}

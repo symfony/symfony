@@ -1,7 +1,7 @@
 {% use 'form_div_layout.html.twig' %}
 
 {%- block form_row_render -%}
-    <tr{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+    <tr{% if row_attr %}{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}>
         <td>
             {{- form_label(form) -}}
         </td>
@@ -14,7 +14,7 @@
 {%- endblock form_row_render -%}
 
 {%- block button_row -%}
-    <tr{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+    <tr{% if row_attr %}{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}>
         <td></td>
         <td>
             {{- form_widget(form) -}}

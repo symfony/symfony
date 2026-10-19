@@ -36,6 +36,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     private bool $firstCall = true;
     private bool $hasTerminatedWithException = false;
     private ?\WeakReference $configuredErrorHandler = null;
+    private ?array $installedExceptionHandler = null;
 
     /**
      * @param callable|null                $exceptionHandler A handler that must support \Throwable instances that will be called on Exception
@@ -99,7 +100,13 @@ class DebugHandlersListener implements EventSubscriberInterface
             }
 
             if ($handler instanceof ErrorHandler) {
-                $handler->setExceptionHandler($this->exceptionHandler);
+                $previous = $handler->setExceptionHandler($this->exceptionHandler);
+                if (null !== $hasRun) {
+                    if (null !== $this->installedExceptionHandler && $previous === $this->installedExceptionHandler[1]) {
+                        $previous = $this->installedExceptionHandler[2];
+                    }
+                    $this->installedExceptionHandler = [$handler, $this->exceptionHandler, $previous];
+                }
                 if (null !== $hasRun && $handler !== $this->configuredErrorHandler?->get()) {
                     $this->configuredErrorHandler = \WeakReference::create($handler);
                     $throwAt = $handler->throwAt(0) | \E_ERROR | \E_CORE_ERROR | \E_COMPILE_ERROR | \E_USER_ERROR | \E_RECOVERABLE_ERROR | \E_PARSE;
@@ -116,6 +123,23 @@ class DebugHandlersListener implements EventSubscriberInterface
                 }
             }
             $this->exceptionHandler = null;
+        }
+    }
+
+    /**
+     * Restores the exception handler replaced for the main request, so that the error handler doesn't keep the kernel and the request alive.
+     */
+    public function reset(): void
+    {
+        if (null === $this->installedExceptionHandler) {
+            return;
+        }
+
+        [$handler, $exceptionHandler, $previous] = $this->installedExceptionHandler;
+        $this->installedExceptionHandler = null;
+
+        if ($exceptionHandler !== $current = $handler->setExceptionHandler($previous)) {
+            $handler->setExceptionHandler($current);
         }
     }
 

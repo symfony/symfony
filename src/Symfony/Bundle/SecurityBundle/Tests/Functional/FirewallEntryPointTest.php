@@ -27,4 +27,14 @@ class FirewallEntryPointTest extends AbstractWebTestCase
             "Custom entry point wasn't started"
         );
     }
+
+    public function testEntryPointPathRedirectsToAnAbsoluteUrl()
+    {
+        $client = $this->createClient(['test_case' => 'FirewallEntryPoint', 'root_config' => 'config_entry_point_path.yml']);
+
+        $client->request('GET', '/secure/resource');
+
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertSame('https://sso.example.com/login', $client->getResponse()->headers->get('Location'));
+    }
 }

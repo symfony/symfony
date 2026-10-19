@@ -58,6 +58,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Controller\SecurityTokenValueResolver;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
+use Symfony\Component\Security\Http\EntryPoint\RedirectAuthenticationEntryPoint;
 use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\FirewallMapInterface;
@@ -358,6 +359,13 @@ return static function (ContainerConfigurator $container) {
                 service('router')->nullOnInvalid(),
             ])
         ->alias(HttpUtils::class, 'security.http_utils')
+
+        ->set('security.authentication.redirect_entry_point', RedirectAuthenticationEntryPoint::class)
+            ->abstract()
+            ->args([
+                service('security.http_utils'),
+                abstract_arg('path'),
+            ])
 
         // Validator
         ->set('security.validator.user_password', UserPasswordValidator::class)

@@ -57,6 +57,7 @@ use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\FallbackAuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\ReAuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\EntryPoint\RedirectAuthenticationEntryPoint;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
@@ -223,6 +224,17 @@ class ExceptionListenerTest extends TestCase
 
         $this->createExceptionListener(null, null, null, $this->createEntryPoint())->onKernelException($event);
 
+        $this->assertSame('http://localhost/', $session->get('_security.key.target_path'));
+    }
+
+    public function testRedirectEntryPointSavesTheTargetPath()
+    {
+        $event = $this->createEvent(new AuthenticationException(), null, $session = new Session(new MockArraySessionStorage()));
+        $httpUtils = new HttpUtils();
+
+        $this->createExceptionListener(null, null, $httpUtils, new RedirectAuthenticationEntryPoint($httpUtils, '/login'))->onKernelException($event);
+
+        $this->assertSame('http://localhost/login', $event->getResponse()->getTargetUrl());
         $this->assertSame('http://localhost/', $session->get('_security.key.target_path'));
     }
 

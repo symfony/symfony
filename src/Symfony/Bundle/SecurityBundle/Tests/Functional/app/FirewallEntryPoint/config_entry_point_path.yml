@@ -1,0 +1,8 @@
+imports:
+    - { resource: ./config.yml }
+
+security:
+    firewalls:
+        secure:
+            entry_point: ~
+            entry_point_path: https://sso.example.com/login

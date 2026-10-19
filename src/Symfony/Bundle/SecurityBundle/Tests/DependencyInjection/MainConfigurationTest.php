@@ -164,6 +164,23 @@ class MainConfigurationTest extends TestCase
         (new Processor())->processConfiguration(new MainConfiguration([], []), [$config]);
     }
 
+    public function testEntryPointAndEntryPointPathCannotBeUsedTogether()
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'firewalls' => [
+                'main' => [
+                    'entry_point' => 'form_login',
+                    'entry_point_path' => '/login',
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('"entry_point" and "entry_point_path" cannot be used together.');
+
+        (new Processor())->processConfiguration(new MainConfiguration([], []), [$config]);
+    }
+
     public function testLogoutDeleteCookies()
     {
         $config = [

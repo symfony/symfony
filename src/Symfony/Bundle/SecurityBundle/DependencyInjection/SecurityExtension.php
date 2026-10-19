@@ -551,6 +551,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // Determine default entry point
         $configuredEntryPoint = $firewall['entry_point'] ?? null;
 
+        if (isset($firewall['entry_point_path'])) {
+            $configuredEntryPoint = 'security.authentication.redirect_entry_point.'.$id;
+            $container
+                ->setDefinition($configuredEntryPoint, new ChildDefinition('security.authentication.redirect_entry_point'))
+                ->replaceArgument(1, $firewall['entry_point_path'])
+            ;
+        }
+
         // Authentication listeners
         $firewallAuthenticationProviders = [];
         [$authListeners, $defaultEntryPoint] = $this->createAuthenticationListeners($container, $id, $firewall, $firewallAuthenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint);

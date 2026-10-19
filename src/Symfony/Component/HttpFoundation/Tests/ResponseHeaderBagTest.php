@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -96,6 +97,54 @@ class ResponseHeaderBagTest extends TestCase
         $bag->set('Cache-Control', 'must-revalidate', false);
         $this->assertCount(1, $bag->all('Cache-Control'));
         $this->assertEquals('must-revalidate, public', $bag->get('Cache-Control'));
+    }
+
+    #[DataProvider('provideCacheControlDirectiveChanges')]
+    public function testCacheControlDirectiveChanges(array $headers, array $changes, string $header, array $directives, array $computedDirectives)
+    {
+        $bag = new class($headers) extends ResponseHeaderBag {
+            public function getCacheControlDirectives(): array
+            {
+                return [$this->cacheControl, $this->computedCacheControl];
+            }
+        };
+
+        foreach ($changes as [$key, $value]) {
+            null === $value ? $bag->removeCacheControlDirective($key) : $bag->addCacheControlDirective($key, $value);
+        }
+
+        $this->assertSame([$header], $bag->all('Cache-Control'));
+        $this->assertSame([$directives, $computedDirectives], $bag->getCacheControlDirectives());
+    }
+
+    public static function provideCacheControlDirectiveChanges(): iterable
+    {
+        yield [[], [['public', true]], 'public', ['public' => true], ['public' => true]];
+        yield [[], [['max-age', '10']], 'max-age=10, private', ['max-age' => '10'], ['max-age' => '10', 'private' => true]];
+        yield [[], [['s-maxage', '10']], 's-maxage=10', ['s-maxage' => '10'], ['s-maxage' => '10']];
+        yield [[], [['public', null], ['private', true], ['max-age', '0'], ['must-revalidate', true]], 'max-age=0, must-revalidate, private', ['max-age' => '0', 'must-revalidate' => true, 'private' => true], ['max-age' => '0', 'must-revalidate' => true, 'private' => true]];
+        yield [[], [['public', true], ['private', null], ['max-age', '10'], ['s-maxage', '20']], 'max-age=10, public, s-maxage=20', ['max-age' => '10', 'public' => true, 's-maxage' => '20'], ['max-age' => '10', 'public' => true, 's-maxage' => '20']];
+        yield [[], [['max-age', '10'], ['max-age', true]], 'max-age, private', ['max-age' => true], ['max-age' => true, 'private' => true]];
+        yield [[], [['foo', false]], 'foo="", private', ['foo' => ''], ['foo' => '', 'private' => true]];
+        yield [[], [['foo', '']], 'foo="", private', ['foo' => ''], ['foo' => '', 'private' => true]];
+        yield [[], [['foo', 'a b']], 'foo="a b", private', ['foo' => 'a b'], ['foo' => 'a b', 'private' => true]];
+        yield [[], [['foo', "a\nb"]], "foo=\"a\nb\", private", ['foo' => "a\nb"], ['foo' => "a\nb", 'private' => true]];
+        yield [[], [['Foo', true]], 'foo, private', ['foo' => true], ['foo' => true, 'private' => true]];
+        yield [[], [['a,b', true]], 'a, b, private', ['a' => true, 'b' => true], ['a' => true, 'b' => true, 'private' => true]];
+        yield [[], [['a=b', true]], 'a=b, private', ['a' => 'b'], ['a' => 'b', 'private' => true]];
+        yield [[], [['', true]], 'no-cache, private', [], ['no-cache' => true, 'private' => true]];
+        yield [[], [['', 'a']], '=a, private', ['' => 'a'], ['' => 'a', 'private' => true]];
+        yield [[], [['123', true], ['0', '1']], '0=1, 123, private', [0 => '1', 123 => true], [0 => '1', 123 => true, 'private' => true]];
+        yield [[], [['private', 'set-cookie']], 'private=set-cookie', ['private' => 'set-cookie'], ['private' => 'set-cookie']];
+        yield [[], [['foo', null]], 'no-cache, private', [], ['no-cache' => true, 'private' => true]];
+        yield [['Cache-Control' => 'max-age=10'], [['max-age', null]], 'no-cache, private', [], ['no-cache' => true, 'private' => true]];
+        yield [['Cache-Control' => 'max-age=10', 'Last-Modified' => 'Wed, 16 Feb 2011 14:17:43 GMT'], [['max-age', null]], 'private, must-revalidate', [], ['private' => true, 'must-revalidate' => true]];
+        yield [['Cache-Control' => 'public', 'Expires' => 'Wed, 16 Feb 2011 14:17:43 GMT', 'Set-Cookie' => 'foo=bar'], [['public', null]], 'private, must-revalidate', [], ['private' => true, 'must-revalidate' => true]];
+        yield [['Cache-Control' => 'max-age=10', 'Expires' => 'Wed, 16 Feb 2011 14:17:43 GMT'], [['must-revalidate', true]], 'max-age=10, must-revalidate, private', ['max-age' => '10', 'must-revalidate' => true], ['max-age' => '10', 'must-revalidate' => true, 'private' => true]];
+        yield [['Cache-Control' => 'max-age=10'], [['Max-Age', '20']], 'max-age=10, private', ['max-age' => '10'], ['max-age' => '10', 'private' => true]];
+        yield [['Cache-Control' => 'b, a'], [['c', true]], 'a, b, c, private', ['a' => true, 'b' => true, 'c' => true], ['a' => true, 'b' => true, 'c' => true, 'private' => true]];
+        yield [['Cache-Control' => '"a=b"=c'], [['d', true]], 'a="b=c", d, private', ['a' => 'b=c', 'd' => true], ['a' => 'b=c', 'd' => true, 'private' => true]];
+        yield [['Cache-Control' => 'no cache'], [['public', true]], 'no cache, public', ['no cache' => true, 'public' => true], ['no cache' => true, 'public' => true]];
     }
 
     public function testCacheControlClone()

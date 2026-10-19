@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-19T12:47:38Z
+
+Thank you @ephpicman. I pushed a few changes. The exclude file is now found once per search instead of once per file. In a worktree, the previous code made listing 4000 files 3 times slower. Its rules are no longer matched against symlink targets outside of the repository. And finding the git directory doesn't trigger `open_basedir` warnings anymore.

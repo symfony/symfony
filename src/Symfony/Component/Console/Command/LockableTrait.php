@@ -60,9 +60,9 @@ trait LockableTrait
      */
     private function release(): void
     {
-        if ($this->lock) {
-            $this->lock->release();
+        if ($lock = $this->lock) {
             $this->lock = null;
+            $lock->release();
         }
     }
 }

@@ -13,7 +13,9 @@ namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 
@@ -26,6 +28,7 @@ class LockableTraitTest extends TestCase
         self::$fixturesPath = __DIR__.'/../Fixtures/';
         require_once self::$fixturesPath.'/FooLockCommand.php';
         require_once self::$fixturesPath.'/FooLock2Command.php';
+        require_once self::$fixturesPath.'/FooLockReleaseFailureCommand.php';
     }
 
     public function testLockIsReleased()
@@ -63,5 +66,14 @@ class LockableTraitTest extends TestCase
 
         $tester = new CommandTester($command);
         $this->assertSame(1, $tester->execute([]));
+    }
+
+    public function testFailingToReleaseALockDoesNotKeepTheCommandFromLockingAgain()
+    {
+        $lock = $this->createMock(LockInterface::class);
+        $lock->expects($this->once())->method('release')->willThrowException(new LockReleasingException('Failed to release the "foo" lock.'));
+
+        $tester = new CommandTester(new \FooLockReleaseFailureCommand($lock));
+        $this->assertSame(2, $tester->execute([]));
     }
 }

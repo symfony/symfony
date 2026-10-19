@@ -13,7 +13,10 @@ namespace Symfony\Component\DependencyInjection\Kernel;
 
 use Symfony\Component\Cache\Tests\CacheBundleTest;
 
-function gc_collect_cycles(): int
-{
-    return CacheBundleTest::$collectCycles ? \gc_collect_cycles() : 0;
+// the tests of several components declare this function, the first one loaded is used when they run together
+if (!\function_exists(__NAMESPACE__.'\gc_collect_cycles')) {
+    function gc_collect_cycles(): int
+    {
+        return CacheBundleTest::$collectCycles ? \gc_collect_cycles() : 0;
+    }
 }

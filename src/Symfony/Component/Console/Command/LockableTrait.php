@@ -55,6 +55,8 @@ trait LockableTrait
         if (!$name) {
             if ($this instanceof Command) {
                 $name = $this->getName();
+            } elseif ($command = InvokableCommand::getRunningCommand($this)) {
+                $name = $command->getName();
             } elseif ($attribute = (new \ReflectionClass($this::class))->getAttributes(AsCommand::class)) {
                 $name = explode('|', ltrim($attribute[0]->newInstance()->name, '|'), 2)[0];
             } else {

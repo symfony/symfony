@@ -119,4 +119,59 @@ class LockableTraitTest extends TestCase
         $lockFactory->expects(static::once())->method('createLock')->with('foo:lock-aliased')->willReturn($lock);
         $this->assertSame(Command::SUCCESS, $tester->execute([]));
     }
+
+    public function testInvokableCommandIsLockedOnTheNameItRunsUnder()
+    {
+        $lockFactory = $this->createMock(LockFactory::class);
+        $command = new Command('foo:lock-renamed', new \FooLockAliasedInvokableCommand($lockFactory));
+
+        $tester = new CommandTester($command);
+
+        $lock = $this->createStub(SharedLockInterface::class);
+        $lock->method('acquire')->willReturn(true);
+
+        $lockFactory->expects(static::once())->method('createLock')->with('foo:lock-renamed')->willReturn($lock);
+        $this->assertSame(Command::SUCCESS, $tester->execute([]));
+    }
+
+    public function testInvokableCalledDirectlyIsLockedOnTheNameOfItsAttribute()
+    {
+        $lockFactory = $this->createMock(LockFactory::class);
+        $invokable = new \FooLockAliasedInvokableCommand($lockFactory);
+
+        $lock = $this->createStub(SharedLockInterface::class);
+        $lock->method('acquire')->willReturn(true);
+
+        $lockFactory->expects(static::once())->method('createLock')->with('foo:lock-aliased')->willReturn($lock);
+        $this->assertSame(Command::SUCCESS, $invokable());
+    }
+
+    public function testInvokableIsNoLongerLockedOnTheNameOfACommandThatFailed()
+    {
+        $names = [];
+        $lockFactory = $this->createStub(LockFactory::class);
+        $lockFactory->method('createLock')->willReturnCallback(function (string $name) use (&$names) {
+            $names[] = $name;
+
+            if (1 === \count($names)) {
+                throw new \RuntimeException('Failed to create the lock.');
+            }
+
+            $lock = $this->createStub(SharedLockInterface::class);
+            $lock->method('acquire')->willReturn(true);
+
+            return $lock;
+        });
+        $invokable = new \FooLockAliasedInvokableCommand($lockFactory);
+
+        try {
+            (new CommandTester(new Command('foo:lock-renamed', $invokable)))->execute([]);
+            $this->fail('The command should have failed.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Failed to create the lock.', $e->getMessage());
+        }
+
+        $this->assertSame(Command::SUCCESS, $invokable());
+        $this->assertSame(['foo:lock-renamed', 'foo:lock-aliased'], $names);
+    }
 }

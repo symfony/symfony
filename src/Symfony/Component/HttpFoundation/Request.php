@@ -848,7 +848,8 @@ class Request
     public function hasPreviousSession(): bool
     {
         // the check for $this->session avoids malicious users trying to fake a session cookie with proper name
-        return $this->hasSession() && $this->cookies->has($this->getSession()->getName());
+        // counting cookies first avoids creating the session when the request has no cookie at all
+        return $this->hasSession() && $this->cookies->count() && $this->cookies->has($this->getSession()->getName());
     }
 
     /**

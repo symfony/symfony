@@ -19,6 +19,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 class FormTypeGuesserChain implements FormTypeGuesserInterface
 {
     private array $guessers = [];
+    private array $guesses = [];
 
     /**
      * @param FormTypeGuesserInterface[] $guessers
@@ -45,22 +46,30 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
 
     public function guessType(string $class, string $property): ?TypeGuess
     {
-        return $this->guess(static fn ($guesser) => $guesser->guessType($class, $property));
+        $key = 'guessType:'.$class.'::'.$property;
+
+        return \array_key_exists($key, $this->guesses) ? $this->guesses[$key] : $this->guesses[$key] = $this->guess(static fn ($guesser) => $guesser->guessType($class, $property));
     }
 
     public function guessRequired(string $class, string $property): ?ValueGuess
     {
-        return $this->guess(static fn ($guesser) => $guesser->guessRequired($class, $property));
+        $key = 'guessRequired:'.$class.'::'.$property;
+
+        return \array_key_exists($key, $this->guesses) ? $this->guesses[$key] : $this->guesses[$key] = $this->guess(static fn ($guesser) => $guesser->guessRequired($class, $property));
     }
 
     public function guessMaxLength(string $class, string $property): ?ValueGuess
     {
-        return $this->guess(static fn ($guesser) => $guesser->guessMaxLength($class, $property));
+        $key = 'guessMaxLength:'.$class.'::'.$property;
+
+        return \array_key_exists($key, $this->guesses) ? $this->guesses[$key] : $this->guesses[$key] = $this->guess(static fn ($guesser) => $guesser->guessMaxLength($class, $property));
     }
 
     public function guessPattern(string $class, string $property): ?ValueGuess
     {
-        return $this->guess(static fn ($guesser) => $guesser->guessPattern($class, $property));
+        $key = 'guessPattern:'.$class.'::'.$property;
+
+        return \array_key_exists($key, $this->guesses) ? $this->guesses[$key] : $this->guesses[$key] = $this->guess(static fn ($guesser) => $guesser->guessPattern($class, $property));
     }
 
     /**

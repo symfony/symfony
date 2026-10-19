@@ -126,6 +126,12 @@ trait HttpClientTrait
             throw new InvalidArgumentException('Option "crypto_method" must be one of "STREAM_CRYPTO_METHOD_TLSv1_*_CLIENT".');
         }
 
+        $options['follow_cross_origin_redirects'] ??= true;
+
+        if (!\is_bool($options['follow_cross_origin_redirects'])) {
+            throw new InvalidArgumentException(\sprintf('Option "follow_cross_origin_redirects" must be bool, "%s" given.', get_debug_type($options['follow_cross_origin_redirects'])));
+        }
+
         // Validate on_progress
         if (isset($options['on_progress']) && !\is_callable($onProgress = $options['on_progress'])) {
             throw new InvalidArgumentException(\sprintf('Option "on_progress" must be callable, "%s" given.', get_debug_type($onProgress)));

@@ -385,6 +385,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
      */
     private static function createRedirectResolver(array $options, string $scheme, string $authority, ?array $proxy, array &$info, ?\Closure $onProgress): \Closure
     {
+        $followCrossOrigin = $options['follow_cross_origin_redirects'];
         $redirectHeaders = [];
         if (0 < $maxRedirects = $options['max_redirects']) {
             $redirectHeaders = ['scheme' => $scheme, 'authority' => $authority];
@@ -395,7 +396,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             }
         }
 
-        return static function (NativeClientState $multi, ?string $location, $context) use (&$redirectHeaders, $proxy, &$info, $maxRedirects, $onProgress): ?string {
+        return static function (NativeClientState $multi, ?string $location, $context) use (&$redirectHeaders, $proxy, &$info, $maxRedirects, $followCrossOrigin, $onProgress): ?string {
             if (null === $location || $info['http_code'] < 300 || 400 <= $info['http_code']) {
                 $info['redirect_url'] = null;
 
@@ -414,7 +415,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
             $info['redirect_url'] = implode('', $url);
 
-            if ($info['redirect_count'] >= $maxRedirects || ('http:' === $url['scheme'] && 'https:' === $info['url']['scheme'])) {
+            if ($info['redirect_count'] >= $maxRedirects || ('http:' === $url['scheme'] && 'https:' === $info['url']['scheme']) || (!$followCrossOrigin && ($redirectHeaders['scheme'] !== $url['scheme'] || $redirectHeaders['authority'] !== $url['authority']))) {
                 return null;
             }
 

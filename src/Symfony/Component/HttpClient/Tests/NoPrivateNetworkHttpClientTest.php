@@ -275,6 +275,23 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $this->assertSame('/', $response->toArray()['REQUEST_URI']);
     }
 
+    public function testCrossOriginRedirectsCanBeDisabled()
+    {
+        TestHttpServer::start();
+        $client = new NoPrivateNetworkHttpClient(new NativeHttpClient(), '10.0.0.0/8');
+
+        $response = $client->request('GET', 'http://localhost:8057/302?location=/302/relative', ['follow_cross_origin_redirects' => false]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
+        $this->assertSame(2, $response->getInfo('redirect_count'));
+
+        $response = $client->request('GET', 'http://localhost:8057/302?location=http://127.0.0.1:8057/', ['follow_cross_origin_redirects' => false]);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('http://127.0.0.1:8057/', $response->getInfo('redirect_url'));
+    }
+
     public function testHeadersArePassedOnRedirect()
     {
         $ipAddr = '104.26.14.6';

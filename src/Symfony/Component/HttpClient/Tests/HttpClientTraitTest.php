@@ -434,6 +434,13 @@ b'])]
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => new \stdClass()], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
+    public function testInvalidFollowCrossOriginRedirectsOption()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "follow_cross_origin_redirects" must be bool, "string" given.');
+        self::prepareRequest('GET', 'http://example.com', ['follow_cross_origin_redirects' => 'false'], HttpClientInterface::OPTIONS_DEFAULTS);
+    }
+
     public function testInvalidAuthBearerValue()
     {
         $this->expectException(InvalidArgumentException::class);

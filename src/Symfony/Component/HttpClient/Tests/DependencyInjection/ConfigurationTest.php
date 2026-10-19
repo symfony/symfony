@@ -94,6 +94,17 @@ class ConfigurationTest extends TestCase
         $this->process(['default_options' => ['retry_failed' => ['enabled' => false, 'base_uris' => ['http://example.com']]]]);
     }
 
+    public function testFollowCrossOriginRedirects()
+    {
+        $config = $this->process([
+            'default_options' => ['follow_cross_origin_redirects' => false],
+            'scoped_clients' => ['foo' => ['base_uri' => 'http://example.com', 'follow_cross_origin_redirects' => false]],
+        ]);
+
+        $this->assertFalse($config['default_options']['follow_cross_origin_redirects']);
+        $this->assertFalse($config['scoped_clients']['foo']['follow_cross_origin_redirects']);
+    }
+
     private function process(mixed ...$configs): array
     {
         return new Processor()->processConfiguration(new Configuration(new HttpClientBundle(), null, 'http_client'), $configs);

@@ -130,6 +130,16 @@ class HttpOptions
     /**
      * @return $this
      */
+    public function followCrossOriginRedirects(bool $follow): static
+    {
+        $this->options['follow_cross_origin_redirects'] = $follow;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function setHttpVersion(string $version): static
     {
         $this->options['http_version'] = $version;

@@ -33,6 +33,7 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
 class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStoreInterface
 {
     private Connection $conn;
+    private bool $ownsConnection = false;
 
     /**
      * You can either pass an existing database connection a Doctrine DBAL Connection
@@ -67,6 +68,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
             $this->conn = DriverManager::getConnection($params, $config);
+            $this->ownsConnection = true;
         }
     }
 
@@ -242,6 +244,16 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
     }
 
     /**
+     * Closes the connection created from a DSN, unless a lock is acquired on it.
+     */
+    public function close(): void
+    {
+        if ($this->ownsConnection && !$this->hasAcquiredLocks()) {
+            $this->conn->close();
+        }
+    }
+
+    /**
      * Returns a hashed version of the key.
      */
     private function getHashedKey(Key $key): int
@@ -295,5 +307,11 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
         static $storeRegistry = new \WeakMap();
 
         return $storeRegistry[$this->conn] ??= new InMemoryStore();
+    }
+
+    private function hasAcquiredLocks(): bool
+    {
+        // the in-memory store tracks the locks acquired on the connection, and it equals a new instance when it holds none
+        return $this->getInternalStore() != new InMemoryStore();
     }
 }

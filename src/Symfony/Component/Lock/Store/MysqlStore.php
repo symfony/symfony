@@ -131,6 +131,16 @@ class MysqlStore implements BlockingStoreInterface
         return false;
     }
 
+    /**
+     * Closes the connection created from a DSN, unless a lock is acquired on it.
+     */
+    public function close(): void
+    {
+        if (isset($this->dsn, $this->conn) && !$this->hasAcquiredLocks()) {
+            unset($this->conn, $this->saveStmt, $this->existsStmt, $this->deleteStmt);
+        }
+    }
+
     private function saveWithTimeout(Key $key, int $timeout): void
     {
         $this->getInternalStore()->save($key);
@@ -210,5 +220,11 @@ class MysqlStore implements BlockingStoreInterface
         static $storeRegistry = new \WeakMap();
 
         return $storeRegistry[$this->getConnection()] ??= new InMemoryStore();
+    }
+
+    private function hasAcquiredLocks(): bool
+    {
+        // the in-memory store tracks the locks acquired on the connection, and it equals a new instance when it holds none
+        return $this->getInternalStore() != new InMemoryStore();
     }
 }

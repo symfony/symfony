@@ -20,6 +20,7 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockStorageException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\SharedLockStoreInterface;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
 /**
  * RedisStore is a PersistingStoreInterface implementation using Redis as store engine.
@@ -226,6 +227,16 @@ class RedisStore implements SharedLockStoreInterface
         ';
 
         return (bool) $this->evaluate($script, (string) $key, [microtime(true), $this->getUniqueToken($key)]);
+    }
+
+    /**
+     * Resets a lazy connection, so that it connects again when used next.
+     */
+    public function close(): void
+    {
+        if ($this->redis instanceof LazyObjectInterface) {
+            $this->redis->resetLazyObject();
+        }
     }
 
     private function evaluate(string $script, string $resource, array $args): mixed

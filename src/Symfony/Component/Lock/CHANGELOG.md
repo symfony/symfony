@@ -9,6 +9,7 @@ CHANGELOG
  * Add the `service_id` and `advisory` options of lock stores and the `$advisory` argument of `StoreFactory::createStore()` to use advisory locks on an existing `\PDO` or Doctrine DBAL connection
  * Add `MysqlStore` and `DoctrineDbalMysqlStore`, based on MySQL `GET_LOCK()` and usable with the `mysql+advisory:` DSN
  * Add argument `$removeOnRelease` to `FlockStore` and the `flock+remove` DSN to remove the lock file when an exclusive lock is released
+ * Add `close()` to `DoctrineDbalMysqlStore`, `DoctrineDbalPostgreSqlStore`, `DoctrineDbalStore`, `MysqlStore`, `PdoStore`, `PostgreSqlStore` and `RedisStore`, called when the kernel shuts down
 
 8.1
 ---

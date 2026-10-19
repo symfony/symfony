@@ -259,6 +259,16 @@ class PdoStore implements PersistingStoreInterface
     }
 
     /**
+     * Closes the connection created from a DSN.
+     */
+    public function close(): void
+    {
+        if (isset($this->dsn)) {
+            unset($this->conn);
+        }
+    }
+
+    /**
      * Cleans up the table by removing all expired locks.
      */
     private function prune(): void

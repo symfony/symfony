@@ -248,6 +248,51 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         pg_close($waiter);
     }
 
+    public function testCloseClosesTheConnection()
+    {
+        $this->createPostgreSqlConnection();
+        $store = new DoctrineDbalPostgreSqlStore('pgsql+advisory://postgres:password@'.getenv('POSTGRES_HOST'));
+        $conn = (new \ReflectionProperty($store, 'conn'))->getValue($store);
+        $key = new Key(__METHOD__);
+        $this->assertFalse($store->exists($key));
+        $this->assertTrue($conn->isConnected());
+
+        $store->close();
+        $this->assertFalse($conn->isConnected());
+
+        $store->save($key);
+        $this->assertTrue($store->exists($key));
+        $store->delete($key);
+    }
+
+    public function testCloseKeepsTheConnectionWhileALockIsHeld()
+    {
+        $this->createPostgreSqlConnection();
+        $store = new DoctrineDbalPostgreSqlStore('pgsql+advisory://postgres:password@'.getenv('POSTGRES_HOST'));
+        $conn = (new \ReflectionProperty($store, 'conn'))->getValue($store);
+        $key = new Key(__METHOD__);
+        $store->save($key);
+
+        $store->close();
+        $this->assertTrue($conn->isConnected());
+        $this->assertTrue($store->exists($key));
+
+        $store->delete($key);
+        $store->close();
+        $this->assertFalse($conn->isConnected());
+    }
+
+    public function testCloseKeepsAnInjectedConnection()
+    {
+        $conn = $this->createPostgreSqlConnection();
+        $store = new DoctrineDbalPostgreSqlStore($conn);
+        $this->assertFalse($store->exists(new Key(__METHOD__)));
+
+        $store->close();
+
+        $this->assertTrue($conn->isConnected());
+    }
+
     private static function getDbalConnection(string $dsn): Connection
     {
         $params = (new DsnParser(['sqlite' => 'pdo_sqlite']))->parse($dsn);

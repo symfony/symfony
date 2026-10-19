@@ -241,6 +241,16 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
     }
 
     /**
+     * Closes the connection created from a DSN, unless a lock is acquired on it.
+     */
+    public function close(): void
+    {
+        if (isset($this->dsn, $this->conn) && !$this->hasAcquiredLocks()) {
+            unset($this->conn);
+        }
+    }
+
+    /**
      * Returns a hashed version of the key.
      */
     private function getHashedKey(Key $key): int
@@ -300,5 +310,11 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         static $storeRegistry = new \WeakMap();
 
         return $storeRegistry[$this->getConnection()] ??= new InMemoryStore();
+    }
+
+    private function hasAcquiredLocks(): bool
+    {
+        // the in-memory store tracks the locks acquired on the connection, and it equals a new instance when it holds none
+        return $this->getInternalStore() != new InMemoryStore();
     }
 }

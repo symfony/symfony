@@ -22,7 +22,7 @@ use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
-use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 /**
  * A performant implementation of the HttpClientInterface contracts based on the curl extension.
@@ -32,7 +32,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
+final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface, ShutdownInterface
 {
     use HttpClientTrait;
 
@@ -359,9 +359,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         return new ResponseStream(CurlResponse::stream($responses, $timeout));
     }
 
-    public function reset(): void
+    public function reset(bool $shutdown = false): void
     {
-        $this->multi->reset();
+        $this->multi->reset($shutdown);
     }
 
     /**

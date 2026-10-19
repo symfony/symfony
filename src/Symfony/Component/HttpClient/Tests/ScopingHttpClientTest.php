@@ -19,6 +19,8 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpClient\Tests\Fixtures\ResettableClient;
+use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 
 class ScopingHttpClientTest extends TestCase
 {
@@ -166,5 +168,19 @@ class ScopingHttpClientTest extends TestCase
         $response = $client->request('GET', 'santysisi');
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('https://foo.example.com/app/santysisi', $response->getInfo('url'));
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwareClientsOnly()
+    {
+        $client = new ScopingHttpClient($inner = new ShutdownAwareClient(), []);
+        $client->reset();
+        $client->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $client = new ScopingHttpClient($inner = new ResettableClient(), []);
+        $client->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

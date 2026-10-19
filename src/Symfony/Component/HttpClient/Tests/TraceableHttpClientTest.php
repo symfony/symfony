@@ -16,6 +16,8 @@ use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Tests\Fixtures\ResettableClient;
+use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -224,5 +226,19 @@ class TraceableHttpClientTest extends TestCase
         $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
 
         $this->assertCount(1, $sut->getTracedRequests());
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwareClientsOnly()
+    {
+        $client = new TraceableHttpClient($inner = new ShutdownAwareClient());
+        $client->reset();
+        $client->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $client = new TraceableHttpClient($inner = new ResettableClient());
+        $client->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

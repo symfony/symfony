@@ -47,8 +47,8 @@ final class AmpClientState extends ClientState
     public array $dnsCache = [];
     public int $responseCount = 0;
     public array $pushedResponses = [];
+    public array $clients = [];
 
-    private array $clients = [];
     private \Closure $clientConfigurator;
 
     public function __construct(

@@ -22,6 +22,8 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Tests\Fixtures\ResettableClient;
+use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class NoPrivateNetworkHttpClientTest extends TestCase
@@ -300,5 +302,19 @@ class NoPrivateNetworkHttpClientTest extends TestCase
     private function getMockHttpClient(string $ipAddr, string $content)
     {
         return new MockHttpClient(new MockResponse($content, ['primary_ip' => $ipAddr]));
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwareClientsOnly()
+    {
+        $client = new NoPrivateNetworkHttpClient($inner = new ShutdownAwareClient());
+        $client->reset();
+        $client->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $client = new NoPrivateNetworkHttpClient($inner = new ResettableClient());
+        $client->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

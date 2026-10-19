@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Tests\Fixtures\ResettableClient;
+use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
@@ -73,5 +75,19 @@ class ThrottlingHttpClientTest extends TestCase
         $client->request('GET', 'http://example.com/bar');
 
         $this->assertEqualsWithDelta(5, microtime(true) - $start, 1);
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwareClientsOnly()
+    {
+        $client = new ThrottlingHttpClient($inner = new ShutdownAwareClient(), new RateLimiterFactory(['id' => 'foo', 'policy' => 'no_limit'], new InMemoryStorage())->create());
+        $client->reset();
+        $client->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $client = new ThrottlingHttpClient($inner = new ResettableClient(), new RateLimiterFactory(['id' => 'foo', 'policy' => 'no_limit'], new InMemoryStorage())->create());
+        $client->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

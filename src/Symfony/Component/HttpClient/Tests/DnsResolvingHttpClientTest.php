@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\DnsResolvingHttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 use Symfony\Contracts\Service\ResetInterface;
 
 class DnsResolvingHttpClientTest extends TestCase
@@ -163,5 +164,29 @@ class DnsResolvingHttpClientTest extends TestCase
         $client->reset();
 
         $this->assertSame(1, $resolver->resetCount);
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwareClientsOnly()
+    {
+        $resolver = new class implements ResetInterface {
+            public array $resets = [];
+
+            public function __invoke(string $host): ?string
+            {
+                return null;
+            }
+
+            public function reset(): void
+            {
+                $this->resets[] = \func_get_args();
+            }
+        };
+
+        $client = new DnsResolvingHttpClient($inner = new ShutdownAwareClient(), $resolver);
+        $client->reset();
+        $client->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+        $this->assertSame([[], []], $resolver->resets);
     }
 }

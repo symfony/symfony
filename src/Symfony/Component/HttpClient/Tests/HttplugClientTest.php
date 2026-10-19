@@ -24,6 +24,8 @@ use Symfony\Component\HttpClient\HttplugClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Tests\Fixtures\ResettableClient;
+use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 use Symfony\Component\HttpClient\Tests\Fixtures\UnknownSizeStream;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
@@ -342,5 +344,19 @@ class HttplugClientTest extends TestCase
             $bodyWithOptionFalse = json_decode((string) $responseWithOptionFalse->getBody(), true);
             $this->assertSame('HTTP/'.$httpVersion, $bodyWithOptionFalse['SERVER_PROTOCOL']);
         }
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwareClientsOnly()
+    {
+        $client = new HttplugClient($inner = new ShutdownAwareClient());
+        $client->reset();
+        $client->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $client = new HttplugClient($inner = new ResettableClient());
+        $client->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

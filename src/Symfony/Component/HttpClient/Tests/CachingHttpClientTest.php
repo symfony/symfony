@@ -28,6 +28,8 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Tests\Fixtures\ResettableClient;
+use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
@@ -2776,5 +2778,19 @@ class CachingHttpClientTest extends TestCase
             $sharedCache,
             $maxTtl,
         );
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwareClientsOnly()
+    {
+        $client = new CachingHttpClient($inner = new ShutdownAwareClient(), $this->cacheAdapter);
+        $client->reset();
+        $client->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $client = new CachingHttpClient($inner = new ResettableClient(), $this->cacheAdapter);
+        $client->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

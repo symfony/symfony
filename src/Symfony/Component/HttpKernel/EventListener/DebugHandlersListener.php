@@ -35,6 +35,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     private bool|\Closure $webMode;
     private bool $firstCall = true;
     private bool $hasTerminatedWithException = false;
+    private ?\WeakReference $configuredErrorHandler = null;
 
     /**
      * @param callable|null                $exceptionHandler A handler that must support \Throwable instances that will be called on Exception
@@ -99,7 +100,8 @@ class DebugHandlersListener implements EventSubscriberInterface
 
             if ($handler instanceof ErrorHandler) {
                 $handler->setExceptionHandler($this->exceptionHandler);
-                if (null !== $hasRun) {
+                if (null !== $hasRun && $handler !== $this->configuredErrorHandler?->get()) {
+                    $this->configuredErrorHandler = \WeakReference::create($handler);
                     $throwAt = $handler->throwAt(0) | \E_ERROR | \E_CORE_ERROR | \E_COMPILE_ERROR | \E_USER_ERROR | \E_RECOVERABLE_ERROR | \E_PARSE;
                     $loggers = [];
 

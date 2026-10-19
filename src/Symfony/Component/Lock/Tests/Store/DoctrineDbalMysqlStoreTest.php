@@ -295,6 +295,49 @@ class DoctrineDbalMysqlStoreTest extends AbstractStoreTestCase
         }
     }
 
+    public function testCloseClosesTheConnection()
+    {
+        $store = new DoctrineDbalMysqlStore(self::getMysqlDsn('mysql+advisory'));
+        $conn = (new \ReflectionProperty($store, 'conn'))->getValue($store);
+        $key = new Key(__METHOD__);
+        $this->assertFalse($store->exists($key));
+        $this->assertTrue($conn->isConnected());
+
+        $store->close();
+        $this->assertFalse($conn->isConnected());
+
+        $store->save($key);
+        $this->assertTrue($store->exists($key));
+        $store->delete($key);
+    }
+
+    public function testCloseKeepsTheConnectionWhileALockIsHeld()
+    {
+        $store = new DoctrineDbalMysqlStore(self::getMysqlDsn('mysql+advisory'));
+        $conn = (new \ReflectionProperty($store, 'conn'))->getValue($store);
+        $key = new Key(__METHOD__);
+        $store->save($key);
+
+        $store->close();
+        $this->assertTrue($conn->isConnected());
+        $this->assertTrue($store->exists($key));
+
+        $store->delete($key);
+        $store->close();
+        $this->assertFalse($conn->isConnected());
+    }
+
+    public function testCloseKeepsAnInjectedConnection()
+    {
+        $conn = $this->createMysqlConnection();
+        $store = new DoctrineDbalMysqlStore($conn);
+        $this->assertFalse($store->exists(new Key(__METHOD__)));
+
+        $store->close();
+
+        $this->assertTrue($conn->isConnected());
+    }
+
     private static function getMysqlDsn(string $scheme): string
     {
         if (!$host = getenv('MYSQL_HOST')) {

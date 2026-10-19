@@ -240,4 +240,46 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $this->assertSame(\PGSQL_TUPLES_OK, pg_result_status(pg_get_result($waiter)));
         pg_close($waiter);
     }
+
+    public function testCloseClosesTheConnection()
+    {
+        $store = $this->getStore();
+        $key = new Key(__METHOD__);
+        $this->assertFalse($store->exists($key));
+        $conn = \WeakReference::create((new \ReflectionProperty($store, 'conn'))->getValue($store));
+
+        $store->close();
+        $this->assertNull($conn->get());
+
+        $store->save($key);
+        $this->assertTrue($store->exists($key));
+        $store->delete($key);
+    }
+
+    public function testCloseKeepsTheConnectionWhileALockIsHeld()
+    {
+        $store = $this->getStore();
+        $key = new Key(__METHOD__);
+        $store->save($key);
+        $conn = \WeakReference::create((new \ReflectionProperty($store, 'conn'))->getValue($store));
+
+        $store->close();
+        $this->assertNotNull($conn->get());
+        $this->assertTrue($store->exists($key));
+
+        $store->delete($key);
+        $store->close();
+        $this->assertNull($conn->get());
+    }
+
+    public function testCloseKeepsAnInjectedConnection()
+    {
+        $pdo = new \PDO('pgsql:host='.$this->getPostgresHost(), 'postgres', 'password');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $store = new PostgreSqlStore($pdo);
+
+        $store->close();
+
+        $this->assertSame($pdo, (new \ReflectionProperty($store, 'conn'))->getValue($store));
+    }
 }

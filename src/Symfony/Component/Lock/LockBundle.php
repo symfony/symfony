@@ -136,7 +136,8 @@ class LockBundle extends AbstractBundle
                 $storeDefinition
                     ->setFactory([StoreFactory::class, 'createStore'])
                     ->setArguments($advisory ? [$resourceStore, true] : [$resourceStore])
-                    ->addTag('lock.store');
+                    ->addTag('lock.store')
+                    ->addTag('kernel.reset', ['method' => 'close', 'on_invalid' => 'ignore', 'on_shutdown' => 'only']);
 
                 $container->setDefinition($storeDefinitionId = '.lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
 

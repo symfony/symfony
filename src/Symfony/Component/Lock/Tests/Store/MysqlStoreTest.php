@@ -226,4 +226,48 @@ class MysqlStoreTest extends AbstractStoreTestCase
             $this->addToAssertionCount(1);
         }
     }
+
+    public function testCloseClosesTheConnection()
+    {
+        [$dsn, $user, $pass] = $this->getEnv();
+        $store = new MysqlStore($dsn, ['db_username' => $user, 'db_password' => $pass]);
+        $key = new Key(__METHOD__);
+        $this->assertFalse($store->exists($key));
+        $conn = \WeakReference::create((new \ReflectionProperty($store, 'conn'))->getValue($store));
+
+        $store->close();
+        $this->assertNull($conn->get());
+
+        $store->save($key);
+        $this->assertTrue($store->exists($key));
+        $store->delete($key);
+    }
+
+    public function testCloseKeepsTheConnectionWhileALockIsHeld()
+    {
+        [$dsn, $user, $pass] = $this->getEnv();
+        $store = new MysqlStore($dsn, ['db_username' => $user, 'db_password' => $pass]);
+        $key = new Key(__METHOD__);
+        $store->save($key);
+        $conn = \WeakReference::create((new \ReflectionProperty($store, 'conn'))->getValue($store));
+
+        $store->close();
+        $this->assertNotNull($conn->get());
+        $this->assertTrue($store->exists($key));
+
+        $store->delete($key);
+        $store->close();
+        $this->assertNull($conn->get());
+    }
+
+    public function testCloseKeepsAnInjectedConnection()
+    {
+        $pdo = $this->getPdo();
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $store = new MysqlStore($pdo);
+
+        $store->close();
+
+        $this->assertSame($pdo, (new \ReflectionProperty($store, 'conn'))->getValue($store));
+    }
 }

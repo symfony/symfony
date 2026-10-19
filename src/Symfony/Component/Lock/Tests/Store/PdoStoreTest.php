@@ -191,4 +191,30 @@ class PdoStoreTest extends AbstractStoreTestCase
             $pdo->exec('DROP TABLE IF EXISTS lock_keys');
         }
     }
+
+    public function testCloseClosesTheConnection()
+    {
+        $store = new PdoStore('sqlite:'.self::$dbFile);
+        $key = new Key(__METHOD__);
+        $store->save($key);
+        $conn = \WeakReference::create((new \ReflectionProperty($store, 'conn'))->getValue($store));
+
+        $store->close();
+        $this->assertNull($conn->get());
+
+        $this->assertTrue($store->exists($key));
+        $store->delete($key);
+        $this->assertFalse($store->exists($key));
+    }
+
+    public function testCloseKeepsAnInjectedConnection()
+    {
+        $pdo = new \PDO('sqlite:'.self::$dbFile);
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $store = new PdoStore($pdo);
+
+        $store->close();
+
+        $this->assertSame($pdo, (new \ReflectionProperty($store, 'conn'))->getValue($store));
+    }
 }

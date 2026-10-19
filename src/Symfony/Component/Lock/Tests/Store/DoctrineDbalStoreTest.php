@@ -373,4 +373,33 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $table = $schema->getTable('lock_keys');
         $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
+
+    public function testCloseClosesTheConnection()
+    {
+        $store = new DoctrineDbalStore('sqlite://localhost/'.self::$dbFile);
+        $conn = (new \ReflectionProperty($store, 'conn'))->getValue($store);
+        $key = new Key(__METHOD__);
+        $store->save($key);
+        $this->assertTrue($conn->isConnected());
+
+        $store->close();
+        $this->assertFalse($conn->isConnected());
+
+        $this->assertTrue($store->exists($key));
+        $store->delete($key);
+        $this->assertFalse($store->exists($key));
+    }
+
+    public function testCloseKeepsAnInjectedConnection()
+    {
+        $store = $this->getStore();
+        $conn = (new \ReflectionProperty($store, 'conn'))->getValue($store);
+        $key = new Key(__METHOD__);
+        $store->save($key);
+
+        $store->close();
+
+        $this->assertTrue($conn->isConnected());
+        $store->delete($key);
+    }
 }

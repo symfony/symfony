@@ -55,6 +55,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
     use ExpiringStoreTrait;
 
     private Connection $conn;
+    private bool $ownsConnection = false;
 
     /**
      * List of available options:
@@ -97,6 +98,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
             $this->conn = DriverManager::getConnection($params, $config);
+            $this->ownsConnection = true;
         }
     }
 
@@ -275,6 +277,16 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $this->configureSchemaTable($schema->createTable($this->table));
 
         return $schema;
+    }
+
+    /**
+     * Closes the connection created from a DSN.
+     */
+    public function close(): void
+    {
+        if ($this->ownsConnection) {
+            $this->conn->close();
+        }
     }
 
     private function buildSchemaTable(): Table

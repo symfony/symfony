@@ -21,7 +21,7 @@ class CasTokenHandlerFactory implements TokenHandlerFactoryInterface
 {
     public function create(ContainerBuilder $container, string $id, array|string $config): void
     {
-        $container->setDefinition($id, new ChildDefinition('security.access_token_handler.cas'));
+        $container->setDefinition($id, new ChildDefinition('security.access_token_handler.cas'))->setLazy(true);
 
         $container
             ->register('security.access_token_handler.cas', Cas2Handler::class)

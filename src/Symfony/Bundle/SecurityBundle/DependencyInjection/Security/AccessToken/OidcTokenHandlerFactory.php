@@ -38,6 +38,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
         $audience = [0] === array_keys($config['audience']) ? $config['audience'][0] : $config['audience'];
 
         $tokenHandlerDefinition = $container->setDefinition($id, (new ChildDefinition('security.access_token_handler.oidc'))
+            ->setLazy(true)
             ->replaceArgument(2, $audience)
             ->replaceArgument(3, $config['issuers'])
             ->replaceArgument(4, $config['claim'])

@@ -36,6 +36,7 @@ class OidcUserInfoTokenHandlerFactory implements TokenHandlerFactoryInterface
         }
 
         $tokenHandlerDefinition = $container->setDefinition($id, new ChildDefinition('security.access_token_handler.oidc_user_info'))
+            ->setLazy(true)
             ->replaceArgument(0, $clientDefinition)
             ->replaceArgument(2, $config['claim']);
 

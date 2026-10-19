@@ -1443,6 +1443,38 @@ class AccessTokenFactoryTest extends TestCase
         yield 'an environment variable inside a URL' => ['https://env_2b0d1a_API_HOST_4f8c/v1', '/.well-known/oauth-protected-resource/v1', 'https://env_2b0d1a_API_HOST_4f8c/.well-known/oauth-protected-resource/v1'];
     }
 
+    #[DataProvider('provideBuiltInTokenHandlers')]
+    public function testBuiltInTokenHandlersAreLazy(array $tokenHandler)
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig(['token_handler' => $tokenHandler], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $this->assertTrue($container->getDefinition('security.access_token_handler.firewall1')->isLazy());
+    }
+
+    public static function provideBuiltInTokenHandlers(): iterable
+    {
+        yield 'oidc' => [['oidc' => ['issuers' => ['https://www.example.com'], 'audience' => 'audience', 'keyset' => 'keyset', 'enforce_at_jwt_type' => true]]];
+        yield 'oidc with discovery' => [['oidc' => ['issuers' => ['https://www.example.com'], 'audience' => 'audience', 'discovery' => ['base_uri' => 'https://www.example.com/realms/demo/'], 'enforce_at_jwt_type' => true]]];
+        yield 'oidc_user_info' => [['oidc_user_info' => ['base_uri' => 'https://www.example.com/userinfo', 'client' => 'oidc.client']]];
+        yield 'oauth2' => [['oauth2' => true]];
+        yield 'cas' => [['cas' => ['validation_url' => 'https://www.example.com/cas/validate']]];
+    }
+
+    public function testATokenHandlerServiceIsLeftAsDefined()
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig(['token_handler' => 'in_memory_token_handler_service_id'], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $this->assertFalse($container->getDefinition('security.access_token_handler.firewall1')->isLazy());
+    }
+
     private function createContainerBuilder(): ContainerBuilder
     {
         $container = new ContainerBuilder();

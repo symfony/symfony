@@ -107,7 +107,9 @@ class Response
 
     public ResponseHeaderBag $headers {
         set {
-            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "headers" of "%s" is deprecated; pass the header bag as a constructor argument instead.', static::class);
+            if (!self::$writingHeaders) {
+                trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "headers" of "%s" is deprecated; pass the header bag as a constructor argument instead.', static::class);
+            }
 
             $this->headers = $value;
         }
@@ -200,6 +202,8 @@ class Response
      */
     private array $sentHeaders;
 
+    private static bool $writingHeaders = false;
+
     /**
      * @param int $status The HTTP status code (200 "OK" by default)
      *
@@ -207,7 +211,10 @@ class Response
      */
     public function __construct(?string $content = '', int $status = 200, array|ResponseHeaderBag $headers = [])
     {
-        self::setHeaders($this, $headers instanceof ResponseHeaderBag ? $headers : new ResponseHeaderBag($headers));
+        $headers = $headers instanceof ResponseHeaderBag ? $headers : new ResponseHeaderBag($headers);
+        self::$writingHeaders = true;
+        $this->headers = $headers;
+        self::$writingHeaders = false;
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
@@ -235,7 +242,10 @@ class Response
      */
     public function __clone()
     {
-        self::setHeaders($this, clone $this->headers);
+        $headers = clone $this->headers;
+        self::$writingHeaders = true;
+        $this->headers = $headers;
+        self::$writingHeaders = false;
     }
 
     /**
@@ -1342,14 +1352,5 @@ class Response
                 $this->headers->remove('Cache-Control');
             }
         }
-    }
-
-    private static function setHeaders(self $response, ResponseHeaderBag $headers): void
-    {
-        static $r;
-
-        $r ??= new \ReflectionProperty(self::class, 'headers');
-
-        $r->setRawValue($response, $headers);
     }
 }

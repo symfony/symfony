@@ -3212,6 +3212,23 @@ b'])]
 
     #[Group('legacy')]
     #[IgnoreDeprecations]
+    public function testDirectPropertyWriteIsDeprecatedAfterFailedInitialize()
+    {
+        $request = new Request();
+
+        try {
+            $request->initialize([], [], [], [], ['file' => 'not an uploaded file']);
+            $this->fail('An exception should have been thrown.');
+        } catch (\InvalidArgumentException) {
+        }
+
+        $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.1: Directly setting property "query" of "Symfony\Component\HttpFoundation\Request" is deprecated; pass query parameters as a constructor argument or call "initialize()" instead.');
+
+        $request->query = new InputBag(['k' => 'v']);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testDirectPropertyWriteFromSubclassReportsSubclass()
     {
         $request = new NewRequest();

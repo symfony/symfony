@@ -45,8 +45,12 @@ class ResettableServicePass implements CompilerPassInterface
                     throw new RuntimeException(\sprintf('Tag "kernel.reset" requires the "method" attribute to be set on service "%s".', $id));
                 }
 
-                if ('ignore' === ($attributes['on_invalid'] ?? null)) {
-                    $attributes['method'] = '?'.$attributes['method'];
+                $method = $attributes['method'];
+                $optional = 'ignore' === ($attributes['on_invalid'] ?? null);
+
+                if (str_starts_with($method, '?')) {
+                    $method = substr($method, 1);
+                    $optional = true;
                 }
 
                 $onShutdown = $attributes['on_shutdown'] ?? null;
@@ -54,7 +58,7 @@ class ResettableServicePass implements CompilerPassInterface
                     throw new RuntimeException(\sprintf('The "on_shutdown" attribute of tag "kernel.reset" on service "%s" must be "flag" or "only".', $id));
                 }
 
-                $method = [$attributes['method'] => $onShutdown];
+                $method = [$method, $optional, $onShutdown];
 
                 if ($isShared) {
                     $methods[$id][] = $method;

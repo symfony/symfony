@@ -410,7 +410,7 @@ class ContainerTest extends TestCase
                 $this->calls[] = $shutdown;
             }
         };
-        $resetter = new ServicesResetter(new \ArrayIterator(['tagged' => $tagged, 'disabled' => $disabled, 'custom' => $custom]), ['tagged' => [['reset' => 'flag']], 'disabled' => [['reset' => null]], 'custom' => [['clear' => 'flag']]]);
+        $resetter = new ServicesResetter(new \ArrayIterator(['tagged' => $tagged, 'disabled' => $disabled, 'custom' => $custom]), ['tagged' => [['reset', false, 'flag']], 'disabled' => [['reset', false, null]], 'custom' => [['clear', false, 'flag']]]);
         $container = new class($resetter) extends Container {
             public function __construct(private ServicesResetter $resetter)
             {
@@ -447,7 +447,7 @@ class ContainerTest extends TestCase
     public function testResetInitializesLazyServicesResetter(bool $shutdown)
     {
         $service = new ShutdownAwareService();
-        $resetter = new ServicesResetter(new \ArrayIterator(['service' => $service]), ['service' => [['reset' => 'flag']]]);
+        $resetter = new ServicesResetter(new \ArrayIterator(['service' => $service]), ['service' => [['reset', false, 'flag']]]);
         $lazyResetter = (new \ReflectionClass(ServicesResetter::class))->newLazyProxy(static fn () => $resetter);
         $container = new Container();
         $container->set('services_resetter', $lazyResetter);
@@ -477,7 +477,7 @@ class ContainerTest extends TestCase
             }
         };
         $second = new ShutdownAwareService();
-        $resetter = new ServicesResetter(new \ArrayIterator(['first' => $first, 'second' => $second]), ['first' => [['reset' => 'flag']], 'second' => [['reset' => 'flag']]]);
+        $resetter = new ServicesResetter(new \ArrayIterator(['first' => $first, 'second' => $second]), ['first' => [['reset', false, 'flag']], 'second' => [['reset', false, 'flag']]]);
         $container->set('services_resetter', $resetter);
         $container->set('first', $first);
         $container->set('second', $second);

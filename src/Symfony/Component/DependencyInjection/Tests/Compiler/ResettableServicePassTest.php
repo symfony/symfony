@@ -59,9 +59,9 @@ class ResettableServicePassTest extends TestCase
                     'three' => new Reference('three', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
                 ]),
                 [
-                    'one' => [['reset' => null]],
-                    'two' => [['clear' => null]],
-                    'three' => [['resetFirst' => null], ['resetSecond' => null]],
+                    'one' => [['reset', false, null]],
+                    'two' => [['clear', false, null]],
+                    'three' => [['resetFirst', false, null], ['resetSecond', false, null]],
                 ],
             ],
             $definition->getArguments()
@@ -91,7 +91,7 @@ class ResettableServicePassTest extends TestCase
         $container->addCompilerPass(new ResettableServicePass());
         $container->compile();
 
-        $method = ['reset' => $onShutdown];
+        $method = ['reset', false, $onShutdown];
         if ($shared) {
             $this->assertSame(['service' => [$method]], $container->getDefinition('services_resetter')->getArgument(1));
         } else {
@@ -134,12 +134,14 @@ class ResettableServicePassTest extends TestCase
         $container->compile();
     }
 
-    public function testIgnoreInvalidMethod()
+    #[TestWith([['method' => 'missingMethod', 'on_invalid' => 'ignore']])]
+    #[TestWith([['method' => '?missingMethod']])]
+    public function testIgnoreInvalidMethod(array $attributes)
     {
         $container = new ContainerBuilder();
         $container->register(ResettableService::class)
             ->setPublic(true)
-            ->addTag('kernel.reset', ['method' => 'missingMethod', 'on_invalid' => 'ignore']);
+            ->addTag('kernel.reset', $attributes);
         $container->register('services_resetter', ServicesResetter::class)
             ->setPublic(true)
             ->setArguments([null, []]);
@@ -147,7 +149,7 @@ class ResettableServicePassTest extends TestCase
 
         $container->compile();
 
-        $this->assertSame([ResettableService::class => [['?missingMethod' => null]]], $container->getDefinition('services_resetter')->getArgument(1));
+        $this->assertSame([ResettableService::class => [['missingMethod', true, null]]], $container->getDefinition('services_resetter')->getArgument(1));
 
         $resettable = $container->get(ResettableService::class);
         $resetter = $container->get('services_resetter');
@@ -184,7 +186,7 @@ class ResettableServicePassTest extends TestCase
 
         // Methods should only contain shared services
         $this->assertSame(
-            ['shared' => [['reset' => null]]],
+            ['shared' => [['reset', false, null]]],
             $definition->getArgument(1)
         );
 
@@ -196,7 +198,7 @@ class ResettableServicePassTest extends TestCase
 
         // Non-shared service should have container.tracked_for_reset tag
         $this->assertSame(
-            [['method' => ['clear' => null]]],
+            [['method' => ['clear', false, null]]],
             $container->getDefinition('non_shared')->getTag('container.tracked_for_reset')
         );
     }
@@ -250,7 +252,7 @@ class ResettableServicePassTest extends TestCase
         $container->compile();
 
         $this->assertSame(
-            [['method' => ['reset' => null]], ['method' => ['clear' => null]]],
+            [['method' => ['reset', false, null]], ['method' => ['clear', false, null]]],
             $container->getDefinition('non_shared')->getTag('container.tracked_for_reset')
         );
     }
@@ -271,7 +273,7 @@ class ResettableServicePassTest extends TestCase
         $container->compile();
 
         $this->assertSame(
-            [['method' => ['?reset' => null]]],
+            [['method' => ['reset', true, null]]],
             $container->getDefinition('non_shared')->getTag('container.tracked_for_reset')
         );
     }

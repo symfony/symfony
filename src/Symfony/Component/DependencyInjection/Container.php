@@ -434,7 +434,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Registers an instance of a non-shared service for reset tracking.
      *
-     * @param list<string|array<string, 'flag'|'only'|null>> $resetMethods
+     * @param list<string|array{string, bool, 'flag'|'only'|null}> $resetMethods
      *
      * @internal
      */

@@ -66,6 +66,23 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertSame(['kernel.reset' => [['method' => 'reset']]], $discoveryMain->getTags());
     }
 
+    public function testTheServicesThatReachTheProviderAreLazy()
+    {
+        $container = new ContainerBuilder();
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+        ], $factory);
+        $factory->createAuthenticator($container, 'main', $config, 'userprovider');
+
+        $this->assertTrue($container->getDefinition('security.authenticator.oidc_login.discovery.main')->isLazy());
+        $this->assertTrue($container->getDefinition('security.authenticator.oidc_login.client.main')->isLazy());
+        $this->assertTrue($container->getDefinition('security.authenticator.oidc_login.signature_verifier.main')->isLazy());
+    }
+
     public function testFirewallUserProviderIsInjected()
     {
         // the user provider loads the user, so that the token stored in the session can be

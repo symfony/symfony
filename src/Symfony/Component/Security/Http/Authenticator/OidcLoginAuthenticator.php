@@ -57,12 +57,6 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     private array $options;
 
     /**
-     * Refuses a public client that turns PKCE or the ID token signature check off.
-     *
-     * Such a client, which authenticates with "none", sends no secret: PKCE is then the only
-     * thing binding the authorization code to it, and the ID token signature the only thing
-     * tying the token endpoint response to the provider beyond the TLS verification.
-     *
      * @param array<string, string>         $authorizationParams Additional parameters of the authorization request, e.g.
      *                                                           "prompt" or "ui_locales"; the protocol parameters the
      *                                                           authenticator manages itself are rejected. Listen to
@@ -106,16 +100,6 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
 
         if (!\in_array($this->options['pkce_method'], ['S256', 'plain'], true)) {
             throw new \InvalidArgumentException(\sprintf('Invalid PKCE method "%s": RFC 7636 defines "S256" and "plain" only.', $this->options['pkce_method']));
-        }
-
-        if ('none' === $oidcClient->getClientAuthenticationMethod()) {
-            if (!$this->options['pkce_enabled']) {
-                throw new \InvalidArgumentException('PKCE cannot be disabled for a public OIDC client, which authenticates with "none": it is the only thing binding the authorization code to this client.');
-            }
-
-            if (null === $signatureVerifier) {
-                throw new \InvalidArgumentException('The ID token signature must be verified for a public OIDC client, which authenticates with "none": without the check, only the TLS verification of the token request ties the ID token to the provider, which is too little for a client that has nothing but PKCE protecting its code exchange.');
-            }
         }
 
         if ($managed = array_intersect_key($authorizationParams, array_flip(self::MANAGED_PARAMS))) {
@@ -172,6 +156,8 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
      */
     private function startAuthorizationRequest(Request $request, array $forcedParams = []): Response
     {
+        $this->checkPublicClient();
+
         $session = $this->getSession($request);
         $prefix = $this->getSessionPrefix();
 
@@ -260,6 +246,8 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
 
     public function authenticate(Request $request): Passport
     {
+        $this->checkPublicClient();
+
         $session = $this->getSession($request);
         $prefix = $this->getSessionPrefix();
 
@@ -614,5 +602,30 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     private function getSessionPrefix(): string
     {
         return '_security.oidc_login.'.$this->options['firewall_name'].'.';
+    }
+
+    /**
+     * Refuses a public client that turns PKCE or the ID token signature check off.
+     *
+     * Such a client, which authenticates with "none", sends no secret: PKCE is then the only
+     * thing binding the authorization code to it, and the ID token signature the only thing
+     * tying the token endpoint response to the provider beyond the TLS verification.
+     *
+     * This is checked when the authenticator is used rather than when it is created, so that
+     * the client can be a lazy service.
+     */
+    private function checkPublicClient(): void
+    {
+        if ('none' !== $this->oidcClient->getClientAuthenticationMethod()) {
+            return;
+        }
+
+        if (!$this->options['pkce_enabled']) {
+            throw new \LogicException('PKCE cannot be disabled for a public OIDC client, which authenticates with "none": it is the only thing binding the authorization code to this client.');
+        }
+
+        if (null === $this->signatureVerifier) {
+            throw new \LogicException('The ID token signature must be verified for a public OIDC client, which authenticates with "none": without the check, only the TLS verification of the token request ties the ID token to the provider, which is too little for a client that has nothing but PKCE protecting its code exchange.');
+        }
     }
 }

@@ -14,7 +14,10 @@ namespace Symfony\Component\Console\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\SharedLockInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
@@ -31,6 +34,7 @@ class LockableTraitTest extends TestCase
         require_once self::$fixturesPath.'/FooLock3Command.php';
         require_once self::$fixturesPath.'/FooLock4InvokableCommand.php';
         require_once self::$fixturesPath.'/FooLockAliasedInvokableCommand.php';
+        require_once self::$fixturesPath.'/FooLockReleaseFailureCommand.php';
     }
 
     public function testLockIsReleased()
@@ -68,6 +72,28 @@ class LockableTraitTest extends TestCase
 
         $tester = new CommandTester($command);
         $this->assertSame(1, $tester->execute([]));
+    }
+
+    public function testFailingToAcquireALockDoesNotKeepTheCommandFromLockingAgain()
+    {
+        $failingLock = $this->createStub(SharedLockInterface::class);
+        $failingLock->method('acquire')->willThrowException(new LockAcquiringException('Failed to acquire the "foo:lock3" lock.'));
+
+        $lock = $this->createStub(SharedLockInterface::class);
+        $lock->method('acquire')->willReturn(true);
+
+        $lockFactory = $this->createMock(LockFactory::class);
+        $lockFactory->expects(static::exactly(2))->method('createLock')->willReturnOnConsecutiveCalls($failingLock, $lock);
+
+        $tester = new CommandTester(new \FooLock3Command($lockFactory));
+
+        try {
+            $tester->execute([]);
+            $this->fail('The first lock() call should have thrown.');
+        } catch (LockAcquiringException) {
+        }
+
+        $this->assertSame(2, $tester->execute([]));
     }
 
     public function testCustomLockFactoryIsUsed()
@@ -173,5 +199,14 @@ class LockableTraitTest extends TestCase
 
         $this->assertSame(Command::SUCCESS, $invokable());
         $this->assertSame(['foo:lock-renamed', 'foo:lock-aliased'], $names);
+    }
+
+    public function testFailingToReleaseALockDoesNotKeepTheCommandFromLockingAgain()
+    {
+        $lock = $this->createMock(LockInterface::class);
+        $lock->expects($this->once())->method('release')->willThrowException(new LockReleasingException('Failed to release the "foo" lock.'));
+
+        $tester = new CommandTester(new \FooLockReleaseFailureCommand($lock));
+        $this->assertSame(2, $tester->execute([]));
     }
 }

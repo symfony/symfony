@@ -64,12 +64,12 @@ trait LockableTrait
             }
         }
 
-        $this->lock = $this->lockFactory->createLock($name);
-        if (!$this->lock->acquire($blocking)) {
-            $this->lock = null;
-
+        $lock = $this->lockFactory->createLock($name);
+        if (!$lock->acquire($blocking)) {
             return false;
         }
+
+        $this->lock = $lock;
 
         return true;
     }
@@ -79,9 +79,9 @@ trait LockableTrait
      */
     private function release(): void
     {
-        if ($this->lock) {
-            $this->lock->release();
+        if ($lock = $this->lock) {
             $this->lock = null;
+            $lock->release();
         }
     }
 }

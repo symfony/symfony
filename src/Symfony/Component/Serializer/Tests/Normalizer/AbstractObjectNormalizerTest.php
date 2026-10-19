@@ -1367,6 +1367,26 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals('', $actual->value->value);
     }
 
+    public function testDenormalizeStringKeyedCollectionDecodedFromXml()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), new BackedEnumNormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $actual = $serializer->denormalize(['children' => ['a' => ['bar' => 'first']], 'enums' => ['a' => 'a'], 'strings' => ['a' => 'first']], StringKeyedCollectionsDummy::class, 'xml');
+
+        $child = new DummyChild();
+        $child->bar = 'first';
+        $this->assertEquals(['a' => $child], $actual->children);
+        $this->assertSame(['a' => EnumA::A], $actual->enums);
+        $this->assertSame(['a' => 'first'], $actual->strings);
+    }
+
+    public function testDenormalizeUnionOfCollectionAndScalarDecodedFromXml()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $actual = $serializer->denormalize(['children' => 'plain'], DummyWithChildrenOrString::class, 'xml');
+
+        $this->assertSame('plain', $actual->children);
+    }
+
     public function testDebugTraceIdDoesNotChangeContextCacheKey()
     {
         $normalizer = new class extends AbstractObjectNormalizerDummy {
@@ -2151,6 +2171,31 @@ class DummyCollection
 class DummyChild
 {
     public $bar;
+}
+
+class StringKeyedCollectionsDummy
+{
+    /** @var array<string, DummyChild> */
+    public array $children = [];
+
+    /** @var array<string, EnumA> */
+    public array $enums = [];
+
+    /** @var array<string, string> */
+    public array $strings = [];
+}
+
+class DummyChildWithConstructor
+{
+    public function __construct(public string $bar)
+    {
+    }
+}
+
+class DummyWithChildrenOrString
+{
+    /** @var DummyChildWithConstructor[]|string */
+    public array|string $children = [];
 }
 
 class XmlScalarDummy

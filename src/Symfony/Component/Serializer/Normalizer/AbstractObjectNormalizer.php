@@ -474,16 +474,22 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             usort($types, static fn (LegacyType $a, LegacyType $b): int => ($a->getClassName() ?? $a->getBuiltinType()) <=> ($b->getClassName() ?? $b->getBuiltinType()));
         }
 
+        $originalData = $data;
         foreach ($types as $type) {
+            // each type of a union gets the data as given, not as changed for the previous type
+            $data = $originalData;
+
             if (null === $data && $type->isNullable()) {
                 return null;
             }
 
             $collectionValueType = $type->isCollection() ? $type->getCollectionValueTypes()[0] ?? null : null;
+            $collectionKeyTypes = array_map(static fn (LegacyType $t) => $t->getBuiltinType(), $type->getCollectionKeyTypes());
 
             // Fix a collection that contains the only one element
             // This is special to xml format only
-            if ('xml' === $format && null !== $collectionValueType && (!\is_array($data) || !\is_int(key($data)))) {
+            // When the keys cannot be int, an array with other keys is the collection itself, not its only element
+            if ('xml' === $format && null !== $collectionValueType && (!\is_array($data) || (!\is_int(key($data)) && (!$collectionKeyTypes || \in_array(LegacyType::BUILTIN_TYPE_INT, $collectionKeyTypes, true))))) {
                 $data = [$data];
             }
 
@@ -736,7 +742,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             default => [$type],
         };
 
+        $originalData = $data;
         foreach ($types as $t) {
+            // each type of a union gets the data as given, not as changed for the previous type
+            $data = $originalData;
+
             if (null === $data && $type->isNullable()) {
                 return null;
             }
@@ -758,7 +768,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             // Fix a collection that contains the only one element
             // This is special to xml format only
-            if ('xml' === $format && $collectionValueType && (!\is_array($data) || !\is_int(key($data)))) {
+            // When the keys cannot be int, an array with other keys is the collection itself, not its only element
+            if ('xml' === $format && $collectionValueType && (!\is_array($data) || (!\is_int(key($data)) && $collectionKeyType->isIdentifiedBy(TypeIdentifier::INT)))) {
                 // BC layer for type-info < 7.2
                 $isMixedType = method_exists(Type::class, 'isA') ? $collectionValueType->isA(TypeIdentifier::MIXED) : $collectionValueType->isIdentifiedBy(TypeIdentifier::MIXED);
                 if (!$isMixedType) {

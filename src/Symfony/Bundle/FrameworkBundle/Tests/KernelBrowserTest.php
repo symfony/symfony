@@ -11,7 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests;
 
+require_once __DIR__.'/Fixtures/gc-function-mock.php';
+
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\GcFunctionMock;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\AbstractWebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -50,6 +53,19 @@ class KernelBrowserTest extends AbstractWebTestCase
         $client->request('GET', '/');
         $client->enableReboot();
         $client->request('GET', '/');
+    }
+
+    public function testRebootCollectsCycles()
+    {
+        $mock = $this->getKernelMock();
+        $mock->expects($this->once())->method('shutdown');
+
+        $client = new KernelBrowser($mock);
+        $client->request('GET', '/');
+        GcFunctionMock::$collections = 0;
+        $client->request('GET', '/');
+
+        $this->assertSame(1, GcFunctionMock::$collections);
     }
 
     public function testRequestAfterKernelShutdownAndPerformedRequest()

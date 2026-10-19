@@ -14,9 +14,12 @@ namespace Symfony\Component\Security\Core\Authorization\Voter;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\TokenAuthorizationChecker;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
@@ -31,6 +34,8 @@ class ExpressionVoter implements CacheableVoterInterface
         private ?AuthenticationTrustResolverInterface $trustResolver,
         private AuthorizationCheckerInterface $authChecker,
         private ?RoleHierarchyInterface $roleHierarchy = null,
+        private ?AccessDecisionManagerInterface $accessDecisionManager = null,
+        private ?TokenStorageInterface $tokenStorage = null,
     ) {
     }
 
@@ -92,7 +97,7 @@ class ExpressionVoter implements CacheableVoterInterface
             'object' => $subject,
             'subject' => $subject,
             'role_names' => $roleNames,
-            'auth_checker' => $this->authChecker,
+            'auth_checker' => $this->accessDecisionManager ? new TokenAuthorizationChecker($token, $this->accessDecisionManager, $this->authChecker, $this->tokenStorage) : $this->authChecker,
         ];
 
         if ($this->trustResolver) {

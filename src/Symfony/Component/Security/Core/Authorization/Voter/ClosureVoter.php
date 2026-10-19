@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\TokenAuthorizationChecker;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Attribute\IsGrantedContext;
 
@@ -27,6 +30,8 @@ final class ClosureVoter implements CacheableVoterInterface
 {
     public function __construct(
         private AuthorizationCheckerInterface $authorizationChecker,
+        private ?AccessDecisionManagerInterface $accessDecisionManager = null,
+        private ?TokenStorageInterface $tokenStorage = null,
     ) {
     }
 
@@ -42,7 +47,8 @@ final class ClosureVoter implements CacheableVoterInterface
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
     {
-        $context = new IsGrantedContext($token, $token->getUser(), $this->authorizationChecker);
+        $authorizationChecker = $this->accessDecisionManager ? new TokenAuthorizationChecker($token, $this->accessDecisionManager, $this->authorizationChecker, $this->tokenStorage) : $this->authorizationChecker;
+        $context = new IsGrantedContext($token, $token->getUser(), $authorizationChecker);
         $failingClosures = [];
         $result = VoterInterface::ACCESS_ABSTAIN;
         foreach ($attributes as $attribute) {

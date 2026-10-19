@@ -42,7 +42,7 @@ class MessagePartTest extends TestCase
 
     public function testSerialize()
     {
-        $email = (new Email())->from('fabien@symfony.com')->to('you@example.com')->text('content');
+        $email = (new Email())->date(new \DateTimeImmutable())->from('fabien@symfony.com')->to('you@example.com')->text('content');
         $email->getHeaders()->addIdHeader('Message-ID', $email->generateMessageId());
 
         $p = new MessagePart($email);

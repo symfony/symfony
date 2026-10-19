@@ -2246,23 +2246,25 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertCount(2, $chain->getArguments());
         $this->assertCount(3, $chain->getArguments()[0]);
+        $this->assertSame(12, $chain->getArgument(1));
 
-        $expectedSeed = $chain->getArgument(0)[1]->getArgument(0);
+        $adapters = array_map(static fn ($adapter) => $adapter instanceof Reference ? $container->getDefinition((string) $adapter) : $adapter, $chain->getArgument(0));
+        $expectedSeed = $adapters[1]->getArgument(0);
         $expected = [
-            [
-                (new ChildDefinition('cache.adapter.array'))
-                    ->replaceArgument(0, 12),
-                (new ChildDefinition('cache.adapter.filesystem'))
-                    ->replaceArgument(0, $expectedSeed)
-                    ->replaceArgument(1, 12),
-                (new ChildDefinition('cache.adapter.redis'))
-                    ->replaceArgument(0, new Reference('.cache_connection.'.(\count((new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()) > 2 ? 'U5HliuY' : 'kYdiLgf')))
-                    ->replaceArgument(1, $expectedSeed)
-                    ->replaceArgument(2, 12),
-            ],
-            12,
+            (new ChildDefinition('cache.adapter.array'))
+                ->replaceArgument(0, 12),
+            (new ChildDefinition('cache.adapter.filesystem'))
+                ->replaceArgument(0, $expectedSeed)
+                ->replaceArgument(1, 12),
+            (new ChildDefinition('cache.adapter.redis'))
+                ->replaceArgument(0, new Reference('.cache_connection.'.(\count((new \ReflectionMethod(ContainerConfigurator::class, 'extension'))->getParameters()) > 2 ? 'U5HliuY' : 'kYdiLgf')))
+                ->replaceArgument(1, $expectedSeed)
+                ->replaceArgument(2, 12),
         ];
-        $this->assertEquals($expected, $chain->getArguments());
+        foreach ($expected as $i => $adapter) {
+            $this->assertSame($adapter->getParent(), $adapters[$i]->getParent());
+            $this->assertEquals($adapter->getArguments(), $adapters[$i]->getArguments());
+        }
 
         // Test "tags: true" wrapping logic
         $tagAwareDefinition = $container->getDefinition('cache.ccc');

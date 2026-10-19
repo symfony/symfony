@@ -73,6 +73,21 @@ class LocaleSwitcherTest extends TestCase
         $this->assertSame('en', $switcher->getLocale());
     }
 
+    public function testLocaleAwareServicesAreIteratedOnce()
+    {
+        $service = new DummyLocaleAware('en');
+        $services = new CountingIterable([$service]);
+        $switcher = new LocaleSwitcher('en', $services);
+
+        $switcher->setLocale('fr');
+        $this->assertSame('fr', $service->getLocale());
+
+        $switcher->reset();
+        $this->assertSame('en', $service->getLocale());
+
+        $this->assertSame(1, $services->iterations);
+    }
+
     public function testWithRequestContext()
     {
         $context = new RequestContext();
@@ -106,5 +121,21 @@ class DummyLocaleAware implements LocaleAwareInterface
     public function getLocale(): string
     {
         return $this->locale;
+    }
+}
+
+class CountingIterable implements \IteratorAggregate
+{
+    public int $iterations = 0;
+
+    public function __construct(private array $values)
+    {
+    }
+
+    public function getIterator(): \Iterator
+    {
+        ++$this->iterations;
+
+        return new \ArrayIterator($this->values);
     }
 }

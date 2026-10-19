@@ -42,7 +42,7 @@ class LocaleAwareListener implements EventSubscriberInterface
         if (!$event->isMainRequest()) {
             $locales = [];
 
-            foreach ($this->localeAwareServices as $key => $service) {
+            foreach ($this->getLocaleAwareServices() as $key => $service) {
                 // a service the listener never set can hold no locale to restore
                 if (isset($this->initializedServices[$key])) {
                     $locales[$key] = $service->getLocale();
@@ -61,7 +61,7 @@ class LocaleAwareListener implements EventSubscriberInterface
         unset($this->storedLocales[$id]);
 
         if (null === $parentRequest = $this->requestStack->getParentRequest()) {
-            foreach ($this->localeAwareServices as $service) {
+            foreach ($this->getLocaleAwareServices() as $service) {
                 $service->setLocale($event->getRequest()->getDefaultLocale());
             }
 
@@ -81,7 +81,7 @@ class LocaleAwareListener implements EventSubscriberInterface
 
     private function setLocale(string $locale, string $defaultLocale, array $storedLocales = []): void
     {
-        foreach ($this->localeAwareServices as $key => $service) {
+        foreach ($this->getLocaleAwareServices() as $key => $service) {
             try {
                 $service->setLocale($storedLocales[$key] ?? $locale);
             } catch (\InvalidArgumentException) {
@@ -90,5 +90,11 @@ class LocaleAwareListener implements EventSubscriberInterface
 
             $this->initializedServices[$key] = true;
         }
+    }
+
+    private function getLocaleAwareServices(): array
+    {
+        // a tagged iterator runs its generator again on every iteration, which costs much more than iterating an array
+        return \is_array($this->localeAwareServices) ? $this->localeAwareServices : $this->localeAwareServices = iterator_to_array($this->localeAwareServices);
     }
 }

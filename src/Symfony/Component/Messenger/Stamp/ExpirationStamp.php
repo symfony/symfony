@@ -30,7 +30,7 @@ final class ExpirationStamp implements StampInterface
 
     public function getExpiresAt(): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $this->expiresAt));
+        return \DateTimeImmutable::createFromTimestamp($this->expiresAt);
     }
 
     public function isExpired(\DateTimeImmutable $now): bool

@@ -108,7 +108,7 @@ class RouterListener implements EventSubscriberInterface
             $this->logger?->info('Matched route "{route}".', [
                 'route' => $parameters['_route'] ?? 'n/a',
                 'route_parameters' => $parameters,
-                'request_uri' => $request->getUri(),
+                'request_uri' => $this->getRequestUri($request),
                 'method' => $request->getMethod(),
             ]);
 
@@ -208,6 +208,18 @@ class RouterListener implements EventSubscriberInterface
             KernelEvents::FINISH_REQUEST => [['onKernelFinishRequest', 0]],
             KernelEvents::EXCEPTION => ['onKernelException', -64],
         ];
+    }
+
+    /**
+     * Builds the same URI as Request::getUri() from the context, which was just filled from the request.
+     */
+    private function getRequestUri(Request $request): string
+    {
+        $scheme = $this->context->getScheme();
+        $port = 'https' === $scheme ? $this->context->getHttpsPort() : $this->context->getHttpPort();
+        $qs = $request::normalizeQueryString($this->context->getQueryString());
+
+        return $scheme.'://'.$this->context->getHost().(('https' === $scheme ? 443 : 80) === $port ? '' : ':'.$port).$this->context->getBaseUrl().$this->context->getPathInfo().('' === $qs ? '' : '?'.$qs);
     }
 
     private function createWelcomeResponse(): Response

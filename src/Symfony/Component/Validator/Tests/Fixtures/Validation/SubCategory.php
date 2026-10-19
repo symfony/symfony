@@ -2,7 +2,8 @@
 
 namespace Symfony\Component\Validator\Tests\Fixtures\Validation;
 
-// Missing "use" for Assert\Type is on purpose
+// Assert\Type does not exist on purpose
+use Symfony\Component\Validator\Tests\Fixtures\Constraints as Assert;
 
 class SubCategory extends Category
 {

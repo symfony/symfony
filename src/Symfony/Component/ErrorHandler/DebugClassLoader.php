@@ -540,6 +540,8 @@ class DebugClassLoader
                 }
             }
 
+            $this->checkAttributes($refl, $class, $deprecations);
+
             return $deprecations;
         }
 
@@ -721,6 +723,8 @@ class DebugClassLoader
                 }
             }
         }
+
+        $this->checkAttributes($refl, $class, $deprecations);
 
         return $deprecations;
     }
@@ -1414,5 +1418,97 @@ class DebugClassLoader
         }
 
         return $tags;
+    }
+
+    /**
+     * Reports the attributes that resolve to a missing class in the namespace of the class using them, or below it.
+     *
+     * This is where PHP puts an unqualified or a relative attribute name when its "use" statement is missing.
+     * Attributes of other namespaces are left alone: using an attribute whose class is not available is by design.
+     */
+    private function checkAttributes(\ReflectionClass $refl, string $class, array &$deprecations): void
+    {
+        // Anonymous classes carry a file path instead of a namespace, and the root namespace matches every vendor.
+        if ($refl->isAnonymous() || false === $sep = strrpos($class, '\\')) {
+            return;
+        }
+
+        $namespace = substr($class, 0, 1 + $sep);
+
+        // The attributes a trait brings in are reported when the trait itself is checked, not for each class using it.
+        // Constants and properties do not tell which trait they come from, so they are matched by name and attribute.
+        $fromTraits = [];
+        foreach ($refl->getTraits() as $trait) {
+            foreach ($trait->getReflectionConstants() as $constant) {
+                foreach ($constant->getAttributes() as $attribute) {
+                    $fromTraits[$constant->name][$attribute->getName()] = true;
+                }
+            }
+            foreach ($trait->getProperties() as $property) {
+                foreach ($property->getAttributes() as $attribute) {
+                    $fromTraits['$'.$property->name][$attribute->getName()] = true;
+                }
+            }
+        }
+
+        $this->collectMissingAttributes($refl, $namespace, $class, $deprecations);
+
+        foreach ($refl->getReflectionConstants() as $constant) {
+            if ($constant->getDeclaringClass()->name === $class) {
+                $this->collectMissingAttributes($constant, $namespace, $class.'::'.$constant->name, $deprecations, $fromTraits[$constant->name] ?? []);
+            }
+        }
+
+        foreach ($refl->getProperties() as $property) {
+            // The attributes of a promoted property are the ones of the constructor parameter declaring it.
+            if ($property->class === $class && !$property->isPromoted()) {
+                $this->collectMissingAttributes($property, $namespace, $class.'::$'.$property->name, $deprecations, $fromTraits['$'.$property->name] ?? []);
+            }
+        }
+
+        foreach ($refl->getMethods() as $method) {
+            // Methods keep the file and line of the trait they come from, aliased or not.
+            if ($method->class !== $class || $class !== (self::$methodTraits[$method->getFileName()][$method->getStartLine()] ?? $class)) {
+                continue;
+            }
+
+            $this->collectMissingAttributes($method, $namespace, $class.'::'.$method->name.'()', $deprecations);
+
+            foreach ($method->getParameters() as $parameter) {
+                $this->collectMissingAttributes($parameter, $namespace, $class.'::'.$method->name.'($'.$parameter->name.')', $deprecations);
+            }
+        }
+    }
+
+    /**
+     * @param array<string, true> $fromTrait The attributes a trait declares on the same member, which it reports itself
+     */
+    private function collectMissingAttributes(\ReflectionClass|\ReflectionClassConstant|\ReflectionMethod|\ReflectionParameter|\ReflectionProperty $reflector, string $namespace, string $target, array &$deprecations, array $fromTrait = []): void
+    {
+        foreach ($reflector->getAttributes() as $attribute) {
+            $name = $attribute->getName();
+
+            // Only the namespace of the declaring class and below, so that the autoloader is not asked for third-party attributes.
+            if (isset($fromTrait[$name]) || !str_starts_with($name, $namespace)) {
+                continue;
+            }
+
+            try {
+                if (class_exists($name)) {
+                    continue;
+                }
+            } catch (\Error $e) {
+                // A plain \Error is a missing parent, interface or trait, which is fine as long as the attribute is not instantiated
+                if (\Error::class !== $e::class) {
+                    throw $e;
+                }
+
+                $deprecations[] = \sprintf('Attribute "%s" used on "%s" cannot be loaded: %s', $name, $target, $e->getMessage());
+
+                continue;
+            }
+
+            $deprecations[] = \sprintf('Attribute "%s" used on "%s" does not exist. Did you forget a "use" statement?', $name, $target);
+        }
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Fixtures\Controller;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\NotAnAttribute;
 
 #[Cache(lastModified: 'this.lastModified')]
 class ExpressionsController

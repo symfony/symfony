@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Fixtures\Controller;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Bar;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Baz;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Undefined;
 
 #[Bar('class'), Undefined('class')]
 class AttributeController

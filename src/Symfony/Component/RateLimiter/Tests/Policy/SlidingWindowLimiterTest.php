@@ -78,10 +78,8 @@ class SlidingWindowLimiterTest extends TestCase
 
         $rateLimit = $limiter->consume();
         $this->assertFalse($rateLimit->isAccepted());
-        $this->assertEquals(
-            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12)),
-            $rateLimit->getRetryAfter()
-        );
+        $this->assertGreaterThanOrEqual(microtime(true) + 12, $rateLimit->getRetryAfter()->getTimestamp());
+        $this->assertLessThan(microtime(true) + 13, $rateLimit->getRetryAfter()->getTimestamp());
 
         sleep(11);
         $this->assertFalse($limiter->consume()->isAccepted());
@@ -98,10 +96,8 @@ class SlidingWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume(1);
         $this->assertSame(0, $rateLimit->getRemainingTokens());
         $this->assertTrue($rateLimit->isAccepted());
-        $this->assertEquals(
-            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12)),
-            $rateLimit->getRetryAfter()
-        );
+        $this->assertGreaterThanOrEqual(microtime(true) + 12, $rateLimit->getRetryAfter()->getTimestamp());
+        $this->assertLessThan(microtime(true) + 13, $rateLimit->getRetryAfter()->getTimestamp());
     }
 
     public function testReserve()
@@ -138,10 +134,8 @@ class SlidingWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume(0);
         $this->assertEquals(0, $rateLimit->getRemainingTokens());
         $this->assertTrue($rateLimit->isAccepted());
-        $this->assertEquals(
-            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12)),
-            $rateLimit->getRetryAfter()
-        );
+        $this->assertGreaterThanOrEqual(microtime(true) + 12, $rateLimit->getRetryAfter()->getTimestamp());
+        $this->assertLessThan(microtime(true) + 13, $rateLimit->getRetryAfter()->getTimestamp());
     }
 
     public function testNegativeConsume()
@@ -184,6 +178,15 @@ class SlidingWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume(0);
         $this->assertSame(-5, $rateLimit->getRemainingTokens());
         $this->assertGreaterThan(microtime(true), $rateLimit->getRetryAfter()->getTimestamp());
+    }
+
+    public function testRetryAfterIsNotBeforeTheNextTokenIsAvailable()
+    {
+        ClockMock::withClockMock(1729990780.75);
+        $limiter = $this->createLimiter();
+
+        $limiter->consume(10)->wait();
+        $this->assertTrue($limiter->consume()->isAccepted());
     }
 
     private function createLimiter(): SlidingWindowLimiter

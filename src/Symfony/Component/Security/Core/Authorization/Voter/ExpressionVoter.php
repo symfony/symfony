@@ -14,9 +14,12 @@ namespace Symfony\Component\Security\Core\Authorization\Voter;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\TokenAuthorizationChecker;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
@@ -30,13 +33,17 @@ class ExpressionVoter implements CacheableVoterInterface
     private AuthenticationTrustResolverInterface $trustResolver;
     private AuthorizationCheckerInterface $authChecker;
     private ?RoleHierarchyInterface $roleHierarchy;
+    private ?AccessDecisionManagerInterface $accessDecisionManager;
+    private ?TokenStorageInterface $tokenStorage;
 
-    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, AuthorizationCheckerInterface $authChecker, ?RoleHierarchyInterface $roleHierarchy = null)
+    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, AuthorizationCheckerInterface $authChecker, ?RoleHierarchyInterface $roleHierarchy = null, ?AccessDecisionManagerInterface $accessDecisionManager = null, ?TokenStorageInterface $tokenStorage = null)
     {
         $this->expressionLanguage = $expressionLanguage;
         $this->trustResolver = $trustResolver;
         $this->authChecker = $authChecker;
         $this->roleHierarchy = $roleHierarchy;
+        $this->accessDecisionManager = $accessDecisionManager;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function supportsAttribute(string $attribute): bool
@@ -84,7 +91,7 @@ class ExpressionVoter implements CacheableVoterInterface
             'subject' => $subject,
             'role_names' => $roleNames,
             'trust_resolver' => $this->trustResolver,
-            'auth_checker' => $this->authChecker,
+            'auth_checker' => $this->accessDecisionManager ? new TokenAuthorizationChecker($token, $this->accessDecisionManager, $this->authChecker, $this->tokenStorage) : $this->authChecker,
         ];
 
         // this is mainly to propose a better experience when the expression is used

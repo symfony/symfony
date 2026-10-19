@@ -10,6 +10,10 @@ services:
         alias: security.token_storage
         public: true
 
+    functional.test.security.access_decision_manager:
+        alias: security.access.decision_manager
+        public: true
+
     Symfony\Bundle\SecurityBundle\Tests\Functional\ForceLoginController:
         arguments: ['@security.helper']
         public: true

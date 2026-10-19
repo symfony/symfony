@@ -65,8 +65,28 @@ class SlidingWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume(4);
 
         $start = microtime(true);
-        $rateLimit->wait(); // wait 12 seconds
-        $this->assertEqualsWithDelta($start + (12 / 5), microtime(true), 1);
+        // the 8 hits count in full until the window ends (12 seconds), then fade out at 8 hits per 12 seconds
+        $rateLimit->wait();
+        $this->assertEqualsWithDelta($start + 12 + (12 / 8), microtime(true), 1);
+        $this->assertTrue($limiter->consume()->isAccepted());
+    }
+
+    public function testRetryAfterWhenRefusedByTheHitsOfTheCurrentWindow()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12)),
+            $rateLimit->getRetryAfter()
+        );
+
+        sleep(11);
+        $this->assertFalse($limiter->consume()->isAccepted());
+
+        sleep(2);
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
@@ -89,8 +109,8 @@ class SlidingWindowLimiterTest extends TestCase
         $limiter = $this->createLimiter();
         $limiter->consume(8);
 
-        // 2 over the limit, causing the WaitDuration to become 2/10th of the 12s interval
-        $this->assertEqualsWithDelta(12 / 5, $limiter->reserve(4)->getWaitDuration(), 1);
+        // 1 hit must be released: it happens once the window has ended (12s), at 8 hits per 12 seconds
+        $this->assertEqualsWithDelta(12 + (12 / 8), $limiter->reserve(4)->getWaitDuration(), 1);
 
         $limiter->reset();
         $this->assertEquals(0, $limiter->reserve(10)->getWaitDuration());

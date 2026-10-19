@@ -70,6 +70,7 @@ CHANGELOG
  * Add the `$cooldownStrategies` argument to `Worker` and the `$cooldownStrategyLocator` argument to `ConsumeMessagesCommand`
  * Log the names of the consumed transports when a worker starts
  * Display the stamps of failed messages with `-vv` in the `messenger:failed:show`, `messenger:failed:retry` and `messenger:failed:remove` commands
+ * Close the transports that implement `CloseableTransportInterface` when the kernel shuts down
 
 8.1
 ---

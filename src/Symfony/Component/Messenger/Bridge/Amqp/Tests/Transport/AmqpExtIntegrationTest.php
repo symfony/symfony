@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceiver;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpSender;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransport;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\BatchSendFailedException;
@@ -451,6 +452,23 @@ class AmqpExtIntegrationTest extends TestCase
 
         sleep(1); // give amqp a moment to have the messages ready
         $this->assertSame(3, $connection->countMessagesInQueues());
+    }
+
+    public function testTheTransportConnectsAgainAfterBeingClosed()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
+        $connection->setup();
+        $connection->purgeQueues();
+        $transport = new AmqpTransport($connection, $this->createSerializer());
+        $transport->send(new Envelope(new DummyMessage('First')));
+        $amqpConnection = \WeakReference::create($connection->channel()->getConnection());
+
+        $transport->close();
+        $this->assertNull($amqpConnection->get());
+
+        $transport->send(new Envelope(new DummyMessage('Second')));
+        $this->assertEquals(new DummyMessage('First'), iterator_to_array($transport->get())[0]->getMessage());
+        $this->assertEquals(new DummyMessage('Second'), iterator_to_array($transport->get())[0]->getMessage());
     }
 
     private function waitForOutput(Process $process, string $output, $timeoutInSeconds = 10)

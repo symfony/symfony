@@ -60,9 +60,13 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\FailingDummyMessageHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
+use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\Serialization\StampHeaderMapperInterface;
+use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -457,6 +461,25 @@ class MessengerBundleTest extends TestCase
         $this->assertSame([], $outbox->get());
         $this->assertCount(1, $forwarded = $orders->get());
         $this->assertEquals(new DummyMessage('Hey'), $forwarded[0]->getMessage());
+    }
+
+    public function testTheTransportsAreClosedWhenTheKernelShutsDown()
+    {
+        $kernel = new TestCloseableTransportKernel('test', true, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $transport = $container->get('test.messenger.transport.async');
+        $this->assertInstanceOf(InMemoryTransport::class, $container->get('test.messenger.transport.memory'));
+
+        $container->get('test.messenger.default_bus')->dispatch(new DummyMessage('Hey'));
+        $this->assertTrue($transport->connected);
+
+        $container->get('services_resetter')->reset();
+        $this->assertTrue($transport->connected);
+
+        $kernel->shutdown();
+        $this->assertFalse($transport->connected);
+        $this->assertSame(1, $transport->closeCount);
     }
 
     private static function hideTheUidComponent(): void
@@ -1041,5 +1064,84 @@ class TestOutboxDsnKernel extends AbstractKernel
             ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
             ->alias('test.messenger.receiver_locator', 'messenger.receiver_locator')->public()
         ;
+    }
+}
+
+class TestCloseableTransportKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new MessengerBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('messenger', [
+            'transports' => ['async' => 'closeable://', 'memory' => 'in-memory://'],
+            'routing' => [DummyMessage::class => 'async'],
+        ]);
+        $container->services()
+            ->set(CloseableTransportFactory::class)->tag('messenger.transport_factory')
+            ->alias('test.messenger.default_bus', 'messenger.default_bus')->public()
+            ->alias('test.messenger.transport.async', 'messenger.transport.async')->public()
+            ->alias('test.messenger.transport.memory', 'messenger.transport.memory')->public()
+        ;
+    }
+}
+
+class CloseableTransportFactory implements TransportFactoryInterface
+{
+    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    {
+        return new CloseableTransport();
+    }
+
+    public function supports(string $dsn, array $options): bool
+    {
+        return str_starts_with($dsn, 'closeable://');
+    }
+}
+
+class CloseableTransport implements TransportInterface, CloseableTransportInterface
+{
+    public bool $connected = false;
+    public int $closeCount = 0;
+
+    public function get(): iterable
+    {
+        return [];
+    }
+
+    public function ack(Envelope $envelope): void
+    {
+    }
+
+    public function reject(Envelope $envelope): void
+    {
+    }
+
+    public function send(Envelope $envelope): Envelope
+    {
+        $this->connected = true;
+
+        return $envelope;
+    }
+
+    public function close(): void
+    {
+        $this->connected = false;
+        ++$this->closeCount;
     }
 }

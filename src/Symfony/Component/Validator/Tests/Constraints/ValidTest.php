@@ -49,6 +49,20 @@ class ValidTest extends TestCase
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }
+
+        public function testEmbeddedGroupsDefaultToNull()
+    {
+        $constraint = new Valid();
+
+        $this->assertNull($constraint->embeddedGroups);
+    }
+
+    public function testEmbeddedGroupsCanBeSet()
+    {
+        $constraint = new Valid(embeddedGroups: ['foo', 'bar']);
+
+        $this->assertSame(['foo', 'bar'], $constraint->embeddedGroups);
+    }
 }
 
 class ValidDummy
@@ -56,7 +70,7 @@ class ValidDummy
     #[Valid]
     private $a;
 
-    #[Valid(groups: ['traverse_group'], traverse: false)] // Needs a group to work at all for this test
+    #[Valid(groups: ['traverse_group'], traverse: false)]
     private $b;
 
     #[Valid(groups: ['my_group'], payload: 'some attached data')]

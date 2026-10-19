@@ -39,6 +39,28 @@ class ValidValidatorTest extends TestCase
 
         $this->assertCount(0, $violations);
     }
+
+        public function testEmbeddedGroupsAreUsedForChildValidation()
+    {
+        $validatorBuilder = new ValidatorBuilder();
+        $validator = $validatorBuilder->enableAttributeMapping()->getValidator();
+
+        $violations = $validator->validate(new ParentWithEmbeddedGroups(), null, ['children']);
+
+        $this->assertCount(2, $violations);
+        $this->assertSame('child.name', $violations->get(0)->getPropertyPath());
+        $this->assertSame('child.code', $violations->get(1)->getPropertyPath());
+    }
+
+    public function testDefaultBehaviorPreservedWhenEmbeddedGroupsNotSet()
+    {
+        $validatorBuilder = new ValidatorBuilder();
+        $validator = $validatorBuilder->enableAttributeMapping()->getValidator();
+
+        $violations = $validator->validate(new ParentWithoutEmbeddedGroups(), null, ['children']);
+
+        $this->assertCount(0, $violations);
+    }
 }
 
 class Foo
@@ -67,4 +89,35 @@ class FooBarBaz
 {
     #[Assert\NotBlank(groups: ['nested'])]
     public $foo;
+}
+
+class ChildWithGroups
+{
+    #[Assert\NotBlank]
+    public ?string $name = null;
+
+    #[Assert\Length(max: 3, groups: ['strict'])]
+    public string $code = 'toolong';
+}
+
+class ParentWithEmbeddedGroups
+{
+    #[Assert\Valid(groups: ['children'], embeddedGroups: ['Default', 'strict'])]
+    public ChildWithGroups $child;
+
+    public function __construct()
+    {
+        $this->child = new ChildWithGroups();
+    }
+}
+
+class ParentWithoutEmbeddedGroups
+{
+    #[Assert\Valid(groups: ['children'])]
+    public ChildWithGroups $child;
+
+    public function __construct()
+    {
+        $this->child = new ChildWithGroups();
+    }
 }

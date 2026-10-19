@@ -25,10 +25,19 @@ class Valid extends Constraint
     public bool $traverse = true;
 
     /**
-     * @param string[]|null $groups
-     * @param bool|null     $traverse Whether to validate {@see \Traversable} objects (defaults to true)
+     * The validation groups to use when validating the embedded object.
+     * When null, the current validation group is used (default behavior).
+     *
+     * @var string[]|null
      */
-    public function __construct(?array $options = null, ?array $groups = null, $payload = null, ?bool $traverse = null)
+    public ?array $embeddedGroups = null;
+
+    /**
+     * @param string[]|null $groups         The groups this constraint belongs to
+     * @param string[]|null $embeddedGroups The groups to use when validating the embedded object
+     * @param bool|null     $traverse       Whether to validate {@see \Traversable} objects (defaults to true)
+     */
+    public function __construct(?array $options = null, ?array $groups = null, $payload = null, ?bool $traverse = null, ?array $embeddedGroups = null)
     {
         if (null !== $options) {
             throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
@@ -37,6 +46,7 @@ class Valid extends Constraint
         parent::__construct(null, $groups, $payload);
 
         $this->traverse = $traverse ?? $this->traverse;
+        $this->embeddedGroups = $embeddedGroups;
     }
 
     public function __get(string $option): mixed

@@ -25,8 +25,13 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
 class ServicesResetter implements ServicesResetterInterface
 {
     /**
-     * @param \Traversable<string, object>                                         $resettableServices
-     * @param array<string, string|list<string|array<string, 'flag'|'only'|null>>> $resetMethods
+     * @var array<class-string, \ReflectionClass>
+     */
+    private static array $reflectors = [];
+
+    /**
+     * @param \Traversable<string, object>                                               $resettableServices
+     * @param array<string, string|list<string|array{string, bool, 'flag'|'only'|null}>> $resetMethods
      */
     public function __construct(
         private \Traversable $resettableServices,
@@ -65,6 +70,9 @@ class ServicesResetter implements ServicesResetterInterface
         }
     }
 
+    /**
+     * @param list<string|array{string, bool, 'flag'|'only'|null}> $methods
+     */
     private function resetInstance(object $service, array $methods, ?\Throwable &$throwable, bool $shutdown): void
     {
         if ($this->isUninitializedLazyObject($service)) {
@@ -72,17 +80,20 @@ class ServicesResetter implements ServicesResetterInterface
         }
 
         foreach ($methods as $resetMethod) {
-            $onShutdown = null;
             if (\is_array($resetMethod)) {
-                $onShutdown = reset($resetMethod);
-                $resetMethod = key($resetMethod);
+                [$resetMethod, $optional, $onShutdown] = $resetMethod;
+
+                if (!$shutdown && 'only' === $onShutdown) {
+                    continue;
+                }
+            } else {
+                $onShutdown = null;
+                if ($optional = '?' === $resetMethod[0]) {
+                    $resetMethod = substr($resetMethod, 1);
+                }
             }
 
-            if (!$shutdown && 'only' === $onShutdown) {
-                continue;
-            }
-
-            if ('?' === $resetMethod[0] && !method_exists($service, $resetMethod = substr($resetMethod, 1))) {
+            if ($optional && !method_exists($service, $resetMethod)) {
                 continue;
             }
 
@@ -110,6 +121,6 @@ class ServicesResetter implements ServicesResetterInterface
             return true;
         }
 
-        return (new \ReflectionClass($service))->isUninitializedLazyObject($service);
+        return (self::$reflectors[$service::class] ??= new \ReflectionClass($service))->isUninitializedLazyObject($service);
     }
 }

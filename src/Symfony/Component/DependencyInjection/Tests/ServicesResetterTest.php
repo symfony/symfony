@@ -39,7 +39,7 @@ class ServicesResetterTest extends TestCase
             'id2' => new ClearableService(),
             'id3' => new MultiResettableService(),
         ]), [
-            'id1' => ['reset'],
+            'id1' => 'reset',
             'id2' => ['clear'],
             'id3' => ['resetFirst', 'resetSecond'],
         ]);
@@ -69,7 +69,7 @@ class ServicesResetterTest extends TestCase
                 $this->calls[] = ['clear', \func_num_args()];
             }
         };
-        $methods = [['reset' => 'flag'], '?missing', ['?missingWithFlag' => 'flag'], ['clear' => null], ['reset' => null], 'clear'];
+        $methods = [['reset', false, 'flag'], '?missing', ['missingWithFlag', true, 'flag'], ['clear', false, null], ['reset', false, null], 'clear'];
         $resetMap = null;
         $services = ['service' => $service];
         $resetMethods = ['service' => $methods];
@@ -99,7 +99,7 @@ class ServicesResetterTest extends TestCase
                 $this->calls[] = \func_num_args();
             }
         };
-        $methods = [['close' => 'only'], ['?missing' => 'only']];
+        $methods = [['close', false, 'only'], ['missing', true, 'only']];
         $resetMap = null;
         $services = ['service' => $service];
         $resetMethods = ['service' => $methods];
@@ -122,7 +122,7 @@ class ServicesResetterTest extends TestCase
     public function testShutdownThroughContract()
     {
         $service = new ShutdownAwareService();
-        $resetter = new ServicesResetter(new \ArrayIterator(['service' => $service]), ['service' => [['reset' => 'flag']]]);
+        $resetter = new ServicesResetter(new \ArrayIterator(['service' => $service]), ['service' => [['reset', false, 'flag']]]);
 
         (static function (ShutdownInterface $resetter) {
             $resetter->reset(true);
@@ -148,7 +148,7 @@ class ServicesResetterTest extends TestCase
                 $this->calls[] = 'clear';
             }
         };
-        $resetter = new ServicesResetter(new \ArrayIterator(['first' => $service, 'second' => $service]), ['first' => [['reset' => null]], 'second' => [['clear' => null]]]);
+        $resetter = new ServicesResetter(new \ArrayIterator(['first' => $service, 'second' => $service]), ['first' => [['reset', false, null]], 'second' => [['clear', false, null]]]);
 
         $resetter->reset($shutdown);
 
@@ -179,6 +179,38 @@ class ServicesResetterTest extends TestCase
 
         $resetter->reset();
         $this->assertSame(1, LazyResettableService::$counter);
+    }
+
+    public function testResetNativeLazyObjects()
+    {
+        $service = new class {
+            public int $resets = 0;
+
+            public function reset(): void
+            {
+                ++$this->resets;
+            }
+        };
+        $class = new \ReflectionClass($service);
+        $lazyService = $class->newLazyGhost(static function () {});
+
+        $resetter = new ServicesResetter(new \ArrayIterator([
+            'service' => $service,
+            'lazy' => $lazyService,
+        ]), [
+            'service' => ['reset'],
+            'lazy' => ['reset'],
+        ]);
+
+        $resetter->reset();
+        $this->assertSame(1, $service->resets);
+        $this->assertTrue($class->isUninitializedLazyObject($lazyService));
+
+        $class->initializeLazyObject($lazyService);
+
+        $resetter->reset();
+        $this->assertSame(2, $service->resets);
+        $this->assertSame(1, $lazyService->resets);
     }
 
     public function testResetNonSharedServices()

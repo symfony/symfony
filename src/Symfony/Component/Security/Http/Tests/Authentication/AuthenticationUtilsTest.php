@@ -125,6 +125,64 @@ class AuthenticationUtilsTest extends TestCase
         $this->assertSame('user', $utils->getLastUsername());
     }
 
+    public function testNewSessionIsNotStarted()
+    {
+        $request = Request::create('/login');
+
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $utils = new AuthenticationUtils($requestStack);
+        $this->assertNull($utils->getLastAuthenticationError());
+        $this->assertSame('', $utils->getLastUsername());
+        $this->assertNull($utils->getReAuthenticationAttribute());
+        $this->assertFalse($session->isStarted());
+    }
+
+    public function testSessionOfThePreviousRequestIsRead()
+    {
+        $authenticationError = new AuthenticationException();
+
+        $storage = new MockArraySessionStorage();
+        $storage->setSessionData(['_sf2_attributes' => [
+            SecurityRequestAttributes::AUTHENTICATION_ERROR => $authenticationError,
+            SecurityRequestAttributes::LAST_USERNAME => 'user',
+            SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE => 'IS_AUTHENTICATED_RECENTLY',
+        ]]);
+
+        $request = Request::create('/login', 'GET', [], [$storage->getName() => 'session-id']);
+        $request->setSessionFactory(static fn () => new Session($storage));
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $utils = new AuthenticationUtils($requestStack);
+        $this->assertSame($authenticationError, $utils->getLastAuthenticationError());
+        $this->assertSame('user', $utils->getLastUsername());
+        $this->assertSame('IS_AUTHENTICATED_RECENTLY', $utils->getReAuthenticationAttribute());
+    }
+
+    public function testSessionWithAnIdButNoCookieIsRead()
+    {
+        $storage = new MockArraySessionStorage();
+        $storage->setSessionData(['_sf2_attributes' => [SecurityRequestAttributes::LAST_USERNAME => 'user']]);
+
+        $session = new Session($storage);
+        $session->setId('session-id');
+
+        $request = Request::create('/login');
+        $request->setSession($session);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $utils = new AuthenticationUtils($requestStack);
+        $this->assertSame('user', $utils->getLastUsername());
+    }
+
     public function testReAuthenticationAttributeWhenRequestHasAttribute()
     {
         $request = Request::create('/login');

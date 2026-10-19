@@ -80,6 +80,31 @@ class AuthenticatorManagerTest extends TestCase
         yield [[], false];
     }
 
+    public function testSupportsLogsOneRecordListingTheCheckedAuthenticators()
+    {
+        $supporting = $this->createStub(TestInteractiveAuthenticator::class);
+        $supporting->method('supports')->willReturn(true);
+        $skipped = self::createDummySupportsAuthenticator(false);
+
+        $logger = new class extends AbstractLogger {
+            public array $records = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->records[] = [$level, $message, $context];
+            }
+        };
+
+        $manager = $this->createManager([$skipped, $supporting], 'main', [], $logger, exposeSecurityErrors: ExposeSecurityLevel::None);
+
+        $this->assertTrue($manager->supports($this->request));
+        $this->assertSame([['debug', 'Checked for authenticator support.', [
+            'firewall_name' => 'main',
+            'supporting_authenticators' => [$supporting::class],
+            'skipped_authenticators' => [DummySupportsAuthenticator::class],
+        ]]], $logger->records);
+    }
+
     public function testSupportsInvalidAuthenticator()
     {
         $manager = $this->createManager([new \stdClass()], exposeSecurityErrors: ExposeSecurityLevel::None);

@@ -159,7 +159,9 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
                 $targetPropertyName = $mapping->target ?? $propertyName;
                 if (false === $if = $mapping->if) {
-                    unset($ctorArguments[$targetPropertyName]);
+                    if (!isset($explicitTargets[$targetPropertyName])) {
+                        unset($ctorArguments[$targetPropertyName]);
+                    }
 
                     continue;
                 }
@@ -181,7 +183,9 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
                 $value = $this->getRawValue($source, $sourcePropertyName);
                 if ($if && $fn && !$this->call($fn, $value, $source, $mappedTarget)) {
-                    unset($ctorArguments[$targetPropertyName]);
+                    if (!isset($explicitTargets[$targetPropertyName])) {
+                        unset($ctorArguments[$targetPropertyName]);
+                    }
 
                     continue;
                 }

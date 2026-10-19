@@ -30,6 +30,7 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     protected function setUp(): void
     {
+        (new \ReflectionProperty(ArgumentMetadataFactory::class, 'parametersCache'))->setValue(null, []);
         $this->factory = new ArgumentMetadataFactory();
     }
 
@@ -174,6 +175,19 @@ class ArgumentMetadataFactoryTest extends TestCase
         yield 'method with its reflector' => [static fn (ArgumentMetadataFactory $factory) => $factory->createArgumentMetadata([new CountedAttributeController(), 'action'], new \ReflectionMethod(CountedAttributeController::class, 'action'))];
         yield 'invokable' => [static fn (ArgumentMetadataFactory $factory) => $factory->createArgumentMetadata(new CountedAttributeController())];
         yield 'first-class callable' => [static fn (ArgumentMetadataFactory $factory) => $factory->createArgumentMetadata((new CountedAttributeController())->action(...))];
+    }
+
+    public function testFactoriesShareTheirCache()
+    {
+        Counted::$instances = 0;
+
+        foreach ([new ArgumentMetadataFactory(), new ArgumentMetadataFactory()] as $factory) {
+            $arguments = $factory->createArgumentMetadata([new CountedAttributeController(), 'action']);
+
+            $this->assertSame(['argument'], array_map(static fn (Counted $attribute) => $attribute->value, $arguments[0]->getAttributes()));
+        }
+
+        $this->assertSame(1, Counted::$instances);
     }
 
     public function testEachCallGetsItsOwnInstances()

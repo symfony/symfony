@@ -47,9 +47,11 @@ class ControllerAttributesListener implements EventSubscriberInterface
     /**
      * Attributes are cloned for each request, since listeners can change them.
      *
+     * Static since it only holds what the code declares, which is the same for all instances.
+     *
      * @var array<string, list<object>>
      */
-    private array $attributesCache = [];
+    private static array $attributesCache = [];
 
     public function beforeController(ControllerEvent|ControllerArgumentsEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -123,7 +125,7 @@ class ControllerAttributesListener implements EventSubscriberInterface
         }
 
         $attributes = [];
-        foreach ($this->attributesCache[$key] ??= $event->getAttributes('*') as $attribute) {
+        foreach (self::$attributesCache[$key] ??= $event->getAttributes('*') as $attribute) {
             $attributes[] = clone $attribute;
         }
         $request->attributes->set('_controller_attributes', $attributes);

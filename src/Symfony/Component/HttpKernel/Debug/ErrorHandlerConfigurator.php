@@ -121,7 +121,7 @@ class ErrorHandlerConfigurator
 
         $installedLoggers = [];
         foreach ($handler->setLoggers([]) as $type => [$logger]) {
-            if (null !== $logger && ($logger === $this->logger || $logger === $this->deprecationLogger)) {
+            if ($logger instanceof LoggerInterface && ($logger === $this->logger || $logger === $this->deprecationLogger)) {
                 $installedLoggers[$type] = $logger;
             }
         }

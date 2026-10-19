@@ -15,6 +15,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLang
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSessionDomainConstraintPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\MakeFirewallsEventDispatcherTraceablePass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCallableVotersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfFeaturesPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterDebugRoleHierarchyPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterEntryPointPass;
@@ -92,6 +93,7 @@ class SecurityBundle extends Bundle
         $extension->addUserProviderFactory(new LdapFactory());
         $extension->addUserProviderFactory(new OidcFactory());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
+        $container->addCompilerPass(new RegisterCallableVotersPass());
         $container->addCompilerPass(new AddSecurityVotersPass());
         $container->addCompilerPass(new AddSessionDomainConstraintPass());
         $container->addCompilerPass(new RegisterCsrfFeaturesPass());

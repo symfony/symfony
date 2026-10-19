@@ -235,14 +235,15 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 $voter = $voter->getDecoratedVoter();
             }
 
-            $voters[] = $this->hasVarDumper ? new ClassStub($voter::class) : $voter::class;
+            $voterName = $voter instanceof \Stringable ? (string) $voter : $voter::class;
+            $voters[] = $this->hasVarDumper ? new ClassStub($voterName) : $voterName;
         }
         $this->data['voters'] = $voters;
 
         foreach ($this->data['access_decision_log'] ?? [] as $key => $log) {
             $this->data['access_decision_log'][$key]['voter_details'] = [];
             foreach ($log['voterDetails'] as $voterDetail) {
-                $voterClass = $voterDetail['voter']::class;
+                $voterClass = $voterDetail['voter'] instanceof \Stringable ? (string) $voterDetail['voter'] : $voterDetail['voter']::class;
                 $classData = $this->hasVarDumper ? new ClassStub($voterClass) : $voterClass;
                 $this->data['access_decision_log'][$key]['voter_details'][] = [
                     'class' => $classData,

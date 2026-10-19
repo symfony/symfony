@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\Voter\CallableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Tests\Fixtures\DummyVoter;
@@ -257,6 +258,28 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 'result' => true,
             ],
         ], $sut->getDecisionLog());
+    }
+
+    public function testGetVotersKeepsStringableVotersOfTheSameClassApart()
+    {
+        $isAuthor = new CallableVoter(static fn () => true, [], ['EDIT'], null, 'App\PostRules::isAuthor');
+        $isLocked = new CallableVoter(static fn () => null, [], ['EDIT'], null, 'App\PostRules::isLocked');
+        $voter = new DummyVoter();
+
+        $decoratedAccessDecisionManager = $this->createStub(AccessDecisionManagerInterface::class);
+        $accessDecisionManager = new TraceableAccessDecisionManager($decoratedAccessDecisionManager);
+        $decoratedAccessDecisionManager->method('decide')->willReturnCallback(static function (TokenInterface $token, array $attributes) use ($accessDecisionManager, $isAuthor, $isLocked, $voter) {
+            $accessDecisionManager->addVoterVote($isAuthor, $attributes, VoterInterface::ACCESS_GRANTED);
+            $accessDecisionManager->addVoterVote($isLocked, $attributes, VoterInterface::ACCESS_ABSTAIN);
+            $accessDecisionManager->addVoterVote($voter, $attributes, VoterInterface::ACCESS_ABSTAIN);
+
+            return true;
+        });
+
+        $accessDecisionManager->decide(new NullToken(), ['EDIT']);
+        $accessDecisionManager->decide(new NullToken(), ['EDIT']);
+
+        $this->assertSame([$isAuthor, $isLocked, $voter], array_values($accessDecisionManager->getVoters()));
     }
 
     public function testCustomAccessDecisionManagerReturnsEmptyStrategy()

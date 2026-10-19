@@ -54,6 +54,7 @@ use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Loader\ContainerLoader;
+use Symfony\Component\Security\Core\Attribute\AsVoter;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\PriorityStrategy;
@@ -228,6 +229,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $container->registerForAutoconfiguration(VoterInterface::class)
             ->addTag('security.voter');
+
+        $container->registerAttributeForAutoconfiguration(AsVoter::class, static function (ChildDefinition $definition, AsVoter $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
+            $definition->addTag('.security.callable_voter', [
+                'attributes' => (array) $attribute->attributes,
+                'method' => $reflector instanceof \ReflectionMethod ? $reflector->name : '__invoke',
+                'priority' => $attribute->priority,
+            ]);
+        });
     }
 
     private function createStrategyDefinition(string $strategy, bool $allowIfAllAbstainDecisions, bool $allowIfEqualGrantedDeniedDecisions): Definition

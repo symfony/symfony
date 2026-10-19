@@ -52,6 +52,8 @@ CHANGELOG
  * Make login links and signed remember-me cookies expire according to the `clock` service
  * Add the `security.route_loader` service to load the routes of all firewalls with a single import
  * Deprecate the `security.route_loader.logout` service, use `security.route_loader` instead
+ * Register the methods and invokable classes marked with `#[AsVoter]` as voters
+ * Show the name of the voters that implement `\Stringable` in the security profiler panel
 
 8.1
 ---

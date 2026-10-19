@@ -2085,11 +2085,12 @@ class OidcLoginAuthenticatorTest extends TestCase
     public function testRejectsAPublicClientWithoutPkce()
     {
         $this->oidcClient->method('getClientAuthenticationMethod')->willReturn('none');
+        $authenticator = $this->createAuthenticator(['pkce_enabled' => false], signatureVerifier: $this->createSignatureVerifier());
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('PKCE cannot be disabled for a public OIDC client');
 
-        $this->createAuthenticator(['pkce_enabled' => false], signatureVerifier: $this->createSignatureVerifier());
+        $authenticator->start($this->createRequestWithSession('/protected'));
     }
 
     /**
@@ -2101,18 +2102,27 @@ class OidcLoginAuthenticatorTest extends TestCase
     public function testRejectsAPublicClientThatDoesNotVerifyTheIdTokenSignature()
     {
         $this->oidcClient->method('getClientAuthenticationMethod')->willReturn('none');
+        $authenticator = $this->createAuthenticator();
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The ID token signature must be verified for a public OIDC client');
 
-        $this->createAuthenticator();
+        $authenticator->authenticate($this->createRequestWithSession('/oidc/callback?code=code&state=state'));
     }
 
     public function testAPublicClientIsAcceptedWithPkceAndTheSignatureCheck()
     {
         $this->oidcClient->method('getClientAuthenticationMethod')->willReturn('none');
+        $authenticator = $this->createAuthenticator(signatureVerifier: $this->createSignatureVerifier());
 
-        $this->assertInstanceOf(OidcLoginAuthenticator::class, $this->createAuthenticator(signatureVerifier: $this->createSignatureVerifier()));
+        $this->assertInstanceOf(RedirectResponse::class, $authenticator->start($this->createRequestWithSession('/protected')));
+    }
+
+    public function testCreatingTheAuthenticatorDoesNotUseTheClient()
+    {
+        $this->oidcClient->expects($this->never())->method('getClientAuthenticationMethod');
+
+        $this->createAuthenticator(['pkce_enabled' => false]);
     }
 
     /**
@@ -2123,8 +2133,9 @@ class OidcLoginAuthenticatorTest extends TestCase
     public function testAConfidentialClientMayTurnBothOff()
     {
         $this->oidcClient->method('getClientAuthenticationMethod')->willReturn('client_secret_basic');
+        $authenticator = $this->createAuthenticator(['pkce_enabled' => false]);
 
-        $this->assertInstanceOf(OidcLoginAuthenticator::class, $this->createAuthenticator(['pkce_enabled' => false]));
+        $this->assertInstanceOf(RedirectResponse::class, $authenticator->start($this->createRequestWithSession('/protected')));
     }
 
     /**
@@ -2159,6 +2170,14 @@ class OidcLoginAuthenticatorTest extends TestCase
         $params = [];
         parse_str(parse_url($response->getTargetUrl(), \PHP_URL_QUERY), $params);
         $this->assertArrayNotHasKey('dpop_jkt', $params);
+    }
+
+    private function createRequestWithSession(string $uri): Request
+    {
+        $request = Request::create($uri);
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        return $request;
     }
 
     private function createAuthenticator(array $options = [], ?UserProviderInterface $userProvider = null, array $authorizationParams = [], ?OidcSignatureVerifier $signatureVerifier = null, ?ClockInterface $clock = null, ?EventDispatcherInterface $eventDispatcher = null, ?DpopProofFactory $dpopProofFactory = null): OidcLoginAuthenticator

@@ -224,6 +224,27 @@ final class ConnectionTest extends TestCase
         $this->assertSame('1234', $connection->get()['id']);
     }
 
+    public function testCloseDisconnectsAndTheNextCommandsUseAndWatchTheTubeAgain()
+    {
+        $tube = new TubeName('baz');
+
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('disconnect');
+        $client->expects($this->exactly(2))->method('useTube')->with($tube);
+        $client->expects($this->exactly(2))->method('put')->willReturn(new Job(new JobId('1234'), 'foo'));
+        $client->expects($this->exactly(2))->method('watch')->with($tube)->willReturn(1);
+        $client->expects($this->exactly(2))->method('reserveWithTimeout')->willReturn(null);
+
+        $connection = new Connection(['tube_name' => 'baz'], $client);
+        $connection->send('foo', []);
+        $connection->get();
+
+        $connection->close();
+
+        $connection->send('foo', []);
+        $connection->get();
+    }
+
     public function testGetWhenThereIsNoJobInTheTube()
     {
         $tube = 'baz';

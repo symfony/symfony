@@ -245,6 +245,15 @@ class Connection
         });
     }
 
+    public function close(): void
+    {
+        $this->client->disconnect();
+
+        // the next command opens a new session, which uses and watches the "default" tube
+        $this->usedTube = null;
+        $this->watchingTube = false;
+    }
+
     private function useTube(?TubeName $tube = null): void
     {
         $tube ??= $this->tube;
@@ -290,10 +299,7 @@ class Connection
                 try {
                     return $command();
                 } catch (ConnectionException) {
-                    $this->client->disconnect();
-
-                    $this->usedTube = null;
-                    $this->watchingTube = false;
+                    $this->close();
 
                     if (null !== $reservedJobId) {
                         try {

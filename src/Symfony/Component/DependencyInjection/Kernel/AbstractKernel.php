@@ -120,7 +120,6 @@ abstract class AbstractKernel implements KernelInterface
             }
         } finally {
             $this->container = null;
-            gc_collect_cycles();
         }
     }
 

@@ -26,6 +26,13 @@ interface TestAppInterface extends HttpKernelInterface, TerminableInterface
 
 class FrankenPhpWorkerRunnerTest extends TestCase
 {
+    public static ?int $requests = null;
+
+    protected function tearDown(): void
+    {
+        self::$requests = null;
+    }
+
     public function testRun()
     {
         $application = $this->createMock(TestAppInterface::class);
@@ -49,5 +56,17 @@ class FrankenPhpWorkerRunnerTest extends TestCase
         } finally {
             $_SERVER = $server;
         }
+    }
+
+    public function testRunDoesNotTerminateTheLastRequestAgainWhenTheWorkerStops()
+    {
+        $application = $this->createMock(TestAppInterface::class);
+        $application->expects($this->exactly(2))->method('handle')->willReturn(new Response());
+        $application->expects($this->exactly(2))->method('terminate');
+
+        self::$requests = 2;
+
+        $runner = new FrankenPhpWorkerRunner($application, 500);
+        $this->assertSame(0, $runner->run());
     }
 }

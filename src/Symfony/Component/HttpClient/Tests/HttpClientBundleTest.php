@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+require_once __DIR__.'/Fixtures/gc-function-mock.php';
+
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -24,16 +27,23 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
+use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\HttpClientBundle;
 use Symfony\Component\HttpClient\RecorderHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 class HttpClientBundleTest extends TestCase
 {
+    public static bool $collectCycles = true;
+
     private string $varDir;
 
     protected function setUp(): void
@@ -83,6 +93,41 @@ class HttpClientBundleTest extends TestCase
 
         $this->assertSame(1, $collector->getRequestCount());
         $this->assertSame(['http_client', 'scoped_client', 'cached_client'], array_keys($collector->getClients()));
+    }
+
+    #[RequiresPhpExtension('curl')]
+    public function testShutdownClosesTheConnectionsOfClientsInAReferenceCycle()
+    {
+        TestHttpServer::start();
+        $kernel = new ShutdownHttpClientKernel($this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        if (!($transport = $container->get('test.transport')) instanceof CurlHttpClient) {
+            $this->markTestSkipped('CurlHttpClient is not the default transport.');
+        }
+
+        $this->assertSame('GET', $container->get('test.client_holder')->client->request('GET', '/')->toArray()['REQUEST_METHOD']);
+        $handle = \WeakReference::create((new \ReflectionProperty($transport, 'multi'))->getValue($transport)->handle);
+        $holder = \WeakReference::create($container->get('test.client_holder'));
+        unset($container, $transport);
+
+        $gcEnabled = gc_enabled();
+        gc_disable();
+        self::$collectCycles = false;
+
+        try {
+            $kernel->shutdown();
+
+            $this->assertNotNull($holder->get());
+            $this->assertNull($handle->get());
+        } finally {
+            self::$collectCycles = true;
+            gc_collect_cycles();
+
+            if ($gcEnabled) {
+                gc_enable();
+            }
+        }
     }
 
     public function testTheCachePoolAndTheDataCollectorGoWithWhatTheyNeed()
@@ -306,6 +351,55 @@ class TestHttpClientKernel extends AbstractKernel
             $services->set('profiler', \stdClass::class);
             $services->alias('test.data_collector', 'data_collector.http_client')->public();
         }
+    }
+}
+
+class ShutdownHttpClientKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(private string $dir)
+    {
+        parent::__construct('shutdown', true);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new ServicesBundle();
+        yield new HttpClientBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('http_client', [
+            'scoped_clients' => [
+                'scoped_client' => ['base_uri' => 'http://127.0.0.1:8057/'],
+            ],
+        ]);
+
+        $container->services()
+            ->set('profiler', \stdClass::class)
+            ->set('test.client_holder', SelfReferencingClientHolder::class)
+                ->args([service('scoped_client')])
+                ->public()
+            ->alias('test.transport', 'http_client.transport')->public()
+        ;
+    }
+}
+
+class SelfReferencingClientHolder
+{
+    public self $self;
+
+    public function __construct(
+        public HttpClientInterface $client,
+    ) {
+        $this->self = $this;
     }
 }
 

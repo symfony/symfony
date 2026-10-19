@@ -25,6 +25,8 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
+use Symfony\Component\HttpClient\Tests\Fixtures\ResettableClient;
+use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -266,5 +268,19 @@ class EventSourceHttpClientTest extends TestCase
             ['text/html; charset="utf-8"', new EventSourceException('Response content-type is "text/html; charset="utf-8"" while "text/event-stream" was expected for "http://localhost:8080/events".')],
             ['text/event-streambla', new EventSourceException('Response content-type is "text/event-streambla" while "text/event-stream" was expected for "http://localhost:8080/events".')],
         ];
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwareClientsOnly()
+    {
+        $client = new EventSourceHttpClient($inner = new ShutdownAwareClient());
+        $client->reset();
+        $client->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $client = new EventSourceHttpClient($inner = new ResettableClient());
+        $client->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

@@ -16,6 +16,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 /**
  * Auto-configure the default options based on the requested URL.
@@ -117,9 +118,14 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface
         return $this->client->stream($responses, $timeout);
     }
 
-    public function reset(): void
+    /**
+     * @param bool $shutdown Whether the client is being shut down
+     */
+    public function reset(/* bool $shutdown = false */): void
     {
-        if ($this->client instanceof ResetInterface) {
+        if ($this->client instanceof ShutdownInterface) {
+            $this->client->reset(...\func_get_args());
+        } elseif ($this->client instanceof ResetInterface) {
             $this->client->reset();
         }
     }

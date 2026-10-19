@@ -15,6 +15,7 @@ use Symfony\Component\HttpClient\Internal\FollowRedirectsTrait;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 /**
  * Decorator that resolves host names using a custom resolver before delegating to the transport.
@@ -30,7 +31,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class DnsResolvingHttpClient implements HttpClientInterface, ResetInterface
+final class DnsResolvingHttpClient implements HttpClientInterface, ShutdownInterface
 {
     use AsyncDecoratorTrait;
     use FollowRedirectsTrait;
@@ -84,13 +85,17 @@ final class DnsResolvingHttpClient implements HttpClientInterface, ResetInterfac
         return $clone;
     }
 
-    public function reset(): void
+    public function reset(bool $shutdown = false): void
     {
-        if ($this->resolver instanceof ResetInterface) {
+        if ($this->resolver instanceof ShutdownInterface) {
+            $this->resolver->reset($shutdown);
+        } elseif ($this->resolver instanceof ResetInterface) {
             $this->resolver->reset();
         }
 
-        if ($this->client instanceof ResetInterface) {
+        if ($this->client instanceof ShutdownInterface) {
+            $this->client->reset($shutdown);
+        } elseif ($this->client instanceof ResetInterface) {
             $this->client->reset();
         }
     }

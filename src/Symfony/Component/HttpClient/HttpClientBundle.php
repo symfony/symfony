@@ -349,7 +349,7 @@ class HttpClientBundle extends AbstractBundle
 
             $scopingDefinition = $container->register($name.'.scoping', ScopingHttpClient::class)
                 ->setDecoratedService($name, null, 15)
-                ->addTag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore']);
+                ->addTag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore', 'on_shutdown' => 'flag']);
 
             if (null === $scope) {
                 $baseUri = $scopeConfig['base_uri'];

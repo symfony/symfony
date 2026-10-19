@@ -62,7 +62,7 @@ final class CurlClientState extends ClientState
         return $scheme.'://'.strtolower($host).':'.$port;
     }
 
-    public function reset(): void
+    public function reset(bool $shutdown = false): void
     {
         foreach ($this->pushedResponses as $url => $response) {
             $this->logger?->debug(\sprintf('Unused pushed response: "%s"', $url));
@@ -76,6 +76,11 @@ final class CurlClientState extends ClientState
         $this->ntlmRequiresFreshConnection = [];
 
         unset($this->share);
+
+        if ($shutdown && !$this->openHandles) {
+            // Drop the multi handle to close its idle connections, unless a response still needs it
+            unset($this->handle);
+        }
     }
 
     public function __get(string $name): mixed

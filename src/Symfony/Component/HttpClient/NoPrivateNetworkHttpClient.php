@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 /**
  * Decorator that blocks requests to private networks by default.
@@ -24,7 +25,7 @@ use Symfony\Contracts\Service\ResetInterface;
  * @author Hallison Boaventura <hallisonboaventura@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class NoPrivateNetworkHttpClient implements HttpClientInterface, ResetInterface
+final class NoPrivateNetworkHttpClient implements HttpClientInterface, ShutdownInterface
 {
     use AsyncDecoratorTrait;
     use FollowRedirectsTrait;
@@ -118,11 +119,13 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, ResetInte
         return $clone;
     }
 
-    public function reset(): void
+    public function reset(bool $shutdown = false): void
     {
         $this->dnsCache->exchangeArray([]);
 
-        if ($this->client instanceof ResetInterface) {
+        if ($this->client instanceof ShutdownInterface) {
+            $this->client->reset($shutdown);
+        } elseif ($this->client instanceof ResetInterface) {
             $this->client->reset();
         }
     }

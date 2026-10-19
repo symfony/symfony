@@ -14,6 +14,8 @@ namespace Symfony\Component\HttpClient\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Tests\Fixtures\ResettableClient;
+use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 use Symfony\Component\HttpClient\UriTemplateHttpClient;
 
 final class UriTemplateHttpClientTest extends TestCase
@@ -125,5 +127,19 @@ final class UriTemplateHttpClientTest extends TestCase
                 'foo2' => 'bar2',
             ],
         ]);
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwareClientsOnly()
+    {
+        $client = new UriTemplateHttpClient($inner = new ShutdownAwareClient());
+        $client->reset();
+        $client->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $client = new UriTemplateHttpClient($inner = new ResettableClient());
+        $client->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

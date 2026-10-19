@@ -21,6 +21,9 @@ CHANGELOG
  * Allow passing the `query` and `body` options as lists of single-entry arrays to repeat a field
  * Make `http_version: 2.0` use HTTP/2 with prior knowledge on `http://` URLs in `CurlHttpClient` and `AmpHttpClient`
  * Stop following redirects from `https://` to `http://` URLs
+ * Make `AmpHttpClient`, `CurlHttpClient`, `DnsResolvingHttpClient`, `HttplugClient`, `NoPrivateNetworkHttpClient`, `Psr18Client` and `TraceableHttpClient` implement `ShutdownInterface`
+ * Add argument `$shutdown` to `reset()` in `DecoratorTrait`, `ScopingHttpClient` and `ThrottlingHttpClient`
+ * Close the idle connections of `CurlHttpClient` and `AmpHttpClient` when `reset(true)` is called at shutdown
 
 8.1
 ---

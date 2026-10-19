@@ -159,4 +159,20 @@ class AmpHttpClientTest extends HttpClientTestCase
 
         $this->assertLessThan(0.5, (hrtime(true) - $start) / 1E9);
     }
+
+    public function testShutdownResetClosesTheConnectionPools()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $state = (new \ReflectionProperty($client, 'multi'))->getValue($client);
+        $client->request('GET', 'http://127.0.0.1:8057/json')->getContent();
+        $pool = \WeakReference::create(current((new \ReflectionProperty($state, 'clients'))->getValue($state))[0]);
+
+        $client->reset();
+        $this->assertNotNull($pool->get());
+
+        $client->reset(true);
+        $this->assertNull($pool->get());
+
+        $this->assertSame(200, $client->request('GET', 'http://127.0.0.1:8057/json')->getStatusCode());
+    }
 }

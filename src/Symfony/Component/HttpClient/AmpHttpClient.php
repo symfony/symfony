@@ -26,7 +26,7 @@ use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
-use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 if (!interface_exists(DelegateHttpClient::class)) {
     throw new \LogicException('You cannot use "Symfony\Component\HttpClient\AmpHttpClient" as the "amphp/http-client" package is not installed. Try running "composer require amphp/http-client:^5".');
@@ -37,7 +37,7 @@ if (!interface_exists(DelegateHttpClient::class)) {
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
+final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, ShutdownInterface
 {
     use HttpClientTrait;
     use LoggerAwareTrait;
@@ -152,7 +152,7 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         return new ResponseStream(AmpResponse::stream($responses, $timeout));
     }
 
-    public function reset(): void
+    public function reset(bool $shutdown = false): void
     {
         $this->multi->dnsCache = [];
 
@@ -165,5 +165,10 @@ final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, 
         }
 
         $this->multi->pushedResponses = [];
+
+        if ($shutdown) {
+            // Drop the connection pools to close their idle connections, in-flight requests keep theirs
+            $this->multi->clients = [];
+        }
     }
 }

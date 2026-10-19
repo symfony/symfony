@@ -20,6 +20,8 @@ use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\Psr18NetworkException;
 use Symfony\Component\HttpClient\Psr18RequestException;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Tests\Fixtures\ResettableClient;
+use Symfony\Component\HttpClient\Tests\Fixtures\ShutdownAwareClient;
 use Symfony\Component\HttpClient\Tests\Fixtures\UnknownSizeStream;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
@@ -81,7 +83,7 @@ class Psr18ClientTest extends TestCase
         $body = new UnknownSizeStream('IMPORTANT-PAYLOAD');
         $body->getContents();
         $this->assertTrue($body->eof());
-        $client = new Psr18Client(new MockHttpClient(function (string $method, string $url, array $options) use (&$sentBody): MockResponse {
+        $client = new Psr18Client(new MockHttpClient(static function (string $method, string $url, array $options) use (&$sentBody): MockResponse {
             $sentBody = $options['body'];
 
             if (!\is_string($sentBody)) {
@@ -187,5 +189,19 @@ class Psr18ClientTest extends TestCase
             $bodyWithOptionFalse = json_decode((string) $responseWithOptionFalse->getBody(), true);
             $this->assertSame('HTTP/'.$httpVersion, $bodyWithOptionFalse['SERVER_PROTOCOL']);
         }
+    }
+
+    public function testResetForwardsTheShutdownFlagToShutdownAwareClientsOnly()
+    {
+        $client = new Psr18Client($inner = new ShutdownAwareClient());
+        $client->reset();
+        $client->reset(true);
+
+        $this->assertSame([false, true], $inner->resets);
+
+        $client = new Psr18Client($inner = new ResettableClient());
+        $client->reset(true);
+
+        $this->assertSame([[]], $inner->resets);
     }
 }

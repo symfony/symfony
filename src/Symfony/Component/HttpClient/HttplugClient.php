@@ -37,6 +37,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 if (!interface_exists(HttpAsyncClient::class)) {
     throw new \LogicException('You cannot use "Symfony\Component\HttpClient\HttplugClient" as the "php-http/httplug" package is not installed. Try running "composer require php-http/discovery php-http/async-client-implementation:*".');
@@ -56,7 +57,7 @@ if (!interface_exists(RequestFactoryInterface::class)) {
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFactoryInterface, StreamFactoryInterface, UriFactoryInterface, ResetInterface
+final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFactoryInterface, StreamFactoryInterface, UriFactoryInterface, ShutdownInterface
 {
     private HttpClientInterface $client;
     private ResponseFactoryInterface $responseFactory;
@@ -218,9 +219,11 @@ final class HttplugClient implements ClientInterface, HttpAsyncClient, RequestFa
         $this->wait();
     }
 
-    public function reset(): void
+    public function reset(bool $shutdown = false): void
     {
-        if ($this->client instanceof ResetInterface) {
+        if ($this->client instanceof ShutdownInterface) {
+            $this->client->reset($shutdown);
+        } elseif ($this->client instanceof ResetInterface) {
             $this->client->reset();
         }
     }

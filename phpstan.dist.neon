@@ -72,9 +72,7 @@ parameters:
         # reset() keeps its optional argument virtual for subclasses
         -
             message: '#^PHPDoc tag @param references unknown parameter\: \$shutdown$#'
-            paths:
-                - src/Symfony/Component/DependencyInjection/Container.php
-                - src/Symfony/Bundle/FrameworkBundle/Test/TestContainer.php
+            path: src/Symfony/*
         # The deprecated HttpKernel wrapper keeps its parent class for BC.
         -
             identifier: class.extendsFinalByPhpDoc

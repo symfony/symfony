@@ -18,11 +18,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 /**
  * @author Jérémy Romey <jeremy@free-agent.fr>
  */
-final class TraceableHttpClient implements HttpClientInterface, ResetInterface
+final class TraceableHttpClient implements HttpClientInterface, ShutdownInterface
 {
     private \ArrayObject $tracedRequests;
 
@@ -83,9 +84,11 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface
         return $this->tracedRequests->getArrayCopy();
     }
 
-    public function reset(): void
+    public function reset(bool $shutdown = false): void
     {
-        if ($this->client instanceof ResetInterface) {
+        if ($this->client instanceof ShutdownInterface) {
+            $this->client->reset($shutdown);
+        } elseif ($this->client instanceof ResetInterface) {
             $this->client->reset();
         }
 

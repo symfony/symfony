@@ -31,6 +31,7 @@ use Symfony\Component\HttpClient\Internal\HttplugWaitLoop;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ShutdownInterface;
 
 if (!interface_exists(ClientInterface::class)) {
     throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as the "psr/http-client" package is not installed. Try running "composer require php-http/discovery psr/http-client-implementation:*".');
@@ -48,7 +49,7 @@ if (!interface_exists(RequestFactoryInterface::class)) {
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class Psr18Client implements ClientInterface, RequestFactoryInterface, StreamFactoryInterface, UriFactoryInterface, ResetInterface
+final class Psr18Client implements ClientInterface, RequestFactoryInterface, StreamFactoryInterface, UriFactoryInterface, ShutdownInterface
 {
     private HttpClientInterface $client;
     private ResponseFactoryInterface $responseFactory;
@@ -208,9 +209,11 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
         throw new \LogicException(\sprintf('You cannot use "%s()" as no PSR-17 factories have been found. Try running "composer require php-http/discovery psr/http-factory-implementation:*".', __METHOD__));
     }
 
-    public function reset(): void
+    public function reset(bool $shutdown = false): void
     {
-        if ($this->client instanceof ResetInterface) {
+        if ($this->client instanceof ShutdownInterface) {
+            $this->client->reset($shutdown);
+        } elseif ($this->client instanceof ResetInterface) {
             $this->client->reset();
         }
     }

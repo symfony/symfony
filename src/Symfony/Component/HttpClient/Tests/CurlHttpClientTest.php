@@ -60,6 +60,35 @@ class CurlHttpClientTest extends HttpClientTestCase
         self::assertNotSame($initialShareId, $clientState->share);
     }
 
+    public function testShutdownResetClosesTheMultiHandle()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $state = (new \ReflectionProperty($client, 'multi'))->getValue($client);
+        $client->request('GET', 'http://127.0.0.1:8057/json')->getContent();
+        $handle = \WeakReference::create($state->handle);
+
+        $client->reset();
+        $this->assertNotNull($handle->get());
+
+        $client->reset(true);
+        $this->assertNull($handle->get());
+
+        $this->assertSame(200, $client->request('GET', 'http://127.0.0.1:8057/json')->getStatusCode());
+    }
+
+    public function testShutdownResetKeepsTheMultiHandleOfOpenResponses()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $state = (new \ReflectionProperty($client, 'multi'))->getValue($client);
+        $response = $client->request('GET', 'http://127.0.0.1:8057/json');
+        $handle = \WeakReference::create($state->handle);
+
+        $client->reset(true);
+
+        $this->assertNotNull($handle->get());
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     public function testCurlClientStateIsSharedBetweenClones()
     {
         $client = $this->getHttpClient(__FUNCTION__);

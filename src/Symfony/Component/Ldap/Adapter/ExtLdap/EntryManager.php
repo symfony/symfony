@@ -50,7 +50,11 @@ class EntryManager implements EntryManagerInterface
     {
         $con = $this->getConnectionResource();
 
-        if (!@ldap_modify($con, $entry->getDn(), $entry->getAttributes())) {
+        if (!$attributes = $entry->getChangedAttributes()) {
+            return $this;
+        }
+
+        if (!@ldap_modify($con, $entry->getDn(), $attributes)) {
             throw new LdapException(\sprintf('Could not update entry "%s": ', $entry->getDn()).ldap_error($con), ldap_errno($con));
         }
 

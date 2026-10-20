@@ -28,6 +28,11 @@ class Entry
     private array $lowerMap = [];
 
     /**
+     * @var array<string, true>
+     */
+    private array $unchangedAttributes = [];
+
+    /**
      * @param array<string, array> $attributes
      */
     public function __construct(
@@ -99,6 +104,7 @@ class Entry
     {
         $this->attributes[$name] = $value;
         $this->lowerMap[strtolower($name)] = $name;
+        unset($this->unchangedAttributes[$name]);
     }
 
     /**
@@ -108,6 +114,24 @@ class Entry
     {
         unset($this->attributes[$name]);
         unset($this->lowerMap[strtolower($name)]);
+    }
+
+    /**
+     * Returns the attributes that were set since the entry was fetched, or all attributes for an entry that was not fetched.
+     *
+     * @internal
+     */
+    public function getChangedAttributes(): array
+    {
+        return array_diff_key($this->attributes, $this->unchangedAttributes);
+    }
+
+    /**
+     * @internal
+     */
+    public function markAsUnchanged(): void
+    {
+        $this->unchangedAttributes = array_fill_keys(array_keys($this->attributes), true);
     }
 
     private function getAttributeKey(string $name, bool $caseSensitive = true): ?string

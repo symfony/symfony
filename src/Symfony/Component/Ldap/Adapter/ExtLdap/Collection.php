@@ -117,7 +117,10 @@ class Collection implements CollectionInterface
             throw new LdapException('Could not fetch DN: '.ldap_error($con));
         }
 
-        return new Entry($dn, $attributes);
+        $entry = new Entry($dn, $attributes);
+        $entry->markAsUnchanged();
+
+        return $entry;
     }
 
     private function cleanupAttributes(array $entry): array

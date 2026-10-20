@@ -40,16 +40,18 @@ final class ExpirationMiddlewareTest extends MiddlewareTestCase
 
     public function testMessageIsHandledUntilItsDeadline()
     {
-        $envelope = new Envelope(new DummyMessage('Hello'), [new ExpirationStamp(new \DateTimeImmutable('2026-10-20 12:00:01'))]);
+        $clock = new MockClock('2026-10-20 12:00:00');
+        $envelope = new Envelope(new DummyMessage('Hello'), [new ExpirationStamp($clock->now()->modify('+1 second'))]);
 
-        $middleware = new ExpirationMiddleware(new MockClock('2026-10-20 12:00:00'));
+        $middleware = new ExpirationMiddleware($clock);
 
         $this->assertSame($envelope, $middleware->handle($envelope, $this->getStackMock()));
     }
 
     public function testExpiredMessageIsDiscarded()
     {
-        $envelope = new Envelope(new DummyMessage('Hello'), [new ExpirationStamp(new \DateTimeImmutable('2026-10-20 11:59:59'))]);
+        $clock = new MockClock('2026-10-20 12:00:00');
+        $envelope = new Envelope(new DummyMessage('Hello'), [new ExpirationStamp($clock->now()->modify('-1 second'))]);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
@@ -59,16 +61,17 @@ final class ExpirationMiddlewareTest extends MiddlewareTestCase
                 $this->callback(static fn (array $context) => DummyMessage::class === $context['class'] && str_starts_with($context['expiration'], '2026-10-20T11:59:59')),
             );
 
-        $middleware = new ExpirationMiddleware(new MockClock('2026-10-20 12:00:00'), $logger);
+        $middleware = new ExpirationMiddleware($clock, $logger);
 
         $this->assertSame($envelope, $middleware->handle($envelope, $this->getStackMock(false)));
     }
 
     public function testMessageExpiringAtTheCurrentTimeIsDiscarded()
     {
-        $envelope = new Envelope(new DummyMessage('Hello'), [new ExpirationStamp(new \DateTimeImmutable('2026-10-20 12:00:00'))]);
+        $clock = new MockClock('2026-10-20 12:00:00');
+        $envelope = new Envelope(new DummyMessage('Hello'), [new ExpirationStamp($clock->now())]);
 
-        $middleware = new ExpirationMiddleware(new MockClock('2026-10-20 12:00:00'));
+        $middleware = new ExpirationMiddleware($clock);
 
         $this->assertSame($envelope, $middleware->handle($envelope, $this->getStackMock(false)));
     }
@@ -107,7 +110,7 @@ final class ExpirationMiddlewareTest extends MiddlewareTestCase
 
     public function testTheDeadlineSurvivesSerialization()
     {
-        $stamp = new ExpirationStamp($expiresAt = new \DateTimeImmutable('2026-10-20 11:59:59.123456'));
+        $stamp = new ExpirationStamp($expiresAt = new \DateTimeImmutable('2026-10-20 11:59:59.123456', new \DateTimeZone('UTC')));
 
         $this->assertEquals($expiresAt, unserialize(serialize($stamp))->getExpiresAt());
     }

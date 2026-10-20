@@ -325,6 +325,20 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
+    public function testPeekConsumeWhenReservationsExceedTheLimit()
+    {
+        ClockMock::withClockMock(1729990780.75);
+        $limiter = $this->createLimiter(10, Rate::perMinute(1));
+        $limiter->consume(10);
+        $limiter->reserve(2);
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertSame(-2, $rateLimit->getRemainingTokens());
+
+        $rateLimit->wait();
+        $this->assertTrue($limiter->consume()->isAccepted());
+    }
+
     private function createLimiter($initialTokens = 10, ?Rate $rate = null)
     {
         return new TokenBucketLimiter('test', $initialTokens, $rate ?? Rate::perSecond(10), $this->storage);

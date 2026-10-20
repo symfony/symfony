@@ -84,7 +84,8 @@ final class TokenBucketLimiter implements LimiterInterface
 
                 $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', $availableTokens === $tokens ? ceil($retryAfter) : floor($retryAfter)), true, $this->maxBurst));
             } else {
-                $remainingTokens = $tokens - $availableTokens;
+                // peeking with 0 tokens tells when the next token is available
+                $remainingTokens = max(1, $tokens) - $availableTokens;
                 $waitDuration = $this->rate->calculateTimeForTokens($remainingTokens);
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {

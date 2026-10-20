@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormRenderer;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
@@ -138,6 +139,28 @@ class TwigRendererEngineTest extends FormIntegrationTestCase
 
         $engine->setTheme($view, ['second_layout.html.twig']);
         $this->assertSame('[second-row]', $engine->renderBlock($view, $engine->getResourceForBlockName($view, 'form_row'), 'form_row'));
+    }
+
+    public function testChildClassesThatLoadResourcesKeepTheirLookups()
+    {
+        $twig = new Environment(new ArrayLoader([
+            'form_layout.html.twig' => '{% block form_row %}[form-row]{% endblock %}{% block text_row %}[text-row]{% endblock %}',
+        ]));
+        $engine = new class(['form_layout.html.twig'], $twig) extends TwigRendererEngine {
+            public array $loadedBlocks = [];
+
+            protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName): bool
+            {
+                $this->loadedBlocks[] = $blockName;
+
+                return parent::loadResourceForBlockName($cacheKey, $view, $blockName);
+            }
+        };
+
+        $view = $this->factory->create(TextType::class)->createView();
+
+        $this->assertSame('[text-row]', (new FormRenderer($engine))->searchAndRenderBlock($view, 'row'));
+        $this->assertNotSame([], $engine->loadedBlocks);
     }
 
     private function createRenderer(?array $templates = null): FormRenderer

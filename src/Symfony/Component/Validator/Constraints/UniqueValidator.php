@@ -47,6 +47,8 @@ class UniqueValidator extends ConstraintValidator
         }
 
         $collectionElements = [];
+        $intElements = [];
+        $stringElements = [];
         $instants = [];
         $normalizer = $this->getNormalizer($constraint);
         foreach ($value as $index => $element) {
@@ -58,7 +60,17 @@ class UniqueValidator extends ConstraintValidator
 
             $element = self::canonicalizeDateTimes($element, $instants);
 
-            if (!\in_array($element, $collectionElements, true)) {
+            if (\is_int($element)) {
+                if (!isset($intElements[$element])) {
+                    $intElements[$element] = true;
+                    continue;
+                }
+            } elseif (\is_string($element)) {
+                if (!isset($stringElements[$element])) {
+                    $stringElements[$element] = true;
+                    continue;
+                }
+            } elseif (!\in_array($element, $collectionElements, true)) {
                 $collectionElements[] = $element;
                 continue;
             }

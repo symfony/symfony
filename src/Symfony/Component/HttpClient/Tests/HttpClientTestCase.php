@@ -311,6 +311,20 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertGreaterThanOrEqual(1, microtime(true) - $time);
     }
 
+    public function testPauseBeforeTheRequestIsSent()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $time = hrtime(true);
+        for ($i = 0; $i < 5; ++$i) {
+            $response = $client->request('GET', 'http://localhost:8057/');
+            $response->getInfo('pause_handler')(0.1);
+            $this->assertSame(200, $response->getStatusCode());
+        }
+
+        $this->assertLessThan(3, (hrtime(true) - $time) / 1E9);
+    }
+
     public function testHttp2PushVulcainWithUnusedResponse()
     {
         $client = $this->getHttpClient(__FUNCTION__);

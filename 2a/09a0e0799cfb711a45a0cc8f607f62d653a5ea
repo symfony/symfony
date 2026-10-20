@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-20T06:44:54Z
+
+I pushed a simpler version. It collects the ids as array keys, then calls `array_values()`. These helpers are internal and every caller only iterates the values, so the keys don't need to be preserved. On a real app container, the previous version was about 15% slower than 8.2, because most arrays there have fewer than 6 items. This one is on par or faster there, and it stays linear on wide arrays.

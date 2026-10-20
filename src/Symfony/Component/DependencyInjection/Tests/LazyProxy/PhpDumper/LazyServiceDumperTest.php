@@ -111,7 +111,6 @@ class LazyServiceDumperTest extends TestCase
         $this->assertStringContainsString('', $dumper->getProxyCode($definition));
     }
 
-    #[RequiresPhp('>=8.4.0')]
     public function testFactoryWithLeadingBackslashClass()
     {
         $dumper = new LazyServiceDumper();

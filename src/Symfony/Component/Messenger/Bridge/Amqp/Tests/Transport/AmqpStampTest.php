@@ -76,6 +76,30 @@ class AmqpStampTest extends TestCase
         $this->assertSame(0, $stamp->getAttributes()['priority']);
     }
 
+    public function testCreateFromAmqpEnvelopeOnlyKeepsAnExplicitUserId()
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getUserId')->willReturn('producer');
+
+        $this->assertArrayNotHasKey('user_id', AmqpStamp::createFromAmqpEnvelope($amqpEnvelope)->getAttributes());
+        $this->assertArrayNotHasKey('user_id', AmqpStamp::createFromAmqpEnvelope($amqpEnvelope, null, 'original_queue')->getAttributes());
+
+        $stamp = AmqpStamp::createFromAmqpEnvelope($amqpEnvelope, new AmqpStamp(null, \AMQP_NOPARAM, ['user_id' => 'consumer']));
+        $this->assertSame('consumer', $stamp->getAttributes()['user_id']);
+    }
+
+    public function testCreateFromAmqpEnvelopeDoesNotCopyTheCcHeader()
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getHeaders')->willReturn(['CC' => ['other_queue'], 'x-some-header' => 'foo']);
+
+        $this->assertSame(['x-some-header' => 'foo'], AmqpStamp::createFromAmqpEnvelope($amqpEnvelope)->getAttributes()['headers']);
+        $this->assertSame(['x-some-header' => 'foo'], AmqpStamp::createFromAmqpEnvelope($amqpEnvelope, null, 'original_queue')->getAttributes()['headers']);
+
+        $stamp = AmqpStamp::createFromAmqpEnvelope($amqpEnvelope, new AmqpStamp(null, \AMQP_NOPARAM, ['headers' => ['CC' => ['explicit_queue']]]));
+        $this->assertSame(['CC' => ['explicit_queue']], $stamp->getAttributes()['headers']);
+    }
+
     public function testCreateFromAmqpEnvelopeWithPreviousStamp()
     {
         $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);

@@ -40,7 +40,7 @@ class FixedWindowLimiterTest extends TestCase
 
     public function testConsume()
     {
-        $now = time();
+        $now = microtime(true);
         $limiter = $this->createLimiter();
 
         // fill 9 tokens in 45 seconds
@@ -56,8 +56,8 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertFalse($rateLimit->isAccepted());
         $this->assertSame(10, $rateLimit->getLimit());
         // Window ends after 1 minute
-        $retryAfter = \DateTimeImmutable::createFromTimestamp($now + 60);
-        $this->assertEquals($retryAfter, $rateLimit->getRetryAfter());
+        $this->assertGreaterThanOrEqual($now + 60, $rateLimit->getRetryAfter()->getTimestamp());
+        $this->assertLessThan($now + 61, $rateLimit->getRetryAfter()->getTimestamp());
     }
 
     public function testResetTimeStaysConstantWithinWindow()
@@ -116,17 +116,15 @@ class FixedWindowLimiterTest extends TestCase
 
     public function testConsumeLastToken()
     {
-        $now = time();
+        $now = microtime(true);
         $limiter = $this->createLimiter();
         $limiter->consume(9);
 
         $rateLimit = $limiter->consume(1);
         $this->assertSame(0, $rateLimit->getRemainingTokens());
         $this->assertTrue($rateLimit->isAccepted());
-        $this->assertEquals(
-            \DateTimeImmutable::createFromTimestamp($now + 60),
-            $rateLimit->getRetryAfter()
-        );
+        $this->assertGreaterThanOrEqual($now + 60, $rateLimit->getRetryAfter()->getTimestamp());
+        $this->assertLessThan($now + 61, $rateLimit->getRetryAfter()->getTimestamp());
     }
 
     #[DataProvider('provideConsumeOutsideInterval')]
@@ -389,10 +387,8 @@ class FixedWindowLimiterTest extends TestCase
         $rateLimit = $limiter->consume(0);
         $this->assertEquals(0, $rateLimit->getRemainingTokens());
         $this->assertTrue($rateLimit->isAccepted());
-        $this->assertEquals(
-            \DateTimeImmutable::createFromTimestamp(floor(microtime(true) + 60)),
-            $rateLimit->getRetryAfter()
-        );
+        $this->assertGreaterThanOrEqual(microtime(true) + 60, $rateLimit->getRetryAfter()->getTimestamp());
+        $this->assertLessThan(microtime(true) + 61, $rateLimit->getRetryAfter()->getTimestamp());
     }
 
     public function testNegativeConsume()
@@ -613,6 +609,39 @@ class FixedWindowLimiterTest extends TestCase
             (new \DateTimeImmutable('2026-01-01 05:00:00', new \DateTimeZone('UTC')))->getTimestamp(),
             $rateLimit->getRetryAfter()->getTimestamp()
         );
+    }
+
+    public function testConsumeRefusedAtTheEndOfTheWindowDoesNotRecordTheHits()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(5);
+        sleep(30);
+        $limiter->consume(5);
+        sleep(30);
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+
+        sleep(1);
+        $this->assertTrue($limiter->consume(10)->isAccepted());
+    }
+
+    public function testRetryAfterIsTheEndOfTheWindowRoundedUpToTheSecond()
+    {
+        ClockMock::withClockMock(1729990780.75);
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+
+        $this->assertSame(1729990841, $limiter->consume()->getRetryAfter()->getTimestamp());
+
+        usleep(30500000);
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(1729990841, $rateLimit->getRetryAfter()->getTimestamp());
+
+        $rateLimit->wait();
+        $this->assertTrue($limiter->consume()->isAccepted());
     }
 
     public static function provideConsumeOutsideInterval(): \Generator

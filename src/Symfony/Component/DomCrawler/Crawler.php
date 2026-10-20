@@ -268,8 +268,8 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function addNode(\DOMNode $node): void
     {
-        if ($node instanceof \DOMDocument) {
-            $node = $node->documentElement;
+        if ($node instanceof \DOMDocument && !$node = $node->documentElement) {
+            return;
         }
 
         if (null !== $this->document && $this->document !== $node->ownerDocument) {

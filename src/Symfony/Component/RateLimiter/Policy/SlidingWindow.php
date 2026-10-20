@@ -58,7 +58,7 @@ final class SlidingWindow implements LimiterStateInterface
      */
     public function getExpirationTime(): int
     {
-        return (int) ($this->windowEndAt + $this->intervalInSeconds - microtime(true));
+        return (int) ceil($this->windowEndAt + $this->intervalInSeconds - microtime(true));
     }
 
     public function isExpired(): bool
@@ -107,18 +107,18 @@ final class SlidingWindow implements LimiterStateInterface
         }
 
         $time = microtime(true);
-        $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
-        $timePassed = $time - $startOfWindow;
-        $windowPassed = min($timePassed / $this->intervalInSeconds, 1);
-        $releasable = max(1, $maxSize - floor($this->hitCountForLastWindow * (1 - $windowPassed)));
-        $remainingWindow = $this->intervalInSeconds - $timePassed;
-        $needed = $tokens - $remaining;
+        $windowPassed = min(($time - ($this->windowEndAt - $this->intervalInSeconds)) / $this->intervalInSeconds, 1);
+        // Hits of the previous window fade out during the current one,
+        // while hits of the current window count in full until it ends and only fade out during the next one
+        $releasableInWindow = $this->hitCountForLastWindow * (1 - $windowPassed);
+        // getHitCount() floors the weighted count: the tokens are available once it goes below this threshold
+        $toRelease = $releasableInWindow + $this->hitCount - ($maxSize - $tokens + 1);
 
-        if ($releasable >= $needed) {
-            return $needed * ($remainingWindow / max(1, $releasable));
+        if ($toRelease < $releasableInWindow) {
+            return $toRelease * $this->intervalInSeconds / $this->hitCountForLastWindow;
         }
 
-        return ($this->windowEndAt - $time) + ($needed - $releasable) * ($this->intervalInSeconds / $maxSize);
+        return ($this->windowEndAt - $time) + ($toRelease - $releasableInWindow) * $this->intervalInSeconds / max(1, $this->hitCount);
     }
 
     public function __serialize(): array

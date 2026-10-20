@@ -288,6 +288,14 @@ class CrawlerTest extends TestCase
         $this->assertSame([$other], iterator_to_array($crawler));
     }
 
+    public function testAddNodeWithADocumentWithoutRootElement()
+    {
+        $crawler = $this->createCrawler();
+        $crawler->addNode(new \DOMDocument());
+
+        $this->assertCount(0, $crawler);
+    }
+
     public function testClear()
     {
         $doc = $this->createDomDocument();

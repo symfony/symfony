@@ -344,6 +344,10 @@ abstract class Descriptor implements DescriptorInterface
                 $docComment = preg_split('#\n\s*\*\s*[\n@]#', substr($docComment, 3, -2), 2)[0];
                 $docComment = preg_replace_callback('#\{@(?:see|link)\s++([^\s}]++)\s*+([^}]*)\}#', static fn ($m) => rtrim($m[2]) ?: $m[1], $docComment);
 
+                if (str_starts_with(ltrim($docComment), '@')) {
+                    return '';
+                }
+
                 return trim(preg_replace('#\s*\n\s*\*\s*#', ' ', $docComment));
             }
         } catch (\ReflectionException) {

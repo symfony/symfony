@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -357,6 +358,23 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
 
         $this->assertSame('b', (string) $aDefinition->getArgument(0));
+    }
+
+    public function testGuessableIntersectionTypeWithTarget()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('b', \stdClass::class);
+        $container->registerAliasForArgument('b', CollisionInterface::class, 'foo.collision', 'foo');
+        $container->registerAliasForArgument('b', AnotherInterface::class, 'foo.another', 'foo');
+
+        $aDefinition = $container->register('a', IntersectionClassesWithTarget::class);
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame($container->getDefinition('b'), $container->findDefinition((string) $aDefinition->getArgument(0)));
     }
 
     public function testTypeNotGuessableWithTypeSet()

@@ -83,14 +83,15 @@ final class TokenBucketLimiter implements LimiterInterface
                     $retryAfter += $this->rate->calculateTimeForTokens(1);
                 }
 
-                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp((int) $retryAfter), true, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now)));
+                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp($availableTokens === $tokens ? ceil($retryAfter) : floor($retryAfter)), true, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now)));
             } else {
-                $remainingTokens = $tokens - $availableTokens;
+                // peeking with 0 tokens tells when the next token is available
+                $remainingTokens = max(1, $tokens) - $availableTokens;
                 $waitDuration = $this->rate->calculateTimeForTokens($remainingTokens);
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
-                    $rateLimit = new RateLimit($availableTokens, \DateTimeImmutable::createFromTimestamp((int) ($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens, $now));
+                    $rateLimit = new RateLimit($availableTokens, \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens, $now));
 
                     throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), $rateLimit);
                 }
@@ -99,7 +100,7 @@ final class TokenBucketLimiter implements LimiterInterface
                 // so no tokens are left for other processes.
                 $bucket->setTokens($availableTokens - $tokens);
 
-                $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromTimestamp((int) ($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now)));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now)));
             }
 
             if (0 !== $tokens) {

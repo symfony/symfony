@@ -226,6 +226,10 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
     private static function perform(ClientState $multi, ?array $responses = null): void
     {
         foreach ($multi->openHandles as $i => [$pauseExpiry, $h, $dechunker, $onProgress]) {
+            if (null === $h) {
+                continue;
+            }
+
             if ($pauseExpiry) {
                 if (hrtime(true) / 1E9 < $pauseExpiry) {
                     continue;
@@ -322,7 +326,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
                 $maxHosts = 0;
             } else {
                 // Create empty open handles to tell we still have pending requests
-                $multi->openHandles[$i] = [\INF, null, null, null];
+                $multi->openHandles[$i] = [&$response->pauseExpiry, null, null, null];
             }
         }
     }
@@ -340,16 +344,11 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
         $now = null;
 
         foreach ($multi->openHandles as [$pauseExpiry, $h]) {
-            if (null === $h) {
-                continue;
-            }
-
             if ($pauseExpiry && ($now ??= hrtime(true) / 1E9) < $pauseExpiry) {
                 $timeout = min($timeout, $pauseExpiry - $now);
-                continue;
+            } elseif (null !== $h) {
+                $handles[] = $h;
             }
-
-            $handles[] = $h;
         }
 
         if (!$handles) {

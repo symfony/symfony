@@ -155,6 +155,9 @@ class YamlReferenceDumper
 
             $this->writeLine('# '.$message.':', $depth * 4 + 4);
 
+            array_walk_recursive($defaultArray, static function (&$value) {
+                $value = Inline::dump($value);
+            });
             $this->writeArray($defaultArray, $depth + 1);
         }
 

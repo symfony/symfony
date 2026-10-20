@@ -289,6 +289,34 @@ class AmqpExtIntegrationTest extends TestCase
         $receiver->ack($envelope);
     }
 
+    public function testAnExpirationShorterThanTheDelayDoesNotReleaseTheMessageEarly()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
+
+        $sender->send(new Envelope(new DummyMessage('Retried'), [new AmqpStamp(null, \AMQP_NOPARAM, ['expiration' => '1000'])]));
+        $envelopes = iterator_to_array($receiver->get());
+        $receiver->ack($envelopes[0]);
+
+        $startTime = microtime(true);
+        $sender->send($envelopes[0]->with(new DelayStamp(2000), new RedeliveryStamp(1)));
+        $sender->send(new Envelope(new DummyMessage('Delayed'), [new DelayStamp(2000), new AmqpStamp(null, \AMQP_NOPARAM, ['expiration' => '100'])]));
+
+        $envelopes = $this->receiveEnvelopes($receiver, 3);
+        $this->assertApproximateDuration($startTime, 2);
+        $this->assertCount(1, $envelopes);
+        $receiver->ack($envelopes[0]);
+
+        $envelopes = $this->receiveEnvelopes($receiver, 3);
+        $this->assertApproximateDuration($startTime, 2);
+        $this->assertCount(1, $envelopes);
+        $receiver->ack($envelopes[0]);
+    }
+
     public function testRetryAffectsOnlyOriginalQueue()
     {
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), [
@@ -391,6 +419,40 @@ class AmqpExtIntegrationTest extends TestCase
         $retriedEnvelopes = $this->receiveWithQueueName($receiver);
         $this->assertCount(1, $retriedEnvelopes);
         $this->assertArrayHasKey('direct_queue', $retriedEnvelopes);
+    }
+
+    public function testRetryWithoutDelayDoesNotReachTheQueuesOfTheCcHeader()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), [
+            'exchange' => [
+                'name' => 'messages_cc',
+                'type' => 'direct',
+                'default_publish_routing_key' => 'cc_main',
+            ],
+            'queues' => [
+                'cc_main' => ['binding_keys' => ['cc_main']],
+                'cc_other' => ['binding_keys' => ['cc_other']],
+            ],
+        ]);
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
+
+        $sender->send(new Envelope(new DummyMessage('Payload'), [new AmqpStamp(null, \AMQP_NOPARAM, ['headers' => ['CC' => ['cc_other']]])]));
+
+        $receivedEnvelopes = $this->receiveWithQueueName($receiver);
+        $this->assertCount(2, $receivedEnvelopes);
+
+        $retryEnvelope = $receivedEnvelopes['cc_main']
+            ->with(new DelayStamp(0))
+            ->with(new RedeliveryStamp(1));
+        $sender->send($retryEnvelope);
+
+        $retriedEnvelopes = $this->receiveWithQueueName($receiver);
+        $this->assertCount(1, $retriedEnvelopes);
+        $this->assertArrayHasKey('cc_main', $retriedEnvelopes);
     }
 
     public function testItReceivesSignals()
@@ -514,9 +576,19 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertFailedMessageReachesTheFailureTransport($main, $failure, 2);
     }
 
-    private function assertFailedMessageReachesTheFailureTransport(AmqpTransport $main, AmqpTransport $failure, int $maxRetries = 0): void
+    public function testAFailedMessageDoesNotInheritTheExpirationOfTheOriginalMessage()
     {
-        $main->send(new Envelope(new DummyMessage('Failing')));
+        $main = $this->createTransport();
+        $failure = $this->createTransport(['exchange' => ['name' => 'messages_failed', 'type' => 'direct', 'default_publish_routing_key' => 'failed'], 'queues' => ['messages_failed' => ['binding_keys' => ['failed']]]]);
+
+        $failed = $this->assertFailedMessageReachesTheFailureTransport($main, $failure, 0, [new AmqpStamp(null, \AMQP_NOPARAM, ['expiration' => '600000'])]);
+
+        $this->assertContains($failed->last(AmqpReceivedStamp::class)->getAmqpEnvelope()->getExpiration(), [null, '']);
+    }
+
+    private function assertFailedMessageReachesTheFailureTransport(AmqpTransport $main, AmqpTransport $failure, int $maxRetries = 0, array $stamps = []): Envelope
+    {
+        $main->send(new Envelope(new DummyMessage('Failing'), $stamps));
 
         $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
             DummyMessage::class => [static function () { throw new \RuntimeException('Boom.'); }],
@@ -550,6 +622,8 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertEquals(new DummyMessage('Failing'), $failed[0]->getMessage());
         $failure->ack($failed[0]);
         $this->assertSame([], iterator_to_array($main->get(), false), 'The failed message went back to its original queue.');
+
+        return $failed[0];
     }
 
     private function createTransport(array $options = []): AmqpTransport

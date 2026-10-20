@@ -34,4 +34,11 @@ class NativeParserTest extends TestCase
         $this->assertCount(1, $node->childNodes);
         $this->assertSame('DIV', $node->childNodes->item(0)->nodeName);
     }
+
+    public function testParseIgnoresMetaCharset()
+    {
+        $node = (new NativeParser())->parse('<meta charset="Windows-1252"><p>§ü</p>');
+        $this->assertInstanceOf(\Dom\Node::class, $node);
+        $this->assertSame('§ü', $node->textContent);
+    }
 }

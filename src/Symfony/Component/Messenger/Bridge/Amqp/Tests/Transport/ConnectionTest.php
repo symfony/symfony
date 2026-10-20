@@ -887,6 +887,39 @@ class ConnectionTest extends TestCase
         $connection->publish('{}', [], 5000, $amqpStamp);
     }
 
+    public function testItDoesNotPublishTheExpirationIntoTheDelayQueue()
+    {
+        $delayExchange = $this->createMock(\AMQPExchange::class);
+        $delayExchange->expects($this->once())
+            ->method('publish')
+            ->with('{}', 'delay_messages__5000_delay', \AMQP_NOPARAM, [
+                'app_id' => 'app',
+                'headers' => [],
+                'delivery_mode' => 2,
+                'timestamp' => time(),
+            ]);
+        $connection = $this->createDelayOrRetryConnection($delayExchange, self::DEFAULT_EXCHANGE_NAME, 'delay_messages__5000_delay');
+
+        $connection->publish('{}', [], 5000, new AmqpStamp(null, \AMQP_NOPARAM, ['app_id' => 'app', 'expiration' => '100']));
+    }
+
+    public function testItDoesNotPublishTheExpirationOfARetriedMessageIntoTheDelayQueue()
+    {
+        $delayExchange = $this->createMock(\AMQPExchange::class);
+        $delayExchange->expects($this->once())
+            ->method('publish')
+            ->with('{}', 'delay_messages__5000_retry', \AMQP_NOPARAM, $this->callback(function (array $attributes) {
+                $this->assertArrayNotHasKey('expiration', $attributes);
+
+                return true;
+            }));
+        $connection = $this->createDelayOrRetryConnection($delayExchange, '', 'delay_messages__5000_retry');
+
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getExpiration')->willReturn('100');
+        $connection->publish('{}', [], 5000, AmqpStamp::createFromAmqpEnvelope($amqpEnvelope, null, ''));
+    }
+
     public function testItRetriesTheMessageWithDailyDelayQueues()
     {
         $delayExchange = $this->createMock(\AMQPExchange::class);

@@ -34,6 +34,11 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\CountedAttributeContr
 
 class ControllerAttributesListenerTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        (new \ReflectionProperty(ControllerAttributesListener::class, 'attributesCache'))->setValue(null, []);
+    }
+
     public function testOnKernelControllerArgumentsDispatchesEventsForEachAttribute()
     {
         $dispatchedEvents = [];
@@ -279,6 +284,20 @@ class ControllerAttributesListenerTest extends TestCase
         yield 'method' => [static fn () => [new CountedAttributeController(), 'action']];
         yield 'invokable' => [static fn () => new CountedAttributeController()];
         yield 'first-class callable' => [static fn () => (new CountedAttributeController())->action(...)];
+    }
+
+    public function testListenersShareTheirCache()
+    {
+        Counted::$instances = 0;
+
+        foreach ([$this->createListener([]), $this->createListener([])] as $listener) {
+            $event = new ControllerEvent($this->createStub(HttpKernelInterface::class), [new CountedAttributeController(), 'action'], new Request(), HttpKernelInterface::MAIN_REQUEST);
+            $listener->beforeController($event, KernelEvents::CONTROLLER, new EventDispatcher());
+
+            $this->assertSame(['class', 'method'], array_map(static fn (Counted $attribute) => $attribute->value, $event->getAttributes('*')));
+        }
+
+        $this->assertSame(2, Counted::$instances);
     }
 
     public function testEachRequestGetsItsOwnAttributeInstances()

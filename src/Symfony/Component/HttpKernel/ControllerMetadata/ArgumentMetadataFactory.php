@@ -21,9 +21,11 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     /**
      * Default values are read again and attributes are cloned on each call, so that callers never share objects.
      *
+     * Static since it only holds what the code declares, which is the same for all instances.
+     *
      * @var array<string, list<array{string, ?string, bool, ?\ReflectionParameter, bool, list<object>, string}>>
      */
-    private array $parametersCache = [];
+    private static array $parametersCache = [];
 
     public function createArgumentMetadata(string|object|array $controller, ?\ReflectionFunctionAbstract $reflector = null): array
     {
@@ -35,7 +37,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
             $reflector instanceof \ReflectionFunction && !$reflector->isAnonymous() => $reflector->getClosureCalledClass()?->name.'::'.$reflector->name.'@'.$reflector->getClosureScopeClass()?->name,
             default => null,
         };
-        $parameters = null === $key ? $this->getParameters($reflector) : $this->parametersCache[$key] ??= $this->getParameters($reflector);
+        $parameters = null === $key ? $this->getParameters($reflector) : self::$parametersCache[$key] ??= $this->getParameters($reflector);
         $arguments = [];
 
         foreach ($parameters as [$name, $type, $isVariadic, $param, $isNullable, $attributes, $controllerName]) {

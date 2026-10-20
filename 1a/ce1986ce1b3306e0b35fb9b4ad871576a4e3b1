@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-20T06:44:51Z
+
+Thanks for the detailed numbers. I pushed one change. Integers and strings now get their own index, so we don't need the `'s'` prefix anymore. Strings are then used as keys as-is instead of being copied. On my machine, this removes the slowdown that the concatenation added on lists of 1 to 10 strings. It also saves 320 KB per 10k short strings, and 2.1 MB with 200-byte strings.

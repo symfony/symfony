@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\InvalidOptionsException;
 
 /**
- * Contains the properties of a constraint definition.
+ * Defines a rule that a value must follow to be valid.
  *
  * A constraint can be defined on a class, a property or a getter method.
  * The Constraint class encapsulates all the configuration required for

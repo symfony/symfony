@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
- * Responsible for resolving the value of an argument based on its metadata.
+ * Resolves the value of a controller argument from its metadata and the request.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */

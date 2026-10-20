@@ -12,6 +12,8 @@
 namespace Symfony\Component\Routing\Attribute;
 
 /**
+ * Defines a route for a controller method, or the common route options of a controller class.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander M. Turek <me@derrabus.de>
  */

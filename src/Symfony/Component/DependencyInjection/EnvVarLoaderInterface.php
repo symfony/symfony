@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection;
 
 /**
- * EnvVarLoaderInterface objects return key/value pairs that are added to the list of available env vars.
+ * Provides more env vars, as key/value pairs, to be read with the %env()% syntax.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */

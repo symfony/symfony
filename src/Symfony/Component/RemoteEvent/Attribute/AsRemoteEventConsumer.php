@@ -12,6 +12,8 @@
 namespace Symfony\Component\RemoteEvent\Attribute;
 
 /**
+ * Makes the class consume the remote events received by the webhook with the given name.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]

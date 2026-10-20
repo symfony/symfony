@@ -15,7 +15,7 @@ use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
 
 /**
- * An asset compiler is responsible for applying any changes to the contents of an asset.
+ * Changes the contents of an asset, for example to update the paths of the files it refers to.
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */

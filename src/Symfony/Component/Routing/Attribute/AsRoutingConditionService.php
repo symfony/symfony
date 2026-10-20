@@ -12,7 +12,7 @@
 namespace Symfony\Component\Routing\Attribute;
 
 /**
- * Service tag to autoconfigure routing condition services.
+ * Makes the service available in route conditions, through the service() function.
  *
  * You can tag a service:
  *

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Scheduler\Attribute;
 
 /**
- * A marker to call a service method from scheduler.
+ * Schedules the class or the method to run according to a cron expression.
  *
  * @author valtzu <valtzu@gmail.com>
  */

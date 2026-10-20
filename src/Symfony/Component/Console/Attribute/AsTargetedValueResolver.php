@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Attribute;
 
 /**
- * Service tag to autoconfigure targeted value resolvers.
+ * Registers a value resolver that runs only for the command arguments that request it with #[ValueResolver].
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class AsTargetedValueResolver

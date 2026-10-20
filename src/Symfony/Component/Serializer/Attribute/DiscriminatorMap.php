@@ -14,6 +14,8 @@ namespace Symfony\Component\Serializer\Attribute;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
+ * Selects the class to deserialize into from the value of a type property.
+ *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]

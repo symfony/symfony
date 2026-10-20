@@ -21,6 +21,8 @@ use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
+ * Gives access to a fixed set of services by name, and creates each service only when it is requested.
+ *
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  *

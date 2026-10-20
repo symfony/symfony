@@ -14,6 +14,8 @@ namespace Symfony\Component\Form;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
+ * Adds options, fields or view variables to existing form types.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface FormTypeExtensionInterface

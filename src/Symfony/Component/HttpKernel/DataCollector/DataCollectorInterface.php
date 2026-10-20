@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * DataCollectorInterface.
+ * Collects data about a request and its response, for the profiler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

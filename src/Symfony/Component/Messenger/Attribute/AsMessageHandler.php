@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Attribute;
 
 /**
- * Service tag to autoconfigure message handlers.
+ * Registers the class or the method as a message handler.
  *
  * @author Alireza Mirsepassi <alirezamirsepassi@gmail.com>
  */

@@ -14,6 +14,8 @@ namespace Symfony\Component\Serializer\Attribute;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
+ * Sets the context used to serialize and deserialize a property, a method or a class.
+ *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]

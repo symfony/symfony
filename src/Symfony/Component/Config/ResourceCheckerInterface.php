@@ -14,7 +14,7 @@ namespace Symfony\Component\Config;
 use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
- * Interface for ResourceCheckers.
+ * Tells whether a cache is still fresh by checking the resources it was built from.
  *
  * When a ResourceCheckerConfigCache instance is checked for freshness, all its associated
  * metadata resources are passed to ResourceCheckers. The ResourceCheckers

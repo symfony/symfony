@@ -12,7 +12,7 @@
 namespace Symfony\Component\Scheduler\Attribute;
 
 /**
- * Service tag to autoconfigure schedules.
+ * Registers the class as the provider of the schedule with the given name.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

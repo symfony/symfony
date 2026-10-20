@@ -12,7 +12,7 @@
 namespace Symfony\Component\ObjectMapper;
 
 /**
- * Service used by "Map::if".
+ * Decides whether a value is mapped, when used as the "if" option of #[Map].
  *
  * @template T of object
  * @template T2 of object

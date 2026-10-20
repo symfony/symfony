@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\CacheClearer;
 
 /**
- * CacheClearerInterface.
+ * Clears a cache when the cache:clear command runs.
  *
  * @author Dustin Dobervich <ddobervich@gmail.com>
  */

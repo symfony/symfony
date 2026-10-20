@@ -15,6 +15,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEvent
 use Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface;
 
 /**
+ * Dispatches events to listeners, and allows adding or removing listeners.
+ *
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
  * Listeners are registered on the manager and events are dispatched through the
  * manager.

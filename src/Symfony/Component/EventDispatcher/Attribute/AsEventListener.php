@@ -12,7 +12,7 @@
 namespace Symfony\Component\EventDispatcher\Attribute;
 
 /**
- * Service tag to autoconfigure event listeners.
+ * Registers the class or the method as an event listener.
  *
  * @author Alexander M. Turek <me@derrabus.de>
  */

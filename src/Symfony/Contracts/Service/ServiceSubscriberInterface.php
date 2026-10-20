@@ -14,7 +14,7 @@ namespace Symfony\Contracts\Service;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
 
 /**
- * A ServiceSubscriber exposes its dependencies via the static {@link getSubscribedServices} method.
+ * Lists the services that the class needs, so that a service locator creates each service only when it is requested.
  *
  * The getSubscribedServices method returns an array of service types required by such instances,
  * optionally keyed by the service names used internally. Service types that start with an interrogation

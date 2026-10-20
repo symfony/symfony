@@ -32,7 +32,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Base class for all commands.
+ * Defines the name, arguments and options of a console command, and the code it runs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

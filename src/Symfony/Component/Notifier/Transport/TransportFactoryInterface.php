@@ -16,6 +16,8 @@ use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 
 /**
+ * Creates a Notifier transport from a DSN.
+ *
  * @author Konstantin Myakshin <molodchick@gmail.com>
  */
 interface TransportFactoryInterface

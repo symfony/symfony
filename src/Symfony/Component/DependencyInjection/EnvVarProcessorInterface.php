@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
- * The EnvVarProcessorInterface is implemented by objects that manage environment-like variables.
+ * Defines prefixes, like "json:" in "%env(json:FOO)%", that read or transform the value of env vars.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */

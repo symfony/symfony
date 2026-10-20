@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Attribute;
 
 /**
- * Attribute for configuring message routing.
+ * Configures the transports and the serialized type name of a message class.
  *
  * @author Pierre Rineau pierre.rineau@processus.org>
  */

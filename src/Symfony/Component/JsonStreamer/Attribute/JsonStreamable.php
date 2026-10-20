@@ -12,6 +12,8 @@
 namespace Symfony\Component\JsonStreamer\Attribute;
 
 /**
+ * Generates the JSON stream reader and writer of the class when the cache is warmed up.
+ *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]

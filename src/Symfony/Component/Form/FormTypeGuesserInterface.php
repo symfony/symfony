@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form;
 
 /**
+ * Guesses the type of a form field and some of its options from a property of the data class.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface FormTypeGuesserInterface

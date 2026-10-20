@@ -34,6 +34,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     private const NARROW_NO_BREAK_SPACE = "\u{202F}"; // Used by ICU 72+ before AM/PM
     private const THIN_SPACE = "\u{2009}";
 
+    /** @var array<string, \IntlDateFormatter> */
+    private static array $sharedFormatters = [];
+    /** @var array<class-string, bool> */
+    private static array $canShareFormatters = [];
+
     private int $dateFormat;
     private int $timeFormat;
 
@@ -88,7 +93,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException('Expected a \DateTimeInterface.');
         }
 
-        $value = $this->getIntlDateFormatter()->format($dateTime->getTimestamp());
+        $value = $this->getSharedIntlDateFormatter()->format($dateTime->getTimestamp());
 
         if (0 != intl_get_error_code()) {
             throw new TransformationFailedException(intl_get_error_message());
@@ -110,7 +115,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         // date-only patterns require parsing to be done in UTC, as midnight might not exist in the local timezone due
         // to DST changes
         $dateOnly = $this->isPatternDateOnly();
-        $dateFormatter = $this->getIntlDateFormatter($dateOnly);
+        $dateFormatter = $this->getSharedIntlDateFormatter($dateOnly);
 
         $timestamp = $this->parse($dateFormatter, $value);
 
@@ -171,6 +176,26 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $intlDateFormatter->setLenient(false);
 
         return $intlDateFormatter;
+    }
+
+    /**
+     * Returns a formatter shared by the transformers that have the same configuration.
+     *
+     * The formatter is not shared when a child class creates it or when the calendar is an object, so that nothing can change it.
+     */
+    private function getSharedIntlDateFormatter(bool $ignoreTimezone = false): \IntlDateFormatter
+    {
+        if (!\is_int($this->calendar) || !(self::$canShareFormatters[static::class] ??= self::class === (new \ReflectionMethod(static::class, 'getIntlDateFormatter'))->class)) {
+            return $this->getIntlDateFormatter($ignoreTimezone);
+        }
+
+        $key = implode("\0", [\Locale::getDefault(), $this->dateFormat, $this->timeFormat, $ignoreTimezone ? 'UTC' : $this->outputTimezone, $this->calendar, $this->pattern]);
+
+        if (!isset(self::$sharedFormatters[$key]) && \count(self::$sharedFormatters) >= 64) {
+            unset(self::$sharedFormatters[array_key_first(self::$sharedFormatters)]);
+        }
+
+        return self::$sharedFormatters[$key] ??= $this->getIntlDateFormatter($ignoreTimezone);
     }
 
     /**

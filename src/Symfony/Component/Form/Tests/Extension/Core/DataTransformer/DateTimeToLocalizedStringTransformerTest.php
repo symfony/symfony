@@ -124,6 +124,34 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $this->assertEquals('03.02.2010, 04:05:06 Koordinierte Weltzeit', $transformer->transform($this->dateTime));
     }
 
+    public function testTransformFollowsTheDefaultLocale()
+    {
+        IntlTestHelper::requireFullIntl($this, '59.1');
+
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::GREGORIAN, 'd MMMM y');
+
+        \Locale::setDefault('en_US');
+        $this->assertSame('3 February 2010', $transformer->transform($this->dateTime));
+
+        \Locale::setDefault('de_AT');
+        $this->assertSame('3 Februar 2010', $transformer->transform($this->dateTime));
+    }
+
+    public function testTransformUsesTheFormatterOfChildClasses()
+    {
+        \Locale::setDefault('en_US');
+        (new DateTimeToLocalizedStringTransformer('UTC', 'UTC'))->transform($this->dateTime);
+
+        $transformer = new class('UTC', 'UTC') extends DateTimeToLocalizedStringTransformer {
+            protected function getIntlDateFormatter(bool $ignoreTimezone = false): \IntlDateFormatter
+            {
+                return new \IntlDateFormatter('en_US', \IntlDateFormatter::NONE, \IntlDateFormatter::NONE, 'UTC', \IntlDateFormatter::GREGORIAN, 'yyyy');
+            }
+        };
+
+        $this->assertSame('2010', $transformer->transform($this->dateTime));
+    }
+
     public function testTransformToDifferentLocale()
     {
         \Locale::setDefault('en_US');

@@ -25,6 +25,11 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class NumberToLocalizedStringTransformer implements DataTransformerInterface
 {
+    /** @var array<string, \NumberFormatter> */
+    private static array $sharedFormatters = [];
+    /** @var array<class-string, bool> */
+    private static array $canShareFormatters = [];
+
     protected bool $grouping;
     protected int $roundingMode;
 
@@ -48,7 +53,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Expected a numeric.');
         }
 
-        $formatter = $this->getNumberFormatter();
+        $formatter = $this->getSharedNumberFormatter();
         $value = $formatter->format($value);
 
         if (intl_is_failure($formatter->getErrorCode())) {
@@ -74,7 +79,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         $position = 0;
-        $formatter = $this->getNumberFormatter();
+        $formatter = $this->getSharedNumberFormatter();
         $groupSep = $formatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
         $decSep = $formatter->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
 
@@ -155,6 +160,26 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $this->grouping);
 
         return $formatter;
+    }
+
+    /**
+     * Returns a formatter shared by the transformers that have the same configuration.
+     *
+     * The formatter is not shared when a child class creates it, so that nothing can change it.
+     */
+    private function getSharedNumberFormatter(): \NumberFormatter
+    {
+        if (!(self::$canShareFormatters[static::class] ??= self::class === (new \ReflectionMethod(static::class, 'getNumberFormatter'))->class)) {
+            return $this->getNumberFormatter();
+        }
+
+        $key = implode("\0", [$this->locale ?? \Locale::getDefault(), $this->scale ?? '', $this->roundingMode, (int) $this->grouping]);
+
+        if (!isset(self::$sharedFormatters[$key]) && \count(self::$sharedFormatters) >= 64) {
+            unset(self::$sharedFormatters[array_key_first(self::$sharedFormatters)]);
+        }
+
+        return self::$sharedFormatters[$key] ??= $this->getNumberFormatter();
     }
 
     /**

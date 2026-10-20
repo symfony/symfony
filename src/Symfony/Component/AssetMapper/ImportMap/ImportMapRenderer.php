@@ -35,6 +35,8 @@ class ImportMapRenderer
     private const LOADER_CSS = 'document.head.appendChild(Object.assign(document.createElement(`link`),{rel:`stylesheet`,href:`%s`}))';
     private const LOADER_CSS_WITH_INTEGRITY = 'document.head.appendChild(Object.assign(document.createElement(`link`),{rel:`stylesheet`,href:`%s`,integrity:`%s`}))';
 
+    private array $rendered = [];
+
     public function __construct(
         private readonly ImportMapGenerator $importMapGenerator,
         private readonly ?Packages $assetPackages = null,
@@ -101,6 +103,18 @@ class ImportMapRenderer
             } else {
                 $importMap[$importName] = $this->createLoaderUrl(self::LOADER_CSS, $path);
             }
+        }
+
+        // the HTML only depends on these values, so it can be reused when they did not change
+        $inputs = [$entryPoint, $attributes, $importMap, $integrity, $modulePreloads, $webLinks, $styleIntegrity, $polyfillPath, $polyfillIntegrity];
+        $renderKey = implode("\n", $entryPoint);
+
+        if (($this->rendered[$renderKey][0] ?? null) === $inputs) {
+            if (class_exists(AddLinkHeaderListener::class) && $request = $this->requestStack?->getCurrentRequest()) {
+                $this->addWebLinkPreloads($request, $webLinks);
+            }
+
+            return $this->rendered[$renderKey][1];
         }
 
         $output = '';
@@ -187,6 +201,8 @@ class ImportMapRenderer
             }
             $output .= '</script>';
         }
+
+        $this->rendered[$renderKey] = [$inputs, $output];
 
         return $output;
     }

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-20T06:40:52Z
+
+I pushed a change so that the section keeps its bookkeeping and forwards what it writes. Undecorated, it still appends, like `ConsoleOutput` does. Decorated, the buffers now get the same escape sequences as with `ConsoleOutput`. Appending lost the content of `overwrite()` after a question asked in the section. It also glued the frames of a progress bar together (`0/21/22/2`). And quiet writes to a section were dropped under `-q`.

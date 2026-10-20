@@ -147,6 +147,34 @@ class AmqpExtIntegrationTest extends TestCase
         $receiver->ack($envelope);
     }
 
+    public function testAnExpirationShorterThanTheDelayDoesNotReleaseTheMessageEarly()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
+
+        $sender->send(new Envelope(new DummyMessage('Retried'), [new AmqpStamp(null, \AMQP_NOPARAM, ['expiration' => '1000'])]));
+        $envelopes = iterator_to_array($receiver->get());
+        $receiver->ack($envelopes[0]);
+
+        $startTime = microtime(true);
+        $sender->send($envelopes[0]->with(new DelayStamp(2000), new RedeliveryStamp(1)));
+        $sender->send(new Envelope(new DummyMessage('Delayed'), [new DelayStamp(2000), new AmqpStamp(null, \AMQP_NOPARAM, ['expiration' => '100'])]));
+
+        $envelopes = $this->receiveEnvelopes($receiver, 3);
+        $this->assertApproximateDuration($startTime, 2);
+        $this->assertCount(1, $envelopes);
+        $receiver->ack($envelopes[0]);
+
+        $envelopes = $this->receiveEnvelopes($receiver, 3);
+        $this->assertApproximateDuration($startTime, 2);
+        $this->assertCount(1, $envelopes);
+        $receiver->ack($envelopes[0]);
+    }
+
     public function testRetryAffectsOnlyOriginalQueue()
     {
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), [
@@ -249,6 +277,40 @@ class AmqpExtIntegrationTest extends TestCase
         $retriedEnvelopes = $this->receiveWithQueueName($receiver);
         $this->assertCount(1, $retriedEnvelopes);
         $this->assertArrayHasKey('direct_queue', $retriedEnvelopes);
+    }
+
+    public function testRetryWithoutDelayDoesNotReachTheQueuesOfTheCcHeader()
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), [
+            'exchange' => [
+                'name' => 'messages_cc',
+                'type' => 'direct',
+                'default_publish_routing_key' => 'cc_main',
+            ],
+            'queues' => [
+                'cc_main' => ['binding_keys' => ['cc_main']],
+                'cc_other' => ['binding_keys' => ['cc_other']],
+            ],
+        ]);
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $sender = new AmqpSender($connection);
+        $receiver = new AmqpReceiver($connection);
+
+        $sender->send(new Envelope(new DummyMessage('Payload'), [new AmqpStamp(null, \AMQP_NOPARAM, ['headers' => ['CC' => ['cc_other']]])]));
+
+        $receivedEnvelopes = $this->receiveWithQueueName($receiver);
+        $this->assertCount(2, $receivedEnvelopes);
+
+        $retryEnvelope = $receivedEnvelopes['cc_main']
+            ->with(new DelayStamp(0))
+            ->with(new RedeliveryStamp(1));
+        $sender->send($retryEnvelope);
+
+        $retriedEnvelopes = $this->receiveWithQueueName($receiver);
+        $this->assertCount(1, $retriedEnvelopes);
+        $this->assertArrayHasKey('cc_main', $retriedEnvelopes);
     }
 
     public function testItReceivesSignals()

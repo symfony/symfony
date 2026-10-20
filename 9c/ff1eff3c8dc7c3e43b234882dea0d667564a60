@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-20T07:08:54Z
+
+Thank you! I replaced the key sort with a cache inside the existing comparators, which keeps most of the gain for a much smaller diff. Here, `sortByName()` on 1000 files takes 16ms, vs 24ms before and 13ms with the key sort. Subclasses of SplFileInfo also get the speedup now.

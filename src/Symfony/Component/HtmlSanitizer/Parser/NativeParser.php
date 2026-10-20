@@ -30,7 +30,7 @@ final class NativeParser implements ParserInterface
             $element = \Dom\HTMLDocument::createEmpty()->createElement($context);
             $element->innerHTML = $html;
         } else {
-            $document = @\Dom\HTMLDocument::createFromString(\sprintf('<!DOCTYPE html><%s>%s</%1$s>', $context, $html));
+            $document = @\Dom\HTMLDocument::createFromString(\sprintf('<!DOCTYPE html><%s>%s</%1$s>', $context, $html), 0, 'UTF-8');
             $element = $document->getElementsByTagName($context)->item(0);
         }
 

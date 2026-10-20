@@ -123,6 +123,10 @@ final class TokenBucketLimiter implements LimiterInterface
 
     private function resetAt(int $availableTokens, float $now): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromTimestamp((int) ($now + $this->rate->calculateTimeForTokens(max(0, $this->maxBurst - $availableTokens))));
+        if ($availableTokens >= $this->maxBurst) {
+            return \DateTimeImmutable::createFromTimestamp((int) $now);
+        }
+
+        return \DateTimeImmutable::createFromTimestamp((int) ceil($now + $this->rate->calculateTimeForTokens($this->maxBurst - $availableTokens)));
     }
 }

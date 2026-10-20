@@ -62,14 +62,38 @@ class FixedWindowLimiterTest extends TestCase
 
     public function testResetTimeStaysConstantWithinWindow()
     {
-        $now = time();
+        $now = microtime(true);
         $limiter = new FixedWindowLimiter('test', 5, new \DateInterval('PT1M'), $this->storage);
 
         // pinned to the window's end for every call within it, accepted or not
         for ($i = 0; $i < 6; ++$i) {
             $rateLimit = $limiter->consume();
-            $this->assertSame($now + 60, $rateLimit->getResetAt()->getTimestamp());
+            $this->assertSame((int) ceil($now + 60), $rateLimit->getResetAt()->getTimestamp());
         }
+    }
+
+    public function testResetTimeIsNotBeforeTheWindowEnds()
+    {
+        ClockMock::withClockMock(1729990780.75);
+        $limiter = $this->createLimiter();
+        $limiter->consume(5);
+        sleep(30);
+
+        $resetAt = $limiter->consume()->getResetAt();
+
+        ClockMock::withClockMock((float) $resetAt->getTimestamp());
+        $this->assertSame(10, $limiter->consume(0)->getRemainingTokens());
+    }
+
+    public function testResetTimeIsNowOnceTheWindowHasEnded()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(5);
+        sleep(30);
+        $limiter->consume();
+        sleep(40);
+
+        $this->assertSame(time(), $limiter->consume(0)->getResetAt()->getTimestamp());
     }
 
     public function testCalendarAnchorResetTimeBoundedToPeriodEnd()

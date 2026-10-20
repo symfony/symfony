@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Make `DebugClassLoader` report the attributes that resolve to a missing class in or below the namespace they are used in
  * Add `HtmlErrorRenderer::setNonce()` to configure CSP nonces for error pages
  * Serve the problem documents of `SerializerErrorRenderer` as `application/problem+json`, and render them as JSON when the `problem` format is requested
 

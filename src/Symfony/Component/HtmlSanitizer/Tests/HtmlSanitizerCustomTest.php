@@ -643,6 +643,16 @@ class HtmlSanitizerCustomTest extends TestCase
         $this->assertSame($expected, (new HtmlSanitizer($config))->sanitizeFor('title', $input));
     }
 
+    public function testMaxInputLengthDoesNotCutAMultibyteCharacter()
+    {
+        $config = (new HtmlSanitizerConfig())->allowSafeElements();
+
+        $this->assertSame('<p>abcde</p>', $this->sanitize($config->withMaxInputLength(9), '<p>abcde§f</p>'));
+        $this->assertSame('<p>abcde</p>', $this->sanitize($config->withMaxInputLength(10), '<p>abcde日f</p>'));
+        $this->assertSame('<p>abcde日</p>', $this->sanitize($config->withMaxInputLength(11), '<p>abcde日f</p>'));
+        $this->assertSame('abcde', (new HtmlSanitizer($config->withMaxInputLength(6)))->sanitizeFor('textarea', 'abcde日'));
+    }
+
     private function sanitize(HtmlSanitizerConfig $config, string $input): string
     {
         return (new HtmlSanitizer($config))->sanitize($input);

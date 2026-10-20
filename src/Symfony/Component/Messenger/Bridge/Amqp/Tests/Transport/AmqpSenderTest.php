@@ -249,6 +249,51 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
+    public function testItDoesNotReuseTheReceivedExpirationWhenSendingToAnotherTransport()
+    {
+        $this->assertExpirationWhenSending(null, ['other_queue']);
+        $this->assertExpirationWhenSending(null, ['other_queue'], [new RedeliveryStamp(1)]);
+        $this->assertExpirationWhenSending(null, ['other_queue'], [new RedeliveryStamp(0), new SentToFailureTransportStamp('async')]);
+    }
+
+    public function testAnExplicitExpirationIsUsedWhenSendingAReceivedMessageToAnotherTransport()
+    {
+        $amqpStamp = new AmqpStamp(null, \AMQP_NOPARAM, ['expiration' => '300000']);
+
+        $this->assertExpirationWhenSending('300000', ['other_queue'], [$amqpStamp]);
+        $this->assertExpirationWhenSending('300000', ['other_queue'], [$amqpStamp, new RedeliveryStamp(0), new SentToFailureTransportStamp('async')]);
+    }
+
+    public function testItKeepsTheReceivedExpirationWhenSendingToTheTransportTheMessageWasReceivedFrom()
+    {
+        $this->assertExpirationWhenSending('60000', ['original_queue']);
+        $this->assertExpirationWhenSending('60000', ['original_queue'], [new RedeliveryStamp(1)]);
+    }
+
+    private function assertExpirationWhenSending(?string $expectedExpiration, array $queueNames, array $stamps = []): void
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getExpiration')->willReturn('60000');
+
+        $envelope = new Envelope(new DummyMessage('Oy'), [new AmqpReceivedStamp($amqpEnvelope, 'original_queue'), ...$stamps]);
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn($queueNames);
+        $connection->expects($this->once())->method('publish')
+            ->with($encoded['body'], $encoded['headers'], 0, $this->callback(function (AmqpStamp $stamp) use ($expectedExpiration) {
+                $this->assertSame($expectedExpiration, $stamp->getAttributes()['expiration'] ?? null);
+
+                return true;
+            }));
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
     private function assertRoutingKeyWhenSendingToAnotherTransport(?string $expectedRoutingKey, array $stamps = []): void
     {
         $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);

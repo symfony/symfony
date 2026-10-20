@@ -355,9 +355,19 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertFailedMessageReachesTheFailureTransport($main, $failure, 2);
     }
 
-    private function assertFailedMessageReachesTheFailureTransport(AmqpTransport $main, AmqpTransport $failure, int $maxRetries = 0): void
+    public function testAFailedMessageDoesNotInheritTheExpirationOfTheOriginalMessage()
     {
-        $main->send(new Envelope(new DummyMessage('Failing')));
+        $main = $this->createTransport();
+        $failure = $this->createTransport(['exchange' => ['name' => 'messages_failed', 'type' => 'direct', 'default_publish_routing_key' => 'failed'], 'queues' => ['messages_failed' => ['binding_keys' => ['failed']]]]);
+
+        $failed = $this->assertFailedMessageReachesTheFailureTransport($main, $failure, 0, [new AmqpStamp(null, \AMQP_NOPARAM, ['expiration' => '600000'])]);
+
+        $this->assertContains($failed->last(AmqpReceivedStamp::class)->getAmqpEnvelope()->getExpiration(), [null, '']);
+    }
+
+    private function assertFailedMessageReachesTheFailureTransport(AmqpTransport $main, AmqpTransport $failure, int $maxRetries = 0, array $stamps = []): Envelope
+    {
+        $main->send(new Envelope(new DummyMessage('Failing'), $stamps));
 
         $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
             DummyMessage::class => [static function () { throw new \RuntimeException('Boom.'); }],
@@ -391,6 +401,8 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertEquals(new DummyMessage('Failing'), $failed[0]->getMessage());
         $failure->ack($failed[0]);
         $this->assertSame([], iterator_to_array($main->get(), false), 'The failed message went back to its original queue.');
+
+        return $failed[0];
     }
 
     private function createTransport(array $options = []): AmqpTransport

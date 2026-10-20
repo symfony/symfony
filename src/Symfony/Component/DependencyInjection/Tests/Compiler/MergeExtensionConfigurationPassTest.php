@@ -105,6 +105,51 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $this->assertSame(['BAZ' => 1, 'FOO' => 0], $container->getEnvCounters());
     }
 
+    public function testEnvOfExtensionDefinitionReplacedByUserDefinitionIsCounted()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new FooExtension());
+        $container->prependExtensionConfig('foo', ['bar' => '%env(FOO)%']);
+        $container->register('foo.bar', \ArrayObject::class);
+
+        (new MergeExtensionConfigurationPass())->process($container);
+
+        $this->assertSame(\ArrayObject::class, $container->getDefinition('foo.bar')->getClass());
+        $this->assertSame(['FOO' => 1], $container->getEnvCounters());
+    }
+
+    public function testEnvOfExtensionDefinitionReplacedByUserAliasIsCounted()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new FooExtension());
+        $container->prependExtensionConfig('foo', ['bar' => '%env(FOO)%']);
+        $container->register('mock', \ArrayObject::class);
+        $container->setAlias('foo.bar', 'mock');
+
+        (new MergeExtensionConfigurationPass())->process($container);
+
+        $this->assertFalse($container->hasDefinition('foo.bar'));
+        $this->assertSame(['FOO' => 1], $container->getEnvCounters());
+    }
+
+    public function testUnserializableExtensionDefinitionReplacedByUserDefinition()
+    {
+        $extension = $this->createStub(ExtensionInterface::class);
+        $extension->method('getAlias')->willReturn('closure_argument');
+        $extension->method('load')->willReturnCallback(static function (array $configs, ContainerBuilder $container) {
+            $container->register('closure_argument', \stdClass::class)->setArguments([static fn () => null]);
+        });
+
+        $container = new ContainerBuilder();
+        $container->registerExtension($extension);
+        $container->prependExtensionConfig('closure_argument', []);
+        $container->register('closure_argument', \ArrayObject::class);
+
+        (new MergeExtensionConfigurationPass())->process($container);
+
+        $this->assertSame(\ArrayObject::class, $container->getDefinition('closure_argument')->getClass());
+    }
+
     public function testEnvOverriddenInPreviousExtensionIsTrackedWhenReused()
     {
         $container = new ContainerBuilder();
@@ -210,6 +255,10 @@ class FooExtension extends Extension
         if (isset($config['baz'])) {
             $container->getParameterBag()->get('env(BOZ)');
             $container->resolveEnvPlaceholders($config['baz']);
+        }
+
+        if (isset($config['bar'])) {
+            $container->register('foo.bar', \stdClass::class)->setArguments([$config['bar']]);
         }
 
         $container->setParameter('foo.param', 'ccc');

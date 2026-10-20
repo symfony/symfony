@@ -91,6 +91,18 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             $container->getParameterBag()->add($parameters);
         }
 
+        foreach ($container->getDefinitions() as $id => $definition) {
+            if (isset($aliases[$id]) || (isset($definitions[$id]) && $definitions[$id] !== $definition)) {
+                // count the env vars of extension definitions that user-defined services or aliases replace
+                try {
+                    $value = serialize($definition);
+                } catch (\Throwable) {
+                    $value = $definition;
+                }
+                $container->resolveEnvPlaceholders($value);
+            }
+        }
+
         $container->addDefinitions($definitions);
         $container->addAliases($aliases);
     }

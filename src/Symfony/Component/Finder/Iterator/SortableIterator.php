@@ -35,6 +35,8 @@ class SortableIterator implements \IteratorAggregate
     /** @var \Traversable<string, \SplFileInfo> */
     private \Traversable $iterator;
     private \Closure|int $sort;
+    /** @var array<int, string> */
+    private array $sortKeys = [];
 
     /**
      * @param \Traversable<string, \SplFileInfo> $iterator
@@ -46,24 +48,28 @@ class SortableIterator implements \IteratorAggregate
     {
         $this->iterator = $iterator;
         $order = $reverseOrder ? -1 : 1;
+        $sortKeys = &$this->sortKeys;
+        $path = static function (\SplFileInfo $file) use (&$sortKeys) {
+            return $sortKeys[spl_object_id($file)] ??= $file->getRealPath() ?: $file->getPathname();
+        };
 
         if (self::SORT_BY_NAME === $sort) {
-            $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * strcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
+            $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * strcmp($path($a), $path($b));
         } elseif (self::SORT_BY_NAME_NATURAL === $sort) {
-            $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * strnatcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
+            $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * strnatcmp($path($a), $path($b));
         } elseif (self::SORT_BY_NAME_CASE_INSENSITIVE === $sort) {
-            $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * strcasecmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
+            $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * strcasecmp($path($a), $path($b));
         } elseif (self::SORT_BY_NAME_NATURAL_CASE_INSENSITIVE === $sort) {
-            $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * strnatcasecmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
+            $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * strnatcasecmp($path($a), $path($b));
         } elseif (self::SORT_BY_TYPE === $sort) {
-            $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
+            $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order, $path) {
                 if ($a->isDir() && $b->isFile()) {
                     return -$order;
                 } elseif ($a->isFile() && $b->isDir()) {
                     return $order;
                 }
 
-                return $order * strcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
+                return $order * strcmp($path($a), $path($b));
             };
         } elseif (self::SORT_BY_ACCESSED_TIME === $sort) {
             $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * ($a->getATime() - $b->getATime());
@@ -72,7 +78,9 @@ class SortableIterator implements \IteratorAggregate
         } elseif (self::SORT_BY_MODIFIED_TIME === $sort) {
             $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * ($a->getMTime() - $b->getMTime());
         } elseif (self::SORT_BY_EXTENSION === $sort) {
-            $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * strnatcmp($a->getExtension(), $b->getExtension());
+            $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order, &$sortKeys) {
+                return $order * strnatcmp($sortKeys[spl_object_id($a)] ??= $a->getExtension(), $sortKeys[spl_object_id($b)] ??= $b->getExtension());
+            };
         } elseif (self::SORT_BY_SIZE === $sort) {
             $this->sort = static fn (\SplFileInfo $a, \SplFileInfo $b) => $order * ($a->getSize() - $b->getSize());
         } elseif (self::SORT_BY_NONE === $sort) {
@@ -106,7 +114,11 @@ class SortableIterator implements \IteratorAggregate
             return;
         }
 
-        uasort($values, $this->sort);
+        try {
+            uasort($values, $this->sort);
+        } finally {
+            $this->sortKeys = [];
+        }
 
         foreach ($values as $i => $v) {
             yield $keys[$i] => $v;

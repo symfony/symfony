@@ -29,6 +29,8 @@ final class TestOutput implements ConsoleOutputInterface
     private CombinedOutput $output;
     private CombinedOutput $errorOutput;
     private OutputFormatterInterface $formatter;
+    /** @var ConsoleSectionOutput[] */
+    private array $sections = [];
 
     /**
      * @param OutputInterface::VERBOSITY_* $verbosity
@@ -80,9 +82,60 @@ final class TestOutput implements ConsoleOutputInterface
         throw new LogicException('TestOutput does not support modifying the error output.');
     }
 
+    /**
+     * Returns a section that writes to the same buffers as the output itself.
+     *
+     * As with ConsoleOutput, a decorated section erases lines using ANSI escape sequences, which the buffers record, while an undecorated one appends.
+     */
     public function section(): ConsoleSectionOutput
     {
-        throw new LogicException('ConsoleSectionOutput is not supported by TestOutput.');
+        if (false === $stream = fopen('php://memory', 'w')) {
+            throw new RuntimeException('Failed to open stream.');
+        }
+
+        return new class($stream, $this->sections, $this->verbosity, $this->decorated, $this->formatter, $this->output) extends ConsoleSectionOutput {
+            public function __construct($stream, array &$sections, int $verbosity, bool $decorated, OutputFormatterInterface $formatter, private OutputInterface $target)
+            {
+                parent::__construct($stream, $sections, $verbosity, $decorated, $formatter);
+            }
+
+            public function setMaxHeight(int $maxHeight): void
+            {
+                parent::setMaxHeight($maxHeight);
+                $this->forward();
+            }
+
+            public function clear(?int $lines = null): void
+            {
+                parent::clear($lines);
+                $this->forward();
+            }
+
+            public function overwrite(string|iterable $message): void
+            {
+                parent::overwrite($message);
+                $this->forward();
+            }
+
+            protected function doWrite(string $message, bool $newline): void
+            {
+                parent::doWrite($message, $newline);
+                $this->forward();
+            }
+
+            private function forward(): void
+            {
+                $stream = $this->getStream();
+                rewind($stream);
+                $contents = stream_get_contents($stream);
+                ftruncate($stream, 0);
+                rewind($stream);
+
+                if ('' !== $contents && false !== $contents) {
+                    $this->target->write($contents, false, self::OUTPUT_RAW | self::VERBOSITY_QUIET);
+                }
+            }
+        };
     }
 
     public function write(iterable|string $messages, bool $newline = false, int $options = 0): void

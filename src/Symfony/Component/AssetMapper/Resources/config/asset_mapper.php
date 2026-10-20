@@ -40,6 +40,10 @@ use Symfony\Component\AssetMapper\ImportMap\Resolver\JsDelivrEsmResolver;
 use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 use Symfony\Component\AssetMapper\Path\LocalPublicAssetsFilesystem;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\WebLink\GenericLinkProvider;
+use Symfony\Component\WebLink\Link;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -94,6 +98,8 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.debug'),
                 service('cache.asset_mapper')->nullOnInvalid(),
             ])
+            ->tag('container.preload', ['class' => Filesystem::class])
+            ->tag('container.preload', ['class' => Path::class])
 
         ->set('asset_mapper.asset_package', MapperAwareAssetPackage::class)
             ->decorate('assets._default_package')
@@ -202,6 +208,8 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('script HTML attributes'),
                 service('request_stack'),
             ])
+            ->tag('container.preload', ['class' => Link::class])
+            ->tag('container.preload', ['class' => GenericLinkProvider::class])
 
         ->set('asset_mapper.importmap.auditor', ImportMapAuditor::class)
         ->args([

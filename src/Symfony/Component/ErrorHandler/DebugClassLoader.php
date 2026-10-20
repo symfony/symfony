@@ -399,11 +399,11 @@ class DebugClassLoader
 
         $parent = get_parent_class($class) ?: null;
         self::$returnTypes[$class] = [];
-        $classIsTemplate = false;
+        $classTemplates = [];
 
         // Detect annotations on the class
         if ($doc = $this->parsePhpDoc($refl)) {
-            $classIsTemplate = isset($doc['template']) || isset($doc['template-covariant']);
+            $classTemplates = [...$doc['template'] ?? [], ...$doc['template-covariant'] ?? []];
 
             foreach (['final', 'deprecated', 'internal'] as $annotation) {
                 if (null !== $description = $doc[$annotation][0] ?? null) {
@@ -424,7 +424,7 @@ class DebugClassLoader
                     self::$method[$class][] = [$class, $static, $returnType, $name.$signature, $description];
 
                     if ('' !== $returnType) {
-                        $this->setReturnType($returnType, $refl->name, $name, $refl->getFileName(), $parent);
+                        $this->setReturnType($returnType, $refl->name, $name, $refl->getFileName(), $parent, null, $classTemplates);
                     }
                 }
             }
@@ -568,8 +568,9 @@ class DebugClassLoader
 
             // To read method annotations
             $doc = $this->parsePhpDoc($method);
+            $templates = isset($doc['template']) || isset($doc['template-covariant']) ? [...$classTemplates, ...$doc['template'] ?? [], ...$doc['template-covariant'] ?? []] : $classTemplates;
 
-            if (($classIsTemplate || isset($doc['template']) || isset($doc['template-covariant'])) && $method->hasReturnType()) {
+            if ($templates && $method->hasReturnType()) {
                 unset($doc['return']);
             }
 
@@ -631,7 +632,7 @@ class DebugClassLoader
             }
 
             if (isset($doc['return']) || 'void' !== (self::MAGIC_METHODS[$method->name] ?? 'void')) {
-                $this->setReturnType($doc['return'] ?? self::MAGIC_METHODS[$method->name], $method->class, $method->name, $method->getFileName(), $parent, $method->getReturnType());
+                $this->setReturnType($doc['return'] ?? self::MAGIC_METHODS[$method->name], $method->class, $method->name, $method->getFileName(), $parent, $method->getReturnType(), $templates);
 
                 if (isset(self::$returnTypes[$class][$method->name][0]) && $canAddReturnType) {
                     $this->fixReturnStatements($method, self::$returnTypes[$class][$method->name][0]);
@@ -832,7 +833,7 @@ class DebugClassLoader
         return $ownInterfaces;
     }
 
-    private function setReturnType(string $types, string $class, string $method, string $filename, ?string $parent, ?\ReflectionType $returnType = null): void
+    private function setReturnType(string $types, string $class, string $method, string $filename, ?string $parent, ?\ReflectionType $returnType = null, array $templates = []): void
     {
         if ('__construct' === $method) {
             return;
@@ -853,6 +854,18 @@ class DebugClassLoader
         $typesMap = [];
         $glue = str_contains($types, '&') ? '&' : '|';
         foreach (explode($glue, $types) as $t) {
+            if (\in_array($t, $templates, true)) {
+                // there is no native type for a template, but $class remains the declaring class for its child classes
+                if (isset(self::$returnTypes[$class][$method])) {
+                    self::$returnTypes[$class][$method][2] = $class;
+                } else {
+                    // a null entry hides the types that child classes get from their own interfaces
+                    self::$returnTypes[$class][$method] = null;
+                }
+
+                return;
+            }
+
             $t = self::SPECIAL_RETURN_TYPES[strtolower($t)] ?? $t;
             $typesMap[$this->normalizeType($t, $class, $parent, $returnType)][$t] = $t;
         }
@@ -1293,6 +1306,12 @@ class DebugClassLoader
             $param = substr($param, 1 + $i, (strpos($param, ' ', $i) ?: (1 + $i + \strlen($param))) - $i - 1);
 
             $tags['param'][$param] = $type;
+        }
+
+        foreach (['template', 'template-covariant'] as $k) {
+            foreach ($tags[$k] ?? [] as $i => $v) {
+                $tags[$k][$i] = substr($v, 0, strpos($v, ' ') ?: \strlen($v));
+            }
         }
 
         foreach (['var', 'return'] as $k) {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\LazyProxy\PhpDumper;
 
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;

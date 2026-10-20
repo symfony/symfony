@@ -776,11 +776,12 @@ class ErrorHandlerTest extends TestCase
         $handler = new ErrorHandler();
         $handler->setExceptionHandler([$handler, 'renderException']);
 
-        ob_start();
-        $handler->handleException(new \RuntimeException('Class Foo not found'));
-        $response = ob_get_clean();
+        $exception = new \RuntimeException('Class Foo not found');
+        [$response, $errorLog] = $this->handleExceptionWithErrorLog($handler, $exception);
 
         self::assertStringContainsString('Class Foo not found', $response);
+        self::assertStringContainsString('PHP Fatal error:  Uncaught RuntimeException: Class Foo not found in '.__FILE__.':'.$exception->getLine(), $errorLog);
+        self::assertStringContainsString("\n  thrown in ".__FILE__.' on line '.$exception->getLine(), $errorLog);
     }
 
     #[WithoutErrorHandler]
@@ -941,6 +942,144 @@ class ErrorHandlerTest extends TestCase
         } finally {
             restore_error_handler();
             restore_exception_handler();
+        }
+    }
+
+    public function testRenderExceptionLogsTheParentOfAnonymousClasses()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler([$handler, 'renderException']);
+
+        [, $errorLog] = $this->handleExceptionWithErrorLog($handler, new class('foo') extends \RuntimeException {
+        });
+
+        self::assertStringContainsString('PHP Fatal error:  Uncaught RuntimeException@anonymous: foo in '.__FILE__, $errorLog);
+    }
+
+    public function testHandleExceptionDoesNotLogWhenACustomHandlerIsSet()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler(static function () {});
+
+        [, $errorLog] = $this->handleExceptionWithErrorLog($handler, new \RuntimeException('foo'));
+
+        self::assertSame('', $errorLog);
+    }
+
+    public function testRenderExceptionDoesNotLogWhenACustomHandlerThrew()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler(static function () {
+            throw new \RuntimeException('bar');
+        });
+
+        [$response, $errorLog] = $this->handleExceptionWithErrorLog($handler, new \RuntimeException('foo'));
+
+        self::assertStringContainsString('bar', $response);
+        self::assertSame('', $errorLog);
+    }
+
+    public function testRenderExceptionDoesNotLogOnceACustomHandlerRan()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler(static function () {});
+        $handler->handleException(new \RuntimeException('foo'));
+
+        [$response, $errorLog] = $this->handleExceptionWithErrorLog($handler, new \RuntimeException('bar'));
+
+        self::assertStringContainsString('bar', $response);
+        self::assertSame('', $errorLog);
+    }
+
+    public function testRenderExceptionDoesNotLogWhenALoggerIsSet()
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->exactly(2))->method('log');
+
+        $handler = new ErrorHandler();
+        $handler->setDefaultLogger($logger);
+
+        $handler->setExceptionHandler([$handler, 'renderException']);
+        [, $errorLog] = $this->handleExceptionWithErrorLog($handler, new \RuntimeException('foo'));
+
+        self::assertSame('', $errorLog);
+
+        $handler->setExceptionHandler(static function (\Throwable $e) {
+            throw $e;
+        });
+        [, $errorLog] = $this->handleExceptionWithErrorLog($handler, new \RuntimeException('foo'));
+
+        self::assertSame('', $errorLog);
+    }
+
+    public function testRenderExceptionDoesNotLogFatalErrors()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler([$handler, 'renderException']);
+
+        $error = ['type' => \E_ERROR, 'message' => 'foo', 'file' => 'bar.php', 'line' => 123];
+
+        [, $errorLog] = $this->handleExceptionWithErrorLog($handler, new FatalError('Error: foo', 0, $error));
+
+        self::assertSame('', $errorLog);
+    }
+
+    public function testRenderExceptionDoesNotLogWhenLogErrorsIsDisabled()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler([$handler, 'renderException']);
+
+        [, $errorLog] = $this->handleExceptionWithErrorLog($handler, new \RuntimeException('foo'), false);
+
+        self::assertSame('', $errorLog);
+    }
+
+    public function testRenderExceptionDoesNotLogWhenErrorReportingExcludesErrors()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler([$handler, 'renderException']);
+
+        $errorReporting = error_reporting(\E_ALL & ~\E_ERROR);
+
+        try {
+            [, $errorLog] = $this->handleExceptionWithErrorLog($handler, new \RuntimeException('foo'));
+        } finally {
+            error_reporting($errorReporting);
+        }
+
+        self::assertSame('', $errorLog);
+    }
+
+    public function testRenderExceptionRendersWhenToStringThrows()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler([$handler, 'renderException']);
+
+        [$response] = $this->handleExceptionWithErrorLog($handler, new class('foo') extends \RuntimeException {
+            public function __toString(): string
+            {
+                throw new \LogicException('bar');
+            }
+        });
+
+        self::assertStringContainsString('foo', $response);
+    }
+
+    private function handleExceptionWithErrorLog(ErrorHandler $handler, \Throwable $exception, bool $logErrors = true): array
+    {
+        $errorLog = tempnam(sys_get_temp_dir(), 'error_log');
+        $prevErrorLog = ini_set('error_log', $errorLog);
+        $prevLogErrors = ini_set('log_errors', $logErrors);
+
+        try {
+            ob_start();
+            $handler->handleException($exception);
+
+            return [ob_get_clean(), file_get_contents($errorLog)];
+        } finally {
+            ini_set('error_log', $prevErrorLog);
+            ini_set('log_errors', $prevLogErrors);
+            unlink($errorLog);
         }
     }
 }

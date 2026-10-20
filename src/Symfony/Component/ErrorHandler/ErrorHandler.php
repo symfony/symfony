@@ -94,6 +94,7 @@ class ErrorHandler
 
     private bool $isRecursive = false;
     private bool $isRoot = false;
+    private bool $customExceptionHandlerCalled = false;
     /** @var callable|null */
     private $exceptionHandler;
     private ?BufferingLogger $bootstrappingLogger = null;
@@ -511,6 +512,15 @@ class ErrorHandler
             } catch (\Throwable $handlerException) {
                 $loggerFailed = true;
             }
+        } elseif ([$this, 'renderException'] === $this->exceptionHandler && !$this->customExceptionHandlerCalled && !isset($this->loggers[$type][0]) && !$exception instanceof FatalError && (error_reporting() & \E_ERROR) && filter_var(\ini_get('log_errors'), \FILTER_VALIDATE_BOOL)) {
+            // renderException() replaces PHP's native handler, so log the exception like PHP does. PHP already logged fatal errors.
+            // In CLI, PHP logs to STDERR when error_log is empty, and renderException() already displays the exception.
+            if (\ini_get('error_log') || !\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+                try {
+                    error_log(\sprintf("PHP Fatal error:  Uncaught %s\n  thrown in %s on line %d", $this->parseAnonymousClass((string) $exception), $exception->getFile(), $exception->getLine()));
+                } catch (\Throwable) {
+                }
+            }
         }
 
         $exception = $this->enhanceError($exception);
@@ -520,6 +530,9 @@ class ErrorHandler
 
         if (null === $exceptionHandler || $exceptionHandler === $this->exceptionHandler) {
             $this->exceptionHandler = null;
+        } else {
+            // renderException() is now the fallback of a custom handler, which is in charge of logging
+            $this->customExceptionHandlerCalled = true;
         }
 
         try {

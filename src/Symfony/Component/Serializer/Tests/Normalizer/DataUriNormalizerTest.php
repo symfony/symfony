@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -105,6 +106,44 @@ class DataUriNormalizerTest extends TestCase
 
         $this->assertInstanceOf(File::class, $file);
         $this->assertSame(file_get_contents(self::TEST_GIF_DATA), $this->getContent($file->openFile()));
+    }
+
+    #[DataProvider('denormalizedFileProvider')]
+    public function testNormalizeDenormalizedFile(string $uri, string $type, string $expected)
+    {
+        $this->assertSame($expected, $this->normalizer->normalize($this->normalizer->denormalize($uri, $type)));
+    }
+
+    public static function denormalizedFileProvider(): iterable
+    {
+        yield [self::TEST_GIF_DATA, \SplFileInfo::class, self::TEST_GIF_DATA];
+        yield [self::TEST_GIF_DATA, \SplFileObject::class, self::TEST_GIF_DATA];
+        yield [self::TEST_GIF_DATA, File::class, self::TEST_GIF_DATA];
+        yield [self::TEST_TXT_DATA, File::class, self::TEST_TXT_DATA];
+        yield ['data:,Hello%2C%20World!', \SplFileObject::class, 'data:text/plain,Hello%2C%20World%21'];
+        yield ['data:;base64,SGVsbG8gV29ybGQh', \SplFileObject::class, 'data:text/plain,Hello%20World%21'];
+        yield ['data:text/plain;charset=utf-8;base64,SGVsbG8gV29ybGQh', \SplFileObject::class, 'data:text/plain;charset=utf-8,Hello%20World%21'];
+    }
+
+    #[DataProvider('guessedMimeTypeProvider')]
+    public function testNormalizeDenormalizedFileWithGuesser(?string $guessedMimeType, string $uri, string $expected)
+    {
+        $guesser = $this->createStub(MimeTypeGuesserInterface::class);
+        $guesser->method('guessMimeType')->willReturn($guessedMimeType);
+        $normalizer = new DataUriNormalizer($guesser);
+
+        $this->assertSame($expected, $normalizer->normalize($normalizer->denormalize($uri, \SplFileObject::class)));
+    }
+
+    public static function guessedMimeTypeProvider(): iterable
+    {
+        yield [null, 'data:text/plain,Hello', 'data:application/octet-stream;base64,SGVsbG8='];
+        yield ['image/gif', 'data:application/octet-stream;base64,R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=', self::TEST_GIF_DATA];
+    }
+
+    public function testNormalizeDataStreamWithSlashes()
+    {
+        $this->assertSame('data:text/plain,Hello%20World%21', $this->normalizer->normalize(new \SplFileObject('data://text/plain;base64,SGVsbG8gV29ybGQh')));
     }
 
     public function testGiveNotAccessToLocalFiles()

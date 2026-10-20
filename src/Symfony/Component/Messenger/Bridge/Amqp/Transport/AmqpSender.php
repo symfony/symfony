@@ -64,6 +64,7 @@ class AmqpSender implements SenderInterface
         if ($amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class)) {
             $isSameTransport = \in_array($amqpReceivedStamp->getQueueName(), $this->connection->getQueueNames(), true);
             $routingKey = $amqpStamp?->getRoutingKey();
+            $hasExpiration = isset($amqpStamp?->getAttributes()['expiration']);
 
             $amqpStamp = AmqpStamp::createFromAmqpEnvelope(
                 $amqpReceivedStamp->getAmqpEnvelope(),
@@ -72,7 +73,11 @@ class AmqpSender implements SenderInterface
             );
 
             if (!$isSameTransport) {
-                $amqpStamp = new AmqpStamp($routingKey, $amqpStamp->getFlags(), $amqpStamp->getAttributes());
+                $attributes = $amqpStamp->getAttributes();
+                if (!$hasExpiration) {
+                    unset($attributes['expiration']);
+                }
+                $amqpStamp = new AmqpStamp($routingKey, $amqpStamp->getFlags(), $attributes);
             }
         }
 

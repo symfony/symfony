@@ -269,6 +269,25 @@ class HttpBrowserTest extends AbstractBrowserTest
         $browser->request('POST', 'http://example.com/', [], ['file' => new UploadedFile('', 'file', null, \UPLOAD_ERR_NO_FILE)]);
     }
 
+    public function testMultiPartRequestSendsContentLength()
+    {
+        $client = new MockHttpClient(function ($method, $url, $options) {
+            $body = '';
+            while ('' !== $data = $options['body'](1024)) {
+                $body .= $data;
+            }
+
+            $this->assertArrayHasKey('content-length', $options['normalized_headers']);
+            $this->assertSame(['Content-Length: '.\strlen($body)], $options['normalized_headers']['content-length']);
+            $this->assertStringContainsString('file1_content', $body);
+
+            return new MockResponse();
+        });
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', '/', ['foo' => 'bar'], ['file1' => $this->getUploadedFile('file1')]);
+    }
+
     private function uploadFile(string $data): string
     {
         $path = tempnam(sys_get_temp_dir(), 'http');

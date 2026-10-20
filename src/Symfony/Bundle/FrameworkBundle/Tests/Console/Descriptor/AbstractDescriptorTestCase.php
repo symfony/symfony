@@ -258,6 +258,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
             [ClassWithDocCommentWithoutInitialSpace::class, 'Foo.'],
             [ClassWithoutDocComment::class, ''],
             [ClassWithDocComment::class, 'This is a class with a doc comment.'],
+            [ClassWithTagOnlyDocComment::class, ''],
         ];
     }
 

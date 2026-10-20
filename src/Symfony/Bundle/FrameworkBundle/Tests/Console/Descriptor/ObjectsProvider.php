@@ -423,6 +423,11 @@ class ClassWithDocCommentWithoutInitialSpace
 {
 }
 
+/** @template T of object */
+class ClassWithTagOnlyDocComment
+{
+}
+
 #[AsTaggedItem(priority: 30)]
 class TaggedItemWithPriorityClass
 {

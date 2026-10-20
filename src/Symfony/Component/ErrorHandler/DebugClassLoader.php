@@ -429,7 +429,7 @@ class DebugClassLoader
         $classIsTemplate = false;
 
         // Detect annotations on the class
-        if ($doc = $this->parsePhpDoc($refl)) {
+        if ($doc = $this->parsePhpDoc($refl, ['@final', '@deprecated', '@internal', '@template', '@method'])) {
             $classIsTemplate = isset($doc['template']) || isset($doc['template-covariant']);
 
             foreach (['final', 'deprecated', 'internal'] as $annotation) {
@@ -594,8 +594,10 @@ class DebugClassLoader
                 }
             }
 
+            $forcePatchTypes = $this->patchTypes['force'];
+
             // To read method annotations
-            $doc = $this->parsePhpDoc($method);
+            $doc = null !== $forcePatchTypes || $this->isPhpDocNeeded($method, $class) ? $this->parsePhpDoc($method) : [];
 
             if (($classIsTemplate || isset($doc['template']) || isset($doc['template-covariant'])) && $method->hasReturnType()) {
                 unset($doc['return']);
@@ -613,8 +615,6 @@ class DebugClassLoader
                     }
                 }
             }
-
-            $forcePatchTypes = $this->patchTypes['force'];
 
             if ($canAddReturnType = null !== $forcePatchTypes && !str_contains($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
                 $this->patchTypes['force'] = $forcePatchTypes ?: 'docblock';
@@ -656,7 +656,7 @@ class DebugClassLoader
                 continue;
             }
 
-            if (isset($doc['return'])) {
+            if (isset($doc['return']) && (null !== $forcePatchTypes || !$method->hasReturnType())) {
                 $this->setReturnType($doc['return'] ?? self::MAGIC_METHODS[$method->name], $method->class, $method->name, $method->getFileName(), $parent, $method->getReturnType());
 
                 if (isset(self::$returnTypes[$class][$method->name][0]) && $canAddReturnType) {
@@ -709,7 +709,7 @@ class DebugClassLoader
                     continue;
                 }
 
-                $doc = $this->parsePhpDoc($r);
+                $doc = $this->parsePhpDoc($r, ['@final', '@deprecated']);
 
                 foreach ($parentAndOwnInterfaces as $use) {
                     if (isset(self::${$type}[$use][$r->name]) && !isset($doc['deprecated']) && ('finalConstants' === $type || substr($use, 0, strrpos($use, '\\')) !== substr($use, 0, strrpos($class, '\\')))) {
@@ -1307,11 +1307,65 @@ class DebugClassLoader
     }
 
     /**
-     * @param \ReflectionClass|\ReflectionMethod|\ReflectionProperty $reflector
+     * Tells whether the docblock of a method can trigger a deprecation when types are not patched.
+     *
+     * The "@return" tag of a method that has a native return type does not matter. PHP requires a return type on the methods that override it.
      */
-    private function parsePhpDoc(\Reflector $reflector): array
+    private function isPhpDocNeeded(\ReflectionMethod $method, string $class): bool
+    {
+        if ($method->isPrivate() || !$doc = $method->getDocComment()) {
+            return false;
+        }
+
+        if (str_contains($doc, '@final') || str_contains($doc, '@internal')) {
+            return true;
+        }
+
+        if (!$method->hasReturnType() && (str_contains($doc, '@return') || str_contains($doc, '@deprecated'))) {
+            return true;
+        }
+
+        if (!str_contains($doc, '@param') || !preg_match_all('/\$(\S*+)/', $doc, $matches)) {
+            return false;
+        }
+
+        if (isset(self::$annotatedParameters[$class][$method->name])) {
+            return true;
+        }
+
+        $parameters = [];
+        foreach ($method->getParameters() as $parameter) {
+            $parameters[$parameter->name] = true;
+        }
+
+        // Parsing is needed only when a "@param" tag is about a parameter that the method does not declare
+        foreach ($matches[1] as $name) {
+            if (!isset($parameters[$name])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \ReflectionClass|\ReflectionClassConstant|\ReflectionMethod|\ReflectionProperty $reflector
+     * @param list<string>                                                                    $tags      The tags that make parsing worth it, or an empty list to always parse
+     */
+    private function parsePhpDoc(\Reflector $reflector, array $tags = []): array
     {
         if (!$doc = $reflector->getDocComment()) {
+            return [];
+        }
+
+        foreach ($tags as $tag) {
+            if (str_contains($doc, $tag)) {
+                $tags = [];
+                break;
+            }
+        }
+
+        if ($tags) {
             return [];
         }
 

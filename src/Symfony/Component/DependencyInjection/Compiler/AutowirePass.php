@@ -783,7 +783,7 @@ class AutowirePass extends AbstractRecursivePass
 
             if (null === $alias) {
                 $alias = (string) $this->container->getAlias($prefix.$type.$suffix);
-            } elseif ((string) $this->container->getAlias($prefix.$type.$suffix) !== $alias) {
+            } elseif ((string) $this->container->getAlias($prefix.$type.$suffix) !== $alias && $this->resolveAlias($prefix.$type.$suffix) !== $this->resolveAlias($alias)) {
                 return $prefix || $name !== $parsedName && ($name = $parsedName) ? $this->getCombinedAlias($type, $name) : null;
             }
         }
@@ -811,5 +811,17 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         return $resolvedType;
+    }
+
+    private function resolveAlias(string $id): string
+    {
+        $seen = [];
+
+        while ($this->container->hasAlias($id) && !isset($seen[$id])) {
+            $seen[$id] = true;
+            $id = (string) $this->container->getAlias($id);
+        }
+
+        return $id;
     }
 }

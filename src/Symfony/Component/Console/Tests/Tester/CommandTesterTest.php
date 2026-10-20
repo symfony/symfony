@@ -711,6 +711,71 @@ class CommandTesterTest extends TestCase
         $this->assertSame("bar\n", $result->getDisplay());
     }
 
+    public function testItCanTestACommandRenderingATable()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            $io = new SymfonyStyle($input, $output);
+            $io->table(['Name'], [['bar']]);
+            $io->definitionList(['baz' => 'qux']);
+
+            return 0;
+        });
+
+        $result = (new CommandTester($command))->run();
+
+        $this->assertCommandIsSuccessful($result);
+        $this->assertStringContainsString('bar', $result->getOutput());
+        $this->assertStringContainsString('qux', $result->getDisplay());
+    }
+
+    public function testItCanTestACommandOverwritingASection()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (OutputInterface $output) {
+            $section = $output->section();
+            $section->writeln('bar');
+            $section->overwrite('baz');
+
+            return 0;
+        });
+
+        $tester = new CommandTester($command);
+
+        $this->assertSame("bar\nbaz\n", $tester->run()->getDisplay());
+        $this->assertSame("bar\n\e[1A\e[0Jbaz\n", $tester->run([], [], null, true)->getDisplay());
+    }
+
+    public function testItCanTestACommandOverwritingASectionAfterAQuestion()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            $section = $output->section();
+            $name = (new SymfonyStyle($input, $section))->ask('Name?');
+            $section->overwrite('Hello '.$name);
+
+            return 0;
+        });
+
+        $result = (new CommandTester($command))->run([], ['Bob'], true, true);
+
+        $this->assertStringEndsWith("Hello Bob\n", $result->getDisplay());
+    }
+
+    public function testItCanTestACommandWritingToASectionWhenQuiet()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (OutputInterface $output) {
+            $output->section()->writeln('bar', OutputInterface::VERBOSITY_QUIET);
+
+            return 0;
+        });
+
+        $result = (new CommandTester($command))->run([], [], null, null, OutputInterface::VERBOSITY_QUIET);
+
+        $this->assertSame("bar\n", $result->getDisplay());
+    }
+
     public function testItCanTestACommandWritingAGenerator()
     {
         $command = new Command('foo');

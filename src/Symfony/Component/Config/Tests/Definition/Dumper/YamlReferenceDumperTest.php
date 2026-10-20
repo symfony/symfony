@@ -12,8 +12,10 @@
 namespace Symfony\Component\Config\Tests\Definition\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Config\Tests\Fixtures\Configuration\ExampleConfiguration;
+use Symfony\Component\Yaml\Yaml;
 
 class YamlReferenceDumperTest extends TestCase
 {
@@ -79,6 +81,48 @@ class YamlReferenceDumperTest extends TestCase
         $dumper = new YamlReferenceDumper();
 
         $this->assertSame(trim($expected), trim($dumper->dumpAtPath($configuration, $path)));
+    }
+
+    public function testDumpQuotesDefaultValuesOfArrays()
+    {
+        $treeBuilder = new TreeBuilder('acme_root');
+        $treeBuilder->getRootNode()
+            ->children()
+                ->arrayNode('hosts')
+                    ->prototype('scalar')->end()
+                    ->defaultValue(['%env(HOSTS)%', '*.example.com'])
+                ->end()
+                ->arrayNode('options')
+                    ->prototype('variable')->end()
+                    ->defaultValue(['enabled' => true, 'path' => null, 'logger' => '@logger'])
+                ->end()
+            ->end()
+        ;
+
+        $dumper = new YamlReferenceDumper();
+        $reference = $dumper->dumpNode($treeBuilder->buildTree());
+
+        $this->assertSame(<<<'EOL'
+            acme_root:
+                hosts:
+
+                    # Defaults:
+                    - '%env(HOSTS)%'
+                    - '*.example.com'
+                options:
+
+                    # Defaults:
+                    enabled:             true
+                    path:                null
+                    logger:              '@logger'
+
+            EOL, $reference);
+        $this->assertSame([
+            'acme_root' => [
+                'hosts' => ['%env(HOSTS)%', '*.example.com'],
+                'options' => ['enabled' => true, 'path' => null, 'logger' => '@logger'],
+            ],
+        ], Yaml::parse($reference));
     }
 
     private function getConfigurationAsString(): string

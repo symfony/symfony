@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-20T06:44:53Z
+
+Thank you @andreybolonin. I pushed a simpler version that indexes every node from the first one.
+Building the index at the 33rd node made selections of 33 to 60 nodes up to 30% slower than before. For example, `new Crawler($nodes)` with 33 nodes went from 14.4 to 18.5µs here.
+Below 33 nodes, the linear scan saves less than 0.2µs per crawler, and that's lost in the noise of any `filter()` call.

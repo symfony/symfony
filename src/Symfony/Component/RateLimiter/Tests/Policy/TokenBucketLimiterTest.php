@@ -167,6 +167,18 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertEqualsWithDelta(time() + 7, $rateLimit->getResetAt()->getTimestamp(), 1);
     }
 
+    public function testResetTimeIsNotBeforeTheBucketIsFull()
+    {
+        ClockMock::withClockMock(1729990780.75);
+        $limiter = $this->createLimiter(10, Rate::perSecond(1));
+        $limiter->consume(5);
+
+        $resetAt = $limiter->consume(0)->getResetAt();
+
+        ClockMock::withClockMock((float) $resetAt->getTimestamp());
+        $this->assertSame(10, $limiter->consume(0)->getRemainingTokens());
+    }
+
     public function testConsumeLastToken()
     {
         $rate = Rate::perSecond(1);

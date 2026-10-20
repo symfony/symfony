@@ -134,7 +134,7 @@ class RateLimitAttributeListenerTest extends TestCase
 
         $this->assertSame('5', $response->headers->get('X-RateLimit-Limit'));
         $this->assertSame('4', $response->headers->get('X-RateLimit-Remaining'));
-        $this->assertThat((int) $response->headers->get('X-RateLimit-Reset'), $this->logicalAnd($this->greaterThan(time() + 50), $this->lessThanOrEqual(time() + 60)));
+        $this->assertThat((int) $response->headers->get('X-RateLimit-Reset'), $this->logicalAnd($this->greaterThan(time() + 50), $this->lessThanOrEqual(time() + 61)));
     }
 
     public function testAddingHeadersMarksResponsePrivate()
@@ -441,7 +441,7 @@ class RateLimitAttributeListenerTest extends TestCase
             $this->assertSame((string) $remaining, $response->headers->get('X-RateLimit-Remaining'));
             $reset = (int) $response->headers->get('X-RateLimit-Reset') - time();
             $this->assertGreaterThan(0, $reset);
-            $this->assertLessThanOrEqual(120, $reset);
+            $this->assertLessThanOrEqual(121, $reset);
         }
     }
 

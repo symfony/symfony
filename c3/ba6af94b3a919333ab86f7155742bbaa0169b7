@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-20T08:02:28Z
+
+Thanks @KalimeroMK, I pushed a few changes.
+
+`NotAnAttribute` in `ExpressionsController` was missing on purpose, and so is `Undefined` in `AttributeController`: HttpKernel skips attributes whose class doesn't exist, and these fixtures test that. I import both from another namespace instead of creating them. The report on `AttributeController` was hidden in the full suite because a data provider loads the class first, but running `ControllerAttributeEventTest.php` alone failed.
+
+Sub-namespaces are checked too now. Without `use Symfony\Component\Validator\Constraints as Assert;`, `#[Assert\NotBlank]` becomes `App\Entity\Assert\NotBlank` and the constraint is silently skipped. That's the missing use I'd expect most in apps.
+
+Loading errors aren't swallowed anymore. A misnamed attribute class file now throws the loader's usual exception, and an attribute class whose parent isn't installed is reported.

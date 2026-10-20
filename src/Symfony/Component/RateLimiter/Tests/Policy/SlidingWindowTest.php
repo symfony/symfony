@@ -130,7 +130,45 @@ class SlidingWindowTest extends TestCase
         $window->add();
         $window = SlidingWindow::createFromPreviousWindow($window, 10);
         sleep(10);
-        $this->assertEquals(40, $window->calculateTimeForTokens(1, 4));
+        $this->assertEquals(30, $window->calculateTimeForTokens(1, 4));
+    }
+
+    public function testCalculateTimeForTokensWaitsForTheEndOfTheWindowToReleaseItsHits()
+    {
+        ClockMock::register(SlidingWindow::class);
+        $window = new SlidingWindow('foo', 20);
+        $window->add(10);
+
+        // the hits of the current window count in full until it ends, the first one fades out right after
+        $this->assertEqualsWithDelta(20, $window->calculateTimeForTokens(10, 1), 0.01);
+    }
+
+    public function testCalculateTimeForTokensWhenThePreviousWindowReleasesEnoughHits()
+    {
+        ClockMock::register(SlidingWindow::class);
+        $window = new SlidingWindow('foo', 20);
+        $window->add(10);
+        sleep(20);
+        $window = SlidingWindow::createFromPreviousWindow($window, 20);
+        sleep(10);
+        $window->add(6);
+
+        // 5 hits left from the previous window + 6: one must fade out, at 10 hits per 20 seconds
+        $this->assertEqualsWithDelta(2, $window->calculateTimeForTokens(10, 1), 0.01);
+    }
+
+    public function testCalculateTimeForTokensWhenThePreviousWindowDoesNotReleaseEnoughHits()
+    {
+        ClockMock::register(SlidingWindow::class);
+        $window = new SlidingWindow('foo', 20);
+        $window->add(4);
+        sleep(20);
+        $window = SlidingWindow::createFromPreviousWindow($window, 20);
+        sleep(10);
+        $window->add(8);
+
+        // 2 hits left from the previous window + 8: getting 3 tokens takes the end of the current window
+        $this->assertEqualsWithDelta(10, $window->calculateTimeForTokens(10, 3), 0.01);
     }
 
     public function testUnserializeRejectsObjectInTypedIdProperty()

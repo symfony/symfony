@@ -265,6 +265,14 @@ class CrawlerTest extends TestCase
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a \DOMNode');
     }
 
+    public function testAddNodeWithADocumentWithoutRootElement()
+    {
+        $crawler = $this->createCrawler();
+        $crawler->addNode(new \DOMDocument());
+
+        $this->assertCount(0, $crawler);
+    }
+
     public function testClear()
     {
         $doc = $this->createDomDocument();

@@ -49,8 +49,13 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
         $element = isset(W3CReference::BODY_ELEMENTS[$element]) ? $element : $context;
 
         // Prevent DOS attack induced by extremely long HTML strings
-        if (-1 !== $this->config->getMaxInputLength() && \strlen($input) > $this->config->getMaxInputLength()) {
-            $input = substr($input, 0, $this->config->getMaxInputLength());
+        if (-1 !== ($maxLength = $this->config->getMaxInputLength()) && \strlen($input) > $maxLength) {
+            // Don't cut a multibyte character, which would make the input invalid UTF-8
+            while (0 < $maxLength && 0x80 === (\ord($input[$maxLength]) & 0xC0)) {
+                --$maxLength;
+            }
+
+            $input = substr($input, 0, $maxLength);
         }
 
         // Text context: early return with HTML encoding

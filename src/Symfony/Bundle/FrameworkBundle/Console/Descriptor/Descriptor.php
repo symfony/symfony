@@ -331,6 +331,10 @@ abstract class Descriptor implements DescriptorInterface
             if ($docComment = $r->getDocComment()) {
                 $docComment = preg_split('#\n\s*\*\s*[\n@]#', substr($docComment, 3, -2), 2)[0];
 
+                if (str_starts_with(ltrim($docComment), '@')) {
+                    return '';
+                }
+
                 return trim(preg_replace('#\s*\n\s*\*\s*#', ' ', $docComment));
             }
         } catch (\ReflectionException) {

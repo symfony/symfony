@@ -479,6 +479,40 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
+    public function testReturnTypeFromTemplate()
+    {
+        $deprecations = [];
+        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(\E_USER_DEPRECATED);
+
+        class_exists('Test\\'.TemplatedReturnType::class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([
+            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\TemplatedReturnTypeInterface::arrayOfTemplates()" might add "array" as a native return type declaration in the future. Do the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\TemplatedReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
+            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\TemplatedReturnTypeInterface::notTemplated()" might add "string" as a native return type declaration in the future. Do the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\TemplatedReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
+        ], $deprecations);
+    }
+
+    public function testReturnTypeFromTemplateOverridingAnInheritedOne()
+    {
+        $deprecations = [];
+        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(\E_USER_DEPRECATED);
+
+        class_exists('Test\\'.ExtendsTemplatedReturnTypeParent::class, true);
+        class_exists(ExtendsTemplatedReturnTypeParent::class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([
+            'Method "Test\Symfony\Component\ErrorHandler\Tests\TemplatedReturnTypeParent::current()" might add "mixed" as a native return type declaration in the future. Do the same in child class "Symfony\Component\ErrorHandler\Tests\ExtendsTemplatedReturnTypeParent" now to avoid errors or add an explicit @return annotation to suppress this message.',
+        ], $deprecations);
+    }
+
     #[RequiresPhp('>=8.3.0')]
     public function testReturnTypePhp83()
     {
@@ -649,6 +683,29 @@ class ClassLoader
             return $fixtureDir.\DIRECTORY_SEPARATOR.'ReturnType.php';
         } elseif ('Test\\'.ReturnTypePhp83::class === $class) {
             return $fixtureDir.\DIRECTORY_SEPARATOR.'ReturnTypePhp83.php';
+        } elseif ('Test\\'.TemplatedReturnType::class === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class TemplatedReturnType implements \\'.__NAMESPACE__.'\Fixtures\TemplatedReturnTypeInterface {
+                public function classTemplate() { }
+                public function nullableClassTemplate() { }
+                public function methodTemplate($value) { }
+                public function arrayOfTemplates() { }
+                public function notTemplated() { }
+                public function virtualMethod() { }
+            }');
+        } elseif ('Test\\'.TemplatedReturnTypeParent::class === $class) {
+            return $fixtureDir.'TemplatedReturnTypeParent.php';
+        } elseif ('Test\\'.ExtendsTemplatedReturnTypeParent::class === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsTemplatedReturnTypeParent extends TemplatedReturnTypeParent implements \\'.__NAMESPACE__.'\Fixtures\ReturnTypeParentInterface {
+                #[\ReturnTypeWillChange]
+                public function current() { }
+                public function returnTypeGrandParent() { }
+                public function returnTypeParentInterface() { }
+            }');
+        } elseif (ExtendsTemplatedReturnTypeParent::class === $class) {
+            eval('namespace '.__NAMESPACE__.'; class ExtendsTemplatedReturnTypeParent extends \Test\\'.__NAMESPACE__.'\TemplatedReturnTypeParent {
+                #[\ReturnTypeWillChange]
+                public function current() { }
+            }');
         } elseif ('Test\\'.Fixtures\OutsideInterface::class === $class) {
             return $fixtureDir.\DIRECTORY_SEPARATOR.'OutsideInterface.php';
         } elseif ('Test\\'.OverrideOutsideFinalProperty::class === $class) {

@@ -342,6 +342,11 @@ class Connection
 
         $this->setupDelay($delay, $routingKey, $isRetryAttempt);
 
+        // an expiration shorter than the delay would release the message early, and the delay queue removes the expiration when it releases the message
+        if (isset($amqpStamp?->getAttributes()['expiration'])) {
+            $amqpStamp = new AmqpStamp($amqpStamp->getRoutingKey(), $amqpStamp->getFlags(), array_diff_key($amqpStamp->getAttributes(), ['expiration' => true]));
+        }
+
         $this->publishOnExchange(
             $this->getDelayExchange(),
             $body,

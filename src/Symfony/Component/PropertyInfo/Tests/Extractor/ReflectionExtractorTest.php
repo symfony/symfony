@@ -491,6 +491,22 @@ class ReflectionExtractorTest extends TestCase
         $this->assertEquals(PropertyWriteInfo::TYPE_NONE, $bazMutator->getType());
     }
 
+    public function testExtractorsWithTheSameConfigurationShareTheirReadInfo()
+    {
+        $readInfo = (new ReflectionExtractor())->getReadInfo(Dummy::class, 'foo');
+
+        $this->assertNotNull($readInfo);
+        $this->assertSame($readInfo, (new ReflectionExtractor())->getReadInfo(Dummy::class, 'foo'));
+        $this->assertNotSame($readInfo, (new ReflectionExtractor())->getReadInfo(Dummy::class, 'foo', ['enable_getter_setter_extraction' => true]));
+    }
+
+    public function testReadInfoDependsOnTheConfigurationOfTheExtractor()
+    {
+        $this->assertNull((new ReflectionExtractor())->getReadInfo(Dummy::class, 'bar'));
+        $this->assertSame('bar', (new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PRIVATE))->getReadInfo(Dummy::class, 'bar')?->getName());
+        $this->assertNull((new ReflectionExtractor())->getReadInfo(Dummy::class, 'bar'));
+    }
+
     #[DataProvider('readAccessorProvider')]
     public function testGetReadAccessor($class, $property, $found, $type, $name, $visibility, $static)
     {

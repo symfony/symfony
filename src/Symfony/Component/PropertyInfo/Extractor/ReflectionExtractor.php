@@ -98,6 +98,14 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
     private array $accessorMethodToPropertyMap = [];
 
     /**
+     * Read infos only depend on the code and on the configuration of the extractor, so extractors that have the same configuration share them.
+     *
+     * @var array<string, PropertyReadInfo|null>
+     */
+    private static array $readInfoCache = [];
+    private string $readInfoKey;
+
+    /**
      * @param string[]|null $mutatorPrefixes
      * @param string[]|null $accessorPrefixes
      * @param string[]|null $arrayMutatorPrefixes
@@ -354,66 +362,22 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
 
     public function getReadInfo(string $class, string $property, array $context = []): ?PropertyReadInfo
     {
+        $allowGetterSetter = (bool) ($context['enable_getter_setter_extraction'] ?? false);
+        $magicMethods = (int) ($context['enable_magic_methods_extraction'] ?? $this->magicMethodsFlags);
+        $this->readInfoKey ??= static::class.'|'.implode(',', $this->accessorPrefixes).'|'.$this->methodReflectionFlags.'|'.$this->propertyReflectionFlags.'|';
+        $key = $this->readInfoKey.$allowGetterSetter.'|'.$magicMethods.'|'.$class.'::'.$property;
+
+        if (isset(self::$readInfoCache[$key]) || \array_key_exists($key, self::$readInfoCache)) {
+            return self::$readInfoCache[$key];
+        }
+
         try {
             $reflClass = new \ReflectionClass($class);
         } catch (\ReflectionException) {
             return null;
         }
 
-        if (null !== $methodName = $this->getAccessorsAttribute($reflClass, $property)?->getter) {
-            $method = $reflClass->getMethod($methodName);
-
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $methodName, $this->getReadVisibilityForMethod($method), $method->isStatic(), false);
-        }
-
-        $allowGetterSetter = $context['enable_getter_setter_extraction'] ?? false;
-        $magicMethods = $context['enable_magic_methods_extraction'] ?? $this->magicMethodsFlags;
-        $allowMagicCall = (bool) ($magicMethods & self::ALLOW_MAGIC_CALL);
-        $allowMagicGet = (bool) ($magicMethods & self::ALLOW_MAGIC_GET);
-        $hasProperty = $reflClass->hasProperty($property);
-        $camelProp = $this->camelize($property);
-        $getsetter = lcfirst($camelProp); // jQuery style, e.g. read: last(), write: last($item)
-
-        $accessorMethods = array_map(static fn ($prefix) => $prefix.$camelProp, $this->accessorPrefixes);
-
-        if ($allowGetterSetter) {
-            $getterPosition = array_search('get'.$camelProp, $accessorMethods, true);
-            array_splice($accessorMethods, false === $getterPosition ? \count($accessorMethods) : $getterPosition + 1, 0, [$getsetter]);
-        }
-
-        $deferredGetsetter = null;
-
-        foreach ($accessorMethods as $methodName) {
-            if ($reflClass->hasMethod($methodName) && ($m = $reflClass->getMethod($methodName))->getModifiers() & $this->methodReflectionFlags && !$m->getNumberOfRequiredParameters() && !\in_array((string) $m->getReturnType(), ['void', 'never'], true)) {
-                if ($allowGetterSetter && $methodName === $getsetter && ($m->isStatic() || $this->isDeclaringClassType($m->getReturnType(), $m->getDeclaringClass()))) {
-                    // a method named after the property that hands back an object of the same class,
-                    // e.g. a named constructor or a derived value, cannot report the state of the
-                    // object being read; it must not win over any instance-based candidate; try it last
-                    $deferredGetsetter = $m;
-                    continue;
-                }
-
-                return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $methodName, $this->getReadVisibilityForMethod($m), $m->isStatic(), false);
-            }
-        }
-
-        if ($hasProperty && (($r = $reflClass->getProperty($property))->getModifiers() & $this->propertyReflectionFlags)) {
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, $this->getReadVisibilityForProperty($r), $r->isStatic(), true, $this->propertyHasHook($r, 'get'), $this->propertyIsVirtual($r));
-        }
-
-        if ($allowMagicGet && $reflClass->hasMethod('__get') && (($r = $reflClass->getMethod('__get'))->getModifiers() & $this->methodReflectionFlags)) {
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, PropertyReadInfo::VISIBILITY_PUBLIC, false, $r->returnsReference(), false, false);
-        }
-
-        if ($allowMagicCall && $reflClass->hasMethod('__call') && ($reflClass->getMethod('__call')->getModifiers() & $this->methodReflectionFlags)) {
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, 'get'.$camelProp, PropertyReadInfo::VISIBILITY_PUBLIC, false, false);
-        }
-
-        if ($deferredGetsetter) {
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $getsetter, $this->getReadVisibilityForMethod($deferredGetsetter), $deferredGetsetter->isStatic(), false);
-        }
-
-        return null;
+        return self::$readInfoCache[$key] = $this->doGetReadInfo($reflClass, $property, $allowGetterSetter, $magicMethods);
     }
 
     public function getWriteInfo(string $class, string $property, array $context = []): ?PropertyWriteInfo
@@ -1142,5 +1106,61 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
             \ReflectionProperty::class => new ReflectionPropertyTypeResolver($reflectionTypeResolver, $typeContextFactory),
             \ReflectionFunctionAbstract::class => new ReflectionReturnTypeResolver($reflectionTypeResolver, $typeContextFactory),
         ]);
+    }
+
+    private function doGetReadInfo(\ReflectionClass $reflClass, string $property, bool $allowGetterSetter, int $magicMethods): ?PropertyReadInfo
+    {
+        if (null !== $methodName = $this->getAccessorsAttribute($reflClass, $property)?->getter) {
+            $method = $reflClass->getMethod($methodName);
+
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $methodName, $this->getReadVisibilityForMethod($method), $method->isStatic(), false);
+        }
+
+        $allowMagicCall = (bool) ($magicMethods & self::ALLOW_MAGIC_CALL);
+        $allowMagicGet = (bool) ($magicMethods & self::ALLOW_MAGIC_GET);
+        $hasProperty = $reflClass->hasProperty($property);
+        $camelProp = $this->camelize($property);
+        $getsetter = lcfirst($camelProp); // jQuery style, e.g. read: last(), write: last($item)
+
+        $accessorMethods = array_map(static fn ($prefix) => $prefix.$camelProp, $this->accessorPrefixes);
+
+        if ($allowGetterSetter) {
+            $getterPosition = array_search('get'.$camelProp, $accessorMethods, true);
+            array_splice($accessorMethods, false === $getterPosition ? \count($accessorMethods) : $getterPosition + 1, 0, [$getsetter]);
+        }
+
+        $deferredGetsetter = null;
+
+        foreach ($accessorMethods as $methodName) {
+            if ($reflClass->hasMethod($methodName) && ($m = $reflClass->getMethod($methodName))->getModifiers() & $this->methodReflectionFlags && !$m->getNumberOfRequiredParameters() && !\in_array((string) $m->getReturnType(), ['void', 'never'], true)) {
+                if ($allowGetterSetter && $methodName === $getsetter && ($m->isStatic() || $this->isDeclaringClassType($m->getReturnType(), $m->getDeclaringClass()))) {
+                    // a method named after the property that hands back an object of the same class,
+                    // e.g. a named constructor or a derived value, cannot report the state of the
+                    // object being read; it must not win over any instance-based candidate; try it last
+                    $deferredGetsetter = $m;
+                    continue;
+                }
+
+                return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $methodName, $this->getReadVisibilityForMethod($m), $m->isStatic(), false);
+            }
+        }
+
+        if ($hasProperty && (($r = $reflClass->getProperty($property))->getModifiers() & $this->propertyReflectionFlags)) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, $this->getReadVisibilityForProperty($r), $r->isStatic(), true, $this->propertyHasHook($r, 'get'), $this->propertyIsVirtual($r));
+        }
+
+        if ($allowMagicGet && $reflClass->hasMethod('__get') && (($r = $reflClass->getMethod('__get'))->getModifiers() & $this->methodReflectionFlags)) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, PropertyReadInfo::VISIBILITY_PUBLIC, false, $r->returnsReference(), false, false);
+        }
+
+        if ($allowMagicCall && $reflClass->hasMethod('__call') && ($reflClass->getMethod('__call')->getModifiers() & $this->methodReflectionFlags)) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, 'get'.$camelProp, PropertyReadInfo::VISIBILITY_PUBLIC, false, false);
+        }
+
+        if ($deferredGetsetter) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $getsetter, $this->getReadVisibilityForMethod($deferredGetsetter), $deferredGetsetter->isStatic(), false);
+        }
+
+        return null;
     }
 }

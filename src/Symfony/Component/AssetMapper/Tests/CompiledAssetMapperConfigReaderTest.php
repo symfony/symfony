@@ -116,6 +116,7 @@ class CompiledAssetMapperConfigReaderTest extends TestCase
         $this->assertSame([], $cache->getValues());
 
         sleep(1);
+        $reader = new CompiledAssetMapperConfigReader($this->writableRoot, false, $cache);
 
         $this->assertSame(['foo' => 'baz'], $reader->loadConfig('foo.json'));
         $this->assertSame([['foo' => 'baz']], array_values($cache->getValues()));
@@ -133,6 +134,29 @@ class CompiledAssetMapperConfigReaderTest extends TestCase
         $this->assertFalse($reader->configExists('foo.json'));
         $this->expectException(IOException::class);
         $reader->loadConfig('foo.json');
+    }
+
+    public function testLoadedConfigIsKeptInMemory()
+    {
+        $reader = new CompiledAssetMapperConfigReader($this->writableRoot);
+        $this->filesystem->dumpFile($this->writableRoot.'/foo.json', '{"foo": "bar"}');
+        $this->assertSame(['foo' => 'bar'], $reader->loadConfig('foo.json'));
+
+        $this->filesystem->remove($this->writableRoot.'/foo.json');
+
+        $this->assertTrue($reader->configExists('foo.json'));
+        $this->assertSame(['foo' => 'bar'], $reader->loadConfig('foo.json'));
+    }
+
+    public function testSaveConfigForgetsTheLoadedConfig()
+    {
+        $reader = new CompiledAssetMapperConfigReader($this->writableRoot);
+        $reader->saveConfig('foo.json', ['foo' => 'bar']);
+        $this->assertSame(['foo' => 'bar'], $reader->loadConfig('foo.json'));
+
+        $reader->saveConfig('foo.json', ['foo' => 'baz']);
+
+        $this->assertSame(['foo' => 'baz'], $reader->loadConfig('foo.json'));
     }
 
     public function testSaveConfig()

@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\Tests\Factory;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactoryInterface;
@@ -98,6 +99,23 @@ class CachedMappedAssetFactoryTest extends TestCase
 
         $cachedFactory->reset();
         $this->assertNotSame($actualAsset, $cachedFactory->createMappedAsset('file1.css', $sourcePath));
+    }
+
+    public function testCachedAssetIsKeptAcrossResetsWhenNotInDebugMode()
+    {
+        $sourcePath = __DIR__.'/../Fixtures/dir1/file1.css';
+        $this->warmUpCache(new MappedAsset('file1.css', $sourcePath, content: 'cached content'), false);
+
+        $factory = $this->createMock(MappedAssetFactoryInterface::class);
+        $factory->expects($this->never())
+            ->method('createMappedAsset');
+        $cachedFactory = new CachedMappedAssetFactory($factory, $this->cacheDir, false);
+
+        $actualAsset = $cachedFactory->createMappedAsset('file1.css', $sourcePath);
+        $this->filesystem->remove($this->cacheDir);
+
+        $cachedFactory->reset();
+        $this->assertSame($actualAsset, $cachedFactory->createMappedAsset('file1.css', $sourcePath));
     }
 
     public function testAssetCacheFreshnessIsNotMemoizedInDebugMode()
@@ -207,7 +225,9 @@ class CachedMappedAssetFactoryTest extends TestCase
         $this->assertSame('cached content', $actualAsset->content);
     }
 
-    public function testResetIsForwardedToTheInnerFactory()
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testResetIsForwardedToTheInnerFactory(bool $debug)
     {
         $innerFactory = new class implements MappedAssetFactoryInterface {
             public int $resetCount = 0;
@@ -223,7 +243,7 @@ class CachedMappedAssetFactoryTest extends TestCase
             }
         };
 
-        (new CachedMappedAssetFactory($innerFactory, $this->cacheDir, true))->reset();
+        (new CachedMappedAssetFactory($innerFactory, $this->cacheDir, $debug))->reset();
 
         $this->assertSame(1, $innerFactory->resetCount);
     }

@@ -15,8 +15,7 @@ use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
- * Responsible for resolving the value of a Command argument based on its
- * parameter metadata and the Command MapInput.
+ * Resolves the value of a command argument from its parameter metadata and the console input.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Robin Chalas <robin.chalas@gmail.com>

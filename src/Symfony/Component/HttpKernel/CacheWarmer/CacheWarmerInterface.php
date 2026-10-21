@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\CacheWarmer;
 
 /**
- * Interface for classes able to warm up the cache.
+ * Fills a cache before the app needs it.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

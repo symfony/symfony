@@ -15,7 +15,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * Service tag to autoconfigure commands.
+ * Registers the class or the method as a console command with the given name.
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
 final class AsCommand

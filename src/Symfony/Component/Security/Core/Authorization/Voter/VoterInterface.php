@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Authorization\Voter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * VoterInterface is the interface implemented by all voters.
+ * Votes on whether a security token is granted an attribute, such as a role, on a subject.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

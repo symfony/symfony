@@ -14,7 +14,7 @@ namespace Symfony\Component\JsonPath\Attribute;
 use Symfony\Component\JsonPath\FunctionReturnType;
 
 /**
- * Service tag to autoconfigure JsonPath functions.
+ * Registers an invokable class as a custom function for JsonPath queries.
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class AsJsonPathFunction

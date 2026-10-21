@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer\Attribute;
 
 /**
+ * Excludes a property or a method from serialization and deserialization.
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]

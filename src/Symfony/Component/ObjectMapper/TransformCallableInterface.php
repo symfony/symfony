@@ -12,7 +12,7 @@
 namespace Symfony\Component\ObjectMapper;
 
 /**
- * Service used by "Map::transform".
+ * Transforms a value while it is mapped, when used as the "transform" option of #[Map].
  *
  * @template T of object
  * @template T2 of object

@@ -14,6 +14,8 @@ namespace Symfony\Component\Serializer\Attribute;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
+ * Defines the serialization groups of a property, a method or a whole class.
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS)]

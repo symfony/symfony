@@ -14,6 +14,8 @@ namespace Symfony\Component\Form;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
+ * Defines the options, the fields and the view of a form type.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface FormTypeInterface

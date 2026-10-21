@@ -14,6 +14,8 @@ namespace Symfony\Component\Serializer\Attribute;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
+ * Changes the name of a property in the serialized data.
+ *
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]

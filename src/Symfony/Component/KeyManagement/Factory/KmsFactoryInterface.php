@@ -17,7 +17,7 @@ use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\UnsupportedSchemeException;
 
 /**
- * Contract implemented by each KMS bridge to build a client from a parsed {@see Dsn}.
+ * Creates a KMS client from a parsed {@see Dsn}.
  *
  * A factory exposes the DSN scheme(s) it understands and builds an
  * {@see EncrypterInterface} / {@see DecrypterInterface} from the DSN.

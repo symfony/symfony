@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Interface that must be implemented by compilation passes.
+ * Modifies the container while it is compiled, for example to collect tagged services.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

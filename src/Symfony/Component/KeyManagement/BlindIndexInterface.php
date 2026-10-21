@@ -14,7 +14,7 @@ namespace Symfony\Component\KeyManagement;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 
 /**
- * A searchable trace of a value whose encrypted column cannot be searched.
+ * Computes a keyed digest of a value, to find the rows where an encrypted column has that value.
  *
  * Encryption is randomized, by design and without a way around it, so two encryptions of the same
  * value differ and `WHERE email = ?` never matches. The usual answer is to keep a blind index in a

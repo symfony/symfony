@@ -12,7 +12,8 @@
 namespace Symfony\Component\EventDispatcher;
 
 /**
- * An EventSubscriber knows itself what events it is interested in.
+ * Lists the events it listens to, with the method to call for each of them.
+ *
  * If an EventSubscriber is added to an EventDispatcherInterface, the manager invokes
  * {@link getSubscribedEvents} and registers the subscriber as a listener for all
  * returned events.

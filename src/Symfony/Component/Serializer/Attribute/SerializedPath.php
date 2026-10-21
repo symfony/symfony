@@ -16,6 +16,8 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
+ * Reads and writes a property at a nested path of the serialized data.
+ *
  * @author Tobias Bönner <tobi@boenner.family>
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Handler;
 
 /**
+ * Handles messages in batches instead of one by one.
+ *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 interface BatchHandlerInterface

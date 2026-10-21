@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
- * Defines the interface for a validation group provider.
+ * Returns the validation groups to use for an object, depending on its state.
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */

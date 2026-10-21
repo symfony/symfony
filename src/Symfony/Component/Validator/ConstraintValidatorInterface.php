@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
+ * Validates a value against a constraint and reports the violations.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @method void validateInContext(mixed $value, Constraint $constraint, ExecutionContextInterface $context)

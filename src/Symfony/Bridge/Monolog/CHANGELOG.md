@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Restrict the logs `ConsoleHandler` writes to a subset of the channels with the `SYMFONY_CONSOLE_LOG_CHANNELS` env var
+ * Allow `NotifierHandler` to handle records below the `Error` level
 
 8.1
 ---

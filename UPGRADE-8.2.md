@@ -407,6 +407,11 @@ Mime
    part coming from such a message is no longer forced to `8bit` in a form: consume the queues of transports
    using the Serializer before upgrading
 
+MonologBridge
+-------------
+
+ * A level below `Error` passed to `NotifierHandler` is no longer raised to `Error`, so the records of that level are now sent to the notifier. Pass `Level::Error` to keep the previous behavior
+
 Notifier
 --------
 

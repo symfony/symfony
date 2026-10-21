@@ -20,6 +20,7 @@ use Psr\Log\LoggerTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
@@ -156,6 +157,48 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertEquals($shouldReset, $receiver->hasBeenReset(), '$receiver->reset() should have been called');
         $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
+    }
+
+    public static function provideRunWithProfileOption(): iterable
+    {
+        yield 'services are not reset' => [[], false];
+        yield 'an explicit reset interval is kept' => [['--no-reset' => '1'], true];
+    }
+
+    #[DataProvider('provideRunWithProfileOption')]
+    public function testRunWithProfileOption(array $options, bool $shouldReset)
+    {
+        $envelope = new Envelope(new \stdClass());
+
+        $receiver = new ResettableDummyReceiver([
+            [$envelope],
+            [$envelope],
+        ]);
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', $receiver);
+
+        $bus = $this->createStub(RoutableMessageBus::class);
+        $bus->method('dispatch')->willReturnArgument(0);
+
+        $servicesResetter = new ServicesResetter(new \ArrayIterator([$receiver]), ['reset']);
+
+        $command = new ConsumeMessagesCommand($bus, $receiverLocator, new EventDispatcher(), null, [], new ResetServicesListener($servicesResetter));
+
+        $application = new Application();
+        // the option FrameworkBundle adds to the application
+        $application->getDefinition()->addOption(new InputOption('--profile', null, InputOption::VALUE_NONE));
+        $application->addCommand($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--sleep' => '0.001',
+            '--limit' => 2,
+            '--profile' => true,
+        ] + $options);
+
+        $this->assertSame($shouldReset, $receiver->hasBeenReset());
+        $tester->assertCommandIsSuccessful();
     }
 
     public function testRunTwiceInTheSameProcess()

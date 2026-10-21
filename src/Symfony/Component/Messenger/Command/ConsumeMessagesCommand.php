@@ -143,6 +143,8 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
                     <info>php %command.full_name% <receiver-name> --no-reset</info>
 
+                Services are not reset when the <info>--profile</info> option is used, unless <info>--no-reset</info> is given a number.
+
                 Use the <info>--all</info> option to consume from all receivers:
 
                     <info>php %command.full_name% --all</info>
@@ -274,7 +276,8 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
         }
 
         $resetInterval = match ($resetInterval = $input->getOption('no-reset')) {
-            false => 1,
+            // resetting services would wipe the data collected by the profiler
+            false => $input->hasOption('profile') && $input->getOption('profile') ? 0 : 1,
             null => 0,
             default => filter_var($resetInterval, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE),
         };

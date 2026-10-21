@@ -71,6 +71,7 @@ CHANGELOG
  * Log the names of the consumed transports when a worker starts
  * Display the stamps of failed messages with `-vv` in the `messenger:failed:show`, `messenger:failed:retry` and `messenger:failed:remove` commands
  * Close the transports that implement `CloseableTransportInterface` when the kernel shuts down
+ * Do not reset services between messages in the `messenger:consume` command when the `--profile` option is used, unless `--no-reset` is given an interval
 
 8.1
 ---

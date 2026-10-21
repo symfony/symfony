@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Exception\UnsupportedFormatException;
+use Symfony\Component\Serializer\Internal\WeakSerializer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -79,7 +80,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      */
     public function __construct(
         private array $normalizers = [],
-        array $encoders = [],
+        private array $encoders = [],
         private array $defaultContext = [],
     ) {
         foreach ($normalizers as $normalizer) {
@@ -409,5 +410,35 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     public function supportsDecoding(string $format, array $context = []): bool
     {
         return $this->decoder->supportsDecoding($format, $context);
+    }
+
+    /**
+     * Gives the normalizers and the encoders a weak reference to this serializer.
+     *
+     * This lets PHP free them together with the serializer, without waiting for the garbage collector.
+     */
+    public function shutdown(): void
+    {
+        $serializer = new WeakSerializer($this);
+
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer instanceof SerializerAwareInterface) {
+                $normalizer->setSerializer($serializer);
+            }
+
+            if ($normalizer instanceof DenormalizerAwareInterface) {
+                $normalizer->setDenormalizer($serializer);
+            }
+
+            if ($normalizer instanceof NormalizerAwareInterface) {
+                $normalizer->setNormalizer($serializer);
+            }
+        }
+
+        foreach ($this->encoders as $encoder) {
+            if ($encoder instanceof SerializerAwareInterface) {
+                $encoder->setSerializer($serializer);
+            }
+        }
     }
 }

@@ -85,7 +85,7 @@ EOF;
 
         [$staticRoutes, $dynamicRoutes] = $this->groupStaticRoutes($routes);
 
-        $conditions = [null];
+        $conditions = ['' => null];
         $compiledRoutes[] = $this->compileStaticRoutes($staticRoutes, $conditions);
         $chunkLimit = \count($dynamicRoutes);
 
@@ -107,7 +107,7 @@ EOF;
         if ($forDump) {
             $compiledRoutes[2] = $compiledRoutes[4];
         }
-        unset($conditions[0]);
+        unset($conditions['']);
 
         if ($conditions) {
             foreach ($conditions as $expression => $condition) {
@@ -425,7 +425,7 @@ EOF;
             unset($defaults['_canonical_route']);
         }
 
-        if ($condition = $route->getCondition()) {
+        if ('' !== $condition = $route->getCondition()) {
             $condition = $this->getExpressionLanguage()->compile($condition, ['context', 'request']);
             $condition = $conditions[$condition] ?? $conditions[$condition] = (str_contains($condition, '$request') ? 1 : -1) * \count($conditions);
         } else {

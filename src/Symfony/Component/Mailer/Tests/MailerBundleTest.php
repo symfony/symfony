@@ -87,6 +87,14 @@ class MailerBundleTest extends TestCase
         $this->assertTrue($stream->isClosed());
     }
 
+    public function testSendPulseTransportFactoryIsRegistered(): void
+    {
+        $container = $this->load(['dsn' => 'sendpulse+api://client:secret@default']);
+
+        $this->assertTrue($container->hasDefinition('mailer.transport_factory.sendpulse'));
+        $this->assertSame(\Symfony\Component\Mailer\Bridge\SendPulse\Transport\SendPulseTransportFactory::class, $container->getDefinition('mailer.transport_factory.sendpulse')->getClass());
+    }
+
     public function testTheTransportsAreRegisteredFromTheDsn()
     {
         $container = $this->load(['dsn' => 'smtp://example.com']);

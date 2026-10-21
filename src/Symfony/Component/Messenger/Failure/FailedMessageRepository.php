@@ -112,7 +112,7 @@ final class FailedMessageRepository
     }
 
     /**
-     * The limit bounds what is read from the transport, before the filter is applied.
+     * The limit bounds the number of messages that match the filter.
      *
      * @return iterable<Envelope>
      */
@@ -174,9 +174,26 @@ final class FailedMessageRepository
     {
         $this->phpSerializer?->acceptPhpIncompleteClass();
         try {
-            foreach ($receiver->all($limit) as $envelope) {
-                if (!$filter || $filter->matches($envelope)) {
+            if (!$filter || $filter->isEmpty()) {
+                foreach ($receiver->all($limit) as $envelope) {
                     yield $envelope;
+                }
+
+                return;
+            }
+
+            if (null !== $limit && 1 > $limit) {
+                return;
+            }
+
+            $count = 0;
+            foreach ($receiver->all() as $envelope) {
+                if ($filter->matches($envelope)) {
+                    yield $envelope;
+
+                    if (null !== $limit && ++$count >= $limit) {
+                        return;
+                    }
                 }
             }
         } finally {

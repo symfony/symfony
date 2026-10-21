@@ -56,6 +56,7 @@ class Connection implements ResetInterface
     private const MAX_BATCH_ROWS = 100;
     // keeps the statements of a batch below the packet size limit of the server
     private const MAX_BATCH_SIZE = 1048576;
+    private const LISTING_BATCH_SIZE = 100;
     protected const TABLE_OPTION_NAME = '_symfony_messenger_table_name';
 
     protected const DEFAULT_OPTIONS = [
@@ -406,6 +407,69 @@ class Connection implements ResetInterface
             $this->decodeEnvelopeHeaders(...),
             $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters(), $queryBuilder->getParameterTypes())->fetchAllAssociative()
         );
+    }
+
+    /**
+     * Reads the available messages in batches, so that they are not all loaded in memory at once.
+     *
+     * The messages that were never delivered come first, then the ones whose delivery timed out.
+     *
+     * @return \Generator<int, array>
+     */
+    public function findAllInBatches(): \Generator
+    {
+        $now = \DateTimeImmutable::createFromTimestamp(microtime(true));
+
+        foreach ([false, true] as $deliveryTimedOut) {
+            $queryBuilder = $this->createQueryBuilder()
+                ->where('m.queue_name = ?')
+                ->andWhere('m.available_at <= ?');
+            $parameters = [$this->configuration['queue_name'], $now];
+            $types = [Types::STRING, Types::DATETIME_IMMUTABLE];
+
+            // the next batches are read in the order of the index, so the database does not sort the messages that have the same "available_at"
+            if ($deliveryTimedOut) {
+                $queryBuilder->andWhere('m.delivered_at < ?');
+                $parameters[] = $now->modify(\sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
+                $types[] = Types::DATETIME_IMMUTABLE;
+                $nextQueryBuilders = [
+                    [(clone $queryBuilder)->andWhere('m.available_at = ?')->andWhere('m.delivered_at = ?')->andWhere('m.id > ?')->orderBy('m.id'), ['available_at', 'delivered_at', 'id']],
+                    [(clone $queryBuilder)->andWhere('m.available_at = ?')->andWhere('m.delivered_at > ?')->orderBy('m.delivered_at')->addOrderBy('m.id'), ['available_at', 'delivered_at']],
+                ];
+            } else {
+                $nextQueryBuilders = [
+                    [(clone $queryBuilder)->andWhere('m.delivered_at IS NULL')->andWhere('m.available_at = ?')->andWhere('m.id > ?')->orderBy('m.id'), ['available_at', 'id']],
+                ];
+                // SQLite sorts the messages that have the same "available_at" unless "delivered_at" is in the ORDER BY and its condition is not written "IS NULL"
+                $queryBuilder->andWhere('NOT (m.delivered_at IS NOT NULL)');
+            }
+
+            $queryBuilder->orderBy('m.available_at')->addOrderBy('m.delivered_at')->addOrderBy('m.id')->setMaxResults(self::LISTING_BATCH_SIZE);
+            $doctrineEnvelopes = $this->executeQuery($queryBuilder->getSQL(), $parameters, $types)->fetchAllAssociative();
+            $nextQueryBuilders[] = [$queryBuilder->andWhere('m.available_at > ?'), ['available_at']];
+
+            while (true) {
+                foreach ($doctrineEnvelopes as $doctrineEnvelope) {
+                    yield $this->decodeEnvelopeHeaders($doctrineEnvelope);
+                }
+
+                if (self::LISTING_BATCH_SIZE > \count($doctrineEnvelopes)) {
+                    break;
+                }
+
+                $last = end($doctrineEnvelopes);
+                $doctrineEnvelopes = [];
+
+                foreach ($nextQueryBuilders as [$nextQueryBuilder, $columns]) {
+                    $nextQueryBuilder->setMaxResults(self::LISTING_BATCH_SIZE - \count($doctrineEnvelopes));
+                    array_push($doctrineEnvelopes, ...$this->executeQuery($nextQueryBuilder->getSQL(), [...$parameters, ...array_map(static fn (string $column) => $last[$column], $columns)], $types)->fetchAllAssociative());
+
+                    if (self::LISTING_BATCH_SIZE === \count($doctrineEnvelopes)) {
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     public function find(mixed $id): ?array

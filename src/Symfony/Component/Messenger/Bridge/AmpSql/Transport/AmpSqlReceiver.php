@@ -59,7 +59,7 @@ final class AmpSqlReceiver implements ListableReceiverInterface, MessageCountAwa
 
     public function all(?int $limit = null): iterable
     {
-        foreach ($this->connection->findAll($limit) as $data) {
+        foreach (null === $limit ? $this->connection->findAllInBatches() : $this->connection->findAll($limit) as $data) {
             yield $this->createEnvelopeFromData($data);
         }
     }

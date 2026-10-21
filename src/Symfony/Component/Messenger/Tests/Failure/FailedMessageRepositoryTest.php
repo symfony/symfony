@@ -118,6 +118,66 @@ class FailedMessageRepositoryTest extends TestCase
         $this->assertSame([], iterator_to_array($repository->all(null, null, 10), false));
     }
 
+    public function testAllAppliesTheLimitToTheMessagesThatMatchTheFilter()
+    {
+        $calls = [];
+        $read = 0;
+        $receiver = $this->createListableReceiver(250, [120, 230, 240, 250], $calls, $read);
+        $repository = new FailedMessageRepository(new ServiceLocator(['global' => static fn () => $receiver]), 'global');
+
+        $envelopes = iterator_to_array($repository->all(null, new FailedMessageFilter(DummyMessage::class), 2), false);
+
+        $this->assertSame(['120', '230'], array_map(static fn (Envelope $envelope) => $envelope->getMessage()->getMessage(), $envelopes));
+        $this->assertSame([[null]], $calls);
+        $this->assertSame(230, $read);
+    }
+
+    public function testAllWithAFilterReadsTheReceiverOnce()
+    {
+        $calls = [];
+        $read = 0;
+        $receiver = $this->createListableReceiver(250, [120, 230, 240, 250], $calls, $read);
+        $repository = new FailedMessageRepository(new ServiceLocator(['global' => static fn () => $receiver]), 'global');
+
+        $envelopes = iterator_to_array($repository->all(null, new FailedMessageFilter(DummyMessage::class)), false);
+
+        $this->assertSame(['120', '230', '240', '250'], array_map(static fn (Envelope $envelope) => $envelope->getMessage()->getMessage(), $envelopes));
+        $this->assertSame([[null]], $calls);
+        $this->assertSame(250, $read);
+    }
+
+    public function testAllStopsReadingWhenTheCallerStops()
+    {
+        $calls = [];
+        $read = 0;
+        $receiver = $this->createListableReceiver(250, [10, 230], $calls, $read);
+        $repository = new FailedMessageRepository(new ServiceLocator(['global' => static fn () => $receiver]), 'global');
+
+        foreach ($repository->all(null, new FailedMessageFilter(DummyMessage::class)) as $envelope) {
+            break;
+        }
+
+        $this->assertSame('10', $envelope->getMessage()->getMessage());
+        $this->assertSame(10, $read);
+    }
+
+    #[DataProvider('provideLimitsThatSelectNothing')]
+    public function testAllDoesNotReadTheTransportWhenTheLimitSelectsNoMatchingMessage(int $limit)
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->never())->method('all');
+
+        $repository = new FailedMessageRepository(new ServiceLocator(['global' => static fn () => $receiver]), 'global');
+
+        $this->assertSame([], iterator_to_array($repository->all(null, new FailedMessageFilter(DummyMessage::class), $limit), false));
+    }
+
+    public static function provideLimitsThatSelectNothing(): iterable
+    {
+        yield [0];
+        yield [-1];
+    }
+
     public function testAllRejectsANonListableTransportEagerly()
     {
         $repository = new FailedMessageRepository(new ServiceLocator([
@@ -329,6 +389,22 @@ class FailedMessageRepositoryTest extends TestCase
         $this->expectExceptionMessage('Cannot redispatch a failed message without a message bus.');
 
         $repository->redispatch(new Envelope(new DummyMessage('a')));
+    }
+
+    private function createListableReceiver(int $count, array $matching, array &$calls, int &$read): ListableReceiverInterface
+    {
+        $receiver = $this->createStub(ListableReceiverInterface::class);
+        $receiver->method('all')->willReturnCallback(static function () use ($count, $matching, &$calls, &$read) {
+            $calls[] = \func_get_args();
+
+            foreach (range(1, $count) as $i) {
+                ++$read;
+
+                yield new Envelope(\in_array($i, $matching, true) ? new DummyMessage((string) $i) : new \stdClass(), [new TransportMessageIdStamp($i)]);
+            }
+        });
+
+        return $receiver;
     }
 }
 

@@ -152,7 +152,7 @@ class DoctrineReceiverTest extends TestCase
         $doctrineEnvelope1 = $this->createRetriedDoctrineEnvelope();
         $doctrineEnvelope2 = $this->createRetriedDoctrineEnvelope();
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())->method('findAll')->willReturn([$doctrineEnvelope1, $doctrineEnvelope2]);
+        $connection->expects($this->once())->method('findAllInBatches')->willReturnCallback(static fn () => yield from [$doctrineEnvelope1, $doctrineEnvelope2]);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
         $actualEnvelopes = $receiver->all();
@@ -161,6 +161,53 @@ class DoctrineReceiverTest extends TestCase
 
             $this->assertCount(1, $messageIdStamps);
         }
+    }
+
+    public function testAllWithoutLimitReadsTheMessagesInBatches()
+    {
+        $read = 0;
+        $doctrineEnvelope = $this->createDoctrineEnvelope();
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->never())->method('findAll');
+        $connection->expects($this->once())->method('findAllInBatches')->willReturnCallback(static function () use (&$read, $doctrineEnvelope) {
+            foreach ([1, 2, 3] as $id) {
+                ++$read;
+
+                yield ['id' => $id] + $doctrineEnvelope;
+            }
+        });
+
+        $receiver = new DoctrineReceiver($connection, $this->createSerializer());
+        foreach ($receiver->all() as $envelope) {
+            break;
+        }
+
+        $this->assertSame(1, $envelope->last(TransportMessageIdStamp::class)->getId());
+        $this->assertSame(1, $read);
+    }
+
+    public function testAllThrowsATransportExceptionWhenABatchCannotBeRead()
+    {
+        $doctrineEnvelope = $this->createDoctrineEnvelope();
+        $exception = $this->createAccessDenied();
+        $connection = $this->createStub(Connection::class);
+        $connection->method('findAllInBatches')->willReturnCallback(static function () use ($doctrineEnvelope, $exception) {
+            yield $doctrineEnvelope;
+
+            throw $exception;
+        });
+
+        $envelopes = [];
+        try {
+            foreach ((new DoctrineReceiver($connection, $this->createSerializer()))->all() as $envelope) {
+                $envelopes[] = $envelope;
+            }
+            $this->fail('A TransportException should have been thrown.');
+        } catch (TransportException $e) {
+            $this->assertSame($exception, $e->getPrevious());
+        }
+
+        $this->assertCount(1, $envelopes);
     }
 
     public function testFind()

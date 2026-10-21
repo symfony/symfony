@@ -285,7 +285,7 @@ class RedisReceiverTest extends TestCase
         ];
 
         $connection = $this->createStub(Connection::class);
-        $connection->method('findAll')->willReturn($messages);
+        $connection->method('findAllInBatches')->willReturnCallback(static fn () => yield from $messages);
 
         $receiver = new RedisReceiver($connection, new Serializer(
             new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
@@ -507,7 +507,7 @@ class RedisReceiverTest extends TestCase
             ->willReturn(new Envelope(new DummyMessage('Hi')));
 
         $connection = $this->createStub(Connection::class);
-        $connection->method('findAll')->willReturn([
+        $connection->method('findAllInBatches')->willReturnCallback(static fn () => yield from [
             [
                 'id' => '1',
                 'data' => [
@@ -559,7 +559,7 @@ class RedisReceiverTest extends TestCase
         ];
 
         $connection = $this->createStub(Connection::class);
-        $connection->method('findAll')->willReturn($messages);
+        $connection->method('findAllInBatches')->willReturnCallback(static fn () => yield from $messages);
 
         $receiver = new RedisReceiver($connection, new Serializer(
             new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])

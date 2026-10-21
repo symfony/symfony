@@ -33,6 +33,7 @@ class Connection
     // bounds what a pipeline buffers and what a connection broken during its round trip leaves unknown
     private const MAX_PIPELINE_COMMANDS = 1000;
     private const MAX_PIPELINE_SIZE = 1048576;
+    private const LISTING_BATCH_SIZE = 100;
 
     private const DEFAULT_OPTIONS = [
         'host' => '127.0.0.1',
@@ -944,37 +945,37 @@ class Connection
 
     public function findAll(?int $limit = null): array
     {
-        $redis = $this->getRedis();
+        return $this->findRange('-', '+', $limit);
+    }
 
-        try {
-            if (null === $limit) {
-                $range = $redis->xRange($this->stream, '-', '+');
-            } else {
-                $range = $redis->xRange($this->stream, '-', '+', $limit);
+    /**
+     * Reads the stream in batches, so that it is not loaded in memory at once.
+     *
+     * The entries added after the listing started are not listed.
+     *
+     * @return \Generator<int, array{id: string, data: mixed}>
+     */
+    public function findAllInBatches(): \Generator
+    {
+        if (!$last = $this->findRange('+', '-', 1, true)) {
+            return;
+        }
+
+        $start = '-';
+
+        do {
+            $messages = $this->findRange($start, $last[0]['id'], self::LISTING_BATCH_SIZE);
+
+            foreach ($messages as $message) {
+                yield $message;
             }
-        } catch (\RedisException|\RedisClusterException|\Relay\Exception $e) {
-            $this->redis = null;
 
-            throw new TransportException($e->getMessage(), 0, $e);
-        }
-
-        if (!$range) {
-            if ($error = $redis->getLastError() ?: null) {
-                $redis->clearLastError();
+            if ($messages) {
+                // XRANGE includes its start, so the next batch starts at the id that follows the last one
+                [$time, $sequence] = explode('-', end($messages)['id']);
+                $start = $time.'-'.((int) $sequence + 1);
             }
-
-            return [];
-        }
-
-        $messages = [];
-        foreach ($range as $id => $data) {
-            $messages[] = [
-                'id' => $id,
-                'data' => $data,
-            ];
-        }
-
-        return $messages;
+        } while (self::LISTING_BATCH_SIZE === \count($messages));
     }
 
     public function find(mixed $id): ?array
@@ -1116,5 +1117,42 @@ class Connection
         }
 
         return $redis->xadd($this->stream, '*', ['message' => $message]);
+    }
+
+    private function findRange(string $start, string $end, ?int $count, bool $reverse = false): array
+    {
+        $redis = $this->getRedis();
+
+        try {
+            if (null === $count) {
+                $range = $redis->xRange($this->stream, $start, $end);
+            } elseif ($reverse) {
+                $range = $redis->xRevRange($this->stream, $start, $end, $count);
+            } else {
+                $range = $redis->xRange($this->stream, $start, $end, $count);
+            }
+        } catch (\RedisException|\RedisClusterException|\Relay\Exception $e) {
+            $this->redis = null;
+
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if (!$range) {
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
+            }
+
+            return [];
+        }
+
+        $messages = [];
+        foreach ($range as $id => $data) {
+            $messages[] = [
+                'id' => $id,
+                'data' => $data,
+            ];
+        }
+
+        return $messages;
     }
 }

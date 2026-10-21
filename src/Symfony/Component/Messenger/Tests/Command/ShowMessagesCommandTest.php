@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\Attributes\BackupGlobals;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -21,6 +22,7 @@ use Symfony\Component\Messenger\Command\ShowMessagesCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
@@ -94,7 +96,7 @@ class ShowMessagesCommandTest extends TestCase
     public function testListMessagesReturnsFilteredByClassMessage()
     {
         $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->expects($this->once())->method('all')->with(50)->willReturn([
+        $receiver->expects($this->once())->method('all')->with(null)->willReturn([
             new Envelope(new \stdClass(), [new TransportMessageIdStamp(15)]),
             new Envelope(new DummyMessage('Hello'), [new TransportMessageIdStamp(16)]),
         ]);
@@ -109,6 +111,88 @@ class ShowMessagesCommandTest extends TestCase
         $this->assertStringContainsString('16   '.DummyMessage::class, $display);
         $this->assertStringContainsString('Showing 1 message(s).', $display);
         $this->assertStringNotContainsString('stdClass', $display);
+    }
+
+    public function testListMessagesAppliesMaxAfterClassFilter()
+    {
+        $command = new ShowMessagesCommand(new ServiceLocator(['async' => fn () => $this->createInMemoryTransport(10, 3)]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['transport' => 'async', '--class-filter' => DummyMessage::class, '--max' => 2]);
+
+        $display = $tester->getDisplay(true);
+        $this->assertStringContainsString('11   '.DummyMessage::class, $display);
+        $this->assertStringContainsString('12   '.DummyMessage::class, $display);
+        $this->assertStringNotContainsString('13   ', $display);
+        $this->assertStringContainsString('Showing first 2 messages.', $display);
+    }
+
+    public function testListMessagesStopsReadingAfterMaxMatches()
+    {
+        $read = 0;
+        $receiver = $this->createStub(ListableReceiverInterface::class);
+        $receiver->method('all')->willReturnCallback(static function () use (&$read) {
+            foreach ([11, 12, 13, 14] as $id) {
+                ++$read;
+
+                yield new Envelope(new DummyMessage('Hello'), [new TransportMessageIdStamp($id)]);
+            }
+        });
+
+        $command = new ShowMessagesCommand(new ServiceLocator(['async' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['transport' => 'async', '--class-filter' => DummyMessage::class, '--max' => 2]);
+
+        $display = $tester->getDisplay(true);
+        $this->assertStringContainsString('12   '.DummyMessage::class, $display);
+        $this->assertStringNotContainsString('13   ', $display);
+        $this->assertSame(2, $read);
+    }
+
+    #[DataProvider('provideMaxThatSelectsNothing')]
+    public function testListMessagesDoesNotReadTheReceiverWhenMaxSelectsNoMatchingMessage(int $max)
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->never())->method('all');
+
+        $command = new ShowMessagesCommand(new ServiceLocator(['async' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['transport' => 'async', '--class-filter' => DummyMessage::class, '--max' => $max]);
+
+        $this->assertStringContainsString('[OK] No pending messages were found.', $tester->getDisplay(true));
+    }
+
+    public static function provideMaxThatSelectsNothing(): iterable
+    {
+        yield [0];
+        yield [-1];
+    }
+
+    #[DataProvider('provideMaxWithoutClassFilter')]
+    public function testMaxIsPassedToTheReceiverWithoutClassFilter(array $options, int $max, string $expected)
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->with($max)->willReturn([
+            new Envelope(new \stdClass(), [new TransportMessageIdStamp(15)]),
+            new Envelope(new \stdClass(), [new TransportMessageIdStamp(16)]),
+            new Envelope(new \stdClass(), [new TransportMessageIdStamp(17)]),
+        ]);
+
+        $command = new ShowMessagesCommand(new ServiceLocator(['async' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['transport' => 'async', '--max' => $max] + $options);
+
+        $this->assertStringContainsString($expected, $tester->getDisplay(true));
+    }
+
+    public static function provideMaxWithoutClassFilter(): iterable
+    {
+        yield 'list' => [[], 2, '17   stdClass'];
+        yield 'list with a negative max' => [[], -1, '17   stdClass'];
+        yield 'stats' => [['--stats' => true], 2, 'stdClass   3'];
     }
 
     public function testStatsIgnoresDefaultMaxAndCountsAllMessages()
@@ -154,6 +238,18 @@ class ShowMessagesCommandTest extends TestCase
 
         $display = $tester->getDisplay(true);
         $this->assertStringContainsString(DummyMessage::class.'   1', $display);
+        $this->assertStringNotContainsString('stdClass', $display);
+    }
+
+    public function testStatsAppliesMaxAfterClassFilter()
+    {
+        $command = new ShowMessagesCommand(new ServiceLocator(['async' => fn () => $this->createInMemoryTransport(10, 3)]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['transport' => 'async', '--stats' => true, '--class-filter' => DummyMessage::class, '--max' => 2]);
+
+        $display = $tester->getDisplay(true);
+        $this->assertStringContainsString(DummyMessage::class.'   2', $display);
         $this->assertStringNotContainsString('stdClass', $display);
     }
 
@@ -279,5 +375,20 @@ class ShowMessagesCommandTest extends TestCase
         $tester = new CommandCompletionTester($command);
 
         $this->assertSame(['async', 'failed'], $tester->complete(['']));
+    }
+
+    private function createInMemoryTransport(int $otherMessages, int $dummyMessages): InMemoryTransport
+    {
+        $transport = new InMemoryTransport();
+
+        for ($i = 0; $i < $otherMessages; ++$i) {
+            $transport->send(new Envelope(new \stdClass()));
+        }
+
+        for ($i = 0; $i < $dummyMessages; ++$i) {
+            $transport->send(new Envelope(new DummyMessage('Hello')));
+        }
+
+        return $transport;
     }
 }

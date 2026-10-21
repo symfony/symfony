@@ -221,6 +221,15 @@ class TranslatorTest extends TestCase
         $this->assertSame(['two', 'tail'], $this->getElementIds($xpath, $translator, 'li:nth-last-child(-2n+5 of .active, .special)'));
         $this->assertSame(['two'], $this->getElementIds($xpath, $translator, 'li:nth-child(2 OF .active, .special)'));
         $this->assertSame(['two'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of li:nth-child(2 of .active, .special))'));
+        $this->assertSame(['one'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of .active)'));
+        $this->assertSame(['tail'], $this->getElementIds($xpath, $translator, 'li:nth-last-child(1 of .special)'));
+        $this->assertSame(['outside'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of li:nth-child(1))'));
+        $this->assertSame(['other'], $this->getElementIds($xpath, $translator, 'li:nth-last-child(1 of li:nth-last-child(1))'));
+        $this->assertSame(['both'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of :is(li:nth-child(2 of .active)))'));
+        $this->assertSame(['outside'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of :not(li:nth-child(2 of .active)))'));
+        $this->assertSame(['one'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of :has(> span:first-child))'));
+        $this->assertSame(['both'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of .special + .active)'));
+        $this->assertSame(['both'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of .active ~ .active)'));
         $this->assertSame(['one'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of li:has(> span).active)'));
         $this->assertSame(['one'], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of [CLASS~="active"])'));
         $this->assertSame([], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of :is(::before))'));
@@ -228,6 +237,12 @@ class TranslatorTest extends TestCase
         $this->assertSame([], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of :is())'));
         $this->assertSame([], $this->getElementIds($xpath, $translator, 'li:nth-child(1 of :where())'));
         $this->assertSame(['outside', 'one', 'two', 'both', 'tail', 'other'], $this->getElementIds($xpath, $translator, 'li:nth-child(n of *)'));
+
+        $this->assertStringContainsString('not(preceding-sibling::*[', $translator->cssToXPath('li:nth-child(1 of .active)'));
+        $this->assertStringContainsString('not(following-sibling::*[', $translator->cssToXPath('li:nth-last-child(1 of .special)'));
+        $this->assertStringContainsString('not(preceding-sibling::*[true()][1])', $translator->cssToXPath('li:nth-child(1 of li:nth-child(1))'));
+        $this->assertStringContainsString('preceding-sibling::*[1]/self::*[', $translator->cssToXPath('li:nth-child(1 of .special + .active)'));
+        $this->assertMatchesRegularExpression('/preceding-sibling::\*\[.*\]\[1\]/', $translator->cssToXPath('li:nth-child(1 of .active ~ .active)'));
     }
 
     #[DataProvider('getUntypedOfTypeInSelectorListTestData')]

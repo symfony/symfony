@@ -120,6 +120,32 @@ class ParserTest extends TestCase
         (new Parser())->parse(str_repeat(':nth-child(1 of ', 17).'*'.str_repeat(')', 17));
     }
 
+    public function testNthSelectorListNestingLimitAndParserReuse()
+    {
+        $parser = new Parser();
+        $this->assertCount(1, $parser->parse(':nth-child(1 of :nth-child(1 of .item))'));
+        $this->assertCount(1, $parser->parse(':nth-last-child(1 of :nth-last-child(1 of .item))'));
+
+        foreach ([
+            ':nth-child(1 of :nth-child(1 of :nth-child(1 of .item)))',
+            ':nth-child(1 of :is(:nth-child(1 of :nth-child(1 of .item))))',
+            ':nth-child(1 of :not(:nth-child(1 of :nth-child(1 of .item))))',
+            ':nth-child(1 of :has(:nth-child(1 of :nth-child(1 of .item))))',
+            ':nth-last-child(1 of :nth-last-child(1 of :nth-last-child(1 of .item)))',
+        ] as $selector) {
+            try {
+                $parser->parse($selector);
+                $this->fail('The third nested "of" list should be rejected.');
+            } catch (SyntaxErrorException $e) {
+                $identifier = str_starts_with($selector, ':nth-last-child') ? 'nth-last-child' : 'nth-child';
+                $this->assertSame('Got too deeply nested :'.$identifier.'().', $e->getMessage());
+            }
+
+            $this->assertCount(1, $parser->parse(':nth-child(1 of .item)'));
+            $this->assertCount(1, $parser->parse(':nth-last-child(1 of .item)'));
+        }
+    }
+
     public static function getParserTestData()
     {
         return [

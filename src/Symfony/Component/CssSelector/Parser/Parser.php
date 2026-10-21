@@ -30,10 +30,12 @@ class Parser implements ParserInterface
 {
     private const HAS_NESTING_LIMIT = 16;
     private const NESTING_LIMIT = 16;
+    private const NTH_OF_NESTING_LIMIT = 2;
 
     private Tokenizer $tokenizer;
     private int $hasNestingDepth = 0;
     private int $nestingDepth = 0;
+    private int $nthOfNestingDepth = 0;
 
     public function __construct(?Tokenizer $tokenizer = null)
     {
@@ -421,7 +423,18 @@ class Parser implements ParserInterface
             }
 
             if ($arguments && $whitespace && $next->isIdentifier() && 'of' === strtolower($next->getValue())) {
-                $selectorList = $this->parseNestedSelectorList($stream, $identifier, true);
+                if ($this->nthOfNestingDepth >= self::NTH_OF_NESTING_LIMIT) {
+                    throw new SyntaxErrorException(\sprintf('Got too deeply nested :%s().', $identifier));
+                }
+
+                ++$this->nthOfNestingDepth;
+
+                try {
+                    $selectorList = $this->parseNestedSelectorList($stream, $identifier, true);
+                } finally {
+                    --$this->nthOfNestingDepth;
+                }
+
                 $closingToken = $stream->getNext();
                 if (!$closingToken->isDelimiter([')'])) {
                     throw SyntaxErrorException::unexpectedToken('")"', $closingToken);

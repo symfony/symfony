@@ -84,6 +84,13 @@ class FunctionExtension extends AbstractExtension
             $translator = $this->translator?->get() ?? throw new ExpressionErrorException('The translator is not set.');
             $selectorCondition = $this->selectorListCondition($function->getSelectorList(), $translator);
             $siblings = $last ? 'following-sibling' : 'preceding-sibling';
+
+            if (0 === $a && 1 === $b) {
+                return $xpath
+                    ->addCondition($selectorCondition)
+                    ->addCondition('not('.$siblings.'::*['.$selectorCondition.'][1])');
+            }
+
             $index = \sprintf('count(%s::*[%s]) + 1', $siblings, $selectorCondition);
 
             return $xpath
@@ -217,11 +224,18 @@ class FunctionExtension extends AbstractExtension
         if ($node instanceof CombinedSelectorNode) {
             $left = $this->nodeCondition($node->getSelector(), $translator);
             $right = $this->nodeCondition($node->getSubSelector(), $translator);
+
+            if ('+' === $node->getCombinator()) {
+                return \sprintf('(%s) and boolean(preceding-sibling::*[1]/self::*[%s])', $right, $left);
+            }
+
+            if ('~' === $node->getCombinator()) {
+                return \sprintf('(%s) and boolean(preceding-sibling::*[%s][1])', $right, $left);
+            }
+
             $axis = match ($node->getCombinator()) {
                 '>' => 'parent::*',
                 ' ' => 'ancestor::*',
-                '+' => 'preceding-sibling::*[1]',
-                '~' => 'preceding-sibling::*',
                 default => throw new ExpressionErrorException(\sprintf('Combiner "%s" not supported.', $node->getCombinator())),
             };
 
@@ -253,6 +267,11 @@ class FunctionExtension extends AbstractExtension
                 ? $this->selectorListCondition($node->getSelectorList(), $translator)
                 : 'true()';
             $siblings = 'nth-last-child' === $node->getName() ? 'following-sibling' : 'preceding-sibling';
+
+            if (0 === $a && 1 === $b) {
+                return \sprintf('(%s) and (%s) and not(%s::*[%s][1])', $selectorCondition, $filterCondition, $siblings, $filterCondition);
+            }
+
             $index = \sprintf('count(%s::*[%s]) + 1', $siblings, $filterCondition);
 
             return \sprintf('(%s) and (%s) and (%s)', $selectorCondition, $filterCondition, $this->nthCondition($index, $a, $b));

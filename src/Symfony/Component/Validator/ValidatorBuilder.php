@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\Factory\SharedMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
@@ -51,6 +52,7 @@ class ValidatorBuilder
     private ConstraintValidatorFactoryInterface $validatorFactory;
     private ?ContainerInterface $groupProviderLocator = null;
     private ?CacheItemPoolInterface $mappingCache = null;
+    private ?string $sharedMetadataKey = null;
     private ?TranslatorInterface $translator = null;
     private string|false|null $translationDomain = null;
     private bool $propertyMetadataExistenceCheck = false;
@@ -287,6 +289,24 @@ class ValidatorBuilder
     }
 
     /**
+     * Sets a key so that the validators created with it share the metadata they load.
+     *
+     * The validators that use the same key must use the same mapping.
+     *
+     * @return $this
+     */
+    public function setSharedMetadataKey(?string $key): static
+    {
+        if (null !== $this->metadataFactory) {
+            throw new ValidatorException('You cannot set a shared metadata key after setting a custom metadata factory. Configure your metadata factory instead.');
+        }
+
+        $this->sharedMetadataKey = $key;
+
+        return $this;
+    }
+
+    /**
      * Sets the constraint validator factory used by the validator.
      *
      * @return $this
@@ -398,6 +418,10 @@ class ValidatorBuilder
             }
 
             $metadataFactory = new LazyLoadingMetadataFactory($loader, $this->mappingCache);
+
+            if (null !== $this->sharedMetadataKey) {
+                $metadataFactory = new SharedMetadataFactory($metadataFactory, $this->sharedMetadataKey);
+            }
         }
 
         $validatorFactory = $this->validatorFactory ?? new ConstraintValidatorFactory();

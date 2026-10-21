@@ -678,6 +678,23 @@ class SerializerPassTest extends TestCase
         $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($context, false));
     }
 
+    public function testNamedSerializersDoNotShareTheCacheOfTheDefaultSerializer()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('.serializer.named_serializers', ['api' => []]);
+
+        $container->register('serializer')->setArguments([null, null])->setArgument('$sharedCacheKey', 'build_id');
+        $container->register('n')->addTag('serializer.normalizer', ['serializer' => '*']);
+        $container->register('e')->addTag('serializer.encoder', ['serializer' => '*']);
+
+        $serializerPass = new SerializerPass();
+        $serializerPass->process($container);
+
+        $this->assertSame('build_id', $container->getDefinition('serializer')->getArgument('$sharedCacheKey'));
+        $this->assertNull($container->getDefinition('serializer.api')->getArgument('$sharedCacheKey'));
+    }
+
     public function testNamedSerializersAreRegistered()
     {
         $container = new ContainerBuilder();

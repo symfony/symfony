@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Mime\Header\Headers;
@@ -33,6 +34,7 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Serializer\Mapping\Factory\SharedClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -167,6 +169,14 @@ class SerializerBundle extends AbstractBundle
                 ->replaceArgument(1, new Reference('cache.serializer'));
         }
 
+        if (!$container->getParameter('kernel.debug')) {
+            // the containers created by kernel resets share the metadata they load, until the container is rebuilt
+            $container->register('serializer.mapping.shared_class_metadata_factory', SharedClassMetadataFactory::class)
+                ->setDecoratedService('serializer.mapping.class_metadata_factory')
+                ->setArguments([new Reference('.inner'), new Parameter('container.build_id')]);
+            $container->getDefinition('serializer')->setArgument('$sharedCacheKey', new Parameter('container.build_id'));
+        }
+
         $serializerLoaders = [];
 
         // When attributes are disabled, it means from runtime-discovery only; autoconfiguration should still happen.
@@ -251,6 +261,11 @@ class SerializerBundle extends AbstractBundle
         if ($config['name_converter'] ?? false) {
             $container->setParameter('.serializer.name_converter', $config['name_converter']);
             $container->getDefinition('serializer.name_converter.metadata_aware')->setArgument(1, new Reference($config['name_converter']));
+        }
+
+        if (!$container->getParameter('kernel.debug')) {
+            // the converters created by kernel resets share the names they resolve, until the container is rebuilt
+            $container->getDefinition('serializer.name_converter.metadata_aware')->setArgument('$sharedCacheKey', new Parameter('container.build_id'));
         }
 
         $defaultContext = $config['default_context'] ?? [];

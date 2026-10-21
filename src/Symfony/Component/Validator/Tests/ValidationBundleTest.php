@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPa
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -67,7 +68,9 @@ class ValidationBundleTest extends TestCase
         $this->assertSame(['loadValidatorMetadata'], $calls[5][1]);
         $this->assertSame('setMappingCache', $calls[6][0]);
         $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[6][1]);
-        $this->assertCount(7, $calls);
+        $this->assertSame('setSharedMetadataKey', $calls[7][0]);
+        $this->assertEquals([new Parameter('container.build_id')], $calls[7][1]);
+        $this->assertCount(8, $calls);
     }
 
     public function testAttributeMappingCanBeDisabled()
@@ -94,6 +97,12 @@ class ValidationBundleTest extends TestCase
     {
         $this->assertContains('setMappingCache', $this->methodCalls([]));
         $this->assertNotContains('setMappingCache', $this->methodCalls([], debug: true));
+    }
+
+    public function testTheMetadataIsOnlySharedOutsideDebugMode()
+    {
+        $this->assertContains('setSharedMetadataKey', $this->methodCalls([]));
+        $this->assertNotContains('setSharedMetadataKey', $this->methodCalls([], debug: true));
     }
 
     public function testTranslationCanBeDisabled()
@@ -328,6 +337,7 @@ class ValidationBundleTest extends TestCase
             'kernel.enabled_locales' => [],
             'kernel.bundles_metadata' => [],
             'kernel.container_class' => 'TestContainer',
+            'container.build_id' => 'abc123',
         ]));
 
         // what the neighbouring bundles would have registered

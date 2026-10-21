@@ -1256,7 +1256,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(10, $calls);
+        $this->assertCount(11, $calls);
         $this->assertSame('addXmlMappings', $calls[4][0]);
         $this->assertSame('addYamlMappings', $calls[5][0]);
         $this->assertSame('addMappedClasses', $calls[6][0]);
@@ -1265,6 +1265,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(['loadValidatorMetadata'], $calls[8][1]);
         $this->assertSame('setMappingCache', $calls[9][0]);
         $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[9][1]);
+        $this->assertSame('setSharedMetadataKey', $calls[10][0]);
+        $this->assertEquals([new Parameter('container.build_id')], $calls[10][1]);
 
         $xmlMappings = $calls[4][1][0];
 

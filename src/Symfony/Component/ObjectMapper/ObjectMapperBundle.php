@@ -17,8 +17,13 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\ObjectMapper\DependencyInjection\ReverseMappingPass;
+use Symfony\Component\ObjectMapper\Metadata\SharedClassMetadataFactory;
+use Symfony\Component\ObjectMapper\Metadata\SharedPropertyMetadataFactory;
+use Symfony\Component\ObjectMapper\Metadata\SharedPropertyNameCollectionFactory;
 
 /**
  * Provides the object mapper services.
@@ -46,6 +51,18 @@ class ObjectMapperBundle extends AbstractBundle
             $container->removeDefinition('object_mapper.metadata.cache_class_metadata_factory');
             $container->removeDefinition('object_mapper.metadata.cache_property_name_collection_factory');
             $container->removeDefinition('object_mapper.metadata.cache_property_metadata_factory');
+        } else {
+            // the containers created by kernel resets share the metadata they load, until the container is rebuilt
+            $buildId = new Parameter('container.build_id');
+            $container->register('object_mapper.metadata.shared_class_metadata_factory', SharedClassMetadataFactory::class)
+                ->setDecoratedService('object_mapper.class_metadata_factory')
+                ->setArguments([new Reference('.inner'), $buildId]);
+            $container->register('object_mapper.metadata.shared_property_name_collection_factory', SharedPropertyNameCollectionFactory::class)
+                ->setDecoratedService('object_mapper.property_name_collection_factory')
+                ->setArguments([new Reference('.inner'), $buildId]);
+            $container->register('object_mapper.metadata.shared_property_metadata_factory', SharedPropertyMetadataFactory::class)
+                ->setDecoratedService('object_mapper.property_metadata_factory')
+                ->setArguments([new Reference('.inner'), $buildId]);
         }
 
         $container->registerForAutoconfiguration(TransformCallableInterface::class)

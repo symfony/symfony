@@ -13,8 +13,11 @@ namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
 use Symfony\Component\Validator\ValidatorBuilder;
@@ -78,6 +81,29 @@ class ValidatorBuilderTest extends TestCase
     public function testSetMappingCache()
     {
         $this->assertSame($this->builder, $this->builder->setMappingCache($this->createStub(CacheItemPoolInterface::class)));
+    }
+
+    public function testSetSharedMetadataKey()
+    {
+        $this->assertSame($this->builder, $this->builder->setSharedMetadataKey('key'));
+    }
+
+    public function testValidatorsCreatedWithTheSameSharedMetadataKeyShareTheMetadataTheyLoad()
+    {
+        $metadata = $this->builder->setMappingCache(new ArrayAdapter())->setSharedMetadataKey(__METHOD__)->getValidator()->getMetadataFor(\stdClass::class);
+
+        $this->assertSame($metadata, (new ValidatorBuilder())->setSharedMetadataKey(__METHOD__)->getValidator()->getMetadataFor(\stdClass::class));
+        $this->assertNotSame($metadata, (new ValidatorBuilder())->setSharedMetadataKey(__METHOD__.'2')->getValidator()->getMetadataFor(\stdClass::class));
+        $this->assertNotSame($metadata, (new ValidatorBuilder())->setMappingCache(new ArrayAdapter())->getValidator()->getMetadataFor(\stdClass::class));
+    }
+
+    public function testSharedMetadataKeyCannotBeSetAfterACustomMetadataFactory()
+    {
+        $this->builder->setMetadataFactory($this->createStub(MetadataFactoryInterface::class));
+
+        $this->expectException(ValidatorException::class);
+
+        $this->builder->setSharedMetadataKey('key');
     }
 
     public function testSetConstraintValidatorFactory()

@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
@@ -244,6 +245,8 @@ class ValidationBundle extends AbstractBundle
 
         if (!$container->getParameter('kernel.debug')) {
             $validatorBuilder->addMethodCall('setMappingCache', [new Reference('validator.mapping.cache.adapter')]);
+            // the validators created by kernel resets share the metadata they load, until the container is rebuilt
+            $validatorBuilder->addMethodCall('setSharedMetadataKey', [new Parameter('container.build_id')]);
         }
 
         if ($config['disable_translation']) {

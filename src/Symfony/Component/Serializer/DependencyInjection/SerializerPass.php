@@ -183,6 +183,7 @@ class SerializerPass implements CompilerPassInterface
 
             $container->registerChild($serializerId, 'serializer')
                 ->setArgument('$defaultContext', $config['default_context'])
+                ->setArgument('$sharedCacheKey', null);
                 ->addTag('kernel.reset', ['method' => 'shutdown', 'on_invalid' => 'ignore', 'on_shutdown' => 'only']);
             $container->registerAliasForArgument($serializerId, SerializerInterface::class, $serializerName.'.serializer', $serializerName);
             $container->registerAliasForArgument($serializerId, NormalizerInterface::class, $serializerName.'.normalizer', $serializerName);

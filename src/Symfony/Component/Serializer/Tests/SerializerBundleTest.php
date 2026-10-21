@@ -431,6 +431,12 @@ class SerializerBundleTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $container->getParameter('serializer.default_context'));
     }
 
+    public function testTheMetadataAwareNameConverterSharesTheNamesItResolvesOutsideDebugMode()
+    {
+        $this->assertEquals(new Parameter('container.build_id'), $this->load(['enabled' => true])->getDefinition('serializer.name_converter.metadata_aware')->getArgument('$sharedCacheKey'));
+        $this->assertArrayNotHasKey('$sharedCacheKey', $this->load(['enabled' => true], debug: true)->getDefinition('serializer.name_converter.metadata_aware')->getArguments());
+    }
+
     public function testNamedSerializersReservedName()
     {
         $this->expectException(InvalidConfigurationException::class);

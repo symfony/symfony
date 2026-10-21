@@ -21,6 +21,16 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 final class MetadataAwareNameConverter implements NameConverterInterface
 {
     /**
+     * @var array<string, array<string, array<string, string|false>>>
+     */
+    private static array $sharedNormalizeCache = [];
+
+    /**
+     * @var array<string, array<string, array<string, string>>>
+     */
+    private static array $sharedAttributesMetadataCache = [];
+
+    /**
      * @var array<string, array<string, string|false>>
      */
     private array $normalizeCache = [];
@@ -35,9 +45,13 @@ final class MetadataAwareNameConverter implements NameConverterInterface
      */
     private array $attributesMetadataCache = [];
 
+    /**
+     * @param string|null $sharedCacheKey Converters created with the same key share the names they resolve, so they must use the same metadata
+     */
     public function __construct(
         private readonly ClassMetadataFactoryInterface $metadataFactory,
         private readonly ?NameConverterInterface $fallbackNameConverter = null,
+        private readonly ?string $sharedCacheKey = null,
     ) {
     }
 
@@ -47,7 +61,10 @@ final class MetadataAwareNameConverter implements NameConverterInterface
             return $this->normalizeFallback($propertyName, $class, $format, $context);
         }
 
-        $name = $this->normalizeCache[$this->getCacheKey($class, $context)][$propertyName] ??= $this->getCacheValueForNormalization($propertyName, $class, $context) ?? false;
+        $cacheKey = $this->getCacheKey($class, $context);
+        $name = $this->normalizeCache[$cacheKey][$propertyName] ??= null === $this->sharedCacheKey
+            ? $this->getCacheValueForNormalization($propertyName, $class, $context) ?? false
+            : self::$sharedNormalizeCache[$this->sharedCacheKey][$cacheKey][$propertyName] ??= $this->getCacheValueForNormalization($propertyName, $class, $context) ?? false;
 
         return false !== $name ? $name : $this->normalizeFallback($propertyName, $class, $format, $context);
     }
@@ -102,7 +119,9 @@ final class MetadataAwareNameConverter implements NameConverterInterface
     {
         $cacheKey = $this->getCacheKey($class, $context);
         if (!\array_key_exists($cacheKey, $this->attributesMetadataCache)) {
-            $this->attributesMetadataCache[$cacheKey] = $this->getCacheValueForAttributesMetadata($class, $context);
+            $this->attributesMetadataCache[$cacheKey] = null === $this->sharedCacheKey
+                ? $this->getCacheValueForAttributesMetadata($class, $context)
+                : self::$sharedAttributesMetadataCache[$this->sharedCacheKey][$cacheKey] ??= $this->getCacheValueForAttributesMetadata($class, $context);
         }
 
         return $this->attributesMetadataCache[$cacheKey][$propertyName] ?? null;

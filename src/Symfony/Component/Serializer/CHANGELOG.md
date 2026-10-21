@@ -28,6 +28,7 @@ CHANGELOG
  * Build the collection class declared for a property, e.g. `ArrayCollection<int, User>`, from its denormalized elements when the property does not accept an array
  * Add `Serializer::shutdown()` to break the reference cycles between a serializer and its normalizers, called when the kernel shuts down
  * Add argument `$sharedCacheKey` to `Serializer::__construct()` to share which normalizers support which types between serializers
+ * Add argument `$sharedCacheKey` to `MetadataAwareNameConverter::__construct()` to share the resolved names between converters
 
 8.1
 ---

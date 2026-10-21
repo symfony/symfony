@@ -263,6 +263,11 @@ class SerializerBundle extends AbstractBundle
             $container->getDefinition('serializer.name_converter.metadata_aware')->setArgument(1, new Reference($config['name_converter']));
         }
 
+        if (!$container->getParameter('kernel.debug')) {
+            // the converters created by kernel resets share the names they resolve, until the container is rebuilt
+            $container->getDefinition('serializer.name_converter.metadata_aware')->setArgument('$sharedCacheKey', new Parameter('container.build_id'));
+        }
+
         $defaultContext = $config['default_context'] ?? [];
 
         if ($defaultContext) {

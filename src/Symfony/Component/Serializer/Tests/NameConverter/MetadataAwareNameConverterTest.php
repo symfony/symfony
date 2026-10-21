@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
@@ -433,6 +434,57 @@ final class MetadataAwareNameConverterTest extends TestCase
 
         $this->assertSame('foo', $attributes->normalize('foo', ScalarDummy::class));
         $this->assertSame('yaml_foo', $attributes->denormalize('yaml_foo', ScalarDummy::class));
+    }
+
+    public function testConvertersCreatedWithTheSameSharedCacheKeyShareTheNamesTheyResolve()
+    {
+        $nameConverter = new MetadataAwareNameConverter($this->createYamlMetadataFactory(), null, __METHOD__);
+        $nameConverter->normalize('foo', ScalarDummy::class);
+        $nameConverter->denormalize('yaml_foo', ScalarDummy::class);
+
+        $metadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
+        $metadataFactory->expects($this->never())->method('hasMetadataFor');
+        $nameConverter = new MetadataAwareNameConverter($metadataFactory, null, __METHOD__);
+
+        $this->assertSame('yaml_foo', $nameConverter->normalize('foo', ScalarDummy::class));
+        $this->assertSame('foo', $nameConverter->denormalize('yaml_foo', ScalarDummy::class));
+    }
+
+    public function testConvertersCreatedWithDifferentSharedCacheKeysDoNotShare()
+    {
+        (new MetadataAwareNameConverter($this->createYamlMetadataFactory(), null, __METHOD__.'1'))->normalize('foo', ScalarDummy::class);
+
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader()), null, __METHOD__.'2');
+
+        $this->assertSame('foo', $nameConverter->normalize('foo', ScalarDummy::class));
+        $this->assertSame('yaml_foo', $nameConverter->denormalize('yaml_foo', ScalarDummy::class));
+    }
+
+    public function testConvertersCreatedWithoutSharedCacheKeyDoNotShare()
+    {
+        (new MetadataAwareNameConverter($this->createYamlMetadataFactory()))->normalize('foo', ScalarDummy::class);
+
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader()));
+
+        $this->assertSame('foo', $nameConverter->normalize('foo', ScalarDummy::class));
+        $this->assertSame('yaml_foo', $nameConverter->denormalize('yaml_foo', ScalarDummy::class));
+    }
+
+    public function testCloningAConverterCreatedWithASharedCacheKey()
+    {
+        $nameConverter = new MetadataAwareNameConverter($this->createYamlMetadataFactory(), null, __METHOD__);
+        $nameConverter->normalize('foo', ScalarDummy::class);
+        $clone = clone $nameConverter;
+
+        $this->assertSame('yaml_foo', $clone->normalize('foo', ScalarDummy::class));
+        $this->assertSame('foo', $clone->denormalize('yaml_foo', ScalarDummy::class));
+        $this->assertSame('yaml_foo', $nameConverter->normalize('foo', ScalarDummy::class));
+        $this->assertSame('foo', $nameConverter->denormalize('yaml_foo', ScalarDummy::class));
+    }
+
+    private function createYamlMetadataFactory(): ClassMetadataFactory
+    {
+        return new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/serialized-name-mapping.yml'));
     }
 }
 

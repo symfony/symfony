@@ -964,6 +964,36 @@ class PhpDocExtractorTest extends TestCase
 
     /**
      * @param class-string $class
+     */
+    #[DataProvider('selfDocBlockInNestedTypeProvider')]
+    public function testSelfDocBlockInNestedTypeResolvesClass(string $class, string $property, Type $expectedType)
+    {
+        $this->assertEquals($expectedType, $this->extractor->getType($class, $property));
+    }
+
+    /**
+     * @return iterable<string, array{0: class-string, 1: string, 2: Type}>
+     */
+    public static function selfDocBlockInNestedTypeProvider(): iterable
+    {
+        $parent = Type::object(ParentWithSelfDocBlock::class);
+        $child = Type::object(ChildWithSelfDocBlock::class);
+
+        yield 'self collection' => [ParentWithSelfDocBlock::class, 'selfCollectionProp', Type::array($parent)];
+        yield 'self collection from child' => [ChildWithSelfDocBlock::class, 'selfCollectionProp', Type::array($parent)];
+        yield 'static collection' => [ParentWithSelfDocBlock::class, 'staticCollectionProp', Type::dict($parent)];
+        yield 'static collection from child' => [ChildWithSelfDocBlock::class, 'staticCollectionProp', Type::dict($child)];
+        yield 'parent collection' => [ChildWithSelfDocBlock::class, 'parentCollectionProp', Type::list($parent)];
+        yield 'nullable self' => [ChildWithSelfDocBlock::class, 'nullableSelfProp', Type::nullable($parent)];
+        yield 'self or int' => [ParentWithSelfDocBlock::class, 'selfOrIntProp', Type::union($parent, Type::int())];
+        yield 'nullable self or int' => [ParentWithSelfDocBlock::class, 'nullableSelfOrIntProp', Type::nullable(Type::union($parent, Type::int()))];
+        yield 'self or static' => [ParentWithSelfDocBlock::class, 'selfOrStaticProp', $parent];
+        yield 'self or static from child' => [ChildWithSelfDocBlock::class, 'selfOrStaticProp', Type::union($parent, $child)];
+        yield 'collection of self or int' => [ParentWithSelfDocBlock::class, 'selfOrIntCollectionProp', Type::array(Type::union($parent, Type::int()), Type::int())];
+    }
+
+    /**
+     * @param class-string $class
      * @param class-string $expectedResolvedClass
      */
     #[DataProvider('selfDocBlockResolutionProvider')]

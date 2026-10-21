@@ -14,9 +14,44 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor;
 class ParentWithSelfDocBlock
 {
     /**
+     * @var ?self
+     */
+    public $nullableSelfProp;
+
+    /**
+     * @var self|int
+     */
+    public $selfOrIntProp;
+
+    /**
+     * @var self|int|null
+     */
+    public $nullableSelfOrIntProp;
+
+    /**
+     * @var self|static
+     */
+    public $selfOrStaticProp;
+
+    /**
+     * @var array<int, self|int>
+     */
+    public $selfOrIntCollectionProp;
+
+    /**
      * @var self
      */
     public $selfProp;
+
+    /**
+     * @var self[]
+     */
+    public $selfCollectionProp;
+
+    /**
+     * @var array<string, static>
+     */
+    public $staticCollectionProp;
 
     /**
      * @return self
@@ -36,6 +71,10 @@ class ParentWithSelfDocBlock
 
 class ChildWithSelfDocBlock extends ParentWithSelfDocBlock
 {
+    /**
+     * @var list<parent>
+     */
+    public $parentCollectionProp;
 }
 
 trait TraitWithSelfDocBlock

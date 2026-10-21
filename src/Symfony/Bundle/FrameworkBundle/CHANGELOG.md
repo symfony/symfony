@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Set the default locale of the intl extension to `framework.default_locale` when a console command starts, like HTTP requests do
  * Resolve the env vars of the `framework.disallow_search_engine_index` option while the container is compiled
  * Resolve the env vars of the `framework.test` option while the container is compiled
  * Default `framework.session.storage_factory_id` to `session.storage.factory.mock_file` when `framework.test` is `true`

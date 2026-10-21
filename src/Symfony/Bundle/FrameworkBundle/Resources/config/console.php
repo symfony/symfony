@@ -32,6 +32,7 @@ use Symfony\Bundle\FrameworkBundle\Command\SecretsSetCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintSchemaResolver;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\EventListener\ConsoleLocaleListener;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
@@ -56,6 +57,13 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.event_subscriber')
             ->tag('container.remove_if_missing', ['service' => 'validator'])
+
+        ->set('.console.locale_listener', ConsoleLocaleListener::class)
+            ->args([
+                param('kernel.default_locale'),
+                service('request_stack'),
+            ])
+            ->tag('kernel.event_subscriber')
 
         ->set('console.command.about', AboutCommand::class)
             ->tag('console.command')

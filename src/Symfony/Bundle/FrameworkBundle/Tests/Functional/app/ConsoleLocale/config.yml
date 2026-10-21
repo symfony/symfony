@@ -1,0 +1,5 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    default_locale: fr

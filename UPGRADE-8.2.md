@@ -210,6 +210,7 @@ FrameworkBundle
  * The secrets vault no longer loads env vars when its directory is in the project but does not exist when the container is built (`config/secrets/` by default). The env var of `framework.secret` is then not derived from `SYMFONY_DECRYPTION_SECRET` anymore when it is empty or not defined: define it, or create the vault. In non-debug environments, clear the cache after creating the first vault
  * The env vars of the `framework.test` option are now read while the container is compiled. With `test: '%env(bool:FOO)%'`, the test services are not loaded anymore when `FOO` is false. They used to be loaded whatever the value of `FOO`. The container also fails to compile when `FOO` is not defined
  * The env vars of the `framework.disallow_search_engine_index` option are now read while the container is compiled. With `disallow_search_engine_index: '%env(bool:FOO)%'`, the `X-Robots-Tag: noindex` header is not added anymore when `FOO` is false. It used to be added whatever the value of `FOO`. The container also fails to compile when `FOO` is not defined
+ * Console commands now start with the `framework.default_locale` locale, like HTTP requests, instead of the `intl.default_locale` setting of php.ini or the system locale. A `console.command` listener that sets another locale needs a priority lower than 250
 
 HttpClient
 ----------

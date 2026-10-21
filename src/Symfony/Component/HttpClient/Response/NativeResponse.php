@@ -41,7 +41,6 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
 
     private ?Dechunker $dechunker;
     private NativeClientState $multi;
-    private float $pauseExpiry = 0.0;
 
     /**
      * @internal
@@ -70,7 +69,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
 
         $pauseExpiry = &$this->pauseExpiry;
         $info['pause_handler'] = static function (float $duration) use (&$pauseExpiry) {
-            $pauseExpiry = 0 < $duration ? hrtime(true) / 1E9 + $duration : 0;
+            $pauseExpiry = 0 < $duration ? hrtime(true) / 1E9 + $duration : min($pauseExpiry, hrtime(true) / 1E9);
         };
 
         $this->canary = new Canary(static function () use ($multi, $id) {
@@ -125,6 +124,10 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
             $this->info['start_time'] = microtime(true);
 
             [$resolver, $url] = ($this->resolver)($this->multi);
+
+            if ($this->maxDurationExpiry) {
+                stream_context_set_option($this->context, 'http', 'timeout', max(0.001, min(stream_context_get_options($this->context)['http']['timeout'], $this->maxDurationExpiry - hrtime(true) / 1E9)));
+            }
 
             while (true) {
                 $context = stream_context_get_options($this->context);
@@ -228,12 +231,8 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
                 continue;
             }
 
-            if ($pauseExpiry) {
-                if (hrtime(true) / 1E9 < $pauseExpiry) {
-                    continue;
-                }
-
-                $multi->openHandles[$i][0] = 0;
+            if ($pauseExpiry && hrtime(true) / 1E9 < $pauseExpiry) {
+                continue;
             }
 
             $hasActivity = false;

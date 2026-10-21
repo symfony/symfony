@@ -25,7 +25,7 @@ class SendPulseTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     use IncompleteDsnTestTrait;
 
-    public function testDefaultFactoryRegistrationDoesNotMakeHttpRequests(): void
+    public function testDefaultFactoryRegistrationDoesNotMakeHttpRequests()
     {
         $client = new MockHttpClient([]);
         $transport = \Symfony\Component\Mailer\Transport::fromDsn('sendpulse+api://client:secret@default', null, $client);

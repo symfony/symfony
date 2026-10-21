@@ -87,7 +87,7 @@ class MailerBundleTest extends TestCase
         $this->assertTrue($stream->isClosed());
     }
 
-    public function testSendPulseTransportFactoryIsRegistered(): void
+    public function testSendPulseTransportFactoryIsRegistered()
     {
         $container = $this->load(['dsn' => 'sendpulse+api://client:secret@default']);
 

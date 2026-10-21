@@ -77,6 +77,41 @@ class CompiledEventDispatcherTest extends TestCase
         $this->assertSame([], $fetched);
     }
 
+    public function testShutdownReleasesTheListeners()
+    {
+        $fetched = [];
+        $called = [];
+        $dispatcher = $this->createDispatcher([self::preFoo => [0 => [['foo', 'onEvent']]]], $called, $fetched);
+
+        $dispatcher->dispatch(new Event(), self::preFoo);
+        $dispatcher->dispatch(new Event(), self::preFoo);
+
+        $this->assertSame(['foo'], $fetched);
+
+        $dispatcher->shutdown();
+        $dispatcher->dispatch(new Event(), self::preFoo);
+
+        $this->assertSame(['foo', 'foo'], $fetched);
+        $this->assertSame(['foo', 'foo', 'foo'], $called);
+    }
+
+    public function testShutdownReleasesTheListenersOfAThawedDispatcher()
+    {
+        $called = [];
+        $dispatcher = $this->createDispatcher([self::preFoo => [0 => [['foo', 'onEvent']]]], $called);
+        $listener = \WeakReference::create($dispatcher->getListeners(self::preFoo)[0][0]);
+
+        $this->assertNotNull($listener->get());
+
+        $dispatcher->shutdown();
+
+        $this->assertNull($listener->get());
+
+        $dispatcher->dispatch(new Event(), self::preFoo);
+
+        $this->assertSame(['foo'], $called);
+    }
+
     #[Group('legacy')]
     #[IgnoreDeprecations]
     public function testAddingAListenerKeepsTheCompiledOnes()

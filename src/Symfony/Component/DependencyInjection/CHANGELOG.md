@@ -30,6 +30,7 @@ CHANGELOG
  * Dump the container's compiler log in all environments, not only when debug mode is enabled
  * Add `#[AsCallable]` to expose a public method of a service as a service of its own
  * Reset the container in `AbstractKernel::shutdown()`, so that its services are released even when something still references the container
+ * Release the listeners of the `event_dispatcher` service when the kernel shuts down
 
 8.1
 ---

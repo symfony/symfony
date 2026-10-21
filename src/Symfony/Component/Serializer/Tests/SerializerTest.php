@@ -105,6 +105,40 @@ class SerializerTest extends TestCase
         new Serializer([], [new \stdClass()]);
     }
 
+    public function testShutdownKeepsTheSerializerUsable()
+    {
+        $serializer = new Serializer([new DateTimeNormalizer(), new ObjectNormalizer()], [new JsonEncoder()]);
+        $serializer->shutdown();
+
+        $object = new DummyEntityWithStringAndDateTime('foo', new \DateTimeImmutable('2026-10-21T00:00:00+00:00'));
+        $json = '{"bar":"foo","date":"2026-10-21T00:00:00+00:00"}';
+
+        $this->assertSame($json, $serializer->serialize($object, 'json'));
+        $this->assertEquals($object, $serializer->deserialize($json, DummyEntityWithStringAndDateTime::class, 'json'));
+    }
+
+    public function testShutdownLetsPhpFreeTheSerializerWithoutTheGarbageCollector()
+    {
+        $serializer = new Serializer([new ObjectNormalizer()], [new XmlEncoder()]);
+        $serializer->serialize(new DummyNullableInt(), 'xml');
+        $serializer->shutdown();
+
+        $serializer = \WeakReference::create($serializer);
+
+        $this->assertNull($serializer->get());
+    }
+
+    public function testTheNormalizersOfAFreedSerializerThrow()
+    {
+        $normalizer = new ObjectNormalizer();
+        new Serializer([$normalizer])->shutdown();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The serializer was released when the kernel shut down.');
+
+        $normalizer->normalize(new DummyEntityWithStringAndDateTime('foo', new \DateTimeImmutable()));
+    }
+
     public function testNormalizeNoMatch()
     {
         $serializer = new Serializer([$this->createStub(NormalizerInterface::class)]);

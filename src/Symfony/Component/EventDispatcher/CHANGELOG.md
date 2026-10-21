@@ -10,6 +10,7 @@ CHANGELOG
  * Deprecate calling `addListener()`, `addSubscriber()`, `removeListener()` and `removeSubscriber()` on a `CompiledEventDispatcher`, declare the listener in the container or add it to a `ScopedEventDispatcher` instead
  * Allow `getSubscribedEvents()` to name its keys: `['method' => 'onEvent', 'priority' => 10]`
  * Add `before` and `after` to `#[AsEventListener]` and to the named keys of `getSubscribedEvents()` to order listeners, and make `AsEventListener::$priority` nullable
+ * Add `CompiledEventDispatcher::shutdown()` to release the listeners
 
 8.1
 ---

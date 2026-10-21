@@ -66,6 +66,7 @@ return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('serializer', Serializer::class)
             ->args([[], [], []])
+            ->tag('kernel.reset', ['method' => 'shutdown', 'on_invalid' => 'ignore', 'on_shutdown' => 'only'])
 
         ->alias(SerializerInterface::class, 'serializer')
         ->alias(NormalizerInterface::class, 'serializer')

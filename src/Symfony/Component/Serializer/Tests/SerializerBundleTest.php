@@ -23,8 +23,12 @@ use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
+use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
@@ -211,6 +215,26 @@ class SerializerBundleTest extends TestCase
         $container = $this->load(['enabled' => true]);
 
         $this->assertTrue($container->hasDefinition('serializer'));
+        $this->assertSame([['method' => 'shutdown', 'on_invalid' => 'ignore', 'on_shutdown' => 'only']], $container->getDefinition('serializer')->getTag('kernel.reset'));
+    }
+
+    public function testTheSerializersAreFreedWhenTheKernelShutsDown()
+    {
+        $kernel = new TestShutdownSerializerKernel(sys_get_temp_dir().'/sf_serializer_bundle_shutdown');
+
+        try {
+            $kernel->boot();
+            $container = $kernel->getContainer();
+            $serializers = [\WeakReference::create($container->get('test.serializer')), \WeakReference::create($container->get('test.serializer.api'))];
+
+            $kernel->shutdown();
+
+            foreach ($serializers as $serializer) {
+                $this->assertNull($serializer->get());
+            }
+        } finally {
+            new Filesystem()->remove($kernel->getProjectDir());
+        }
     }
 
     public function testSerializerServiceIsNotRegisteredWhenDisabled()
@@ -440,5 +464,37 @@ class SerializerBundleTest extends TestCase
         new RemoveMissingDependenciesPass()->process($container);
 
         return $container;
+    }
+}
+
+class TestShutdownSerializerKernel extends AbstractKernel
+{
+    use KernelTrait;
+
+    public function __construct(private string $dir)
+    {
+        parent::__construct('test', false);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+
+    public function registerBundles(): iterable
+    {
+        yield new SerializerBundle();
+    }
+
+    private function configureContainer(ContainerConfigurator $container): void
+    {
+        $container->extension('serializer', [
+            'named_serializers' => ['api' => ['include_built_in_normalizers' => true, 'include_built_in_encoders' => true]],
+        ]);
+
+        $container->services()
+            ->alias('test.serializer', 'serializer')->public()
+            ->alias('test.serializer.api', 'serializer.api')->public()
+        ;
     }
 }

@@ -507,6 +507,47 @@ class XliffFileLoaderTest extends TestCase
         $this->assertSame($expected, $catalogue->get('party_host', $intlDomain));
     }
 
+    public function testLoadVersion22KeepsTheLastOfARegularAndAPgsUnitWithTheSameName()
+    {
+        $xml = <<<XLIFF
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" xmlns:pgs="urn:oasis:names:tc:xliff:pgs:1.0"
+                   version="2.2" srcLang="en" trgLang="fr">
+                <file id="f1">
+                    <unit id="tu1" name="file_deleted">
+                        <segment id="seg1">
+                            <source>You deleted a file.</source>
+                            <target>Vous avez supprimé un fichier.</target>
+                        </segment>
+                    </unit>
+                    <unit id="tu2" name="file_deleted" pgs:switch="plural:file_count">
+                        <segment id="seg2" pgs:case="other">
+                            <source>You deleted # files.</source>
+                            <target>Vous avez supprimé # fichiers.</target>
+                        </segment>
+                    </unit>
+                    <unit id="tu3" name="folder_deleted" pgs:switch="plural:folder_count">
+                        <segment id="seg3" pgs:case="other">
+                            <source>You deleted # folders.</source>
+                            <target>Vous avez supprimé # dossiers.</target>
+                        </segment>
+                    </unit>
+                    <unit id="tu4" name="folder_deleted">
+                        <segment id="seg4">
+                            <source>You deleted a folder.</source>
+                            <target>Vous avez supprimé un dossier.</target>
+                        </segment>
+                    </unit>
+                </file>
+            </xliff>
+            XLIFF;
+
+        $catalogue = new XliffFileLoader()->load($xml, 'fr', 'domain1');
+
+        $this->assertSame(['file_deleted' => '{file_count, plural, other {Vous avez supprimé # fichiers.}}'], $catalogue->all('domain1'.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX));
+        $this->assertSame('Vous avez supprimé un dossier.', $catalogue->get('folder_deleted', 'domain1'));
+    }
+
     public static function provideMalformedPgsSwitchValues(): iterable
     {
         yield 'empty' => [''];

@@ -8,6 +8,7 @@ CHANGELOG
  * Add a `Ctrl/Cmd+Shift+ArrowDown`/`ArrowUp` shortcut to expand or collapse all children of the focused toggle
  * Add `$srcContext` to `TraceStub` and `FrameStub` to set the number of source lines dumped around each frame, `-1` for none
  * Add casters for Messenger stamps that link class and handler names to their source
+ * Dump previous exceptions without the trace frames they share with the exception that wraps them
 
 8.1
 ---

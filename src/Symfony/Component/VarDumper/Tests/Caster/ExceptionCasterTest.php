@@ -495,6 +495,173 @@ class ExceptionCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $e, Caster::EXCLUDE_VERBOSE);
     }
 
+    public function testPreviousExceptionWithoutTheFramesItSharesWithItsWrapper()
+    {
+        ExceptionCaster::$srcContext = -1;
+        $e = $this->getChainedException();
+        $sharedFrames = \count($e->getTrace());
+
+        $expectedDump = <<<EODUMP
+            RuntimeException {
+              #message: "foo"
+              #code: 0
+              #file: "%sExceptionCasterTest.php"
+              #line: %d
+              -previous: ErrorException {
+                #message: "bar"
+                #code: 0
+                #file: "%sExceptionCasterTest.php"
+                #line: %d
+                #severity: E_WARNING
+                trace: {
+                  %sExceptionCasterTest.php:%d
+                  %sExceptionCasterTest.php:%d
+                   …{$sharedFrames}
+                }
+              }
+              trace: {
+                %sExceptionCasterTest.php:%d
+                %sExceptionCasterTest.php:%d
+            %A
+            EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $e);
+    }
+
+    public function testPreviousExceptionKeepsItsTraceWhereItIsDumpedOnItsOwn()
+    {
+        $e = $this->getChainedException();
+        $previous = $e->getPrevious();
+
+        $this->assertSame($this->getDump($previous), $this->getDump([$e, $previous], 1));
+        $this->assertSame($this->getDump($previous), $this->getDump([$previous, $e], 0));
+        $this->assertSame($this->getDump($e), $this->getDump([$previous, $e], 1));
+        $this->assertSame($this->getDump([[$previous]]), $this->getDump([$e, [[$previous]]], 1));
+        $this->assertSame($this->getDump($e), $this->getDump([[[$previous]], $e], 1));
+    }
+
+    public function testPreviousExceptionKeepsItsTraceWhenItSharesNoFrameWithItsWrapper()
+    {
+        $e = $this->getChainedException();
+        $trace = $e->getTrace();
+        // make the wrapper look like it was created by another call from the main script
+        ++$trace[\count($trace) - 1]['line'];
+        (new \ReflectionProperty(\Exception::class, 'trace'))->setValue($e, $trace);
+
+        $this->assertSame($this->getDump($e->getPrevious()), $this->getDump($e, "\0Exception\0previous"));
+    }
+
+    public function testPreviousExceptionWhenTheClonerIsReused()
+    {
+        $e = $this->getChainedException();
+        $cloner = new VarCloner();
+        $cloner->cloneVar($e);
+
+        $this->assertSame(\ErrorException::class, $cloner->cloneVar($e)->seek("\0Exception\0previous")->getType());
+    }
+
+    public function testCircularPreviousExceptions()
+    {
+        ExceptionCaster::$srcContext = -1;
+        $e = $this->getChainedException();
+        $e->getPrevious()->__construct('bar', 0, \E_WARNING, null, null, $e);
+        $sharedFrames = \count($e->getTrace());
+
+        $expectedDump = <<<EODUMP
+            RuntimeException {
+              #message: "foo"
+              #code: 0
+              #file: "%sExceptionCasterTest.php"
+              #line: %d
+              -previous: ErrorException {#1
+                #message: "bar"
+                #code: 0
+                #file: "%sExceptionCasterTest.php"
+                #line: %d
+                -previous: RuntimeException {
+                  #message: "foo"
+                  #code: 0
+                  #file: "%sExceptionCasterTest.php"
+                  #line: %d
+                  -previous: ErrorException {#1}
+                  trace: {
+                    %sExceptionCasterTest.php:%d
+                     …{$sharedFrames}
+                  }
+                }
+                #severity: E_WARNING
+                trace: {
+                  %sExceptionCasterTest.php:%d
+                  %sExceptionCasterTest.php:%d
+                   …{$sharedFrames}
+                }
+              }
+              trace: {
+                %sExceptionCasterTest.php:%d
+                %sExceptionCasterTest.php:%d
+            %A
+            EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $e);
+    }
+
+    public function testPreviousExceptionWithExcludeVerbosity()
+    {
+        $e = $this->getChainedException();
+
+        $expectedDump = <<<'EODUMP'
+            array:2 [
+              0 => RuntimeException {
+                #message: "foo"
+                #code: 0
+                #file: "%sExceptionCasterTest.php"
+                #line: %d
+                -previous: ErrorException {#1
+                  #message: "bar"
+                  #code: 0
+                  #file: "%sExceptionCasterTest.php"
+                  #line: %d
+                  #severity: E_WARNING
+                }
+              }
+              1 => ErrorException {#1}
+            ]
+            EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, [$e, $e->getPrevious()], Caster::EXCLUDE_VERBOSE);
+    }
+
+    public function testPreviousExceptionWithTracesThatAreNotLists()
+    {
+        ExceptionCaster::$srcContext = -1;
+        $e = new \Exception('foo', 0, new \Error('bar'));
+        (new \ReflectionProperty(\Exception::class, 'trace'))->setValue($e, ['file' => __FILE__, 'line' => 123]);
+        (new \ReflectionProperty(\Error::class, 'trace'))->setValue($e->getPrevious(), ['file' => __FILE__, 'line' => 123]);
+
+        $expectedDump = <<<'EODUMP'
+            Exception {
+              #message: "foo"
+              #code: 0
+              #file: "%sExceptionCasterTest.php"
+              #line: %d
+              -previous: Error {
+                #message: "bar"
+                #code: 0
+                #file: "%sExceptionCasterTest.php"
+                #line: %d
+                trace: {
+                  %sExceptionCasterTest.php:%d
+                }
+              }
+              trace: {
+                %sExceptionCasterTest.php:%d
+              }
+            }
+            EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $e);
+    }
+
     #[RequiresMethod(FlattenException::class, 'create')]
     public function testFlattenException()
     {
@@ -555,5 +722,19 @@ class ExceptionCasterTest extends TestCase
         } finally {
             restore_error_handler();
         }
+    }
+
+    private function getChainedException(): \RuntimeException
+    {
+        try {
+            $this->throwErrorException();
+        } catch (\ErrorException $e) {
+            return new \RuntimeException('foo', 0, $e);
+        }
+    }
+
+    private function throwErrorException(): never
+    {
+        throw new \ErrorException('bar', 0, \E_WARNING);
     }
 }

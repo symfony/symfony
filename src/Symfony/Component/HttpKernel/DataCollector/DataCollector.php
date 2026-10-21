@@ -62,7 +62,7 @@ abstract class DataCollector implements DataCollectorInterface
                 if (!$v instanceof Stub) {
                     $b = $a;
                     foreach ($a as $k => $v) {
-                        if (!\is_object($v) || $v instanceof \DateTimeInterface || $v instanceof Stub) {
+                        if (!\is_object($v) || $v instanceof \DateTimeInterface || $v instanceof Stub || "\0Exception\0previous" === $k || "\0Error\0previous" === $k) {
                             continue;
                         }
 

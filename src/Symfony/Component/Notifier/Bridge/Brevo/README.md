@@ -15,7 +15,7 @@ where:
 - `API_KEY` is your api key from your Brevo account
 - `SENDER` is your sender's phone number
 
-See more info at https://developers.brevo.com/reference/sendtransacsms
+See more info at https://developers.brevo.com/docs/transactional-sms-endpoints
 
 Sponsor
 -------

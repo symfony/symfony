@@ -38,6 +38,10 @@ final class ProcessStream extends AbstractStream
 
     public function initialize(): void
     {
+        if (!\function_exists('proc_open')) {
+            throw new TransportException('Unable to start the process: the "proc_open()" function is not available on your PHP installation.');
+        }
+
         $descriptorSpec = [
             0 => ['pipe', 'r'],
             1 => ['pipe', 'w'],

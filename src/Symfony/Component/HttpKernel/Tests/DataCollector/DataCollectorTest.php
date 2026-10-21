@@ -89,4 +89,20 @@ class DataCollectorTest extends TestCase
 
         $this->assertNotNull($c->getData()->parent);
     }
+
+    public function testCloneVarKeepsPreviousExceptions()
+    {
+        $exception = new \RuntimeException('foo', 0, new \TypeError('bar', 0, new \LogicException('baz')));
+        $object = new WithPublicObjectProperty();
+        $object->parent = new WithPublicObjectProperty();
+
+        $c = new CloneVarDataCollector([$exception, $object]);
+        $c->collect(new Request(), new Response());
+
+        $previous = $c->getData()[0]->seek("\0Exception\0previous");
+
+        $this->assertSame('bar', $previous->message);
+        $this->assertSame('baz', $previous->seek("\0Error\0previous")->message);
+        $this->assertFalse(isset($c->getData()[1]->parent->parent));
+    }
 }

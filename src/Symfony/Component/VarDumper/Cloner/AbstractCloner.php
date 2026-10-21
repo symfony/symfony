@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Cloner;
 
 use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Caster\PreviousExceptionStub;
 use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 
 /**
@@ -226,6 +227,11 @@ abstract class AbstractCloner implements ClonerInterface
     private int $filter = 0;
 
     /**
+     * @var array<int, array<int, PreviousExceptionStub>>
+     */
+    private array $previousExceptions = [];
+
+    /**
      * @param callable[]|null $casters A map of casters
      *
      * @see addCasters
@@ -324,6 +330,7 @@ abstract class AbstractCloner implements ClonerInterface
             }
             restore_error_handler();
             $this->prevErrorHandler = null;
+            $this->previousExceptions = [];
         }
     }
 
@@ -340,6 +347,19 @@ abstract class AbstractCloner implements ClonerInterface
     protected function castObject(Stub $stub, bool $isNested): array
     {
         $obj = $stub->value;
+
+        if ($obj instanceof PreviousExceptionStub) {
+            if ($previous = $this->previousExceptions[spl_object_id($obj->value)][$obj->sharedFrames] ?? null) {
+                $stub->value = $previous;
+
+                return [];
+            }
+
+            $this->previousExceptions[spl_object_id($obj->value)][$obj->sharedFrames] = $obj;
+            $obj = $obj->value;
+            $stub->class = $obj::class;
+        }
+
         $class = $stub->class;
 
         if (str_contains($class, "@anonymous\0")) {

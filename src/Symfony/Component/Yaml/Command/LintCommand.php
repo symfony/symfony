@@ -411,6 +411,8 @@ class LintCommand extends Command
     {
         if ($input->mustSuggestOptionValuesFor('format')) {
             $suggestions->suggestValues($this->getAvailableFormatOptions());
+        } elseif (($input->mustSuggestArgumentValuesFor('filename') || $input->mustSuggestOptionValuesFor('exclude') || $input->mustSuggestOptionValuesFor('schema')) && method_exists($suggestions, 'suggestPaths')) {
+            $suggestions->suggestPaths();
         }
     }
 

@@ -11,7 +11,7 @@
 # prepends the part it keeps in place, as readline does.
 
 # command names
-all|app demo:|demo:hello;demo:other;demo:special
+all|app demo:|demo:file;demo:hello;demo:other;demo:special
 all|app demo:h|demo:hello
 
 # global option names
@@ -19,7 +19,7 @@ all|app --|--ansi;--help;--no-ansi;--no-interaction;--quiet;--silent;--verbose;-
 
 # the application called through a path instead of a name (%app% is replaced by
 # the absolute path of the fixture)
-all|%app% demo:|demo:hello;demo:other;demo:special
+all|%app% demo:|demo:file;demo:hello;demo:other;demo:special
 
 # option names
 all|app demo:hello --d|--dry-run
@@ -87,3 +87,28 @@ bash,fish|app demo:special --value=y|--value=y/z;--value=y$z;--value=y z;--value
 zsh|app demo:special --value=y|y/z;y$z;y z;y"z;y'z
 all|app demo:special 'x|x/y;x$y;x y;x"y;x'y;x`y;x*y;x&y;x\y;x(y);x!y;x#y;x=y
 all|app demo:special "x|x/y;x$y;x y;x"y;x'y;x`y;x*y;x&y;x\y;x(y);x!y;x#y;x=y
+
+# paths and directories completed by the shell. The cases run in a directory
+# containing "dir one/inner.txt", "dir2/x.twig", "file a.txt" and "file_b.yaml".
+all|app demo:file fi|file a.txt;file_b.yaml
+all|app demo:file d|dir one/;dir2/
+all|app demo:file dir2/|dir2/x.twig
+all|app demo:file file_b.yaml fi|file a.txt;file_b.yaml
+all|app demo:file 'fi|file a.txt;file_b.yaml
+# bash-completion quotes the word before listing the paths. bash only removes
+# these quotes while readline completes a line, which the driver does not do.
+zsh,fish|app demo:file |dir one/;dir2/;file a.txt;file_b.yaml
+zsh,fish|app demo:file "fi|file a.txt;file_b.yaml
+all|app demo:file --dir |dir one/;dir2/
+all|app demo:file --dir d|dir one/;dir2/
+all|app demo:file -d d|dir one/;dir2/
+all|app demo:file --dir f|
+bash,fish|app demo:file --dir=d|--dir=dir one/;--dir=dir2/
+zsh|app demo:file --dir=d|dir one/;dir2/
+
+# values completed along with the paths
+all|app demo:file --config d|default;dir one/;dir2/
+all|app demo:file --config b|bob smith
+bash,fish|app demo:file --config bob\ s|bob smith
+bash,fish|app demo:file --config=d|--config=default;--config=dir one/;--config=dir2/
+zsh|app demo:file --config=d|default;dir one/;dir2/

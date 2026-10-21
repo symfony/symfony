@@ -16,7 +16,7 @@
 #
 _sf_{{ COMMAND_NAME }}() {
     local lastParam out comp sf_cmd
-    local -a completions flagPrefix requestComp inputs
+    local -a completions flagPrefix requestComp inputs files
 
     # The user could have moved the cursor backwards on the command-line.
     # We need to trigger completion from the $CURRENT location, so we need
@@ -69,6 +69,18 @@ _sf_{{ COMMAND_NAME }}() {
     # "$(...)" or a backtick typed on the command line is not executed
     out=$(SHELL_VERBOSITY=0 "${requestComp[@]}" "${inputs[@]}" 2>/dev/null)
 
+    # The first line can ask to complete the paths or the directories along with the values
+    case "${out%%$'\n'*}" in
+        :paths)
+            files=(_files)
+            out="${out#:paths}"
+            ;;
+        :directories)
+            files=(_directories)
+            out="${out#:directories}"
+            ;;
+    esac
+
     while IFS='\n' read -r comp; do
         if [ -n "$comp" ]; then
             # If requested, completions are returned with a description.
@@ -84,7 +96,15 @@ _sf_{{ COMMAND_NAME }}() {
 
     # Let inbuilt _describe handle completions
     _describe "completions" completions "${flagPrefix[@]}"
-    return $?
+    local ret=$?
+
+    # Let inbuilt _files or _directories complete the paths, after the "=" of an option
+    if (( $#files )); then
+        (( $#flagPrefix )) && compset -P '*='
+        "${files[@]}" && ret=0
+    fi
+
+    return $ret
 }
 
 compdef _sf_{{ COMMAND_NAME }} {{ COMMAND_NAME }}

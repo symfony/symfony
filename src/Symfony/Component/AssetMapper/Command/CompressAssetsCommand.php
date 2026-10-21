@@ -14,6 +14,8 @@ namespace Symfony\Component\AssetMapper\Command;
 use Symfony\Component\AssetMapper\Compressor\CompressorInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -59,5 +61,12 @@ final class CompressAssetsCommand extends Command
         $io->success(\sprintf('File%s compressed successfully.', \count($paths) > 1 ? 's' : ''));
 
         return Command::SUCCESS;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('paths') && method_exists($suggestions, 'suggestPaths')) {
+            $suggestions->suggestPaths();
+        }
     }
 }

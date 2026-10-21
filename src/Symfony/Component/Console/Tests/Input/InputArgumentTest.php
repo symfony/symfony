@@ -156,6 +156,19 @@ class InputArgumentTest extends TestCase
         $this->assertSame($values, array_map(static fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
     }
 
+    public function testCompleteClosureGetsTheSuggestions()
+    {
+        $argument = new InputArgument('foo', null, '', null, static function (CompletionInput $input, CompletionSuggestions $suggestions): array {
+            $suggestions->suggestPaths();
+
+            return ['-'];
+        });
+        $argument->complete(new CompletionInput(), $suggestions = new CompletionSuggestions());
+
+        $this->assertSame('paths', $suggestions->getPathSuggestion());
+        $this->assertEquals([new Suggestion('-')], $suggestions->getValueSuggestions());
+    }
+
     public function testCompleteClosureReturnIncorrectType()
     {
         $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', null, static fn (CompletionInput $input) => 'invalid');

@@ -14,10 +14,13 @@ namespace Symfony\Bridge\Twig\Tests\Command;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Command\LintCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -161,6 +164,17 @@ class LintCommandTest extends TestCase
     public static function provideCompletionSuggestions(): iterable
     {
         yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
+    }
+
+    #[RequiresMethod(CompletionSuggestions::class, 'suggestPaths')]
+    public function testCompleteFilenames()
+    {
+        $command = $this->createCommand();
+        $input = CompletionInput::fromTokens(['lint:twig'], 1);
+        $input->bind($command->getDefinition());
+        $command->complete($input, $suggestions = new CompletionSuggestions());
+
+        $this->assertSame('paths', $suggestions->getPathSuggestion());
     }
 
     private function createCommandTester(): CommandTester

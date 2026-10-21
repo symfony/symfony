@@ -176,6 +176,12 @@ class XliffUpdateSourcesCommand extends Command
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
+        if ($input->mustSuggestArgumentValuesFor('paths') && method_exists($suggestions, 'suggestDirectories')) {
+            $suggestions->suggestDirectories();
+
+            return;
+        }
+
         if ($input->mustSuggestOptionValuesFor('locales')) {
             $suggestions->suggestValues($this->enabledLocales);
 

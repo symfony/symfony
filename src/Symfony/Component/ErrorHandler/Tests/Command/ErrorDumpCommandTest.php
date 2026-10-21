@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\ErrorHandler\Tests\Command;
 
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\ErrorHandler\Command\ErrorDumpCommand;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
@@ -78,6 +81,17 @@ class ErrorDumpCommandTest extends TestCase
 
         $this->assertFileDoesNotExist($this->tmpDir.\DIRECTORY_SEPARATOR.'test.html');
         $this->assertFileExists($this->tmpDir.\DIRECTORY_SEPARATOR.'404.html');
+    }
+
+    #[RequiresMethod(CompletionSuggestions::class, 'suggestDirectories')]
+    public function testCompletePath()
+    {
+        $command = new ErrorDumpCommand(new Filesystem(), $this->createStub(ErrorRendererInterface::class));
+        $input = CompletionInput::fromTokens(['error:dump'], 1);
+        $input->bind($command->getDefinition());
+        $command->complete($input, $suggestions = new CompletionSuggestions());
+
+        $this->assertSame('directories', $suggestions->getPathSuggestion());
     }
 
     private function getCommandTester(KernelInterface $kernel): CommandTester

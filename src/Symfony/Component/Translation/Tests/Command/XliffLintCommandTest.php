@@ -12,9 +12,12 @@
 namespace Symfony\Component\Translation\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -204,6 +207,17 @@ class XliffLintCommandTest extends TestCase
         $this->files[] = $filename;
 
         return $filename;
+    }
+
+    #[RequiresMethod(CompletionSuggestions::class, 'suggestPaths')]
+    public function testCompleteFilenames()
+    {
+        $command = $this->createCommand();
+        $input = CompletionInput::fromTokens(['lint:xliff'], 1);
+        $input->bind($command->getDefinition());
+        $command->complete($input, $suggestions = new CompletionSuggestions());
+
+        $this->assertSame('paths', $suggestions->getPathSuggestion());
     }
 
     private function createCommand($requireStrictFileNames = true, $application = null): Command

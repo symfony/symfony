@@ -2008,6 +2008,73 @@ class SerializerTest extends TestCase
         $serializer->denormalize('foo', Model::class, 'json');
     }
 
+    public function testSerializersCreatedWithTheSameSharedCacheKeyShareWhichNormalizersSupportWhichTypes()
+    {
+        $normalizer = $this->createSupportingNormalizer(1);
+
+        $serializer = new Serializer([$normalizer], [], [], __METHOD__);
+        $serializer->normalize(new Model());
+        $serializer->denormalize('foo', Model::class);
+
+        $serializer = new Serializer([$normalizer], [], [], __METHOD__);
+
+        $this->assertSame(['foo' => 'bar'], $serializer->normalize(new Model()));
+        $this->assertInstanceOf(Model::class, $serializer->denormalize('foo', Model::class));
+    }
+
+    public function testSerializersCreatedWithDifferentSharedCacheKeysDoNotShare()
+    {
+        $normalizer = $this->createSupportingNormalizer(2);
+
+        foreach ([__METHOD__.'1', __METHOD__.'2'] as $key) {
+            $serializer = new Serializer([$normalizer], [], [], $key);
+            $serializer->normalize(new Model());
+            $serializer->denormalize('foo', Model::class);
+        }
+    }
+
+    public function testSerializersCreatedWithoutSharedCacheKeyDoNotShare()
+    {
+        $normalizer = $this->createSupportingNormalizer(2);
+
+        for ($i = 0; $i < 2; ++$i) {
+            $serializer = new Serializer([$normalizer]);
+            $serializer->normalize(new Model());
+            $serializer->denormalize('foo', Model::class);
+        }
+    }
+
+    public function testCloningASerializerCreatedWithASharedCacheKey()
+    {
+        $serializer = new Serializer([new ObjectNormalizer()], [], [], __METHOD__);
+        $clone = clone $serializer;
+
+        $this->assertSame(['foo' => 'bar'], $clone->normalize((object) ['foo' => 'bar']));
+        $this->assertSame(['foo' => 'bar'], $serializer->normalize((object) ['foo' => 'bar']));
+        $this->assertSame(['foo' => 'bar'], (clone $serializer)->normalize((object) ['foo' => 'bar']));
+    }
+
+    private function createSupportingNormalizer(int $instances): DummyNormalizer
+    {
+        $normalizer = $this->createMock(DummyNormalizer::class);
+        $normalizer
+            ->expects($this->exactly(2 * $instances))
+            ->method('getSupportedTypes')
+            ->willReturn([Model::class => true]);
+        $normalizer
+            ->expects($this->exactly($instances))
+            ->method('supportsNormalization')
+            ->willReturn(true);
+        $normalizer
+            ->expects($this->exactly($instances))
+            ->method('supportsDenormalization')
+            ->willReturn(true);
+        $normalizer->method('normalize')->willReturn(['foo' => 'bar']);
+        $normalizer->method('denormalize')->willReturn(new Model());
+
+        return $normalizer;
+    }
+
     public function testPartialDenormalizationWithMissingConstructorTypes()
     {
         $json = '{"one": "one string", "three": "three string"}';

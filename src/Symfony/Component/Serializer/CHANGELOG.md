@@ -27,6 +27,7 @@ CHANGELOG
  * Trigger a deprecation when denormalizing a property from its PHP name while a name converter maps it to another key
  * Build the collection class declared for a property, e.g. `ArrayCollection<int, User>`, from its denormalized elements when the property does not accept an array
  * Add `Serializer::shutdown()` to break the reference cycles between a serializer and its normalizers, called when the kernel shuts down
+ * Add argument `$sharedCacheKey` to `Serializer::__construct()` to share which normalizers support which types between serializers
 
 8.1
 ---

@@ -174,6 +174,7 @@ class SerializerBundle extends AbstractBundle
             $container->register('serializer.mapping.shared_class_metadata_factory', SharedClassMetadataFactory::class)
                 ->setDecoratedService('serializer.mapping.class_metadata_factory')
                 ->setArguments([new Reference('.inner'), new Parameter('container.build_id')]);
+            $container->getDefinition('serializer')->setArgument('$sharedCacheKey', new Parameter('container.build_id'));
         }
 
         $serializerLoaders = [];

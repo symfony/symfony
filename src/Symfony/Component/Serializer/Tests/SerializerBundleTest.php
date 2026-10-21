@@ -174,6 +174,12 @@ class SerializerBundleTest extends TestCase
         $this->assertFalse($this->load(['enabled' => true], debug: true)->hasDefinition('serializer.mapping.shared_class_metadata_factory'));
     }
 
+    public function testTheSerializerSharesWhichNormalizersSupportWhichTypesOutsideDebugMode()
+    {
+        $this->assertEquals(new Parameter('container.build_id'), $this->load(['enabled' => true])->getDefinition('serializer')->getArgument('$sharedCacheKey'));
+        $this->assertArrayNotHasKey('$sharedCacheKey', $this->load(['enabled' => true], debug: true)->getDefinition('serializer')->getArguments());
+    }
+
     public function testSerializerMappingFilesAreTrackedWhenCacheIsUsed()
     {
         $container = $this->load(['enable_attributes' => false, 'mapping' => ['paths' => [__DIR__.'/Fixtures/serialization.yml']]], debug: true);

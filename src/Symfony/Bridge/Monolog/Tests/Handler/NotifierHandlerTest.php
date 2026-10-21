@@ -69,6 +69,43 @@ class NotifierHandlerTest extends TestCase
         $this->assertSame([], $notifier->recipients);
     }
 
+    public function testHandleIgnoresWarningsByDefault()
+    {
+        $notifier = new class implements NotifierInterface {
+            public ?Notification $notification = null;
+
+            public function send(Notification $notification, RecipientInterface ...$recipients): void
+            {
+                $this->notification = $notification;
+            }
+        };
+
+        $this->assertFalse((new NotifierHandler($notifier))->handle(RecordFactory::create(Level::Warning, 'Something looks wrong')));
+        $this->assertNull($notifier->notification);
+    }
+
+    public function testHandleWarningsWhenTheLevelIsWarning()
+    {
+        $notifier = new class implements NotifierInterface {
+            public ?Notification $notification = null;
+
+            public function send(Notification $notification, RecipientInterface ...$recipients): void
+            {
+                $this->notification = $notification;
+            }
+        };
+
+        $handler = new NotifierHandler($notifier, Level::Warning);
+        $handler->handle(RecordFactory::create(Level::Notice, 'Not handled'));
+
+        $this->assertNull($notifier->notification);
+
+        $handler->handle(RecordFactory::create(Level::Warning, 'Something looks wrong'));
+
+        $this->assertSame('Something looks wrong', $notifier->notification->getSubject());
+        $this->assertSame(Notification::IMPORTANCE_LOW, $notifier->notification->getImportance());
+    }
+
     public function testHandleSendsToAdminRecipients()
     {
         $notifier = new class implements NotifierInterface, AdminRecipientsProviderInterface {

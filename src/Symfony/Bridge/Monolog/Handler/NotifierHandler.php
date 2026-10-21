@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Monolog\Handler;
 
 use Monolog\Handler\AbstractHandler;
 use Monolog\Level;
-use Monolog\Logger;
 use Monolog\LogRecord;
 use Symfony\Component\Notifier\AdminRecipientsProviderInterface;
 use Symfony\Component\Notifier\Notification\Notification;
@@ -31,7 +30,7 @@ final class NotifierHandler extends AbstractHandler
         string|int|Level $level = Level::Error,
         bool $bubble = true,
     ) {
-        parent::__construct(Logger::toMonologLevel($level)->isLowerThan(Level::Error) ? Level::Error : $level, $bubble);
+        parent::__construct($level, $bubble);
     }
 
     public function handle(LogRecord $record): bool

@@ -39,6 +39,12 @@ final class Address
      */
     private const FROM_STRING_PATTERN = '~(?<displayName>[^<]*)<(?<addrSpec>.*)>[^>]*~';
 
+    /**
+     * Dot-atoms of letters, digits, "_", "+" and "-", with domain labels of up to 30 characters and
+     * domains of up to 63 characters: all supported versions of egulias/email-validator accept them.
+     */
+    private const SIMPLE_ADDR_SPEC_PATTERN = '/^(?=[^@]{1,64}@[^@]{1,63}$)[a-zA-Z0-9_+-]++(?:\.[a-zA-Z0-9_+-]++)*+@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,28}[a-zA-Z0-9])?\.)++[a-zA-Z](?:[a-zA-Z0-9-]{0,28}[a-zA-Z0-9])?$/D';
+
     private static EmailValidator $validator;
     private static IdnAddressEncoder $encoder;
 
@@ -150,6 +156,11 @@ final class Address
 
     private static function isValidAddrSpec(string $address): bool
     {
+        // the validator parses addresses one character at a time, which makes it the main cost of building simple emails
+        if (preg_match(self::SIMPLE_ADDR_SPEC_PATTERN, $address)) {
+            return true;
+        }
+
         // the message id validation is needed as this class also holds the ids of the Message-ID,
         // In-Reply-To and References headers, but it accepts an unquoted "@" in the local part
         if (!self::$validator->isValid($address, class_exists(MessageIDValidation::class) ? new MessageIDValidation() : new RFCValidation())) {

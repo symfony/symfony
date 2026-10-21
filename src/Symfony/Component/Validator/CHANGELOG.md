@@ -24,6 +24,7 @@ CHANGELOG
  * Make the `Unique` constraint consider `\DateTimeInterface` values that represent the same instant as duplicates
  * Add an optional `$mappedClasses` argument to `Mapping\Loader\LoaderChain::__construct()`, to declare which classes each loader maps
  * Add `ValidatorBuilder::addMappedClasses()`, to declare which classes each mapping file maps
+ * Add `ValidatorBuilder::setSharedMetadataKey()` to share the metadata loaded by the validators created with the same key
 
 8.1
 ---

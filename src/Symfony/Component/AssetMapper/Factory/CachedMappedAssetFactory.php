@@ -42,7 +42,10 @@ class CachedMappedAssetFactory implements MappedAssetFactoryInterface
 
     public function reset(): void
     {
-        $this->mappedAssets = [];
+        // without debug, cache files are not checked for freshness, so loading them again would return the same assets
+        if ($this->debug) {
+            $this->mappedAssets = [];
+        }
 
         if (\is_callable([$this->innerFactory, 'reset'])) {
             $this->innerFactory->reset();

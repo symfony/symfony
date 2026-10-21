@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `ChoiceFormField::selectByText()` to select an option by its visible text content
+ * Make `ChoiceFormField::disableValidation()` part of the supported public API
 
 8.1
 ---

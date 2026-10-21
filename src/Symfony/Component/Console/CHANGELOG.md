@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Add `CompletionSuggestions::suggestPaths()`, `suggestDirectories()` and `getPathSuggestion()` to let the shell complete file system paths, as `InputFile` arguments and options now do
+ * Pass the `CompletionSuggestions` to the `suggestedValues` closures of arguments and options
  * List the accepted values of `#[Argument]` and `#[Option]` inputs mapped to backed enums in their description, e.g. `[possible values: pending, paid]`
  * Map `#[Argument]` and `#[Option]` arrays to backed enums when their PHPDoc narrows them, e.g. `@param list<Suit> $suits` or `@var Suit[]`
  * Add `LockableTrait::setLockFactory()`, autowired with the lock factory of the resource named `console` when the app declares one

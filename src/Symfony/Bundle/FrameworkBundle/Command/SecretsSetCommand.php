@@ -138,6 +138,8 @@ final class SecretsSetCommand extends Command
     {
         if ($input->mustSuggestArgumentValuesFor('name')) {
             $suggestions->suggestValues(array_keys($this->vault->list(false)));
+        } elseif ($input->mustSuggestArgumentValuesFor('file') && method_exists($suggestions, 'suggestPaths')) {
+            $suggestions->suggestPaths();
         }
     }
 }

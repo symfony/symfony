@@ -28,8 +28,29 @@ function _sf_{{ COMMAND_NAME }}
 
     set sfcomplete (env SHELL_VERBOSITY=0 $completecmd)
 
+    # the first line can ask to complete the paths or the directories along with the values
+    set paths ""
+    if contains -- "$sfcomplete[1]" :paths :directories
+        set paths $sfcomplete[1]
+        set -e sfcomplete[1]
+    end
+
     for i in $sfcomplete
         echo "$flag_prefix$i"
+    end
+
+    # fish completes the paths, after the "=" of an option. "complete -C" reads the
+    # token as typed, while __fish_complete_path ignores its quotes before fish 3.7.
+    set token (commandline -ct)
+    set token (string sub -s (math (string length -- "$flag_prefix") + 1) -- "$token")
+    if [ "$paths" = ":paths" ]
+        for i in (complete -C"'' $token")
+            echo "$flag_prefix$i"
+        end
+    else if [ "$paths" = ":directories" ]
+        for i in (__fish_complete_directories "$token")
+            echo "$flag_prefix$i"
+        end
     end
 end
 

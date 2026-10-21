@@ -14,8 +14,10 @@ namespace Symfony\Component\Console\Attribute;
 use Symfony\Component\Console\Attribute\Reflection\DocBlockTypeResolver;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Input\File\InputFileType;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\String\UnicodeString;
 
@@ -45,9 +47,9 @@ class Option
      *
      * If unset, the `name` value will be inferred from the parameter definition.
      *
-     * @param string|(callable():string)                                                 $description     The description of the option, displayed with the help page
-     * @param array|string|null                                                          $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param array<string|Suggestion>|callable(CompletionInput):list<string|Suggestion> $suggestedValues The values used for input completion
+     * @param string|(callable():string)                                                                        $description     The description of the option, displayed with the help page
+     * @param array|string|null                                                                                 $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param array<string|Suggestion>|callable(CompletionInput, CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      */
     public function __construct(
         string|callable $description = '',
@@ -131,6 +133,14 @@ class Option
 
         if (!$self->suggestedValues) {
             $self->suggestedValues = $self->possibleValues;
+        }
+
+        if (!$self->suggestedValues && (InputFileType::isInputFile($reflection) || InputFileType::isInputFileCollection($reflection))) {
+            $self->suggestedValues = static function (CompletionInput $input, CompletionSuggestions $suggestions): array {
+                $suggestions->suggestPaths();
+
+                return [];
+            };
         }
 
         return $self;

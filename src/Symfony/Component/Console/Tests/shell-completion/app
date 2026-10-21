@@ -12,6 +12,8 @@
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -83,8 +85,31 @@ $special->setCode(fn () => Command::SUCCESS);
 $other = (new Command('demo:other'))->setDescription('Another command');
 $other->setCode(fn () => Command::SUCCESS);
 
+// paths and directories completed by the shell
+$file = (new Command('demo:file'))
+    ->setDescription('Completes paths')
+    ->addArgument('paths', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'Some paths', null, static function (CompletionInput $input, CompletionSuggestions $suggestions): array {
+        $suggestions->suggestPaths();
+
+        return [];
+    })
+    ->addOption('dir', 'd', InputOption::VALUE_REQUIRED, 'A directory', null, static function (CompletionInput $input, CompletionSuggestions $suggestions): array {
+        $suggestions->suggestDirectories();
+
+        return [];
+    })
+    // values completed along with the paths
+    ->addOption('config', null, InputOption::VALUE_REQUIRED, 'A configuration', null, static function (CompletionInput $input, CompletionSuggestions $suggestions): array {
+        $suggestions->suggestPaths();
+
+        return ['default', 'bob smith'];
+    })
+;
+$file->setCode(fn () => Command::SUCCESS);
+
 $app = new Application('app', '1.0.0');
 $app->addCommand($hello);
 $app->addCommand($special);
 $app->addCommand($other);
+$app->addCommand($file);
 $app->run();

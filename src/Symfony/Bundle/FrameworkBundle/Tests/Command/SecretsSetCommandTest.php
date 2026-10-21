@@ -12,9 +12,12 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsSetCommand;
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 
 class SecretsSetCommandTest extends TestCase
@@ -35,5 +38,16 @@ class SecretsSetCommandTest extends TestCase
     {
         yield 'name' => [[''], ['SECRET', 'OTHER_SECRET']];
         yield '--local name (with local vault)' => [['--local', ''], ['SECRET', 'OTHER_SECRET']];
+    }
+
+    #[RequiresMethod(CompletionSuggestions::class, 'suggestPaths')]
+    public function testCompleteFile()
+    {
+        $command = new SecretsSetCommand($this->createStub(AbstractVault::class), $this->createStub(AbstractVault::class));
+        $input = CompletionInput::fromTokens(['secrets:set', 'SECRET'], 2);
+        $input->bind($command->getDefinition());
+        $command->complete($input, $suggestions = new CompletionSuggestions());
+
+        $this->assertSame('paths', $suggestions->getPathSuggestion());
     }
 }

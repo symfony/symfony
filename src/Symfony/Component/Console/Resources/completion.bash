@@ -81,6 +81,30 @@ _sf_{{ COMMAND_NAME }}() {
             cur="${cur#*=}"
         fi
 
+        # the first line can ask to complete the paths or the directories along
+        # with the values. Readline then quotes the values the same way as paths.
+        local paths="${sfcomplete%%$'\n'*}"
+        if [[ "$paths" == :paths || "$paths" == :directories ]]; then
+            # the word can start with a quote or contain escaped characters
+            local word="$cur" s q
+            [[ "${cur:0:1}" == [\'\"] ]] && word="${cur:1}"
+
+            while IFS= read -r s; do
+                printf -v q %q "$s"
+                [[ -n "$s" && ( "$s" == "$word"* || "$q" == "$cur"* ) ]] && COMPREPLY+=("$s")
+            done <<< "${sfcomplete#"$paths"}"
+
+            compopt -o filenames 2> /dev/null
+            if [[ "$paths" == :directories ]]; then
+                _filedir -d
+            else
+                _filedir
+            fi
+            __ltrim_colon_completions "$cur"
+
+            return 0
+        fi
+
         quote=${cur:0:1}
 
         # Use single quotes by default if suggestions contains backslash (FQCN)

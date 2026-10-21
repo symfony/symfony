@@ -33,6 +33,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\File\InputFile;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -406,6 +407,32 @@ class InvokableCommandTest extends TestCase
 
         $definition->getOption('suggested-enum')->complete(CompletionInput::fromTokens([], 0), $suggestions = new CompletionSuggestions());
         self::assertEquals([new Suggestion('video')], $suggestions->getValueSuggestions());
+    }
+
+    public function testInputFileInputsCompletePaths()
+    {
+        $command = new Command('foo');
+        $command->setCode(
+            /** @param list<InputFile> $files */
+            static fn (
+                #[Argument] InputFile $file,
+                #[Argument] array $files = [],
+                #[Option] ?InputFile $config = null,
+                #[Option(suggestedValues: ['-'])] ?InputFile $source = null,
+                #[Option] InputFile ...$includes,
+            ): int => 0
+        );
+
+        $definition = $command->getDefinition();
+        foreach ([$definition->getArgument('file'), $definition->getArgument('files'), $definition->getOption('config'), $definition->getOption('includes')] as $input) {
+            $input->complete(CompletionInput::fromTokens([], 0), $suggestions = new CompletionSuggestions());
+            self::assertSame('paths', $suggestions->getPathSuggestion(), $input->getName());
+            self::assertSame([], $suggestions->getValueSuggestions());
+        }
+
+        $definition->getOption('source')->complete(CompletionInput::fromTokens([], 0), $suggestions = new CompletionSuggestions());
+        self::assertNull($suggestions->getPathSuggestion());
+        self::assertEquals([new Suggestion('-')], $suggestions->getValueSuggestions());
     }
 
     public function testNumericArgumentIsConvertedOrRejected()

@@ -26,6 +26,11 @@ ln -s "$dir/app" "$tmp/bin/app"
 chmod +x "$dir/app"
 export PATH="$tmp/bin:$PATH"
 
+# the paths completed by the shell are looked up in this directory
+mkdir -p "$tmp/files/dir one" "$tmp/files/dir2"
+touch "$tmp/files/dir one/inner.txt" "$tmp/files/dir2/x.twig" "$tmp/files/file a.txt" "$tmp/files/file_b.yaml"
+cd "$tmp/files" || exit 1
+
 passed=0
 failed=0
 skipped=0
@@ -96,13 +101,34 @@ run_case() {
 test_api_version() {
     local script="$tmp/completion-outdated.bash" output
 
-    sed 's/-a1/-a0.9/' "$tmp/completion.bash" > "$script"
+    sed -E 's/-a[0-9.]+/-a0.9/' "$tmp/completion.bash" > "$script"
     output="$(bash "$dir/drivers/bash.sh" "$script" 'app demo:' 2>&1)"
 
     case "$output" in
         *'Completion script version is not supported'*) pass "[bash] outdated completion script is detected" ;;
         *) fail "[bash] outdated completion script is detected" "$output" ;;
     esac
+}
+
+# A script generated for the first version of the API keeps working. The
+# application does not ask it to complete paths, so it only gets the values.
+test_api_version_1() {
+    local shell="$1" script="$tmp/completion-v1.$shell" driver actual name="[$shell] a script of the first API version gets no paths"
+
+    case "$shell" in
+        bash) driver=(bash "$dir/drivers/bash.sh") ;;
+        zsh) driver=(zsh "$dir/drivers/zsh.zsh") ;;
+        fish) driver=(fish "$dir/drivers/fish.fish") ;;
+    esac
+
+    sed -E 's/-a[0-9.]+/-a1/' "$tmp/completion.$shell" > "$script"
+    actual="$("${driver[@]}" "$script" 'app demo:file --config d' 2> "$tmp/case.err" | normalize)"
+
+    if [ "$actual" = 'default' ]; then
+        pass "$name"
+    else
+        fail "$name" "expected:" "default" "actual:" "${actual:-<none>}" "$(cat "$tmp/case.err")"
+    fi
 }
 
 # bash-completion is not installed everywhere, for instance on macOS: the script
@@ -220,6 +246,7 @@ for shell in $shells; do
     test_alias "$shell" 'an alias' 'sfa=app'
     test_alias "$shell" 'an alias with arguments' 'sfb=app --no-ansi'
     test_no_command_execution "$shell"
+    test_api_version_1 "$shell"
 
     if [ "$shell" = "bash" ]; then
         test_api_version

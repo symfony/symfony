@@ -326,6 +326,19 @@ class InputOptionTest extends TestCase
         $this->assertSame($values, array_map(static fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
     }
 
+    public function testCompleteClosureGetsTheSuggestions()
+    {
+        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', null, static function (CompletionInput $input, CompletionSuggestions $suggestions): array {
+            $suggestions->suggestPaths();
+
+            return ['-'];
+        });
+        $option->complete(new CompletionInput(), $suggestions = new CompletionSuggestions());
+
+        $this->assertSame('paths', $suggestions->getPathSuggestion());
+        $this->assertEquals([new Suggestion('-')], $suggestions->getValueSuggestions());
+    }
+
     public function testCompleteClosureReturnIncorrectType()
     {
         $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', null, static fn (CompletionInput $input) => 'invalid');

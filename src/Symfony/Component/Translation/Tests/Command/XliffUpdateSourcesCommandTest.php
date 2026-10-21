@@ -12,9 +12,12 @@
 namespace Symfony\Component\Translation\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
@@ -307,6 +310,17 @@ class XliffUpdateSourcesCommandTest extends TestCase
             ['--locales', 'fr', '--locales', 'it', '--domains'],
             ['messages', 'validators'],
         ];
+    }
+
+    #[RequiresMethod(CompletionSuggestions::class, 'suggestDirectories')]
+    public function testCompletePaths()
+    {
+        $command = $this->createCommand();
+        $input = CompletionInput::fromTokens(['translation:update-xliff-sources'], 1);
+        $input->bind($command->getDefinition());
+        $command->complete($input, $suggestions = new CompletionSuggestions());
+
+        $this->assertSame('directories', $suggestions->getPathSuggestion());
     }
 
     private function createCommand(array $additionalTransPaths = [], array $enabledLocales = []): Command

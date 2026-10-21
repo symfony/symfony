@@ -13,6 +13,8 @@ namespace Symfony\Component\ErrorHandler\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -63,6 +65,13 @@ final class ErrorDumpCommand extends Command
         $io->success(\sprintf('Error pages have been dumped in "%s".', $path));
 
         return Command::SUCCESS;
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('path') && method_exists($suggestions, 'suggestDirectories')) {
+            $suggestions->suggestDirectories();
+        }
     }
 
     private function dump(SymfonyStyle $io, string $path, array $statusCodes, bool $force = false): void

@@ -22,6 +22,7 @@ final class CompletionSuggestions
 {
     private array $valueSuggestions = [];
     private array $optionSuggestions = [];
+    private ?string $pathSuggestion = null;
 
     /**
      * Add a suggested value for an input option or argument.
@@ -82,6 +83,34 @@ final class CompletionSuggestions
     }
 
     /**
+     * Lets the shell complete file system paths, in addition to the suggested values.
+     *
+     * Completion scripts installed by older versions of Symfony ignore it.
+     *
+     * @return $this
+     */
+    public function suggestPaths(): static
+    {
+        $this->pathSuggestion = 'paths';
+
+        return $this;
+    }
+
+    /**
+     * Lets the shell complete directory paths, in addition to the suggested values.
+     *
+     * Completion scripts installed by older versions of Symfony ignore it.
+     *
+     * @return $this
+     */
+    public function suggestDirectories(): static
+    {
+        $this->pathSuggestion ??= 'directories';
+
+        return $this;
+    }
+
+    /**
      * @return InputOption[]
      */
     public function getOptionSuggestions(): array
@@ -95,5 +124,15 @@ final class CompletionSuggestions
     public function getValueSuggestions(): array
     {
         return $this->valueSuggestions;
+    }
+
+    /**
+     * Returns the kind of paths the shell should complete, if any.
+     *
+     * @return 'paths'|'directories'|null
+     */
+    public function getPathSuggestion(): ?string
+    {
+        return $this->pathSuggestion;
     }
 }

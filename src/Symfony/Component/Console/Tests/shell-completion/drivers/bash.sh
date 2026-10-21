@@ -35,7 +35,7 @@ fi
 
 # Splits the command line the way readline does: on the characters of
 # COMP_WORDBREAKS, which are words of their own, and on unquoted whitespace.
-# Quotes are kept, and open quotes protect the characters they contain.
+# Quotes and backslashes are kept, and they protect the characters they quote.
 #
 # Sets: words, cword, cur and prefix, the part of the current shell token that
 # readline keeps in place, before the word being completed.
@@ -56,6 +56,11 @@ tokenize() {
             \'|\")
                 quote="$char"
                 word+="$char" token+="$char"
+                ;;
+            \\)
+                char+="${line:i+1:1}"
+                word+="$char" token+="$char"
+                i=$((i + 1))
                 ;;
             ' '|$'\t')
                 [ -n "$word" ] && words+=("$word")
@@ -87,14 +92,26 @@ COMP_LINE="$command_line"
 COMP_POINT=${#COMP_LINE}
 COMPREPLY=()
 
-# compopt is only available while a completion is running
-compopt() { :; }
+# compopt is only available while a completion is running. The "filenames"
+# option is recorded to print the suggestions as readline would insert them.
+filenames=''
+compopt() {
+    local IFS=' '
+    [[ " $* " == *' -o filenames '* ]] && filenames=1
+
+    return 0
+}
 
 "$completion_function" || exit $?
 
 # Undo the shell escaping and prepend what readline keeps, to print the value the
-# user ends up with
+# user ends up with. With the "filenames" option, the suggestions are not escaped
+# and readline adds a slash to the directories.
 for suggestion in "${COMPREPLY[@]}"; do
-    suggestion="$(eval "printf '%s' $suggestion" 2> /dev/null || printf '%s' "$suggestion")"
+    if [ -n "$filenames" ]; then
+        [ -d "$suggestion" ] && suggestion="$suggestion/"
+    else
+        suggestion="$(eval "printf '%s' $suggestion" 2> /dev/null || printf '%s' "$suggestion")"
+    fi
     printf '%s%s\n' "$prefix" "$suggestion"
 done

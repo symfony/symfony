@@ -57,6 +57,26 @@ _describe() {
     done
 }
 
+# compset -P '*=' is called before _files and _directories to complete the value
+# of an option. It keeps the "--option=" part out of the word being completed.
+local ignored_prefix=''
+compset() {
+    if [[ "$1" == '-P' && "$current_word" == *=* ]]; then
+        ignored_prefix="${current_word%%=*}="
+    fi
+}
+
+# _files and _directories complete the paths starting with the word being
+# completed and add a slash to the directories. When no directory matches, the
+# real _directories falls back to the files unless the file-patterns style says
+# otherwise. The stub does not.
+_files() {
+    print -rl -- ${~${(b)current_word#$ignored_prefix}}*(NM)
+}
+_directories() {
+    print -rl -- ${~${(b)current_word#$ignored_prefix}}*(N-/M)
+}
+
 # the completion script is a compdef file, ignore the compdef call
 compdef() { :; }
 

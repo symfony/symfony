@@ -277,6 +277,8 @@ class XliffLintCommand extends Command
     {
         if ($input->mustSuggestOptionValuesFor('format')) {
             $suggestions->suggestValues($this->getAvailableFormatOptions());
+        } elseif ($input->mustSuggestArgumentValuesFor('filename') && method_exists($suggestions, 'suggestPaths')) {
+            $suggestions->suggestPaths();
         }
     }
 

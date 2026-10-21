@@ -41,6 +41,8 @@ class Isin extends Constraint
 
     /**
      * @param string[]|null $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(?array $options = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {

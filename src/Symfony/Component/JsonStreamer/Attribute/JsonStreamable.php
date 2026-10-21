@@ -19,6 +19,9 @@ namespace Symfony\Component\JsonStreamer\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class JsonStreamable
 {
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         public bool $asObject = true,
         public bool $asList = true,

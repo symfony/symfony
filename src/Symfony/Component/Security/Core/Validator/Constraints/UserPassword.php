@@ -26,6 +26,9 @@ class UserPassword extends Constraint
     public string $message = 'This value should be the user\'s current password.';
     public string $service = 'security.validator.user_password';
 
+    /**
+     * @stable-parameter-names
+     */
     #[HasNamedArguments]
     public function __construct(?array $options = null, ?string $message = null, ?string $service = null, ?array $groups = null, mixed $payload = null)
     {

@@ -32,6 +32,8 @@ final class IsSignatureValid
 
     /**
      * @param string[]|string $methods HTTP methods that require signature validation. An empty array means that no method filtering is done
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         array|string $methods = [],

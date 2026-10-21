@@ -22,6 +22,8 @@ class FirewallListenerOrder
     /**
      * @param string|list<string>|null $before Listeners this one runs before, as service ids or classes
      * @param string|list<string>|null $after  Listeners this one runs after, as service ids or classes
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string|array|null $before = null,

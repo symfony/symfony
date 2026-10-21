@@ -148,6 +148,8 @@ final class Currencies extends ResourceBundle
      * @return list<string> a list of unique currencies
      *
      * @throws MissingResourceException if the given $country does not exist
+     *
+     * @stable-parameter-names
      */
     public static function forCountry(string $country, ?bool $legalTender = true, ?bool $active = true, \DateTimeInterface $date = new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC')), bool $includeUndated = true): array
     {
@@ -180,6 +182,8 @@ final class Currencies extends ResourceBundle
      * @param ?bool              $legalTender If the currency must be a legal tender; null to not filter anything
      * @param ?bool              $active      Indicates whether the currency should always be active for the given $date; null to not filter anything
      * @param \DateTimeInterface $date        The date that will be checked when $active is set to true
+     *
+     * @stable-parameter-names
      */
     public static function isValidInCountry(string $country, string $currency, ?bool $legalTender = true, ?bool $active = true, \DateTimeInterface $date = new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC')), bool $includeUndated = true): bool
     {
@@ -239,6 +243,8 @@ final class Currencies extends ResourceBundle
      * @param ?bool              $legalTender If the currency must be a legal tender; null to not filter anything
      * @param ?bool              $active      Indicates whether the currency should always be active for the given $date; null to not filter anything
      * @param \DateTimeInterface $date        the date on which the check will be performed if $active is set to true
+     *
+     * @stable-parameter-names
      */
     public static function isValidInAnyCountry(string $currency, ?bool $legalTender = true, ?bool $active = true, \DateTimeInterface $date = new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC')), bool $includeUndated = true): bool
     {

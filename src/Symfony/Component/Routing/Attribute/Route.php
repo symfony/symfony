@@ -50,6 +50,8 @@ class Route
      * @param string|null                                       $firewall     The firewall name to use for matching this route
      * @param string|string[]|null                              $env          The env(s) in which the route is defined (i.e. "dev", "test", "prod", ["dev", "test"])
      * @param string|DeprecatedAlias|(string|DeprecatedAlias)[] $alias        The list of aliases for this route
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string|array|null $path = null,

@@ -108,6 +108,8 @@ class File extends Constraint
      * @param self::FILENAME_COUNT_*|null        $filenameCountUnit           The character count unit used for checking the filename length (defaults to {@see self::FILENAME_COUNT_BYTES})
      *
      * @see https://www.iana.org/assignments/media-types/media-types.xhtml Existing media types
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

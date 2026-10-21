@@ -30,6 +30,8 @@ class SerializedPath
     /**
      * @param string       $serializedPath A path using a valid PropertyAccess syntax where the value is stored in a normalized representation
      * @param string|array $groups         The groups to use when serializing or deserializing
+     *
+     * @stable-parameter-names
      */
     public function __construct(string $serializedPath, string|array $groups = ['*'])
     {

@@ -29,6 +29,8 @@ class AsAlias
      * @param bool                $public Whether to declare the alias public
      * @param string|list<string> $when   The environments under which the class will be registered as a service (i.e. "dev", "test", "prod")
      * @param string|null         $target The name of the target to bind the alias to
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public ?string $id = null,

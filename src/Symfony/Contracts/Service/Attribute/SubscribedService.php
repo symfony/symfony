@@ -35,6 +35,8 @@ final class SubscribedService
      * @param string|null     $type       The service type (a class name, "string", "iterable", etc.)
      * @param bool            $nullable   Whether the service is optional
      * @param object|object[] $attributes One or more dependency injection attributes to use
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public ?string $key = null,

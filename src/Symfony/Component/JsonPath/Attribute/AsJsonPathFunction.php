@@ -19,6 +19,9 @@ use Symfony\Component\JsonPath\FunctionReturnType;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class AsJsonPathFunction
 {
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         public string $name,
         public FunctionReturnType $returnType = FunctionReturnType::Value,

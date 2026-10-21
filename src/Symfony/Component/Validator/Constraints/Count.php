@@ -48,6 +48,8 @@ class Count extends Constraint
      * @param int<0, max>|null  $max         Maximum expected number of elements
      * @param positive-int|null $divisibleBy The number the collection count should be divisible by
      * @param string[]|null     $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?int $exactly = null,

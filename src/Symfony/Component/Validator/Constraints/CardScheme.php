@@ -50,6 +50,8 @@ class CardScheme extends Constraint
     /**
      * @param non-empty-string|non-empty-string[]|null $schemes Name(s) of the number scheme(s) used to validate the credit card number
      * @param string[]|null                            $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(array|string|null $schemes, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {

@@ -88,6 +88,8 @@ class NoSuspiciousCharacters extends Constraint
      *                                                                      {@see NoSuspiciousCharacters::RESTRICTION_LEVEL_MODERATE} on ICU >= 58, {@see NoSuspiciousCharacters::RESTRICTION_LEVEL_SINGLE_SCRIPT} otherwise)
      * @param string[]|null                               $locales          Restrict the string's characters to those normally used with these locales. Pass null to use the default locales configured for the NoSuspiciousCharactersValidator. (defaults to null)
      * @param string[]|null                               $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

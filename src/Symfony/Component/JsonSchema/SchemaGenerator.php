@@ -103,6 +103,8 @@ final class SchemaGenerator implements SchemaGeneratorInterface
      * @param iterable<PropertySchemaProviderInterface> $propertySchemaProviders
      * @param iterable<PropertySchemaEnricherInterface> $propertySchemaEnrichers
      * @param iterable<DefinitionProcessorInterface>    $definitionProcessors
+     *
+     * @optional-arguments-by-name
      */
     public static function create(?DefinitionPolicyInterface $definitionPolicy = null, iterable $classSchemaResolvers = [], iterable $propertySchemaProviders = [], iterable $propertySchemaEnrichers = [], iterable $definitionProcessors = []): self
     {
@@ -682,7 +684,19 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             return $config;
         }
 
-        return new Configuration($config->dialect, $config->groups, $attributes, $config->ignoredAttributes, $config->allowExtraAttributes, $config->validationGroups, $config->definitionName, $config->definitionPrefix, $config->format, $config->direction, $config->context);
+        return new Configuration(
+            dialect: $config->dialect,
+            groups: $config->groups,
+            attributes: $attributes,
+            ignoredAttributes: $config->ignoredAttributes,
+            allowExtraAttributes: $config->allowExtraAttributes,
+            validationGroups: $config->validationGroups,
+            definitionName: $config->definitionName,
+            definitionPrefix: $config->definitionPrefix,
+            format: $config->format,
+            direction: $config->direction,
+            context: $config->context,
+        );
     }
 
     /**

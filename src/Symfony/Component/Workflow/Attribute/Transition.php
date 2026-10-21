@@ -40,6 +40,8 @@ class Transition
      * @param string|null                                                   $description The description of the transition, stored under the "description" key of its metadata
      * @param string|null                                                   $guard       An expression that must be true to enable the transition
      * @param array<string, mixed>                                          $metadata    The metadata of the transition
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly \BackedEnum|Arc|string|array $from,

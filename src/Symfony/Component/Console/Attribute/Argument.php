@@ -43,6 +43,8 @@ class Argument
      *
      * @param string|(callable():string)                                                 $description     The description of the argument, displayed with the help page
      * @param array<string|Suggestion>|callable(CompletionInput):list<string|Suggestion> $suggestedValues The values used for input completion
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         string|callable $description = '',

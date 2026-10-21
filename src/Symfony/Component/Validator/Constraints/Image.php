@@ -118,6 +118,8 @@ class Image extends File
      * @param string|null              $sizeNotDetectedMessage      Message if the system can not determine image size and there is a size constraint to validate
      *
      * @see https://www.iana.org/assignments/media-types/media-types.xhtml Existing media types
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

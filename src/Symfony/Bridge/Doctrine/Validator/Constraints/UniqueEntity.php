@@ -46,6 +46,8 @@ class UniqueEntity extends Constraint
      * @param string|null          $repositoryMethod The repository method to check uniqueness instead of findBy. The method will receive as its argument
      *                                               a fieldName => value associative array according to the fields option configuration
      * @param string|null          $errorPath        Bind the constraint violation to this field instead of the first one in the fields option configuration
+     *
+     * @stable-parameter-names
      */
     #[HasNamedArguments]
     public function __construct(

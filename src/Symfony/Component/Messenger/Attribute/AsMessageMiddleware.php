@@ -25,6 +25,8 @@ class AsMessageMiddleware
      * @param string                   $bus    The id of the bus to add the middleware to, or "*" for all buses
      * @param string|list<string>|null $before Middleware of the same bus this one runs before, as configured ids, service ids or classes
      * @param string|list<string>|null $after  Middleware of the same bus this one runs after, as configured ids, service ids or classes
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $bus,

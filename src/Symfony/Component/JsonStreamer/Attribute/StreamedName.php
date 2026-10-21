@@ -19,6 +19,9 @@ namespace Symfony\Component\JsonStreamer\Attribute;
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class StreamedName
 {
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         private string $name,
     ) {

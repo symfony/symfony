@@ -41,6 +41,8 @@ class Collection extends Composite
      * @param string[]|null                                  $groups
      * @param bool|null                                      $allowExtraFields   Whether to allow additional keys not declared in the configured fields (defaults to false)
      * @param bool|null                                      $allowMissingFields Whether to allow the collection to lack some fields declared in the configured fields (defaults to false)
+     *
+     * @stable-parameter-names
      */
     public function __construct(?array $fields = null, ?array $groups = null, mixed $payload = null, ?bool $allowExtraFields = null, ?bool $allowMissingFields = null, ?string $extraFieldsMessage = null, ?string $missingFieldsMessage = null)
     {

@@ -25,6 +25,8 @@ class Cascade extends Constraint
 
     /**
      * @param non-empty-string[]|non-empty-string|null $exclude Properties excluded from validation
+     *
+     * @stable-parameter-names
      */
     public function __construct(array|string|null $exclude = null)
     {

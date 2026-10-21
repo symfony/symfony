@@ -22,6 +22,8 @@ class GroupSequenceProvider
     /**
      * @param bool $cascadeCurrentGroup Whether the group being stepped through must be cascaded to referenced
      *                                  objects on top of "Default"; see {@see GroupSequence::$cascadeCurrentGroup}
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public ?string $provider = null,

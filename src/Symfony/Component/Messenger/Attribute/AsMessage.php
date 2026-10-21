@@ -19,6 +19,9 @@ namespace Symfony\Component\Messenger\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class AsMessage
 {
+    /**
+     * @stable-parameter-names
+     */
     public function __construct(
         /**
          * Name of the transports to which the message should be routed.

@@ -34,6 +34,8 @@ class Hostname extends Constraint
     /**
      * @param bool|null     $requireTld Whether to require the hostname to include its top-level domain (defaults to true)
      * @param string[]|null $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

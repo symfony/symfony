@@ -48,6 +48,8 @@ class Cron extends Constraint
     /**
      * @param string[]|null     $groups
      * @param self::MODE_*|null $mode   The accepted cron expression flavor (defaults to {@see self::MODE_ALIASES})
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?string $message = null,

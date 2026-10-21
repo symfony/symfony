@@ -40,6 +40,8 @@ class Country extends Constraint
      * @param string[]|null $groups
      *
      * @see https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3#Current_codes
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

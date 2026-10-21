@@ -29,6 +29,8 @@ final class AsControllerAttributeListener extends AsEventListener
      * @param int|null                 $priority       The priority of this listener; null lets "before"/"after" decide it, else they only reorder within that priority
      * @param string|list<string>|null $before         Listeners this one runs before, as service ids, classes or "service::method"
      * @param string|list<string>|null $after          Listeners this one runs after, as service ids, classes or "service::method"
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         string $kernelEvent,

@@ -54,6 +54,8 @@ class Choice extends Constraint
      * @param positive-int|null    $max      Maximum of valid choices if multiple values are expected
      * @param string[]|null        $groups
      * @param bool|null            $match    Whether to validate the values are part of the choices or not (defaults to true)
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         string|array|null $options = null,

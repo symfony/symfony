@@ -22,6 +22,8 @@ class AutowireServiceClosure extends Autowire
 {
     /**
      * @param string $service The service id to wrap in the closure
+     *
+     * @stable-parameter-names
      */
     public function __construct(string $service)
     {

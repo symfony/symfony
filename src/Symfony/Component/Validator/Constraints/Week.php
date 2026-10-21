@@ -35,6 +35,8 @@ final class Week extends Constraint
     /**
      * @param non-empty-string|null $min
      * @param non-empty-string|null $max
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public ?string $min = null,

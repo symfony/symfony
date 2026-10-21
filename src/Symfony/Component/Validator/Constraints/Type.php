@@ -34,6 +34,8 @@ class Type extends Constraint
     /**
      * @param string|list<string>|null $type   The type(s) to enforce on the value
      * @param string[]|null            $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(string|array|null $type, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {

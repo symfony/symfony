@@ -36,6 +36,8 @@ final class MapInput
 
     /**
      * @param string[]|null $validationGroups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public readonly ?array $validationGroups = null,

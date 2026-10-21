@@ -28,6 +28,9 @@ class Form extends Constraint
         self::NO_SUCH_FIELD_ERROR => 'NO_SUCH_FIELD_ERROR',
     ];
 
+    /**
+     * @stable-parameter-names
+     */
     #[HasNamedArguments]
     public function __construct(mixed $options = null, ?array $groups = null, mixed $payload = null)
     {

@@ -21,6 +21,8 @@ class AsRemoteEventConsumer
 {
     /**
      * @param string $name The name of the remote event consumer, used to identify it when defining remote events
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $name,

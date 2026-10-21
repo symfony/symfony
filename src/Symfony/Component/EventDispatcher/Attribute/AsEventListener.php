@@ -26,6 +26,8 @@ class AsEventListener
      * @param string|null              $dispatcher The service id of the event dispatcher to listen to
      * @param string|list<string>|null $before     Listeners this one runs before, as service ids, classes or "service::method"
      * @param string|list<string>|null $after      Listeners this one runs after, as service ids, classes or "service::method"
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public ?string $event = null,

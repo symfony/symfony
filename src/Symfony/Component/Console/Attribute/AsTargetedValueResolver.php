@@ -19,6 +19,8 @@ class AsTargetedValueResolver
 {
     /**
      * @param string|null $name The name with which the resolver can be targeted
+     *
+     * @stable-parameter-names
      */
     public function __construct(public readonly ?string $name = null)
     {

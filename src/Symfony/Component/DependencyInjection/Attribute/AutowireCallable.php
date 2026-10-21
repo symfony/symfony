@@ -26,6 +26,8 @@ class AutowireCallable extends AutowireInline
      * @param string|null       $service  The service containing the callable to autowire
      * @param string|null       $method   The method name that will be autowired
      * @param bool|class-string $lazy     Whether to use lazy-loading for this argument
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         string|array|null $callable = null,

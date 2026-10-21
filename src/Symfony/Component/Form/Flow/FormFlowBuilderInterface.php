@@ -32,6 +32,8 @@ interface FormFlowBuilderInterface extends FormBuilderInterface, FormFlowConfigI
 
     /**
      * Adds a step to the form flow.
+     *
+     * @stable-parameter-names
      */
     public function addStep(StepFlowBuilderConfigInterface|string $name, string $type = FormType::class, array $options = [], ?callable $skip = null, int $priority = 0): static;
 

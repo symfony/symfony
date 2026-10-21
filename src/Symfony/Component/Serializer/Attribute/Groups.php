@@ -28,6 +28,8 @@ class Groups
 
     /**
      * @param string|string[] $groups The groups to define on the attribute target
+     *
+     * @stable-parameter-names
      */
     public function __construct(string|array $groups)
     {

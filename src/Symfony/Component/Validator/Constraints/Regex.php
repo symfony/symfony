@@ -41,6 +41,8 @@ class Regex extends Constraint
      * @param string|null   $htmlPattern The pattern to use in the HTML5 pattern attribute
      * @param bool|null     $match       Whether to validate the value matches the configured pattern or not (defaults to true)
      * @param string[]|null $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?string $pattern,

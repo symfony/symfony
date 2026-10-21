@@ -39,6 +39,8 @@ class MapEntity extends ValueResolver
      *                                                                                                                     On Console commands, the id name is matched against argument/option names after a kebab-case
      *                                                                                                                     transformation (e.g. "userId" looks for "user-id")
      * @param bool|null                                                                                     $evictCache    If true, forces Doctrine to always fetch the entity from the database instead of cache (defaults to false)
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public ?string $class = null,

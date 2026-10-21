@@ -321,6 +321,8 @@ class RequestContext
      * @param callable():T $callback
      *
      * @return T
+     *
+     * @optional-arguments-by-name
      */
     public function runWith(callable $callback, ?string $baseUrl = null, ?string $method = null, ?string $host = null, ?string $scheme = null, ?int $httpPort = null, ?int $httpsPort = null, ?string $pathInfo = null, ?string $queryString = null, ?array $parameters = null): mixed
     {

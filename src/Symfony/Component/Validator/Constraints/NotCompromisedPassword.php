@@ -36,6 +36,8 @@ class NotCompromisedPassword extends Constraint
      * @param positive-int|null $threshold   The number of times the password should have been leaked to consider it is compromised (defaults to 1)
      * @param bool|null         $skipOnError Whether to ignore HTTP errors while requesting the API and thus consider the password valid (defaults to false)
      * @param string[]|null     $groups
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         ?array $options = null,

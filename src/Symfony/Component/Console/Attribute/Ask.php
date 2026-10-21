@@ -40,6 +40,8 @@ class Ask implements InteractiveAttributeInterface
      * @param callable|null              $validator   The validator for the question
      * @param int|null                   $maxAttempts The maximum number of attempts allowed to answer the question.
      *                                                Null means an unlimited number of attempts
+     *
+     * @stable-parameter-names
      */
     public function __construct(
         public string $question,

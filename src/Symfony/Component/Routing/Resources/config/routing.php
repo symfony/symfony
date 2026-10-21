@@ -198,7 +198,7 @@ return static function (ContainerConfigurator $container) {
 
         ->alias('Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController', RedirectController::class)
             ->public()
-            ->deprecate('symfony/routing', '8.2', 'The "%alias_id%" service is deprecated, use "Symfony\\Component\\Routing\\Controller\\RedirectController" instead.')
+            ->deprecate('symfony/routing', '8.2', 'The "%alias_id%" service is deprecated, use the "redirect_to_route" or "redirect_to" routing option instead.')
 
         ->set(RedirectController::class)
             ->public()

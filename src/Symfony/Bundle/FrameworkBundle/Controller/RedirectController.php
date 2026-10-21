@@ -13,13 +13,13 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\Routing\Controller\RedirectController as BaseRedirectController;
 
-trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController', BaseRedirectController::class);
+trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use the "redirect_to_route" or "redirect_to" routing option instead.', 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController');
 
 class_alias(BaseRedirectController::class, 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController');
 
 if (false) {
     /**
-     * @deprecated since Symfony 8.2, use Symfony\Component\Routing\Controller\RedirectController instead
+     * @deprecated since Symfony 8.2, use the "redirect_to_route" or "redirect_to" routing option instead
      */
     class RedirectController
     {

@@ -18,6 +18,7 @@ use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
@@ -400,6 +401,45 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('/a', $routes->get('a')->getPath());
         $this->assertSame('/b', $routes->get('b')->getPath());
         $this->assertSame(['GET'], $routes->get('b')->getMethods());
+    }
+
+    public function testLoadsArrayRoutesWithControllerShortcuts()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller_shortcuts']));
+        $routes = $loader->load('routing.php');
+
+        $this->assertSame('pages/faq.html.twig', $routes->get('faq')->getDefault('_template'));
+        $this->assertSame(RedirectController::class.'::redirectAction', $routes->get('doc_debug_mode')->getDefault('_controller'));
+        $this->assertSame('doc_page', $routes->get('doc_debug_mode')->getDefault('route'));
+        $this->assertSame(RedirectController::class.'::urlRedirectAction', $routes->get('external')->getDefault('_controller'));
+        $this->assertSame('https://example.com/some/path', $routes->get('external')->getDefault('path'));
+    }
+
+    public function testLoadRoutesWithFluentControllerShortcuts()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures/controller_shortcuts']);
+        $routes = new PhpFileLoader($locator)->load('fluent.php');
+        $expectedRoutes = new YamlFileLoader($locator)->load('routing.yml');
+
+        $this->assertCount(8, $routes);
+        foreach ($expectedRoutes as $name => $route) {
+            $this->assertEquals($route, $routes->get($name));
+        }
+
+        $this->assertSame(['_template' => 'pages/faq.html.twig', 'maxAge' => 300], $routes->get('collection_faq')->getDefaults());
+        foreach (['en', 'fr'] as $locale) {
+            $this->assertSame('pages/faq.html.twig', $routes->get('localized_faq.'.$locale)->getDefault('_template'));
+            $this->assertSame($locale, $routes->get('localized_faq.'.$locale)->getDefault('_locale'));
+        }
+
+        $this->assertSame([
+            '_locale' => 'en',
+            '_format' => 'html',
+            '_stateless' => true,
+            '_controller' => RedirectController::class.'::urlRedirectAction',
+            'path' => '/faq.html',
+            'permanent' => true,
+        ], $routes->get('imported_defaults')->getDefaults());
     }
 
     public function testWhenEnvWithArray()

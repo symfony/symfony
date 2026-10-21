@@ -32,6 +32,18 @@
           "type": ["string", "null"],
           "description": "The controller that handles the request, e.g., 'App\\Controller\\BlogController::show'."
         },
+        "template": {
+          "type": ["string", "null"],
+          "description": "The template to render instead of calling a controller, e.g., 'pages/faq.html.twig'. Requires TwigBundle."
+        },
+        "redirect_to_route": {
+          "type": ["string", "null"],
+          "description": "The name of the route to redirect to instead of calling a controller."
+        },
+        "redirect_to": {
+          "type": ["string", "null"],
+          "description": "The path or URL to redirect to instead of calling a controller, e.g., '/doc/current' or 'https://example.com'."
+        },
         "methods": {
           "description": "The HTTP method(s) this route matches.",
           "oneOf": [

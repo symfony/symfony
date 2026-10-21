@@ -20,7 +20,7 @@ use Twig\Environment;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final
+ * @internal
  */
 #[AsController]
 class TemplateController

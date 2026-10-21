@@ -1,0 +1,4 @@
+doc:
+    path: /doc
+    redirect_to: /doc/current
+    defaults: { path: /doc/other }

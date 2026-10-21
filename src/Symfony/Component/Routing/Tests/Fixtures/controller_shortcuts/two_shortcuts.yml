@@ -1,0 +1,4 @@
+doc:
+    path: /doc
+    redirect_to_route: doc_page
+    redirect_to: /doc/current

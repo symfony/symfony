@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Constraint;
@@ -57,6 +58,10 @@ class TwigExtension extends Extension
 
         if ($container::willBeAvailable('symfony/console', Application::class, ['symfony/twig-bundle'])) {
             $loader->load('console.php');
+        }
+
+        if ($container::willBeAvailable('symfony/routing', RouteCollection::class, ['symfony/twig-bundle'])) {
+            $loader->load('routing.php');
         }
 
         if (!$container::willBeAvailable('symfony/translation', Translator::class, ['symfony/twig-bundle'])) {

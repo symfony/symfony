@@ -24,14 +24,15 @@ CHANGELOG
  * Add the `configure_container` option to `WebTestCase::createClient()` to configure the container after every kernel reboot
  * Add an "Inlined" column to `debug:container --env-vars`, telling which env vars are read while the container is compiled
  * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer`, `CacheWarmer\CachePoolClearerCacheWarmer` and the five `Command\CachePool*Command` classes, use the ones from the Cache component instead
- * Deprecate `CacheWarmer\RouterCacheWarmer`, `Command\RouterMatchCommand`, `Controller\RedirectController`, `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader`, `Routing\RedirectableCompiledUrlMatcher`, `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use the ones from the Routing component instead
+ * Deprecate `CacheWarmer\RouterCacheWarmer`, `Command\RouterMatchCommand`, `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader`, `Routing\RedirectableCompiledUrlMatcher`, `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use the ones from the Routing component instead
+ * Deprecate `Controller\RedirectController`, use the `redirect_to_route` or `redirect_to` route key instead
  * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component instead
  * Deprecate `CacheWarmer\TranslationsCacheWarmer`, `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand`, `DependencyInjection\Compiler\TranslationLintCommandPass`, `DependencyInjection\Compiler\TranslationUpdateCommandPass` and `Translation\Translator`, use the ones from the Translation component instead
  * Deprecate `CacheWarmer\SerializerCacheWarmer`, use the one from the Serializer component instead
  * Deprecate `CacheWarmer\ValidatorCacheWarmer`, use the one from the Validator component instead
  * Deprecate `DependencyInjection\Compiler\AssetsContextPass`, use the one from the Asset component instead
  * Deprecate `DependencyInjection\Compiler\JsonPathPass`, use the one from the JsonPath component instead
- * Deprecate `Controller\TemplateController`, use the one from TwigBundle instead
+ * Deprecate `Controller\TemplateController`, use the `template` route key instead
  * Register the bundle each installed component now ships: `AssetBundle`, `AssetMapperBundle`, `CacheBundle`, `HtmlSanitizerBundle`, `HttpClientBundle`, `JsonPathBundle`, `JsonSchemaBundle`, `JsonStreamerBundle`, `KeyManagementBundle`, `LockBundle`, `MailerBundle`, `MessengerBundle`, `MimeBundle`, `NotifierBundle`, `ObjectMapperBundle`, `ProcessBundle`, `PropertyAccessBundle`, `PropertyInfoBundle`, `RateLimiterBundle`, `RemoteEventBundle`, `RouterBundle`, `SchedulerBundle`, `SemaphoreBundle`, `SerializerBundle`, `TranslationBundle`, `TypeInfoBundle`, `UidBundle`, `ValidationBundle`, `WebLinkBundle`, `WebhookBundle` and `WorkflowBundle`
  * Make every `framework.*` key an alias of the configuration of the bundle that provides it; three are spelled differently at the root: `framework.assets` for `asset`, `framework.translator` for `translation` and `framework.workflows` for `workflow`
  * Auto-configure the `form.data_class` resource tag for classes with the `#[AsFormType]` attribute

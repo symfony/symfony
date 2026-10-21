@@ -1,0 +1,4 @@
+external:
+    path: /external
+    redirect_to: https://example.com/some/path
+    defaults: { _controller: App\Controller\PageController::external }

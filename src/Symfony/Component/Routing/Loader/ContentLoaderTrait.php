@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
+use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Loader\Configurator\Traits\HostTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\LocalizedRouteTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\PrefixTrait;
@@ -29,8 +30,13 @@ trait ContentLoaderTrait
      * Config keys accepted at the route or import level by {@see validate()}.
      */
     private const AVAILABLE_KEYS = [
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'add_condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless', 'firewall',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'add_condition', 'controller', 'template', 'redirect_to_route', 'redirect_to', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless', 'firewall',
     ];
+
+    /**
+     * Route keys that replace the "controller" key.
+     */
+    private const CONTROLLER_SHORTCUT_KEYS = ['template', 'redirect_to_route', 'redirect_to'];
 
     /**
      * Processes a parsed configuration array, handling `when@<env>` filtering
@@ -90,6 +96,17 @@ trait ContentLoaderTrait
 
         if (isset($config['controller'])) {
             $defaults['_controller'] = $config['controller'];
+        }
+        if (isset($config['template'])) {
+            $defaults['_template'] = $config['template'];
+        }
+        if (isset($config['redirect_to_route'])) {
+            $defaults['_controller'] = RedirectController::class.'::redirectAction';
+            $defaults['route'] = $config['redirect_to_route'];
+        }
+        if (isset($config['redirect_to'])) {
+            $defaults['_controller'] = RedirectController::class.'::urlRedirectAction';
+            $defaults['path'] = $config['redirect_to'];
         }
         if (isset($config['locale'])) {
             $defaults['_locale'] = $config['locale'];
@@ -227,6 +244,26 @@ trait ContentLoaderTrait
         }
         if (isset($config['controller']) && isset($config['defaults']['_controller'])) {
             throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "controller" key and the defaults key "_controller" for "%s".', $path, $name));
+        }
+        if ($shortcutKeys = array_values(array_filter(self::CONTROLLER_SHORTCUT_KEYS, static fn ($key) => isset($config[$key])))) {
+            if (isset($config['resource'])) {
+                throw new \InvalidArgumentException(\sprintf('The "%s" key for the import "%s" in "%s" is unsupported. It is only available for route definitions.', $shortcutKeys[0], $name, $path));
+            }
+            if (1 < \count($shortcutKeys)) {
+                throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify more than one of the "%s" keys for "%s".', $path, implode('", "', $shortcutKeys), $name));
+            }
+            if (isset($config['controller']) || isset($config['defaults']['_controller'])) {
+                throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "%s" key and a controller for "%s".', $path, $shortcutKeys[0], $name));
+            }
+        }
+        if (isset($config['template']) && isset($config['defaults']['_template'])) {
+            throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "template" key and the defaults key "_template" for "%s".', $path, $name));
+        }
+        if (isset($config['redirect_to_route']) && isset($config['defaults']['route'])) {
+            throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "redirect_to_route" key and the defaults key "route" for "%s".', $path, $name));
+        }
+        if (isset($config['redirect_to']) && isset($config['defaults']['path'])) {
+            throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "redirect_to" key and the defaults key "path" for "%s".', $path, $name));
         }
         if (isset($config['stateless']) && isset($config['defaults']['_stateless'])) {
             throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "stateless" key and the defaults key "_stateless" for "%s".', $path, $name));

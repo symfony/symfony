@@ -1,0 +1,4 @@
+faq:
+    path: /faq.html
+    template: 'pages/faq.html.twig'
+    defaults: { maxAge: 300, context: { lastUpdate: '2026-10-20' } }

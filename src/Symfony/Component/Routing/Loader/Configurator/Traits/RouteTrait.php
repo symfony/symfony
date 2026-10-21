@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader\Configurator\Traits;
 
+use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -142,6 +143,42 @@ trait RouteTrait
     final public function controller(callable|string|array $controller): static
     {
         $this->route->addDefaults(['_controller' => $controller]);
+
+        return $this;
+    }
+
+    /**
+     * Sets the template to render with TwigBundle.
+     *
+     * @return $this
+     */
+    final public function template(string $template): static
+    {
+        $this->route->addDefaults(['_template' => $template]);
+
+        return $this;
+    }
+
+    /**
+     * Sets the route to redirect to.
+     *
+     * @return $this
+     */
+    final public function redirectToRoute(string $route): static
+    {
+        $this->route->addDefaults(['_controller' => RedirectController::class.'::redirectAction', 'route' => $route]);
+
+        return $this;
+    }
+
+    /**
+     * Sets the path or URL to redirect to.
+     *
+     * @return $this
+     */
+    final public function redirectTo(string $path): static
+    {
+        $this->route->addDefaults(['_controller' => RedirectController::class.'::urlRedirectAction', 'path' => $path]);
 
         return $this;
     }

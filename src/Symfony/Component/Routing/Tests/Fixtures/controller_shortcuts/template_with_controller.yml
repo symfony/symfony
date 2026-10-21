@@ -1,0 +1,4 @@
+faq:
+    path: /faq.html
+    template: 'pages/faq.html.twig'
+    controller: App\Controller\PageController::faq

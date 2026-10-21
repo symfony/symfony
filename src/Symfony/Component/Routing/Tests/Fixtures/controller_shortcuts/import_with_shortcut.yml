@@ -1,0 +1,3 @@
+pages:
+    resource: routing.yml
+    template: 'pages/faq.html.twig'

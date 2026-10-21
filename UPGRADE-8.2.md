@@ -199,14 +199,23 @@ FrameworkBundle
    `Bundle::registerCommands()` method, listed in the new `console.command.bundles` container parameter; that
    parameter exists only to support the deprecated method and goes away with it in 9.0
  * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer`, `CacheWarmer\CachePoolClearerCacheWarmer`, `Command\CachePoolClearCommand`, `Command\CachePoolDeleteCommand`, `Command\CachePoolInvalidateTagsCommand`, `Command\CachePoolListCommand` and `Command\CachePoolPruneCommand`, use their counterparts from the Cache component instead
- * Deprecate `CacheWarmer\RouterCacheWarmer`, `Command\RouterMatchCommand`, `Controller\RedirectController`, `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader`, `Routing\RedirectableCompiledUrlMatcher`, `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use their counterparts from the Routing component instead. The `Symfony\Bundle\FrameworkBundle\Controller\RedirectController` service id, which route definitions reference, keeps working as a deprecated alias, and `AsRoutingConditionService` no longer tags the subclasses of the classes that carry it
+ * Deprecate `CacheWarmer\RouterCacheWarmer`, `Command\RouterMatchCommand`, `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader`, `Routing\RedirectableCompiledUrlMatcher`, `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use their counterparts from the Routing component instead.
+   The `AsRoutingConditionService` attribute no longer tags subclasses of annotated classes
+ * Deprecate `Controller\RedirectController`, use the `redirect_to_route` or `redirect_to` route key in YAML and PHP array configurations.
+   Use `redirect_to_route` for route names and `redirect_to` for paths or URLs.
+   In fluent PHP configurations, use `->redirectToRoute()` or `->redirectTo()`.
+   You can also use `Symfony\Component\Routing\Controller\RedirectController` directly.
+   The old service id remains a deprecated alias
  * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component instead. Unlike the interface, the attribute is not inherited: a class extending an annotated one has to carry it too
  * Deprecate `CacheWarmer\TranslationsCacheWarmer`, `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand`, `DependencyInjection\Compiler\TranslationLintCommandPass`, `DependencyInjection\Compiler\TranslationUpdateCommandPass` and `Translation\Translator`, use their counterparts from the Translation component instead
  * Deprecate `CacheWarmer\SerializerCacheWarmer`, use the one from the Serializer component instead
  * Deprecate `CacheWarmer\ValidatorCacheWarmer`, use the one from the Validator component instead
  * Deprecate `DependencyInjection\Compiler\AssetsContextPass`, use the one from the Asset component instead
  * Deprecate `DependencyInjection\Compiler\JsonPathPass`, use the one from the JsonPath component instead
- * Deprecate `Controller\TemplateController`, use the one from TwigBundle instead. Its service now exists when TwigBundle is registered instead of whenever routing is, and the old service id keeps working as a deprecated alias
+ * Deprecate `Controller\TemplateController`, use the `template` route key in YAML and PHP array configurations.
+   In fluent PHP configurations, use `->template()`.
+   In custom route loaders, set the `_template` route default.
+   The service now requires TwigBundle to be registered, and the old service id remains a deprecated alias
  * The secrets vault no longer loads env vars when its directory is in the project but does not exist when the container is built (`config/secrets/` by default). The env var of `framework.secret` is then not derived from `SYMFONY_DECRYPTION_SECRET` anymore when it is empty or not defined: define it, or create the vault. In non-debug environments, clear the cache after creating the first vault
  * The env vars of the `framework.test` option are now read while the container is compiled. With `test: '%env(bool:FOO)%'`, the test services are not loaded anymore when `FOO` is false. They used to be loaded whatever the value of `FOO`. The container also fails to compile when `FOO` is not defined
  * The env vars of the `framework.disallow_search_engine_index` option are now read while the container is compiled. With `disallow_search_engine_index: '%env(bool:FOO)%'`, the `X-Robots-Tag: noindex` header is not added anymore when `FOO` is false. It used to be added whatever the value of `FOO`. The container also fails to compile when `FOO` is not defined

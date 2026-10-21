@@ -13,13 +13,13 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Bundle\TwigBundle\Controller\TemplateController as BaseTemplateController;
 
-trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Controller\TemplateController', BaseTemplateController::class);
+trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use the "template" routing option instead.', 'Symfony\Bundle\FrameworkBundle\Controller\TemplateController');
 
 class_alias(BaseTemplateController::class, 'Symfony\Bundle\FrameworkBundle\Controller\TemplateController');
 
 if (false) {
     /**
-     * @deprecated since Symfony 8.2, use Symfony\Bundle\TwigBundle\Controller\TemplateController instead
+     * @deprecated since Symfony 8.2, use the "template" routing option instead
      */
     class TemplateController
     {

@@ -1,0 +1,4 @@
+faq:
+    path: /faq.html
+    template: 'pages/faq.html.twig'
+    defaults: { _template: 'pages/other.html.twig' }

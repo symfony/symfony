@@ -1,0 +1,17 @@
+faq:
+    path: /faq.html
+    template: 'pages/faq.html.twig'
+    defaults: { maxAge: 300 }
+
+doc_debug_mode:
+    path: /doc/{version}/debug-mode
+    redirect_to_route: doc_page
+    defaults: { page: 'configuration/front_controllers_and_kernel', _fragment: 'debug-mode' }
+
+doc_index:
+    path: /doc/{version}
+    redirect_to: /doc/current/{page}
+
+external:
+    path: /external
+    redirect_to: https://example.com/some/path

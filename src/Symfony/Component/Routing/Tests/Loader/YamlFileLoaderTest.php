@@ -20,6 +20,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\DirectoryLoader;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
@@ -179,6 +180,44 @@ class YamlFileLoaderTest extends TestCase
         $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" key and the defaults key "_controller" for "app_blog"/');
 
         $loader->load('override_defaults.yml');
+    }
+
+    public function testLoadRoutesWithControllerShortcuts()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller_shortcuts']));
+        $routeCollection = $loader->load('routing.yml');
+
+        $this->assertSame(['maxAge' => 300, '_template' => 'pages/faq.html.twig'], $routeCollection->get('faq')->getDefaults());
+        $this->assertSame([
+            'page' => 'configuration/front_controllers_and_kernel',
+            '_fragment' => 'debug-mode',
+            '_controller' => RedirectController::class.'::redirectAction',
+            'route' => 'doc_page',
+        ], $routeCollection->get('doc_debug_mode')->getDefaults());
+        $this->assertSame(['_controller' => RedirectController::class.'::urlRedirectAction', 'path' => '/doc/current/{page}'], $routeCollection->get('doc_index')->getDefaults());
+        $this->assertSame(['_controller' => RedirectController::class.'::urlRedirectAction', 'path' => 'https://example.com/some/path'], $routeCollection->get('external')->getDefaults());
+    }
+
+    #[DataProvider('provideInvalidControllerShortcuts')]
+    public function testLoadThrowsExceptionWithInvalidControllerShortcut(string $file, string $message)
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller_shortcuts']));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($message);
+
+        $loader->load($file);
+    }
+
+    public static function provideInvalidControllerShortcuts(): iterable
+    {
+        yield ['template_with_controller.yml', 'must not specify both the "template" key and a controller for "faq".'];
+        yield ['redirect_with_controller_default.yml', 'must not specify both the "redirect_to" key and a controller for "external".'];
+        yield ['two_shortcuts.yml', 'must not specify more than one of the "redirect_to_route", "redirect_to" keys for "doc".'];
+        yield ['import_with_shortcut.yml', 'The "template" key for the import "pages" in'];
+        yield ['template_with_template_default.yml', 'must not specify both the "template" key and the defaults key "_template" for "faq".'];
+        yield ['redirect_to_route_with_route_default.yml', 'must not specify both the "redirect_to_route" key and the defaults key "route" for "doc".'];
+        yield ['redirect_to_with_path_default.yml', 'must not specify both the "redirect_to" key and the defaults key "path" for "doc".'];
     }
 
     #[DataProvider('provideFilesImportingRoutesWithControllers')]

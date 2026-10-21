@@ -224,6 +224,6 @@ return static function (ContainerConfigurator $container) {
         // only one that can answer for it now that it provides the controller
         ->alias('Symfony\\Bundle\\FrameworkBundle\\Controller\\TemplateController', TemplateController::class)
             ->public()
-            ->deprecate('symfony/twig-bundle', '8.2', 'The "%alias_id%" service is deprecated, use "Symfony\\Bundle\\TwigBundle\\Controller\\TemplateController" instead.')
+            ->deprecate('symfony/twig-bundle', '8.2', 'The "%alias_id%" service is deprecated, use the "template" routing option instead.')
     ;
 };

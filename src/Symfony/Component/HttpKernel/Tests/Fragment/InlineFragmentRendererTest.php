@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -79,8 +80,10 @@ class InlineFragmentRendererTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->never())->method('dispatch');
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())->method($this->anything());
 
-        $strategy = new InlineFragmentRenderer($this->getKernel(new \RuntimeException('foo')), $dispatcher);
+        $strategy = new InlineFragmentRenderer($this->getKernel(new \RuntimeException('foo')), $dispatcher, $logger);
 
         $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
@@ -114,6 +117,47 @@ class InlineFragmentRendererTest extends TestCase
         }));
 
         $this->assertEquals('bar', $strategy->render('/', Request::create('/'), ['ignore_errors' => true, 'alt' => '/foo'])->getContent());
+    }
+
+    public function testRenderExceptionWithAltIsLogged()
+    {
+        $exception = new \RuntimeException('foo');
+        $kernel = $this->getKernel(static fn (Request $subRequest) => '/foo' === $subRequest->getPathInfo() ? new Response('bar') : throw $exception);
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects($this->never())->method('dispatch');
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('warning')->with(\sprintf('Exception thrown when rendering the "/" fragment, using its "alt" URI instead (RuntimeException: foo at %s line %d)', basename(__FILE__), $exception->getLine()), ['exception' => $exception]);
+
+        $strategy = new InlineFragmentRenderer($kernel, $dispatcher, $logger);
+
+        $this->assertSame('bar', $strategy->render('/', Request::create('/'), ['alt' => '/foo'])->getContent());
+    }
+
+    public function testRenderControllerReferenceExceptionWithAltIsLogged()
+    {
+        $exception = new \RuntimeException('foo');
+        $kernel = $this->getKernel(static fn (Request $subRequest) => '/foo' === $subRequest->getPathInfo() ? new Response('bar') : throw $exception);
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('warning')->with(\sprintf('Exception thrown when rendering the "main_controller" fragment, using its "alt" URI instead (RuntimeException: foo at %s line %d)', basename(__FILE__), $exception->getLine()), ['exception' => $exception]);
+
+        $strategy = new InlineFragmentRenderer($kernel, null, $logger);
+
+        $this->assertSame('bar', $strategy->render(new ControllerReference('main_controller'), Request::create('/'), ['alt' => '/foo'])->getContent());
+    }
+
+    public function testRenderExceptionIgnoreErrorsWithAltIsDispatchedButNotLogged()
+    {
+        $exception = new \RuntimeException('foo');
+        $kernel = $this->getKernel(static fn (Request $subRequest) => '/foo' === $subRequest->getPathInfo() ? new Response('bar') : throw $exception);
+        $request = Request::create('/');
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects($this->once())->method('dispatch')->with(new ExceptionEvent($kernel, $request, $kernel::SUB_REQUEST, $exception), KernelEvents::EXCEPTION);
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())->method($this->anything());
+
+        $strategy = new InlineFragmentRenderer($kernel, $dispatcher, $logger);
+
+        $this->assertSame('bar', $strategy->render('/', $request, ['ignore_errors' => true, 'alt' => '/foo'])->getContent());
     }
 
     private function getKernel($returnValue)

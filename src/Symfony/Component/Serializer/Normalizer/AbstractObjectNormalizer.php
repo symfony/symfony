@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\UnsupportedException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
@@ -330,7 +331,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         if (XmlEncoder::FORMAT === $format && !\is_array($data)) {
             $data = ['#' => $data];
+        } elseif (isset($context['_union_member']) && !\is_array($data) && !\is_object($data)) {
+            throw new UnsupportedException(\sprintf('Data expected to be an array or an object to denormalize "%s" as a member of a union type, "%s" given.', $type, get_debug_type($data)));
         }
+
+        unset($context['_union_member']);
 
         $context[self::ENABLE_TYPE_CONVERSION] ??= XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format;
 
@@ -692,6 +697,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     }
 
                     $childContext = $this->createChildContext($context, $attribute, $format);
+                    if ($type instanceof UnionType && !\is_array($data) && !\is_object($data)) {
+                        // object normalizers leave a scalar to the other types of the union instead of building an empty object from it
+                        $childContext['_union_member'] = true;
+                    }
                     if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
                         return $this->serializer->denormalize($data, $class, $format, $childContext);
                     }
@@ -734,6 +743,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
                 if ($dataMatchesExpectedType) {
                     return $data;
+                }
+            } catch (UnsupportedException $unsupported) {
+                // a type that does not accept the data has no error of its own to report
+                if (!$type instanceof UnionType) {
+                    throw $unsupported;
                 }
             } catch (NotNormalizableValueException|InvalidArgumentException $e) {
                 if (!$type instanceof UnionType) {

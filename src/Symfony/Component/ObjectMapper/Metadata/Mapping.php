@@ -16,8 +16,6 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 /**
  * Configures a class or a property to map to.
  *
- * @internal
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class Mapping extends Map

@@ -38,9 +38,10 @@ return static function (ContainerConfigurator $container) {
         ->alias(FragmentUriGeneratorInterface::class, 'fragment.uri_generator')
 
         ->set('fragment.renderer.inline', InlineFragmentRenderer::class)
-            ->args([service('http_kernel'), service('event_dispatcher')])
+            ->args([service('http_kernel'), service('event_dispatcher'), service('logger')->nullOnInvalid()])
             ->call('setFragmentPath', [param('fragment.path')])
             ->tag('kernel.fragment_renderer', ['alias' => 'inline'])
+            ->tag('monolog.logger', ['channel' => 'request'])
 
         ->set('fragment.renderer.hinclude', HIncludeFragmentRenderer::class)
             ->args([

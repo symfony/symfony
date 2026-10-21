@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Fragment;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
@@ -30,6 +31,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
     public function __construct(
         private HttpKernelInterface $kernel,
         private ?EventDispatcherInterface $dispatcher = null,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -80,6 +82,8 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
                 $event = new ExceptionEvent($this->kernel, $request, HttpKernelInterface::SUB_REQUEST, $e);
 
                 $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
+            } elseif (isset($options['alt'])) {
+                $this->logger?->warning(\sprintf('Exception thrown when rendering the "%s" fragment, using its "alt" URI instead (%s: %s at %s line %s)', $reference?->controller ?? $uri, get_debug_type($e), $e->getMessage(), basename($e->getFile()), $e->getLine()), ['exception' => $e]);
             }
 
             // let's clean up the output buffers that were created by the sub-request

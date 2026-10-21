@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-10-21T14:00:55Z
+
+A bit of context on why the diff is that small, since it looks almost too easy. 🙂
+
+Before touching anything I went back to #39604 to understand why the method became internal. It was opened to close #18465, which was only about `containsOption()`: that method expects the options as an argument instead of reading the field's own options, so it was never usable from the outside. `containsOption()`, `availableOptionValues()` and `disableValidation()` were then marked internal together, but the discussion never mentions `disableValidation()` and nothing in its behavior was questioned.
+
+So I left the two other methods internal (their API is still odd, and nobody asked for them) and only made public the one that has real use cases and is already documented. No behavior changes: it is already covered by `ChoiceFormFieldTest::testDisableValidation()` and by `FormTest`, which calls it through `Form::disableValidation()`. I also ran the example from the description against the branch to make sure it works as shown.
+
+Happy to add a dedicated test for the per field usage through `Form` if you think it's worth locking the public contract.

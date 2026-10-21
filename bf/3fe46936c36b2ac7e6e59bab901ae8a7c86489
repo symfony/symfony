@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-21T15:55:26Z
+
+It could be nice to improve the deprecation of the corresponding legacy classes in FrameworkBundle to hint about this instead of hinting them about the new classes, since these options are better and decoupled from the actual namespace.

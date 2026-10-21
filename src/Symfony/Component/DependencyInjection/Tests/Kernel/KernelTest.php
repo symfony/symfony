@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Kernel;
 
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -19,6 +20,7 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ShutdownAwareService;
+use Symfony\Component\EventDispatcher\CompiledEventDispatcher;
 
 class KernelTest extends TestCase
 {
@@ -87,6 +89,26 @@ class KernelTest extends TestCase
         $this->assertSame([false, true], $nestedService->calls);
         $this->assertTrue((new \ReflectionClass($lazy))->isUninitializedLazyObject($lazy));
         $this->assertFalse($container->initialized('unused'));
+    }
+
+    #[RequiresMethod(CompiledEventDispatcher::class, 'shutdown')]
+    public function testTheEventDispatcherReleasesItsListenersWhenTheKernelShutsDown()
+    {
+        mkdir($this->projectDir.'/config', 0o777, true);
+        file_put_contents($this->projectDir.'/config/bundles.php', '<?php return '.var_export([ServicesBundle::class => ['all' => true]], true).';');
+        $kernel = new EventListenerKernel($this->projectDir);
+        $kernel->boot();
+        // the dispatcher outlives the kernel, as it would in a reference cycle
+        $dispatcher = $kernel->getContainer()->get('event_dispatcher');
+        $dispatcher->dispatch($event = new \stdClass(), 'foo');
+        $listener = \WeakReference::create($event->listener);
+        unset($event);
+
+        $kernel->getContainer()->get('services_resetter')->reset();
+        $this->assertNotNull($listener->get());
+
+        $kernel->shutdown();
+        $this->assertNull($listener->get());
     }
 
     public function testBuildContainerWritesCachedirTag()
@@ -236,6 +258,25 @@ class BrokenKernel extends TestKernel
     protected function build(ContainerBuilder $container): void
     {
         throw new \LogicException('Broken build.');
+    }
+}
+
+class EventListenerKernel extends TestKernel
+{
+    protected function build(ContainerBuilder $container): void
+    {
+        // not shared, so that only the dispatcher references the listener
+        $container->register('listener', RecordingListener::class)
+            ->setShared(false)
+            ->addTag('kernel.event_listener', ['event' => 'foo', 'method' => '__invoke']);
+    }
+}
+
+class RecordingListener
+{
+    public function __invoke(\stdClass $event): void
+    {
+        $event->listener = $this;
     }
 }
 

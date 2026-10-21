@@ -54,6 +54,7 @@ return static function (ContainerConfigurator $container) {
             ->public()
             ->tag('container.hot_path')
             ->tag('event_dispatcher.dispatcher', ['name' => 'event_dispatcher'])
+            ->tag('kernel.reset', ['method' => 'shutdown', 'on_invalid' => 'ignore', 'on_shutdown' => 'only'])
         ->alias(EventDispatcherInterface::class, 'event_dispatcher')
             ->deprecate('symfony/dependency-injection', '8.2', 'The "%alias_id%" alias is deprecated, use "'.ContractsEventDispatcherInterface::class.'" instead.')
         ->alias(ContractsEventDispatcherInterface::class, 'event_dispatcher')

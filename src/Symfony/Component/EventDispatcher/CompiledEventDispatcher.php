@@ -128,6 +128,17 @@ final class CompiledEventDispatcher implements EventDispatcherInterface
     }
 
     /**
+     * Releases the listeners so that PHP can free them without waiting for the garbage collector.
+     *
+     * If the dispatcher is used afterwards, it fetches the listeners again from the locator.
+     */
+    public function shutdown(): void
+    {
+        $this->services = $this->optimized = [];
+        $this->dispatcher = null;
+    }
+
+    /**
      * Flattens the listeners of an event, each one replacing itself with its service the first time it runs.
      */
     private function optimize(string $eventName): array
@@ -148,7 +159,7 @@ final class CompiledEventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * Moves the listeners to a plain dispatcher, which everything but dispatching goes through.
+     * Copies the listeners to a plain dispatcher, which everything but dispatching goes through.
      */
     private function thaw(): EventDispatcher
     {
@@ -162,8 +173,6 @@ final class CompiledEventDispatcher implements EventDispatcherInterface
                 }
             }
         }
-
-        $this->listeners = [];
 
         return $this->dispatcher;
     }

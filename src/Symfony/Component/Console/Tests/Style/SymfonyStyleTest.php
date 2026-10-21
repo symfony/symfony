@@ -174,6 +174,7 @@ class SymfonyStyleTest extends TestCase
         $str = 'teststr';
         $io->writeln($str, SymfonyStyle::VERBOSITY_QUIET);
         $io->writeln($str, SymfonyStyle::VERBOSITY_QUIET);
+        $io->writeln($str, SymfonyStyle::VERBOSITY_QUIET);
         $start = memory_get_usage();
         for ($i = 0; $i < 100; ++$i) {
             $io->writeln($str, SymfonyStyle::VERBOSITY_QUIET);

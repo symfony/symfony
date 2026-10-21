@@ -145,6 +145,32 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
         );
     }
 
+    public function testRowWithRowAttr()
+    {
+        $view = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, ['row_attr' => ['data-foo' => 'bar']])->createView();
+        $html = $this->renderRow($view);
+
+        $this->assertMatchesXpath($html,
+            '/tr
+    [@data-foo="bar"]
+    [./td/input[@id="name"]]
+'
+        );
+    }
+
+    public function testButtonRowWithRowAttr()
+    {
+        $view = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, ['row_attr' => ['data-foo' => 'bar']])->createView();
+        $html = $this->renderRow($view);
+
+        $this->assertMatchesXpath($html,
+            '/tr
+    [@data-foo="bar"]
+    [./td/button[@type="button"][@name="name"]]
+'
+        );
+    }
+
     public function testRest()
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')

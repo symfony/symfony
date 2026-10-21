@@ -41,10 +41,9 @@ final class QpContentEncoder implements ContentEncoderInterface
      */
     private function standardize(string $string): string
     {
-        // transform CR or LF to CRLF
-        $string = preg_replace('~=0D(?!=0A)|(?<!=0D)=0A~', '=0D=0A', $string);
-        // transform =0D=0A to CRLF
-        $string = str_replace(["\t=0D=0A", ' =0D=0A', '=0D=0A'], ["=09\r\n", "=20\r\n", "\r\n"], $string);
+        // quoted_printable_encode() keeps CRLF as is and encodes tabs, so only the encoded CR and LF are left
+        // to transform into CRLF, after encoding the space that precedes them
+        $string = preg_replace(['/ =0[AD]/', '/=0[AD]/'], ["=20\r\n", "\r\n"], $string);
 
         return match ($string[-1] ?? '') {
             "\x09" => substr_replace($string, '=09', -1),

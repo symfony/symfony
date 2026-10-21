@@ -39,6 +39,45 @@ class AddressTest extends TestCase
         new Address('fab   pot@symfony.com');
     }
 
+    #[DataProvider('provideValidAddresses')]
+    public function testConstructorWithValidAddress(string $address)
+    {
+        $this->assertSame($address, (new Address($address))->getAddress());
+    }
+
+    public static function provideValidAddresses(): iterable
+    {
+        yield ['user@example.com'];
+        yield ['first.last+tag@mail.example.co.uk'];
+        yield ['o_k-1@a-b.io'];
+        yield ['0123456789abcdef0123456789abcdef@example.com'];
+        yield ["o'brien@example.com"];
+        yield ['user@localhost'];
+        yield ['user@[127.0.0.1]'];
+    }
+
+    #[DataProvider('provideInvalidAddresses')]
+    public function testConstructorWithInvalidAddresses(string $address)
+    {
+        $this->expectException(RfcComplianceException::class);
+
+        new Address($address);
+    }
+
+    public static function provideInvalidAddresses(): iterable
+    {
+        yield ['a..b@example.com'];
+        yield ['.a@example.com'];
+        yield ['a.@example.com'];
+        yield ['a@-example.com'];
+        yield ['a@example-.com'];
+        yield ['a@example..com'];
+        yield ['a@.example.com'];
+        yield ['a@example.com.'];
+        yield ['@example.com'];
+        yield ['a@'];
+    }
+
     public function testConstructorWithUnquotedAtSignInLocalPart()
     {
         $this->expectException(RfcComplianceException::class);

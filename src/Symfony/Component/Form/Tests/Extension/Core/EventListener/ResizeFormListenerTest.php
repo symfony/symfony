@@ -15,7 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Event\PostSetDataEvent;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
@@ -67,21 +67,33 @@ class ResizeFormListenerTest extends TestCase
 
     public function testPostSetDataRequiresArrayOrTraversable()
     {
+        $this->builder->addEventSubscriber(new ResizeFormListener(TextType::class, [], false, false));
+        $form = $this->builder->getForm();
+
         $this->expectException(UnexpectedTypeException::class);
-        $data = 'no array or traversable';
-        $event = new PostSetDataEvent($this->builder->getForm(), $data);
-        $listener = new ResizeFormListener(TextType::class, [], false, false);
-        $listener->postSetData($event);
+        $form->setData('no array or traversable');
     }
 
     public function testPostSetDataDealsWithNullData()
     {
-        $data = null;
-        $event = new PostSetDataEvent($this->builder->getForm(), $data);
-        $listener = new ResizeFormListener(TextType::class, [], false, false);
-        $listener->postSetData($event);
+        $this->builder->addEventSubscriber(new ResizeFormListener(TextType::class, [], false, false));
+        $form = $this->builder->getForm();
+        $form->setData(null);
 
-        $this->assertSame(0, $this->builder->count());
+        $this->assertCount(0, $form);
+    }
+
+    public function testPostSetDataResizesFormFromViewData()
+    {
+        $this->builder->addModelTransformer(new CallbackTransformer(static fn ($value) => json_decode($value, true), static fn ($value) => json_encode($value)));
+        $this->builder->addEventSubscriber(new ResizeFormListener(TextType::class, [], false, false));
+
+        $form = $this->builder->getForm();
+        $form->setData('{"1":"first","2":"second"}');
+
+        $this->assertCount(2, $form);
+        $this->assertSame('first', $form->get('1')->getData());
+        $this->assertSame('second', $form->get('2')->getData());
     }
 
     public function testPreSubmitResizesUpIfAllowAdd()
@@ -299,6 +311,18 @@ class ResizeFormListenerTest extends TestCase
         $form->submit(['0' => ['name' => 'John'], '1' => ['name' => '']]);
 
         $this->assertEquals(['0' => ['name' => 'John']], $form->getData());
+    }
+
+    public function testOnSubmitDeleteEmptyKeepsExistingEntriesOfViewData()
+    {
+        $this->builder->addModelTransformer(new CallbackTransformer(static fn ($value) => json_decode($value, true), static fn ($value) => json_encode($value)));
+        $this->builder->addEventSubscriber(new ResizeFormListener(TextType::class, [], true, false, true));
+
+        $form = $this->builder->getForm();
+        $form->setData('{"first":"a"}');
+        $form->submit(['first' => '', 'second' => '']);
+
+        $this->assertSame('{"first":null}', $form->getData());
     }
 }
 

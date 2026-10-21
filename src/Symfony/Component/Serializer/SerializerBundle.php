@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Mime\Header\Headers;
@@ -33,6 +34,7 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Serializer\Mapping\Factory\SharedClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -165,6 +167,13 @@ class SerializerBundle extends AbstractBundle
             // warmer, which does not run when the container is rebuilt while handling a request
             $container->getDefinition('serializer.mapping.cache_class_metadata_factory')
                 ->replaceArgument(1, new Reference('cache.serializer'));
+        }
+
+        if (!$container->getParameter('kernel.debug')) {
+            // the containers created by kernel resets share the metadata they load, until the container is rebuilt
+            $container->register('serializer.mapping.shared_class_metadata_factory', SharedClassMetadataFactory::class)
+                ->setDecoratedService('serializer.mapping.class_metadata_factory')
+                ->setArguments([new Reference('.inner'), new Parameter('container.build_id')]);
         }
 
         $serializerLoaders = [];

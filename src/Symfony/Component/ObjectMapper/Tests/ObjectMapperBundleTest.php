@@ -13,16 +13,21 @@ namespace Symfony\Component\ObjectMapper\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\ObjectMapper\Metadata\CachePropertyMetadataFactory;
 use Symfony\Component\ObjectMapper\Metadata\PropertyReadability;
+use Symfony\Component\ObjectMapper\Metadata\SharedClassMetadataFactory;
+use Symfony\Component\ObjectMapper\Metadata\SharedPropertyMetadataFactory;
+use Symfony\Component\ObjectMapper\Metadata\SharedPropertyNameCollectionFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperBundle;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
@@ -157,7 +162,8 @@ class ObjectMapperBundleTest extends TestCase
 
         $this->assertInstanceOf(ObjectMapped::class, $mapped);
         $this->assertSame('transformed', $mapped->a);
-        $this->assertInstanceOf(CachePropertyMetadataFactory::class, (new \ReflectionProperty(ObjectMapper::class, 'propertyMetadataFactory'))->getValue($objectMapper));
+        $this->assertInstanceOf(SharedPropertyMetadataFactory::class, $factory = (new \ReflectionProperty(ObjectMapper::class, 'propertyMetadataFactory'))->getValue($objectMapper));
+        $this->assertInstanceOf(CachePropertyMetadataFactory::class, (new \ReflectionProperty(SharedPropertyMetadataFactory::class, 'decorated'))->getValue($factory));
     }
 
     public function testTheMetadataCacheAndItsWarmerAreRegisteredWhenNotInDebug()
@@ -169,6 +175,27 @@ class ObjectMapperBundleTest extends TestCase
         $this->assertTrue($container->hasDefinition('object_mapper.metadata.cache_property_metadata_factory'));
         $this->assertTrue($container->hasDefinition('object_mapper.metadata.cache_warmer'));
         $this->assertTrue($container->hasDefinition('cache.object_mapper'));
+    }
+
+    public function testTheMetadataIsSharedByTheContainersOfTheSameBuildOutsideDebugMode()
+    {
+        $container = $this->load(debug: false);
+        new DecoratorServicePass()->process($container);
+
+        foreach ([
+            'object_mapper.class_metadata_factory' => SharedClassMetadataFactory::class,
+            'object_mapper.property_name_collection_factory' => SharedPropertyNameCollectionFactory::class,
+            'object_mapper.property_metadata_factory' => SharedPropertyMetadataFactory::class,
+        ] as $id => $class) {
+            $definition = $container->findDefinition($id);
+            $this->assertSame($class, $definition->getClass());
+            $this->assertEquals(new Parameter('container.build_id'), $definition->getArgument(1));
+        }
+
+        $container = $this->load(debug: true);
+        $this->assertFalse($container->hasDefinition('object_mapper.metadata.shared_class_metadata_factory'));
+        $this->assertFalse($container->hasDefinition('object_mapper.metadata.shared_property_name_collection_factory'));
+        $this->assertFalse($container->hasDefinition('object_mapper.metadata.shared_property_metadata_factory'));
     }
 
     public function testTheMetadataCacheAndItsWarmerAreRemovedInDebug()

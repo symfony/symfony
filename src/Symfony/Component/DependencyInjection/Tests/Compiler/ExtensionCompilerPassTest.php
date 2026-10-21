@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ExtensionCompilerPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
@@ -49,6 +50,40 @@ class ExtensionCompilerPassTest extends TestCase
         $this->assertFalse($this->container->hasDefinition('extension2'));
         $this->assertFalse($this->container->hasDefinition('extension3'));
         $this->assertTrue($this->container->hasDefinition('extension4'));
+    }
+
+    public function testExtensionAlsoRegisteredAsCompilerPassIsProcessedOnceAtItsOwnPriority()
+    {
+        $extension = new class extends Extension implements CompilerPassInterface {
+            public function getAlias(): string
+            {
+                return 'pass_extension';
+            }
+
+            public function load(array $configs, ContainerBuilder $container): void
+            {
+            }
+
+            public function process(ContainerBuilder $container): void
+            {
+                $container->setParameter('test.processed', $container->hasParameter('test.processed') ? $container->getParameter('test.processed') + 1 : 1);
+                $container->setParameter('test.processed_after_earlier_pass', $container->hasParameter('test.earlier_pass'));
+            }
+        };
+
+        $this->container->registerExtension($extension);
+        $this->container->addCompilerPass($extension, PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
+        $this->container->addCompilerPass(new class implements CompilerPassInterface {
+            public function process(ContainerBuilder $container): void
+            {
+                $container->setParameter('test.earlier_pass', true);
+            }
+        }, PassConfig::TYPE_BEFORE_OPTIMIZATION, -5000);
+
+        $this->container->compile();
+
+        $this->assertSame(1, $this->container->getParameter('test.processed'));
+        $this->assertTrue($this->container->getParameter('test.processed_after_earlier_pass'));
     }
 }
 

@@ -35,7 +35,7 @@ class SendPulseApiTransportTest extends TestCase
         unset($this->email);
     }
 
-    public function testSendsPayloadAndReusesToken(): void
+    public function testSendsPayloadAndReusesToken()
     {
         $requests = [];
         $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$requests): MockResponse {
@@ -73,7 +73,7 @@ class SendPulseApiTransportTest extends TestCase
     }
 
     #[DataProvider('streamBodyProvider')]
-    public function testStreamBodiesCanBeSentTwice(string $body): void
+    public function testStreamBodiesCanBeSentTwice(string $body)
     {
         $text = fopen('php://temp', 'r+');
         $html = fopen('php://temp', 'r+');
@@ -117,7 +117,7 @@ class SendPulseApiTransportTest extends TestCase
     }
 
     #[DataProvider('networkFailureProvider')]
-    public function testNetworkFailuresAreNotRetried(bool $duringAuthentication): void
+    public function testNetworkFailuresAreNotRetried(bool $duringAuthentication)
     {
         $failedRequests = 0;
         $failure = static function () use (&$failedRequests): MockResponse {
@@ -144,7 +144,7 @@ class SendPulseApiTransportTest extends TestCase
         yield 'send' => [false];
     }
 
-    public function testStreamAttachmentsAreEncodedAsAnObject(): void
+    public function testStreamAttachmentsAreEncodedAsAnObject()
     {
         $attachment = fopen('php://temp', 'r+');
         fwrite($attachment, "\x00binary");
@@ -167,7 +167,7 @@ class SendPulseApiTransportTest extends TestCase
         }
     }
 
-    public function testEnvelopeOverridesDoNotReintroduceExcludedRecipients(): void
+    public function testEnvelopeOverridesDoNotReintroduceExcludedRecipients()
     {
         $client = new MockHttpClient([
             new MockResponse('{"access_token":"token","expires_in":3600}'),
@@ -186,7 +186,7 @@ class SendPulseApiTransportTest extends TestCase
         $transport->send($this->email, new Envelope(new Address('sender@example.com'), [new Address('override@example.com')]));
     }
 
-    public function testRefreshesTokenOnceAfterUnauthorizedResponse(): void
+    public function testRefreshesTokenOnceAfterUnauthorizedResponse()
     {
         $client = new MockHttpClient([
             new MockResponse('{"access_token":"old","expires_in":3600}'),
@@ -206,7 +206,7 @@ class SendPulseApiTransportTest extends TestCase
     }
 
     #[DataProvider('invalidResponseProvider')]
-    public function testRejectsFailedResponses(array $responses, int $count): void
+    public function testRejectsFailedResponses(array $responses, int $count)
     {
         $client = new MockHttpClient(array_map(static fn (array $response) => new MockResponse($response[0], ['http_code' => $response[1]]), $responses));
         $transport = new SendPulseApiTransport('client', 'secret', $client);
@@ -238,7 +238,7 @@ class SendPulseApiTransportTest extends TestCase
     }
 
     #[DataProvider('unsupportedMessageProvider')]
-    public function testRejectsUnsupportedMessagesBeforeAuthentication(string $case): void
+    public function testRejectsUnsupportedMessagesBeforeAuthentication(string $case)
     {
         match ($case) {
             'inline' => $this->email->embed('image', 'logo.png', 'image/png'),
@@ -265,7 +265,7 @@ class SendPulseApiTransportTest extends TestCase
     }
 
     #[DataProvider('tokenInvalidationProvider')]
-    public function testRenewsExpiredOrDifferentEndpointToken(bool $changeEndpoint): void
+    public function testRenewsExpiredOrDifferentEndpointToken(bool $changeEndpoint)
     {
         $token = new MockResponse('{"access_token":"token","expires_in":'.($changeEndpoint ? '3600' : '1').'}');
         $client = new MockHttpClient([$token, new MockResponse('{"result":true,"id":"one"}'), new MockResponse('{"access_token":"new","expires_in":3600}'), new MockResponse('{"result":true,"id":"two"}')]);

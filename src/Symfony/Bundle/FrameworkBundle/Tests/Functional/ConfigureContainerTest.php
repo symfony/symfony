@@ -118,6 +118,16 @@ class ConfigureContainerTest extends AbstractWebTestCase
         $this->createClient(['test_case' => 'ConfigureContainer', 'configure_container' => 'not a closure']);
     }
 
+    public function testBootingTheKernelFirstPointsToTheOption()
+    {
+        self::bootKernel(['test_case' => 'ConfigureContainer']);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('To set up services before the requests, use the "configure_container" option instead.');
+
+        $this->createClient(['test_case' => 'ConfigureContainer']);
+    }
+
     public function testInsulatingRequestsIsRejected()
     {
         $calls = 0;

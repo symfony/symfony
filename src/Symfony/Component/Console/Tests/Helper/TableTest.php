@@ -1873,6 +1873,137 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    public function testColumnMaxWidthsWithWindowsLineEndings()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setColumnMaxWidth(0, 5)
+            ->setRows([
+                ["Lorem ipsum\r\ndolor sit amet", 'x'],
+                ["foo\r\nbar\nbaz", 'y'],
+                ["<info>ab</info>cde\r\nfgh", 'z'],
+                ["abcde \r\n", 'w'],
+            ])
+            ->render()
+        ;
+
+        $expected =
+            <<<'TABLE'
+                +-------+---+
+                | Lorem | x |
+                | ipsum |   |
+                | dolor |   |
+                | sit   |   |
+                | amet  |   |
+                | foo   | y |
+                | bar   |   |
+                | baz   |   |
+                | abcde | z |
+                | fgh   |   |
+                | abcde | w |
+                |       |   |
+                +-------+---+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthsWithWideCharacters()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setColumnMaxWidth(0, 4)
+            ->setRows([
+                ['字字字字字', 'x'],
+                ['ab 字字 c', 'y'],
+                ['a字\<字', 'z'],
+            ])
+            ->render()
+        ;
+
+        $expected =
+            <<<'TABLE'
+                +------+---+
+                | 字字 | x |
+                | 字字 |   |
+                | 字   |   |
+                | ab   | y |
+                | 字字 |   |
+                | c    |   |
+                | a字< | z |
+                | 字   |   |
+                +------+---+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthsWithControlCharacters()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setColumnMaxWidth(0, 5)
+            ->setRows([
+                ["abcdefg\n\e[32m\t\e[39m", 'x'],
+                ["12\\\n34567\n1\\\\", 'y'],
+            ])
+            ->render()
+        ;
+
+        $expected =
+            <<<TABLE
+                +-------+---+
+                | abcde | x |
+                | fg    |   |
+                | \e[32m\t\e[39m     |   |
+                | 12\\   | y |
+                | 34567 |   |
+                | 1\\\\   |   |
+                +-------+---+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthsWithTrailingWhitespace()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setColumnMaxWidth(0, 6)
+            ->setRows([['abcdef ', 'x']])
+            ->render()
+        ;
+
+        $expected =
+            <<<'TABLE'
+                +--------+---+
+                | abcdef | x |
+                +--------+---+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthsWithStyledLineFollowedByWhitespace()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setColumnMaxWidth(0, 6)
+            ->setRows([['<info>abcdef</info> ', 'x']])
+            ->render()
+        ;
+
+        $expected =
+            <<<'TABLE'
+                +--------+---+
+                | abcdef | x |
+                |        |   |
+                +--------+---+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
     public function testColumnMaxWidthsWithTrailingBackslash()
     {
         (new Table($output = $this->getOutputStream()))
@@ -2762,6 +2893,25 @@ class TableTest extends TestCase
                 | \033]8;;Lorem\033\\adipiscing elit, sed\033]8;;\033\\ |
                 | \033]8;;Lorem\033\\do eiusmod tempor\033]8;;\033\\    |
                 +----------------------+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testWithHyperlinkAndEscapedLessThanAndMaxWidth()
+    {
+        $table = new Table($output = $this->getOutputStream(true));
+        $table->setRows([['<href=Lorem>abcd\<x</>']]);
+        $table->setColumnMaxWidth(0, 4);
+        $table->render();
+
+        $expected =
+            <<<TABLE
+                +------+
+                | \033]8;;Lorem\033\\abcd\033]8;;\033\\ |
+                | \033]8;;Lorem\033\\<x\033]8;;\033\\   |
+                +------+
 
                 TABLE;
 

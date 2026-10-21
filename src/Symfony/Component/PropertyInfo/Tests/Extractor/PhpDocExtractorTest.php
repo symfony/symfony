@@ -1026,6 +1026,29 @@ class PhpDocExtractorTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
+    #[DataProvider('selfDocBlockInNestedTypeProviderLegacy')]
+    public function testSelfDocBlockInNestedTypeResolvesClassLegacy(string $class, string $property, LegacyType $expectedType)
+    {
+        $this->assertEquals([$expectedType], $this->extractor->getTypes($class, $property));
+    }
+
+    /**
+     * @return iterable<string, array{0: class-string, 1: string, 2: LegacyType}>
+     */
+    public static function selfDocBlockInNestedTypeProviderLegacy(): iterable
+    {
+        $parent = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, ParentWithSelfDocBlock::class);
+        $child = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, ChildWithSelfDocBlock::class);
+
+        yield 'self collection' => [ParentWithSelfDocBlock::class, 'selfCollectionProp', new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, $parent)];
+        yield 'self collection from child' => [ChildWithSelfDocBlock::class, 'selfCollectionProp', new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, $parent)];
+        yield 'static collection' => [ParentWithSelfDocBlock::class, 'staticCollectionProp', new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_STRING), $parent)];
+        yield 'static collection from child' => [ChildWithSelfDocBlock::class, 'staticCollectionProp', new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_STRING), $child)];
+        yield 'parent collection' => [ChildWithSelfDocBlock::class, 'parentCollectionProp', new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), $parent)];
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     #[DataProvider('inheritedPromotedPropertyWithConstructorOverrideProviderLegacy')]
     public function testInheritedPromotedPropertyWithConstructorOverrideLegacy(string $class, string $property, ?array $expectedTypes)
     {

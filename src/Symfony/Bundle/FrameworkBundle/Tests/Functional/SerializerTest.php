@@ -40,10 +40,9 @@ class SerializerTest extends AbstractWebTestCase
 
     public function testNormalizersAndEncodersUseDefaultContextConfigOption()
     {
-        /** @var SerializerKernel $kernel */
-        $kernel = static::bootKernel(['test_case' => 'Serializer', 'root_config' => 'default_context.yaml']);
+        static::bootKernel(['test_case' => 'Serializer', 'root_config' => 'default_context.yaml']);
 
-        foreach ($kernel->normalizersAndEncoders as $normalizerOrEncoderId) {
+        foreach (static::getContainer()->getParameter('serializer_test.normalizers_and_encoders') as $normalizerOrEncoderId) {
             if (!static::getContainer()->has($normalizerOrEncoderId)) {
                 continue;
             }
@@ -60,6 +59,15 @@ class SerializerTest extends AbstractWebTestCase
         }
     }
 
+    public function testSerializeTranslatableBackedEnum()
+    {
+        static::bootKernel(['test_case' => 'Serializer']);
+
+        $serializer = static::getContainer()->get('serializer.alias');
+
+        $this->assertEquals('GET', $serializer->serialize(TranslatableBackedEnum::Get, 'yaml'));
+    }
+
     protected static function getKernelClass(): string
     {
         return SerializerKernel::class;
@@ -68,12 +76,12 @@ class SerializerTest extends AbstractWebTestCase
 
 class SerializerKernel extends AppKernel implements CompilerPassInterface
 {
-    public $normalizersAndEncoders = [
-        'serializer.normalizer.property.alias', // Special case as this normalizer isn't tagged
-    ];
-
     public function process(ContainerBuilder $container): void
     {
+        $normalizersAndEncoders = [
+            'serializer.normalizer.property.alias', // Special case as this normalizer isn't tagged
+        ];
+
         $services = array_merge(
             $container->findTaggedServiceIds('serializer.normalizer'),
             $container->findTaggedServiceIds('serializer.encoder')
@@ -85,20 +93,13 @@ class SerializerKernel extends AppKernel implements CompilerPassInterface
             }
             foreach ($reflectionConstructor->getParameters() as $reflectionParam) {
                 if ('array $defaultContext' === $reflectionParam->getType()->getName().' $'.$reflectionParam->getName()) {
-                    $this->normalizersAndEncoders[] = $serviceId.'.alias';
+                    $normalizersAndEncoders[] = $serviceId.'.alias';
                     break;
                 }
             }
         }
-    }
 
-    public function testSerializeTranslatableBackedEnum()
-    {
-        static::bootKernel(['test_case' => 'Serializer']);
-
-        $serializer = static::getContainer()->get('serializer.alias');
-
-        $this->assertEquals('GET', $serializer->serialize(TranslatableBackedEnum::Get, 'yaml'));
+        $container->setParameter('serializer_test.normalizers_and_encoders', $normalizersAndEncoders);
     }
 }
 

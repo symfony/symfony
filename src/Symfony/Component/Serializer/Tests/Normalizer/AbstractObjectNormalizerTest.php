@@ -61,6 +61,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyWithNotNormalizable;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrBool;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrNull;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithStringObject;
+use Symfony\Component\Serializer\Tests\Fixtures\IntegerBackedEnumDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummyWithContextAttribute;
 
 class AbstractObjectNormalizerTest extends TestCase
@@ -1036,6 +1037,82 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('plain', $actual->children);
     }
 
+    /**
+     * @dataProvider provideScalarsForUnionWithObjectAndScalarTypes
+     */
+    public function testDenormalizeScalarIntoUnionWithObjectTypeTriesTheOtherTypes(string $attribute, mixed $data, mixed $expected)
+    {
+        $actual = $this->getDenormalizerForUnionsWithObjectType()->denormalize([$attribute => $data], DummyWithObjectOrScalarUnion::class);
+
+        $this->assertSame($expected, $actual->$attribute);
+    }
+
+    public static function provideScalarsForUnionWithObjectAndScalarTypes(): iterable
+    {
+        yield 'int' => ['int', 5, 5];
+        yield 'int from phpdoc' => ['docBlock', 5, 5];
+        yield 'string' => ['string', 'abc', 'abc'];
+        yield 'backed enum' => ['enum', 'a', EnumA::A];
+    }
+
+    /**
+     * @dataProvider provideScalarsForObjectTypesDenormalizedFromScalars
+     */
+    public function testDenormalizeScalarIntoUnionKeepsObjectTypesDenormalizedFromScalars(string $attribute, mixed $data, object $expected, ?string $format = null)
+    {
+        $actual = $this->getDenormalizerForUnionsWithObjectType()->denormalize([$attribute => $data], DummyWithObjectOrScalarUnion::class, $format);
+
+        $this->assertEquals($expected, $actual->$attribute);
+    }
+
+    public static function provideScalarsForObjectTypesDenormalizedFromScalars(): iterable
+    {
+        yield 'date' => ['date', '2024-01-01T00:00:00+00:00', new \DateTimeImmutable('2024-01-01T00:00:00+00:00')];
+        yield 'backed enum' => ['enumOrString', 200, IntegerBackedEnumDummy::SUCCESS];
+
+        $string = new DummyString();
+        $string->value = 5;
+        yield 'denormalizable' => ['denormalizable', 5, $string];
+
+        $xml = new XmlScalarDummy();
+        $xml->value = '5';
+        yield 'xml' => ['xml', '5', $xml, 'xml'];
+    }
+
+    /**
+     * @dataProvider provideScalarsMatchingNoTypeOfUnionWithObjectType
+     */
+    public function testDenormalizeScalarMatchingNoTypeOfUnionWithObjectType(string $attribute, mixed $data, string $expectedMessage)
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $this->getDenormalizerForUnionsWithObjectType()->denormalize([$attribute => $data], DummyWithObjectOrScalarUnion::class);
+    }
+
+    public static function provideScalarsMatchingNoTypeOfUnionWithObjectType(): iterable
+    {
+        yield 'string' => ['int', 'abc', \sprintf('The type of the "int" attribute for class "%s" must be one of "%s", "int" ("string" given).', DummyWithObjectOrScalarUnion::class, DummyChild::class)];
+        yield 'null' => ['int', null, \sprintf('The type of the "int" attribute for class "%s" must be one of "%s", "int" ("null" given).', DummyWithObjectOrScalarUnion::class, DummyChild::class)];
+        yield 'nullable' => ['nullable', 5, \sprintf('The type of the "nullable" attribute for class "%s" must be one of "%s" ("int" given).', DummyWithObjectOrScalarUnion::class, DummyChild::class)];
+    }
+
+    /**
+     * @dataProvider provideScalarsMatchingNoTypeOfUntypedUnionWithObjectType
+     */
+    public function testDenormalizeScalarMatchingNoTypeOfUnionWithObjectTypeWithoutTypeEnforcement(string $attribute, mixed $data)
+    {
+        $actual = $this->getDenormalizerForUnionsWithObjectType()->denormalize([$attribute => $data], DummyWithObjectOrScalarUnion::class, null, [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]);
+
+        $this->assertSame($data, $actual->$attribute);
+    }
+
+    public static function provideScalarsMatchingNoTypeOfUntypedUnionWithObjectType(): iterable
+    {
+        yield 'string' => ['docBlock', 'abc'];
+        yield 'nullable' => ['nullableDocBlock', 5];
+    }
+
     public function testDebugTraceIdDoesNotChangeContextCacheKey()
     {
         $normalizer = new class extends AbstractObjectNormalizerDummy {
@@ -1253,6 +1330,14 @@ class AbstractObjectNormalizerTest extends TestCase
         $deserialized = $normalizer->denormalize($serialized, DummyMessageInterface::class, 'json');
 
         $this->assertEquals($example, $deserialized);
+    }
+
+    private function getDenormalizerForUnionsWithObjectType(): Serializer
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+
+        return new Serializer([new BackedEnumNormalizer(), new DateTimeNormalizer(), new CustomNormalizer(), new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory), null, $extractor)]);
     }
 }
 
@@ -1560,6 +1645,22 @@ class XmlScalarDummy
 {
     #[SerializedName('#')]
     public $value;
+}
+
+class DummyWithObjectOrScalarUnion
+{
+    public DummyChild|int $int;
+    /** @var DummyChild|int */
+    public $docBlock;
+    public DummyChild|string $string;
+    public DummyChild|EnumA $enum;
+    public ?DummyChild $nullable;
+    /** @var DummyChild|null */
+    public $nullableDocBlock;
+    public \DateTimeImmutable|string $date;
+    public IntegerBackedEnumDummy|string $enumOrString;
+    public DummyString|int $denormalizable;
+    public XmlScalarDummy|int $xml;
 }
 
 class FalsePropertyDummy

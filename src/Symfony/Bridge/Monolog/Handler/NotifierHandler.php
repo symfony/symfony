@@ -36,7 +36,9 @@ class NotifierHandler extends AbstractHandler
     {
         $this->notifier = $notifier;
 
-        parent::__construct(Logger::toMonologLevel($level) < Logger::ERROR ? Logger::ERROR : $level, $bubble);
+        $level = Logger::toMonologLevel($level);
+
+        parent::__construct(($level instanceof Level ? $level->value : $level) < Logger::ERROR ? Logger::ERROR : $level, $bubble);
     }
 
     private function doHandle(array|LogRecord $record): bool

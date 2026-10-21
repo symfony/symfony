@@ -42,6 +42,35 @@ class NotifierHandlerTest extends TestCase
         $this->assertSame([], $notifier->recipients);
     }
 
+    /**
+     * @dataProvider provideLevelsBelowError
+     */
+    public function testLevelBelowErrorIsRaisedToError($level)
+    {
+        $notifier = new class implements NotifierInterface {
+            public ?Notification $notification = null;
+
+            public function send(Notification $notification, RecipientInterface ...$recipients): void
+            {
+                $this->notification = $notification;
+            }
+        };
+
+        $handler = new NotifierHandler($notifier, $level);
+
+        $handler->handle(RecordFactory::create(Logger::WARNING, 'Not handled'));
+        $this->assertNull($notifier->notification);
+
+        $handler->handle(RecordFactory::create(Logger::ERROR, 'Something went wrong'));
+        $this->assertSame('Something went wrong', $notifier->notification->getSubject());
+    }
+
+    public static function provideLevelsBelowError(): iterable
+    {
+        yield [Logger::WARNING];
+        yield ['warning'];
+    }
+
     public function testHandleBatchWithoutAdminRecipients()
     {
         $notifier = new class implements NotifierInterface {

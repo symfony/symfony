@@ -51,7 +51,7 @@ class AutowireCallableTest extends TestCase
         $attribute = new AutowireCallable(callable: 'my_callable');
 
         self::assertSame('my_callable', $attribute->value);
-        self::assertFalse($attribute->lazy);
+        self::assertTrue($attribute->lazy);
     }
 
     public function testArrayCallable()
@@ -59,7 +59,7 @@ class AutowireCallableTest extends TestCase
         $attribute = new AutowireCallable(callable: ['My\StaticClass', 'my_callable']);
 
         self::assertSame(['My\StaticClass', 'my_callable'], $attribute->value);
-        self::assertFalse($attribute->lazy);
+        self::assertTrue($attribute->lazy);
     }
 
     public function testArrayCallableWithReferenceAndMethod()
@@ -67,7 +67,7 @@ class AutowireCallableTest extends TestCase
         $attribute = new AutowireCallable(callable: [new Reference('my_service'), 'my_callable']);
 
         self::assertEquals([new Reference('my_service'), 'my_callable'], $attribute->value);
-        self::assertFalse($attribute->lazy);
+        self::assertTrue($attribute->lazy);
     }
 
     public function testArrayCallableWithReferenceOnly()
@@ -75,7 +75,7 @@ class AutowireCallableTest extends TestCase
         $attribute = new AutowireCallable(callable: [new Reference('my_service')]);
 
         self::assertEquals([new Reference('my_service')], $attribute->value);
-        self::assertFalse($attribute->lazy);
+        self::assertTrue($attribute->lazy);
     }
 
     public function testArrayCallableWithServiceAndMethod()
@@ -83,7 +83,7 @@ class AutowireCallableTest extends TestCase
         $attribute = new AutowireCallable(service: 'my_service', method: 'my_callable');
 
         self::assertEquals([new Reference('my_service'), 'my_callable'], $attribute->value);
-        self::assertFalse($attribute->lazy);
+        self::assertTrue($attribute->lazy);
     }
 
     public function testArrayCallableWithServiceOnly()
@@ -91,7 +91,7 @@ class AutowireCallableTest extends TestCase
         $attribute = new AutowireCallable(service: 'my_service');
 
         self::assertEquals([new Reference('my_service'), '__invoke'], $attribute->value);
-        self::assertFalse($attribute->lazy);
+        self::assertTrue($attribute->lazy);
     }
 
     public function testLazyAsArrayInDefinition()

@@ -31,7 +31,7 @@ class AutowireCallable extends AutowireInline
         string|array|null $callable = null,
         ?string $service = null,
         ?string $method = null,
-        bool|string $lazy = false,
+        bool|string $lazy = true,
     ) {
         if (!(null !== $callable xor null !== $service)) {
             throw new LogicException('#[AutowireCallable] attribute must declare exactly one of $callable or $service.');

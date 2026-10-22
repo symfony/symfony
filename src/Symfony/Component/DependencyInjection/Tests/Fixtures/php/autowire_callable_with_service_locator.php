@@ -70,7 +70,7 @@ class Symfony_DI_PhpDumper_Test_AutowireCallable_With_ServiceLocator extends Con
      */
     protected static function getListener1Service($container)
     {
-        return $container->privates['Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Listener1'] = new \Symfony\Component\DependencyInjection\Tests\Compiler\Listener1(($container->privates['Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\MyInlineService'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\MyInlineService())->someMethod1(...));
+        return $container->privates['Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Listener1'] = new \Symfony\Component\DependencyInjection\Tests\Compiler\Listener1((new class(fn () => ($container->privates['Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\MyInlineService'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\MyInlineService())) extends \Symfony\Component\DependencyInjection\Argument\LazyClosure { public function someMethod1(): void { $this->service->someMethod1(...\func_get_args()); } })->someMethod1(...));
     }
 
     /**
@@ -80,6 +80,6 @@ class Symfony_DI_PhpDumper_Test_AutowireCallable_With_ServiceLocator extends Con
      */
     protected static function getListener2Service($container)
     {
-        return $container->privates['Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Listener2'] = new \Symfony\Component\DependencyInjection\Tests\Compiler\Listener2(($container->privates['Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\MyInlineService'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\MyInlineService())->someMethod2(...), new \stdClass());
+        return $container->privates['Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\Listener2'] = new \Symfony\Component\DependencyInjection\Tests\Compiler\Listener2((new class(fn () => ($container->privates['Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\MyInlineService'] ??= new \Symfony\Component\DependencyInjection\Tests\Compiler\MyInlineService())) extends \Symfony\Component\DependencyInjection\Argument\LazyClosure { public function someMethod2(): void { $this->service->someMethod2(...\func_get_args()); } })->someMethod2(...), new \stdClass());
     }
 }

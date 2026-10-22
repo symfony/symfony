@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\AutowireMethodOf;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
@@ -1777,6 +1779,31 @@ class IntegrationTest extends TestCase
         }
     }
 
+    public function testAutowireCallablesAreLazyByDefault()
+    {
+        $container = new ContainerBuilder();
+        foreach (['callable', 'method', 'eager_callable'] as $id) {
+            $container->register($id, AutowireCallableTarget::class)->setPublic(true);
+        }
+        $container->register(AutowireCallableConsumer::class)->setAutowired(true)->setPublic(true);
+        $container->compile();
+
+        eval('?>'.(new PhpDumper($container))->dump(['class' => 'Symfony_DI_Integration_AutowireCallable_Lazy']));
+
+        foreach ([$container, new \Symfony_DI_Integration_AutowireCallable_Lazy()] as $container) {
+            $consumer = $container->get(AutowireCallableConsumer::class);
+
+            self::assertFalse($container->initialized('callable'));
+            self::assertFalse($container->initialized('method'));
+            self::assertTrue($container->initialized('eager_callable'));
+            self::assertSame('callable', ($consumer->callable)());
+            self::assertSame('formatted', ($consumer->format)());
+            self::assertSame('callable', ($consumer->eagerCallable)());
+            self::assertTrue($container->initialized('callable'));
+            self::assertTrue($container->initialized('method'));
+        }
+    }
+
     public function testAClosureServiceFailsWhenTheDecoratorDropsTheMethod()
     {
         $container = new ContainerBuilder();
@@ -1868,5 +1895,31 @@ final class TagCollector implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $this->collectedTags = $container->findTaggedServiceIds('app.custom_tag');
+    }
+}
+
+class AutowireCallableTarget
+{
+    public function __invoke(): string
+    {
+        return 'callable';
+    }
+
+    public function format(): string
+    {
+        return 'formatted';
+    }
+}
+
+class AutowireCallableConsumer
+{
+    public function __construct(
+        #[AutowireCallable(service: 'callable')]
+        public \Closure $callable,
+        #[AutowireMethodOf('method')]
+        public \Closure $format,
+        #[AutowireCallable(service: 'eager_callable', lazy: false)]
+        public \Closure $eagerCallable,
+    ) {
     }
 }

@@ -38,6 +38,7 @@ CHANGELOG
  * Add the `$target` argument to `#[Cache]` to set the targeted cache directives defined by RFC 9213, e.g. `CDN-Cache-Control`
  * Add the `$logger` argument to `InlineFragmentRenderer::__construct()` to log the exception thrown by a fragment before rendering its `alt` URI
  * Show previous exceptions in the profiler instead of cutting them
+ * Add `DeprecationHeaderListener` to add the RFC 9745 `Deprecation`, RFC 8594 `Sunset` and `Link` headers to the responses of routes carrying the `_deprecation` default
 
 8.1
 ---

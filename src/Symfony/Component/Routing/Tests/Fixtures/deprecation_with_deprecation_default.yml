@@ -1,0 +1,4 @@
+orders_v1:
+    path: /api/v1/orders
+    deprecation: { since: '2026-10-01' }
+    defaults: { _deprecation: { since: '2026-12-01' } }

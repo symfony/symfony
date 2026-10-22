@@ -57,6 +57,7 @@ CHANGELOG
  * Add support for the `map` and `stream` options of the `#[Serialize]` attribute when the ObjectMapper and JsonStreamer components are installed
  * Register `RateLimitValueResolver` when the rate limiter is enabled
  * Close the lazy Redis connection of the session handler created from `framework.session.handler_id` when the kernel shuts down
+ * Register `DeprecationHeaderListener` to handle the `_deprecation` route default
 
 8.1
 ---

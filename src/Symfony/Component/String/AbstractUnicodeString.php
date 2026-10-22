@@ -48,6 +48,7 @@ abstract class AbstractUnicodeString extends AbstractString
     private static array $transliterators = [];
     private static array $tableZero;
     private static array $tableWide;
+    private static array $widths = [];
 
     public static function fromCodePoints(int ...$codes): static
     {
@@ -684,8 +685,6 @@ abstract class AbstractUnicodeString extends AbstractString
      */
     private function wcswidth(string $string): int
     {
-        static $widths = [];
-
         if (!preg_match('/[^\x20-\x7E]/', $string)) {
             return \strlen($string);
         }
@@ -767,8 +766,8 @@ abstract class AbstractUnicodeString extends AbstractString
                 }
             }
 
-            if (isset($widths[$c])) {
-                if ($charWidth = $widths[$c]) {
+            if (isset(self::$widths[$c])) {
+                if ($charWidth = self::$widths[$c]) {
                     $width += $lastWidth = $charWidth;
                     $lastChar = $c;
                 }
@@ -776,8 +775,8 @@ abstract class AbstractUnicodeString extends AbstractString
                 continue;
             }
 
-            if (5000 <= \count($widths)) {
-                $widths = \array_slice($widths, -4000, null, true);
+            if (5000 <= \count(self::$widths)) {
+                self::$widths = \array_slice(self::$widths, -4000, null, true);
             }
 
             self::$tableZero ??= require __DIR__.'/Resources/data/wcswidth_table_zero.php';
@@ -792,7 +791,7 @@ abstract class AbstractUnicodeString extends AbstractString
                     } elseif ($codePoint < self::$tableZero[$mid][0]) {
                         $ubound = $mid - 1;
                     } else {
-                        $widths[$c] = 0;
+                        self::$widths[$c] = 0;
                         continue 2;
                     }
                 }
@@ -812,7 +811,7 @@ abstract class AbstractUnicodeString extends AbstractString
                     } else {
                         $width += 2;
                         $lastChar = $c;
-                        $lastWidth = $widths[$c] = 2;
+                        $lastWidth = self::$widths[$c] = 2;
 
                         continue 2;
                     }
@@ -821,7 +820,7 @@ abstract class AbstractUnicodeString extends AbstractString
 
             ++$width;
             $lastChar = $c;
-            $lastWidth = $widths[$c] = 1;
+            $lastWidth = self::$widths[$c] = 1;
         }
 
         return $width;

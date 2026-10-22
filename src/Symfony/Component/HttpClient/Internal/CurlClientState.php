@@ -33,6 +33,8 @@ final class CurlClientState extends ClientState
     public DnsCache $dnsCache;
     /** @var float[] */
     public array $pauseExpiries = [];
+    public array $pausedHandles = [];
+    public array $streamingResponses = [];
     /** @var \CurlHandle[] */
     public array $handlesToRemove = [];
     public int $execCounter = \PHP_INT_MIN;

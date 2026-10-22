@@ -29,6 +29,10 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 {
     protected function getHttpClient(string $testCase, ?\Closure $chunkFilter = null, ?HttpClientInterface $decoratedClient = null): HttpClientInterface
     {
+        if (str_starts_with($testCase, 'testBackpressure')) {
+            $this->markTestSkipped('Backpressure requires a transport client.');
+        }
+
         if ('testHandleIsRemovedOnException' === $testCase) {
             $this->markTestSkipped("AsyncDecoratorTrait doesn't cache handles");
         }

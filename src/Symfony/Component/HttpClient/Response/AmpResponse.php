@@ -45,6 +45,8 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
     use CommonResponseTrait;
     use TransportResponseTrait;
 
+    private const MAX_PENDING_SIZE = 1048576;
+
     private static string $nextId = 'a';
 
     private ?array $options;
@@ -72,6 +74,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
         $info = &$this->info;
         $headers = &$this->headers;
+        $pendingSize = &$this->pendingSize;
         $canceller = new DeferredCancellation();
         $handle = &$this->handle;
 
@@ -112,11 +115,13 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         $this->canary = new Canary(static function () use ($canceller, $multi, $id) {
             $canceller->cancel();
             $multi->openHandles[$id]?->isComplete() || $multi->openHandles[$id]?->complete();
-            unset($multi->openHandles[$id], $multi->handlesActivity[$id]);
+            $paused = $multi->pausedResponses[$id] ?? null;
+            unset($multi->openHandles[$id], $multi->handlesActivity[$id], $multi->pausedResponses[$id], $multi->streamingResponses[$id]);
+            $paused?->complete();
         });
 
-        EventLoop::queue(static function () use ($request, $multi, $id, &$info, &$headers, $canceller, &$options, $onProgress, &$handle, $logger, &$pause) {
-            self::generateResponse($request, $multi, $id, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pause);
+        EventLoop::queue(static function () use ($request, $multi, $id, &$info, &$headers, $canceller, &$options, $onProgress, &$handle, $logger, &$pause, &$pendingSize) {
+            self::generateResponse($request, $multi, $id, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pause, $pendingSize);
         });
     }
 
@@ -167,6 +172,18 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
      */
     private static function perform(ClientState $multi, ?array $responses = null): void
     {
+        $responses ??= [];
+        if (\count($responses) !== \count($multi->streamingResponses) || (1 === \count($responses) ? !isset($multi->streamingResponses[array_key_first($responses)]) : array_diff_key($responses, $multi->streamingResponses))) {
+            $multi->streamingResponses = array_fill_keys(array_keys($responses), true);
+        }
+
+        foreach ($multi->pausedResponses as $id => $deferred) {
+            if (!($multi->handlesActivity[$id] ?? []) || !isset($multi->streamingResponses[$id])) {
+                unset($multi->pausedResponses[$id]);
+                $deferred->complete();
+            }
+        }
+
         if ($responses) {
             foreach ($responses as $response) {
                 try {
@@ -207,7 +224,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         return 1;
     }
 
-    private static function generateResponse(Request $request, AmpClientState $multi, string $id, array &$info, array &$headers, DeferredCancellation $canceller, array &$options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, float &$pause): void
+    private static function generateResponse(Request $request, AmpClientState $multi, string $id, array &$info, array &$headers, DeferredCancellation $canceller, array &$options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, float &$pause, int &$pendingSize): void
     {
         $request->setInformationalResponseHandler(static function (Response $response) use ($multi, $id, &$info, &$headers) {
             self::addResponseHeaders($response, $info, $headers);
@@ -249,6 +266,15 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 $multi->openHandles[$id]->complete();
                 $multi->openHandles[$id] = new DeferredFuture();
 
+                if ($pendingSize >= self::MAX_PENDING_SIZE && isset($multi->streamingResponses[$id])) {
+                    $multi->pausedResponses[$id] = $deferred = new DeferredFuture();
+                    $deferred->getFuture()->await();
+
+                    if (!isset($multi->openHandles[$id])) {
+                        return;
+                    }
+                }
+
                 if (0 < $pause) {
                     delay($pause, true, $canceller->getCancellation());
                 }
@@ -259,6 +285,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
                 $info['size_download'] += \strlen($data);
                 $multi->handlesActivity[$id][] = $data;
+                $pendingSize += \strlen($data);
             }
 
             // HTTP/2 completes the future with a Trailers object, HTTP/1.1 with the header array itself

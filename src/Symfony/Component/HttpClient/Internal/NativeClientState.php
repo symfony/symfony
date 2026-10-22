@@ -28,6 +28,7 @@ final class NativeClientState extends ClientState
     public bool $sleep = false;
     /** @var int[] */
     public array $hosts = [];
+    public array $streamingResponses = [];
 
     public function __construct()
     {

@@ -16,7 +16,11 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\HttpClient\AmpHttpClient;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\AmpClientState;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
+
+use function Amp\delay;
 
 #[Group('dns-sensitive')]
 class AmpHttpClientTest extends HttpClientTestCase
@@ -64,6 +68,87 @@ class AmpHttpClientTest extends HttpClientTestCase
     public function testTimeoutOnDestruct()
     {
         parent::testTimeoutOnDestruct();
+    }
+
+    #[TestWith(['/body', false])]
+    #[TestWith(['/chunked', false])]
+    #[TestWith(['/body', true])]
+    public function testBackpressureWhileOtherFibersRun(string $path, bool $cancel)
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $state = (new \ReflectionProperty($client, 'multi'))->getValue($client);
+        $server = TestHttpServer::start(8067, __DIR__.'/Fixtures/backpressure');
+
+        try {
+            $response = $client->request('GET', 'http://localhost:8067'.$path, ['buffer' => false]);
+            $stream = $response->toStream(false);
+            $data = fread($stream, 8192);
+            $this->assertNotEmpty($data);
+
+            delay(0.2);
+            $this->assertNotEmpty($state->handlesActivity);
+            $this->assertAmpPendingDataIsBounded($state);
+
+            if ($cancel) {
+                $response->cancel();
+                fclose($stream);
+                delay(0);
+
+                $this->assertSame([], $state->handlesActivity);
+                $this->assertSame([], $state->openHandles);
+
+                return;
+            }
+
+            $actual = hash_init('sha256');
+            hash_update($actual, $data);
+            $length = \strlen($data);
+            $reads = 0;
+
+            while (!feof($stream)) {
+                $data = fread($stream, 8192);
+                hash_update($actual, $data);
+                $length += \strlen($data);
+
+                if (0 === ++$reads % 64) {
+                    delay(0.01);
+                    $this->assertAmpPendingDataIsBounded($state);
+                }
+            }
+
+            $this->assertSame(4194304, $length);
+            $this->assertSame($this->getAmpBackpressureBodyHash(), hash_final($actual));
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testBackpressureReleasesAResponseWhenAnotherResponseIsSelected()
+    {
+        $client = new AmpHttpClient(['timeout' => 2], null, 1);
+        $state = (new \ReflectionProperty($client, 'multi'))->getValue($client);
+        $server = TestHttpServer::start(8067, __DIR__.'/Fixtures/backpressure');
+
+        try {
+            $first = $client->request('GET', 'http://localhost:8067/body', ['buffer' => false]);
+            $stream = $first->toStream(false);
+            $data = fread($stream, 8192);
+            $this->assertNotEmpty($data);
+
+            delay(0.2);
+            $this->assertNotEmpty($state->handlesActivity);
+            $this->assertAmpPendingDataIsBounded($state);
+
+            $second = $client->request('GET', 'http://localhost:8067/');
+            $this->assertSame('Success', $second->getContent());
+
+            $actual = hash_init('sha256');
+            hash_update($actual, $data);
+            $this->assertSame(4194304, \strlen($data) + hash_update_stream($actual, $stream));
+            $this->assertSame($this->getAmpBackpressureBodyHash(), hash_final($actual));
+        } finally {
+            $server->stop();
+        }
     }
 
     protected function getHttpClient(string $testCase): HttpClientInterface
@@ -174,5 +259,27 @@ class AmpHttpClientTest extends HttpClientTestCase
         $this->assertNull($pool->get());
 
         $this->assertSame(200, $client->request('GET', 'http://127.0.0.1:8057/json')->getStatusCode());
+    }
+
+    private function assertAmpPendingDataIsBounded(AmpClientState $state): void
+    {
+        $pendingBytes = 0;
+        foreach ($state->handlesActivity as $activity) {
+            foreach ($activity as $chunk) {
+                $pendingBytes += \is_string($chunk) ? \strlen($chunk) : 0;
+            }
+        }
+
+        $this->assertLessThanOrEqual(1048576 + 8192, $pendingBytes);
+    }
+
+    private function getAmpBackpressureBodyHash(): string
+    {
+        $hash = hash_init('sha256');
+        for ($i = 0; $i < 256; ++$i) {
+            hash_update($hash, str_repeat(\chr($i), 16384));
+        }
+
+        return hash_final($hash);
     }
 }

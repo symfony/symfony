@@ -322,6 +322,10 @@ class MockHttpClientTest extends HttpClientTestCase
 
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
+        if (str_starts_with($testCase, 'testBackpressure')) {
+            $this->markTestSkipped('Backpressure requires a transport client.');
+        }
+
         $responses = [];
 
         $headers = [

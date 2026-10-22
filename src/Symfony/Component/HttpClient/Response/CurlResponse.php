@@ -32,6 +32,8 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
     }
     use TransportResponseTrait;
 
+    private const MAX_PENDING_SIZE = 1048576;
+
     /**
      * @var resource|null
      */
@@ -80,6 +82,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $headers = &$this->headers;
         $trailers = &$this->trailers;
         $debugBuffer = $this->debugBuffer;
+        $pendingSize = &$this->pendingSize;
 
         if (!$info['response_headers']) {
             // Used to keep track of what we're waiting for
@@ -92,8 +95,9 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
         if (null === $options) {
             // Pushed response: buffer until requested
-            curl_setopt($ch, \CURLOPT_WRITEFUNCTION, static function ($ch, string $data) use ($multi, $id): int {
+            curl_setopt($ch, \CURLOPT_WRITEFUNCTION, static function ($ch, string $data) use ($multi, $id, &$pendingSize): int {
                 $multi->handlesActivity[$id][] = $data;
+                $pendingSize += \strlen($data);
                 curl_pause($ch, \CURLPAUSE_RECV);
 
                 return \strlen($data);
@@ -117,7 +121,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 curl_pause($ch, \CURLPAUSE_ALL);
             } else {
                 unset($multi->pauseExpiries[(int) $ch]);
-                curl_pause($ch, \CURLPAUSE_CONT);
+                curl_pause($ch, isset($multi->pausedHandles[(int) $ch]) ? \CURLPAUSE_RECV : \CURLPAUSE_CONT);
                 curl_multi_add_handle($multi->handle, $ch);
             }
         };
@@ -152,7 +156,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         }
 
         $checkProtocol = true;
-        curl_setopt($ch, \CURLOPT_WRITEFUNCTION, static function ($ch, string $data) use ($multi, $id, &$checkProtocol): int {
+        curl_setopt($ch, \CURLOPT_WRITEFUNCTION, static function ($ch, string $data) use ($multi, $id, &$checkProtocol, &$pendingSize): int {
             if ($checkProtocol) {
                 if ('H' === (curl_getinfo($ch, \CURLINFO_PRIVATE)[0] ?? null)) {
                     $multi->handlesActivity[$id][] = null;
@@ -164,7 +168,14 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 $checkProtocol = false;
             }
 
+            if ($pendingSize >= self::MAX_PENDING_SIZE && isset($multi->streamingResponses[$id])) {
+                $multi->pausedHandles[$id] = $ch;
+
+                return \CURL_WRITEFUNC_PAUSE;
+            }
+
             $multi->handlesActivity[$id][] = $data;
+            $pendingSize += \strlen($data);
 
             return \strlen($data);
         });
@@ -181,7 +192,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         curl_multi_add_handle($multi->handle, $ch);
 
         $this->canary = new Canary(static function () use ($ch, $multi, $id) {
-            unset($multi->pauseExpiries[$id], $multi->openHandles[$id], $multi->handlesActivity[$id]);
+            unset($multi->pauseExpiries[$id], $multi->pausedHandles[$id], $multi->openHandles[$id], $multi->handlesActivity[$id], $multi->streamingResponses[$id]);
             curl_setopt($ch, \CURLOPT_PRIVATE, '_0');
             $multi->handlesToRemove[$id] = $ch;
 
@@ -297,6 +308,19 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
         try {
             $multi->performing = true;
+            $responses ??= [];
+            // Pausing unread responses can block queued requests when every connection is busy.
+            if (\count($responses) !== \count($multi->streamingResponses) || (1 === \count($responses) ? !isset($multi->streamingResponses[array_key_first($responses)]) : array_diff_key($responses, $multi->streamingResponses))) {
+                $multi->streamingResponses = array_fill_keys(array_keys($responses), true);
+            }
+
+            foreach ($multi->pausedHandles as $id => $ch) {
+                if ((!($multi->handlesActivity[$id] ?? []) || !isset($multi->streamingResponses[$id])) && !isset($multi->pauseExpiries[$id])) {
+                    unset($multi->pausedHandles[$id]);
+                    curl_pause($ch, \CURLPAUSE_CONT);
+                }
+            }
+
             ++$multi->execCounter;
             $active = 0;
             while (\CURLM_CALL_MULTI_PERFORM === ($err = curl_multi_exec($multi->handle, $active))) {
@@ -367,7 +391,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 }
 
                 unset($multi->pauseExpiries[$id]);
-                curl_pause($multi->openHandles[$id][0], \CURLPAUSE_CONT);
+                curl_pause($multi->openHandles[$id][0], isset($multi->pausedHandles[$id]) ? \CURLPAUSE_RECV : \CURLPAUSE_CONT);
                 curl_multi_add_handle($multi->handle, $multi->openHandles[$id][0]);
             }
         }

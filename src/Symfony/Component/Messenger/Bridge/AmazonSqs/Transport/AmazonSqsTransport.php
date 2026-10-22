@@ -15,10 +15,12 @@ use AsyncAws\Core\Exception\Exception as AsyncAwsException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\BatchSendFailedException;
+use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
@@ -32,7 +34,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class AmazonSqsTransport implements TransportInterface, BatchSenderInterface, KeepaliveReceiverInterface, SetupableTransportInterface, CloseableTransportInterface, MessageCountAwareInterface, ResetInterface
+class AmazonSqsTransport implements TransportInterface, BatchSenderInterface, KeepaliveReceiverInterface, ListableReceiverInterface, SetupableTransportInterface, CloseableTransportInterface, MessageCountAwareInterface, ResetInterface
 {
     private SerializerInterface $serializer;
 
@@ -78,6 +80,16 @@ class AmazonSqsTransport implements TransportInterface, BatchSenderInterface, Ke
     public function getMessageCount(): int
     {
         return $this->getReceiver()->getMessageCount();
+    }
+
+    public function all(?int $limit = null): iterable
+    {
+        return $this->getListableReceiver()->all($limit);
+    }
+
+    public function find(mixed $id): ?Envelope
+    {
+        return $this->getListableReceiver()->find($id);
     }
 
     public function send(Envelope $envelope): Envelope
@@ -136,6 +148,17 @@ class AmazonSqsTransport implements TransportInterface, BatchSenderInterface, Ke
     private function getReceiver(): MessageCountAwareInterface&ReceiverInterface
     {
         return $this->receiver ??= new AmazonSqsReceiver($this->connection, $this->serializer);
+    }
+
+    private function getListableReceiver(): ListableReceiverInterface
+    {
+        $receiver = $this->getReceiver();
+
+        if (!$receiver instanceof ListableReceiverInterface) {
+            throw new LogicException(\sprintf('The "%s" receiver cannot list messages.', get_debug_type($receiver)));
+        }
+
+        return $receiver;
     }
 
     private function getSender(): SenderInterface

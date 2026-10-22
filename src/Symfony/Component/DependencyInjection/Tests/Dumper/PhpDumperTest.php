@@ -2467,7 +2467,8 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsGeneratedFile('lazy_autowire_attribute_with_intersection.php', $dumper->dump());
+        // The proxy trait depends on the installed VarExporter version.
+        $this->assertStringEqualsGeneratedFile('lazy_autowire_attribute_with_intersection.php', str_replace('LazyInterfaceProxyTrait;', 'LazyDecoratorTrait;', $dumper->dump()));
     }
 
     public function testLazyProxyArgument()
@@ -2513,6 +2514,9 @@ class PhpDumperTest extends TestCase
         $this->assertNotInstanceOf(FinalLazyProxyImplementation::class, $bar->foo);
         $this->assertInstanceOf(LazyObjectInterface::class, $bar->foo);
         $this->assertFalse($bar->foo->isLazyObjectInitialized());
+        $this->assertFalse($container->initialized('foo'));
+        $this->assertSame($bar->foo, $bar->foo->getSelf());
+        $this->assertTrue($bar->foo->isLazyObjectInitialized());
         $this->assertSame($container->get('foo'), $bar->foo->initializeLazyObject());
     }
 

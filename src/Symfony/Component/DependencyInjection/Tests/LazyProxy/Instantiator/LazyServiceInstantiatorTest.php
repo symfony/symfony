@@ -20,6 +20,33 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\AbstractSayClass;
 
 class LazyServiceInstantiatorTest extends TestCase
 {
+    public function testInstantiateInterfaceProxy()
+    {
+        $definition = (new Definition(LazyProxiedTestImplementation::class))
+            ->setLazy(true)
+            ->addTag('proxy', ['interface' => LazyProxiedTestInterface::class]);
+        $calls = 0;
+
+        $proxy = (new LazyServiceInstantiator())->instantiateProxy(new Container(), $definition, 'foo', static function () use (&$calls) {
+            return new LazyProxiedTestImplementation(++$calls);
+        });
+
+        $this->assertInstanceOf(LazyProxiedTestInterface::class, $proxy);
+        $this->assertFalse($proxy->isLazyObjectInitialized());
+        $this->assertSame(0, $calls);
+
+        $this->assertSame(1, $proxy->getGeneration());
+        $this->assertSame(1, $proxy->getGeneration());
+        $this->assertSame(1, $calls);
+        $this->assertTrue($proxy->isLazyObjectInitialized());
+
+        $this->assertTrue($proxy->resetLazyObject());
+        $this->assertFalse($proxy->isLazyObjectInitialized());
+        $this->assertSame(1, $calls);
+        $this->assertSame(2, $proxy->getGeneration());
+        $this->assertSame(2, $calls);
+    }
+
     public function testInstantiateAbstractClassProxy()
     {
         $instantiator = new LazyServiceInstantiator();
@@ -70,5 +97,22 @@ class LazyProxiedTestService
     public function say(): string
     {
         return 'hello';
+    }
+}
+
+interface LazyProxiedTestInterface
+{
+    public function getGeneration(): int;
+}
+
+final class LazyProxiedTestImplementation implements LazyProxiedTestInterface
+{
+    public function __construct(private int $generation)
+    {
+    }
+
+    public function getGeneration(): int
+    {
+        return $this->generation;
     }
 }

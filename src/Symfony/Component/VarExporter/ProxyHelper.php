@@ -13,6 +13,7 @@ namespace Symfony\Component\VarExporter;
 
 use Symfony\Component\VarExporter\Exception\LogicException;
 use Symfony\Component\VarExporter\Internal\LazyDecoratorTrait;
+use Symfony\Component\VarExporter\Internal\LazyInterfaceProxyTrait;
 use Symfony\Component\VarExporter\Internal\LazyObjectRegistry;
 
 /**
@@ -221,6 +222,7 @@ final class ProxyHelper
         }
         $body = $methods ? "\n".implode("\n\n", $methods)."\n" : '';
         $propertyScopes = $class ? self::exportPropertyScopes($class->name, $propertyScopes) : '[]';
+        $lazyProxyTrait = $class ? LazyDecoratorTrait::class : LazyInterfaceProxyTrait::class;
         $lazyProxyTraitStatement = [];
 
         if (
@@ -243,13 +245,13 @@ final class ProxyHelper
         if ($lazyProxyTraitStatement) {
             $lazyProxyTraitStatement = implode("\n        ", $lazyProxyTraitStatement);
             $lazyProxyTraitStatement = <<<EOPHP
-                use \Symfony\Component\VarExporter\Internal\LazyDecoratorTrait {
+                use \\{$lazyProxyTrait} {
                         {$lazyProxyTraitStatement}
                     }
                 EOPHP;
         } else {
             $lazyProxyTraitStatement = <<<EOPHP
-                use \Symfony\Component\VarExporter\Internal\LazyDecoratorTrait;
+                use \\{$lazyProxyTrait};
                 EOPHP;
         }
 

@@ -318,6 +318,12 @@ class UnsupportedSchemeException extends LogicException
             return;
         }
 
+        if (!$name && $package && \in_array($dsn->getScheme(), ['fakechat+email', 'fakechat+logger', 'fakesms+email', 'fakesms+logger', 'mercure'], true)) {
+            parent::__construct(\sprintf('The "%s" scheme requires a configured "%s" factory. Pass it to "new Transport([$factory])" instead of using "Transport::fromDsn()" or "Transport::fromDsns()".', $dsn->getScheme(), $package['class']), 0, $previous);
+
+            return;
+        }
+
         $message = \sprintf('The "%s" scheme is not supported', $dsn->getScheme());
         if ($name && $supported) {
             $message .= \sprintf('; supported schemes for notifier "%s" are: "%s"', $name, implode('", "', $supported));

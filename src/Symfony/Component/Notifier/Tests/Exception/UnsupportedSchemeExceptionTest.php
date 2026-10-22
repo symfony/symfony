@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Notifier\Bridge;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
+use Symfony\Component\Notifier\Transport;
 use Symfony\Component\Notifier\Transport\Dsn;
 
 /**
@@ -97,6 +98,51 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\Zendesk\ZendeskTransportFactory::class => false,
             Bridge\Zulip\ZulipTransportFactory::class => false,
         ]);
+    }
+
+    /**
+     * @dataProvider schemesRequiringDependencies
+     */
+    public function testSchemeRequiringDependencies(string $scheme, string $factoryClass, bool $multiple)
+    {
+        ClassExistsMock::withMockedClasses([$factoryClass => false]);
+
+        $message = (new UnsupportedSchemeException(new Dsn($scheme.'://default')))->getMessage();
+        $this->assertStringContainsString('as the bridge is not installed.', $message);
+        $this->assertStringContainsString('composer require', $message);
+
+        ClassExistsMock::withMockedClasses([$factoryClass => true]);
+
+        $this->expectException(UnsupportedSchemeException::class);
+        $this->expectExceptionMessage(\sprintf('The "%s" scheme requires a configured "%s" factory. Pass it to "new Transport([$factory])" instead of using "Transport::fromDsn()" or "Transport::fromDsns()".', $scheme, $factoryClass));
+
+        if ($multiple) {
+            Transport::fromDsns([$scheme.'://default']);
+        } else {
+            Transport::fromDsn($scheme.'://default');
+        }
+    }
+
+    public function testUnsupportedSchemeForInstalledBridge()
+    {
+        ClassExistsMock::withMockedClasses([Bridge\FakeChat\FakeChatTransportFactory::class => true]);
+
+        $this->assertSame('The "fakechat+unknown" scheme is not supported.', (new UnsupportedSchemeException(new Dsn('fakechat+unknown://default')))->getMessage());
+        $this->assertSame('The "fakechat+email" scheme is not supported; supported schemes for notifier "fakechat" are: "fakechat+logger".', (new UnsupportedSchemeException(new Dsn('fakechat+email://default'), 'fakechat', ['fakechat+logger']))->getMessage());
+    }
+
+    public static function schemesRequiringDependencies(): \Generator
+    {
+        foreach ([
+            'fakechat+email' => Bridge\FakeChat\FakeChatTransportFactory::class,
+            'fakechat+logger' => Bridge\FakeChat\FakeChatTransportFactory::class,
+            'fakesms+email' => Bridge\FakeSms\FakeSmsTransportFactory::class,
+            'fakesms+logger' => Bridge\FakeSms\FakeSmsTransportFactory::class,
+            'mercure' => Bridge\Mercure\MercureTransportFactory::class,
+        ] as $scheme => $factoryClass) {
+            yield $scheme.' fromDsn' => [$scheme, $factoryClass, false];
+            yield $scheme.' fromDsns' => [$scheme, $factoryClass, true];
+        }
     }
 
     /**

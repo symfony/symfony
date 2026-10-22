@@ -68,6 +68,18 @@ class SerializerTest extends AbstractWebTestCase
         $this->assertEquals('GET', $serializer->serialize(TranslatableBackedEnum::Get, 'yaml'));
     }
 
+    public function testPropertyNormalizerOfNamedSerializerUsesItsDefaultContextConfigOption()
+    {
+        static::bootKernel(['test_case' => 'Serializer', 'root_config' => 'default_context.yaml']);
+
+        $normalizer = static::getContainer()->get('serializer.normalizer.property.tagged.api.alias');
+
+        $defaultContext = (new \ReflectionProperty($normalizer, 'defaultContext'))->getValue($normalizer);
+
+        self::assertArrayHasKey('fake_context_option', $defaultContext);
+        self::assertEquals('bar', $defaultContext['fake_context_option']);
+    }
+
     protected static function getKernelClass(): string
     {
         return SerializerKernel::class;

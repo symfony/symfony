@@ -15,6 +15,7 @@ use Seld\JsonLint\JsonParser;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -282,7 +283,7 @@ class SerializerBundle extends AbstractBundle
             $container->setParameter('.serializer.max_depth_handler', $config['max_depth_handler']);
         }
 
-        $container->getDefinition('serializer.normalizer.property')->setArgument(5, $defaultContext);
+        $container->getDefinition('serializer.normalizer.property')->setBindings(['array $defaultContext' => new BoundArgument($defaultContext, false)]);
 
         $container->setParameter('.serializer.named_serializers', $config['named_serializers'] ?? []);
 

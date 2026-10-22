@@ -176,10 +176,11 @@ class SerializerPass implements CompilerPassInterface
                 ? $this->buildChildNameConverterDefinition($container, $config['name_converter'])
                 : self::NAME_CONVERTER_METADATA_AWARE_ID;
 
-            $normalizers = $this->buildChildDefinitions($container, $serializerName, $normalizers, $config);
-            $encoders = $this->buildChildDefinitions($container, $serializerName, $encoders, $config);
+            $children = [];
+            $normalizers = $this->buildChildDefinitions($container, $serializerName, $normalizers, $config, $children);
+            $encoders = $this->buildChildDefinitions($container, $serializerName, $encoders, $config, $children);
 
-            $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $config['default_context'], $circularReferenceHandler, $maxDepthHandler);
+            $this->bindDefaultContext($container, $children, $config['default_context'], $circularReferenceHandler, $maxDepthHandler);
 
             $container->registerChild($serializerId, 'serializer')
                 ->setArgument('$defaultContext', $config['default_context'])
@@ -214,24 +215,61 @@ class SerializerPass implements CompilerPassInterface
         return $childId;
     }
 
-    private function buildChildDefinitions(ContainerBuilder $container, string $serializerName, array $services, array $config): array
+    /**
+     * @param array<string, Reference> $children
+     */
+    private function buildChildDefinitions(ContainerBuilder $container, string $serializerName, array $services, array $config, array &$children): array
     {
         foreach ($services as &$id) {
-            $childId = $id.'.'.$serializerName;
-
-            $definition = $container->registerChild($childId, (string) $id);
-
-            if (null !== $nameConverterIndex = $this->findNameConverterIndex($container, (string) $id)) {
-                $definition->replaceArgument($nameConverterIndex, new Reference($config['name_converter']));
-            }
-
-            $id = new Reference($childId);
+            $id = $this->buildChildDefinition($container, $serializerName, (string) $id, $config, $children);
         }
 
         return $services;
     }
 
-    private function findNameConverterIndex(ContainerBuilder $container, string $id): int|string|null
+    /**
+     * @param array<string, Reference> $children
+     */
+    private function buildChildDefinition(ContainerBuilder $container, string $serializerName, string $id, array $config, array &$children): Reference
+    {
+        if (isset($children[$id])) {
+            return $children[$id];
+        }
+
+        $childId = $id.'.'.$serializerName;
+        $children[$id] = new Reference($childId);
+
+        $definition = $container->registerChild($childId, $id);
+
+        foreach ($this->resolveArguments($container, $id) as $index => $argument) {
+            if (!$argument instanceof Reference) {
+                continue;
+            }
+
+            if (self::NAME_CONVERTER_METADATA_AWARE_ID === (string) $argument) {
+                $definition->replaceArgument($index, new Reference($config['name_converter']));
+            } elseif ($this->isNormalizer($container, (string) $argument)) {
+                $child = $this->buildChildDefinition($container, $serializerName, (string) $argument, $config, $children);
+                $definition->replaceArgument($index, new Reference((string) $child, $argument->getInvalidBehavior()));
+            }
+        }
+
+        return $children[$id];
+    }
+
+    private function isNormalizer(ContainerBuilder $container, string $id): bool
+    {
+        if (!$container->hasDefinition($id)) {
+            return false;
+        }
+
+        $class = $this->resolveClass($container, $id);
+
+        return (is_a($class, NormalizerInterface::class, true) || is_a($class, DenormalizerInterface::class, true))
+            && !is_a($class, SerializerInterface::class, true);
+    }
+
+    private function resolveArguments(ContainerBuilder $container, string $id): array
     {
         $arguments = [];
 
@@ -252,13 +290,7 @@ class SerializerPass implements CompilerPassInterface
             }
         }
 
-        foreach ($arguments as $index => $argument) {
-            if ($argument instanceof Reference && self::NAME_CONVERTER_METADATA_AWARE_ID === (string) $argument) {
-                return $index;
-            }
-        }
-
-        return null;
+        return $arguments;
     }
 
     private function resolveClass(ContainerBuilder $container, string $id): ?string

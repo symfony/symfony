@@ -45,6 +45,7 @@ class TestContainer extends Container
         private array $nonSharedServices = [],
         private iterable $keptServices = [],
         private array $stateMethods = [],
+        private array $privateServiceIds = [],
     ) {
     }
 
@@ -113,7 +114,15 @@ class TestContainer extends Container
 
     public function initialized(string $id): bool
     {
-        return $this->getPublicContainer()->initialized($id);
+        $container = $this->getPublicContainer();
+
+        if (!isset($this->privateServiceIds[$id])) {
+            return $container->initialized($id);
+        }
+
+        $id = $this->privateServiceIds[$id];
+
+        return 'service_container' !== $id && ($container->initialized($id) || isset($container->privates[$id]));
     }
 
     /**

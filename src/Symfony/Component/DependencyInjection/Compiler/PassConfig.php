@@ -43,6 +43,7 @@ class PassConfig
         $this->beforeOptimizationPasses = [
             100 => [
                 new ResolveClassPass(),
+                new RegisterAsFactoryAttributesPass(),
                 new RegisterAutoconfigureAttributesPass(),
                 new RegisterAsCallableAttributesPass(),
                 new AutowireAsDecoratorPass(),

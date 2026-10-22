@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `#[AsFactory]` to declare a method as the factory for a service
  * Add the `on_shutdown` attribute on `kernel.reset` tags to pass a shutdown flag or call a method only on shutdown
  * Add argument `$shutdown` to `Container::reset()`, `ServicesResetter::reset()` and `ServicesResetterInterface::reset()`
  * Add return type `void` to `ServicesResetterInterface::reset()`

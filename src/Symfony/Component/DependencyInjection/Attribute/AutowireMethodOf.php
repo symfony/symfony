@@ -24,7 +24,7 @@ class AutowireMethodOf extends AutowireCallable
      * @param string            $service The service containing the method to autowire
      * @param bool|class-string $lazy    Whether to use lazy-loading for this argument
      */
-    public function __construct(string $service, bool|string $lazy = false)
+    public function __construct(string $service, bool|string $lazy = true)
     {
         parent::__construct([new Reference($service)], lazy: $lazy);
     }

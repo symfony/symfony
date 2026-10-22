@@ -54,6 +54,7 @@ Console
 DependencyInjection
 -------------------
 
+ * [BC BREAK] `#[AutowireCallable]` and `#[AutowireMethodOf]` now instantiate the target service when the callable is first called. Pass `lazy: false` to keep instantiation at injection time, or when the target class or method cannot be reflected
  * [BC BREAK] A top-level extension key that holds a value which is not an array is now passed to that
    extension instead of being replaced by an empty array. `lock: 'redis://example.com'` configures the lock,
    where it used to be ignored. An extension whose configuration tree does not accept the value now reports

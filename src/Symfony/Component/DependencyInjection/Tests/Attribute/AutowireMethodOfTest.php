@@ -31,4 +31,12 @@ class AutowireMethodOfTest extends TestCase
 
         $this->assertEquals([[new Reference('foo'), 'dummy']], $a->buildDefinition($a->value, 'Closure', $r)->getArguments());
     }
+
+    public function testLazyCanBeDisabled(?\Closure $dummy = null)
+    {
+        $a = new AutowireMethodOf('foo', lazy: false);
+        $r = new \ReflectionParameter([__CLASS__, __FUNCTION__], 0);
+
+        $this->assertFalse($a->buildDefinition($a->value, 'Closure', $r)->isLazy());
+    }
 }

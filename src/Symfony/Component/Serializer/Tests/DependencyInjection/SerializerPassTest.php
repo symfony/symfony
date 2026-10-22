@@ -1073,7 +1073,7 @@ class SerializerPassTest extends TestCase
         $container->get($namedSerializerFirst ? 'serializer.api' : 'serializer');
         $container->get($namedSerializerFirst ? 'serializer' : 'serializer.api');
 
-        $email = (new Email())->from('a@example.com')->text('Body')->date(new \DateTimeImmutable('2020-01-02 03:04:05 +00:00'));
+        $email = (new Email())->text('Body')->date(new \DateTimeImmutable('2020-01-02 03:04:05 +00:00'));
         $defaultData = $container->get('serializer')->normalize($email);
         $namedData = $container->get('serializer.api')->normalize($email);
 

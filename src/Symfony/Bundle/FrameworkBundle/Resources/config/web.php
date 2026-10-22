@@ -43,6 +43,7 @@ use Symfony\Component\HttpKernel\Controller\ErrorController;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
 use Symfony\Component\HttpKernel\EventListener\CacheAttributeListener;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
+use Symfony\Component\HttpKernel\EventListener\DeprecationHeaderListener;
 use Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\IsSignatureValidAttributeListener;
@@ -177,6 +178,9 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.event_subscriber')
             ->tag('kernel.reset', ['method' => '?reset'])
+
+        ->set('deprecation_header_listener', DeprecationHeaderListener::class)
+            ->tag('kernel.event_subscriber')
 
         ->set('controller.is_signature_valid_attribute_listener', IsSignatureValidAttributeListener::class)
             ->args([

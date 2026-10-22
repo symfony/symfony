@@ -41,6 +41,7 @@ class RouteTest extends TestCase
             ['condition', 'condition', 'context.getMethod() == \'GET\''],
             ['alias', 'aliases', ['alias', 'completely_different_name']],
             ['firewall', 'defaults', ['_firewall' => 'api']],
+            ['deprecation', 'defaults', ['_deprecation' => ['since' => '2026-10-01', 'sunset' => '2027-06-30', 'link' => 'https://example.com/deprecation']]],
         ];
     }
 }

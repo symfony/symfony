@@ -72,6 +72,7 @@ class TranslationDebugCommand extends Command
             ->setDefinition([
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, json or csv)', 'txt'),
                 new InputOption('domain', null, InputOption::VALUE_REQUIRED, 'The messages domain'),
                 new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Display only missing messages'),
                 new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Display only unused messages'),
@@ -89,6 +90,11 @@ class TranslationDebugCommand extends Command
                 You can also specify a translation domain for the search:
 
                   <info>php %command.full_name% --domain=messages en AcmeDemoBundle</info>
+
+                You can export full messages as JSON or CSV:
+
+                  <info>php %command.full_name% en --format=json</info>
+                  <info>php %command.full_name% en --format=csv</info>
 
                 You can only display missing messages:
 
@@ -113,6 +119,11 @@ class TranslationDebugCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $format = $input->getOption('format');
+        if (!\in_array($format, ['txt', 'json', 'csv'], true)) {
+            throw new InvalidArgumentException(\sprintf('Unsupported format "%s". Supported formats are "txt", "json" and "csv".', $format));
+        }
+
         $io = new SymfonyStyle($input, $output);
 
         $locale = $input->getArgument('locale');
@@ -182,7 +193,11 @@ class TranslationDebugCommand extends Command
 
             $io->getErrorStyle()->warning($outputMessage);
 
-            return self::EXIT_CODE_GENERAL_ERROR;
+            if ('txt' === $format) {
+                return self::EXIT_CODE_GENERAL_ERROR;
+            }
+
+            $exitCode = self::EXIT_CODE_GENERAL_ERROR;
         }
 
         // Load the fallback catalogues
@@ -232,22 +247,63 @@ class TranslationDebugCommand extends Command
                     }
                 }
 
-                $row = [$this->formatStates($states), $domain, $this->formatId($messageId), $this->sanitizeString($value)];
-                foreach ($fallbackCatalogues as $fallbackCatalogue) {
-                    $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
+                if ('txt' === $format) {
+                    $row = [$this->formatStates($states), $domain, $this->formatId($messageId), $this->sanitizeString($value)];
+                    foreach ($fallbackCatalogues as $fallbackCatalogue) {
+                        $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
+                    }
+                } else {
+                    $fallback = [];
+                    foreach ($fallbackCatalogues as $fallbackCatalogue) {
+                        $fallback[$fallbackCatalogue->getLocale()] = $fallbackCatalogue->get($messageId, $domain);
+                    }
+                    $row = [
+                        'state' => array_map(static fn (int $state): string => match ($state) {
+                            self::MESSAGE_MISSING => 'missing',
+                            self::MESSAGE_UNUSED => 'unused',
+                            self::MESSAGE_EQUALS_FALLBACK => 'fallback',
+                        }, $states),
+                        'domain' => $domain,
+                        'id' => $messageId,
+                        'message' => $value,
+                        'fallback' => $fallback,
+                    ];
                 }
 
                 $rows[] = $row;
             }
         }
 
-        $io->table($headers, $rows);
+        if ('json' === $format) {
+            $output->writeln(json_encode($rows, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE | \JSON_THROW_ON_ERROR), OutputInterface::OUTPUT_RAW);
+        } elseif ('csv' === $format) {
+            $stream = fopen('php://memory', 'w+');
+            $headers = ['state', 'domain', 'id', 'message'];
+            foreach ($fallbackCatalogues as $fallbackCatalogue) {
+                $headers[] = 'fallback.'.$fallbackCatalogue->getLocale();
+            }
+            fputcsv($stream, $headers, escape: '');
+            foreach ($rows as $row) {
+                fputcsv($stream, [implode(', ', $row['state']), $row['domain'], $row['id'], $row['message'], ...array_values($row['fallback'])], escape: '');
+            }
+            rewind($stream);
+            $output->write(stream_get_contents($stream), false, OutputInterface::OUTPUT_RAW);
+            fclose($stream);
+        } else {
+            $io->table($headers, $rows);
+        }
 
         return $exitCode;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues(['txt', 'json', 'csv']);
+
+            return;
+        }
+
         if ($input->mustSuggestArgumentValuesFor('locale')) {
             $suggestions->suggestValues($this->enabledLocales);
 

@@ -587,7 +587,9 @@ abstract class AbstractUnicodeString extends AbstractString
             if ($joined) {
                 $joined = false;
 
-                continue;
+                if ("\x7F" < $c[0] && preg_match(self::EMOJI_REGEX, $c)) {
+                    continue;
+                }
             }
 
             $codePoint = mb_ord($c, 'UTF-8');

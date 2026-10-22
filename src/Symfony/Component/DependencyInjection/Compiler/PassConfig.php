@@ -80,6 +80,7 @@ class PassConfig
             new ResolveServiceSubscribersPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),
+            new CheckCallableAdapterPass(),
             new AnalyzeServiceReferencesPass(true),
             new CheckCircularReferencesPass(),
             new CheckReferenceValidityPass(),

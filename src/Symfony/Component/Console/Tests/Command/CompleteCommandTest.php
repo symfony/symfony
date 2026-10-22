@@ -135,7 +135,7 @@ class CompleteCommandTest extends TestCase
         $this->application->addCommand(new CompleteCommandTest_FileCommand());
 
         $this->execute(['--shell' => $shell, '--current' => (string) \count($input), '--input' => $input]);
-        $this->assertSame($display, $this->tester->getDisplay());
+        $this->assertSame($display, $this->tester->getDisplay(true));
     }
 
     public static function provideCompletePathsInputs()
@@ -154,7 +154,7 @@ class CompleteCommandTest extends TestCase
         $this->tester->execute(['--shell' => 'bash', '--current' => '2', '--input' => ['bin/console', 'file']] + $version);
 
         $this->tester->assertCommandIsSuccessful();
-        $this->assertSame("default\n", $this->tester->getDisplay());
+        $this->assertSame("default\n", $this->tester->getDisplay(true));
     }
 
     public static function provideOldScriptVersions()

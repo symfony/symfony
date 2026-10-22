@@ -24,7 +24,6 @@ one Reply-To address, and binary file attachments with distinct filenames.
 It requires at least one To recipient. Inline attachments and multiple Reply-To
 addresses are rejected before HTTP requests; use SMTP for these messages or for
 custom MIME headers, signed/encrypted messages and full MIME fidelity.
-Automation 360 and webhooks are outside this bridge's scope.
 
 Resources
 ---------

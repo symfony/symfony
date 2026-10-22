@@ -60,7 +60,12 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function keys(): array
     {
-        return array_map(strval(...), array_keys($this->parameters));
+        $keys = [];
+        foreach ($this->parameters as $key => $value) {
+            $keys[] = (string) $key;
+        }
+
+        return $keys;
     }
 
     /**

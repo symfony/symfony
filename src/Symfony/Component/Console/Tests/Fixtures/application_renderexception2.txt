@@ -5,3 +5,5 @@
 
 list [--raw] [--format FORMAT] [--short] [--] [<namespace>]
 
+Global options are available. Run the command with --help to list them.
+

@@ -390,7 +390,9 @@ final class ProxyHelper
             $args .= ($param->isVariadic() ? '...$' : '$').$param->name.', ';
         }
 
-        if (!$param || !$byRefIndex) {
+        if ($param?->isVariadic() && !$byRefIndex) {
+            $args = ($param->getPosition() ? \sprintf('...\array_slice(\func_get_args(), 0, %d), ', $param->getPosition()) : '').'...$'.$param->name;
+        } elseif (!$param || !$byRefIndex) {
             $args = '...\func_get_args()';
         } elseif ($param->isVariadic()) {
             $args = substr($args, 0, -2);

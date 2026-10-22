@@ -32,7 +32,7 @@ class UlidType extends AbstractType
     {
         $resolver->setDefaults([
             'compound' => false,
-            'invalid_message' => 'Please enter a valid ULID.',
+            'invalid_message' => 'This value is not a valid ULID.',
         ]);
     }
 }

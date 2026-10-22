@@ -38,7 +38,7 @@ class CountryType extends AbstractType
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'alpha3' => false,
-            'invalid_message' => 'Please select a valid country.',
+            'invalid_message' => 'This value is not a valid country.',
         ]);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);

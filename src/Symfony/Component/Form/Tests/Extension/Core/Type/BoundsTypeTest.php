@@ -125,7 +125,7 @@ class BoundsTypeTest extends BaseTypeTestCase
         $this->assertCount(0, $form['to']->getErrors());
         $this->assertCount(1, $errors = $form['from']->getErrors());
         // the message of the inner type, not one the range makes up for it
-        $this->assertSame('Please enter an integer.', $errors[0]->getMessageTemplate());
+        $this->assertSame('This value is not a valid integer.', $errors[0]->getMessageTemplate());
     }
 
     public function testInvalidMessageCanBeOverriddenForBothBounds()
@@ -434,7 +434,7 @@ class BoundsTypeTest extends BaseTypeTestCase
 
         // the bound already reports the transformation failure, nothing is added on top of it
         $this->assertCount(1, $errors = $form['from']->getErrors());
-        $this->assertSame('Please enter an integer.', $errors[0]->getMessageTemplate());
+        $this->assertSame('This value is not a valid integer.', $errors[0]->getMessageTemplate());
     }
 
     public function testCompareOrdersDates()

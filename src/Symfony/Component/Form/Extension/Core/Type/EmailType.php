@@ -19,7 +19,7 @@ class EmailType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'invalid_message' => 'Please enter a valid email address.',
+            'invalid_message' => 'This value is not a valid email address.',
         ]);
     }
 

@@ -367,7 +367,7 @@ class TimeType extends AbstractType
             'empty_data' => static fn (Options $options) => $options['compound'] ? [] : '',
             'compound' => $compound,
             'choice_translation_domain' => false,
-            'invalid_message' => 'Please enter a valid time.',
+            'invalid_message' => 'This value is not a valid time.',
         ]);
 
         $resolver->setNormalizer('view_timezone', static function (Options $options, $viewTimezone): ?string {

@@ -60,7 +60,7 @@ class NumberType extends AbstractType
             'compound' => false,
             'input' => 'number',
             'html5' => false,
-            'invalid_message' => 'Please enter a number.',
+            'invalid_message' => 'This value is not a valid number.',
         ]);
 
         $resolver->setAllowedValues('rounding_mode', [

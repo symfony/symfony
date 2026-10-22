@@ -24,6 +24,6 @@ class CountryTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please select a valid country.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid country.', $form->getConfig()->getOption('invalid_message'));
     }
 }

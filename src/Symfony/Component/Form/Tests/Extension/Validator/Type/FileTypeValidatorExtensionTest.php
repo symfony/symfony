@@ -24,6 +24,6 @@ class FileTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please select a valid file.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid file.', $form->getConfig()->getOption('invalid_message'));
     }
 }

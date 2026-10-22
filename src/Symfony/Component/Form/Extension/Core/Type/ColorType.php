@@ -63,7 +63,7 @@ class ColorType extends AbstractType
     {
         $resolver->setDefaults([
             'html5' => false,
-            'invalid_message' => 'Please select a valid color.',
+            'invalid_message' => 'This value is not a valid color.',
         ]);
 
         $resolver->setAllowedTypes('html5', 'bool');

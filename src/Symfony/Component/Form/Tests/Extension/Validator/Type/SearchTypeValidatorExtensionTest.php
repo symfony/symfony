@@ -24,6 +24,6 @@ class SearchTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please enter a valid search term.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid search term.', $form->getConfig()->getOption('invalid_message'));
     }
 }

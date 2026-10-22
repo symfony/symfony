@@ -24,6 +24,6 @@ class TimeTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please enter a valid time.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid time.', $form->getConfig()->getOption('invalid_message'));
     }
 }

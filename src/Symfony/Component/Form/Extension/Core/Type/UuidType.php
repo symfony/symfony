@@ -32,7 +32,7 @@ class UuidType extends AbstractType
     {
         $resolver->setDefaults([
             'compound' => false,
-            'invalid_message' => 'Please enter a valid UUID.',
+            'invalid_message' => 'This value is not a valid UUID.',
         ]);
     }
 }

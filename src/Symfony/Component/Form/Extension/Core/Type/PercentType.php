@@ -48,7 +48,7 @@ class PercentType extends AbstractType
             'type' => 'fractional',
             'compound' => false,
             'html5' => false,
-            'invalid_message' => 'Please enter a percentage value.',
+            'invalid_message' => 'This value is not a valid percentage.',
         ]);
 
         $resolver->setAllowedValues('type', [

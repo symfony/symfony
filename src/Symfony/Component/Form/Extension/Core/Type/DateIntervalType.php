@@ -214,7 +214,7 @@ class DateIntervalType extends AbstractType
             'compound' => $compound,
             'empty_data' => $emptyData,
             'labels' => [],
-            'invalid_message' => 'Please choose a valid date interval.',
+            'invalid_message' => 'This value is not a valid date interval.',
         ]);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('labels', $labelsNormalizer);

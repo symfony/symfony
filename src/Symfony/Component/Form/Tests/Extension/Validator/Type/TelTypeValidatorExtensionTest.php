@@ -24,6 +24,6 @@ class TelTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please provide a valid phone number.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid phone number.', $form->getConfig()->getOption('invalid_message'));
     }
 }

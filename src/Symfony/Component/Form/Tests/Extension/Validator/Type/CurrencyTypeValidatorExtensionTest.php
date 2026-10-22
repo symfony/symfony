@@ -24,6 +24,6 @@ class CurrencyTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please select a valid currency.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid currency.', $form->getConfig()->getOption('invalid_message'));
     }
 }

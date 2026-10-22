@@ -24,6 +24,6 @@ class UrlTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please enter a valid URL.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid URL.', $form->getConfig()->getOption('invalid_message'));
     }
 }

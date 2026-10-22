@@ -24,6 +24,6 @@ class MoneyTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please enter a valid money amount.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid money amount.', $form->getConfig()->getOption('invalid_message'));
     }
 }

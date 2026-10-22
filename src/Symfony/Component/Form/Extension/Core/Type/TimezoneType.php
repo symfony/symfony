@@ -65,7 +65,7 @@ class TimezoneType extends AbstractType
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'input' => 'string',
-            'invalid_message' => 'Please select a valid timezone.',
+            'invalid_message' => 'This value is not a valid timezone.',
             'regions' => \DateTimeZone::ALL,
         ]);
 

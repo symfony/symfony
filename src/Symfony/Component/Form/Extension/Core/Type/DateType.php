@@ -329,7 +329,7 @@ class DateType extends AbstractType
             'empty_data' => static fn (Options $options) => $options['compound'] ? [] : '',
             'choice_translation_domain' => false,
             'input_format' => 'Y-m-d',
-            'invalid_message' => 'Please enter a valid date.',
+            'invalid_message' => 'This value is not a valid date.',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);

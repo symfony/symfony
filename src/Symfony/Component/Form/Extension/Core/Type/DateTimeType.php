@@ -294,7 +294,7 @@ class DateTimeType extends AbstractType
             'time_label' => null,
             'empty_data' => static fn (Options $options) => $options['compound'] ? [] : '',
             'input_format' => 'Y-m-d H:i:s',
-            'invalid_message' => 'Please enter a valid date and time.',
+            'invalid_message' => 'This value is not a valid date and time.',
         ]);
 
         // Don't add some defaults in order to preserve the defaults

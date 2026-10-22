@@ -19,7 +19,7 @@ class TelType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'invalid_message' => 'Please provide a valid phone number.',
+            'invalid_message' => 'This value is not a valid phone number.',
         ]);
     }
 

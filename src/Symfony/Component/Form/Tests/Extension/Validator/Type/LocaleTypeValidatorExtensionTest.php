@@ -24,6 +24,6 @@ class LocaleTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please select a valid locale.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid locale.', $form->getConfig()->getOption('invalid_message'));
     }
 }

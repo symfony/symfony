@@ -24,6 +24,6 @@ class LanguageTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please select a valid language.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid language.', $form->getConfig()->getOption('invalid_message'));
     }
 }

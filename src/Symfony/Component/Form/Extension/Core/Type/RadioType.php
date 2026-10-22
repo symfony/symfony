@@ -19,7 +19,7 @@ class RadioType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'invalid_message' => 'Please select a valid option.',
+            'invalid_message' => 'This value is not a valid option.',
         ]);
     }
 

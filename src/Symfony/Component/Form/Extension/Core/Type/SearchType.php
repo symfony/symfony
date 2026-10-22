@@ -19,7 +19,7 @@ class SearchType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'invalid_message' => 'Please enter a valid search term.',
+            'invalid_message' => 'This value is not a valid search term.',
         ]);
     }
 

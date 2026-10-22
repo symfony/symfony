@@ -39,7 +39,7 @@ class UrlType extends AbstractType
     {
         $resolver->setDefaults([
             'default_protocol' => null,
-            'invalid_message' => 'Please enter a valid URL.',
+            'invalid_message' => 'This value is not a valid URL.',
         ]);
 
         $resolver->setAllowedTypes('default_protocol', ['null', 'string']);

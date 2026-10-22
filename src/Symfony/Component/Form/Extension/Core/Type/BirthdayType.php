@@ -22,7 +22,7 @@ class BirthdayType extends AbstractType
     {
         $resolver->setDefaults([
             'years' => range(date('Y') - 120, date('Y')),
-            'invalid_message' => 'Please enter a valid birthdate.',
+            'invalid_message' => 'This value is not a valid birthdate.',
         ]);
 
         $resolver->setAllowedTypes('years', 'array');

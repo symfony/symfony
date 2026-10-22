@@ -24,6 +24,6 @@ class ColorTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please select a valid color.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid color.', $form->getConfig()->getOption('invalid_message'));
     }
 }

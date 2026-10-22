@@ -96,7 +96,7 @@ final class ColorTypeTest extends BaseTypeTestCase
         $this->assertSame('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
         $errors = iterator_to_array($form->getErrors());
         $this->assertCount(1, $errors);
-        $this->assertSame('Please select a valid color.', $errors[0]->getMessage());
+        $this->assertSame('This value is not a valid color.', $errors[0]->getMessage());
     }
 
     public function testPreSubmitListenersCanTurnArraysIntoColors()

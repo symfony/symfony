@@ -24,6 +24,6 @@ class DateIntervalTypeValidatorExtensionTest extends BaseValidatorExtensionTestC
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please choose a valid date interval.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid date interval.', $form->getConfig()->getOption('invalid_message'));
     }
 }

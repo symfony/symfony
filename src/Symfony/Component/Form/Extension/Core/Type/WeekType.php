@@ -135,7 +135,7 @@ class WeekType extends AbstractType
             'empty_data' => static fn (Options $options) => $options['compound'] ? [] : '',
             'compound' => $compound,
             'choice_translation_domain' => false,
-            'invalid_message' => 'Please enter a valid week.',
+            'invalid_message' => 'This value is not a valid week.',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);

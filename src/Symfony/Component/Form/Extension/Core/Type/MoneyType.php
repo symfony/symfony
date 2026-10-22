@@ -70,7 +70,7 @@ class MoneyType extends AbstractType
             'currency' => 'EUR',
             'compound' => false,
             'html5' => false,
-            'invalid_message' => 'Please enter a valid money amount.',
+            'invalid_message' => 'This value is not a valid money amount.',
             'input' => 'float',
         ]);
 

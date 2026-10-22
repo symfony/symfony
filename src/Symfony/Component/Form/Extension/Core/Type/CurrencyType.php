@@ -91,7 +91,7 @@ class CurrencyType extends AbstractType
             'not_active_at' => null,
             'include_undated' => true,
             'legal_tender' => true,
-            'invalid_message' => 'Please select a valid currency.',
+            'invalid_message' => 'This value is not a valid currency.',
         ]);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);

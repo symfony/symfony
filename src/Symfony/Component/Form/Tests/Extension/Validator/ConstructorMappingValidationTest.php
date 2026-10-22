@@ -52,7 +52,7 @@ class ConstructorMappingValidationTest extends TestCase
 
         $this->assertFalse($form->isValid());
         $this->assertSame([], $this->getMessages($form));
-        $this->assertSame(['Please enter a valid date.'], $this->getMessages($form->get('birthDate')));
+        $this->assertSame(['This value is not a valid date.'], $this->getMessages($form->get('birthDate')));
     }
 
     public function testAllEmptyFieldsAreReported()
@@ -63,7 +63,7 @@ class ConstructorMappingValidationTest extends TestCase
 
         $this->assertSame([], $this->getMessages($form));
         $this->assertSame(['This value should not be blank.'], $this->getMessages($form->get('email')));
-        $this->assertSame(['Please enter a valid date.'], $this->getMessages($form->get('birthDate')));
+        $this->assertSame(['This value is not a valid date.'], $this->getMessages($form->get('birthDate')));
     }
 
     public function testEmptyFieldIsReportedNextToAnUnsynchronizedField()
@@ -74,7 +74,7 @@ class ConstructorMappingValidationTest extends TestCase
 
         $this->assertSame([], $this->getMessages($form));
         $this->assertSame(['This value should not be blank.'], $this->getMessages($form->get('email')));
-        $this->assertSame(['Please enter a valid date.'], $this->getMessages($form->get('birthDate')));
+        $this->assertSame(['This value is not a valid date.'], $this->getMessages($form->get('birthDate')));
     }
 
     public function testEmptyFieldIsReportedWhenTheDataIsReplaced()

@@ -24,6 +24,6 @@ class BirthdayTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please enter a valid birthdate.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid birthdate.', $form->getConfig()->getOption('invalid_message'));
     }
 }

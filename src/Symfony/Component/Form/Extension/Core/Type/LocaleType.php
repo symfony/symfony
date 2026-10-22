@@ -36,7 +36,7 @@ class LocaleType extends AbstractType
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
-            'invalid_message' => 'Please select a valid locale.',
+            'invalid_message' => 'This value is not a valid locale.',
         ]);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);

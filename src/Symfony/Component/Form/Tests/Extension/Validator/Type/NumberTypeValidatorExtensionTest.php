@@ -24,6 +24,6 @@ class NumberTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please enter a number.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid number.', $form->getConfig()->getOption('invalid_message'));
     }
 }

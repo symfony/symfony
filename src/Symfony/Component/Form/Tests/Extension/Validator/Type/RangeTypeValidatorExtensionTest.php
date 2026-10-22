@@ -24,6 +24,6 @@ class RangeTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     {
         $form = $this->createForm();
 
-        $this->assertSame('Please choose a valid range.', $form->getConfig()->getOption('invalid_message'));
+        $this->assertSame('This value is not a valid range.', $form->getConfig()->getOption('invalid_message'));
     }
 }

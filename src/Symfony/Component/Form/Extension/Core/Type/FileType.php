@@ -115,7 +115,7 @@ class FileType extends AbstractType
             'empty_data' => $emptyData,
             'multiple' => false,
             'allow_file_upload' => true,
-            'invalid_message' => 'Please select a valid file.',
+            'invalid_message' => 'This value is not a valid file.',
         ]);
     }
 

@@ -95,6 +95,7 @@ final class Transport
         Bridge\Smsense\SmsenseTransportFactory::class,
         Bridge\SmsFactor\SmsFactorTransportFactory::class,
         Bridge\Smsmode\SmsmodeTransportFactory::class,
+        Bridge\SmsProxima\SmsProximaTransportFactory::class,
         Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,
         Bridge\SpotHit\SpotHitTransportFactory::class,
         Bridge\Sweego\SweegoTransportFactory::class,

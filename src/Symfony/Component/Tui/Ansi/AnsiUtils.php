@@ -58,8 +58,9 @@ final class AnsiUtils
      * Characters that mb_strwidth() does not measure the way terminals draw them.
      *
      * It counts a tab as one column, a combining mark as its own column, a zero-width joiner or a Hangul vowel or final consonant jamo as one more and a skin tone modifier as two more.
+     * Characters unknown to PCRE use String's Unicode tables.
      */
-    private const MISMEASURED_BY_MB_STRWIDTH = '/[\t\p{M}\p{Cf}\x{1160}-\x{11FF}\x{D7B0}-\x{D7FF}\x{1F3FB}-\x{1F3FF}]/u';
+    private const MISMEASURED_BY_MB_STRWIDTH = '/[\t\p{M}\p{Cf}\p{Cn}\x{1160}-\x{11FF}\x{2028}-\x{2029}\x{D7B0}-\x{D7FF}\x{1F3FB}-\x{1F3FF}]/u';
 
     /**
      * Character set for CSI parameter bytes (0x30-0x3F).
@@ -191,9 +192,8 @@ final class AnsiUtils
             $clean = mb_scrub($clean, 'UTF-8');
         }
 
-        // Only text that mb_strwidth() mismeasures needs the slower per grapheme walk, which is also the measure the wrapper breaks lines by:
-        // the two have to agree or a wrapped chunk comes back wider than the width it was wrapped to.
-        if (preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $clean)) {
+        // Use the wrapper's grapheme widths when native mb_strwidth() cannot measure the text.
+        if (!\extension_loaded('mbstring') && preg_match('/[\x80-\xFF]/', $clean) || preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $clean)) {
             $width = 0;
             foreach (self::splitGraphemes($clean) as $grapheme) {
                 $width += self::graphemeWidth($grapheme);
@@ -480,7 +480,7 @@ final class AnsiUtils
                 $textPortion = substr($line, $i, $segLen);
 
                 // Take the whole segment when it fits, unless mb_strwidth() would mismeasure it
-                $segWidth = !preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $textPortion) ? mb_strwidth($textPortion, 'UTF-8') : self::visibleWidth($textPortion);
+                $segWidth = \extension_loaded('mbstring') && !preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $textPortion) ? mb_strwidth($textPortion, 'UTF-8') : self::visibleWidth($textPortion);
                 if ($currentCol >= $startCol && $currentCol + $segWidth <= $endCol) {
                     if ('' !== $pendingAnsi) {
                         $result .= $pendingAnsi;
@@ -530,6 +530,7 @@ final class AnsiUtils
      * Calculate the display width of a single grapheme in terminal columns.
      *
      * A single code point is measured with mb_strwidth(), a fast C-level call, except the ones it gives a column that terminals do not draw, like a lone combining mark or a bidi isolate: those, and graphemes of several code points, are measured with CodePointString::width(). Malformed UTF-8 is measured with each invalid sequence replaced by a character, the way visibleWidth() does, so it never throws. Widths are cached per grapheme.
+     * Without native mbstring, multibyte graphemes use CodePointString::width(), except C1 controls.
      */
     public static function graphemeWidth(string $grapheme): int
     {
@@ -537,7 +538,7 @@ final class AnsiUtils
             return self::$graphemeWidths[$grapheme];
         }
 
-        if (1 === mb_strlen($grapheme, 'UTF-8')) {
+        if (1 === mb_strlen($grapheme, 'UTF-8') && (!isset($grapheme[1]) || \extension_loaded('mbstring') || $grapheme < "\xC2\xA0")) {
             $width = !isset($grapheme[1]) || !preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $grapheme) ? mb_strwidth($grapheme, 'UTF-8') : new CodePointString($grapheme)->width(false);
         } elseif (preg_match('//u', $grapheme)) {
             $width = new CodePointString($grapheme)->width(false);
@@ -661,7 +662,7 @@ final class AnsiUtils
                 $currentCol += $take;
             } else {
                 // Unicode path
-                $segWidth = !preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $segment) ? mb_strwidth($segment, 'UTF-8') : self::visibleWidth($segment);
+                $segWidth = \extension_loaded('mbstring') && !preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $segment) ? mb_strwidth($segment, 'UTF-8') : self::visibleWidth($segment);
                 if ($currentCol + $segWidth <= $length) {
                     $result .= $segment;
                     $currentCol += $segWidth;

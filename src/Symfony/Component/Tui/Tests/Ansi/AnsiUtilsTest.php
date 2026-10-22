@@ -738,12 +738,36 @@ class AnsiUtilsTest extends TestCase
         yield 'soft hyphen' => [1, "\u{00AD}"];
         yield 'accented letter' => [1, "\u{00E9}"];
         yield 'wide character' => [2, "\u{6771}"];
+        yield 'emoji' => [2, "\u{1F600}"];
+        yield 'watch' => [2, "\u{231A}"];
+        yield 'newer wide character' => [2, "\u{1FA8B}"];
+        yield 'newer combining mark' => [0, "\u{1E4EC}"];
+        yield 'unassigned format character' => [0, "\u{2065}"];
+        yield 'unassigned interlinear annotation character' => [0, "\u{FFF0}"];
+        yield 'line separator' => [0, "\u{2028}"];
+        yield 'paragraph separator' => [0, "\u{2029}"];
     }
 
     #[DataProvider('singleCodePointWidthProvider')]
     public function testGraphemeWidthOfASingleCodePoint(int $expected, string $grapheme)
     {
         $this->assertSame($expected, AnsiUtils::graphemeWidth($grapheme));
+    }
+
+    #[DataProvider('singleCodePointWidthProvider')]
+    public function testVisibleWidthOfASingleCodePoint(int $expected, string $grapheme)
+    {
+        $this->assertSame($expected, AnsiUtils::visibleWidth($grapheme));
+        $this->assertSame(4 + $expected, AnsiUtils::visibleWidth("a \x1b[1m".$grapheme."\x1b[0m b"));
+    }
+
+    public function testWidthOfANewerWideCharacterDoesNotChangeWithACombiningMark()
+    {
+        foreach (["\u{1FA8B}", "\u{1FA8B}\u{0301}"] as $grapheme) {
+            $this->assertSame(2, AnsiUtils::graphemeWidth($grapheme));
+            $this->assertSame(2, AnsiUtils::visibleWidth($grapheme));
+            $this->assertSame(['text' => $grapheme.'b', 'width' => 3], AnsiUtils::sliceWithWidth('a'.$grapheme.'bc', 1, 3, true));
+        }
     }
 
     public function testVisibleWidthGivesNoColumnToFormatCharacters()

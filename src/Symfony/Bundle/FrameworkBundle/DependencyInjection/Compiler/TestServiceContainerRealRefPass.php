@@ -60,8 +60,14 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
 
         $privateContainer->replaceArgument(0, $privateServices);
 
-        if ($container->hasDefinition('test.service_container') && $renamedIds) {
-            $container->getDefinition('test.service_container')->setArgument(2, $renamedIds);
+        $privateServiceIds = [];
+
+        foreach ($privateServices as $id => $argument) {
+            $target = (string) $argument->getValues()[0];
+
+            if ($definitions[$target]->isShared()) {
+                $privateServiceIds[$id] = $target;
+            }
         }
 
         $nonSharedServices = [];
@@ -72,8 +78,11 @@ class TestServiceContainerRealRefPass implements CompilerPassInterface
             }
         }
 
-        if ($container->hasDefinition('test.service_container') && $nonSharedServices) {
-            $container->getDefinition('test.service_container')->setArgument(3, $nonSharedServices);
+        if ($container->hasDefinition('test.service_container') && ($renamedIds || $nonSharedServices || $privateServiceIds)) {
+            $container->getDefinition('test.service_container')
+                ->setArgument(2, $renamedIds)
+                ->setArgument(3, $nonSharedServices)
+                ->setArgument(4, $privateServiceIds);
         }
     }
 }

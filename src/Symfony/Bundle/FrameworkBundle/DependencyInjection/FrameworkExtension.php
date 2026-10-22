@@ -49,6 +49,7 @@ use Symfony\Component\Console\Attribute\AsTargetedValueResolver as AsTargetedCon
 use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -2181,7 +2182,7 @@ class FrameworkExtension extends Extension
             $container->setParameter('.serializer.max_depth_handler', $config['max_depth_handler']);
         }
 
-        $container->getDefinition('serializer.normalizer.property')->setArgument(5, $defaultContext);
+        $container->getDefinition('serializer.normalizer.property')->setBindings(['array $defaultContext' => new BoundArgument($defaultContext, false)]);
 
         $container->setParameter('.serializer.named_serializers', $config['named_serializers'] ?? []);
 

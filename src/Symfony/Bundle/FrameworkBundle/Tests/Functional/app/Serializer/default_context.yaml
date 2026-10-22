@@ -8,8 +8,19 @@ framework:
         max_depth_handler: ~ # This must be null
         default_context:
             fake_context_option: foo
+        named_serializers:
+            api:
+                include_built_in_normalizers: true
+                default_context:
+                    fake_context_option: bar
 
 services:
+    serializer.normalizer.property.tagged:
+        parent: serializer.normalizer.property
+        class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
+        tags:
+            - { name: serializer.normalizer, serializer: api }
+
     serializer.normalizer.constraint_violation_list.alias:
         alias: serializer.normalizer.constraint_violation_list
         public: true
@@ -36,6 +47,10 @@ services:
 
     serializer.normalizer.property.alias:
         alias: serializer.normalizer.property
+        public: true
+
+    serializer.normalizer.property.tagged.api.alias:
+        alias: serializer.normalizer.property.tagged.api
         public: true
 
     serializer.normalizer.uid.alias:

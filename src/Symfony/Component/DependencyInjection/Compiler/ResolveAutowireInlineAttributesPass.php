@@ -83,6 +83,11 @@ class ResolveAutowireInlineAttributesPass extends AbstractRecursivePass
         return $value;
     }
 
+    protected function registerDefinition(string $id, Definition $definition, AutowireInline $attribute, \ReflectionParameter $parameter): void
+    {
+        $this->container->setDefinition($id, $definition);
+    }
+
     private function registerAutowireInlineAttributes(\ReflectionFunctionAbstract $method, array $arguments, bool $isChildDefinition): array
     {
         $parameters = $method->getParameters();
@@ -119,10 +124,12 @@ class ResolveAutowireInlineAttributesPass extends AbstractRecursivePass
             $paramResolverContainer->setDefinition('.autowire_inline', $definition);
             (new ResolveParameterPlaceHoldersPass(false, false))->process($paramResolverContainer);
 
-            $id = '.autowire_inline.'.$this->currentId.'.'.++$this->counter;
+            do {
+                $id = '.autowire_inline.'.$this->currentId.'.'.++$this->counter;
+            } while ($this->container->has($id));
 
-            $this->container->setDefinition($id, $definition);
-            $arguments[$isChildDefinition ? '$'.$parameter->name : $index] = new Reference($id);
+            $this->registerDefinition($id, $definition, $attribute, $parameter);
+            $arguments[$isChildDefinition || \array_key_exists('$'.$parameter->name, $arguments) ? '$'.$parameter->name : $index] = new Reference($id);
 
             if ($definition->isAutowired()) {
                 $this->processValue($definition);

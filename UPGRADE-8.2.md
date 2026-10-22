@@ -54,6 +54,7 @@ Console
 DependencyInjection
 -------------------
 
+ * [BC BREAK] Callable adapters now report incompatible argument counts and disjoint parameter or return types during container compilation. Check that the target method accepts the arguments declared by the interface and returns a compatible value
  * [BC BREAK] A top-level extension key that holds a value which is not an array is now passed to that
    extension instead of being replaced by an empty array. `lock: 'redis://example.com'` configures the lock,
    where it used to be ignored. An extension whose configuration tree does not accept the value now reports

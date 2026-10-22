@@ -53,6 +53,7 @@ final class Transport
         Bridge\JoliNotif\JoliNotifTransportFactory::class,
         Bridge\KazInfoTeh\KazInfoTehTransportFactory::class,
         Bridge\LightSms\LightSmsTransportFactory::class,
+        Bridge\LineBot\LineBotTransportFactory::class,
         Bridge\LineNotify\LineNotifyTransportFactory::class,
         Bridge\LinkedIn\LinkedInTransportFactory::class,
         Bridge\Lox24\Lox24TransportFactory::class,

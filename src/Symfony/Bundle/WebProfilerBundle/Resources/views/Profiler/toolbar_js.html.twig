@@ -67,6 +67,9 @@
                 var profilerOverlay = document.querySelector('.sf-profiler-overlay');
                 if (profilerOverlay && typeof profilerOverlay.showModal === 'function') {
                     var profilerHome = new URL('{{ url('_profiler_home')|e('js') }}');
+                    var isProfilerUrl = function(url) {
+                        return url.origin === window.location.origin && url.origin === profilerHome.origin && url.pathname.indexOf(profilerHome.pathname) === 0;
+                    };
                     var profilerTabLink = profilerOverlay.querySelector('a');
                     var profilerFrame = null;
                     var profilerOpener = null;
@@ -119,7 +122,7 @@
                             return;
                         }
 
-                        if (link.origin !== window.location.origin || link.origin !== profilerHome.origin || link.pathname.indexOf(profilerHome.pathname) !== 0) {
+                        if (!isProfilerUrl(link)) {
                             return;
                         }
 
@@ -160,6 +163,52 @@
                                 return;
                             }
 
+                            var replaceProfilerPage = function(event, url) {
+                                if (!isProfilerUrl(url)) {
+                                    return;
+                                }
+
+                                event.preventDefault();
+                                profilerTabLink.href = url.href;
+                                frame.contentWindow.location.replace(url.href);
+                            };
+                            addEventListener(frameDocument, 'click', function(event) {
+                                if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+                                    return;
+                                }
+
+                                var link = event.target.closest('a');
+                                if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) {
+                                    return;
+                                }
+
+                                replaceProfilerPage(event, link);
+                            });
+                            addEventListener(frameDocument, 'submit', function(event) {
+                                if (event.defaultPrevented) {
+                                    return;
+                                }
+
+                                var form = event.target;
+                                var submitter = event.submitter;
+                                var method = submitter && submitter.hasAttribute('formmethod') ? submitter.formMethod : (form.getAttribute('method') || 'get').toLowerCase();
+                                var target = submitter && submitter.hasAttribute('formtarget') ? submitter.formTarget : form.getAttribute('target');
+                                if (method !== 'get' || (target && target !== '_self')) {
+                                    return;
+                                }
+
+                                var url = new URL(submitter && submitter.hasAttribute('formaction') ? submitter.formAction : form.getAttribute('action') || frameDocument.location.href, frameDocument.baseURI);
+                                if (!isProfilerUrl(url)) {
+                                    return;
+                                }
+
+                                var parameters = new URLSearchParams();
+                                new FormData(form, submitter).forEach(function(value, name) {
+                                    parameters.append(name, typeof value === 'string' ? value : value.name);
+                                });
+                                url.search = parameters.toString();
+                                replaceProfilerPage(event, url);
+                            });
                             addEventListener(frameDocument, 'keydown', function(event) {
                                 if (event.key !== 'Escape' || event.defaultPrevented || event.target.closest('dialog[open]')) {
                                     return;

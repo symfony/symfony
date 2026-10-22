@@ -32,6 +32,7 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
             [2, "\u{1100}\u{1161}\u{11A8}"],
             [2, "\u{1100}\u{D7B0}\u{D7CB}"],
             [2, '1️⃣'],
+            [5, "abc1\u{FE0F}\u{20E3}"],
             [3, "1\u{1F3FB}"],
             [3, "#\u{1F3FB}"],
             [4, "\u{1F3FB}\u{1F3FB}"],

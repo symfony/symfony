@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Emoji\EmojiTransliterator;
+use Symfony\Component\Emoji\Util\GzipStreamWrapper;
 use Symfony\Component\Finder\Finder;
 
 #[RequiresPhpExtension('intl')]
@@ -83,6 +84,79 @@ class EmojiTransliteratorTest extends TestCase
             $specialArrowInput,
             ' - ',
         ];
+    }
+
+    #[DataProvider('provideStrtrTests')]
+    public function testTransliterateGivesTheSameResultAsStrtr(string $id, string $input)
+    {
+        $map = self::loadMap($id);
+
+        $this->assertSame(strtr($input, $map), EmojiTransliterator::create($id)->transliterate($input));
+    }
+
+    public static function provideStrtrTests(): iterable
+    {
+        $inputs = [
+            'one emoji' => 'Great job 👍 see you',
+            'adjacent emoji' => '👍👍🎉👍',
+            'skin tones' => '👋🏽 👋 🏽 👍🏿👍',
+            'families' => "👨\u{200D}👩\u{200D}👧\u{200D}👦👨\u{200D}👩\u{200D}👧 👨\u{200D}👩",
+            'flags' => '🇪🇸🇫🇷 🇪 🇺🇳🇺',
+            'tags' => "🏴\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F} 🏴",
+            'keycaps' => "1\u{FE0F}\u{20E3} #\u{FE0F}\u{20E3}2\u{20E3} *\u{FE0F}\u{20E3} 10\u{FE0F}\u{20E3} 9 \u{FE0F}\u{20E3}",
+            'text presentation' => "↔ ↔\u{FE0F} © ®\u{FE0F} ™",
+            'no emoji' => "It’s a “great” day \u{2013} isn’t it… 10 € «oui»",
+            'Japanese' => "今日はいい天気〰\u{FE0F}ですね〽",
+            'shortcodes' => 'At 10:30 :thumbsup: :+1::tada: :tada:thumbsup: :not_a_shortcode: :',
+            'dense' => str_repeat("👨\u{200D}👩\u{200D}👧\u{200D}👦 👍🏽 ", 20),
+        ];
+
+        foreach (['emoji-en', 'emoji-ja', 'emoji-strip', 'emoji-github', 'text-emoji', 'github-emoji', 'slack-emoji'] as $id) {
+            foreach ($inputs as $name => $input) {
+                yield "$id, $name" => [$id, $input];
+            }
+        }
+    }
+
+    #[DataProvider('provideAllIds')]
+    public function testKeysHaveTheExpectedStructure(string $id)
+    {
+        $class = new \ReflectionClass(EmojiTransliterator::class);
+        $maxKeyLength = $class->getConstant('MAX_KEY_LENGTH');
+        $keyTailBytes = $class->getConstant('KEY_TAIL_BYTES');
+        $sequencePattern = $class->getConstant('SEQUENCE_PATTERN');
+
+        $map = self::loadMap($id);
+        $shortcodes = str_starts_with(array_key_first($map), ':');
+        $invalidKeys = [];
+
+        foreach ($map as $key => $value) {
+            $key = (string) $key;
+
+            if ($shortcodes) {
+                $valid = preg_match('/^:[^:]++:$/', $key);
+            } else {
+                $firstCharacterLength = \strlen(mb_substr($key, 0, 1));
+                $valid = str_contains("\xC2\xE2\xE3\xF0#*0123456789", $key[0])
+                    && \strlen($key) <= $maxKeyLength
+                    && \strlen($key) - 1 === strspn($key, $keyTailBytes, 1)
+                    && (\strlen($key) === $firstCharacterLength || preg_match($sequencePattern, $key, offset: $firstCharacterLength))
+                    && (1 !== $firstCharacterLength || str_contains("\xE2\xEF", $key[1]));
+            }
+
+            if (!$valid) {
+                $invalidKeys[] = $key;
+            }
+        }
+
+        $this->assertSame([], $invalidKeys);
+    }
+
+    public static function provideAllIds(): iterable
+    {
+        foreach (EmojiTransliterator::listIDs() as $id) {
+            yield [$id];
+        }
     }
 
     #[DataProvider('provideLocaleTest')]
@@ -204,5 +278,12 @@ class EmojiTransliteratorTest extends TestCase
         $transliterator = EmojiTransliterator::create('emoji-en');
 
         $this->assertSame('', $transliterator->getErrorMessage());
+    }
+
+    private static function loadMap(string $id): array
+    {
+        $file = __DIR__."/../Resources/data/{$id}.php";
+
+        return is_file($file) ? require $file : GzipStreamWrapper::require($file.'.gz');
     }
 }

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `#[AutowireStack]` to inject a stack of decorators into an argument
  * Add the `on_shutdown` attribute on `kernel.reset` tags to pass a shutdown flag or call a method only on shutdown
  * Add argument `$shutdown` to `Container::reset()`, `ServicesResetter::reset()` and `ServicesResetterInterface::reset()`
  * Add return type `void` to `ServicesResetterInterface::reset()`

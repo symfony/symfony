@@ -101,7 +101,7 @@ class LegacyProxyHelperTest extends ProxyHelperTest
                 public function foo2(?\Symfony\Component\VarExporter\Tests\Bar $b, ...$d): \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2
                 {
                     if (isset($this->lazyObjectState)) {
-                        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo2(...\func_get_args());
+                        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->foo2(...\array_slice(\func_get_args(), 0, 1), ...$d);
                     }
 
                     return throw new \BadMethodCallException('Cannot forward abstract method "Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2::foo2()".');

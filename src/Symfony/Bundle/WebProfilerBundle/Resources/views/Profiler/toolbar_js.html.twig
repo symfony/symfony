@@ -63,12 +63,13 @@
                 }
 
                 var toolbarLoadAborter = null;
+                var openProfilerOverlay = null;
 
                 var profilerOverlay = document.querySelector('.sf-profiler-overlay');
                 if (profilerOverlay && typeof profilerOverlay.showModal === 'function') {
                     var profilerHome = new URL('{{ url('_profiler_home')|e('js') }}');
-                    var isProfilerUrl = function(url) {
-                        return url.origin === window.location.origin && url.origin === profilerHome.origin && url.pathname.indexOf(profilerHome.pathname) === 0;
+                    var isProfilerUrl = function(origin, pathname) {
+                        return origin === window.location.origin && origin === profilerHome.origin && pathname.indexOf(profilerHome.pathname) === 0;
                     };
                     var profilerTabLink = profilerOverlay.querySelector('a');
                     var profilerFrame = null;
@@ -112,17 +113,17 @@
                             navigateToProfiler();
                         }
                     });
-                    addEventListener(document, 'click', function(event) {
+                    openProfilerOverlay = function(event) {
                         if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
                             return;
                         }
 
                         var link = event.target.closest('a');
-                        if (!link || !link.closest('.sf-toolbar') || link.hasAttribute('download') || (link.target && link.target !== '_self')) {
+                        if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) {
                             return;
                         }
 
-                        if (!isProfilerUrl(link)) {
+                        if (!isProfilerUrl(link.origin, link.pathname)) {
                             return;
                         }
 
@@ -163,14 +164,10 @@
                                 return;
                             }
 
-                            var replaceProfilerPage = function(event, url) {
-                                if (!isProfilerUrl(url)) {
-                                    return;
-                                }
-
+                            var replaceProfilerPage = function(event, href) {
                                 event.preventDefault();
-                                profilerTabLink.href = url.href;
-                                frame.contentWindow.location.replace(url.href);
+                                profilerTabLink.href = href;
+                                frame.contentWindow.location.replace(href);
                             };
                             addEventListener(frameDocument, 'click', function(event) {
                                 if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
@@ -178,11 +175,11 @@
                                 }
 
                                 var link = event.target.closest('a');
-                                if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) {
+                                if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self') || !isProfilerUrl(link.origin, link.pathname)) {
                                     return;
                                 }
 
-                                replaceProfilerPage(event, link);
+                                replaceProfilerPage(event, link.href);
                             });
                             addEventListener(frameDocument, 'submit', function(event) {
                                 if (event.defaultPrevented) {
@@ -198,7 +195,7 @@
                                 }
 
                                 var url = new URL(submitter && submitter.hasAttribute('formaction') ? submitter.formAction : form.getAttribute('action') || frameDocument.location.href, frameDocument.baseURI);
-                                if (!isProfilerUrl(url)) {
+                                if (!isProfilerUrl(url.origin, url.pathname)) {
                                     return;
                                 }
 
@@ -207,7 +204,7 @@
                                     parameters.append(name, typeof value === 'string' ? value : value.name);
                                 });
                                 url.search = parameters.toString();
-                                replaceProfilerPage(event, url);
+                                replaceProfilerPage(event, url.href);
                             });
                             addEventListener(frameDocument, 'keydown', function(event) {
                                 if (event.key !== 'Escape' || event.defaultPrevented || event.target.closest('dialog[open]')) {
@@ -222,7 +219,7 @@
                         });
                         profilerOverlay.appendChild(frame);
                         profilerOverlay.showModal();
-                    });
+                    };
                 }
 
                 var request = function(url, onSuccess, onError, payload, options, tries) {
@@ -639,6 +636,10 @@
 
                     loadToolbar: function(token, newToken) {
                         var that = this;
+                        var toolbar = this.getSfwdt(token);
+                        if (openProfilerOverlay && toolbar) {
+                            addEventListener(toolbar.parentNode, 'click', openProfilerOverlay);
+                        }
                         var triesCounter = document.getElementById('sfLoadCounter-' + token);
 
                         var options = {

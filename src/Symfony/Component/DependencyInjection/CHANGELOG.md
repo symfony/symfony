@@ -31,6 +31,7 @@ CHANGELOG
  * Add `#[AsCallable]` to expose a public method of a service as a service of its own
  * Reset the container in `AbstractKernel::shutdown()`, so that its services are released even when something still references the container
  * Release the listeners of the `event_dispatcher` service when the kernel shuts down
+ * Stop tracking the classes of the definitions tagged `container.excluded` for changes, unless a compiler pass reads them
 
 8.1
 ---

@@ -22,6 +22,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
@@ -1653,6 +1654,70 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals([], $container->getResources());
     }
 
+    public function testCompileDoesNotTrackExcludedClasses()
+    {
+        $container = new ContainerBuilder();
+        $container->register(CaseSensitiveClass::class, CaseSensitiveClass::class)
+            ->setAbstract(true)
+            ->addTag('container.excluded');
+        $container->register('foo', ScalarFactory::class);
+        $container->getReflectionClass(CaseSensitiveClass::class);
+        $container->getReflectionClass(ScalarFactory::class);
+
+        $container->compile();
+
+        $this->assertSame(['reflection.'.ScalarFactory::class], $this->getReflectionResources($container));
+    }
+
+    public function testCompileTracksExcludedClassesReadByCompilerPasses()
+    {
+        $container = new ContainerBuilder();
+        $container->register(CaseSensitiveClass::class, CaseSensitiveClass::class)
+            ->setAbstract(true)
+            ->addTag('container.excluded');
+        $container->getReflectionClass(CaseSensitiveClass::class);
+        $container->addCompilerPass(new class implements CompilerPassInterface {
+            public function process(ContainerBuilder $container): void
+            {
+                $container->getReflectionClass(CaseSensitiveClass::class);
+            }
+        });
+
+        $container->compile();
+
+        $this->assertSame(['reflection.'.CaseSensitiveClass::class], $this->getReflectionResources($container));
+    }
+
+    public function testCompileTracksExcludedClassesUsedByServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register(CaseSensitiveClass::class, CaseSensitiveClass::class)
+            ->setAbstract(true)
+            ->addTag('container.excluded');
+        $container->register('foo', CaseSensitiveClass::class);
+        $container->getReflectionClass(CaseSensitiveClass::class);
+
+        $container->compile();
+
+        $this->assertSame(['reflection.'.CaseSensitiveClass::class], $this->getReflectionResources($container));
+    }
+
+    public function testMergeDoesNotTrackExcludedClasses()
+    {
+        $config = new ContainerBuilder();
+        $config->register(CaseSensitiveClass::class, CaseSensitiveClass::class)
+            ->setAbstract(true)
+            ->addTag('container.excluded');
+        $config->register('foo', ScalarFactory::class);
+        $config->getReflectionClass(CaseSensitiveClass::class);
+        $config->getReflectionClass(ScalarFactory::class);
+
+        $container = new ContainerBuilder();
+        $container->merge($config);
+
+        $this->assertSame(['reflection.'.ScalarFactory::class], $this->getReflectionResources($container));
+    }
+
     public function testFileExists()
     {
         $container = new ContainerBuilder();
@@ -2607,6 +2672,13 @@ class ContainerBuilderTest extends TestCase
 
         $foo = $container->get(ProxyAndInheritance\Foo::class);
         $this->assertSame('my-app', $foo->getApplicationName());
+    }
+
+    private function getReflectionResources(ContainerBuilder $container): array
+    {
+        $resources = array_filter($container->getResources(), static fn ($resource) => $resource instanceof ReflectionClassResource);
+
+        return array_values(array_map('strval', $resources));
     }
 }
 

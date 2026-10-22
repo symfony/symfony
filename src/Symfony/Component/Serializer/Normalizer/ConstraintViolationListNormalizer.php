@@ -57,6 +57,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
             $payloadFieldsToSerialize = array_flip($payloadFieldsToSerialize);
         }
 
+        $ignoredAttributes = array_flip($context[AbstractNormalizer::IGNORED_ATTRIBUTES] ?? $this->defaultContext[AbstractNormalizer::IGNORED_ATTRIBUTES] ?? []);
         $violations = [];
         $messages = [];
         foreach ($data as $violation) {
@@ -87,7 +88,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
                 $violationEntry['payload'] = $payloadFields;
             }
 
-            $violations[] = $violationEntry;
+            $violations[] = array_diff_key($violationEntry, $ignoredAttributes);
 
             $prefix = $propertyPath ? \sprintf('%s: ', $propertyPath) : '';
             $messages[] = $prefix.$violation->getMessage();
@@ -107,7 +108,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
             $result['instance'] = $instance;
         }
 
-        return $result + ['violations' => $violations];
+        return array_diff_key($result + ['violations' => $violations], $ignoredAttributes);
     }
 
     private function normalizePropertyPath(string $propertyPath, ?string $class, ?string $format, array $context): string

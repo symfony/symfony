@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
@@ -441,6 +443,31 @@ class ImportMapGeneratorTest extends TestCase
             });
 
         $this->assertEquals($expectedData, $manager->getRawImportMapData());
+    }
+
+    #[BackupGlobals(true)]
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testMissingRemoteAssetSuggestsCurrentLauncher(bool $symfonyCli)
+    {
+        $_SERVER['PHP_SELF'] = 'tools/render-importmap.php';
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        if ($symfonyCli) {
+            $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+            $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+        } else {
+            unset($_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'], $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT']);
+        }
+
+        $manager = $this->createImportMapGenerator();
+        $this->mockImportMap([self::createRemoteEntry('missing-package', '1.0.0', self::$writableRoot.'/missing.js')]);
+        $this->mockAssetMapper([]);
+        $this->configReader->method('convertPathToFilesystemPath')->willReturnArgument(0);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage($symfonyCli ? 'The "missing-package" vendor asset is missing. Try running the "symfony console importmap:install" command.' : ' bin/console importmap:install" command.');
+
+        $manager->getRawImportMapData();
     }
 
     public function testGetRawImportMapDataUsesCompiledFileWhenNotDebug()

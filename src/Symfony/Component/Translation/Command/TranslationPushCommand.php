@@ -87,15 +87,15 @@ final class TranslationPushCommand extends Command
 
                 You can overwrite existing translations by using the <info>--force</> flag:
 
-                  <info>php %command.full_name% --force provider</>
+                  <info>%command.invocation% --force provider</>
 
                 You can delete provider translations which are not present locally by using the <info>--delete-missing</> flag:
 
-                  <info>php %command.full_name% --delete-missing provider</>
+                  <info>%command.invocation% --delete-missing provider</>
 
                 Full example:
 
-                  <info>php %command.full_name% provider --force --delete-missing --domains=messages --domains=validators --locales=en</>
+                  <info>%command.invocation% provider --force --delete-missing --domains=messages --domains=validators --locales=en</>
 
                 This command pushes all translations associated with the <info>messages</> and <info>validators</> domains for the <info>en</> locale.
                 Provider translations for the specified domains and locale are deleted if they're not present locally and overwritten if it's the case.

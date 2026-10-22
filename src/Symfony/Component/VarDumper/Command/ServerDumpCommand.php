@@ -61,12 +61,12 @@ class ServerDumpCommand extends Command
                 <info>%command.name%</info> starts a dump server that collects and displays
                 dumps in a single place for debugging you application:
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 You can consult dumped data in HTML format in your browser by providing the <info>--format=html</info> option
                 and redirecting the output to a file:
 
-                  <info>php %command.full_name% --format="html" > dump.html</info>
+                  <info>%command.invocation% --format="html" > dump.html</info>
 
                 EOF
             )

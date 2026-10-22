@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Command;
 
 use Amp\Parallel\Worker\ContextWorkerFactory;
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -55,8 +56,13 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertFalse($command->getDefinition()->hasOption('parallel-limit'));
     }
 
+    #[BackupGlobals(true)]
     public function testBasicRun()
     {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
 
         $receiver = $this->createMock(ReceiverInterface::class);
@@ -83,6 +89,8 @@ class ConsumeMessagesCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
+        $display = preg_replace('/\s+/', ' ', preg_replace('/^\s*\/\/ ?/m', '', $tester->getDisplay(true)));
+        $this->assertStringContainsString('via the symfony console messenger:stop-workers', $display);
     }
 
     public function testRunWithBusOption()

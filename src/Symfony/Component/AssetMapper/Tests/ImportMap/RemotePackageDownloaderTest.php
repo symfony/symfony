@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
@@ -161,6 +163,32 @@ class RemotePackageDownloaderTest extends TestCase
             ],
             $installed
         );
+    }
+
+    #[BackupGlobals(true)]
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testMissingDependencySuggestsCurrentLauncher(bool $symfonyCli)
+    {
+        $_SERVER['PHP_SELF'] = 'tools/render-importmap.php';
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        if ($symfonyCli) {
+            $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+            $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+        } else {
+            unset($_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'], $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT']);
+        }
+
+        $downloader = new RemotePackageDownloader(
+            new RemotePackageStorage(self::$writableRoot.'/assets/vendor'),
+            $this->createStub(ImportMapConfigReader::class),
+            $this->createStub(PackageResolverInterface::class),
+        );
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($symfonyCli ? 'The "missing-package" vendor asset is missing. Run "symfony console importmap:install".' : ' bin/console importmap:install".');
+
+        $downloader->getDependencies('missing-package');
     }
 
     public function testGetVendorDir()

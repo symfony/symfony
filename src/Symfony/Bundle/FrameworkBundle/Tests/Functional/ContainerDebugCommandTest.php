@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -38,8 +39,13 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertFileExists(static::getContainer()->getParameter('debug.container.dump'));
     }
 
+    #[BackupGlobals(true)]
     public function testNoDebug()
     {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => false]);
 
         $application = new Application(static::$kernel);
@@ -49,6 +55,8 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $tester->run(['command' => 'debug:container']);
 
         $this->assertStringContainsString('public', $tester->getDisplay());
+        $display = preg_replace('/\s+/', ' ', preg_replace('/^\s*\/\/ ?/m', '', $tester->getDisplay(true)));
+        $this->assertStringContainsString('symfony console debug:container log', $display);
     }
 
     public function testNoDumpedXML()

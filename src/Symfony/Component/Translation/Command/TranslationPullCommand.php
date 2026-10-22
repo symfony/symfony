@@ -96,11 +96,11 @@ final class TranslationPullCommand extends Command
 
                 You can overwrite existing translations (and remove the missing ones on local side) by using the <info>--force</> flag:
 
-                  <info>php %command.full_name% --force provider</>
+                  <info>%command.invocation% --force provider</>
 
                 Full example:
 
-                  <info>php %command.full_name% provider --force --domains=messages --domains=validators --locales=en</>
+                  <info>%command.invocation% provider --force --domains=messages --domains=validators --locales=en</>
 
                 This command pulls all translations associated with the <info>messages</> and <info>validators</> domains for the <info>en</> locale.
                 Local translations for the specified domains and locale are deleted if they're not present on the provider and overwritten if it's the case.

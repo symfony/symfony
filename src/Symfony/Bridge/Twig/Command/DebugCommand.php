@@ -63,19 +63,19 @@ class DebugCommand extends Command
                 The <info>%command.name%</info> command outputs a list of twig functions,
                 filters, globals and tests.
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 The command lists all functions, filters, etc.
 
-                  <info>php %command.full_name% @Twig/Exception/error.html.twig</info>
+                  <info>%command.invocation% @Twig/Exception/error.html.twig</info>
 
                 The command lists all paths that match the given template name.
 
-                  <info>php %command.full_name% --filter=date</info>
+                  <info>%command.invocation% --filter=date</info>
 
                 The command lists everything that contains the word date.
 
-                  <info>php %command.full_name% --format=json</info>
+                  <info>%command.invocation% --format=json</info>
 
                 The command lists everything in a machine readable json format.
                 EOF

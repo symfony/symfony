@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -44,17 +45,17 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> shows message that are pending in the failure transport.
 
-                    <info>php %command.full_name%</info>
+                    <info>%command.invocation%</info>
 
                 Or look at a specific message by its id:
 
-                    <info>php %command.full_name% {id}</info>
+                    <info>%command.invocation% {id}</info>
 
                 The listing can be narrowed down by class name, by failure time, or by both:
 
-                    <info>php %command.full_name% --class-filter='App\Message\SendEmail'</info>
-                    <info>php %command.full_name% --failed-after='-1 hour'</info>
-                    <info>php %command.full_name% --failed-after='2024-05-01 08:00' --failed-before='2024-05-01 09:30'</info>
+                    <info>%command.invocation% --class-filter='App\Message\SendEmail'</info>
+                    <info>%command.invocation% --failed-after='-1 hour'</info>
+                    <info>%command.invocation% --failed-after='2024-05-01 08:00' --failed-before='2024-05-01 09:30'</info>
 
                 The "--failed-after" and "--failed-before" options accept any expression supported by
                 DateTimeImmutable and both bounds are inclusive. The failure time is the one shown in the
@@ -142,7 +143,7 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
             $errorIo->comment(\sprintf('Showing %d message(s).', $rowsCount));
         }
 
-        $errorIo->comment(\sprintf('Run <comment>messenger:failed:show {id} --transport=%s -vv</comment> to see message details.', $failedTransportName));
+        $errorIo->comment(\sprintf('Run <comment>%s {id} --transport=%s -vv</comment> to see message details.', CommandInvocation::formatEscaped($this), $failedTransportName));
     }
 
     private function listMessagesPerClass(string $failedTransportName, SymfonyStyle $io, ?int $max, FailedMessageFilter $filter): void
@@ -178,8 +179,8 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 
         $io->writeln([
             '',
-            \sprintf(' Run <comment>messenger:failed:retry %s --transport=%s</comment> to retry this message.', $id, $failedTransportName),
-            \sprintf(' Run <comment>messenger:failed:remove %s --transport=%s</comment> to delete it.', $id, $failedTransportName),
+            \sprintf(' Run <comment>%s %s --transport=%s</comment> to retry this message.', CommandInvocation::formatEscaped('messenger:failed:retry'), $id, $failedTransportName),
+            \sprintf(' Run <comment>%s %s --transport=%s</comment> to delete it.', CommandInvocation::formatEscaped('messenger:failed:remove'), $id, $failedTransportName),
         ]);
     }
 }

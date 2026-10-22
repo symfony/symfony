@@ -39,8 +39,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
             payload; pass it back to <info>key-management:decrypt</info> or to the API to recover the
             plaintext data key).
 
-          <info>php %command.full_name% app-key</info>
-          <info>php %command.full_name% app-key --length=64 --client=aws</info>
+          <info>%command.invocation% app-key</info>
+          <info>%command.invocation% app-key --length=64 --client=aws</info>
 
         This is an advanced primitive. <comment>The plaintext data key reaches STDOUT,</comment>
         which means it can be captured in shell history, log redirection or

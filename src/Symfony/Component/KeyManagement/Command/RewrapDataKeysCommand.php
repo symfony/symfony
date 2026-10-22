@@ -65,12 +65,12 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
         key, or under another provider entirely. Payloads are left untouched: they refer to
         data keys, and only the way those keys are protected changes.
 
-          <info>php %command.full_name% --to=azure --key-id=my-vault-key</info>
+          <info>%command.invocation% --to=azure --key-id=my-vault-key</info>
 
         Restrict the run to the keys a given client still holds, which is what a provider
         migration looks like while both clients are configured:
 
-          <info>php %command.full_name% --from=aws --to=azure --key-id=my-vault-key</info>
+          <info>%command.invocation% --from=aws --to=azure --key-id=my-vault-key</info>
 
         Rows are committed one by one, so an interrupted run is resumed by running the same
         command again. Start with <comment>--dry-run</comment> to see the scope of the operation.
@@ -79,7 +79,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
         Move them over once with <comment>--accept-unbound</comment>, which also reads the keys wrapped
         under no context. Every key is re-wrapped under the context of the store, never under none:
 
-          <info>php %command.full_name% --to=vault --key-id=app-dek --accept-unbound</info>
+          <info>%command.invocation% --to=vault --key-id=app-dek --accept-unbound</info>
         HELP,
 )]
 final class RewrapDataKeysCommand

@@ -41,11 +41,11 @@ class StopWorkersCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command sends a signal to stop any <info>messenger:consume</info> processes that are running.
 
-                    <info>php %command.full_name%</info>
+                    <info>%command.invocation%</info>
 
                 Pass the names of some receivers/transports to only stop the workers that consume them:
 
-                    <info>php %command.full_name% scheduler_default</info>
+                    <info>%command.invocation% scheduler_default</info>
 
                 Each worker command will finish the message they are currently processing
                 and then exit. Worker commands are *not* automatically restarted: that

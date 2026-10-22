@@ -42,11 +42,11 @@ final class SecretsDecryptToLocalCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command decrypts all secrets and copies them in the local vault.
 
-                    <info>%command.full_name%</info>
+                    <info>%command.invocation%</info>
 
                 When the <info>--force</info> option is provided, secrets that already exist in the local vault are overridden.
 
-                    <info>%command.full_name% --force</info>
+                    <info>%command.invocation% --force</info>
                 EOF
             )
         ;

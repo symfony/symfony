@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Psr\Link\EvolvableLinkProviderInterface;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
@@ -144,7 +145,9 @@ class ImportMapRenderer
 
         if (false !== $this->polyfillImportName && null === $polyfillPath) {
             if ('es-module-shims' !== $this->polyfillImportName) {
-                throw new \InvalidArgumentException(\sprintf('The JavaScript module polyfill was not found in your import map. Either disable the polyfill or run "php bin/console importmap:require "%s"" to install it.', $this->polyfillImportName));
+                $command = class_exists(CommandInvocation::class) ? CommandInvocation::format('importmap:require', 'bin/console') : 'importmap:require';
+
+                throw new \InvalidArgumentException(\sprintf('The JavaScript module polyfill was not found in your import map. Either disable the polyfill or run "%s "%s"" to install it.', $command, $this->polyfillImportName));
             }
 
             // a fallback for the default polyfill in case it's not in the importmap

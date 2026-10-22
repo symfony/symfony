@@ -19,6 +19,7 @@ use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -61,16 +62,16 @@ class ConfigDebugCommand extends AbstractConfigCommand
 
                 Either the extension alias or bundle name can be used:
 
-                  <info>php %command.full_name% framework</info>
-                  <info>php %command.full_name% FrameworkBundle</info>
+                  <info>%command.invocation% framework</info>
+                  <info>%command.invocation% FrameworkBundle</info>
 
                 The <info>--format</info> option specifies the format of the command output:
 
-                  <info>php %command.full_name% framework --format=json</info>
+                  <info>%command.invocation% framework --format=json</info>
 
                 For dumping a specific option, add its path as second argument:
 
-                  <info>php %command.full_name% framework serializer.enabled</info>
+                  <info>%command.invocation% framework serializer.enabled</info>
 
                 EOF
             )
@@ -86,8 +87,9 @@ class ConfigDebugCommand extends AbstractConfigCommand
             $this->listBundles($errorIo);
             $this->listNonBundleExtensions($errorIo);
 
-            $errorIo->comment('Provide the name of a bundle as the first argument of this command to dump its configuration. (e.g. <comment>debug:config FrameworkBundle</comment>)');
-            $errorIo->comment('For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>debug:config FrameworkBundle serializer</comment> to dump the <comment>framework.serializer</comment> configuration)');
+            $invocation = CommandInvocation::formatEscaped($this);
+            $errorIo->comment(\sprintf('Provide the name of a bundle as the first argument of this command to dump its configuration. (e.g. <comment>%s FrameworkBundle</comment>)', $invocation));
+            $errorIo->comment(\sprintf('For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>%s FrameworkBundle serializer</comment> to dump the <comment>framework.serializer</comment> configuration)', $invocation));
 
             return 0;
         }

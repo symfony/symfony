@@ -41,8 +41,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
         The <info>%command.name%</info> command decrypts a base64-encoded envelope produced by
         <info>key-management:encrypt</info> and writes the plaintext to STDOUT byte-for-byte.
 
-          <info>php %command.full_name% 'AQI...base64...'</info>
-          <info>php %command.full_name% < envelope.b64</info>
+          <info>%command.invocation% 'AQI...base64...'</info>
+          <info>%command.invocation% < envelope.b64</info>
 
         The key id is read from the envelope itself, so no <comment>envelope</comment> argument is needed.
 

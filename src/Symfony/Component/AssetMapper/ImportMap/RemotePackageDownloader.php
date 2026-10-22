@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -107,7 +108,9 @@ class RemotePackageDownloader
     {
         $installed = $this->loadInstalled();
         if (!isset($installed[$importName])) {
-            throw new \InvalidArgumentException(\sprintf('The "%s" vendor asset is missing. Run "php bin/console importmap:install".', $importName));
+            $command = class_exists(CommandInvocation::class) ? CommandInvocation::format('importmap:install', 'bin/console') : 'importmap:install';
+
+            throw new \InvalidArgumentException(\sprintf('The "%s" vendor asset is missing. Run "%s".', $importName, $command));
         }
 
         return $installed[$importName]['dependencies'];

@@ -40,7 +40,7 @@ final class SecretsRevealCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command reveals a stored secret.
 
-                    <info>%command.full_name%</info>
+                    <info>%command.invocation%</info>
                 EOF
             )
         ;

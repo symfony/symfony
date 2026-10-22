@@ -62,8 +62,8 @@ class CacheClearCommand extends Command
                 The <info>%command.name%</info> command clears and warms up the application cache for a given environment
                 and debug mode:
 
-                  <info>php %command.full_name% --env=dev</info>
-                  <info>php %command.full_name% --env=prod --no-debug</info>
+                  <info>%command.invocation% --env=dev</info>
+                  <info>%command.invocation% --env=prod --no-debug</info>
                 EOF
             )
         ;

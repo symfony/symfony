@@ -84,27 +84,27 @@ class TranslationDebugCommand extends Command
 
                 You can display information about bundle translations in a specific locale:
 
-                  <info>php %command.full_name% en AcmeDemoBundle</info>
+                  <info>%command.invocation% en AcmeDemoBundle</info>
 
                 You can also specify a translation domain for the search:
 
-                  <info>php %command.full_name% --domain=messages en AcmeDemoBundle</info>
+                  <info>%command.invocation% --domain=messages en AcmeDemoBundle</info>
 
                 You can only display missing messages:
 
-                  <info>php %command.full_name% --only-missing en AcmeDemoBundle</info>
+                  <info>%command.invocation% --only-missing en AcmeDemoBundle</info>
 
                 You can only display unused messages:
 
-                  <info>php %command.full_name% --only-unused en AcmeDemoBundle</info>
+                  <info>%command.invocation% --only-unused en AcmeDemoBundle</info>
 
                 You can display information about application translations in a specific locale:
 
-                  <info>php %command.full_name% en</info>
+                  <info>%command.invocation% en</info>
 
                 You can display information about translations in all registered bundles in a specific locale:
 
-                  <info>php %command.full_name% --all en</info>
+                  <info>%command.invocation% --all en</info>
 
                 EOF
             )

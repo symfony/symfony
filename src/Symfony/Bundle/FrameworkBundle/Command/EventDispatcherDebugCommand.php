@@ -56,19 +56,19 @@ class EventDispatcherDebugCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command displays all configured listeners:
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 To get specific listeners for an event, specify its name:
 
-                  <info>php %command.full_name% kernel.request</info>
+                  <info>%command.invocation% kernel.request</info>
 
                 To list all available event dispatchers:
 
-                  <info>php %command.full_name% --dispatchers</info>
+                  <info>%command.invocation% --dispatchers</info>
 
                 The <info>--format</info> option specifies the format of the command output:
 
-                  <info>php %command.full_name% --format=json</info>
+                  <info>%command.invocation% --format=json</info>
 
                 EOF
             )

@@ -33,9 +33,9 @@ class InspectUlidCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> displays information about a ULID.
 
-                    <info>php %command.full_name% 01EWAKBCMWQ2C94EXNN60ZBS0Q</info>
-                    <info>php %command.full_name% 1BVdfLn3ERmbjYBLCdaaLW</info>
-                    <info>php %command.full_name% 01771535-b29c-b898-923b-b5a981f5e417</info>
+                    <info>%command.invocation% 01EWAKBCMWQ2C94EXNN60ZBS0Q</info>
+                    <info>%command.invocation% 1BVdfLn3ERmbjYBLCdaaLW</info>
+                    <info>%command.invocation% 01771535-b29c-b898-923b-b5a981f5e417</info>
                 EOF
             )
         ;

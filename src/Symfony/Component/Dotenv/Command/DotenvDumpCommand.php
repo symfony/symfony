@@ -52,7 +52,7 @@ final class DotenvDumpCommand extends Command
             ->setHelp(<<<'EOT'
                 The <info>%command.name%</info> command compiles .env files into a PHP-optimized file called .env.local.php.
 
-                    <info>%command.full_name%</info>
+                    <info>%command.invocation%</info>
                 EOT
             )
         ;

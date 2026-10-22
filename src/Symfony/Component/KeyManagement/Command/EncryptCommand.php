@@ -41,8 +41,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
         data key, IV, tag, ciphertext) are bundled into a self-contained binary
         envelope. The result is emitted as base64.
 
-          <info>php %command.full_name% app-key 'hello world'</info>
-          <info>cat secrets.json | php %command.full_name% app-key</info>
+          <info>%command.invocation% app-key 'hello world'</info>
+          <info>cat secrets.json | %command.invocation% app-key</info>
 
         A <comment>value</comment> passed as an argument is visible in the process list and in the
         shell history: pass a real secret through STDIN instead, as the second example does.
@@ -55,12 +55,12 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 
         When several KMS clients are registered, pick one with <comment>--client</comment>:
 
-          <info>php %command.full_name% --client=aws app-key 'hello world'</info>
+          <info>%command.invocation% --client=aws app-key 'hello world'</info>
 
         <comment>--aad</comment> binds additional authenticated data to the ciphertext. The same
         exact bytes must be supplied to <info>key-management:decrypt</info>.
 
-          <info>php %command.full_name% app-key 'hello' --aad 'tenant=acme;env=prod'</info>
+          <info>%command.invocation% app-key 'hello' --aad 'tenant=acme;env=prod'</info>
         HELP,
 )]
 final class EncryptCommand

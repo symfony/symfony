@@ -24,11 +24,12 @@
     },
     "require-dev": {
         "symfony/config": "^7.4|^8.0",
-        "symfony/console": "^7.4|^8.0",
+        "symfony/console": "^8.2",
         "symfony/dependency-injection": "^8.1",
         "symfony/http-kernel": "^7.4|^8.0"
     },
     "conflict": {
+        "symfony/console": "<8.2",
         "symfony/dependency-injection": "<8.1"
     },
     "autoload": {

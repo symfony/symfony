@@ -45,15 +45,15 @@ class StatsCommand extends Command
             ->setHelp(<<<EOF
                 The <info>%command.name%</info> command counts the messages for all the transports:
 
-                    <info>php %command.full_name%</info>
+                    <info>%command.invocation%</info>
 
                 Or specific transports only:
 
-                    <info>php %command.full_name% <transportNames></info>
+                    <info>%command.invocation% <transportNames></info>
 
                 The <info>--format</info> option specifies the format of the command output:
 
-                  <info>php %command.full_name% --format=json</info>
+                  <info>%command.invocation% --format=json</info>
 
                 EOF
             )

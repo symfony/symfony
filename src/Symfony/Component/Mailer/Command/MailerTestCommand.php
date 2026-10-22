@@ -42,11 +42,11 @@ final class MailerTestCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command tests a Mailer transport by sending a simple email message:
 
-                <info>php %command.full_name% to@example.com</info>
+                <info>%command.invocation% to@example.com</info>
 
                 You can also specify a specific transport:
 
-                    <info>php %command.full_name% to@example.com --transport=transport_name</info>
+                    <info>%command.invocation% to@example.com --transport=transport_name</info>
 
                 Note that this command bypasses the Messenger bus if configured.
 

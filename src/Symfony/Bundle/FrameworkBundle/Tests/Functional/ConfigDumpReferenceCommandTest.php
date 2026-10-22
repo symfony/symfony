@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -53,10 +54,15 @@ use Symfony\Component\Workflow\WorkflowBundle;
 #[Group('functional')]
 class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 {
+    #[BackupGlobals(true)]
     #[TestWith([true])]
     #[TestWith([false])]
     public function testShowList(bool $debug)
     {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute([]);
 
@@ -69,6 +75,9 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('Available registered non-bundle extension aliases', $tester->getDisplay());
         $this->assertStringContainsString('  foo', $tester->getDisplay());
         $this->assertStringContainsString('  test_dump', $tester->getDisplay());
+        $display = preg_replace('/\s+/', ' ', preg_replace('/^\s*\/\/ ?/m', '', $tester->getDisplay(true)));
+        $this->assertStringContainsString('symfony console config:dump-reference FrameworkBundle', $display);
+        $this->assertStringContainsString('symfony console config:dump-reference FrameworkBundle http_client.default_options', $display);
     }
 
     #[TestWith([true])]

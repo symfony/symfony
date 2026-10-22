@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Secrets\AbstractVault;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -45,11 +46,11 @@ final class SecretsListCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command list all stored secrets.
 
-                    <info>%command.full_name%</info>
+                    <info>%command.invocation%</info>
 
                 When the option <info>--reveal</info> is provided, the decrypted secrets are also displayed.
 
-                    <info>%command.full_name% --reveal</info>
+                    <info>%command.invocation% --reveal</info>
                 EOF
             )
         ;
@@ -62,7 +63,7 @@ final class SecretsListCommand extends Command
         $io->comment('Use <info>"%env(<name>)%"</info> to reference a secret in a config file.');
 
         if (!$reveal = $input->getOption('reveal')) {
-            $io->comment(\sprintf('To reveal the secrets run <info>php %s %s --reveal</info>', $_SERVER['PHP_SELF'], $this->getName()));
+            $io->comment(\sprintf('To reveal the secrets run <info>%s --reveal</info>', CommandInvocation::formatEscaped($this)));
         }
 
         $secrets = $this->vault->list($reveal);
@@ -94,7 +95,7 @@ final class SecretsListCommand extends Command
         (new SymfonyStyle($input, $output))
             ->table(['Secret', 'Value'] + (null !== $localSecrets ? [2 => 'Local Value'] : []), $rows);
 
-        $io->comment("Local values override secret values.\nUse <info>secrets:set --local</info> to define them.");
+        $io->comment(\sprintf("Local values override secret values.\nUse <info>%s --local</info> to define them.", CommandInvocation::formatEscaped('secrets:set')));
 
         return 0;
     }

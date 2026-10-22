@@ -56,7 +56,7 @@ class CachePoolClearCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
 
-                    %command.full_name% <cache pool or clearer 1> [...<cache pool or clearer N>]
+                    %command.invocation% <cache pool or clearer 1> [...<cache pool or clearer N>]
                 EOF
             )
         ;

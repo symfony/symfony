@@ -45,13 +45,13 @@ final class SecretsGenerateKeysCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command generates a new encryption key.
 
-                    <info>%command.full_name%</info>
+                    <info>%command.invocation%</info>
 
                 If encryption keys already exist, the command must be called with
                 the <info>--rotate</info> option in order to override those keys and re-encrypt
                 existing secrets.
 
-                    <info>%command.full_name% --rotate</info>
+                    <info>%command.invocation% --rotate</info>
                 EOF
             )
         ;

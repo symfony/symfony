@@ -54,11 +54,11 @@ final class DumpCompletionCommand extends Command
 
                 Dump the script to a global completion file and restart your shell:
 
-                    <info>%command.full_name% {$shell} | sudo tee {$completionFile}</>
+                    <info>%command.invocation% {$shell} | sudo tee {$completionFile}</>
 
                 Or dump the script to a local file and source it:
 
-                    <info>%command.full_name% {$shell} > completion.sh</>
+                    <info>%command.invocation% {$shell} > completion.sh</>
 
                     <comment># source the file whenever you use the project</>
                     <info>source completion.sh</>

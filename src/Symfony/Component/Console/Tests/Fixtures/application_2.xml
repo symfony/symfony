@@ -104,11 +104,11 @@
       <description>Display help for a command</description>
       <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
  
-   &lt;info&gt;%%PHP_SELF%% help list&lt;/info&gt;
+   &lt;info&gt;%%PHP_BINARY%% %%PHP_SELF%% help list&lt;/info&gt;
  
  You can also output the help in other formats by using the &lt;info&gt;--format&lt;/info&gt; option:
  
-   &lt;info&gt;%%PHP_SELF%% help --format=xml list&lt;/info&gt;
+   &lt;info&gt;%%PHP_BINARY%% %%PHP_SELF%% help --format=xml list&lt;/info&gt;
  
  To display the list of available commands, please use the &lt;info&gt;list&lt;/info&gt; command.</help>
       <arguments>
@@ -162,19 +162,19 @@
       <description>List commands</description>
       <help>The &lt;info&gt;list&lt;/info&gt; command lists all commands:
  
-   &lt;info&gt;%%PHP_SELF%% list&lt;/info&gt;
+   &lt;info&gt;%%PHP_BINARY%% %%PHP_SELF%% list&lt;/info&gt;
  
  You can also display the commands for a specific namespace:
  
-   &lt;info&gt;%%PHP_SELF%% list test&lt;/info&gt;
+   &lt;info&gt;%%PHP_BINARY%% %%PHP_SELF%% list test&lt;/info&gt;
  
  You can also output the information in other formats by using the &lt;info&gt;--format&lt;/info&gt; option:
  
-   &lt;info&gt;%%PHP_SELF%% list --format=xml&lt;/info&gt;
+   &lt;info&gt;%%PHP_BINARY%% %%PHP_SELF%% list --format=xml&lt;/info&gt;
  
  It's also possible to get raw list of commands (useful for embedding command runner):
  
-   &lt;info&gt;%%PHP_SELF%% list --raw&lt;/info&gt;</help>
+   &lt;info&gt;%%PHP_BINARY%% %%PHP_SELF%% list --raw&lt;/info&gt;</help>
       <arguments>
         <argument name="namespace" is_required="0" is_array="0">
           <description>The namespace name</description>

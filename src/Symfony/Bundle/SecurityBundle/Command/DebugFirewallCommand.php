@@ -18,6 +18,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -55,17 +56,17 @@ final class DebugFirewallCommand extends Command
                 The <info>%command.name%</info> command displays the firewalls that are configured
                 in your application:
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 You can pass a firewall name to display more detailed information about
                 a specific firewall:
 
-                  <info>php %command.full_name% $exampleName</info>
+                  <info>%command.invocation% $exampleName</info>
 
                 To include all events and event listeners for a specific firewall, use the
                 <info>events</info> option:
 
-                  <info>php %command.full_name% --events $exampleName</info>
+                  <info>%command.invocation% --events $exampleName</info>
 
                 EOF
             )
@@ -120,7 +121,7 @@ final class DebugFirewallCommand extends Command
 
         $io->listing($this->firewallNames);
 
-        $io->comment(\sprintf('To view details of a specific firewall, re-run this command with a firewall name. (e.g. <comment>debug:firewall %s</comment>)', $this->getExampleName()));
+        $io->comment(\sprintf('To view details of a specific firewall, re-run this command with a firewall name. (e.g. <comment>%s %s</comment>)', CommandInvocation::formatEscaped($this), $this->getExampleName()));
     }
 
     protected function displayFirewallSummary(string $name, FirewallContext $context, SymfonyStyle $io): void

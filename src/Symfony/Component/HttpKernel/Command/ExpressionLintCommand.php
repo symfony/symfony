@@ -46,7 +46,7 @@ final class ExpressionLintCommand extends Command
 
             It also reports the functions that do not exist and, when the expression language tells which ones it provides, the variables that do not exist:
 
-              <info>php %command.full_name%</info>
+              <info>%command.invocation%</info>
             EOF);
     }
 

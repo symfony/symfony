@@ -70,9 +70,9 @@ class WorkflowDumpCommand extends Command
                 The <info>%command.name%</info> command dumps the graphical representation of a
                 workflow in different formats
 
-                <info>DOT</info>:  %command.full_name% <workflow name> | dot -Tpng > workflow.png
-                <info>PUML</info>: %command.full_name% <workflow name> --dump-format=puml | java -jar plantuml.jar -p > workflow.png
-                <info>MERMAID</info>: %command.full_name% <workflow name> --dump-format=mermaid | mmdc -o workflow.svg
+                <info>DOT</info>:  %command.invocation% <workflow name> | dot -Tpng > workflow.png
+                <info>PUML</info>: %command.invocation% <workflow name> --dump-format=puml | java -jar plantuml.jar -p > workflow.png
+                <info>MERMAID</info>: %command.invocation% <workflow name> --dump-format=mermaid | mmdc -o workflow.svg
                 EOF
             )
         ;

@@ -53,29 +53,29 @@ final class DebugAssetMapperCommand extends Command
                 To list all configured paths (with local paths and their namespace prefixes) and
                 all mapped assets (with their logical path and filesystem path), run:
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 You can filter the results by providing a name to search for in the asset name
                 or path:
 
-                  <info>php %command.full_name% bootstrap.js</info>
-                  <info>php %command.full_name% style/</info>
+                  <info>%command.invocation% bootstrap.js</info>
+                  <info>%command.invocation% style/</info>
 
                 To filter the assets by extension, use the <info>--ext</info> option:
 
-                  <info>php %command.full_name% --ext=css</info>
+                  <info>%command.invocation% --ext=css</info>
 
                 To show only assets from vendor packages, use the <info>--vendor</info> option:
 
-                  <info>php %command.full_name% --vendor</info>
+                  <info>%command.invocation% --vendor</info>
 
                 To exclude assets from vendor packages, use the <info>--no-vendor</info> option:
 
-                  <info>php %command.full_name% --no-vendor</info>
+                  <info>%command.invocation% --no-vendor</info>
 
                 To see the full paths, use the <info>--full</info> option:
 
-                    <info>php %command.full_name% --full</info>
+                    <info>%command.invocation% --full</info>
 
                 EOT
             );

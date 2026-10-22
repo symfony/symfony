@@ -46,11 +46,11 @@ class SetupTransportsCommand extends Command
             ->setHelp(<<<EOF
                 The <info>%command.name%</info> command setups the transports:
 
-                    <info>php %command.full_name%</info>
+                    <info>%command.invocation%</info>
 
                 Or a specific transport only:
 
-                    <info>php %command.full_name% <transport></info>
+                    <info>%command.invocation% <transport></info>
                 EOF
             )
         ;

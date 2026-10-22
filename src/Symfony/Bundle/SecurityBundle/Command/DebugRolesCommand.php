@@ -16,6 +16,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -41,21 +42,21 @@ final class DebugRolesCommand extends Command
         $this->setHelp(<<<EOF
             The <info>%command.name%</info> command displays the current role hierarchy:
 
-                <info>php %command.full_name%</info>
+                <info>%command.invocation%</info>
 
             You can pass one or multiple role names to display the effective roles:
 
-                <info>php %command.full_name% ROLE_USER</info>
+                <info>%command.invocation% ROLE_USER</info>
 
             To get a tree view of the inheritance, use the <info>tree</info> option:
 
-                <info>php %command.full_name% --tree</info>
-                <info>php %command.full_name% ROLE_USER --tree</info>
+                <info>%command.invocation% --tree</info>
+                <info>%command.invocation% ROLE_USER --tree</info>
 
             To dump the hierarchy as a Mermaid flowchart, use the <info>mermaid</info> format:
 
-                <info>php %command.full_name% --format=mermaid > roles.mmd</info>
-                <info>php %command.full_name% --format=mermaid --direction=BT > roles.mmd</info>
+                <info>%command.invocation% --format=mermaid > roles.mmd</info>
+                <info>%command.invocation% --format=mermaid --direction=BT > roles.mmd</info>
 
             <comment>Note:</comment> With a custom implementation for <info>security.role_hierarchy</info>, the <info>--tree</info> option is ignored and the <info>roles</info> argument is required; the <info>mermaid</info> format is available only if it extends <info>RoleHierarchy</info>.
 
@@ -150,7 +151,7 @@ final class DebugRolesCommand extends Command
                 $this->outputMap($io, $this->getBuiltInDebugHierarchy()->getMap());
             }
 
-            $io->comment('To show reachable roles for a given role, re-run this command with role names. (e.g. <comment>debug:roles ROLE_USER</comment>)');
+            $io->comment(\sprintf('To show reachable roles for a given role, re-run this command with role names. (e.g. <comment>%s ROLE_USER</comment>)', CommandInvocation::formatEscaped($this)));
 
             return self::SUCCESS;
         }

@@ -40,7 +40,7 @@ class DebugCommand extends Command
     {
         $this
             ->addArgument('class', InputArgument::REQUIRED, 'A fully qualified class name')
-            ->setHelp("The <info>%command.name% 'App\Entity\Dummy'</info> command dumps the serializer groups for the dummy class.")
+            ->setHelp("The <info>%command.invocation% 'App\Entity\Dummy'</info> command dumps the serializer groups for the dummy class.")
         ;
     }
 

@@ -55,11 +55,11 @@ class RouterMatchCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> shows which routes match a given request and which don't and for what reason:
 
-                  <info>php %command.full_name% /foo</info>
+                  <info>%command.invocation% /foo</info>
 
                 or
 
-                  <info>php %command.full_name% /foo --method POST --scheme https --host symfony.com --verbose</info>
+                  <info>%command.invocation% /foo --method POST --scheme https --host symfony.com --verbose</info>
 
                 EOF
             )

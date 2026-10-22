@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\Command;
 
 use Symfony\Component\AssetMapper\ImportMap\ImportMapVersionChecker;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -24,7 +25,7 @@ trait VersionProblemCommandTrait
         $problems = $importMapVersionChecker->checkVersions();
         foreach ($problems as $problem) {
             if (null === $problem->installedVersion) {
-                $output->writeln(\sprintf('[warning] <info>%s</info> requires <info>%s</info> but it is not in the importmap.php. You may need to run "php bin/console importmap:require %s".', $problem->packageName, $problem->dependencyPackageName, $problem->dependencyPackageName));
+                $output->writeln(\sprintf('[warning] <info>%s</info> requires <info>%s</info> but it is not in the importmap.php. You may need to run "%s %s".', $problem->packageName, $problem->dependencyPackageName, CommandInvocation::formatEscaped('importmap:require'), $problem->dependencyPackageName));
 
                 continue;
             }

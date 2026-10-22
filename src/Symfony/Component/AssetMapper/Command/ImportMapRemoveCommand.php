@@ -41,7 +41,7 @@ final class ImportMapRemoveCommand extends Command
 
                 For example:
 
-                    <info>php %command.full_name% lodash</info>
+                    <info>%command.invocation% lodash</info>
                 EOT
             )
         ;

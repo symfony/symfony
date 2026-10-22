@@ -42,19 +42,19 @@ class GenerateUlidCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command generates a ULID.
 
-                    <info>php %command.full_name%</info>
+                    <info>%command.invocation%</info>
 
                 To specify the timestamp:
 
-                    <info>php %command.full_name% --time="2021-02-16 14:09:08"</info>
+                    <info>%command.invocation% --time="2021-02-16 14:09:08"</info>
 
                 To generate several ULIDs:
 
-                    <info>php %command.full_name% --count=10</info>
+                    <info>%command.invocation% --count=10</info>
 
                 To output a specific format:
 
-                    <info>php %command.full_name% --format=rfc4122</info>
+                    <info>%command.invocation% --format=rfc4122</info>
                 EOF
             )
         ;

@@ -42,19 +42,19 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> removes given messages that are pending in the failure transport.
 
-                    <info>php %command.full_name% {id1} [{id2} ...]</info>
+                    <info>%command.invocation% {id1} [{id2} ...]</info>
 
                 The specific ids can be found via the messenger:failed:show command.
 
                 You can remove all failed messages from the failure transport by using the "--all" option:
 
-                    <info>php %command.full_name% --all</info>
+                    <info>%command.invocation% --all</info>
 
                 Instead of ids, messages can be selected by class name, by failure time, or by both:
 
-                    <info>php %command.full_name% --class-filter='App\Message\SendEmail'</info>
-                    <info>php %command.full_name% --failed-after='-1 hour'</info>
-                    <info>php %command.full_name% --failed-after='2024-05-01 08:00' --failed-before='2024-05-01 09:30'</info>
+                    <info>%command.invocation% --class-filter='App\Message\SendEmail'</info>
+                    <info>%command.invocation% --failed-after='-1 hour'</info>
+                    <info>%command.invocation% --failed-after='2024-05-01 08:00' --failed-before='2024-05-01 09:30'</info>
 
                 The "--failed-after" and "--failed-before" options accept any expression supported by
                 DateTimeImmutable and both bounds are inclusive. The failure time comes from the message

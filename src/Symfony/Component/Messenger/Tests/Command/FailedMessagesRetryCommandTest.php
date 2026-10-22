@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Command;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
@@ -50,8 +51,13 @@ use Symfony\Component\Messenger\Worker;
 
 class FailedMessagesRetryCommandTest extends TestCase
 {
+    #[BackupGlobals(true)]
     public function testBasicRunWithServiceLocator()
     {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
         $series = [
             [[10], new Envelope(new \stdClass())],
             [[12], new Envelope(new \stdClass())],
@@ -88,6 +94,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $tester->execute(['id' => [10, 12], '--force' => true]);
 
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
+        $this->assertStringContainsString('To retry all the messages, run symfony console messenger:consume failure_receiver', $tester->getDisplay());
         $this->assertStringNotContainsString('Available failure transports are:', $tester->getDisplay());
     }
 

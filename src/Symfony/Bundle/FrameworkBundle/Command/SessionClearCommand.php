@@ -40,11 +40,11 @@ final class SessionClearCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command clears all session data from the storage.
 
-                    %command.full_name%
+                    %command.invocation%
 
                 This will clear all active sessions. Use the <info>--force</info> option to skip confirmation:
 
-                    %command.full_name% --force
+                    %command.invocation% --force
                 EOF
             )
         ;

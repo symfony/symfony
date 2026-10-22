@@ -749,6 +749,67 @@ class ConnectionTest extends TestCase
         $connection->reject($id);
     }
 
+    public function testFindAllReceivesEveryMessageThenMakesThemVisibleAgain()
+    {
+        $client = $this->createListingClient([['1', '2'], ['3'], []], $visible, $requests);
+        $connection = new Connection(['auto_setup' => false, 'visibility_timeout' => 30, 'wait_time' => 5], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue');
+
+        $messages = iterator_to_array($connection->findAll(), false);
+
+        $this->assertSame(['1', '2', '3'], array_column($messages, 'message_id'));
+        $this->assertSame(['handle-1', 'handle-2', 'handle-3'], array_column($messages, 'id'));
+        $this->assertSame(['handle-1', 'handle-2', 'handle-3'], $visible);
+        $this->assertSame([10, 10, 10], array_column($requests, 'MaxNumberOfMessages'));
+        $this->assertSame([30, 5], [$requests[0]['VisibilityTimeout'], $requests[0]['WaitTimeSeconds']]);
+    }
+
+    public function testFindAllStopsWhenOnlyAlreadyReceivedMessagesComeBack()
+    {
+        // the visibility timeout of the first messages expired during the traversal
+        $client = $this->createListingClient([['1', '2'], ['2', '1']], $visible, $requests);
+        $connection = new Connection(['auto_setup' => false], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue');
+
+        $this->assertSame(['1', '2'], array_column(iterator_to_array($connection->findAll(), false), 'message_id'));
+        $this->assertCount(2, $requests);
+    }
+
+    public function testFindAllRequestsNoMoreMessagesThanTheLimit()
+    {
+        $client = $this->createListingClient([['1', '2', '3']], $visible, $requests);
+        $connection = new Connection(['auto_setup' => false], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue');
+
+        $this->assertSame(['1', '2', '3'], array_column(iterator_to_array($connection->findAll(3), false), 'message_id'));
+        $this->assertSame([3], array_column($requests, 'MaxNumberOfMessages'));
+        $this->assertSame(['handle-1', 'handle-2', 'handle-3'], $visible);
+    }
+
+    public function testFindMakesTheWholeBatchVisibleAgainWhenItStopsInTheMiddleOfIt()
+    {
+        $client = $this->createListingClient([['1', '2', '3']], $visible, $requests);
+        $connection = new Connection(['auto_setup' => false], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue');
+
+        $this->assertSame('handle-2', $connection->find('2')['id']);
+        $this->assertSame(['handle-1', 'handle-2', 'handle-3'], $visible);
+    }
+
+    public function testFindReturnsNullWhenTheMessageIsNotInTheQueue()
+    {
+        $client = $this->createListingClient([['1'], []], $visible, $requests);
+        $connection = new Connection(['auto_setup' => false], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue');
+
+        $this->assertNull($connection->find('2'));
+        $this->assertSame(['handle-1'], $visible);
+    }
+
+    public function testFindAllMakesTheOtherMessagesVisibleAgainWhenOneWasDeletedDuringTheTraversal()
+    {
+        $client = $this->createListingClient([['1', '2', '3'], []], $visible, $requests, deleted: ['handle-2']);
+        $connection = new Connection(['auto_setup' => false], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue');
+
+        $this->assertCount(3, iterator_to_array($connection->findAll(), false));
+        $this->assertSame(['handle-1', 'handle-3'], $visible);
+    }
+
     public function testKeepaliveWithTooSmallTtl()
     {
         $client = $this->createMock(SqsClient::class);
@@ -1074,6 +1135,39 @@ class ConnectionTest extends TestCase
             new Connection(['queue_name' => $queueName, 'queue_attributes' => $queueAttributes, 'queue_tags' => $queueTags], new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
             Connection::fromDsn('sqs://default/'.$queueName, ['queue_attributes' => $queueAttributes, 'queue_tags' => $queueTags], $httpClient)
         );
+    }
+
+    /**
+     * @param list<list<string>> $batches  the ids of the messages each receiveMessage() call returns
+     * @param list<string>       $deleted  the receipt handles of the messages deleted during the traversal
+     * @param list<string>|null  $visible  the receipt handles of the messages made visible again
+     * @param list<array>|null   $requests the receiveMessage() requests
+     */
+    private function createListingClient(array $batches, ?array &$visible, ?array &$requests, array $deleted = []): SqsClient
+    {
+        $visible = $requests = [];
+
+        $client = $this->createMock(SqsClient::class);
+        $client->method('receiveMessage')->willReturnCallback(static function (array $input) use (&$batches, &$requests) {
+            $requests[] = $input;
+
+            return ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => array_map(
+                static fn (string $id) => new Message(['MessageId' => $id, 'ReceiptHandle' => 'handle-'.$id, 'Body' => 'body']),
+                array_shift($batches) ?? [],
+            )]);
+        });
+        $client->method('changeMessageVisibility')->willReturnCallback(static function (array $input) use (&$visible, $deleted) {
+            if (\in_array($input['ReceiptHandle'], $deleted, true)) {
+                throw new NetworkException('Message does not exist or is not available for visibility timeout change.');
+            }
+            if (0 === $input['VisibilityTimeout']) {
+                $visible[] = $input['ReceiptHandle'];
+            }
+
+            return ResultMockFactory::create(Result::class);
+        });
+
+        return $client;
     }
 
     private function getMockedQueueUrlResponse(): MockResponse

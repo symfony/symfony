@@ -103,19 +103,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
 
     public function get(string $id, string $domain = 'messages'): string
     {
-        if (isset($this->messages[$domain.self::INTL_DOMAIN_SUFFIX][$id])) {
-            return $this->messages[$domain.self::INTL_DOMAIN_SUFFIX][$id];
-        }
-
-        if (isset($this->messages[$domain][$id])) {
-            return $this->messages[$domain][$id];
-        }
-
-        if (null !== $this->fallbackCatalogue) {
-            return $this->fallbackCatalogue->get($id, $domain);
-        }
-
-        return $id;
+        return $this->messages[$domain.self::INTL_DOMAIN_SUFFIX][$id] ?? $this->messages[$domain][$id] ?? $this->fallbackCatalogue?->get($id, $domain) ?? $id;
     }
 
     public function replace(array $messages, string $domain = 'messages'): void

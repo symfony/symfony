@@ -98,7 +98,7 @@ final class BeforeAfterSorter
     {
         $seed = array_keys($priorities);
         $indexes = array_flip($seed);
-        usort($seed, static fn ($a, $b) => ($priorities[$b] ?? 0) <=> ($priorities[$a] ?? 0) ?: $indexes[$a] <=> $indexes[$b]);
+        usort($seed, static fn ($a, $b) => ($priorities[$b] ?? 0) <=> ($priorities[$a] ?? 0));
 
         if (!$constraints) {
             return array_combine($seed, array_map(static fn ($item) => $priorities[$item] ?? 0, $seed));

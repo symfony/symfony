@@ -105,6 +105,13 @@ class BeforeAfterSorterTest extends TestCase
         ]));
     }
 
+    public function testPromotedPriorityKeepsTheSeedOrderAmongUnrelatedItems()
+    {
+        $this->assertSame(['free' => 1, 'peer' => 1, 'anchor' => 1], BeforeAfterSorter::sortWithPriorities(['free' => null, 'peer' => 1, 'anchor' => 1], [
+            'free' => ['before' => ['anchor']],
+        ]));
+    }
+
     public function testAnItemWithoutPriorityStaysAtZeroWhenThatFits()
     {
         $this->assertSame(['a' => 10, 'b' => 0, 'd' => -5], BeforeAfterSorter::sortWithPriorities(['a' => 10, 'b' => null, 'd' => -5], [

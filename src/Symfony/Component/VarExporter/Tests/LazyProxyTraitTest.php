@@ -209,6 +209,36 @@ class LazyProxyTraitTest extends TestCase
         $this->assertSame('abc', $proxy->abc);
     }
 
+    public function testVariadicArguments()
+    {
+        $obj = new class extends \stdClass {
+            public function collect(...$args): array
+            {
+                return $args;
+            }
+        };
+        $proxy = $this->createLazyProxy($obj::class, static fn () => $obj);
+
+        foreach ([[], [1, 2], ['named' => 3], [1, 2, 'named' => 3]] as $args) {
+            $this->assertSame($obj->collect(...$args), $proxy->collect(...$args));
+        }
+    }
+
+    public function testVariadicArgumentsWithOptionalParameters()
+    {
+        $obj = new class extends \stdClass {
+            public function collect($first = 'first', $second = 'second', ...$args): array
+            {
+                return [\func_get_args(), $args];
+            }
+        };
+        $proxy = $this->createLazyProxy($obj::class, static fn () => $obj);
+
+        foreach ([[], [1], [1, 2, 3, 4], ['named' => 3], ['second' => 2, 'named' => 3], [1, 2, 3, 'named' => 4]] as $args) {
+            $this->assertSame($obj->collect(...$args), $proxy->collect(...$args));
+        }
+    }
+
     public function testFinalPublicClass()
     {
         $proxy = $this->createLazyProxy(FinalPublicClass::class, static fn () => new FinalPublicClass());

@@ -161,10 +161,17 @@ class HtmlErrorRenderer implements ErrorRendererInterface
             ]);
         }
 
-        $exceptionMessage = $this->escape($exception->getMessage());
+        $exceptionAsArray = $exception->toArray();
+        if ('' !== $binary = $_SERVER['SYMFONY_CLI_BINARY_NAME'] ?? '') {
+            foreach ($exceptionAsArray as $i => $e) {
+                $exceptionAsArray[$i]['message'] = str_replace('"composer require ', '"'.$binary.' composer require ', $e['message']);
+            }
+        }
+        $exceptionMessage = $this->escape($exceptionAsArray[0]['message']);
 
         return $this->include($debugTemplate, [
             'exception' => $exception,
+            'exceptionAsArray' => $exceptionAsArray,
             'scriptNonce' => $scriptNonce,
             'styleNonce' => $styleNonce,
             'exceptionMessage' => $exceptionMessage,

@@ -1,4 +1,3 @@
-<?php $exceptionAsArray = $exception->toArray(); ?>
 <?php $exceptionCount = \count($exceptionAsArray); ?>
 
 <div class="container">

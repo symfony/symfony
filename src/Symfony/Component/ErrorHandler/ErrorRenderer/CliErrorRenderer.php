@@ -12,6 +12,7 @@
 namespace Symfony\Component\ErrorHandler\ErrorRenderer;
 
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
@@ -26,6 +27,15 @@ class CliErrorRenderer implements ErrorRendererInterface
     public function render(\Throwable $exception): FlattenException
     {
         $cloner = new VarCloner();
+        $cloner->addCasters([
+            \Throwable::class => static function (\Throwable $exception, array $a): array {
+                if ('' !== ($binary = $_SERVER['SYMFONY_CLI_BINARY_NAME'] ?? '') && isset($a[Caster::PREFIX_PROTECTED.'message'])) {
+                    $a[Caster::PREFIX_PROTECTED.'message'] = str_replace('"composer require ', '"'.$binary.' composer require ', $a[Caster::PREFIX_PROTECTED.'message']);
+                }
+
+                return $a;
+            },
+        ]);
         $dumper = new class extends CliDumper {
             protected function supportsColors(): bool
             {

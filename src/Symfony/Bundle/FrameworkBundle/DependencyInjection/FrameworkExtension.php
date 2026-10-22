@@ -3318,7 +3318,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\OvhCloud\OvhCloudTransportFactory::class => ['symfony/ovh-cloud-notifier', 'notifier.transport_factory.ovh-cloud'],
             NotifierBridge\PagerDuty\PagerDutyTransportFactory::class => ['symfony/pager-duty-notifier', 'notifier.transport_factory.pager-duty'],
             NotifierBridge\Plivo\PlivoTransportFactory::class => ['symfony/plivo-notifier', 'notifier.transport_factory.plivo'],
-            NotifierBridge\Prelude\PreludeTransportFactory::class => ['symfony/prelude-notifier','notifier.transport_factory.prelude'],
+            NotifierBridge\Prelude\PreludeTransportFactory::class => ['symfony/prelude-notifier', 'notifier.transport_factory.prelude'],
             NotifierBridge\Primotexto\PrimotextoTransportFactory::class => ['symfony/primotexto-notifier', 'notifier.transport_factory.primotexto'],
             NotifierBridge\Pushover\PushoverTransportFactory::class => ['symfony/pushover-notifier', 'notifier.transport_factory.pushover'],
             NotifierBridge\Pushy\PushyTransportFactory::class => ['symfony/pushy-notifier', 'notifier.transport_factory.pushy'],

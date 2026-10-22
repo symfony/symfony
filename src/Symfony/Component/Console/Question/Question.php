@@ -305,7 +305,13 @@ class Question
 
     protected function isAssoc(array $array): bool
     {
-        return (bool) \count(array_filter(array_keys($array), 'is_string'));
+        foreach ($array as $key => $value) {
+            if (\is_string($key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function isTrimmable(): bool

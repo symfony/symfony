@@ -8,6 +8,8 @@ services:
 
     private_service: '@Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PrivateService'
 
+    private_public_alias: '@Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PublicService'
+
     decorated:
         class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PrivateService
 
@@ -23,6 +25,16 @@ services:
         decorates: decorated
         properties:
             inner: '@.inner'
+
+    non_shared_service:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PrivateService
+        shared: false
+
+    non_shared_consumer:
+        class: stdClass
+        public: true
+        properties:
+            service: '@non_shared_service'
 
     Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\ResettableService:
         public: true

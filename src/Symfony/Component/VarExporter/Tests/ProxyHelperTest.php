@@ -87,7 +87,7 @@ class ProxyHelperTest extends TestCase
                 public function foo2(?\Symfony\Component\VarExporter\Tests\Bar $b, ...$d): ?\Symfony\Component\VarExporter\Tests\TestForProxyHelper
                 {
                     ${0} = $this->lazyObjectState->realInstance;
-                    ${1} = ${0}->foo2(...\func_get_args());
+                    ${1} = ${0}->foo2(...\array_slice(\func_get_args(), 0, 1), ...$d);
 
                     return match (true) {
                         ${1} === ${0} => $this,
@@ -195,7 +195,7 @@ class ProxyHelperTest extends TestCase
                 public function foo2(?\Symfony\Component\VarExporter\Tests\Bar $b, ...$d): \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2
                 {
                     ${0} = $this->lazyObjectState->realInstance;
-                    ${1} = ${0}->foo2(...\func_get_args());
+                    ${1} = ${0}->foo2(...\array_slice(\func_get_args(), 0, 1), ...$d);
 
                     return match (true) {
                         ${1} === ${0} => $this,

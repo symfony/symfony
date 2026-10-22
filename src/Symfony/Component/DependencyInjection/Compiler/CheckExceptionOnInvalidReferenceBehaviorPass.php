@@ -102,6 +102,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
             public Reference $ref;
             public string $sourceId;
             public array $alternatives;
+            public string $autowiringAlternative;
 
             public function processValue(mixed $value, bool $isRoot = false): mixed
             {
@@ -113,12 +114,15 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
                     $sourceId = $this->currentId.'" in the container provided to "'.$sourceId;
                 }
 
-                throw new ServiceNotFoundException((string) $value, $sourceId, null, $this->alternatives);
+                $message = $this->autowiringAlternative ? \sprintf('The service "%s" has a dependency on a non-existent service "%s".', $sourceId, $value).$this->autowiringAlternative : null;
+
+                throw new ServiceNotFoundException((string) $value, $sourceId, null, $this->alternatives, $message);
             }
         };
         $pass->ref = $ref;
         $pass->sourceId = $sourceId;
         $pass->alternatives = $alternatives;
+        $pass->autowiringAlternative = $ref instanceof AutowiringFailedReference ? $ref->getAlternatives() : '';
 
         $pass->processValue($value, true);
     }

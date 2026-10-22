@@ -6,3 +6,5 @@ In ApplicationTest.php line %d:
 
 foo
 
+Global options are available. Run the command with --help to list them.
+

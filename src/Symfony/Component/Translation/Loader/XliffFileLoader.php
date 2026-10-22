@@ -165,7 +165,7 @@ class XliffFileLoader implements LoaderInterface
             $catalogue->setCatalogueMetadata($meta->attributes()['type'] ?? '', (string) $meta, $domain);
         }
 
-        $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:2.0');
+        $xml->registerXPathNamespace('xliff', $dom->documentElement->namespaceURI);
 
         foreach ($xml->xpath('//xliff:unit') as $unit) {
             if (null !== $pgsSwitch = $unit->attributes('urn:oasis:names:tc:xliff:pgs:1.0')['switch'] ?? null) {

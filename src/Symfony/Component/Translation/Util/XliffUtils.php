@@ -61,7 +61,13 @@ class XliffUtils
         $xliffVersion = static::getVersionNumber($dom);
         $internalErrors = libxml_use_internal_errors(true);
 
-        if (!@$dom->schemaValidateSource(self::getSchema($xliffVersion))) {
+        $schema = self::getSchema($xliffVersion);
+        if ('2.2' === $xliffVersion && 'urn:oasis:names:tc:xliff:document:2.0' === $dom->documentElement->namespaceURI) {
+            // Keep accepting XLIFF 2.2 files written with the legacy 2.0 namespace.
+            $schema = str_replace('urn:oasis:names:tc:xliff:document:2.2', 'urn:oasis:names:tc:xliff:document:2.0', $schema);
+        }
+
+        if (!@$dom->schemaValidateSource($schema)) {
             return self::getXmlErrors($internalErrors);
         }
 

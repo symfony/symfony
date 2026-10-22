@@ -5,6 +5,14 @@
 <link rel="stylesheet"{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %} href="{{ url('_wdt_stylesheet') }}" />
 <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}> </script>
 
+<dialog class="sf-profiler-overlay" aria-label="Symfony Profiler" data-frankenphp-hot-reload-preserve>
+    <div class="sf-profiler-overlay-header">
+        <span>Symfony Profiler</span>
+        <a href="{{ url('_profiler', {token: token}) }}" target="_blank" rel="noopener">Open in a new tab</a>
+        <button type="button" autofocus>Close</button>
+    </div>
+</dialog>
+
 <div class="sf-toolbar sf-toolbar-opened" role="toolbar" aria-label="Symfony Web Debug Toolbar" data-frankenphp-hot-reload-preserve>
     <div id="sfwdt{{ token }}">
         {{ include('@WebProfiler/Profiler/toolbar.html.twig', {
@@ -55,6 +63,118 @@
                 }
 
                 var toolbarLoadAborter = null;
+
+                var profilerOverlay = document.querySelector('.sf-profiler-overlay');
+                if (profilerOverlay && typeof profilerOverlay.showModal === 'function') {
+                    var profilerHome = new URL('{{ url('_profiler_home')|e('js') }}');
+                    var profilerTabLink = profilerOverlay.querySelector('a');
+                    var profilerFrame = null;
+                    var profilerOpener = null;
+
+                    var navigateToProfiler = function() {
+                        var url = profilerTabLink.href;
+                        profilerOverlay.close();
+                        window.location.assign(url);
+                    };
+
+                    var bindProfilerOverlay = function(overlay) {
+                        profilerOverlay = overlay;
+                        profilerTabLink = overlay.querySelector('a');
+                        profilerFrame = null;
+                        profilerOpener = null;
+
+                        addEventListener(overlay.querySelector('button'), 'click', function() {
+                            overlay.close();
+                        });
+                        addEventListener(overlay, 'close', function() {
+                            if (overlay !== profilerOverlay || !overlay.isConnected || overlay.open) {
+                                return;
+                            }
+
+                            if (profilerFrame) {
+                                profilerFrame.remove();
+                                profilerFrame = null;
+                            }
+
+                            var opener = profilerOpener && profilerOpener.isConnected ? profilerOpener : document.querySelector('.sf-toolbar [tabindex="0"]');
+                            if (opener) {
+                                opener.focus();
+                            }
+                        });
+                    };
+                    bindProfilerOverlay(profilerOverlay);
+
+                    addEventListener(document, 'securitypolicyviolation', function(event) {
+                        if (profilerFrame && profilerOverlay.isConnected && profilerOverlay.open && event.disposition === 'enforce' && event.effectiveDirective === 'frame-src' && event.blockedURI === profilerFrame.src) {
+                            navigateToProfiler();
+                        }
+                    });
+                    addEventListener(document, 'click', function(event) {
+                        if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+                            return;
+                        }
+
+                        var link = event.target.closest('a');
+                        if (!link || !link.closest('.sf-toolbar') || link.hasAttribute('download') || (link.target && link.target !== '_self')) {
+                            return;
+                        }
+
+                        if (link.origin !== window.location.origin || link.origin !== profilerHome.origin || link.pathname.indexOf(profilerHome.pathname) !== 0) {
+                            return;
+                        }
+
+                        var overlay = document.querySelector('.sf-profiler-overlay');
+                        if (!overlay || typeof overlay.showModal !== 'function') {
+                            return;
+                        }
+                        if (overlay !== profilerOverlay) {
+                            bindProfilerOverlay(overlay);
+                        }
+
+                        event.preventDefault();
+                        profilerOpener = link;
+                        profilerTabLink.href = link.href;
+                        if (profilerFrame) {
+                            profilerFrame.remove();
+                        }
+                        var frame = profilerFrame = document.createElement('iframe');
+                        frame.title = 'Symfony Profiler';
+                        frame.src = link.href;
+                        addEventListener(frame, 'load', function() {
+                            if (!overlay.isConnected || !overlay.open || profilerFrame !== frame) {
+                                return;
+                            }
+
+                            var frameDocument;
+                            try {
+                                frameDocument = frame.contentDocument;
+                                if (!frameDocument || frame.contentWindow.location.href === 'about:blank') {
+                                    navigateToProfiler();
+
+                                    return;
+                                }
+                                profilerTabLink.href = frame.contentWindow.location.href;
+                            } catch (error) {
+                                navigateToProfiler();
+
+                                return;
+                            }
+
+                            addEventListener(frameDocument, 'keydown', function(event) {
+                                if (event.key !== 'Escape' || event.defaultPrevented || event.target.closest('dialog[open]')) {
+                                    return;
+                                }
+
+                                event.preventDefault();
+                                if (!event.target.closest('.modal-wrap')) {
+                                    profilerOverlay.close();
+                                }
+                            });
+                        });
+                        profilerOverlay.appendChild(frame);
+                        profilerOverlay.showModal();
+                    });
+                }
 
                 var request = function(url, onSuccess, onError, payload, options, tries) {
                     url = new URL(url);

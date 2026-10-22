@@ -247,6 +247,108 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertFalse($this->getField($node, 'normalizeKeys'));
     }
 
+    #[DataProvider('provideRecursiveKeyNormalization')]
+    public function testNormalizeKeysRecursively(bool $normalizeKeys, array $expected)
+    {
+        $root = new ArrayNodeDefinition('root');
+        $nested = new ArrayNodeDefinition('nested');
+        $deep = new ArrayNodeDefinition('deep');
+        $root->ignoreExtraKeys(false)->append($nested);
+        $nested->ignoreExtraKeys(false)->append($deep);
+        $deep->ignoreExtraKeys(false);
+
+        $this->assertSame($root, $root->normalizeKeysRecursively($normalizeKeys));
+        $this->assertSame($expected, (new Processor())->process($root->getNode(), [[
+            'root-key' => 1,
+            'nested' => ['child-key' => 2, 'deep' => ['leaf-key' => 3]],
+        ]]));
+    }
+
+    public static function provideRecursiveKeyNormalization(): iterable
+    {
+        yield 'disabled' => [false, ['root-key' => 1, 'nested' => ['child-key' => 2, 'deep' => ['leaf-key' => 3]]]];
+        yield 'enabled' => [true, ['root_key' => 1, 'nested' => ['child_key' => 2, 'deep' => ['leaf_key' => 3]]]];
+    }
+
+    public function testRecursiveKeyNormalizationAppliesToPrototypes()
+    {
+        $root = new ArrayNodeDefinition('root');
+        $root->normalizeKeysRecursively(false);
+        $items = new ArrayNodeDefinition('items');
+        $item = $items->useAttributeAsKey('name')->arrayPrototype()->ignoreExtraKeys(false);
+        $data = new ArrayNodeDefinition('data');
+        $data->scalarPrototype();
+        $item->append($data);
+        $root->append($items);
+        $input = ['items' => ['first-item' => ['item-key' => 1, 'data' => ['data-key' => 2]]]];
+
+        $this->assertSame($input, (new Processor())->process($root->getNode(), [$input]));
+    }
+
+    #[DataProvider('provideLocalKeyNormalizationOverrides')]
+    public function testLocalKeyNormalizationOverridesRecursiveDefault(bool $recursive, bool $local, array $expected)
+    {
+        $root = new ArrayNodeDefinition('root');
+        $child = new ArrayNodeDefinition('child');
+        $child->normalizeKeys($local)->ignoreExtraKeys(false);
+        $deep = new ArrayNodeDefinition('deep');
+        $deep->ignoreExtraKeys(false);
+        $child->append($deep);
+        $root->append($child)->normalizeKeysRecursively($recursive);
+
+        $this->assertSame($expected, (new Processor())->process($root->getNode(), [[
+            'child' => ['child-key' => 1, 'deep' => ['deep-key' => 2]],
+        ]]));
+    }
+
+    public static function provideLocalKeyNormalizationOverrides(): iterable
+    {
+        yield 'enable locally' => [false, true, ['child' => ['child_key' => 1, 'deep' => ['deep-key' => 2]]]];
+        yield 'disable locally' => [true, false, ['child' => ['child-key' => 1, 'deep' => ['deep_key' => 2]]]];
+    }
+
+    public function testChildRecursiveKeyNormalizationOverridesParentDefault()
+    {
+        $root = new ArrayNodeDefinition('root');
+        $child = new ArrayNodeDefinition('child');
+        $child->normalizeKeysRecursively(true)->ignoreExtraKeys(false);
+        $deep = new ArrayNodeDefinition('deep');
+        $deep->ignoreExtraKeys(false);
+        $child->append($deep);
+        $root->append($child)->normalizeKeysRecursively(false)->ignoreExtraKeys(false);
+
+        $this->assertSame(['root-key' => 1, 'child' => ['child_key' => 2, 'deep' => ['deep_key' => 3]]], (new Processor())->process($root->getNode(), [[
+            'root-key' => 1, 'child' => ['child-key' => 2, 'deep' => ['deep-key' => 3]],
+        ]]));
+    }
+
+    public function testRecursiveKeyNormalizationDoesNotPersistOnReusedDefinition()
+    {
+        $child = new ArrayNodeDefinition('child');
+        $child->ignoreExtraKeys(false);
+        $root = new ArrayNodeDefinition('root');
+        $root->append($child)->normalizeKeysRecursively(false);
+        $processor = new Processor();
+
+        $this->assertSame(['child' => ['test-key' => 1]], $processor->process($root->getNode(), [['child' => ['test-key' => 1]]]));
+        $this->assertSame(['test_key' => 1], $processor->process($child->getNode(true), [['test-key' => 1]]));
+        $root->normalizeKeysRecursively(true);
+        $this->assertSame(['child' => ['test_key' => 1]], $processor->process($root->getNode(), [['child' => ['test-key' => 1]]]));
+    }
+
+    public function testNormalizeKeysRemainsLocal()
+    {
+        $root = new ArrayNodeDefinition('root');
+        $root->normalizeKeys(false)->ignoreExtraKeys(false);
+        $child = new ArrayNodeDefinition('child');
+        $child->ignoreExtraKeys(false);
+        $root->append($child);
+
+        $this->assertSame(['root-key' => 1, 'child' => ['child_key' => 2]], (new Processor())->process($root->getNode(), [[
+            'root-key' => 1, 'child' => ['child-key' => 2],
+        ]]));
+    }
+
     public function testUnsetChild()
     {
         $node = new ArrayNodeDefinition('root');

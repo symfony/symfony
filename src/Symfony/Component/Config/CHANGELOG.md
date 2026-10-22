@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `ArrayNodeDefinition::normalizeKeysRecursively()` to set key normalization defaults for descendant array nodes
  * Add `ArrayNodeDefinition::acceptElementsAtParentLevel()`
  * Add support for the `array` type to `ArrayNodeDefinition::acceptAndWrap()`, to wrap the arrays that do not set the given child into it, or the keys of a map into the given child of the items of a list
  * Add `NodeDefinition::resolvesAtCompileTime()` to resolve the env vars of a node while the container is compiled instead of passing them as placeholders

@@ -139,6 +139,9 @@ class AutowirePass extends AbstractRecursivePass
             if ($ref = $this->getAutowiredReference($value, true)) {
                 return $ref;
             }
+            if (ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE === $value->getInvalidBehavior()) {
+                return new AutowiringFailedReference($value, (fn () => $this->container->getReflectionClass($value->getType(), false) ? $this->createTypeAlternatives($this->container, $value) : '')->bindTo($this->getTypesClone()));
+            }
             if (ContainerBuilder::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE === $value->getInvalidBehavior()) {
                 $message = $this->createTypeNotFoundMessageCallback($value, 'it');
 
@@ -587,7 +590,7 @@ class AutowirePass extends AbstractRecursivePass
         $this->ambiguousServiceTypes[$type][] = $id;
     }
 
-    private function createTypeNotFoundMessageCallback(TypedReference $reference, string $label): \Closure
+    private function getTypesClone(): self
     {
         if (!isset($this->typesClone->container)) {
             $this->typesClone->container = new ContainerBuilder($this->container->getParameterBag());
@@ -595,9 +598,15 @@ class AutowirePass extends AbstractRecursivePass
             $this->typesClone->container->setDefinitions($this->container->getDefinitions());
             $this->typesClone->container->setResourceTracking(false);
         }
+
+        return $this->typesClone;
+    }
+
+    private function createTypeNotFoundMessageCallback(TypedReference $reference, string $label): \Closure
+    {
         $currentId = $this->currentId;
 
-        return (fn () => $this->createTypeNotFoundMessage($reference, $label, $currentId))->bindTo($this->typesClone);
+        return (fn () => $this->createTypeNotFoundMessage($reference, $label, $currentId))->bindTo($this->getTypesClone());
     }
 
     private function createTypeNotFoundMessage(TypedReference $reference, string $label, string $currentId): string

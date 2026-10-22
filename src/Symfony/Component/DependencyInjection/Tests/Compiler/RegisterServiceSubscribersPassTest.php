@@ -18,15 +18,20 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
+use Symfony\Component\DependencyInjection\Compiler\AutowiringFailedReference;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\RegisterServiceSubscribersPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveServiceSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ServiceSubscriberWithMissingType;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition3;
@@ -198,6 +203,128 @@ class RegisterServiceSubscribersPassTest extends TestCase
         ];
 
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+    }
+
+    public function testMissingTypeSuggestsServices()
+    {
+        foreach ([['first' => \ArrayObject::class], ['first' => \ArrayObject::class, 'second' => \SplObjectStorage::class]] as $services) {
+            $container = new ContainerBuilder();
+            foreach ($services as $id => $class) {
+                $container->register($id, $class);
+            }
+            $container->register('subscriber', ServiceSubscriberWithMissingType::class)
+                ->setAutowired(true)
+                ->setPublic(true)
+                ->addTag('container.service_subscriber');
+
+            try {
+                $container->compile();
+                $this->fail('The missing type should prevent compilation.');
+            } catch (ServiceNotFoundException $e) {
+                $alternatives = 1 === \count($services) ? 'the existing "first" service' : 'one of these existing services: "first", "second"';
+                $this->assertSame('The service "counter" in the container provided to "subscriber" has a dependency on a non-existent service "Countable". You should maybe alias this interface to '.$alternatives.'.', $e->getMessage());
+                $this->assertSame(\Countable::class, $e->getId());
+                $this->assertSame('counter" in the container provided to "subscriber', $e->getSourceId());
+                $this->assertFalse($container->hasDefinition('first'));
+            }
+        }
+    }
+
+    public function testMissingTypeSuggestsTargets()
+    {
+        $container = new ContainerBuilder();
+        $container->register('first', \ArrayObject::class);
+        $container->registerAliasForArgument('first', \Countable::class, 'items');
+        $container->register('subscriber', ServiceSubscriberWithMissingType::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+            ->addTag('container.service_subscriber');
+
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('The service "counter" in the container provided to "subscriber" has a dependency on a non-existent service "Countable". Did you mean to target "items" instead?');
+
+        $container->compile();
+    }
+
+    public function testMissingTypeWithLateAlias()
+    {
+        $container = new ContainerBuilder();
+        $container->register('first', \ArrayObject::class);
+        $container->register('subscriber', ServiceSubscriberWithMissingType::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+            ->addTag('container.service_subscriber');
+        $lateAliasPass = new class implements CompilerPassInterface {
+            public function process(ContainerBuilder $container): void
+            {
+                $container->setAlias(\Countable::class, 'first');
+            }
+        };
+        $passes = $container->getCompilerPassConfig()->getOptimizationPasses();
+        foreach ($passes as $i => $pass) {
+            if ($pass instanceof ResolveReferencesToAliasesPass) {
+                array_splice($passes, $i, 0, [$lateAliasPass]);
+                break;
+            }
+        }
+        $container->getCompilerPassConfig()->setOptimizationPasses($passes);
+
+        $container->compile();
+
+        $this->assertInstanceOf(\ArrayObject::class, $container->get('subscriber')->container->get('counter'));
+    }
+
+    public function testOptionalMissingType()
+    {
+        $subscriber = new class(new ContainerBuilder()) extends ServiceSubscriberWithMissingType {
+            public static function getSubscribedServices(): array
+            {
+                return ['counter' => '?'.\Countable::class];
+            }
+        };
+        $container = new ContainerBuilder();
+        $container->register('first', \ArrayObject::class);
+        $container->register('subscriber', $subscriber::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+            ->addTag('container.service_subscriber');
+
+        $container->compile();
+
+        $this->assertFalse($container->get('subscriber')->container->has('counter'));
+    }
+
+    public function testUnusedSubscriberWithMissingType()
+    {
+        $container = new ContainerBuilder();
+        $container->register('first', \ArrayObject::class);
+        $container->register('subscriber', ServiceSubscriberWithMissingType::class)
+            ->setAutowired(true)
+            ->addTag('container.service_subscriber');
+
+        $container->compile();
+
+        $this->assertFalse($container->has('subscriber'));
+    }
+
+    public function testExplicitMissingServiceDoesNotSuggestTypeAliases()
+    {
+        $container = new ContainerBuilder();
+        $container->register('first', \ArrayObject::class);
+        $container->register('unused_subscriber', ServiceSubscriberWithMissingType::class)
+            ->setAutowired(true)
+            ->addTag('container.service_subscriber');
+        $container->register('subscriber', ServiceSubscriberWithMissingType::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+            ->addTag('container.service_subscriber', ['key' => 'counter', 'id' => 'missing_counter']);
+
+        try {
+            $container->compile();
+            $this->fail('The missing service should prevent compilation.');
+        } catch (ServiceNotFoundException $e) {
+            $this->assertSame('The service "counter" in the container provided to "subscriber" has a dependency on a non-existent service "missing_counter".', $e->getMessage());
+        }
     }
 
     public function testExtraServiceSubscriber()
@@ -425,9 +552,18 @@ class RegisterServiceSubscribersPassTest extends TestCase
             'autowired.nullable' => new ServiceClosureArgument(new TypedReference('service.id', 'stdClass', ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'autowired.nullable', [new Autowire(service: 'service.id')])),
             'autowired.parameter' => new ServiceClosureArgument('foobar'),
             'autowire.decorated' => new ServiceClosureArgument(new Reference('.service_locator.Di.wrC8.inner', ContainerInterface::NULL_ON_INVALID_REFERENCE)),
-            'target' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'target', [new Target('someTarget')])),
         ];
-        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+        $actual = $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0);
+        $target = $actual['target']->getValues()[0];
+        unset($actual['target']);
+
+        $this->assertEquals($expected, $actual);
+        $this->assertInstanceOf(AutowiringFailedReference::class, $target);
+        $this->assertSame('stdClass', (string) $target);
+        $this->assertSame('stdClass', $target->getType());
+        $this->assertSame(ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $target->getInvalidBehavior());
+        $this->assertSame('target', $target->getName());
+        $this->assertEquals([new Target('someTarget')], $target->getAttributes());
     }
 
     public function testBinding()

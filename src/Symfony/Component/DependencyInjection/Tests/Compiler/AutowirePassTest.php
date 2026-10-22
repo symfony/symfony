@@ -26,14 +26,17 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Compiler\AutowireAsDecoratorPass;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
+use Symfony\Component\DependencyInjection\Compiler\CheckExceptionOnInvalidReferenceBehaviorPass;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveLazyProxyPass;
 use Symfony\Component\DependencyInjection\Compiler\TagDecoratorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
@@ -68,6 +71,63 @@ class AutowirePassTest extends TestCase
 
         $this->assertCount(1, $container->getDefinition('bar')->getArguments());
         $this->assertEquals(Foo::class, (string) $container->getDefinition('bar')->getArgument(0));
+    }
+
+    public function testMissingTypeSuggestionsDoNotLeakBetweenContainers()
+    {
+        $pass = new AutowirePass();
+
+        foreach (['first', 'second'] as $id) {
+            $container = new ContainerBuilder();
+            $container->register($id, \ArrayObject::class);
+            $container->register('consumer', \stdClass::class)
+                ->addArgument(new TypedReference(\Countable::class, \Countable::class));
+
+            $pass->process($container);
+
+            try {
+                (new CheckExceptionOnInvalidReferenceBehaviorPass())->process($container);
+                $this->fail('The missing type should prevent compilation.');
+            } catch (ServiceNotFoundException $e) {
+                $this->assertSame('The service "consumer" has a dependency on a non-existent service "Countable". You should maybe alias this interface to the existing "'.$id.'" service.', $e->getMessage());
+            }
+        }
+    }
+
+    public function testMissingTypeSuggestionsAreLazy()
+    {
+        $unrelatedClass = __NAMESPACE__.'\\UnrelatedAutowiringCandidate';
+        $loaded = false;
+        $autoload = static function (string $class) use ($unrelatedClass, &$loaded) {
+            if ($unrelatedClass === $class) {
+                $loaded = true;
+            }
+        };
+        spl_autoload_register($autoload);
+
+        try {
+            $container = new ContainerBuilder();
+            $container->register('unrelated', $unrelatedClass);
+            $container->register('consumer', \stdClass::class)
+                ->addArgument(new TypedReference(\Countable::class, \Countable::class));
+
+            (new AutowirePass())->process($container);
+
+            $this->assertFalse($loaded);
+
+            (new XmlDumper($container))->dump();
+
+            $this->assertFalse($loaded);
+
+            try {
+                (new CheckExceptionOnInvalidReferenceBehaviorPass())->process($container);
+                $this->fail('The missing type should prevent compilation.');
+            } catch (ServiceNotFoundException $e) {
+                $this->assertTrue($loaded);
+            }
+        } finally {
+            spl_autoload_unregister($autoload);
+        }
     }
 
     public function testProcessNotExistingActionParam()

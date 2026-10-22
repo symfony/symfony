@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Exception\LogicException;
@@ -20,6 +21,44 @@ use Symfony\Component\Cache\Tests\Fixtures\StringableTag;
 
 class CacheItemTest extends TestCase
 {
+    #[DataProvider('provideLogMessages')]
+    public function testLogWithoutLogger(string $message, array $context, string $expected)
+    {
+        $warnings = [];
+        set_error_handler(static function (int $type, string $message) use (&$warnings): bool {
+            $warnings[] = [$type, $message];
+
+            return true;
+        }, \E_USER_WARNING);
+        try {
+            CacheItem::log(null, $message, $context);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([[\E_USER_WARNING, $expected]], $warnings);
+    }
+
+    public static function provideLogMessages(): iterable
+    {
+        yield 'adapter appended' => ['Failed to save "{key}".', ['key' => 'foo', 'cache-adapter' => 'ExampleAdapter'], 'Failed to save "foo". (from "ExampleAdapter")'];
+        yield 'explicit placeholder' => ['{cache-adapter}: failed to save "{key}".', ['key' => 'foo', 'cache-adapter' => 'ExampleAdapter'], 'ExampleAdapter: failed to save "foo".'];
+        yield 'no adapter' => ['Failed to save "{key}".', ['key' => 'foo'], 'Failed to save "foo".'];
+        yield 'null adapter' => ['Failed.', ['cache-adapter' => null], 'Failed.'];
+        yield 'non-scalar adapter' => ['Failed.', ['cache-adapter' => new \stdClass()], 'Failed.'];
+        yield 'adapter contains placeholder' => ['Failed to save "{key}".', ['key' => 'foo', 'cache-adapter' => 'Adapter{key}'], 'Failed to save "foo". (from "Adapter{key}")'];
+    }
+
+    public function testLogWithLoggerPreservesMessageAndContext()
+    {
+        $message = 'Failed to save "{key}".';
+        $context = ['key' => 'foo', 'cache-adapter' => 'ExampleAdapter', 'exception' => new \RuntimeException('Failed')];
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('warning')->with($message, $context);
+
+        CacheItem::log($logger, $message, $context);
+    }
+
     public function testValidKey()
     {
         $this->assertSame('foo', CacheItem::validateKey('foo'));

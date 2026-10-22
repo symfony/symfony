@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `csrf_input_field()` function to render a hidden CSRF field without the Form component
  * Add the `logout_form()` function to build a form that logs the user out with a POST
  * Add the `normalize` filter to normalize values with the Serializer component
  * Add the `impersonation_form()` and `impersonation_exit_form()` functions to build a form that switches the user with a POST

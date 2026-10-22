@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Twig\Environment;
+use Twig\Runtime\EscaperRuntime;
 
 /**
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
@@ -27,5 +29,12 @@ final class CsrfRuntime
     public function getCsrfToken(string $tokenId): string
     {
         return $this->csrfTokenManager->getToken($tokenId)->getValue();
+    }
+
+    public function renderCsrfInputField(Environment $env, string $tokenId, string $fieldName = '_token'): string
+    {
+        $escaper = $env->getRuntime(EscaperRuntime::class);
+
+        return \sprintf('<input type="hidden" name="%s" value="%s" data-controller="csrf-protection">', $escaper->escape($fieldName), $escaper->escape($this->getCsrfToken($tokenId)));
     }
 }

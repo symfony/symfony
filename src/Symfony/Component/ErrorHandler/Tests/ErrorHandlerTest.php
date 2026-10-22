@@ -12,6 +12,8 @@
 namespace Symfony\Component\ErrorHandler\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -120,8 +122,7 @@ class ErrorHandlerTest extends TestCase
     {
         $logger = new NullLogger();
         $handler = ErrorHandler::register();
-        $handler->setDefaultLogger($logger);
-        $handler->screamAt(\E_ALL);
+        $handler->configure($logger, null, true);
 
         try {
             @trigger_error('Hello', \E_USER_WARNING);
@@ -230,6 +231,8 @@ class ErrorHandlerTest extends TestCase
         unlink($filename);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     #[WithoutErrorHandler]
     public function testConstruct()
     {
@@ -243,6 +246,8 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     #[WithoutErrorHandler]
     public function testDefaultLogger()
     {
@@ -277,6 +282,8 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     #[WithoutErrorHandler]
     public function testHandleError()
     {
@@ -421,7 +428,7 @@ class ErrorHandlerTest extends TestCase
         ;
 
         $handler = new ErrorHandler();
-        $handler->setDefaultLogger($logger);
+        $handler->configure($logger);
         @$handler->handleError(\E_USER_DEPRECATED, 'Foo deprecation', __FILE__, __LINE__, []);
     }
 
@@ -446,7 +453,7 @@ class ErrorHandlerTest extends TestCase
                 ->willReturnCallback($logArgCheck)
             ;
 
-            $handler->setDefaultLogger($logger, \E_ERROR);
+            $handler->configure($logger, null, false, null, \E_ERROR);
             $handler->setExceptionHandler(null);
 
             try {
@@ -487,6 +494,8 @@ class ErrorHandlerTest extends TestCase
         ];
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     #[WithoutErrorHandler]
     public function testBootstrappingLogger()
     {
@@ -552,7 +561,7 @@ class ErrorHandlerTest extends TestCase
             ->with(LogLevel::CRITICAL, 'Uncaught Exception: Foo message', ['exception' => $exception]);
 
         $handler->setExceptionHandler(static function () use ($handler, $mockLogger) {
-            $handler->setDefaultLogger($mockLogger);
+            $handler->configure($mockLogger);
         });
 
         $handler->handleException($exception);
@@ -584,7 +593,7 @@ class ErrorHandlerTest extends TestCase
                 ->willReturnCallback($logArgCheck)
             ;
 
-            $handler->setDefaultLogger($logger, \E_PARSE);
+            $handler->configure($logger, null, false, null, \E_PARSE);
             $handler->setExceptionHandler(null);
 
             $handler->handleFatalError($error);
@@ -607,7 +616,7 @@ class ErrorHandlerTest extends TestCase
             ;
 
             $handler = ErrorHandler::register();
-            $handler->setDefaultLogger($logger, \E_ALL);
+            $handler->configure($logger);
             $handler->setExceptionHandler(null);
 
             try {
@@ -653,7 +662,7 @@ class ErrorHandlerTest extends TestCase
                 })
             ;
 
-            $handler->setDefaultLogger($logger, \E_ERROR);
+            $handler->configure($logger, null, false, null, \E_ERROR);
             $handler->setExceptionHandler(null);
 
             $handler->handleFatalError($error);
@@ -836,7 +845,7 @@ class ErrorHandlerTest extends TestCase
             $logger = $loggerSetsAnotherHandler ? new LoggerThatSetAnErrorHandler() : new NullLogger();
 
             $handler = ErrorHandler::register();
-            $handler->setDefaultLogger($logger);
+            $handler->configure($logger);
 
             if ($nextHandlerIsDefined) {
                 $handler = ErrorHandlerThatUsesThePreviousOne::register();
@@ -924,7 +933,7 @@ class ErrorHandlerTest extends TestCase
     {
         try {
             $handler = ErrorHandler::register();
-            $handler->setDefaultLogger($logger = new BufferingLogger());
+            $handler->configure($logger = new BufferingLogger());
 
             $expectedLine = __LINE__ + 1;
             trigger_deprecation('foo', '1.2.3', 'bar');
@@ -997,7 +1006,7 @@ class ErrorHandlerTest extends TestCase
         $logger->expects($this->exactly(2))->method('log');
 
         $handler = new ErrorHandler();
-        $handler->setDefaultLogger($logger);
+        $handler->configure($logger);
 
         $handler->setExceptionHandler([$handler, 'renderException']);
         [, $errorLog] = $this->handleExceptionWithErrorLog($handler, new \RuntimeException('foo'));

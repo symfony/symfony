@@ -25,7 +25,7 @@ if (true) {
 
 $_SERVER['NO_COLOR'] = '1';
 set_exception_handler(function ($e) { echo "EHLO\n"; throw $e; });
-ErrorHandler::register()->setDefaultLogger(new TestLogger());
+ErrorHandler::register()->configure(new TestLogger());
 
 throw new \Exception('foo');
 ?>

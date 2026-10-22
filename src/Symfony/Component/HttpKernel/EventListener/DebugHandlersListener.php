@@ -100,15 +100,19 @@ class DebugHandlersListener implements EventSubscriberInterface
             }
 
             if ($handler instanceof ErrorHandler) {
-                $previous = $handler->setExceptionHandler($this->exceptionHandler);
+                $configureLoggers = null !== $hasRun && $handler !== $this->configuredErrorHandler?->get();
+                $legacy = !method_exists($handler, 'configure');
+                $previous = $configureLoggers && !$legacy ? $handler->setExceptionHandler($this->exceptionHandler, false) : $handler->setExceptionHandler($this->exceptionHandler);
                 if (null !== $hasRun) {
                     if (null !== $this->installedExceptionHandler && $previous === $this->installedExceptionHandler[1]) {
                         $previous = $this->installedExceptionHandler[2];
                     }
                     $this->installedExceptionHandler = [$handler, $this->exceptionHandler, $previous];
                 }
-                if (null !== $hasRun && $handler !== $this->configuredErrorHandler?->get()) {
+                if ($configureLoggers) {
                     $this->configuredErrorHandler = \WeakReference::create($handler);
+                }
+                if ($configureLoggers && $legacy) {
                     $throwAt = $handler->throwAt(0) | \E_ERROR | \E_CORE_ERROR | \E_COMPILE_ERROR | \E_USER_ERROR | \E_RECOVERABLE_ERROR | \E_PARSE;
                     $loggers = [];
 

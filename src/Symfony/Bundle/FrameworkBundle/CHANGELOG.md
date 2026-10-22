@@ -58,6 +58,7 @@ CHANGELOG
  * Register `RateLimitValueResolver` when the rate limiter is enabled
  * Close the lazy Redis connection of the session handler created from `framework.session.handler_id` when the kernel shuts down
  * Add the `debug:autoconfiguration` command to list the classes, interfaces and attributes used for autoconfiguration
+ * Register `DeprecationHeaderListener` to handle the `_deprecation` route default
 
 8.1
 ---

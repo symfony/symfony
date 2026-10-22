@@ -222,6 +222,12 @@ class EsmtpTransport extends SmtpTransport
         return \array_key_exists('SMTPUTF8', $this->capabilities);
     }
 
+    protected function serverSupportsSize(): bool
+    {
+        // capabilities are not known when the server only answered to HELO
+        return isset($this->capabilities['SIZE']);
+    }
+
     private function handleAuth(array $modes): void
     {
         if (!$this->username) {

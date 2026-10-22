@@ -215,15 +215,32 @@ class SmtpTransport extends AbstractTransport
                 $this->start();
             }
 
+            $chunks = $message->toIterable();
+            $size = null;
+            if ($this->serverSupportsSize()) {
+                // the message can only be iterated once: buffer it to know its size before sending it
+                $buffer = fopen('php://temp', 'w+');
+                foreach ($chunks as $chunk) {
+                    fwrite($buffer, $chunk);
+                }
+                $size = ftell($buffer);
+                rewind($buffer);
+                $chunks = (static function () use ($buffer) {
+                    while (!feof($buffer)) {
+                        yield fread($buffer, 8192);
+                    }
+                })();
+            }
+
             $envelope = $message->getEnvelope();
-            $this->doMailFromCommand($envelope->getSender()->getEncodedAddress(), $envelope->anyAddressHasUnicodeLocalpart());
+            $this->doMailFromCommand($envelope->getSender()->getEncodedAddress(), $envelope->anyAddressHasUnicodeLocalpart(), $size);
             foreach ($envelope->getRecipients() as $recipient) {
                 $this->doRcptToCommand($recipient->getEncodedAddress());
             }
 
             $this->executeCommand("DATA\r\n", [354]);
             try {
-                foreach (AbstractStream::replace("\r\n.", "\r\n..", $message->toIterable()) as $chunk) {
+                foreach (AbstractStream::replace("\r\n.", "\r\n..", $chunks) as $chunk) {
                     $this->stream->write($chunk, false);
                 }
                 $this->stream->flush();
@@ -254,17 +271,22 @@ class SmtpTransport extends AbstractTransport
         return false;
     }
 
+    protected function serverSupportsSize(): bool
+    {
+        return false;
+    }
+
     private function doHeloCommand(): void
     {
         $this->executeCommand(\sprintf("HELO %s\r\n", $this->domain), [250]);
     }
 
-    private function doMailFromCommand(string $address, bool $smtputf8): void
+    private function doMailFromCommand(string $address, bool $smtputf8, ?int $size = null): void
     {
         if ($smtputf8 && !$this->serverSupportsSmtpUtf8()) {
             throw new InvalidArgumentException('The SMTP server does not support the SMTPUTF8 extension required to send to addresses with non-ASCII characters in their local-part.');
         }
-        $this->executeCommand(\sprintf("MAIL FROM:<%s>%s\r\n", $address, $smtputf8 ? ' SMTPUTF8' : ''), [250]);
+        $this->executeCommand(\sprintf("MAIL FROM:<%s>%s%s\r\n", $address, $smtputf8 ? ' SMTPUTF8' : '', null !== $size ? ' SIZE='.$size : ''), [250]);
     }
 
     private function doRcptToCommand(string $address): void

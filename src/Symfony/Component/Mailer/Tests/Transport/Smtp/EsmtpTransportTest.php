@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Exception\UnexpectedResponseException;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\CramMd5Authenticator;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\LoginAuthenticator;
 use Symfony\Component\Mailer\Transport\Smtp\Auth\XOAuth2Authenticator;
@@ -108,6 +109,40 @@ class EsmtpTransportTest extends TestCase
 
         $this->assertContains("MAIL FROM:<info@xn--dmi-0na.fo>\r\n", $stream->getCommands());
         $this->assertContains("RCPT TO:<example@example.com>\r\n", $stream->getCommands());
+    }
+
+    public function testSize()
+    {
+        $stream = new DummyStream();
+        $transport = new SizeEsmtpTransport('localhost', 0, null, null, null, $stream);
+
+        $transport->send($this->createSizeTestEmail());
+
+        $commands = $stream->getCommands();
+        $dataStart = array_search("DATA\r\n", $commands, true) + 1;
+        $data = implode('', \array_slice($commands, $dataStart, array_search("\r\n.\r\n", $commands, true) - $dataStart));
+
+        $this->assertContains(\sprintf("MAIL FROM:<sender@example.org> SIZE=%d\r\n", \strlen($data)), $commands);
+    }
+
+    public function testSizeIsNotSentWhenNotSupported()
+    {
+        $stream = new DummyStream();
+        $transport = new EsmtpTransport('localhost', 0, null, null, null, $stream);
+
+        $transport->send($this->createSizeTestEmail());
+
+        $this->assertContains("MAIL FROM:<sender@example.org>\r\n", $stream->getCommands());
+    }
+
+    public function testSizeIsNotSentAfterHeloFallback()
+    {
+        $stream = new DummyStream();
+        $transport = new HeloOnlyEsmtpTransport('localhost', 0, null, null, null, $stream);
+
+        $transport->send($this->createSizeTestEmail());
+
+        $this->assertContains("MAIL FROM:<sender@example.org>\r\n", $stream->getCommands());
     }
 
     public function testConstructorWithDefaultAuthenticators()
@@ -314,6 +349,14 @@ class EsmtpTransportTest extends TestCase
 
         $transport->send($message);
     }
+
+    private function createSizeTestEmail(): Email
+    {
+        return (new Email())
+            ->from('sender@example.org')
+            ->to('recipient@example.org')
+            ->text('Hello');
+    }
 }
 
 class CustomEsmtpTransport extends EsmtpTransport
@@ -347,5 +390,31 @@ class SmtpUtf8EsmtpTransport extends EsmtpTransport
         }
 
         return $response;
+    }
+}
+
+class SizeEsmtpTransport extends EsmtpTransport
+{
+    public function executeCommand(string $command, array $codes): string
+    {
+        $response = parent::executeCommand($command, $codes);
+
+        if (str_starts_with($command, 'EHLO ')) {
+            $response .= "250 SIZE 10240000\r\n";
+        }
+
+        return $response;
+    }
+}
+
+class HeloOnlyEsmtpTransport extends EsmtpTransport
+{
+    public function executeCommand(string $command, array $codes): string
+    {
+        if (str_starts_with($command, 'EHLO ')) {
+            throw new UnexpectedResponseException('Expected response code "250" but got code "502", with message "502 Command not implemented".', 502);
+        }
+
+        return parent::executeCommand($command, $codes);
     }
 }

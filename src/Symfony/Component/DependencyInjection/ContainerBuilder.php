@@ -707,8 +707,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($this->trackResources) {
+            $excludedClasses = self::getExcludedClasses($container->getDefinitions());
             foreach ($container->getResources() as $resource) {
-                $this->addResource($resource);
+                if (!$resource instanceof ReflectionClassResource || !isset($excludedClasses[(string) $resource])) {
+                    $this->addResource($resource);
+                }
             }
         }
 
@@ -883,6 +886,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $compiler = $this->getCompiler();
 
         if ($this->trackResources) {
+            // excluded classes are not services: compiler passes that read them track them again
+            foreach (self::getExcludedClasses($this->definitions) as $resourceId => $_) {
+                unset($this->resources[$resourceId]);
+            }
+
             foreach ($compiler->getPassConfig()->getPasses() as $pass) {
                 $this->addObjectResource($pass);
             }
@@ -1949,6 +1957,28 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $this->expressionLanguage;
+    }
+
+    /**
+     * @param array<string, Definition> $definitions
+     *
+     * @return array<string, true> The ids of the reflection resources of the classes that only excluded definitions use
+     */
+    private static function getExcludedClasses(array $definitions): array
+    {
+        $excludedClasses = $usedClasses = [];
+        foreach ($definitions as $definition) {
+            if (!\is_string($class = $definition->getClass())) {
+                continue;
+            }
+            if ($definition->hasTag('container.excluded')) {
+                $excludedClasses['reflection.'.$class] = true;
+            } else {
+                $usedClasses['reflection.'.$class] = true;
+            }
+        }
+
+        return array_diff_key($excludedClasses, $usedClasses);
     }
 
     private function inVendors(string $path): bool

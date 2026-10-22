@@ -108,6 +108,46 @@ class InputBagTest extends TestCase
         $this->assertSame([12, 8], $result);
     }
 
+    public function testFilterArrayWithCycle()
+    {
+        $value = ['value' => '12'];
+        $value['cycle'] = &$value;
+        $calls = 0;
+        $bag = new InputBag(['foo' => $value]);
+
+        $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => static function ($value) use (&$calls) {
+            ++$calls;
+
+            return (int) $value;
+        }]);
+
+        $this->assertSame(2, $calls);
+        $this->assertSame(12, $result['value']);
+        $this->assertSame(12, $result['cycle']['value']);
+        $result['cycle']['value'] = 99;
+        $this->assertSame(99, $result['cycle']['cycle']['value']);
+        $this->assertSame(12, $result['value']);
+    }
+
+    public function testFilterArrayWithSharedScalarReference()
+    {
+        $value = '12';
+        $calls = 0;
+        $bag = new InputBag(['foo' => ['first' => &$value, 'second' => &$value]]);
+
+        $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => static function ($value) use (&$calls) {
+            ++$calls;
+
+            return (int) $value;
+        }]);
+
+        $this->assertSame(2, $calls);
+        $this->assertSame(['first' => 12, 'second' => 12], $result);
+        $this->assertSame(12, $value);
+        $result['first'] = 99;
+        $this->assertSame(99, $result['second']);
+    }
+
     public function testFilterCallback()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -123,6 +163,54 @@ class InputBagTest extends TestCase
         $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => strtoupper(...)]);
 
         $this->assertSame('BAR', $result);
+    }
+
+    /**
+     * @group legacy
+     *
+     * @dataProvider provideInvalidFilterArrayValues
+     */
+    public function testFilterArrayWithInvalidValue($value, int $filter, $options, array $expected)
+    {
+        $this->expectDeprecation('Since symfony/http-foundation 6.3: Ignoring invalid values when using "Symfony\Component\HttpFoundation\InputBag::filter(\'foo\')" is deprecated and will throw a "Symfony\Component\HttpFoundation\Exception\BadRequestException" in 7.0; pass flag "FILTER_NULL_ON_FAILURE" to keep ignoring them.');
+
+        $bag = new InputBag(['foo' => $value]);
+
+        $this->assertSame($expected, $bag->filter('foo', null, $filter, $options));
+    }
+
+    /**
+     * @dataProvider provideInvalidFilterArrayValues
+     */
+    public function testFilterArrayWithNullOnFailure($value, int $filter, $options, array $expected)
+    {
+        if (!\is_array($options)) {
+            $options = ['flags' => $options];
+        }
+        $options['flags'] |= \FILTER_NULL_ON_FAILURE;
+        $bag = new InputBag(['foo' => $value]);
+
+        $this->assertSame($expected, $bag->filter('foo', null, $filter, $options));
+    }
+
+    public static function provideInvalidFilterArrayValues(): iterable
+    {
+        yield from ParameterBagTest::provideInvalidFilterArrayValues();
+    }
+
+    /**
+     * @dataProvider provideValidFilterArrayValues
+     */
+    public function testFilterArrayWithValidValue($value, int $filter, $options, array $expected)
+    {
+        $bag = new InputBag(['foo' => $value]);
+
+        $this->assertSame($expected, $bag->filter('foo', null, $filter, $options));
+    }
+
+    public static function provideValidFilterArrayValues(): iterable
+    {
+        yield from ParameterBagTest::provideValidFilterArrayValues();
     }
 
     public function testSetWithNonScalarOrArray()

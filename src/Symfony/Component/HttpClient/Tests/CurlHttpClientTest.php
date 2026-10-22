@@ -102,6 +102,64 @@ class CurlHttpClientTest extends HttpClientTestCase
         self::assertSame($state, $r->getValue($cloneB));
     }
 
+    #[TestWith([0])]
+    #[TestWith([2])]
+    public function testPipeliningOption(int $pipelining)
+    {
+        $client = new CurlHttpClient(['pipelining' => $pipelining]);
+        $response = $client->request('GET', 'http://localhost:8057/');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $client->reset(true);
+        $this->assertSame(200, $client->request('GET', 'http://localhost:8057/')->getStatusCode());
+    }
+
+    public function testPipeliningCloneHasAnIndependentConnectionPool()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $client->setLogger($logger = new TestLogger());
+        $response = $client->request('GET', 'http://localhost:8057/');
+        $clone = $client->withOptions(['pipelining' => 0]);
+        $reflection = new \ReflectionProperty($client, 'multi');
+
+        $this->assertSame($logger, $reflection->getValue($clone)->logger);
+        $this->assertNotSame($reflection->getValue($client), $reflection->getValue($clone));
+        $this->assertSame($reflection->getValue($clone), $reflection->getValue($clone->withOptions(['pipelining' => 0])));
+        $this->assertSame($reflection->getValue($client), $reflection->getValue($client->withOptions(['pipelining' => 2])));
+        $this->assertSame(200, $clone->request('GET', 'http://localhost:8057/')->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testPipeliningCannotChangePerRequest()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "pipelining" option must be configured using the constructor or "withOptions()".');
+
+        $client->request('GET', 'http://localhost:8057/', ['pipelining' => 0]);
+    }
+
+    #[TestWith(['0'])]
+    #[TestWith([false])]
+    #[TestWith([-1])]
+    #[TestWith([4])]
+    public function testInvalidPipeliningOption(mixed $pipelining)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "pipelining" option must be an integer between 0 and 3.');
+
+        new CurlHttpClient(['pipelining' => $pipelining]);
+    }
+
+    public function testInvalidPipeliningOptionOnClone()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "pipelining" option must be an integer between 0 and 3.');
+
+        $client->withOptions(['pipelining' => 4]);
+    }
+
     public function testCurlClientStateInitializesHandlesLazily()
     {
         $client = $this->getHttpClient(__FUNCTION__);

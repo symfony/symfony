@@ -70,6 +70,22 @@ class CookieTest extends TestCase
         Cookie::create('');
     }
 
+    public function testInstantiationAcceptsZeroName()
+    {
+        $cookie = Cookie::create('0', 'value');
+
+        $this->assertSame('0', $cookie->getName());
+        $this->assertStringStartsWith('0=value;', (string) $cookie);
+    }
+
+    public function testFromStringAcceptsZeroName()
+    {
+        $cookie = Cookie::fromString('0=value');
+
+        $this->assertSame('0', $cookie->getName());
+        $this->assertStringStartsWith('0=value;', (string) $cookie);
+    }
+
     public static function pathsAndDomainsWithSpecialCharacters()
     {
         return [
@@ -474,6 +490,128 @@ class CookieTest extends TestCase
 
         $cookie = Cookie::fromString('foo=bar; expires=Fri, 20 May 2011 15:25:52 GMT; path=/; domain=.myfoodomain.com; secure');
         $this->assertFalse($cookie->isHttpOnly());
+    }
+
+    public function testFromStringTreatsSecureAsFlag()
+    {
+        foreach (['0', 'false'] as $value) {
+            $this->assertTrue(Cookie::fromString('foo=bar; Secure='.$value)->isSecure());
+        }
+    }
+
+    public function testFromStringTreatsHttpOnlyAsFlag()
+    {
+        foreach (['0', 'false'] as $value) {
+            $this->assertTrue(Cookie::fromString('foo=bar; HttpOnly='.$value)->isHttpOnly());
+        }
+    }
+
+    public function testFromStringTreatsPartitionedAsFlag()
+    {
+        foreach (['0', 'false'] as $value) {
+            $this->assertTrue(Cookie::fromString('foo=bar; Partitioned='.$value)->isPartitioned());
+        }
+    }
+
+    /**
+     * @dataProvider quotedValues
+     */
+    public function testFromStringPreservesQuotes(string $header, bool $decode, string $value)
+    {
+        $cookie = Cookie::fromString($header, $decode);
+
+        $this->assertSame($value, $cookie->getValue());
+    }
+
+    public static function quotedValues(): array
+    {
+        return [
+            ['foo="bar"; path=/', false, '"bar"'],
+            ['foo="bar=baz"; path=/', false, '"bar=baz"'],
+            [' foo = "bar" ; path=/', false, '"bar"'],
+            ['foo="bar%20baz"; path=/', true, '"bar baz"'],
+        ];
+    }
+
+    public function testFromStringIgnoresInvalidExpires()
+    {
+        $cookie = Cookie::fromString('foo=bar; Expires=invalid; Secure; HttpOnly');
+
+        $this->assertSame(0, $cookie->getExpiresTime());
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+    }
+
+    public function testFromStringIgnoresInvalidSameSite()
+    {
+        $cookie = Cookie::fromString('foo=bar; SameSite=future; Secure; HttpOnly');
+
+        $this->assertNull($cookie->getSameSite());
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+    }
+
+    /**
+     * @dataProvider rawAttributes
+     */
+    public function testFromStringIgnoresRawAttribute(bool $decode, string $raw)
+    {
+        $cookie = Cookie::fromString('foo=bar%20baz; raw='.$raw, $decode);
+
+        $this->assertSame(!$decode, $cookie->isRaw());
+        $this->assertStringStartsWith('foo=bar%20baz;', (string) $cookie);
+    }
+
+    public static function rawAttributes(): array
+    {
+        return [[false, '0'], [true, '1']];
+    }
+
+    public function testFromStringKeepsValidAttributesBeforeInvalidDuplicates()
+    {
+        $cookie = Cookie::fromString('foo=bar; Expires=Fri, 20 May 2011 15:25:52 GMT; Expires=invalid; SameSite=Lax; SameSite=future; Max-Age=123abc');
+
+        $this->assertSame(strtotime('Fri, 20 May 2011 15:25:52 GMT'), $cookie->getExpiresTime());
+        $this->assertSame(Cookie::SAMESITE_LAX, $cookie->getSameSite());
+    }
+
+    public function testFromStringHandlesOverflowingMaxAge()
+    {
+        $cookie = Cookie::fromString('foo=bar; Max-Age=9999999999999999999999999999999999999999');
+
+        $this->assertSame(\PHP_INT_MAX, $cookie->getExpiresTime());
+    }
+
+    /**
+     * @dataProvider nonPositiveMaxAges
+     */
+    public function testFromStringExpiresNonPositiveMaxAge(string $maxAge)
+    {
+        $cookie = Cookie::fromString('foo=bar; Max-Age='.$maxAge);
+
+        $this->assertTrue($cookie->isCleared());
+        $this->assertSame(0, $cookie->getMaxAge());
+        $this->assertStringContainsString('; Max-Age=0', (string) $cookie);
+    }
+
+    public static function nonPositiveMaxAges(): array
+    {
+        return [['0'], ['-1'], ['-9999999999999999999999999999999999999999']];
+    }
+
+    /**
+     * @dataProvider invalidMaxAges
+     */
+    public function testFromStringIgnoresInvalidMaxAge(string $maxAge)
+    {
+        $cookie = Cookie::fromString('foo=bar; Max-Age='.$maxAge);
+
+        $this->assertSame(0, $cookie->getExpiresTime());
+    }
+
+    public static function invalidMaxAges(): array
+    {
+        return [['123abc'], ['1.5'], ['+123'], ['invalid'], [''], ['--1']];
     }
 
     public function testSameSiteAttribute()

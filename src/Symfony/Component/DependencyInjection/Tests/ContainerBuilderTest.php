@@ -1089,6 +1089,27 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame(['AInterface' => $childDefA, 'BInterface' => $childDefB], $container->getAutoconfiguredInstanceof());
     }
 
+    public function testMergePreservesCompilerLogs()
+    {
+        $pass = $this->createStub(CompilerPassInterface::class);
+        $container = new ContainerBuilder();
+        $container->log($pass, 'Main container');
+        $child = new ContainerBuilder();
+        $child->log($pass, "Child container\nSecond line");
+        $grandchild = new ContainerBuilder();
+        $grandchild->getCompiler()->log($pass, 'Nested container');
+
+        $child->merge($grandchild);
+        $container->merge($child);
+        $child->log($pass, 'Logged after merging');
+
+        $this->assertSame([
+            $pass::class.': Main container',
+            $pass::class.': Child container'."\n".$pass::class.': Second line',
+            $pass::class.': Nested container',
+        ], $container->getCompiler()->getLog());
+    }
+
     public function testMergeWithExcludedServices()
     {
         $container = new ContainerBuilder();

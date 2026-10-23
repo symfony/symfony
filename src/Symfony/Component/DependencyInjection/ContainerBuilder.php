@@ -747,6 +747,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $configurators)
             ;
         }
+
+        if (isset($container->compiler)) {
+            $this->getCompiler()->mergeLog($container->compiler);
+        }
     }
 
     /**
@@ -1696,7 +1700,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * @final
      */
-    public function log(CompilerPassInterface $pass, string $message): void
+    public function log(CompilerPassInterface|ExtensionInterface $pass, string $message): void
     {
         $this->getCompiler()->log($pass, $this->resolveEnvPlaceholders($message));
     }

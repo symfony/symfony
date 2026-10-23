@@ -193,7 +193,7 @@ class StreamWriterGeneratorTest extends TestCase
                 'second' => new PropertyMetadata('second', Type::nullable(Type::object(ClassicDummy::class))),
             ] : []);
 
-        $generator = new StreamWriterGenerator($propertyMetadataLoader, $this->streamWritersDir);
+        $generator = new StreamWriterGenerator($propertyMetadataLoader, new ServiceContainer(), $this->streamWritersDir);
         $generator->generate(Type::object(DummyWithNullableRepeatedDummies::class));
     }
 

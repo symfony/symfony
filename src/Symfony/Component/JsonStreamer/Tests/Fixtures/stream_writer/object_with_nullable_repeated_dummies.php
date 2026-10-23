@@ -3,8 +3,8 @@
 /**
  * @param Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies $data
  */
-return static function (mixed $data, \Psr\Container\ContainerInterface $valueTransformers, array $options): \Traversable {
-    $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'] = static function ($data, $depth) use ($valueTransformers, $options, &$generators) {
+return static function (mixed $data, \Psr\Container\ContainerInterface $transformers, array $options): \Traversable {
+    $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'] = static function ($data, $depth) use ($transformers, $options, &$generators) {
         if ($depth >= 512) {
             throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException('Maximum stack depth exceeded');
         }
@@ -37,6 +37,6 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $valueTra
         }
         yield "}";
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException($e->getMessage(), 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException('Cannot encode "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNullableRepeatedDummies" to JSON: '.$e->getMessage(), 0, $e);
     }
 };

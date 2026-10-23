@@ -113,7 +113,7 @@ class Cookie
 
         self::validateAttribute('path', $path);
         self::validateAttribute('domain', $domain);
-        self::validateNamePrefix($name, $secure, $domain, $path ?: '/');
+        self::validateNamePrefix($name, $secure, $domain, $path ?: '/', $httpOnly);
 
         $this->expire = self::expiresTimestamp($expire);
         $this->path = $path ?: '/';
@@ -137,7 +137,7 @@ class Cookie
     public function withDomain(?string $domain): static
     {
         self::validateAttribute('domain', $domain);
-        self::validateNamePrefix($this->name, $this->secure, $domain, $this->path);
+        self::validateNamePrefix($this->name, $this->secure, $domain, $this->path, $this->httpOnly);
 
         $cookie = clone $this;
         $cookie->domain = $domain;
@@ -191,7 +191,7 @@ class Cookie
     public function withPath(string $path): static
     {
         self::validateAttribute('path', $path);
-        self::validateNamePrefix($this->name, $this->secure, $this->domain, '' === $path ? '/' : $path);
+        self::validateNamePrefix($this->name, $this->secure, $this->domain, '' === $path ? '/' : $path, $this->httpOnly);
 
         $cookie = clone $this;
         $cookie->path = '' === $path ? '/' : $path;
@@ -204,7 +204,7 @@ class Cookie
      */
     public function withSecure(bool $secure = true): static
     {
-        self::validateNamePrefix($this->name, $secure, $this->domain, $this->path);
+        self::validateNamePrefix($this->name, $secure, $this->domain, $this->path, $this->httpOnly);
 
         $cookie = clone $this;
         $cookie->secure = $secure;
@@ -217,6 +217,8 @@ class Cookie
      */
     public function withHttpOnly(bool $httpOnly = true): static
     {
+        self::validateNamePrefix($this->name, $this->secure, $this->domain, $this->path, $httpOnly);
+
         $cookie = clone $this;
         $cookie->httpOnly = $httpOnly;
 
@@ -429,14 +431,18 @@ class Cookie
     }
 
     /**
-     * Rejects a "__Host-" prefixed name combined with attributes that make browsers discard the cookie.
+     * Rejects prefixed names combined with attributes that make browsers discard the cookie.
      *
-     * @see https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis#section-4.1.3
+     * @see https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-layered-cookies-02#section-4.1.3
      */
-    private static function validateNamePrefix(string $name, ?bool $secure, ?string $domain, string $path): void
+    private static function validateNamePrefix(string $name, ?bool $secure, ?string $domain, string $path, bool $httpOnly): void
     {
-        if (false === $secure && (str_starts_with($name, '__Secure-') || str_starts_with($name, '__Host-'))) {
+        if (false === $secure && (str_starts_with($name, '__Secure-') || str_starts_with($name, '__Host-') || str_starts_with($name, '__Http-'))) {
             throw new \InvalidArgumentException(\sprintf('The cookie name "%s" uses a reserved prefix, which requires the "secure" flag to be enabled.', $name));
+        }
+
+        if (!$httpOnly && (str_starts_with($name, '__Http-') || str_starts_with($name, '__Host-Http-'))) {
+            throw new \InvalidArgumentException(\sprintf('The cookie name "%s" uses a reserved prefix, which requires the "httpOnly" flag to be enabled.', $name));
         }
 
         if (!str_starts_with($name, '__Host-')) {

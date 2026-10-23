@@ -460,7 +460,7 @@ class Form extends Link implements \ArrayAccess
             }
         } elseif ('input' == $nodeName && 'file' == strtolower($node->getAttribute('type'))) {
             $this->set(new Field\FileFormField($node));
-        } elseif ('input' == $nodeName && !\in_array(strtolower($node->getAttribute('type')), ['submit', 'button', 'image'])) {
+        } elseif ('input' == $nodeName && !\in_array(strtolower($node->getAttribute('type')), ['submit', 'button', 'image', 'reset'])) {
             $this->set(new Field\InputFormField($node));
         } elseif ('textarea' == $nodeName) {
             $this->set(new Field\TextareaFormField($node));

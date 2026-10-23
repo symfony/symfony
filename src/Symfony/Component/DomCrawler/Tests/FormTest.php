@@ -255,6 +255,13 @@ class FormTest extends TestCase
                 ['foobar' => ['InputFormField', 'foobar']],
             ],
             [
+                'does not take into account reset and button inputs',
+                '<input type="reset" name="foo" value="foo" />
+                 <input type="button" name="bar" value="bar" />
+                 <input type="submit" />',
+                [],
+            ],
+            [
                 'turns an image input into x and y fields',
                 '<input type="image" name="bar" />',
                 ['bar.x' => ['InputFormField', '0'], 'bar.y' => ['InputFormField', '0']],

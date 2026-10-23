@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -44,6 +47,36 @@ class StoreTest extends TestCase
     public function testReadsAnEmptyArrayWithReadWhenNothingCachedAtKey()
     {
         $this->assertSame([], $this->getStoreMetadata('/nothing'));
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testAForkedStoreOnlyCleansUpItsOwnLocks()
+    {
+        $observer = new Store(sys_get_temp_dir().'/http_cache');
+        $childRequest = Request::create('/child');
+        $this->assertTrue($this->store->lock($this->request));
+
+        if (0 === $pid = pcntl_fork()) {
+            if (true === $this->store->lock($this->request) || $this->store->unlock($this->request)) {
+                exit(1);
+            }
+            if (true !== $this->store->lock($childRequest) || !$observer->isLocked($childRequest)) {
+                exit(2);
+            }
+            $this->store->cleanup();
+
+            exit(!$observer->isLocked($childRequest) && $observer->isLocked($this->request) ? 0 : 3);
+        }
+
+        $this->assertGreaterThan(0, $pid);
+        $this->assertSame($pid, pcntl_waitpid($pid, $status));
+        $this->assertTrue(pcntl_wifexited($status));
+        $this->assertSame(0, pcntl_wexitstatus($status));
+        $this->assertTrue($observer->isLocked($this->request));
+        $this->assertTrue($this->store->unlock($this->request));
+        $this->assertFalse($observer->isLocked($this->request));
     }
 
     public function testUnlockFileThatDoesExist()

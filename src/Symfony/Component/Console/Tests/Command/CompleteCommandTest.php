@@ -21,6 +21,7 @@ use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Output\BashCompletionOutput;
 use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -170,6 +171,65 @@ class CompleteCommandTest extends TestCase
 
         $this->assertSame(126, $this->tester->getStatusCode());
         $this->assertStringContainsString('Completion script version is not supported ("0.9" given, ">=1" required).', $this->tester->getDisplay());
+    }
+
+    public function testMergeApplicationDefinitionKeepsNativeArguments()
+    {
+        $this->command->addArgument('native');
+
+        foreach ([false, true, false, true] as $mergeArgs) {
+            $this->command->mergeApplicationDefinition($mergeArgs);
+
+            $this->assertSame($mergeArgs ? ['command', 'native'] : ['native'], array_keys($this->command->getDefinition()->getArguments()));
+        }
+    }
+
+    public function testSetDefinitionClearsMergedDefinition()
+    {
+        foreach ([new InputDefinition([new InputOption('replacement')]), [new InputOption('replacement')]] as $definition) {
+            $this->command->mergeApplicationDefinition();
+            $this->command->setDefinition($definition);
+
+            $this->assertSame($this->command->getNativeDefinition(), $this->command->getDefinition());
+            $this->assertTrue($this->command->getDefinition()->hasOption('replacement'));
+        }
+    }
+
+    public function testSetApplicationClearsMergedDefinition()
+    {
+        $this->command->mergeApplicationDefinition();
+        $this->command->setApplication(null);
+
+        $this->assertSame($this->command->getNativeDefinition(), $this->command->getDefinition());
+
+        $application = new Application();
+        $application->getDefinition()->addOption(new InputOption('other-global'));
+        $this->command->setApplication($application);
+
+        $this->assertSame($this->command->getNativeDefinition(), $this->command->getDefinition());
+
+        $this->command->mergeApplicationDefinition();
+
+        $this->assertTrue($this->command->getDefinition()->hasOption('other-global'));
+        $this->assertFalse($this->command->getDefinition()->hasOption('global-option'));
+    }
+
+    public function testApplicationOptionConflictingWithOwnOption()
+    {
+        $options = $this->application->getDefinition()->getOptions();
+
+        foreach ([
+            [new InputOption('config', 'c', InputOption::VALUE_REQUIRED, '', null, ['foo', 'bar']), '-c'],
+            [new InputOption('config', 'C|s', InputOption::VALUE_REQUIRED, '', null, ['foo', 'bar']), '-s'],
+            [new InputOption('shell', null, InputOption::VALUE_REQUIRED, '', null, ['foo', 'bar']), '--shell'],
+        ] as [$option, $optionToken]) {
+            $this->application->getDefinition()->setOptions($options);
+            $this->application->getDefinition()->addOption($option);
+
+            $this->tester->execute(['-s' => 'bash', '-a' => '1', '-c' => '2', '-i' => ['bin/console', 'hello', $optionToken]], ['verbosity' => OutputInterface::VERBOSITY_DEBUG]);
+
+            $this->assertEquals("foo\nbar".\PHP_EOL, $this->tester->getDisplay());
+        }
     }
 
     private function execute(array $input)

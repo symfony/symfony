@@ -67,9 +67,17 @@ class FileFormField extends FormField
             copy($value, $tmp);
             if (!self::$temporaryFiles) {
                 // Browser history and copied field values can outlive this field.
-                register_shutdown_function(static fn () => array_walk(self::$temporaryFiles, static fn ($file) => @unlink($file)));
+                register_shutdown_function(static function () {
+                    $pid = getmypid();
+
+                    foreach (self::$temporaryFiles as $file => $ownerPid) {
+                        if ($pid === $ownerPid) {
+                            @unlink($file);
+                        }
+                    }
+                });
             }
-            self::$temporaryFiles[] = $tmp;
+            self::$temporaryFiles[$tmp] = getmypid();
             $value = $tmp;
         } else {
             $error = \UPLOAD_ERR_NO_FILE;

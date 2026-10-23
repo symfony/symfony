@@ -41,6 +41,19 @@ class SplitterTest extends TestCase
         $this->assertDictBoundaries(['k' => [5, 4]], '{"k":[10]}');
     }
 
+    public function testSplitCollection()
+    {
+        foreach (['null' => null, '{}' => [], '[]' => [], '{"k":[10]}' => ['k' => [5, 4]], '[100,200]' => [[1, 3], [5, 3]], '[1,[2,3]]' => [[1, 1], [3, 5]]] as $content => $expectedBoundaries) {
+            $resource = fopen('php://temp', 'w');
+            fwrite($resource, $content);
+            rewind($resource);
+
+            $boundaries = Splitter::splitCollection($resource);
+
+            $this->assertSame($expectedBoundaries, null !== $boundaries ? iterator_to_array($boundaries) : null);
+        }
+    }
+
     #[DataProvider('splitMatchesJsonDecodeDataProvider')]
     public function testSplitMatchesJsonDecode(string $json)
     {
@@ -51,16 +64,18 @@ class SplitterTest extends TestCase
         fwrite($resource, $prefix.$json.' , "suffix"');
         rewind($resource);
 
-        $boundaries = array_is_list($expected) && '[' === ltrim($json)[0]
-            ? Splitter::splitList($resource, \strlen($prefix), \strlen($json))
-            : Splitter::splitDict($resource, \strlen($prefix), \strlen($json));
+        $method = array_is_list($expected) && '[' === ltrim($json)[0] ? 'splitList' : 'splitDict';
 
-        $actual = [];
-        foreach ($boundaries as $key => [$offset, $length]) {
-            $actual[$key] = json_decode(stream_get_contents($resource, $length, $offset), true);
+        foreach ([$method, 'splitCollection'] as $method) {
+            $boundaries = Splitter::$method($resource, \strlen($prefix), \strlen($json));
+
+            $actual = [];
+            foreach ($boundaries as $key => [$offset, $length]) {
+                $actual[$key] = json_decode(stream_get_contents($resource, $length, $offset), true);
+            }
+
+            $this->assertSame($expected, $actual);
         }
-
-        $this->assertSame($expected, $actual);
     }
 
     public static function splitMatchesJsonDecodeDataProvider(): iterable
@@ -78,14 +93,15 @@ class SplitterTest extends TestCase
         yield 'escape at chunk edge' => [json_encode([str_repeat('a', 65_531).'\\"', 'b'])];
     }
 
-    public function testSplitWhenStreamIsConsumedBetweenChunks()
+    #[DataProvider('listAndCollectionMethodsProvider')]
+    public function testSplitWhenStreamIsConsumedBetweenChunks(string $method)
     {
         $json = '['.str_repeat('1, ', 40_000).'1]';
         $resource = fopen('php://temp', 'w');
         fwrite($resource, $json);
 
         $count = 0;
-        foreach (Splitter::splitList($resource, 0, \strlen($json)) as $boundary) {
+        foreach (Splitter::$method($resource, 0, \strlen($json)) as $boundary) {
             fseek($resource, 0, \SEEK_END);
             fread($resource, 1);
             ++$count;
@@ -94,12 +110,13 @@ class SplitterTest extends TestCase
         $this->assertSame(40_001, $count);
     }
 
-    public function testSplitDoesNotReadCollectionBeforeIteration()
+    #[DataProvider('listAndCollectionMethodsProvider')]
+    public function testSplitDoesNotReadCollectionBeforeIteration(string $method)
     {
         $resource = fopen('php://temp', 'w+');
         fwrite($resource, '[1,2]');
 
-        $boundaries = Splitter::splitList($resource);
+        $boundaries = Splitter::$method($resource);
 
         rewind($resource);
         fwrite($resource, '[10,2]');
@@ -107,12 +124,13 @@ class SplitterTest extends TestCase
         $this->assertSame([[1, 2], [4, 1]], iterator_to_array($boundaries));
     }
 
-    public function testSplitThrowOnRootChangedBeforeIteration()
+    #[DataProvider('listAndCollectionMethodsProvider')]
+    public function testSplitThrowOnRootChangedBeforeIteration(string $method)
     {
         $resource = fopen('php://temp', 'w+');
         fwrite($resource, '[1,2]');
 
-        $boundaries = Splitter::splitList($resource);
+        $boundaries = Splitter::$method($resource);
 
         rewind($resource);
         fwrite($resource, '{"a":1}');
@@ -123,13 +141,71 @@ class SplitterTest extends TestCase
         iterator_to_array($boundaries);
     }
 
+    public static function listAndCollectionMethodsProvider(): iterable
+    {
+        yield ['splitList'];
+        yield ['splitCollection'];
+    }
+
     public function testSplitNonSeekableStream()
     {
         [$resource, $writer] = stream_socket_pair('\\' === \DIRECTORY_SEPARATOR ? \STREAM_PF_INET : \STREAM_PF_UNIX, \STREAM_SOCK_STREAM, \STREAM_IPPROTO_IP);
         fwrite($writer, '[1, {"a":2}]');
         fclose($writer);
 
-        $this->assertSame([[1, 1], [4, 7]], iterator_to_array(@Splitter::splitList($resource)));
+        $this->assertSame([[1, 1], [4, 7]], iterator_to_array(Splitter::splitList($resource)));
+    }
+
+    #[DataProvider('nonSeekableCollectionDataProvider')]
+    public function testSplitCollectionFromNonSeekableStream(string $json, ?array $expectedBoundaries)
+    {
+        [$resource, $writer] = stream_socket_pair('\\' === \DIRECTORY_SEPARATOR ? \STREAM_PF_INET : \STREAM_PF_UNIX, \STREAM_SOCK_STREAM, \STREAM_IPPROTO_IP);
+        fwrite($writer, $json);
+        fclose($writer);
+
+        try {
+            $boundaries = Splitter::splitCollection($resource);
+
+            $this->assertSame($expectedBoundaries, null !== $boundaries ? iterator_to_array($boundaries) : null);
+        } finally {
+            fclose($resource);
+        }
+    }
+
+    public static function nonSeekableCollectionDataProvider(): iterable
+    {
+        yield 'null' => ['null', null];
+        yield 'empty list' => ['[]', []];
+        yield 'empty dict' => ['{}', []];
+        yield 'list' => ['[1, {"a":2}]', [[1, 1], [4, 7]]];
+        yield 'dict' => ['{"k":[10]}', ['k' => [5, 4]]];
+        yield 'whitespace' => [" \n[true,false]", [[3, 4], [8, 5]]];
+    }
+
+    #[DataProvider('invalidNonSeekableCollectionRootDataProvider')]
+    public function testSplitCollectionRejectsInvalidNonSeekableRootBeforeIteration(string $json)
+    {
+        [$resource, $writer] = stream_socket_pair('\\' === \DIRECTORY_SEPARATOR ? \STREAM_PF_INET : \STREAM_PF_UNIX, \STREAM_SOCK_STREAM, \STREAM_IPPROTO_IP);
+        fwrite($writer, $json);
+        fclose($writer);
+
+        $this->expectException(InvalidStreamException::class);
+
+        try {
+            Splitter::splitCollection($resource);
+        } finally {
+            fclose($resource);
+        }
+    }
+
+    public static function invalidNonSeekableCollectionRootDataProvider(): iterable
+    {
+        yield 'boolean' => ['true'];
+        yield 'number' => ['1'];
+        yield 'string' => ['"x"'];
+        yield 'null followed by scalar' => ['null true'];
+        yield 'null followed by collection' => ['null {}'];
+        yield 'null prefix' => ['nullx'];
     }
 
     public function testRejectsLengthBeyondEndOfStream()

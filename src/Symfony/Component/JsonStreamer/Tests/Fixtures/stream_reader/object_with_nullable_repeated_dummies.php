@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * @return Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies
+ */
+return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $transformers, array $options): mixed {
+    $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNullableRepeatedDummies'] = static function ($data) use ($options, $transformers, &$providers) {
+        $object = new \Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies();
+        if (\array_key_exists('first', $data)) {
+            $value = $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy|null']($data['first']);
+            try {
+                $object->{'first'} = $value;
+            } catch (\TypeError $e) {
+                throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
+            }
+        }
+        if (\array_key_exists('second', $data)) {
+            $value = $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy|null']($data['second']);
+            try {
+                $object->{'second'} = $value;
+            } catch (\TypeError $e) {
+                throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
+            }
+        }
+        return $object;
+    };
+    $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'] = static function ($data) use ($options, $transformers, &$providers) {
+        $object = new \Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy();
+        if (isset($data['id'])) {
+            $value = $data['id'];
+            try {
+                $object->{'id'} = $value;
+            } catch (\TypeError $e) {
+                throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
+            }
+        }
+        if (isset($data['name'])) {
+            $value = $data['name'];
+            try {
+                $object->{'name'} = $value;
+            } catch (\TypeError $e) {
+                throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
+            }
+        }
+        return $object;
+    };
+    $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy|null'] = static function ($data) use ($options, $transformers, &$providers) {
+        if (\is_array($data)) {
+            return $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($data);
+        }
+        if (null === $data) {
+            return null;
+        }
+        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy|null'));
+    };
+    return $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNullableRepeatedDummies'](\Symfony\Component\JsonStreamer\Read\Decoder::decodeString((string) $string));
+};

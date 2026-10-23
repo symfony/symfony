@@ -89,6 +89,10 @@ final class PhpGenerator
      */
     private function generateProviders(DataModelNodeInterface $node, bool $decodeFromStream, array &$context): string
     {
+        if ($node instanceof ObjectNode && $node->isMock()) {
+            return '';
+        }
+
         if ($context['providers'][$node->getIdentifier()] ?? false) {
             return '';
         }
@@ -149,7 +153,13 @@ final class PhpGenerator
 
             $collectionKeyType = $node->getType()->getCollectionKeyType();
 
-            $php .= $decodeFromStream ? $this->line('$data = \\'.Splitter::class.'::'.($collectionKeyType instanceof BuiltinType && TypeIdentifier::INT === $collectionKeyType->getTypeIdentifier() ? 'splitList' : 'splitDict').'($stream, $offset, $length);', $context) : '';
+            $splitMethod = match (true) {
+                $collectionKeyType instanceof BuiltinType && TypeIdentifier::INT === $collectionKeyType->getTypeIdentifier() => 'splitList',
+                $collectionKeyType instanceof BuiltinType && TypeIdentifier::STRING === $collectionKeyType->getTypeIdentifier() => 'splitDict',
+                default => 'splitCollection',
+            };
+
+            $php .= $decodeFromStream ? $this->line('$data = \\'.Splitter::class.'::'.$splitMethod.'($stream, $offset, $length);', $context) : '';
 
             if ($decodeFromStream) {
                 $itemPhp = $this->canBeDecodedWithJsonDecode($node->getItemNode(), $decodeFromStream)
@@ -189,10 +199,6 @@ final class PhpGenerator
         }
 
         if ($node instanceof ObjectNode) {
-            if ($node->isMock()) {
-                return '';
-            }
-
             $arguments = $decodeFromStream ? '$stream, $offset, $length' : '$data';
 
             $php = $this->line('$providers['.var_export($node->getIdentifier(), true)."] = static function ($arguments) use ($uses) {", $context);

@@ -49,6 +49,16 @@ final class Splitter
     /**
      * @param resource $stream
      *
+     * @return \Iterator<array-key, array{0: int, 1: int}>|null
+     */
+    public static function splitCollection($stream, int $offset = 0, ?int $length = null): ?\Iterator
+    {
+        return self::split($stream, $offset, $length, null);
+    }
+
+    /**
+     * @param resource $stream
+     *
      * @return \Iterator<string, array{0: int, 1: int}>|null
      */
     public static function splitDict($stream, int $offset = 0, ?int $length = null): ?\Iterator
@@ -59,24 +69,30 @@ final class Splitter
     /**
      * @param resource $stream
      */
-    private static function split($stream, int $offset, ?int $length, bool $dict): ?\Iterator
+    private static function split($stream, int $offset, ?int $length, ?bool $dict): ?\Iterator
     {
-        $opening = $dict ? '{' : '[';
-
         // non-seekable streams cannot be read twice, so their root is checked eagerly
-        if (stream_get_meta_data($stream)['seekable'] && $opening === self::getFirstChar($stream, $offset, $length)) {
-            return self::createBoundaries($stream, $offset, $length, $dict);
+        if (stream_get_meta_data($stream)['seekable']) {
+            $opening = self::getFirstChar($stream, $offset, $length);
+            $dict ??= '{' === $opening;
+
+            if (($dict ? '{' : '[') === $opening) {
+                return self::createBoundaries($stream, $offset, $length, $dict);
+            }
         }
 
         $scan = self::scan($stream, $offset, $length);
+        $opening = $scan->current();
 
-        if ('null' === $scan->current()) {
+        if ('null' === $opening) {
             $scan->next();
 
             return null;
         }
 
-        if ($opening !== $scan->current()) {
+        $dict ??= '{' === $opening;
+
+        if (($dict ? '{' : '[') !== $opening) {
             throw new InvalidStreamException('JSON is not valid.');
         }
 
@@ -412,7 +428,9 @@ final class Splitter
         $infiniteLength = null === $length;
         $toReadLength = $length;
 
-        rewind($stream);
+        if (stream_get_meta_data($stream)['seekable']) {
+            rewind($stream);
+        }
 
         while (($infiniteLength && !feof($stream)) || $toReadLength > 0) {
             if (false === $chunk = stream_get_contents($stream, $infiniteLength ? self::CHUNK_LENGTH : min(self::CHUNK_LENGTH, $toReadLength), $offset)) {

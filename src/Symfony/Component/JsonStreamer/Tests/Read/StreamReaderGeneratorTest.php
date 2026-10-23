@@ -27,9 +27,11 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithBackedEnumValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithOtherDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
@@ -132,9 +134,11 @@ class StreamReaderGeneratorTest extends TestCase
         yield ['object', Type::object(ClassicDummy::class)];
         yield ['nullable_object', Type::nullable(Type::object(ClassicDummy::class))];
         yield ['object_in_object', Type::object(DummyWithOtherDummies::class)];
+        yield ['object_with_nullable_repeated_dummies', Type::object(DummyWithNullableRepeatedDummies::class)];
         yield ['object_with_nullable_properties', Type::object(DummyWithNullableProperties::class)];
         yield ['object_with_value_transformer', Type::object(DummyWithValueTransformerAttributes::class)];
         yield ['object_with_value_object', Type::object(DummyWithDateTimes::class)];
+        yield ['object_with_backed_enum_value_transformer', Type::object(DummyWithBackedEnumValueTransformer::class)];
         yield ['object_with_synthetic_properties', Type::object(DummyWithSyntheticProperties::class), new SyntheticPropertyMetadataLoader()];
 
         yield ['union', Type::union(Type::int(), Type::list(Type::enum(DummyBackedEnum::class)), Type::object(DummyWithNameAttributes::class))];
@@ -173,6 +177,20 @@ class StreamReaderGeneratorTest extends TestCase
         $this->expectExceptionMessage(\sprintf('Expected "%s" stream value type to be one of "int", "float", "bool", "true", "false", "string", "null", but got "mixed".', UnsupportedStreamValueTypeObjectTransformer::class));
 
         $generator->generate(Type::union(Type::object(DummyWithValueObjects::class), Type::int()), false);
+    }
+
+    public function testGenerateRepeatedNullableObjectsOnlyOnce()
+    {
+        $propertyMetadataLoader = $this->createMock(PropertyMetadataLoaderInterface::class);
+        $propertyMetadataLoader->expects($this->exactly(2))
+            ->method('load')
+            ->willReturnCallback(static fn (string $className): array => DummyWithNullableRepeatedDummies::class === $className ? [
+                'first' => new PropertyMetadata('first', Type::nullable(Type::object(ClassicDummy::class))),
+                'second' => new PropertyMetadata('second', Type::nullable(Type::object(ClassicDummy::class))),
+            ] : []);
+
+        $generator = new StreamReaderGenerator($propertyMetadataLoader, new ServiceContainer(), $this->streamReadersDir);
+        $generator->generate(Type::object(DummyWithNullableRepeatedDummies::class), false);
     }
 
     public function testCallPropertyMetadataLoaderWithProperContext()

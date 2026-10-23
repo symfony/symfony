@@ -72,7 +72,7 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>Please select a valid locale.</source>
-                <target>الرجاء اختيار لغة صالحة.</target>
+                <target>يرجى اختيار إعدادات لغة ومنطقة صالحة.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>Please enter a valid money amount.</source>
@@ -104,11 +104,11 @@
             </trans-unit>
             <trans-unit id="121">
                 <source>Please enter a valid URL.</source>
-                <target>أدخل عنوان الرابط صحيح من فضلك.</target>
+                <target>يرجى إدخال عنوان URL صالح.</target>
             </trans-unit>
             <trans-unit id="122">
                 <source>Please enter a valid search term.</source>
-                <target>الرجاء إدخال مصطلح البحث ساري المفعول.</target>
+                <target>يرجى إدخال عبارة بحث صالحة.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>Please provide a valid phone number.</source>

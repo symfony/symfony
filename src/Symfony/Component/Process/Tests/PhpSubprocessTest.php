@@ -12,8 +12,12 @@
 namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\PhpSubprocess;
 use Symfony\Component\Process\Process;
 
 class PhpSubprocessTest extends TestCase
@@ -39,6 +43,33 @@ class PhpSubprocessTest extends TestCase
 
         $process->mustRun();
         $this->assertEquals($expectedMemoryLimit, trim($process->getOutput()));
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testForkDoesNotRemoveTemporaryIni()
+    {
+        $precision = ini_set('precision', '13');
+        try {
+            $process = new PhpSubprocess(['-r', 'echo ini_get("precision");'], null, null, 5, [self::$phpBin]);
+        } finally {
+            ini_set('precision', $precision);
+        }
+
+        $pid = pcntl_fork();
+        if (-1 === $pid) {
+            $this->fail('Unable to fork.');
+        }
+        if (0 === $pid) {
+            exit(0);
+        }
+
+        $this->assertSame($pid, pcntl_waitpid($pid, $status));
+        $this->assertTrue(pcntl_wifexited($status));
+        $this->assertSame(0, pcntl_wexitstatus($status));
+        $process->mustRun();
+        $this->assertSame('13', $process->getOutput());
     }
 
     public static function subprocessProvider(): \Generator

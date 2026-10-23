@@ -65,6 +65,10 @@ class XliffUtils
         // the subset compiles ten times faster than the full XLIFF 1.2 schema, and the documents it accepts are valid against the full schema too
         if ('1.2' !== $xliffVersion || !@$dom->schemaValidateSource(file_get_contents(__DIR__.'/../Resources/schemas/xliff-core-1.2-subset.xsd'))) {
             $schema = self::getSchema($xliffVersion);
+            if ('2.2' === $xliffVersion && 'urn:oasis:names:tc:xliff:document:2.0' === $dom->documentElement->namespaceURI) {
+                // Keep accepting XLIFF 2.2 files written with the legacy 2.0 namespace.
+                $schema = str_replace('urn:oasis:names:tc:xliff:document:2.2', 'urn:oasis:names:tc:xliff:document:2.0', $schema);
+            }
             libxml_clear_errors();
 
             if (!@$dom->schemaValidateSource($schema)) {
@@ -146,8 +150,11 @@ class XliffUtils
                 $newPath = self::getFileUrl($path);
             } elseif ($tmpfile = tempnam(sys_get_temp_dir(), 'symfony')) {
                 copy($path, $tmpfile);
-                register_shutdown_function(static function () use ($tmpfile) {
-                    @unlink($tmpfile);
+                $pid = getmypid();
+                register_shutdown_function(static function () use ($tmpfile, $pid) {
+                    if (getmypid() === $pid) {
+                        @unlink($tmpfile);
+                    }
                 });
                 $newPath = self::getFileUrl($tmpfile);
             } else {

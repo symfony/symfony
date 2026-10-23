@@ -121,6 +121,24 @@ class FileFormFieldTest extends FormFieldTestCase
                 $third = $other->getValue()['tmp_name'];
                 unset($field, $other);
 
+                if (function_exists('pcntl_fork')) {
+                    if (0 > $pid = pcntl_fork()) {
+                        throw new \RuntimeException('Could not fork.');
+                    }
+
+                    if (0 === $pid) {
+                        $child = new \Symfony\Component\DomCrawler\Field\FileFormField($node);
+                        $child->upload($argv[2]);
+                        echo json_encode($child->getValue()['tmp_name']), "\n";
+                        exit(0);
+                    }
+
+                    if ($pid !== pcntl_waitpid($pid, $status) || !pcntl_wifexited($status) || 0 !== pcntl_wexitstatus($status)) {
+                        throw new \RuntimeException('The child process failed.');
+                    }
+                }
+
+                clearstatcache();
                 echo json_encode([$first, $second, $third, is_file($first), is_file($second), is_file($third), $GLOBALS['shutdownCallbacks']]);
             }
             PHP;
@@ -130,6 +148,9 @@ class FileFormFieldTest extends FormFieldTestCase
         fclose($pipes[1]);
         fclose($pipes[2]);
         $this->assertSame(0, proc_close($process), $errors);
+        $lines = explode("\n", $output);
+        $output = array_pop($lines);
+        $child = $lines ? json_decode($lines[0], true, 512, \JSON_THROW_ON_ERROR) : null;
         [$first, $second, $third, $firstExists, $secondExists, $thirdExists, $shutdownCallbacks] = json_decode($output, true, 512, \JSON_THROW_ON_ERROR);
 
         try {
@@ -141,7 +162,13 @@ class FileFormFieldTest extends FormFieldTestCase
             $this->assertFileDoesNotExist($third);
             $this->assertFileExists(__FILE__);
             $this->assertSame(1, $shutdownCallbacks);
+            if (null !== $child) {
+                $this->assertFileDoesNotExist($child);
+            }
         } finally {
+            if (null !== $child) {
+                @unlink($child);
+            }
             @unlink($first);
             @unlink($second);
             @unlink($third);

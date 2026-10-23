@@ -2,6 +2,7 @@
 SendmailTransport throws a TransportException when proc_open() is disabled
 --INI--
 disable_functions=proc_open
+opcache.enable=0
 --FILE--
 <?php
 

@@ -325,6 +325,51 @@ class XliffFileLoaderTest extends TestCase
         $this->assertEquals(['target-attributes' => ['order' => 1], 'source' => 'bar'], $catalogue->getMetadata('bar', 'domain1'));
     }
 
+    public function testLoadVersion22WithOfficialNamespace()
+    {
+        $xml = <<<'XLIFF'
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:2.2" version="2.2" srcLang="en" trgLang="fr">
+                <file id="f1">
+                    <unit id="u1" name="greeting">
+                        <segment>
+                            <source>Hello</source>
+                            <target>Bonjour</target>
+                        </segment>
+                    </unit>
+                </file>
+            </xliff>
+            XLIFF;
+
+        $catalogue = (new XliffFileLoader())->load($xml, 'fr', 'messages');
+
+        $this->assertSame('Bonjour', $catalogue->get('greeting', 'messages'));
+    }
+
+    #[DataProvider('provideVersion22Namespaces')]
+    public function testLoadVersion22RejectsInvalidContent(string $namespace)
+    {
+        $xml = <<<XLIFF
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="$namespace" version="2.2" srcLang="en" trgLang="fr">
+                <file id="f1">
+                    <invalid/>
+                </file>
+            </xliff>
+            XLIFF;
+
+        $this->expectException(InvalidResourceException::class);
+        $this->expectExceptionMessage("Element '{{$namespace}}invalid': This element is not expected.");
+
+        (new XliffFileLoader())->load($xml, 'fr', 'messages');
+    }
+
+    public static function provideVersion22Namespaces(): iterable
+    {
+        yield 'official' => ['urn:oasis:names:tc:xliff:document:2.2'];
+        yield 'legacy' => ['urn:oasis:names:tc:xliff:document:2.0'];
+    }
+
     public function testLoadVersion2WithCatalogMeta()
     {
         $loader = new XliffFileLoader();
@@ -464,9 +509,12 @@ class XliffFileLoaderTest extends TestCase
         $this->assertSame('My Value', $metadata['segment-attributes']['subState']);
     }
 
-    public function testLoadVersion22WithPgsPlural()
+    #[DataProvider('provideVersion22Namespaces')]
+    public function testLoadVersion22WithPgsPlural(string $namespace)
     {
-        $catalogue = new XliffFileLoader()->load(__DIR__.'/../Fixtures/resources-2.2-pgs-plural.xlf', 'fr', 'domain1');
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'.file_get_contents(__DIR__.'/../Fixtures/resources-2.2-pgs-plural.xlf');
+        $xml = str_replace('urn:oasis:names:tc:xliff:document:2.0', $namespace, $xml);
+        $catalogue = new XliffFileLoader()->load($xml, 'fr', 'domain1');
 
         $intlDomain = 'domain1'.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
 

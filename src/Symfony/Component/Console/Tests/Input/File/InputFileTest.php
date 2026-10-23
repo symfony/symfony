@@ -294,6 +294,53 @@ class InputFileTest extends TestCase
         }
     }
 
+    #[RequiresPhpExtension('pcntl')]
+    public function testTemporaryFilesAreOnlyRemovedByTheirCreatingProcess()
+    {
+        $code = <<<'PHP'
+            use Symfony\Component\Console\Input\File\InputFile;
+
+            require $argv[1];
+
+            $file = InputFile::fromData('parent');
+
+            if (0 > $pid = pcntl_fork()) {
+                throw new RuntimeException('Could not fork.');
+            }
+
+            if (0 === $pid) {
+                $childFile = InputFile::fromData('child');
+                file_put_contents($argv[2], $childFile->getPathname());
+                exit(0);
+            }
+
+            if ($pid !== pcntl_waitpid($pid, $status) || !pcntl_wifexited($status) || 0 !== pcntl_wexitstatus($status)) {
+                throw new RuntimeException('The child process failed.');
+            }
+
+            clearstatcache();
+            $childPath = file_get_contents($argv[2]);
+            echo json_encode([$file->getPathname(), $childPath, $file->isValid() ? $file->getContents() : null, is_file($childPath)]);
+            PHP;
+        $process = proc_open([\PHP_BINARY, '-r', $code, (new \ReflectionClass(InputFile::class))->getFileName(), $this->tempDir.'/child-path'], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+        $output = stream_get_contents($pipes[1]);
+        $errors = stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        $this->assertSame(0, proc_close($process), $errors);
+        [$parentPath, $childPath, $parentContents, $childExists] = json_decode($output, true, 512, \JSON_THROW_ON_ERROR);
+
+        try {
+            $this->assertSame('parent', $parentContents);
+            $this->assertFalse($childExists);
+            $this->assertFileDoesNotExist($parentPath);
+            $this->assertFileDoesNotExist($childPath);
+        } finally {
+            @unlink($parentPath);
+            @unlink($childPath);
+        }
+    }
+
     public function testCleanupRemovesTempFile()
     {
         $file = InputFile::fromData('test content');

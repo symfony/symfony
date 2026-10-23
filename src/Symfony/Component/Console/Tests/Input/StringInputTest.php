@@ -68,6 +68,10 @@ class StringInputTest extends TestCase
             ['--long-option=\'foo bar\'', ['--long-option=foo bar'], '->tokenize() parses long options with a value'],
             ["--long-option='foo bar''another'", ['--long-option=foo baranother'], '->tokenize() parses long options with a value'],
             ["--long-option='foo bar'\"another\"", ['--long-option=foo baranother'], '->tokenize() parses long options with a value'],
+            ["--long-option='{\"foo\":\"\"}'", ['--long-option={"foo":""}'], '->tokenize() keeps quotes inside a quoted value'],
+            ["--long-option=\"foo = ''\"", ["--long-option=foo = ''"], '->tokenize() keeps quotes inside a quoted value'],
+            ["--long-option=\"foo \\\"'bar\"", ["--long-option=foo \"'bar"], '->tokenize() keeps quotes inside a quoted value'],
+            ["-a'\"\"'", ['-a""'], '->tokenize() keeps quotes inside a quoted value'],
             ['foo -a -ffoo --long bar', ['foo', '-a', '-ffoo', '--long', 'bar'], '->tokenize() parses when several arguments and options'],
             ["--arg=\\\"'Jenny'\''s'\\\"", ["--arg=\"Jenny's\""], '->tokenize() parses quoted quotes'],
         ];

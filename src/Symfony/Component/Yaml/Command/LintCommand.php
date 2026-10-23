@@ -274,6 +274,7 @@ class LintCommand extends Command
         return match ($this->format) {
             'txt' => $this->displayTxt($io, $files),
             'json' => $this->displayJson($io, $files),
+            'junit' => $this->displayJunit($io, $files),
             'github' => $this->displayTxt($io, $files, true),
             'gitlab' => class_exists(GitlabCiReporter::class)
                 ? $this->displayGitlab($io, $files)
@@ -337,6 +338,41 @@ class LintCommand extends Command
         }
 
         return min($erroredFiles, 1);
+    }
+
+    private function displayJunit(SymfonyStyle $io, array $filesInfo): int
+    {
+        $failures = 0;
+        $testCases = '';
+
+        foreach ($filesInfo as $info) {
+            $file = $this->escapeXml((string) ($info['file'] ?? 'php://stdin'));
+            $testCases .= \sprintf('    <testcase name="%s" classname="lint:yaml" file="%s"', $file, $file);
+
+            if ($info['valid']) {
+                $testCases .= "/>\n";
+
+                continue;
+            }
+
+            ++$failures;
+            $message = $this->escapeXml($info['message']);
+            $testCases .= \sprintf(">\n      <failure type=\"error\" message=\"%s\">%s</failure>\n    </testcase>\n", $message, $message);
+        }
+
+        $io->writeln('<?xml version="1.0" encoding="UTF-8"?>', OutputInterface::OUTPUT_RAW);
+        $io->writeln('<testsuites>', OutputInterface::OUTPUT_RAW);
+        $io->writeln(\sprintf('  <testsuite name="lint:yaml" tests="%d" failures="%d" errors="0">', \count($filesInfo), $failures), OutputInterface::OUTPUT_RAW);
+        $io->write($testCases, false, OutputInterface::OUTPUT_RAW);
+        $io->writeln('  </testsuite>', OutputInterface::OUTPUT_RAW);
+        $io->writeln('</testsuites>', OutputInterface::OUTPUT_RAW);
+
+        return min($failures, 1);
+    }
+
+    private function escapeXml(string $value): string
+    {
+        return htmlspecialchars($value, \ENT_XML1 | \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
     }
 
     private function displayJson(SymfonyStyle $io, array $filesInfo): int
@@ -419,7 +455,7 @@ class LintCommand extends Command
     /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
-        $formats = ['txt', 'json', 'github'];
+        $formats = ['txt', 'json', 'github', 'junit'];
 
         if (class_exists(GitlabCiReporter::class)) {
             $formats[] = 'gitlab';

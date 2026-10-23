@@ -54,6 +54,7 @@ trait TransportResponseTrait
     private array $trailers = [];
     private ?LoggerInterface $logger = null;
     private bool $didTimeout = false;
+    private int $pendingSize = 0;
 
     public function getStatusCode(): int
     {
@@ -91,6 +92,7 @@ trait TransportResponseTrait
     {
         $this->canary->cancel();
         $this->inflate = null;
+        $this->pendingSize = 0;
     }
 
     /**
@@ -205,6 +207,10 @@ trait TransportResponseTrait
 
                     while ($multi->handlesActivity[$j] ?? false) {
                         if (\is_string($chunk = array_shift($multi->handlesActivity[$j]))) {
+                            if ($response->pendingSize) {
+                                $response->pendingSize -= \strlen($chunk);
+                            }
+
                             if (null !== $response->inflate && false === $chunk = @inflate_add($response->inflate, $chunk)) {
                                 $multi->handlesActivity[$j] = [null, new TransportException(\sprintf('Error while processing content unencoding for "%s".', $response->getInfo('url')))];
                                 continue;

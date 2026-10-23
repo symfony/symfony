@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bridge\PhpUnit\DnsMock;
+use Symfony\Component\HttpClient\AmpHttpClient;
+use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
@@ -330,6 +332,137 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         }
 
         $this->assertCount(2, $completed);
+    }
+
+    public function testBackpressureLimitsUnreadResponseData()
+    {
+        $this->assertBackpressureLimitsResponseData(__FUNCTION__, '/body');
+    }
+
+    public function testBackpressureLimitsUnreadChunkedResponseData()
+    {
+        $this->assertBackpressureLimitsResponseData(__FUNCTION__, '/chunked');
+    }
+
+    public function testBackpressureRemainsAfterReleasingAManualPause()
+    {
+        $this->assertBackpressureLimitsResponseData(__FUNCTION__, '/body', true);
+    }
+
+    public function testBackpressurePreservesAManualPause()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        if (!$client instanceof CurlHttpClient) {
+            $this->markTestSkipped('This test requires cURL backpressure.');
+        }
+
+        $server = TestHttpServer::start(8067, __DIR__.'/Fixtures/backpressure');
+
+        try {
+            $response = $client->request('GET', 'http://localhost:8067/body', ['buffer' => false]);
+            $this->assertSame(200, $response->getStatusCode());
+            usleep(100000);
+
+            $state = (new \ReflectionProperty($client, 'multi'))->getValue($client);
+            $pause = $response->getInfo('pause_handler');
+            $body = '';
+            $timedOut = false;
+
+            do {
+                $received = false;
+                foreach ($client->stream($response) as $chunk) {
+                    if ('' !== $data = $chunk->getContent()) {
+                        $body .= $data;
+                        $received = true;
+                        break;
+                    }
+                }
+
+                $this->assertTrue($received);
+                $this->assertPendingResponseDataIsBounded($client);
+                usleep(1000);
+            } while ($client instanceof CurlHttpClient && !$state->pausedHandles);
+
+            if ($client instanceof CurlHttpClient) {
+                $this->assertNotEmpty($state->pausedHandles);
+            }
+
+            $pause(30);
+
+            try {
+                foreach ($client->stream($response, 0.1) as $chunk) {
+                    if ($chunk->isTimeout()) {
+                        $timedOut = true;
+                        break;
+                    }
+
+                    $body .= $chunk->getContent();
+                    $this->assertPendingResponseDataIsBounded($client);
+                }
+            } finally {
+                $pause(0);
+            }
+
+            $this->assertTrue($timedOut);
+            $this->assertSame($this->getBackpressureBodyHash(), hash('sha256', $body.stream_get_contents($response->toStream(false))));
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testBackpressureCanBeCanceled()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $server = TestHttpServer::start(8067, __DIR__.'/Fixtures/backpressure');
+
+        try {
+            $response = $client->request('GET', 'http://localhost:8067/body', ['buffer' => false]);
+            $this->assertSame(200, $response->getStatusCode());
+            usleep(100000);
+
+            $stream = $response->toStream(false);
+            $state = (new \ReflectionProperty($client, 'multi'))->getValue($client);
+
+            do {
+                $this->assertNotEmpty(fread($stream, 8192));
+                $this->assertPendingResponseDataIsBounded($client);
+                usleep(1000);
+            } while ($client instanceof CurlHttpClient && !$state->pausedHandles && !feof($stream));
+
+            if ($client instanceof CurlHttpClient) {
+                $this->assertNotEmpty($state->pausedHandles);
+            }
+
+            $response->cancel();
+            fclose($stream);
+
+            $this->assertTrue($response->getInfo('canceled'));
+            $this->assertSame([], $state->handlesActivity);
+            $this->assertSame([], $state->openHandles);
+            $this->assertSame(200, $client->request('GET', 'http://localhost:8057/')->getStatusCode());
+        } finally {
+            $server->stop();
+        }
+    }
+
+    public function testBackpressureAllowsOutOfOrderResponseConsumption()
+    {
+        $clientClass = $this->getHttpClient(__FUNCTION__)::class;
+        $client = AmpHttpClient::class === $clientClass ? new $clientClass([], null, 1) : new $clientClass([], 1);
+        $server = TestHttpServer::start(8067, __DIR__.'/Fixtures/backpressure');
+
+        try {
+            $first = $client->request('GET', 'http://localhost:8067/body', ['buffer' => false, 'timeout' => 2]);
+            $this->assertSame(200, $first->getStatusCode());
+
+            $second = $client->request('GET', 'http://localhost:8067/', ['timeout' => 2]);
+
+            $this->assertSame('Success', $second->getContent());
+            $this->assertSame($this->getBackpressureBodyHash(), hash('sha256', stream_get_contents($first->toStream(false))));
+        } finally {
+            $server->stop();
+        }
     }
 
     public function testSeekAsyncStream()
@@ -1034,5 +1167,67 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $info = $response->getInfo();
         $this->assertSame('/run/docker.sock', $info['primary_ip']);
+    }
+
+    private function assertBackpressureLimitsResponseData(string $testCase, string $path, bool $releasePause = false): void
+    {
+        $client = $this->getHttpClient($testCase);
+        $server = TestHttpServer::start(8067, __DIR__.'/Fixtures/backpressure');
+
+        try {
+            $response = $client->request('GET', 'http://localhost:8067'.$path, ['buffer' => false]);
+            $this->assertSame(200, $response->getStatusCode());
+            usleep(100000);
+            $stream = $response->toStream(false);
+            $state = (new \ReflectionProperty($client, 'multi'))->getValue($client);
+            $body = '';
+
+            while (!feof($stream)) {
+                $body .= fread($stream, 8192);
+                $this->assertPendingResponseDataIsBounded($client);
+
+                if ($releasePause && (!$client instanceof CurlHttpClient || $state->pausedHandles)) {
+                    if ($client instanceof CurlHttpClient) {
+                        $this->assertNotEmpty($state->pausedHandles);
+                    }
+
+                    $pause = $response->getInfo('pause_handler');
+                    $pause(30);
+                    $pause(0);
+                    $releasePause = false;
+                }
+
+                usleep(1000);
+            }
+
+            $this->assertFalse($releasePause);
+            $this->assertSame($this->getBackpressureBodyHash(), hash('sha256', $body));
+        } finally {
+            $server->stop();
+        }
+    }
+
+    private function assertPendingResponseDataIsBounded(HttpClientInterface $client): void
+    {
+        $state = (new \ReflectionProperty($client, 'multi'))->getValue($client);
+        $pendingBytes = 0;
+
+        foreach ($state->handlesActivity as $activity) {
+            foreach ($activity as $chunk) {
+                $pendingBytes += \is_string($chunk) ? \strlen($chunk) : 0;
+            }
+        }
+
+        $this->assertLessThanOrEqual(1048576 + 16384, $pendingBytes);
+    }
+
+    private function getBackpressureBodyHash(): string
+    {
+        $hash = hash_init('sha256');
+        for ($i = 0; $i < 256; ++$i) {
+            hash_update($hash, str_repeat(\chr($i), 16384));
+        }
+
+        return hash_final($hash);
     }
 }

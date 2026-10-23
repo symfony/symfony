@@ -48,6 +48,9 @@ final class AmpClientState extends ClientState
     public int $responseCount = 0;
     public array $pushedResponses = [];
     public array $clients = [];
+    /** @var array<string, DeferredFuture> */
+    public array $pausedResponses = [];
+    public array $streamingResponses = [];
 
     private \Closure $clientConfigurator;
 

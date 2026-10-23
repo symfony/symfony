@@ -93,6 +93,15 @@ class ConnectionTest extends TestCase
             'mongodb://localhost:27017/db',
         ];
 
+        foreach (['%61pp' => 'app', '%2561pp' => '%61pp', '0' => '0', '%30' => '0'] as $path => $database) {
+            yield 'database path '.$path => [
+                'mongodb://localhost/'.$path,
+                [],
+                ['database' => $database] + $defaultConfiguration,
+                'mongodb://localhost/'.$path,
+            ];
+        }
+
         yield 'settings from the DSN query string are extracted' => [
             'mongodb://localhost:27017/db?collection_name=my_collection&queue_name=my_queue&redeliver_timeout=100',
             [],

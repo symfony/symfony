@@ -268,7 +268,8 @@ trait MongoDbTrait
             parse_str($params['query'], $query);
         }
 
-        $options['database_name'] ??= $query['database_name'] ?? (ltrim($params['path'] ?? '', '/') ?: self::DSN_OPTIONS['database_name']);
+        $database = rawurldecode(ltrim($params['path'] ?? '', '/'));
+        $options['database_name'] ??= $query['database_name'] ?? ('' !== $database ? $database : self::DSN_OPTIONS['database_name']);
         $options['collection_name'] ??= $query['collection_name'] ?? self::DSN_OPTIONS['collection_name'];
         $options['namespace'] ??= $query['namespace'] ?? '';
 

@@ -108,7 +108,8 @@ class Connection
         }
 
         $configuration = $options + array_intersect_key($query, self::DEFAULT_OPTIONS) + self::DEFAULT_OPTIONS;
-        $configuration['database'] ??= ltrim($components['path'] ?? '', '/') ?: null;
+        $database = rawurldecode(ltrim($components['path'] ?? '', '/'));
+        $configuration['database'] ??= '' !== $database ? $database : null;
 
         if (null === $configuration['database']) {
             throw new InvalidArgumentException('The MongoDB Messenger transport requires a "database", provide it in the DSN path or as an option.');

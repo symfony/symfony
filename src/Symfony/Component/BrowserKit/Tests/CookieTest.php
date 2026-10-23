@@ -101,11 +101,120 @@ class CookieTest extends TestCase
         $this->assertEquals('foo=bar; domain=www.myotherexample.com; path=/', (string) Cookie::fromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
     }
 
+    public function testFromStringNormalizesDomains()
+    {
+        $this->assertSame('www.example.com', Cookie::fromString('foo=bar', 'http://WWW.Example.COM/')->getDomain());
+        $this->assertSame('example.com', Cookie::fromString('foo=bar; Domain=.Example.COM')->getDomain());
+    }
+
+    public function testFromStringRejectsAnEmptyDomainAfterNormalization()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Cookie::fromString('foo=bar; Domain=.');
+    }
+
+    public function testFromStringRejectsAnEmptyNameAndValue()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Cookie::fromString("\t = \t");
+    }
+
+    #[DataProvider('provideNamelessCookies')]
+    public function testFromStringParsesNamelessCookies(string $header)
+    {
+        $cookie = Cookie::fromString($header);
+
+        $this->assertSame('', $cookie->getName());
+        $this->assertSame('token', $cookie->getRawValue());
+        $this->assertEquals($cookie, Cookie::fromString((string) $cookie));
+    }
+
+    public static function provideNamelessCookies(): iterable
+    {
+        yield ['token'];
+        yield ['=token'];
+        yield ["\t token \t"];
+        yield ["\t = token \t"];
+    }
+
+    #[DataProvider('provideCookiesWithControlCharacters')]
+    public function testFromStringRejectsControlCharacters(string $cookie)
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Cookie::fromString($cookie);
+    }
+
+    public static function provideCookiesWithControlCharacters(): iterable
+    {
+        foreach (array_merge(range(0, 8), range(10, 31), [127]) as $byte) {
+            foreach (['fo%so=bar', 'foo=ba%sr', 'foo=bar; Path=/fo%so', 'foo=bar; unknown=ba%sr'] as $format) {
+                yield [\sprintf($format, \chr($byte))];
+            }
+        }
+    }
+
+    #[DataProvider('provideOversizedCookies')]
+    public function testFromStringRejectsOversizedCookies(string $cookie)
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Cookie::fromString($cookie);
+    }
+
+    public static function provideOversizedCookies(): iterable
+    {
+        yield ['f='.str_repeat('a', 4096)];
+        yield [str_repeat('a', 4096).'=v'];
+    }
+
+    public function testFromStringAcceptsCookiesAtTheSizeLimit()
+    {
+        $value = str_repeat('a', 4095);
+        $cookie = Cookie::fromString("\tf = $value\t");
+
+        $this->assertSame('f', $cookie->getName());
+        $this->assertSame($value, $cookie->getRawValue());
+    }
+
+    public function testFromStringPreservesTabsAndNonAsciiBytes()
+    {
+        $this->assertSame("bar\tbaz\x80", Cookie::fromString("foo=bar\tbaz\x80")->getRawValue());
+    }
+
+    #[DataProvider('provideOversizedAttributes')]
+    public function testFromStringIgnoresOversizedAttributes(string $attributes, string $getter, mixed $expected)
+    {
+        $cookie = Cookie::fromString('foo=bar; '.$attributes, 'https://example.com/account/login');
+
+        $this->assertSame($expected, $cookie->$getter());
+    }
+
+    public static function provideOversizedAttributes(): iterable
+    {
+        yield ['Path=/account; Path=/'.str_repeat('a', 1024), 'getPath', '/account'];
+        yield ['Domain=example.com; Domain='.str_repeat('a', 1025), 'getDomain', 'example.com'];
+        yield ['SameSite=Lax; SameSite='.str_repeat('a', 1025), 'getSameSite', 'Lax'];
+        yield ['Expires=Wed, 09 Jun 2032 10:18:14 GMT; Expires='.str_repeat('a', 1025), 'getExpiresTime', '1970389094'];
+        yield ['Max-Age=0; Max-Age='.str_repeat('0', 1024).'1', 'isExpired', true];
+        yield ['Secure='.str_repeat('a', 1025), 'isSecure', false];
+        yield ['HttpOnly='.str_repeat('a', 1025), 'isHttpOnly', false];
+    }
+
+    public function testFromStringAcceptsAttributesAtTheSizeLimit()
+    {
+        $path = '/'.str_repeat('a', 1023);
+
+        $this->assertSame($path, Cookie::fromString('foo=bar; Path='.$path)->getPath());
+    }
+
     public function testFromStringTrimsAttributeNamesAndValues()
     {
         $cookie = Cookie::fromString('foo=bar; Domain = .example.com; Path = /account; Expires = Fri, 20 May 2011 15:25:52 GMT; SameSite = Lax', 'http://www.example.com/');
 
-        $this->assertSame('.example.com', $cookie->getDomain());
+        $this->assertSame('example.com', $cookie->getDomain());
         $this->assertSame('/account', $cookie->getPath());
         $this->assertSame('1305905152', $cookie->getExpiresTime());
         $this->assertSame('Lax', $cookie->getSameSite());
@@ -180,7 +289,7 @@ class CookieTest extends TestCase
     public function testFromStringThrowsAnExceptionIfCookieIsNotValid()
     {
         $this->expectException(InvalidArgumentException::class);
-        Cookie::fromString('foo');
+        Cookie::fromString('');
     }
 
     public function testFromStringIgnoresInvalidExpiresDate()

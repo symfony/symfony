@@ -17,6 +17,10 @@ AssetMapper
 BrowserKit
 ----------
 
+ * [BC BREAK] `CookieJar::updateFromSetCookie()` and `updateFromResponse()` no longer split comma-separated cookies. Send each cookie in a separate `Set-Cookie` header
+ * [BC BREAK] `Cookie::fromString()` normalizes cookie domains to lowercase and removes the leading dot. `CookieJar` treats these domain spellings as equivalent. A `Domain=.` attribute is rejected
+ * [BC BREAK] `Cookie::fromString()` treats a header without `=` as a nameless cookie. Cookies whose name and value are both empty are rejected
+ * [BC BREAK] `Cookie::fromString()` rejects control bytes other than tabs and cookies whose name and value exceed 4096 bytes. Attribute values longer than 1024 bytes are ignored
  * [BC BREAK] `CookieJar::updateFromSetCookie()` and `updateFromResponse()` ignore a cookie whose `Domain` attribute does not match the host of the response, as browsers do
  * [BC BREAK] `CookieJar` sends a cookie set without a `Domain` attribute only to the host that set it, not to its subdomains, as browsers do
 

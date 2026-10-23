@@ -444,6 +444,41 @@ class FormTest extends TestCase
         $this->assertEquals(['foo[bar]' => 'foo', 'bar' => 'bar', 'baz' => []], $form->getValues(), '->getValues() returns all form field values from template field inside a turbo-stream');
     }
 
+    public function testSelectDefaultSkipsDisabledOptions()
+    {
+        $form = $this->createForm('<form><select name="choice"><option disabled>foo</option><option>bar</option></select><input type="submit" /></form>');
+        $this->assertSame(['choice' => 'bar'], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice"><optgroup disabled><option>foo</option></optgroup><optgroup><option>bar</option></optgroup></select><input type="submit" /></form>');
+        $this->assertSame(['choice' => 'bar'], $form->getValues());
+    }
+
+    public function testSelectDefaultPreservesExplicitSelection()
+    {
+        $form = $this->createForm('<form><select name="choice"><option selected disabled>foo</option><option>bar</option></select><input type="submit" /></form>');
+        $this->assertSame([], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice"><optgroup disabled><option selected>foo</option></optgroup><option>bar</option></select><input type="submit" /></form>');
+        $this->assertSame([], $form->getValues());
+
+        $form['choice']->select('bar');
+        $this->assertSame(['choice' => 'bar'], $form->getValues());
+        $form['choice']->select('foo');
+        $this->assertSame([], $form->getValues());
+    }
+
+    public function testSelectDefaultWithAllOptionsDisabled()
+    {
+        $form = $this->createForm('<form><select name="choice"><option disabled>foo</option><optgroup disabled><option>bar</option></optgroup></select><input type="submit" /></form>');
+        $this->assertSame([], $form->getValues());
+    }
+
+    public function testSelectWithSizeDoesNotChooseEnabledDefault()
+    {
+        $form = $this->createForm('<form><select name="choice" size="2"><option disabled>foo</option><option>bar</option></select><input type="submit" /></form>');
+        $this->assertSame([], $form->getValues());
+    }
+
     public function testSetValues()
     {
         $form = $this->createForm('<form><input type="checkbox" name="foo" value="foo" checked="checked" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');

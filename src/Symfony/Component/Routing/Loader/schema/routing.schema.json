@@ -76,17 +76,7 @@
         "format": { "type": ["string", "null"] },
         "utf8": { "type": ["boolean", "null"] },
         "stateless": { "type": ["boolean", "null"] },
-        "firewall": { "type": ["string", "null"] },
-        "deprecated": {
-          "type": "object",
-          "properties": {
-            "package": { "type": "string" },
-            "version": { "type": "string" },
-            "message": { "type": "string" }
-          },
-          "required": ["package", "version"],
-          "additionalProperties": false
-        }
+        "firewall": { "type": ["string", "null"] }
       },
       "required": ["path"],
       "additionalProperties": false

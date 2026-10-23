@@ -274,6 +274,11 @@ class SplitterTest extends TestCase
      */
     public static function rfc8259ComplianceProvider(): iterable
     {
+        yield 'string_unpaired_high_surrogate' => ['string_unpaired_high_surrogate', '["\uD800"]', false];
+        yield 'string_unpaired_low_surrogate' => ['string_unpaired_low_surrogate', '["\uDC00"]', false];
+        yield 'key_unpaired_high_surrogate' => ['key_unpaired_high_surrogate', '{"\uD800":1}', false];
+        yield 'key_unpaired_low_surrogate' => ['key_unpaired_low_surrogate', '{"\uDC00":1}', false];
+
         $testSuitePath = self::getRfc8259TestSuitePath();
         if (null === $testSuitePath) {
             yield 'json-test-suite-missing' => ['JSON Test Suite Missing', '{}', true];

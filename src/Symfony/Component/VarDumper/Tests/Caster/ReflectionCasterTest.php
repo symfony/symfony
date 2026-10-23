@@ -66,7 +66,7 @@ class ReflectionCasterTest extends TestCase
                     "name" => ReflectionProperty {
                 %A    +name: "name"
                       +class: "ReflectionClass"
-                %A    modifiers: "public"
+                %A    modifiers: "public%S"
                     }
                 %A]
                   methods: array:%d [

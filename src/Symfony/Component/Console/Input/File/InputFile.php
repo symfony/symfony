@@ -24,7 +24,7 @@ use Symfony\Component\Mime\MimeTypes;
  */
 final class InputFile extends \SplFileInfo
 {
-    /** @var string[] */
+    /** @var array<string, int|false> */
     private static array $tempFiles = [];
     private static bool $shutdownRegistered = false;
 
@@ -46,7 +46,7 @@ final class InputFile extends \SplFileInfo
                 register_shutdown_function(self::cleanupAll(...));
                 self::$shutdownRegistered = true;
             }
-            self::$tempFiles[$path] = $path;
+            self::$tempFiles[$path] = getmypid();
         }
     }
 
@@ -221,8 +221,10 @@ final class InputFile extends \SplFileInfo
      */
     public static function cleanupAll(): void
     {
-        foreach (self::$tempFiles as $path) {
-            if (file_exists($path)) {
+        $pid = getmypid();
+
+        foreach (self::$tempFiles as $path => $ownerPid) {
+            if ($pid === $ownerPid && file_exists($path)) {
                 @unlink($path);
             }
         }

@@ -59,7 +59,7 @@ class XliffFileDumperTest extends TestCase
     }
 
     #[DataProvider('provideXliff2Versions')]
-    public function testFormatCatalogueWithNewXliffVersions(string $version, string $namespace): void
+    public function testFormatCatalogueWithNewXliffVersions(string $version, string $namespace)
     {
         $catalogue = new MessageCatalogue('fr');
         $catalogue->add(['greeting' => 'Bonjour']);

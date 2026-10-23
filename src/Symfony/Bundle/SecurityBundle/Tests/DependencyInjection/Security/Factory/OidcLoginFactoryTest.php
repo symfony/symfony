@@ -66,6 +66,45 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertSame(['kernel.reset' => [['method' => 'reset']]], $discoveryMain->getTags());
     }
 
+    public function testTheDiscoveryUrlIsLeftRelativeToTheIssuerByDefault()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+            'check_path' => '/oidc/callback',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $discovery = $container->getDefinition('security.authenticator.oidc_login.discovery.main');
+        $this->assertArrayNotHasKey('index_2', $discovery->getArguments());
+        $this->assertSame('https://provider.example.com', $discovery->getArgument(3));
+    }
+
+    public function testDiscoveryUriNamesTheDocumentUrlAndLeavesTheIssuerAlone()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'discovery_uri' => 'https://provider.internal/.well-known/openid-configuration',
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+            'check_path' => '/oidc/callback',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $discovery = $container->getDefinition('security.authenticator.oidc_login.discovery.main');
+        $this->assertSame('https://provider.internal/.well-known/openid-configuration', $discovery->getArgument(2));
+        $this->assertSame('https://provider.example.com', $discovery->getArgument(3));
+    }
+
     public function testTheServicesThatReachTheProviderAreLazy()
     {
         $container = new ContainerBuilder();
@@ -500,6 +539,55 @@ class OidcLoginFactoryTest extends TestCase
             'client_id' => 'my-client-id',
             'client_authentication' => 'app.client_authentication',
         ], $factory);
+    }
+
+    #[DataProvider('provideInvalidDiscoveryUris')]
+    public function testRejectsNonHttpsDiscoveryUri(string $uri)
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The OIDC "discovery_uri" must use HTTPS');
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'discovery_uri' => $uri,
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'app.client_authentication',
+        ], $factory);
+    }
+
+    public static function provideInvalidDiscoveryUris(): iterable
+    {
+        yield 'remote HTTP' => ['http://provider.internal/.well-known/openid-configuration'];
+        yield 'relative path' => ['private/config'];
+        yield 'scheme-relative URL' => ['//localhost/config'];
+        yield 'scheme without a host' => ['https:config'];
+        yield 'non-HTTP loopback URL' => ['ftp://localhost/config'];
+    }
+
+    #[DataProvider('provideSecureDiscoveryUris')]
+    public function testAcceptsSecureDiscoveryUris(string $uri)
+    {
+        $factory = new OidcLoginFactory();
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'discovery_uri' => $uri,
+            'client_id' => 'my-client-id',
+            'client_authentication' => 'none',
+        ], $factory);
+
+        $this->assertSame($uri, $config['discovery_uri']);
+    }
+
+    public static function provideSecureDiscoveryUris(): iterable
+    {
+        yield 'HTTPS' => ['https://metadata.example.com/config?tenant=app'];
+        yield 'uppercase scheme' => ['HTTPS://metadata.example.com/config'];
+        yield 'localhost' => ['http://localhost:8080/config'];
+        yield 'IPv4 loopback' => ['http://127.0.0.1:8080/config'];
+        yield 'IPv6 loopback' => ['http://[::1]:8080/config'];
+        yield 'localhost subdomain' => ['http://provider.localhost/config'];
     }
 
     public function testAcceptsAnUppercaseSchemeInTheProviderUri()

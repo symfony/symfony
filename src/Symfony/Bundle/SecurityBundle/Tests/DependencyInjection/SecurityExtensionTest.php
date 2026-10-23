@@ -23,6 +23,7 @@ use Symfony\Bundle\SecurityBundle\Security\TestBrowserAccessTokenAuthenticator;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProviderFactory\CustomProviderFactory;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProviderFactory\DummyProviderFactory;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -37,6 +38,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,6 +76,7 @@ use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\NoClientAuthenti
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\PrivateKeyJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\SelfSignedTlsClientAuth;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\TlsClientAuth;
+use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -2028,6 +2031,81 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertTrue($container->hasDefinition('security.authenticator.oidc_login.main'));
+    }
+
+    #[DataProvider('provideOidcDiscoveryEnvironmentVariables')]
+    public function testOidcLoginResolvesDiscoveryEnvironmentVariables(string $uri, ?string $expectedUrl)
+    {
+        $container = $this->getRawContainer();
+        $container->getCompilerPassConfig()->setOptimizationPasses([
+            new ValidateEnvPlaceholdersPass(),
+            new ResolveChildDefinitionsPass(),
+        ]);
+        $container->register('app.oidc_client', MockHttpClient::class);
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com/tenant',
+                        'discovery_uri' => '%env(SYMFONY_TEST_OIDC_DISCOVERY_URI)%',
+                        'client_id' => 'app',
+                        'client_authentication' => 'none',
+                        'http_client' => 'app.oidc_client',
+                    ],
+                ],
+            ],
+        ]);
+        $container->compile();
+
+        $definition = $container->getDefinition('security.authenticator.oidc_login.discovery.main');
+        $this->assertEquals(new Reference('app.oidc_client'), $definition->getArgument(0));
+        $this->assertSame('https://provider.example.com/tenant', $definition->getArgument(3));
+        $requested = null;
+        $httpClient = new MockHttpClient(static function (string $method, string $url) use (&$requested): JsonMockResponse {
+            $requested = $url;
+
+            return new JsonMockResponse([
+                'issuer' => 'https://provider.example.com/tenant',
+                'authorization_endpoint' => 'https://provider.example.com/authorize',
+                'token_endpoint' => 'https://provider.example.com/token',
+                'userinfo_endpoint' => 'https://provider.example.com/userinfo',
+            ]);
+        });
+        $previous = $_ENV['SYMFONY_TEST_OIDC_DISCOVERY_URI'] ?? null;
+        $_ENV['SYMFONY_TEST_OIDC_DISCOVERY_URI'] = $uri;
+        try {
+            $resolvedUri = $container->resolveEnvPlaceholders($definition->getArgument(2), true);
+        } finally {
+            if (null === $previous) {
+                unset($_ENV['SYMFONY_TEST_OIDC_DISCOVERY_URI']);
+            } else {
+                $_ENV['SYMFONY_TEST_OIDC_DISCOVERY_URI'] = $previous;
+            }
+        }
+        $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), $resolvedUri, $definition->getArgument(3), 3600, null, $definition->getArgument(6), $definition->getArgument(7));
+
+        if (null === $expectedUrl) {
+            $this->expectException(AuthenticationException::class);
+            $this->expectExceptionMessage('must use HTTPS');
+
+            try {
+                $discovery->getIssuer();
+            } finally {
+                $this->assertSame(0, $httpClient->getRequestsCount());
+            }
+        } else {
+            $this->assertSame('https://provider.example.com/tenant', $discovery->getIssuer());
+            $this->assertSame($expectedUrl, $requested);
+        }
+    }
+
+    public static function provideOidcDiscoveryEnvironmentVariables(): iterable
+    {
+        yield 'HTTPS' => ['https://metadata.example.com/config', 'https://metadata.example.com/config'];
+        yield 'loopback HTTP' => ['http://[::1]:8080/config', 'http://[::1]:8080/config'];
+        yield 'empty' => ['', 'https://provider.example.com/tenant/.well-known/openid-configuration'];
+        yield 'remote HTTP' => ['http://provider.internal/config', null];
     }
 
     public function testOidcLoginUsesTheFirewallUserProvider()

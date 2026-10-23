@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
-                <target>يجب ان تختار {{ limit }} اختيار على الاقل.|يجب ان تختار {{ limit }} اختيار على الاقل.|يجب ان تختار {{ limit }} اختيارات على الاقل.|يجب ان تختار {{ limit }} اختيار على الاقل.|يجب ان تختار {{ limit }} اختيار على الاقل.|يجب ان تختار {{ limit }} اختيار على الاقل.</target>
+                <target>يجب اختيار {{ limit }} خيار على الأقل.|يجب اختيار خيار واحد على الأقل.|يجب اختيار خيارين على الأقل.|يجب اختيار {{ limit }} خيارات على الأقل.|يجب اختيار {{ limit }} خيارًا على الأقل.|يجب اختيار {{ limit }} خيار على الأقل.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>يجب ان تختار {{ limit }} اختيار على الاكثر.|يجب ان تختار {{ limit }} اختيار على الاكثر.|يجب ان تختار {{ limit }} اختيارات على الاكثر.|يجب ان تختار {{ limit }} اختيار على الاكثر.|يجب ان تختار {{ limit }} اختيار على الاكثر.|يجب ان تختار {{ limit }} اختيار على الاكثر.</target>
+                <target>يجب عدم اختيار أي خيار.|يجب عدم اختيار أكثر من خيار واحد.|يجب عدم اختيار أكثر من خيارين.|يجب عدم اختيار أكثر من {{ limit }} خيارات.|يجب عدم اختيار أكثر من {{ limit }} خيارًا.|يجب عدم اختيار أكثر من {{ limit }} خيار.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -64,11 +64,11 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>الملف كبير جدا ({{ size }} {{ suffix }}).اقصى مساحه مسموح بها ({{ limit }} {{ suffix }}).</target>
+                <target>حجم الملف كبير جدًا ({{ size }} {{ suffix }}). الحد الأقصى المسموح به هو {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>نوع الملف غير صحيح ({{ type }}). الانواع المسموح بها هى {{ types }}.</target>
+                <target>نوع MIME للملف غير صالح ({{ type }}). أنواع MIME المسموح بها هي {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
@@ -92,11 +92,11 @@
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>هذه القيمة يجب لا تكون فارغة.</target>
+                <target>يجب ألا تكون هذه القيمة مساوية لـ null.</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
-                <target>هذه القيمة يجب ان تكون فارغة.</target>
+                <target>يجب أن تكون هذه القيمة مساوية لـ null.</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>الملف كبير جدا. اقصى مساحه مسموح بها {{ limit }} {{ suffix }}.</target>
+                <target>حجم الملف كبير جدًا. الحد الأقصى المسموح به هو {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>تعذر تحميل الملف.</target>
+                <target>تعذّر رفع الملف.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -132,7 +132,7 @@
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>هذا الملف غير صالح للصورة.</target>
+                <target>هذا الملف ليس صورة صالحة.</target>
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
@@ -144,7 +144,7 @@
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>هذه القيمة ليست موقع صحيح.</target>
+                <target>هذه القيمة ليست معرّفًا صالحًا للغة والمنطقة.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
@@ -188,11 +188,11 @@
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
-                <target>لم يتم ارسال اى ملف.</target>
+                <target>لم يتم رفع أي ملف.</target>
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target>لم يتم تكوين مجلد مؤقت في ملف php.ini.</target>
+                <target>لم يُحدَّد مجلد مؤقت في ملف php.ini، أو أن المجلد المحدَّد غير موجود.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -200,7 +200,7 @@
             </trans-unit>
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
-                <target>احد اضافات PHP تسببت فى فشل استقبال الملف.</target>
+                <target>تسبّبت إحدى إضافات PHP في فشل رفع الملف.</target>
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
@@ -304,15 +304,15 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>يتعذر الإتصال بالنطاق.</target>
+                <target>تعذّر تحديد عنوان IP لاسم المضيف.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>هذه القيمة غير متطابقة مع صيغة التحويل {{ charset }}.</target>
+                <target>هذه القيمة لا تتوافق مع مجموعة المحارف {{ charset }} المتوقعة.</target>
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target>هذه القيمة ليست رمز معرف أعمال (BIC) صالحًا.</target>
+                <target>هذه القيمة ليست رمز تعريف مؤسسة (BIC) صالحًا.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -328,7 +328,7 @@
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
-                <target>رمز المعرّف نشاط تجاري (BIC) هذا لا يرتبط مع IBAN {{ iban }}.</target>
+                <target>رمز تعريف المؤسسة (BIC) هذا غير مرتبط برقم الحساب المصرفي الدولي (IBAN) {{ iban }}.</target>
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
@@ -384,7 +384,7 @@
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target> صالح (ISIN) هذه القيمة ليست رقم تعريف الأوراق المالية الدولي.</target>
+                <target>هذه القيمة ليست رقم تعريف دولي صالحًا للأوراق المالية (ISIN).</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
@@ -420,7 +420,7 @@
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target>لا يسمح بخلط الأرقام من نصوص مختلفة.</target>
+                <target>لا يُسمح بخلط أرقام من أنظمة كتابة مختلفة.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
@@ -496,11 +496,11 @@
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>الفيديو منخفض الجودة جداً ({{ pixels }} بكسل). الحد الأدنى المتوقع هو {{ min_pixels }} بكسل.</target>
+                <target>عدد بكسلات الفيديو قليل جدًا ({{ pixels }} بكسل). الحد الأدنى المطلوب هو {{ min_pixels }} بكسل.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>دقة الفيديو مرتفعة جداً ({{ pixels }} بكسل). الحد الأقصى المتوقع هو {{ max_pixels }} بكسل.</target>
+                <target>عدد بكسلات الفيديو كبير جدًا ({{ pixels }} بكسل). الحد الأقصى المسموح به هو {{ max_pixels }} بكسل.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
@@ -544,15 +544,15 @@
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>الصورة منخفضة الجودة جدًا ({{ pixels }} بكسل)، و الحد الأدنى المتوقع: {{ min_pixels }} بكسل.</target>
+                <target>عدد بكسلات الصورة قليل جدًا ({{ pixels }} بكسل). الحد الأدنى المطلوب هو {{ min_pixels }} بكسل.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>جودة الصورة مرتفعة جدًا ({{ pixels }} بكسل). العدد الأقصى المتوقع هو {{ max_pixels }} بكسل.</target>
+                <target>عدد بكسلات الصورة كبير جدًا ({{ pixels }} بكسل). الحد الأقصى المسموح به هو {{ max_pixels }} بكسل.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target>اسم الملف يحتوي على أحرف غير مسموح بها.</target>
+                <target>اسم الملف لا يتوافق مع مجموعة المحارف المتوقعة.</target>
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>

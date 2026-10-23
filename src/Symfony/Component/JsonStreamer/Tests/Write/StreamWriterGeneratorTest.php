@@ -33,6 +33,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedArray;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedDictDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedListDummies;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithOtherDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
@@ -134,6 +135,7 @@ class StreamWriterGeneratorTest extends TestCase
         yield ['object', Type::object(DummyWithNameAttributes::class)];
         yield ['nullable_object', Type::nullable(Type::object(DummyWithNameAttributes::class))];
         yield ['object_in_object', Type::object(DummyWithOtherDummies::class)];
+        yield ['object_with_nullable_repeated_dummies', Type::object(DummyWithNullableRepeatedDummies::class)];
         yield ['object_with_value_transformer', Type::object(DummyWithValueTransformerAttributes::class)];
         yield ['object_with_value_object', Type::object(DummyWithDateTimes::class)];
         yield ['self_referencing_object', Type::object(SelfReferencingDummy::class)];
@@ -179,6 +181,20 @@ class StreamWriterGeneratorTest extends TestCase
         $this->expectExceptionMessage(\sprintf('Cannot encode "%s"', $streamedName));
 
         $generator->generate(Type::object(ClassicDummy::class));
+    }
+
+    public function testGenerateRepeatedNullableObjectsOnlyOnce()
+    {
+        $propertyMetadataLoader = $this->createMock(PropertyMetadataLoaderInterface::class);
+        $propertyMetadataLoader->expects($this->exactly(2))
+            ->method('load')
+            ->willReturnCallback(static fn (string $className): array => DummyWithNullableRepeatedDummies::class === $className ? [
+                'first' => new PropertyMetadata('first', Type::nullable(Type::object(ClassicDummy::class))),
+                'second' => new PropertyMetadata('second', Type::nullable(Type::object(ClassicDummy::class))),
+            ] : []);
+
+        $generator = new StreamWriterGenerator($propertyMetadataLoader, $this->streamWritersDir);
+        $generator->generate(Type::object(DummyWithNullableRepeatedDummies::class));
     }
 
     public function testCallPropertyMetadataLoaderWithProperContext()

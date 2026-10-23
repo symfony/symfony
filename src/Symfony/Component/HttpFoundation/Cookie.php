@@ -51,17 +51,56 @@ class Cookie
             'partitioned' => false,
         ];
 
-        $parts = HeaderUtils::split($cookie, ';=');
-        $part = array_shift($parts);
+        [$pair, $attributes] = explode(';', $cookie, 2) + ['', ''];
+        $part = explode('=', $pair, 2);
 
-        $name = $decode ? urldecode($part[0]) : $part[0];
-        $value = isset($part[1]) ? ($decode ? urldecode($part[1]) : $part[1]) : null;
+        $name = trim($part[0]);
+        $value = isset($part[1]) ? trim($part[1]) : null;
+        $name = $decode ? urldecode($name) : $name;
+        $value = $decode && null !== $value ? urldecode($value) : $value;
 
-        $data = HeaderUtils::combine($parts) + $data;
-        $data['expires'] = self::expiresTimestamp($data['expires']);
+        foreach (HeaderUtils::split($attributes, ';=') as $attribute) {
+            $attributeName = strtolower($attribute[0]);
+            $attributeValue = $attribute[1] ?? true;
 
-        if (isset($data['max-age']) && ($data['max-age'] > 0 || $data['expires'] > time())) {
-            $data['expires'] = time() + (int) $data['max-age'];
+            if ('raw' === $attributeName || !\array_key_exists($attributeName, $data) && 'max-age' !== $attributeName) {
+                continue;
+            }
+
+            if (\in_array($attributeName, ['secure', 'httponly', 'partitioned'], true)) {
+                $attributeValue = true;
+            } elseif ('expires' === $attributeName) {
+                if (false === $attributeValue = strtotime((string) $attributeValue)) {
+                    continue;
+                }
+
+                $attributeValue = max(1, $attributeValue);
+            } elseif ('max-age' === $attributeName) {
+                if (!\is_string($attributeValue) || !preg_match('/^-?\d+$/D', $attributeValue)) {
+                    continue;
+                }
+            } elseif ('samesite' === $attributeName) {
+                $attributeValue = strtolower((string) $attributeValue);
+
+                if (!\in_array($attributeValue, [self::SAMESITE_LAX, self::SAMESITE_STRICT, self::SAMESITE_NONE], true)) {
+                    continue;
+                }
+            }
+
+            $data[$attributeName] = $attributeValue;
+        }
+
+        if (isset($data['max-age'])) {
+            $maxAge = (int) $data['max-age'];
+            $now = time();
+
+            if ($maxAge > 0) {
+                $data['expires'] = $now + min($maxAge, \PHP_INT_MAX - $now);
+            } elseif ($data['expires'] > $now) {
+                $data['expires'] = $now;
+            } elseif (0 === $data['expires']) {
+                $data['expires'] = 1;
+            }
         }
 
         return new static($name, $value, $data['expires'], $data['path'], $data['domain'], $data['secure'], $data['httponly'], $data['raw'], $data['samesite'], $data['partitioned']);
@@ -107,7 +146,7 @@ class Cookie
             throw new \InvalidArgumentException(\sprintf('The cookie name "%s" contains invalid characters.', $name));
         }
 
-        if (!$name) {
+        if ('' === $name) {
             throw new \InvalidArgumentException('The cookie name cannot be empty.');
         }
 

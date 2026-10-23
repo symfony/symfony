@@ -40,8 +40,7 @@ final class Lexer
     private const TOKEN_END = 256;
     private const TOKEN_VALUE = self::TOKEN_DICT_START | self::TOKEN_LIST_START | self::TOKEN_SCALAR;
 
-    private const KEY_REGEX = '/^(?:(?>"(?>\\\\(?>["\\\\\/bfnrt]|u[a-fA-F0-9]{4})|[^\0-\x1F\\\\"]+)*"))$/u';
-    private const SCALAR_REGEX = '/^(?:(?:(?>"(?>\\\\(?>["\\\\\/bfnrt]|u[a-fA-F0-9]{4})|[^\0-\x1F\\\\"]+)*"))|(?:(?>-?(?>0|[1-9][0-9]*)(?>\.[0-9]+)?(?>[eE][+-]?[0-9]+)?))|true|false|null)$/u';
+    private const SCALAR_REGEX = '/^(?:(?>-?(?>0|[1-9][0-9]*)(?>\.[0-9]+)?(?>[eE][+-]?[0-9]+)?)|true|false|null)$/u';
 
     /**
      * @param resource $stream
@@ -140,7 +139,9 @@ final class Lexer
         $chunkLength = $infiniteLength ? self::MAX_CHUNK_LENGTH : min($length, self::MAX_CHUNK_LENGTH);
         $toReadLength = $length;
 
-        rewind($stream);
+        if (stream_get_meta_data($stream)['seekable']) {
+            rewind($stream);
+        }
 
         while (($infiniteLength && !feof($stream)) || $toReadLength > 0) {
             if (false === $chunk = stream_get_contents($stream, $infiniteLength ? $chunkLength : min($chunkLength, $toReadLength), $offset)) {
@@ -247,7 +248,9 @@ final class Lexer
             return;
         }
 
-        if (self::TOKEN_VALUE & $context['expected_token'] && !preg_match(self::SCALAR_REGEX, $token)) {
+        $isString = '"' === $token[0] && \is_string(json_decode($token));
+
+        if (self::TOKEN_VALUE & $context['expected_token'] && !$isString && !preg_match(self::SCALAR_REGEX, $token)) {
             throw new InvalidStreamException(\sprintf('Expected scalar value, but got "%s".', $token));
         }
 
@@ -263,7 +266,7 @@ final class Lexer
 
         if ('dict' === $context['structures'][$context['pointer']]) {
             if (self::TOKEN_KEY & $context['expected_token']) {
-                if (!preg_match(self::KEY_REGEX, $token)) {
+                if (!$isString) {
                     throw new InvalidStreamException(\sprintf('Expected dict key, but got "%s".', $token));
                 }
 

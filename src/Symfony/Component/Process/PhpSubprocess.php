@@ -68,7 +68,12 @@ class PhpSubprocess extends Process
         $tmpIni = $this->writeTmpIni($this->getAllIniFiles(), sys_get_temp_dir());
 
         $php = array_merge($php, ['-n', '-c', $tmpIni]);
-        register_shutdown_function('unlink', $tmpIni);
+        $pid = getmypid();
+        register_shutdown_function(static function () use ($tmpIni, $pid) {
+            if ($pid === getmypid()) {
+                unlink($tmpIni);
+            }
+        });
 
         $command = array_merge($php, $command);
 

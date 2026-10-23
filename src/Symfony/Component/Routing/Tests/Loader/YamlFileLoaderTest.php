@@ -618,6 +618,15 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame([], $failures);
     }
 
+    #[RequiresMethod(Validator::class, 'validate')]
+    public function testSchemaRejectsTheDeprecatedKeyOnRouteDefinitions()
+    {
+        $schema = json_decode(file_get_contents(\dirname(__DIR__, 2).'/Loader/schema/routing.schema.json'));
+        $data = (object) ['blog_show' => (object) ['path' => '/blog/{slug}', 'deprecated' => (object) ['package' => 'acme/blog', 'version' => '1.2']]];
+
+        $this->assertFalse((new Validator())->validate($data, $schema)->isValid());
+    }
+
     private static function toJsonData(mixed $value): mixed
     {
         return match (true) {

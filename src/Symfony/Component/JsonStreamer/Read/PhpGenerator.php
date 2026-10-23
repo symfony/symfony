@@ -89,6 +89,10 @@ final class PhpGenerator
      */
     private function generateProviders(DataModelNodeInterface $node, bool $decodeFromStream, array &$context): string
     {
+        if ($node instanceof ObjectNode && $node->isMock()) {
+            return '';
+        }
+
         if ($context['providers'][$node->getIdentifier()] ?? false) {
             return '';
         }
@@ -148,7 +152,13 @@ final class PhpGenerator
             $collectionKeyType = $node->getType()->getCollectionKeyType();
 
             $arguments = $decodeFromStream ? '$stream, $data' : '$data';
-            $php .= ($decodeFromStream ? $this->line('$data = \\'.Splitter::class.'::'.($collectionKeyType instanceof BuiltinType && TypeIdentifier::INT === $collectionKeyType->getTypeIdentifier() ? 'splitList' : 'splitDict').'($stream, $offset, $length);', $context) : '')
+            $splitMethod = match (true) {
+                $collectionKeyType instanceof BuiltinType && TypeIdentifier::INT === $collectionKeyType->getTypeIdentifier() => 'splitList',
+                $collectionKeyType instanceof BuiltinType && TypeIdentifier::STRING === $collectionKeyType->getTypeIdentifier() => 'splitDict',
+                default => 'splitCollection',
+            };
+
+            $php .= ($decodeFromStream ? $this->line('$data = \\'.Splitter::class.'::'.$splitMethod.'($stream, $offset, $length);', $context) : '')
                 .$this->line("\$iterable = static function ($arguments) use (\$options, \$transformers, \$instantiator, &\$providers) {", $context)
                 .$this->line('    foreach ($data as $k => $v) {', $context);
 
@@ -178,10 +188,6 @@ final class PhpGenerator
         }
 
         if ($node instanceof ObjectNode) {
-            if ($node->isMock()) {
-                return '';
-            }
-
             $arguments = $decodeFromStream ? '$stream, $offset, $length' : '$data';
 
             $php = $this->line('$providers['.var_export($node->getIdentifier(), true)."] = static function ($arguments) use (\$options, \$transformers, \$instantiator, &\$providers) {", $context);
@@ -221,10 +227,10 @@ final class PhpGenerator
                 $separator = '';
                 foreach ($node->getProperties() as $streamedName => $property) {
                     $quotedStreamedName = var_export($streamedName, true);
-                    $propertyValuePhp = $this->canBeDecodedWithJsonDecode($property['value'], $decodeFromStream)
-                        ? "\$data[$quotedStreamedName] ?? '_symfony_missing_value'"
-                        : "\\array_key_exists($quotedStreamedName, \$data) ? \$providers[".var_export($property['value']->getIdentifier(), true)."](\$data[$quotedStreamedName]) : '_symfony_missing_value'";
-                    $propertiesValuePhp .= $separator.var_export($property['name'], true).' => '.$property['accessor']($propertyValuePhp);
+                    [$isSetPhp, $propertyValuePhp] = $this->canBeDecodedWithJsonDecode($property['value'], $decodeFromStream)
+                        ? ["isset(\$data[$quotedStreamedName])", "\$data[$quotedStreamedName]"]
+                        : ["\\array_key_exists($quotedStreamedName, \$data)", '$providers['.var_export($property['value']->getIdentifier(), true)."](\$data[$quotedStreamedName])"];
+                    $propertiesValuePhp .= $separator.var_export($property['name'], true)." => $isSetPhp ? ".$property['accessor']($propertyValuePhp)." : '_symfony_missing_value'";
                     $separator = ', ';
                 }
                 $propertiesValuePhp .= ']';

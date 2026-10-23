@@ -87,7 +87,12 @@ final class StreamWriterGenerator
         }
 
         if ($type instanceof UnionType) {
-            return new CompositeNode($accessor, array_map(fn (Type $t): DataModelNodeInterface => $this->createDataModel($t, $accessor, $options, $context), $type->getTypes()));
+            $nodes = [];
+            foreach ($type->getTypes() as $t) {
+                $nodes[] = $this->createDataModel($t, $accessor, $options, $context);
+            }
+
+            return new CompositeNode($accessor, $nodes);
         }
 
         if ($type instanceof BuiltinType) {

@@ -13,6 +13,9 @@ namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +32,85 @@ use Symfony\Component\HttpKernel\Kernel;
 #[Group('time-sensitive')]
 class HttpCacheTest extends HttpCacheTestCase
 {
+    #[RequiresPhpExtension('pcntl')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testAChildShutdownDoesNotReleaseTheParentStoreLocks()
+    {
+        $store = $this->createStore();
+        $this->cache = new HttpCache($this->createStub(HttpKernelInterface::class), $store);
+        $request = Request::create('/locked');
+        $observer = $this->createStore();
+
+        $this->assertTrue($store->lock($request));
+        $this->assertTrue($observer->isLocked($request));
+
+        if (0 === $pid = pcntl_fork()) {
+            exit(0);
+        }
+
+        $this->assertGreaterThan(0, $pid);
+        $this->assertSame($pid, pcntl_waitpid($pid, $status));
+        $this->assertTrue(pcntl_wifexited($status));
+        $this->assertSame(0, pcntl_wexitstatus($status));
+        $this->assertTrue($observer->isLocked($request));
+        $this->assertTrue($store->unlock($request));
+        $this->assertFalse($observer->isLocked($request));
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testAChildCanUseTheInheritedStoreInANewHttpCache()
+    {
+        $store = $this->createStore();
+        $this->cache = new HttpCache($this->createStub(HttpKernelInterface::class), $store);
+        $request = Request::create('/parent');
+        $childRequest = Request::create('/child');
+        $observer = $this->createStore();
+
+        $this->assertTrue($store->lock($request));
+
+        if (0 === $pid = pcntl_fork()) {
+            new HttpCache($this->createStub(HttpKernelInterface::class), $store);
+            exit(true === $store->lock($childRequest) ? 0 : 1);
+        }
+
+        $this->assertGreaterThan(0, $pid);
+        $this->assertSame($pid, pcntl_waitpid($pid, $status));
+        $this->assertTrue(pcntl_wifexited($status));
+        $this->assertSame(0, pcntl_wexitstatus($status));
+        $this->assertTrue($observer->isLocked($request));
+        $this->assertFalse($observer->isLocked($childRequest));
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testAChildShutdownDoesNotCleanUpACustomStore()
+    {
+        $cleanup = tmpfile();
+        $store = $this->createStub(StoreInterface::class);
+        $store->method('cleanup')->willReturnCallback(static function () use ($cleanup) {
+            if (\is_resource($cleanup)) {
+                fwrite($cleanup, 'cleanup');
+            }
+        });
+        new HttpCache($this->createStub(HttpKernelInterface::class), $store);
+
+        if (0 === $pid = pcntl_fork()) {
+            exit(0);
+        }
+
+        $this->assertGreaterThan(0, $pid);
+        $this->assertSame($pid, pcntl_waitpid($pid, $status));
+        $this->assertTrue(pcntl_wifexited($status));
+        $this->assertSame(0, pcntl_wexitstatus($status));
+        rewind($cleanup);
+        $this->assertSame('', stream_get_contents($cleanup));
+        fclose($cleanup);
+    }
+
     public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
     {
         $storeMock = $this->createStub(StoreInterface::class);

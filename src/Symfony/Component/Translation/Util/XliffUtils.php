@@ -145,8 +145,11 @@ class XliffUtils
                 $newPath = self::getFileUrl($path);
             } elseif ($tmpfile = tempnam(sys_get_temp_dir(), 'symfony')) {
                 copy($path, $tmpfile);
-                register_shutdown_function(static function () use ($tmpfile) {
-                    @unlink($tmpfile);
+                $pid = getmypid();
+                register_shutdown_function(static function () use ($tmpfile, $pid) {
+                    if (getmypid() === $pid) {
+                        @unlink($tmpfile);
+                    }
                 });
                 $newPath = self::getFileUrl($tmpfile);
             } else {

@@ -41,6 +41,23 @@ final class Splitter
     }
 
     /**
+     * Splits either a list or a dict, depending on the JSON value.
+     *
+     * @param resource $stream
+     */
+    public static function splitCollection($stream, int $offset = 0, ?int $length = null): ?\Iterator
+    {
+        $lexer = self::$lexer ??= new Lexer();
+        $tokens = $lexer->getTokens($stream, $offset, $length);
+
+        if ('null' === $tokens->current()[0] && 1 === iterator_count($tokens)) {
+            return null;
+        }
+
+        return '[' === $tokens->current()[0] ? self::createListBoundaries($tokens) : self::createDictBoundaries($tokens);
+    }
+
+    /**
      * @param resource $stream
      */
     public static function splitDict($stream, int $offset = 0, ?int $length = null): ?\Iterator

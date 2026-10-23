@@ -4,25 +4,35 @@
  * @param Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedListDummies $data
  */
 return static function (mixed $data, \Psr\Container\ContainerInterface $transformers, array $options): \Traversable {
-    $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNestedListDummies'] = static function ($data, $depth) use ($transformers, $options, &$generators) {
+    $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNestedListDummies'] = static function ($data, $depth, &$buffer) use ($transformers, $options, &$generators) {
         if ($depth >= 512) {
             throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException('Maximum stack depth exceeded');
         }
-        $prefix1 = '';
-        yield "{{$prefix1}\"dummies\":";
-        yield "{";
+        $buffer .= "{\"dummies\":{";
         $prefix2 = '';
         foreach ($data->dummies as $key1 => $value1) {
             $key1 = is_int($key1) ? $key1 : \substr(\json_encode($key1, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE), 1, -1);
-            yield "{$prefix2}\"{$key1}\":";
-            yield from $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNestedListDummies']($value1, $depth + 1);
+            $buffer .= "{$prefix2}\"{$key1}\":";
+            yield from $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNestedListDummies']($value1, $depth + 1, $buffer);
             $prefix2 = ',';
+            if (\strlen($buffer) >= 8192) {
+                yield $buffer;
+                $buffer = '';
+            }
         }
-        yield "}}";
+        $buffer .= "}}";
+        if (\strlen($buffer) >= 8192) {
+            yield $buffer;
+            $buffer = '';
+        }
     };
     try {
-        yield from $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNestedListDummies']($data, 0);
+        $buffer = '';
+        yield from $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNestedListDummies']($data, 0, $buffer);
+        if ('' !== $buffer) {
+            yield $buffer;
+        }
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException(\sprintf('Cannot encode "%s" to JSON: %s.', 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNestedListDummies', $e->getMessage()), 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException('Cannot encode "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNestedListDummies" to JSON: '.$e->getMessage(), 0, $e);
     }
 };

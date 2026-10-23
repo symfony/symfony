@@ -5,23 +5,26 @@
  */
 return static function (mixed $data, \Psr\Container\ContainerInterface $transformers, array $options): \Traversable {
     try {
+        $buffer = "{";
         $prefix1 = '';
-        yield "{";
         if (null === $data->value && ($options['include_null_properties'] ?? false)) {
-            yield "{$prefix1}\"value\":null";
+            $buffer .= "{$prefix1}\"value\":null";
         }
         if (null !== $data->value) {
-            yield "{$prefix1}\"value\":";
+            $buffer .= "{$prefix1}\"value\":";
             if ($data->value instanceof \Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum) {
-                yield \json_encode($data->value->value, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
+                $buffer .= \json_encode($data->value->value, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
             } elseif (\is_string($data->value)) {
-                yield \json_encode($data->value, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
+                $buffer .= \json_encode($data->value, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
             } else {
                 throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value.', \get_debug_type($data->value)));
             }
         }
-        yield "}";
+        $buffer .= "}";
+        if ('' !== $buffer) {
+            yield $buffer;
+        }
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException(\sprintf('Cannot encode "%s" to JSON: %s.', 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithUnionProperties', $e->getMessage()), 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException('Cannot encode "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithUnionProperties" to JSON: '.$e->getMessage(), 0, $e);
     }
 };

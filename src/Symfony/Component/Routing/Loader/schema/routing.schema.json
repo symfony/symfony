@@ -77,6 +77,17 @@
         "utf8": { "type": ["boolean", "null"] },
         "stateless": { "type": ["boolean", "null"] },
         "firewall": { "type": ["string", "null"] },
+        "deprecation": {
+          "type": ["object", "null"],
+          "description": "The RFC 9745 deprecation of the route, exposed as the _deprecation route default.",
+          "properties": {
+            "since": { "type": "string" },
+            "sunset": { "type": "string" },
+            "link": { "type": "string" }
+          },
+          "required": ["since"],
+          "additionalProperties": false
+        },
         "deprecated": {
           "type": "object",
           "properties": {
@@ -150,6 +161,17 @@
         "exclude": { "oneOf": [ { "type": ["string", "null"] }, { "type": "array", "items": { "type": "string" } } ] },
         "stateless": { "type": ["boolean", "null"] },
         "firewall": { "type": ["string", "null"] },
+        "deprecation": {
+          "type": ["object", "null"],
+          "description": "The RFC 9745 deprecation of the route, exposed as the _deprecation route default.",
+          "properties": {
+            "since": { "type": "string" },
+            "sunset": { "type": "string" },
+            "link": { "type": "string" }
+          },
+          "required": ["since"],
+          "additionalProperties": false
+        },
         "controller": { "type": ["string", "null"] }
       },
       "required": ["resource"],

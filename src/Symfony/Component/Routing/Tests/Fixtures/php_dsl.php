@@ -11,6 +11,7 @@ return function (RoutingConfigurator $routes) {
         ->add('buz', 'zub')
             ->controller('foo:act')
             ->stateless(true)
+            ->deprecation('2026-10-01', link: 'https://example.com/deprecation')
         ->add('controller_class', '/controller')
             ->controller(['Acme\MyApp\MyController', 'myAction']);
 

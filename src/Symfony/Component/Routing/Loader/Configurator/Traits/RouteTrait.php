@@ -230,4 +230,20 @@ trait RouteTrait
 
         return $this;
     }
+
+    /**
+     * Adds the "_deprecation" entry to defaults.
+     *
+     * @param string      $since  The date the route is or will be deprecated
+     * @param string|null $sunset The date the route is expected to become unresponsive
+     * @param string|null $link   The URI of the documentation describing the deprecation
+     *
+     * @return $this
+     */
+    final public function deprecation(string $since, ?string $sunset = null, ?string $link = null): static
+    {
+        $this->route->addDefaults(['_deprecation' => array_filter(['since' => $since, 'sunset' => $sunset, 'link' => $link], static fn (?string $value) => null !== $value)]);
+
+        return $this;
+    }
 }

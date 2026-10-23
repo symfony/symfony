@@ -209,7 +209,7 @@ class PhpFileLoaderTest extends TestCase
             ->setCondition('abc')
         );
         $expectedCollection->add('buz', (new Route('/zub'))
-            ->setDefaults(['_controller' => 'foo:act', '_stateless' => true])
+            ->setDefaults(['_controller' => 'foo:act', '_stateless' => true, '_deprecation' => ['since' => '2026-10-01', 'link' => 'https://example.com/deprecation']])
         );
         $expectedCollection->add('controller_class', (new Route('/controller'))
             ->setDefaults(['_controller' => ['Acme\MyApp\MyController', 'myAction']])

@@ -50,6 +50,7 @@ namespace Symfony\Component\Routing\Loader\Configurator;
  *     utf8?: bool,
  *     stateless?: bool,
  *     firewall?: string,
+ *     deprecation?: array{since: string, sunset?: string, link?: string},
  * }
  * @psalm-type ImportConfig = array{
  *     resource: string,
@@ -72,6 +73,7 @@ namespace Symfony\Component\Routing\Loader\Configurator;
  *     utf8?: bool,
  *     stateless?: bool,
  *     firewall?: string,
+ *     deprecation?: array{since: string, sunset?: string, link?: string},
  * }
  * @psalm-type AliasConfig = array{
  *     alias: string,

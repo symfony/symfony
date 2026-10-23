@@ -62,17 +62,7 @@
         "locale": { "type": ["string", "null"] },
         "format": { "type": ["string", "null"] },
         "utf8": { "type": ["boolean", "null"] },
-        "stateless": { "type": ["boolean", "null"] },
-        "deprecated": {
-          "type": "object",
-          "properties": {
-            "package": { "type": "string" },
-            "version": { "type": "string" },
-            "message": { "type": "string" }
-          },
-          "required": ["package", "version"],
-          "additionalProperties": false
-        }
+        "stateless": { "type": ["boolean", "null"] }
       },
       "required": ["path"],
       "additionalProperties": false

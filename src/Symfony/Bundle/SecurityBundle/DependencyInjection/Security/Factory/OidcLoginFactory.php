@@ -70,12 +70,26 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
                     })
                     ->thenInvalid('The OIDC "provider_uri" must use HTTPS (got %s): the authorization code, the PKCE verifier and the tokens it is exchanged for are only confidential over TLS. Use HTTPS, or a loopback host (localhost, 127.0.0.1, ::1, *.localhost) for local development.')
                 ->end()
-                ->info('The OIDC Issuer URL (e.g. "https://accounts.example.com"). Used for .well-known/openid-configuration discovery.')
+                ->info('The OIDC Issuer URL (e.g. "https://accounts.example.com"). Used for .well-known/openid-configuration discovery unless "discovery_uri" is set.')
+            ->end()
+            ->scalarNode('discovery_uri')
+                ->defaultNull()
+                ->validate()
+                    ->ifTrue(static function ($v): bool {
+                        if (null === $v || '' === (string) $v) {
+                            return false;
+                        }
+
+                        return !preg_match('#^https?://#i', (string) $v) || !OidcDiscovery::isSecureUrl((string) $v);
+                    })
+                    ->thenInvalid('The OIDC "discovery_uri" must use HTTPS (got %s): a discovery document read over plain HTTP can name any endpoint. Use HTTPS, or a loopback host (localhost, 127.0.0.1, ::1, *.localhost) for local development.')
+                ->end()
+                ->info('Absolute URL of the discovery document. The "issuer" it announces is still checked against "provider_uri".')
             ->end()
             ->scalarNode('http_client')
                 ->defaultNull()
                 ->cannotBeEmpty()
-                ->info('The id of the HttpClient service every call to the provider is made with: discovery, JWKS, token and UserInfo endpoints. Defaults to "http_client". A scoped client must scope every host the provider announces, not only the issuer.')
+                ->info('The id of the HttpClient service every call to the provider is made with: discovery, JWKS, token and UserInfo endpoints. Defaults to "http_client". A scoped client must scope the discovery host and every host the provider announces.')
             ->end()
             ->scalarNode('client_id')
                 ->isRequired()
@@ -502,7 +516,7 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
         $httpClient = new Reference($config['http_client'] ?? 'http_client');
 
         $discoveryId = 'security.authenticator.oidc_login.discovery.'.$firewallName;
-        $container
+        $discovery = $container
             ->setDefinition($discoveryId, new ChildDefinition('security.authenticator.oidc_login.discovery'))
             ->setLazy(true)
             ->replaceArgument(0, $httpClient)
@@ -514,6 +528,10 @@ class OidcLoginFactory extends AbstractFactory implements FirewallListenerFactor
             ->replaceArgument(7, $checkedMtlsAliases)
             ->addTag('kernel.reset', ['method' => 'reset'])
         ;
+
+        if (null !== $config['discovery_uri']) {
+            $discovery->replaceArgument(2, $config['discovery_uri']);
+        }
 
         $idTokenId = 'security.authenticator.oidc_login.id_token.'.$firewallName;
         $container

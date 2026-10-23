@@ -66,6 +66,9 @@ final class OidcDiscovery implements ResetInterface
         // placeholder while the container compiles: trimming it there leaves the resolved
         // value untouched, and the discovery URL ends up carrying a double slash.
         $this->issuer = null !== $issuer ? rtrim($issuer, '/') : null;
+        if ('' === $openIdConfigurationUrl) {
+            $openIdConfigurationUrl = '.well-known/openid-configuration';
+        }
         // OIDC Discovery 1.0, Section 4.1: the well-known path is appended to the issuer
         $this->openIdConfigurationUrl = null !== $this->issuer && !preg_match('#^https?://#i', $openIdConfigurationUrl)
             ? $this->issuer.'/'.ltrim($openIdConfigurationUrl, '/')
@@ -85,6 +88,8 @@ final class OidcDiscovery implements ResetInterface
         if (null !== $this->issuer && !self::isSecureUrl($this->issuer)) {
             throw new AuthenticationException(\sprintf('The OIDC issuer "%s" must use HTTPS: the authorization code, the PKCE verifier and the tokens it is exchanged for are only confidential over TLS.', $this->issuer));
         }
+
+        $this->checkDiscoveryUrl();
 
         // the decoded document is memoized for the lifetime of the instance (one per
         // request on classic runtimes, reset between requests in worker mode), so
@@ -113,17 +118,7 @@ final class OidcDiscovery implements ResetInterface
                 throw $this->cannotFetch($e);
             }
 
-            // OpenID Connect Discovery 1.0, Section 4.3: the "issuer" returned MUST be
-            // identical to the issuer used to build the discovery URL. Validating it
-            // prevents a tampered discovery document from redefining the expected issuer.
-            // A trailing slash is ignored on both sides: providers do announce issuers
-            // ending with one (Authentik does), and it carries no security meaning since
-            // the origin and the path are otherwise identical.
-            if (null !== $this->issuer
-                && rtrim((string) ($configuration['issuer'] ?? ''), '/') !== $this->issuer
-            ) {
-                throw new AuthenticationException(\sprintf('The OIDC provider announced the issuer "%s", which does not match the configured issuer "%s".', $configuration['issuer'] ?? '', $this->issuer));
-            }
+            $this->checkIssuer($configuration);
 
             // checked before the document is stored, so that a document sending its
             // clients to plain HTTP is never cached, and a cached configuration does
@@ -152,7 +147,10 @@ final class OidcDiscovery implements ResetInterface
         // in between, instead of being consumed the next time the document is read
         $this->response = null;
 
-        return $this->configuration = $this->decode($value['payload'] ?? '');
+        $configuration = $this->decode($value['payload'] ?? '');
+        $this->checkIssuer($configuration);
+
+        return $this->configuration = $configuration;
     }
 
     /**
@@ -264,8 +262,26 @@ final class OidcDiscovery implements ResetInterface
         return str_ends_with($host, '.localhost');
     }
 
+    private function checkIssuer(array $configuration): void
+    {
+        if (null !== $this->issuer
+            && rtrim((string) ($configuration['issuer'] ?? ''), '/') !== $this->issuer
+        ) {
+            throw new AuthenticationException(\sprintf('The OIDC provider announced the issuer "%s", which does not match the configured issuer "%s".', $configuration['issuer'] ?? '', $this->issuer));
+        }
+    }
+
+    private function checkDiscoveryUrl(): void
+    {
+        if (null !== $this->issuer && !self::isSecureUrl($this->openIdConfigurationUrl)) {
+            throw new AuthenticationException(\sprintf('The OIDC discovery URL "%s" must use HTTPS, or a loopback host for local development.', $this->openIdConfigurationUrl));
+        }
+    }
+
     private function request(): ResponseInterface
     {
+        $this->checkDiscoveryUrl();
+
         try {
             // redirects are not followed: the endpoints announced by the document are
             // checked against the URL it was requested from, which a redirect would change

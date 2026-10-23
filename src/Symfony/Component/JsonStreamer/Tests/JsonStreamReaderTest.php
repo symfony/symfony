@@ -14,7 +14,10 @@ namespace Symfony\Component\JsonStreamer\Tests;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
+use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
+use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
@@ -119,6 +122,21 @@ class JsonStreamReaderTest extends TestCase
         }, '{"it\'s \\\\\' quoted": 5, "transformed": "20"}', Type::object(DummyWithQuotes::class), ['scale' => 1]);
     }
 
+    public function testReadObjectWithQuotedPropertyName()
+    {
+        $propertyMetadataLoader = new class implements PropertyMetadataLoaderInterface {
+            public function load(string $className, array $options = [], array $context = []): array
+            {
+                return ['key' => new PropertyMetadata("a'b\\c", Type::int())];
+            }
+        };
+        $reader = new JsonStreamReader(new Container(), $propertyMetadataLoader, $this->streamReadersDir);
+
+        $read = $reader->read('{"key":7}', Type::object(\stdClass::class));
+
+        $this->assertSame(["a'b\\c" => 7], get_object_vars($read));
+    }
+
     public function testReadTypeWithUnsupportedCharacters()
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);
@@ -217,6 +235,60 @@ class JsonStreamReaderTest extends TestCase
             $this->assertNull($read->name);
             $this->assertNull($read->enum);
         }, '{"name":null,"enum":null}', Type::object(DummyWithNullableProperties::class));
+    }
+
+    public function testReadObjectKeepsDefaultValueOfMissingProperties()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertSame(1, $read->id);
+            $this->assertSame('dummy', $read->name);
+        }, '{}', Type::object(ClassicDummy::class));
+    }
+
+    public function testReadObjectKeepsDefaultValueOfNullProperties()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $read = $reader->read('{"id":null,"name":"name"}', Type::object(ClassicDummy::class));
+        $this->assertSame(1, $read->id);
+        $this->assertSame('name', $read->name);
+    }
+
+    public function testReadObjectPreservesMissingValueSentinel()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertSame('_symfony_missing_value', $read->name);
+        }, '{"name":"_symfony_missing_value"}', Type::object(ClassicDummy::class));
+    }
+
+    public function testReadObjectWithInvalidPropertyType()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        try {
+            $reader->read('{"id":"not an int"}', Type::object(ClassicDummy::class));
+            $this->fail(\sprintf('Expected "%s" to be thrown.', UnexpectedValueException::class));
+        } catch (UnexpectedValueException $e) {
+            $this->assertStringContainsString(ClassicDummy::class.'::$id of type int', $e->getMessage());
+            $this->assertInstanceOf(\TypeError::class, $e->getPrevious());
+        }
+    }
+
+    public function testReadObjectDoesNotWrapValueTransformerTypeError()
+    {
+        $reader = JsonStreamReader::create([
+            StringToBooleanValueTransformer::class => new StringToBooleanValueTransformer(),
+            DivideStringAndCastToIntValueTransformer::class => new DivideStringAndCastToIntValueTransformer(),
+        ], $this->streamReadersDir);
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('explodeRange()');
+
+        $reader->read('{"id":"20","active":"true","name":"name","range":["not","a","string"]}', Type::object(DummyWithValueTransformerAttributes::class), ['scale' => 1]);
     }
 
     public function testReadObjectWithDateTimes()

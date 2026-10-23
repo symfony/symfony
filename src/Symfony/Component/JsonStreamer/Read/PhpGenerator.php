@@ -76,7 +76,7 @@ final class PhpGenerator
             .$this->line('/**', $context)
             .$this->line(' * @return '.$docType, $context)
             .$this->line(' */', $context)
-            .$this->line('return static function (string|\\Stringable $string, \\'.ContainerInterface::class.' $transformers, \\'.Instantiator::class.' $instantiator, array $options): mixed {', $context)
+            .$this->line('return static function (string|\\Stringable $string, \\'.ContainerInterface::class.' $transformers, array $options): mixed {', $context)
             .$providers
             .($this->canBeDecodedWithJsonDecode($dataModel, $decodeFromStream)
                 ? $this->line('    return \\'.Decoder::class.'::decodeString((string) $string);', $context)
@@ -94,6 +94,8 @@ final class PhpGenerator
         }
 
         $context['providers'][$node->getIdentifier()] = true;
+
+        $uses = $decodeFromStream ? '$options, $transformers, $instantiator, &$providers' : '$options, $transformers, &$providers';
 
         if ($this->canBeDecodedWithJsonDecode($node, $decodeFromStream)) {
             return '';
@@ -118,7 +120,7 @@ final class PhpGenerator
 
             $arguments = $decodeFromStream ? '$stream, $offset, $length' : '$data';
 
-            $php .= $this->line('$providers['.var_export($node->getIdentifier(), true)."] = static function ($arguments) use (\$options, \$transformers, \$instantiator, &\$providers) {", $context);
+            $php .= $this->line('$providers['.var_export($node->getIdentifier(), true)."] = static function ($arguments) use ($uses) {", $context);
 
             ++$context['indentation_level'];
 
@@ -141,30 +143,39 @@ final class PhpGenerator
         if ($node instanceof CollectionNode) {
             $arguments = $decodeFromStream ? '$stream, $offset, $length' : '$data';
 
-            $php = $this->line('$providers['.var_export($node->getIdentifier(), true)."] = static function ($arguments) use (\$options, \$transformers, \$instantiator, &\$providers) {", $context);
+            $php = $this->line('$providers['.var_export($node->getIdentifier(), true)."] = static function ($arguments) use ($uses) {", $context);
 
             ++$context['indentation_level'];
 
             $collectionKeyType = $node->getType()->getCollectionKeyType();
 
-            $arguments = $decodeFromStream ? '$stream, $data' : '$data';
-            $php .= ($decodeFromStream ? $this->line('$data = \\'.Splitter::class.'::'.($collectionKeyType instanceof BuiltinType && TypeIdentifier::INT === $collectionKeyType->getTypeIdentifier() ? 'splitList' : 'splitDict').'($stream, $offset, $length);', $context) : '')
-                .$this->line("\$iterable = static function ($arguments) use (\$options, \$transformers, \$instantiator, &\$providers) {", $context)
-                .$this->line('    foreach ($data as $k => $v) {', $context);
+            $php .= $decodeFromStream ? $this->line('$data = \\'.Splitter::class.'::'.($collectionKeyType instanceof BuiltinType && TypeIdentifier::INT === $collectionKeyType->getTypeIdentifier() ? 'splitList' : 'splitDict').'($stream, $offset, $length);', $context) : '';
 
             if ($decodeFromStream) {
-                $php .= $this->canBeDecodedWithJsonDecode($node->getItemNode(), $decodeFromStream)
-                    ? $this->line('        yield $k => '.$this->generateValueFormat($node->getItemNode(), '\\'.Decoder::class.'::decodeStream($stream, $v[0], $v[1]);'), $context)
-                    : $this->line('        yield $k => $providers['.var_export($node->getItemNode()->getIdentifier(), true).']($stream, $v[0], $v[1]);', $context);
+                $itemPhp = $this->canBeDecodedWithJsonDecode($node->getItemNode(), $decodeFromStream)
+                    ? $this->generateValueFormat($node->getItemNode(), '\\'.Decoder::class.'::decodeStream($stream, $v[0], $v[1])')
+                    : '$providers['.var_export($node->getItemNode()->getIdentifier(), true).']($stream, $v[0], $v[1])';
             } else {
-                $php .= $this->canBeDecodedWithJsonDecode($node->getItemNode(), $decodeFromStream)
-                    ? $this->line('        yield $k => $v;', $context)
-                    : $this->line('        yield $k => $providers['.var_export($node->getItemNode()->getIdentifier(), true).']($v);', $context);
+                $itemPhp = $this->canBeDecodedWithJsonDecode($node->getItemNode(), $decodeFromStream)
+                    ? '$v'
+                    : '$providers['.var_export($node->getItemNode()->getIdentifier(), true).']($v)';
             }
 
-            $php .= $this->line('    }', $context)
-                .$this->line('};', $context)
-                .$this->line('return '.($node->getType()->isIdentifiedBy(TypeIdentifier::ARRAY) ? "\\iterator_to_array(\$iterable($arguments))" : "\$iterable($arguments)").';', $context);
+            if ($node->getType()->isIdentifiedBy(TypeIdentifier::ARRAY)) {
+                $php .= $this->line('$collection = [];', $context)
+                    .$this->line('foreach ($data as $k => $v) {', $context)
+                    .$this->line("    \$collection[\$k] = $itemPhp;", $context)
+                    .$this->line('}', $context)
+                    .$this->line('return $collection;', $context);
+            } else {
+                $arguments = $decodeFromStream ? '$stream, $data' : '$data';
+                $php .= $this->line("\$iterable = static function ($arguments) use ($uses) {", $context)
+                    .$this->line('    foreach ($data as $k => $v) {', $context)
+                    .$this->line("        yield \$k => $itemPhp;", $context)
+                    .$this->line('    }', $context)
+                    .$this->line('};', $context)
+                    .$this->line("return \$iterable($arguments);", $context);
+            }
 
             --$context['indentation_level'];
 
@@ -184,7 +195,7 @@ final class PhpGenerator
 
             $arguments = $decodeFromStream ? '$stream, $offset, $length' : '$data';
 
-            $php = $this->line('$providers['.var_export($node->getIdentifier(), true)."] = static function ($arguments) use (\$options, \$transformers, \$instantiator, &\$providers) {", $context);
+            $php = $this->line('$providers['.var_export($node->getIdentifier(), true)."] = static function ($arguments) use ($uses) {", $context);
 
             ++$context['indentation_level'];
 
@@ -217,21 +228,25 @@ final class PhpGenerator
                     .$this->line('    }', $context)
                     .$this->line('});', $context);
             } else {
-                $propertiesValuePhp = '[';
-                $separator = '';
+                $php .= $this->line('$object = new \\'.$node->getType()->getClassName().'();', $context);
+
                 foreach ($node->getProperties() as $streamedName => $property) {
                     $quotedStreamedName = var_export($streamedName, true);
-                    $propertyValuePhp = $this->canBeDecodedWithJsonDecode($property['value'], $decodeFromStream)
-                        ? "\$data[$quotedStreamedName] ?? '_symfony_missing_value'"
-                        : "\\array_key_exists($quotedStreamedName, \$data) ? \$providers[".var_export($property['value']->getIdentifier(), true)."](\$data[$quotedStreamedName]) : '_symfony_missing_value'";
-                    $propertiesValuePhp .= $separator.var_export($property['name'], true).' => '.$property['accessor']($propertyValuePhp);
-                    $separator = ', ';
-                }
-                $propertiesValuePhp .= ']';
+                    [$isSetPhp, $propertyValuePhp] = $this->canBeDecodedWithJsonDecode($property['value'], $decodeFromStream)
+                        ? ["isset(\$data[$quotedStreamedName])", "\$data[$quotedStreamedName]"]
+                        : ["\\array_key_exists($quotedStreamedName, \$data)", '$providers['.var_export($property['value']->getIdentifier(), true)."](\$data[$quotedStreamedName])"];
 
-                $php .= $this->line('return $instantiator->instantiate(\\'.$node->getType()->getClassName()."::class, \\array_filter($propertiesValuePhp, static function (\$v) {", $context)
-                    .$this->line('    return \'_symfony_missing_value\' !== $v;', $context)
-                    .$this->line('}));', $context);
+                    $php .= $this->line("if ($isSetPhp) {", $context)
+                        .$this->line('    $value = '.$property['accessor']($propertyValuePhp).';', $context)
+                        .$this->line('    try {', $context)
+                        .$this->line('        $object->{'.var_export($property['name'], true).'} = $value;', $context)
+                        .$this->line('    } catch (\\TypeError $e) {', $context)
+                        .$this->line('        throw new \\'.UnexpectedValueException::class.'($e->getMessage(), 0, $e);', $context)
+                        .$this->line('    }', $context)
+                        .$this->line('}', $context);
+                }
+
+                $php .= $this->line('return $object;', $context);
             }
 
             --$context['indentation_level'];

@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLazy;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -49,6 +50,7 @@ class AutowirePass extends AbstractRecursivePass
     private object $defaultArgument;
     private ?\Closure $restorePreviousValue = null;
     private ?self $typesClone = null;
+    private bool $autowireLazy = false;
 
     public function __construct(
         private bool $throwOnAutowiringException = true,
@@ -82,6 +84,7 @@ class AutowirePass extends AbstractRecursivePass
             $this->defaultArgument->names = null;
             $this->restorePreviousValue = null;
             $this->typesClone = null;
+            $this->autowireLazy = false;
         }
     }
 
@@ -173,7 +176,13 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         $checkAttributes = !$value->hasTag('container.ignore_attributes');
-        $methodCalls = $this->autowireCalls($methodCalls, $reflectionClass, $isRoot, $checkAttributes);
+        $previousAutowireLazy = $this->autowireLazy;
+        $this->autowireLazy = $checkAttributes && (bool) $reflectionClass->getAttributes(AutowireLazy::class);
+        try {
+            $methodCalls = $this->autowireCalls($methodCalls, $reflectionClass, $isRoot, $checkAttributes);
+        } finally {
+            $this->autowireLazy = $previousAutowireLazy;
+        }
 
         if ($constructor) {
             [, $arguments] = array_shift($methodCalls);
@@ -369,7 +378,7 @@ class AutowirePass extends AbstractRecursivePass
                     if ($attribute instanceof AutowireInline) {
                         $value = $attribute->buildDefinition($value, $type, $parameter);
                         $value = $this->doProcessValue($value);
-                    } elseif ($lazy = $attribute->lazy) {
+                    } elseif ($lazy = $attribute->lazy || $this->autowireLazy && !$attribute instanceof Lazy && (!($attribute instanceof Autowire) || !array_key_exists('lazy', $parameter->getAttributes(Autowire::class)[0]->getArguments()))) {
                         if (true === $lazy && str_contains($type, '|')) {
                             throw new AutowiringFailedException($this->currentId, \sprintf('Cannot use #[Autowire] with option "lazy: true" on union types for service "%s"; set the option to the interface(s) that should be proxied instead.', $this->currentId));
                         }
@@ -440,7 +449,10 @@ class AutowirePass extends AbstractRecursivePass
                 }
             }
 
-            $arguments[$index] = $getValue();
+            $value = $getValue();
+            $arguments[$index] = $this->autowireLazy && !str_contains($type, '|') && $value instanceof Reference
+                ? new LazyProxyArgument(new TypedReference((string) $value, $type, $value->getInvalidBehavior()))
+                : $value;
         }
 
         if ($parameters && !isset($arguments[++$index])) {

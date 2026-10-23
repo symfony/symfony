@@ -12,9 +12,11 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
@@ -92,5 +94,44 @@ final class DeduplicateMiddlewareTest extends MiddlewareTestCase
 
         // Release the lock so the test leaves no stale state for re-runs.
         $decorator->handle($consumed, $this->getStackMock(true));
+    }
+
+    public function testLockIsReleasedWhenTheMessageCannotBeSent()
+    {
+        $store = SemaphoreStore::isSupported() ? new SemaphoreStore() : new FlockStore();
+        $decorator = new DeduplicateMiddleware(new LockFactory($store));
+
+        $failed = new Envelope(new DummyMessage('Hello'), [new DeduplicateStamp('id')]);
+
+        try {
+            $decorator->handle($failed, $this->getThrowingStackMock($exception = new TransportException('Could not connect.')));
+            $this->fail('The send exception must propagate.');
+        } catch (TransportException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        $retry = new Envelope(new DummyMessage('Hello'), [new DeduplicateStamp('id')]);
+        $decorator->handle($retry, $this->getStackMock(true));
+
+        $decorator->handle($retry->with(new ReceivedStamp('transport')), $this->getStackMock(true));
+    }
+
+    public function testSendExceptionIsKeptWhenTheLockCannotBeReleased()
+    {
+        $store = $this->createMock(PersistingStoreInterface::class);
+        $store->expects($this->once())->method('save');
+        $store->expects($this->once())->method('delete');
+
+        $store->expects($this->once())->method('exists')->willThrowException(new \RuntimeException('Store is down.'));
+
+        $decorator = new DeduplicateMiddleware(new LockFactory($store));
+        $envelope = new Envelope(new DummyMessage('Hello'), [new DeduplicateStamp('id')]);
+
+        try {
+            $decorator->handle($envelope, $this->getThrowingStackMock($exception = new TransportException('Could not connect.')));
+            $this->fail('The send exception must propagate.');
+        } catch (\Throwable $e) {
+            $this->assertSame($exception, $e);
+        }
     }
 }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Use RedisCluster pipelines when supported by the Redis extension
+
 8.2
 ---
 

@@ -738,10 +738,18 @@ trait RedisTrait
             }
         });
 
-        foreach ($results as $id => $result) {
-            if (true !== $result && (!$result instanceof Status || Status::get('OK') !== $result)) {
-                $failed[] = $id;
+        try {
+            foreach ($results as $id => $result) {
+                if (true !== $result && (!$result instanceof Status || Status::get('OK') !== $result)) {
+                    $failed[] = $id;
+                }
             }
+        } catch (\RedisException|\RedisClusterException $e) {
+            if (!$this->redis instanceof \RedisCluster || !method_exists(\RedisCluster::class, 'pipeline')) {
+                throw $e;
+            }
+
+            return array_merge($failed, array_keys($values));
         }
 
         return $failed;
@@ -755,7 +763,32 @@ trait RedisTrait
         $ids = [];
         $redis ??= $this->redis;
 
-        if ($redis instanceof \RedisCluster || $redis instanceof RelayCluster || ($redis instanceof \Predis\ClientInterface && ($redis->getConnection() instanceof RedisCluster || $redis->getConnection() instanceof Predis2RedisCluster))) {
+        if ($redis instanceof \RedisCluster && method_exists(\RedisCluster::class, 'pipeline')) {
+            if (false === $redis->multi(\Redis::PIPELINE)) {
+                throw new \RedisException('Failed to start the Redis Cluster pipeline.');
+            }
+
+            $executing = false;
+            try {
+                foreach ($generator() as $command => $args) {
+                    $redis->{$command}(...$args);
+                    $ids[] = 'eval' === $command ? $args[1][0] : $args[0];
+                }
+                $executing = true;
+                $results = $redis->exec();
+            } finally {
+                if (!$executing && \Redis::PIPELINE === $redis->getmode()) {
+                    $redis->discard();
+                }
+            }
+
+            if (!\is_array($results) || \count($results) !== \count($ids)) {
+                throw new \RedisException('Failed to execute the Redis Cluster pipeline.');
+            }
+            if (!$ids) {
+                return;
+            }
+        } elseif ($redis instanceof \RedisCluster || $redis instanceof RelayCluster || ($redis instanceof \Predis\ClientInterface && ($redis->getConnection() instanceof RedisCluster || $redis->getConnection() instanceof Predis2RedisCluster))) {
             // phpredis & predis don't support pipelining with RedisCluster
             // \Relay\Cluster does not support multi with pipeline mode
             // see https://github.com/phpredis/phpredis/blob/develop/cluster.markdown#pipelining

@@ -104,6 +104,125 @@ class MongoDbSessionHandlerTest extends TestCase
         yield 'database missing' => [['collection' => 'foo']];
     }
 
+    #[DataProvider('provideCreateFromDsn')]
+    public function testCreateFromDsn(string $dsn, string $expectedNamespace, ?int $expectedTtl = null)
+    {
+        $storage = MongoDbSessionHandler::createFromDsn($dsn);
+        $reflection = new \ReflectionObject($storage);
+
+        $this->assertSame($expectedNamespace, $reflection->getProperty('namespace')->getValue($storage));
+        if (null !== $expectedTtl) {
+            $this->assertSame($expectedTtl, $reflection->getProperty('ttl')->getValue($storage));
+        }
+    }
+
+    public static function provideCreateFromDsn(): iterable
+    {
+        yield 'bare DSN' => ['mongodb://localhost', 'app.sessions'];
+        yield 'path and TTL' => ['mongodb://localhost/app?collection=sessions&ttl=3600&retryWrites=true', 'app.sessions', 3600];
+        yield 'database from the query' => ['mongodb://localhost?database=app&collection=my_sessions', 'app.my_sessions'];
+        yield 'multiple hosts with ports' => ['mongodb://host1:27017,host2:27017/app?collection=sessions', 'app.sessions'];
+        yield 'multiple hosts without ports' => ['mongodb://host1,host2/app', 'app.sessions'];
+        yield 'multiple hosts with credentials' => ['mongodb://user:pass@host1:27017,host2:27017/app', 'app.sessions'];
+        yield 'question mark in a value' => ['mongodb://localhost/app?collection=sessions&appName=a?b', 'app.sessions'];
+        yield 'path takes precedence over the query' => ['mongodb://localhost/path_db?database=query_db', 'path_db.sessions'];
+        yield 'repeated keys use the last value' => ['mongodb://localhost/app?collection=a&collection=b', 'app.b'];
+        yield 'percent-encoded database in the path' => ['mongodb://localhost/my%2Ddb', 'my-db.sessions'];
+        yield 'database named zero' => ['mongodb://localhost/0', '0.sessions'];
+    }
+
+    #[DataProvider('provideEmptyOptions')]
+    public function testEmptyOptionsAreRejected(string $dsn, array $options)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        MongoDbSessionHandler::createFromDsn($dsn, $options);
+    }
+
+    #[DataProvider('provideInvalidDsn')]
+    public function testInvalidDsnIsRejected(string $dsn, string $expectedMessage)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        MongoDbSessionHandler::createFromDsn($dsn);
+    }
+
+    public static function provideInvalidDsn(): iterable
+    {
+        yield 'wrong scheme' => ['redis://localhost', 'Expecting "mongodb://" or "mongodb+srv://".'];
+        yield 'last host without port' => ['mongodb://host1:27017,host2/app', 'The given MongoDB DSN is invalid.'];
+        yield 'question mark in user information' => ['mongodb://user:p?ss@localhost/app', 'The given MongoDB DSN is invalid.'];
+    }
+
+    public static function provideEmptyOptions(): iterable
+    {
+        yield 'empty collection in the DSN' => ['mongodb://localhost/app?collection=', []];
+        yield 'empty database in the DSN' => ['mongodb://localhost/app?database=', []];
+        yield 'collection without value in the DSN' => ['mongodb://localhost/app?collection', []];
+        yield 'empty collection option' => ['mongodb://localhost/app', ['collection' => '']];
+        yield 'empty database option' => ['mongodb://localhost/app', ['database' => '']];
+    }
+
+    public function testInvalidTtlIsRejected()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "ttl" option must be an integer or a Closure.');
+
+        MongoDbSessionHandler::createFromDsn('mongodb://localhost/app?ttl=abc');
+    }
+
+    public function testInvalidUriIsReportedByTheDriver()
+    {
+        $this->expectException(\MongoDB\Driver\Exception\InvalidArgumentException::class);
+
+        MongoDbSessionHandler::createFromDsn('mongodb://localhost/app?retryWrites=maybe');
+    }
+
+    #[DataProvider('provideDsnOptionsStripping')]
+    public function testDsnOptionsAreStripped(string $dsn, string $expected)
+    {
+        $this->assertSame($expected, (new \ReflectionMethod(MongoDbSessionHandler::class, 'parseDsn'))->invoke(null, $dsn)[0]);
+    }
+
+    public static function provideDsnOptionsStripping(): iterable
+    {
+        yield 'driver options are kept in order' => [
+            'mongodb://localhost/app?retryWrites=true&w=majority',
+            'mongodb://localhost/app?retryWrites=true&w=majority',
+        ];
+
+        yield 'Symfony options are removed from the middle' => [
+            'mongodb://localhost/app?retryWrites=true&ttl=3600&w=majority',
+            'mongodb://localhost/app?retryWrites=true&w=majority',
+        ];
+
+        yield 'all Symfony options are removed' => [
+            'mongodb://localhost/app?collection=sessions&id_field=_id&expiry_field=eol',
+            'mongodb://localhost/app',
+        ];
+
+        yield 'repeated Symfony options are all removed' => [
+            'mongodb://localhost/app?collection=a&ttl=1&collection=b&w=1',
+            'mongodb://localhost/app?w=1',
+        ];
+
+        yield 'repeated driver options are kept in order' => [
+            'mongodb://localhost/app?readPreferenceTags=dc:ny&collection=sessions&readPreferenceTags=dc:sf',
+            'mongodb://localhost/app?readPreferenceTags=dc:ny&readPreferenceTags=dc:sf',
+        ];
+
+        yield 'encoded ampersand in a value is kept' => [
+            'mongodb://localhost/app?appName=my%26app&collection=sessions&w=majority',
+            'mongodb://localhost/app?appName=my%26app&w=majority',
+        ];
+
+        yield 'equals sign in a value is kept' => [
+            'mongodb://localhost/app?appName=a=b&collection=sessions',
+            'mongodb://localhost/app?appName=a=b',
+        ];
+    }
+
     public function testOpenMethodAlwaysReturnTrue()
     {
         $this->assertTrue($this->storage->open('test', 'test'), 'The "open" method should always return true');

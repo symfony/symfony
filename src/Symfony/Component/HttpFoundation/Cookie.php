@@ -29,11 +29,9 @@ class Cookie
     private bool $secureDefault = false;
 
     private const RESERVED_CHARS_LIST = "=,; \t\r\n\v\f";
-    private const RESERVED_CHARS_FROM = ['=', ',', ';', ' ', "\t", "\r", "\n", "\v", "\f"];
-    private const RESERVED_CHARS_TO = ['%3D', '%2C', '%3B', '%20', '%09', '%0D', '%0A', '%0B', '%0C'];
-
     // same list as above minus "=", which PHP allows in the path and domain attributes
     private const RESERVED_ATTR_CHARS_LIST = ",; \t\r\n\v\f";
+    private const RESERVED_CHARS_PATTERN = '/[^!#$%&\'*+\-.^_`|~0-9A-Za-z]/';
 
     /**
      * Creates cookie from raw header string.
@@ -277,10 +275,18 @@ class Cookie
      */
     public function __toString(): string
     {
+        self::validateOutputAttribute('path', $this->getPath());
+        self::validateOutputAttribute('domain', $this->getDomain());
+
         if ($this->isRaw()) {
+            if (preg_match(self::RESERVED_CHARS_PATTERN, $this->getName())) {
+                throw new \InvalidArgumentException(\sprintf('The cookie name "%s" contains invalid characters.', $this->getName()));
+            }
+            self::validateRawValue($this->getValue());
+
             $str = $this->getName();
         } else {
-            $str = str_replace(self::RESERVED_CHARS_FROM, self::RESERVED_CHARS_TO, $this->getName());
+            $str = preg_replace_callback(self::RESERVED_CHARS_PATTERN, static fn ($match) => rawurlencode($match[0]), $this->getName());
         }
 
         $str .= '=';
@@ -426,6 +432,30 @@ class Cookie
     public function setSecureDefault(bool $default): void
     {
         $this->secureDefault = $default;
+    }
+
+    private static function validateOutputAttribute(string $attribute, ?string $value): void
+    {
+        if (null === $value || '' === $value) {
+            return;
+        }
+
+        $pattern = 'domain' === $attribute ? '/^\.?(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/D' : '/^[\x21-\x2B\x2D-\x3A\x3C-\x7E]*$/D';
+        if (!preg_match($pattern, $value) || ('domain' === $attribute && \strlen(ltrim($value, '.')) > 253)) {
+            throw new \InvalidArgumentException(\sprintf('The cookie %s "%s" contains invalid characters.', $attribute, $value));
+        }
+    }
+
+    private static function validateRawValue(?string $value): void
+    {
+        if (null === $value) {
+            return;
+        }
+
+        $unquotedValue = \strlen($value) >= 2 && '"' === $value[0] && '"' === $value[-1] ? substr($value, 1, -1) : $value;
+        if (preg_match('/[^\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]/', $unquotedValue)) {
+            throw new \InvalidArgumentException('The raw cookie value contains invalid characters.');
+        }
     }
 
     /**

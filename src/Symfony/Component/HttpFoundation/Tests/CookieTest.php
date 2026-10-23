@@ -59,6 +59,114 @@ class CookieTest extends TestCase
         $this->assertInstanceOf(Cookie::class, Cookie::create($name));
     }
 
+    public function testParsingPreservesLegacyCookieData()
+    {
+        foreach (['a b', 'a,b', 'café'] as $value) {
+            $this->assertSame($value, Cookie::fromString('name='.$value)->getValue());
+        }
+
+        $this->assertSame('a/b', Cookie::fromString('a/b=value')->getName());
+        $this->assertSame('/café', Cookie::fromString('name=value; Path=/café')->getPath());
+        $this->assertSame('éxample.com', Cookie::fromString('name=value; Domain=éxample.com')->getDomain());
+    }
+
+    public function testNonRawCookieNameEncodesNonTokenCharacters()
+    {
+        $cookie = Cookie::create('a/b[é]'."\0", 'value');
+
+        $this->assertStringStartsWith('a%2Fb%5B%C3%A9%5D%00=value;', (string) $cookie);
+    }
+
+    public static function invalidRawNames()
+    {
+        return [['a/b'], ['a[b]'], ['a"b'], ['a\\b'], ["a\0b"], ["a\x7fb"], ['café']];
+    }
+
+    #[DataProvider('invalidRawNames')]
+    public function testSerializationRejectsInvalidRawNames($name)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (string) Cookie::create($name, 'value', 0, '/', null, false, true, true);
+    }
+
+    #[DataProvider('invalidRawNames')]
+    public function testSerializationRejectsInvalidNamesAfterWithRaw($name)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (string) Cookie::create($name, 'value')->withRaw();
+    }
+
+    public static function invalidRawValues()
+    {
+        return [['a;b'], ['a,b'], ['a b'], ['a\\b'], ['a"b'], ['"a'], ["a\0b"], ["a\x7fb"], ['café']];
+    }
+
+    #[DataProvider('invalidRawValues')]
+    public function testSerializationRejectsInvalidRawValues($value)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (string) Cookie::create('name', $value, 0, '/', null, false, true, true);
+    }
+
+    #[DataProvider('invalidRawValues')]
+    public function testSerializationRejectsInvalidValuesAfterWithRaw($value)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (string) Cookie::create('name', $value)->withRaw();
+    }
+
+    #[DataProvider('invalidRawValues')]
+    public function testSerializationRejectsInvalidRawValuesAfterWithValue($value)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (string) Cookie::create('name', 'value', 0, '/', null, false, true, true)->withValue($value);
+    }
+
+    public function testRawCookieOctetsArePreserved()
+    {
+        foreach (["!#\$%&'()*+-./0123456789:<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~", '"value"', '""'] as $value) {
+            $this->assertStringStartsWith('name='.$value.';', (string) Cookie::create('name', $value, 0, '/', null, false, true, true));
+        }
+    }
+
+    public static function invalidAttributeBytes()
+    {
+        return [["\0"], ["\x01"], ["\x08"], ["\x0e"], ["\x1f"], ["\x7f"], ['é']];
+    }
+
+    #[DataProvider('invalidAttributeBytes')]
+    public function testSerializationRejectsInvalidPathBytes($byte)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (string) Cookie::create('name', 'value', 0, '/a'.$byte.'b');
+    }
+
+    #[DataProvider('invalidAttributeBytes')]
+    public function testSerializationRejectsInvalidBytesAfterWithPath($byte)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (string) Cookie::create('name', 'value')->withPath('/a'.$byte.'b');
+    }
+
+    public static function invalidDomains()
+    {
+        return [['/'], ['/foo'], ['/foo=bar'], ['/foo%20bar'], ['example.com/'], ['example.com=value'], ['example..com'], ['-example.com'], ['example-.com'], ['éxample.com'], ["exam\0ple.com"], [str_repeat('a', 64).'.com'], [str_repeat(str_repeat('a', 63).'.', 3).str_repeat('a', 62)]];
+    }
+
+    #[DataProvider('invalidDomains')]
+    public function testSerializationRejectsInvalidDomains($domain)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (string) Cookie::create('name', 'value', 0, '/', $domain);
+    }
+
+    #[DataProvider('invalidDomains')]
+    public function testSerializationRejectsInvalidDomainsAfterWithDomain($domain)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (string) Cookie::create('name', 'value')->withDomain($domain);
+    }
+
     public function testInstantiationThrowsExceptionIfCookieNameIsEmpty()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -118,28 +226,28 @@ class CookieTest extends TestCase
     public static function validPathsAndDomains()
     {
         return [
-            ['/'],
-            ['/foo'],
-            ['/foo/bar'],
-            ['/foo=bar'],
-            ['/foo%20bar'],
-            ['.myfoodomain.com'],
-            ['myfoodomain.com'],
+            ['/', 'localhost'],
+            ['/foo', '127.0.0.1'],
+            ['/foo/bar', 'myfoodomain.com'],
+            ['/foo=bar', '.myfoodomain.com'],
+            ['/foo%20bar', 'xn--xample-9ua.com'],
+            ['.myfoodomain.com', 'MyFooDomain.com'],
+            ['myfoodomain.com', str_repeat(str_repeat('a', 63).'.', 3).str_repeat('a', 61)],
         ];
     }
 
     #[DataProvider('validPathsAndDomains')]
-    public function testOrdinaryPathsAndDomainsAreAccepted($value)
+    public function testOrdinaryPathsAndDomainsAreAccepted($path, $domain)
     {
-        $cookie = Cookie::create('MyCookie', 'MyValue', 0, $value, $value);
+        $cookie = Cookie::create('MyCookie', 'MyValue', 0, $path, $domain);
 
-        $this->assertSame($value, $cookie->getPath());
-        $this->assertSame($value, $cookie->getDomain());
+        $this->assertSame($path, $cookie->getPath());
+        $this->assertSame($domain, $cookie->getDomain());
 
-        $cookie = Cookie::create('MyCookie')->withPath($value)->withDomain($value);
+        $cookie = Cookie::create('MyCookie')->withPath($path)->withDomain($domain);
 
-        $this->assertSame($value, $cookie->getPath());
-        $this->assertSame($value, $cookie->getDomain());
+        $this->assertSame($path, $cookie->getPath());
+        $this->assertSame($domain, $cookie->getDomain());
     }
 
     public function testNullAndEmptyPathsAndDomainsAreAccepted()

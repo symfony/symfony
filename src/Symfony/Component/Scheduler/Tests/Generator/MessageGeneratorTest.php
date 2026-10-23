@@ -323,6 +323,10 @@ class MessageGeneratorTest extends TestCase
 
         // Keep the generator and its heap alive while waiting for the next due time.
         $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+        // The initial Schedule::add() sets the restart flag. It is normally
+        // handled at the start of the next poll, which would discard this heap.
+        // Reset it to simulate an already-running worker with a warm heap.
+        $schedule->setRestart(false);
 
         // The shared checkpoint has moved past the due time, but no message was
         // recorded for that run (index -1). The warm heap still contains 11:30.

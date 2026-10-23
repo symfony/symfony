@@ -88,10 +88,11 @@ class RedisClusterPipelineTest extends TestCase
         $this->assertFalse($pool->commit());
     }
 
-    #[TestWith([\Redis::ATOMIC])]
-    #[TestWith([\Redis::PIPELINE])]
-    public function testQueueFailureDiscardsOnlyAnActivePipeline(int $mode)
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testQueueFailureDiscardsOnlyAnActivePipeline(bool $pipeline)
     {
+        $mode = $pipeline ? \Redis::PIPELINE : \Redis::ATOMIC;
         $redis = $this->createMock(\RedisCluster::class);
         $redis->method('mget')->willReturn([false, false]);
         $redis->method('getmode')->willReturn($mode);

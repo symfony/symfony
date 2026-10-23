@@ -11,7 +11,18 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-if (method_exists(\RedisCluster::class, 'pipeline')) {
+if (!method_exists(\RedisCluster::class, 'pipeline')) {
+    /**
+     * @internal
+     */
+    trait RedisClusterPipelineProxyTrait
+    {
+        public function exec(): array|false
+        {
+            return $this->initializeLazyObject()->exec(...\func_get_args());
+        }
+    }
+} else {
     /**
      * @internal
      */
@@ -25,17 +36,6 @@ if (method_exists(\RedisCluster::class, 'pipeline')) {
         public function pipeline(): \RedisCluster|bool
         {
             return $this->initializeLazyObject()->pipeline(...\func_get_args());
-        }
-    }
-} else {
-    /**
-     * @internal
-     */
-    trait RedisClusterPipelineProxyTrait
-    {
-        public function exec(): array|false
-        {
-            return $this->initializeLazyObject()->exec(...\func_get_args());
         }
     }
 }

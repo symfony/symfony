@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `PrivacyPass` namespace, implementing the origin role of Privacy Pass (RFC 9577 and RFC 9578)
+ * Add `#[RequiresPrivateToken]` to require a Privacy Pass token on a controller
+ * Add `SessionPrivateTokenManager` to remember an accepted Privacy Pass token for the session
+
 8.2
 ---
 

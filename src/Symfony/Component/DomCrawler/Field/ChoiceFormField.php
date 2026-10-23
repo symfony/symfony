@@ -254,7 +254,9 @@ class ChoiceFormField extends FormField
         $option = [];
 
         $defaultDefaultValue = 'select' === $this->node->nodeName ? '' : 'on';
-        $defaultValue = (isset($node->nodeValue) && !empty($node->nodeValue)) ? $node->nodeValue : $defaultDefaultValue;
+        // like browsers, use the option text with ASCII whitespace stripped and collapsed
+        $text = trim(preg_replace('/[ \t\n\f\r]+/', ' ', $node->nodeValue ?? ''), " \t\n\f\r");
+        $defaultValue = '' !== $text ? $text : $defaultDefaultValue;
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
         $option['disabled'] = $node->hasAttribute('disabled');
 

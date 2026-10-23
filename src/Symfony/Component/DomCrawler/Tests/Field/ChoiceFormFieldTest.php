@@ -363,6 +363,16 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
     }
 
+    public function testOptionWithNoValueUsesTextWithWhitespaceCollapsed()
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML("<select name=\"name\"><option>0</option><option selected>\n  Two \t\n  words  </option></select>");
+        $field = new ChoiceFormField($document->getElementsByTagName('select')->item(0));
+
+        $this->assertSame('Two words', $field->getValue());
+        $this->assertSame(['0', 'Two words'], $field->availableOptionValues());
+    }
+
     public function testDisableValidation()
     {
         $node = $this->createSelectNode(['foo' => false, 'bar' => false]);

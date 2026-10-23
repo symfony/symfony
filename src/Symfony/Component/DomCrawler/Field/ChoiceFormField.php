@@ -23,6 +23,7 @@ class ChoiceFormField extends FormField
     private string $type;
     private bool $multiple;
     private array $options;
+    private ?int $selectedOption = null;
     private bool $validationDisabled = false;
     private ?int $checkedRadio = null;
 
@@ -33,8 +34,7 @@ class ChoiceFormField extends FormField
      */
     public function hasValue(): bool
     {
-        // don't send a value for unchecked checkboxes
-        if (\in_array($this->type, ['checkbox', 'radio']) && null === $this->value) {
+        if (\in_array($this->type, ['checkbox', 'radio', 'select']) && null === $this->value) {
             return false;
         }
 
@@ -57,6 +57,10 @@ class ChoiceFormField extends FormField
         // radios may share their value, so look at the checked one only
         if ('radio' === $this->type) {
             return null !== $this->checkedRadio && $this->options[$this->checkedRadio]['disabled'];
+        }
+
+        if ('select' === $this->type && !$this->multiple) {
+            return null !== $this->selectedOption && $this->options[$this->selectedOption]['disabled'];
         }
 
         foreach ($this->options as $option) {
@@ -151,6 +155,15 @@ class ChoiceFormField extends FormField
 
                 if ('radio' === $this->type) {
                     $this->checkRadio($this->value);
+                } elseif ('select' === $this->type) {
+                    $this->selectedOption = null;
+                    foreach ($this->options as $i => $option) {
+                        if ($option['value'] == $this->value) {
+                            $this->selectedOption = $i;
+
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -216,6 +229,7 @@ class ChoiceFormField extends FormField
         }
 
         $this->value = null;
+        $this->selectedOption = null;
         $this->options = [];
         $this->multiple = false;
         $this->checkedRadio = null;
@@ -248,21 +262,24 @@ class ChoiceFormField extends FormField
                         $this->value[] = $optionValue['value'];
                     } else {
                         $this->value = $optionValue['value'];
+                        $this->selectedOption = \count($this->options) - 1;
                     }
                 }
             }
 
             // if no option is selected and if it is a simple select box, take the first option as the value
             if (!$found && !$this->multiple && $this->options) {
-                $this->value = $this->options[0]['value'];
-
                 if (preg_match('/^[\t\n\f\r ]*\+?([0-9]+)/', $this->node->getAttribute('size'), $matches) && 1 < $matches[1]) {
                     return;
                 }
 
-                foreach ($this->options as $option) {
+                $this->value = $this->options[0]['value'];
+                $this->selectedOption = 0;
+
+                foreach ($this->options as $i => $option) {
                     if (!$option['disabled']) {
                         $this->value = $option['value'];
+                        $this->selectedOption = $i;
 
                         break;
                     }

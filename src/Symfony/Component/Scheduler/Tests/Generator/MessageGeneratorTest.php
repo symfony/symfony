@@ -315,9 +315,9 @@ class MessageGeneratorTest extends TestCase
         // A previous worker completed an earlier occurrence.
         $item = $cache->getItem('dummy');
         $item->set([
-            new \\DateTimeImmutable('2026-10-23 10:30:00 UTC'),
+            new \DateTimeImmutable('2026-10-23 10:30:00 UTC'),
             0,
-            new \\DateTimeImmutable('2026-10-23 10:30:00 UTC'),
+            new \DateTimeImmutable('2026-10-23 10:30:00 UTC'),
         ]);
         $cache->save($item);
 
@@ -327,9 +327,9 @@ class MessageGeneratorTest extends TestCase
         // The shared checkpoint has moved past the due time, but no message was
         // recorded for that run (index -1). The warm heap still contains 11:30.
         $item->set([
-            new \\DateTimeImmutable('2026-10-23 11:30:01 UTC'),
+            new \DateTimeImmutable('2026-10-23 11:30:01 UTC'),
             -1,
-            new \\DateTimeImmutable('2026-10-23 11:30:01 UTC'),
+            new \DateTimeImmutable('2026-10-23 11:30:01 UTC'),
         ]);
         $cache->save($item);
 

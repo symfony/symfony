@@ -13,12 +13,15 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Dummy\DummyClassOne;
 use Symfony\Component\Serializer\Tests\Dummy\DummyClassTwo;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -77,6 +80,87 @@ class ConstraintViolationListNormalizerTest extends TestCase
         ];
 
         $this->assertEquals($expected, $this->normalizer->normalize($list));
+    }
+
+    #[DataProvider('provideIgnoredAttributes')]
+    public function testNormalizeWithIgnoredAttributes(array $defaultContext, array $context, array $expected)
+    {
+        $normalizer = new ConstraintViolationListNormalizer($defaultContext);
+        $list = new ConstraintViolationList([
+            new ConstraintViolation('Invalid', 'Template', ['type' => 'parameter'], null, 'name', null, null, 'code'),
+        ]);
+
+        $this->assertSame($expected, $normalizer->normalize($list, null, $context));
+    }
+
+    public static function provideIgnoredAttributes(): iterable
+    {
+        $violation = [
+            'propertyPath' => 'name',
+            'title' => 'Invalid',
+            'template' => 'Template',
+            'parameters' => ['type' => 'parameter'],
+            'type' => 'urn:uuid:code',
+        ];
+        $complete = [
+            'type' => 'https://symfony.com/errors/validation',
+            'title' => 'Validation Failed',
+            'detail' => 'name: Invalid',
+            'violations' => [$violation],
+        ];
+        $withoutType = [
+            'title' => 'Validation Failed',
+            'detail' => 'name: Invalid',
+            'violations' => [[
+                'propertyPath' => 'name',
+                'title' => 'Invalid',
+                'template' => 'Template',
+                'parameters' => ['type' => 'parameter'],
+            ]],
+        ];
+
+        yield 'context' => [[], [AbstractNormalizer::IGNORED_ATTRIBUTES => ['type']], $withoutType];
+        yield 'default context' => [[AbstractNormalizer::IGNORED_ATTRIBUTES => ['type']], [], $withoutType];
+        yield 'override defaults' => [[AbstractNormalizer::IGNORED_ATTRIBUTES => ['type']], [AbstractNormalizer::IGNORED_ATTRIBUTES => []], $complete];
+        yield 'null falls back to defaults' => [[AbstractNormalizer::IGNORED_ATTRIBUTES => ['type']], [AbstractNormalizer::IGNORED_ATTRIBUTES => null], $withoutType];
+        yield 'unknown attribute' => [[], [AbstractNormalizer::IGNORED_ATTRIBUTES => ['unknown']], $complete];
+        yield 'multiple attributes' => [[], [AbstractNormalizer::IGNORED_ATTRIBUTES => ['title', 'template', 'parameters']], [
+            'type' => 'https://symfony.com/errors/validation',
+            'detail' => 'name: Invalid',
+            'violations' => [[
+                'propertyPath' => 'name',
+                'type' => 'urn:uuid:code',
+            ]],
+        ]];
+        yield 'ignore violations' => [[], [AbstractNormalizer::IGNORED_ATTRIBUTES => ['violations']], [
+            'type' => 'https://symfony.com/errors/validation',
+            'title' => 'Validation Failed',
+            'detail' => 'name: Invalid',
+        ]];
+        yield 'ignore all attributes' => [[], [AbstractNormalizer::IGNORED_ATTRIBUTES => ['type', 'title', 'detail', 'violations']], []];
+    }
+
+    public function testSerializeWithIgnoredAttributes()
+    {
+        $constraint = new NotNull();
+        $constraint->payload = ['type' => 'payload type'];
+        $list = new ConstraintViolationList([
+            new ConstraintViolation('Invalid', 'Template', [], null, 'name', null, null, 'code', $constraint),
+            new ConstraintViolation('Missing', 'Template', [], null, 'email', null),
+        ]);
+        $serializer = new Serializer([$this->normalizer], [new JsonEncoder()]);
+
+        $this->assertSame([
+            'title' => 'Validation Failed',
+            'detail' => "name: Invalid\nemail: Missing",
+            'violations' => [
+                ['propertyPath' => 'name', 'title' => 'Invalid', 'parameters' => [], 'payload' => ['type' => 'payload type']],
+                ['propertyPath' => 'email', 'title' => 'Missing', 'parameters' => []],
+            ],
+        ], json_decode($serializer->serialize($list, 'json', [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['type', 'template'],
+            ConstraintViolationListNormalizer::PAYLOAD_FIELDS => true,
+        ]), true, 512, \JSON_THROW_ON_ERROR));
     }
 
     public function testNormalizeWithNameConverter()

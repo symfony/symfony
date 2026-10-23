@@ -30,7 +30,24 @@ class DeflateMarshaller implements MarshallerInterface
 
     public function marshall(array $values, ?array &$failed): array
     {
-        return array_map('gzdeflate', $this->marshaller->marshall($values, $failed));
+        $values = $this->marshaller->marshall($values, $failed);
+
+        foreach ($values as $id => $value) {
+            $compressed = 32 > \strlen($value) ? null : gzdeflate($value);
+
+            if (null !== $compressed && \strlen($compressed) < \strlen($value)) {
+                $values[$id] = $compressed;
+                continue;
+            }
+
+            // Keep possible DEFLATE streams compressed so unmarshall() cannot inflate raw payloads.
+            $inflated = 128 < \strlen($value) ? @inflate_add(inflate_init(\ZLIB_ENCODING_RAW), substr($value, 0, 128), \ZLIB_NO_FLUSH) : @gzinflate($value);
+            if (false !== $inflated) {
+                $values[$id] = $compressed ?? gzdeflate($value);
+            }
+        }
+
+        return $values;
     }
 
     public function unmarshall(string $value): mixed

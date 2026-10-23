@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Make `DeflateMarshaller` skip compression for small values and keep uncompressed values when compression does not reduce their size
+
 8.2
 ---
 

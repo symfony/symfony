@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Make `DeflateMarshaller` skip compression for small values and keep uncompressed values when compression does not reduce their size
+ * Deprecate nesting `DeflateMarshaller` decorators
 
 8.2
 ---

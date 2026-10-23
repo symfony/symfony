@@ -12,6 +12,8 @@
 namespace Symfony\Component\Cache\Tests\Marshaller;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
@@ -87,14 +89,19 @@ class DeflateMarshallerTest extends TestCase
         yield 'deflate stream across probe limit' => [gzdeflate($binary, 0), true];
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testNestedMarshallers()
     {
+        $this->expectUserDeprecationMessage('Since symfony/cache 8.3: Nesting "Symfony\Component\Cache\Marshaller\DeflateMarshaller" decorators is deprecated. Use a single decorator instead.');
+
         $marshaller = new DeflateMarshaller(new DeflateMarshaller(new DefaultMarshaller()));
         $values = ['abc' => str_repeat('cache value ', 100)];
 
         $result = $marshaller->marshall($values, $failed);
 
         $this->assertSame($values['abc'], $marshaller->unmarshall($result['abc']));
+        $this->assertSame($values['abc'], $marshaller->unmarshall(gzdeflate(gzdeflate(serialize($values['abc'])))));
     }
 
     public function testFailedValues()

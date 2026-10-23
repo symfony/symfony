@@ -20,11 +20,18 @@ use Symfony\Component\Cache\Exception\CacheException;
  */
 class DeflateMarshaller implements MarshallerInterface
 {
+    /**
+     * @param MarshallerInterface $marshaller Nesting DeflateMarshaller decorators is deprecated since Symfony 8.3
+     */
     public function __construct(
         private MarshallerInterface $marshaller,
     ) {
         if (!\function_exists('gzdeflate')) {
             throw new CacheException('The "zlib" PHP extension is not loaded.');
+        }
+
+        if ($marshaller instanceof self) {
+            trigger_deprecation('symfony/cache', '8.3', 'Nesting "%s" decorators is deprecated. Use a single decorator instead.', self::class);
         }
     }
 

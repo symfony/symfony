@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\Read;
 
+use Symfony\Component\JsonStreamer\Exception\InvalidStreamException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
 
@@ -41,6 +42,24 @@ final class Decoder
             throw new RuntimeException('Failed to read JSON stream.');
         }
 
-        return self::decodeString($contents);
+        try {
+            return json_decode($contents, associative: true, flags: \JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new InvalidStreamException('JSON is not valid: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * @param resource $stream
+     */
+    public static function validateStream($stream, int $offset, int $length): void
+    {
+        if (false === $contents = stream_get_contents($stream, $length, $offset)) {
+            throw new RuntimeException('Failed to read JSON stream.');
+        }
+
+        if (!json_validate($contents)) {
+            throw new InvalidStreamException('JSON is not valid: '.json_last_error_msg());
+        }
     }
 }

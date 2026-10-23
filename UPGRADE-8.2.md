@@ -17,6 +17,12 @@ AssetMapper
 BrowserKit
 ----------
 
+ * Add `CookieJar::allForUri()` to retrieve matching `Cookie` objects in request order, including duplicate names.
+   `allValues()` and `allRawValues()` still return one value per name.
+ * [BC BREAK] `HttpBrowser` sends all matching cookies, including duplicate names.
+   Cookies with longer paths come first; cookies with the same path length keep their creation order.
+   Host-only and domain cookies with the same name, domain and path coexist.
+   `CookieJar::expire()` removes both variants; a received expiration cookie removes only the matching variant.
  * [BC BREAK] `CookieJar::updateFromSetCookie()` and `updateFromResponse()` ignore a cookie whose `Domain` attribute does not match the host of the response, as browsers do
  * [BC BREAK] `CookieJar` sends a cookie set without a `Domain` attribute only to the host that set it, not to its subdomains, as browsers do
 

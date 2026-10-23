@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Add `CookieJar::allForUri()` and send cookies with duplicate names in path and creation order
+ * Keep host-only and domain cookies with the same name, domain and path separate
  * Make `CookieJar` ignore a cookie whose `Domain` attribute does not match the host of the response
  * Add `Cookie::isHostOnly()`
  * Make `CookieJar` send a cookie set without a `Domain` attribute only to the host that set it

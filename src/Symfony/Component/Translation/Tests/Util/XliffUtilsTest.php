@@ -12,6 +12,9 @@
 namespace Symfony\Component\Translation\Tests\Util;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Util\XliffUtils;
 
@@ -80,6 +83,33 @@ class XliffUtilsTest extends TestCase
         }
     }
 
+    #[RequiresPhpExtension('pcntl')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testEntityLoaderTemporaryFileSurvivesFork()
+    {
+        $dom = new \DOMDocument();
+        $dom->load(__DIR__.'/../Fixtures/resources-clean.xlf');
+        $this->assertSame([], XliffUtils::validateSchema($dom));
+
+        $method = new \ReflectionMethod(XliffUtils::class, 'shouldEnableEntityLoader');
+        preg_match('/schemaLocation="([^"]+)"/', $method->getStaticVariables()['schema'], $matches);
+        $tmpfile = rawurldecode(parse_url($matches[1], \PHP_URL_PATH));
+
+        if (0 === $pid = pcntl_fork()) {
+            exit(0);
+        }
+
+        $this->assertGreaterThan(0, $pid);
+        $this->assertSame($pid, pcntl_waitpid($pid, $status));
+        $this->assertTrue(pcntl_wifexited($status));
+        $this->assertSame(0, pcntl_wexitstatus($status));
+
+        clearstatcache(true, $tmpfile);
+        $this->assertFileExists($tmpfile);
+        $this->assertSame([], XliffUtils::validateSchema($dom));
+    }
+
     public function testSchemaValidationInsideAPharDoesNotLeakTemporaryFiles()
     {
         if (!\extension_loaded('phar')) {
@@ -105,14 +135,14 @@ class XliffUtilsTest extends TestCase
 
             $phar = new Phar($workspace.'/translation.phar');
             $phar->addFile($componentDir.'/Util/XliffUtils.php', 'Util/XliffUtils.php');
-            $phar->addFile($componentDir.'/Resources/schemas/xliff-core-1.2-transitional.xsd', 'Resources/schemas/xliff-core-1.2-transitional.xsd');
+            $phar->addFile($componentDir.'/Resources/schemas/xliff-core-2.0.xsd', 'Resources/schemas/xliff-core-2.0.xsd');
             $phar->addFile($componentDir.'/Resources/schemas/xml.xsd', 'Resources/schemas/xml.xsd');
             $phar->setStub('<?php __HALT_COMPILER();');
             unset($phar);
 
             require 'phar://'.$workspace.'/translation.phar/Util/XliffUtils.php';
 
-            $xliff = '<?xml version="1.0"?><xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file source-language="en" datatype="plaintext" original="file.ext"><body><trans-unit id="1"><source>foo</source><target>bar</target></trans-unit></body></file></xliff>';
+            $xliff = '<?xml version="1.0"?><xliff version="2.0" xmlns="urn:oasis:names:tc:xliff:document:2.0" srcLang="en"><file id="file"><unit id="1"><segment><source>foo</source><target>bar</target></segment></unit></file></xliff>';
 
             $validateAndCountTempFiles = function () use ($xliff) {
                 $dom = new DOMDocument();
@@ -128,11 +158,24 @@ class XliffUtilsTest extends TestCase
 
             $afterOne = $validateAndCountTempFiles();
 
+            if (function_exists('pcntl_fork')) {
+                if (0 === $pid = pcntl_fork()) {
+                    exit(0);
+                }
+
+                if (0 > $pid || $pid !== pcntl_waitpid($pid, $status) || !pcntl_wifexited($status) || 0 !== pcntl_wexitstatus($status)) {
+                    echo 'FORK FAILED';
+                    exit(1);
+                }
+            }
+
+            $afterChild = count(glob(sys_get_temp_dir().'/symfony*'));
+
             for ($i = 0; $i < 4; ++$i) {
                 $afterFive = $validateAndCountTempFiles();
             }
 
-            echo 'OK ', $afterOne, ' ', $afterFive;
+            echo 'OK ', $afterOne, ' ', $afterChild, ' ', $afterFive;
             EOPHP;
 
         $command = [\PHP_BINARY, '-d', 'phar.readonly=0', '-d', 'sys_temp_dir="'.$tmpDir.'"', '--', \dirname(__DIR__, 2), $workspace];
@@ -155,8 +198,10 @@ class XliffUtilsTest extends TestCase
                 $this->markTestSkipped('Phar archives cannot be created.');
             }
 
-            [$status, $afterOne, $afterFive] = explode(' ', $output) + [null, null, null];
+            [$status, $afterOne, $afterChild, $afterFive] = explode(' ', $output) + [null, null, null, null];
             $this->assertSame('OK', $status, $output.$error);
+            $this->assertGreaterThan(0, (int) $afterOne);
+            $this->assertSame($afterOne, $afterChild, 'Child processes must not remove the schema files.');
             $this->assertSame($afterOne, $afterFive, 'Validating more files must not copy the schema again.');
             $this->assertSame([], glob($tmpDir.'/symfony*'), 'Temporary files must be removed when the process ends.');
         } finally {

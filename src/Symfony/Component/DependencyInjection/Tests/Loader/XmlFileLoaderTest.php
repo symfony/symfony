@@ -14,6 +14,9 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
@@ -115,6 +118,29 @@ class XmlFileLoaderTest extends TestCase
 
         $xml = $m->invoke($loader, self::$fixturesPath.'/xml/services1.xml');
         $this->assertInstanceOf(\DOMDocument::class, $xml, '->parseFileToDOM() returns an SimpleXMLElement object');
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testEntityLoaderTemporaryFileSurvivesFork()
+    {
+        $loader = new XmlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services1.xml');
+
+        $method = new \ReflectionMethod(XmlFileLoader::class, 'shouldEnableEntityLoader');
+        preg_match('/schemaLocation="([^"]+)"/', $method->getStaticVariables()['schema'], $matches);
+        $tmpfile = rawurldecode(parse_url($matches[1], \PHP_URL_PATH));
+
+        if (0 === $pid = pcntl_fork()) {
+            exit(0);
+        }
+
+        $this->assertGreaterThan(0, $pid);
+        pcntl_waitpid($pid, $status);
+
+        $this->assertSame(0, pcntl_wexitstatus($status));
+        $this->assertFileExists($tmpfile);
     }
 
     public function testLoadWithExternalEntitiesDisabled()

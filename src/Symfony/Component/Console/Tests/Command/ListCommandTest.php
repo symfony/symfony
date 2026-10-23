@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests\Command;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -34,6 +35,20 @@ class ListCommandTest extends TestCase
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(['command' => $command->getName(), '--format' => 'xml']);
         $this->assertMatchesRegularExpression('/<command id="list" name="list" hidden="0">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
+    }
+
+    public function testExecuteDescribesCompleteCommandWithConflictingApplicationOption()
+    {
+        $application = new Application();
+        $application->getDefinition()->addOption(new InputOption('config', 'c', InputOption::VALUE_REQUIRED));
+        $commandTester = new CommandTester($command = $application->get('list'));
+
+        foreach (['json', 'xml'] as $format) {
+            $commandTester->execute(['command' => $command->getName(), '--format' => $format]);
+
+            $commandTester->assertCommandIsSuccessful();
+            $this->assertStringContainsString('_complete', $commandTester->getDisplay());
+        }
     }
 
     public function testExecuteListsCommandsWithRawOption()

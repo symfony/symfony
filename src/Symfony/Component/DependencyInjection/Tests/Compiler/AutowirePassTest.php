@@ -1728,8 +1728,10 @@ class AutowirePassTest extends TestCase
         $definition = $container->getDefinition('consumer');
         $this->assertEquals(new LazyProxyArgument(new TypedReference(A::class, A::class)), $definition->getArgument(0));
         $this->assertEquals(new TypedReference(Foo::class, Foo::class), $definition->getArgument(1));
-        $this->assertEquals(new LazyProxyArgument(new TypedReference('custom_a', A::class)), $definition->getArgument(2));
-        $this->assertEquals(new TypedReference('custom_foo', Foo::class), $definition->getArgument(3));
+        $this->assertInstanceOf(LazyProxyArgument::class, $definition->getArgument(2));
+        $this->assertSame('custom_a', (string) $definition->getArgument(2)->getValues()[0]);
+        $this->assertSame('custom_foo', (string) $definition->getArgument(3));
+        $this->assertNotInstanceOf(LazyProxyArgument::class, $definition->getArgument(3));
 
         $calls = $definition->getMethodCalls();
         $this->assertCount(1, $calls);

@@ -220,10 +220,10 @@ final class PhpGenerator
                 $separator = '';
                 foreach ($node->getProperties() as $streamedName => $property) {
                     $quotedStreamedName = var_export($streamedName, true);
-                    $propertyValuePhp = $this->canBeDecodedWithJsonDecode($property['value'], $decodeFromStream)
-                        ? "\$data[$quotedStreamedName] ?? '_symfony_missing_value'"
-                        : "\\array_key_exists($quotedStreamedName, \$data) ? \$providers[".var_export($property['value']->getIdentifier(), true)."](\$data[$quotedStreamedName]) : '_symfony_missing_value'";
-                    $propertiesValuePhp .= $separator.var_export($property['name'], true).' => '.$property['accessor']($propertyValuePhp);
+                    [$isSetPhp, $propertyValuePhp] = $this->canBeDecodedWithJsonDecode($property['value'], $decodeFromStream)
+                        ? ["isset(\$data[$quotedStreamedName])", "\$data[$quotedStreamedName]"]
+                        : ["\\array_key_exists($quotedStreamedName, \$data)", '$providers['.var_export($property['value']->getIdentifier(), true)."](\$data[$quotedStreamedName])"];
+                    $propertiesValuePhp .= $separator.var_export($property['name'], true)." => $isSetPhp ? ".$property['accessor']($propertyValuePhp)." : '_symfony_missing_value'";
                     $separator = ', ';
                 }
                 $propertiesValuePhp .= ']';

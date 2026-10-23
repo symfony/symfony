@@ -16,7 +16,7 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
         return \Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum::from($data);
     };
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNameAttributes'] = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
-        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes::class, \array_filter(['id' => $data['@id'] ?? '_symfony_missing_value', 'name' => $data['name'] ?? '_symfony_missing_value'], static function ($v) {
+        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes::class, \array_filter(['id' => isset($data['@id']) ? $data['@id'] : '_symfony_missing_value', 'name' => isset($data['name']) ? $data['name'] : '_symfony_missing_value'], static function ($v) {
             return '_symfony_missing_value' !== $v;
         }));
     };

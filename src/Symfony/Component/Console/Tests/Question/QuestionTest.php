@@ -111,6 +111,11 @@ class QuestionTest extends TestCase
                 ['a' => 'c', 'b' => 'd'],
                 ['a', 'b', 'c', 'd'],
             ],
+            'empty array' => [[], []],
+            'sparse integer keys' => [[2 => 'a', 5 => 'b'], ['a', 'b']],
+            'integer string key' => [['42' => 'a'], ['a']],
+            'mixed keys with string last' => [[2 => 'a', 'name' => 'b'], [2, 'name', 'a', 'b']],
+            'string key with leading zero' => [['01' => 'a'], ['01', 'a']],
             'iterator' => [
                 new \ArrayIterator(['a', 'b', 'c', 'd']),
                 ['a', 'b', 'c', 'd'],

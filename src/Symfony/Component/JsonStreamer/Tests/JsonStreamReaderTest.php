@@ -81,6 +81,17 @@ class JsonStreamReaderTest extends TestCase
             $reader,
             [true, false],
             '[true, false]',
+            Type::array(Type::bool()),
+        );
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertSame([1, 2], array_map(static fn (ClassicDummy $d): int => $d->id, $read));
+        }, '[{"id":1,"name":"a"},{"id":2,"name":"b"}]', Type::array(Type::object(ClassicDummy::class)));
+
+        $this->assertRead(
+            $reader,
+            [true, false],
+            '[true, false]',
             Type::list(Type::bool()),
         );
 
@@ -88,6 +99,11 @@ class JsonStreamReaderTest extends TestCase
             $this->assertIsIterable($read);
             $this->assertSame([true, false], iterator_to_array($read));
         }, '{"0": true, "1": false}', Type::iterable(Type::bool()));
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertIsIterable($read);
+            $this->assertSame([true, false], iterator_to_array($read));
+        }, '[true, false]', Type::iterable(Type::bool()));
 
         $this->assertRead($reader, function (mixed $read) {
             $this->assertIsIterable($read);

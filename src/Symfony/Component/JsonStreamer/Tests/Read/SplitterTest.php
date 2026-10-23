@@ -40,6 +40,19 @@ class SplitterTest extends TestCase
         $this->assertDictBoundaries(['k' => [5, 4]], '{"k":[10]}');
     }
 
+    public function testSplitCollection()
+    {
+        foreach (['null' => null, '{}' => [], '[]' => [], '{"k":[10]}' => ['k' => [5, 4]], '[100,200]' => [[1, 3], [5, 3]], '[1,[2,3]]' => [[1, 1], [3, 5]]] as $content => $expectedBoundaries) {
+            $resource = fopen('php://temp', 'w');
+            fwrite($resource, $content);
+            rewind($resource);
+
+            $boundaries = Splitter::splitCollection($resource);
+
+            $this->assertSame($expectedBoundaries, null !== $boundaries ? iterator_to_array($boundaries) : null);
+        }
+    }
+
     public function testSplitDictDoesNotRetainKeys()
     {
         $countRetainedValues = static function (): int {

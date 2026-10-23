@@ -160,6 +160,25 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals(['foo', 'baz'], $field->getValue());
     }
 
+    public function testAddChoiceReadsTextFromAnotherDocument()
+    {
+        $field = new ChoiceFormField($this->createSelectNode(['foo' => true], ['multiple' => 'multiple']));
+        $document = new \DOMDocument();
+        $option = $document->createElement('option');
+        $option->appendChild($document->createTextNode(" \tbar\n"));
+        $option->appendChild($document->createElement('script', 'ignored'));
+        $option->appendChild($document->createTextNode("\rbaz\f "));
+
+        $field->addChoice($option);
+
+        $this->assertSame(['foo', 'bar baz'], $field->availableOptionValues());
+        $this->assertSame(['foo'], $field->getValue());
+
+        $field->select('bar baz');
+
+        $this->assertSame(['bar baz'], $field->getValue());
+    }
+
     public function testMultipleSelects()
     {
         $node = $this->createSelectNode(['foo' => false, 'bar' => false], ['multiple' => 'multiple']);

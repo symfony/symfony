@@ -299,7 +299,8 @@ class ChoiceFormField extends FormField
         $text = $node->nodeValue ?? '';
         if ('option' === $node->nodeName && !$node->hasAttribute('value')) {
             $text = '';
-            foreach ($this->xpath->query('descendant::text()[not(ancestor::*[local-name()="script" and (namespace-uri()="" or namespace-uri()="http://www.w3.org/1999/xhtml" or namespace-uri()="http://www.w3.org/2000/svg")])]', $node) as $textNode) {
+            $xpath = $node->ownerDocument === $this->node->ownerDocument ? $this->xpath : new \DOMXPath($node->ownerDocument);
+            foreach ($xpath->query('descendant::text()[not(ancestor::*[local-name()="script" and (namespace-uri()="" or namespace-uri()="http://www.w3.org/1999/xhtml" or namespace-uri()="http://www.w3.org/2000/svg")])]', $node) as $textNode) {
                 $text .= $textNode->nodeValue;
             }
         }

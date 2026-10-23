@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `ExpirationStamp` and `ExpirationMiddleware` to discard a message whose deadline has passed instead of sending or handling it
  * Add `#[AsMessageMiddleware]` and the `messenger.middleware` tag to add a middleware to a bus, placed with `before` and `after`
  * Add `before` and `after` to `#[AsMessageHandler]` and the `messenger.message_handler` tag to order handlers
  * Add the `messages` option of buses and the `$messageTypes` argument of `MessageBus`, to restrict the types of the messages the application can dispatch on a bus

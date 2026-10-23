@@ -464,6 +464,9 @@ class MessengerBundle extends AbstractBundle
             $defaultMiddleware['before'][] = ['id' => 'deduplicate_middleware'];
         }
 
+        // inside the deduplication middleware, so that discarding an expired message releases its deduplication lock
+        $defaultMiddleware['before'][] = ['id' => 'expiration'];
+
         $inboxTransportNames = array_keys(array_filter($config['transports'], static fn (array $transport) => $transport['inbox']['enabled']));
 
         if ($inboxTransportNames) {

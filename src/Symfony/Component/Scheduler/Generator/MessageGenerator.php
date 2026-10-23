@@ -69,7 +69,7 @@ final class MessageGenerator implements MessageGeneratorInterface
             $trigger = $recurringMessage->getTrigger();
             $yield = true;
 
-            if ($time < $lastTime) {
+            if ($time < $lastTime && -1 !== $lastIndex) {
                 $time = $lastTime;
                 $yield = false;
             } elseif ($time == $lastTime && $index <= $lastIndex) {

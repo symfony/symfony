@@ -65,6 +65,15 @@ final class GenericType extends Type implements WrappingTypeInterface
         return $this->variableTypes;
     }
 
+    public function isIdentifiedBy(TypeIdentifier|string ...$identifiers): bool
+    {
+        if ($this->type instanceof WrappingTypeInterface || $this->type instanceof CompositeTypeInterface) {
+            return parent::isIdentifiedBy(...$identifiers);
+        }
+
+        return $this->type->isIdentifiedBy(...$identifiers);
+    }
+
     /**
      * @param-immediately-invoked-callable $specification
      */

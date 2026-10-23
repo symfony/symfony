@@ -70,6 +70,34 @@ class LexerTest extends TestCase
         $this->assertTokens([[$veryLongString, 0]], $veryLongString);
     }
 
+    public function testTokensFromNonSeekableStream()
+    {
+        [$resource, $writer] = stream_socket_pair('\\' === \DIRECTORY_SEPARATOR ? \STREAM_PF_INET : \STREAM_PF_UNIX, \STREAM_SOCK_STREAM, \STREAM_IPPROTO_IP);
+        $this->assertSame(5, fwrite($writer, '[1,2]'));
+        fclose($writer);
+
+        try {
+            $this->assertSame([['[', 0], ['1', 1], [',', 2], ['2', 3], [']', 4]], iterator_to_array((new Lexer())->getTokens($resource, 0, null)));
+        } finally {
+            fclose($resource);
+        }
+    }
+
+    public function testTokensWithLongEscapedString()
+    {
+        $json = json_encode(str_repeat('a"b\\c{}[],: ', 10_000));
+
+        $this->assertTokens([[$json, 0]], $json);
+    }
+
+    public function testTokensWithLongEscapedKey()
+    {
+        $key = json_encode(str_repeat('a"b\\c{}[],: ', 10_000));
+        $length = \strlen($key);
+
+        $this->assertTokens([['{', 0], [$key, 1], [':', $length + 1], ['1', $length + 2], ['}', $length + 3]], '{'.$key.':1}');
+    }
+
     /**
      * Ensures that the lexer is compliant with RFC 8259.
      */
@@ -107,6 +135,10 @@ class LexerTest extends TestCase
      */
     public static function jsonDataProvider(): iterable
     {
+        yield 'string_unpaired_high_surrogate' => ['string_unpaired_high_surrogate', '["\uD800"]', false];
+        yield 'string_unpaired_low_surrogate' => ['string_unpaired_low_surrogate', '["\uDC00"]', false];
+        yield 'key_unpaired_high_surrogate' => ['key_unpaired_high_surrogate', '{"\uD800":1}', false];
+        yield 'key_unpaired_low_surrogate' => ['key_unpaired_low_surrogate', '{"\uDC00":1}', false];
         yield ['array_1_true_without_comma', '[1 true]', false];
         yield ['array_a_invalid_utf8', '[aå]', false];
         yield ['array_colon_instead_of_comma', '["": 1]', false];

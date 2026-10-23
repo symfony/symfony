@@ -13,6 +13,7 @@ namespace Symfony\Component\JsonStreamer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\JsonStreamer\Exception\InvalidStreamException;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
@@ -66,6 +67,18 @@ class JsonStreamReaderTest extends TestCase
         $this->assertRead($reader, [['foo' => 1, 'bar' => 2], ['foo' => 3]], '[{"foo": 1, "bar": 2}, {"foo": 3}]', Type::builtin(TypeIdentifier::ITERABLE));
         $this->assertRead($reader, (object) ['foo' => 'bar'], '{"foo": "bar"}', Type::object());
         $this->assertRead($reader, DummyBackedEnum::ONE, '1', Type::enum(DummyBackedEnum::class, Type::string()));
+    }
+
+    public function testRejectsUnknownPropertyWithInvalidUnicodeEscapeFromStream()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, '{"id":1,"extra":"\uD800"}');
+        rewind($resource);
+
+        $this->expectException(InvalidStreamException::class);
+
+        $reader->read($resource, Type::object(ClassicDummy::class))->id;
     }
 
     public function testReadCollection()

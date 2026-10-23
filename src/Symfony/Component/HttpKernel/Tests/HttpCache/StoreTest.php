@@ -46,6 +46,40 @@ class StoreTest extends TestCase
         $this->assertEmpty($this->getStoreMetadata('/nothing'));
     }
 
+    /**
+     * @requires extension pcntl
+     *
+     * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
+     */
+    public function testAForkedStoreOnlyCleansUpItsOwnLocks()
+    {
+        $observer = new Store(sys_get_temp_dir().'/http_cache');
+        $childRequest = Request::create('/child');
+        $this->assertTrue($this->store->lock($this->request));
+
+        if (0 === $pid = pcntl_fork()) {
+            if (true === $this->store->lock($this->request) || $this->store->unlock($this->request)) {
+                exit(1);
+            }
+            if (true !== $this->store->lock($childRequest) || !$observer->isLocked($childRequest)) {
+                exit(2);
+            }
+            $this->store->cleanup();
+
+            exit(!$observer->isLocked($childRequest) && $observer->isLocked($this->request) ? 0 : 3);
+        }
+
+        $this->assertGreaterThan(0, $pid);
+        $this->assertSame($pid, pcntl_waitpid($pid, $status));
+        $this->assertTrue(pcntl_wifexited($status));
+        $this->assertSame(0, pcntl_wexitstatus($status));
+        $this->assertTrue($observer->isLocked($this->request));
+        $this->assertTrue($this->store->unlock($this->request));
+        $this->assertFalse($observer->isLocked($this->request));
+    }
+
     public function testUnlockFileThatDoesExist()
     {
         $this->storeSimpleEntry();

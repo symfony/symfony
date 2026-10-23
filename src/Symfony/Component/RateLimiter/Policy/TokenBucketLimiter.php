@@ -122,6 +122,46 @@ final class TokenBucketLimiter implements LimiterInterface
         }
     }
 
+    /**
+     * Gives back one token of a consume() call that should not count.
+     *
+     * The bucket refills on its own, so refunding a token that has been
+     * refilled in the meantime has no effect: the token is back already.
+     */
+    public function refund(RateLimit $rateLimit): RateLimit
+    {
+        if (!$rateLimit->isAccepted()) {
+            return $rateLimit;
+        }
+
+        $this->lock?->acquire(true);
+
+        try {
+            $bucket = $this->storage->fetch($this->id);
+
+            if (!$bucket instanceof TokenBucket) {
+                return $rateLimit;
+            }
+
+            $bucket->configure($this->maxBurst, $this->rate);
+
+            $now = microtime(true);
+
+            // the token has been given back when the bucket is full again, which the reset time of the consumed limit tells
+            if (null === $rateLimit->getResetAt() || (int) $now >= $rateLimit->getResetAt()->getTimestamp()) {
+                return $rateLimit;
+            }
+
+            $availableTokens = min($this->maxBurst, $bucket->getAvailableTokens($now) + 1);
+            $bucket->setTokens($availableTokens);
+            $this->storage->save($bucket);
+
+            return new RateLimit($availableTokens, \DateTimeImmutable::createFromTimestamp((int) ceil($now)), true, $this->maxBurst, $this->resetAt($availableTokens, $now));
+        } finally {
+            $this->lock?->release();
+        }
+    }
+
     private function resetAt(int $availableTokens, float $now): \DateTimeImmutable
     {
         if ($availableTokens >= $this->maxBurst) {

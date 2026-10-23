@@ -16,6 +16,8 @@ use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @method RateLimit refund(RateLimit $rateLimit) Gives back one token of a consume() call that should not count. Not implementing it is deprecated since Symfony 8.2.
  */
 interface LimiterInterface
 {

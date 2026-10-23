@@ -116,6 +116,44 @@ final class SlidingWindowLimiter implements LimiterInterface
         }
     }
 
+    /**
+     * Gives back one token of a consume() call that should not count.
+     *
+     * Hits fade out as the window slides, so refunding a hit whose weight has
+     * already been released has no effect: the token is back already.
+     */
+    public function refund(RateLimit $rateLimit): RateLimit
+    {
+        if (!$rateLimit->isAccepted()) {
+            return $rateLimit;
+        }
+
+        $this->lock?->acquire(true);
+
+        try {
+            $window = $this->storage->fetch($this->id);
+
+            if (!$window instanceof SlidingWindow || $window->isExpired()) {
+                return $rateLimit;
+            }
+
+            $now = microtime(true);
+
+            if (!$window->getHitCount() || null === $rateLimit->getResetAt() || (int) $now >= $rateLimit->getResetAt()->getTimestamp()) {
+                return $rateLimit;
+            }
+
+            $window->add(-1);
+            $this->storage->save($window);
+
+            $availableTokens = $this->getAvailableTokens($window->getHitCount());
+
+            return new RateLimit($availableTokens, \DateTimeImmutable::createFromTimestamp($availableTokens > 0 ? (int) floor($now) : (int) ceil($now + $window->calculateTimeForTokens($this->limit, 1))), true, $this->limit, $this->resetAt($window, $now));
+        } finally {
+            $this->lock?->release();
+        }
+    }
+
     private function getAvailableTokens(int $hitCount): int
     {
         return $this->limit - $hitCount;

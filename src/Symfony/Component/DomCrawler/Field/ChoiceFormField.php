@@ -242,6 +242,18 @@ class ChoiceFormField extends FormField
             // if no option is selected and if it is a simple select box, take the first option as the value
             if (!$found && !$this->multiple && $this->options) {
                 $this->value = $this->options[0]['value'];
+
+                if (preg_match('/^[\t\n\f\r ]*\+?([0-9]+)/', $this->node->getAttribute('size'), $matches) && 1 < $matches[1]) {
+                    return;
+                }
+
+                foreach ($this->options as $option) {
+                    if (!$option['disabled']) {
+                        $this->value = $option['value'];
+
+                        break;
+                    }
+                }
             }
         }
     }
@@ -258,7 +270,7 @@ class ChoiceFormField extends FormField
         $text = trim(preg_replace('/[ \t\n\f\r]+/', ' ', $node->nodeValue ?? ''), " \t\n\f\r");
         $defaultValue = '' !== $text ? $text : $defaultDefaultValue;
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
-        $option['disabled'] = $node->hasAttribute('disabled');
+        $option['disabled'] = $node->hasAttribute('disabled') || ('option' === $node->nodeName && $node->parentNode instanceof \DOMElement && 'optgroup' === $node->parentNode->nodeName && $node->parentNode->hasAttribute('disabled'));
 
         return $option;
     }

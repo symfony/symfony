@@ -373,6 +373,34 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertSame(['0', 'Two words'], $field->availableOptionValues());
     }
 
+    public function testSelectWithoutSelectedOptionTakesFirstEnabledOption()
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML('<select name="name"><option disabled>foo</option><optgroup disabled><option>bar</option></optgroup><optgroup><option>baz</option></optgroup></select>');
+        $field = new ChoiceFormField($document->getElementsByTagName('select')->item(0));
+
+        $this->assertSame('baz', $field->getValue(), '->getValue() returns the first option that is not disabled if none are selected');
+        $this->assertFalse($field->isDisabled());
+
+        $document = new \DOMDocument();
+        $document->loadHTML('<select name="name" size="2"><option disabled>foo</option><option>bar</option></select>');
+        $field = new ChoiceFormField($document->getElementsByTagName('select')->item(0));
+
+        $this->assertSame('foo', $field->getValue(), '->getValue() does not skip disabled options of a list box');
+    }
+
+    public function testSelectDefaultWithSizeUsesHtmlIntegerPrefix()
+    {
+        foreach (['1e2', '+1e2', '0001e2', "\v2", "\u{00A0}2", '-2', '+ 2'] as $size) {
+            $node = $this->createSelectNode(['foo' => false, 'bar' => false], ['size' => $size]);
+            $node->firstChild->setAttribute('disabled', '');
+            $field = new ChoiceFormField($node);
+
+            $this->assertSame('bar', $field->getValue(), $size);
+            $this->assertFalse($field->isDisabled());
+        }
+    }
+
     public function testDisableValidation()
     {
         $node = $this->createSelectNode(['foo' => false, 'bar' => false]);

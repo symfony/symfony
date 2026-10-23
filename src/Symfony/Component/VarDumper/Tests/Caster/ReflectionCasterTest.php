@@ -65,7 +65,7 @@ class ReflectionCasterTest extends TestCase
                     "name" => ReflectionProperty {
                 %A    +name: "name"
                       +class: "ReflectionClass"
-                %A    modifiers: "public"
+                %A    modifiers: "public%S"
                     }
                 %A]
                   methods: array:%d [
@@ -86,7 +86,7 @@ class ReflectionCasterTest extends TestCase
     public function testClosureCaster()
     {
         $a = $b = 123;
-        $var = static function ($x) use ($a, &$b) {};
+        $var = static function ($x) use ($a, &$b) { return $a; };
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'

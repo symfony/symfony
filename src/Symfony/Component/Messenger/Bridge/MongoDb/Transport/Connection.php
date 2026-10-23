@@ -34,8 +34,8 @@ use Symfony\Component\Messenger\Exception\TransportException;
 class Connection
 {
     private const DEFAULT_OPTIONS = [
-        'database' => null,
-        'collection_name' => 'messenger_messages',
+        'database' => 'app',
+        'collection' => 'messenger_messages',
         'queue_name' => 'default',
         'redeliver_timeout' => 3600,
     ];
@@ -56,7 +56,7 @@ class Connection
         [$configuration, $uri] = self::buildConfiguration($dsn, $options);
 
         $client ??= new Client($uri, [], self::driverInfo());
-        $collection = $client->getCollection($configuration['database'], $configuration['collection_name']);
+        $collection = $client->getCollection($configuration['database'], $configuration['collection']);
 
         return new self($collection, $configuration['queue_name'], $configuration['redeliver_timeout'], $clock);
     }
@@ -86,7 +86,7 @@ class Connection
      * Query parameters that are not transport settings are kept and passed
      * to the MongoDB driver.
      *
-     * @return array{0: array{database: string, collection_name: string, queue_name: string, redeliver_timeout: int}, 1: string}
+     * @return array{0: array{database: string, collection: string, queue_name: string, redeliver_timeout: int}, 1: string}
      */
     public static function buildConfiguration(#[\SensitiveParameter] string $dsn, array $options = []): array
     {
@@ -94,37 +94,31 @@ class Connection
             throw new InvalidArgumentException('The given MongoDB Messenger DSN is invalid. Expecting "mongodb://" or "mongodb+srv://".');
         }
 
-        if (false === $components = parse_url($dsn)) {
-            throw new InvalidArgumentException('The given MongoDB Messenger DSN is invalid.');
-        }
-
-        $query = [];
-        if (isset($components['query'])) {
-            parse_str($components['query'], $query);
-        }
+        [$uri, $query, $path] = self::parseDsn($dsn);
 
         if ($invalidOptions = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS))) {
             throw new InvalidArgumentException(\sprintf('Unknown option found: [%s]. Allowed options are [%s].', implode(', ', $invalidOptions), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
         }
 
-        $configuration = $options + array_intersect_key($query, self::DEFAULT_OPTIONS) + self::DEFAULT_OPTIONS;
-        $database = rawurldecode(ltrim($components['path'] ?? '', '/'));
-        $configuration['database'] ??= '' !== $database ? $database : null;
-
-        if (null === $configuration['database']) {
-            throw new InvalidArgumentException('The MongoDB Messenger transport requires a "database", provide it in the DSN path or as an option.');
+        if (isset($options['database']) && '' === $options['database']) {
+            throw new InvalidArgumentException('The "database" option must not be empty.');
         }
+        if (isset($options['collection']) && '' === $options['collection']) {
+            throw new InvalidArgumentException('The "collection" option must not be empty.');
+        }
+
+        $configuration = $options;
+        $database = rawurldecode(ltrim($path, '/'));
+        $configuration['database'] ??= '' !== $database ? $database : ($query['database'] ?? self::DEFAULT_OPTIONS['database']);
+        unset($query['database']);
+        $configuration += array_intersect_key($query, self::DEFAULT_OPTIONS) + self::DEFAULT_OPTIONS;
 
         if (!is_numeric($configuration['redeliver_timeout'])) {
             throw new InvalidArgumentException(\sprintf('The "redeliver_timeout" option must be an integer, "%s" given.', get_debug_type($configuration['redeliver_timeout'])));
         }
         $configuration['redeliver_timeout'] = (int) $configuration['redeliver_timeout'];
 
-        foreach (array_keys(self::DEFAULT_OPTIONS) as $option) {
-            $dsn = self::removeUriOption($dsn, $option);
-        }
-
-        return [$configuration, $dsn];
+        return [$configuration, $uri];
     }
 
     public function getUniqueId(): string
@@ -448,16 +442,48 @@ class Connection
         return $this->clock?->now() ?? \DateTimeImmutable::createFromTimestamp(microtime(true));
     }
 
-    private static function removeUriOption(string $uri, string $option): string
+    /**
+     * Removes the transport options from the DSN and returns the remaining URI, query options and path.
+     *
+     * URI options are kept in order, including repeated options such as "readPreferenceTags".
+     *
+     * @return array{0: string, 1: array<string, string>, 2: string}
+     */
+    private static function parseDsn(#[\SensitiveParameter] string $dsn): array
     {
-        if (preg_match('/^(.*[?&])'.$option.'=[^&#]*&?(([^#]*).*)$/', $uri, $matches)) {
-            $prefix = $matches[1];
-            if ('' === $matches[3]) {
-                $prefix = substr($prefix, 0, -1);
-            }
-            $uri = $prefix.$matches[2];
+        if (false === $params = parse_url($dsn)) {
+            throw new InvalidArgumentException('The given MongoDB DSN is invalid.');
         }
 
-        return $uri;
+        if ('' === ($params['host'] ?? '')) {
+            throw new InvalidArgumentException('The given MongoDB DSN is invalid: no host specified.');
+        }
+
+        $query = $kept = [];
+        foreach (explode('&', $params['query'] ?? '') as $pair) {
+            if ('' === $pair) {
+                continue;
+            }
+
+            $eq = strpos($pair, '=');
+            $key = rawurldecode(false === $eq ? $pair : substr($pair, 0, $eq));
+            $value = false === $eq ? '' : rawurldecode(substr($pair, $eq + 1));
+
+            if (('database' === $key || 'collection' === $key) && '' === $value) {
+                throw new InvalidArgumentException(\sprintf('The "%s" DSN option must not be empty.', $key));
+            }
+
+            $query[$key] = $value;
+            if (!\array_key_exists($key, self::DEFAULT_OPTIONS)) {
+                $kept[] = $pair;
+            }
+        }
+
+        $uri = $dsn;
+        if (isset($params['query'])) {
+            $uri = str_replace('?'.$params['query'], $kept ? '?'.implode('&', $kept) : '', $uri);
+        }
+
+        return [$uri, $query, $params['path'] ?? ''];
     }
 }

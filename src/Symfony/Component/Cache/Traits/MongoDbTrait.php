@@ -40,23 +40,19 @@ trait MongoDbTrait
     private MarshallerInterface $marshaller;
     private ?ClockInterface $clock;
 
-    /**
-     * The adapter options that are read from the DSN query string and must not
-     * be forwarded to the driver.
-     */
-    private const DSN_OPTIONS = [
+    private const DEFAULT_OPTIONS = [
+        'database' => 'app',
+        'collection' => 'cache_items',
         'namespace' => '',
-        'database_name' => 'app',
-        'collection_name' => 'cache_items',
     ];
 
     /**
      * @param string $namespace Prefix prepended to every cache key. When empty, it falls back to the DSN "namespace" query parameter.
      *
      * Available options:
-     *  * database_name:   The name of the database, also read from the DSN path [default: app]
-     *  * collection_name: The name of the collection, also read from the DSN "collection_name" query parameter [default: cache_items]
-     *  * driverOptions:   Array of driver options passed to MongoDB\Client [used when a DSN is given]
+     *  * database:      The name of the database, also read from the DSN path [default: app]
+     *  * collection:    The name of the collection, also read from the DSN "collection" query parameter [default: cache_items]
+     *  * driverOptions: Array of driver options passed to MongoDB\Client [used when a DSN is given]
      *
      * Any other option is forwarded to the collection, typically a "readPreference", "readConcern" or
      * "writeConcern" given as a MongoDB\Driver\* object. Connection string options (as strings) are read
@@ -72,7 +68,7 @@ trait MongoDbTrait
             [$options, $mongo] = self::parseDsn($mongo, $options);
         }
 
-        $options += self::DSN_OPTIONS + ['driverOptions' => []];
+        $options += self::DEFAULT_OPTIONS + ['driverOptions' => []];
 
         // Set before the parent constructor so that it can check the namespace length.
         $this->maxIdLength = 1024;
@@ -84,21 +80,21 @@ trait MongoDbTrait
         // collection (read/write concerns, read preference). The raw BSON type
         // map and the disabled codec are then forced, since the adapter reads
         // and writes plain documents itself.
-        $collectionOptions = array_diff_key($options, self::DSN_OPTIONS + ['driverOptions' => null]);
+        $collectionOptions = array_diff_key($options, self::DEFAULT_OPTIONS + ['driverOptions' => null]);
         $collectionOptions['typeMap'] = ['root' => 'bson'];
         $collectionOptions['codec'] = null;
 
         if ($mongo instanceof Collection) {
             $this->collection = $mongo->withOptions($collectionOptions);
         } elseif ($mongo instanceof Database) {
-            $this->collection = $mongo->getCollection($options['collection_name'], $collectionOptions);
+            $this->collection = $mongo->getCollection($options['collection'], $collectionOptions);
         } elseif ($mongo instanceof Client) {
-            $this->collection = $mongo->getCollection($options['database_name'], $options['collection_name'], $collectionOptions);
+            $this->collection = $mongo->getCollection($options['database'], $options['collection'], $collectionOptions);
         } else {
             // $mongo is the connection string stripped from the adapter options by parseDsn().
             // Connection options are read from the DSN query string.
             $client = new Client($mongo, [], self::addDriverInfo($options['driverOptions']));
-            $this->collection = $client->getCollection($options['database_name'], $options['collection_name'], $collectionOptions);
+            $this->collection = $client->getCollection($options['database'], $options['collection'], $collectionOptions);
         }
 
         $this->marshaller = $this->createMarshaller($marshaller);
@@ -131,11 +127,11 @@ trait MongoDbTrait
         // including the "lazy" flag (the client only connects on first use). The
         // raw BSON type map is forced, since the adapter reads and writes plain
         // documents itself.
-        $uriOptions = array_diff_key($options, self::DSN_OPTIONS + ['driverOptions' => null, 'lazy' => null]);
+        $uriOptions = array_diff_key($options, self::DEFAULT_OPTIONS + ['driverOptions' => null, 'lazy' => null]);
 
         $client = new Client($uri, $uriOptions, self::addDriverInfo($driverOptions));
 
-        return $client->getCollection($options['database_name'], $options['collection_name'], ['typeMap' => ['root' => 'bson'], 'codec' => null]);
+        return $client->getCollection($options['database'], $options['collection'], ['typeMap' => ['root' => 'bson'], 'codec' => null]);
     }
 
     /**
@@ -243,13 +239,10 @@ trait MongoDbTrait
     }
 
     /**
-     * Reads the adapter options from the DSN and returns them along with the
-     * connection string stripped from those options, ready for MongoDB\Client.
+     * Reads the adapter options from the DSN and removes them from the connection string.
      *
-     * The database is read from the DSN path, the collection from the
-     * "collection_name" query parameter and the key prefix from the
-     * "namespace" query parameter. Explicit options take precedence. Any
-     * other query parameter is kept and passed to the driver.
+     * The DSN path selects the database. The "collection" and "namespace" query parameters select the collection and key prefix.
+     * Explicit options take precedence. Other query parameters are passed to the driver.
      *
      * @return array{0: array, 1: string}
      */
@@ -263,42 +256,48 @@ trait MongoDbTrait
             throw new InvalidArgumentException('The given MongoDB DSN is invalid.');
         }
 
-        $query = [];
-        if (isset($params['query'])) {
-            parse_str($params['query'], $query);
+        if ('' === ($params['host'] ?? '')) {
+            throw new InvalidArgumentException('The given MongoDB DSN is invalid: no host specified.');
+        }
+
+        $query = $kept = [];
+        foreach (explode('&', $params['query'] ?? '') as $pair) {
+            if ('' === $pair) {
+                continue;
+            }
+
+            $eq = strpos($pair, '=');
+            $key = rawurldecode(false === $eq ? $pair : substr($pair, 0, $eq));
+            $value = false === $eq ? '' : rawurldecode(substr($pair, $eq + 1));
+
+            if (('database' === $key || 'collection' === $key) && '' === $value) {
+                throw new InvalidArgumentException(\sprintf('The "%s" DSN option must not be empty.', $key));
+            }
+
+            $query[$key] = $value;
+            if (!\array_key_exists($key, self::DEFAULT_OPTIONS)) {
+                $kept[] = $pair;
+            }
+        }
+
+        if (isset($options['database']) && '' === $options['database']) {
+            throw new InvalidArgumentException('The "database" option must not be empty.');
+        }
+        if (isset($options['collection']) && '' === $options['collection']) {
+            throw new InvalidArgumentException('The "collection" option must not be empty.');
         }
 
         $database = rawurldecode(ltrim($params['path'] ?? '', '/'));
-        $options['database_name'] ??= $query['database_name'] ?? ('' !== $database ? $database : self::DSN_OPTIONS['database_name']);
-        $options['collection_name'] ??= $query['collection_name'] ?? self::DSN_OPTIONS['collection_name'];
-        $options['namespace'] ??= $query['namespace'] ?? '';
+        $options['database'] ??= '' !== $database ? $database : ($query['database'] ?? self::DEFAULT_OPTIONS['database']);
+        unset($query['database']);
+        $options['collection'] ??= $query['collection'] ?? self::DEFAULT_OPTIONS['collection'];
+        $options['namespace'] ??= $query['namespace'] ?? self::DEFAULT_OPTIONS['namespace'];
 
-        return [$options, self::stripDsnOptions($dsn)];
-    }
+        if (isset($params['query'])) {
+            $dsn = str_replace('?'.$params['query'], $kept ? '?'.implode('&', $kept) : '', $dsn);
+        }
 
-    /**
-     * Removes the adapter's query parameters from the DSN in a single pass,
-     * keeping the other parameters (including repeated driver parameters such
-     * as "readPreferenceTags") and fixing the query separators.
-     */
-    private static function stripDsnOptions(#[\SensitiveParameter] string $dsn): string
-    {
-        $first = true;
-
-        return preg_replace_callback(
-            '/[?&]([^=&#]++)=[^&#]*+/',
-            static function (array $matches) use (&$first): string {
-                if (\array_key_exists($matches[1], self::DSN_OPTIONS)) {
-                    return '';
-                }
-
-                $separator = $first ? '?' : '&';
-                $first = false;
-
-                return $separator.substr($matches[0], 1);
-            },
-            $dsn,
-        ) ?? throw new InvalidArgumentException('The given MongoDB DSN is invalid.');
+        return [$options, $dsn];
     }
 
     private function now(): float

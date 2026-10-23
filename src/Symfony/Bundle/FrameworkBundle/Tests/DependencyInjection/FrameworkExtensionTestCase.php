@@ -1476,7 +1476,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $this->assertSame('cache.default_mongodb_provider', $container->getDefinition($id)->getTag('cache.pool')[0]['provider']);
         }
 
-        $dsn = 'mongodb://localhost:27017/db?collection_name=cache';
+        $dsn = 'mongodb://localhost:27017/db?collection=cache';
         $providerId = '.cache_connection.'.ContainerBuilder::hash($dsn);
 
         $this->assertTrue($container->hasDefinition($providerId));
@@ -1494,7 +1494,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame([AbstractAdapter::class, 'createAdapter'], $pool->getFactory());
 
         $connection = $container->getDefinition((string) $pool->getArgument(0));
-        $this->assertSame('mongodb://localhost:27017/db?collection_name=pool', $connection->getArgument(0));
+        $this->assertSame('mongodb://localhost:27017/db?collection=pool', $connection->getArgument(0));
     }
 
     public function testCacheDefaultValkeyProvider()

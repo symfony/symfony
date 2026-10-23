@@ -62,11 +62,11 @@ class ConnectionTest extends TestCase
             ->with('some_db', 'some_collection')
             ->willReturn($collection);
 
-        $this->assertInstanceOf(Connection::class, Connection::fromDsn('mongodb://localhost:27017', ['database' => 'some_db', 'collection_name' => 'some_collection'], $client));
+        $this->assertInstanceOf(Connection::class, Connection::fromDsn('mongodb://localhost:27017', ['database' => 'some_db', 'collection' => 'some_collection'], $client));
     }
 
     /**
-     * @param array{database: string, collection_name: string, queue_name: string, redeliver_timeout: int} $expectedConfiguration
+     * @param array{database: string, collection: string, queue_name: string, redeliver_timeout: int} $expectedConfiguration
      */
     #[DataProvider('buildConfigurationProvider')]
     public function testBuildConfiguration(string $dsn, array $options, array $expectedConfiguration, string $expectedUri)
@@ -81,7 +81,7 @@ class ConnectionTest extends TestCase
     {
         $defaultConfiguration = [
             'database' => 'db',
-            'collection_name' => 'messenger_messages',
+            'collection' => 'messenger_messages',
             'queue_name' => 'default',
             'redeliver_timeout' => 3600,
         ];
@@ -102,10 +102,66 @@ class ConnectionTest extends TestCase
             ];
         }
 
-        yield 'settings from the DSN query string are extracted' => [
-            'mongodb://localhost:27017/db?collection_name=my_collection&queue_name=my_queue&redeliver_timeout=100',
+        yield 'multiple hosts with ports' => [
+            'mongodb://host1:27017,host2:27017/db',
             [],
-            ['database' => 'db', 'collection_name' => 'my_collection', 'queue_name' => 'my_queue', 'redeliver_timeout' => 100] + $defaultConfiguration,
+            $defaultConfiguration,
+            'mongodb://host1:27017,host2:27017/db',
+        ];
+
+        yield 'multiple hosts without ports' => [
+            'mongodb://host1,host2/db',
+            [],
+            $defaultConfiguration,
+            'mongodb://host1,host2/db',
+        ];
+
+        yield 'multiple hosts with credentials and URI options' => [
+            'mongodb://user:pass@host1:27017,host2:27017/db?retryWrites=true',
+            [],
+            $defaultConfiguration,
+            'mongodb://user:pass@host1:27017,host2:27017/db?retryWrites=true',
+        ];
+
+        yield 'percent-encoded database in the path' => [
+            'mongodb://localhost/my%2Ddb',
+            [],
+            ['database' => 'my-db'] + $defaultConfiguration,
+            'mongodb://localhost/my%2Ddb',
+        ];
+
+        yield 'database named zero' => [
+            'mongodb://localhost/0',
+            [],
+            ['database' => '0'] + $defaultConfiguration,
+            'mongodb://localhost/0',
+        ];
+
+        yield 'question mark in a value' => [
+            'mongodb://localhost/app?collection=c&appName=a?b',
+            [],
+            ['database' => 'app', 'collection' => 'c'] + $defaultConfiguration,
+            'mongodb://localhost/app?appName=a?b',
+        ];
+
+        yield 'database from the path takes precedence over the query' => [
+            'mongodb://localhost/path_db?database=query_db',
+            [],
+            ['database' => 'path_db'] + $defaultConfiguration,
+            'mongodb://localhost/path_db',
+        ];
+
+        yield 'fragment is kept in the URI' => [
+            'mongodb://localhost/app#frag',
+            [],
+            ['database' => 'app'] + $defaultConfiguration,
+            'mongodb://localhost/app#frag',
+        ];
+
+        yield 'settings from the DSN query string are extracted' => [
+            'mongodb://localhost:27017/db?collection=my_collection&queue_name=my_queue&redeliver_timeout=100',
+            [],
+            ['database' => 'db', 'collection' => 'my_collection', 'queue_name' => 'my_queue', 'redeliver_timeout' => 100] + $defaultConfiguration,
             'mongodb://localhost:27017/db',
         ];
 
@@ -121,6 +177,48 @@ class ConnectionTest extends TestCase
             ['database' => 'other_db', 'queue_name' => 'from_options'],
             ['database' => 'other_db', 'queue_name' => 'from_options'] + $defaultConfiguration,
             'mongodb://localhost:27017/db',
+        ];
+
+        yield 'bare DSN uses the defaults' => [
+            'mongodb://localhost',
+            [],
+            ['database' => 'app'] + $defaultConfiguration,
+            'mongodb://localhost',
+        ];
+
+        yield 'transport options are removed from the middle' => [
+            'mongodb://localhost/db?retryWrites=true&queue_name=my_queue&w=majority',
+            [],
+            ['queue_name' => 'my_queue'] + $defaultConfiguration,
+            'mongodb://localhost/db?retryWrites=true&w=majority',
+        ];
+
+        yield 'repeated transport options are all removed' => [
+            'mongodb://localhost/db?queue_name=a&queue_name=b&w=1',
+            [],
+            ['queue_name' => 'b'] + $defaultConfiguration,
+            'mongodb://localhost/db?w=1',
+        ];
+
+        yield 'repeated URI options are kept in order' => [
+            'mongodb://localhost/db?readPreferenceTags=dc:ny&queue_name=q&readPreferenceTags=dc:sf',
+            [],
+            ['queue_name' => 'q'] + $defaultConfiguration,
+            'mongodb://localhost/db?readPreferenceTags=dc:ny&readPreferenceTags=dc:sf',
+        ];
+
+        yield 'encoded ampersand in a value is kept' => [
+            'mongodb://localhost/db?appName=my%26app&queue_name=q&w=majority',
+            [],
+            ['queue_name' => 'q'] + $defaultConfiguration,
+            'mongodb://localhost/db?appName=my%26app&w=majority',
+        ];
+
+        yield 'equals sign in a value is kept' => [
+            'mongodb://localhost/db?appName=a=b&queue_name=q',
+            [],
+            ['queue_name' => 'q'] + $defaultConfiguration,
+            'mongodb://localhost/db?appName=a=b',
         ];
     }
 
@@ -141,16 +239,40 @@ class ConnectionTest extends TestCase
             'The given MongoDB Messenger DSN is invalid. Expecting "mongodb://" or "mongodb+srv://".',
         ];
 
-        yield 'missing database' => [
-            'mongodb://localhost:27017',
+        yield 'last host without port' => [
+            'mongodb://host1:27017,host2/db',
             [],
-            'The MongoDB Messenger transport requires a "database", provide it in the DSN path or as an option.',
+            'The given MongoDB DSN is invalid.',
+        ];
+
+        yield 'question mark in user information' => [
+            'mongodb://user:p?ss@localhost/app',
+            [],
+            'The given MongoDB DSN is invalid.',
+        ];
+
+        yield 'empty collection in the DSN' => [
+            'mongodb://localhost/app?collection=',
+            [],
+            'The "collection" DSN option must not be empty.',
+        ];
+
+        yield 'empty database in the DSN' => [
+            'mongodb://localhost/app?database=',
+            [],
+            'The "database" DSN option must not be empty.',
+        ];
+
+        yield 'empty collection option' => [
+            'mongodb://localhost/app',
+            ['collection' => ''],
+            'The "collection" option must not be empty.',
         ];
 
         yield 'unknown option' => [
             'mongodb://localhost:27017/db',
             ['foo' => 'bar'],
-            'Unknown option found: [foo]. Allowed options are [database, collection_name, queue_name, redeliver_timeout].',
+            'Unknown option found: [foo]. Allowed options are [database, collection, queue_name, redeliver_timeout].',
         ];
 
         yield 'invalid redeliver_timeout' => [

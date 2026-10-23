@@ -7,13 +7,11 @@ DSN example
 -----------
 
 ```
-MESSENGER_TRANSPORT_DSN=mongodb://user:pass@mongodb1.example.com:27017/db_name?collection_name=messenger_messages&queue_name=default
+MESSENGER_TRANSPORT_DSN=mongodb://user:pass@mongodb1.example.com:27017/db_name?collection=messenger_messages&queue_name=default
 ```
 
-The transport reads its own settings (`database`, `collection_name`, `queue_name`,
-`redeliver_timeout`) from the query string and passes any other parameter to the
-MongoDB driver, so [connection options](https://www.mongodb.com/docs/manual/reference/connection-string-options/)
-keep working:
+The transport reads `database`, `collection`, `queue_name` and `redeliver_timeout` from the query string.
+Other parameters are passed to the MongoDB driver, so [connection options](https://www.mongodb.com/docs/manual/reference/connection-string-options/) keep working:
 
 ```
 MESSENGER_TRANSPORT_DSN=mongodb+srv://mongodb.example.com/db_name?replicaSet=repl&connectTimeoutMS=3000

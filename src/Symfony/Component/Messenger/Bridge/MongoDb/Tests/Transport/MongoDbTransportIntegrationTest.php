@@ -183,7 +183,7 @@ class MongoDbTransportIntegrationTest extends TestCase
 
     public function testSendBatchReportsTheMessagesTheServerRejected()
     {
-        $connection = Connection::fromDsn('mongodb://localhost/'.self::DATABASE, ['collection_name' => 'messenger_unique_bodies'], $this->client);
+        $connection = Connection::fromDsn('mongodb://localhost/'.self::DATABASE, ['collection' => 'messenger_unique_bodies'], $this->client);
         $collection = $this->client->getCollection(self::DATABASE, 'messenger_unique_bodies');
         $collection->drop();
         $collection->createIndex(['body' => 1], ['unique' => true]);

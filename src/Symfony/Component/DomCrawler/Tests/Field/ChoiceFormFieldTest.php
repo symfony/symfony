@@ -438,6 +438,41 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
+    public function testOptionWithNoValueSkipsScriptText()
+    {
+        foreach ([
+            '<option>A<script type="application/json">ignored</script>B</option>' => 'AB',
+            '<option><script>ignored</script></option>' => '',
+            '<option>A<span>B</span><script>ignored</script>C</option>' => 'ABC',
+            '<option>A<span><script>ignored</script>B</span>C</option>' => 'ABC',
+            '<option value="explicit">A<script>ignored</script>B</option>' => 'explicit',
+            '<option value="">A<script>ignored</script>B</option>' => '',
+        ] as $html => $expected) {
+            $document = new \DOMDocument();
+            $document->loadHTML('<select name="name">'.$html.'</select>');
+            $field = new ChoiceFormField($document->getElementsByTagName('select')->item(0));
+
+            $this->assertSame($expected, $field->getValue());
+            $this->assertSame([$expected], $field->availableOptionValues());
+        }
+    }
+
+    public function testOptionWithNoValueSkipsNamespacedScriptText()
+    {
+        $document = new \DOMDocument();
+        $select = $document->appendChild($document->createElement('select'));
+        $select->setAttribute('name', 'name');
+        $option = $select->appendChild($document->createElement('option'));
+        $option->appendChild($document->createTextNode('A'));
+        $option->appendChild($document->createElementNS('http://www.w3.org/1999/xhtml', 'html:script', 'ignored'));
+        $option->appendChild($document->createElementNS('http://www.w3.org/2000/svg', 'svg:script', 'ignored'));
+        $option->appendChild($document->createElementNS('urn:other', 'other:script', 'kept'));
+        $option->appendChild($document->createCDATASection('B'));
+        $field = new ChoiceFormField($select);
+
+        $this->assertSame('AkeptB', $field->getValue());
+    }
+
     public function testDisableValidation()
     {
         $node = $this->createSelectNode(['foo' => false, 'bar' => false]);

@@ -296,8 +296,15 @@ class ChoiceFormField extends FormField
         $option = [];
 
         $defaultDefaultValue = 'select' === $this->node->nodeName ? '' : 'on';
+        $text = $node->nodeValue ?? '';
+        if ('option' === $node->nodeName && !$node->hasAttribute('value')) {
+            $text = '';
+            foreach ($this->xpath->query('descendant::text()[not(ancestor::*[local-name()="script" and (namespace-uri()="" or namespace-uri()="http://www.w3.org/1999/xhtml" or namespace-uri()="http://www.w3.org/2000/svg")])]', $node) as $textNode) {
+                $text .= $textNode->nodeValue;
+            }
+        }
         // like browsers, use the option text with ASCII whitespace stripped and collapsed
-        $text = trim(preg_replace('/[ \t\n\f\r]+/', ' ', $node->nodeValue ?? ''), " \t\n\f\r");
+        $text = trim(preg_replace('/[ \t\n\f\r]+/', ' ', $text), " \t\n\f\r");
         $defaultValue = '' !== $text ? $text : $defaultDefaultValue;
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
         $option['disabled'] = $node->hasAttribute('disabled') || ('option' === $node->nodeName && $node->parentNode instanceof \DOMElement && 'optgroup' === $node->parentNode->nodeName && $node->parentNode->hasAttribute('disabled')) || ('input' === $node->nodeName && $this->isInDisabledFieldset($node));

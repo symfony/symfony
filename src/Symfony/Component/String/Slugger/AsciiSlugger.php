@@ -109,7 +109,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         $locale ??= $this->defaultLocale;
 
         $transliterator = [];
-        if ($locale && ('de' === $locale || str_starts_with($locale, 'de_'))) {
+        if ($locale && ('de' === $locale || str_starts_with($locale, 'de_') || str_starts_with($locale, 'de-'))) {
             // Use the shortcut for German in UnicodeString::ascii() if possible (faster and no requirement on intl)
             $transliterator = ['de-ASCII'];
         } elseif (\function_exists('transliterator_transliterate') && $locale) {
@@ -154,6 +154,8 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 
     private function createTransliterator(string $locale): ?\Transliterator
     {
+        $locale = str_replace('-', '_', $locale);
+
         if (\array_key_exists($locale, $this->transliterators)) {
             return $this->transliterators[$locale];
         }
@@ -184,6 +186,8 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
             return null;
         }
 
+        $locale = null !== $locale ? str_replace('-', '_', $locale) : null;
+
         while (null !== $locale) {
             try {
                 return EmojiTransliterator::create("emoji-$locale");
@@ -200,11 +204,11 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         if (!$locale) {
             return null;
         }
-        if (false === $str = strrchr($locale, '_')) {
+        if (false === $i = strrpos(str_replace('-', '_', $locale), '_')) {
             // no parent locale
             return null;
         }
 
-        return substr($locale, 0, -\strlen($str));
+        return substr($locale, 0, $i);
     }
 }

@@ -18,7 +18,6 @@ use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\Mapping\Read\AttributePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\Read\Instantiator;
 use Symfony\Component\JsonStreamer\Read\LazyInstantiator;
 use Symfony\Component\JsonStreamer\Read\StreamReaderGenerator;
 use Symfony\Component\JsonStreamer\Transformer\BcMathNumberValueObjectTransformer;
@@ -59,7 +58,6 @@ use Symfony\Component\Uid\Uuid;
 final class JsonStreamReader implements StreamReaderInterface
 {
     private StreamReaderGenerator $streamReaderGenerator;
-    private Instantiator $instantiator;
     private LazyInstantiator $lazyInstantiator;
 
     /**
@@ -78,7 +76,6 @@ final class JsonStreamReader implements StreamReaderInterface
         private array $defaultOptions = [],
     ) {
         $this->streamReaderGenerator = new StreamReaderGenerator($propertyMetadataLoader, $transformers, $streamReadersDir, $configCacheFactory);
-        $this->instantiator = new Instantiator();
         $this->lazyInstantiator = new LazyInstantiator();
     }
 
@@ -88,7 +85,9 @@ final class JsonStreamReader implements StreamReaderInterface
         $isStream = \is_resource($input);
         $path = $this->streamReaderGenerator->generate($type, $isStream, $options);
 
-        return ($this->streamReaders[$path] ??= require $path)($input, $this->transformers, $isStream ? $this->lazyInstantiator : $this->instantiator, $options);
+        $streamReader = $this->streamReaders[$path] ??= require $path;
+
+        return $isStream ? $streamReader($input, $this->transformers, $this->lazyInstantiator, $options) : $streamReader($input, $this->transformers, $options);
     }
 
     /**

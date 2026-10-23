@@ -304,7 +304,7 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>يتعذر الإتصال بالنطاق.</target>
+                <target>تعذّر تحديد عنوان IP لاسم المضيف.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
@@ -384,7 +384,7 @@
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target> صالح (ISIN) هذه القيمة ليست رقم تعريف الأوراق المالية الدولي.</target>
+                <target>هذه القيمة ليست رقم تعريف دولي صالحًا للأوراق المالية (ISIN).</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
@@ -420,7 +420,7 @@
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target>لا يسمح بخلط الأرقام من نصوص مختلفة.</target>
+                <target>لا يُسمح بخلط أرقام من أنظمة كتابة مختلفة.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>

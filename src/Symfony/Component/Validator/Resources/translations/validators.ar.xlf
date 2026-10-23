@@ -496,11 +496,11 @@
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>الفيديو منخفض الجودة جداً ({{ pixels }} بكسل). الحد الأدنى المتوقع هو {{ min_pixels }} بكسل.</target>
+                <target>عدد بكسلات الفيديو قليل جدًا ({{ pixels }} بكسل). الحد الأدنى المطلوب هو {{ min_pixels }} بكسل.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>دقة الفيديو مرتفعة جداً ({{ pixels }} بكسل). الحد الأقصى المتوقع هو {{ max_pixels }} بكسل.</target>
+                <target>عدد بكسلات الفيديو كبير جدًا ({{ pixels }} بكسل). الحد الأقصى المسموح به هو {{ max_pixels }} بكسل.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
@@ -544,11 +544,11 @@
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>الصورة منخفضة الجودة جدًا ({{ pixels }} بكسل)، و الحد الأدنى المتوقع: {{ min_pixels }} بكسل.</target>
+                <target>عدد بكسلات الصورة قليل جدًا ({{ pixels }} بكسل). الحد الأدنى المطلوب هو {{ min_pixels }} بكسل.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>جودة الصورة مرتفعة جدًا ({{ pixels }} بكسل). العدد الأقصى المتوقع هو {{ max_pixels }} بكسل.</target>
+                <target>عدد بكسلات الصورة كبير جدًا ({{ pixels }} بكسل). الحد الأقصى المسموح به هو {{ max_pixels }} بكسل.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>

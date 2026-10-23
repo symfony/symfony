@@ -378,7 +378,7 @@ class AutowirePass extends AbstractRecursivePass
                     if ($attribute instanceof AutowireInline) {
                         $value = $attribute->buildDefinition($value, $type, $parameter);
                         $value = $this->doProcessValue($value);
-                    } elseif ($lazy = $attribute->lazy || $this->autowireLazy && !$attribute instanceof Lazy && (!($attribute instanceof Autowire) || !array_key_exists('lazy', $parameter->getAttributes(Autowire::class)[0]->getArguments()))) {
+                    } elseif ($lazy = $attribute->lazy ?: ($this->autowireLazy && $attribute instanceof Autowire && !array_key_exists('lazy', $parameter->getAttributes(Autowire::class)[0]->getArguments()))) {
                         if (true === $lazy && str_contains($type, '|')) {
                             throw new AutowiringFailedException($this->currentId, \sprintf('Cannot use #[Autowire] with option "lazy: true" on union types for service "%s"; set the option to the interface(s) that should be proxied instead.', $this->currentId));
                         }

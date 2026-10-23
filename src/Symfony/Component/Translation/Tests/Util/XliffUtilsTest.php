@@ -155,7 +155,7 @@ class XliffUtilsTest extends TestCase
                     exit(1);
                 }
 
-                return count(glob(sys_get_temp_dir().'/symfony*'));
+                return count(glob(sys_get_temp_dir().'/*'));
             };
 
             $afterOne = $validateAndCountTempFiles();
@@ -171,7 +171,7 @@ class XliffUtilsTest extends TestCase
                 }
             }
 
-            $afterChild = count(glob(sys_get_temp_dir().'/symfony*'));
+            $afterChild = count(glob(sys_get_temp_dir().'/*'));
 
             for ($i = 0; $i < 4; ++$i) {
                 $afterFive = $validateAndCountTempFiles();
@@ -205,7 +205,7 @@ class XliffUtilsTest extends TestCase
             $this->assertGreaterThan(0, (int) $afterOne);
             $this->assertSame($afterOne, $afterChild, 'Child processes must not remove the schema files.');
             $this->assertSame($afterOne, $afterFive, 'Validating more files must not copy the schema again.');
-            $this->assertSame([], glob($tmpDir.'/symfony*'), 'Temporary files must be removed when the process ends.');
+            $this->assertSame([], glob($tmpDir.'/*'), 'Temporary files must be removed when the process ends.');
         } finally {
             foreach (glob($tmpDir.'/*') as $file) {
                 @unlink($file);

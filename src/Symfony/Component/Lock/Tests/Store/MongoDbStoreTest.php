@@ -98,6 +98,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
     public static function provideConstructorArgs()
     {
         yield [self::getMongoManager(), ['database' => 'test', 'collection' => 'lock']];
+        yield ['mongodb://localhost', []];
         yield ['mongodb://localhost/test?collection=lock', []];
         yield ['mongodb://localhost/test', ['collection' => 'lock']];
         yield ['mongodb://localhost/', ['database' => 'test', 'collection' => 'lock']];
@@ -167,13 +168,92 @@ class MongoDbStoreTest extends AbstractStoreTestCase
 
     public static function provideInvalidConstructorArgs()
     {
-        $manager = self::getMongoManager();
-        yield [$manager, ['collection' => 'lock']];
-        yield [$manager, ['database' => 'test']];
+        yield ['redis://localhost', []];
+        yield ['mongodb://', []];
+        yield ['mongodb://host1:27017,host2/app', []];
+        yield ['mongodb://user:p?ss@localhost/app', []];
+    }
 
-        yield ['mongodb://localhost/?collection=lock', []];
-        yield ['mongodb://localhost/test', []];
-        yield ['mongodb://localhost/', []];
+    public function testRepeatedOptionsUseTheLastValue()
+    {
+        $store = new MongoDbStore('mongodb://localhost/app?collection=a&collection=b');
+        $reflection = new \ReflectionObject($store);
+
+        $this->assertSame('app.b', $reflection->getProperty('namespace')->getValue($store));
+        $this->assertSame('mongodb://localhost/app', $reflection->getProperty('uri')->getValue($store));
+    }
+
+    #[DataProvider('provideMultipleHosts')]
+    public function testMultipleHosts(string $dsn, string $expectedUri)
+    {
+        $store = new MongoDbStore($dsn);
+        $reflection = new \ReflectionObject($store);
+
+        $this->assertSame('test.locks', $reflection->getProperty('namespace')->getValue($store));
+        $this->assertSame($expectedUri, $reflection->getProperty('uri')->getValue($store));
+    }
+
+    public static function provideMultipleHosts(): iterable
+    {
+        yield 'with ports' => ['mongodb://host1:27017,host2:27017/test?collection=locks', 'mongodb://host1:27017,host2:27017/test'];
+        yield 'without ports' => ['mongodb://host1,host2/test', 'mongodb://host1,host2/test'];
+        yield 'with credentials' => ['mongodb://user:pass@host1:27017,host2:27017/test', 'mongodb://user:pass@host1:27017,host2:27017/test'];
+    }
+
+    public function testQuestionMarksAndDatabasePrecedence()
+    {
+        $store = new MongoDbStore('mongodb://localhost/app?collection=c&appName=a?b');
+        $reflection = new \ReflectionObject($store);
+        $this->assertSame('app.c', $reflection->getProperty('namespace')->getValue($store));
+        $this->assertSame('mongodb://localhost/app?appName=a?b', $reflection->getProperty('uri')->getValue($store));
+
+        $store = new MongoDbStore('mongodb://localhost/path_db?database=query_db');
+        $this->assertSame('path_db.locks', (new \ReflectionObject($store))->getProperty('namespace')->getValue($store));
+    }
+
+    #[DataProvider('provideEmptyOptions')]
+    public function testEmptyOptionsAreRejected(string $dsn, array $options)
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new MongoDbStore($dsn, $options);
+    }
+
+    public static function provideEmptyOptions(): iterable
+    {
+        yield 'empty collection in the DSN' => ['mongodb://localhost/app?collection=', []];
+        yield 'empty database in the DSN' => ['mongodb://localhost/app?database=', []];
+        yield 'collection without value in the DSN' => ['mongodb://localhost/app?collection', []];
+        yield 'empty collection option' => ['mongodb://localhost', ['collection' => '']];
+        yield 'empty database option' => ['mongodb://localhost', ['database' => '']];
+    }
+
+    public function testUriOverridesEmptyOptions()
+    {
+        $store = new MongoDbStore('mongodb://localhost/app?collection=locks', ['database' => '', 'collection' => '']);
+
+        $this->assertSame('app.locks', (new \ReflectionObject($store))->getProperty('namespace')->getValue($store));
+    }
+
+    public function testDecodedDatabasePath()
+    {
+        $store = new MongoDbStore('mongodb://localhost/my%2Ddb');
+        $this->assertSame('my-db.locks', (new \ReflectionObject($store))->getProperty('namespace')->getValue($store));
+
+        $store = new MongoDbStore('mongodb://localhost/0');
+        $this->assertSame('0.locks', (new \ReflectionObject($store))->getProperty('namespace')->getValue($store));
+    }
+
+    public function testBareDsnUsesDefaultDatabaseAndCollection()
+    {
+        $store = new MongoDbStore('mongodb://localhost');
+        $reflection = new \ReflectionObject($store);
+
+        $this->assertSame('app.locks', $reflection->getProperty('namespace')->getValue($store));
+
+        $options = $reflection->getProperty('options')->getValue($store);
+        $this->assertSame('app', $options['database']);
+        $this->assertSame('locks', $options['collection']);
     }
 
     #[DataProvider('provideUriCollectionStripArgs')]
@@ -203,7 +283,9 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         yield ['mongodb://localhost?foo_collection=x&collection=lock&bar_collection=x#collection=x', ['database' => 'test'], 'mongodb://localhost?foo_collection=x&bar_collection=x#collection=x'];
         yield ['mongodb://localhost?collection=lock&foo_collection=x&bar_collection=x#collection=x', ['database' => 'test'], 'mongodb://localhost?foo_collection=x&bar_collection=x#collection=x'];
         yield ['mongodb://localhost?foo_collection=x&bar_collection=x&collection=lock#collection=x', ['database' => 'test'], 'mongodb://localhost?foo_collection=x&bar_collection=x#collection=x'];
-        yield ['mongodb://user:?collection=a@localhost?collection=lock', ['database' => 'test'], 'mongodb://user:?collection=a@localhost'];
         yield ['mongodb://user:&collection=a@localhost/?collection=lock', ['database' => 'test'], 'mongodb://user:&collection=a@localhost/'];
+        yield ['mongodb://localhost/app?appName=my%26app&collection=lock&w=majority', [], 'mongodb://localhost/app?appName=my%26app&w=majority'];
+        yield ['mongodb://localhost/app?appName=a=b&collection=lock', [], 'mongodb://localhost/app?appName=a=b'];
+        yield ['mongodb://localhost/app?collection=a&collection=b&w=1', [], 'mongodb://localhost/app?w=1'];
     }
 }

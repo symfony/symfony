@@ -25,6 +25,10 @@ class SessionHandlerFactory
 {
     public static function createHandler(object|string $connection, array $options = []): AbstractSessionHandler
     {
+        if (\is_string($connection) && (str_starts_with($connection, 'mongodb://') || str_starts_with($connection, 'mongodb+srv://'))) {
+            return MongoDbSessionHandler::createFromDsn($connection, $options);
+        }
+
         if ($query = \is_string($connection) ? parse_url($connection) : false) {
             parse_str($query['query'] ?? '', $query);
 

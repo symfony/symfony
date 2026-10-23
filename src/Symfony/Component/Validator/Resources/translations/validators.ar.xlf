@@ -64,11 +64,11 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>الملف كبير جدا ({{ size }} {{ suffix }}).اقصى مساحه مسموح بها ({{ limit }} {{ suffix }}).</target>
+                <target>حجم الملف كبير جدًا ({{ size }} {{ suffix }}). الحد الأقصى المسموح به هو {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>نوع الملف غير صحيح ({{ type }}). الانواع المسموح بها هى {{ types }}.</target>
+                <target>نوع MIME للملف غير صالح ({{ type }}). أنواع MIME المسموح بها هي {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>الملف كبير جدا. اقصى مساحه مسموح بها {{ limit }} {{ suffix }}.</target>
+                <target>حجم الملف كبير جدًا. الحد الأقصى المسموح به هو {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>

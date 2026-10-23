@@ -1147,7 +1147,7 @@ class ConnectionTest extends TestCase
     {
         $visible = $requests = [];
 
-        $client = $this->createMock(SqsClient::class);
+        $client = $this->createStub(SqsClient::class);
         $client->method('receiveMessage')->willReturnCallback(static function (array $input) use (&$batches, &$requests) {
             $requests[] = $input;
 

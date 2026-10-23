@@ -22,6 +22,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithIterable;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithQuotes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
@@ -213,6 +214,22 @@ class JsonStreamReaderTest extends TestCase
         }, '{"name":null,"enum":null}', Type::object(DummyWithNullableProperties::class));
     }
 
+    public function testReadObjectWithNullableRepeatedObjects()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithNullableRepeatedDummies::class, $read);
+            $this->assertSame(1, $read->first->id);
+            $this->assertSame(2, $read->second->id);
+        }, '{"first":{"id":1,"name":"a"},"second":{"id":2,"name":"b"}}', Type::object(DummyWithNullableRepeatedDummies::class));
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertNull($read->first);
+            $this->assertSame(2, $read->second->id);
+        }, '{"first":null,"second":{"id":2,"name":"b"}}', Type::object(DummyWithNullableRepeatedDummies::class));
+    }
+
     public function testReadObjectWithDateTimes()
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
@@ -243,6 +260,30 @@ class JsonStreamReaderTest extends TestCase
         }, '{"@id": 10, "name": "dummy"}', Type::union(Type::int(), Type::list(Type::enum(DummyBackedEnum::class)), Type::object(DummyWithNameAttributes::class)));
 
         $this->assertRead($reader, [DummyBackedEnum::ONE, DummyBackedEnum::TWO], '[1, 2]', Type::union(Type::int(), Type::list(Type::enum(DummyBackedEnum::class)), Type::object(DummyWithNameAttributes::class)));
+    }
+
+    public function testReadUnionWithRepeatedObjectListType()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+        $type = Type::union(Type::object(ClassicDummy::class), Type::list(Type::object(ClassicDummy::class)));
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(ClassicDummy::class, $read[0]);
+            $this->assertSame(10, $read[0]->id);
+            $this->assertSame('dummy', $read[0]->name);
+        }, '[{"id":10,"name":"dummy"}]', $type);
+    }
+
+    public function testReadUnionWithRepeatedObjectDictType()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+        $type = Type::union(Type::object(ClassicDummy::class), Type::dict(Type::object(ClassicDummy::class)));
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(ClassicDummy::class, $read['key']);
+            $this->assertSame(10, $read['key']->id);
+            $this->assertSame('dummy', $read['key']->name);
+        }, '{"key":{"id":10,"name":"dummy"}}', $type);
     }
 
     public function testReadObjectWithSyntheticProperties()

@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
+use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\Mapping\Read\AttributePropertyMetadataLoader;
@@ -26,6 +27,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetad
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithOtherDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
@@ -123,6 +125,7 @@ class StreamReaderGeneratorTest extends TestCase
         yield ['object', Type::object(ClassicDummy::class)];
         yield ['nullable_object', Type::nullable(Type::object(ClassicDummy::class))];
         yield ['object_in_object', Type::object(DummyWithOtherDummies::class)];
+        yield ['object_with_nullable_repeated_dummies', Type::object(DummyWithNullableRepeatedDummies::class)];
         yield ['object_with_nullable_properties', Type::object(DummyWithNullableProperties::class)];
         yield ['object_with_value_transformer', Type::object(DummyWithValueTransformerAttributes::class)];
         yield ['object_with_synthetic_properties', Type::object(DummyWithSyntheticProperties::class), new SyntheticPropertyMetadataLoader()];
@@ -149,6 +152,20 @@ class StreamReaderGeneratorTest extends TestCase
         $this->expectExceptionMessage(\sprintf('"%s" type is not supported.', DummyEnum::class));
 
         $generator->generate(Type::enum(DummyEnum::class), false);
+    }
+
+    public function testGenerateRepeatedNullableObjectsOnlyOnce()
+    {
+        $propertyMetadataLoader = $this->createMock(PropertyMetadataLoaderInterface::class);
+        $propertyMetadataLoader->expects($this->exactly(2))
+            ->method('load')
+            ->willReturnCallback(static fn (string $className): array => DummyWithNullableRepeatedDummies::class === $className ? [
+                'first' => new PropertyMetadata('first', Type::nullable(Type::object(ClassicDummy::class))),
+                'second' => new PropertyMetadata('second', Type::nullable(Type::object(ClassicDummy::class))),
+            ] : []);
+
+        $generator = new StreamReaderGenerator($propertyMetadataLoader, $this->streamReadersDir);
+        $generator->generate(Type::object(DummyWithNullableRepeatedDummies::class), false);
     }
 
     public function testCallPropertyMetadataLoaderWithProperContext()

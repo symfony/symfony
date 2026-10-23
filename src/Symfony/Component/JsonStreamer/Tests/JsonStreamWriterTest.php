@@ -30,6 +30,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedDictDummi
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedListDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithQuotes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSelfReferencingDummy;
@@ -320,6 +321,23 @@ class JsonStreamWriterTest extends TestCase
         $dummy->arrayOfDummies = ['key' => new DummyWithNameAttributes()];
 
         $this->assertWritten('{"arrayOfDummies":{"key":{"@id":1,"name":"dummy"}},"array":[]}', $dummy, Type::object(DummyWithPhpDoc::class));
+    }
+
+    public function testWriteObjectWithNullableRepeatedObjects()
+    {
+        $dummy = new DummyWithNullableRepeatedDummies();
+        $dummy->first = new ClassicDummy();
+        $dummy->second = new ClassicDummy();
+        $dummy->second->id = 2;
+
+        $this->assertWritten('{"first":{"id":1,"name":"dummy"},"second":{"id":2,"name":"dummy"}}', $dummy, Type::object(DummyWithNullableRepeatedDummies::class));
+
+        $dummy->first = null;
+        $this->assertWritten('{"first":null,"second":{"id":2,"name":"dummy"}}', $dummy, Type::object(DummyWithNullableRepeatedDummies::class), ['include_null_properties' => true]);
+
+        $dummy->first = new ClassicDummy();
+        $dummy->second = null;
+        $this->assertWritten('{"first":{"id":1,"name":"dummy"}}', $dummy, Type::object(DummyWithNullableRepeatedDummies::class));
     }
 
     public function testWriteObjectWithNullableProperties()

@@ -80,8 +80,12 @@ final class PhpGenerator
     /**
      * @param array<string, mixed> $context
      */
-    private function generateProviders(DataModelNodeInterface $node, bool $decodeFromStream, array $context): string
+    private function generateProviders(DataModelNodeInterface $node, bool $decodeFromStream, array &$context): string
     {
+        if ($node instanceof ObjectNode && $node->isMock()) {
+            return '';
+        }
+
         if ($context['providers'][$node->getIdentifier()] ?? false) {
             return '';
         }
@@ -186,10 +190,6 @@ final class PhpGenerator
         }
 
         if ($node instanceof ObjectNode) {
-            if ($node->isMock()) {
-                return '';
-            }
-
             $arguments = $decodeFromStream ? '$stream, $offset, $length' : '$data';
 
             $php = $this->line('$providers['.var_export($node->getIdentifier(), true)."] = static function ($arguments) use (\$options, \$valueTransformers, \$instantiator, &\$providers) {", $context);

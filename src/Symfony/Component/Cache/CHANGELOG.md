@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `BatchCache` to load missing values with a single callback
+
 8.2
 ---
 

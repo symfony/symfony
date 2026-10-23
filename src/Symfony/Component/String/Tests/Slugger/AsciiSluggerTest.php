@@ -26,6 +26,20 @@ class AsciiSluggerTest extends TestCase
         $this->assertSame($expected, (string) $slugger->slug($string, $separator, $locale));
     }
 
+    public function testSluggingParentLocaleDoesNotDependOnPreviousCalls()
+    {
+        if (!\function_exists('transliterator_transliterate')) {
+            $this->markTestSkipped('The intl extension is required.');
+        }
+
+        $slugger = new AsciiSlugger();
+
+        $this->assertSame('g', (string) $slugger->slug('ғ', '-', 'uz_Latn_UZ'));
+        $this->assertSame('gh', (string) $slugger->slug('ғ', '-', 'uz_Latn'));
+        $this->assertSame('g', (string) $slugger->slug('ғ', '-', 'uz_Latn_UZ'));
+        $this->assertSame('gh', (string) $slugger->slug('ғ', '-', 'uz_Latn'));
+    }
+
     public static function provideSlugTests(): iterable
     {
         yield ['', ''];

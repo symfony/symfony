@@ -112,6 +112,22 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
+    public function testSelectSizeUsesIntegerPrefix()
+    {
+        foreach (['1e2' => 'foo', '+1e2' => 'foo', '0001e2' => 'foo', '2junk' => null, '2.5' => null, '1.9' => 'foo', '-2' => 'foo', '+ 2' => 'foo', 'invalid' => 'foo', '' => 'foo'] as $size => $expected) {
+            $field = new ChoiceFormField($this->createSelectNode(['foo' => false, 'bar' => false], ['size' => $size]));
+            $this->assertSame($expected, $field->getValue(), $size);
+        }
+    }
+
+    public function testSelectSizeSkipsOnlyAsciiWhitespace()
+    {
+        foreach ([" \t\n\f\r+2" => null, "\v2" => 'foo', "\u{00A0}2" => 'foo'] as $size => $expected) {
+            $field = new ChoiceFormField($this->createSelectNode(['foo' => false, 'bar' => false], ['size' => $size]));
+            $this->assertSame($expected, $field->getValue(), $size);
+        }
+    }
+
     public function testSelectWithEmptyBooleanAttribute()
     {
         $node = $this->createSelectNode(['foo' => false, 'bar' => true], [], '');
@@ -288,6 +304,27 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo', $field->getValue());
     }
 
+    public function testInitializeClearsCheckedRadio()
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML('<form><input type="radio" name="r" value="a" /><input type="radio" name="r" value="b" checked disabled /></form>');
+        $nodes = $document->getElementsByTagName('input');
+        $field = new class($nodes->item(0)) extends ChoiceFormField {
+            public function reload(): void
+            {
+                $this->initialize();
+            }
+        };
+        $field->addChoice($nodes->item(1));
+        $this->assertSame('b', $field->getValue());
+
+        $field->reload();
+
+        $this->assertNull($field->getValue());
+        $this->assertFalse($field->hasValue());
+        $this->assertFalse($field->isDisabled());
+    }
+
     public function testCheckboxIsDisabled()
     {
         $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'disabled' => '']);
@@ -361,6 +398,79 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('bar', $field->getValue());
         $field->select('foo');
         $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
+    }
+
+    public function testOptionWithNoValueUsesTextWithWhitespaceCollapsed()
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML("<select name=\"name\"><option>0</option><option selected>\n  Two \t\n  words  </option></select>");
+        $field = new ChoiceFormField($document->getElementsByTagName('select')->item(0));
+
+        $this->assertSame('Two words', $field->getValue());
+        $this->assertSame(['0', 'Two words'], $field->availableOptionValues());
+    }
+
+    public function testSelectWithoutSelectedOptionTakesFirstEnabledOption()
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML('<select name="name"><option disabled>foo</option><optgroup disabled><option>bar</option></optgroup><optgroup><option>baz</option></optgroup></select>');
+        $field = new ChoiceFormField($document->getElementsByTagName('select')->item(0));
+
+        $this->assertSame('baz', $field->getValue(), '->getValue() returns the first option that is not disabled if none are selected');
+        $this->assertFalse($field->isDisabled());
+
+        $document = new \DOMDocument();
+        $document->loadHTML('<select name="name" size="2"><option disabled>foo</option><option>bar</option></select>');
+        $field = new ChoiceFormField($document->getElementsByTagName('select')->item(0));
+
+        $this->assertNull($field->getValue(), '->getValue() returns null for an unselected list box');
+    }
+
+    public function testSelectDefaultWithSizeUsesHtmlIntegerPrefix()
+    {
+        foreach (['1e2', '+1e2', '0001e2', "\v2", "\u{00A0}2", '-2', '+ 2'] as $size) {
+            $node = $this->createSelectNode(['foo' => false, 'bar' => false], ['size' => $size]);
+            $node->firstChild->setAttribute('disabled', '');
+            $field = new ChoiceFormField($node);
+
+            $this->assertSame('bar', $field->getValue(), $size);
+            $this->assertFalse($field->isDisabled());
+        }
+    }
+
+    public function testOptionWithNoValueSkipsScriptText()
+    {
+        foreach ([
+            '<option>A<script type="application/json">ignored</script>B</option>' => 'AB',
+            '<option><script>ignored</script></option>' => '',
+            '<option>A<span>B</span><script>ignored</script>C</option>' => 'ABC',
+            '<option>A<span><script>ignored</script>B</span>C</option>' => 'ABC',
+            '<option value="explicit">A<script>ignored</script>B</option>' => 'explicit',
+            '<option value="">A<script>ignored</script>B</option>' => '',
+        ] as $html => $expected) {
+            $document = new \DOMDocument();
+            $document->loadHTML('<select name="name">'.$html.'</select>');
+            $field = new ChoiceFormField($document->getElementsByTagName('select')->item(0));
+
+            $this->assertSame($expected, $field->getValue());
+            $this->assertSame([$expected], $field->availableOptionValues());
+        }
+    }
+
+    public function testOptionWithNoValueSkipsNamespacedScriptText()
+    {
+        $document = new \DOMDocument();
+        $select = $document->appendChild($document->createElement('select'));
+        $select->setAttribute('name', 'name');
+        $option = $select->appendChild($document->createElement('option'));
+        $option->appendChild($document->createTextNode('A'));
+        $option->appendChild($document->createElementNS('http://www.w3.org/1999/xhtml', 'html:script', 'ignored'));
+        $option->appendChild($document->createElementNS('http://www.w3.org/2000/svg', 'svg:script', 'ignored'));
+        $option->appendChild($document->createElementNS('urn:other', 'other:script', 'kept'));
+        $option->appendChild($document->createCDATASection('B'));
+        $field = new ChoiceFormField($select);
+
+        $this->assertSame('AkeptB', $field->getValue());
     }
 
     public function testDisableValidation()

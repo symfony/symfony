@@ -253,6 +253,13 @@ class FormTest extends TestCase
                 ['foobar' => ['InputFormField', 'foobar']],
             ],
             [
+                'does not take into account reset and button inputs',
+                '<input type="reset" name="foo" value="foo" />
+                 <input type="button" name="bar" value="bar" />
+                 <input type="submit" />',
+                [],
+            ],
+            [
                 'turns an image input into x and y fields',
                 '<input type="image" name="bar" />',
                 ['bar.x' => ['InputFormField', '0'], 'bar.y' => ['InputFormField', '0']],
@@ -427,12 +434,111 @@ class FormTest extends TestCase
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" disabled="disabled" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include disabled fields');
 
+        $form = $this->createForm('<form><fieldset disabled><input type="text" name="foo" value="foo" /><input type="checkbox" name="baz" checked /><input type="radio" name="qux" value="qux" checked /><select name="quux"><option>quux</option></select><textarea name="corge">corge</textarea></fieldset><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include fields inside a disabled fieldset');
+
+        $form = $this->createForm('<form><fieldset disabled><input type="radio" name="foo" /></fieldset><input type="radio" name="foo" checked /><input type="submit" /></form>');
+        $this->assertEquals(['foo' => 'on'], $form->getValues(), '->getValues() includes a checked radio even if a radio with the same value is inside a disabled fieldset');
+
+        $form = $this->createForm('<form><fieldset disabled><input type="radio" name="foo" value="foo" /></fieldset><input type="radio" name="foo" value="foo" /><input type="submit" /></form>');
+        $form['foo']->select('foo');
+        $this->assertEquals(['foo' => 'foo'], $form->getValues(), '->select() checks the enabled radio when a disabled one has the same value');
+
+        $form = $this->createForm('<form><fieldset disabled><legend><input type="text" name="foo" value="foo" /></legend><legend><input type="text" name="baz" value="baz" /></legend></fieldset><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $this->assertEquals(['foo' => 'foo', 'bar' => 'bar'], $form->getValues(), '->getValues() includes fields inside the first legend of a disabled fieldset');
+
         $form = $this->createForm('<form><template><input type="text" name="foo" value="foo" /></template><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include template fields');
         $this->assertFalse($form->has('foo'));
 
         $form = $this->createForm('<turbo-stream><template><form><input type="text" name="foo[bar]" value="foo" /><input type="text" name="bar" value="bar" /><select multiple="multiple" name="baz[]"></select><input type="submit" /></form></template></turbo-stream>');
         $this->assertEquals(['foo[bar]' => 'foo', 'bar' => 'bar', 'baz' => []], $form->getValues(), '->getValues() returns all form field values from template field inside a turbo-stream');
+    }
+
+    public function testSelectDefaultSkipsDisabledOptions()
+    {
+        $form = $this->createForm('<form><select name="choice"><option disabled>foo</option><option>bar</option></select><input type="submit" /></form>');
+        $this->assertSame(['choice' => 'bar'], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice"><optgroup disabled><option>foo</option></optgroup><optgroup><option>bar</option></optgroup></select><input type="submit" /></form>');
+        $this->assertSame(['choice' => 'bar'], $form->getValues());
+    }
+
+    public function testSelectDefaultPreservesExplicitSelection()
+    {
+        $form = $this->createForm('<form><select name="choice"><option selected disabled>foo</option><option>bar</option></select><input type="submit" /></form>');
+        $this->assertSame([], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice"><optgroup disabled><option selected>foo</option></optgroup><option>bar</option></select><input type="submit" /></form>');
+        $this->assertSame([], $form->getValues());
+
+        $form['choice']->select('bar');
+        $this->assertSame(['choice' => 'bar'], $form->getValues());
+        $form['choice']->select('foo');
+        $this->assertSame([], $form->getValues());
+    }
+
+    public function testSelectDefaultWithAllOptionsDisabled()
+    {
+        $form = $this->createForm('<form><select name="choice"><option disabled>foo</option><optgroup disabled><option>bar</option></optgroup></select><input type="submit" /></form>');
+        $this->assertSame([], $form->getValues());
+    }
+
+    public function testSelectWithSizeDoesNotChooseEnabledDefault()
+    {
+        $form = $this->createForm('<form><select name="choice" size="2"><option disabled>foo</option><option>bar</option></select><input type="submit" /></form>');
+        $this->assertSame([], $form->getValues());
+    }
+
+    public function testSelectRadioPreservesNumericValueValidation()
+    {
+        foreach ([['01', '1'], ['01', 1], ['01', true], ['00', 0], ['00', '0']] as [$option, $value]) {
+            $form = $this->createForm('<form><input type="radio" name="r" value="'.$option.'" checked disabled /><input type="submit" /></form>');
+            $form['r']->setValue($value);
+
+            $this->assertSame((string) $value, $form['r']->getValue());
+            $this->assertSame([], $form->getValues());
+        }
+    }
+
+    public function testListboxWithoutSelectedOptionHasNoValue()
+    {
+        $form = $this->createForm('<form><select name="choice" size="2"><option>foo</option><option>bar</option></select><input type="submit" /></form>');
+        $this->assertNull($form['choice']->getValue());
+        $this->assertFalse($form['choice']->hasValue());
+        $this->assertSame([], $form->getValues());
+
+        $form['choice']->select('foo');
+        $this->assertSame(['choice' => 'foo'], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice" size="2"><option>foo</option><option selected>bar</option></select><input type="submit" /></form>');
+        $this->assertSame(['choice' => 'bar'], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice" size="2"><option selected value="">foo</option><option>bar</option></select><input type="submit" /></form>');
+        $this->assertSame(['choice' => ''], $form->getValues());
+    }
+
+    public function testDisabledOptionsWithDuplicateValues()
+    {
+        $form = $this->createForm('<form><select name="choice"><option disabled>foo</option><option selected>foo</option></select><input type="submit" /></form>');
+        $this->assertSame('foo', $form['choice']->getValue());
+        $this->assertFalse($form['choice']->isDisabled());
+        $this->assertSame(['choice' => 'foo'], $form->getValues());
+
+        $form['choice']->select('foo');
+        $this->assertSame('foo', $form['choice']->getValue());
+        $this->assertTrue($form['choice']->isDisabled());
+        $this->assertSame([], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice"><option>foo</option><option disabled>foo</option></select><input type="submit" /></form>');
+        $this->assertSame(['choice' => 'foo'], $form->getValues());
+        $form['choice']->select('foo');
+        $this->assertSame(['choice' => 'foo'], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice"><option>foo</option><option selected disabled>foo</option></select><input type="submit" /></form>');
+        $this->assertSame([], $form->getValues());
+        $form['choice']->select('foo');
+        $this->assertSame(['choice' => 'foo'], $form->getValues());
     }
 
     public function testSetValues()

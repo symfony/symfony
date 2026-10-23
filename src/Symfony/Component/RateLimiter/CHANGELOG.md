@@ -7,6 +7,7 @@ CHANGELOG
  * Resolve env vars at compile time in bundle options used to build the container
  * Add `RateLimiterBundle`, which provides the `rate_limiter` configuration and the services previously provided by `FrameworkBundle` under `framework.rate_limiter`
  * Add `RateLimitExceededEvent`
+ * Add `LimiterInterface::refund()`, to give back the token of a `consume()` call that should not count
  * Make `CompoundLimiter::consume()` stop at the first limiter that rejects the request
  * Add `RateLimiterBuilder` and the `rate_limiter.builder` option
  * Allow `\DateInterval` for the `interval` and `rate.interval` options of `RateLimiterFactory`

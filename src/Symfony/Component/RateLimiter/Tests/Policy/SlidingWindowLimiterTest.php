@@ -302,6 +302,35 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertFalse($limiter->consume()->isAccepted());
     }
 
+    public function testRefund()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume();
+        $this->assertSame(9, $rateLimit->getRemainingTokens());
+
+        $refundedRateLimit = $limiter->refund($rateLimit);
+
+        $this->assertTrue($refundedRateLimit->isAccepted());
+        $this->assertSame(10, $refundedRateLimit->getRemainingTokens());
+        $this->assertSame(10, $limiter->consume(0)->getRemainingTokens());
+        $this->assertTrue($limiter->consume(10)->isAccepted());
+    }
+
+    public function testRefundIsIgnoredOnceTheHitsFadedOut()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume();
+        sleep(13);
+
+        // the hit has faded out of the window, the token was given back on its own
+        $limiter->consume(10);
+        $limiter->refund($rateLimit);
+
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
     public function testLoweringTheLimitKeepsTheReservations()
     {
         $limiter = new SlidingWindowLimiter('test', 20, new \DateInterval('PT12S'), $this->storage);
@@ -335,6 +364,18 @@ class SlidingWindowLimiterTest extends TestCase
         $this->expectExceptionMessage('Cannot set the limit of "Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter" to 0, as that would never accept any hit.');
 
         new SlidingWindowLimiter('test', -1, new \DateInterval('PT12S'), $this->storage);
+    }
+
+    public function testRefundIsIgnoredWhenTheRateLimitWasRejected()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+        $this->assertFalse($limiter->consume()->isAccepted());
     }
 
     private function createLimiter(): SlidingWindowLimiter

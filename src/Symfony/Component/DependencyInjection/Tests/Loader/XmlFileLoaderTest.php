@@ -114,6 +114,33 @@ class XmlFileLoaderTest extends TestCase
         $this->assertInstanceOf(\DOMDocument::class, $xml, '->parseFileToDOM() returns an SimpleXMLElement object');
     }
 
+    /**
+     * @requires extension pcntl
+     *
+     * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
+     */
+    public function testEntityLoaderTemporaryFileSurvivesFork()
+    {
+        $loader = new XmlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services1.xml');
+
+        $method = new \ReflectionMethod(XmlFileLoader::class, 'shouldEnableEntityLoader');
+        preg_match('/schemaLocation="([^"]+)"/', $method->getStaticVariables()['schema'], $matches);
+        $tmpfile = rawurldecode(parse_url($matches[1], \PHP_URL_PATH));
+
+        if (0 === $pid = pcntl_fork()) {
+            exit(0);
+        }
+
+        $this->assertGreaterThan(0, $pid);
+        pcntl_waitpid($pid, $status);
+
+        $this->assertSame(0, pcntl_wexitstatus($status));
+        $this->assertFileExists($tmpfile);
+    }
+
     public function testLoadWithExternalEntitiesDisabled()
     {
         $container = new ContainerBuilder();

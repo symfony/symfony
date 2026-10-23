@@ -4,13 +4,55 @@
  * @return list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>|null
  */
 return static function (mixed $stream, \Psr\Container\ContainerInterface $transformers, \Symfony\Component\JsonStreamer\Read\LazyInstantiator $instantiator, array $options): mixed {
-    $providers['list<Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy>'] = static function ($stream, $offset, $length) use ($options, $transformers, $instantiator, &$providers) {
+    $providers['list<Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy>'] = static function ($stream, $offset, $length) use ($options, $transformers, $instantiator, &$providers, &$readers) {
         $data = \Symfony\Component\JsonStreamer\Read\Splitter::splitList($stream, $offset, $length);
         $collection = [];
         foreach ($data as $k => $v) {
-            $collection[$k] = $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($stream, $v[0], $v[1]);
+            $collection[$k] = $readers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($stream, $v[0], $v[1]);
         }
         return $collection;
+    };
+    $denormalizers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'] = static function ($data) use ($options, $transformers, &$denormalizers) {
+        if (!$data instanceof \stdClass) {
+            throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'));
+        }
+        $data = (array) $data;
+        $object = (new \ReflectionClass(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy::class))->newInstanceWithoutConstructor();
+        if (\array_key_exists('id', $data)) {
+            $value = (null === $data['id'] || \is_scalar($data['id']) ? $data['id'] : throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data['id']), 'int')));
+            try {
+                $object->{'id'} = $value;
+            } catch (\TypeError $e) {
+                throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
+            }
+        }
+        if (\array_key_exists('name', $data)) {
+            $value = (null === $data['name'] || \is_scalar($data['name']) ? $data['name'] : throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data['name']), 'string')));
+            try {
+                $object->{'name'} = $value;
+            } catch (\TypeError $e) {
+                throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
+            }
+        }
+        return $object;
+    };
+    $validators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'] = static function ($stream, $offset, $length, $data) use (&$validators) {
+        if ($data instanceof \stdClass) {
+            foreach (\Symfony\Component\JsonStreamer\Read\Splitter::splitDict($stream, $offset, $length) as $k => $v) {
+            }
+        }
+        return $data;
+    };
+    $readers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'] = static function ($stream, $offset, $length) use (&$providers, &$denormalizers, &$validators) {
+        try {
+            $data = \Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $offset, $length, false);
+        } catch (\Symfony\Component\JsonStreamer\Exception\InvalidStreamException $e) {
+            if (\JSON_ERROR_INVALID_PROPERTY_NAME !== $e->getPrevious()?->getCode()) {
+                throw $e;
+            }
+            return $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($stream, $offset, $length);
+        }
+        return $denormalizers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($validators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($stream, $offset, $length, $data));
     };
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'] = static function ($stream, $offset, $length) use ($options, $transformers, $instantiator, &$providers) {
         $data = \Symfony\Component\JsonStreamer\Read\Splitter::splitDict($stream, $offset, $length);

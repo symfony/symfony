@@ -36,16 +36,16 @@ final class Decoder
     /**
      * @param resource $stream
      */
-    public static function decodeStream($stream, int $offset = 0, ?int $length = null): mixed
+    public static function decodeStream($stream, int $offset = 0, ?int $length = null, bool $associative = true): mixed
     {
         if (false === $contents = stream_get_contents($stream, $length ?? -1, $offset)) {
             throw new RuntimeException('Failed to read JSON stream.');
         }
 
         try {
-            return json_decode($contents, associative: true, flags: \JSON_THROW_ON_ERROR);
+            return json_decode($contents, associative: $associative, flags: \JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new InvalidStreamException('JSON is not valid: '.$e->getMessage());
+            throw new InvalidStreamException('JSON is not valid: '.$e->getMessage(), 0, $e);
         }
     }
 

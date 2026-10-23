@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -20,6 +21,7 @@ use Symfony\Component\Console\Completion\Output\FishCompletionOutput;
 use Symfony\Component\Console\Completion\Output\ZshCompletionOutput;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -46,6 +48,8 @@ final class CompleteCommand extends Command
 
     private array $completionOutputs;
 
+    private ?InputDefinition $fullDefinition = null;
+
     private bool $isDebug = false;
 
     /**
@@ -61,6 +65,53 @@ final class CompleteCommand extends Command
         ];
 
         parent::__construct();
+    }
+
+    public function setApplication(?Application $application = null): void
+    {
+        $this->fullDefinition = null;
+
+        parent::setApplication(...\func_get_args());
+    }
+
+    public function setDefinition(array|InputDefinition $definition): static
+    {
+        $this->fullDefinition = null;
+
+        return parent::setDefinition($definition);
+    }
+
+    /**
+     * @internal
+     */
+    public function mergeApplicationDefinition(bool $mergeArgs = true): void
+    {
+        if (!$application = $this->getApplication()) {
+            return;
+        }
+
+        $definition = $this->getNativeDefinition();
+        $this->fullDefinition = new InputDefinition();
+        $this->fullDefinition->setOptions($definition->getOptions());
+
+        foreach ($application->getDefinition()->getOptions() as $option) {
+            // the completion scripts rely on the options of this command, they win over the conflicting application ones
+            if ($definition->hasOption($option->getName()) || array_filter(explode('|', $option->getShortcut() ?? ''), $definition->hasShortcut(...))) {
+                continue;
+            }
+
+            $this->fullDefinition->addOption($option);
+        }
+
+        if ($mergeArgs) {
+            $this->fullDefinition->setArguments($application->getDefinition()->getArguments());
+        }
+        $this->fullDefinition->addArguments($definition->getArguments());
+    }
+
+    public function getDefinition(): InputDefinition
+    {
+        return $this->fullDefinition ?? parent::getDefinition();
     }
 
     protected function configure(): void

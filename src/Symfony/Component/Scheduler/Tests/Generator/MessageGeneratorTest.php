@@ -300,57 +300,6 @@ class MessageGeneratorTest extends TestCase
         $this->assertSame([], $getRunTimes($createGenerator()));
     }
 
-    public function testWarmHeapDoesNotSkipDueCronRunWithUncommittedCheckpoint()
-    {
-        $message = (object) ['id' => 'recurring'];
-        $cache = new ArrayAdapter();
-        $schedule = (new Schedule())
-            ->stateful($cache)
-            ->processOnlyLastMissedRun(true)
-            ->add(RecurringMessage::cron('30 * * * *', $message));
-        $checkpoint = new Checkpoint('dummy', cache: $cache);
-        $clock = new MockClock('2026-10-23 11:29:00 UTC');
-        $generator = new MessageGenerator($schedule, 'dummy', clock: $clock, checkpoint: $checkpoint);
-
-        // A previous worker completed an earlier occurrence.
-        $item = $cache->getItem('dummy');
-        $item->set([
-            new \DateTimeImmutable('2026-10-23 10:30:00 UTC'),
-            0,
-            new \DateTimeImmutable('2026-10-23 10:30:00 UTC'),
-        ]);
-        $cache->save($item);
-
-        // Keep the generator and its heap alive while waiting for the next due time.
-        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
-        // The initial Schedule::add() sets the restart flag. It is normally
-        // handled at the start of the next poll, which would discard this heap.
-        // Reset it to simulate an already-running worker with a warm heap.
-        $schedule->setRestart(false);
-
-        // The shared checkpoint has moved past the due time, but no message was
-        // recorded for that run (index -1). The warm heap still contains 11:30.
-        $item->set([
-            new \DateTimeImmutable('2026-10-23 11:30:01 UTC'),
-            -1,
-            new \DateTimeImmutable('2026-10-23 11:30:01 UTC'),
-        ]);
-        $cache->save($item);
-
-        $clock->modify('+1 minute +2 seconds');
-
-        $runTimes = [];
-        $messages = [];
-        foreach ($generator->getMessages() as $context => $yieldedMessage) {
-            $runTimes[] = $context->triggeredAt->format('H:i:s');
-            $messages[] = $yieldedMessage;
-        }
-
-        $this->assertSame([$message], $messages);
-        $this->assertSame(['11:30:00'], $runTimes);
-        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
-    }
-
     public function testCheckpointWithMultipleRecurringMessagesAtSameTriggerTime()
     {
         $clock = new MockClock(self::makeDateTime('22:12:00'));

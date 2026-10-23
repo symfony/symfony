@@ -541,24 +541,64 @@ class JsonStreamWriterTest extends TestCase
 
     public function testThrowWhenEncodeError()
     {
-        $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
+        $writer = JsonStreamWriter::create([], $this->streamWritersDir);
 
-        $this->expectException(NotEncodableValueException::class);
-        $this->expectExceptionMessage('Cannot encode "int" to JSON: Inf and NaN cannot be JSON encoded.');
+        try {
+            (string) $writer->write(\INF, Type::int());
+        } catch (NotEncodableValueException $e) {
+            $this->assertInstanceOf(\JsonException::class, $e->getPrevious());
+            $this->assertSame(\JSON_ERROR_INF_OR_NAN, $e->getPrevious()->getCode());
+            $this->assertSame('Inf and NaN cannot be JSON encoded', $e->getPrevious()->getMessage());
+            $this->assertSame('Cannot encode "int" to JSON: '.$e->getPrevious()->getMessage(), $e->getMessage());
 
-        (string) $writer->write(\INF, Type::int());
+            return;
+        }
+
+        $this->fail('An encoding exception should have been thrown.');
     }
 
     #[DataProvider('throwWhenEncodeErrorWithSpecialCharactersInTypeDataProvider')]
     public function testThrowWhenEncodeErrorWithSpecialCharactersInType(string $key)
     {
-        $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
+        $writer = JsonStreamWriter::create([], $this->streamWritersDir);
         $type = Type::arrayShape([$key => Type::float()]);
 
-        $this->expectException(NotEncodableValueException::class);
-        $this->expectExceptionMessage(\sprintf('Cannot encode "%s" to JSON: Inf and NaN cannot be JSON encoded.', $type));
+        try {
+            (string) $writer->write([$key => \INF], $type);
+        } catch (NotEncodableValueException $e) {
+            $this->assertSame('Cannot encode "'.$type.'" to JSON: Inf and NaN cannot be JSON encoded', $e->getMessage());
 
-        (string) $writer->write([$key => \INF], $type);
+            return;
+        }
+
+        $this->fail('An encoding exception should have been thrown.');
+    }
+
+    public function testPreserveEncodingError()
+    {
+        $writer = JsonStreamWriter::create([], $this->streamWritersDir);
+        $exception = new \JsonException('Encoding failed: "%s".');
+        $data = new class($exception) implements \JsonSerializable {
+            public function __construct(private \JsonException $exception)
+            {
+            }
+
+            public function jsonSerialize(): mixed
+            {
+                throw $this->exception;
+            }
+        };
+
+        try {
+            (string) $writer->write($data, Type::mixed());
+        } catch (NotEncodableValueException $e) {
+            $this->assertSame($exception, $e->getPrevious());
+            $this->assertSame('Cannot encode "mixed" to JSON: Encoding failed: "%s".', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('An encoding exception should have been thrown.');
     }
 
     /**

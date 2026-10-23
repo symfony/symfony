@@ -72,6 +72,7 @@ final class PhpGenerator
 
         $context['indentation_level'] = 0;
         $docType = str_replace('*/', '*\/', (string) $dataModel->getType());
+        $exceptionMessagePrefix = var_export('Cannot encode "'.(string) $dataModel->getType().'" to JSON: ', true);
 
         return $this->line('<?php', $context)
             .$this->line('', $context)
@@ -83,7 +84,7 @@ final class PhpGenerator
             .$this->line('    try {', $context)
             .$yields
             .$this->line('    } catch (\\JsonException $e) {', $context)
-            .$this->line('        throw new \\'.NotEncodableValueException::class.'(\\sprintf(\'Cannot encode "%s" to JSON: %s.\', '.var_export((string) $dataModel->getType(), true).', $e->getMessage()), 0, $e);', $context)
+            .$this->line('        throw new \\'.NotEncodableValueException::class.'('.$exceptionMessagePrefix.'.$e->getMessage(), 0, $e);', $context)
             .$this->line('    }', $context)
             .$this->line('};', $context);
     }

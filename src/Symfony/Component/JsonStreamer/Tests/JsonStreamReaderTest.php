@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -72,6 +73,48 @@ class JsonStreamReaderTest extends TestCase
         $this->assertRead($reader, [['foo' => 1, 'bar' => 2], ['foo' => 3]], '[{"foo": 1, "bar": 2}, {"foo": 3}]', Type::builtin(TypeIdentifier::ITERABLE));
         $this->assertRead($reader, (object) ['foo' => 'bar'], '{"foo": "bar"}', Type::object());
         $this->assertRead($reader, DummyBackedEnum::ONE, '1', Type::enum(DummyBackedEnum::class, Type::string()));
+    }
+
+    #[DataProvider('invalidCollectionElementDataProvider')]
+    public function testReadCollectionWithInvalidElementFromStream(string $json)
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, $json);
+        rewind($resource);
+
+        $this->expectException(UnexpectedValueException::class);
+
+        $reader->read($resource, Type::list(Type::int()));
+    }
+
+    public static function invalidCollectionElementDataProvider(): iterable
+    {
+        yield ['[1 0]'];
+        yield ['[_]'];
+        yield ['[[1}]'];
+    }
+
+    #[DataProvider('invalidUnknownPropertyDataProvider')]
+    public function testReadObjectWithInvalidUnknownPropertyFromStream(string $json)
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, $json);
+        rewind($resource);
+
+        $this->expectException(UnexpectedValueException::class);
+
+        $reader->read($resource, Type::object(ClassicDummy::class))->id;
+    }
+
+    public static function invalidUnknownPropertyDataProvider(): iterable
+    {
+        yield ['{"id":1,"extra":[1 2 _],"name":"x"}'];
+        yield ['{"id":1,"extra":[},"name":"x"}'];
+        yield 'unpaired surrogate' => ['{"id":1,"extra":"\uD800","name":"x"}'];
     }
 
     public function testReadCollection()

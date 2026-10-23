@@ -9,7 +9,7 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
         return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties::class, static function ($object) use ($stream, $data, $options, $transformers, $instantiator, &$providers) {
             foreach ($data as $k => $v) {
                 match ($k) {
-                    default => null,
+                    default => \Symfony\Component\JsonStreamer\Read\Decoder::validateStream($stream, $v[0], $v[1]),
                 };
             }
         });

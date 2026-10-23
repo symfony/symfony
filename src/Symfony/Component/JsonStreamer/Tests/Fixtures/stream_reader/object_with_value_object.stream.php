@@ -12,7 +12,7 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
                     'interface' => $object->interface = $providers['DateTimeInterface']($stream, $v[0], $v[1]),
                     'immutable' => $object->immutable = $providers['DateTimeImmutable']($stream, $v[0], $v[1]),
                     'union' => $object->union = $providers['DateTimeImmutable|int']($stream, $v[0], $v[1]),
-                    default => null,
+                    default => \Symfony\Component\JsonStreamer\Read\Decoder::validateStream($stream, $v[0], $v[1]),
                 };
             }
         });

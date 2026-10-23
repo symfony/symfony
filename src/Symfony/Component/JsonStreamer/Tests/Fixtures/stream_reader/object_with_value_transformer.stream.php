@@ -13,7 +13,7 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
                     'active' => $object->active = $transformers->get('Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Transformer\\StringToBooleanValueTransformer')->transform(\Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $v[0], $v[1]), $options),
                     'name' => $object->name = strtoupper(\Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $v[0], $v[1])),
                     'range' => $object->range = Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes::explodeRange(\Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $v[0], $v[1]), $options),
-                    default => null,
+                    default => \Symfony\Component\JsonStreamer\Read\Decoder::validateStream($stream, $v[0], $v[1]),
                 };
             }
         });

@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonStreamer\Tests\Read;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\JsonStreamer\Exception\InvalidStreamException;
 use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
 use Symfony\Component\JsonStreamer\Read\Decoder;
 
@@ -37,7 +38,7 @@ class DecoderTest extends TestCase
 
     public function testDecodeThrowOnInvalidJsonStream()
     {
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(InvalidStreamException::class);
         $this->expectExceptionMessage('JSON is not valid: Syntax error');
 
         $resource = fopen('php://temp', 'w');

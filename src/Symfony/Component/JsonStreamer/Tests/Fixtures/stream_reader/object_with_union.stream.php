@@ -10,7 +10,7 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
             foreach ($data as $k => $v) {
                 match ($k) {
                     'value' => $object->value = $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum|null|string']($stream, $v[0], $v[1]),
-                    default => null,
+                    default => \Symfony\Component\JsonStreamer\Read\Decoder::validateStream($stream, $v[0], $v[1]),
                 };
             }
         });

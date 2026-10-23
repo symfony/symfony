@@ -223,7 +223,7 @@ final class PhpGenerator
                     $php .= $this->line('            '.var_export($streamedName, true).' => $object->'.$property['name'].' = '.$property['accessor']($propertyValuePhp).',', $context);
                 }
 
-                $php .= $this->line('            default => null,', $context)
+                $php .= $this->line('            default => \\'.Decoder::class.'::validateStream($stream, $v[0], $v[1]),', $context)
                     .$this->line('        };', $context)
                     .$this->line('    }', $context)
                     .$this->line('});', $context);

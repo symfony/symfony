@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
-                <target>يجب ان تختار {{ limit }} اختيار على الاقل.|يجب ان تختار {{ limit }} اختيار على الاقل.|يجب ان تختار {{ limit }} اختيارات على الاقل.|يجب ان تختار {{ limit }} اختيار على الاقل.|يجب ان تختار {{ limit }} اختيار على الاقل.|يجب ان تختار {{ limit }} اختيار على الاقل.</target>
+                <target>يجب اختيار {{ limit }} خيار على الأقل.|يجب اختيار خيار واحد على الأقل.|يجب اختيار خيارين على الأقل.|يجب اختيار {{ limit }} خيارات على الأقل.|يجب اختيار {{ limit }} خيارًا على الأقل.|يجب اختيار {{ limit }} خيار على الأقل.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>يجب ان تختار {{ limit }} اختيار على الاكثر.|يجب ان تختار {{ limit }} اختيار على الاكثر.|يجب ان تختار {{ limit }} اختيارات على الاكثر.|يجب ان تختار {{ limit }} اختيار على الاكثر.|يجب ان تختار {{ limit }} اختيار على الاكثر.|يجب ان تختار {{ limit }} اختيار على الاكثر.</target>
+                <target>يجب عدم اختيار أي خيار.|يجب عدم اختيار أكثر من خيار واحد.|يجب عدم اختيار أكثر من خيارين.|يجب عدم اختيار أكثر من {{ limit }} خيارات.|يجب عدم اختيار أكثر من {{ limit }} خيارًا.|يجب عدم اختيار أكثر من {{ limit }} خيار.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>

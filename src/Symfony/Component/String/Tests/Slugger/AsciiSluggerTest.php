@@ -56,9 +56,57 @@ class AsciiSluggerTest extends TestCase
         yield ['a', 'ä', '-', 'fr'];
         yield ['ae', 'ä', '-', 'de'];
         yield ['ae', 'ä', '-', 'de_fr']; // Ensure we get the parent locale
+        yield ['ae', 'ä', '-', 'de-FR'];
         yield [\function_exists('transliterator_transliterate') ? 'g' : '', 'ғ', '-'];
         yield [\function_exists('transliterator_transliterate') ? 'gh' : '', 'ғ', '-', 'uz'];
         yield [\function_exists('transliterator_transliterate') ? 'gh' : '', 'ғ', '-', 'uz_fr']; // Ensure we get the parent locale
+    }
+
+    public function testHyphenatedLocaleUsesParentTransliterator()
+    {
+        $slugger = new AsciiSlugger();
+
+        $this->assertSame((string) $slugger->slug('ғ', '-', 'uz_fr'), (string) $slugger->slug('ғ', '-', 'uz-FR'));
+    }
+
+    public function testParentSymbolsMapPreservesHyphens()
+    {
+        $slugger = new AsciiSlugger(null, ['en-US' => ['@' => 'custom']]);
+
+        $this->assertSame('foo-custom-bar', (string) $slugger->slug('foo@bar', '-', 'en-US_POSIX'));
+    }
+
+    public function testHyphenatedParentSymbolsMap()
+    {
+        $slugger = new AsciiSlugger(null, ['en-US' => ['@' => 'custom']]);
+
+        $this->assertSame('foo-custom-bar', (string) $slugger->slug('foo@bar', '-', 'en-US-POSIX'));
+    }
+
+    public function testHyphenatedLocaleUsesScriptTransliterator()
+    {
+        $slugger = new AsciiSlugger();
+        $expected = (string) $slugger->slug('љђ', '-', 'sr_Cyrl');
+
+        $this->assertSame($expected, (string) $slugger->slug('љђ', '-', 'sr-Cyrl'));
+        $this->assertSame($expected, (string) $slugger->slug('љђ', '-', 'sr-Cyrl-RS'));
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testHyphenatedLocaleUsesParentEmojiTransliterator()
+    {
+        $slugger = (new AsciiSlugger())->withEmoji();
+
+        $this->assertSame((string) $slugger->slug('😺', '-', 'zh_Hant_HK'), (string) $slugger->slug('😺', '-', 'zh-Hant-HK'));
+    }
+
+    public function testHyphenatedArabicLocaleUsesParentSymbolsMap()
+    {
+        $slugger = new AsciiSlugger(null, ['ar' => ['@' => 'at']]);
+
+        $this->assertSame('foo-at-bar', (string) $slugger->slug('foo@bar', '-', 'ar-TN'));
     }
 
     /**

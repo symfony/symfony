@@ -979,6 +979,99 @@ class CrawlerTest extends TestCase
         }
     }
 
+    #[DataProvider('provideHtmlFormValues')]
+    public function testHtmlFormValues(string $html, array $expected, array $values = [], ?array $availableOptions = null)
+    {
+        $crawler = $this->createCrawler(null, 'http://example.com');
+        $crawler->addHtmlContent(static::getDoctype().'<html><body><form>'.$html.'<button type="submit">Send</button></form></body></html>');
+        $form = $crawler->filter('form')->form($values);
+
+        $this->assertSame($expected, $form->getValues());
+
+        if (null !== $availableOptions) {
+            $this->assertSame($availableOptions, $form['choice']->availableOptionValues());
+        }
+    }
+
+    public static function provideHtmlFormValues(): iterable
+    {
+        yield 'reset and button inputs' => ['<input type="reset" name="reset" value="reset"><input type="button" name="button" value="button"><input name="kept" value="yes">', ['kept' => 'yes']];
+        yield 'zero option text' => ['<select name="choice"><option>0</option></select>', ['choice' => '0'], [], ['0']];
+        yield 'ASCII option whitespace' => ["<select name=\"choice\"><option selected>\n  Two \t\n\f\r words  </option></select>", ['choice' => 'Two words'], [], ['Two words']];
+        yield 'nonbreaking option whitespace' => ['<select name="choice"><option>&nbsp;One&nbsp;&nbsp;Two&nbsp;</option></select>', ['choice' => "\u{00A0}One\u{00A0}\u{00A0}Two\u{00A0}"], [], ["\u{00A0}One\u{00A0}\u{00A0}Two\u{00A0}"]];
+        yield 'explicit option value' => ['<select name="choice"><option value="  raw  ">ignored</option></select>', ['choice' => '  raw  '], [], ['  raw  ']];
+        yield 'script option text' => ['<select name="choice"><option>A<script type="application/json">ignored</script>B</option></select>', ['choice' => 'AB'], [], ['AB']];
+        yield 'nested script option text' => ['<select name="choice"><option>A<span><script>ignored</script>B</span>C</option></select>', ['choice' => 'ABC'], [], ['ABC']];
+        yield 'script-only option' => ['<select name="choice"><option><script>ignored</script></option></select>', ['choice' => ''], [], ['']];
+        yield 'explicit empty option value' => ['<select name="choice"><option value="">A<script>ignored</script>B</option></select>', ['choice' => ''], [], ['']];
+        yield 'disabled first option' => ['<select name="choice"><option disabled>foo</option><option>bar</option></select>', ['choice' => 'bar']];
+        yield 'disabled first optgroup' => ['<select name="choice"><optgroup disabled><option>foo</option></optgroup><optgroup><option>bar</option></optgroup></select>', ['choice' => 'bar']];
+        yield 'selected disabled option' => ['<select name="choice"><option selected disabled>foo</option><option>bar</option></select>', []];
+        yield 'selected disabled optgroup' => ['<select name="choice"><optgroup disabled><option selected>foo</option></optgroup><option>bar</option></select>', []];
+        yield 'manual selection outside disabled optgroup' => ['<select name="choice"><optgroup disabled><option selected>foo</option></optgroup><option>bar</option></select>', ['choice' => 'bar'], ['choice' => 'bar']];
+        yield 'all options disabled' => ['<select name="choice"><option disabled>foo</option><optgroup disabled><option>bar</option></optgroup></select>', []];
+        yield 'unselected listbox' => ['<select name="choice" size="2"><option>foo</option><option>bar</option></select>', []];
+        yield 'manual listbox selection' => ['<select name="choice" size="2"><option>foo</option><option>bar</option></select>', ['choice' => 'foo'], ['choice' => 'foo']];
+        yield 'size integer prefix one' => ['<select name="choice" size="1e2"><option>foo</option><option>bar</option></select>', ['choice' => 'foo']];
+        yield 'size integer prefix two' => ['<select name="choice" size="2junk"><option>foo</option><option>bar</option></select>', []];
+        yield 'size leading ASCII whitespace' => ["<select name=\"choice\" size=\" \t\n\r+2\"><option>foo</option><option>bar</option></select>", []];
+        yield 'size leading nonbreaking space' => ['<select name="choice" size="&nbsp;2"><option>foo</option><option>bar</option></select>', ['choice' => 'foo']];
+        yield 'disabled fieldset controls' => ['<fieldset disabled><input name="text" value="text"><input type="checkbox" name="checkbox" checked><input type="radio" name="radio" checked><select name="choice"><option>foo</option></select><textarea name="textarea">text</textarea></fieldset><input name="kept" value="yes">', ['kept' => 'yes']];
+        yield 'first and later legends' => ['<fieldset disabled><legend><input name="first" value="one"></legend><legend><input name="later" value="two"></legend></fieldset>', ['first' => 'one']];
+        yield 'nested fieldset legend' => ['<fieldset disabled><legend><input name="first" value="one"></legend><fieldset><legend><input name="nested" value="two"></legend></fieldset></fieldset>', ['first' => 'one']];
+        yield 'same-valued checked radio' => ['<fieldset disabled><input type="radio" name="radio" value="foo"></fieldset><input type="radio" name="radio" value="foo" checked>', ['radio' => 'foo']];
+        yield 'same-valued manual radio' => ['<fieldset disabled><input type="radio" name="radio" value="foo"></fieldset><input type="radio" name="radio" value="foo">', ['radio' => 'foo'], ['radio' => 'foo']];
+        yield 'duplicate selected enabled option' => ['<select name="choice"><option disabled>foo</option><option selected>foo</option></select>', ['choice' => 'foo']];
+        yield 'duplicate manual first disabled option' => ['<select name="choice"><option disabled>foo</option><option selected>foo</option></select>', [], ['choice' => 'foo']];
+        yield 'duplicate selected disabled option' => ['<select name="choice"><option>foo</option><option selected disabled>foo</option></select>', []];
+        yield 'duplicate manual first enabled option' => ['<select name="choice"><option>foo</option><option selected disabled>foo</option></select>', ['choice' => 'foo'], ['choice' => 'foo']];
+    }
+
+    public function testSelectByTextKeepsDuplicateOptionIdentity()
+    {
+        foreach ([
+            '<option value="same" disabled>Disabled</option><option value="same">Enabled</option>',
+            '<option value="same">Enabled</option><option value="same" disabled>Disabled</option>',
+        ] as $options) {
+            $crawler = $this->createCrawler('<form><select name="choice">'.$options.'</select></form>', 'http://example.com/');
+            $form = $crawler->filter('form')->form();
+
+            $form['choice']->selectByText('Disabled');
+            $this->assertTrue($form['choice']->isDisabled());
+            $this->assertSame([], $form->getPhpValues());
+
+            $form['choice']->selectByText('Enabled');
+            $this->assertFalse($form['choice']->isDisabled());
+            $this->assertSame(['choice' => 'same'], $form->getPhpValues());
+        }
+    }
+
+    public function testSelectByTextKeepsFirstMatchingDisabledOption()
+    {
+        $crawler = $this->createCrawler('<form><select name="choice"><option value="same" disabled>Same text</option><option value="same" selected>Same text</option></select></form>', 'http://example.com/');
+        $form = $crawler->filter('form')->form();
+
+        $this->assertSame(['choice' => 'same'], $form->getPhpValues());
+
+        $form['choice']->selectByText('Same text');
+
+        $this->assertTrue($form['choice']->isDisabled());
+        $this->assertSame([], $form->getPhpValues());
+    }
+
+    public function testSelectByTextExcludesScriptText()
+    {
+        foreach (['' => 'Foo Bar', ' value=" raw 0 "' => ' raw 0 '] as $attributes => $expected) {
+            $crawler = $this->createCrawler('<form><select name="choice"><option value="initial" selected>Initial</option><option'.$attributes."> \tFoo<script>hidden</script>\n Bar \r</option></select></form>", 'http://example.com/');
+            $form = $crawler->filter('form')->form();
+
+            $form['choice']->selectByText(" \tFoo\nBar ");
+
+            $this->assertSame($expected, $form['choice']->getValue());
+            $this->assertSame(['choice' => $expected], $form->getPhpValues());
+        }
+    }
+
     public function testInvalidForm()
     {
         $this->expectException(\InvalidArgumentException::class);

@@ -23,6 +23,8 @@ use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 use Symfony\Component\Form\Tests\Fixtures\BlockPrefixedFooTextType;
 use Symfony\Component\Form\Tests\Fixtures\CollectionWithPreSetDataType;
 use Symfony\Component\Form\Tests\Fixtures\CollectionWithRecursiveSetDataType;
+use Symfony\Component\Form\Tests\Fixtures\CustomChildCollectionType;
+use Symfony\Component\Form\Tests\Fixtures\CustomCollectionType;
 use Symfony\Component\Form\Tests\Fixtures\Product;
 use Symfony\Component\Form\Tests\Fixtures\ProductType;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -519,6 +521,37 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertCount(1, $collectionView);
         $this->assertSame($expectedBlockPrefixes, $collectionView[0]->vars['block_prefixes']);
         $this->assertSame($expectedBlockPrefixes, $collectionView->vars['prototype']->vars['block_prefixes']);
+    }
+
+    #[DataProvider('provideCollectionEntryBlockPrefixes')]
+    public function testEntriesInheritCollectionBlockPrefixes(string $type, array $options, array $prefixes)
+    {
+        $view = $this->factory->createNamed('fields', $type, ['value'], $options + [
+            'allow_add' => true,
+            'entry_options' => ['block_prefix' => 'entry_custom'],
+            'prototype_options' => ['block_prefix' => 'prototype_custom'],
+        ])->createView();
+
+        $this->assertSame(['form', ...$prefixes, 'text', 'entry_custom', '_fields_entry'], $view[0]->vars['block_prefixes']);
+        $this->assertSame(['form', ...$prefixes, 'text', 'prototype_custom', '_fields_entry'], $view->vars['prototype']->vars['block_prefixes']);
+    }
+
+    public static function provideCollectionEntryBlockPrefixes(): iterable
+    {
+        yield 'block prefix option' => [CollectionType::class, ['block_prefix' => 'custom'], ['collection_entry', 'custom_entry']];
+        yield 'custom collection type' => [CustomCollectionType::class, [], ['collection_entry', 'custom_collection_entry']];
+        yield 'inherited collection type' => [CustomChildCollectionType::class, [], ['collection_entry', 'custom_collection_entry', 'custom_child_collection_entry']];
+        yield 'type and option' => [CustomChildCollectionType::class, ['block_prefix' => 'custom'], ['collection_entry', 'custom_collection_entry', 'custom_child_collection_entry', 'custom_entry']];
+    }
+
+    public function testEmptyCollectionPrototypeInheritsBlockPrefixes()
+    {
+        $view = $this->factory->createNamed('fields', CustomCollectionType::class, [], [
+            'allow_add' => true,
+        ])->createView();
+
+        $this->assertCount(0, $view);
+        $this->assertSame(['form', 'collection_entry', 'custom_collection_entry', 'text', '_fields_entry'], $view->vars['prototype']->vars['block_prefixes']);
     }
 
     public function testEntriesBlockPrefixesWithCustomBlockPrefix()

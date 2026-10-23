@@ -503,6 +503,46 @@ class FormTest extends TestCase
         }
     }
 
+    public function testListboxWithoutSelectedOptionHasNoValue()
+    {
+        $form = $this->createForm('<form><select name="choice" size="2"><option>foo</option><option>bar</option></select><input type="submit" /></form>');
+        $this->assertNull($form['choice']->getValue());
+        $this->assertFalse($form['choice']->hasValue());
+        $this->assertSame([], $form->getValues());
+
+        $form['choice']->select('foo');
+        $this->assertSame(['choice' => 'foo'], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice" size="2"><option>foo</option><option selected>bar</option></select><input type="submit" /></form>');
+        $this->assertSame(['choice' => 'bar'], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice" size="2"><option selected value="">foo</option><option>bar</option></select><input type="submit" /></form>');
+        $this->assertSame(['choice' => ''], $form->getValues());
+    }
+
+    public function testDisabledOptionsWithDuplicateValues()
+    {
+        $form = $this->createForm('<form><select name="choice"><option disabled>foo</option><option selected>foo</option></select><input type="submit" /></form>');
+        $this->assertSame('foo', $form['choice']->getValue());
+        $this->assertFalse($form['choice']->isDisabled());
+        $this->assertSame(['choice' => 'foo'], $form->getValues());
+
+        $form['choice']->select('foo');
+        $this->assertSame('foo', $form['choice']->getValue());
+        $this->assertTrue($form['choice']->isDisabled());
+        $this->assertSame([], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice"><option>foo</option><option disabled>foo</option></select><input type="submit" /></form>');
+        $this->assertSame(['choice' => 'foo'], $form->getValues());
+        $form['choice']->select('foo');
+        $this->assertSame(['choice' => 'foo'], $form->getValues());
+
+        $form = $this->createForm('<form><select name="choice"><option>foo</option><option selected disabled>foo</option></select><input type="submit" /></form>');
+        $this->assertSame([], $form->getValues());
+        $form['choice']->select('foo');
+        $this->assertSame(['choice' => 'foo'], $form->getValues());
+    }
+
     public function testSetValues()
     {
         $form = $this->createForm('<form><input type="checkbox" name="foo" value="foo" checked="checked" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');

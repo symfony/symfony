@@ -112,6 +112,22 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
+    public function testSelectSizeUsesIntegerPrefix()
+    {
+        foreach (['1e2' => 'foo', '+1e2' => 'foo', '0001e2' => 'foo', '2junk' => null, '2.5' => null, '1.9' => 'foo', '-2' => 'foo', '+ 2' => 'foo', 'invalid' => 'foo', '' => 'foo'] as $size => $expected) {
+            $field = new ChoiceFormField($this->createSelectNode(['foo' => false, 'bar' => false], ['size' => $size]));
+            $this->assertSame($expected, $field->getValue(), $size);
+        }
+    }
+
+    public function testSelectSizeSkipsOnlyAsciiWhitespace()
+    {
+        foreach ([" \t\n\f\r+2" => null, "\v2" => 'foo', "\u{00A0}2" => 'foo'] as $size => $expected) {
+            $field = new ChoiceFormField($this->createSelectNode(['foo' => false, 'bar' => false], ['size' => $size]));
+            $this->assertSame($expected, $field->getValue(), $size);
+        }
+    }
+
     public function testSelectWithEmptyBooleanAttribute()
     {
         $node = $this->createSelectNode(['foo' => false, 'bar' => true], [], '');
@@ -407,7 +423,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $document->loadHTML('<select name="name" size="2"><option disabled>foo</option><option>bar</option></select>');
         $field = new ChoiceFormField($document->getElementsByTagName('select')->item(0));
 
-        $this->assertSame('foo', $field->getValue(), '->getValue() does not skip disabled options of a list box');
+        $this->assertNull($field->getValue(), '->getValue() returns null for an unselected list box');
     }
 
     public function testSelectDefaultWithSizeUsesHtmlIntegerPrefix()

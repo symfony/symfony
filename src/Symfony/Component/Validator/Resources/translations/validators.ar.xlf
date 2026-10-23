@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>تعذر تحميل الملف.</target>
+                <target>تعذّر رفع الملف.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -188,11 +188,11 @@
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
-                <target>لم يتم ارسال اى ملف.</target>
+                <target>لم يتم رفع أي ملف.</target>
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target>لم يتم تكوين مجلد مؤقت في ملف php.ini.</target>
+                <target>لم يُحدَّد مجلد مؤقت في ملف php.ini، أو أن المجلد المحدَّد غير موجود.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -200,7 +200,7 @@
             </trans-unit>
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
-                <target>احد اضافات PHP تسببت فى فشل استقبال الملف.</target>
+                <target>تسبّبت إحدى إضافات PHP في فشل رفع الملف.</target>
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>

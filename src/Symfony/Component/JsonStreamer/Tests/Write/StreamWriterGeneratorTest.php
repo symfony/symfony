@@ -13,6 +13,8 @@ namespace Symfony\Component\JsonStreamer\Tests\Write;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
+use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
@@ -311,6 +313,37 @@ class StreamWriterGeneratorTest extends TestCase
 
         $this->assertSame($generator->generate($type), $generator->generate($type, ['include_null_properties' => true]));
         $this->assertStringEndsWith('.json.php', $generator->generate($type));
+    }
+
+    public function testDumpOncePerPath()
+    {
+        $dumpedPaths = [];
+        $cacheFactory = $this->createMock(ConfigCacheFactoryInterface::class);
+        $cacheFactory->expects($this->exactly(3))->method('cache')->willReturnCallback(function (string $file) use (&$dumpedPaths): ConfigCacheInterface {
+            $dumpedPaths[] = $file;
+
+            return $this->createStub(ConfigCacheInterface::class);
+        });
+
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamWritersDir, $cacheFactory);
+
+        $paths = [];
+        foreach ([[Type::object(ClassicDummy::class), []], [Type::object(ClassicDummy::class), ['cache_variant' => 'jsonld']], [Type::int(), []]] as [$type, $options]) {
+            $paths[] = $path = $generator->generate($type, $options);
+            $this->assertSame($path, $generator->generate($type, $options));
+        }
+
+        $this->assertSame($paths, $dumpedPaths);
+    }
+
+    public function testDoNotRegenerateDeletedFileWithinTheSameProcess()
+    {
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamWritersDir);
+
+        unlink($path = $generator->generate(Type::object(ClassicDummy::class)));
+
+        $this->assertSame($path, $generator->generate(Type::object(ClassicDummy::class)));
+        $this->assertFileDoesNotExist($path);
     }
 
     #[DataProvider('invalidCacheVariants')]

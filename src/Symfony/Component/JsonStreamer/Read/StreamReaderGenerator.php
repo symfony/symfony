@@ -49,6 +49,11 @@ final class StreamReaderGenerator
     private StreamerDumper $dumper;
     private ?PhpGenerator $phpGenerator = null;
 
+    /**
+     * @var array<string, true>
+     */
+    private array $generatedPaths = [];
+
     public function __construct(
         private PropertyMetadataLoaderInterface $propertyMetadataLoader,
         private ContainerInterface $transformers,
@@ -66,6 +71,11 @@ final class StreamReaderGenerator
     public function generate(Type $type, bool $decodeFromStream, array $options = []): string
     {
         $path = \sprintf('%s%s%s.%s%s.php', $this->streamReadersDir, \DIRECTORY_SEPARATOR, hash('xxh128', StreamerDumper::FORMAT_VERSION.$type), self::cacheVariant($options), $decodeFromStream ? '.stream' : '');
+
+        if (isset($this->generatedPaths[$path])) {
+            return $path;
+        }
+
         $generateContent = function () use ($type, $decodeFromStream, $options): string {
             $this->phpGenerator ??= new PhpGenerator($this->transformers);
 
@@ -73,6 +83,7 @@ final class StreamReaderGenerator
         };
 
         $this->dumper->dump($type, $path, $generateContent);
+        $this->generatedPaths[$path] = true;
 
         return $path;
     }

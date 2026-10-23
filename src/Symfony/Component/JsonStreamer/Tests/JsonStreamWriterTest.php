@@ -914,6 +914,16 @@ class JsonStreamWriterTest extends TestCase
         $this->assertCount(1, glob($this->streamWritersDir.'/*'));
     }
 
+    public function testWriteAfterStreamWriterFileIsDeleted()
+    {
+        $writer = JsonStreamWriter::create([], $this->streamWritersDir);
+        $this->assertSame('true', (string) $writer->write(true, Type::bool()));
+
+        array_map('unlink', glob($this->streamWritersDir.'/*'));
+
+        $this->assertSame('true', (string) $writer->write(true, Type::bool()));
+    }
+
     public function testCreateStreamWriterFileOnlyIfNotExists()
     {
         $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);

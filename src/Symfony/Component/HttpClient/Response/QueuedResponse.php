@@ -27,12 +27,22 @@ final class QueuedResponse implements ResponseInterface, StreamableInterface
 {
     use CommonResponseTrait;
 
+    private static ?\Closure $initializerClosure = null;
+
     private ?ResponseInterface $response = null;
     private bool $complete = false;
     private array $chunks = [];
     /** @var resource|null */
     private $backlog;
-    private array $info;
+    private array $info = [
+        'canceled' => false,
+        'error' => null,
+        'http_code' => 0,
+        'redirect_count' => 0,
+        'redirect_url' => null,
+        'response_headers' => [],
+        'start_time' => 0.0,
+    ];
     private float $timeout;
     private array $headers = [];
 
@@ -50,20 +60,7 @@ final class QueuedResponse implements ResponseInterface, StreamableInterface
             $this->timeout = 172800.0;
         }
 
-        $this->initializer = static fn (self $response) => null !== $response->shouldBuffer;
-        $this->info = [
-            'canceled' => false,
-            'error' => null,
-            'http_code' => 0,
-            'http_method' => $method,
-            'redirect_count' => 0,
-            'redirect_url' => null,
-            'response_headers' => [],
-            'start_time' => 0.0,
-            'url' => $url,
-            'user_data' => $options['user_data'] ?? null,
-            'max_duration' => $options['max_duration'] ?? 0,
-        ];
+        $this->initializer = self::$initializerClosure ??= static fn (self $response) => null !== $response->shouldBuffer;
     }
 
     public function getClient(): HttpClientInterface
@@ -80,7 +77,7 @@ final class QueuedResponse implements ResponseInterface, StreamableInterface
         try {
             return $this->response = $this->client->request($this->method, $this->url, ['buffer' => false] + $this->options);
         } finally {
-            $this->options = [];
+            $this->clearOptions();
         }
     }
 
@@ -163,10 +160,21 @@ final class QueuedResponse implements ResponseInterface, StreamableInterface
                 return true;
             }
 
-            return $this->response?->getInfo($type) ?? $this->info[$type] ?? null;
+            return $this->response?->getInfo($type) ?? $this->info[$type] ?? match ($type) {
+                'http_method' => $this->method,
+                'url' => $this->url,
+                'user_data' => $this->options['user_data'] ?? null,
+                'max_duration' => $this->options['max_duration'] ?? 0,
+                default => null,
+            };
         }
 
-        $info = ($this->response?->getInfo() ?? []) + $this->info;
+        $info = ($this->response?->getInfo() ?? []) + $this->info + [
+            'http_method' => $this->method,
+            'url' => $this->url,
+            'user_data' => $this->options['user_data'] ?? null,
+            'max_duration' => $this->options['max_duration'] ?? 0,
+        ];
 
         if (null !== $this->info['error']) {
             $info['error'] = $this->info['error'];
@@ -423,6 +431,17 @@ final class QueuedResponse implements ResponseInterface, StreamableInterface
         $this->state->release($this);
         $this->chunks = [];
         $this->backlog = null;
+        $this->clearOptions();
+    }
+
+    private function clearOptions(): void
+    {
+        foreach (['user_data', 'max_duration'] as $key) {
+            if (isset($this->options[$key])) {
+                $this->info[$key] = $this->options[$key];
+            }
+        }
+
         $this->options = [];
     }
 }

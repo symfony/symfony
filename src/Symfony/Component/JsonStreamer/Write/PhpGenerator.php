@@ -43,8 +43,16 @@ final class PhpGenerator
     private const JSON_ENCODE_FLAGS = \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE;
     private const THROWING_JSON_ENCODE_FLAGS_EXPRESSION = '\\JSON_THROW_ON_ERROR | \\JSON_PRESERVE_ZERO_FRACTION | \\JSON_UNESCAPED_SLASHES | \\JSON_UNESCAPED_UNICODE';
     private const MAX_DEPTH = 512;
+    private const BUFFER_SIZE = 8192;
 
-    private string $yieldBuffer = '';
+    private string $pendingString = '';
+
+    /**
+     * @var list<string>
+     */
+    private array $pendingExpressions = [];
+
+    private bool $isBufferDefined = true;
 
     public function __construct(
         private ContainerInterface $transformers,
@@ -60,18 +68,25 @@ final class PhpGenerator
         $context['depth'] = 0;
         $context['indentation_level'] = 1;
 
+        $this->pendingString = '';
+        $this->pendingExpressions = [];
+        $this->isBufferDefined = true;
+
         $generators = $this->generateObjectGenerators($dataModel, $options, $context);
 
         // filter generators to mock only
         $generators = array_intersect_key($generators, $context['mocks'] ?? []);
         $context['generated_generators'] = array_intersect_key($context['generated_generators'] ?? [], $context['mocks'] ?? []);
 
+        $this->isBufferDefined = false;
+
         $context['indentation_level'] = 2;
         $yields = $this->generateYields($dataModel, $options, $context)
-            .$this->flushYieldBuffer($context);
+            .$this->yieldBuffer($context);
 
         $context['indentation_level'] = 0;
         $docType = str_replace('*/', '*\/', (string) $dataModel->getType());
+        $exceptionMessagePrefix = var_export('Cannot encode "'.(string) $dataModel->getType().'" to JSON: ', true);
 
         return $this->line('<?php', $context)
             .$this->line('', $context)
@@ -83,7 +98,7 @@ final class PhpGenerator
             .$this->line('    try {', $context)
             .$yields
             .$this->line('    } catch (\\JsonException $e) {', $context)
-            .$this->line('        throw new \\'.NotEncodableValueException::class.'(\\sprintf(\'Cannot encode "%s" to JSON: %s.\', '.var_export((string) $dataModel->getType(), true).', $e->getMessage()), 0, $e);', $context)
+            .$this->line('        throw new \\'.NotEncodableValueException::class.'('.$exceptionMessagePrefix.'.$e->getMessage(), 0, $e);', $context)
             .$this->line('    }', $context)
             .$this->line('};', $context);
     }
@@ -131,11 +146,11 @@ final class PhpGenerator
 
             ++$context['indentation_level'];
             $yields = $this->generateYields($node->withAccessor('$data'), $options, $context)
-                .$this->flushYieldBuffer($context);
+                .$this->yieldBuffer($context, true);
             --$context['indentation_level'];
 
             $generators = [
-                $node->getIdentifier() => $this->line('$generators['.var_export($node->getIdentifier(), true).'] = static function ($data, $depth) use ($transformers, $options, &$generators) {', $context)
+                $node->getIdentifier() => $this->line('$generators['.var_export($node->getIdentifier(), true).'] = static function ($data, $depth, &$buffer) use ($transformers, $options, &$generators) {', $context)
                     .$this->line('    if ($depth >= '.self::MAX_DEPTH.') {', $context)
                     .$this->line('        throw new \\'.NotEncodableValueException::class.'(\'Maximum stack depth exceeded\');', $context)
                     .$this->line('    }', $context)
@@ -168,7 +183,7 @@ final class PhpGenerator
         $accessor = $dataModelNode->getAccessor();
 
         if ($this->canBeEncodedWithJsonEncode($dataModelNode)) {
-            return $this->yield($this->encode($accessor, $context), $context);
+            return $this->append($this->encode($accessor, $context), $context);
         }
 
         if ($context['depth'] >= self::MAX_DEPTH) {
@@ -177,29 +192,28 @@ final class PhpGenerator
 
         if ($dataModelNode instanceof ScalarNode) {
             return match (true) {
-                TypeIdentifier::NULL === $dataModelNode->getType()->getTypeIdentifier() => $this->yieldInterpolatedString('null', $context),
-                TypeIdentifier::BOOL === $dataModelNode->getType()->getTypeIdentifier() => $this->yield("$accessor ? 'true' : 'false'", $context),
-                default => $this->yield($this->encode($accessor, $context), $context),
+                TypeIdentifier::NULL === $dataModelNode->getType()->getTypeIdentifier() => $this->appendString('null', $context),
+                TypeIdentifier::BOOL === $dataModelNode->getType()->getTypeIdentifier() => $this->append("($accessor ? 'true' : 'false')", $context),
+                default => $this->append($this->encode($accessor, $context), $context),
             };
         }
 
         if ($dataModelNode instanceof BackedEnumNode) {
-            return $this->yield($this->encode("{$accessor}->value", $context), $context);
+            return $this->append($this->encode("{$accessor}->value", $context), $context);
         }
 
         if ($dataModelNode instanceof CompositeNode) {
-            $php = $this->flushYieldBuffer($context);
+            $php = $this->flushBuffer($context);
             foreach ($dataModelNode->getNodes() as $i => $node) {
                 $php .= $this->line((0 === $i ? 'if' : '} elseif').' ('.$this->generateCompositeNodeItemCondition($node).') {', $context);
 
                 ++$context['indentation_level'];
                 $php .= $this->generateYields($node, $options, $context)
-                    .$this->flushYieldBuffer($context);
+                    .$this->flushBuffer($context);
                 --$context['indentation_level'];
             }
 
             return $php
-                .$this->flushYieldBuffer($context)
                 .$this->line('} else {', $context)
                 .$this->line('    throw new \\'.UnexpectedValueException::class."(\\sprintf('Unexpected \"%s\" value.', \get_debug_type($accessor)));", $context)
                 .$this->line('}', $context);
@@ -211,22 +225,23 @@ final class PhpGenerator
             $collectionKeyType = $dataModelNode->getType()->getCollectionKeyType();
 
             if ($collectionKeyType instanceof BuiltinType && TypeIdentifier::INT === $collectionKeyType->getTypeIdentifier()) {
-                $php = $this->yieldInterpolatedString('[', $context)
-                    .$this->flushYieldBuffer($context)
+                $php = $this->appendString('[', $context)
+                    .$this->flushBuffer($context)
                     .$this->line('$prefix'.$context['depth'].' = \'\';', $context)
                     .$this->line("foreach ($accessor as ".$dataModelNode->getItemNode()->getAccessor().') {', $context);
 
                 ++$context['indentation_level'];
-                $php .= $this->yieldInterpolatedString('{$prefix'.$context['depth'].'}', $context, false)
+                $php .= $this->appendString('{$prefix'.$context['depth'].'}', $context, false)
                     .$this->generateYields($dataModelNode->getItemNode(), $options, $context)
-                    .$this->flushYieldBuffer($context)
-                    .$this->line('$prefix'.$context['depth'].' = \',\';', $context);
+                    .$this->flushBuffer($context)
+                    .$this->line('$prefix'.$context['depth'].' = \',\';', $context)
+                    .$this->yieldBuffer($context, true);
 
                 --$context['indentation_level'];
 
                 return $php
                     .$this->line('}', $context)
-                    .$this->yieldInterpolatedString(']', $context);
+                    .$this->appendString(']', $context);
             }
 
             $keyAccessor = $dataModelNode->getKeyNode()->getAccessor();
@@ -235,45 +250,48 @@ final class PhpGenerator
                 ? "$keyAccessor = is_int($keyAccessor) ? $keyAccessor : \substr(\json_encode($keyAccessor, ".self::THROWING_JSON_ENCODE_FLAGS_EXPRESSION.'), 1, -1);'
                 : "$keyAccessor = \substr(\json_encode($keyAccessor, ".self::THROWING_JSON_ENCODE_FLAGS_EXPRESSION.'), 1, -1);';
 
-            $php = $this->yieldInterpolatedString('{', $context)
-                .$this->flushYieldBuffer($context)
+            $php = $this->appendString('{', $context)
+                .$this->flushBuffer($context)
                 .$this->line('$prefix'.$context['depth'].' = \'\';', $context)
                 .$this->line("foreach ($accessor as $keyAccessor => ".$dataModelNode->getItemNode()->getAccessor().') {', $context);
 
             ++$context['indentation_level'];
             $php .= $this->line($escapedKey, $context)
-                .$this->yieldInterpolatedString('{$prefix'.$context['depth'].'}"{'.$keyAccessor.'}":', $context, false)
+                .$this->appendString('{$prefix'.$context['depth'].'}"{'.$keyAccessor.'}":', $context, false)
                 .$this->generateYields($dataModelNode->getItemNode(), $options, $context)
-                .$this->flushYieldBuffer($context)
-                .$this->line('$prefix'.$context['depth'].' = \',\';', $context);
+                .$this->flushBuffer($context)
+                .$this->line('$prefix'.$context['depth'].' = \',\';', $context)
+                .$this->yieldBuffer($context, true);
 
             --$context['indentation_level'];
 
             return $php
                 .$this->line('}', $context)
-                .$this->yieldInterpolatedString('}', $context);
+                .$this->appendString('}', $context);
         }
 
         if ($dataModelNode instanceof ObjectNode) {
             if ($valueObjectTransformerId = $this->getValueObjectTransformerId($dataModelNode->getType()->getClassName())) {
                 $rawValue = '$transformers->get('.var_export($valueObjectTransformerId, true).")->transform({$dataModelNode->getAccessor()}, \$options)";
 
-                return $this->yield($this->encode($rawValue, $context), $context);
+                return $this->append($this->encode($rawValue, $context), $context);
             }
 
             if (isset($context['generated_generators'][$dataModelNode->getIdentifier()]) || $dataModelNode->isMock()) {
                 $depthArgument = ($context['generating_generator'] ?? false) ? '$depth + 1' : (string) $context['depth'];
 
-                return $this->flushYieldBuffer($context)
-                    .$this->line('yield from $generators['.var_export($dataModelNode->getIdentifier(), true).']('.$accessor.', '.$depthArgument.');', $context);
+                return $this->flushBuffer($context)
+                    .$this->line('yield from $generators['.var_export($dataModelNode->getIdentifier(), true).']('.$accessor.', '.$depthArgument.', $buffer);', $context);
             }
 
             ++$context['depth'];
 
-            $php = $this->line('$prefix'.$context['depth'].' = \'\';', $context)
-                .$this->yieldInterpolatedString('{', $context);
+            $prefixVariable = '$prefix'.$context['depth'];
 
-            $prefixIsCommaForSure = false;
+            // the separator is only resolved at runtime while every written property may be null
+            $staticPrefix = '';
+
+            $php = $this->appendString('{', $context);
 
             foreach ($dataModelNode->getProperties() as $name => $propertyNode) {
                 $encodedName = json_encode($name, self::JSON_ENCODE_FLAGS);
@@ -293,57 +311,53 @@ final class PhpGenerator
                         ? $nonNullableCompositeParts[0]
                         : new CompositeNode($propertyNode->getAccessor(), $nonNullableCompositeParts);
 
-                    $php .= $this->flushYieldBuffer($context)
-                        .$this->line('if (null === '.$propertyNode->getAccessor().' && ($options[\'include_null_properties\'] ?? false)) {', $context);
+                    $php .= $this->flushBuffer($context);
+
+                    if ('' === $staticPrefix) {
+                        $php .= $this->line($prefixVariable.' = \'\';', $context);
+                        $staticPrefix = null;
+                    }
+
+                    $prefix = $staticPrefix ?? '{'.$prefixVariable.'}';
+                    $updatePrefix = null === $staticPrefix && $name !== array_key_last($dataModelNode->getProperties());
+
+                    $php .= $this->line('if (null === '.$propertyNode->getAccessor().' && ($options[\'include_null_properties\'] ?? false)) {', $context);
 
                     ++$context['indentation_level'];
 
-                    $php .= $this->yieldInterpolatedString('{$prefix'.$context['depth'].'}', $context, false)
-                        .$this->yieldInterpolatedString('"'.$encodedName.'":', $context)
-                        .$this->yieldInterpolatedString('null', $context)
-                        .$this->flushYieldBuffer($context);
-
-                    if (!$prefixIsCommaForSure && $name !== array_key_last($dataModelNode->getProperties())) {
-                        $php .= $this->line('$prefix'.$context['depth'].' = \',\';', $context);
-                    }
+                    $php .= $this->appendString($prefix, $context, false)
+                        .$this->appendString('"'.$encodedName.'":', $context)
+                        .$this->appendString('null', $context)
+                        .$this->flushBuffer($context)
+                        .($updatePrefix ? $this->line($prefixVariable.' = \',\';', $context) : '');
 
                     --$context['indentation_level'];
 
                     $php .= $this->line('}', $context)
-                        .$this->flushYieldBuffer($context)
                         .$this->line('if (null !== '.$propertyNode->getAccessor().') {', $context);
 
                     ++$context['indentation_level'];
 
-                    $php .= $this->yieldInterpolatedString('{$prefix'.$context['depth'].'}', $context, false)
-                        .$this->yieldInterpolatedString('"'.$encodedName.'":', $context)
-                        .$this->flushYieldBuffer($context)
+                    $php .= $this->appendString($prefix, $context, false)
+                        .$this->appendString('"'.$encodedName.'":', $context)
                         .$this->generateYields($propertyNode, $options, $context)
-                        .$this->flushYieldBuffer($context);
-
-                    if (!$prefixIsCommaForSure && $name !== array_key_last($dataModelNode->getProperties())) {
-                        $php .= $this->line('$prefix'.$context['depth'].' = \',\';', $context);
-                    }
+                        .$this->flushBuffer($context)
+                        .($updatePrefix ? $this->line($prefixVariable.' = \',\';', $context) : '');
 
                     --$context['indentation_level'];
 
                     $php .= $this->line('}', $context);
                 } else {
-                    $php .= $this->yieldInterpolatedString('{$prefix'.$context['depth'].'}', $context, false)
-                        .$this->yieldInterpolatedString('"'.$encodedName.'":', $context)
-                        .$this->flushYieldBuffer($context)
+                    $php .= $this->appendString($staticPrefix ?? '{'.$prefixVariable.'}', $context, false)
+                        .$this->appendString('"'.$encodedName.'":', $context)
                         .$this->generateYields($propertyNode, $options, $context);
 
-                    if (!$prefixIsCommaForSure && $name !== array_key_last($dataModelNode->getProperties())) {
-                        $php .= $this->line('$prefix'.$context['depth'].' = \',\';', $context);
-                    }
-
-                    $prefixIsCommaForSure = true;
+                    $staticPrefix = ',';
                 }
             }
 
             return $php
-                .$this->yieldInterpolatedString('}', $context);
+                .$this->appendString('}', $context);
         }
 
         throw new LogicException(\sprintf('Unexpected "%s" node', $dataModelNode::class));
@@ -360,18 +374,10 @@ final class PhpGenerator
     /**
      * @param array<string, mixed> $context
      */
-    private function yield(string $value, array $context): string
+    private function append(string $expression, array $context): string
     {
-        return $this->flushYieldBuffer($context)
-            .$this->line("yield $value;", $context);
-    }
-
-    /**
-     * @param array<string, mixed> $context
-     */
-    private function yieldInterpolatedString(string $string, array $context, bool $escapeDollar = true): string
-    {
-        $this->yieldBuffer .= addcslashes($string, "\\\"\n\r\t\v\e\f".($escapeDollar ? '$' : ''));
+        $this->closePendingString();
+        $this->pendingExpressions[] = $expression;
 
         return '';
     }
@@ -379,16 +385,69 @@ final class PhpGenerator
     /**
      * @param array<string, mixed> $context
      */
-    private function flushYieldBuffer(array $context): string
+    private function appendString(string $string, array $context, bool $escapeDollar = true): string
     {
-        if ('' === $this->yieldBuffer) {
-            return '';
+        $this->pendingString .= addcslashes($string, "\\\"\n\r\t\v\e\f".($escapeDollar ? '$' : ''));
+
+        return '';
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function flushBuffer(array $context): string
+    {
+        $expression = $this->takePendingExpression();
+
+        if ($this->isBufferDefined) {
+            return null !== $expression ? $this->line("\$buffer .= $expression;", $context) : '';
         }
 
-        $yieldBuffer = $this->yieldBuffer;
-        $this->yieldBuffer = '';
+        $this->isBufferDefined = true;
 
-        return $this->yield('"'.$yieldBuffer.'"', $context);
+        return $this->line('$buffer = '.($expression ?? '\'\'').';', $context);
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function yieldBuffer(array $context, bool $whenFull = false): string
+    {
+        if (!$whenFull && !$this->isBufferDefined) {
+            $expression = $this->takePendingExpression();
+
+            return null !== $expression ? $this->line("yield $expression;", $context) : '';
+        }
+
+        return $this->flushBuffer($context)
+            .$this->line($whenFull ? 'if (\\strlen($buffer) >= '.self::BUFFER_SIZE.') {' : 'if (\'\' !== $buffer) {', $context)
+            .$this->line('    yield $buffer;', $context)
+            .($whenFull ? $this->line('    $buffer = \'\';', $context) : '')
+            .$this->line('}', $context);
+    }
+
+    private function closePendingString(): void
+    {
+        if ('' === $this->pendingString) {
+            return;
+        }
+
+        $this->pendingExpressions[] = '"'.$this->pendingString.'"';
+        $this->pendingString = '';
+    }
+
+    private function takePendingExpression(): ?string
+    {
+        $this->closePendingString();
+
+        if ([] === $this->pendingExpressions) {
+            return null;
+        }
+
+        $expression = implode('.', $this->pendingExpressions);
+        $this->pendingExpressions = [];
+
+        return $expression;
     }
 
     private function generateCompositeNodeItemCondition(DataModelNodeInterface $node): string

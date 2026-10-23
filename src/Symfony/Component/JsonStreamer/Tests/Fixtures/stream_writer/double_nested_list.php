@@ -5,42 +5,41 @@
  */
 return static function (mixed $data, \Psr\Container\ContainerInterface $transformers, array $options): \Traversable {
     try {
-        yield "[";
+        $buffer = "[";
         $prefix1 = '';
         foreach ($data as $value1) {
-            $prefix2 = '';
-            yield "{$prefix1}{{$prefix2}\"dummies\":";
-            yield "[";
+            $buffer .= "{$prefix1}{\"dummies\":[";
             $prefix3 = '';
             foreach ($value1->dummies as $value2) {
-                $prefix4 = '';
-                yield "{$prefix3}{{$prefix4}\"dummies\":";
-                yield "[";
+                $buffer .= "{$prefix3}{\"dummies\":[";
                 $prefix5 = '';
                 foreach ($value2->dummies as $value3) {
-                    $prefix6 = '';
-                    yield "{$prefix5}{{$prefix6}\"id\":";
-                    yield \json_encode($value3->id, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 506);
-                    $prefix6 = ',';
-                    yield "{$prefix6}\"name\":";
-                    yield \json_encode($value3->name, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 506);
-                    yield "}";
+                    $buffer .= "{$prefix5}{\"id\":".\json_encode($value3->id, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 506).",\"name\":".\json_encode($value3->name, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 506)."}";
                     $prefix5 = ',';
+                    if (\strlen($buffer) >= 8192) {
+                        yield $buffer;
+                        $buffer = '';
+                    }
                 }
-                $prefix4 = ',';
-                yield "]{$prefix4}\"customProperty\":";
-                yield \json_encode($value2->customProperty, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 508);
-                yield "}";
+                $buffer .= "],\"customProperty\":".\json_encode($value2->customProperty, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 508)."}";
                 $prefix3 = ',';
+                if (\strlen($buffer) >= 8192) {
+                    yield $buffer;
+                    $buffer = '';
+                }
             }
-            $prefix2 = ',';
-            yield "]{$prefix2}\"stringProperty\":";
-            yield \json_encode($value1->stringProperty, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 510);
-            yield "}";
+            $buffer .= "],\"stringProperty\":".\json_encode($value1->stringProperty, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 510)."}";
             $prefix1 = ',';
+            if (\strlen($buffer) >= 8192) {
+                yield $buffer;
+                $buffer = '';
+            }
         }
-        yield "]";
+        $buffer .= "]";
+        if ('' !== $buffer) {
+            yield $buffer;
+        }
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException(\sprintf('Cannot encode "%s" to JSON: %s.', 'list<Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNestedList>', $e->getMessage()), 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException('Cannot encode "list<Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNestedList>" to JSON: '.$e->getMessage(), 0, $e);
     }
 };

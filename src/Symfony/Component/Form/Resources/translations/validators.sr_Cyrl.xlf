@@ -18,9 +18,9 @@
                 <source>This value is not a valid HTML5 color.</source>
                 <target>Ова вредност није исправна HTML5 боја.</target>
             </trans-unit>
-            <trans-unit id="100">
-                <source>Please enter a valid birthdate.</source>
-                <target>Молим упишите исправан датум рођења.</target>
+            <trans-unit id="100" resname="Please enter a valid birthdate.">
+                <source>This value is not a valid birthdate.</source>
+                <target state="needs-review-translation">Ова вредност није исправан датум рођења.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
@@ -30,113 +30,113 @@
                 <source>The collection is invalid.</source>
                 <target>Ова колекција није исправна.</target>
             </trans-unit>
-            <trans-unit id="103">
-                <source>Please select a valid color.</source>
-                <target>Молим изаберите исправну боју.</target>
+            <trans-unit id="103" resname="Please select a valid color.">
+                <source>This value is not a valid color.</source>
+                <target state="needs-review-translation">Ова вредност није исправна боја.</target>
             </trans-unit>
-            <trans-unit id="104">
-                <source>Please select a valid country.</source>
-                <target>Молим изаберите исправну државу.</target>
+            <trans-unit id="104" resname="Please select a valid country.">
+                <source>This value is not a valid country.</source>
+                <target>Вредност није исправна држава.</target>
             </trans-unit>
-            <trans-unit id="105">
-                <source>Please select a valid currency.</source>
-                <target>Молим изаберите исправну валуту.</target>
+            <trans-unit id="105" resname="Please select a valid currency.">
+                <source>This value is not a valid currency.</source>
+                <target>Ова вредност није исправна валута.</target>
             </trans-unit>
-            <trans-unit id="106">
-                <source>Please choose a valid date interval.</source>
-                <target>Молим изаберите исправан датумски интервал.</target>
+            <trans-unit id="106" resname="Please choose a valid date interval.">
+                <source>This value is not a valid date interval.</source>
+                <target state="needs-review-translation">Ова вредност није исправан датумски интервал.</target>
             </trans-unit>
-            <trans-unit id="107">
-                <source>Please enter a valid date and time.</source>
-                <target>Молим упишите исправан датум и време.</target>
+            <trans-unit id="107" resname="Please enter a valid date and time.">
+                <source>This value is not a valid date and time.</source>
+                <target>Вредност није исправан датум-време.</target>
             </trans-unit>
-            <trans-unit id="108">
-                <source>Please enter a valid date.</source>
-                <target>Молим упишите исправан датум.</target>
+            <trans-unit id="108" resname="Please enter a valid date.">
+                <source>This value is not a valid date.</source>
+                <target>Вредност није исправан датум.</target>
             </trans-unit>
-            <trans-unit id="109">
-                <source>Please select a valid file.</source>
-                <target>Молим изаберите исправну датотеку.</target>
+            <trans-unit id="109" resname="Please select a valid file.">
+                <source>This value is not a valid file.</source>
+                <target state="needs-review-translation">Ова вредност није исправна датотека.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The hidden field is invalid.</source>
                 <target>Скривено поље није исправно.</target>
             </trans-unit>
-            <trans-unit id="111">
-                <source>Please enter an integer.</source>
-                <target>Молим упишите цео број (integer).</target>
+            <trans-unit id="111" resname="Please enter an integer.">
+                <source>This value is not a valid integer.</source>
+                <target state="needs-review-translation">Ова вредност није исправан цео број.</target>
             </trans-unit>
-            <trans-unit id="112">
-                <source>Please select a valid language.</source>
-                <target>Молим изаберите исправан језик.</target>
+            <trans-unit id="112" resname="Please select a valid language.">
+                <source>This value is not a valid language.</source>
+                <target>Вредност није исправан језик.</target>
             </trans-unit>
-            <trans-unit id="113">
-                <source>Please select a valid locale.</source>
-                <target>Молим изаберите исправну локализацију.</target>
+            <trans-unit id="113" resname="Please select a valid locale.">
+                <source>This value is not a valid locale.</source>
+                <target>Вредност није исправна међународна ознака језика.</target>
             </trans-unit>
-            <trans-unit id="114">
-                <source>Please enter a valid money amount.</source>
-                <target>Молим упишите исправну количину новца.</target>
+            <trans-unit id="114" resname="Please enter a valid money amount.">
+                <source>This value is not a valid money amount.</source>
+                <target state="needs-review-translation">Ова вредност није исправна количина новца.</target>
             </trans-unit>
-            <trans-unit id="115">
-                <source>Please enter a number.</source>
-                <target>Молим упишите број.</target>
+            <trans-unit id="115" resname="Please enter a number.">
+                <source>This value is not a valid number.</source>
+                <target state="needs-review-translation">Ова вредност није исправан број.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>The password is invalid.</source>
                 <target>Ова лозинка није исправна.</target>
             </trans-unit>
-            <trans-unit id="117">
-                <source>Please enter a percentage value.</source>
-                <target>Молим упишите процентуалну вредност.</target>
+            <trans-unit id="117" resname="Please enter a percentage value.">
+                <source>This value is not a valid percentage.</source>
+                <target state="needs-review-translation">Ова вредност није исправан проценат.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>The values do not match.</source>
                 <target>Дате вредности се не поклапају.</target>
             </trans-unit>
-            <trans-unit id="119">
-                <source>Please enter a valid time.</source>
-                <target>Молим упишите исправно време.</target>
+            <trans-unit id="119" resname="Please enter a valid time.">
+                <source>This value is not a valid time.</source>
+                <target>Вредност није исправно време.</target>
             </trans-unit>
-            <trans-unit id="120">
-                <source>Please select a valid timezone.</source>
-                <target>Молим изаберите исправну временску зону.</target>
+            <trans-unit id="120" resname="Please select a valid timezone.">
+                <source>This value is not a valid timezone.</source>
+                <target>Ова вредност није исправна временска зона.</target>
             </trans-unit>
-            <trans-unit id="121">
-                <source>Please enter a valid URL.</source>
-                <target>Молим упишите исправан URL.</target>
+            <trans-unit id="121" resname="Please enter a valid URL.">
+                <source>This value is not a valid URL.</source>
+                <target>Вредност није исправан URL.</target>
             </trans-unit>
-            <trans-unit id="122">
-                <source>Please enter a valid search term.</source>
-                <target>Молим упишите исправан термин за претрагу.</target>
+            <trans-unit id="122" resname="Please enter a valid search term.">
+                <source>This value is not a valid search term.</source>
+                <target state="needs-review-translation">Ова вредност није исправан термин за претрагу.</target>
             </trans-unit>
-            <trans-unit id="123">
-                <source>Please provide a valid phone number.</source>
-                <target>Молим наведите исправан број телефона.</target>
+            <trans-unit id="123" resname="Please provide a valid phone number.">
+                <source>This value is not a valid phone number.</source>
+                <target state="needs-review-translation">Ова вредност није исправан број телефона.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The checkbox has an invalid value.</source>
                 <target>Поље за потврду садржи неисправну вредност.</target>
             </trans-unit>
-            <trans-unit id="125">
-                <source>Please enter a valid email address.</source>
-                <target>Молим упишите исправну email адресу.</target>
+            <trans-unit id="125" resname="Please enter a valid email address.">
+                <source>This value is not a valid email address.</source>
+                <target>Вредност није исправна адреса електронске поште.</target>
             </trans-unit>
-            <trans-unit id="126">
-                <source>Please select a valid option.</source>
-                <target>Молим изаберите исправну опцију.</target>
+            <trans-unit id="126" resname="Please select a valid option.">
+                <source>This value is not a valid option.</source>
+                <target state="needs-review-translation">Ова вредност није исправна опција.</target>
             </trans-unit>
-            <trans-unit id="127">
-                <source>Please select a valid range.</source>
-                <target>Молим изаберите исправан опсег.</target>
+            <trans-unit id="127" resname="Please select a valid range.">
+                <source>This value is not a valid range.</source>
+                <target state="needs-review-translation">Ова вредност није исправан опсег.</target>
             </trans-unit>
-            <trans-unit id="128">
-                <source>Please enter a valid week.</source>
-                <target>Молим упишите исправну седмицу.</target>
+            <trans-unit id="128" resname="Please enter a valid week.">
+                <source>This value is not a valid week.</source>
+                <target>Ова вредност није исправна недеља.</target>
             </trans-unit>
-            <trans-unit id="129">
-                <source>Please enter a valid UUID.</source>
-                <target>Молим упишите исправан UUID.</target>
+            <trans-unit id="129" resname="Please enter a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>Ова вредност није исправан UUID.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>

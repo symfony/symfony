@@ -18,9 +18,9 @@
                 <source>This value is not a valid HTML5 color.</source>
                 <target>Balio hori ez da HTML5 kolore onargarria.</target>
             </trans-unit>
-            <trans-unit id="100">
-                <source>Please enter a valid birthdate.</source>
-                <target>Mesedez, sartu baliozko urtebetetze-eguna.</target>
+            <trans-unit id="100" resname="Please enter a valid birthdate.">
+                <source>This value is not a valid birthdate.</source>
+                <target state="needs-review-translation">Balio hori ez da urtebetetze-egun baliozkoa.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
@@ -30,113 +30,113 @@
                 <source>The collection is invalid.</source>
                 <target>Bilduma ez da baliozkoa.</target>
             </trans-unit>
-            <trans-unit id="103">
-                <source>Please select a valid color.</source>
-                <target>Mesedez, hautatu baliozko kolore bat.</target>
+            <trans-unit id="103" resname="Please select a valid color.">
+                <source>This value is not a valid color.</source>
+                <target state="needs-review-translation">Balio hori ez da kolore baliozkoa.</target>
             </trans-unit>
-            <trans-unit id="104">
-                <source>Please select a valid country.</source>
-                <target>Mesedez, hautatu baliozko herrialde bat.</target>
+            <trans-unit id="104" resname="Please select a valid country.">
+                <source>This value is not a valid country.</source>
+                <target>Balio hau ez da herrialde egoki bat.</target>
             </trans-unit>
-            <trans-unit id="105">
-                <source>Please select a valid currency.</source>
-                <target>Mesedez, hautatu baliozko moneta bat.</target>
+            <trans-unit id="105" resname="Please select a valid currency.">
+                <source>This value is not a valid currency.</source>
+                <target>Balio hau ez da baliozko moneta bat.</target>
             </trans-unit>
-            <trans-unit id="106">
-                <source>Please choose a valid date interval.</source>
-                <target>Mesedez, hautatu baliozko data-tarte bat.</target>
+            <trans-unit id="106" resname="Please choose a valid date interval.">
+                <source>This value is not a valid date interval.</source>
+                <target state="needs-review-translation">Balio hori ez da data-tarte baliozkoa.</target>
             </trans-unit>
-            <trans-unit id="107">
-                <source>Please enter a valid date and time.</source>
-                <target>Mesedez, sartu baliozko data eta ordua.</target>
+            <trans-unit id="107" resname="Please enter a valid date and time.">
+                <source>This value is not a valid date and time.</source>
+                <target>Balio hau ez da data-ordu egoki bat.</target>
             </trans-unit>
-            <trans-unit id="108">
-                <source>Please enter a valid date.</source>
-                <target>Mesedez, sartu baliozko data bat.</target>
+            <trans-unit id="108" resname="Please enter a valid date.">
+                <source>This value is not a valid date.</source>
+                <target>Balio hau ez da data egoki bat.</target>
             </trans-unit>
-            <trans-unit id="109">
-                <source>Please select a valid file.</source>
-                <target>Mesedez, hautatu baliozko fitxategi bat.</target>
+            <trans-unit id="109" resname="Please select a valid file.">
+                <source>This value is not a valid file.</source>
+                <target state="needs-review-translation">Balio hori ez da fitxategi baliozkoa.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The hidden field is invalid.</source>
                 <target>Eremu ezkutua ez da baliozkoa.</target>
             </trans-unit>
-            <trans-unit id="111">
-                <source>Please enter an integer.</source>
-                <target>Mesedez, sartu zenbaki oso bat.</target>
+            <trans-unit id="111" resname="Please enter an integer.">
+                <source>This value is not a valid integer.</source>
+                <target state="needs-review-translation">Balio hori ez da zenbaki oso baliozkoa.</target>
             </trans-unit>
-            <trans-unit id="112">
-                <source>Please select a valid language.</source>
-                <target>Mesedez, hautatu baliozko hizkuntza bat.</target>
+            <trans-unit id="112" resname="Please select a valid language.">
+                <source>This value is not a valid language.</source>
+                <target>Balio hau ez da hizkuntza egoki bat.</target>
             </trans-unit>
-            <trans-unit id="113">
-                <source>Please select a valid locale.</source>
-                <target>Mesedez, hautatu baliozko eskualde-konfigurazio bat.</target>
+            <trans-unit id="113" resname="Please select a valid locale.">
+                <source>This value is not a valid locale.</source>
+                <target state="needs-review-translation">Balio hori ez da eskualde-konfigurazio baliozkoa.</target>
             </trans-unit>
-            <trans-unit id="114">
-                <source>Please enter a valid money amount.</source>
-                <target>Mesedez, sartu baliozko diru-kopuru bat.</target>
+            <trans-unit id="114" resname="Please enter a valid money amount.">
+                <source>This value is not a valid money amount.</source>
+                <target state="needs-review-translation">Balio hori ez da diru-kopuru baliozkoa.</target>
             </trans-unit>
-            <trans-unit id="115">
-                <source>Please enter a number.</source>
-                <target>Mesedez, sartu zenbaki bat.</target>
+            <trans-unit id="115" resname="Please enter a number.">
+                <source>This value is not a valid number.</source>
+                <target state="needs-review-translation">Balio hori ez da zenbaki baliozkoa.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>The password is invalid.</source>
                 <target>Pasahitza ez da zuzena.</target>
             </trans-unit>
-            <trans-unit id="117">
-                <source>Please enter a percentage value.</source>
-                <target>Mesedez, sartu portzentajezko balio bat.</target>
+            <trans-unit id="117" resname="Please enter a percentage value.">
+                <source>This value is not a valid percentage.</source>
+                <target state="needs-review-translation">Balio hori ez da portzentaje baliozkoa.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>The values do not match.</source>
                 <target>Balioak ez datoz bat.</target>
             </trans-unit>
-            <trans-unit id="119">
-                <source>Please enter a valid time.</source>
-                <target>Mesedez, sartu baliozko ordu bat.</target>
+            <trans-unit id="119" resname="Please enter a valid time.">
+                <source>This value is not a valid time.</source>
+                <target>Balio hau ez da ordu egoki bat.</target>
             </trans-unit>
-            <trans-unit id="120">
-                <source>Please select a valid timezone.</source>
-                <target>Mesedez, hautatu baliozko ordu-eremua.</target>
+            <trans-unit id="120" resname="Please select a valid timezone.">
+                <source>This value is not a valid timezone.</source>
+                <target>Balio hori ez da baliozko ordu-eremua.</target>
             </trans-unit>
-            <trans-unit id="121">
-                <source>Please enter a valid URL.</source>
-                <target>Mesedez, sartu baliozko URL bat.</target>
+            <trans-unit id="121" resname="Please enter a valid URL.">
+                <source>This value is not a valid URL.</source>
+                <target>Balio hau ez da baliabideen kokatzaile uniforme (URL) egoki bat.</target>
             </trans-unit>
-            <trans-unit id="122">
-                <source>Please enter a valid search term.</source>
-                <target>Mesedez, sartu bilaketa-termino onargarri bat.</target>
+            <trans-unit id="122" resname="Please enter a valid search term.">
+                <source>This value is not a valid search term.</source>
+                <target state="needs-review-translation">Balio hori ez da bilaketa-termino baliozkoa.</target>
             </trans-unit>
-            <trans-unit id="123">
-                <source>Please provide a valid phone number.</source>
-                <target>Mesedez, eman baliozko telefono-zenbaki bat.</target>
+            <trans-unit id="123" resname="Please provide a valid phone number.">
+                <source>This value is not a valid phone number.</source>
+                <target state="needs-review-translation">Balio hori ez da telefono-zenbaki baliozkoa.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The checkbox has an invalid value.</source>
                 <target>Egiaztatze-laukiak balio baliogabea du.</target>
             </trans-unit>
-            <trans-unit id="125">
-                <source>Please enter a valid email address.</source>
-                <target>Mesedez, sartu baliozko helbide elektroniko bat.</target>
+            <trans-unit id="125" resname="Please enter a valid email address.">
+                <source>This value is not a valid email address.</source>
+                <target>Balio hau ez da posta elektroniko egoki bat.</target>
             </trans-unit>
-            <trans-unit id="126">
-                <source>Please select a valid option.</source>
-                <target>Mesedez, hautatu baliozko aukera bat.</target>
+            <trans-unit id="126" resname="Please select a valid option.">
+                <source>This value is not a valid option.</source>
+                <target state="needs-review-translation">Balio hori ez da aukera baliozkoa.</target>
             </trans-unit>
-            <trans-unit id="127">
-                <source>Please select a valid range.</source>
-                <target>Mesedez, hautatu baliozko tarte bat.</target>
+            <trans-unit id="127" resname="Please select a valid range.">
+                <source>This value is not a valid range.</source>
+                <target state="needs-review-translation">Balio hori ez da tarte baliozkoa.</target>
             </trans-unit>
-            <trans-unit id="128">
-                <source>Please enter a valid week.</source>
-                <target>Mesedez, sartu baliozko aste bat.</target>
+            <trans-unit id="128" resname="Please enter a valid week.">
+                <source>This value is not a valid week.</source>
+                <target state="needs-review-translation">Balio hori ez da aste baliozkoa.</target>
             </trans-unit>
-            <trans-unit id="129">
-                <source>Please enter a valid UUID.</source>
-                <target state="needs-review-translation">Mesedez, sartu baliozko UUID bat.</target>
+            <trans-unit id="129" resname="Please enter a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target state="needs-review-translation">Balio hori ez da UUID baliozkoa.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>

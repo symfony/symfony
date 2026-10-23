@@ -27,9 +27,9 @@
                 <source>This value is not a valid HTML5 color.</source>
                 <target>Kjo vlerë nuk është një ngjyrë e vlefshme HTML5.</target>
             </trans-unit>
-            <trans-unit id="100">
-                <source>Please enter a valid birthdate.</source>
-                <target>Ju lutemi shkruani një datëlindje të vlefshme.</target>
+            <trans-unit id="100" resname="Please enter a valid birthdate.">
+                <source>This value is not a valid birthdate.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një datëlindje e vlefshme.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
@@ -39,113 +39,113 @@
                 <source>The collection is invalid.</source>
                 <target>Koleksioni është i pavlefshëm.</target>
             </trans-unit>
-            <trans-unit id="103">
-                <source>Please select a valid color.</source>
-                <target>Ju lutemi zgjidhni një ngjyrë të vlefshme.</target>
+            <trans-unit id="103" resname="Please select a valid color.">
+                <source>This value is not a valid color.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një ngjyrë e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="104">
-                <source>Please select a valid country.</source>
-                <target>Ju lutemi zgjidhni një shtet të vlefshëm.</target>
+            <trans-unit id="104" resname="Please select a valid country.">
+                <source>This value is not a valid country.</source>
+                <target>Kjo vlerë nuk është një shtet i vlefshëm.</target>
             </trans-unit>
-            <trans-unit id="105">
-                <source>Please select a valid currency.</source>
-                <target>Ju lutemi zgjidhni një valutë të vlefshme.</target>
+            <trans-unit id="105" resname="Please select a valid currency.">
+                <source>This value is not a valid currency.</source>
+                <target>Kjo vlerë nuk është një valutë e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="106">
-                <source>Please choose a valid date interval.</source>
-                <target>Ju lutemi zgjidhni një interval të vlefshëm.</target>
+            <trans-unit id="106" resname="Please choose a valid date interval.">
+                <source>This value is not a valid date interval.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një interval i vlefshëm.</target>
             </trans-unit>
-            <trans-unit id="107">
-                <source>Please enter a valid date and time.</source>
-                <target>Ju lutemi shkruani një datë dhe orë të vlefshme.</target>
+            <trans-unit id="107" resname="Please enter a valid date and time.">
+                <source>This value is not a valid date and time.</source>
+                <target>Kjo vlerë nuk është datë dhe orë e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="108">
-                <source>Please enter a valid date.</source>
-                <target>Ju lutemi shkruani një datë të vlefshme.</target>
+            <trans-unit id="108" resname="Please enter a valid date.">
+                <source>This value is not a valid date.</source>
+                <target>Kjo vlerë nuk është datë e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="109">
-                <source>Please select a valid file.</source>
-                <target>Ju lutemi zgjidhni një skedë të vlefshme.</target>
+            <trans-unit id="109" resname="Please select a valid file.">
+                <source>This value is not a valid file.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një skedar i vlefshëm.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The hidden field is invalid.</source>
                 <target>Fusha e fshehur është e pavlefshme.</target>
             </trans-unit>
-            <trans-unit id="111">
-                <source>Please enter an integer.</source>
-                <target>Ju lutemi shkruani një numër të plotë.</target>
+            <trans-unit id="111" resname="Please enter an integer.">
+                <source>This value is not a valid integer.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një numër i plotë i vlefshëm.</target>
             </trans-unit>
-            <trans-unit id="112">
-                <source>Please select a valid language.</source>
-                <target>Ju lutemi zgjidhni një gjuhë të vlefshme.</target>
+            <trans-unit id="112" resname="Please select a valid language.">
+                <source>This value is not a valid language.</source>
+                <target>Kjo vlerë nuk është një gjuhë e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="113">
-                <source>Please select a valid locale.</source>
-                <target>Ju lutemi zgjidhni një “locale” të vlefshme.</target>
+            <trans-unit id="113" resname="Please select a valid locale.">
+                <source>This value is not a valid locale.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një “locale” e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="114">
-                <source>Please enter a valid money amount.</source>
-                <target>Ju lutemi shkruani një shumë të vlefshme parash.</target>
+            <trans-unit id="114" resname="Please enter a valid money amount.">
+                <source>This value is not a valid money amount.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një shumë parash e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="115">
-                <source>Please enter a number.</source>
-                <target>Ju lutemi shkruani një numër.</target>
+            <trans-unit id="115" resname="Please enter a number.">
+                <source>This value is not a valid number.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një numër i vlefshëm.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>The password is invalid.</source>
                 <target>Fjalëkalimi është i pavlefshëm.</target>
             </trans-unit>
-            <trans-unit id="117">
-                <source>Please enter a percentage value.</source>
-                <target>Ju lutemi shkruani një vlerë përqindjeje.</target>
+            <trans-unit id="117" resname="Please enter a percentage value.">
+                <source>This value is not a valid percentage.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një vlerë përqindjeje e vlefshme.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>The values do not match.</source>
                 <target>Vlerat nuk përputhen.</target>
             </trans-unit>
-            <trans-unit id="119">
-                <source>Please enter a valid time.</source>
-                <target>Ju lutemi shkruani një orë të vlefshme.</target>
+            <trans-unit id="119" resname="Please enter a valid time.">
+                <source>This value is not a valid time.</source>
+                <target>Kjo vlerë nuk është një orë e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="120">
-                <source>Please select a valid timezone.</source>
-                <target>Ju lutemi zgjidhni një zonë kohore të vlefshme.</target>
+            <trans-unit id="120" resname="Please select a valid timezone.">
+                <source>This value is not a valid timezone.</source>
+                <target>Kjo vlerë nuk është një zonë e vlefshme kohore.</target>
             </trans-unit>
-            <trans-unit id="121">
-                <source>Please enter a valid URL.</source>
-                <target>Ju lutemi shkruani një URL të vlefshme.</target>
+            <trans-unit id="121" resname="Please enter a valid URL.">
+                <source>This value is not a valid URL.</source>
+                <target>Kjo vlerë nuk është URL e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="122">
-                <source>Please enter a valid search term.</source>
-                <target>Ju lutemi shkruani një term të vlefshëm kërkimi.</target>
+            <trans-unit id="122" resname="Please enter a valid search term.">
+                <source>This value is not a valid search term.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një term kërkimi i vlefshëm.</target>
             </trans-unit>
-            <trans-unit id="123">
-                <source>Please provide a valid phone number.</source>
-                <target>Ju lutemi jepni një numër telefoni të vlefshëm.</target>
+            <trans-unit id="123" resname="Please provide a valid phone number.">
+                <source>This value is not a valid phone number.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një numër telefoni i vlefshëm.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The checkbox has an invalid value.</source>
                 <target>Kutia e zgjedhjes ka një vlerë të pavlefshme.</target>
             </trans-unit>
-            <trans-unit id="125">
-                <source>Please enter a valid email address.</source>
-                <target>Ju lutemi shkruani një adresë të vlefshme email-i.</target>
+            <trans-unit id="125" resname="Please enter a valid email address.">
+                <source>This value is not a valid email address.</source>
+                <target>Kjo vlerë nuk është email adresë e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="126">
-                <source>Please select a valid option.</source>
-                <target>Ju lutemi zgjidhni një alternativë të vlefshme.</target>
+            <trans-unit id="126" resname="Please select a valid option.">
+                <source>This value is not a valid option.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një alternativë e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="127">
-                <source>Please select a valid range.</source>
-                <target>Ju lutemi zgjidhni një seri të vlefshme.</target>
+            <trans-unit id="127" resname="Please select a valid range.">
+                <source>This value is not a valid range.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një seri e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="128">
-                <source>Please enter a valid week.</source>
-                <target>Ju lutemi shkruani një javë të vlefshme.</target>
+            <trans-unit id="128" resname="Please enter a valid week.">
+                <source>This value is not a valid week.</source>
+                <target>Kjo vlerë nuk është një javë e vlefshme.</target>
             </trans-unit>
-            <trans-unit id="129">
-                <source>Please enter a valid UUID.</source>
-                <target>Ju lutemi shkruani një UUID të vlefshëm.</target>
+            <trans-unit id="129" resname="Please enter a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një UUID i vlefshëm.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>

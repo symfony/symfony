@@ -436,6 +436,19 @@ class FormTest extends TestCase
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" disabled="disabled" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include disabled fields');
 
+        $form = $this->createForm('<form><fieldset disabled><input type="text" name="foo" value="foo" /><input type="checkbox" name="baz" checked /><input type="radio" name="qux" value="qux" checked /><select name="quux"><option>quux</option></select><textarea name="corge">corge</textarea></fieldset><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include fields inside a disabled fieldset');
+
+        $form = $this->createForm('<form><fieldset disabled><input type="radio" name="foo" /></fieldset><input type="radio" name="foo" checked /><input type="submit" /></form>');
+        $this->assertEquals(['foo' => 'on'], $form->getValues(), '->getValues() includes a checked radio even if a radio with the same value is inside a disabled fieldset');
+
+        $form = $this->createForm('<form><fieldset disabled><input type="radio" name="foo" value="foo" /></fieldset><input type="radio" name="foo" value="foo" /><input type="submit" /></form>');
+        $form['foo']->select('foo');
+        $this->assertEquals(['foo' => 'foo'], $form->getValues(), '->select() checks the enabled radio when a disabled one has the same value');
+
+        $form = $this->createForm('<form><fieldset disabled><legend><input type="text" name="foo" value="foo" /></legend><legend><input type="text" name="baz" value="baz" /></legend></fieldset><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
+        $this->assertEquals(['foo' => 'foo', 'bar' => 'bar'], $form->getValues(), '->getValues() includes fields inside the first legend of a disabled fieldset');
+
         $form = $this->createForm('<form><template><input type="text" name="foo" value="foo" /></template><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(['bar' => 'bar'], $form->getValues(), '->getValues() does not include template fields');
         $this->assertFalse($form->has('foo'));
@@ -477,6 +490,17 @@ class FormTest extends TestCase
     {
         $form = $this->createForm('<form><select name="choice" size="2"><option disabled>foo</option><option>bar</option></select><input type="submit" /></form>');
         $this->assertSame([], $form->getValues());
+    }
+
+    public function testSelectRadioPreservesNumericValueValidation()
+    {
+        foreach ([['01', '1'], ['01', 1], ['01', true], ['00', 0], ['00', '0']] as [$option, $value]) {
+            $form = $this->createForm('<form><input type="radio" name="r" value="'.$option.'" checked disabled /><input type="submit" /></form>');
+            $form['r']->setValue($value);
+
+            $this->assertSame((string) $value, $form['r']->getValue());
+            $this->assertSame([], $form->getValues());
+        }
     }
 
     public function testSetValues()

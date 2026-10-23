@@ -288,6 +288,27 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo', $field->getValue());
     }
 
+    public function testInitializeClearsCheckedRadio()
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML('<form><input type="radio" name="r" value="a" /><input type="radio" name="r" value="b" checked disabled /></form>');
+        $nodes = $document->getElementsByTagName('input');
+        $field = new class($nodes->item(0)) extends ChoiceFormField {
+            public function reload(): void
+            {
+                $this->initialize();
+            }
+        };
+        $field->addChoice($nodes->item(1));
+        $this->assertSame('b', $field->getValue());
+
+        $field->reload();
+
+        $this->assertNull($field->getValue());
+        $this->assertFalse($field->hasValue());
+        $this->assertFalse($field->isDisabled());
+    }
+
     public function testCheckboxIsDisabled()
     {
         $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'disabled' => '']);

@@ -378,7 +378,7 @@ class AutowirePass extends AbstractRecursivePass
                     if ($attribute instanceof AutowireInline) {
                         $value = $attribute->buildDefinition($value, $type, $parameter);
                         $value = $this->doProcessValue($value);
-                    } elseif ($lazy = $attribute->lazy ?: ($this->autowireLazy && !str_contains($type, '|') && $attribute instanceof Autowire && !array_key_exists('lazy', $parameter->getAttributes(Autowire::class)[0]->getArguments()))) {
+                    } elseif ($lazy = $attribute->lazy ?: ($this->autowireLazy && !str_contains($type, '|') && $attribute instanceof Autowire && !\array_key_exists('lazy', $parameter->getAttributes(Autowire::class)[0]->getArguments()))) {
                         if (true === $lazy && str_contains($type, '|')) {
                             throw new AutowiringFailedException($this->currentId, \sprintf('Cannot use #[Autowire] with option "lazy: true" on union types for service "%s"; set the option to the interface(s) that should be proxied instead.', $this->currentId));
                         }
@@ -422,7 +422,8 @@ class AutowirePass extends AbstractRecursivePass
                     $type = ProxyHelper::exportType($parameter);
                     $type = $type ? \sprintf('is type-hinted "%s"', preg_replace('/(^|[(|&])\\\\|^\?\\\\?/', '\1', $type)) : 'has no type-hint';
 
-                    throw new AutowiringFailedException($this->currentId, \sprintf('Cannot autowire service "%s": argument "$%s" of method "%s()" "%s", you should configure its value explicitly.', $this->currentId, $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method, $type));
+                    $message = \sprintf('Cannot autowire service "%s": argument "$%s" of method "%s()" %s, you should configure its value explicitly.', $this->currentId, $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method, $type);
+                    throw new AutowiringFailedException($this->currentId, $message);
                 }
 
                 // specifically pass the default value

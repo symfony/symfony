@@ -17,6 +17,7 @@ use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithBackedEnumValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithIterable;
@@ -188,6 +189,91 @@ class JsonStreamReaderTest extends TestCase
             $this->assertSame('LOWERCASE NAME', $read->name);
             $this->assertSame([0, 1], $read->range);
         }, '{"id": "20", "active": "true", "name": "lowercase name", "range": "0..1"}', Type::object(DummyWithValueTransformerAttributes::class), ['scale' => 1]);
+    }
+
+    public function testReadObjectWithValueTransformerAndMissingProperty()
+    {
+        $reader = JsonStreamReader::create([
+            StringToBooleanValueTransformer::class => new StringToBooleanValueTransformer(),
+            DivideStringAndCastToIntValueTransformer::class => new DivideStringAndCastToIntValueTransformer(),
+        ], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithValueTransformerAttributes::class, $read);
+            $this->assertSame(1, $read->id);
+            $this->assertTrue($read->active);
+            $this->assertSame('DUMMY', $read->name);
+            $this->assertSame([0, 1], $read->range);
+        }, '{"active": "true", "range": "0..1"}', Type::object(DummyWithValueTransformerAttributes::class), ['scale' => 1]);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertSame(1, $read->id);
+            $this->assertFalse($read->active);
+            $this->assertSame('DUMMY', $read->name);
+            $this->assertSame([10, 20], $read->range);
+        }, '{}', Type::object(DummyWithValueTransformerAttributes::class), ['scale' => 1]);
+    }
+
+    public function testReadObjectWithValueTransformerAndNullProperty()
+    {
+        $reader = JsonStreamReader::create([
+            StringToBooleanValueTransformer::class => new StringToBooleanValueTransformer(),
+            DivideStringAndCastToIntValueTransformer::class => new DivideStringAndCastToIntValueTransformer(),
+        ], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $read = $reader->read('{"id": "20", "active": "true", "name": null, "range": "0..1"}', Type::object(DummyWithValueTransformerAttributes::class), ['scale' => 1]);
+        $this->assertSame(10, $read->id);
+        $this->assertSame('DUMMY', $read->name);
+    }
+
+    public function testReadObjectWithBackedEnumValueTransformerAndMissingProperty()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertSame('DEFAULT', $read->enum);
+            $this->assertSame('DEFAULT', $read->nullableEnum);
+            $this->assertFalse((new \ReflectionProperty($read, 'requiredEnum'))->isInitialized($read));
+        }, '{}', Type::object(DummyWithBackedEnumValueTransformer::class));
+    }
+
+    public function testReadObjectWithBackedEnumValueTransformerAndMissingNullableProperty()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertSame('TWO', $read->enum);
+            $this->assertSame('DEFAULT', $read->nullableEnum);
+            $this->assertSame('TWO', $read->requiredEnum);
+        }, '{"enum": 2, "requiredEnum": 2}', Type::object(DummyWithBackedEnumValueTransformer::class));
+    }
+
+    public function testReadObjectWithBackedEnumValueTransformerAndMissingRequiredProperty()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertSame('TWO', $read->enum);
+            $this->assertSame('TWO', $read->nullableEnum);
+            $this->assertFalse((new \ReflectionProperty($read, 'requiredEnum'))->isInitialized($read));
+        }, '{"enum": 2, "nullableEnum": 2}', Type::object(DummyWithBackedEnumValueTransformer::class));
+    }
+
+    public function testReadObjectWithBackedEnumValueTransformer()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertSame('TWO', $read->enum);
+            $this->assertSame('TWO', $read->nullableEnum);
+            $this->assertSame('TWO', $read->requiredEnum);
+        }, '{"enum": 2, "nullableEnum": 2, "requiredEnum": 2}', Type::object(DummyWithBackedEnumValueTransformer::class));
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertSame('TWO', $read->enum);
+            $this->assertNull($read->nullableEnum);
+            $this->assertSame('TWO', $read->requiredEnum);
+        }, '{"enum": 2, "nullableEnum": null, "requiredEnum": 2}', Type::object(DummyWithBackedEnumValueTransformer::class));
     }
 
     public function testReadObjectWithPhpDoc()

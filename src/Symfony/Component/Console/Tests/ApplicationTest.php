@@ -1157,7 +1157,7 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(['command' => 'foo'], ['decorated' => false, 'capture_stderr_separately' => true]);
-        $this->assertStringMatchesFormat("\nIn ApplicationTest.php line %d:\n".implode("\n", $expectedBlock)."\n\nfoo\n\n", $tester->getErrorOutput(true));
+        $this->assertStringMatchesFormat("\nIn ApplicationTest.php line %d:\n".implode("\n", $expectedBlock)."\n\nfoo\n\nGlobal options are available. Run the command with --help to list them.\n\n", $tester->getErrorOutput(true));
     }
 
     public static function provideWordWrappedExceptionMessages(): iterable
@@ -1240,6 +1240,48 @@ class ApplicationTest extends TestCase
 
         $tester->run(['command' => 'foo'], ['decorated' => false]);
         $this->assertStringContainsString('Dummy type "class@anonymous" is invalid.', $tester->getDisplay(true));
+    }
+
+    #[DataProvider('provideGlobalOptionsErrorHint')]
+    public function testRenderExceptionWithGlobalOptions(array $options, int $verbosity, bool $expectedHint)
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->getDefinition()->setOptions($options);
+        $application->addCommand((new Command('up'))->addOption('local')->setCode(static fn () => 0));
+        $tester = new ApplicationTester($application);
+
+        $this->assertSame(1, $tester->run(['command' => 'up', '--unknown' => true], ['verbosity' => $verbosity, 'capture_stderr_separately' => true]));
+        $error = $tester->getErrorOutput(true);
+        $this->assertSame($expectedHint, str_contains($error, 'Global options are available. Run the command with --help to list them.'));
+        $this->assertSame('', $tester->getDisplay());
+        if (OutputInterface::VERBOSITY_SILENT !== $verbosity) {
+            $this->assertStringContainsString('up [--local]', $error);
+            $this->assertStringNotContainsString('--config', $error);
+        }
+    }
+
+    public static function provideGlobalOptionsErrorHint(): iterable
+    {
+        yield 'global option' => [[new InputOption('config', 'c', InputOption::VALUE_REQUIRED)], OutputInterface::VERBOSITY_NORMAL, true];
+        yield 'quiet' => [[new InputOption('config')], OutputInterface::VERBOSITY_QUIET, true];
+        yield 'silent' => [[new InputOption('config')], OutputInterface::VERBOSITY_SILENT, false];
+        yield 'no global options' => [[], OutputInterface::VERBOSITY_NORMAL, false];
+        yield 'hidden global option' => [[new InputOption('secret', null, InputOption::HIDDEN)], OutputInterface::VERBOSITY_NORMAL, false];
+    }
+
+    public function testCommandHelpIncludesGlobalOptions()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->getDefinition()->addOption(new InputOption('config', 'c', InputOption::VALUE_REQUIRED, 'Path to configuration file'));
+        $application->addCommand((new Command('up'))->addOption('local')->setCode(static fn () => 0));
+        $tester = new ApplicationTester($application);
+
+        $this->assertSame(0, $tester->run(['command' => 'up', '--help' => true]));
+        $this->assertStringContainsString('--config=CONFIG', $tester->getDisplay());
+        $this->assertStringContainsString('Path to configuration file', $tester->getDisplay());
+        $this->assertStringContainsString('--local', $tester->getDisplay());
     }
 
     public function testRenderExceptionEscapesLinesOfSynopsis()

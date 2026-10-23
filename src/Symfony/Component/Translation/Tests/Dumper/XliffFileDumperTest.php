@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests\Dumper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
@@ -55,6 +56,32 @@ class XliffFileDumperTest extends TestCase
             __DIR__.'/../Fixtures/resources-2.0-clean.xlf',
             $dumper->formatCatalogue($catalogue, 'messages', ['default_locale' => 'fr_FR', 'xliff_version' => '2.0'])
         );
+    }
+
+    #[DataProvider('provideXliff2Versions')]
+    public function testFormatCatalogueWithNewXliffVersions(string $version, string $namespace): void
+    {
+        $catalogue = new MessageCatalogue('fr');
+        $catalogue->add(['greeting' => 'Bonjour']);
+
+        $xml = (new XliffFileDumper())->formatCatalogue($catalogue, 'messages', [
+            'default_locale' => 'en',
+            'xliff_version' => $version,
+        ]);
+
+        $dom = new \DOMDocument();
+        $this->assertTrue($dom->loadXML($xml));
+        $this->assertSame($version, $dom->documentElement->getAttribute('version'));
+        $this->assertSame($namespace, $dom->documentElement->namespaceURI);
+        $this->assertSame('en', $dom->documentElement->getAttribute('srcLang'));
+        $this->assertSame('fr', $dom->documentElement->getAttribute('trgLang'));
+        $this->assertSame('Bonjour', $dom->getElementsByTagName('target')->item(0)->textContent);
+    }
+
+    public static function provideXliff2Versions(): iterable
+    {
+        yield '2.1' => ['2.1', 'urn:oasis:names:tc:xliff:document:2.0'];
+        yield '2.2' => ['2.2', 'urn:oasis:names:tc:xliff:document:2.2'];
     }
 
     public function testFormatIcuCatalogueXliff2()

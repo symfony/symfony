@@ -81,7 +81,12 @@ final class StreamReaderGenerator
         $context['original_type'] ??= $type;
 
         if ($type instanceof UnionType) {
-            return new CompositeNode(array_map(fn (Type $t): DataModelNodeInterface => $this->createDataModel($t, $options, $context), $type->getTypes()));
+            $nodes = [];
+            foreach ($type->getTypes() as $t) {
+                $nodes[] = $this->createDataModel($t, $options, $context);
+            }
+
+            return new CompositeNode($nodes);
         }
 
         if ($type instanceof BuiltinType) {

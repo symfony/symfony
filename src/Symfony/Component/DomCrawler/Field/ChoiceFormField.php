@@ -24,6 +24,7 @@ class ChoiceFormField extends FormField
     private bool $multiple;
     private array $options;
     private bool $validationDisabled = false;
+    private ?int $checkedRadio = null;
 
     /**
      * Returns true if the field should be included in the submitted values.
@@ -51,6 +52,11 @@ class ChoiceFormField extends FormField
 
         if (parent::isDisabled() && 'select' === $this->type) {
             return true;
+        }
+
+        // radios may share their value, so look at the checked one only
+        if ('radio' === $this->type) {
+            return null !== $this->checkedRadio && $this->options[$this->checkedRadio]['disabled'];
         }
 
         foreach ($this->options as $option) {
@@ -142,6 +148,10 @@ class ChoiceFormField extends FormField
                 $this->value = $value;
             } else {
                 parent::setValue($value);
+
+                if ('radio' === $this->type) {
+                    $this->checkRadio($this->value);
+                }
             }
         }
     }
@@ -167,6 +177,7 @@ class ChoiceFormField extends FormField
                 $this->value[] = $option['value'];
             } else {
                 $this->value = $option['value'];
+                $this->checkedRadio = array_key_last($this->options);
             }
         }
     }
@@ -207,6 +218,7 @@ class ChoiceFormField extends FormField
         $this->value = null;
         $this->options = [];
         $this->multiple = false;
+        $this->checkedRadio = null;
 
         if ('input' == $this->node->nodeName) {
             $this->type = strtolower($this->node->getAttribute('type'));
@@ -215,6 +227,7 @@ class ChoiceFormField extends FormField
 
             if ($this->node->hasAttribute('checked')) {
                 $this->value = $optionValue['value'];
+                $this->checkedRadio = 'radio' === $this->type ? 0 : null;
             }
         } else {
             $this->type = 'select';
@@ -270,7 +283,7 @@ class ChoiceFormField extends FormField
         $text = trim(preg_replace('/[ \t\n\f\r]+/', ' ', $node->nodeValue ?? ''), " \t\n\f\r");
         $defaultValue = '' !== $text ? $text : $defaultDefaultValue;
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
-        $option['disabled'] = $node->hasAttribute('disabled') || ('option' === $node->nodeName && $node->parentNode instanceof \DOMElement && 'optgroup' === $node->parentNode->nodeName && $node->parentNode->hasAttribute('disabled'));
+        $option['disabled'] = $node->hasAttribute('disabled') || ('option' === $node->nodeName && $node->parentNode instanceof \DOMElement && 'optgroup' === $node->parentNode->nodeName && $node->parentNode->hasAttribute('disabled')) || ('input' === $node->nodeName && $this->isInDisabledFieldset($node));
 
         return $option;
     }
@@ -323,5 +336,25 @@ class ChoiceFormField extends FormField
         $this->validationDisabled = true;
 
         return $this;
+    }
+
+    /**
+     * Checks the first enabled radio with the given value, or the first one with that value if all are disabled.
+     */
+    private function checkRadio(string $value): void
+    {
+        $this->checkedRadio = null;
+
+        foreach ($this->options as $i => $option) {
+            if ($option['value'] == $value) {
+                $this->checkedRadio ??= $i;
+
+                if (!$option['disabled']) {
+                    $this->checkedRadio = $i;
+
+                    return;
+                }
+            }
+        }
     }
 }

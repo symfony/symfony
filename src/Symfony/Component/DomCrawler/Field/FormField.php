@@ -115,7 +115,26 @@ abstract class FormField
      */
     public function isDisabled(): bool
     {
-        return $this->node->hasAttribute('disabled');
+        return $this->node->hasAttribute('disabled') || $this->isInDisabledFieldset($this->node);
+    }
+
+    /**
+     * Checks if the node is inside a disabled fieldset, outside of that fieldset's first legend.
+     *
+     * @internal
+     */
+    protected function isInDisabledFieldset(\DOMElement $node): bool
+    {
+        $child = $node;
+        while (($parent = $child->parentNode) instanceof \DOMElement) {
+            if ('fieldset' === $parent->nodeName && $parent->hasAttribute('disabled') && $child !== $this->getFirstLegend($parent)) {
+                return true;
+            }
+
+            $child = $parent;
+        }
+
+        return false;
     }
 
     /**
@@ -124,4 +143,15 @@ abstract class FormField
      * @return void
      */
     abstract protected function initialize();
+
+    private function getFirstLegend(\DOMElement $fieldset): ?\DOMElement
+    {
+        foreach ($fieldset->childNodes as $child) {
+            if ($child instanceof \DOMElement && 'legend' === $child->nodeName) {
+                return $child;
+            }
+        }
+
+        return null;
+    }
 }

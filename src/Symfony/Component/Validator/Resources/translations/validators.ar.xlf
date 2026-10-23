@@ -92,11 +92,11 @@
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>هذه القيمة يجب لا تكون فارغة.</target>
+                <target>يجب ألا تكون هذه القيمة مساوية لـ null.</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
-                <target>هذه القيمة يجب ان تكون فارغة.</target>
+                <target>يجب أن تكون هذه القيمة مساوية لـ null.</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
@@ -144,7 +144,7 @@
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>هذه القيمة ليست موقع صحيح.</target>
+                <target>هذه القيمة ليست معرّفًا صالحًا للغة والمنطقة.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
@@ -308,7 +308,7 @@
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>هذه القيمة غير متطابقة مع صيغة التحويل {{ charset }}.</target>
+                <target>هذه القيمة لا تتوافق مع مجموعة المحارف {{ charset }} المتوقعة.</target>
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>

@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
@@ -87,6 +88,60 @@ class DeflateMarshallerTest extends TestCase
         yield 'deflate stream' => [gzdeflate('cache value'), true];
         yield 'deflate stream with stored block' => [gzdeflate(hash('sha512', 'cache value', true), 0), true];
         yield 'deflate stream across probe limit' => [gzdeflate($binary, 0), true];
+    }
+
+    #[DataProvider('provideCompressionLevels')]
+    public function testCompressionLevel(int $compressionLevel)
+    {
+        $value = str_repeat('cache value ', 128);
+        $marshaller = $this->createStub(MarshallerInterface::class);
+        $marshaller->method('marshall')->willReturn(['abc' => $value]);
+        $marshaller->method('unmarshall')->willReturnCallback(static fn ($value) => $value);
+        $deflateMarshaller = new DeflateMarshaller($marshaller, $compressionLevel);
+
+        $result = $deflateMarshaller->marshall(['abc' => $value], $failed);
+
+        $this->assertSame(['abc' => 0 === $compressionLevel ? $value : gzdeflate($value, $compressionLevel)], $result);
+        $this->assertSame($value, (new DeflateMarshaller($marshaller))->unmarshall($result['abc']));
+        $this->assertSame($value, $deflateMarshaller->unmarshall(gzdeflate($value)));
+    }
+
+    #[DataProvider('provideCompressionLevels')]
+    public function testAlreadyCompressedValueWithCompressionLevel(int $compressionLevel)
+    {
+        $value = gzdeflate('cache value');
+        $marshaller = $this->createStub(MarshallerInterface::class);
+        $marshaller->method('marshall')->willReturn(['abc' => $value]);
+        $marshaller->method('unmarshall')->willReturnCallback(static fn ($value) => $value);
+        $deflateMarshaller = new DeflateMarshaller($marshaller, $compressionLevel);
+
+        $result = $deflateMarshaller->marshall(['abc' => $value], $failed);
+
+        $this->assertSame(['abc' => gzdeflate($value, $compressionLevel)], $result);
+        $this->assertSame($value, (new DeflateMarshaller($marshaller))->unmarshall($result['abc']));
+    }
+
+    public static function provideCompressionLevels(): iterable
+    {
+        yield 'default' => [-1];
+        yield 'no compression' => [0];
+        yield 'fastest' => [1];
+        yield 'smallest' => [9];
+    }
+
+    #[DataProvider('provideInvalidCompressionLevels')]
+    public function testInvalidCompressionLevel(int $compressionLevel)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The compression level must be between -1 and 9, "%d" given.', $compressionLevel));
+
+        new DeflateMarshaller(new DefaultMarshaller(), $compressionLevel);
+    }
+
+    public static function provideInvalidCompressionLevels(): iterable
+    {
+        yield 'below minimum' => [-2];
+        yield 'above maximum' => [10];
     }
 
     #[Group('legacy')]

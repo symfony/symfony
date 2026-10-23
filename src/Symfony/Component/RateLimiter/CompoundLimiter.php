@@ -38,16 +38,25 @@ final class CompoundLimiter implements LimiterInterface
     {
         $minimalRateLimit = null;
         $resetAt = null;
-        foreach ($this->limiters as $limiter) {
+        $accepted = [];
+
+        foreach ($this->limiters as $index => $limiter) {
             $rateLimit = $limiter->consume($tokens);
 
             // the latest reset time is when all the consulted limiters are back to their full capacity
             $resetAt = max($resetAt, $rateLimit->getResetAt());
 
             if (!$rateLimit->isAccepted()) {
+                // consuming is all-or-nothing: give back the tokens of the limiters that accepted
+                foreach ($accepted as $acceptedIndex => $acceptedRateLimit) {
+                    $this->limiters[$acceptedIndex]->refund($acceptedRateLimit);
+                }
+
                 $minimalRateLimit = $rateLimit;
                 break;
             }
+
+            $accepted[$index] = $rateLimit;
 
             if (null === $minimalRateLimit || self::isMoreRestrictive($rateLimit, $minimalRateLimit)) {
                 $minimalRateLimit = $rateLimit;
@@ -59,6 +68,26 @@ final class CompoundLimiter implements LimiterInterface
         }
 
         return new RateLimit($minimalRateLimit->getRemainingTokens(), $minimalRateLimit->getRetryAfter(), $minimalRateLimit->isAccepted(), $minimalRateLimit->getLimit(), $resetAt);
+    }
+
+    /**
+     * Gives back one token of a consume() call that should not count.
+     *
+     * Each sub-limiter ignores the refund when it gave the token back on its own already.
+     */
+    public function refund(RateLimit $rateLimit): RateLimit
+    {
+        $minimalRateLimit = null;
+
+        foreach ($this->limiters as $limiter) {
+            $refundedRateLimit = $limiter->refund($rateLimit);
+
+            if (null === $minimalRateLimit || $refundedRateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
+                $minimalRateLimit = $refundedRateLimit;
+            }
+        }
+
+        return $minimalRateLimit;
     }
 
     public function reset(): void

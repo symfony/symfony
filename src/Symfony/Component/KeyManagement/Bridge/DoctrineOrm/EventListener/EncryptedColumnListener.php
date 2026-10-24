@@ -19,7 +19,7 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\Encrypted;
  *
  * It runs when the metadata of a class is loaded, so the metadata cache keeps the encrypted type.
  * This is also why the listener doesn't register the types. It never runs when the cache is warm.
- * The types must be registered before the first query, as the KeyManagementBundle does when DoctrineBundle creates a connection.
+ * The types must be registered before the first query, as the KeyManagementBundle does.
  *
  * A column inherited from a parent class, or inlined from an embeddable, got its type when the metadata of that class was loaded.
  *

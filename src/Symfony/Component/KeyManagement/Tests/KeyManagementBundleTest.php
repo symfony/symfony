@@ -11,21 +11,19 @@
 
 namespace Symfony\Component\KeyManagement\Tests;
 
-use Doctrine\Common\EventManager;
+use Doctrine\Bundle\DoctrineBundle\Dbal\TypeProviderGlobalFallback;
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
-use Doctrine\DBAL\Types\StringType;
-use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Events;
-use Doctrine\ORM\Mapping\Driver\AttributeDriver;
-use Doctrine\ORM\ORMSetup;
+use Doctrine\DBAL\Types\TextType;
+use Doctrine\ORM\Internal\TypeProviderLocator;
 use Doctrine\ORM\Tools\SchemaTool;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
@@ -34,11 +32,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\KeyManagement\Base64UrlSafe;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
-use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
-use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterBlindIndexesPass;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterEncryptedColumnsPass;
-use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\DependencyInjection\RegisterFlysystemStoragesPass;
 use Symfony\Component\KeyManagement\DataCollector\KeyManagementDataCollector;
 use Symfony\Component\KeyManagement\Debug\TraceableKms;
@@ -50,7 +45,7 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\KeyManagementBundle;
 use Symfony\Component\KeyManagement\Local\SodiumKms;
-use Symfony\Component\KeyManagement\Tests\Fixtures\Entity\Speaker;
+use Symfony\Component\KeyManagement\Tests\Fixtures\Customer\Customer;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\inline_service;
 
@@ -161,102 +156,52 @@ class KeyManagementBundleTest extends TestCase
     }
 
     #[RequiresPhpExtension('sodium')]
-    public function testTheConfiguredDoctrineDbalTypesAreRegisteredWhenTheKernelBoots()
-    {
-        if (!class_exists(DriverManager::class) || !class_exists(EncryptedTypes::class)) {
-            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
-        }
-
-        $kernel = new TestKeyManagementKernel('doctrine_dbal_types', false, $this->varDir);
-        $kernel->boot();
-        $container = $kernel->getContainer();
-        $connection = $container->get('test.dbal');
-        $types = method_exists($connection->getConfiguration(), 'getTypeProvider') ? $connection->getConfiguration()->getTypeProvider() : Type::getTypeRegistry();
-
-        $this->assertInstanceOf(EncryptedType::class, $types->get('test_encrypted_phone'));
-
-        $container->get('test.store')->createTable();
-        $connection->executeStatement('CREATE TABLE speaker (id INTEGER PRIMARY KEY, phone BLOB)');
-        $connection->insert('speaker', ['id' => 1, 'phone' => '+33 6 12 34 56 78'], ['phone' => 'test_encrypted_phone']);
-
-        $stored = $connection->fetchOne('SELECT phone FROM speaker WHERE id = 1');
-        $this->assertNotNull(Envelope::fromBytes($stored)->reference, 'the type encrypts with the store, as the envelope interfaces do.');
-        $this->assertSame('+33 6 12 34 56 78', $connection->convertToPHPValue($stored, 'test_encrypted_phone'));
-    }
-
-    #[RequiresPhpExtension('sodium')]
+    #[RequiresPhpExtension('pdo_sqlite')]
+    #[RequiresMethod(Configuration::class, 'setTypeProvider')]
+    #[RequiresMethod(TypeProviderLocator::class, 'fromConnection')]
+    #[RequiresMethod(TypeProviderGlobalFallback::class, 'get')]
     #[TestWith([false])]
     #[TestWith([true])]
-    public function testTheDoctrineDbalTypesBuildTheStoreOnFirstUse(bool $debug)
+    public function testTheEncryptedTypesAreDeclaredOnTheConnectionOfTheirEntityManager(bool $debug)
     {
-        if (!class_exists(DriverManager::class) || !class_exists(EncryptedTypes::class)) {
-            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
-        }
-
-        $kernel = new TestKeyManagementKernel('doctrine_dbal_types', $debug, $this->varDir);
+        $kernel = new TestKeyManagementKernel('doctrine_bundle', $debug, $this->varDir);
         $kernel->boot();
         $container = $kernel->getContainer();
 
-        $this->assertFalse($container->initialized('test.dbal'));
+        $entityManager = $container->get('doctrine.orm.customer_entity_manager');
+        new SchemaTool($entityManager)->createSchema([$entityManager->getClassMetadata(Customer::class)]);
 
-        $connection = $container->get('test.dbal');
-        $container->get('test.store')->createTable();
-        $stored = $connection->convertToDatabaseValue('+33 6 12 34 56 78', 'test_encrypted_phone');
-
-        $this->assertSame('+33 6 12 34 56 78', $connection->convertToPHPValue($stored, 'test_encrypted_phone'));
-    }
-
-    #[RequiresPhpExtension('sodium')]
-    public function testTheDoctrineDbalTypesCanWrapATypeRegisteredWhenDoctrineCreatesTheConnection()
-    {
-        if (!class_exists(DriverManager::class) || !class_exists(EncryptedTypes::class)) {
-            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
-        }
-
-        $kernel = new TestKeyManagementKernel('doctrine_connections', false, $this->varDir);
-        $kernel->boot();
-        $container = $kernel->getContainer();
-
-        $connection = $container->get('doctrine.dbal.default_connection');
-        $container->get('test.store')->createTable();
-        $stored = $connection->convertToDatabaseValue('42.00', 'test_encrypted_amount');
-
-        $this->assertNotNull(Envelope::fromBytes($stored)->reference, 'the type encrypts with the store, as the envelope interfaces do.');
-        $this->assertSame('42.00', $connection->convertToPHPValue($stored, 'test_encrypted_amount'));
-    }
-
-    #[RequiresPhpExtension('sodium')]
-    #[RequiresPhpExtension('pdo_sqlite')]
-    public function testAnEncryptedPropertyOfAScannedEntityIsEncryptedAtRest()
-    {
-        if (!class_exists(EntityManager::class) || !class_exists(EncryptedColumnListener::class)) {
-            $this->markTestSkipped('doctrine/orm or symfony/doctrine-orm-key-management is not installed.');
-        }
-
-        $kernel = new TestKeyManagementKernel('encrypted_columns', false, $this->varDir);
-        $kernel->boot();
-        $container = $kernel->getContainer();
-        $connection = $container->get('test.dbal');
-        $container->get('test.store')->createTable();
-
-        $config = ORMSetup::createConfiguration(true);
-        $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/Fixtures/Entity'], true));
-        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        $config->enableNativeLazyObjects(true);
-        $eventManager = new EventManager();
-        $eventManager->addEventListener(Events::loadClassMetadata, $container->get('test.encrypted_column_listener'));
-        $entityManager = new EntityManager($connection, $config, $eventManager);
-        new SchemaTool($entityManager)->createSchema([$entityManager->getClassMetadata(Speaker::class)]);
-
-        $speaker = new Speaker();
-        $speaker->phone = '+33 6 12 34 56 78';
-        $entityManager->persist($speaker);
+        $customer = new Customer();
+        $customer->phone = '+33 6 12 34 56 78';
+        $customer->notes = 'Prefers calls in the morning';
+        $entityManager->persist($customer);
         $entityManager->flush();
         $entityManager->clear();
 
-        $stored = $connection->fetchOne('SELECT phone FROM Speaker');
-        $this->assertNotNull(Envelope::fromBytes($stored)->reference, 'the column encrypts with the store, as the envelope interfaces do.');
-        $this->assertSame('+33 6 12 34 56 78', $entityManager->find(Speaker::class, $speaker->id)->phone);
+        $row = $entityManager->getConnection()->fetchAssociative('SELECT phone, notes FROM Customer');
+        $this->assertNotNull(Envelope::fromBytes($row['phone'])->reference, 'the column encrypts with the store, as the envelope interfaces do.');
+        $this->assertNotNull(Envelope::fromBytes($row['notes'])->reference);
+
+        $customer = $entityManager->find(Customer::class, $customer->id);
+        $this->assertSame('+33 6 12 34 56 78', $customer->phone);
+        $this->assertSame('Prefers calls in the morning', $customer->notes);
+
+        $default = $container->get('doctrine.dbal.default_connection');
+        $stored = $default->convertToDatabaseValue('+33 1 23 45 67 89', 'customer_phone');
+        $this->assertNotNull(Envelope::fromBytes($stored)->reference);
+        $this->assertSame('+33 1 23 45 67 89', $default->convertToPHPValue($stored, 'customer_phone'));
+
+        $customerTypes = $entityManager->getConnection()->getConfiguration()->getTypeProvider();
+        $defaultTypes = $default->getConfiguration()->getTypeProvider();
+        $globalTypes = new Configuration()->getTypeProvider();
+
+        $this->assertTrue($customerTypes->has('customer_phone'));
+        $this->assertTrue($defaultTypes->has('customer_phone'), 'a configured type is declared on every connection.');
+        $this->assertTrue($customerTypes->has('encrypted_customer_text@customer.notes'));
+        $this->assertFalse($defaultTypes->has('encrypted_customer_text@customer.notes'), 'the default entity manager maps no encrypted column.');
+        $this->assertFalse($globalTypes->has('customer_phone'), 'nothing is declared on the global type registry.');
+        $this->assertFalse($globalTypes->has('encrypted_customer_text@customer.notes'), 'nothing is declared on the global type registry.');
+        $this->assertFalse($globalTypes->has('customer_text'), 'the encrypted type wraps the type of its connection.');
     }
 
     #[RequiresPhpExtension('sodium')]
@@ -361,6 +306,10 @@ class TestKeyManagementKernel extends AbstractKernel
     public function registerBundles(): iterable
     {
         yield new KeyManagementBundle();
+
+        if ('doctrine_bundle' === $this->environment) {
+            yield new DoctrineBundle();
+        }
     }
 
     private function configureContainer(ContainerConfigurator $container): void
@@ -417,50 +366,31 @@ class TestKeyManagementKernel extends AbstractKernel
             $config['store'] = ['connection' => 'test.dbal', 'client' => 'default', 'key_id' => 'app', 'read_self_contained' => true];
         }
 
-        if ('doctrine_dbal_types' === $this->environment) {
-            $services->set('test.dbal', Connection::class)
-                ->factory([DriverManager::class, 'getConnection'])
-                ->args([['driver' => 'pdo_sqlite', 'memory' => true]])
-                ->public();
-            $services->alias('test.store', 'key_management.store')->public();
-            $config['store'] = ['connection' => 'test.dbal', 'key_id' => 'app'];
-            $config['doctrine_dbal'] = ['types' => ['test_encrypted_phone' => ['type' => 'string', 'key' => 'speaker.phone']]];
-        }
-
-        if ('doctrine_connections' === $this->environment) {
-            $services->set('doctrine.dbal.default_connection', Connection::class)
-                ->factory([TestConnectionFactory::class, 'createConnection'])
-                ->public();
-            $services->alias('test.store', 'key_management.store')->public();
-            $container->parameters()->set('doctrine.connections', ['default' => 'doctrine.dbal.default_connection']);
-            $config['store'] = ['connection' => 'doctrine.dbal.default_connection', 'key_id' => 'app'];
-            $config['doctrine_dbal'] = ['types' => ['test_encrypted_amount' => ['type' => 'test_amount', 'key' => 'invoice.amount']]];
-        }
-
-        if ('encrypted_columns' === $this->environment) {
-            $services->set('test.dbal', Connection::class)
-                ->factory([DriverManager::class, 'getConnection'])
-                ->args([['driver' => 'pdo_sqlite', 'memory' => true]])
-                ->public();
-            $services->alias('test.store', 'key_management.store')->public();
-            $services->alias('test.encrypted_column_listener', 'key_management.encrypted_column_listener')->public();
+        if ('doctrine_bundle' === $this->environment) {
+            $services->set('logger', NullLogger::class);
             $services->defaults()->autoconfigure();
-            $services->load('Symfony\\Component\\KeyManagement\\Tests\\Fixtures\\Entity\\', 'Fixtures/Entity/*');
-            $config['store'] = ['connection' => 'test.dbal', 'key_id' => 'app'];
+            $services->load('Symfony\\Component\\KeyManagement\\Tests\\Fixtures\\Customer\\', 'Fixtures/Customer/*');
+            $config['store'] = ['connection' => 'doctrine.dbal.customer_connection', 'key_id' => 'app'];
+            $config['doctrine_dbal'] = ['types' => ['customer_phone' => ['type' => 'string', 'key' => 'customer.phone']]];
+            $services->set('test.customer_text', TextType::class)
+                ->tag('doctrine.dbal.type', ['type_name' => 'customer_text', 'connection' => 'customer']);
+            $container->extension('doctrine', [
+                'dbal' => ['connections' => [
+                    'default' => ['driver' => 'pdo_sqlite', 'memory' => true],
+                    'customer' => ['driver' => 'pdo_sqlite', 'memory' => true],
+                ]],
+                'orm' => ['entity_managers' => [
+                    'default' => ['connection' => 'default'],
+                    'customer' => ['connection' => 'customer', 'mappings' => ['Customer' => [
+                        'type' => 'attribute',
+                        'dir' => __DIR__.'/Fixtures/Customer',
+                        'prefix' => 'Symfony\\Component\\KeyManagement\\Tests\\Fixtures\\Customer',
+                        'is_bundle' => false,
+                    ]]],
+                ]],
+            ]);
         }
 
         $container->extension('key_management', $config);
-    }
-}
-
-class TestConnectionFactory
-{
-    public static function createConnection(): Connection
-    {
-        // DoctrineBundle registers the types of its configuration when it creates the first connection, not before
-        $types = method_exists(Configuration::class, 'getTypeProvider') ? (new Configuration())->getTypeProvider() : Type::getTypeRegistry();
-        $types->has('test_amount') ? $types->override('test_amount', new StringType()) : $types->register('test_amount', new StringType());
-
-        return DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
     }
 }

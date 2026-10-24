@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\Tests\Read;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Exception\InvalidStreamException;
 use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
@@ -46,6 +47,53 @@ class DecoderTest extends TestCase
         rewind($resource);
 
         Decoder::decodeStream($resource);
+    }
+
+    #[DataProvider('hasDuplicateKeysDataProvider')]
+    public function testHasDuplicateKeys(bool $hasDuplicateKeys, string $encoded)
+    {
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, '  '.$encoded);
+
+        $this->assertSame($hasDuplicateKeys, Decoder::hasDuplicateKeys($resource, 2, \strlen($encoded), json_decode($encoded)));
+    }
+
+    public static function hasDuplicateKeysDataProvider(): iterable
+    {
+        yield [false, '1'];
+        yield [false, '[]'];
+        yield [false, '{}'];
+        yield [false, '{"":1}'];
+        yield [false, '{"id":1,"name":"foo"}'];
+        yield [false, '{ "id" : 1 , "name" : "a:b" }'];
+        yield [false, '{"a":"x",":b":1}'];
+        yield [false, '{"a":"\\":","b\\"":":"}'];
+        yield [false, '[{"id":1},{"id":1}]'];
+        yield [false, '{"a":{"id":1},"b":[{"id":1,"name":{"id":1}}]}'];
+        yield [false, '{"a\\\\":1,"b":"\\\\"}'];
+        yield [false, '{"1":1,"01":2}'];
+        yield [true, '{"id":1,"id":2}'];
+        yield [true, '{"id":1,"\\u0069d":2}'];
+        yield [true, '{"1":1,"1":2}'];
+        yield [true, '{"1":1,"\\u0031":2}'];
+        yield [true, '{"":1,"":2}'];
+        yield [true, '{"a":{"id":1,"id":2}}'];
+        yield [true, '[[{"id":1,"id":2}]]'];
+        yield [true, '{"a":{"id":1},"a":{"id":2}}'];
+    }
+
+    public function testHasDuplicateKeysOnRegexFailure()
+    {
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, '{"id":1}');
+
+        $backtrackLimit = ini_set('pcre.backtrack_limit', '1');
+
+        try {
+            $this->assertTrue(Decoder::hasDuplicateKeys($resource, 0, 8, json_decode('{"id":1}')));
+        } finally {
+            ini_set('pcre.backtrack_limit', $backtrackLimit);
+        }
     }
 
     private function assertDecoded(mixed $decoded, string $encoded, int $offset = 0, ?int $length = null): void

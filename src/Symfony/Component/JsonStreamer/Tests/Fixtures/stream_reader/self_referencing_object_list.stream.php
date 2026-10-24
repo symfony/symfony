@@ -58,7 +58,6 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
                 };
             }
         }
-        return $data;
     };
     $validators['array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>'] = static function ($stream, $offset, $length, $data) use (&$validators) {
         if (\is_array($data) || $data instanceof \stdClass) {
@@ -66,7 +65,6 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
                 $validators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList']($stream, $v[0], $v[1], \is_array($data) ? $data[$k] : $data->{$k});
             }
         }
-        return $data;
     };
     $readers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList'] = static function ($stream, $offset, $length) use (&$providers, &$denormalizers, &$validators) {
         try {
@@ -77,7 +75,10 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
             }
             return $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList']($stream, $offset, $length);
         }
-        return $denormalizers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList']($validators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList']($stream, $offset, $length, $data));
+        if (\Symfony\Component\JsonStreamer\Read\Decoder::hasDuplicateKeys($stream, $offset, $length, $data)) {
+            $validators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList']($stream, $offset, $length, $data);
+        }
+        return $denormalizers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList']($data);
     };
     return $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList']($stream, 0, null);
 };

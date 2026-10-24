@@ -456,7 +456,11 @@ final class PhpGenerator
             .$this->line('        }', $context)
             .$this->line('        return $providers['.$identifier.']($stream, $offset, $length);', $context)
             .$this->line('    }', $context)
-            .$this->line('    return $denormalizers['.$identifier.']($validators['.$identifier.']($stream, $offset, $length, $data));', $context)
+            // duplicated keys are tolerated inside the values of unmapped keys, so the validators decide
+            .$this->line('    if (\\'.Decoder::class.'::hasDuplicateKeys($stream, $offset, $length, $data)) {', $context)
+            .$this->line('        $validators['.$identifier.']($stream, $offset, $length, $data);', $context)
+            .$this->line('    }', $context)
+            .$this->line('    return $denormalizers['.$identifier.']($data);', $context)
             .$this->line('};', $context);
 
         return $php.$this->generateProviders($node, true, $context);
@@ -481,9 +485,15 @@ final class PhpGenerator
         $children = [];
 
         if ($node instanceof CompositeNode) {
+            // unstructured nodes hold no keys, and as structured nodes conditions may overlap, the first match wins
             foreach ($node->getNodes() as $child) {
+                if (!$this->isStructured($child)) {
+                    continue;
+                }
+
                 $php .= $this->line('if ('.$this->generateCompositeNodeItemCondition($child, '$data', true).') {', $context)
-                    .$this->line('    return '.($this->isStructured($child) ? '$validators['.var_export($child->getIdentifier(), true).']($stream, $offset, $length, $data)' : '$data').';', $context)
+                    .$this->line('    $validators['.var_export($child->getIdentifier(), true).']($stream, $offset, $length, $data);', $context)
+                    .$this->line('    return;', $context)
                     .$this->line('}', $context);
                 $children[] = $child;
             }
@@ -522,7 +532,6 @@ final class PhpGenerator
             $php .= $this->line('    }', $context).$this->line('}', $context);
         }
 
-        $php .= $this->line('return $data;', $context);
         --$context['indentation_level'];
         $php .= $this->line('};', $context);
         foreach ($children as $child) {

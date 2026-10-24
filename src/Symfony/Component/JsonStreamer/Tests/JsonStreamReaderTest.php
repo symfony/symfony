@@ -842,13 +842,14 @@ class JsonStreamReaderTest extends TestCase
         $this->expectException(InvalidStreamException::class);
         $this->expectExceptionMessage('dict key twice');
 
-        json_encode($reader->read($this->createStream($json), $type), \JSON_THROW_ON_ERROR);
+        $reader->read($this->createStream($json), $type);
     }
 
     public static function duplicateStreamItemKeysDataProvider(): iterable
     {
         yield ['[{"id":1,"id":2}]', Type::list(Type::object(ClassicDummy::class))];
         yield ['[{"id":1,"\\u0069d":2}]', Type::list(Type::object(ClassicDummy::class))];
+        yield ['[{"id":1,"name":"a:b","id":2}]', Type::list(Type::object(ClassicDummy::class))];
         yield ['{"first":{"id":1,"id":2}}', Type::dict(Type::object(ClassicDummy::class))];
         yield ['[{"dummy":{"id":1,"id":2}}]', Type::list(Type::object(DummyWithDummyAndDummies::class))];
         yield ['[{"dummies":[{"id":1,"id":2}]}]', Type::list(Type::object(DummyWithDummiesAndDummy::class))];
@@ -856,7 +857,18 @@ class JsonStreamReaderTest extends TestCase
         yield ['[{"left":{"id":1},"left":{"id":2}}]', Type::list(Type::dict(Type::object(ClassicDummy::class)))];
         yield ['[{"id":1,"id":2}]', Type::list(Type::nullable(Type::object(ClassicDummy::class)))];
         yield ['[{"dummies":{"first":{"id":1,"id":2}}}]', Type::list(Type::object(DummyWithGenericDummies::class))];
-        yield ['[{"id":3,"\\u0000extra":1,"\\u0000extra":2}]', Type::list(Type::object(ClassicDummy::class))];
+        yield ['[{"items":{"a":{"items":{"b":{"items":{},"items":{}}}}}}]', Type::list(Type::object(SelfReferencingDummyList::class))];
+    }
+
+    public function testReadStreamCollectionItemsRejectDuplicateKeysWhenReadLazily()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->expectException(InvalidStreamException::class);
+        $this->expectExceptionMessage('dict key twice');
+
+        // keys starting with a NUL byte cannot be decoded at once, so the item is read lazily
+        json_encode($reader->read($this->createStream('[{"id":3,"\\u0000extra":1,"\\u0000extra":2}]'), Type::list(Type::object(ClassicDummy::class))), \JSON_THROW_ON_ERROR);
     }
 
     public function testReadStreamCollectionItemsAllowDuplicateKeysInUnknownValues()
@@ -865,6 +877,17 @@ class JsonStreamReaderTest extends TestCase
         $list = $reader->read($this->createStream('[{"unknown":{"id":1,"id":2},"id":3}]'), Type::list(Type::object(ClassicDummy::class)));
 
         $this->assertSame(3, $list[0]->id);
+        $this->assertFalse((new \ReflectionClass(ClassicDummy::class))->isUninitializedLazyObject($list[0]));
+    }
+
+    public function testReadStreamCollectionItemsWithDuplicateKeysInUnknownValuesRejectInvalidValues()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Cannot assign string to property');
+
+        $reader->read($this->createStream('[{"id":"notint","unknown":{"a":1,"a":2}}]'), Type::list(Type::object(ClassicDummy::class)));
     }
 
     private function assertRead(JsonStreamReader $reader, mixed $readOrAssert, string $json, Type $type, array $options = []): void

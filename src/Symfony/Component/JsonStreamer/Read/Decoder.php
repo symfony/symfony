@@ -62,4 +62,42 @@ final class Decoder
             throw new InvalidStreamException('JSON is not valid: '.json_last_error_msg());
         }
     }
+
+    /**
+     * Tells whether the JSON stream part holds an object key twice, as "json_decode" silently keeps the last value.
+     *
+     * Objects must have been decoded as "\stdClass" in $data, associative arrays lead to false positives only.
+     *
+     * @param resource $stream
+     */
+    public static function hasDuplicateKeys($stream, int $offset, int $length, mixed $data): bool
+    {
+        if (false === $contents = stream_get_contents($stream, $length, $offset)) {
+            throw new RuntimeException('Failed to read JSON stream.');
+        }
+
+        // as the JSON is valid, every string followed by a colon is a key, and strings that are not are skipped whole
+        // on failure, preg_match_all() returns false, so duplicated keys are assumed
+        return preg_match_all('/"(?:[^"\\\\]++|\\\\.)*+"(?:\s*+:|(*SKIP)(*FAIL))/', $contents) !== self::countKeys($data);
+    }
+
+    private static function countKeys(mixed $data): int
+    {
+        if ($data instanceof \stdClass) {
+            $data = (array) $data;
+            $count = \count($data);
+        } elseif (\is_array($data)) {
+            $count = 0;
+        } else {
+            return 0;
+        }
+
+        foreach ($data as $value) {
+            if (\is_array($value) || $value instanceof \stdClass) {
+                $count += self::countKeys($value);
+            }
+        }
+
+        return $count;
+    }
 }

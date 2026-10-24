@@ -124,6 +124,7 @@ class StreamReaderGeneratorTest extends TestCase
         yield ['list', Type::list()];
         yield ['object_list', Type::list(Type::object(ClassicDummy::class))];
         yield ['nullable_object_list', Type::nullable(Type::list(Type::object(ClassicDummy::class)))];
+        yield ['union_list', Type::list(Type::union(Type::object(ClassicDummy::class), Type::list(Type::int()), Type::null()))];
 
         yield ['array_shape', Type::arrayShape(['id' => Type::int(), 'name' => Type::string()])];
 

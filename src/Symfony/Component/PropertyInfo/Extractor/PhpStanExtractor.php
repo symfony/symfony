@@ -65,9 +65,14 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
      * @param list<string>|null $mutatorPrefixes
      * @param list<string>|null $accessorPrefixes
      * @param list<string>|null $arrayMutatorPrefixes
+     * @param bool|null         $resolveRefinements   Whether to resolve PHPDoc refinements, such as literals and integer ranges. Not passing true is deprecated since 8.2, refinements will always be resolved as of 9.0
      */
-    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null, private bool $allowPrivateAccess = true)
+    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null, private bool $allowPrivateAccess = true, ?bool $resolveRefinements = null)
     {
+        if (true !== $resolveRefinements) {
+            trigger_deprecation('symfony/property-info', '8.2', 'Not passing true for the "$resolveRefinements" argument of "%s()" is deprecated; PHPDoc refinements will always be resolved in 9.0.', __METHOD__);
+        }
+
         if (!class_exists(ContextFactory::class)) {
             throw new \LogicException(\sprintf('Unable to use the "%s" class as the "phpdocumentor/type-resolver" package is not installed. Try running composer require "phpdocumentor/type-resolver".', __CLASS__));
         }
@@ -88,7 +93,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             $this->phpDocParser = new PhpDocParser(new TypeParser($constExprParser = new ConstExprParser(true, true), true), $constExprParser);
             $this->lexer = new Lexer();
         }
-        $this->stringTypeResolver = new StringTypeResolver();
+        $this->stringTypeResolver = new StringTypeResolver(null, null, [], $resolveRefinements ?? false);
         $this->typeContextFactory = new TypeContextFactory($this->stringTypeResolver);
     }
 

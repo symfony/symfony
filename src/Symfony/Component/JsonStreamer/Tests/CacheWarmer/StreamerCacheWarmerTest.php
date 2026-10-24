@@ -71,7 +71,7 @@ class StreamerCacheWarmerTest extends TestCase
      */
     private function cacheWarmer(array $streamable = []): StreamerCacheWarmer
     {
-        $typeResolver = TypeResolver::create();
+        $typeResolver = TypeResolver::create(null, true);
 
         return new StreamerCacheWarmer(
             $streamable,

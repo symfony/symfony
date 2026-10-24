@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\TypeInfo\Tests\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
@@ -26,13 +27,29 @@ class CollectionTypeTest extends TestCase
         new CollectionType(Type::int());
     }
 
-    public function testCanOnlyConstructListWithIntKeyType()
+    #[DataProvider('cannotConstructWithInvalidKeyTypeDataProvider')]
+    public function testCannotConstructWithInvalidKeyType(string $expectedMessage, Type $keyType)
     {
-        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::bool()), isList: true);
-        $this->addToAssertionCount(1);
-
         $this->expectException(InvalidArgumentException::class);
-        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool()), isList: true);
+        $this->expectExceptionMessage($expectedMessage);
+
+        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), $keyType, Type::bool()), isList: true);
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: Type}>
+     */
+    public static function cannotConstructWithInvalidKeyTypeDataProvider(): iterable
+    {
+        yield ['"string" is not a valid list key type.', Type::string()];
+        yield ['"1.5" is not a valid list key type.', Type::literal(1.5)];
+    }
+
+    public function testCanConstructWithRefinedKeyType()
+    {
+        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::intRange(1, null), Type::bool()));
+        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::union(Type::literal('a'), Type::literal('b')), Type::bool()));
+        $this->addToAssertionCount(1);
     }
 
     public function testIsList()

@@ -19,6 +19,8 @@ use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\IntRangeType;
+use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
@@ -296,6 +298,23 @@ trait TypeFactoryTrait
     public static function template(string $name, ?Type $bound = null): TemplateType
     {
         return new TemplateType($name, $bound ?? Type::mixed());
+    }
+
+    /**
+     * @template T of int|float|string
+     *
+     * @param T $value
+     *
+     * @return LiteralType<T>
+     */
+    public static function literal(int|float|string $value): LiteralType
+    {
+        return new LiteralType($value);
+    }
+
+    public static function intRange(?int $min, ?int $max): IntRangeType
+    {
+        return new IntRangeType($min, $max);
     }
 
     /**

@@ -8,6 +8,9 @@ CHANGELOG
  * Add support for `@template-covariant` and its vendor prefixed synonyms
  * Add `Type::map()` to map a type and its parts bottom-up
  * Add `Type::getMismatches()` and `TypeMismatch` to tell where and why a value is not accepted by a type
+ * Add `LiteralType` and `IntRangeType`, and the `Type::literal()` and `Type::intRange()` factories
+ * Add a `$resolveRefinements` argument to `StringTypeResolver::__construct()` and `TypeResolver::create()`, and a `resolve_refinements` option to `TypeInfoBundle`, to resolve literals and integer ranges as `LiteralType` and `IntRangeType`
+ * Deprecate not passing `true` for the `$resolveRefinements` argument of `StringTypeResolver::__construct()` and `TypeResolver::create()`, and not setting the `type_info.resolve_refinements` option to `true`
 
 8.1
 ---

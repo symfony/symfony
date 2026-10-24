@@ -183,7 +183,7 @@ final class PhpGenerator
             $hasIntKeys = $this->hasIntKeys($node->getType());
             $splitMethod = match (true) {
                 $hasIntKeys => 'splitList',
-                $collectionKeyType instanceof BuiltinType && TypeIdentifier::STRING === $collectionKeyType->getTypeIdentifier() => 'splitDict',
+                TypeIdentifier::STRING === self::getCollectionKeyTypeIdentifier($collectionKeyType) => 'splitDict',
                 default => 'splitCollection',
             };
 
@@ -488,7 +488,7 @@ final class PhpGenerator
 
         return match (true) {
             $this->hasIntKeys($type) => "\\is_array($accessor)",
-            $keyType instanceof BuiltinType && TypeIdentifier::STRING === $keyType->getTypeIdentifier() => "$accessor instanceof \\stdClass",
+            TypeIdentifier::STRING === self::getCollectionKeyTypeIdentifier($keyType) => "$accessor instanceof \\stdClass",
             default => "\\is_array($accessor) || $accessor instanceof \\stdClass",
         };
     }
@@ -557,7 +557,7 @@ final class PhpGenerator
             $keyType = $node->getType()->getCollectionKeyType();
             $splitMethod = match (true) {
                 $this->hasIntKeys($node->getType()) => 'splitList',
-                $keyType instanceof BuiltinType && TypeIdentifier::STRING === $keyType->getTypeIdentifier() => 'splitDict',
+                TypeIdentifier::STRING === self::getCollectionKeyTypeIdentifier($keyType) => 'splitDict',
                 default => 'splitCollection',
             };
             $php .= $this->line('if ('.$this->generateCollectionCondition($node->getType(), '$data').') {', $context)
@@ -602,7 +602,7 @@ final class PhpGenerator
     {
         $keyType = $type->getCollectionKeyType();
 
-        return $keyType instanceof BuiltinType && TypeIdentifier::INT === $keyType->getTypeIdentifier();
+        return TypeIdentifier::INT === self::getCollectionKeyTypeIdentifier($keyType);
     }
 
     /**

@@ -263,7 +263,8 @@ final class PhpGenerator
             $prefixIsCommaForSure = false;
 
             foreach ($dataModelNode->getProperties() as $name => $propertyNode) {
-                $encodedName = json_encode($name, self::JSON_ENCODE_FLAGS);
+                // numeric streamed names are int array keys
+                $encodedName = json_encode((string) $name, self::JSON_ENCODE_FLAGS);
                 if (false === $encodedName) {
                     throw new RuntimeException(\sprintf('Cannot encode "%s"', $name));
                 }

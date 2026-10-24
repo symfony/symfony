@@ -31,6 +31,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedListDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNumericStreamedNames;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithQuotes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSelfReferencingDummy;
@@ -259,6 +260,11 @@ class JsonStreamWriterTest extends TestCase
         $dummy->name = 'dummy name';
 
         $this->assertWritten('{"@id":10,"name":"dummy name"}', $dummy, Type::object(DummyWithNameAttributes::class));
+    }
+
+    public function testWriteObjectWithNumericStreamedNames()
+    {
+        $this->assertWritten('{"0":1,"1":2,"12":"three"}', new DummyWithNumericStreamedNames(), Type::object(DummyWithNumericStreamedNames::class));
     }
 
     public function testWriteObjectWithValueTransformer()

@@ -208,7 +208,8 @@ final class PhpGenerator
                         ? $this->generateValueFormat($property['value'], '\\'.Decoder::class.'::decodeStream($stream, $v[0], $v[1])')
                         : '$providers['.var_export($property['value']->getIdentifier(), true).']($stream, $v[0], $v[1])';
 
-                    $php .= $this->line('            '.var_export($streamedName, true).' => $object->'.$property['name'].' = '.$property['accessor']($propertyValuePhp).',', $context);
+                    // numeric streamed names are int array keys, while split dict keys are strings
+                    $php .= $this->line('            '.var_export((string) $streamedName, true).' => $object->'.$property['name'].' = '.$property['accessor']($propertyValuePhp).',', $context);
                 }
 
                 $php .= $this->line('            default => null,', $context)

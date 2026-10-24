@@ -21,13 +21,12 @@ class SwitchableKmsTest extends TestCase
     {
         $kms = new SwitchableKms(new InMemoryKms());
 
-        $this->assertSame('secret', $kms->decrypt($kms->encrypt('app', 'secret', 'aad', true), 'aad'));
+        $this->assertSame('secret', $kms->decrypt($kms->encrypt('app', 'secret', 'aad'), 'aad'));
         $dataKey = $kms->generateDataKey('app', 16);
         $this->assertSame(16, \strlen($kms->unwrapDataKey($dataKey->wrapped)->use(static fn (string $key): string => $key)));
 
         $this->assertSame(['encrypt' => 1, 'decrypt' => 1, 'generateDataKey' => 1, 'unwrapDataKey' => 1], $kms->calls);
         $this->assertSame(['app', 'app'], $kms->keyIds);
-        $this->assertSame([true], $kms->deterministic);
     }
 
     public function testEveryCallThrowsWhileDown()

@@ -24,7 +24,9 @@ namespace Symfony\Component\KeyManagement;
  * the new provider configured at the same time, so each row must say who can unwrap it.
  *
  * `$binding` ties the key to its reference and scope, {@see bindingFor()}.
- * It is keyed by the data key, so only what can open the key can produce it, and a store checks it once the key is open.
+ * Its HMAC key is derived from the data key and from a secret of the store.
+ * A database writer doesn't know that secret.
+ * A store checks it once the key is open.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -52,18 +54,20 @@ final class StoredDataKey
     }
 
     /**
-     * Proof that a data key was minted for `$reference` and `$scope`, which only its plaintext can produce.
+     * Proof that a data key was minted for `$reference` and `$scope` by a store that knows `$secret`.
      *
      * The wrapping of a data key is bound to nothing but the master key.
      * Without this proof, a row whose scope was edited would hand the key of one tenant, column or purpose to another one, and the row of a retired key copied under a fresh UUIDv7 would read as the current key of its scope.
      * The length prefix keeps two different pairs from hashing the same input.
      *
-     * The HMAC key is derived from the data key, instead of passing authenticated data to the KMS, which some backends cannot enforce.
-     * Forging a binding thus takes the KMS, not only write access to the table, and a rewrap keeps it valid since the key does not change.
+     * The HMAC key is derived from the data key and the secret, instead of passing authenticated data to the KMS, which some backends cannot enforce.
+     * The secret stops a database writer from inserting a data key they know.
+     * They could wrap such a key under a public key, or under a master key of their own that the application is allowed to use.
+     * A rewrap keeps the data key, so the binding can be checked and computed again under the current secret of the store.
      */
-    public static function bindingFor(string $reference, string $scope, #[\SensitiveParameter] string $plaintext): string
+    public static function bindingFor(string $reference, string $scope, #[\SensitiveParameter] string $plaintext, #[\SensitiveParameter] string $secret): string
     {
-        return hash_hmac('sha256', pack('n', \strlen($reference)).$reference.$scope, hash_hkdf('sha256', $plaintext, 32, self::BINDING_INFO), true);
+        return hash_hmac('sha256', pack('n', \strlen($reference)).$reference.$scope, hash_hkdf('sha256', $plaintext, 32, self::BINDING_INFO, $secret), true);
     }
 
     /**

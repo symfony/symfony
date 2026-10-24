@@ -97,7 +97,7 @@ class RewrapDataKeysCommandTest extends TestCase
         $handle = $store->current('user.email');
         $plaintext = $handle->use(static fn (string $key): string => $key);
         // wrapped under no context on purpose: this is how the store wrote it before it bound one
-        $store->rewrap($handle->reference, $this->aws->encrypt('app', $plaintext), 'aws');
+        $store->rewrap(self::rowOf($store, $handle->reference), new DataKey($plaintext, $this->aws->encrypt('app', $plaintext)), 'aws');
         $store->forget();
 
         $tester = new CommandTester(new RewrapDataKeysCommand($store, $this->locator()));
@@ -163,8 +163,8 @@ class RewrapDataKeysCommandTest extends TestCase
 
     public function testARowThatNoLongerMatchesItsKeyIsReportedAndLeftBehind()
     {
-        $reference = $this->store->current('user.email')->reference;
-        $this->store->rewrap($reference, $this->azure->encrypt('app', random_bytes(32)), 'azure');
+        $handle = $this->store->current('user.email');
+        $this->store->rewrap(self::rowOf($this->store, $handle->reference), new DataKey($handle->use(static fn (string $key): string => $key), $this->azure->encrypt('app', random_bytes(32))), 'azure');
 
         $tester = $this->tester();
         $exit = $tester->execute(['--to' => 'aws', '--key-id' => 'app']);
@@ -224,8 +224,10 @@ class RewrapDataKeysCommandTest extends TestCase
 
     public function testAKeyWhoseClientIsGoneIsReportedAndLeftBehind()
     {
-        $reference = $this->store->current('user.email')->reference;
-        $this->store->rewrap($reference, iterator_to_array($this->store->all(), false)[0]->wrapped, 'vanished');
+        $this->store = new InMemoryDataKeyStore(['aws' => $this->aws, 'azure' => $this->azure, 'vanished' => $this->aws], 'aws');
+        $handle = $this->store->current('user.email');
+        $row = self::rowOf($this->store, $handle->reference);
+        $this->store->rewrap($row, new DataKey($handle->use(static fn (string $key): string => $key), $row->wrapped), 'vanished');
 
         $tester = $this->tester();
         $exit = $tester->execute(['--to' => 'azure', '--key-id' => 'app']);
@@ -346,13 +348,13 @@ class RewrapDataKeysCommandTest extends TestCase
                 }
             }
 
-            public function rewrap(string $reference, Ciphertext $wrapped, string $client): void
+            public function rewrap(StoredDataKey $row, DataKey $rewrapped, string $client): void
             {
                 if ($this->listing) {
                     throw new \LogicException('The listing was still open.');
                 }
 
-                $this->inner->rewrap($reference, $wrapped, $client);
+                $this->inner->rewrap($row, $rewrapped, $client);
             }
 
             public function wrappingContextOf(StoredDataKey $row): string
@@ -402,7 +404,7 @@ class RewrapDataKeysCommandTest extends TestCase
         $old = $store->current('user.phone');
         $plaintexts = [$moved->reference => $moved->use(static fn (string $key): string => $key), $old->reference => $old->use(static fn (string $key): string => $key)];
         // wrapped under no context on purpose: this is a row the previous run did not reach yet
-        $store->rewrap($old->reference, $this->aws->encrypt('app', $plaintexts[$old->reference]), 'aws');
+        $store->rewrap(self::rowOf($store, $old->reference), new DataKey($plaintexts[$old->reference], $this->aws->encrypt('app', $plaintexts[$old->reference])), 'aws');
         $store->forget();
 
         return [$store, $plaintexts];
@@ -443,5 +445,16 @@ class RewrapDataKeysCommandTest extends TestCase
             'aws' => fn (): OpenSslKms => $this->aws,
             'azure' => fn (): OpenSslKms => $this->azure,
         ]);
+    }
+
+    private static function rowOf(InMemoryDataKeyStore $store, string $reference): StoredDataKey
+    {
+        foreach ($store->all() as $row) {
+            if ($reference === $row->reference) {
+                return $row;
+            }
+        }
+
+        throw new \LogicException('No row has that reference.');
     }
 }

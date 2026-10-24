@@ -73,7 +73,10 @@ The scope is `'orm:'.hash('sha256', serialize([$schema, $table, $column]))`, usi
 Naming strategies, embedded prefixes and the physical owning table of inherited fields are included.
 The framed hash keeps names containing dots distinct and fits the store's scope column.
 The value also authenticates the parent Doctrine type name.
-Values copied to another physical column are refused.
+Values copied to a column with different resolved schema, table or column names are refused.
+Database, connection, application and tenant identifiers aren't part of the automatic scope.
+Identically named columns in separate databases can read each other's values when they use the same data key store.
+Use explicit scopes containing the trusted application or tenant identifier to keep those values apart.
 Renaming the entity or property leaves existing values readable when the physical names stay unchanged.
 Renaming the schema, table or column changes the automatic scope.
 Before such a rename, set the explicit key to the existing generated scope to keep old values readable.

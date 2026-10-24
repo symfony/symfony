@@ -33,6 +33,8 @@ use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
  * encrypted blobs to git) but cannot decrypt anything; deployments that
  * load the keypair can decrypt at runtime.
  *
+ * Anyone with the public key can produce valid ciphertext, so decryption doesn't authenticate the writer.
+ *
  * Each entry returned by the {@see KeyLoaderInterface} must be either:
  *   - a 32-byte public key (encrypt-only mode), or
  *   - a 64-byte keypair (sk || pk, the libsodium convention) for full mode.
@@ -63,13 +65,10 @@ final class SealedBoxKms implements DecrypterInterface, EncrypterInterface, Data
         }
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
         if ('' !== $aad) {
             throw new UnsupportedOperationException('SealedBoxKms does not support additional authenticated data.');
-        }
-        if ($deterministic) {
-            throw new UnsupportedOperationException('SealedBoxKms cannot produce deterministic ciphertexts: crypto_box_seal generates a fresh ephemeral keypair on every call.');
         }
 
         return new Ciphertext(sodium_crypto_box_seal($plaintext, $this->loadPublicKey($keyId)), $keyId);

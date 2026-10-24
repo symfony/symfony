@@ -15,6 +15,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\Type;
@@ -26,11 +27,14 @@ use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\KeyManagement\Base64UrlSafe;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
@@ -41,15 +45,18 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\Regis
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\DependencyInjection\RegisterFlysystemStoragesPass;
 use Symfony\Component\KeyManagement\DataCollector\KeyManagementDataCollector;
+use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\Debug\TraceableKms;
 use Symfony\Component\KeyManagement\DependencyInjection\KeyManagementPass;
 use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
+use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\KeyManagementBundle;
 use Symfony\Component\KeyManagement\Local\SodiumKms;
+use Symfony\Component\KeyManagement\StoredDataKey;
 use Symfony\Component\KeyManagement\Tests\Fixtures\Entity\Speaker;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\inline_service;
@@ -158,6 +165,92 @@ class KeyManagementBundleTest extends TestCase
         $this->assertSame(2, $collector->getEnvelopeCallCount(), 'the write and the read, not the fallback the read went through.');
         $this->assertSame(['decrypt' => 1], $services['stored']['operations']);
         $this->assertSame(['encrypt' => 1], $services['default']['operations']);
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    #[RequiresPhpExtension('pdo_sqlite')]
+    #[TestWith(['read'])]
+    #[TestWith(['write'])]
+    #[TestWith(['rewrap'])]
+    public function testAnUnrelatedClientCannotSupplyAStoredDataKey(string $operation)
+    {
+        if (!class_exists(DriverManager::class) || !class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $kernel = new TestKeyManagementKernel('store_clients', false, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $store = $container->get('test.store');
+        $store->createTable();
+        $reference = $store->current('user.email')->reference;
+        $key = str_repeat('a', 32);
+        $publicKey = sodium_crypto_box_publickey(sodium_crypto_box_seed_keypair(str_repeat('p', 32)));
+        $connection = $container->get('test.dbal');
+        // bound under the secret of the store on purpose, so that only the client check refuses the row
+        $connection->update(DataKeyStore::DEFAULT_TABLE, [
+            'client' => 'public',
+            'key_material' => sodium_crypto_box_seal($key, $publicKey),
+            'binding' => StoredDataKey::bindingFor($reference, 'user.email', $key, 'kernel-secret'),
+        ], ['id' => $reference], ['id' => ParameterType::BINARY, 'key_material' => ParameterType::BINARY, 'binding' => ParameterType::BINARY]);
+        $store->forget();
+
+        if ('rewrap' === $operation) {
+            $tester = new CommandTester($container->get('test.rewrap'));
+            $this->assertSame(Command::FAILURE, $tester->execute(['--to' => 'default', '--key-id' => 'app']));
+            $this->assertSame('public', $connection->fetchOne('SELECT client FROM key_management_data_keys'));
+
+            return;
+        }
+
+        $this->expectException(LogicException::class);
+        'read' === $operation ? $store->get($reference) : $store->current('user.email');
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    #[RequiresPhpExtension('pdo_sqlite')]
+    public function testAnExplicitlyTrustedClientCanRewrapStoredKeys()
+    {
+        if (!class_exists(DriverManager::class) || !class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $kernel = new TestKeyManagementKernel('trusted_store_clients', false, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $store = $container->get('test.store');
+        $store->createTable();
+        $encrypter = $container->get('test.stored_envelope_encrypter');
+        $envelope = $encrypter->encrypt('user.email', 'secret');
+        $tester = new CommandTester($container->get('test.rewrap'));
+        $tester->execute(['--to' => 'legacy', '--key-id' => 'app']);
+        $tester->assertCommandIsSuccessful();
+        $store->forget();
+
+        $this->assertSame('secret', $encrypter->decrypt($envelope));
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    #[RequiresPhpExtension('pdo_sqlite')]
+    public function testRewrappingBindsTheStoredKeysUnderTheFirstSecret()
+    {
+        if (!class_exists(DriverManager::class) || !class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $kernel = new TestKeyManagementKernel('rotated_store_secret', false, $this->varDir);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $container->get('test.store')->createTable();
+        $kms = $container->get('test.kms');
+        $connection = $container->get('test.dbal');
+        $reference = new DataKeyStore($connection, new ServiceLocator(['default' => static fn (): object => $kms]), 'default', 'app', 'old')->current('user.email')->reference;
+
+        $tester = new CommandTester($container->get('test.rewrap'));
+        $tester->execute(['--to' => 'default', '--key-id' => 'app']);
+        $tester->assertCommandIsSuccessful();
+
+        $this->assertInstanceOf(DataKeyHandle::class, new DataKeyStore($connection, new ServiceLocator(['default' => static fn (): object => $kms]), 'default', 'app', 'new')->get($reference));
     }
 
     #[RequiresPhpExtension('sodium')]
@@ -366,6 +459,7 @@ class TestKeyManagementKernel extends AbstractKernel
     private function configureContainer(ContainerConfigurator $container): void
     {
         $config = ['clients' => 'sodium://?keys[app]='.Base64UrlSafe::encode(random_bytes(32))];
+        $container->parameters()->set('kernel.secret', 'kernel-secret');
 
         $services = $container->services();
         $services
@@ -415,6 +509,28 @@ class TestKeyManagementKernel extends AbstractKernel
                 ->args([['driver' => 'pdo_sqlite', 'memory' => true]]);
             $services->alias('test.stored_envelope_encrypter', 'key_management.stored_envelope_encrypter')->public();
             $config['store'] = ['connection' => 'test.dbal', 'client' => 'default', 'key_id' => 'app', 'read_self_contained' => true];
+        }
+
+        if (\in_array($this->environment, ['store_clients', 'trusted_store_clients', 'rotated_store_secret'], true)) {
+            $config['clients'] = [
+                'default' => $config['clients'],
+                'public' => 'sodium-sealed-box://?keys[app]='.Base64UrlSafe::encode(sodium_crypto_box_seed_keypair(str_repeat('p', 32))),
+                'legacy' => 'sodium://?keys[app]='.Base64UrlSafe::encode(random_bytes(32)),
+            ];
+            $config['store'] = ['connection' => 'test.dbal', 'client' => 'default', 'key_id' => 'app'];
+            if ('trusted_store_clients' === $this->environment) {
+                $config['store']['allowed_clients'] = ['legacy'];
+            }
+            if ('rotated_store_secret' === $this->environment) {
+                $config['store']['secret'] = ['new', 'old'];
+            }
+            $services->set('test.dbal', Connection::class)
+                ->factory([DriverManager::class, 'getConnection'])
+                ->args([['driver' => 'pdo_sqlite', 'memory' => true]])
+                ->public();
+            $services->alias('test.store', 'key_management.store')->public();
+            $services->alias('test.stored_envelope_encrypter', 'key_management.stored_envelope_encrypter')->public();
+            $services->alias('test.rewrap', 'console.command.key_management_rewrap_data_keys')->public();
         }
 
         if ('doctrine_dbal_types' === $this->environment) {

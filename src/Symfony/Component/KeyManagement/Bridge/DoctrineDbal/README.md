@@ -168,7 +168,7 @@ rows instead of rewriting the payloads:
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
 
-$store = new DataKeyStore($connection, $clients, 'aws', 'alias/app-key');
+$store = new DataKeyStore($connection, $clients, 'aws', 'alias/app-key', $secret);
 $store->createTable();
 
 $encrypter = new StoredEnvelopeEncrypter($store);
@@ -206,6 +206,37 @@ Turn the fallback off once the migration is over.
 A self-contained payload contains its own wrapped data key and bypasses the store's scope and binding checks.
 The envelope still authenticates the type's configured key and parent type name.
 
+The bundle trusts only `store.client` by default.
+List additional clients in `key_management.store.allowed_clients` before reading or rewrapping keys with them.
+The rewrap command uses the same list.
+Registering a client elsewhere in the application doesn't authorize that client for stored keys.
+For standalone usage, pass only trusted clients to the store and rewrap command.
+
+```yaml
+key_management:
+    store:
+        client: new
+        key_id: app-key
+        allowed_clients: [old]
+```
+
+Only list the clients that wrapped stored keys.
+The store never uses a client that isn't in this list, whatever a row of the table says.
+
+The store also authenticates each row with a secret: `$secret` above, `key_management.store.secret` in the bundle.
+In a Symfony application, it defaults to the `kernel.secret` parameter.
+Without this secret, a database writer could insert a data key that they know, and your application would encrypt new values with that key.
+They can wrap such a key under a public key, for example the one of a `SealedBoxKms`.
+They can also use a master key of their own that your KMS credentials are allowed to use.
+Keep the secret out of the database, like your other application secrets.
+
+To change the secret, add the new secret at the top of the list and keep the old one.
+The store signs new keys with the first secret and accepts keys signed with any of them.
+Then run `key-management:rewrap-data-keys` with the current client and master key to bind every key under the new secret.
+Remove the old secret after that run.
+Removing it earlier makes the keys bound under it unreadable.
+This includes changing `kernel.secret` when the store uses it.
+
 The table holds exactly what the store needs and nothing else:
 
 | Column | Type | Role |
@@ -215,7 +246,7 @@ The table holds exactly what the store needs and nothing else:
 | `key_material` | `BLOB` | The wrapped data key |
 | `master_key_id` | `VARCHAR(255)` | The master key that wrapped it |
 | `client` | `VARCHAR(64)` | The configured KMS client able to unwrap it |
-| `binding` | `BINARY(32)` | Proof that the key was minted for this reference and scope, checked once the key is unwrapped |
+| `binding` | `BINARY(32)` | Proof that the key was minted for this reference and scope by a store that knows the secret, checked once the key is unwrapped |
 
 There is no timestamp column on purpose: a UUIDv7 carries its creation instant
 and sorts chronologically, so the newest row of a scope is its current key and
@@ -225,13 +256,15 @@ A scope longer than its column is refused rather than truncated, and the column
 follows the collation of the connection: under a case-insensitive one,
 `user.email` and `User.Email` are one scope.
 
-A key is retired thirty days after it was minted, `DEFAULT_MAX_AGE_SECONDS`, and
-`max_age` moves that. Rotating is not hygiene here, it is what the format
-requires: every payload is sealed under a random 96-bit IV, which NIST SP 800-38D
-bounds at 2^32 payloads per key, and thirty days covers some 1650 payloads per
-second in one scope. Passing `null` turns rotation off and hands that bound to
-the application. Retiring a key never deletes its row, so what it sealed stays
-readable.
+A key is retired thirty days after it was minted, `DEFAULT_MAX_AGE_SECONDS`, and `max_age` controls that age.
+Stored envelopes use AES-256-GCM with random 96-bit IVs.
+NIST SP 800-38D limits this mode to 2^32 encryptions per key across all processes.
+Age-based rotation doesn't count encryptions.
+Choose `max_age` so the total writes under one key stay below that limit.
+The default thirty days covers about 1650 writes per second across all writers of one scope.
+Passing `null` disables age-based rotation.
+Rewrapping keeps the same data key and doesn't reset its usage count.
+Retiring a key never deletes its row, so existing values stay readable.
 
 `bindWrappingContext: true`, `bind_wrapping_context` in the bundle, has the backend
 authenticate the reference and the scope of each data key as it wraps it, which is
@@ -322,9 +355,10 @@ once meanwhile, which in a Symfony application makes their encrypters available
 through `#[Target('old')]` and `#[Target('new')]`.
 
 **Rows referring to a stored data key.** Nothing to do on the Doctrine side.
-Declare the new client next to the old one, move the data keys over with
-`key-management:rewrap-data-keys --from=old --to=new --key-id=...`, then point
-the store at the new client so the keys it creates afterwards are wrapped there.
+Declare the new client and add it to `key_management.store.allowed_clients`.
+Run `key-management:rewrap-data-keys --from=old --to=new --key-id=...`.
+Then change `store.client` to the new client.
+Keep the old client in `store.allowed_clients` until all its stored keys have been moved.
 No payload is read or rewritten, the references stay what they were, and the old
 client goes away once a `--from=old --dry-run` run lists nothing.
 
@@ -398,6 +432,9 @@ Remove the old column and client when they are no longer used.
 For an offline migration, stop reads and writes, update `email` in that loop, then change the mapping to the new type.
 Writing through a store-backed encrypter also lets later provider changes rewrap the stored keys without rewriting the payloads.
 
+Re-encrypting existing values doesn't establish their original ownership.
+Use a trusted copy or re-enroll affected secrets before migration if database values may have been replaced.
+
 Physical key rotation within a provider doesn't require rewriting values while the type's configured key string stays unchanged.
 For example, the same logical alias can point to a new master key while old keys remain available for decryption.
 Changing the configured alias, key name or ARN changes the authenticated context and requires migration, even if the KMS still reads the old key.
@@ -445,7 +482,8 @@ Either way:
     `convertToDatabaseValue()` never sees the table, column or row it converts for.
     Rows using the same configured key and parent type name can read each other's encrypted values.
     To detect moving a value between rows, include the row identity in the payload.
-    Check the row identity after decryption.
+    Check the row identity against the expected row after decryption.
+  * **SQL `NULL` isn't authenticated.** Deny protected operations when a required encrypted value is missing.
 
 Resources
 ---------

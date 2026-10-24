@@ -37,6 +37,9 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  * losing, and each of them deserves the protection the first one gets. Composite members are not
  * supported.
  *
+ * One member is also enough to accept a ciphertext. Anyone who can encrypt for a member can write
+ * a ciphertext that the composite reads, and the public key of a sealed box is enough for that.
+ *
  * Writing goes through every member, and a member that cannot wrap fails the whole call: a
  * ciphertext missing one wrapping is a ciphertext less redundant than the configuration claims,
  * and the point of this client is that the claim holds. Reading only needs one. When eligible
@@ -123,11 +126,11 @@ final class CompositeKms implements DataKeyGeneratorInterface, DecrypterInterfac
         }
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
         $wrappings = [];
         foreach ($this->members as $name => $memberKeyId) {
-            $wrappings[$name] = $this->member($name)->encrypt($memberKeyId ?? $keyId, $plaintext, $aad, $deterministic);
+            $wrappings[$name] = $this->member($name)->encrypt($memberKeyId ?? $keyId, $plaintext, $aad);
         }
 
         return new Ciphertext(self::frame($wrappings), $keyId);

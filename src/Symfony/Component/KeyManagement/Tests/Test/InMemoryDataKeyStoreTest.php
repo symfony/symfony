@@ -14,6 +14,7 @@ namespace Symfony\Component\KeyManagement\Tests\Test;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\KeyManagement\DataKey;
 use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
@@ -23,6 +24,7 @@ use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
 use Symfony\Component\KeyManagement\StoredDataKey;
 use Symfony\Component\KeyManagement\Test\InMemoryDataKeyStore;
+use Symfony\Component\KeyManagement\Test\InMemoryKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\DerivedKeyKms;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV7;
@@ -142,11 +144,12 @@ class InMemoryDataKeyStoreTest extends TestCase
 
     public function testRewrapKeepsTheReferenceAndTheScope()
     {
-        $store = new InMemoryDataKeyStore();
-        $reference = $store->current('user.email')->reference;
-        $wrapped = self::rowOf($store)->wrapped;
+        $store = new InMemoryDataKeyStore(['default' => new InMemoryKms(), 'azure' => new InMemoryKms()]);
+        $handle = $store->current('user.email');
+        $reference = $handle->reference;
+        $row = self::rowOf($store);
 
-        $store->rewrap($reference, $wrapped, 'azure');
+        $store->rewrap($row, new DataKey(self::plaintextOf($handle), $row->wrapped), 'azure');
 
         $rewrapped = self::rowOf($store);
         $this->assertSame($reference, $rewrapped->reference);
@@ -157,10 +160,37 @@ class InMemoryDataKeyStoreTest extends TestCase
     public function testRewrapOnAnUnknownReferenceThrows()
     {
         $store = new InMemoryDataKeyStore();
-        $store->current('user.email');
+        $plaintext = self::plaintextOf($store->current('user.email'));
+        $row = self::rowOf($store);
 
         $this->expectException(DataKeyNotFoundException::class);
-        $store->rewrap('nope', self::rowOf($store)->wrapped, 'default');
+        $store->rewrap(new StoredDataKey('nope', $row->scope, $row->wrapped, $row->client, $row->binding), new DataKey($plaintext, $row->wrapped), 'default');
+    }
+
+    public function testRewrappingAKeyThatDoesNotMatchItsRowIsRefused()
+    {
+        $kms = new InMemoryKms();
+        $store = new InMemoryDataKeyStore(['default' => $kms]);
+        $store->current('user.email');
+        $row = self::rowOf($store);
+        $planted = str_repeat('A', 32);
+
+        try {
+            $store->rewrap($row, new DataKey($planted, $kms->encrypt('app', $planted)), 'default');
+            $this->fail('A key that does not match the binding of its row must be refused.');
+        } catch (DecryptionFailedException) {
+        }
+
+        $this->assertEquals($row, self::rowOf($store));
+    }
+
+    public function testAKeyIsBoundUnderTheFirstSecret()
+    {
+        $store = new InMemoryDataKeyStore([], 'default', 'app', 32, null, null, false, ['new', 'old']);
+        $plaintext = self::plaintextOf($store->current('user.email'));
+        $row = self::rowOf($store);
+
+        $this->assertSame(StoredDataKey::bindingFor($row->reference, 'user.email', $plaintext, 'new'), $row->binding);
     }
 
     public function testAMissingClientIsReportedLoudly()
@@ -180,7 +210,7 @@ class InMemoryDataKeyStoreTest extends TestCase
         $plaintext = self::plaintextOf($store->current('user.email'));
         $row = self::rowOf($store);
 
-        $store->rewrap($row->reference, $azure->encrypt('app', $plaintext), 'azure');
+        $store->rewrap($row, new DataKey($plaintext, $azure->encrypt('app', $plaintext)), 'azure');
         $store->forget();
 
         $this->assertSame($plaintext, self::plaintextOf($store->get($row->reference)));
@@ -190,10 +220,10 @@ class InMemoryDataKeyStoreTest extends TestCase
     public function testARowClaimingTheWrongClientFailsToUnwrap()
     {
         $store = self::migratingStore(new OpenSslKms(new InMemoryKeyLoader(['app' => random_bytes(32)])));
-        $store->current('user.email');
+        $plaintext = self::plaintextOf($store->current('user.email'));
         $row = self::rowOf($store);
 
-        $store->rewrap($row->reference, $row->wrapped, 'azure');
+        $store->rewrap($row, new DataKey($plaintext, $row->wrapped), 'azure');
         $store->forget();
 
         $this->expectException(DecryptionFailedException::class);
@@ -205,10 +235,10 @@ class InMemoryDataKeyStoreTest extends TestCase
     {
         $azure = new OpenSslKms(new InMemoryKeyLoader(['app' => random_bytes(32)]));
         $store = self::migratingStore($azure);
-        $store->current('user.email');
+        $plaintext = self::plaintextOf($store->current('user.email'));
         $row = self::rowOf($store);
 
-        $store->rewrap($row->reference, $azure->encrypt('app', random_bytes(32)), 'azure');
+        $store->rewrap($row, new DataKey($plaintext, $azure->encrypt('app', random_bytes(32))), 'azure');
         $store->forget();
 
         $this->expectException(DecryptionFailedException::class);

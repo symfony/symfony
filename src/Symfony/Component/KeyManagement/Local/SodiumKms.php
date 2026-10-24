@@ -33,12 +33,7 @@ use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
  * AAD is forwarded as-is to the AEAD primitive: callers are responsible for
  * any serialization (e.g. canonical JSON for a structured map).
  *
- * Deterministic mode: when `$deterministic` is true, the nonce is derived
- * from the AAD and the plaintext via keyed BLAKE2b
- * (`sodium_crypto_generichash`) under a subkey of the AEAD key, so the same
- * (key, aad, plaintext) triple always yields the same ciphertext. This
- * enables exact-match indexing on encrypted columns at the cost of leaking
- * equality.
+ * Use a blind index for equality lookups while encrypting values with a random nonce.
  *
  * Key material is sourced through a {@see KeyLoaderInterface} so callers can
  * pick between an in-memory map, a directory of files, or any custom loader.
@@ -66,10 +61,10 @@ final class SodiumKms implements DecrypterInterface, EncrypterInterface, DataKey
         }
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
         $key = $this->lookup($keyId);
-        $nonce = $deterministic ? self::syntheticNonce($key, $aad, $plaintext) : random_bytes(\SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
+        $nonce = random_bytes(\SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
         $sealed = sodium_crypto_aead_xchacha20poly1305_ietf_encrypt($plaintext, $aad, $nonce, $key);
 
         return new Ciphertext(\chr(self::VERSION).$nonce.$sealed, $keyId);
@@ -113,29 +108,6 @@ final class SodiumKms implements DecrypterInterface, EncrypterInterface, DataKey
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         return new DataKey($this->decrypt($wrapped, $aad), $wrapped);
-    }
-
-    /**
-     * Derives the nonce of a deterministic encryption from the AAD as well as the plaintext.
-     *
-     * This is what SIV constructions do. Two encryptions differing only by
-     * their AAD must not land on the same nonce: the pair of Poly1305 tags
-     * they would produce under one key reveals the one-time authentication
-     * key, and with it the ability to forge tags for that (key, nonce) pair.
-     * The length prefix keeps the concatenation unambiguous, so no
-     * (aad, plaintext) pair can be read as another one. It spans 8 big-endian
-     * bytes, as the `J` format code would write them, that one being
-     * unavailable on 32-bit builds where no string is ever long enough for the
-     * high word to be anything but zero. The hash is keyed with a subkey
-     * derived from the AEAD key rather than with the AEAD key itself, so the
-     * two primitives never share a key.
-     */
-    private static function syntheticNonce(#[\SensitiveParameter] string $key, string $aad, #[\SensitiveParameter] string $plaintext): string
-    {
-        $nonceKey = sodium_crypto_generichash('nonce', $key, \SODIUM_CRYPTO_GENERICHASH_KEYBYTES);
-        $prefix = pack('NN', \PHP_INT_SIZE >= 8 ? \strlen($aad) >> 32 : 0, \strlen($aad));
-
-        return sodium_crypto_generichash($prefix.$aad.$plaintext, $nonceKey, \SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
     }
 
     private function lookup(string $keyId): string

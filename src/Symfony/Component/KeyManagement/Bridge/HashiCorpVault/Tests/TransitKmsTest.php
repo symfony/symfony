@@ -583,14 +583,6 @@ class TransitKmsTest extends TestCase
         (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('app', 'hello');
     }
 
-    public function testDeterministicModeIsRejected()
-    {
-        $client = new MockHttpClient([], 'https://vault.local/v1/');
-
-        $this->expectException(UnsupportedOperationException::class);
-        (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('app', 'hello', deterministic: true);
-    }
-
     public function testInvalidTokenIsRefreshedAndRetried()
     {
         $tokens = $this->tokenSequence('expired', 'fresh');

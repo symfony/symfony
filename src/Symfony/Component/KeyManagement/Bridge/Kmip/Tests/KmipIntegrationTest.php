@@ -27,7 +27,6 @@ use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
-use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 #[Group('integration')]
 #[Group('kmip-integration')]
@@ -205,11 +204,6 @@ final class KmipIntegrationTest extends TestCase
             $this->assertStringContainsString('\\x0A', $e->getMessage());
             $this->assertStringContainsString('\\x1B', $e->getMessage());
             $this->assertStringNotContainsString("\n", $e->getMessage());
-        }
-        try {
-            $kms->encrypt($keyId, 'data', '', true);
-            $this->fail('Deterministic encryption must fail.');
-        } catch (UnsupportedOperationException) {
         }
 
         $this->expectAuthenticationFailure(static fn () => $kms->decrypt($ciphertext, 'wrong aad'));

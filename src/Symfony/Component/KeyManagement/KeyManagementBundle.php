@@ -32,7 +32,9 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterBlindIndexesPass;
@@ -202,10 +204,21 @@ class KeyManagementBundle extends AbstractBundle
                             ->defaultNull()
                             ->cannotBeEmpty()
                         ->end()
+                        ->arrayNode('allowed_clients')
+                            ->info('Additional clients trusted to wrap and unwrap stored data keys. The store client is always trusted.')
+                            ->scalarPrototype()->cannotBeEmpty()->end()
+                            ->defaultValue([])
+                        ->end()
                         ->scalarNode('key_id')
                             ->info('Master key wrapping the data keys this store creates (backend-specific: alias, ARN, key URL, ...).')
                             ->isRequired()
                             ->cannotBeEmpty()
+                        ->end()
+                        ->arrayNode('secret')
+                            ->info('Secret used to authenticate the stored data keys, defaults to the "kernel.secret" parameter. List several to rotate it: the first one signs, all of them verify.')
+                            ->acceptAndWrap(['string'])
+                            ->performNoDeepMerging()
+                            ->scalarPrototype()->cannotBeEmpty()->end()
                         ->end()
                         ->scalarNode('table')
                             ->info('Name of the table holding the wrapped data keys.')
@@ -221,7 +234,7 @@ class KeyManagementBundle extends AbstractBundle
                             ->defaultFalse()
                         ->end()
                         ->variableNode('max_age')
-                            ->info('Seconds after which the current data key of a scope is retired in favour of a fresh one; the default of 30 days keeps what one key seals under the collision bound of the random 96-bit IV each payload carries. 0 retires the key on every call, null never retires it.')
+                            ->info('Seconds after which the current data key of a scope is retired; this does not enforce a usage limit. The default is 30 days; 0 forces rotation on every call and null disables retirement.')
                             ->defaultValue(2592000)
                             ->validate()
                                 ->ifTrue(static fn ($maxAge): bool => null !== $maxAge && (!\is_int($maxAge) || $maxAge < 0))
@@ -407,9 +420,7 @@ class KeyManagementBundle extends AbstractBundle
      * per-client encrypters stay reachable under their own name for whoever wants the other regime
      * explicitly.
      *
-     * The clients it can rewrap a data key under are the tagged ones rather than the configured
-     * ones, so a client contributed by a bundle is a rewrap target as well. The one it wraps with
-     * is still checked against the configuration, where a typo can be reported against a name.
+     * The store and its rewrap command use only explicitly trusted clients.
      *
      * @param list<string> $clientNames
      */
@@ -432,12 +443,26 @@ class KeyManagementBundle extends AbstractBundle
             throw new LogicException('The "key_management.store.read_self_contained" option needs a client to read those payloads with: set "key_management.default_client", or turn the option off.');
         }
 
+        $allowedClients = [$client => new Reference('key_management.'.$client)];
+        foreach ($config['allowed_clients'] as $name) {
+            if (!\in_array($name, $clientNames, true)) {
+                throw new LogicException(\sprintf('The KMS client "%s" set in "key_management.store.allowed_clients" is not registered in "key_management.clients".', $name));
+            }
+
+            $allowedClients[$name] = new Reference('key_management.'.$name);
+        }
+
+        $container->register('.key_management.store.clients', ServiceLocator::class)
+            ->setArguments([$allowedClients])
+            ->addTag('container.service_locator');
+
         $container->register('key_management.store', DataKeyStore::class)
             ->setArguments([
                 new Reference($config['connection']),
-                new ServiceLocatorArgument(new TaggedIteratorArgument('key_management.client', 'key', true)),
+                new Reference('.key_management.store.clients'),
                 $client,
                 $config['key_id'],
+                $config['secret'] ?: new Parameter('kernel.secret'),
                 $config['table'],
                 32,
                 $config['max_age'],

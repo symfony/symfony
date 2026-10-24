@@ -74,6 +74,10 @@ final class SelfContainedFormat extends EnvelopeFormat
      */
     public function parse(string $bytes): Envelope
     {
+        if ('' === $bytes || self::ID !== \ord($bytes[0])) {
+            throw new InvalidArgumentException('Invalid envelope format.');
+        }
+
         $length = \strlen($bytes);
         $offset = 1;
 

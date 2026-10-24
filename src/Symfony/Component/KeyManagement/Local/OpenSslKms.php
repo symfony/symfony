@@ -16,6 +16,7 @@ use Symfony\Component\KeyManagement\DataKey;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DecrypterInterface;
 use Symfony\Component\KeyManagement\EncrypterInterface;
+use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
@@ -36,12 +37,12 @@ use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
  * AAD is forwarded as-is to the AEAD primitive: callers are responsible for
  * any serialization (e.g. canonical JSON for a structured map).
  *
- * Deterministic mode: when `$deterministic` is true, the IV is derived from
- * the AAD and the plaintext via `HMAC-SHA512(len(aad) || aad || plaintext,
- * HMAC-SHA256("nonce", key))` truncated to 12 bytes, yielding the same
- * ciphertext for the same (key, aad, plaintext) triple. This enables
- * exact-match indexing on encrypted columns at the cost of leaking equality.
- * Decrypt is unchanged: the IV is read from the blob either way.
+ * Each encryption draws a random 96-bit IV, so NIST SP 800-38D limits a key to 2^32 encryptions.
+ * Wrapping a data key counts as one, for each envelope that {@see EnvelopeEncrypter} writes.
+ * Use {@see SodiumKms} for a key that encrypts more values.
+ * Its 192-bit nonces don't have that limit.
+ *
+ * Use a blind index for equality lookups while encrypting values with a random nonce.
  *
  * Key material is sourced through a {@see KeyLoaderInterface} so callers can
  * pick between an in-memory map, a directory of files, or any custom loader.
@@ -71,10 +72,10 @@ final class OpenSslKms implements DecrypterInterface, EncrypterInterface, DataKe
         }
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
         $key = $this->lookup($keyId);
-        $iv = $deterministic ? self::syntheticIv($key, $aad, $plaintext) : random_bytes(self::IV_BYTES);
+        $iv = random_bytes(self::IV_BYTES);
         $tag = '';
 
         $ciphertext = openssl_encrypt($plaintext, self::CIPHER, $key, \OPENSSL_RAW_DATA, $iv, $tag, $aad, self::TAG_BYTES);
@@ -117,34 +118,12 @@ final class OpenSslKms implements DecrypterInterface, EncrypterInterface, DataKe
 
         $plaintext = random_bytes($length);
 
-        return new DataKey($plaintext, $this->encrypt($keyId, $plaintext, $aad, false));
+        return new DataKey($plaintext, $this->encrypt($keyId, $plaintext, $aad));
     }
 
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         return new DataKey($this->decrypt($wrapped, $aad), $wrapped);
-    }
-
-    /**
-     * Derives the IV of a deterministic encryption from the AAD as well as the plaintext.
-     *
-     * This is what SIV constructions do. Two encryptions differing only by
-     * their AAD must not land on the same IV: the pair of GCM tags they would
-     * produce under one key reveals the authentication subkey, and with it the
-     * ability to forge tags for anything encrypted under that key. The length
-     * prefix keeps the concatenation unambiguous, so no (aad, plaintext) pair
-     * can be read as another one. It spans 8 big-endian bytes, as the `J`
-     * format code would write them, that one being unavailable on 32-bit builds
-     * where no string is ever long enough for the high word to be anything but
-     * zero. The HMAC is keyed with a subkey derived from the AEAD key rather
-     * than with the AEAD key itself, so the two primitives never share a key.
-     */
-    private static function syntheticIv(#[\SensitiveParameter] string $key, string $aad, #[\SensitiveParameter] string $plaintext): string
-    {
-        $ivKey = hash_hmac('sha256', 'nonce', $key, true);
-        $prefix = pack('NN', \PHP_INT_SIZE >= 8 ? \strlen($aad) >> 32 : 0, \strlen($aad));
-
-        return substr(hash_hmac('sha512', $prefix.$aad.$plaintext, $ivKey, true), 0, self::IV_BYTES);
     }
 
     private function lookup(string $keyId): string

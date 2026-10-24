@@ -12,11 +12,12 @@
 namespace Symfony\Component\KeyManagement\Test;
 
 use Psr\Clock\ClockInterface;
-use Symfony\Component\KeyManagement\Ciphertext;
+use Symfony\Component\KeyManagement\DataKey;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
+use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface;
 use Symfony\Component\KeyManagement\StoredDataKey;
@@ -54,10 +55,18 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
     private readonly array $clients;
 
     /**
+     * @var non-empty-list<string>
+     */
+    private readonly array $secrets;
+
+    /**
      * @param array<string, DataKeyGeneratorInterface> $clients             KMS clients indexed by name; defaults to a single {@see InMemoryKms} under `$client`
      * @param positive-int                             $keyBytes            Length of the data keys to generate
      * @param int<0, max>|null                         $maxAgeSeconds       Age past which {@see current()} rotates; `0` rotates on every call, `null` never
      * @param bool                                     $bindWrappingContext Whether the wrapping of a data key is authenticated by the backend, {@see StoredDataKey::wrappingContextFor()}
+     * @param string|non-empty-list<string>|null       $secret              Secret authenticating the stored keys, or a list of secrets to rotate it: the first one signs, all of them verify; random unless given
+     *
+     * @throws InvalidArgumentException If a secret is empty
      */
     public function __construct(
         array $clients = [],
@@ -67,8 +76,14 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
         private readonly ?int $maxAgeSeconds = null,
         private readonly ?ClockInterface $clock = null,
         private readonly bool $bindWrappingContext = false,
+        #[\SensitiveParameter] string|array|null $secret = null,
     ) {
         $this->clients = $clients ?: [$this->client => new InMemoryKms()];
+        $this->secrets = \is_array($secret) ? array_values($secret) : [$secret ?? random_bytes(32)];
+
+        if (!$this->secrets || \in_array('', $this->secrets, true)) {
+            throw new InvalidArgumentException('A data key store needs a secret, and none of its secrets can be empty.');
+        }
     }
 
     public function current(string $scope): DataKeyHandle
@@ -98,11 +113,25 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
      * Rewrapping changes how the data key is protected, not the key itself, so anything already
      * encrypted with it stays valid.
      */
-    public function rewrap(string $reference, Ciphertext $wrapped, string $client): void
+    public function rewrap(StoredDataKey $row, DataKey $rewrapped, string $client): void
     {
-        $row = $this->rows[$reference] ?? throw new DataKeyNotFoundException($reference);
+        $this->clientFor($client);
+        $stored = $this->rows[$row->reference] ?? null;
 
-        $this->rows[$reference] = new StoredDataKey($reference, $row->scope, $wrapped, $client, $row->binding);
+        if (null === $stored || $stored->scope !== $row->scope || $stored->binding !== $row->binding) {
+            throw new DataKeyNotFoundException($row->reference);
+        }
+
+        $secrets = $this->secrets;
+        $binding = $rewrapped->use(static function (#[\SensitiveParameter] string $plaintext) use ($row, $secrets): string {
+            if (!self::isBound($row, $plaintext, $secrets)) {
+                throw new DecryptionFailedException();
+            }
+
+            return StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext, $secrets[0]);
+        });
+
+        $this->rows[$row->reference] = new StoredDataKey($row->reference, $row->scope, $rewrapped->wrapped, $client, $binding);
     }
 
     public function wrappingContextOf(StoredDataKey $row): string
@@ -121,7 +150,8 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
         $reference = (new UuidV7(UuidV7::generate($this->clock?->now())))->toBinary();
         $dataKey = $this->clientFor($this->client)->generateDataKey($this->masterKeyId, $this->keyBytes, $this->wrappingContext($reference, $scope));
         $handle = new DataKeyHandle($reference, $dataKey);
-        $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($reference, $scope, $plaintext));
+        $secret = $this->secrets[0];
+        $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($reference, $scope, $plaintext, $secret));
 
         $this->rows[$reference] = new StoredDataKey($reference, $scope, $dataKey->wrapped, $this->client, $binding);
 
@@ -144,19 +174,28 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
 
     private function handleFor(StoredDataKey $row): DataKeyHandle
     {
-        if (isset($this->handles[$row->reference]) && !$this->handles[$row->reference]->isReleased()) {
-            return $this->handles[$row->reference];
+        $client = $this->clientFor($row->client);
+        $handle = $this->handles[$row->reference] ?? null;
+        if (null === $handle || $handle->isReleased()) {
+            $handle = new DataKeyHandle($row->reference, $client->unwrapDataKey($row->wrapped, $this->wrappingContext($row->reference, $row->scope)));
         }
 
-        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped, $this->wrappingContext($row->reference, $row->scope)));
-
-        if (!$handle->use(static fn (#[\SensitiveParameter] string $plaintext): bool => hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext)))) {
+        $secrets = $this->secrets;
+        if (!$handle->use(static fn (#[\SensitiveParameter] string $plaintext): bool => self::isBound($row, $plaintext, $secrets))) {
             $handle->release();
 
             throw new DecryptionFailedException();
         }
 
         return $this->handles[$row->reference] = $handle;
+    }
+
+    /**
+     * @param non-empty-list<string> $secrets
+     */
+    private static function isBound(StoredDataKey $row, #[\SensitiveParameter] string $plaintext, #[\SensitiveParameter] array $secrets): bool
+    {
+        return array_any($secrets, static fn (#[\SensitiveParameter] string $secret): bool => hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext, $secret)));
     }
 
     private function newest(string $scope): ?StoredDataKey

@@ -28,7 +28,6 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
-use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 use Symfony\Component\KeyManagement\Exception\UnsupportedSchemeException;
 
 final class KmipKmsTest extends TestCase
@@ -57,8 +56,9 @@ final class KmipKmsTest extends TestCase
         $kms = new KmipKms($client);
 
         $this->assertInstanceOf(KmipKms::class, $kms);
-        $this->expectException(UnsupportedOperationException::class);
-        $kms->encrypt('key', 'plaintext', '', true);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Test client was called.');
+        $kms->encrypt('key', 'plaintext');
     }
 
     public function testOversizedStoredCiphertextIsRejectedAsInvalidCiphertext()
@@ -322,14 +322,6 @@ final class KmipKmsTest extends TestCase
     {
         $this->assertSame('missing\\xC29B[31m', (new \ReflectionMethod(KmipKms::class, 'safeKeyId'))->invoke(null, "missing\u{009B}[31m"));
         $this->assertSame('missing\\xE280AEevil', (new \ReflectionMethod(KmipKms::class, 'safeKeyId'))->invoke(null, "missing\u{202E}evil"));
-    }
-
-    public function testDeterministicModeIsRejectedBeforeOpeningAConnection()
-    {
-        $kms = self::kms();
-
-        $this->expectException(UnsupportedOperationException::class);
-        $kms->encrypt('key', 'plaintext', '', true);
     }
 
     public function testSecretHoldersAreNotDumpableOrSerializable()

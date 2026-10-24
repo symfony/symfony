@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Tests\Local;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\Ciphertext;
@@ -57,46 +58,30 @@ class OpenSslKmsTest extends TestCase
         $this->assertNotSame($a, $b, 'A fresh IV must be drawn for every encryption.');
     }
 
-    public function testDeterministicModeYieldsTheSameCiphertext()
-    {
-        $a = $this->kms->encrypt('app', 'hello', deterministic: true)->blob;
-        $b = $this->kms->encrypt('app', 'hello', deterministic: true)->blob;
-        $c = $this->kms->encrypt('app', 'world', deterministic: true)->blob;
-
-        $this->assertSame($a, $b, 'Deterministic mode must produce identical ciphertexts for the same plaintext.');
-        $this->assertNotSame($a, $c, 'Different plaintexts must still produce different ciphertexts.');
-    }
-
-    public function testDeterministicCiphertextRoundTrips()
-    {
-        $ciphertext = $this->kms->encrypt('app', 'hello', deterministic: true);
-
-        $this->assertSame('hello', $this->kms->decrypt($ciphertext));
-    }
-
-    public function testDeterministicModeDerivesTheIvFromTheAadToo()
-    {
-        $acme = $this->kms->encrypt('app', 'hello', 'tenant=acme', true)->blob;
-        $globex = $this->kms->encrypt('app', 'hello', 'tenant=globex', true)->blob;
-
-        $this->assertNotSame(self::ivOf($acme), self::ivOf($globex), 'Two AADs sharing an IV under the same key would reveal the GCM authentication subkey.');
-        $this->assertSame($acme, $this->kms->encrypt('app', 'hello', 'tenant=acme', true)->blob, 'The same (key, aad, plaintext) triple must still produce the same ciphertext.');
-    }
-
-    public function testDeterministicIvIsIndependentOfThePlatformIntegerSize()
+    #[DataProvider('provideLegacyDeterministicCiphertexts')]
+    public function testDecryptLegacyDeterministicCiphertext(string $plaintext, string $aad, string $blob)
     {
         $kms = new OpenSslKms(new InMemoryKeyLoader(['app' => str_repeat("\x01", 32)]));
 
-        $blob = $kms->encrypt('app', 'hello', 'tenant=acme', true)->blob;
-
-        $this->assertSame('2c8a4c867d43aefe06ca3a9d', bin2hex(self::ivOf($blob)), 'A deterministic ciphertext outlives the process that wrote it: 32-bit and 64-bit builds must derive the same IV.');
+        $this->assertSame($plaintext, $kms->decrypt(new Ciphertext(hex2bin($blob), 'app'), $aad));
     }
 
-    public function testDeterministicCiphertextWithAadRoundTrips()
+    #[DataProvider('provideLegacyDeterministicCiphertexts')]
+    public function testCannotDecryptLegacyDeterministicCiphertextWithWrongAad(string $plaintext, string $aad, string $blob)
     {
-        $ciphertext = $this->kms->encrypt('app', 'hello', 'tenant=acme', true);
+        $kms = new OpenSslKms(new InMemoryKeyLoader(['app' => str_repeat("\x01", 32)]));
 
-        $this->assertSame('hello', $this->kms->decrypt($ciphertext, 'tenant=acme'));
+        $this->expectException(DecryptionFailedException::class);
+
+        $kms->decrypt(new Ciphertext(hex2bin($blob), 'app'), $aad.'-changed');
+    }
+
+    public static function provideLegacyDeterministicCiphertexts(): iterable
+    {
+        yield 'plain' => ['hello', '', '013db53c318d437d074bb8d7ae1296e7753517b22de1f3ffd370559c0dd7cd353152'];
+        yield 'aad' => ['hello', 'tenant=acme', '012c8a4c867d43aefe06ca3a9d56218d66ff0dd5b23e36350655c78baec2aee589ed'];
+        yield 'empty' => ['', '', '01a39aab0505f01a295ecde7d73385f257a840d7af67ad8e6f0300a537'];
+        yield 'binary' => ["\x00\xff", "opaque\x00", '01f9708e81f934d57cc793fea5abd5abf3a2205ddb696fbff1f7f811306138'];
     }
 
     public function testDecryptionFailsOnTamperedCiphertext()
@@ -200,10 +185,5 @@ class OpenSslKmsTest extends TestCase
 
         $this->expectException(DecryptionFailedException::class);
         $this->kms->unwrapDataKey($tampered);
-    }
-
-    private static function ivOf(string $blob): string
-    {
-        return substr($blob, 1, 12);
     }
 }

@@ -16,7 +16,7 @@ use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\KeyManagement\Ciphertext;
+use Symfony\Component\KeyManagement\DataKey;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DecrypterInterface;
 use Symfony\Component\KeyManagement\EncrypterInterface;
@@ -33,6 +33,9 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  * Each row is unwrapped with the client it records and re-wrapped with the target one, then the row
  * is updated. Encrypted payloads are neither read nor rewritten: they keep referring to the same
  * data keys, which is the whole point of holding those keys in a store.
+ *
+ * The store checks each key against the binding of its row, then binds the key again under its first secret.
+ * This is how the stored keys move to a new secret before an old one is removed.
  *
  * Both halves are bound to the context the store wraps with,
  * {@see RewrappableDataKeyStoreInterface::wrappingContextOf()}. `--accept-unbound` also accepts a key
@@ -80,6 +83,12 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
         under no context. Every key is re-wrapped under the context of the store, never under none:
 
           <info>%command.invocation% --to=vault --key-id=app-dek --accept-unbound</info>
+
+        Every key is also bound again under the first secret of the store. To retire an
+        old secret, run the command once with the current client and master key, then
+        remove the old secret:
+
+          <info>%command.invocation% --to=aws --key-id=alias/app-key</info>
         HELP,
 )]
 final class RewrapDataKeysCommand
@@ -87,7 +96,7 @@ final class RewrapDataKeysCommand
     use CommandTrait;
 
     /**
-     * @param ServiceProviderInterface<EncrypterInterface&DecrypterInterface>|null $clients
+     * @param ServiceProviderInterface<EncrypterInterface&DecrypterInterface>|null $clients Clients trusted by the store
      */
     public function __construct(
         private readonly ?RewrappableDataKeyStoreInterface $store = null,
@@ -147,7 +156,7 @@ final class RewrapDataKeysCommand
 
             try {
                 if (!$dryRun) {
-                    $this->store->rewrap($row->reference, $this->rewrap($row, $target, $keyId, $this->store->wrappingContextOf($row), $acceptUnbound), $to);
+                    $this->store->rewrap($row, $this->rewrap($row, $target, $keyId, $this->store->wrappingContextOf($row), $acceptUnbound), $to);
                 }
                 ++$moved;
                 $io->writeln(\sprintf('%s %s (scope "%s") from "%s" to "%s"', $dryRun ? 'Would move' : 'Moved', $reference, $row->scope, $row->client, $to), OutputInterface::VERBOSITY_VERBOSE);
@@ -173,13 +182,10 @@ final class RewrapDataKeysCommand
     /**
      * Unwraps through {@see DataKeyGeneratorInterface::unwrapDataKey()}, not a bare `decrypt()`.
      *
-     * That keeps the plaintext inside a {@see DataKey}, which wipes it once re-wrapped.
-     *
-     * This is the one path that opens a stored key without going through the store, so the binding is
-     * checked here too: a row the store refuses to open is reported and left as it is, instead of
-     * being re-wrapped into a row the store still refuses.
+     * That keeps the plaintext inside a {@see DataKey}, and the store wipes it after writing the row.
+     * The store checks the binding before writing, so a row it refuses to open is reported and left as it is.
      */
-    private function rewrap(StoredDataKey $row, EncrypterInterface $target, string $keyId, string $context, bool $acceptUnbound): Ciphertext
+    private function rewrap(StoredDataKey $row, EncrypterInterface $target, string $keyId, string $context, bool $acceptUnbound): DataKey
     {
         $source = $this->clients?->has($row->client) ? $this->clients->get($row->client) : null;
 
@@ -202,12 +208,6 @@ final class RewrapDataKeysCommand
             }
         }
 
-        return $unwrapped->use(static function (#[\SensitiveParameter] string $dataKey) use ($row, $target, $keyId, $context): Ciphertext {
-            if (!hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $dataKey))) {
-                throw new DecryptionFailedException();
-            }
-
-            return $target->encrypt($keyId, $dataKey, $context);
-        });
+        return $unwrapped->use(static fn (#[\SensitiveParameter] string $dataKey): DataKey => new DataKey($dataKey, $target->encrypt($keyId, $dataKey, $context)));
     }
 }

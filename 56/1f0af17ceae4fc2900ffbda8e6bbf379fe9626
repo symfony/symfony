@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-23T21:57:26Z
+
+After the split, this PR now only contains the Cache and Messenger alignment, the two components that are new in 8.2. The Session and Lock changes have moved to #67403.

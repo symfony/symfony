@@ -1482,8 +1482,78 @@ tr.status-warning td {
 #sidebar-search .form-group select {
     font-size: 13px;
 }
-#sidebar-search select#method {
-    width: 11ch;
+#sidebar-search .method-filter {
+    margin-right: 8px;
+    position: relative;
+}
+#sidebar-search .method-filter summary {
+    align-items: center;
+    box-sizing: border-box;
+    background: var(--button-background);
+    border: 1px solid var(--button-border-color);
+    border-radius: 6px;
+    box-shadow: var(--button-box-shadow);
+    color: var(--button-color);
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    font-weight: 500;
+    height: 25px;
+    padding: 0 8px;
+    width: 12ch;
+}
+#sidebar-search .method-filter summary .icon {
+    flex-shrink: 0;
+    height: 18px;
+    margin-right: 7px;
+    width: 18px;
+}
+#sidebar-search .method-filter summary svg {
+    height: 18px;
+    opacity: 0.7;
+    stroke-width: 2;
+    width: 18px;
+}
+#sidebar-search .method-filter-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+#sidebar-search .method-filter-count {
+    flex-shrink: 0;
+    margin-left: 4px;
+}
+#sidebar-search .method-filter-content {
+    background: var(--base-0);
+    border: 1px solid var(--table-border-color);
+    border-radius: 6px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    left: 0;
+    min-width: 200px;
+    padding: 15px;
+    position: absolute;
+    top: 32px;
+    z-index: 9999;
+}
+#sidebar-search .method-filter-actions {
+    margin-bottom: 10px;
+}
+#sidebar-search .method-filter-actions button + button {
+    margin-left: 15px;
+}
+#sidebar-search .method-filter-option {
+    align-items: center;
+    display: flex;
+}
+#sidebar-search .method-filter-option + .method-filter-option {
+    margin-top: 7px;
+}
+#sidebar-search .method-filter-option label {
+    cursor: pointer;
+    flex: 1;
+    margin: 0;
+    padding-left: 10px;
 }
 #sidebar-search input#status_code {
     width: 8ch;

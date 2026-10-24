@@ -13,6 +13,7 @@
         constructor() {
             this.#createTabs();
             this.#createTableSearchFields();
+            this.#createMethodFilters();
             this.#createToggles();
             this.#createCopyToClipboard();
             this.#convertDateTimesToUserTimezone();
@@ -139,6 +140,41 @@
                 });
 
                 tabGroup.setAttribute('data-processed', 'true');
+            });
+        }
+
+        #createMethodFilters() {
+            document.querySelectorAll('details.method-filter').forEach((filter) => {
+                const inputs = Array.from(filter.querySelectorAll('input[type="checkbox"]'));
+                const summary = filter.querySelector('summary');
+                const label = filter.querySelector('.method-filter-label');
+                const count = filter.querySelector('.method-filter-count');
+
+                const updateLabel = () => {
+                    const selected = inputs.filter((input) => input.checked).map((input) => input.value);
+                    const isAll = 0 === selected.length || selected.length === inputs.length;
+
+                    label.textContent = isAll ? 'All' : selected.join(', ');
+                    count.textContent = !isAll && selected.length > 1 ? `(${selected.length})` : '';
+                    summary.title = isAll ? '' : selected.join(', ');
+                };
+
+                inputs.forEach((input) => input.addEventListener('change', updateLabel));
+
+                filter.querySelectorAll('.method-filter-actions button').forEach((button) => {
+                    button.addEventListener('click', () => {
+                        inputs.forEach((input) => { input.checked = button.classList.contains('select-all'); });
+                        updateLabel();
+                    });
+                });
+
+                document.body.addEventListener('click', (event) => {
+                    if (!filter.contains(event.target)) {
+                        filter.open = false;
+                    }
+                });
+
+                updateLabel();
             });
         }
 

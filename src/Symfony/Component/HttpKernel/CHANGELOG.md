@@ -38,6 +38,7 @@ CHANGELOG
  * Add the `$target` argument to `#[Cache]` to set the targeted cache directives defined by RFC 9213, e.g. `CDN-Cache-Control`
  * Add the `$logger` argument to `InlineFragmentRenderer::__construct()` to log the exception thrown by a fragment before rendering its `alt` URI
  * Show previous exceptions in the profiler instead of cutting them
+ * Allow `FileProfilerStorage::find()` to filter on a comma-separated list of HTTP methods
 
 8.1
 ---

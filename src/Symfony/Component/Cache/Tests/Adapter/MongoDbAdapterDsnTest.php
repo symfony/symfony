@@ -56,6 +56,17 @@ class MongoDbAdapterDsnTest extends TestCase
             'mongodb://localhost/mydb',
         ];
 
+        foreach (['%61pp' => 'app', '%2561pp' => '%61pp', '0' => '0', '%30' => '0'] as $path => $database) {
+            yield 'database path '.$path => [
+                'mongodb://localhost/'.$path,
+                [],
+                $database,
+                'cache_items',
+                '',
+                'mongodb://localhost/'.$path,
+            ];
+        }
+
         yield 'default database and collection when the DSN carries neither' => [
             'mongodb://localhost',
             [],

@@ -25,6 +25,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithIterable;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNumericStreamedNames;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithQuotes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
@@ -183,6 +184,16 @@ class JsonStreamReaderTest extends TestCase
             $this->assertInstanceOf(DummyWithNameAttributes::class, $read);
             $this->assertSame(10, $read->id);
         }, '{"@id": 10}', Type::object(DummyWithNameAttributes::class));
+    }
+
+    public function testReadObjectWithNumericStreamedNames()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithNumericStreamedNames::class, $read);
+            $this->assertSame([10, 20, 'twelve'], [$read->first, $read->second, $read->third]);
+        }, '{"0": 10, "1": 20, "12": "twelve"}', Type::object(DummyWithNumericStreamedNames::class));
     }
 
     public function testReadObjectWithValueTransformer()

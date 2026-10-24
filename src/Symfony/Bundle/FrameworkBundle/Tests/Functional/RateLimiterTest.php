@@ -49,6 +49,16 @@ class RateLimiterTest extends AbstractWebTestCase
         self::assertResponseStatusCodeSame(429);
     }
 
+    public function testInlineLimiter()
+    {
+        $client = self::createClient(['test_case' => 'RateLimiter']);
+
+        $this->consumeAllTokens($client, '/inline');
+
+        $client->request('GET', '/inline');
+        self::assertResponseStatusCodeSame(429);
+    }
+
     private function consumeAllTokens(KernelBrowser $client, string $uri): void
     {
         for ($i = 0; $i < 5; ++$i) {

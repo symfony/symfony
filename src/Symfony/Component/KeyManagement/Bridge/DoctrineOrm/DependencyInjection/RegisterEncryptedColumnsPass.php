@@ -16,20 +16,19 @@ use Doctrine\ORM\Mapping\DefaultTypedFieldMapper;
 use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\Encrypted;
 
 /**
- * Registers an encrypted type for each key and type of the columns marked with {@see Encrypted}.
+ * Registers the encrypted types and entity manager configurators needed by {@see Encrypted} columns.
  *
- * The types must be registered before the first query, even when the metadata comes from the cache, so they are collected when the container is compiled.
- * {@see self::autoconfigure()} tags the entities, embeddables and mapped superclasses that the container loads with their encrypted columns.
- * This pass then adds one type per key and type to the types declared in "key_management.doctrine_dbal.types".
- * A declared type is used for the columns of its key and type, instead of registering another one.
- *
- * {@see \Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener} gets the names of all these types.
+ * Explicit keys use types collected during container compilation, including matching configured declarations.
+ * Columns whose key is omitted get their scope from resolved ORM metadata after the entity manager is constructed.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
@@ -74,8 +73,18 @@ final class RegisterEncryptedColumnsPass implements CompilerPassInterface
             $names[$type['key']][$type['type']] ??= $name;
         }
 
+        $automatic = false;
         foreach ($container->findTaggedResourceIds(self::TAG, false) as $id => $tags) {
             foreach ($tags as ['key' => $key, 'type' => $type]) {
+                if (null === $key) {
+                    if (!$container->hasDefinition('key_management.stored_envelope_encrypter')) {
+                        throw new \LogicException(\sprintf('An encrypted column of "%s" omits its key and needs a data key store: configure "key_management.store", or set an explicit key.', $container->getDefinition($id)->getClass()));
+                    }
+
+                    $automatic = true;
+                    continue;
+                }
+
                 if (isset($names[$key][$type])) {
                     continue;
                 }
@@ -96,6 +105,19 @@ final class RegisterEncryptedColumnsPass implements CompilerPassInterface
         }
 
         $container->getDefinition(self::LISTENER)->setArgument(0, $names);
+
+        if ($automatic) {
+            $container->getDefinition(self::LISTENER)->setArgument(1, new LazyProxyArgument(new Reference('key_management.stored_envelope_encrypter')));
+
+            foreach ($container->hasParameter('doctrine.entity_managers') ? $container->getParameter('doctrine.entity_managers') : [] as $id) {
+                $manager = $container->findDefinition($id);
+                $previous = $manager->getConfigurator();
+                $configurator = null === $previous ? null : (new Definition(\Closure::class))->setFactory([\Closure::class, 'fromCallable'])->setArguments([$previous]);
+                $name = '.key_management.configure_encrypted_columns.'.$id;
+                $container->register($name, ConfigureEncryptedColumns::class)->setArguments([new Reference(self::LISTENER), $configurator]);
+                $manager->setConfigurator([new Reference($name), '__invoke']);
+            }
+        }
 
         if (!$types) {
             $container->removeDefinition(self::TYPES);

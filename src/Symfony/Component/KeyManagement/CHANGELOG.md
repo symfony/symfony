@@ -12,3 +12,4 @@ CHANGELOG
  * Add `StoredDataKey::wrappingContextFor()` and `RewrappableDataKeyStoreInterface::wrappingContextOf()`
  * Add the `key_management.store.bind_wrapping_context` option, and `--accept-unbound` to `key-management:rewrap-data-keys`
  * Add an optional `$bindWrappingContext` argument to `InMemoryDataKeyStore`
+ * Authenticate the AAD of `EnvelopeEncrypter` locally without forwarding it to the KMS

@@ -97,13 +97,19 @@ final class TransitKmsIntegrationTest extends TestCase
         );
     }
 
-    public function testCiphertextsWrittenBeforeStillDecrypt()
+    public function testCiphertextsWrittenBeforeWithANonDerivedKeyStillDecrypt()
     {
-        $kms = $this->transit($this->appToken());
+        $fixture = json_decode(file_get_contents(self::FIXTURES.'/ciphertexts.json'), true, flags: \JSON_THROW_ON_ERROR)['non-derived key'];
 
-        foreach (json_decode(file_get_contents(self::FIXTURES.'/ciphertexts.json'), true, flags: \JSON_THROW_ON_ERROR) as $name => $fixture) {
-            $this->assertSame($fixture['plaintext'], $kms->decrypt(new Ciphertext($fixture['ciphertext'], $fixture['key']), $fixture['aad']), $name);
-        }
+        $this->assertSame($fixture['plaintext'], $this->transit($this->appToken())->decrypt(new Ciphertext($fixture['ciphertext'], $fixture['key']), $fixture['aad']));
+    }
+
+    public function testCiphertextsWrittenWithAnUnframedDerivedContextAreRefused()
+    {
+        $fixture = json_decode(file_get_contents(self::FIXTURES.'/ciphertexts.json'), true, flags: \JSON_THROW_ON_ERROR)['derived key with AAD'];
+
+        $this->expectException(DecryptionFailedException::class);
+        $this->transit($this->appToken())->decrypt(new Ciphertext($fixture['ciphertext'], $fixture['key']), $fixture['aad']);
     }
 
     public function testAadIsRefusedOnANonDerivedKey()
@@ -121,6 +127,18 @@ final class TransitKmsIntegrationTest extends TestCase
 
         $this->expectException(DecryptionFailedException::class);
         $kms->decrypt($ciphertext, 'tenant-b');
+    }
+
+    public function testADerivedKeyWrapsDataKeysWithoutAnAad()
+    {
+        $kms = $this->transit($this->appToken(self::POLICY_WITHOUT_KEY_READ));
+        $dataKey = $kms->generateDataKey(self::DERIVED_KEY, 32);
+
+        $this->assertSame(
+            $dataKey->use(static fn (string $key): string => $key),
+            $kms->unwrapDataKey($dataKey->wrapped)->use(static fn (string $key): string => $key),
+            'Vault refuses a derived key without a context, so the data key path binds one of its own.',
+        );
     }
 
     public function testRevokedTokenIsReplacedAndTheRequestRetried()

@@ -64,9 +64,10 @@ interface DataKeyGeneratorInterface
      *
      * @param string $aad Must match the AAD supplied at wrap time
      *
-     * @throws KeyNotFoundException      If the wrapped ciphertext's key is unknown
-     * @throws DecryptionFailedException If the backend identifies tampering, a wrong key, or an AAD mismatch
-     * @throws RuntimeException          If the backend reports an operational or ambiguous failure that it cannot identify as a ciphertext failure
+     * @throws KeyNotFoundException          If the wrapped ciphertext's key is unknown
+     * @throws DecryptionFailedException     If the backend identifies tampering, a wrong key, or an AAD mismatch
+     * @throws RuntimeException              If the backend reports an operational or ambiguous failure that it cannot identify as a ciphertext failure
+     * @throws UnsupportedOperationException If `$aad` is non-empty and the backend cannot enforce it
      */
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey;
 }

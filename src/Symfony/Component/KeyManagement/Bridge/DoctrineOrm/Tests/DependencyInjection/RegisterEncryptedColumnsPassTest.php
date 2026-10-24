@@ -16,13 +16,19 @@ use Doctrine\ORM\Mapping\Entity;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterEncryptedColumnsPass;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\Fixtures\Automatic\AutomaticRecord;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\Fixtures\EncryptedColumnsAddress;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\Fixtures\EncryptedColumnsEntity;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\Fixtures\PlainEntity;
+use Symfony\Component\KeyManagement\Envelope;
+use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
+use Symfony\Component\KeyManagement\Test\InMemoryDataKeyStore;
 
 class RegisterEncryptedColumnsPassTest extends TestCase
 {
@@ -150,6 +156,82 @@ class RegisterEncryptedColumnsPassTest extends TestCase
         (new RegisterEncryptedColumnsPass())->process($container);
 
         $this->assertTrue($container->hasDefinition('key_management.doctrine_dbal.encrypted_types'));
+    }
+
+    public function testAnOmittedKeyNeedsAStoreEvenWithADefaultEncrypter()
+    {
+        $container = $this->createContainer([]);
+        $container->register('.abstract.person', EncryptedColumnsEntity::class)
+            ->addResourceTag('key_management.encrypted_column', ['key' => null, 'type' => 'string']);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('omits its key and needs a data key store');
+
+        (new RegisterEncryptedColumnsPass())->process($container);
+    }
+
+    public function testAutomaticColumnsConfigureTheEntityManagers()
+    {
+        $container = $this->createContainer([]);
+        $container->register('key_management.stored_envelope_encrypter', StoredEnvelopeEncrypter::class);
+        $container->register('.abstract.person', EncryptedColumnsEntity::class)
+            ->addResourceTag('key_management.encrypted_column', ['key' => null, 'type' => 'string']);
+        $container->register('app.manager', \Doctrine\ORM\EntityManager::class)->setConfigurator('app_configure_manager');
+        $container->setParameter('doctrine.entity_managers', ['default' => 'app.manager']);
+
+        (new RegisterEncryptedColumnsPass())->process($container);
+
+        $this->assertNotSame('app_configure_manager', $container->getDefinition('app.manager')->getConfigurator());
+        $this->assertFalse($container->hasDefinition('key_management.doctrine_dbal.encrypted_types'));
+        $this->assertSame([], $container->getDefinition('key_management.encrypted_column_listener')->getArgument(0));
+        $this->assertNotNull($container->getDefinition('key_management.encrypted_column_listener')->getArgument(1));
+    }
+
+    public function testTheCompiledConfiguratorPreservesThePreviousCallback()
+    {
+        $container = $this->createContainer([]);
+        $container->register('key_management.stored_envelope_encrypter', StoredEnvelopeEncrypter::class)
+            ->setArguments([new Definition(InMemoryDataKeyStore::class)]);
+        $container->register('.abstract.person', AutomaticRecord::class)
+            ->addResourceTag('key_management.encrypted_column', ['key' => null, 'type' => 'string']);
+        $events = (new Definition(\Doctrine\Common\EventManager::class))
+            ->addMethodCall('addEventListener', [[\Doctrine\ORM\Events::loadClassMetadata], new Reference('key_management.encrypted_column_listener')]);
+        $configuration = (new Definition(\Doctrine\ORM\Configuration::class))
+            ->setFactory([\Doctrine\ORM\ORMSetup::class, 'createConfiguration'])
+            ->setArguments([true])
+            ->addMethodCall('setMetadataDriverImpl', [(new Definition(\Doctrine\ORM\Mapping\Driver\AttributeDriver::class))->setArguments([[], true])])
+            ->addMethodCall('enableNativeLazyObjects', [true]);
+        $connection = (new Definition(\Doctrine\DBAL\Connection::class))
+            ->setFactory([\Doctrine\DBAL\DriverManager::class, 'getConnection'])
+            ->setArguments([['driver' => 'pdo_sqlite', 'memory' => true]]);
+        $container->register('app.manager', \Doctrine\ORM\EntityManager::class)
+            ->setArguments([$connection, $configuration, $events])
+            ->setConfigurator([self::class, 'configureAutomaticManager'])
+            ->setPublic(true);
+        $container->setParameter('doctrine.entity_managers', ['default' => 'app.manager']);
+        (new RegisterEncryptedColumnsPass())->process($container);
+        $container->compile();
+        eval('?>'.(new PhpDumper($container))->dump(['class' => 'AutomaticEncryptedColumnContainer']));
+
+        $manager = (new \AutomaticEncryptedColumnContainer())->get('app.manager');
+        $configuration = $manager->getConnection()->getConfiguration();
+        $registry = method_exists($configuration, 'getTypeProvider') ? $configuration->getTypeProvider() : \Doctrine\DBAL\Types\Type::getTypeRegistry();
+        $type = $registry->get($manager->getClassMetadata(AutomaticRecord::class)->getTypeOfField('first'));
+        $platform = $manager->getConnection()->getDatabasePlatform();
+        $written = $type->convertToDatabaseValue('a note', $platform);
+
+        $this->assertInstanceOf(Envelope::class, Envelope::fromBytes($written));
+        $this->assertSame('a note', $type->convertToPHPValue($written, $platform));
+    }
+
+    public static function configureAutomaticManager(\Doctrine\ORM\EntityManagerInterface $manager): void
+    {
+        $manager->getConfiguration()->setMetadataDriverImpl(new class([], true) extends \Doctrine\ORM\Mapping\Driver\AttributeDriver {
+            public function getAllClassNames(): array
+            {
+                return [AutomaticRecord::class];
+            }
+        });
     }
 
     private function createContainer(?array $types): ContainerBuilder

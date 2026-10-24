@@ -21,6 +21,7 @@ $type = new EncryptedType(
     Type::getTypeRegistry()->get('string'),
     $envelopeEncrypter,
     'alias/app-key',
+    'string',
 );
 
 Type::getTypeRegistry()->register('app_user_email', $type);
@@ -53,6 +54,26 @@ class User
     public string $email;
 }
 ```
+
+A type authenticates its configured key and parent type name with every value.
+Both strings have a length prefix, so a decorator can append its own context without changing their boundaries.
+Values written under a different key or parent type name are refused.
+The encrypted declaration's name and the parent instance's configuration aren't authenticated.
+Two columns using the same key and parent type name can read each other's values.
+Give those columns different keys or scopes to keep them apart.
+
+`EncryptedTypes` uses the configured `type` as the parent type name, `string` in the example below.
+Changing the PHP implementation behind that name leaves existing values readable if the new converter can read the old plaintext.
+Changing the parent type name requires rewriting existing values, even when both names resolve to the same PHP class.
+Renaming the encrypted declaration doesn't require rewriting values.
+
+For direct construction, pass the same stable parent name as the optional fourth argument, `$typeName`.
+Use the configured parent alias when direct and configured types must read each other's values.
+Only `null` falls back to the parent PHP class; empty strings and `'0'` are valid names.
+The class fallback changes when the parent class is renamed or subclassed, so these changes require rewriting existing values.
+Use a stable explicit name to avoid that migration.
+Values written before context binding need to be read with the previous implementation, then rewritten with the current type.
+The envelope binds this context locally, so the KMS needn't support authenticated data.
 
 Where to register the types
 ---------------------------
@@ -131,6 +152,8 @@ For instance, its `$envelopes` is `@key_management.envelope_encrypter.<client>` 
 Calling `register()` twice is safe and is what a rebooted kernel does: the type
 registry is global and outlives the container, so a name already taken is
 replaced rather than refused.
+Pass the connection to `register($connection)` when the connection uses its own type registry.
+That registry must be a writable `TypeRegistry`.
 
 Keeping the data keys in a table
 --------------------------------
@@ -161,23 +184,27 @@ Type::getTypeRegistry()->register('app_user_email', new EncryptedType(
     Type::getTypeRegistry()->get('string'),
     $encrypter,
     'user.email',
+    'string',
 ));
 ```
 
-Rows of that column then share one data key and carry a 16-byte reference to
-it. To migrate a column that already holds self-contained envelopes, give the
-store-backed encrypter a fallback, `read_self_contained: true` in the bundle, and
-keep the same registered name: rows written before are still read through the KMS,
-and rows written afterwards refer to the stored key.
+Rows of that column use the same data key and contain a 16-byte reference to that key.
+To read existing self-contained envelopes during migration, give the store-backed encrypter a fallback, `read_self_contained: true` in the bundle.
+Keep the old configured key string as the new scope and retain the same parent type name.
+The encrypted declaration's name can change.
+Use the configured key from the earlier `alias/app-key` example.
 
 ```php
 $encrypter = new StoredEnvelopeEncrypter($store, new EnvelopeEncrypter($kms));
+$type = new EncryptedType(Type::getTypeRegistry()->get('string'), $encrypter, 'alias/app-key', 'string');
 ```
 
-Turn it off once the migration is over. Such a payload carries its own wrapped
-data key, so it resolves no row: the store, the scope it states and the binding it
-carries have nothing to say about it, and the only thing standing between it and a
-reader is the master key.
+Rows written before are still read through the KMS, and new rows refer to the stored data key.
+Changing the scope to `user.email` at the same time would prevent the fallback from reading existing values.
+
+Turn the fallback off once the migration is over.
+A self-contained payload contains its own wrapped data key and bypasses the store's scope and binding checks.
+The envelope still authenticates the type's configured key and parent type name.
 
 The table holds exactly what the store needs and nothing else:
 
@@ -318,9 +345,10 @@ a full decryption path and needs the same protection as an active member.
 
 **Rows carrying their own wrapped data key.** Each one is wrapped by the master
 key of the provider that wrote it, so moving to another provider means rewriting
-every row, and a row not yet rewritten still needs the old client to be read. A
-decrypter routing on the key id keeps both readable while the column is being
-rewritten, and writes everything through the new provider:
+every row, and a row not yet rewritten still needs the old client to be read.
+When the configured key changes, read through the old type and write through a new type.
+To keep serving queries, add another column mapped to the new type and backfill that column.
+Both types can use an encrypter that routes to the appropriate provider by key id:
 
 ```php
 final class MigratingEnvelopes implements EnvelopeEncrypterInterface, EnvelopeDecrypterInterface
@@ -345,37 +373,34 @@ final class MigratingEnvelopes implements EnvelopeEncrypterInterface, EnvelopeDe
 }
 ```
 
-Register the type with that encrypter, deploy, then rewrite the column. Do that
-through DBAL rather than through the ORM: the decrypted value is the same before
-and after, so the unit of work computes an empty change set and no `UPDATE` is
-ever issued.
+Keep the existing column mapped to the old type.
+Register a separate type with the new key for a second column, `email_next` here.
+Keep writes consistent across both columns during the backfill, or pause writes.
+The following DBAL pass reads with the old type and writes with the new type.
 
 ```php
 $platform = $connection->getDatabasePlatform();
-$legacy = new EncryptedType($parent, new EnvelopeEncrypter($awsKms), 'alias/app-key');
-$target = new EncryptedType($parent, $encrypter, 'user.email');
+$legacy = new EncryptedType($parent, new EnvelopeEncrypter($awsKms), 'alias/app-key', 'string');
+$target = new EncryptedType($parent, $encrypter, 'user.email', 'string');
 
 foreach ($connection->iterateAssociative('SELECT id, email FROM user ORDER BY id') as $row) {
     $connection->update(
         'user',
-        ['email' => $target->convertToDatabaseValue($legacy->convertToPHPValue($row['email'], $platform), $platform)],
+        ['email_next' => $target->convertToDatabaseValue($legacy->convertToPHPValue($row['email'], $platform), $platform)],
         ['id' => $row['id']],
-        ['email' => ParameterType::BINARY],
+        ['email_next' => ParameterType::BINARY],
     );
 }
 ```
 
-Register the type with the target encrypter alone once every row is rewritten,
-and drop the old client. That pass is the one occasion to change how the column
-is protected without paying for it twice, so it is worth writing through a
-store-backed encrypter, as `$target` does above: the cost is the same today, and
-the next provider change becomes the case above, one command and not a single
-row read.
+Once every row has a new value, switch readers to the new column and type.
+Remove the old column and client when they are no longer used.
+For an offline migration, stop reads and writes, update `email` in that loop, then change the mapping to the new type.
+Writing through a store-backed encrypter also lets later provider changes rewrap the stored keys without rewriting the payloads.
 
-Rotating the master key within one provider is another matter entirely. The key
-id travels inside the envelope and is handed back to the KMS on every read, so
-rows written under a retired key keep resolving and nothing has to be rewritten,
-for as long as that key stays usable.
+Physical key rotation within a provider doesn't require rewriting values while the type's configured key string stays unchanged.
+For example, the same logical alias can point to a new master key while old keys remain available for decryption.
+Changing the configured alias, key name or ARN changes the authenticated context and requires migration, even if the KMS still reads the old key.
 
 Requirements
 ------------
@@ -416,12 +441,11 @@ Either way:
     and the ciphertext outgrows it by the envelope's framing, so a column sized
     after it would truncate the ciphertext and destroy the authentication tag
     with it.
-  * **A ciphertext is not bound to its row.** The type passes no AAD, because
-    `convertToDatabaseValue()` never sees the table, the column or the row it
-    converts for. Within one scope, or one master key, an encrypted value copied
-    into another row of the same type decrypts there. When moving a value
-    between rows must be detectable, bind the row yourself: put its identity in
-    the payload and check it after decryption.
+  * **A ciphertext is not bound to its row.** The type authenticates its configured key and parent type name.
+    `convertToDatabaseValue()` never sees the table, column or row it converts for.
+    Rows using the same configured key and parent type name can read each other's encrypted values.
+    To detect moving a value between rows, include the row identity in the payload.
+    Check the row identity after decryption.
 
 Resources
 ---------

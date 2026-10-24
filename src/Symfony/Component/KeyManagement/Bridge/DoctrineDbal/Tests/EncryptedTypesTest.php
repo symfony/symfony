@@ -21,8 +21,10 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\Tests\Fixtures\ContextType;
 use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
+use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
@@ -101,8 +103,127 @@ class EncryptedTypesTest extends TestCase
 
         (new EncryptedTypes($this->envelopes, [$name => ['type' => $parent, 'key' => 'app']]))->register($connection);
 
-        $type = self::type($name);
+        $type = $connection->getConfiguration()->getTypeProvider()->get($name);
         $this->assertSame('x', $type->convertToPHPValue($type->convertToDatabaseValue('x', new SQLitePlatform()), new SQLitePlatform()));
+    }
+
+    public function testAReadOnlyTypeProviderCannotReceiveEncryptedTypes()
+    {
+        if (!method_exists(Configuration::class, 'setTypeProvider')) {
+            $this->markTestSkipped('doctrine/dbal < 4.6 has no type provider per connection.');
+        }
+
+        $provider = new class implements \Doctrine\DBAL\Types\TypeProvider, \IteratorAggregate {
+            public function get(string $name): Type
+            {
+                return new StringType();
+            }
+
+            public function has(string $name): bool
+            {
+                return 'string' === $name;
+            }
+
+            public function getIterator(): \Traversable
+            {
+                yield 'string' => new StringType();
+            }
+        };
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], (new Configuration())->setTypeProvider($provider));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Encrypted types require a writable Doctrine type registry.');
+
+        (new EncryptedTypes($this->envelopes, [self::uniqueName() => ['type' => 'string', 'key' => 'app']]))->register($connection);
+    }
+
+    public function testTypesSharingAKeyButNotADoctrineTypeRefuseEachOtherSValues()
+    {
+        $notes = self::uniqueName();
+        $roles = self::uniqueName();
+
+        (new EncryptedTypes($this->envelopes, [
+            $notes => ['type' => 'text', 'key' => 'app'],
+            $roles => ['type' => 'json', 'key' => 'app'],
+        ]))->register();
+
+        $written = self::type($notes)->convertToDatabaseValue('{"role":"admin"}', new SQLitePlatform());
+
+        $this->expectException(DecryptionFailedException::class);
+        self::type($roles)->convertToPHPValue($written, new SQLitePlatform());
+    }
+
+    public function testTypesSharingAKeyAndADoctrineTypeReadEachOtherSValues()
+    {
+        $notes = self::uniqueName();
+        $address = self::uniqueName();
+
+        (new EncryptedTypes($this->envelopes, [
+            $notes => ['type' => 'text', 'key' => 'app'],
+            $address => ['type' => 'text', 'key' => 'app'],
+        ]))->register();
+
+        $written = self::type($notes)->convertToDatabaseValue('a note', new SQLitePlatform());
+
+        $this->assertSame('a note', self::type($address)->convertToPHPValue($written, new SQLitePlatform()), 'the declaration name is not what identifies a value, so the order they are declared in cannot matter.');
+    }
+
+    public function testRenamingADeclarationLeavesItsValuesReadable()
+    {
+        $before = self::uniqueName();
+        $after = self::uniqueName();
+
+        (new EncryptedTypes($this->envelopes, [$before => ['type' => 'text', 'key' => 'app']]))->register();
+        $written = self::type($before)->convertToDatabaseValue('a note', new SQLitePlatform());
+
+        (new EncryptedTypes($this->envelopes, [$after => ['type' => 'text', 'key' => 'app']]))->register();
+
+        $this->assertSame('a note', self::type($after)->convertToPHPValue($written, new SQLitePlatform()));
+    }
+
+    public function testAParentAliasSurvivesAClassOverride()
+    {
+        $parent = self::uniqueName();
+        $name = self::uniqueName();
+        self::registry()->register($parent, new StringType());
+        $types = new EncryptedTypes($this->envelopes, [$name => ['type' => $parent, 'key' => 'app']]);
+        $types->register();
+        $written = self::type($name)->convertToDatabaseValue('a note', new SQLitePlatform());
+
+        self::registry()->override($parent, new ContextType());
+        $types->register();
+
+        $this->assertSame('a note', self::type($name)->convertToPHPValue($written, new SQLitePlatform()));
+    }
+
+    public function testDifferentParentAliasesRefuseValuesOfTheSameClass()
+    {
+        $firstParent = self::uniqueName();
+        $secondParent = self::uniqueName();
+        $first = self::uniqueName();
+        $second = self::uniqueName();
+        self::registry()->register($firstParent, new StringType());
+        self::registry()->register($secondParent, new StringType());
+        (new EncryptedTypes($this->envelopes, [
+            $first => ['type' => $firstParent, 'key' => 'app'],
+            $second => ['type' => $secondParent, 'key' => 'app'],
+        ]))->register();
+        $written = self::type($first)->convertToDatabaseValue('a note', new SQLitePlatform());
+
+        $this->expectException(DecryptionFailedException::class);
+        self::type($second)->convertToPHPValue($written, new SQLitePlatform());
+    }
+
+    public function testDirectAndRegisteredTypesUseTheSameParentAlias()
+    {
+        $name = self::uniqueName();
+        (new EncryptedTypes($this->envelopes, [$name => ['type' => 'string', 'key' => 'app']]))->register();
+        $direct = new EncryptedType(new StringType(), $this->envelopes, 'app', 'string');
+        $registered = self::type($name);
+        $platform = new SQLitePlatform();
+
+        $this->assertSame('direct', $registered->convertToPHPValue($direct->convertToDatabaseValue('direct', $platform), $platform));
+        $this->assertSame('registered', $direct->convertToPHPValue($registered->convertToDatabaseValue('registered', $platform), $platform));
     }
 
     public function testADeclarationWithoutAKeyIsReported()
@@ -135,6 +256,11 @@ class EncryptedTypesTest extends TestCase
 
     private static function type(string $name): Type
     {
-        return method_exists(Configuration::class, 'getTypeProvider') ? (new Configuration())->getTypeProvider()->get($name) : Type::getType($name);
+        return self::registry()->get($name);
+    }
+
+    private static function registry(): TypeRegistry
+    {
+        return method_exists(Configuration::class, 'getTypeProvider') ? (new Configuration())->getTypeProvider() : Type::getTypeRegistry();
     }
 }

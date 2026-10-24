@@ -48,11 +48,11 @@ class TransitKmsTest extends TestCase
         [$method, $url, $body, $headers] = $captured;
         $this->assertSame('POST', $method);
         $this->assertSame('https://vault.local/v1/transit/encrypt/app', $url);
-        $this->assertSame(['plaintext' => base64_encode('hello')], $body);
+        $this->assertSame(['plaintext' => base64_encode('hello'), 'context' => base64_encode("symfony/key-management/hashicorp-vault/transit/v1\0")], $body);
         $this->assertContains('X-Vault-Token: s.token', $headers);
     }
 
-    public function testEncryptForwardsAadAsBase64ContextBytes()
+    public function testEncryptPrefixesAadBeforeEncodingTheContext()
     {
         $captured = null;
         $client = new MockHttpClient(static function ($m, $u, $o) use (&$captured) {
@@ -66,7 +66,49 @@ class TransitKmsTest extends TestCase
 
         (new TransitKms($client, new StaticTokenProvider('t')))->encrypt('app', 'hello', 'opaque-aad');
 
-        $this->assertSame(base64_encode('opaque-aad'), $captured['context']);
+        $this->assertSame(base64_encode("symfony/key-management/hashicorp-vault/transit/v1\0opaque-aad"), $captured['context']);
+    }
+
+    #[DataProvider('provideDifferentAadValues')]
+    public function testDecryptionRequiresTheSameAad(string $aad, string $otherAad)
+    {
+        $kms = $this->contextBoundKms();
+        $ciphertext = $kms->encrypt('app', 'hello', $aad);
+
+        $this->assertSame('hello', $kms->decrypt($ciphertext, $aad));
+
+        $this->expectException(DecryptionFailedException::class);
+        $kms->decrypt($ciphertext, $otherAad);
+    }
+
+    #[DataProvider('provideDifferentAadValues')]
+    public function testUnwrappingRequiresTheSameAad(string $aad, string $otherAad)
+    {
+        $kms = $this->contextBoundKms();
+        $dataKey = $kms->generateDataKey('app', 32, $aad);
+
+        $this->assertSame(
+            $dataKey->use(static fn (string $key): string => $key),
+            $kms->unwrapDataKey($dataKey->wrapped, $aad)->use(static fn (string $key): string => $key),
+        );
+
+        $this->expectException(DecryptionFailedException::class);
+        $kms->unwrapDataKey($dataKey->wrapped, $otherAad);
+    }
+
+    public static function provideDifferentAadValues(): iterable
+    {
+        $label = 'symfony/key-management/hashicorp-vault/transit/v1';
+        $prefix = $label."\0";
+
+        yield 'fallback to empty' => [$label, ''];
+        yield 'empty to fallback' => ['', $label];
+        yield 'prefix to empty' => [$prefix, ''];
+        yield 'empty to prefix' => ['', $prefix];
+        yield 'binary to prefix' => ["\0\xFF", $prefix."\0\xFF"];
+        yield 'prefix to binary' => [$prefix."\0\xFF", "\0\xFF"];
+        yield 'NUL suffix' => ['tenant', "tenant\0"];
+        yield 'zero to empty' => ['0', ''];
     }
 
     public function testAadOnADerivedKeyIsAcceptedAndTheKeyIsReadOnce()
@@ -284,11 +326,108 @@ class TransitKmsTest extends TestCase
 
         [$url, $body] = $captured;
         $this->assertSame('https://vault.local/v1/transit/datakey/plaintext/app', $url);
-        $this->assertSame(['bits' => 256], $body);
+        $this->assertSame(['bits' => 256, 'context' => base64_encode("symfony/key-management/hashicorp-vault/transit/v1\0")], $body);
         $this->assertSame('vault:v1:wrapped-dek', $dataKey->wrapped->blob);
 
         $extracted = $dataKey->use(static fn (string $p): string => $p);
         $this->assertSame(str_repeat("\xAA", 32), $extracted);
+    }
+
+    public function testEveryPathBindsTheSameContextWhenTheCallerBindsNothing()
+    {
+        $contexts = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$contexts): MockResponse {
+            $contexts[] = json_decode($options['body'], true)['context'] ?? null;
+
+            return new MockResponse(json_encode(['data' => [
+                'plaintext' => base64_encode(str_repeat("\xAA", 32)),
+                'ciphertext' => 'vault:v1:wrapped',
+            ]]));
+        }, 'https://vault.local/v1/');
+
+        $kms = new TransitKms($client, new StaticTokenProvider('t'));
+        $kms->encrypt('app', 'hello');
+        $kms->decrypt(new Ciphertext('vault:v1:wrapped', 'app'));
+        $kms->generateDataKey('app', 32);
+        $kms->unwrapDataKey(new Ciphertext('vault:v1:wrapped', 'app'));
+
+        $this->assertCount(4, $contexts);
+        $this->assertIsString($contexts[0]);
+        $this->assertNotSame('', $contexts[0]);
+        $this->assertSame([$contexts[0]], array_unique($contexts), 'a data key wrapped on one path is rewrapped on another, so all four must bind the same.');
+    }
+
+    public function testTheDataKeyPathBindsAContextTheWrapAndTheUnwrapShare()
+    {
+        $requests = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$requests): MockResponse {
+            $requests[] = [$url, json_decode($options['body'], true)];
+
+            return new MockResponse(json_encode(['data' => [
+                'plaintext' => base64_encode(str_repeat("\xAA", 32)),
+                'ciphertext' => 'vault:v1:wrapped-dek',
+            ]]));
+        }, 'https://vault.local/v1/');
+
+        $kms = new TransitKms($client, new StaticTokenProvider('t'));
+        $kms->unwrapDataKey($kms->generateDataKey('app', 32)->wrapped);
+
+        $this->assertCount(2, $requests, 'the key configuration is not read, so no policy has to grant it.');
+        $this->assertStringContainsString('/datakey/plaintext/app', $requests[0][0]);
+        $this->assertStringContainsString('/decrypt/app', $requests[1][0]);
+        $this->assertArrayHasKey('context', $requests[0][1]);
+        $this->assertArrayHasKey('context', $requests[1][1]);
+        $this->assertSame($requests[0][1]['context'], $requests[1][1]['context'], 'Vault derives the same key on both paths, or the unwrap fails.');
+    }
+
+    public function testAFalsyAadOnTheDataKeyPathIsStillAuthenticated()
+    {
+        $contexts = [];
+        $keyReads = 0;
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$contexts, &$keyReads): MockResponse {
+            if (str_contains($url, '/keys/')) {
+                ++$keyReads;
+
+                return new MockResponse(json_encode(['data' => ['derived' => true]]));
+            }
+            $contexts[] = json_decode($options['body'], true)['context'] ?? null;
+
+            return new MockResponse(json_encode(['data' => [
+                'plaintext' => base64_encode(str_repeat("\xAA", 32)),
+                'ciphertext' => 'vault:v1:wrapped-dek',
+            ]]));
+        }, 'https://vault.local/v1/');
+
+        $kms = new TransitKms($client, new StaticTokenProvider('t'));
+        $kms->unwrapDataKey($kms->generateDataKey('app', 32, '0')->wrapped, '0');
+
+        $this->assertSame([base64_encode("symfony/key-management/hashicorp-vault/transit/v1\0".'0'), base64_encode("symfony/key-management/hashicorp-vault/transit/v1\0".'0')], $contexts, 'an AAD of "0" is not an absent one.');
+        $this->assertSame(1, $keyReads, 'a bound AAD is checked against the key being derived, once per key.');
+    }
+
+    public function testAnAadOnTheDataKeyPathUsesTheSameFraming()
+    {
+        $contexts = [];
+        $keyReads = 0;
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$contexts, &$keyReads): MockResponse {
+            if (str_contains($url, '/keys/')) {
+                ++$keyReads;
+
+                return new MockResponse(json_encode(['data' => ['derived' => true]]));
+            }
+            $contexts[] = json_decode($options['body'], true)['context'] ?? null;
+
+            return new MockResponse(json_encode(['data' => [
+                'plaintext' => base64_encode(str_repeat("\xAA", 32)),
+                'ciphertext' => 'vault:v1:wrapped-dek',
+            ]]));
+        }, 'https://vault.local/v1/');
+
+        $kms = new TransitKms($client, new StaticTokenProvider('t'));
+        $kms->unwrapDataKey($kms->generateDataKey('app', 32, 'tenant-a')->wrapped, 'tenant-a');
+
+        $this->assertSame([base64_encode("symfony/key-management/hashicorp-vault/transit/v1\0tenant-a"), base64_encode("symfony/key-management/hashicorp-vault/transit/v1\0tenant-a")], $contexts);
+        $this->assertSame(1, $keyReads, 'a bound AAD is checked against the key being derived, once per key.');
     }
 
     public function testGenerateDataKeyRejectsUnsupportedLengths()
@@ -615,6 +754,33 @@ class TransitKmsTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Failed to reach Vault.');
         (new TransitKms(new MockHttpClient([], 'https://vault.local/v1/'), $tokens))->encrypt('app', 'hello');
+    }
+
+    private function contextBoundKms(): TransitKms
+    {
+        $ciphertexts = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$ciphertexts): MockResponse {
+            if (str_contains($url, '/keys/')) {
+                return new MockResponse(json_encode(['data' => ['derived' => true]]));
+            }
+
+            $body = json_decode($options['body'], true);
+            if (str_contains($url, '/decrypt/')) {
+                [$context, $plaintext] = $ciphertexts[$body['ciphertext']];
+
+                return $context === $body['context']
+                    ? new MockResponse(json_encode(['data' => ['plaintext' => $plaintext]]))
+                    : new MockResponse('{"errors":["cipher: message authentication failed"]}', ['http_code' => 400]);
+            }
+
+            $ciphertext = 'vault:v1:'.\count($ciphertexts);
+            $plaintext = $body['plaintext'] ?? base64_encode(str_repeat("\xAA", intdiv($body['bits'], 8)));
+            $ciphertexts[$ciphertext] = [$body['context'], $plaintext];
+
+            return new MockResponse(json_encode(['data' => ['ciphertext' => $ciphertext, 'plaintext' => $plaintext]]));
+        }, 'https://vault.local/v1/');
+
+        return new TransitKms($client, new StaticTokenProvider('t'));
     }
 
     /**

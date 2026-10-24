@@ -13,7 +13,6 @@ namespace Symfony\Component\KeyManagement;
 
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
-use Symfony\Component\KeyManagement\Exception\RuntimeException;
 
 /**
  * High-level envelope encryption helper.
@@ -62,16 +61,12 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
  * through the direct path on a backend that offers the flag, or keep a blind
  * index (an HMAC of the plaintext) in a sibling column.
  *
- * AAD handling: the `$aad` argument is forwarded BOTH to the KMS (binding
- * the wrapped data key) and to the local AEAD (binding the bulk ciphertext),
- * which prefixes it with the id of the format it frames.
- * The double binding is defense in depth: the local AEAD always catches
- * AAD mismatches even on backends where the KMS can't enforce them. Note
- * that some backends require a specific key shape for KMS-side AAD: e.g.
- * Vault Transit only accepts a `context` for keys created with
- * `derived=true` and rejects it on plain symmetric keys. Passing a
- * non-empty `$aad` to a non-derived Vault key will surface as a
- * RuntimeException at encrypt time.
+ * The `$aad` argument authenticates the bulk ciphertext through the local AEAD.
+ * The AEAD prefixes the AAD with the envelope format id.
+ * The AAD isn't forwarded to the KMS, so wrapping the data key doesn't authenticate the AAD.
+ * A mismatch is refused on every backend, including backends that don't support AAD.
+ * A self-contained envelope can't use a KMS policy conditioned on the AAD, such as AWS KMS `kms:EncryptionContext`.
+ * A data key store can bind a context at the backend, {@see DataKeyStoreInterface}.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -96,7 +91,7 @@ final class EnvelopeEncrypter implements EnvelopeEncrypterInterface, EnvelopeDec
     public function encrypt(string $key, #[\SensitiveParameter] string $plaintext, string $aad = ''): Envelope
     {
         $format = $this->format;
-        $dataKey = $this->kms->generateDataKey($key, $format->keyBytes(), $aad);
+        $dataKey = $this->kms->generateDataKey($key, $format->keyBytes());
         $iv = random_bytes($format->ivBytes());
 
         [$ciphertext, $tag] = $dataKey->use(static fn (#[\SensitiveParameter] string $dek): array => self::seal($format, $dek, $plaintext, $iv, $aad));
@@ -114,7 +109,7 @@ final class EnvelopeEncrypter implements EnvelopeEncrypterInterface, EnvelopeDec
             throw new LogicException(\sprintf('The envelope refers to a stored data key, which "%s" cannot resolve.', self::class));
         }
 
-        $dataKey = $this->kms->unwrapDataKey(new Ciphertext($envelope->wrappedDek, $envelope->keyId), $aad);
+        $dataKey = $this->kms->unwrapDataKey(new Ciphertext($envelope->wrappedDek, $envelope->keyId));
 
         return $dataKey->use(static fn (#[\SensitiveParameter] string $dek): string => self::open($envelope, $dek, $aad));
     }

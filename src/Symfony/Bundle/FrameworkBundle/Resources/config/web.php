@@ -269,6 +269,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 tagged_locator('rate_limiter', 'name'),
                 service('controller.expression_language')->nullOnInvalid(),
+                service('limiter_builder')->nullOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('container.remove_if_missing', ['service' => 'limiter'])

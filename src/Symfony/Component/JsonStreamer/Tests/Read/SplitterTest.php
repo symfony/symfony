@@ -91,6 +91,23 @@ class SplitterTest extends TestCase
         yield 'long values' => [json_encode([$long, ['a' => $long], $long])];
         yield 'long keys' => [json_encode([$long => 1, $long.'2' => [$long]])];
         yield 'escape at chunk edge' => [json_encode([str_repeat('a', 65_531).'\\"', 'b'])];
+        yield 'nested escape at chunk edge' => [json_encode([[str_repeat('a', 65_530).'\\"', '}'], 'b'])];
+        yield 'nested string across chunks' => [json_encode([[str_repeat('a', 65_530).'}],"[{', ['c' => 'd']], 'b'])];
+        yield 'nested escapes' => [json_encode([['a' => str_repeat('\\"}', 30_000)], [str_repeat('"]', 30_000)]])];
+        yield 'nested string ending at chunk edge' => [json_encode([[str_repeat('a', 65_532), 'b'], 'c'])];
+        yield 'nested string starting at chunk edge' => [json_encode([[str_repeat('a', 65_530), 'b'], 'c'])];
+    }
+
+    #[DataProvider('splitMatchesJsonDecodeDataProvider')]
+    public function testSplitMatchesJsonDecodeWhenRegexFails(string $json)
+    {
+        $backtrackLimit = ini_set('pcre.backtrack_limit', '1');
+
+        try {
+            $this->testSplitMatchesJsonDecode($json);
+        } finally {
+            ini_set('pcre.backtrack_limit', $backtrackLimit);
+        }
     }
 
     #[DataProvider('listAndCollectionMethodsProvider')]

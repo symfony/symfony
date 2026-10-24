@@ -17,6 +17,12 @@ AssetMapper
 BrowserKit
 ----------
 
+ * [BC BREAK] `Cookie::fromString()` rejects invalid reserved cookie prefixes and `SameSite=None` without `Secure`.
+   The reserved prefixes are `__Secure-`, `__Host-`, `__Http-` and `__Host-Http-`.
+   It also rejects `Secure` cookies received over HTTP.
+   `CookieJar` ignores these cookies and prevents HTTP responses from overwriting secure cookies.
+   Cookies added with `CookieJar::set()` are still accepted.
+ * `Cookie::fromString()` preserves `Secure` when no URL is given and ignores unknown `SameSite` values
  * [BC BREAK] `CookieJar::updateFromSetCookie()` and `updateFromResponse()` ignore a cookie whose `Domain` attribute does not match the host of the response, as browsers do
  * [BC BREAK] `CookieJar` sends a cookie set without a `Domain` attribute only to the host that set it, not to its subdomains, as browsers do
 

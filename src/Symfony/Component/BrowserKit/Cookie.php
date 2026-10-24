@@ -157,15 +157,15 @@ class Cookie
 
         $maxAge = null;
         $hostOnly = null !== $url;
+        $hasPath = false;
 
         foreach ($parts as $part) {
             $elements = explode('=', $part, 2);
             $attribute = strtolower(trim($elements[0]));
 
             if ('secure' === $attribute) {
-                // Ignore the secure flag if the original URI is not given or is not HTTPS
-                if (null === $url || !isset($urlParts['scheme']) || 'https' !== $urlParts['scheme']) {
-                    continue;
+                if (null !== $url && 'https' !== strtolower($urlParts['scheme'] ?? '')) {
+                    throw new InvalidArgumentException('A secure cookie cannot be set over an insecure connection.');
                 }
 
                 $values['secure'] = true;
@@ -194,11 +194,14 @@ class Cookie
                     continue;
                 } elseif ('domain' === $attribute && '' === $attributeValue) {
                     continue;
+                } elseif ('samesite' === $attribute && !\in_array(strtolower($attributeValue), ['none', 'lax', 'strict'], true)) {
+                    continue;
                 } elseif (!\in_array($attribute, ['domain', 'path', 'samesite'], true)) {
                     continue;
                 }
 
                 $hostOnly = $hostOnly && 'domain' !== $attribute;
+                $hasPath = $hasPath || 'path' === $attribute;
                 $values[$attribute] = $attributeValue;
             }
         }
@@ -207,6 +210,27 @@ class Cookie
             $now = time();
             // 1 is the earliest expiration time, 0 means a session cookie
             $values['expires'] = 0 < $maxAge ? (\PHP_INT_MAX - $now > $maxAge ? $now + $maxAge : \PHP_INT_MAX) : 1;
+        }
+
+        if ('none' === strtolower($values['samesite'] ?? '') && !$values['secure']) {
+            throw new InvalidArgumentException('A cookie with SameSite=None must be secure.');
+        }
+
+        $name = strtolower($values['name']);
+        if ('' === $name && preg_match('/^__(?:secure|host|http)-/i', $values['value'])) {
+            throw new InvalidArgumentException('A nameless cookie cannot use a reserved prefix in its value.');
+        }
+
+        if (str_starts_with($name, '__secure-') && !$values['secure']) {
+            throw new InvalidArgumentException('A cookie with the "__Secure-" prefix must be secure.');
+        }
+
+        if (str_starts_with($name, '__host-') && (!$values['secure'] || !$hasPath || '/' !== $values['path'] || (!$hostOnly && (null !== $url || '' !== $values['domain'])))) {
+            throw new InvalidArgumentException('A cookie with the "__Host-" prefix must be secure, have an explicit Path=/ and no Domain attribute.');
+        }
+
+        if ((str_starts_with($name, '__http-') || str_starts_with($name, '__host-http-')) && (!$values['secure'] || !$values['httponly'])) {
+            throw new InvalidArgumentException('A cookie with the "__Http-" or "__Host-Http-" prefix must be secure and HTTP-only.');
         }
 
         $cookie = new static(

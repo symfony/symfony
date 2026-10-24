@@ -94,6 +94,92 @@ class CookieJarTest extends TestCase
         $this->assertNull($cookieJar->get('foo'));
     }
 
+    #[DataProvider('provideRejectedCookies')]
+    public function testUpdateFromSetCookieRejectsInvalidSecurityAttributes(string $header, string $uri)
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie([$header], $uri);
+
+        $this->assertSame([], $cookieJar->all());
+    }
+
+    public static function provideRejectedCookies(): iterable
+    {
+        yield ['sid=value; Secure', 'http://example.com/'];
+        yield ['sid=value; SameSite=None', 'https://example.com/'];
+        yield ['sid=value; SameSite=nOnE', 'https://example.com/'];
+        yield ['sid=value; SameSite=None; SameSite=unknown', 'https://example.com/'];
+        yield ['__Secure-sid=value', 'https://example.com/'];
+        yield ['__sEcUrE-sid=value', 'https://example.com/'];
+        yield ['__Host-sid=value; Secure', 'https://example.com/'];
+        yield ['__Host-sid=value; Secure; Path=/login', 'https://example.com/'];
+        yield ['__Host-sid=value; Secure; Domain=example.com; Path=/', 'https://example.com/'];
+        yield ['__hOsT-sid=value; Path=/', 'https://example.com/'];
+        yield ['__Http-sid=value; Secure', 'https://example.com/'];
+        yield ['__hTtP-sid=value; HttpOnly', 'https://example.com/'];
+        yield ['__Host-Http-sid=value; Secure; Path=/', 'https://example.com/'];
+        yield ['__Host-Http-sid=value; Secure; HttpOnly', 'https://example.com/'];
+        yield ['__Host-Http-sid=value; Secure; HttpOnly; Domain=example.com; Path=/', 'https://example.com/'];
+        yield ['=__Secure-sid=value', 'https://example.com/'];
+        yield ['=__hOsT-sid=value; Secure; Path=/', 'https://example.com/'];
+        yield ['=__Http-sid=value; Secure; HttpOnly', 'https://example.com/'];
+        yield ['=__Host-Http-sid=value; Secure; HttpOnly; Path=/', 'https://example.com/'];
+    }
+
+    public function testUpdateFromSetCookieAcceptsValidSecurityAttributes()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie([
+            'sid=value; Secure; SameSite=None',
+            '__Secure-sid=value; Secure',
+            '__Host-sid=value; Secure; Path=/',
+            '__Http-sid=value; Secure; HttpOnly',
+            '__Host-Http-sid=value; Secure; HttpOnly; Path=/',
+        ], 'https://example.com/');
+
+        $this->assertCount(5, $cookieJar->all());
+    }
+
+    #[DataProvider('provideSecureCookieOverwrites')]
+    public function testUpdateFromSetCookieProtectsSecureCookies(string $header, string $uri, bool $accepted)
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['sid=secure; Secure; Domain=example.com; Path=/login'], 'https://example.com/login');
+        $cookieJar->updateFromSetCookie([$header], $uri);
+
+        $this->assertSame($accepted ? 'replacement' : 'secure', $cookieJar->get('sid', '/login', 'example.com')->getValue());
+    }
+
+    public static function provideSecureCookieOverwrites(): iterable
+    {
+        yield ['sid=replacement; Domain=example.com; Path=/login', 'http://example.com/login', false];
+        yield ['sid=replacement; Domain=example.com; Path=/login; Max-Age=0', 'http://example.com/login', false];
+        yield ['sid=replacement; Domain=example.com; Path=/login', 'https://example.com/login', true];
+    }
+
+    public function testUpdateFromSetCookieProtectsSecureCookiesAcrossDomainsAndPaths()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['sid=secure; Secure; Domain=example.com; Path=/login'], 'https://www.example.com/');
+        $cookieJar->updateFromSetCookie(['sid=replacement; Path=/login/en'], 'http://www.example.com/');
+
+        $this->assertCount(1, $cookieJar->all());
+
+        $cookieJar->updateFromSetCookie(['sid=root; Path=/'], 'http://www.example.com/');
+        $cookieJar->updateFromSetCookie(['sid=other; Path=/other'], 'http://www.example.com/');
+
+        $this->assertCount(3, $cookieJar->all());
+    }
+
+    public function testUpdateFromSetCookieCanReplaceExpiredSecureCookies()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['sid=secure; Secure; Max-Age=0'], 'https://example.com/');
+        $cookieJar->updateFromSetCookie(['sid=replacement'], 'http://example.com/');
+
+        $this->assertSame('replacement', $cookieJar->get('sid')->getValue());
+    }
+
     public function testUpdateFromSetCookieIgnoresAnEmptyDomainAttribute()
     {
         $cookieJar = new CookieJar();

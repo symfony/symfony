@@ -127,6 +127,7 @@ class CookieJar
         }
 
         $host = null !== $uri ? parse_url($uri, \PHP_URL_HOST) : null;
+        $isSecure = null === $uri || 'https' === strtolower(parse_url($uri, \PHP_URL_SCHEME) ?? '');
 
         foreach ($cookies as $cookie) {
             try {
@@ -136,9 +137,19 @@ class CookieJar
                 continue;
             }
 
-            if (null === $host || self::domainMatches($host, $cookie->getDomain())) {
-                $this->set($cookie);
+            if (null !== $host && !self::domainMatches($host, $cookie->getDomain())) {
+                continue;
             }
+
+            if (!$isSecure) {
+                foreach ($this->all() as $existingCookie) {
+                    if ($existingCookie->isSecure() && $existingCookie->getName() === $cookie->getName() && (self::domainMatches($existingCookie->getDomain(), $cookie->getDomain()) || self::domainMatches($cookie->getDomain(), $existingCookie->getDomain())) && self::pathMatches($existingCookie->getPath(), $cookie->getPath())) {
+                        continue 2;
+                    }
+                }
+            }
+
+            $this->set($cookie);
         }
     }
 

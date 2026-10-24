@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2026-10-24T08:12:03Z
+
+`Value-Of<…>` and `Key-Of<…>` are still case-sensitive, while they shouldn't.

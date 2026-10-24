@@ -514,7 +514,7 @@ final class PhpGenerator
             if ($structured) {
                 $php .= $this->line('        match ($k) {', $context);
                 foreach ($structured as $name => $child) {
-                    $php .= $this->line('            '.var_export($name, true).' => $validators['.var_export($child->getIdentifier(), true).']($stream, $v[0], $v[1], $data->{$k}),', $context);
+                    $php .= $this->line('            '.var_export((string) $name, true).' => $validators['.var_export($child->getIdentifier(), true).']($stream, $v[0], $v[1], $data->{$k}),', $context);
                     $children[] = $child;
                 }
                 $php .= $this->line('            default => null,', $context).$this->line('        };', $context);

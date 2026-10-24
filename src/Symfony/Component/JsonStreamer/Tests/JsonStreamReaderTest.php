@@ -40,6 +40,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullablePropert
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullablePropertyWithDefault;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNulName;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNumericStreamedObject;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPrivateConstructor;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithQuotes;
@@ -857,6 +858,19 @@ class JsonStreamReaderTest extends TestCase
         yield ['[{"id":1,"id":2}]', Type::list(Type::nullable(Type::object(ClassicDummy::class)))];
         yield ['[{"dummies":{"first":{"id":1,"id":2}}}]', Type::list(Type::object(DummyWithGenericDummies::class))];
         yield ['[{"id":3,"\\u0000extra":1,"\\u0000extra":2}]', Type::list(Type::object(ClassicDummy::class))];
+    }
+
+    public function testReadStreamCollectionItemsWithNumericStreamedObject()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+        $type = Type::list(Type::object(DummyWithNumericStreamedObject::class));
+        $list = $reader->read($this->createStream('[{"0":{"id":3}}]'), $type);
+
+        $this->assertSame(3, $list[0]->dummy->id);
+        $this->expectException(InvalidStreamException::class);
+        $this->expectExceptionMessage('dict key twice');
+
+        $reader->read($this->createStream('[{"0":{"id":1,"id":2}}]'), $type);
     }
 
     public function testReadStreamCollectionItemsAllowDuplicateKeysInUnknownValues()

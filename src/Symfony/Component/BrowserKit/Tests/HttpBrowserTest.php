@@ -23,6 +23,34 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class HttpBrowserTest extends AbstractBrowserTest
 {
+    public function testSendsDuplicateCookieNamesInPathAndCreationOrder()
+    {
+        $client = new MockHttpClient(function ($method, $url, $options) {
+            $this->assertSame(['cookie: sid=deep%3Dvalue; first=old; sid=root; later=value'], $options['normalized_headers']['cookie']);
+
+            return new MockResponse();
+        });
+        $browser = new HttpBrowser($client);
+        $cookieJar = $browser->getCookieJar();
+        $cookieJar->updateFromSetCookie(['first=old; Path=/'], 'https://www.example.com/');
+        $cookieJar->updateFromSetCookie(['sid=root; Domain=example.com; Path=/'], 'https://www.example.com/');
+        $cookieJar->updateFromSetCookie(['sid=deep%3Dvalue; Path=/login'], 'https://www.example.com/');
+        $cookieJar->updateFromSetCookie(['later=value; Path=/'], 'https://www.example.com/');
+        $browser->request('GET', 'https://www.example.com/login');
+    }
+
+    public function testSendsNamelessCookiesWithoutAnEqualsSign()
+    {
+        $client = new MockHttpClient(function ($method, $url, $options) {
+            $this->assertSame(['cookie: raw'], $options['normalized_headers']['cookie']);
+
+            return new MockResponse();
+        });
+        $browser = new HttpBrowser($client);
+        $browser->getCookieJar()->updateFromSetCookie(['=raw'], 'https://example.com/');
+        $browser->request('GET', 'https://example.com/');
+    }
+
     public function getBrowser(array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
         return new TestHttpClient($server, $history, $cookieJar);

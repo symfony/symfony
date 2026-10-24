@@ -21,10 +21,14 @@ use Symfony\Component\BrowserKit\Exception\InvalidArgumentException;
 class CookieJar
 {
     protected array $cookieJar = [];
+    private array $creationOrder = [];
+    private int $nextCreationOrder = 0;
 
     public function set(Cookie $cookie): void
     {
-        $this->cookieJar[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
+        $name = ($cookie->isHostOnly() ? 'h:' : 'd:').$cookie->getName();
+        $this->creationOrder[$cookie->getDomain()][$cookie->getPath()][$name] ??= $this->nextCreationOrder++;
+        $this->cookieJar[$cookie->getDomain()][$cookie->getPath()][$name] = $cookie;
     }
 
     /**
@@ -52,14 +56,16 @@ class CookieJar
             }
 
             foreach ($pathCookies as $cookiePath => $namedCookies) {
-                if (!self::pathMatches($cookiePath, $path) || !isset($namedCookies[$name])) {
+                if (!self::pathMatches($cookiePath, $path)) {
                     continue;
                 }
-                if ($domain && $namedCookies[$name]->isHostOnly() && ltrim($domain, '.') !== $namedCookies[$name]->getDomain()) {
-                    continue;
-                }
-                if (null === $match || self::isMoreSpecific($namedCookies[$name], $match)) {
-                    $match = $namedCookies[$name];
+                foreach ($namedCookies as $cookie) {
+                    if ($name !== $cookie->getName() || ($domain && $cookie->isHostOnly() && ltrim($domain, '.') !== $cookie->getDomain())) {
+                        continue;
+                    }
+                    if (null === $match || self::isMoreSpecific($cookie, $match)) {
+                        $match = $cookie;
+                    }
                 }
             }
         }
@@ -87,12 +93,16 @@ class CookieJar
         }
 
         foreach ($domains as $domain) {
-            unset($this->cookieJar[$domain][$path][$name]);
+            foreach (['d:'.$name, 'h:'.$name] as $key) {
+                if (isset($this->cookieJar[$domain][$path][$key])) {
+                    unset($this->creationOrder[$domain][$path][$key], $this->cookieJar[$domain][$path][$key]);
+                }
+            }
 
-            if (empty($this->cookieJar[$domain][$path])) {
+            if (!($this->cookieJar[$domain][$path] ?? [])) {
                 unset($this->cookieJar[$domain][$path]);
 
-                if (empty($this->cookieJar[$domain])) {
+                if (!($this->cookieJar[$domain] ?? [])) {
                     unset($this->cookieJar[$domain]);
                 }
             }
@@ -105,6 +115,8 @@ class CookieJar
     public function clear(): void
     {
         $this->cookieJar = [];
+        $this->creationOrder = [];
+        $this->nextCreationOrder = 0;
     }
 
     /**
@@ -176,38 +188,11 @@ class CookieJar
      */
     public function allValues(string $uri, bool $returnsRawValue = false): array
     {
-        $this->flushExpiredCookies();
-
-        $parts = array_replace(['path' => '/'], parse_url($uri));
         $cookies = [];
-        foreach ($this->cookieJar as $domain => $pathCookies) {
-            if ($domain) {
-                $domain = '.'.ltrim($domain, '.');
-                if (!str_ends_with('.'.$parts['host'], $domain)) {
-                    continue;
-                }
-            }
-
-            foreach ($pathCookies as $path => $namedCookies) {
-                if (!self::pathMatches($path, $parts['path'])) {
-                    continue;
-                }
-
-                foreach ($namedCookies as $cookie) {
-                    if ($cookie->isSecure() && 'https' !== $parts['scheme']) {
-                        continue;
-                    }
-
-                    if ($cookie->isHostOnly() && $parts['host'] !== $cookie->getDomain()) {
-                        continue;
-                    }
-
-                    $name = $cookie->getName();
-
-                    if (!isset($cookies[$name]) || self::isMoreSpecific($cookie, $cookies[$name])) {
-                        $cookies[$name] = $cookie;
-                    }
-                }
+        foreach ($this->getCookiesForUri($uri) as $cookie) {
+            $name = $cookie->getName();
+            if (!isset($cookies[$name]) || self::isMoreSpecific($cookie, $cookies[$name])) {
+                $cookies[$name] = $cookie;
             }
         }
 
@@ -223,6 +208,19 @@ class CookieJar
     }
 
     /**
+     * Returns cookies for the URI, ordered by path length and creation time.
+     *
+     * @return list<Cookie>
+     */
+    public function allForUri(string $uri): array
+    {
+        $cookies = $this->getCookiesForUri($uri);
+        usort($cookies, fn (Cookie $left, Cookie $right) => \strlen($right->getPath()) <=> \strlen($left->getPath()) ?: $this->getCreationOrder($left) <=> $this->getCreationOrder($right));
+
+        return $cookies;
+    }
+
+    /**
      * Removes all expired cookies.
      */
     public function flushExpiredCookies(): void
@@ -231,7 +229,7 @@ class CookieJar
             foreach ($pathCookies as $path => $namedCookies) {
                 foreach ($namedCookies as $name => $cookie) {
                     if ($cookie->isExpired()) {
-                        unset($this->cookieJar[$domain][$path][$name]);
+                        unset($this->creationOrder[$domain][$path][$name], $this->cookieJar[$domain][$path][$name]);
                     }
                 }
             }
@@ -265,5 +263,43 @@ class CookieJar
         }
 
         return str_starts_with($requestPath, $cookiePath) && (str_ends_with($cookiePath, '/') || '/' === $requestPath[\strlen($cookiePath)]);
+    }
+
+    private function getCookiesForUri(string $uri): array
+    {
+        $this->flushExpiredCookies();
+
+        $parts = array_replace(['path' => '/'], parse_url($uri));
+        $cookies = [];
+        foreach ($this->cookieJar as $domain => $pathCookies) {
+            if ($domain && !str_ends_with('.'.$parts['host'], '.'.ltrim($domain, '.'))) {
+                continue;
+            }
+
+            foreach ($pathCookies as $path => $namedCookies) {
+                if (!self::pathMatches($path, $parts['path'])) {
+                    continue;
+                }
+
+                foreach ($namedCookies as $cookie) {
+                    if ($cookie->isSecure() && 'https' !== $parts['scheme']) {
+                        continue;
+                    }
+
+                    if ($cookie->isHostOnly() && $parts['host'] !== $cookie->getDomain()) {
+                        continue;
+                    }
+
+                    $cookies[] = $cookie;
+                }
+            }
+        }
+
+        return $cookies;
+    }
+
+    private function getCreationOrder(Cookie $cookie): int
+    {
+        return $this->creationOrder[$cookie->getDomain()][$cookie->getPath()][($cookie->isHostOnly() ? 'h:' : 'd:').$cookie->getName()];
     }
 }

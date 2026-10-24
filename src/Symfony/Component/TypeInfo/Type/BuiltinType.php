@@ -39,7 +39,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *     mixed
  * )>
  */
-final class BuiltinType extends Type
+class BuiltinType extends Type
 {
     /**
      * @param T $typeIdentifier

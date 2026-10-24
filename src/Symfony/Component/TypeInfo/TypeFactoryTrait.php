@@ -15,10 +15,13 @@ use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\ClassLikeType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
+use Symfony\Component\TypeInfo\Type\ExplicitType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\IntRangeType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
@@ -248,6 +251,35 @@ trait TypeFactoryTrait
         );
 
         return new ObjectShapeType($shape);
+    }
+
+    /**
+     * @template T of TypeIdentifier
+     *
+     * @param T $identifier
+     *
+     * @return ExplicitType<T>
+     */
+    public static function explicit(TypeIdentifier $identifier, string $explicitType): ExplicitType
+    {
+        return new ExplicitType($identifier, $explicitType);
+    }
+
+    public static function intRange(int $from = \PHP_INT_MIN, int $to = \PHP_INT_MAX, ?string $explicitType = null): IntRangeType
+    {
+        return new IntRangeType($from, $to, $explicitType);
+    }
+
+    /**
+     * @template T of ObjectType
+     *
+     * @param T $objectType
+     *
+     * @return ClassLikeType<T>
+     */
+    public static function classLike(string $explicitType, ObjectType $objectType): ClassLikeType
+    {
+        return new ClassLikeType($explicitType, $objectType);
     }
 
     /**

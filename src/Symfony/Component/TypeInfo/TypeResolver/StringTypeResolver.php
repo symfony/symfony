@@ -43,7 +43,9 @@ use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\ExplicitType;
 use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\IntRangeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 use Symfony\Component\TypeInfo\TypeIdentifier;
@@ -71,11 +73,13 @@ final class StringTypeResolver implements TypeResolverInterface
 
     /**
      * @param array<string, string> $extraTypeAliases
+     * @param bool                  $explicitTypes    Whether to keep PHPStan types more specific than their builtin type, such as "non-empty-string" or "int<0, 100>"
      */
     public function __construct(
         ?Lexer $lexer = null,
         ?TypeParser $parser = null,
         private readonly array $extraTypeAliases = [],
+        private readonly bool $explicitTypes = false,
     ) {
         if (class_exists(ParserConfig::class)) {
             $this->lexer = $lexer ?? new Lexer(new ParserConfig([]));
@@ -217,6 +221,10 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         if ($node instanceof IdentifierTypeNode) {
+            if ($this->explicitTypes && null !== $type = $this->getExplicitTypeFromIdentifier($node->name)) {
+                return $type;
+            }
+
             $type = match ($node->name) {
                 'bool', 'boolean' => Type::bool(),
                 'true' => Type::true(),
@@ -292,9 +300,9 @@ final class StringTypeResolver implements TypeResolverInterface
 
             $type = $this->getTypeFromNode($node->type, $typeContext);
 
-            // handle integer ranges as simple integers
+            // handle integer ranges as simple integers, unless explicit types are kept
             if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
-                return $type;
+                return $this->explicitTypes ? $this->getIntRangeFromNode($node) : $type;
             }
 
             $variableTypes = array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->genericTypes);
@@ -327,6 +335,10 @@ final class StringTypeResolver implements TypeResolverInterface
                 };
             }
 
+            if ($type instanceof ExplicitType && \in_array($type->getExplicitType(), ['class-string', 'interface-string', 'trait-string'], true) && 1 === \count($variableTypes) && $variableTypes[0] instanceof ObjectType) {
+                return Type::classLike($type->getExplicitType(), $variableTypes[0]);
+            }
+
             if ($type instanceof BuiltinType && TypeIdentifier::ARRAY !== $type->getTypeIdentifier() && TypeIdentifier::ITERABLE !== $type->getTypeIdentifier()) {
                 return $type;
             }
@@ -355,6 +367,46 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         throw new \DomainException(\sprintf('Unhandled "%s" node.', $node::class));
+    }
+
+    private function getExplicitTypeFromIdentifier(string $identifier): ?Type
+    {
+        return match ($identifier) {
+            'positive-int' => Type::intRange(from: 1, explicitType: $identifier),
+            'negative-int' => Type::intRange(to: -1, explicitType: $identifier),
+            'non-positive-int' => Type::intRange(to: 0, explicitType: $identifier),
+            'non-negative-int' => Type::intRange(from: 0, explicitType: $identifier),
+            'non-zero-int' => Type::union(Type::intRange(to: -1), Type::intRange(from: 1)),
+            'class-string',
+            'trait-string',
+            'interface-string',
+            'callable-string',
+            'numeric-string',
+            'lowercase-string',
+            'non-empty-lowercase-string',
+            'non-empty-string',
+            'non-falsy-string',
+            'truthy-string',
+            'literal-string',
+            'html-escaped-string' => Type::explicit(TypeIdentifier::STRING, $identifier),
+            default => null,
+        };
+    }
+
+    private function getIntRangeFromNode(GenericTypeNode $node): IntRangeType
+    {
+        if (2 !== \count($node->genericTypes)) {
+            throw new \DomainException(\sprintf('"%s" must have exactly two bounds.', $node));
+        }
+
+        [$from, $to] = array_map(static fn (TypeNode $bound): int => match (true) {
+            $bound instanceof IdentifierTypeNode && 'min' === $bound->name => \PHP_INT_MIN,
+            $bound instanceof IdentifierTypeNode && 'max' === $bound->name => \PHP_INT_MAX,
+            $bound instanceof ConstTypeNode && $bound->constExpr instanceof ConstExprIntegerNode => (int) $bound->constExpr->value,
+            default => throw new \DomainException(\sprintf('Invalid int range bound "%s".', $bound)),
+        }, $node->genericTypes);
+
+        return Type::intRange($from, $to);
     }
 
     private function resolveCustomIdentifier(string $identifier, ?TypeContext $typeContext): Type

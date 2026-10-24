@@ -37,6 +37,8 @@ class ResizeFormListener implements EventSubscriberInterface
     private \Closure|bool $deleteEmpty;
     private ?\Closure $entryName;
     private array $preSetDataChildrenStack = [];
+    /** @var \WeakMap<FormInterface, array<int|string, bool>> */
+    private \WeakMap $initialKeys;
 
     /**
      * @param string|array<string, string>               $type              A type, or one type per entry name when $entryTypeProvider is given
@@ -58,6 +60,7 @@ class ResizeFormListener implements EventSubscriberInterface
     ) {
         $this->deleteEmpty = \is_bool($deleteEmpty) ? $deleteEmpty : $deleteEmpty(...);
         $this->prototypeOptions = $prototypeOptions ?? $options;
+        $this->initialKeys = new \WeakMap();
 
         if (\is_string($entryName) || $entryName instanceof PropertyPathInterface) {
             $propertyPath = \is_string($entryName) ? new PropertyPath($entryName) : $entryName;
@@ -87,7 +90,7 @@ class ResizeFormListener implements EventSubscriberInterface
     final public function postSetData(PostSetDataEvent $event): void
     {
         $form = $event->getForm();
-        $data = $event->getData() ?? [];
+        $data = $form->getNormData() ?? [];
         $childrenToRemove = array_pop($this->preSetDataChildrenStack);
 
         if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
@@ -109,8 +112,9 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         // Then add all rows again in the correct order
-        $names = [];
+        $keys = $names = [];
         foreach ($data as $key => $value) {
+            $keys[$key] = isset($data[$key]);
             $name = $key;
 
             if (null !== $this->entryName) {
@@ -129,12 +133,23 @@ class ResizeFormListener implements EventSubscriberInterface
 
             $form->add($name, $this->forModelData($this->type, $value), $this->withPropertyPath($this->forModelData($this->options, $value), $key));
         }
+
+        $this->initialKeys[$form] = $keys;
     }
 
     public function preSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData();
+
+        if (!isset($this->initialKeys[$form])) {
+            $normData = $form->getNormData() ?? [];
+            $keys = [];
+            foreach ($normData as $key => $value) {
+                $keys[$key] = isset($normData[$key]);
+            }
+            $this->initialKeys[$form] = $keys;
+        }
 
         if (!\is_array($data)) {
             $data = [];
@@ -188,7 +203,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         if ($this->deleteEmpty) {
-            $previousData = $form->getData();
+            $initialKeys = $this->initialKeys[$form] ?? [];
             /** @var FormInterface $child */
             foreach ($form as $name => $child) {
                 if (!$child->isValid() || !$child->isSynchronized()) {
@@ -196,11 +211,9 @@ class ResizeFormListener implements EventSubscriberInterface
                 }
 
                 $key = $this->keyOf($child);
-                $isNew = !isset($previousData[$key]);
+                $isNew = !($initialKeys[$key] ?? false);
                 $isEmpty = \is_callable($this->deleteEmpty) ? ($this->deleteEmpty)($child->getData()) : $child->isEmpty();
 
-                // $isNew can only be true if allowAdd is true, so we don't
-                // need to check allowAdd again
                 if ($isEmpty && ($isNew || $this->allowDelete)) {
                     unset($data[$key]);
                     $form->remove($name);
@@ -309,15 +322,11 @@ class ResizeFormListener implements EventSubscriberInterface
     }
 
     /**
-     * @return array<int|string, true>
+     * @return array<int|string, bool>
      */
     private function usedKeys(FormInterface $form): array
     {
-        $keys = [];
-
-        foreach ($form->getData() ?? [] as $key => $value) {
-            $keys[$key] = true;
-        }
+        $keys = $this->initialKeys[$form] ?? [];
 
         foreach ($form as $child) {
             $keys[$this->keyOf($child)] = true;

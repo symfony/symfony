@@ -38,6 +38,8 @@ class UriResolverTest extends TestCase
             ['foo', 'http://localhost/bar/foo', 'http://localhost/bar/foo'],
 
             ['', 'http://localhost/bar/', 'http://localhost/bar/'],
+            ['0', 'http://a/b/c/d;p?q', 'http://a/b/c/0'],
+            [' 0 ', 'http://a/b/c/d;p?q', 'http://a/b/c/0'],
             ['#', 'http://localhost/bar/', 'http://localhost/bar/#'],
             ['#bar', 'http://localhost/bar?a=b', 'http://localhost/bar?a=b#bar'],
             ['#bar', 'http://localhost/bar/#foo', 'http://localhost/bar/#bar'],

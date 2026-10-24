@@ -42,7 +42,7 @@ class UriResolver
         }
 
         // empty URI
-        if (!$uri) {
+        if ('' === $uri) {
             return $baseUri;
         }
 

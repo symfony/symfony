@@ -1713,6 +1713,48 @@ class AutowirePassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition(AutowireNestedAttributes::class)->getArgument(0));
     }
 
+    public function testAutowireLazyClassDefaultAndExplicitOverrides()
+    {
+        $container = new ContainerBuilder();
+        $container->register(A::class);
+        $container->register(Foo::class);
+        $container->register('custom_a', A::class);
+        $container->register('custom_foo', Foo::class);
+        $container->register('consumer', AutowireLazyConsumer::class)->setAutowired(true);
+
+        (new AutowireRequiredMethodsPass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition('consumer');
+        $this->assertEquals(new LazyProxyArgument(new TypedReference(A::class, A::class)), $definition->getArgument(0));
+        $this->assertEquals(new TypedReference(Foo::class, Foo::class), $definition->getArgument(1));
+        $this->assertInstanceOf(LazyProxyArgument::class, $definition->getArgument(2));
+        $this->assertSame('custom_a', (string) $definition->getArgument(2)->getValues()[0]);
+        $this->assertSame('custom_foo', (string) $definition->getArgument(3));
+        $this->assertNotInstanceOf(LazyProxyArgument::class, $definition->getArgument(3));
+
+        $calls = $definition->getMethodCalls();
+        $this->assertCount(1, $calls);
+        $this->assertSame('setOther', $calls[0][0]);
+        $this->assertEquals(new LazyProxyArgument(new TypedReference(A::class, A::class)), $calls[0][1][0]);
+    }
+
+    public function testAutowireLazyDoesNotLeakToOtherServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register(A::class);
+        $container->register(Foo::class);
+        $container->register('custom_a', A::class);
+        $container->register('custom_foo', Foo::class);
+        $container->register('lazy', AutowireLazyConsumer::class)->setAutowired(true);
+        $container->register('eager', AutowireLazyUnannotatedConsumer::class)->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $this->assertEquals(new LazyProxyArgument(new TypedReference(A::class, A::class)), $container->getDefinition('lazy')->getArgument(0));
+        $this->assertEquals(new TypedReference(A::class, A::class), $container->getDefinition('eager')->getArgument(0));
+    }
+
     public function testLazyServiceAttribute()
     {
         $container = new ContainerBuilder();

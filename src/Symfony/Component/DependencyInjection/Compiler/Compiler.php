@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
  * This class is used to remove circular dependencies between individual passes.
@@ -49,13 +50,21 @@ class Compiler
     /**
      * @final
      */
-    public function log(CompilerPassInterface $pass, string $message): void
+    public function log(CompilerPassInterface|ExtensionInterface $pass, string $message): void
     {
         if (str_contains($message, "\n")) {
             $message = str_replace("\n", "\n".$pass::class.': ', trim($message));
         }
 
         $this->log[] = $pass::class.': '.$message;
+    }
+
+    /**
+     * @internal
+     */
+    public function mergeLog(self $compiler): void
+    {
+        $this->log = array_merge($this->log, $compiler->getLog());
     }
 
     public function getLog(): array

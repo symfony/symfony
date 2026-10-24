@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Allow `MaxDepth(0)` and honor zero depth in YAML and XML mappings to skip a property or invoke the max-depth handler at the first level
  * Honor `SerializedName` and `SerializedPath` on properties whose names match their accessors
  * Add `SerializerBundle`, which provides the `serializer` configuration and the services previously provided by `FrameworkBundle` under `framework.serializer`
  * Register the `CollectionDenormalizer` of the Doctrine bridge when `symfony/doctrine-bridge` and `doctrine/collections` are installed

@@ -30,6 +30,13 @@ final class SecurityRequestAttributes
     public const UNSUPPORTED_REASONS = '_security.unsupported_reasons';
 
     /**
+     * Holds whether the request carried a Privacy Pass token the origin accepted.
+     *
+     * @see Attribute\RequiresPrivateToken
+     */
+    public const PRIVATE_TOKEN_VALID = '_security.private_token_valid';
+
+    /**
      * Holds the denied security attribute while a ReAuthenticationEntryPointInterface starts a re-authentication,
      * so that an entry point asking the same question in several ways knows which one was asked here.
      *

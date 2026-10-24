@@ -1,0 +1,15 @@
+contact:
+    path: /contact
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\PrivateTokenController::contact
+
+optional:
+    path: /optional
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\PrivateTokenController::optional
+
+remembered:
+    path: /remembered
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\PrivateTokenController::remembered
+
+remembered_other:
+    path: /remembered-other
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\PrivateTokenController::rememberedOther

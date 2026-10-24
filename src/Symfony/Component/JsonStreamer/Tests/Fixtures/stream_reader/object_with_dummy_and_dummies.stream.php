@@ -65,7 +65,6 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
             foreach (\Symfony\Component\JsonStreamer\Read\Splitter::splitDict($stream, $offset, $length) as $k => $v) {
             }
         }
-        return $data;
     };
     $readers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'] = static function ($stream, $offset, $length) use (&$providers, &$denormalizers, &$validators) {
         try {
@@ -76,7 +75,10 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
             }
             return $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($stream, $offset, $length);
         }
-        return $denormalizers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($validators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($stream, $offset, $length, $data));
+        if (\Symfony\Component\JsonStreamer\Read\Decoder::hasDuplicateKeys($stream, $offset, $length, $data)) {
+            $validators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($stream, $offset, $length, $data);
+        }
+        return $denormalizers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($data);
     };
     return $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDummyAndDummies']($stream, 0, null);
 };

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Tests\Local;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\Ciphertext;
@@ -57,46 +58,30 @@ class SodiumKmsTest extends TestCase
         $this->assertNotSame($a, $b, 'A fresh nonce must be drawn for every encryption.');
     }
 
-    public function testDeterministicModeYieldsTheSameCiphertext()
+    #[DataProvider('provideLegacyDeterministicCiphertexts')]
+    public function testDecryptLegacyDeterministicCiphertext(string $plaintext, string $aad, string $blob)
     {
-        $a = $this->kms->encrypt('app', 'hello', deterministic: true)->blob;
-        $b = $this->kms->encrypt('app', 'hello', deterministic: true)->blob;
-        $c = $this->kms->encrypt('app', 'world', deterministic: true)->blob;
+        $kms = new SodiumKms(new InMemoryKeyLoader(['app' => str_repeat("\x01", 32)]));
 
-        $this->assertSame($a, $b, 'Deterministic mode must produce identical ciphertexts for the same plaintext.');
-        $this->assertNotSame($a, $c, 'Different plaintexts must still produce different ciphertexts.');
+        $this->assertSame($plaintext, $kms->decrypt(new Ciphertext(hex2bin($blob), 'app'), $aad));
     }
 
-    public function testDeterministicCiphertextRoundTrips()
+    #[DataProvider('provideLegacyDeterministicCiphertexts')]
+    public function testCannotDecryptLegacyDeterministicCiphertextWithWrongAad(string $plaintext, string $aad, string $blob)
     {
-        $ciphertext = $this->kms->encrypt('app', 'hello', deterministic: true);
+        $kms = new SodiumKms(new InMemoryKeyLoader(['app' => str_repeat("\x01", 32)]));
 
-        $this->assertSame('hello', $this->kms->decrypt($ciphertext));
+        $this->expectException(DecryptionFailedException::class);
+
+        $kms->decrypt(new Ciphertext(hex2bin($blob), 'app'), $aad.'-changed');
     }
 
-    public function testDeterministicModeDerivesTheNonceFromTheAadToo()
+    public static function provideLegacyDeterministicCiphertexts(): iterable
     {
-        $acme = $this->kms->encrypt('app', 'hello', 'tenant=acme', true)->blob;
-        $globex = $this->kms->encrypt('app', 'hello', 'tenant=globex', true)->blob;
-
-        $this->assertNotSame(self::nonceOf($acme), self::nonceOf($globex), 'Two AADs sharing a nonce under the same key would reveal the Poly1305 one-time key.');
-        $this->assertSame($acme, $this->kms->encrypt('app', 'hello', 'tenant=acme', true)->blob, 'The same (key, aad, plaintext) triple must still produce the same ciphertext.');
-    }
-
-    public function testDeterministicNonceIsIndependentOfThePlatformIntegerSize()
-    {
-        $kms = new SodiumKms(new InMemoryKeyLoader(['app' => str_repeat("\x01", \SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES)]));
-
-        $blob = $kms->encrypt('app', 'hello', 'tenant=acme', true)->blob;
-
-        $this->assertSame('958c327ef07fa86ba0c8cd434ac93e29a2a9d6312665c20f', bin2hex(self::nonceOf($blob)), 'A deterministic ciphertext outlives the process that wrote it: 32-bit and 64-bit builds must derive the same nonce.');
-    }
-
-    public function testDeterministicCiphertextWithAadRoundTrips()
-    {
-        $ciphertext = $this->kms->encrypt('app', 'hello', 'tenant=acme', true);
-
-        $this->assertSame('hello', $this->kms->decrypt($ciphertext, 'tenant=acme'));
+        yield 'plain' => ['hello', '', '018568c316378698b4ee6314639f7cbae4f5d56b7402129fbb74ea486da99b725b44cb1bab674bdc9bb5af03e8fe'];
+        yield 'aad' => ['hello', 'tenant=acme', '01958c327ef07fa86ba0c8cd434ac93e29a2a9d6312665c20fcacfe94ade494165b1f7e7a778e73cd5d0ef2730fc'];
+        yield 'empty' => ['', '', '01d27fd4fc42f8666e34313a20e8fdad2120584440b1bfa87db484633604d888555f9782246929da0c'];
+        yield 'binary' => ["\x00\xff", "opaque\x00", '01082b347fcd793ab98e9085c0b413d1e354011d6defe34ccef58a93b9c0d6302ce4ed97f2b91a7c514294'];
     }
 
     public function testDecryptionFailsOnTamperedCiphertext()
@@ -222,10 +207,5 @@ class SodiumKmsTest extends TestCase
 
         $this->expectException(DecryptionFailedException::class);
         $this->kms->unwrapDataKey($tampered);
-    }
-
-    private static function nonceOf(string $blob): string
-    {
-        return substr($blob, 1, \SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
     }
 }

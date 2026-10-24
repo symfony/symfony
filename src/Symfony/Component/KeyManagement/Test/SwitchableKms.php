@@ -53,23 +53,17 @@ final class SwitchableKms implements DataKeyGeneratorInterface, DecrypterInterfa
      */
     public array $keyIds = [];
 
-    /**
-     * @var list<bool> The `$deterministic` flag of each encrypt() call
-     */
-    public array $deterministic = [];
-
     public function __construct(
         private readonly DataKeyGeneratorInterface&DecrypterInterface&EncrypterInterface $inner,
         private readonly \Throwable $failure = new \RuntimeException('The backend is down.'),
     ) {
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
         $this->keyIds[] = $keyId;
-        $this->deterministic[] = $deterministic;
 
-        return $this->up(__FUNCTION__)->encrypt($keyId, $plaintext, $aad, $deterministic);
+        return $this->up(__FUNCTION__)->encrypt($keyId, $plaintext, $aad);
     }
 
     public function decrypt(Ciphertext $ciphertext, string $aad = ''): string

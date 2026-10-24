@@ -224,6 +224,7 @@ class RewrapDataKeysCommandTest extends TestCase
 
     public function testAKeyWhoseClientIsGoneIsReportedAndLeftBehind()
     {
+        $this->store = new InMemoryDataKeyStore(['aws' => $this->aws, 'azure' => $this->azure, 'vanished' => $this->aws], 'aws');
         $reference = $this->store->current('user.email')->reference;
         $this->store->rewrap($reference, iterator_to_array($this->store->all(), false)[0]->wrapped, 'vanished');
 

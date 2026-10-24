@@ -50,19 +50,11 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  * Backends declining {@see DataKeyGeneratorInterface} are only usable through
  * the direct path.
  *
- * Envelopes are always randomized, and there is no deterministic counterpart
- * to {@see EncrypterInterface::encrypt()}'s `$deterministic` flag here. Stable
- * output would require a stable data key, which `generateDataKey()` refuses to
- * return by contract, and a deterministic wrapping, which AWS KMS, Azure Key
- * Vault, Google Cloud KMS and Vault Transit all decline since they draw a
- * random nonce when they wrap. Deriving the nonce alone would leave the
- * envelope varying from call to call anyway. When equal plaintexts must yield
- * equal ciphertexts, for instance to look up an encrypted column, encrypt
- * through the direct path on a backend that offers the flag, or keep a blind
- * index (an HMAC of the plaintext) in a sibling column.
+ * Envelopes use a fresh data key and random nonce for each payload.
+ * Use a blind index in a sibling column for equality lookups.
  *
  * The `$aad` argument authenticates the bulk ciphertext through the local AEAD.
- * The AEAD prefixes the AAD with the envelope format id.
+ * The AEAD also authenticates the format id, master key id and wrapped data key.
  * The AAD isn't forwarded to the KMS, so wrapping the data key doesn't authenticate the AAD.
  * A mismatch is refused on every backend, including backends that don't support AAD.
  * A self-contained envelope can't use a KMS policy conditioned on the AAD, such as AWS KMS `kms:EncryptionContext`.
@@ -94,7 +86,7 @@ final class EnvelopeEncrypter implements EnvelopeEncrypterInterface, EnvelopeDec
         $dataKey = $this->kms->generateDataKey($key, $format->keyBytes());
         $iv = random_bytes($format->ivBytes());
 
-        [$ciphertext, $tag] = $dataKey->use(static fn (#[\SensitiveParameter] string $dek): array => self::seal($format, $dek, $plaintext, $iv, $aad));
+        [$ciphertext, $tag] = $dataKey->use(static fn (#[\SensitiveParameter] string $dek): array => self::seal($format, $dek, $plaintext, $iv, $aad, $dataKey->wrapped->keyId, $dataKey->wrapped->blob));
 
         return Envelope::selfContained($dataKey->wrapped->keyId, $dataKey->wrapped->blob, $iv, $tag, $ciphertext);
     }

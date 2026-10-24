@@ -5,9 +5,9 @@ The KeyManagement component provides a unified abstraction over Key Management
 Systems such as AWS KMS, Azure Key Vault, Google Cloud KMS, HashiCorp Vault
 Transit, Scaleway Key Manager and KMIP servers. It exposes a small high-level API for
 encrypting/decrypting payloads, generating data keys for envelope encryption,
-and is designed so that the secret material never leaves the underlying KMS. A
-client made of several providers keeps every ciphertext readable when one of
-them is lost.
+and keeps master keys in the underlying KMS.
+Envelope encryption obtains plaintext data keys to encrypt payloads locally.
+A client made of several providers keeps every ciphertext readable when one of them is lost.
 
 **This Component is experimental**.
 [Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
@@ -54,7 +54,9 @@ $payload = $envelopeEncrypter->decrypt(Envelope::fromBytes(file_get_contents($pa
 ```
 
 `EnvelopeEncrypter` authenticates the AAD locally and doesn't pass the AAD to the KMS.
-Older implementations also authenticated the wrapped data key with the AAD.
+The local authentication also covers the envelope format, key ID and wrapped data key.
+Stored envelopes authenticate their format and data key reference instead, so rewrapping preserves existing payloads.
+Earlier experimental implementations used different authenticated data.
 Migrate those envelopes with the previous implementation and the trusted original AAD, then encrypt the plaintext with the current implementation.
 Derived Vault keys also need migration for the new [derivation context framing](Bridge/HashiCorpVault/README.md#migrating-derived-keys).
 The self-contained fallback of `StoredEnvelopeEncrypter` has the same restriction.
@@ -65,6 +67,17 @@ README. `symfony/doctrine-dbal-key-management` ships a Doctrine DBAL Type that
 decorates any parent Type with column-level envelope encryption, and
 `symfony/doctrine-orm-key-management` the attribute filling a blind index on
 flush.
+
+Encryption doesn't prove which row or tenant a value belongs to.
+Supply the expected context as AAD and verify ownership before using decrypted values.
+A valid older ciphertext can still decrypt.
+Replay protection needs trusted state that an attacker can't roll back.
+
+Anyone holding a public encryption key can create valid ciphertext.
+`SealedBoxKms` therefore doesn't authenticate the writer, including when used for envelope encryption.
+Use a separate secret MAC or trusted-writer signature over the value and expected context when writes must be authenticated.
+A store using public-key wrapping also needs to authenticate its key records independently.
+Otherwise, a database writer can plant a known data key and decrypt future application writes.
 
 Searching an encrypted column
 -----------------------------

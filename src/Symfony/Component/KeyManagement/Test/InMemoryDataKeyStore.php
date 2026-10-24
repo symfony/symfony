@@ -100,6 +100,7 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
      */
     public function rewrap(string $reference, Ciphertext $wrapped, string $client): void
     {
+        $this->clientFor($client);
         $row = $this->rows[$reference] ?? throw new DataKeyNotFoundException($reference);
 
         $this->rows[$reference] = new StoredDataKey($reference, $row->scope, $wrapped, $client, $row->binding);
@@ -144,11 +145,11 @@ final class InMemoryDataKeyStore implements RewrappableDataKeyStoreInterface
 
     private function handleFor(StoredDataKey $row): DataKeyHandle
     {
-        if (isset($this->handles[$row->reference]) && !$this->handles[$row->reference]->isReleased()) {
-            return $this->handles[$row->reference];
+        $client = $this->clientFor($row->client);
+        $handle = $this->handles[$row->reference] ?? null;
+        if (null === $handle || $handle->isReleased()) {
+            $handle = new DataKeyHandle($row->reference, $client->unwrapDataKey($row->wrapped, $this->wrappingContext($row->reference, $row->scope)));
         }
-
-        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped, $this->wrappingContext($row->reference, $row->scope)));
 
         if (!$handle->use(static fn (#[\SensitiveParameter] string $plaintext): bool => hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext)))) {
             $handle->release();

@@ -123,11 +123,11 @@ final class CompositeKms implements DataKeyGeneratorInterface, DecrypterInterfac
         }
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
         $wrappings = [];
         foreach ($this->members as $name => $memberKeyId) {
-            $wrappings[$name] = $this->member($name)->encrypt($memberKeyId ?? $keyId, $plaintext, $aad, $deterministic);
+            $wrappings[$name] = $this->member($name)->encrypt($memberKeyId ?? $keyId, $plaintext, $aad);
         }
 
         return new Ciphertext(self::frame($wrappings), $keyId);

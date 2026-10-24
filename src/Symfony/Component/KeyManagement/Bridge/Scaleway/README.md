@@ -75,7 +75,6 @@ Limitations
  * Data keys are at least 16 bytes long.
  * Scaleway encrypts at most 64 KiB per call; use envelope encryption for
    larger payloads.
- * Deterministic encryption is not supported.
  * On decryption, HTTP 400 and 404 are reported as a `DecryptionFailedException`
    so that a caller cannot tell an unknown key from a tampered ciphertext;
    authentication, quota and server errors are reported as a `RuntimeException`.

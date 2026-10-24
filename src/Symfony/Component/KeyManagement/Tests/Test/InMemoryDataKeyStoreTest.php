@@ -23,6 +23,7 @@ use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
 use Symfony\Component\KeyManagement\StoredDataKey;
 use Symfony\Component\KeyManagement\Test\InMemoryDataKeyStore;
+use Symfony\Component\KeyManagement\Test\InMemoryKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\DerivedKeyKms;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV7;
@@ -142,7 +143,7 @@ class InMemoryDataKeyStoreTest extends TestCase
 
     public function testRewrapKeepsTheReferenceAndTheScope()
     {
-        $store = new InMemoryDataKeyStore();
+        $store = new InMemoryDataKeyStore(['default' => new InMemoryKms(), 'azure' => new InMemoryKms()]);
         $reference = $store->current('user.email')->reference;
         $wrapped = self::rowOf($store)->wrapped;
 

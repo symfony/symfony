@@ -155,7 +155,7 @@ class KeyManagementBundleExtensionTest extends TestCase
 
         $arguments = $container->getDefinition('console.command.key_management_rewrap_data_keys')->getArguments();
         $this->assertSame('key_management.store', (string) $arguments[0]);
-        $this->assertInstanceOf(ServiceLocatorArgument::class, $arguments[1]);
+        $this->assertSame('.key_management.store.clients', (string) $arguments[1]);
     }
 
     public function testFlysystemFactoryIsWiredWithTaggedLocator()
@@ -249,9 +249,7 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('key_management.store'));
         $arguments = $container->getDefinition('key_management.store')->getArguments();
         $this->assertSame('app.dbal', (string) $arguments[0]);
-        $this->assertInstanceOf(ServiceLocatorArgument::class, $arguments[1]);
-        $this->assertSame('key_management.client', $arguments[1]->getTaggedIteratorArgument()->getTag(), 'a data key can be rewrapped under any tagged client, not only under a configured one.');
-        $this->assertSame('key', $arguments[1]->getTaggedIteratorArgument()->getIndexAttribute());
+        $this->assertSame('.key_management.store.clients', (string) $arguments[1]);
         $this->assertSame('app', $arguments[2]);
         $this->assertSame('alias/app-key', $arguments[3]);
         $this->assertSame('deks', $arguments[4]);
@@ -264,6 +262,24 @@ class KeyManagementBundleExtensionTest extends TestCase
         $encrypter = $container->getDefinition('key_management.stored_envelope_encrypter')->getArguments();
         $this->assertSame('key_management.store', (string) $encrypter[0]);
         $this->assertNull($encrypter[1], 'a payload carrying its own data key bypasses the store, so reading one is asked for rather than inherited from having a default client.');
+    }
+
+    public function testAnUnknownAllowedStoreClientIsRejected()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The KMS client "missing" set in "key_management.store.allowed_clients" is not registered');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                'store' => ['client' => 'app', 'key_id' => 'app', 'allowed_clients' => ['missing']],
+            ]);
+        });
     }
 
     public function testReadingSelfContainedPayloadsNeedsAClientToReadThemWith()

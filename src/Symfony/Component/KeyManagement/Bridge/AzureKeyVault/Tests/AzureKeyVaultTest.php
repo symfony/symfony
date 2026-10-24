@@ -619,14 +619,6 @@ class AzureKeyVaultTest extends TestCase
         $kms->encrypt('app-key', 'hello', 'tenant=acme');
     }
 
-    public function testEncryptRejectsDeterministic()
-    {
-        $kms = new AzureKeyVault(new MockHttpClient([], self::VAULT), $this->staticToken('T'));
-
-        $this->expectException(UnsupportedOperationException::class);
-        $kms->encrypt('app-key', 'hello', deterministic: true);
-    }
-
     public function testEncryptWithAeadBundlesAlgorithmIvAndTagIntoTheBlob()
     {
         $captured = null;

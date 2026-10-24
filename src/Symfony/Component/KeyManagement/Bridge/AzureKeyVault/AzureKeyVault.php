@@ -78,11 +78,8 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
     ) {
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
-        if ($deterministic) {
-            throw new UnsupportedOperationException('Azure Key Vault does not expose deterministic encryption per call.');
-        }
         if ('' !== $aad && !\in_array($this->encryptAlgorithm, self::AEAD_ALGORITHMS, true)) {
             throw new UnsupportedOperationException(\sprintf('Algorithm "%s" cannot enforce AAD; configure an AEAD algorithm (A128GCM, A192GCM, A256GCM) to use AAD with Azure Key Vault.', $this->encryptAlgorithm));
         }

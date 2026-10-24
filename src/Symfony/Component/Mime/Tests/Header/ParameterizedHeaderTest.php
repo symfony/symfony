@@ -58,6 +58,13 @@ class ParameterizedHeaderTest extends TestCase
         $this->assertEquals('attachment; filename="my file.txt"', $header->getBodyAsString());
     }
 
+    public function testQuotesAndBackslashesAreEscapedInQuotedString()
+    {
+        $header = new ParameterizedHeader('Content-Disposition', 'attachment');
+        $header->setParameters(['filename' => 'my "file" \\ 1.txt']);
+        $this->assertEquals('attachment; filename="my \\"file\\" \\\\ 1.txt"', $header->getBodyAsString());
+    }
+
     public function testFormDataResultsInQuotedString()
     {
         $header = new ParameterizedHeader('Content-Disposition', 'form-data');

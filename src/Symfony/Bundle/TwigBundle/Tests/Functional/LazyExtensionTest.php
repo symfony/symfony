@@ -56,6 +56,10 @@ class LazyExtensionTest extends TestCase
         yield [ExtensionWithDependency::class, 'dependency_value'];
         yield [AttributeExtensionWithDependency::class, 'attribute_dependency_value'];
         yield [DelegatingAttributeExtensionWithDependency::class, 'delegating_dependency_value'];
+
+        if (!(new \ReflectionClass(AttributeExtension::class))->isFinal()) {
+            yield [AttributeExtensionSubclassWithDependency::class, 'subclass_dependency_value'];
+        }
     }
 
     #[Before, After]
@@ -95,6 +99,12 @@ class LazyExtensionKernel extends Kernel
             $container->register(DelegatingAttributeExtensionWithDependency::class, DelegatingAttributeExtensionWithDependency::class)
                 ->setAutowired(true)
                 ->setAutoconfigured(true);
+
+            if (class_exists(AttributeExtensionSubclassWithDependency::class, false)) {
+                $container->register(AttributeExtensionSubclassWithDependency::class, AttributeExtensionSubclassWithDependency::class)
+                    ->setAutowired(true)
+                    ->setAutoconfigured(true);
+            }
 
             $container->setAlias('twig_test', 'twig')->setPublic(true);
         });
@@ -174,5 +184,21 @@ class DelegatingAttributeExtensionWithDependency extends AbstractExtension
     public function getValue(): string
     {
         return $this->dependency->getValue();
+    }
+}
+
+if (!(new \ReflectionClass(AttributeExtension::class))->isFinal()) {
+    class AttributeExtensionSubclassWithDependency extends AttributeExtension
+    {
+        public function __construct(
+            private ExtensionDependency $dependency,
+        ) {
+        }
+
+        #[AsTwigFunction('subclass_dependency_value')]
+        public function getValue(): string
+        {
+            return $this->dependency->getValue();
+        }
     }
 }

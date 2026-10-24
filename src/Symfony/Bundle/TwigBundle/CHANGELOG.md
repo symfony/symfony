@@ -9,6 +9,7 @@ CHANGELOG
  * Add support for the `sign_url` filter of `TwigBridge`
  * Make Twig extensions that depend on other services lazy, so that these services are created on first use
  * Register the Twig extensions that declare their functions, filters and tests with attributes through `AttributeExtension`, so that they are created on first use
+ * Register the Twig extensions that extend `AttributeExtension` as runtimes as well
  * Allow autoconfigured Twig extensions to declare their functions, filters and tests with attributes
 
 8.1

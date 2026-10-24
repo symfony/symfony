@@ -8,6 +8,9 @@ CHANGELOG
  * Add support for `@template-covariant` and its vendor prefixed synonyms
  * Add `Type::map()` to map a type and its parts bottom-up
  * Add `Type::getMismatches()` and `TypeMismatch` to tell where and why a value is not accepted by a type
+ * Add `ExplicitType`, `IntRangeType` and `ClassLikeType`, builtin types that keep a more specific PHPStan type such as `non-empty-string`, `int<0, 100>` or `class-string<Foo>`
+ * Add the `$explicitTypes` argument to `StringTypeResolver` to resolve PHPStan types to these types instead of to plain `int` and `string`
+ * Add the `type_info.explicit_types` option to enable `$explicitTypes` on the `type_info.resolver.string` service
 
 8.1
 ---

@@ -46,6 +46,10 @@ class TypeInfoBundle extends AbstractBundle
                     ->useAttributeAsKey('name')
                     ->scalarPrototype()->end()
                 ->end()
+                ->booleanNode('explicit_types')
+                    ->info('Whether to resolve PHPStan types more specific than their builtin type, such as "non-empty-string" or "int<0, 100>", to explicit types.')
+                    ->defaultFalse()
+                ->end()
             ->end()
         ;
     }
@@ -60,7 +64,7 @@ class TypeInfoBundle extends AbstractBundle
 
         if (ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/type-info'])) {
             $container->register('type_info.resolver.string', StringTypeResolver::class)
-                ->setArguments([null, null, $config['aliases']]);
+                ->setArguments([null, null, $config['aliases'], $config['explicit_types']]);
 
             $container->register('type_info.resolver.reflection_parameter.phpdoc_aware', PhpDocAwareReflectionTypeResolver::class)
                 ->setArguments([new Reference('type_info.resolver.reflection_parameter'), new Reference('type_info.resolver.string'), new Reference('type_info.type_context_factory')]);

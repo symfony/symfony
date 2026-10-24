@@ -56,6 +56,28 @@ class TypeInfoBundleExtensionTest extends TestCase
         $this->assertSame(['CustomAlias' => 'int'], $container->getDefinition('type_info.resolver.string')->getArgument(2));
     }
 
+    public function testExplicitTypesAreDisabledByDefault()
+    {
+        if (!class_exists(PhpDocParser::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" dependency is required.');
+        }
+
+        $container = $this->createContainerFromFile('type_info_default_config');
+
+        $this->assertFalse($container->getDefinition('type_info.resolver.string')->getArgument(3));
+    }
+
+    public function testExplicitTypesArePassedToTheStringResolver()
+    {
+        if (!class_exists(PhpDocParser::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" dependency is required.');
+        }
+
+        $container = $this->createContainerFromFile('type_info_explicit_types');
+
+        $this->assertTrue($container->getDefinition('type_info.resolver.string')->getArgument(3));
+    }
+
     private function createContainerFromFile(string $file): ContainerBuilder
     {
         $container = $this->createContainer();

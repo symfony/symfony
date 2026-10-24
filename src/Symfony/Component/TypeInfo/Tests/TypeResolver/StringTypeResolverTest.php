@@ -30,6 +30,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTypeAliases;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 class StringTypeResolverTest extends TestCase
@@ -213,6 +214,7 @@ class StringTypeResolverTest extends TestCase
         yield [Type::generic(Type::object(\DateTime::class), Type::string(), Type::bool()), \DateTime::class.'<string, bool>'];
         yield [Type::generic(Type::object(\DateTime::class), Type::generic(Type::object(\Stringable::class), Type::bool())), \sprintf('%s<%s<bool>>', \DateTime::class, \Stringable::class)];
         yield [Type::int(), 'int<0, 100>'];
+        yield [Type::string(), 'class-string<'.Dummy::class.'>'];
         yield [Type::string(), \sprintf('value-of<%s>', DummyBackedEnum::class)];
         yield [Type::int(), 'key-of<list<bool>>'];
         yield [Type::bool(), 'value-of<list<bool>>'];
@@ -244,6 +246,58 @@ class StringTypeResolverTest extends TestCase
         yield [Type::int(), 'CustomInt', $typeContextFactory->createFromClassName(DummyWithTypeAliases::class)];
         yield [Type::string(), 'CustomString', $typeContextFactory->createFromClassName(DummyWithTypeAliases::class)];
         yield [Type::template('T'), 'AliasWithTemplate', $typeContextFactory->createFromClassName(DummyWithTemplateTypeAlias::class)];
+    }
+
+    #[DataProvider('resolveExplicitTypesDataProvider')]
+    public function testResolveExplicitTypes(Type $expectedType, string $string)
+    {
+        $this->assertEquals($expectedType, (new StringTypeResolver(explicitTypes: true))->resolve($string));
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: string}>
+     */
+    public static function resolveExplicitTypesDataProvider(): iterable
+    {
+        // int ranges
+        yield [Type::intRange(from: 1, explicitType: 'positive-int'), 'positive-int'];
+        yield [Type::intRange(to: -1, explicitType: 'negative-int'), 'negative-int'];
+        yield [Type::intRange(to: 0, explicitType: 'non-positive-int'), 'non-positive-int'];
+        yield [Type::intRange(from: 0, explicitType: 'non-negative-int'), 'non-negative-int'];
+        yield [Type::union(Type::intRange(to: -1), Type::intRange(from: 1)), 'non-zero-int'];
+        yield [Type::intRange(0, 100), 'int<0, 100>'];
+        yield [Type::intRange(to: 5), 'int<min, 5>'];
+        yield [Type::intRange(from: -3), 'int<-3, max>'];
+
+        // explicit strings
+        foreach (['class-string', 'trait-string', 'interface-string', 'callable-string', 'numeric-string', 'lowercase-string', 'non-empty-lowercase-string', 'non-empty-string', 'non-falsy-string', 'truthy-string', 'literal-string', 'html-escaped-string'] as $explicitType) {
+            yield [Type::explicit(TypeIdentifier::STRING, $explicitType), $explicitType];
+        }
+
+        // class-like strings
+        yield [Type::classLike('class-string', Type::object(Dummy::class)), 'class-string<'.Dummy::class.'>'];
+        yield [Type::classLike('interface-string', Type::object(\Countable::class)), 'interface-string<Countable>'];
+
+        // nested
+        yield [Type::list(Type::intRange(from: 1, explicitType: 'positive-int')), 'list<positive-int>'];
+        yield [Type::array(Type::string(), Type::explicit(TypeIdentifier::STRING, 'non-empty-string')), 'array<non-empty-string, string>'];
+        yield [Type::nullable(Type::explicit(TypeIdentifier::STRING, 'non-empty-string')), '?non-empty-string'];
+
+        // unchanged
+        yield [Type::int(), 'int'];
+        yield [Type::string(), 'string'];
+    }
+
+    public function testCannotResolveIntRangeWithInvalidBound()
+    {
+        $this->expectException(UnsupportedException::class);
+        (new StringTypeResolver(explicitTypes: true))->resolve('int<0, foo>');
+    }
+
+    public function testCannotResolveIntRangeWithOneBound()
+    {
+        $this->expectException(UnsupportedException::class);
+        (new StringTypeResolver(explicitTypes: true))->resolve('int<0>');
     }
 
     public function testResolveWithExtraTypeAlias()

@@ -94,6 +94,59 @@ class CookieJarTest extends TestCase
         $this->assertNull($cookieJar->get('foo'));
     }
 
+    public function testUpdateFromSetCookiePreservesCommasInPaths()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=bar; Path=/c,d=e', 'other=value; Path=/'], 'http://example.com/');
+
+        $this->assertSame(['foo' => 'bar', 'other' => 'value'], $cookieJar->allValues('http://example.com/c,d=e'));
+        $this->assertSame(['other' => 'value'], $cookieJar->allValues('http://example.com/c'));
+        $this->assertNull($cookieJar->get('d'));
+    }
+
+    public function testUpdateFromSetCookieIgnoresInvalidCookies()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(["invalid=va\x00lue", 'oversized='.str_repeat('a', 4096), 'valid=value'], 'http://example.com/');
+
+        $this->assertSame(['valid' => 'value'], $cookieJar->allValues('http://example.com/'));
+    }
+
+    public function testUpdateFromSetCookieAcceptsNamelessCookies()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['token'], 'http://example.com/');
+
+        $this->assertSame(['' => 'token'], $cookieJar->allValues('http://example.com/'));
+    }
+
+    public function testUpdateFromSetCookieNormalizesDomains()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=first; Domain=.Example.COM'], 'http://WWW.Example.COM/');
+        $cookieJar->updateFromSetCookie(['foo=second; Domain=example.com'], 'http://www.example.com/');
+        $cookieJar->updateFromSetCookie(['host=value'], 'http://WWW.Example.COM/');
+
+        $this->assertCount(2, $cookieJar->all());
+        $this->assertSame(['foo' => 'second', 'host' => 'value'], $cookieJar->allValues('http://WWW.Example.COM/'));
+        $this->assertSame('second', $cookieJar->get('foo', '/', 'WWW.Example.COM')->getValue());
+        $this->assertSame('value', $cookieJar->get('host', '/', 'WWW.Example.COM')->getValue());
+
+        $cookieJar->expire('foo', '/', '.EXAMPLE.com');
+
+        $this->assertNull($cookieJar->get('foo'));
+    }
+
+    public function testSetNormalizesDomains()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set(new Cookie('foo', 'first', null, '/', '.Example.COM'));
+        $cookieJar->set(new Cookie('foo', 'second', null, '/', 'example.com'));
+
+        $this->assertCount(1, $cookieJar->all());
+        $this->assertSame(['foo' => 'second'], $cookieJar->allValues('http://WWW.Example.COM/'));
+    }
+
     public function testUpdateFromSetCookieIgnoresAnEmptyDomainAttribute()
     {
         $cookieJar = new CookieJar();
@@ -115,7 +168,7 @@ class CookieJarTest extends TestCase
     {
         $timestamp = time() + 3600;
         $date = gmdate('D, d M Y H:i:s \G\M\T', $timestamp);
-        $setCookies = [\sprintf('foo=foo; expires=%s; domain=.symfony.com; path=/, bar=bar; domain=.blog.symfony.com, PHPSESSID=id; expires=%1$s', $date)];
+        $setCookies = [\sprintf('foo=foo; expires=%s; domain=.symfony.com; path=/', $date), 'bar=bar; domain=.blog.symfony.com', \sprintf('PHPSESSID=id; expires=%s', $date)];
 
         $cookieJar = new CookieJar();
         $cookieJar->updateFromSetCookie($setCookies);

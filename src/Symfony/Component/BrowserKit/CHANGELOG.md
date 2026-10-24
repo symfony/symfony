@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Preserve commas in cookie paths, normalize cookie domains, parse nameless cookies, and enforce cookie parsing limits
  * Make `CookieJar` ignore a cookie whose `Domain` attribute does not match the host of the response
  * Add `Cookie::isHostOnly()`
  * Make `CookieJar` send a cookie set without a `Domain` attribute only to the host that set it

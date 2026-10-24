@@ -61,11 +61,16 @@ final class TypeResolver implements TypeResolverInterface
 
     /**
      * @param array<string, TypeResolverInterface>|null $resolvers
+     * @param bool|null                                 $resolveRefinements Whether the string type resolver resolves PHPDoc refinements, such as literals and integer ranges. Not passing true is deprecated since 8.2, refinements will always be resolved as of 9.0
      */
-    public static function create(?array $resolvers = null): self
+    public static function create(?array $resolvers = null, ?bool $resolveRefinements = null): self
     {
         if (null === $resolvers) {
-            $stringTypeResolver = class_exists(PhpDocParser::class) ? new StringTypeResolver() : null;
+            if (true !== $resolveRefinements && class_exists(PhpDocParser::class)) {
+                trigger_deprecation('symfony/type-info', '8.2', 'Not passing true for the "$resolveRefinements" argument of "%s()" is deprecated; PHPDoc refinements will always be resolved in 9.0.', __METHOD__);
+            }
+
+            $stringTypeResolver = class_exists(PhpDocParser::class) ? new StringTypeResolver(null, null, [], $resolveRefinements ?? false) : null;
             $typeContextFactory = new TypeContextFactory($stringTypeResolver);
             $reflectionTypeResolver = new ReflectionTypeResolver();
 

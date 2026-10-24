@@ -40,6 +40,8 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\IntRangeType;
+use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
@@ -988,6 +990,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $collectionValueType = $collectionValueType instanceof NullableType ? $collectionValueType->getWrappedType() : $collectionValueType->getCollectionValueType();
             }
 
+            if ($collectionValueType instanceof LiteralType || $collectionValueType instanceof IntRangeType) {
+                $collectionValueType = $collectionValueType->getWrappedType();
+            }
+
             $collectionValueBaseType = $collectionValueType;
         }
 
@@ -1179,7 +1185,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return [];
         }
 
-        $this->typeContextFactory ??= new TypeContextFactory(new StringTypeResolver());
+        $this->typeContextFactory ??= new TypeContextFactory(new StringTypeResolver(null, null, [], true));
         $inheritedTemplateTypes = $this->typeContextFactory->createFromClassName($mappedClass, $genericClass->getClassName())->inheritedTemplateTypes;
         $templateTypes = [];
 

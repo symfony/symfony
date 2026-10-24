@@ -11,6 +11,12 @@
 
 namespace Symfony\Component\JsonStreamer;
 
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\IntRangeType;
+use Symfony\Component\TypeInfo\Type\LiteralType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
@@ -56,5 +62,14 @@ trait PhpGeneratorTrait
     private function line(string $line, array $context): string
     {
         return str_repeat('    ', $context['indentation_level']).$line."\n";
+    }
+
+    private static function getCollectionKeyTypeIdentifier(Type $type): ?TypeIdentifier
+    {
+        if ($type instanceof LiteralType || $type instanceof IntRangeType) {
+            $type = $type->getWrappedType();
+        }
+
+        return $type instanceof BuiltinType ? $type->getTypeIdentifier() : null;
     }
 }

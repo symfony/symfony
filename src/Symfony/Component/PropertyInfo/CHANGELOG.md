@@ -10,6 +10,8 @@ CHANGELOG
  * Add `PropertyNameExtractorInterface` and `getPropertyName()` to enable property name extraction from an accessor or mutator
  * Support `enable_default_groups` context option in `SerializerExtractor`
  * Make `PhpDocExtractor` and `PhpStanExtractor` inherit PHPDoc types from parent classes, interfaces and abstract trait methods
+ * Add a `$resolveRefinements` argument to `PhpStanExtractor::__construct()`, set from the `type_info.resolve_refinements` option by `PropertyInfoBundle`
+ * Deprecate not passing `true` for the `$resolveRefinements` argument of `PhpStanExtractor::__construct()`
 
 8.1
 ---

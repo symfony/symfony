@@ -33,7 +33,7 @@ class PhpDocAwareReflectionTypeResolverTest extends TestCase
     #[DataProvider('readPhpDocDataProvider')]
     public function testReadPhpDoc(Type $expected, \Reflector $reflector)
     {
-        $resolver = new PhpDocAwareReflectionTypeResolver(TypeResolver::create(), new StringTypeResolver(), new TypeContextFactory(new StringTypeResolver()));
+        $resolver = new PhpDocAwareReflectionTypeResolver(TypeResolver::create(null, true), new StringTypeResolver(null, null, [], true), new TypeContextFactory(new StringTypeResolver(null, null, [], true)));
 
         $this->assertEquals($expected, $resolver->resolve($reflector));
     }
@@ -54,7 +54,7 @@ class PhpDocAwareReflectionTypeResolverTest extends TestCase
         yield [Type::int(), $reflection->getProperty('aliasedInt')];
         yield [Type::arrayShape(["it's" => Type::int(), 'quoted key' => Type::int()]), $reflection->getProperty('arrayShapeWithQuotedKeys')];
         yield [Type::arrayShape(["it's" => Type::int(), 'quoted key' => Type::int()]), $reflection->getProperty('aliasedArrayShapeWithQuotedKeys')];
-        yield [Type::string(), $reflection->getProperty('literal')];
+        yield [Type::literal('literal'), $reflection->getProperty('literal')];
 
         $reflection = new \ReflectionClass(DummyUsingTraitInDifferentNs::class);
 
@@ -158,7 +158,7 @@ class PhpDocAwareReflectionTypeResolverTest extends TestCase
 
     public function testFallbackWhenNoPhpDoc()
     {
-        $resolver = new PhpDocAwareReflectionTypeResolver(TypeResolver::create(), new StringTypeResolver(), new TypeContextFactory());
+        $resolver = new PhpDocAwareReflectionTypeResolver(TypeResolver::create(null, true), new StringTypeResolver(null, null, [], true), new TypeContextFactory());
         $reflection = new \ReflectionClass(Dummy::class);
 
         $this->assertEquals(Type::int(), $resolver->resolve($reflection->getProperty('id')));

@@ -512,7 +512,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     {
         $curloptsToConfig = [
             // options used in CurlHttpClient
-            \CURLOPT_HTTPAUTH => 'auth_ntlm',
             \CURLOPT_USERPWD => 'auth_ntlm',
             \CURLOPT_RESOLVE => 'resolve',
             \CURLOPT_NOSIGNAL => 'timeout',
@@ -583,6 +582,25 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         }
 
         foreach ($options as $opt => $optValue) {
+            if (\CURLOPT_HTTPAUTH === $opt) {
+                if (!\is_int($optValue)) {
+                    throw new InvalidArgumentException('The "CURLOPT_HTTPAUTH" value in "extra.curl" must be an integer.');
+                }
+
+                $authMethods = [\CURLAUTH_BASIC => 'auth_basic', \CURLAUTH_NTLM => 'auth_ntlm'];
+                if (\defined('CURLAUTH_BEARER')) {
+                    $authMethods[\CURLAUTH_BEARER] = 'auth_bearer';
+                }
+                if (\defined('CURLAUTH_NTLM_WB')) {
+                    $authMethods[\CURLAUTH_NTLM_WB] = 'auth_ntlm';
+                }
+                foreach ($authMethods as $method => $config) {
+                    if ($optValue & $method) {
+                        throw new InvalidArgumentException(\sprintf('Cannot set "CURLOPT_HTTPAUTH" with "extra.curl", use option "%s" instead.', $config));
+                    }
+                }
+            }
+
             if (isset($curloptsToConfig[$opt])) {
                 $constName = $this->findConstantName($opt) ?? $opt;
                 throw new InvalidArgumentException(\sprintf('Cannot set "%s" with "extra.curl", use option "%s" instead.', $constName, $curloptsToConfig[$opt]));

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Limit read-ahead for active responses in `CurlHttpClient`, `AmpHttpClient` and `NativeHttpClient`
+ * Allow `CURLOPT_HTTPAUTH` in `extra.curl` for authentication methods without a dedicated HttpClient option
  * Default the `http_client.recorder.enabled` option to `true` when `framework.test` is enabled
  * Tag the `cache.http_client.pool` cache pool with `kernel.test_state`, so that `KernelTestCase` clears it at the end of each test
  * Add `HttpClientBundle`, which provides the `http_client` configuration and the services previously provided by `FrameworkBundle` under `framework.http_client`

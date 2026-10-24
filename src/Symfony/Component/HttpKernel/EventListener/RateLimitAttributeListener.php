@@ -17,7 +17,11 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Parser;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\AbstractInlineRateLimit;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
+use Symfony\Component\HttpKernel\Attribute\RateLimitFixedWindow;
+use Symfony\Component\HttpKernel\Attribute\RateLimitSlidingWindow;
+use Symfony\Component\HttpKernel\Attribute\RateLimitTokenBucket;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -26,6 +30,7 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\RateLimiter\AppliedRateLimit;
 use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
+use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
@@ -41,17 +46,19 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
     public const RATE_LIMIT_ATTRIBUTE = '_rate_limit';
 
     /**
-     * @var \WeakMap<Request, list<RateLimit>>
+     * @var \WeakMap<Request, list<RateLimit|AbstractInlineRateLimit>>
      */
     private \WeakMap $consumedBeforeArguments;
 
     /**
      * @param ServiceProviderInterface<RateLimiterFactoryInterface> $limiters
      * @param ExpressionLanguage|null                               $expressionLanguage The one that evaluates the keys and the conditions, which knows the variables of the expressions it compiled
+     * @param RateLimiterBuilder|null                               $builder            Creates the limiters of the attributes that configure them inline
      */
     public function __construct(
         private readonly ServiceProviderInterface $limiters,
         private ?ExpressionLanguage $expressionLanguage = null,
+        private readonly ?RateLimiterBuilder $builder = null,
     ) {
         $this->consumedBeforeArguments = new \WeakMap();
     }
@@ -59,7 +66,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
     /**
      * Consumes tokens as soon as the controller is known, or once its arguments are resolved when the key or the condition reads them.
      *
-     * @param ControllerAttributeEvent<RateLimit, ControllerEvent|ControllerArgumentsEvent> $event
+     * @param ControllerAttributeEvent<RateLimit|RateLimitFixedWindow|RateLimitSlidingWindow|RateLimitTokenBucket, ControllerEvent|ControllerArgumentsEvent> $event
      */
     public function onKernelControllerAttribute(ControllerAttributeEvent $event, ?string $eventName = null, ?EventDispatcherInterface $dispatcher = null): void
     {
@@ -81,14 +88,14 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         }
 
         if (!\is_bool($if = $event->evaluate($attribute->if))) {
-            throw new \TypeError(\sprintf('The value of the "$if" option of the "%s" attribute must evaluate to a boolean, "%s" given.', RateLimit::class, get_debug_type($if)));
+            throw new \TypeError(\sprintf('The value of the "$if" option of the "%s" attribute must evaluate to a boolean, "%s" given.', $attribute::class, get_debug_type($if)));
         }
 
         if (!$if) {
             return;
         }
 
-        if (!$this->limiters->has($attribute->limiter)) {
+        if ($attribute instanceof RateLimit && !$this->limiters->has($attribute->limiter)) {
             throw new \InvalidArgumentException(\sprintf('Rate limiter "%s" does not exist. Did you forget to configure it? Available limiters: "%s".', $attribute->limiter, implode('", "', array_keys($this->limiters->getProvidedServices()))));
         }
 
@@ -97,10 +104,18 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         } elseif (\is_string($key = $attribute->key) && str_contains($key, '{')) {
             $key = KeyPlaceholderResolver::resolve($key, $event);
         } elseif (!\is_string($key = $event->evaluate($key))) {
-            throw new \TypeError(\sprintf('The value of the "$key" option of the "%s" attribute must evaluate to a string, "%s" given.', RateLimit::class, get_debug_type($key)));
+            throw new \TypeError(\sprintf('The value of the "$key" option of the "%s" attribute must evaluate to a string, "%s" given.', $attribute::class, get_debug_type($key)));
         }
 
-        $rateLimit = $this->limiters->get($attribute->limiter)->create($key)->consume($attribute->tokens);
+        if ($attribute instanceof RateLimit) {
+            $name = $attribute->limiter;
+            $factory = $this->limiters->get($name);
+        } else {
+            $name = $attribute->id ?? $this->defaultLimiterId($event->kernelEvent->getController(), $attribute);
+            $factory = $attribute->createFactory($this->requireBuilder(), $name);
+        }
+
+        $rateLimit = $factory->create($key)->consume($attribute->tokens);
 
         $candidate = new AppliedRateLimit($rateLimit, $attribute->tokens, $attribute->exposeHeaders);
 
@@ -111,11 +126,24 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
 
         if (!$rateLimit->isAccepted()) {
             if ($dispatcher && class_exists(RateLimitExceededEvent::class)) {
-                $dispatcher->dispatch(new RateLimitExceededEvent($rateLimit, $attribute->limiter, $key));
+                $dispatcher->dispatch(new RateLimitExceededEvent($rateLimit, $name, $key));
             }
 
             throw new TooManyRequestsHttpException(max(0, $rateLimit->getRetryAfter()->getTimestamp() - time()));
         }
+    }
+
+    private function defaultLimiterId(callable $controller, AbstractInlineRateLimit $attribute): string
+    {
+        $r = new \ReflectionFunction($controller(...));
+        $name = !$r->isAnonymous() && ($class = $r->getClosureCalledClass()) ? $class->name.'::'.$r->name : $r->name;
+
+        return $name.'#'.$attribute::class;
+    }
+
+    private function requireBuilder(): RateLimiterBuilder
+    {
+        return $this->builder ?? throw new \LogicException(\sprintf('Rate limiting with "%s" requires the RateLimiter component\'s "limiter_builder" service; is it enabled?', AbstractInlineRateLimit::class));
     }
 
     /**
@@ -152,6 +180,12 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         return [
             KernelEvents::CONTROLLER.'.'.RateLimit::class => 'onKernelControllerAttribute',
             KernelEvents::CONTROLLER_ARGUMENTS.'.'.RateLimit::class => 'onKernelControllerAttribute',
+            KernelEvents::CONTROLLER.'.'.RateLimitFixedWindow::class => 'onKernelControllerAttribute',
+            KernelEvents::CONTROLLER_ARGUMENTS.'.'.RateLimitFixedWindow::class => 'onKernelControllerAttribute',
+            KernelEvents::CONTROLLER.'.'.RateLimitSlidingWindow::class => 'onKernelControllerAttribute',
+            KernelEvents::CONTROLLER_ARGUMENTS.'.'.RateLimitSlidingWindow::class => 'onKernelControllerAttribute',
+            KernelEvents::CONTROLLER.'.'.RateLimitTokenBucket::class => 'onKernelControllerAttribute',
+            KernelEvents::CONTROLLER_ARGUMENTS.'.'.RateLimitTokenBucket::class => 'onKernelControllerAttribute',
             KernelEvents::RESPONSE => 'onKernelResponse',
         ];
     }

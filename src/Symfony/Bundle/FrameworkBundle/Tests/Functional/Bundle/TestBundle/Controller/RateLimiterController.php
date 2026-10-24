@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Cont
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
+use Symfony\Component\HttpKernel\Attribute\RateLimitFixedWindow;
 
 class RateLimiterController
 {
@@ -24,6 +25,12 @@ class RateLimiterController
 
     #[RateLimit('own_pool')]
     public function ownPool(): Response
+    {
+        return new Response('ticket');
+    }
+
+    #[RateLimitFixedWindow(5, '1 hour')]
+    public function inline(): Response
     {
         return new Response('ticket');
     }

@@ -183,9 +183,6 @@
                                         {% if key.aad %}
                                             <span class="kms-detail text-muted">{{ key.aad }} with an AAD</span>
                                         {% endif %}
-                                        {% if key.deterministic %}
-                                            <span class="kms-detail text-muted">{{ key.deterministic }} deterministic</span>
-                                        {% endif %}
                                     </td>
                                     <td class="nowrap {{ key.layers.kms ? '' : 'text-muted' }}">
                                         {{ key.layers.kms }}

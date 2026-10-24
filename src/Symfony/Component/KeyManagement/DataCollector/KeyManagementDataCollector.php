@@ -66,7 +66,6 @@ class KeyManagementDataCollector extends DataCollector implements LateDataCollec
         'reference' => null,
         'format' => null,
         'aad' => null,
-        'deterministic' => null,
         'length' => null,
         'in' => null,
         'out' => null,
@@ -340,7 +339,6 @@ class KeyManagementDataCollector extends DataCollector implements LateDataCollec
             'data_keys' => [],
             'backends' => [],
             'aad' => 0,
-            'deterministic' => 0,
         ] + self::newGroup();
 
         $this->fold($group, $call);
@@ -353,9 +351,6 @@ class KeyManagementDataCollector extends DataCollector implements LateDataCollec
         }
         if (null !== $call['aad'] && '' !== $call['aad']) {
             ++$group['aad'];
-        }
-        if (true === $call['deterministic']) {
-            ++$group['deterministic'];
         }
     }
 

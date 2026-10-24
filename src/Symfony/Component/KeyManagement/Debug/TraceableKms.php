@@ -71,18 +71,17 @@ class TraceableKms implements EncrypterInterface, DecrypterInterface
         return $this->kms;
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
         $start = $this->enter();
         $call = [
             'key' => $keyId,
             'aad' => $aad,
-            'deterministic' => $deterministic,
             'in' => \strlen($plaintext),
         ];
 
         try {
-            $ciphertext = $this->kms->encrypt($keyId, $plaintext, $aad, $deterministic);
+            $ciphertext = $this->kms->encrypt($keyId, $plaintext, $aad);
             $call['out'] = \strlen($ciphertext->blob);
 
             return $ciphertext;

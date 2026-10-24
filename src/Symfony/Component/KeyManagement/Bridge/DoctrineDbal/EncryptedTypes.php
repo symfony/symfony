@@ -82,7 +82,7 @@ final class EncryptedTypes
      * A type authenticates its key and the parent type's registry name.
      * Renaming the encrypted declaration leaves every value readable, {@see EncryptedType}.
      *
-     * @throws InvalidArgumentException If a declaration names no Doctrine type or no key, or the registry is not writable
+     * @throws InvalidArgumentException If a declaration is invalid, has circular parents, or the registry is not writable
      */
     public function register(?Connection $connection = null): void
     {
@@ -99,9 +99,24 @@ final class EncryptedTypes
                     throw new InvalidArgumentException(\sprintf('The encrypted type "%s" must declare a "%s" as a string.', $name, $required));
                 }
             }
+        }
 
-            $type = new EncryptedType($registry->get($definition['type']), $this->envelopes, $definition['key'], $definition['type']);
+        foreach ($this->types as $name => $definition) {
+            $seen = [$name => true];
+            for ($parent = $definition['type']; isset($this->types[$parent]); $parent = $this->types[$parent]['type']) {
+                if (isset($seen[$parent])) {
+                    throw new InvalidArgumentException(\sprintf('The encrypted type "%s" has a circular parent type definition.', $name));
+                }
+                $seen[$parent] = true;
+            }
+        }
 
+        $types = [];
+        foreach ($this->types as $name => $definition) {
+            $types[$name] = new EncryptedType($types[$definition['type']] ?? $registry->get($definition['type']), $this->envelopes, $definition['key'], $definition['type']);
+        }
+
+        foreach ($types as $name => $type) {
             $registry->has($name) ? $registry->override($name, $type) : $registry->register($name, $type);
         }
     }

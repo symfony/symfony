@@ -510,6 +510,58 @@ class DataKeyStoreTest extends TestCase
         $store->current('user.email');
     }
 
+    public function testRewrappingUnderAnUntrustedClientLeavesTheRowUnchanged()
+    {
+        $store = $this->store();
+        $reference = $store->current('user.email')->reference;
+        $row = $this->connection->fetchAssociative('SELECT * FROM key_management_data_keys');
+
+        try {
+            $store->rewrap($reference, new Ciphertext('untrusted', 'app'), 'untrusted');
+            $this->fail('An untrusted client must be refused.');
+        } catch (LogicException) {
+        }
+
+        $this->assertSame($row, $this->connection->fetchAssociative('SELECT * FROM key_management_data_keys'));
+    }
+
+    public function testACachedKeyCannotBeMovedToAnotherScope()
+    {
+        $store = $this->store();
+        $reference = $store->current('user.email')->reference;
+        $this->connection->executeStatement(
+            \sprintf('UPDATE %s SET scope = ? WHERE id = ?', DataKeyStore::DEFAULT_TABLE),
+            ['user.phone', $reference],
+            [ParameterType::STRING, ParameterType::BINARY],
+        );
+
+        for ($attempt = 0; $attempt < 2; ++$attempt) {
+            try {
+                $store->current('user.phone');
+                $this->fail('A changed scope must be authenticated on every lookup.');
+            } catch (DecryptionFailedException) {
+            }
+        }
+
+        $this->assertSame(1, $this->rowCount());
+    }
+
+    public function testACachedKeyCannotUseAnUntrustedClientWhenResolvingAScope()
+    {
+        $store = $this->store();
+        $reference = $store->current('user.email')->reference;
+        $store->forget();
+        $store->get($reference);
+        $this->connection->executeStatement(
+            \sprintf('UPDATE %s SET client = ? WHERE id = ?', DataKeyStore::DEFAULT_TABLE),
+            ['untrusted', $reference],
+            [ParameterType::STRING, ParameterType::BINARY],
+        );
+
+        $this->expectException(LogicException::class);
+        $store->current('user.email');
+    }
+
     public function testAStoreThatWasNotToldToBindAContextWrapsWithNone()
     {
         $store = $this->store(clients: ['default' => new InMemoryKms('aws')]);

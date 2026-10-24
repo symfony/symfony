@@ -123,14 +123,6 @@ class SealedBoxKmsTest extends TestCase
         $kms->decrypt(new Ciphertext('whatever', 'app'), 'tenant=acme');
     }
 
-    public function testDeterministicModeIsRejected()
-    {
-        $kms = new SealedBoxKms(new InMemoryKeyLoader(['app' => $this->keypair]));
-
-        $this->expectException(UnsupportedOperationException::class);
-        $kms->encrypt('app', 'hello', deterministic: true);
-    }
-
     public function testDataKeyRoundTrip()
     {
         $kms = new SealedBoxKms(new InMemoryKeyLoader(['app' => $this->keypair]));

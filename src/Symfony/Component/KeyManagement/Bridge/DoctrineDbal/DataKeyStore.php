@@ -108,7 +108,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     private array $retiresAt = [];
 
     /**
-     * @param ContainerInterface $clients             KMS clients, each a {@see DataKeyGeneratorInterface}, indexed by name
+     * @param ContainerInterface $clients             Trusted KMS clients, each a {@see DataKeyGeneratorInterface}, indexed by name
      * @param string             $client              Name of the client wrapping the keys this store creates
      * @param string             $masterKeyId         Master key wrapping the keys this store creates
      * @param positive-int       $keyBytes            Length of the data keys to generate
@@ -166,9 +166,10 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
             return $this->rotate($scope);
         }
 
+        $handle = $this->handleFor($stored);
         $this->current[$scope] = $stored->reference;
 
-        return $this->handleFor($stored);
+        return $handle;
     }
 
     /**
@@ -214,6 +215,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
      */
     public function rewrap(string $reference, Ciphertext $wrapped, string $client): void
     {
+        $this->clientFor($client);
         $updated = $this->connection->executeStatement(
             \sprintf('UPDATE %s SET key_material = ?, master_key_id = ?, client = ? WHERE id = ?', $this->table),
             [$wrapped->blob, $wrapped->keyId, $client, $reference],
@@ -422,11 +424,11 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
 
     private function handleFor(StoredDataKey $row): DataKeyHandle
     {
-        if (isset($this->handles[$row->reference]) && !$this->handles[$row->reference]->isReleased()) {
-            return $this->handles[$row->reference];
+        $client = $this->clientFor($row->client);
+        $handle = $this->handles[$row->reference] ?? null;
+        if (null === $handle || $handle->isReleased()) {
+            $handle = new DataKeyHandle($row->reference, $client->unwrapDataKey($row->wrapped, $this->wrappingContext($row->reference, $row->scope)));
         }
-
-        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped, $this->wrappingContext($row->reference, $row->scope)));
 
         if (!$handle->use(static fn (#[\SensitiveParameter] string $plaintext): bool => hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext)))) {
             $handle->release();

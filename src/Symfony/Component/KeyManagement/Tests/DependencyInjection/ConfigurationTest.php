@@ -218,6 +218,7 @@ class ConfigurationTest extends TestCase
             'client' => 'app',
             'key_id' => 'alias/app-key',
             'connection' => 'doctrine.dbal.default_connection',
+            'allowed_clients' => [],
             'table' => 'key_management_data_keys',
             'read_self_contained' => false,
             'bind_wrapping_context' => false,

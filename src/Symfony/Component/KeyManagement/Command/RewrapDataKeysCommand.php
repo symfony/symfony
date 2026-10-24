@@ -87,7 +87,7 @@ final class RewrapDataKeysCommand
     use CommandTrait;
 
     /**
-     * @param ServiceProviderInterface<EncrypterInterface&DecrypterInterface>|null $clients
+     * @param ServiceProviderInterface<EncrypterInterface&DecrypterInterface>|null $clients Clients trusted by the store
      */
     public function __construct(
         private readonly ?RewrappableDataKeyStoreInterface $store = null,

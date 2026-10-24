@@ -39,7 +39,7 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.key_management_rewrap_data_keys', RewrapDataKeysCommand::class)
             ->args([
                 service('key_management.store')->nullOnInvalid(),
-                tagged_locator('key_management.client', 'key'),
+                service('.key_management.store.clients')->nullOnInvalid(),
             ])
             ->tag('console.command')
     ;

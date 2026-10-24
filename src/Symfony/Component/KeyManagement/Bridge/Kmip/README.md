@@ -53,7 +53,6 @@ limit. `EnvelopeEncrypter` handles larger payloads locally and asks the server
 to protect only the data key. With the built-in TLS transport, each KMIP
 operation opens a connection. Using a stored data key can reduce KMIP calls
 for repeated operations.
-Deterministic encryption is not supported.
 
 PyKMIP reports an invalid authentication tag as KMIP `General Failure`
 (`0x100`). That reason can also mean a server error, so the bridge leaves it as

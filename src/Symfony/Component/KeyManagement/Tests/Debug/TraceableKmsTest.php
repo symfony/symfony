@@ -68,7 +68,7 @@ class TraceableKmsTest extends TestCase
     public function testEncryptionIsCollected()
     {
         $traceable = TraceableKms::wrap(new InMemoryKms(), $this->collector, 'default');
-        $traceable->encrypt('app', 'hello', 'user:42', true);
+        $traceable->encrypt('app', 'hello', 'user:42');
         $this->collector->lateCollect();
 
         $key = $this->collector->getKeys()[0];
@@ -78,7 +78,6 @@ class TraceableKmsTest extends TestCase
         $this->assertSame(['encrypt' => 1], $key['operations']);
         $this->assertSame([InMemoryKms::class], $key['backends']);
         $this->assertSame(1, $key['aad']);
-        $this->assertSame(1, $key['deterministic']);
         $this->assertSame(5, $key['in']);
         $this->assertGreaterThan(0, $key['out']);
 

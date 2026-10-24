@@ -20,7 +20,6 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
-use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -71,11 +70,8 @@ final class GoogleCloudKms implements DecrypterInterface, EncrypterInterface, Da
     ) {
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
-        if ($deterministic) {
-            throw new UnsupportedOperationException('Google Cloud KMS does not expose deterministic encryption per call.');
-        }
         if (!self::isResourceName($keyId)) {
             throw new InvalidArgumentException(\sprintf('Google Cloud KMS key id "%s" must be a resource name of the form "projects/<project>/locations/<location>/keyRings/<ring>/cryptoKeys/<key>", optionally followed by "/cryptoKeyVersions/<version>".', $keyId));
         }

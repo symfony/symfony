@@ -24,7 +24,6 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
-use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 class GoogleCloudKmsTest extends TestCase
 {
@@ -428,14 +427,6 @@ class GoogleCloudKmsTest extends TestCase
         (new GoogleCloudKms($client, $this->staticToken('T')))->encrypt(self::KEY, 'hello', 'tenant=acme');
 
         $this->assertSame(base64_encode('tenant=acme'), $captured['additionalAuthenticatedData']);
-    }
-
-    public function testEncryptRejectsDeterministic()
-    {
-        $kms = new GoogleCloudKms(new MockHttpClient([], self::BASE), $this->staticToken('T'));
-
-        $this->expectException(UnsupportedOperationException::class);
-        $kms->encrypt(self::KEY, 'hello', deterministic: true);
     }
 
     public function testDecryptDecodesPlaintext()

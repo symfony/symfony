@@ -34,11 +34,11 @@ trait LocalAead
      * @throws LogicException   If the data key is not of the length the format calls for
      * @throws RuntimeException If the cipher rejects the inputs
      */
-    private static function seal(EnvelopeFormat $format, #[\SensitiveParameter] string $dataKey, #[\SensitiveParameter] string $plaintext, string $iv, string $aad): array
+    private static function seal(EnvelopeFormat $format, #[\SensitiveParameter] string $dataKey, #[\SensitiveParameter] string $plaintext, string $iv, string $aad, string ...$fields): array
     {
         self::checkKeyLength($format, $dataKey);
         $tag = '';
-        $ciphertext = openssl_encrypt($plaintext, $format->cipher(), $dataKey, \OPENSSL_RAW_DATA, $iv, $tag, self::bind($format, $aad), $format->tagBytes());
+        $ciphertext = openssl_encrypt($plaintext, $format->cipher(), $dataKey, \OPENSSL_RAW_DATA, $iv, $tag, self::bind($format, $aad, ...$fields), $format->tagBytes());
 
         if (false === $ciphertext) {
             throw new RuntimeException('Local AEAD encryption failed: '.(openssl_error_string() ?: 'unknown error'));
@@ -54,7 +54,8 @@ trait LocalAead
     private static function open(Envelope $envelope, #[\SensitiveParameter] string $dataKey, string $aad): string
     {
         self::checkKeyLength($envelope->format, $dataKey);
-        $plaintext = openssl_decrypt($envelope->ciphertext, $envelope->format->cipher(), $dataKey, \OPENSSL_RAW_DATA, $envelope->iv, $envelope->tag, self::bind($envelope->format, $aad));
+        $fields = null !== $envelope->reference ? [$envelope->reference] : [$envelope->keyId, $envelope->wrappedDek];
+        $plaintext = openssl_decrypt($envelope->ciphertext, $envelope->format->cipher(), $dataKey, \OPENSSL_RAW_DATA, $envelope->iv, $envelope->tag, self::bind($envelope->format, $aad, ...$fields));
 
         if (false === $plaintext) {
             throw new DecryptionFailedException();
@@ -64,15 +65,19 @@ trait LocalAead
     }
 
     /**
-     * The AAD the local cipher is given: the id of the format, then the caller's own bytes.
+     * Authenticates the envelope header before the caller's AAD.
      *
-     * Both shipped formats seal under AES-256-GCM with the same lengths, so the iv, the tag and the ciphertext of a frame in one of them fit the layout of the other.
-     * Committing to the id makes a frame reassembled in the other format fail its tag check, whatever `$aad` the caller passes.
-     * The id is one byte wide, so the caller's bytes start at a fixed offset and the two cannot be shifted into one another.
+     * Length prefixes keep the header fields and the caller's bytes separate.
+     * Stored envelopes bind the reference, so rewrapping a stored key leaves its payloads readable.
      */
-    private static function bind(EnvelopeFormat $format, string $aad): string
+    private static function bind(EnvelopeFormat $format, string $aad, string ...$fields): string
     {
-        return \chr($format->id()).$aad;
+        $header = \chr($format->id());
+        foreach ($fields as $field) {
+            $header .= pack('n', \strlen($field)).$field;
+        }
+
+        return $header.$aad;
     }
 
     /**

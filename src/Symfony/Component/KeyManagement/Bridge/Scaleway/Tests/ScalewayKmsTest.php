@@ -21,7 +21,6 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
-use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 class ScalewayKmsTest extends TestCase
 {
@@ -80,14 +79,6 @@ class ScalewayKmsTest extends TestCase
 
         $this->assertSame(base64_encode('opaque-aad'), $bodies[0]['associated_data']);
         $this->assertSame(base64_encode('opaque-aad'), $bodies[1]['associated_data']);
-    }
-
-    public function testDeterministicEncryptionIsRefusedWithoutCallingScaleway()
-    {
-        $client = new MockHttpClient([], self::BASE_URI);
-
-        $this->expectException(UnsupportedOperationException::class);
-        (new ScalewayKms($client, 'scw-secret'))->encrypt(self::KEY_ID, 'hello', '', true);
     }
 
     public function testHttp404OnEncryptSurfacesAsKeyNotFound()

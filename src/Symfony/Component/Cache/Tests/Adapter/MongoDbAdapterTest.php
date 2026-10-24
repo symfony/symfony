@@ -41,7 +41,7 @@ class MongoDbAdapterTest extends AdapterTestCase
     protected const DATABASE = 'symfony_cache_test';
     protected const COLLECTION = 'cache';
 
-    protected const OPTIONS = ['database_name' => self::DATABASE, 'collection_name' => self::COLLECTION];
+    protected const OPTIONS = ['database' => self::DATABASE, 'collection' => self::COLLECTION];
 
     protected static Client $client;
 
@@ -105,7 +105,7 @@ class MongoDbAdapterTest extends AdapterTestCase
         $uri = getenv('MONGODB_URI') ?: 'mongodb://localhost:27017';
         [$hosts, $query] = explode('?', $uri, 2) + [1 => ''];
 
-        return rtrim($hosts, '/').'/'.self::DATABASE.'?'.($query ? $query.'&' : '').'collection_name='.self::COLLECTION;
+        return rtrim($hosts, '/').'/'.self::DATABASE.'?'.($query ? $query.'&' : '').'collection='.self::COLLECTION;
     }
 
     public function testCreateConnectionFromDsnAcceptsDatabaseAndCollection()

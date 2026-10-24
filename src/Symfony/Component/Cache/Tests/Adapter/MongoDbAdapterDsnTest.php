@@ -30,8 +30,8 @@ class MongoDbAdapterDsnTest extends TestCase
     {
         [$parsedOptions, $uri] = (new \ReflectionMethod(MongoDbAdapter::class, 'parseDsn'))->invoke(null, $dsn, $options);
 
-        $this->assertSame($expectedDatabase, $parsedOptions['database_name']);
-        $this->assertSame($expectedCollection, $parsedOptions['collection_name']);
+        $this->assertSame($expectedDatabase, $parsedOptions['database']);
+        $this->assertSame($expectedCollection, $parsedOptions['collection']);
         $this->assertSame($expectedNamespace, $parsedOptions['namespace']);
         $this->assertSame($expectedUri, $uri);
     }
@@ -39,7 +39,7 @@ class MongoDbAdapterDsnTest extends TestCase
     public static function provideValidDsn(): iterable
     {
         yield 'database from path, collection from query' => [
-            'mongodb://localhost/mydb?collection_name=cache',
+            'mongodb://localhost/mydb?collection=cache',
             [],
             'mydb',
             'cache',
@@ -76,8 +76,80 @@ class MongoDbAdapterDsnTest extends TestCase
             'mongodb://localhost',
         ];
 
+        yield 'multiple hosts with ports' => [
+            'mongodb://host1:27017,host2:27017/app?retryWrites=true&collection=cache',
+            [],
+            'app',
+            'cache',
+            '',
+            'mongodb://host1:27017,host2:27017/app?retryWrites=true',
+        ];
+
+        yield 'multiple hosts without ports' => [
+            'mongodb://host1,host2/app?collection=cache',
+            [],
+            'app',
+            'cache',
+            '',
+            'mongodb://host1,host2/app',
+        ];
+
+        yield 'multiple hosts with credentials and URI options' => [
+            'mongodb://user:pass@host1:27017,host2:27017/app?retryWrites=true&collection=cache',
+            [],
+            'app',
+            'cache',
+            '',
+            'mongodb://user:pass@host1:27017,host2:27017/app?retryWrites=true',
+        ];
+
+        yield 'percent-encoded database in the path' => [
+            'mongodb://localhost/my%2Ddb',
+            [],
+            'my-db',
+            'cache_items',
+            '',
+            'mongodb://localhost/my%2Ddb',
+        ];
+
+        yield 'database named zero' => [
+            'mongodb://localhost/0',
+            [],
+            '0',
+            'cache_items',
+            '',
+            'mongodb://localhost/0',
+        ];
+
+        yield 'question mark in a value' => [
+            'mongodb://localhost/app?collection=cache&appName=a?b',
+            [],
+            'app',
+            'cache',
+            '',
+            'mongodb://localhost/app?appName=a?b',
+        ];
+
+        yield 'database from the path takes precedence over the query' => [
+            'mongodb://localhost/path_db?database=query_db&collection=cache',
+            [],
+            'path_db',
+            'cache',
+            '',
+            'mongodb://localhost/path_db',
+        ];
+
+        yield 'fragment is kept out of the options and in the URI' => [
+            'mongodb://localhost/app?collection=cache#frag',
+            [],
+            'app',
+            'cache',
+            '',
+            'mongodb://localhost/app#frag',
+        ];
+
         yield 'namespace read from the query' => [
-            'mongodb://user:pass@host:27017/db_name?collection_name=cache&namespace=thecacheprefix',
+            'mongodb://user:pass@host:27017/db_name?collection=cache&namespace=thecacheprefix',
             [],
             'db_name',
             'cache',
@@ -86,7 +158,7 @@ class MongoDbAdapterDsnTest extends TestCase
         ];
 
         yield 'other query parameters are kept for the driver' => [
-            'mongodb://localhost/mydb?collection_name=cache&replicaSet=rs0',
+            'mongodb://localhost/mydb?collection=cache&replicaSet=rs0',
             [],
             'mydb',
             'cache',
@@ -95,7 +167,7 @@ class MongoDbAdapterDsnTest extends TestCase
         ];
 
         yield 'adapter options stripped from the middle of the query' => [
-            'mongodb://localhost/mydb?replicaSet=rs0&collection_name=cache&namespace=p&readPreference=secondaryPreferred',
+            'mongodb://localhost/mydb?replicaSet=rs0&collection=cache&namespace=p&readPreference=secondaryPreferred',
             [],
             'mydb',
             'cache',
@@ -104,22 +176,125 @@ class MongoDbAdapterDsnTest extends TestCase
         ];
 
         yield 'options take precedence over the DSN' => [
-            'mongodb://localhost/mydb?collection_name=cache',
-            ['database_name' => 'from_option', 'collection_name' => 'from_option'],
+            'mongodb://localhost/mydb?collection=cache',
+            ['database' => 'from_option', 'collection' => 'from_option'],
             'from_option',
             'from_option',
             '',
             'mongodb://localhost/mydb',
         ];
 
+        yield 'null options fall back to the DSN' => [
+            'mongodb://localhost/mydb?collection=cache&namespace=prefix',
+            ['database' => null, 'collection' => null, 'namespace' => null],
+            'mydb',
+            'cache',
+            'prefix',
+            'mongodb://localhost/mydb',
+        ];
+
+        yield 'null options fall back to defaults' => [
+            'mongodb://localhost',
+            ['database' => null, 'collection' => null, 'namespace' => null],
+            'app',
+            'cache_items',
+            '',
+            'mongodb://localhost',
+        ];
+
         yield 'mongodb+srv scheme' => [
-            'mongodb+srv://localhost/mydb?collection_name=cache',
+            'mongodb+srv://localhost/mydb?collection=cache',
             [],
             'mydb',
             'cache',
             '',
             'mongodb+srv://localhost/mydb',
         ];
+
+        yield 'Symfony options are removed from the middle' => [
+            'mongodb://localhost/app?retryWrites=true&namespace=ns&w=majority',
+            [],
+            'app',
+            'cache_items',
+            'ns',
+            'mongodb://localhost/app?retryWrites=true&w=majority',
+        ];
+
+        yield 'all Symfony options are removed' => [
+            'mongodb://localhost/app?collection=cache&namespace=ns',
+            [],
+            'app',
+            'cache',
+            'ns',
+            'mongodb://localhost/app',
+        ];
+
+        yield 'repeated Symfony options are all removed' => [
+            'mongodb://localhost/app?namespace=a&namespace=b&w=1',
+            [],
+            'app',
+            'cache_items',
+            'b',
+            'mongodb://localhost/app?w=1',
+        ];
+
+        yield 'repeated URI options are kept in order' => [
+            'mongodb://localhost/app?readPreferenceTags=dc:ny&collection=cache&readPreferenceTags=dc:sf',
+            [],
+            'app',
+            'cache',
+            '',
+            'mongodb://localhost/app?readPreferenceTags=dc:ny&readPreferenceTags=dc:sf',
+        ];
+
+        yield 'encoded ampersand in a value is kept' => [
+            'mongodb://localhost/app?appName=my%26app&collection=cache&w=majority',
+            [],
+            'app',
+            'cache',
+            '',
+            'mongodb://localhost/app?appName=my%26app&w=majority',
+        ];
+
+        yield 'equals sign in a value is kept' => [
+            'mongodb://localhost/app?appName=a=b&collection=cache',
+            [],
+            'app',
+            'cache',
+            '',
+            'mongodb://localhost/app?appName=a=b',
+        ];
+    }
+
+    #[DataProvider('provideEmptyOptions')]
+    public function testEmptyDatabaseOrCollectionIsRejected(string $dsn, array $options)
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        (new \ReflectionMethod(MongoDbAdapter::class, 'parseDsn'))->invoke(null, $dsn, $options);
+    }
+
+    public static function provideEmptyOptions(): iterable
+    {
+        yield 'empty collection in the DSN' => ['mongodb://localhost/app?collection=', []];
+        yield 'empty database in the DSN' => ['mongodb://localhost/app?database=', []];
+        yield 'collection without value in the DSN' => ['mongodb://localhost/app?collection', []];
+        yield 'empty collection option' => ['mongodb://localhost/app', ['collection' => '']];
+        yield 'empty database option' => ['mongodb://localhost/app', ['database' => '']];
+    }
+
+    #[DataProvider('provideInvalidDsn')]
+    public function testInvalidDsnIsRejected(string $dsn)
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        (new \ReflectionMethod(MongoDbAdapter::class, 'parseDsn'))->invoke(null, $dsn, []);
+    }
+
+    public static function provideInvalidDsn(): iterable
+    {
+        yield 'last host without port' => ['mongodb://host1:27017,host2/app'];
+        yield 'question mark in user information' => ['mongodb://user:p?ss@localhost/app'];
     }
 
     public function testCreateConnectionReturnsConfiguredCollection()
@@ -129,7 +304,7 @@ class MongoDbAdapterDsnTest extends TestCase
         }
 
         // The client connects lazily, so no server is needed to build the collection.
-        $collection = MongoDbAdapter::createConnection('mongodb://localhost/mydb?collection_name=cache');
+        $collection = MongoDbAdapter::createConnection('mongodb://localhost/mydb?collection=cache');
 
         $this->assertInstanceOf(Collection::class, $collection);
         $this->assertSame('mydb', $collection->getDatabaseName());
@@ -180,7 +355,7 @@ class MongoDbAdapterDsnTest extends TestCase
             ->with('mydb', 'cache_items', $this->anything())
             ->willReturn($this->createStub(Collection::class));
 
-        new MongoDbAdapter($client, options: ['database_name' => 'mydb']);
+        new MongoDbAdapter($client, '', 0, ['database' => 'mydb']);
     }
 
     public function testClientUsesTheDefaultDatabaseAndCollection()

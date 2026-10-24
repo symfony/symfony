@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-22T16:15:05Z
+
+you mean replaceing them by `symfony composer require`?
+
+---------------------------------------------------------------------------
+
+by Kocal at 2026-10-22T16:22:27Z
+
+Exactly
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-22T17:50:58Z
+
+> you mean replaceing them by symfony composer require?
+
+done in #67319

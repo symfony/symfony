@@ -254,11 +254,11 @@ trait TypeFactoryTrait
     }
 
     /**
-     * @template T of TypeIdentifier
+     * @template U of TypeIdentifier
      *
-     * @param T $identifier
+     * @param U $identifier
      *
-     * @return ExplicitType<T>
+     * @return ExplicitType<U>
      */
     public static function explicit(TypeIdentifier $identifier, string $explicitType): ExplicitType
     {
@@ -271,11 +271,11 @@ trait TypeFactoryTrait
     }
 
     /**
-     * @template T of ObjectType
+     * @template U of ObjectType
      *
-     * @param T $objectType
+     * @param U $objectType
      *
-     * @return ClassLikeType<T>
+     * @return ClassLikeType<U>
      */
     public static function classLike(string $explicitType, ObjectType $objectType): ClassLikeType
     {

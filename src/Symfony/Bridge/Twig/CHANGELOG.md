@@ -19,6 +19,7 @@ CHANGELOG
  * Declare the functions and filters of the extensions that provide nothing else with the `#[AsTwigFunction]` and `#[AsTwigFilter]` attributes
  * Make `RoutingExtension::isUrlGenerationSafe()` static
  * Add support for extracting the labels and help messages passed to the `form_label()`, `form_widget()`, `form_help()` and `form_row()` functions
+ * Add the `junit` format to the `lint:twig` command
 
 8.1
 ---

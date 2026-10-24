@@ -34,7 +34,9 @@ use Symfony\Contracts\Service\ShutdownInterface;
  */
 final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface, ShutdownInterface
 {
-    use HttpClientTrait;
+    use HttpClientTrait {
+        withOptions as private withDefaultOptions;
+    }
 
     public const OPTIONS_DEFAULTS = HttpClientInterface::OPTIONS_DEFAULTS + [
         'crypto_method' => \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
@@ -44,13 +46,14 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         // array|string - an array containing the username as first value, and optionally the
         //  password as the second one; or string like username:password - enabling NTLM auth
         'auth_ntlm' => null,
+        'pipelining' => null,
         'extra' => [
             'use_persistent_connections' => false,
             // A list of extra curl options indexed by their corresponding CURLOPT_*
             'curl' => [],
         ],
     ];
-    private static array $emptyDefaults = self::OPTIONS_DEFAULTS + ['auth_ntlm' => null];
+    private static array $emptyDefaults = self::OPTIONS_DEFAULTS + ['auth_ntlm' => null, 'pipelining' => null];
 
     private ?LoggerInterface $logger = null;
 
@@ -66,7 +69,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public function __construct(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 0)
+    public function __construct(array $defaultOptions = [], private int $maxHostConnections = 6, private int $maxPendingPushes = 0)
     {
         if (!\extension_loaded('curl')) {
             throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\CurlHttpClient" as the "curl" extension is not installed.');
@@ -78,7 +81,19 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);
         }
 
-        $this->multi = new CurlClientState($maxHostConnections, $maxPendingPushes);
+        $this->multi = new CurlClientState($maxHostConnections, $maxPendingPushes, self::getPipelining($this->defaultOptions));
+    }
+
+    public function withOptions(array $options): static
+    {
+        $clone = $this->withDefaultOptions($options);
+
+        if (self::getPipelining($clone->defaultOptions) !== self::getPipelining($this->defaultOptions)) {
+            $clone->multi = new CurlClientState($this->maxHostConnections, $this->maxPendingPushes, self::getPipelining($clone->defaultOptions));
+            $clone->multi->logger = $this->logger;
+        }
+
+        return $clone;
     }
 
     public function setLogger(LoggerInterface $logger): void
@@ -92,6 +107,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
+        if (self::getPipelining($options) !== self::getPipelining($this->defaultOptions)) {
+            throw new InvalidArgumentException('The "pipelining" option must be configured using the constructor or "withOptions()".');
+        }
+
         $scheme = $url['scheme'];
         $authority = $url['authority'];
         $host = parse_url($authority, \PHP_URL_HOST);
@@ -362,6 +381,17 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     public function reset(bool $shutdown = false): void
     {
         $this->multi->reset($shutdown);
+    }
+
+    private static function getPipelining(array $options): int
+    {
+        $pipelining = $options['pipelining'] ?? \CURLPIPE_MULTIPLEX;
+
+        if (!\is_int($pipelining) || 0 > $pipelining || 3 < $pipelining) {
+            throw new InvalidArgumentException('The "pipelining" option must be an integer between 0 and 3.');
+        }
+
+        return $pipelining;
     }
 
     /**

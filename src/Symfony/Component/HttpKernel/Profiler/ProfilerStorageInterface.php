@@ -30,6 +30,7 @@ interface ProfilerStorageInterface
      * Finds profiler tokens for the given criteria.
      *
      * @param int|null      $limit      The maximum number of tokens to return
+     * @param string|null   $method     The HTTP method, or a comma-separated list of HTTP methods (e.g. "GET,POST")
      * @param int|null      $start      The start date to search from
      * @param int|null      $end        The end date to search to
      * @param string|null   $statusCode The response status code

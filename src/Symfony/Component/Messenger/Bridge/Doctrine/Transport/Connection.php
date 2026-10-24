@@ -63,6 +63,7 @@ class Connection implements ResetInterface
         'queue_name' => 'default',
         'redeliver_timeout' => 3600,
         'auto_setup' => true,
+        'delete_after_ack' => true,
     ];
 
     protected ?float $queueEmptiedAt = null;
@@ -78,6 +79,7 @@ class Connection implements ResetInterface
      * * connection: name of the Doctrine's entity manager
      * * queue_name: name of the queue
      * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default: 3600
+     * * delete_after_ack: Whether acknowledged messages should be deleted. Default: true
      * * auto_setup: Whether the table should be created automatically during send / get. Default: true
      */
     public function __construct(
@@ -134,6 +136,7 @@ class Connection implements ResetInterface
         $configuration += $query + $options + static::DEFAULT_OPTIONS;
 
         $configuration['auto_setup'] = filter_var($configuration['auto_setup'], \FILTER_VALIDATE_BOOL);
+        $configuration['delete_after_ack'] = filter_var($configuration['delete_after_ack'], \FILTER_VALIDATE_BOOL);
 
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(static::DEFAULT_OPTIONS));
@@ -318,6 +321,12 @@ class Connection implements ResetInterface
     public function ack(string $id): bool
     {
         try {
+            if (!$this->configuration['delete_after_ack']) {
+                return $this->driverConnection->update($this->configuration['table_name'], [
+                    'acknowledged_at' => \DateTimeImmutable::createFromTimestamp(microtime(true)),
+                ], ['id' => $id], ['acknowledged_at' => Types::DATETIME_IMMUTABLE]) > 0;
+            }
+
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -411,7 +420,8 @@ class Connection implements ResetInterface
     public function find(mixed $id): ?array
     {
         $queryBuilder = $this->createQueryBuilder()
-            ->where('m.id = ? and m.queue_name = ?');
+            ->where('m.id = ? and m.queue_name = ?')
+            ->andWhere('m.acknowledged_at is null');
 
         $data = $this->executeQuery($queryBuilder->getSQL(), [$id, $this->configuration['queue_name']])->fetchAssociative();
 
@@ -443,6 +453,7 @@ class Connection implements ResetInterface
 
         return $this->createQueryBuilder()
             ->where('m.queue_name = ?')
+            ->andWhere('m.acknowledged_at is null')
             ->andWhere('m.delivered_at is null OR m.delivered_at < ?')
             ->andWhere('m.available_at <= ?')
             ->setParameters([
@@ -475,7 +486,7 @@ class Connection implements ResetInterface
         return $queryBuilder->select(str_replace(', ', ', '.$alias,
             $alias.'id AS "id", body AS "body", headers AS "headers", queue_name AS "queue_name", '.
             'created_at AS "created_at", available_at AS "available_at", '.
-            'delivered_at AS "delivered_at"'
+            'delivered_at AS "delivered_at", acknowledged_at AS "acknowledged_at"'
         ));
     }
 
@@ -663,8 +674,9 @@ class Connection implements ResetInterface
             ->addColumn(Column::editor()->setUnquotedName('created_at')->setTypeName(Types::DATETIME_IMMUTABLE)->setNotNull(true)->create())
             ->addColumn(Column::editor()->setUnquotedName('available_at')->setTypeName(Types::DATETIME_IMMUTABLE)->setNotNull(true)->create())
             ->addColumn(Column::editor()->setUnquotedName('delivered_at')->setTypeName(Types::DATETIME_IMMUTABLE)->setNotNull(false)->create())
+            ->addColumn(Column::editor()->setUnquotedName('acknowledged_at')->setTypeName(Types::DATETIME_IMMUTABLE)->setNotNull(false)->create())
             ->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('id'))], true))
-            ->addIndex(Index::editor()->setUnquotedColumnNames('queue_name', 'available_at', 'delivered_at', 'id'))
+            ->addIndex(Index::editor()->setUnquotedColumnNames('queue_name', 'acknowledged_at', 'available_at', 'delivered_at', 'id'))
             ->create();
     }
 
@@ -685,8 +697,9 @@ class Connection implements ResetInterface
         $table->addColumn('created_at', Types::DATETIME_IMMUTABLE, ['notnull' => true]);
         $table->addColumn('available_at', Types::DATETIME_IMMUTABLE, ['notnull' => true]);
         $table->addColumn('delivered_at', Types::DATETIME_IMMUTABLE, ['notnull' => false]);
+        $table->addColumn('acknowledged_at', Types::DATETIME_IMMUTABLE, ['notnull' => false]);
         $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('id'))], true));
-        $table->addIndex(['queue_name', 'available_at', 'delivered_at', 'id']);
+        $table->addIndex(['queue_name', 'acknowledged_at', 'available_at', 'delivered_at', 'id']);
     }
 
     private function decodeEnvelopeHeaders(array $doctrineEnvelope): array

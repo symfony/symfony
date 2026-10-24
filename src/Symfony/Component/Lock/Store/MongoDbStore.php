@@ -150,7 +150,7 @@ class MongoDbStore implements PersistingStoreInterface
     /**
      * Extract default database and collection from given connection URI and remove collection querystring.
      *
-     * Non-standard parameters are removed from the URI to improve libmongoc's re-use of connections.
+     * Non-standard parameters are removed from the URI to improve libmongoc's reuse of connections.
      *
      * @see https://php.net/mongodb.connection-handling
      */
@@ -163,8 +163,8 @@ class MongoDbStore implements PersistingStoreInterface
         if (false === $params = parse_url($uri)) {
             throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
         }
-        $pathDb = ltrim($params['path'] ?? '', '/') ?: null;
-        if (null !== $pathDb) {
+        $pathDb = rawurldecode(ltrim($params['path'] ?? '', '/'));
+        if ('' !== $pathDb) {
             $this->options['database'] = $pathDb;
         }
 

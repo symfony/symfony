@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-06T06:40:22Z
+
+Looks right. `EncryptedTypes` has no test, though: ignoring `context` or passing a constant instead of the name keeps the suite green. With a backend that refuses AAD and no store (sealed box, Azure under RSA-OAEP-256, a non-derived Transit key), the first write fails with an error about an AAD the application never passed; catching it to name the type and `context: false` would help. A single `?string $name` could replace `$name` and `$bindContext`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T09:20:25Z
+
+I rebased this on 8.2 and squashed in what I asked for. I also added a `context` option to `key_management.doctrine_dbal.types`. Since #66766 and #66806, apps had no other way to turn the binding off.
+
+For `#[Encrypted]` columns, the authenticated name is the generated `encrypted_<type>@<key>`, so the key is part of the AAD there. Changing the key or the Doctrine type of such a column makes its existing rows unreadable. I documented this on the attribute and in the DoctrineOrm README. To avoid it, declare the type up front, or set `context: false`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T14:04:20Z
+
+Thanks @GromNaN. The `EnvelopeEncrypter` docblock now says that these backends throw `UnsupportedOperationException`, when encrypting and when decrypting.
+
+I'd rather not add `context` to `#[Encrypted]`. Whether the name can be authenticated depends on the backend, not on the column. All `#[Encrypted]` columns use the same encrypter. With a sealed box and no store, they all need `context: false`. With a store, none of them does. So this belongs to the config, next to the KMS. Also, columns with the same key and type use the same type, so a flag on one column could contradict another column.
+
+For `refusedContext()`, the backend contract says that a backend that can't enforce AAD must throw `UnsupportedOperationException`. A plain `RuntimeException` can also be a network error, or a Vault 403 when the token can't read `keys/<name>`. Telling people to set `context: false` would be the wrong advice there.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-13T14:14:13Z
+
+What about binding the AAD locally only in `EnvelopeEncrypter`? We wouldn't need any option here.
+
+`EnvelopeEncrypter` passes the AAD both to the KMS and to the local AES-GCM. The local seal is enough: a payload copied to another column already fails its tag check. And since the AAD isn't secret, binding the wrapped data key too doesn't stop anyone who can call the KMS. `StoredEnvelopeEncrypter` already works this way. The KMS copy is the part that the sealed box, Azure with RSA or `A*KW`, and non-derived Vault keys refuse.
+
+```diff
+-        $dataKey = $this->kms->generateDataKey($key, $format->keyBytes(), $aad);
++        $dataKey = $this->kms->generateDataKey($key, $format->keyBytes());
+```
+
+(same for `unwrapDataKey()` in `decrypt()`)
+
+The name would then be bound on every backend, and `context: false`, the nullable `$name` and the error that points to it could go away. Sending the AAD to the KMS could become opt-in, like `bind_wrapping_context` in #66635, for those who want it in CloudTrail or in IAM conditions on AWS. Derived Vault keys need a context, so they would need that opt-in, or a context provided by `TransitKms` itself.
+
+That would be a separate PR, merged before this one. WDYT?

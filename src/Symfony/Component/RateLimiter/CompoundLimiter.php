@@ -37,15 +37,44 @@ final class CompoundLimiter implements LimiterInterface
     public function consume(int $tokens = 1): RateLimit
     {
         $minimalRateLimit = null;
-        foreach ($this->limiters as $limiter) {
+        $accepted = [];
+
+        foreach ($this->limiters as $index => $limiter) {
             $rateLimit = $limiter->consume($tokens);
 
             if (!$rateLimit->isAccepted()) {
+                // consuming is all-or-nothing: give back the tokens of the limiters that accepted
+                foreach ($accepted as $acceptedIndex => $acceptedRateLimit) {
+                    $this->limiters[$acceptedIndex]->refund($acceptedRateLimit);
+                }
+
                 return $rateLimit;
             }
 
+            $accepted[$index] = $rateLimit;
+
             if (null === $minimalRateLimit || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
                 $minimalRateLimit = $rateLimit;
+            }
+        }
+
+        return $minimalRateLimit;
+    }
+
+    /**
+     * Gives back one token of a consume() call that should not count.
+     *
+     * Each sub-limiter ignores the refund when it gave the token back on its own already.
+     */
+    public function refund(RateLimit $rateLimit): RateLimit
+    {
+        $minimalRateLimit = null;
+
+        foreach ($this->limiters as $limiter) {
+            $refundedRateLimit = $limiter->refund($rateLimit);
+
+            if (null === $minimalRateLimit || $refundedRateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
+                $minimalRateLimit = $refundedRateLimit;
             }
         }
 

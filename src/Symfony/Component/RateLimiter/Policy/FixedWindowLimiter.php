@@ -136,6 +136,42 @@ final class FixedWindowLimiter implements LimiterInterface
         }
     }
 
+    /**
+     * Gives back one token of a consume() call that should not count.
+     *
+     * The window resets on its own at the end of its interval, so refunding
+     * a hit made in a previous window has no effect: the token is back already.
+     */
+    public function refund(RateLimit $rateLimit): RateLimit
+    {
+        if (!$rateLimit->isAccepted()) {
+            return $rateLimit;
+        }
+
+        $this->lock?->acquire(true);
+
+        try {
+            $now = microtime(true);
+            $window = $this->storage->fetch($this->id);
+
+            if (!$window instanceof Window && !$window instanceof CalendarAlignedWindow) {
+                return $rateLimit;
+            }
+
+            // the hit has been given back when the window reset, which the reset time of the consumed limit tells
+            if (!$window->getHitCount() || null === $rateLimit->getResetAt() || (int) $now >= $rateLimit->getResetAt()->getTimestamp()) {
+                return $rateLimit;
+            }
+
+            $window->add(-1, $now);
+            $this->storage->save($window);
+
+            return new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp((int) ceil($now)), true, $this->limit, $this->resetAt($window, $now));
+        } finally {
+            $this->lock?->release();
+        }
+    }
+
     public function getAvailableTokens(int $hitCount): int
     {
         return $this->limit - $hitCount;

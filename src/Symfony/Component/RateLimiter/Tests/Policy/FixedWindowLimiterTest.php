@@ -644,6 +644,47 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
+    public function testRefund()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume();
+        $this->assertSame(9, $rateLimit->getRemainingTokens());
+
+        $refundedRateLimit = $limiter->refund($rateLimit);
+
+        $this->assertTrue($refundedRateLimit->isAccepted());
+        $this->assertSame(10, $refundedRateLimit->getRemainingTokens());
+        $this->assertSame(10, $limiter->consume(0)->getRemainingTokens());
+        $this->assertTrue($limiter->consume(10)->isAccepted());
+    }
+
+    public function testRefundIsIgnoredOnceTheWindowReset()
+    {
+        $limiter = $this->createLimiter('PT1S');
+
+        $rateLimit = $limiter->consume();
+        sleep(2);
+
+        // the window is over, the token was given back on its own
+        $limiter->consume(10);
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundIsIgnoredWhenTheRateLimitWasRejected()
+    {
+        $limiter = $this->createLimiter('PT1S');
+        $limiter->consume(10);
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
     public static function provideConsumeOutsideInterval(): \Generator
     {
         yield ['PT15S'];

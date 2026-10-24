@@ -56,7 +56,7 @@ class CompoundLimiterTest extends TestCase
 
         $rateLimit = $limiter->consume(1);
         $this->assertFalse($rateLimit->isAccepted(), 'Limiter 2 did not accept the request');
-        $this->assertEquals(3, $limiter1->consume(0)->getRemainingTokens(), 'Limiter 1 was consumed before limiter 2 rejected the request');
+        $this->assertEquals(4, $limiter1->consume(0)->getRemainingTokens(), 'Limiter 1 got its token back when limiter 2 rejected the request');
         $this->assertEquals(8, $limiter3->consume(0)->getRemainingTokens(), 'Limiter 3 was not consumed once limiter 2 rejected the request');
 
         sleep(30); // reset all windows
@@ -75,6 +75,23 @@ class CompoundLimiterTest extends TestCase
         $this->assertFalse($limiter->consume()->isAccepted());
 
         $this->assertEquals(9, $limiter2->consume(0)->getRemainingTokens(), 'Rejected hits must not consume the next limiters');
+    }
+
+    public function testRefund()
+    {
+        $limiter1 = $this->createLimiter(4, new \DateInterval('PT1S'));
+        $limiter2 = $this->createLimiter(8, new \DateInterval('PT10S'));
+        $limiter = new CompoundLimiter([$limiter1, $limiter2]);
+
+        $rateLimit = $limiter->consume();
+        $this->assertEquals(3, $rateLimit->getRemainingTokens(), 'Limiter 1 is the limiting one');
+
+        $refundedRateLimit = $limiter->refund($rateLimit);
+
+        $this->assertTrue($refundedRateLimit->isAccepted());
+        $this->assertEquals(4, $refundedRateLimit->getRemainingTokens(), 'Limiter 1 is the limiting one again');
+        $this->assertEquals(4, $limiter1->consume(0)->getRemainingTokens(), 'Limiter 1 got its token back');
+        $this->assertEquals(8, $limiter2->consume(0)->getRemainingTokens(), 'Limiter 2 got its token back');
     }
 
     public function testReserve()

@@ -230,6 +230,47 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertSame(98, $rateLimit->getRemainingTokens());
     }
 
+    public function testRefund()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume();
+        $this->assertSame(9, $rateLimit->getRemainingTokens());
+
+        $refundedRateLimit = $limiter->refund($rateLimit);
+
+        $this->assertTrue($refundedRateLimit->isAccepted());
+        $this->assertSame(10, $refundedRateLimit->getRemainingTokens());
+        $this->assertSame(10, $limiter->consume(0)->getRemainingTokens());
+        $this->assertTrue($limiter->consume(10)->isAccepted());
+    }
+
+    public function testRefundIsIgnoredOnceTheHitsFadedOut()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume();
+        sleep(13);
+
+        // the hit has faded out of the window, the token was given back on its own
+        $limiter->consume(10);
+        $limiter->refund($rateLimit);
+
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundIsIgnoredWhenTheRateLimitWasRejected()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
     private function createLimiter(): SlidingWindowLimiter
     {
         return new SlidingWindowLimiter('test', 10, new \DateInterval('PT12S'), $this->storage);

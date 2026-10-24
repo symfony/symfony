@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyInfo\Tests;
 
+use phpDocumentor\Reflection\Types\ContextFactory;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -101,6 +103,18 @@ class PropertyInfoBundleTest extends TestCase
         $this->assertSame(['foo', 'bar'], $kernel->getContainer()->get('test.property_info')->getProperties(PropertyInfoBundleSubject::class));
     }
 
+    public function testRefinementsAreResolvedAccordingToTheTypeInfoConfiguration()
+    {
+        if (!class_exists(PhpDocParser::class) || !class_exists(ContextFactory::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
+        }
+
+        $kernel = new TestPropertyInfoKernel('test', false, $this->varDir);
+        $kernel->boot();
+
+        $this->assertEquals(Type::intRange(1, null), $kernel->getContainer()->get('test.property_info')->getType(PropertyInfoBundleSubject::class, 'count'));
+    }
+
     public function testNothingIsRegisteredWhenDisabled()
     {
         $container = new ContainerBuilder();
@@ -115,6 +129,11 @@ class PropertyInfoBundleTest extends TestCase
 class PropertyInfoBundleSubject
 {
     public string $foo = 'bar';
+
+    /**
+     * @var positive-int
+     */
+    public int $count = 1;
 }
 
 class PropertyInfoBundleListExtractor implements PropertyListExtractorInterface
@@ -159,6 +178,8 @@ class TestPropertyInfoKernel extends AbstractKernel
 
     private function configureContainer(ContainerConfigurator $container): void
     {
+        $container->extension('type_info', ['resolve_refinements' => true]);
+
         $services = $container->services();
         $services
             ->set(PropertyInfoBundleListExtractor::class)->autoconfigure()

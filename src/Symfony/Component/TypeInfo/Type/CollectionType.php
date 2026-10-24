@@ -76,8 +76,8 @@ class CollectionType extends Type implements WrappingTypeInterface
             return;
         }
 
-        if ($keyType instanceof TemplateType) {
-            $this->assertValidArrayKeyType($keyType->getBound(), $rootType);
+        if ($keyType instanceof WrappingTypeInterface) {
+            $this->assertValidArrayKeyType($keyType->getWrappedType(), $rootType);
 
             return;
         }

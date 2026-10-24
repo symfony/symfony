@@ -73,14 +73,14 @@ class StreamReaderGeneratorTest extends TestCase
     {
         $propertyMetadataLoader ??= new GenericTypePropertyMetadataLoader(
             new AttributePropertyMetadataLoader(
-                new PropertyMetadataLoader(TypeResolver::create()),
+                new PropertyMetadataLoader(TypeResolver::create(null, true)),
                 new ServiceContainer([
                     DivideStringAndCastToIntValueTransformer::class => new DivideStringAndCastToIntValueTransformer(),
                     StringToBooleanValueTransformer::class => new StringToBooleanValueTransformer(),
                 ]),
-                TypeResolver::create(),
+                TypeResolver::create(null, true),
             ),
-            new TypeContextFactory(new StringTypeResolver()),
+            new TypeContextFactory(new StringTypeResolver(null, null, [], true)),
         );
 
         $generator = new StreamReaderGenerator($propertyMetadataLoader, new ServiceContainer([
@@ -156,7 +156,7 @@ class StreamReaderGeneratorTest extends TestCase
 
     public function testDoNotSupportIntersectionType()
     {
-        $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamReadersDir);
+        $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamReadersDir);
 
         $this->expectException(UnsupportedException::class);
         $this->expectExceptionMessage('Intersection types are not supported ("Stringable&Traversable").');
@@ -166,7 +166,7 @@ class StreamReaderGeneratorTest extends TestCase
 
     public function testDoNotSupportEnumType()
     {
-        $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamReadersDir);
+        $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamReadersDir);
 
         $this->expectException(UnsupportedException::class);
         $this->expectExceptionMessage(\sprintf('"%s" type is not supported.', DummyEnum::class));
@@ -177,7 +177,7 @@ class StreamReaderGeneratorTest extends TestCase
     public function testDoNotSupportNonScalarValueObjectValueType()
     {
         $generator = new StreamReaderGenerator(
-            new PropertyMetadataLoader(TypeResolver::create()),
+            new PropertyMetadataLoader(TypeResolver::create(null, true)),
             new ServiceContainer([DummyWithValueObjects::class => new UnsupportedStreamValueTypeObjectTransformer()]),
             $this->streamReadersDir,
         );
@@ -344,7 +344,7 @@ class StreamReaderGeneratorTest extends TestCase
 
     public function testFilenameIsStableWithoutCacheVariantOption()
     {
-        $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamReadersDir);
+        $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamReadersDir);
         $type = Type::object(ClassicDummy::class);
 
         $this->assertSame($generator->generate($type, false), $generator->generate($type, false, ['include_null_properties' => true]));
@@ -354,7 +354,7 @@ class StreamReaderGeneratorTest extends TestCase
 
     public function testCacheVariantOptionCannotShadowTheStreamMarker()
     {
-        $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamReadersDir);
+        $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamReadersDir);
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -364,7 +364,7 @@ class StreamReaderGeneratorTest extends TestCase
     #[DataProvider('invalidCacheVariants')]
     public function testCacheVariantOptionRejectsInvalidValues(mixed $variant)
     {
-        $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamReadersDir);
+        $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamReadersDir);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "cache_variant" option must match "[a-zA-Z0-9_-]+"');

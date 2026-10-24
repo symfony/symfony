@@ -23,7 +23,7 @@ class PropertyMetadataLoaderTest extends TestCase
 {
     public function testReadPropertyType()
     {
-        $loader = new PropertyMetadataLoader(TypeResolver::create());
+        $loader = new PropertyMetadataLoader(TypeResolver::create(null, true));
 
         $this->assertEquals([
             'id' => new PropertyMetadata('id', Type::int()),

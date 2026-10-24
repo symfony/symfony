@@ -18,9 +18,9 @@
                 <source>This value is not a valid HTML5 color.</source>
                 <target>Tato hodnota není platná HTML5 barva.</target>
             </trans-unit>
-            <trans-unit id="100">
-                <source>Please enter a valid birthdate.</source>
-                <target>Prosím zadejte platný datum narození.</target>
+            <trans-unit id="100" resname="Please enter a valid birthdate.">
+                <source>This value is not a valid birthdate.</source>
+                <target state="needs-review-translation">Tato hodnota není platné datum narození.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
@@ -30,113 +30,113 @@
                 <source>The collection is invalid.</source>
                 <target>Kolekce není platná.</target>
             </trans-unit>
-            <trans-unit id="103">
-                <source>Please select a valid color.</source>
-                <target>Prosím vyberte platnou barvu.</target>
+            <trans-unit id="103" resname="Please select a valid color.">
+                <source>This value is not a valid color.</source>
+                <target state="needs-review-translation">Tato hodnota není platná barva.</target>
             </trans-unit>
-            <trans-unit id="104">
-                <source>Please select a valid country.</source>
-                <target>Prosím vyberte platnou zemi.</target>
+            <trans-unit id="104" resname="Please select a valid country.">
+                <source>This value is not a valid country.</source>
+                <target>Tato země neexistuje.</target>
             </trans-unit>
-            <trans-unit id="105">
-                <source>Please select a valid currency.</source>
-                <target>Prosím vyberte platnou měnu.</target>
+            <trans-unit id="105" resname="Please select a valid currency.">
+                <source>This value is not a valid currency.</source>
+                <target>Tato měna neexistuje.</target>
             </trans-unit>
-            <trans-unit id="106">
-                <source>Please choose a valid date interval.</source>
-                <target>Prosím vyberte platné rozpětí dat.</target>
+            <trans-unit id="106" resname="Please choose a valid date interval.">
+                <source>This value is not a valid date interval.</source>
+                <target state="needs-review-translation">Tato hodnota není platné rozpětí dat.</target>
             </trans-unit>
-            <trans-unit id="107">
-                <source>Please enter a valid date and time.</source>
-                <target>Prosím zadejte platný datum a čas.</target>
+            <trans-unit id="107" resname="Please enter a valid date and time.">
+                <source>This value is not a valid date and time.</source>
+                <target>Tato hodnota není platné datum s časovým údajem.</target>
             </trans-unit>
-            <trans-unit id="108">
-                <source>Please enter a valid date.</source>
-                <target>Prosím zadejte platný datum.</target>
+            <trans-unit id="108" resname="Please enter a valid date.">
+                <source>This value is not a valid date.</source>
+                <target>Tato hodnota není platné datum.</target>
             </trans-unit>
-            <trans-unit id="109">
-                <source>Please select a valid file.</source>
-                <target>Prosím vyberte platný soubor.</target>
+            <trans-unit id="109" resname="Please select a valid file.">
+                <source>This value is not a valid file.</source>
+                <target state="needs-review-translation">Tato hodnota není platný soubor.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The hidden field is invalid.</source>
                 <target>Skryté pole není platné.</target>
             </trans-unit>
-            <trans-unit id="111">
-                <source>Please enter an integer.</source>
-                <target>Prosím zadejte číslo.</target>
+            <trans-unit id="111" resname="Please enter an integer.">
+                <source>This value is not a valid integer.</source>
+                <target state="needs-review-translation">Tato hodnota není platné celé číslo.</target>
             </trans-unit>
-            <trans-unit id="112">
-                <source>Please select a valid language.</source>
-                <target>Prosím zadejte platný jazyk.</target>
+            <trans-unit id="112" resname="Please select a valid language.">
+                <source>This value is not a valid language.</source>
+                <target>Tento jazyk neexistuje.</target>
             </trans-unit>
-            <trans-unit id="113">
-                <source>Please select a valid locale.</source>
-                <target>Prosím zadejte platný jazyk.</target>
+            <trans-unit id="113" resname="Please select a valid locale.">
+                <source>This value is not a valid locale.</source>
+                <target>Tato lokalizace neexistuje.</target>
             </trans-unit>
-            <trans-unit id="114">
-                <source>Please enter a valid money amount.</source>
-                <target>Prosím zadejte platnou částku.</target>
+            <trans-unit id="114" resname="Please enter a valid money amount.">
+                <source>This value is not a valid money amount.</source>
+                <target state="needs-review-translation">Tato hodnota není platná částka.</target>
             </trans-unit>
-            <trans-unit id="115">
-                <source>Please enter a number.</source>
-                <target>Prosím zadejte číslo.</target>
+            <trans-unit id="115" resname="Please enter a number.">
+                <source>This value is not a valid number.</source>
+                <target state="needs-review-translation">Tato hodnota není platné číslo.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>The password is invalid.</source>
                 <target>Heslo není platné.</target>
             </trans-unit>
-            <trans-unit id="117">
-                <source>Please enter a percentage value.</source>
-                <target>Prosím zadejte procentuální hodnotu.</target>
+            <trans-unit id="117" resname="Please enter a percentage value.">
+                <source>This value is not a valid percentage.</source>
+                <target state="needs-review-translation">Tato hodnota není platná procentuální hodnota.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>The values do not match.</source>
                 <target>Hodnoty se neshodují.</target>
             </trans-unit>
-            <trans-unit id="119">
-                <source>Please enter a valid time.</source>
-                <target>Prosím zadejte platný čas.</target>
+            <trans-unit id="119" resname="Please enter a valid time.">
+                <source>This value is not a valid time.</source>
+                <target>Tato hodnota není platný časový údaj.</target>
             </trans-unit>
-            <trans-unit id="120">
-                <source>Please select a valid timezone.</source>
-                <target>Prosím vyberte platné časové pásmo.</target>
+            <trans-unit id="120" resname="Please select a valid timezone.">
+                <source>This value is not a valid timezone.</source>
+                <target>Tato časová zóna neexistuje.</target>
             </trans-unit>
-            <trans-unit id="121">
-                <source>Please enter a valid URL.</source>
-                <target>Prosím zadejte platnou URL.</target>
+            <trans-unit id="121" resname="Please enter a valid URL.">
+                <source>This value is not a valid URL.</source>
+                <target>Tato hodnota není platná URL adresa.</target>
             </trans-unit>
-            <trans-unit id="122">
-                <source>Please enter a valid search term.</source>
-                <target>Prosím zadejte platný výraz k vyhledání.</target>
+            <trans-unit id="122" resname="Please enter a valid search term.">
+                <source>This value is not a valid search term.</source>
+                <target state="needs-review-translation">Tato hodnota není platný výraz k vyhledání.</target>
             </trans-unit>
-            <trans-unit id="123">
-                <source>Please provide a valid phone number.</source>
-                <target>Prosím zadejte platné telefonní číslo.</target>
+            <trans-unit id="123" resname="Please provide a valid phone number.">
+                <source>This value is not a valid phone number.</source>
+                <target state="needs-review-translation">Tato hodnota není platné telefonní číslo.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The checkbox has an invalid value.</source>
                 <target>Zaškrtávací políčko má neplatnou hodnotu.</target>
             </trans-unit>
-            <trans-unit id="125">
-                <source>Please enter a valid email address.</source>
-                <target>Prosím zadejte platnou emailovou adresu.</target>
+            <trans-unit id="125" resname="Please enter a valid email address.">
+                <source>This value is not a valid email address.</source>
+                <target>Tato hodnota není platná e-mailová adresa.</target>
             </trans-unit>
-            <trans-unit id="126">
-                <source>Please select a valid option.</source>
-                <target>Prosím vyberte platnou možnost.</target>
+            <trans-unit id="126" resname="Please select a valid option.">
+                <source>This value is not a valid option.</source>
+                <target state="needs-review-translation">Tato hodnota není platná možnost.</target>
             </trans-unit>
-            <trans-unit id="127">
-                <source>Please select a valid range.</source>
-                <target>Prosím vyberte platný rozsah.</target>
+            <trans-unit id="127" resname="Please select a valid range.">
+                <source>This value is not a valid range.</source>
+                <target state="needs-review-translation">Tato hodnota není platný rozsah.</target>
             </trans-unit>
-            <trans-unit id="128">
-                <source>Please enter a valid week.</source>
-                <target>Prosím zadejte platný týden.</target>
+            <trans-unit id="128" resname="Please enter a valid week.">
+                <source>This value is not a valid week.</source>
+                <target>Tato hodnota není validní týden.</target>
             </trans-unit>
-            <trans-unit id="129">
-                <source>Please enter a valid UUID.</source>
-                <target state="needs-review-translation">Prosím zadejte platný UUID.</target>
+            <trans-unit id="129" resname="Please enter a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>Tato hodnota není platným UUID.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>

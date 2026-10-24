@@ -23,6 +23,8 @@ CHANGELOG
  * Stop adding a default `Cache-Control: no-cache, private` header to 308 `RedirectResponse` instances
  * Add argument `$clock` to `MetadataBag::__construct()`
  * Add `RedisSessionHandler::shutdown()` to close lazy connections
+ * Add support for `mongodb://` and `mongodb+srv://` DSNs in `SessionHandlerFactory`
+ * Add `MongoDbSessionHandler::createFromDsn()`
 
 8.1
 ---

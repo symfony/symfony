@@ -10,6 +10,7 @@ CHANGELOG
  * Add `MysqlStore` and `DoctrineDbalMysqlStore`, based on MySQL `GET_LOCK()` and usable with the `mysql+advisory:` DSN
  * Add argument `$removeOnRelease` to `FlockStore` and the `flock+remove` DSN to remove the lock file when an exclusive lock is released
  * Add `close()` to `DoctrineDbalMysqlStore`, `DoctrineDbalPostgreSqlStore`, `DoctrineDbalStore`, `MysqlStore`, `PdoStore`, `PostgreSqlStore` and `RedisStore`, called when the kernel shuts down
+ * Default the MongoDB store "database" option to "app" and its "collection" option to "locks"
 
 8.1
 ---

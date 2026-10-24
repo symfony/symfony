@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionHandlerFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
@@ -72,5 +73,45 @@ class SessionHandlerFactoryTest extends TestCase
         $handler = SessionHandlerFactory::createHandler('redis://localhost?prefix=foo&ttl=3600&ignored=bar', ['ttl' => static fn () => 123]);
 
         $this->assertInstanceOf(\Closure::class, $reflection->getProperty('ttl')->getValue($handler));
+    }
+
+    #[RequiresPhpExtension('mongodb')]
+    public function testCreateMongoDbHandlerWithDefaultDatabase()
+    {
+        $handler = SessionHandlerFactory::createHandler('mongodb://localhost');
+
+        $this->assertInstanceOf(MongoDbSessionHandler::class, $handler);
+        $this->assertSame('app.sessions', (new \ReflectionObject($handler))->getProperty('namespace')->getValue($handler));
+    }
+
+    #[RequiresPhpExtension('mongodb')]
+    public function testMongoDbHandlerKeepsTheTtlClosure()
+    {
+        $ttl = static fn () => 123;
+        $handler = SessionHandlerFactory::createHandler('mongodb://localhost/app', ['ttl' => $ttl]);
+
+        $this->assertSame($ttl, (new \ReflectionObject($handler))->getProperty('ttl')->getValue($handler));
+    }
+
+    #[RequiresPhpExtension('mongodb')]
+    public function testMongoDbDsnIsNotParsedByTheFactory()
+    {
+        $handler = SessionHandlerFactory::createHandler('mongodb://localhost/app?collection=a+b');
+
+        $this->assertSame('app.a+b', (new \ReflectionObject($handler))->getProperty('namespace')->getValue($handler));
+    }
+
+    #[RequiresPhpExtension('mongodb')]
+    public function testExplicitOptionsTakePrecedenceOverTheDsn()
+    {
+        foreach ([
+            'mongodb://localhost/app?collection=a',
+            'mongodb://h1:27017,h2:27017/app?collection=a',
+            'mongodb://h1,h2/app?collection=a',
+        ] as $dsn) {
+            $handler = SessionHandlerFactory::createHandler($dsn, ['collection' => 'b']);
+
+            $this->assertSame('app.b', (new \ReflectionObject($handler))->getProperty('namespace')->getValue($handler));
+        }
     }
 }

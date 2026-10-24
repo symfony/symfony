@@ -57,6 +57,16 @@ class MongoDbStore implements PersistingStoreInterface
 {
     use ExpiringStoreTrait;
 
+    /**
+     * The store options read from the DSN query string, with their default
+     * value. They are removed from the DSN before passing it to the driver, so
+     * that the driver reuses the same connection for a given MONGODB_URI.
+     */
+    private const DEFAULT_OPTIONS = [
+        'database' => 'app',
+        'collection' => 'locks',
+    ];
+
     private Manager $manager;
     private string $namespace;
     private string $uri;
@@ -72,14 +82,14 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * Options:
      *      gcProbability: Should a TTL Index be created expressed as a probability from 0.0 to 1.0 [default: 0.001]
-     *      database:      The name of the database [required when $mongo is a Client]
-     *      collection:    The name of the collection [required when $mongo is a Client]
+     *      database:      The name of the database [default: app]
+     *      collection:    The name of the collection [default: locks]
      *      uriOptions:    Array of uri options. [used when $mongo is a URI]
      *      driverOptions: Array of driver options. [used when $mongo is a URI]
      *
      * When using a URI string:
-     *      The database is determined from the uri's path, otherwise the "database" option is used. To specify an alternate authentication database; "authSource" uriOption or querystring parameter must be used.
-     *      The collection is determined from the uri's "collection" querystring parameter, otherwise the "collection" option is used.
+     *      The database is determined from the uri's path, otherwise the "database" option is used, then the default. To specify an alternate authentication database; "authSource" uriOption or querystring parameter must be used.
+     *      The collection is determined from the uri's "collection" querystring parameter, otherwise the "collection" option is used, then the default.
      *
      * For example: mongodb://myuser:mypass@myhost/mydatabase?collection=mycollection
      *
@@ -97,7 +107,7 @@ class MongoDbStore implements PersistingStoreInterface
      * @see https://docs.mongodb.com/manual/applications/replication/
      */
     public function __construct(
-        Collection|Database|Client|Manager|string $mongo,
+        #[\SensitiveParameter] Collection|Database|Client|Manager|string $mongo,
         array $options = [],
         private float $initialTtl = 300.0,
     ) {
@@ -121,15 +131,19 @@ class MongoDbStore implements PersistingStoreInterface
         } elseif ($mongo instanceof Manager) {
             $this->manager = $mongo;
         } else {
-            $this->uri = $this->skimUri($mongo);
+            $this->uri = $this->parseDsn($mongo);
         }
 
-        if (null === $this->options['database']) {
-            throw new InvalidArgumentException(\sprintf('"%s()" requires the "database" in the URI path or option.', __METHOD__));
+        $this->options['database'] ??= self::DEFAULT_OPTIONS['database'];
+        $this->options['collection'] ??= self::DEFAULT_OPTIONS['collection'];
+
+        if ('' === $this->options['database']) {
+            throw new InvalidArgumentException('The "database" option must not be empty.');
         }
-        if (null === $this->options['collection']) {
-            throw new InvalidArgumentException(\sprintf('"%s()" requires the "collection" in the URI querystring or option.', __METHOD__));
+        if ('' === $this->options['collection']) {
+            throw new InvalidArgumentException('The "collection" option must not be empty.');
         }
+
         $this->namespace = $this->options['database'].'.'.$this->options['collection'];
 
         if ($this->options['gcProbability'] < 0.0 || $this->options['gcProbability'] > 1.0) {
@@ -142,34 +156,64 @@ class MongoDbStore implements PersistingStoreInterface
     }
 
     /**
-     * Extract default database and collection from given connection URI and remove collection querystring.
+     * Extract the database and the collection from the given connection URI and
+     * remove the Symfony options from it.
      *
-     * Non-standard parameters are removed from the URI to improve libmongoc's reuse of connections.
+     * parse_url() rejects valid host lists such as "host1:27017,host2", so the
+     * string is parsed by hand. Non-standard parameters are removed from the
+     * URI to improve libmongoc's reuse of connections.
      *
      * @see https://php.net/mongodb.connection-handling
      */
-    private function skimUri(string $uri): string
+    private function parseDsn(#[\SensitiveParameter] string $uri): string
     {
         if (!str_starts_with($uri, 'mongodb://') && !str_starts_with($uri, 'mongodb+srv://')) {
-            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid. Expecting "mongodb://" or "mongodb+srv://".', $uri));
+            throw new InvalidArgumentException('The given MongoDB Connection URI is invalid. Expecting "mongodb://" or "mongodb+srv://".');
         }
 
         if (false === $params = parse_url($uri)) {
-            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
-        }
-        $pathDb = ltrim($params['path'] ?? '', '/') ?: null;
-        if (null !== $pathDb) {
-            $this->options['database'] = $pathDb;
+            throw new InvalidArgumentException('The given MongoDB Connection URI is invalid.');
         }
 
-        $matches = [];
-        if (preg_match('/^(.*[\?&])collection=([^&#]*)&?(([^#]*).*)$/', $uri, $matches)) {
-            $prefix = $matches[1];
-            $this->options['collection'] = $matches[2];
-            if (empty($matches[4])) {
-                $prefix = substr($prefix, 0, -1);
+        if ('' === ($params['host'] ?? '')) {
+            throw new InvalidArgumentException('The given MongoDB Connection URI is invalid: no host specified.');
+        }
+
+        $query = $kept = [];
+        foreach (explode('&', $params['query'] ?? '') as $pair) {
+            if ('' === $pair) {
+                continue;
             }
-            $uri = $prefix.$matches[3];
+
+            $eq = strpos($pair, '=');
+            $key = rawurldecode(false === $eq ? $pair : substr($pair, 0, $eq));
+            $value = false === $eq ? '' : rawurldecode(substr($pair, $eq + 1));
+
+            if (('database' === $key || 'collection' === $key) && '' === $value) {
+                throw new InvalidArgumentException(\sprintf('The "%s" DSN option must not be empty.', $key));
+            }
+
+            $query[$key] = $value;
+            if (!\array_key_exists($key, self::DEFAULT_OPTIONS)) {
+                $kept[] = $pair;
+            }
+        }
+
+        $pathDb = rawurldecode(ltrim($params['path'] ?? '', '/'));
+
+        // The URI takes precedence over the options, the path over the query string.
+        if ('' !== $pathDb) {
+            $this->options['database'] = $pathDb;
+        } elseif (isset($query['database'])) {
+            $this->options['database'] = $query['database'];
+        }
+
+        if (isset($query['collection'])) {
+            $this->options['collection'] = $query['collection'];
+        }
+
+        if (isset($params['query'])) {
+            $uri = str_replace('?'.$params['query'], $kept ? '?'.implode('&', $kept) : '', $uri);
         }
 
         return $uri;

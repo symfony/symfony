@@ -14,9 +14,11 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\UnionType;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
@@ -57,7 +59,13 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
             /** @var list<BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>> */
             $keyTypes = $keyType instanceof UnionType ? $keyType->getTypes() : [$keyType];
 
-            $typeIdentifiers = array_map(static fn ($t) => $t->getTypeIdentifier()->value, $keyTypes);
+            $typeIdentifiers = array_map(static function (Type $t): string {
+                while ($t instanceof WrappingTypeInterface) {
+                    $t = $t->getWrappedType();
+                }
+
+                return $t->getTypeIdentifier()->value;
+            }, $keyTypes);
         }
 
         $valueType = $context['value_type'] ?? null;

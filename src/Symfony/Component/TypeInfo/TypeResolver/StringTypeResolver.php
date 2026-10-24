@@ -71,12 +71,18 @@ final class StringTypeResolver implements TypeResolverInterface
 
     /**
      * @param array<string, string> $extraTypeAliases
+     * @param bool|null             $resolveRefinements Whether to resolve PHPDoc refinements, such as literals and integer ranges. Not passing true is deprecated since 8.2, refinements will always be resolved as of 9.0
      */
     public function __construct(
         ?Lexer $lexer = null,
         ?TypeParser $parser = null,
         private readonly array $extraTypeAliases = [],
+        private readonly ?bool $resolveRefinements = null,
     ) {
+        if (true !== $resolveRefinements) {
+            trigger_deprecation('symfony/type-info', '8.2', 'Not passing true for the "$resolveRefinements" argument of "%s()" is deprecated; PHPDoc refinements will always be resolved in 9.0.', __METHOD__);
+        }
+
         if (class_exists(ParserConfig::class)) {
             $this->lexer = $lexer ?? new Lexer(new ParserConfig([]));
             $this->parser = $parser ?? new TypeParser($config = new ParserConfig([]), new ConstExprParser($config));
@@ -201,6 +207,19 @@ final class StringTypeResolver implements TypeResolverInterface
                 return CollectionType::mergeCollectionValueTypes($types);
             }
 
+            if ($this->resolveRefinements) {
+                $literal = match (true) {
+                    $node->constExpr instanceof ConstExprStringNode => $node->constExpr->value,
+                    $node->constExpr instanceof ConstExprIntegerNode => self::parseInteger($node->constExpr->value),
+                    $node->constExpr instanceof ConstExprFloatNode => (float) $node->constExpr->value,
+                    default => null,
+                };
+
+                if (null !== $literal) {
+                    return Type::literal($literal);
+                }
+            }
+
             return match (true) {
                 $node->constExpr instanceof ConstExprArrayNode => Type::array(),
                 $node->constExpr instanceof ConstExprFalseNode => Type::false(),
@@ -262,9 +281,23 @@ final class StringTypeResolver implements TypeResolverInterface
 
             $type ??= $this->getTypeFromNode($node->type, $typeContext);
 
-            // handle integer ranges as simple integers
             if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
-                return $type;
+                if (!$this->resolveRefinements || !$type instanceof BuiltinType || 2 !== \count($node->genericTypes)) {
+                    return $type;
+                }
+
+                $min = $this->getIntRangeBound($node->genericTypes[0], 'min');
+                $max = $this->getIntRangeBound($node->genericTypes[1], 'max');
+
+                if (null === $min && null === $max) {
+                    return $type;
+                }
+
+                try {
+                    return Type::intRange($min, $max);
+                } catch (InvalidArgumentException $e) {
+                    throw new \DomainException($e->getMessage(), 0, $e);
+                }
             }
 
             $variableTypes = array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->genericTypes);
@@ -333,7 +366,11 @@ final class StringTypeResolver implements TypeResolverInterface
             'bool', 'boolean' => Type::bool(),
             'true' => Type::true(),
             'false' => Type::false(),
-            'int', 'integer', 'positive-int', 'negative-int', 'non-positive-int', 'non-negative-int', 'non-zero-int' => Type::int(),
+            'int', 'integer', 'non-zero-int' => Type::int(),
+            'positive-int' => $this->resolveRefinements ? Type::intRange(1, null) : Type::int(),
+            'negative-int' => $this->resolveRefinements ? Type::intRange(null, -1) : Type::int(),
+            'non-positive-int' => $this->resolveRefinements ? Type::intRange(null, 0) : Type::int(),
+            'non-negative-int' => $this->resolveRefinements ? Type::intRange(0, null) : Type::int(),
             'float', 'double' => Type::float(),
             'string',
             'class-string',
@@ -445,5 +482,40 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         return $node;
+    }
+
+    private function getIntRangeBound(TypeNode $node, string $unboundedKeyword): ?int
+    {
+        if ($node instanceof ConstTypeNode && $node->constExpr instanceof ConstExprIntegerNode) {
+            return self::parseInteger($node->constExpr->value);
+        }
+
+        if ($node instanceof IdentifierTypeNode && $unboundedKeyword === $node->name) {
+            return null;
+        }
+
+        throw new \DomainException(\sprintf('"%s" is not a valid integer range bound.', $node));
+    }
+
+    private static function parseInteger(string $value): int
+    {
+        preg_match('/^(-?)(0[xbo]|0(?=.))?(.*)$/i', $value, $matches);
+        [, $sign, $prefix, $digits] = $matches;
+
+        $base = match (strtolower($prefix)) {
+            '0x' => 16,
+            '0b' => 2,
+            '0o', '0' => 8,
+            default => 10,
+        };
+
+        $magnitude = \intval($digits, $base);
+
+        // intval() saturates on overflow, while PHP reads such a literal as a float
+        if (\PHP_INT_MAX === $magnitude && ltrim(strtolower($digits), '0') !== base_convert((string) \PHP_INT_MAX, 10, $base)) {
+            throw new \DomainException(\sprintf('"%s" does not fit in an integer.', $value));
+        }
+
+        return '-' === $sign ? -$magnitude : $magnitude;
     }
 }

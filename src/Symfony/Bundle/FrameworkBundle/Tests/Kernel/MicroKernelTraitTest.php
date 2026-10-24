@@ -369,7 +369,7 @@ class MicroKernelTraitTest extends TestCase
         $fs = new Filesystem();
         $fs->mkdir($configDir.'/packages');
         file_put_contents($configDir.'/bundles.php', "<?php\n\nreturn [\n    Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle::class => ['all' => true],\n];\n");
-        file_put_contents($configDir.'/packages/framework.yaml', "framework:\n    secret: \$ecret\n    http_method_override: false\n    test: true\n");
+        file_put_contents($configDir.'/packages/framework.yaml', "framework:\n    secret: \$ecret\n    http_method_override: false\n    test: true\n    type_info:\n        resolve_refinements: true\n");
 
         $kernel = $this->kernel = new CustomConfigDirKernel($projectDir);
 

@@ -154,9 +154,7 @@ class TestJsonStreamerKernel extends AbstractKernel
     {
         $container->extension('json_streamer', $this->config);
 
-        if (!$this->withTypeInfo) {
-            $container->extension('type_info', ['enabled' => false]);
-        }
+        $container->extension('type_info', $this->withTypeInfo ? ['resolve_refinements' => true] : ['enabled' => false]);
 
         $container->services()
             ->set(StreamableDummy::class)->autoconfigure()

@@ -1868,6 +1868,15 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame(['a' => [1, 2]], $dummy->intsByName);
     }
 
+    public function testDenormalizeConvertsNestedRefinedScalarCollectionElements()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()]));
+
+        $dummy = $normalizer->denormalize(['countsByName' => ['a' => ['1', '2']]], RefinedScalarCollectionsDummy::class, null, [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => true]);
+
+        $this->assertSame(['a' => [1, 2]], $dummy->countsByName);
+    }
+
     public function testDenormalizeCollectsScalarCollectionElementErrors()
     {
         $serializer = new Serializer([new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors()]);
@@ -2159,7 +2168,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testTemplateTypeWhenAnObjectIsPassedToDenormalize()
     {
-        $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpStanExtractor(), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
+        $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
             protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
             {
                 return true;
@@ -2178,7 +2187,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeTemplateType()
     {
-        $normalizer = new class(classMetadataFactory: new ClassMetadataFactory(new AttributeLoader()), propertyTypeExtractor: new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
+        $normalizer = new class(classMetadataFactory: new ClassMetadataFactory(new AttributeLoader()), propertyTypeExtractor: new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
             protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
             {
                 return true;
@@ -2366,7 +2375,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     private static function createGenericTypeSerializer(): Serializer
     {
-        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(), new ReflectionExtractor()]));
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()]));
 
         return new Serializer([new ArrayDenormalizer(), $normalizer]);
     }
@@ -3068,6 +3077,12 @@ class ScalarCollectionsDummy
 
     /** @var array<string, string>[] */
     public array $stringMaps = [];
+}
+
+class RefinedScalarCollectionsDummy
+{
+    /** @var array<string, list<positive-int>> */
+    public array $countsByName = [];
 }
 
 class UnionCollectionDocBlockDummy

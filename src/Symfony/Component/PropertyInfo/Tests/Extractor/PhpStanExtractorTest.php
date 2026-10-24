@@ -12,6 +12,8 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
@@ -63,7 +65,7 @@ class PhpStanExtractorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->extractor = new PhpStanExtractor();
+        $this->extractor = new PhpStanExtractor(null, null, null, true, true);
         $this->phpDocExtractor = new PhpDocExtractor();
     }
 
@@ -148,7 +150,7 @@ class PhpStanExtractorTest extends TestCase
     #[DataProvider('typesWithNoPrefixesProvider')]
     public function testExtractTypesWithNoPrefixes(string $property, ?Type $type)
     {
-        $noPrefixExtractor = new PhpStanExtractor([], [], []);
+        $noPrefixExtractor = new PhpStanExtractor([], [], [], true, true);
 
         $this->assertEquals($type, $noPrefixExtractor->getType(Dummy::class, $property));
     }
@@ -207,7 +209,7 @@ class PhpStanExtractorTest extends TestCase
     #[DataProvider('typesWithCustomPrefixesProvider')]
     public function testExtractTypesWithCustomPrefixes(string $property, ?Type $type)
     {
-        $customExtractor = new PhpStanExtractor(['add', 'remove'], ['is', 'can']);
+        $customExtractor = new PhpStanExtractor(['add', 'remove'], ['is', 'can'], null, true, true);
 
         $this->assertEquals($type, $customExtractor->getType(Dummy::class, $property));
     }
@@ -450,8 +452,8 @@ class PhpStanExtractorTest extends TestCase
         yield ['traitString', Type::string()];
         yield ['interfaceString', Type::string()];
         yield ['literalString', Type::string()];
-        yield ['positiveInt', Type::int()];
-        yield ['negativeInt', Type::int()];
+        yield ['positiveInt', Type::intRange(1, null)];
+        yield ['negativeInt', Type::intRange(null, -1)];
         yield ['nonEmptyArray', Type::array()];
         yield ['nonEmptyList', Type::list()];
         yield ['scalar', Type::union(Type::int(), Type::float(), Type::string(), Type::bool())];
@@ -486,14 +488,42 @@ class PhpStanExtractorTest extends TestCase
      */
     public static function intRangeTypeProvider(): iterable
     {
-        yield ['a', Type::int()];
-        yield ['b', Type::nullable(Type::int())];
-        yield ['c', Type::int()];
+        yield ['a', Type::intRange(0, 100)];
+        yield ['b', Type::nullable(Type::intRange(null, 100))];
+        yield ['c', Type::intRange(50, null)];
     }
 
-    public function testExtractorLiteralType()
+    #[DataProvider('literalTypeProvider')]
+    public function testExtractorLiteralType(string $property, ?Type $type)
     {
-        $this->assertEquals(Type::arrayShape(['quoted key' => Type::string()]), $this->extractor->getType(LiteralDummy::class, 'shape'));
+        $this->assertEquals($type, $this->extractor->getType(LiteralDummy::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: ?Type}>
+     */
+    public static function literalTypeProvider(): iterable
+    {
+        yield ['status', Type::union(Type::literal('draft'), Type::literal('published'))];
+        yield ['shape', Type::arrayShape(['quoted key' => Type::literal("it's")])];
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testNotPassingTrueForResolveRefinementsIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 8.2: Not passing true for the "$resolveRefinements" argument of "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::__construct()" is deprecated; PHPDoc refinements will always be resolved in 9.0.');
+
+        new PhpStanExtractor();
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testPassingFalseForResolveRefinementsIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 8.2: Not passing true for the "$resolveRefinements" argument of "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::__construct()" is deprecated; PHPDoc refinements will always be resolved in 9.0.');
+
+        $this->assertEquals(Type::int(), (new PhpStanExtractor(null, null, null, true, false))->getType(IntRangeDummy::class, 'a'));
     }
 
     #[DataProvider('php80TypesProvider')]
@@ -516,7 +546,7 @@ class PhpStanExtractorTest extends TestCase
     #[DataProvider('allowPrivateAccessProvider')]
     public function testAllowPrivateAccess(bool $allowPrivateAccess, Type $expectedType)
     {
-        $extractor = new PhpStanExtractor(null, null, null, $allowPrivateAccess);
+        $extractor = new PhpStanExtractor(null, null, null, $allowPrivateAccess, true);
 
         $this->assertEquals($expectedType, $extractor->getType(DummyPropertyAndGetterWithDifferentTypes::class, 'foo'));
     }

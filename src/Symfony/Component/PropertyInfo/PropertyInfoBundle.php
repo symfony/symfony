@@ -26,11 +26,13 @@ use Symfony\Component\PropertyInfo\DependencyInjection\RemovePropertyInfoCachePa
 use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
+use Symfony\Component\TypeInfo\TypeInfoBundle;
 
 /**
  * Provides the property info services.
  */
 #[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(TypeInfoBundle::class)]
 class PropertyInfoBundle extends AbstractBundle
 {
     public function getPath(): string
@@ -89,6 +91,7 @@ class PropertyInfoBundle extends AbstractBundle
             && ContainerBuilder::willBeAvailable('phpdocumentor/type-resolver', ContextFactory::class, ['symfony/framework-bundle', 'symfony/property-info'])
         ) {
             $container->register('property_info.phpstan_extractor', PhpStanExtractor::class)
+                ->setArguments([null, null, null, true, '%.type_info.resolve_refinements%'])
                 ->addTag('property_info.type_extractor', ['priority' => -1000])
                 ->addTag('property_info.constructor_extractor', ['priority' => -1000]);
         }

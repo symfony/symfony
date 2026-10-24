@@ -1,4 +1,5 @@
-.sf-toolbarreset {
+.sf-toolbarreset,
+.sf-profiler-overlay {
     --sf-toolbar-font-family-system: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --sf-toolbar-font-family-monospace: "Ubuntu Mono", "JetBrains Mono", ui-monospace, "Roboto Mono", SFMono-Regular, Menlo, Monaco, Consolas,"Liberation Mono", "Courier New", monospace;
 
@@ -49,6 +50,64 @@
 .sf-toolbar-clearer {
     clear: both;
     height: 36px;
+}
+
+.sf-profiler-overlay {
+    background: var(--sf-toolbar-gray-800);
+    border: 0;
+    border-radius: 6px;
+    box-sizing: border-box;
+    color: var(--sf-toolbar-gray-200);
+    font: 14px var(--sf-toolbar-font-family-system);
+    height: calc(100% - 32px);
+    inset: 0;
+    margin: auto;
+    max-height: none;
+    max-width: none;
+    overflow: hidden;
+    padding: 0;
+    position: fixed;
+    text-align: left;
+    text-transform: none;
+    width: calc(100% - 32px);
+}
+.sf-profiler-overlay:not([open]) {
+    display: none;
+}
+.sf-profiler-overlay[open] {
+    display: flex;
+    flex-direction: column;
+}
+.sf-profiler-overlay::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+.sf-profiler-overlay .sf-profiler-overlay-header {
+    align-items: center;
+    display: flex;
+    flex-shrink: 0;
+    gap: 16px;
+    padding: 8px 12px;
+}
+.sf-profiler-overlay-header span {
+    flex: 1;
+}
+.sf-profiler-overlay .sf-profiler-overlay-header a,
+.sf-profiler-overlay .sf-profiler-overlay-header button {
+    background: none;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    margin: 0;
+    padding: 4px;
+    text-decoration: underline;
+}
+.sf-profiler-overlay iframe {
+    background: var(--sf-toolbar-white);
+    border: 0;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
 }
 
 .sf-toolbarreset *:not(svg rect) {

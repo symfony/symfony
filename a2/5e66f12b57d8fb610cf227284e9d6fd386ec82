@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-23T12:59:55Z
+
+Can we preserve the distinction between JSON objects and arrays while decoding each item once? `[[]]` currently produces a default `ClassicDummy` when read as `list<ClassicDummy>`. The previous reader rejects this input. Nested object properties need the same validation.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-10-23T15:21:33Z
+
+Indeed, good catch! Items are now decoded as objects (`associative: false`), so containers are checked at each level, nested collections included. Items containing `mixed` values stay lazy.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-10-23T15:41:25Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-10-23T16:24:34Z
+
+Status: Needs Review

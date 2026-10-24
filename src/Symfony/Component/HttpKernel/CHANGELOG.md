@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `#[RateLimitFixedWindow]`, `#[RateLimitSlidingWindow]` and `#[RateLimitTokenBucket]` attributes to rate limit controllers with a limiter configured inline
+
 8.2
 ---
 

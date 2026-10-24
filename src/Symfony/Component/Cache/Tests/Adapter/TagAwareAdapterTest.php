@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -19,6 +20,8 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\LockRegistry;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\ResettableAdapter;
@@ -116,6 +119,220 @@ class TagAwareAdapterTest extends AdapterTestCase
         $adapter->invalidateTags(['bar']);
 
         $this->assertFalse($adapter->getItem('foo')->isHit());
+    }
+
+    #[DataProvider('provideInvalidatedComputations')]
+    public function testComputationsKeepKnownTagVersions(bool $lock, bool $sameAdapter, bool $replacement, bool $refresh, bool $recompute)
+    {
+        $storage = new ArrayAdapter();
+        $adapter = new TagAwareAdapter($storage, null, 0);
+        $invalidator = new TagAwareAdapter($storage, null, 0);
+        $adapter->save($adapter->getItem($recompute ? 'computed' : 'seed')->set('old')->tag('product'));
+        if ($recompute) {
+            $adapter = new TagAwareAdapter($storage, null, 0);
+        }
+        if ($lock) {
+            $adapter->setCallbackWrapper(LockRegistry::compute(...));
+        }
+
+        $this->assertSame('old', $adapter->get('computed', static function (CacheItem $item) use ($adapter, $invalidator, $sameAdapter, $replacement, $refresh) {
+            ($sameAdapter ? $adapter : $invalidator)->invalidateTags(['product']);
+            if ($replacement) {
+                $invalidator->save($invalidator->getItem('replacement')->set('new')->tag('product'));
+            }
+            if ($refresh) {
+                $adapter->getItem('replacement');
+            }
+            $item->tag('product');
+
+            return 'old';
+        }, $recompute ? \INF : null));
+
+        $this->assertTrue($storage->getItem('computed')->isHit());
+        $this->assertFalse((new TagAwareAdapter($storage, null, 0))->getItem('computed')->isHit());
+    }
+
+    public static function provideInvalidatedComputations(): iterable
+    {
+        yield 'deleted version' => [false, false, false, false, false];
+        yield 'replacement version' => [false, false, true, false, false];
+        yield 'refreshed local versions' => [false, false, true, true, false];
+        yield 'same adapter' => [false, true, true, false, false];
+        yield 'forced recomputation' => [false, false, true, false, true];
+        yield 'stampede lock' => [true, false, true, true, false];
+    }
+
+    public function testComputationPreservesCallbackAndPopulatesUnknownTags()
+    {
+        $adapter = new TagAwareAdapter(new ArrayAdapter(), null, 0);
+        $callback = static function (CacheItem $item) {
+            $item->tag('product');
+
+            return 'value';
+        };
+        $adapter->setCallbackWrapper(function (callable $actual, CacheItem $item, bool &$save) use ($callback) {
+            $this->assertSame($callback, $actual);
+
+            return $actual($item, $save);
+        });
+
+        $this->assertSame('value', $adapter->get('cold', $callback));
+        $this->assertSame('value', $adapter->getItem('cold')->get());
+        $this->assertSame('value', $adapter->get('warm', $callback));
+        $this->assertSame('value', $adapter->getItem('warm')->get());
+    }
+
+    public function testExplicitDeferredItemsUseFreshVersionsDuringComputation()
+    {
+        $storage = new ArrayAdapter();
+        $adapter = new TagAwareAdapter($storage, null, 0);
+        $adapter->save($adapter->getItem('seed')->tag('product'));
+
+        $adapter->get('computed', static function (CacheItem $item) use ($adapter) {
+            $adapter->saveDeferred($adapter->getItem('explicit')->set('new')->tag('product'));
+            $adapter->invalidateTags(['product']);
+            $item->tag('product');
+
+            return 'old';
+        });
+
+        $reader = new TagAwareAdapter($storage, null, 0);
+        $this->assertSame('new', $reader->getItem('explicit')->get());
+        $this->assertFalse($reader->getItem('computed')->isHit());
+    }
+
+    public function testFailedComputationSaveKeepsSnapshotForCommitRetry()
+    {
+        $storage = new class extends ArrayAdapter {
+            public bool $fail = false;
+
+            public function saveDeferred(\Psr\Cache\CacheItemInterface $item): bool
+            {
+                return !$this->fail && parent::saveDeferred($item);
+            }
+        };
+        $adapter = new TagAwareAdapter($storage, null, 0);
+        $adapter->save($adapter->getItem('seed')->tag('product'));
+
+        $adapter->get('computed', static function (CacheItem $item) use ($adapter, $storage) {
+            $adapter->invalidateTags(['product']);
+            $storage->fail = true;
+            $item->tag('product');
+
+            return 'old';
+        }, null, $metadata);
+        $this->assertTrue($metadata[CacheItem::METADATA_SAVE_FAILED]);
+        $storage->fail = false;
+        $this->assertTrue($adapter->commit());
+        $this->assertTrue($storage->getItem('computed')->isHit());
+        $this->assertFalse((new TagAwareAdapter($storage, null, 0))->getItem('computed')->isHit());
+    }
+
+    public function testExplicitSaveAfterComputationUsesFreshVersions()
+    {
+        $storage = new ArrayAdapter();
+        $adapter = new TagAwareAdapter($storage, null, 0);
+        $adapter->save($adapter->getItem('seed')->tag('product'));
+        $computed = null;
+        $adapter->get('computed', static function (CacheItem $item) use ($adapter, &$computed) {
+            $adapter->invalidateTags(['product']);
+            $computed = $item;
+            $item->tag('product');
+
+            return 'old';
+        });
+
+        $adapter->save($computed->set('new'));
+        $this->assertSame('new', (new TagAwareAdapter($storage, null, 0))->getItem('computed')->get());
+    }
+
+    public function testResetDuringComputationPreservesSnapshot()
+    {
+        $storage = new ArrayAdapter();
+        $adapter = new TagAwareAdapter($storage, null, 0);
+        $adapter->save($adapter->getItem('seed')->tag('product'));
+
+        $adapter->get('computed', static function (CacheItem $item) use ($adapter) {
+            $adapter->invalidateTags(['product']);
+            $adapter->reset();
+            $item->tag('product');
+
+            return 'old';
+        });
+
+        $this->assertTrue($storage->getItem('computed')->isHit());
+        $this->assertFalse((new TagAwareAdapter($storage, null, 0))->getItem('computed')->isHit());
+    }
+
+    #[DataProvider('provideNestedComputations')]
+    public function testNestedComputationsKeepSeparateSnapshots(bool $subNamespace)
+    {
+        $storage = new ArrayAdapter();
+        $adapter = new TagAwareAdapter($storage, null, 0);
+        $nested = $subNamespace ? $adapter->withSubNamespace('nested') : $adapter;
+        $adapter->save($adapter->getItem('seed')->tag('product'));
+
+        $adapter->get('outer', static function (CacheItem $item) use ($adapter, $nested) {
+            $adapter->invalidateTags(['product']);
+            $nested->get('inner', static function (CacheItem $item) {
+                $item->tag('product');
+
+                return 'new';
+            });
+            $item->tag('product');
+
+            return 'old';
+        });
+
+        $this->assertSame('new', $nested->getItem('inner')->get());
+        $this->assertFalse((new TagAwareAdapter($storage, null, 0))->getItem('outer')->isHit());
+    }
+
+    public static function provideNestedComputations(): iterable
+    {
+        yield 'same namespace' => [false];
+        yield 'different namespace' => [true];
+    }
+
+    public function testExplicitDeferredComputationItemUsesFreshVersions()
+    {
+        $storage = new ArrayAdapter();
+        $adapter = new TagAwareAdapter($storage, null, 0);
+        $adapter->save($adapter->getItem('seed')->tag('product'));
+
+        $adapter->get('computed', static function (CacheItem $item, bool &$save) use ($adapter) {
+            $adapter->saveDeferred($item->set('new')->tag('product'));
+            $adapter->invalidateTags(['product']);
+            $save = false;
+
+            return 'new';
+        });
+        $adapter->commit();
+
+        $this->assertSame('new', (new TagAwareAdapter($storage, null, 0))->getItem('computed')->get());
+    }
+
+    public function testPreparingComputationSavePreservesItemMetadata()
+    {
+        $adapter = new TagAwareAdapter(new ArrayAdapter());
+        $adapter->setCallbackWrapper(function (callable $callback, CacheItem $item, bool &$save, AdapterInterface $pool, \Closure $setMetadata) {
+            $metadata = $item->getMetadata();
+            $value = $callback($item, $save);
+            $setMetadata($item);
+            $this->assertSame($metadata, $item->getMetadata());
+            $saved = $pool->save($item->set($value));
+            $save = false;
+            $setMetadata($item, $saved);
+
+            return $value;
+        });
+
+        $this->assertSame('value', $adapter->get('computed', static function (CacheItem $item) {
+            $item->tag('product');
+
+            return 'value';
+        }));
+        $this->assertSame('value', $adapter->getItem('computed')->get());
     }
 
     private function getPruneableMock(): PruneableInterface&MockObject

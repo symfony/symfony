@@ -109,6 +109,8 @@ class WeekToArrayTransformerTest extends TestCase
             'integer instead of array' => [0, 'Value is expected to be an array, but was "int"'],
             'string instead of array' => ['12345', 'Value is expected to be an array, but was "string"'],
             'week invalid' => [['year' => 2019, 'week' => 66], 'Week "66" does not exist for year "2019".'],
+            'week zero' => [['year' => 2019, 'week' => 0], 'Week "0" does not exist for year "2019".'],
+            'week negative' => [['year' => 2019, 'week' => -1], 'Week "-1" does not exist for year "2019".'],
             'year null' => [['year' => null, 'week' => 1], 'Year is expected to be an integer, but was "null".'],
             'week null' => [['year' => 2019, 'week' => null], 'Week is expected to be an integer, but was "null".'],
             'year non-integer' => [['year' => '2019', 'week' => 1], 'Year is expected to be an integer, but was "string".'],

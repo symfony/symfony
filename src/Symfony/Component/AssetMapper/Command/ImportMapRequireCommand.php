@@ -55,37 +55,37 @@ final class ImportMapRequireCommand extends Command
 
                 For example:
 
-                    <info>php %command.full_name% lodash</info>
-                    <info>php %command.full_name% "lodash@^4.15"</info>
+                    <info>%command.invocation% lodash</info>
+                    <info>%command.invocation% "lodash@^4.15"</info>
 
                 You can also require specific paths of a package:
 
-                    <info>php %command.full_name% "chart.js/auto"</info>
+                    <info>%command.invocation% "chart.js/auto"</info>
 
                 Or require one package/file, but alias its name in your import map:
 
-                    <info>php %command.full_name% "vue/dist/vue.esm-bundler.js=vue"</info>
+                    <info>%command.invocation% "vue/dist/vue.esm-bundler.js=vue"</info>
 
                 Sometimes, a package may require other packages and multiple new items may be added
                 to the import map.
 
                 You can also require multiple packages at once:
 
-                    <info>php %command.full_name% "lodash@^4.15" "@hotwired/stimulus"</info>
+                    <info>%command.invocation% "lodash@^4.15" "@hotwired/stimulus"</info>
 
                 To add an importmap entry pointing to a local file, use the <info>path</info> option:
 
-                    <info>php %command.full_name% "any_module_name" --path=./assets/some_file.js</info>
+                    <info>%command.invocation% "any_module_name" --path=./assets/some_file.js</info>
 
                 Remote packages are downloaded as the ESM build jsDelivr generates for them. When that build
                 is broken for a package, use the <info>--no-esm</info> option to download the files the package
                 publishes instead. The path to the file is then required:
 
-                    <info>php %command.full_name% "fullcalendar/index.global.js=fullcalendar" --no-esm</info>
+                    <info>%command.invocation% "fullcalendar/index.global.js=fullcalendar" --no-esm</info>
 
                 To simulate the installation, use the <info>--dry-run</info> option:
 
-                    <info>php %command.full_name% "any_module_name" --dry-run -v</info>
+                    <info>%command.invocation% "any_module_name" --dry-run -v</info>
 
                 When this option is enabled, this command does not perform any write operations to the filesystem.
 

@@ -25,7 +25,7 @@
         "psr/container": "^1.1|^2.0",
         "psr/log": "^1|^2|^3",
         "symfony/config": "^8.2",
-        "symfony/console": "^7.4|^8.0",
+        "symfony/console": "^8.2",
         "symfony/dependency-injection": "^8.2",
         "symfony/finder": "^7.4|^8.0",
         "symfony/framework-bundle": "^8.2",
@@ -40,6 +40,7 @@
     "conflict": {
         "nikic/php-parser": "<5.0",
         "symfony/config": "<8.2",
+        "symfony/console": "<8.2",
         "symfony/dependency-injection": "<8.2",
         "symfony/framework-bundle": "<8.2",
         "symfony/http-client-contracts": "<2.5",

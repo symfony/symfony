@@ -28,8 +28,8 @@
         "psr/container": "^1.1|^2.0",
         "psr/log": "^1|^2|^3",
         "symfony/clock": "^7.4|^8.0",
-        "symfony/console": "^7.4|^8.0",
         "symfony/config": "^8.2",
+        "symfony/console": "^8.2",
         "symfony/dependency-injection": "^8.2",
         "symfony/filesystem": "^7.4|^8.0",
         "symfony/http-kernel": "^7.4|^8.0",
@@ -41,7 +41,7 @@
     },
     "conflict": {
         "symfony/config": "<8.2",
-        "symfony/console": "<7.4",
+        "symfony/console": "<8.2",
         "symfony/dependency-injection": "<8.2",
         "symfony/serializer": "<7.4",
         "symfony/service-contracts": "<2.5",

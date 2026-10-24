@@ -170,11 +170,11 @@ class XliffLintCommandTest extends TestCase
         $expected = <<<EOF
             Or of a whole directory:
 
-              <info>php %command.full_name% dirname</info>
+              <info>%command.invocation% dirname</info>
 
             The <info>--format</info> option specifies the format of the command output:
 
-              <info>php %command.full_name% dirname --format=json</info>
+              <info>%command.invocation% dirname --format=json</info>
 
             EOF;
 

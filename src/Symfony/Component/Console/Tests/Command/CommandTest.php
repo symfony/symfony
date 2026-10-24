@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Command;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
@@ -21,6 +22,7 @@ use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -196,6 +198,182 @@ class CommandTest extends TestCase
         $application->setDefaultCommand('namespace:name', true);
         $this->assertStringContainsString('The namespace:name command does...', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.name% correctly in single command applications');
         $this->assertStringNotContainsString('%command.full_name%', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.full_name% in single command applications');
+    }
+
+    #[BackupGlobals(true)]
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testProcessedHelpInvocation(bool $singleCommand)
+    {
+        $_SERVER['PHP_SELF'] = 'bin/console';
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
+        $command = new Command('cache:clear');
+        $command->setHelp('%command.invocation%|%command.full_name%|php %command.full_name%');
+        $application = new Application();
+        $application->addCommand($command);
+        $application->setDefaultCommand('cache:clear', $singleCommand);
+
+        $suffix = $singleCommand ? '' : ' cache:clear';
+        $this->assertSame('symfony console'.$suffix.'|bin/console'.$suffix.'|php bin/console'.$suffix, $command->getProcessedHelp());
+    }
+
+    #[BackupGlobals(true)]
+    #[DataProvider('provideInvalidInvocationMetadata')]
+    public function testProcessedHelpInvocationFallsBackToCurrentPhp(?string $launcher, ?string $script)
+    {
+        $_SERVER['PHP_SELF'] = 'bin/console';
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = $launcher;
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = $script;
+
+        $command = new Command('cache:clear');
+        $command->setHelp('%command.invocation%');
+        $help = (new OutputFormatter())->format($command->getProcessedHelp());
+        $binary = preg_match('{\A[a-zA-Z0-9_./:@+-]+\z}', \PHP_BINARY) ? \PHP_BINARY : escapeshellarg(\PHP_BINARY);
+        $phpArguments = 'phpdbg' === \PHP_SAPI ? ' -qrr' : '';
+        $expected = [$binary.$phpArguments.' bin/console cache:clear'];
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $expected = [\PHP_BINARY.$phpArguments.' bin/console cache:clear', '"'.\PHP_BINARY.'"'.$phpArguments.' bin/console cache:clear'];
+        }
+
+        $this->assertContains($help, $expected);
+    }
+
+    public static function provideInvalidInvocationMetadata(): iterable
+    {
+        yield 'no metadata' => [null, null];
+        yield 'invalid JSON' => ['{', __FILE__];
+        yield 'JSON null' => ['null', __FILE__];
+        yield 'JSON scalar' => ['"symfony"', __FILE__];
+        yield 'JSON object' => ['{"binary":"symfony","command":"console"}', __FILE__];
+        yield 'numeric JSON object' => ['{"0":"symfony","1":"console"}', __FILE__];
+        yield 'empty array' => ['[]', __FILE__];
+        yield 'missing subcommand' => ['["symfony"]', __FILE__];
+        yield 'extra argument' => ['["symfony","console","cache:clear"]', __FILE__];
+        yield 'non-string executable' => ['[123,"console"]', __FILE__];
+        yield 'empty executable' => ['["","console"]', __FILE__];
+        yield 'non-console launcher' => ['["symfony","php"]', __FILE__];
+        yield 'NUL in executable' => ['["symfony\u0000","console"]', __FILE__];
+        yield 'different script' => ['["symfony","console"]', __DIR__.'/../Fixtures/TestCommand.php'];
+        yield 'missing script' => ['["symfony","console"]', null];
+        yield 'nonexistent script' => ['["symfony","console"]', __DIR__.'/missing-console'];
+        yield 'NUL in script' => ['["symfony","console"]', __FILE__."\0"];
+    }
+
+    #[BackupGlobals(true)]
+    public function testProcessedHelpInvocationQuotesShellArgumentsAndFormatterTags()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('The launcher contains characters that Windows paths cannot contain.');
+        }
+
+        $launcher = "/tmp/a user's <info>symfony";
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = json_encode([$launcher, 'console']);
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
+        $command = new Command('cache:clear');
+        $command->setHelp('<info>%command.invocation%</info>');
+
+        $this->assertSame(escapeshellarg($launcher).' console cache:clear', (new OutputFormatter())->format($command->getProcessedHelp()));
+    }
+
+    #[BackupGlobals(true)]
+    public function testProcessedHelpInvocationPreservesNonAsciiPathsInTheCLocale()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Unix shell quoting is only used on Unix.');
+        }
+
+        $locale = setlocale(\LC_CTYPE, 0);
+        setlocale(\LC_CTYPE, 'C');
+
+        try {
+            $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+            $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = json_encode(['/tmp/été/symfony', 'console']);
+            $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
+            $command = new Command('cache:clear');
+            $command->setHelp('%command.invocation%');
+
+            $this->assertSame("'/tmp/été/symfony' console cache:clear", $command->getProcessedHelp());
+        } finally {
+            setlocale(\LC_CTYPE, $locale);
+        }
+    }
+
+    #[BackupGlobals(true)]
+    public function testProcessedHelpInvocationQuotesTheScriptAndCommand()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Unix shell quoting is only used on Unix.');
+        }
+
+        $_SERVER['PHP_SELF'] = "/tmp/a user's %command.name%/console";
+        unset($_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'], $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT']);
+
+        $command = new Command('cache;clear');
+        $command->setHelp('%command.invocation%');
+
+        $this->assertStringEndsWith(escapeshellarg($_SERVER['PHP_SELF'])." 'cache;clear'", $command->getProcessedHelp());
+    }
+
+    #[BackupGlobals(true)]
+    #[TestWith(['C:\\Program Files\\Symfony\\symfony.exe'])]
+    #[TestWith(['C:\\tools\\100% !wow!\\symfony.exe'])]
+    public function testProcessedHelpInvocationPreservesWindowsPaths(string $launcher)
+    {
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows quoting is only used on Windows.');
+        }
+
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = json_encode([$launcher, 'console']);
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
+        $command = new Command('cache:clear');
+        $command->setHelp('%command.invocation%');
+
+        $this->assertSame('"'.$launcher.'" console cache:clear', $command->getProcessedHelp());
+    }
+
+    #[BackupGlobals(true)]
+    public function testProcessedHelpInvocationMatchesSymlinkedScripts()
+    {
+        $link = tempnam(sys_get_temp_dir(), 'console-invocation-');
+        unlink($link);
+        if (!@symlink(__FILE__, $link)) {
+            $this->markTestSkipped('Creating symbolic links is not supported.');
+        }
+
+        try {
+            $_SERVER['SCRIPT_FILENAME'] = $link;
+            $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+            $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
+            $command = new Command('cache:clear');
+            $command->setHelp('%command.invocation%');
+
+            $this->assertSame('symfony console cache:clear', $command->getProcessedHelp());
+        } finally {
+            unlink($link);
+        }
+    }
+
+    #[BackupGlobals(true)]
+    public function testProcessedHelpInvocationInDescription()
+    {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
+        $command = new Command('cache:clear');
+        $command->setDescription('Run %command.invocation%.');
+
+        $this->assertSame('Run symfony console cache:clear.', $command->getProcessedHelp());
     }
 
     public function testGetSetAliases()

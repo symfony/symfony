@@ -37,7 +37,7 @@ class XliffLintCommandTest extends TestCase
         $expected = <<<EOF
             Or find all files in a bundle:
 
-              <info>php %command.full_name% @AcmeDemoBundle</info>
+              <info>%command.invocation% @AcmeDemoBundle</info>
             EOF;
 
         $this->assertStringContainsString($expected, $command->getHelp());

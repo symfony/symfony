@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Command\DebugFirewallCommand;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
@@ -23,8 +24,13 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 
 class DebugFirewallCommandTest extends TestCase
 {
+    #[BackupGlobals(true)]
     public function testFirewallListOutputMatchesFixture()
     {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
         $firewallNames = ['main', 'api'];
 
         $command = new DebugFirewallCommand($firewallNames, new Container(), new Container(), []);
@@ -36,6 +42,8 @@ class DebugFirewallCommandTest extends TestCase
         $this->assertStringContainsString('* main', $tester->getDisplay());
         $this->assertStringContainsString('* api', $tester->getDisplay());
         $this->assertStringContainsString('To view details of a specific firewall', $tester->getDisplay());
+        $display = preg_replace('/\s+/', ' ', preg_replace('/^\s*\/\/ ?/m', '', $tester->getDisplay(true)));
+        $this->assertStringContainsString('symfony console debug:firewall main', $display);
     }
 
     public function testFirewallNotFoundDisplaysError()

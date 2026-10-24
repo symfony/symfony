@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapGenerator;
@@ -186,6 +188,30 @@ class ImportMapRendererTest extends TestCase
             ->willReturn([]);
 
         (new ImportMapRenderer($importMapGenerator, polyfillImportName: 'es-module-shims'))->render(['app']);
+    }
+
+    #[BackupGlobals(true)]
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testMissingPolyfillSuggestsCurrentLauncher(bool $symfonyCli)
+    {
+        $_SERVER['PHP_SELF'] = 'tools/render-importmap.php';
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        if ($symfonyCli) {
+            $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+            $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+        } else {
+            unset($_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'], $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT']);
+        }
+
+        $importMapGenerator = $this->createStub(ImportMapGenerator::class);
+        $importMapGenerator->method('getImportMapData')->willReturn([]);
+        $renderer = new ImportMapRenderer($importMapGenerator, null, 'UTF-8', 'custom-polyfill');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($symfonyCli ? 'The JavaScript module polyfill was not found in your import map. Either disable the polyfill or run "symfony console importmap:require "custom-polyfill"" to install it.' : ' bin/console importmap:require "custom-polyfill"" to install it.');
+
+        $renderer->render([]);
     }
 
     public function testIntegrityIsRenderedForCssAndPolyfill()

@@ -39,19 +39,19 @@ class ListCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command lists all commands:
 
-                  <info>%command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 You can also display the commands for a specific namespace:
 
-                  <info>%command.full_name% test</info>
+                  <info>%command.invocation% test</info>
 
                 You can also output the information in other formats by using the <info>--format</info> option:
 
-                  <info>%command.full_name% --format=xml</info>
+                  <info>%command.invocation% --format=xml</info>
 
                 It's also possible to get raw list of commands (useful for embedding command runner):
 
-                  <info>%command.full_name% --raw</info>
+                  <info>%command.invocation% --raw</info>
                 EOF
             )
         ;

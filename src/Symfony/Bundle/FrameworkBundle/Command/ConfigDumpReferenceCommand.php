@@ -18,6 +18,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -52,16 +53,16 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
 
                 Either the extension alias or bundle name can be used:
 
-                  <info>php %command.full_name% framework</info>
-                  <info>php %command.full_name% FrameworkBundle</info>
+                  <info>%command.invocation% framework</info>
+                  <info>%command.invocation% FrameworkBundle</info>
 
                 The <info>--format</info> option specifies the format of the command output:
 
-                  <info>php %command.full_name% FrameworkBundle --format=json</info>
+                  <info>%command.invocation% FrameworkBundle --format=json</info>
 
                 For dumping a specific option, add its path as second argument (only available for the yaml format):
 
-                  <info>php %command.full_name% framework http_client.default_options</info>
+                  <info>%command.invocation% framework http_client.default_options</info>
 
                 EOF
             )
@@ -80,9 +81,10 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
             $this->listBundles($errorIo);
             $this->listNonBundleExtensions($errorIo);
 
+            $invocation = CommandInvocation::formatEscaped($this);
             $errorIo->comment([
-                'Provide the name of a bundle as the first argument of this command to dump its default configuration. (e.g. <comment>config:dump-reference FrameworkBundle</comment>)',
-                'For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>config:dump-reference FrameworkBundle http_client.default_options</comment> to dump the <comment>framework.http_client.default_options</comment> configuration)',
+                \sprintf('Provide the name of a bundle as the first argument of this command to dump its default configuration. (e.g. <comment>%s FrameworkBundle</comment>)', $invocation),
+                \sprintf('For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>%s FrameworkBundle http_client.default_options</comment> to dump the <comment>framework.http_client.default_options</comment> configuration)', $invocation),
             ]);
 
             return 0;

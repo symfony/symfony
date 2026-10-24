@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Command;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
@@ -50,8 +51,13 @@ class FailedMessagesShowCommandTest extends TestCase
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
+    #[BackupGlobals(true)]
     public function testBasicRunWithServiceLocator()
     {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $redeliveryStamp = new RedeliveryStamp(0);
         $errorStamp = ErrorDetailsStamp::create(new \Exception('Things are bad!', 123));
@@ -86,6 +92,8 @@ class FailedMessagesShowCommandTest extends TestCase
             EOF,
             $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')),
             $tester->getDisplay(true));
+        $this->assertStringContainsString('symfony console messenger:failed:retry 15 --transport=failure_receiver', $tester->getDisplay());
+        $this->assertStringContainsString('symfony console messenger:failed:remove 15 --transport=failure_receiver', $tester->getDisplay());
     }
 
     public function testMultipleRedeliveryFailsWithServiceLocator()
@@ -142,8 +150,13 @@ class FailedMessagesShowCommandTest extends TestCase
         $tester->execute(['id' => 15]);
     }
 
+    #[BackupGlobals(true)]
     public function testListMessagesWithServiceLocator()
     {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $redeliveryStamp = new RedeliveryStamp(0);
         $errorStamp = ErrorDetailsStamp::create(new \RuntimeException('Things are bad!'));
@@ -180,7 +193,7 @@ class FailedMessagesShowCommandTest extends TestCase
             EOF;
 
         $this->assertStringContainsString($expectedLoadingMessage, $tester->getDisplay());
-        $this->assertStringContainsString('Run messenger:failed:show {id} --transport=failure_receiver -vv to see message details.', $tester->getDisplay());
+        $this->assertStringContainsString('Run symfony console messenger:failed:show {id} --transport=failure_receiver -vv to see message details.', $tester->getDisplay());
     }
 
     public function testListMessagesReturnsNoMessagesFoundWithServiceLocator()

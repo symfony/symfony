@@ -56,15 +56,15 @@ final class ImportMapOutdatedCommand extends Command
                 Versions showing in <fg=red>red</> are semver compatible versions and you should upgrading.
                 Versions showing in <fg=yellow>yellow</> are major updates that include backward compatibility breaks according to semver.
 
-                   <info>php %command.full_name%</info>
+                   <info>%command.invocation%</info>
 
                 Or specific packages only:
 
-                   <info>php %command.full_name% <packages></info>
+                   <info>%command.invocation% <packages></info>
 
                 The <info>--format</info> option specifies the format of the command output:
 
-                  <info>php %command.full_name% --format=json</info>
+                  <info>%command.invocation% --format=json</info>
 
                 EOT
             );

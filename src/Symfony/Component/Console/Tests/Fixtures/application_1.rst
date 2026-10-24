@@ -27,11 +27,11 @@ Usage
 
 The help command displays help for a given command:
 
-  %%PHP_SELF%% help list
+  %%PHP_BINARY%% %%PHP_SELF%% help list
 
 You can also output the help in other formats by using the --format option:
 
-  %%PHP_SELF%% help --format=xml list
+  %%PHP_BINARY%% %%PHP_SELF%% help --format=xml list
 
 To display the list of available commands, please use the list command.
 
@@ -83,19 +83,19 @@ Usage
 
 The list command lists all commands:
 
-  %%PHP_SELF%% list
+  %%PHP_BINARY%% %%PHP_SELF%% list
 
 You can also display the commands for a specific namespace:
 
-  %%PHP_SELF%% list test
+  %%PHP_BINARY%% %%PHP_SELF%% list test
 
 You can also output the information in other formats by using the --format option:
 
-  %%PHP_SELF%% list --format=xml
+  %%PHP_BINARY%% %%PHP_SELF%% list --format=xml
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  %%PHP_SELF%% list --raw
+  %%PHP_BINARY%% %%PHP_SELF%% list --raw
 
 Arguments
 ^^^^^^^^^

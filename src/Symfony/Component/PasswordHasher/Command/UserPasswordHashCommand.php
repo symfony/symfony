@@ -73,28 +73,28 @@ class UserPasswordHashCommand extends Command
                 the first available configured user class under the
                 <comment>security.password_hashers</comment> key:
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 Pass the full user class path as the second argument to hash passwords for
                 your own entities (pass <comment>''</comment> as the first argument to keep the interactive prompt):
 
-                  <info>php %command.full_name% '' 'App\Entity\User'</info>
+                  <info>%command.invocation% '' 'App\Entity\User'</info>
 
                 Passing the password on the command line is supported for non-interactive
                 use, but exposes the plaintext to shell history and the process list
                 (<comment>ps</comment>, <comment>/proc/&lt;pid&gt;/cmdline</comment>, container audit logs); prefer the
                 interactive form when a terminal is available:
 
-                  <info>php %command.full_name% --no-interaction [password] 'App\Entity\User'</info>
+                  <info>%command.invocation% --no-interaction [password] 'App\Entity\User'</info>
 
                 Read the password from standard input by passing <comment>-</comment> as the password
                 argument; this avoids exposing it to shell history or the process list:
 
-                  <info>echo \$PASSWORD | php %command.full_name% --no-interaction -</info>
+                  <info>echo \$PASSWORD | %command.invocation% --no-interaction -</info>
 
                 In case your hasher doesn't require a salt, add the <comment>empty-salt</comment> option:
 
-                  <info>php %command.full_name% --empty-salt</info>
+                  <info>%command.invocation% --empty-salt</info>
 
                 EOF
             )

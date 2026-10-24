@@ -134,7 +134,7 @@ class ApplicationTest extends TestCase
     protected function ensureStaticCommandHelp(Application $application)
     {
         foreach ($application->all() as $command) {
-            $command->setHelp(str_replace('%command.full_name%', 'app/console %command.name%', $command->getHelp()));
+            $command->setHelp(str_replace(['%command.full_name%', '%command.invocation%'], 'app/console %command.name%', $command->getHelp()));
         }
     }
 

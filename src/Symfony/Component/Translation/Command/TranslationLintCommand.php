@@ -57,7 +57,7 @@ class TranslationLintCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</> command lint translations.
 
-                  <info>php %command.full_name%</>
+                  <info>%command.invocation%</>
                 EOF
             );
     }

@@ -44,11 +44,11 @@ final class ImportMapUpdateCommand extends Command
                 The <info>%command.name%</info> command will update all from the 3rd part packages
                 in <comment>importmap.php</comment> to their latest version, including downloaded packages.
 
-                   <info>php %command.full_name%</info>
+                   <info>%command.invocation%</info>
 
                 Or specific packages only:
 
-                    <info>php %command.full_name% <packages></info>
+                    <info>%command.invocation% <packages></info>
                 EOT
             )
         ;

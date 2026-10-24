@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Debug;
 
 use Symfony\Component\Console\Command\TraceableCommand;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,9 +21,13 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class CliRequest extends Request
 {
+    private readonly string $invocation;
+
     public function __construct(
         public readonly TraceableCommand $command,
     ) {
+        $this->invocation = CommandInvocation::format();
+
         parent::__construct(
             attributes: ['_controller' => $command->command::class, '_virtual_type' => 'command'],
             server: $_SERVER,
@@ -32,13 +37,7 @@ final class CliRequest extends Request
     // Methods below allow to populate a profile, thus enable search and filtering
     public function getUri(): string
     {
-        if ($this->server->has('SYMFONY_CLI_BINARY_NAME')) {
-            $binary = $this->server->get('SYMFONY_CLI_BINARY_NAME').' console';
-        } else {
-            $binary = $this->server->get('argv')[0];
-        }
-
-        return $binary.' '.$this->command->input;
+        return $this->invocation.' '.$this->command->input;
     }
 
     public function getMethod(): string

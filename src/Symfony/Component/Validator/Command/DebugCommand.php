@@ -50,9 +50,9 @@ class DebugCommand extends Command
             ->addArgument('class', InputArgument::REQUIRED, 'A fully qualified class name or a path')
             ->addOption('show-all', null, InputOption::VALUE_NONE, 'Show all classes even if they have no validation constraints')
             ->setHelp(<<<'EOF'
-                The <info>%command.name% 'App\Entity\Dummy'</info> command dumps the validators for the dummy class.
+                The <info>%command.invocation% 'App\Entity\Dummy'</info> command dumps the validators for the dummy class.
 
-                The <info>%command.name% src/</info> command dumps the validators for the `src` directory.
+                The <info>%command.invocation% src/</info> command dumps the validators for the `src` directory.
                 EOF
             )
         ;

@@ -15,6 +15,7 @@ use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\AssetMapper\Exception\LogicException;
 use Symfony\Component\AssetMapper\MappedAsset;
+use Symfony\Component\Console\Helper\CommandInvocation;
 
 /**
  * Provides data needed to write the importmap & preloads.
@@ -344,7 +345,9 @@ class ImportMapGenerator
     {
         if ($entry->isRemotePackage()) {
             if (!is_file($entry->path)) {
-                throw new LogicException(\sprintf('The "%s" vendor asset is missing. Try running the "importmap:install" command.', $entry->importName));
+                $command = class_exists(CommandInvocation::class) ? CommandInvocation::format('importmap:install', 'bin/console') : 'importmap:install';
+
+                throw new LogicException(\sprintf('The "%s" vendor asset is missing. Try running the "%s" command.', $entry->importName, $command));
             }
 
             throw new LogicException(\sprintf('The "%s" vendor file exists locally (%s), but cannot be found in any asset map paths. Be sure the assets vendor directory is an asset mapper path.', $entry->importName, $entry->path));

@@ -52,23 +52,23 @@ final class DebugCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> lists schedules and their recurring messages:
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 Or for a specific schedule only:
 
-                  <info>php %command.full_name% default</info>
+                  <info>%command.invocation% default</info>
 
                 You can also specify a date to use for the next run date:
 
-                  <info>php %command.full_name% --date=2025-10-18</info>
+                  <info>%command.invocation% --date=2025-10-18</info>
 
                 To also display the terminated recurring messages, use the <info>--all</info> option:
 
-                  <info>php %command.full_name% --all</info>
+                  <info>%command.invocation% --all</info>
 
                 To sort the displayed recurring messages by their next run date, use the <info>--sort</info> option:
 
-                  <info>php %command.full_name% --sort</info>
+                  <info>%command.invocation% --sort</info>
 
                 When combined with <info>--all</info>, rows with no next run date are listed first.
 

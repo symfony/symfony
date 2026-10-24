@@ -63,19 +63,19 @@ class XliffLintCommand extends Command
 
                 You can validates XLIFF contents passed from STDIN:
 
-                  <info>cat filename | php %command.full_name% -</info>
+                  <info>cat filename | %command.invocation% -</info>
 
                 You can also validate the syntax of a file:
 
-                  <info>php %command.full_name% filename</info>
+                  <info>%command.invocation% filename</info>
 
                 Or of a whole directory:
 
-                  <info>php %command.full_name% dirname</info>
+                  <info>%command.invocation% dirname</info>
 
                 The <info>--format</info> option specifies the format of the command output:
 
-                  <info>php %command.full_name% dirname --format=json</info>
+                  <info>%command.invocation% dirname --format=json</info>
 
                 EOF
             )

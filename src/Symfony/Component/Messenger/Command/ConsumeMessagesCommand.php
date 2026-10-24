@@ -22,6 +22,7 @@ use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -93,71 +94,71 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
 
-                    <info>php %command.full_name% <receiver-name></info>
+                    <info>%command.invocation% <receiver-name></info>
 
                 You can specify a single receiver name or use a regular expression to match
                 multiple receivers. When a regular expression matches multiple transport names,
                 the order of the receivers will match their order in the configuration:
 
-                    <info>php %command.full_name% "receiver1|receiver2"</info>
+                    <info>%command.invocation% "receiver1|receiver2"</info>
 
                 To get a different order, pass each name or regular expression as a separate argument:
 
-                    <info>php %command.full_name% receiver2 receiver1</info>
+                    <info>%command.invocation% receiver2 receiver1</info>
 
                 Use the <info>--limit</info> option to limit the number of messages received:
 
-                    <info>php %command.full_name% <receiver-name> --limit=10</info>
+                    <info>%command.invocation% <receiver-name> --limit=10</info>
 
                 Use the <info>--failure-limit</info> option to stop the worker when the given number of failed messages is reached:
 
-                    <info>php %command.full_name% <receiver-name> --failure-limit=2</info>
+                    <info>%command.invocation% <receiver-name> --failure-limit=2</info>
 
                 Use the <info>--memory-limit</info> option to stop the worker if it exceeds a given memory usage limit. You can use shorthand byte values [K, M or G]:
 
-                    <info>php %command.full_name% <receiver-name> --memory-limit=128M</info>
+                    <info>%command.invocation% <receiver-name> --memory-limit=128M</info>
 
                 Use the <info>--time-limit</info> option to stop the worker when the given time limit (in seconds) is reached.
                 If a message is being handled, the worker will stop after the processing is finished:
 
-                    <info>php %command.full_name% <receiver-name> --time-limit=3600</info>
+                    <info>%command.invocation% <receiver-name> --time-limit=3600</info>
 
                 Use the <info>--stop-when-empty</info> option to handle the messages that are already in the
                 transports and exit instead of waiting for new ones. Delayed messages, including failed
                 messages that wait for their retry delay, are left in the transports, and so are the
                 messages of the transports cooling down after failures:
 
-                    <info>php %command.full_name% <receiver-name> --stop-when-empty</info>
+                    <info>%command.invocation% <receiver-name> --stop-when-empty</info>
 
                 Use the <info>--bus</info> option to specify the message bus to dispatch received messages
                 to instead of trying to determine it automatically. This is required if the
                 messages didn't originate from Messenger:
 
-                    <info>php %command.full_name% <receiver-name> --bus=event_bus</info>
+                    <info>%command.invocation% <receiver-name> --bus=event_bus</info>
 
                 Use the <info>--queues</info> option to limit a receiver to only certain queues (only supported by some receivers):
 
-                    <info>php %command.full_name% <receiver-name> --queues=fasttrack</info>
+                    <info>%command.invocation% <receiver-name> --queues=fasttrack</info>
 
                 Use the <info>--no-reset</info> option to prevent services resetting after each message (may lead to leaking services' state between messages):
 
-                    <info>php %command.full_name% <receiver-name> --no-reset</info>
+                    <info>%command.invocation% <receiver-name> --no-reset</info>
 
                 Use the <info>--all</info> option to consume from all receivers:
 
-                    <info>php %command.full_name% --all</info>
+                    <info>%command.invocation% --all</info>
 
                 Use the <info>--exclude-receivers</info> option to exclude specific receivers/transports from consumption (can only be used with <info>--all</info>):
 
-                    <info>php %command.full_name% --all --exclude-receivers=<receiver-name></info>
+                    <info>%command.invocation% --all --exclude-receivers=<receiver-name></info>
 
                 Use the <info>--concurrency</info> option to process several messages at the same time:
 
-                    <info>php %command.full_name% <receiver-name> --concurrency=4</info>
+                    <info>%command.invocation% <receiver-name> --concurrency=4</info>
 
                 Use the <info>--fetch-size</info> option to control how many messages are fetched per call to the transport (defaults to the value of <info>--concurrency</info>):
 
-                    <info>php %command.full_name% <receiver-name> --concurrency=4 --fetch-size=8</info>
+                    <info>%command.invocation% <receiver-name> --concurrency=4 --fetch-size=8</info>
                 EOF
             )
         ;
@@ -321,7 +322,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             $stopsWhen[] = 'found no message left in the transports';
         }
 
-        $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
+        $stopsWhen[] = \sprintf('received a stop signal via the %s command', CommandInvocation::formatEscaped('messenger:stop-workers'));
 
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();

@@ -19,8 +19,11 @@
         "php": ">=8.4.1"
     },
     "require-dev": {
-        "symfony/console": "^7.4|^8.0",
+        "symfony/console": "^8.2",
         "symfony/process": "^7.4|^8.0"
+    },
+    "conflict": {
+        "symfony/console": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Dotenv\\": "" },

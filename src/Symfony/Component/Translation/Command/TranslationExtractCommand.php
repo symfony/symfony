@@ -99,22 +99,22 @@ class TranslationExtractCommand extends Command
 
                 Example running against a Bundle (AcmeBundle)
 
-                  <info>php %command.full_name% --dump-messages en AcmeBundle</info>
-                  <info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
+                  <info>%command.invocation% --dump-messages en AcmeBundle</info>
+                  <info>%command.invocation% --force --prefix="new_" fr AcmeBundle</info>
 
                 Example running against default messages directory
 
-                  <info>php %command.full_name% --dump-messages en</info>
-                  <info>php %command.full_name% --force --prefix="new_" fr</info>
+                  <info>%command.invocation% --dump-messages en</info>
+                  <info>%command.invocation% --force --prefix="new_" fr</info>
 
                 You can sort the output with the <info>--sort</> flag:
 
-                    <info>php %command.full_name% --dump-messages --sort=asc en AcmeBundle</info>
-                    <info>php %command.full_name% --force --sort=desc fr</info>
+                    <info>%command.invocation% --dump-messages --sort=asc en AcmeBundle</info>
+                    <info>%command.invocation% --force --sort=desc fr</info>
 
                 You can dump a tree-like structure using the yaml format with <info>--as-tree</> flag:
 
-                    <info>php %command.full_name% --force --format=yaml --as-tree=3 en AcmeBundle</info>
+                    <info>%command.invocation% --force --format=yaml --as-tree=3 en AcmeBundle</info>
 
                 EOF
             )

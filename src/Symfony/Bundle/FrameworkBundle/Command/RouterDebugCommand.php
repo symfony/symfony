@@ -63,15 +63,15 @@ class RouterDebugCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> displays the configured routes:
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 The <info>--format</info> option specifies the format of the command output:
 
-                  <info>php %command.full_name% --format=json</info>
+                  <info>%command.invocation% --format=json</info>
 
                 The <info>--sort</info> option sorts the routes by the given column:
 
-                  <info>php %command.full_name% --sort=path</info>
+                  <info>%command.invocation% --sort=path</info>
 
                 EOF
             )

@@ -19,6 +19,7 @@ use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperInterface;
@@ -573,24 +574,19 @@ class Command implements SignalableCommandInterface
     }
 
     /**
-     * Returns the processed help for the command replacing the %command.name% and
-     * %command.full_name% patterns with the real values dynamically.
+     * Replaces %command.name%, %command.full_name% and %command.invocation% in the help text.
      */
     public function getProcessedHelp(): string
     {
         $name = $this->name;
         $isSingleCommand = $this->application?->isSingleCommand();
+        $help = $this->getHelp() ?: $this->getDescription();
 
-        $placeholders = [
-            '%command.name%',
-            '%command.full_name%',
-        ];
-        $replacements = [
-            $name,
-            $isSingleCommand ? $_SERVER['PHP_SELF'] : $_SERVER['PHP_SELF'].' '.$name,
-        ];
-
-        return str_replace($placeholders, $replacements, $this->getHelp() ?: $this->getDescription());
+        return strtr($help, [
+            '%command.name%' => $name ?? '',
+            '%command.full_name%' => $isSingleCommand ? $_SERVER['PHP_SELF'] : $_SERVER['PHP_SELF'].' '.$name,
+            '%command.invocation%' => str_contains($help, '%command.invocation%') ? CommandInvocation::formatEscaped($this) : '',
+        ]);
     }
 
     /**

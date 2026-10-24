@@ -47,7 +47,7 @@ final class SecretsRemoveCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command removes a secret from the vault.
 
-                    <info>%command.full_name% <name></info>
+                    <info>%command.invocation% <name></info>
                 EOF
             )
         ;

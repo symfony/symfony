@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Command\DebugRolesCommand;
 use Symfony\Bundle\SecurityBundle\Debug\DebugRoleHierarchy;
@@ -23,8 +24,13 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 class DebugRolesCommandTest extends TestCase
 {
+    #[BackupGlobals(true)]
     public function testDebugBuiltInRoleHierarchy()
     {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
         $roleHierarchy = new DebugRoleHierarchy([
             'ROLE_FOO' => ['ROLE_BAR'],
             'ROLE_BAR' => ['ROLE_BAZ'],
@@ -45,6 +51,8 @@ class DebugRolesCommandTest extends TestCase
 
             EOF;
         $this->assertStringContainsString($expected, str_replace(\PHP_EOL, "\n", $tester->getDisplay()));
+        $display = preg_replace('/\s+/', ' ', preg_replace('/^\s*\/\/ ?/m', '', $tester->getDisplay(true)));
+        $this->assertStringContainsString('symfony console debug:roles ROLE_USER', $display);
     }
 
     public function testDebugBuiltInHierarchyWithTreeOption()

@@ -49,7 +49,7 @@ final class CachePoolDeleteCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> deletes an item from a given cache pool.
 
-                    %command.full_name% <pool> <key>
+                    %command.invocation% <pool> <key>
                 EOF
             )
         ;

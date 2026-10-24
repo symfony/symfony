@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Helper\CommandInvocation;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -59,52 +60,52 @@ class ContainerDebugCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 To see deprecations generated during container compilation and cache warmup, use the <info>--deprecations</info> option:
 
-                  <info>php %command.full_name% --deprecations</info>
+                  <info>%command.invocation% --deprecations</info>
 
                 To get specific information about a service, specify its name:
 
-                  <info>php %command.full_name% validator</info>
+                  <info>%command.invocation% validator</info>
 
                 To see available types that can be used for autowiring, use the <info>--types</info> flag:
 
-                  <info>php %command.full_name% --types</info>
+                  <info>%command.invocation% --types</info>
 
                 To see environment variables used by the container, use the <info>--env-vars</info> flag:
 
-                  <info>php %command.full_name% --env-vars</info>
+                  <info>%command.invocation% --env-vars</info>
 
                 Display a specific environment variable by specifying its name with the <info>--env-var</info> option:
 
-                  <info>php %command.full_name% --env-var=APP_ENV</info>
+                  <info>%command.invocation% --env-var=APP_ENV</info>
 
                 Use the --tags option to display tagged <comment>public</comment> services grouped by tag:
 
-                  <info>php %command.full_name% --tags</info>
+                  <info>%command.invocation% --tags</info>
 
                 Find all services with a specific tag by specifying the tag name with the <info>--tag</info> option:
 
-                  <info>php %command.full_name% --tag=form.type</info>
+                  <info>%command.invocation% --tag=form.type</info>
 
                 Use the <info>--parameters</info> option to display all parameters:
 
-                  <info>php %command.full_name% --parameters</info>
+                  <info>%command.invocation% --parameters</info>
 
                 Display a specific parameter by specifying its name with the <info>--parameter</info> option:
 
-                  <info>php %command.full_name% --parameter=kernel.debug</info>
+                  <info>%command.invocation% --parameter=kernel.debug</info>
 
                 By default, internal services are hidden. You can display them
                 using the <info>--show-hidden</info> flag:
 
-                  <info>php %command.full_name% --show-hidden</info>
+                  <info>%command.invocation% --show-hidden</info>
 
                 The <info>--format</info> option specifies the format of the command output:
 
-                  <info>php %command.full_name% --format=json</info>
+                  <info>%command.invocation% --format=json</info>
                 EOF
             )
         ;
@@ -198,12 +199,13 @@ class ContainerDebugCommand extends Command
         }
 
         if (!$input->getArgument('name') && !$input->getOption('tag') && !$input->getOption('parameter') && !$input->getOption('env-vars') && !$input->getOption('env-var') && $input->isInteractive()) {
+            $invocation = CommandInvocation::formatEscaped($this);
             if ($input->getOption('tags')) {
-                $errorIo->comment('To search for a specific tag, re-run this command with a search term. (e.g. <comment>debug:container --tag=form.type</comment>)');
+                $errorIo->comment(\sprintf('To search for a specific tag, re-run this command with a search term. (e.g. <comment>%s --tag=form.type</comment>)', $invocation));
             } elseif ($input->getOption('parameters')) {
-                $errorIo->comment('To search for a specific parameter, re-run this command with a search term. (e.g. <comment>debug:container --parameter=kernel.debug</comment>)');
+                $errorIo->comment(\sprintf('To search for a specific parameter, re-run this command with a search term. (e.g. <comment>%s --parameter=kernel.debug</comment>)', $invocation));
             } elseif (!$input->getOption('deprecations')) {
-                $errorIo->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');
+                $errorIo->comment(\sprintf('To search for a specific service, re-run this command with a search term. (e.g. <comment>%s log</comment>)', $invocation));
             }
         }
 

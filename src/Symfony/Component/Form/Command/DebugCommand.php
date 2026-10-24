@@ -59,28 +59,28 @@ class DebugCommand extends Command
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command displays information about form types.
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 The command lists all built-in types, services types, type extensions and
                 guessers currently available.
 
-                  <info>php %command.full_name% Symfony\Component\Form\Extension\Core\Type\ChoiceType</info>
-                  <info>php %command.full_name% ChoiceType</info>
+                  <info>%command.invocation% Symfony\Component\Form\Extension\Core\Type\ChoiceType</info>
+                  <info>%command.invocation% ChoiceType</info>
 
                 The command lists all defined options that contains the given form type,
                 as well as their parents and type extensions.
 
-                  <info>php %command.full_name% ChoiceType choice_value</info>
+                  <info>%command.invocation% ChoiceType choice_value</info>
 
                 Use the <info>--show-deprecated</info> option to display form types with
                 deprecated options or the deprecated options of the given form type:
 
-                  <info>php %command.full_name% --show-deprecated</info>
-                  <info>php %command.full_name% ChoiceType --show-deprecated</info>
+                  <info>%command.invocation% --show-deprecated</info>
+                  <info>%command.invocation% ChoiceType --show-deprecated</info>
 
                 The command displays the definition of the given option name.
 
-                  <info>php %command.full_name% --format=json</info>
+                  <info>%command.invocation% --format=json</info>
 
                 The command lists everything in a machine readable json format.
                 EOF

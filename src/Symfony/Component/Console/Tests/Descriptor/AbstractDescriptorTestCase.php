@@ -112,6 +112,8 @@ abstract class AbstractDescriptorTestCase extends TestCase
 
     protected function normalizeOutput(string $output)
     {
+        $output = str_replace([escapeshellarg(\PHP_BINARY), '"'.\PHP_BINARY.'"', \PHP_BINARY], '%%PHP_BINARY%%', $output);
+        $output = str_replace('%%PHP_BINARY%% -qrr', '%%PHP_BINARY%%', $output);
         $output = str_replace(['%%PHP_SELF%%', '%%PHP_SELF_FULL%%', '%%COMMAND_NAME%%', '%%SHELL%%'], [$_SERVER['PHP_SELF'], realpath($_SERVER['PHP_SELF']), basename($_SERVER['PHP_SELF']), basename($_SERVER['SHELL'] ?? '')], $output);
 
         return trim(str_replace(\PHP_EOL, "\n", $output));

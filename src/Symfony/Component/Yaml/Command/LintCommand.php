@@ -100,23 +100,23 @@ class LintCommand extends Command
 
                 You can validates YAML contents passed from STDIN:
 
-                  <info>cat filename | php %command.full_name% -</info>
+                  <info>cat filename | %command.invocation% -</info>
 
                 You can also validate the syntax of a file:
 
-                  <info>php %command.full_name% filename</info>
+                  <info>%command.invocation% filename</info>
 
                 Or of a whole directory:
 
-                  <info>php %command.full_name% dirname</info>
+                  <info>%command.invocation% dirname</info>
 
                 The <info>--format</info> option specifies the format of the command output:
 
-                  <info>php %command.full_name% dirname --format=json</info>
+                  <info>%command.invocation% dirname --format=json</info>
 
                 You can also exclude one or more specific files:
 
-                  <info>php %command.full_name% dirname --exclude="dirname/foo.yaml" --exclude="dirname/bar.yaml"</info>
+                  <info>%command.invocation% dirname --exclude="dirname/foo.yaml" --exclude="dirname/bar.yaml"</info>
 
                 {$schemaHelp}
 
@@ -127,11 +127,11 @@ class LintCommand extends Command
                 when a schema cannot be loaded.
                 The <info>--no-check-schema</info> option only checks the syntax:
 
-                  <info>php %command.full_name% dirname --no-check-schema</info>
+                  <info>%command.invocation% dirname --no-check-schema</info>
 
                 The <info>--schema</info> option validates all files against the given schema file:
 
-                  <info>php %command.full_name% filename --schema=schema.json</info>
+                  <info>%command.invocation% filename --schema=schema.json</info>
 
                 EOF
             )

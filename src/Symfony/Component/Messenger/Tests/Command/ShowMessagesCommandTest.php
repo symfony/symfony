@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Command;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -38,8 +39,13 @@ class ShowMessagesCommandTest extends TestCase
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
+    #[BackupGlobals(true)]
     public function testListMessages()
     {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('all')->with(50)->willReturn([
             new Envelope(new \stdClass(), [new TransportMessageIdStamp(15)]),
@@ -54,7 +60,7 @@ class ShowMessagesCommandTest extends TestCase
         $display = $tester->getDisplay(true);
         $this->assertStringContainsString('15   stdClass', $display);
         $this->assertStringContainsString('16   '.DummyMessage::class, $display);
-        $this->assertStringContainsString('Run messenger:show async {id} -vv to see message details.', $display);
+        $this->assertStringContainsString('Run symfony console messenger:show async {id} -vv to see message details.', $display);
     }
 
     public function testListMessagesReturnsNoMessagesFound()

@@ -65,19 +65,19 @@ class DebugCommand extends Command
                 dispatched using the message buses, their handlers, routing rules and
                 failure transports:
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 Or for a specific bus only:
 
-                  <info>php %command.full_name% command_bus</info>
+                  <info>%command.invocation% command_bus</info>
 
                 Or inspect what happens when dispatching a specific message:
 
-                  <info>php %command.full_name% --message='App\Message\MyMessage'</info>
+                  <info>%command.invocation% --message='App\Message\MyMessage'</info>
 
                 Or display the middleware of each bus, in the order they are called:
 
-                  <info>php %command.full_name% --middleware</info>
+                  <info>%command.invocation% --middleware</info>
 
                 Routing is based on configuration and #[AsMessage] attributes.
                 TransportNamesStamp can override this routing at dispatch time.

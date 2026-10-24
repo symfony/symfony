@@ -26,7 +26,7 @@
         "phpdocumentor/reflection-docblock": "^5.2|^6.0",
         "symfony/asset": "^7.4|^8.0",
         "symfony/asset-mapper": "^7.4|^8.0",
-        "symfony/console": "^7.4|^8.0",
+        "symfony/console": "^8.2",
         "symfony/dependency-injection": "^7.4|^8.0",
         "symfony/emoji": "^7.4|^8.0",
         "symfony/expression-language": "^7.4|^8.0",
@@ -58,6 +58,7 @@
     "conflict": {
         "phpdocumentor/reflection-docblock": "<5.2|>=7",
         "phpdocumentor/type-resolver": "<1.5.1",
+        "symfony/console": "<8.2",
         "symfony/form": "<7.4.4|>8.0,<8.0.4",
         "symfony/mime": "<7.4.9|>8.0,<8.0.9",
         "symfony/security-http": "<8.2"

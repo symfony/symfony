@@ -35,11 +35,11 @@
     },
     "require-dev": {
         "opis/json-schema": "^2.6",
-        "symfony/console": "^7.4|^8.0",
+        "symfony/console": "^8.2",
         "yaml/yaml-test-suite": "*"
     },
     "conflict": {
-        "symfony/console": "<7.4"
+        "symfony/console": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Yaml\\": "" },

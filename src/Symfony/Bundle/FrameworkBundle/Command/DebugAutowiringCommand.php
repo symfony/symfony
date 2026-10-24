@@ -51,11 +51,11 @@ class DebugAutowiringCommand extends ContainerDebugCommand
                 The <info>%command.name%</info> command displays the classes and interfaces that
                 you can use as type-hints for autowiring:
 
-                  <info>php %command.full_name%</info>
+                  <info>%command.invocation%</info>
 
                 You can also pass a search term to filter the list:
 
-                  <info>php %command.full_name% log</info>
+                  <info>%command.invocation% log</info>
 
                 EOF
             )

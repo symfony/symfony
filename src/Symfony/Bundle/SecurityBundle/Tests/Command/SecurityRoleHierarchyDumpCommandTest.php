@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Command;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
@@ -21,16 +22,21 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 class SecurityRoleHierarchyDumpCommandTest extends TestCase
 {
+    #[BackupGlobals(true)]
     #[Group('legacy')]
     #[IgnoreDeprecations]
     public function testCommandIsDeprecated()
     {
+        $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+        $_SERVER['SYMFONY_CLI_CONSOLE_COMMAND'] = '["symfony","console"]';
+        $_SERVER['SYMFONY_CLI_CONSOLE_SCRIPT'] = __FILE__;
+
         $this->expectUserDeprecationMessage('Since symfony/security-bundle 8.2: The "debug:security:role-hierarchy" command is deprecated, use "debug:roles --format=mermaid" instead.');
 
         $commandTester = new CommandTester(new SecurityRoleHierarchyDumpCommand(new RoleHierarchy(['ROLE_ADMIN' => ['ROLE_USER']])));
         $commandTester->execute([], ['capture_stderr_separately' => true]);
 
-        $this->assertStringContainsString('use "debug:roles --format=mermaid" instead', preg_replace('/\s+/', ' ', $commandTester->getErrorOutput()));
+        $this->assertStringContainsString('use "symfony console debug:roles --format=mermaid" instead', preg_replace('/\s+/', ' ', $commandTester->getErrorOutput()));
     }
 
     #[Group('legacy')]

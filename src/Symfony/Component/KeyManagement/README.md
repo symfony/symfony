@@ -53,6 +53,12 @@ file_put_contents($path, $envelope);
 $payload = $envelopeEncrypter->decrypt(Envelope::fromBytes(file_get_contents($path)));
 ```
 
+`EnvelopeEncrypter` authenticates the AAD locally and doesn't pass the AAD to the KMS.
+Older implementations also authenticated the wrapped data key with the AAD.
+Migrate those envelopes with the previous implementation and the trusted original AAD, then encrypt the plaintext with the current implementation.
+Derived Vault keys also need migration for the new [derivation context framing](Bridge/HashiCorpVault/README.md#migrating-derived-keys).
+The self-contained fallback of `StoredEnvelopeEncrypter` has the same restriction.
+
 Each bridge under `Symfony\Component\KeyManagement\Bridge\` is published as its
 own Composer package and documents the DSN schemes it supports in its own
 README. `symfony/doctrine-dbal-key-management` ships a Doctrine DBAL Type that

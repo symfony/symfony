@@ -13,7 +13,6 @@ namespace Symfony\Component\KeyManagement;
 
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
-use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 /**
  * Encrypts arbitrary-size payloads into an {@see Envelope}.
@@ -38,9 +37,8 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 interface EnvelopeEncrypterInterface
 {
     /**
-     * @throws KeyNotFoundException          If `$key` is unknown to the underlying KMS
-     * @throws UnsupportedOperationException If `$aad` is non-empty and a backend cannot enforce it
-     * @throws RuntimeException              On any other backend failure
+     * @throws KeyNotFoundException If `$key` is unknown to the underlying KMS
+     * @throws RuntimeException     On any other backend failure
      */
     public function encrypt(string $key, #[\SensitiveParameter] string $plaintext, string $aad = ''): Envelope;
 }

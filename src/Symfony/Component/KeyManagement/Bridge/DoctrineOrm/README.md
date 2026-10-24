@@ -31,11 +31,16 @@ That type converts the value first, then the value is encrypted under the key.
 The column is stored as a binary one.
 When the encrypter uses a data key store, the key is the scope of the data key.
 
-`EncryptedColumnListener` gives each of these columns the encrypted type registered for its key and its type.
-It runs when the metadata of a class is loaded, so the metadata cache keeps that type.
-This is why the listener doesn't register the types.
-They must be registered before the first query.
-The listener gets the names of the types, by key and by the type they wrap:
+Each value is authenticated with the configured key and parent Doctrine type name, `string` here.
+Changing either requires rewriting existing values.
+The PHP implementation behind the parent name can change if the new converter can read the old plaintext.
+The generated encrypted type name can change without rewriting values.
+The parent instance's configuration isn't authenticated.
+Columns with the same key and parent type name can read each other's values.
+Give these columns different keys to keep them apart.
+
+For explicit keys, `EncryptedColumnListener` uses types registered before the first query.
+The listener gets their names by key and by the type they wrap:
 
 ```php
 use Doctrine\DBAL\Types\StringType;
@@ -44,7 +49,7 @@ use Doctrine\ORM\Events;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 
-Type::getTypeRegistry()->register('app_speaker_contact', new EncryptedType(new StringType(), $encrypter, 'speaker.contact'));
+Type::getTypeRegistry()->register('app_speaker_contact', new EncryptedType(new StringType(), $encrypter, 'speaker.contact', 'string'));
 
 $eventManager->addEventListener(Events::loadClassMetadata, new EncryptedColumnListener([
     'speaker.contact' => ['string' => 'app_speaker_contact'],
@@ -54,18 +59,56 @@ $eventManager->addEventListener(Events::loadClassMetadata, new EncryptedColumnLi
 Loading the metadata of a class fails when no encrypted type is registered for the key and the type of a column.
 It also fails when the attribute is on a property that is not a mapped column.
 
-In a Symfony application, the `KeyManagementBundle` registers the types when DoctrineBundle creates a connection.
-When the container is compiled, the bundle finds the `#[Encrypted]` columns and registers one type per key and type.
+With a configured data key store, you can omit the key:
+
+```php
+#[ORM\Column(nullable: true)]
+#[Encrypted]
+public ?string $phone = null;
+```
+
+The store's `key_id` selects the master key.
+The attribute then uses a separate data key scope for each physical column.
+The scope is `'orm:'.hash('sha256', serialize([$schema, $table, $column]))`, using the resolved ORM metadata names.
+Naming strategies, embedded prefixes and the physical owning table of inherited fields are included.
+The framed hash keeps names containing dots distinct and fits the store's scope column.
+The value also authenticates the parent Doctrine type name.
+Values copied to another physical column are refused.
+Renaming the entity or property leaves existing values readable when the physical names stay unchanged.
+Renaming the schema, table or column changes the automatic scope.
+Before such a rename, set the explicit key to the existing generated scope to keep old values readable.
+Choosing a different explicit key requires rewriting values.
+Only a null key selects the automatic scope; explicit `''` and `'0'` remain explicit keys.
+Omitting the key without a store fails, since a self-contained encrypter has no default master key.
+
+With DoctrineBundle, the bundle registers these automatic types after constructing each entity manager, including when metadata is cached.
+This loads all mapped metadata at manager creation when the container finds any omitted-key attribute.
+Applications using only explicit keys keep registration at connection creation.
+The connection's type provider must be a writable `TypeRegistry`.
+Generated automatic type names use an internal namespace, `key_management_auto_v1_<base64-parent>.<64-hex-hash>`.
+Don't use that full name format for your own parent aliases.
+
+Without DoctrineBundle, give the listener a store-backed encrypter and register after constructing the manager:
+
+```php
+$listener = new EncryptedColumnListener($explicitTypes, $storedEnvelopeEncrypter);
+$eventManager->addEventListener(Events::loadClassMetadata, $listener);
+$entityManager = new EntityManager($connection, $configuration, $eventManager);
+$listener->register($entityManager);
+```
+
+In a Symfony application, the `KeyManagementBundle` registers explicit-key types when DoctrineBundle creates a connection.
+When the container is compiled, the bundle finds the `#[Encrypted]` columns and collects one type per explicit key and type.
 It looks for these columns in the entities, embeddables and mapped superclasses found in the `resource` directories of your services.
 With the default `App\:` resource, this covers `src/Entity/`.
 The types encrypt with the encrypter `EnvelopeEncrypterInterface` resolves to, like the ones of `key_management.doctrine_dbal.types`.
 A type declared there is used for the columns of its key and type, instead of registering another one.
 
-The type of a column is read from its `#[ORM\Column]` attribute, or guessed from the type of the property, as the ORM does by default.
+For explicit keys, the column type is read from `#[ORM\Column]` or guessed from the property type, as the ORM does by default.
 The container misses the columns of an entity that your services exclude, or that is mapped in XML.
 It can also guess another type than the ORM when you use a custom typed field mapper.
 Loading the metadata of such an entity fails, `cache:warmup` included.
-Declare its types in `key_management.doctrine_dbal.types`, and the attribute uses them:
+You can declare these explicit-key types in `key_management.doctrine_dbal.types`.
 
 ```yaml
 key_management:
@@ -73,6 +116,10 @@ key_management:
         types:
             speaker_contact: { type: string, key: speaker.contact }
 ```
+
+Automatic scopes use the resolved ORM metadata instead of guessing the column type.
+The container must discover an omitted-key attribute to enable automatic registration.
+For excluded entities or a custom entity manager, configure the listener and call `register()` manually as shown above.
 
 Blind indexes
 -------------

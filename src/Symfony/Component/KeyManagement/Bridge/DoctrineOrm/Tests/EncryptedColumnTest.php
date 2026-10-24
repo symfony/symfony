@@ -29,7 +29,6 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\Fixtures\EncryptedColumnEntity;
-use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Test\InMemoryKms;
 
@@ -83,9 +82,9 @@ class EncryptedColumnTest extends TestCase
         $manager->flush();
 
         $stored = $this->connection->fetchOne('SELECT email FROM EncryptedColumnEntity');
-        $elsewhere = new StoredEnvelopeEncrypter($this->store());
+        $elsewhere = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter($this->store()), 'user.email');
 
-        $this->assertSame('john@example.com', $elsewhere->decrypt(Envelope::fromBytes($stored)));
+        $this->assertSame('john@example.com', $elsewhere->convertToPHPValue($stored, $this->connection->getDatabasePlatform()));
         $this->assertSame(1, $this->keyRows());
     }
 

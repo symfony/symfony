@@ -20,20 +20,26 @@ use Doctrine\DBAL\Types\BlobType;
 use Doctrine\DBAL\Types\Exception\ValueNotConvertible;
 use Doctrine\DBAL\Types\FloatType;
 use Doctrine\DBAL\Types\IntegerType;
+use Doctrine\DBAL\Types\JsonType;
 use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\TextType;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\Tests\Fixtures\ContextType;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\Tests\Fixtures\ContextTypeExtra;
 use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
+use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
+use Symfony\Component\KeyManagement\Local\SealedBoxKms;
 use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Test\InMemoryDataKeyStore;
 
@@ -152,20 +158,190 @@ class EncryptedTypeTest extends TestCase
         $legacy = new EncryptedType(new StringType(), $this->envelopes, 'app');
         $before = $legacy->convertToDatabaseValue('written before', $this->platform);
 
-        $migrating = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter(new InMemoryDataKeyStore(), $this->envelopes), 'user.email');
+        $migrating = new EncryptedType(new StringType(), new StoredEnvelopeEncrypter(new InMemoryDataKeyStore(), $this->envelopes), 'app');
         $after = $migrating->convertToDatabaseValue('written after', $this->platform);
 
         $this->assertSame('written before', $migrating->convertToPHPValue($before, $this->platform));
         $this->assertSame('written after', $migrating->convertToPHPValue($after, $this->platform));
     }
 
+    public function testAValueWithoutTheContextIsRefused()
+    {
+        $written = (string) $this->envelopes->encrypt('app', 'a note');
+        $type = $this->makeType(new StringType());
+
+        $this->expectException(DecryptionFailedException::class);
+        $type->convertToPHPValue($written, $this->platform);
+    }
+
+    #[TestWith(['message'])]
+    #[TestWith([''])]
+    #[TestWith(['0'])]
+    #[TestWith(["message\0name"])]
+    public function testAStableTypeNameSurvivesAParentClassChange(string $name)
+    {
+        $before = new EncryptedType(new StringType(), $this->envelopes, 'app', $name);
+        $after = new EncryptedType(new ContextType(), $this->envelopes, 'app', $name);
+
+        $written = $before->convertToDatabaseValue('a note', $this->platform);
+
+        $this->assertSame('a note', $after->convertToPHPValue($written, $this->platform));
+    }
+
+    #[TestWith(['message', 'other'])]
+    #[TestWith(['0', '00'])]
+    #[TestWith(['', '0'])]
+    #[TestWith(['', StringType::class])]
+    public function testDifferentTypeNamesRefuseValuesOfTheSameParentClass(string $before, string $after)
+    {
+        $first = new EncryptedType(new StringType(), $this->envelopes, 'app', $before);
+        $second = new EncryptedType(new StringType(), $this->envelopes, 'app', $after);
+
+        $written = $first->convertToDatabaseValue('a note', $this->platform);
+
+        $this->expectException(DecryptionFailedException::class);
+        $second->convertToPHPValue($written, $this->platform);
+    }
+
+    public function testANullTypeNameKeepsTheParentClassFallback()
+    {
+        $before = new EncryptedType(new StringType(), $this->envelopes, 'app');
+        $after = new EncryptedType(new StringType(), $this->envelopes, 'app', null);
+        $explicit = new EncryptedType(new StringType(), $this->envelopes, 'app', StringType::class);
+
+        $written = $before->convertToDatabaseValue('a note', $this->platform);
+
+        $this->assertSame('a note', $after->convertToPHPValue($written, $this->platform));
+        $this->assertSame('a note', $explicit->convertToPHPValue($written, $this->platform));
+    }
+
+    public function testATypeNameTooLongForItsLengthPrefixIsRefused()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new EncryptedType(new StringType(), $this->envelopes, 'app', str_repeat('a', 65536));
+    }
+
+    #[TestWith(['message', 'messageExtra'])]
+    #[TestWith(["message\0", "message\0Extra"])]
+    public function testATypeNameCannotBeConfusedWithADecoratorContext(string $before, string $after)
+    {
+        $encrypter = new StoredEnvelopeEncrypter(new InMemoryDataKeyStore());
+        $seen = [];
+        $first = new EncryptedType(new StringType(), self::appendingToTheAad($encrypter, 'Extra/row-42', $seen), 'user.data', $before);
+        $second = new EncryptedType(new StringType(), self::appendingToTheAad($encrypter, '/row-42', $seen), 'user.data', $after);
+
+        $written = $first->convertToDatabaseValue('a note', $this->platform);
+
+        $this->expectException(DecryptionFailedException::class);
+        $second->convertToPHPValue($written, $this->platform);
+    }
+
+    public function testAParentClassCannotBeConfusedWithADecoratorContext()
+    {
+        $encrypter = new StoredEnvelopeEncrypter(new InMemoryDataKeyStore());
+        $seen = [];
+        $first = new EncryptedType(new ContextType(), self::appendingToTheAad($encrypter, 'Extra/row-42', $seen), 'user.data');
+        $second = new EncryptedType(new ContextTypeExtra(), self::appendingToTheAad($encrypter, '/row-42', $seen), 'user.data');
+
+        $written = $first->convertToDatabaseValue('a note', $this->platform);
+
+        $this->expectException(DecryptionFailedException::class);
+        $second->convertToPHPValue($written, $this->platform);
+    }
+
+    public function testAParentClassTooLongForItsLengthPrefixIsRefused()
+    {
+        $class = 'EncryptedParent'.str_repeat('A', 65536 - \strlen('EncryptedParent'));
+        $parent = class_exists($class, false) ? new $class() : eval('class '.$class.' extends \\Doctrine\\DBAL\\Types\\StringType {} return new '.$class.'();');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The parent type name of an encrypted type is at most 65535 bytes long, 65536 given.');
+
+        new EncryptedType($parent, $this->envelopes, 'app');
+    }
+
+    public function testAValueOfAnotherTypeOfTheSameScopeIsRefused()
+    {
+        $encrypter = new StoredEnvelopeEncrypter(new InMemoryDataKeyStore());
+        $notes = new EncryptedType(new TextType(), $encrypter, 'user.data');
+        $label = new EncryptedType(new StringType(), $encrypter, 'user.data');
+
+        $written = $notes->convertToDatabaseValue('a note', $this->platform);
+
+        $this->expectException(DecryptionFailedException::class);
+        $label->convertToPHPValue($written, $this->platform);
+    }
+
+    public function testAValueOfAnotherScopeOfTheSameTypeIsRefused()
+    {
+        $encrypter = new StoredEnvelopeEncrypter(new InMemoryDataKeyStore());
+        $notes = new EncryptedType(new TextType(), $encrypter, 'user.notes');
+        $other = new EncryptedType(new TextType(), $encrypter, 'user.email');
+
+        $written = $notes->convertToDatabaseValue('a note', $this->platform);
+
+        $this->expectException(DecryptionFailedException::class);
+        $other->convertToPHPValue($written, $this->platform);
+    }
+
+    public function testTwoTypesOfTheSameScopeAndTypeReadEachOther()
+    {
+        $encrypter = new StoredEnvelopeEncrypter(new InMemoryDataKeyStore());
+        $notes = new EncryptedType(new TextType(), $encrypter, 'user.data');
+        $elsewhere = new EncryptedType(new TextType(), $encrypter, 'user.data');
+
+        $written = $notes->convertToDatabaseValue('a note', $this->platform);
+
+        $this->assertSame('a note', $elsewhere->convertToPHPValue($written, $this->platform), 'the pair is the identity, so two columns sharing it are one: give them their own scope to keep them apart.');
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    public function testTheContextIsAuthenticatedOnABackendThatRefusesAuthenticatedData()
+    {
+        $envelopes = new EnvelopeEncrypter(new SealedBoxKms(new InMemoryKeyLoader(['app' => sodium_crypto_box_keypair()])));
+        $notes = new EncryptedType(new TextType(), $envelopes, 'app');
+        $roles = new EncryptedType(new JsonType(), $envelopes, 'app');
+
+        $written = $notes->convertToDatabaseValue('{"role":"admin"}', $this->platform);
+
+        $this->assertSame('{"role":"admin"}', $notes->convertToPHPValue($written, $this->platform), 'the envelope binds its own AAD, so the sealed box never sees one.');
+
+        $this->expectException(DecryptionFailedException::class);
+        $roles->convertToPHPValue($written, $this->platform);
+    }
+
+    public function testAKeyTooLongForItsLengthPrefixIsRefused()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The key of an encrypted type is at most 65535 bytes long, 65536 given.');
+
+        new EncryptedType(new StringType(), $this->envelopes, str_repeat('a', 65536));
+    }
+
+    public function testADecoratingEncrypterAddsItsOwnContextToTheTypes()
+    {
+        $seen = [];
+        $decorated = self::appendingToTheAad(new StoredEnvelopeEncrypter(new InMemoryDataKeyStore()), '/row-42', $seen);
+        $type = new EncryptedType(new StringType(), $decorated, 'user.data');
+
+        $written = $type->convertToDatabaseValue('a note', $this->platform);
+
+        $this->assertSame('a note', $type->convertToPHPValue($written, $this->platform));
+        $this->assertCount(2, $seen);
+        $this->assertSame($seen[0], $seen[1], 'the write and the read must hand the same bytes down.');
+        $this->assertStringEndsWith('/row-42', $seen[0]);
+        $this->assertStringStartsWith('symfony/key-management/doctrine-dbal/encrypted-type/v1', $seen[0], 'the type context is what the decorator was given to add to.');
+    }
+
     public function testAColumnIsMovedToAnotherKms()
     {
         $target = new EnvelopeEncrypter(new OpenSslKms(new InMemoryKeyLoader(['next' => random_bytes(32)])));
-        $written = (new EncryptedType(new StringType(), $this->envelopes, 'app'))->convertToDatabaseValue('jane@example.com', $this->platform);
+        $legacy = new EncryptedType(new StringType(), $this->envelopes, 'app');
+        $written = $legacy->convertToDatabaseValue('jane@example.com', $this->platform);
 
-        $migrating = new EncryptedType(new StringType(), $this->routingOnKeyId($target), 'next');
-        $rewritten = $migrating->convertToDatabaseValue($migrating->convertToPHPValue($written, $this->platform), $this->platform);
+        $rewriting = new EncryptedType(new StringType(), $this->routingOnKeyId($target), 'next');
+        $rewritten = $rewriting->convertToDatabaseValue($legacy->convertToPHPValue($written, $this->platform), $this->platform);
 
         $this->assertSame('next', Envelope::fromBytes($rewritten)->keyId);
         $this->assertSame('jane@example.com', (new EncryptedType(new StringType(), $target, 'next'))->convertToPHPValue($rewritten, $this->platform));
@@ -305,6 +481,32 @@ class EncryptedTypeTest extends TestCase
             public function decrypt(Envelope $envelope, string $aad = ''): string
             {
                 return 'app' === $envelope->keyId ? $this->legacy->decrypt($envelope, $aad) : $this->target->decrypt($envelope, $aad);
+            }
+        };
+    }
+
+    private static function appendingToTheAad(EnvelopeEncrypterInterface&EnvelopeDecrypterInterface $inner, string $own, array &$seen): EnvelopeEncrypterInterface&EnvelopeDecrypterInterface
+    {
+        return new class($inner, $own, $seen) implements EnvelopeEncrypterInterface, EnvelopeDecrypterInterface {
+            public function __construct(
+                private EnvelopeEncrypterInterface&EnvelopeDecrypterInterface $inner,
+                private string $own,
+                private array &$seen,
+            ) {
+            }
+
+            public function encrypt(string $key, #[\SensitiveParameter] string $plaintext, string $aad = ''): Envelope
+            {
+                $this->seen[] = $aad.$this->own;
+
+                return $this->inner->encrypt($key, $plaintext, $aad.$this->own);
+            }
+
+            public function decrypt(Envelope $envelope, string $aad = ''): string
+            {
+                $this->seen[] = $aad.$this->own;
+
+                return $this->inner->decrypt($envelope, $aad.$this->own);
             }
         };
     }

@@ -104,13 +104,12 @@ hashicorp-vault-transit://s.token@vault.example.com:8200/v1/?mount=transit&names
 AAD support
 -----------
 
-The `$aad` argument is forwarded as Vault's `context` parameter (HKDF
-context, base64-encoded). This works for keys created with `derived=true`.
-Vault does not reject a context on non-derived keys, it silently ignores it,
-which would make an AAD mismatch decrypt fine. The bridge therefore reads the
-key configuration once per key (`GET <mount>/keys/<name>`) when a non-empty
-`$aad` is used and refuses AAD for non-derived keys with an
-`UnsupportedOperationException`.
+The bridge passes `base64_encode("symfony/key-management/hashicorp-vault/transit/v1\0".$aad)` as Vault's `context` parameter for every request.
+This framing keeps arbitrary binary AAD distinct, including an empty AAD.
+Vault uses the context as HKDF input for keys created with `derived=true`.
+Vault silently ignores the context on non-derived keys.
+For nonempty AAD, the bridge reads each key's configuration once with `GET <mount>/keys/<name>`.
+It throws `UnsupportedOperationException` if the key is non-derived.
 
 That preflight is a read on the key itself, so a token whose policy only
 grants `update` on the encryption endpoints is no longer enough as soon as an
@@ -125,12 +124,35 @@ path "transit/datakey/plaintext/*" { capabilities = ["update"] }
 path "transit/keys/*"              { capabilities = ["read"] }
 ```
 
+Derived keys require a nonempty context.
+The framing supplies a nonempty context even when the caller passes no AAD.
+The key configuration is read only for nonempty AAD, so the `read` permission above stays optional.
+With `convergent_encryption=true`, equal plaintexts with the same AAD produce equal ciphertexts.
+Different AAD values create different convergence scopes.
+
 Note that Vault's `context` is a key-derivation input, not authenticated data
 in the AEAD sense. The practical effect is similar (different context →
 unable to decrypt) but the security model differs slightly from backends like
 AWS KMS, where `EncryptionContext` is integrity-protected. AAD is treated as
 opaque bytes; if you have structured data, serialize it (e.g. canonical JSON
 with sorted keys) yourself and pass the resulting string.
+
+Migrating derived keys
+----------------------
+
+Migrate existing values under derived keys before switching readers.
+Before framing, the nonempty AAD was used directly as the context.
+The previous fallback for empty AAD was `symfony/key-management/hashicorp-vault/transit/v1`.
+Read each old ciphertext with the old implementation or Vault's API, using the trusted original AAD and context.
+Encrypt the plaintext with the current implementation.
+Non-derived keys with empty AAD need no migration.
+
+For persisted wrapped data keys, unwrap with the old context and encrypt the same key bytes with the new context.
+Keep the plaintext key unchanged so existing payloads and blind indexes remain valid.
+Replace the persisted wrapped value, including wrapped keys inside self-contained envelopes.
+`EnvelopeEncrypter` wraps its data keys with empty AAD; the payload AAD is authenticated locally.
+For older envelopes that also passed the payload AAD to the KMS, unwrap with that original AAD before rewrapping with empty AAD.
+The current `key-management:rewrap-data-keys` command uses the new reader and cannot migrate old contexts by itself.
 
 Resources
 ---------

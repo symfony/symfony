@@ -38,9 +38,13 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * The token is then invalidated and the request is retried once with a new one.
  * Other 403s, like a policy that lacks a capability, are not retried since a new token would not fix them.
  *
- * AAD maps to Vault's `context` parameter (HKDF input) and is refused for keys
- * not created with `derived=true`, since Vault silently ignores the context on
- * those; see the bridge README for the security caveats compared with AEAD AAD.
+ * AAD is prefixed with {@see self::CONTEXT_PREFIX} and passed as Vault's `context` parameter (HKDF input).
+ * Nonempty AAD is refused for keys not created with `derived=true`, since Vault silently ignores the context on those.
+ *
+ * Every request has a nonempty context, as required by derived keys, and different AAD bytes always produce different contexts.
+ * A derived key is therefore usable when the caller passes no AAD.
+ * With `convergent_encryption=true`, equal plaintexts with the same AAD produce equal ciphertexts.
+ * See the bridge README for migration guidance and the security differences from AEAD AAD.
  *
  * On the decrypt path, only HTTP 400 is masked as {@see DecryptionFailedException}
  * (key-enumeration oracle hardening); auth (401/403), rate limits (429) and
@@ -59,6 +63,8 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
      * @see https://developer.hashicorp.com/vault/api-docs/secret/transit#bits-1
      */
     private const array SUPPORTED_DATA_KEY_BITS = [128, 256, 512];
+
+    private const string CONTEXT_PREFIX = "symfony/key-management/hashicorp-vault/transit/v1\0";
 
     /**
      * @var array<string, bool> Whether each key was created with `derived=true`, cached per key name
@@ -79,11 +85,7 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
             throw new UnsupportedOperationException('Vault Transit cannot offer per-call deterministic encryption: convergent mode must be set at key creation (`derived=true, convergent_encryption=true`).');
         }
 
-        $body = ['plaintext' => base64_encode($plaintext)];
-        if ('' !== $aad) {
-            $this->assertAadIsEnforceable($keyId, false);
-            $body['context'] = base64_encode($aad);
-        }
+        $body = ['plaintext' => base64_encode($plaintext), 'context' => base64_encode($this->contextFor($keyId, $aad, false))];
 
         $data = $this->request('POST', \sprintf('%s/encrypt/%s', self::encodePath($this->mountPoint), rawurlencode($keyId)), $body, $keyId);
 
@@ -96,11 +98,7 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
 
     public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
     {
-        $body = ['ciphertext' => $ciphertext->blob];
-        if ('' !== $aad) {
-            $this->assertAadIsEnforceable($ciphertext->keyId, true);
-            $body['context'] = base64_encode($aad);
-        }
+        $body = ['ciphertext' => $ciphertext->blob, 'context' => base64_encode($this->contextFor($ciphertext->keyId, $aad, true))];
 
         $data = $this->request('POST', \sprintf('%s/decrypt/%s', self::encodePath($this->mountPoint), rawurlencode($ciphertext->keyId)), $body, $ciphertext->keyId, true);
 
@@ -123,11 +121,7 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
             throw new InvalidArgumentException(\sprintf('Vault Transit can only generate data keys of 16, 32 or 64 bytes, %d given.', $length));
         }
 
-        $body = ['bits' => $bits];
-        if ('' !== $aad) {
-            $this->assertAadIsEnforceable($keyId, false);
-            $body['context'] = base64_encode($aad);
-        }
+        $body = ['bits' => $bits, 'context' => base64_encode($this->contextFor($keyId, $aad, false))];
 
         $data = $this->request('POST', \sprintf('%s/datakey/plaintext/%s', self::encodePath($this->mountPoint), rawurlencode($keyId)), $body, $keyId);
 
@@ -146,6 +140,15 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         return new DataKey($this->decrypt($wrapped, $aad), $wrapped);
+    }
+
+    private function contextFor(string $keyId, string $aad, bool $treatClientErrorAsDecryptionFailure): string
+    {
+        if ('' !== $aad) {
+            $this->assertAadIsEnforceable($keyId, $treatClientErrorAsDecryptionFailure);
+        }
+
+        return self::CONTEXT_PREFIX.$aad;
     }
 
     /**

@@ -21,6 +21,8 @@ use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
+use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
+use Symfony\Component\KeyManagement\Local\SealedBoxKms;
 use Symfony\Component\KeyManagement\SelfContainedFormat;
 use Symfony\Component\KeyManagement\Test\InMemoryKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\RedactedTraceAssertionsTrait;
@@ -134,6 +136,51 @@ class EnvelopeEncrypterTest extends TestCase
 
         $this->expectException(DecryptionFailedException::class);
         $this->encrypter->decrypt($envelope, 'tenant=globex');
+    }
+
+    public function testTheAadDoesNotReachTheKms()
+    {
+        $spying = new class($this->kms) implements DataKeyGeneratorInterface {
+            /**
+             * @var list<string>
+             */
+            public array $seen = [];
+
+            public function __construct(
+                private readonly DataKeyGeneratorInterface $inner,
+            ) {
+            }
+
+            public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
+            {
+                $this->seen[] = $aad;
+
+                return $this->inner->generateDataKey($keyId, $length, $aad);
+            }
+
+            public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
+            {
+                $this->seen[] = $aad;
+
+                return $this->inner->unwrapDataKey($wrapped, $aad);
+            }
+        };
+        $encrypter = new EnvelopeEncrypter($spying);
+
+        $this->assertSame('hello', $encrypter->decrypt($encrypter->encrypt('app-key', 'hello', 'tenant=acme'), 'tenant=acme'));
+        $this->assertSame(['', ''], $spying->seen, 'the AAD binds the payload locally, so the wrapping of the data key carries none.');
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    public function testAnAadIsBoundOnABackendThatRefusesAuthenticatedData()
+    {
+        $encrypter = new EnvelopeEncrypter(new SealedBoxKms(new InMemoryKeyLoader(['app-key' => sodium_crypto_box_keypair()])));
+        $envelope = $encrypter->encrypt('app-key', 'hello', 'tenant=acme');
+
+        $this->assertSame('hello', $encrypter->decrypt($envelope, 'tenant=acme'));
+
+        $this->expectException(DecryptionFailedException::class);
+        $encrypter->decrypt($envelope, 'tenant=globex');
     }
 
     public function testEnvelopeIsPortableAcrossEncrypterInstances()

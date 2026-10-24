@@ -14,6 +14,7 @@ namespace Symfony\Component\KeyManagement\Bridge\DoctrineDbal;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\TypeRegistry;
 use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
@@ -69,7 +70,7 @@ final class EncryptedTypes
     }
 
     /**
-     * Declares the types on the global type registry.
+     * Declares the types on the connection's registry, or the global registry when no connection is given.
      *
      * When a connection is given, the parent types are the ones this connection resolves, so that a type registered on this connection can be wrapped too.
      *
@@ -78,12 +79,19 @@ final class EncryptedTypes
      * container, so the types of the previous one are still there, pointing at encrypters nothing
      * else uses any more.
      *
-     * @throws InvalidArgumentException If a declaration names no Doctrine type or no key
+     * A type authenticates its key and the parent type's registry name.
+     * Renaming the encrypted declaration leaves every value readable, {@see EncryptedType}.
+     *
+     * @throws InvalidArgumentException If a declaration names no Doctrine type or no key, or the registry is not writable
      */
     public function register(?Connection $connection = null): void
     {
-        $registry = method_exists(Configuration::class, 'getTypeProvider') ? (new Configuration())->getTypeProvider() : Type::getTypeRegistry();
-        $parents = $connection && method_exists(Configuration::class, 'getTypeProvider') ? $connection->getConfiguration()->getTypeProvider() : $registry;
+        $configuration = $connection?->getConfiguration() ?? new Configuration();
+        $registry = method_exists($configuration, 'getTypeProvider') ? $configuration->getTypeProvider() : Type::getTypeRegistry();
+
+        if (!$registry instanceof TypeRegistry) {
+            throw new InvalidArgumentException('Encrypted types require a writable Doctrine type registry.');
+        }
 
         foreach ($this->types as $name => $definition) {
             foreach (['type', 'key'] as $required) {
@@ -92,7 +100,7 @@ final class EncryptedTypes
                 }
             }
 
-            $type = new EncryptedType($parents->get($definition['type']), $this->envelopes, $definition['key']);
+            $type = new EncryptedType($registry->get($definition['type']), $this->envelopes, $definition['key'], $definition['type']);
 
             $registry->has($name) ? $registry->override($name, $type) : $registry->register($name, $type);
         }

@@ -27,6 +27,7 @@ final class Splitter
     private const MAX_DEPTH = 512;
     private const WHITESPACES = " \t\n\r";
     private const DELIMITERS = " \t\n\r\"{}[],:";
+    private const NESTED_STRINGS_PATTERN = '/(?:[^"{}\[\]]++|"(?:[^"\\\\]++|\\\\.)*+")*+/As';
 
     private const EXPECT_VALUE = 1;
     private const EXPECT_VALUE_OR_END = 2;
@@ -285,7 +286,13 @@ final class Splitter
 
                 if ($depth > 1) {
                     if ('"' === $char) {
-                        $inString = true;
+                        // skip the string and everything up to the next bracket in one go (following complete strings included);
+                        // a string cut by the chunk end, or a PCRE failure, falls back to the string state
+                        if (preg_match(self::NESTED_STRINGS_PATTERN, $chunk, $matches, 0, $i - 1) && '' !== $matches[0]) {
+                            $i += \strlen($matches[0]) - 1;
+                        } else {
+                            $inString = true;
+                        }
                     } elseif ('{' !== $char && '[' !== $char) {
                         if (array_pop($closers) !== $char) {
                             throw new InvalidStreamException(\sprintf('Unexpected "%s" token.', $char));
@@ -402,7 +409,8 @@ final class Splitter
 
     private static function decodeKey(string $rawKey): string
     {
-        if (!preg_match('/[^\x20-\x5B\x5D-\x7E]/', $rawKey)) {
+        // on failure, preg_match() returns false, so the key is decoded
+        if (0 === preg_match('/[^\x20-\x5B\x5D-\x7E]/', $rawKey)) {
             return $rawKey;
         }
 

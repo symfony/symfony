@@ -43,7 +43,7 @@ class UriResolver
 
         // empty URI
         if ('' === $uri) {
-            return $baseUri;
+            return self::cleanupAnchor($baseUri);
         }
 
         // an anchor

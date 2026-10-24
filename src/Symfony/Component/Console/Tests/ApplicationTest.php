@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests;
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -1037,6 +1038,35 @@ class ApplicationTest extends TestCase
 
         $application->setAutoExit(false);
         $this->assertFalse($application->isAutoExitEnabled());
+    }
+
+    #[BackupGlobals(true)]
+    #[TestWith([null, 'composer', false])]
+    #[TestWith(['', 'composer', false])]
+    #[TestWith(['symfony', 'symfony composer', false])]
+    #[TestWith(['symfony', 'symfony composer', true])]
+    #[TestWith(['symfony-local', 'symfony-local composer', false])]
+    #[TestWith(['symfony-local', 'symfony-local composer', true])]
+    #[TestWith(['0', '0 composer', false])]
+    #[TestWith(['symfony', 'symfony composer', false, 32])]
+    #[TestWith(['symfony', 'symfony composer', true, 32])]
+    public function testRenderExceptionAdaptsComposerSuggestions(?string $binary, string $composer, bool $decorated, int $width = 160)
+    {
+        $_SERVER['SYMFONY_CLI_BINARY_NAME'] = $binary;
+        putenv('COLUMNS='.$width);
+        $previous = new \RuntimeException('Try running "composer require symfony/cache".');
+        $exception = new \RuntimeException('Try running "composer require symfony/http-client". Already suggested: "symfony composer require symfony/yaml".', 0, $previous);
+        $output = new BufferedOutput(Output::VERBOSITY_NORMAL, $decorated);
+
+        (new Application())->renderThrowable($exception, $output);
+        $display = preg_replace('/\x1b\[[0-9;]*m/', '', $output->fetch());
+        $display = preg_replace('/\s+/', ' ', $display);
+
+        $this->assertStringContainsString('Try running "'.$composer.' require symfony/http-client".', $display);
+        $this->assertStringContainsString('Try running "'.$composer.' require symfony/cache".', $display);
+        $this->assertStringContainsString('Already suggested: "symfony composer require symfony/yaml".', $display);
+        $this->assertSame('Try running "composer require symfony/http-client". Already suggested: "symfony composer require symfony/yaml".', $exception->getMessage());
+        $this->assertSame('Try running "composer require symfony/cache".', $previous->getMessage());
     }
 
     public function testRenderException()

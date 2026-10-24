@@ -976,6 +976,9 @@ class Application implements ResetInterface
     {
         do {
             $message = trim($e->getMessage());
+            if ('' !== $binary = $_SERVER['SYMFONY_CLI_BINARY_NAME'] ?? '') {
+                $message = str_replace('"composer require ', '"'.$binary.' composer require ', $message);
+            }
             if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $class = get_debug_type($e);
                 $title = \sprintf('  [%s%s]  ', $class, 0 !== ($code = $e->getCode()) ? ' ('.$code.')' : '');

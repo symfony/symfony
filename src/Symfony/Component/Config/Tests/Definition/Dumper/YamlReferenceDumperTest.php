@@ -125,6 +125,39 @@ class YamlReferenceDumperTest extends TestCase
         ], Yaml::parse($reference));
     }
 
+    public function testDumpQuotesKeysAndEmptyArraysOfDefaultValues()
+    {
+        $treeBuilder = new TreeBuilder('acme_root');
+        $treeBuilder->getRootNode()
+            ->children()
+                ->arrayNode('options')
+                    ->prototype('variable')->end()
+                    ->defaultValue(['@logger' => true, '%kernel.debug%' => 1, '*.example.com' => [], 'a: b' => null])
+                ->end()
+            ->end()
+        ;
+
+        $dumper = new YamlReferenceDumper();
+        $reference = $dumper->dumpNode($treeBuilder->buildTree());
+
+        $this->assertSame(<<<'EOL'
+            acme_root:
+                options:
+
+                    # Defaults:
+                    '@logger':           true
+                    '%kernel.debug%':    1
+                    '*.example.com':     []
+                    'a: b':              null
+
+            EOL, $reference);
+        $this->assertSame([
+            'acme_root' => [
+                'options' => ['@logger' => true, '%kernel.debug%' => 1, '*.example.com' => [], 'a: b' => null],
+            ],
+        ], Yaml::parse($reference));
+    }
+
     private function getConfigurationAsString(): string
     {
         return <<<'EOL'

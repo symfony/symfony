@@ -14,6 +14,7 @@ namespace Symfony\Component\ErrorHandler\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
@@ -315,5 +316,30 @@ class ErrorHandlerConfigurationTest extends TestCase
         yield 'scope' => ['scopeAt', [0, true], 0x1FFF];
         yield 'trace' => ['traceAt', [0, true], 0x77FB];
         yield 'scream' => ['screamAt', [0, true], 0x55];
+    }
+
+    #[DataProvider('provideDeprecatedLoggerSetters')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[WithoutErrorHandler]
+    public function testDeprecatedLoggerSettersReportTheirDeprecationToTheNewLogger(string $method, \Closure $setLogger)
+    {
+        $logger = new BufferingLogger();
+        $handler = ErrorHandler::register();
+
+        try {
+            $setLogger($handler, $logger);
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+        }
+
+        self::assertSame([\sprintf('User Deprecated: Since symfony/error-handler 8.3: Method "Symfony\Component\ErrorHandler\ErrorHandler::%s()" is deprecated, use "configure()" instead.', $method)], array_column($logger->cleanLogs(), 1));
+    }
+
+    public static function provideDeprecatedLoggerSetters(): iterable
+    {
+        yield 'default logger' => ['setDefaultLogger', static fn (ErrorHandler $handler, BufferingLogger $logger) => $handler->setDefaultLogger($logger)];
+        yield 'loggers' => ['setLoggers', static fn (ErrorHandler $handler, BufferingLogger $logger) => $handler->setLoggers([\E_USER_DEPRECATED => [$logger]])];
     }
 }

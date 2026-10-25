@@ -349,7 +349,7 @@ class ErrorHandlerTest extends TestCase
             ;
 
             $handler = ErrorHandler::register();
-            $handler->setDefaultLogger($logger, \E_USER_DEPRECATED);
+            $handler->configure($logger, null, false, null, \E_USER_DEPRECATED);
             $this->assertTrue($handler->handleError(\E_USER_DEPRECATED, 'foo', 'foo.php', 12, []));
 
             restore_error_handler();

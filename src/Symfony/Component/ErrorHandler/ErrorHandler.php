@@ -283,9 +283,9 @@ class ErrorHandler
      */
     public function setDefaultLogger(LoggerInterface $logger, array|int|null $levels = \E_ALL, bool $replace = false): void
     {
-        trigger_deprecation('symfony/error-handler', '8.3', 'Method "%s::setDefaultLogger()" is deprecated, use "configure()" instead.', self::class);
-
         $this->doSetDefaultLogger($logger, $levels, $replace);
+
+        trigger_deprecation('symfony/error-handler', '8.3', 'Method "%s::setDefaultLogger()" is deprecated, use "configure()" instead.', self::class);
     }
 
     /**
@@ -299,9 +299,11 @@ class ErrorHandler
      */
     public function setLoggers(array $loggers): array
     {
+        $prev = $this->doSetLoggers($loggers);
+
         trigger_deprecation('symfony/error-handler', '8.3', 'Method "%s::setLoggers()" is deprecated, use "configure()" instead.', self::class);
 
-        return $this->doSetLoggers($loggers);
+        return $prev;
     }
 
     /**

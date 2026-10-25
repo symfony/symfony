@@ -87,7 +87,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @param array<NormalizerInterface|DenormalizerInterface> $normalizers
      * @param array<EncoderInterface|DecoderInterface>         $encoders
      * @param array<string, mixed>                             $defaultContext
-     * @param string|null                                      $sharedCacheKey Serializers created with the same key share which normalizers support which types, so they must use the same normalizers
+     * @param string|null                                      $sharedCacheKey Serializers created with the same key and normalizers of the same classes share which normalizers support which types
      */
     public function __construct(
         private array $normalizers = [],
@@ -111,6 +111,11 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             if (!($normalizer instanceof NormalizerInterface || $normalizer instanceof DenormalizerInterface)) {
                 throw new InvalidArgumentException(\sprintf('The class "%s" neither implements "%s" nor "%s".', get_debug_type($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
             }
+        }
+
+        if (null !== $sharedCacheKey) {
+            // a service can inherit the key from its parent definition and still use other normalizers
+            $this->sharedCacheKey .= ':'.hash('xxh128', serialize(array_map(get_class(...), $normalizers)));
         }
 
         $decoders = [];

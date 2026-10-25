@@ -2033,6 +2033,18 @@ class SerializerTest extends TestCase
         }
     }
 
+    public function testSerializersCreatedWithTheSameSharedCacheKeyButOtherNormalizersDoNotShare()
+    {
+        $serializer = new Serializer([new DateTimeNormalizer()], [], [], __METHOD__);
+        $serializer->normalize(new \DateTimeImmutable());
+        $serializer->denormalize('2026-10-25T00:00:00+00:00', \DateTimeImmutable::class);
+
+        $serializer = new Serializer([new DateTimeZoneNormalizer(), new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'Y'])], [], [], __METHOD__);
+
+        $this->assertSame('2026', $serializer->normalize(new \DateTimeImmutable('2026-10-25')));
+        $this->assertEquals(new \DateTimeImmutable('2026-01-01'), $serializer->denormalize('2026', \DateTimeImmutable::class, null, [DateTimeNormalizer::FORMAT_KEY => '!Y']));
+    }
+
     public function testSerializersCreatedWithoutSharedCacheKeyDoNotShare()
     {
         $normalizer = $this->createSupportingNormalizer(2);

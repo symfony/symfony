@@ -426,7 +426,8 @@ class StringTypeResolverTest extends TestCase
             yield [Type::literal(\PHP_INT_MIN), '-0x8000000000000000'];
             yield [Type::literal(\PHP_INT_MIN), '-0o1000000000000000000000'];
             yield [Type::literal(\PHP_INT_MIN), '-0b1'.str_repeat('0', 63)];
-            yield [Type::intRange(\PHP_INT_MIN, 0), 'int<-9223372036854775808, 0>'];
+            yield [Type::intRange(null, 0), 'int<-9223372036854775808, 0>'];
+            yield [Type::intRange(0, null), 'int<0, 0x7FFFFFFFFFFFFFFF>'];
         }
         yield [Type::literal(1.5), '1.5'];
         yield [Type::union(Type::literal('draft'), Type::literal('published')), "'draft'|'published'"];
@@ -441,6 +442,29 @@ class StringTypeResolverTest extends TestCase
         yield [Type::intRange(null, 5), 'int<min, 5>'];
         yield [Type::intRange(-5, null), 'int<-5, max>'];
         yield [Type::int(), 'int<min, max>'];
+    }
+
+    #[DataProvider('resolveIntRangeWithConstantBoundDataProvider')]
+    public function testResolveIntRangeWithConstantBound(Type $expectedType, string $string, ?TypeContext $typeContext = null)
+    {
+        $this->assertEquals($expectedType, $this->resolver->resolve($string, $typeContext));
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: string, 2?: TypeContext}>
+     */
+    public static function resolveIntRangeWithConstantBoundDataProvider(): iterable
+    {
+        $typeContextFactory = new TypeContextFactory(new StringTypeResolver(null, null, [], true));
+
+        yield [Type::intRange(0, null), 'int<0, PHP_INT_MAX>'];
+        yield [Type::intRange(null, 0), 'int<\\PHP_INT_MIN, 0>'];
+        yield [Type::int(), 'int<PHP_INT_MIN, PHP_INT_MAX>'];
+        yield [Type::intRange(\PHP_INT_MAX, null), 'int<PHP_INT_MAX, max>'];
+        yield [Type::intRange(0, null), 'int<0, PHP_INT_MAX>', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
+        yield [Type::intRange(0, 1), 'int<0, '.DummyWithConstants::class.'::DUMMY_INT_A>'];
+        yield [Type::intRange(1, null), 'int<self::DUMMY_INT_A, max>', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
+        yield [Type::int(), 'int<0, UNDEFINED_CONSTANT>'];
     }
 
     #[DataProvider('invalidRefinementDataProvider')]
@@ -463,6 +487,10 @@ class StringTypeResolverTest extends TestCase
         yield ['0x8000000000000000'];
         yield ['-9223372036854775809'];
         yield ['-0x8000000000000001'];
+        yield ['int<0, PHP_VERSION>'];
+        yield ['int<0, '.DummyWithConstants::class.'::DUMMY_STRING_A>'];
+        yield ['int<0, '.DummyWithConstants::class.'::UNDEFINED>'];
+        yield ['int<0, UndefinedClass::MAX>'];
     }
 
     #[Group('legacy')]

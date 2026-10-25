@@ -166,29 +166,7 @@ final class StringTypeResolver implements TypeResolverInterface
 
         if ($node instanceof ConstTypeNode) {
             if ($node->constExpr instanceof ConstFetchNode) {
-                $classKeyword = strtolower($node->constExpr->className);
-
-                if (null === $typeContext && \in_array($classKeyword, ['self', 'static', 'parent'], true)) {
-                    throw new InvalidArgumentException(\sprintf('A "%s" must be provided to resolve "%s".', TypeContext::class, $classKeyword));
-                }
-
-                $className = match ($classKeyword) {
-                    'self' => $typeContext->getDeclaringClass(),
-                    'static' => $typeContext->getCalledClass(),
-                    'parent' => $typeContext->getParentClass(),
-                    default => null,
-                };
-
-                if (null === $className) {
-                    $classType = $this->resolveCustomIdentifier($node->constExpr->className, $typeContext);
-                    if (!$classType instanceof ObjectType) {
-                        return Type::mixed();
-                    }
-
-                    $className = $classType->getClassName();
-                }
-
-                if (!class_exists($className) && !interface_exists($className)) {
+                if (null === $className = $this->getConstantClassName($node->constExpr, $typeContext)) {
                     return Type::mixed();
                 }
 
@@ -286,8 +264,16 @@ final class StringTypeResolver implements TypeResolverInterface
                     return $type;
                 }
 
-                $min = $this->getIntRangeBound($node->genericTypes[0], 'min');
-                $max = $this->getIntRangeBound($node->genericTypes[1], 'max');
+                $min = $this->getIntRangeBound($node->genericTypes[0], 'min', $typeContext);
+                $max = $this->getIntRangeBound($node->genericTypes[1], 'max', $typeContext);
+
+                if (false === $min || false === $max) {
+                    return $type;
+                }
+
+                // the integer limits are no bound at all
+                $min = \PHP_INT_MIN === $min ? null : $min;
+                $max = \PHP_INT_MAX === $max ? null : $max;
 
                 if (null === $min && null === $max) {
                     return $type;
@@ -485,7 +471,41 @@ final class StringTypeResolver implements TypeResolverInterface
         return $node;
     }
 
-    private function getIntRangeBound(TypeNode $node, string $unboundedKeyword): ?int
+    private function getConstantClassName(ConstFetchNode $node, ?TypeContext $typeContext): ?string
+    {
+        $classKeyword = strtolower($node->className);
+
+        if (null === $typeContext && \in_array($classKeyword, ['self', 'static', 'parent'], true)) {
+            throw new InvalidArgumentException(\sprintf('A "%s" must be provided to resolve "%s".', TypeContext::class, $classKeyword));
+        }
+
+        $className = match ($classKeyword) {
+            'self' => $typeContext->getDeclaringClass(),
+            'static' => $typeContext->getCalledClass(),
+            'parent' => $typeContext->getParentClass(),
+            default => null,
+        };
+
+        if (null === $className) {
+            $classType = $this->resolveCustomIdentifier($node->className, $typeContext);
+            if (!$classType instanceof ObjectType) {
+                return null;
+            }
+
+            $className = $classType->getClassName();
+        }
+
+        if (!class_exists($className) && !interface_exists($className)) {
+            return null;
+        }
+
+        return $className;
+    }
+
+    /**
+     * @return int|false|null the bound, null when unbounded, or false when it is a constant that cannot be resolved
+     */
+    private function getIntRangeBound(TypeNode $node, string $unboundedKeyword, ?TypeContext $typeContext): int|false|null
     {
         if ($node instanceof ConstTypeNode && $node->constExpr instanceof ConstExprIntegerNode) {
             return self::parseInteger($node->constExpr->value);
@@ -495,7 +515,39 @@ final class StringTypeResolver implements TypeResolverInterface
             return null;
         }
 
-        throw new \DomainException(\sprintf('"%s" is not a valid integer range bound.', $node));
+        $value = false;
+
+        if ($node instanceof ConstTypeNode && $node->constExpr instanceof ConstFetchNode && !str_contains($node->constExpr->name, '*')) {
+            if (null === $className = $this->getConstantClassName($node->constExpr, $typeContext)) {
+                return false;
+            }
+
+            if (!\defined($constant = $className.'::'.$node->constExpr->name)) {
+                throw new \DomainException(\sprintf('No "%s" constant found in "%s".', $node->constExpr->name, $className));
+            }
+
+            $value = \constant($constant);
+        } elseif ($node instanceof IdentifierTypeNode && !\in_array($node->name, ['min', 'max'], true)) {
+            $name = ltrim($node->name, '\\');
+
+            // like PHP, an unqualified constant falls back to the global one
+            if ($typeContext?->namespace && !str_starts_with($node->name, '\\') && \defined($typeContext->namespace.'\\'.$name)) {
+                $name = $typeContext->namespace.'\\'.$name;
+            }
+
+            // the constant may be defined by code that has not run yet
+            if (!\defined($name)) {
+                return false;
+            }
+
+            $value = \constant($name);
+        }
+
+        if (!\is_int($value)) {
+            throw new \DomainException(\sprintf('"%s" is not a valid integer range bound.', $node));
+        }
+
+        return $value;
     }
 
     private static function parseInteger(string $value): int

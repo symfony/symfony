@@ -18,6 +18,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractMultipartPart;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\SMimePart;
 use Symfony\Component\Mime\Part\TextPart;
 
 class AbstractPartTest extends TestCase
@@ -104,6 +106,64 @@ class AbstractPartTest extends TestCase
 
         $this->assertSame(1, $part->wakeups);
         $this->assertCount(1, $part->getParts());
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    #[DataProvider('provideLegacyPayloadsWithObjectInTypedStringProperty')]
+    public function testUnserializeLegacyPayloadRejectsObjectInTypedStringProperty(string $class, array $data, string $deprecation)
+    {
+        AbstractPartTestToStringGadget::$fired = false;
+
+        $this->expectUserDeprecationMessage($deprecation);
+
+        try {
+            unserialize($this->createPayload($class, $data));
+            $this->fail('Expected BadMethodCallException.');
+        } catch (\BadMethodCallException $e) {
+        }
+
+        $this->assertFalse(AbstractPartTestToStringGadget::$fired, '__toString gadget must not fire during unserialize');
+    }
+
+    public static function provideLegacyPayloadsWithObjectInTypedStringProperty(): iterable
+    {
+        $abstractPartDeprecation = 'Since symfony/mime 7.4: Passing more than just key "headers" to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.';
+        $extraKeysDeprecation = 'Since symfony/mime 7.4: Passing extra keys to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.';
+
+        $parts = [
+            AbstractPartTestPart::class => [(new AbstractPartTestPart('private', 'protected', 'public', 'typed'))->__serialize(), ['typed'], \sprintf($abstractPartDeprecation, AbstractPart::class, AbstractPartTestPart::class)],
+            TextPart::class => [(new TextPart('content'))->setDisposition('inline')->setName('file.txt')->__serialize(), ['charset', 'subtype', 'disposition', 'name', 'encoding'], \sprintf($extraKeysDeprecation, TextPart::class, TextPart::class)],
+            DataPart::class => [(new DataPart('content', 'file.txt', 'text/plain'))->setContentId('foo@example.com')->__serialize(), ['filename', 'mediaType', 'cid'], \sprintf($extraKeysDeprecation, DataPart::class, DataPart::class)],
+            SMimePart::class => [(new SMimePart('content', 'application', 'pkcs7-mime', []))->__serialize(), ['body', 'type', 'subtype'], \sprintf($extraKeysDeprecation, SMimePart::class, SMimePart::class)],
+        ];
+        unset($parts[AbstractPartTestPart::class][0]['headers']);
+
+        foreach ($parts as $class => [$template, $properties, $deprecation]) {
+            foreach ($properties as $property) {
+                foreach (['plain' => '', 'protected' => "\0*\0", 'private' => "\0{$class}\0", 'foreign' => "\0stdClass\0"] as $form => $prefix) {
+                    if ('' === $prefix && AbstractPartTestPart::class !== $class) {
+                        continue;
+                    }
+
+                    $data = $template;
+                    $data[$prefix.$property] = new AbstractPartTestToStringGadget();
+
+                    yield "{$class}::\${$property} {$form}" => [$class, $data, $deprecation];
+                }
+            }
+        }
+
+        $data = (new DataPart('content', 'file.txt', 'text/plain'))->__serialize();
+        $data['_parent']['filename'] = new AbstractPartTestToStringGadget();
+
+        yield DataPart::class.'::$filename in _parent' => [DataPart::class, $data, \sprintf($extraKeysDeprecation, TextPart::class, DataPart::class)];
+
+        $data = (new AbstractPartTestMultipartPart('state', new TextPart('content')))->__serialize();
+        unset($data['headers']);
+        $data["\0stdClass\0state"] = new AbstractPartTestToStringGadget();
+
+        yield AbstractPartTestMultipartPart::class.'::$state foreign' => [AbstractPartTestMultipartPart::class, $data, \sprintf($abstractPartDeprecation, AbstractPart::class, AbstractPartTestMultipartPart::class)];
     }
 
     private function createPayload(string $class, array $data): string

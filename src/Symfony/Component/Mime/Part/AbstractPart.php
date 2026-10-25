@@ -117,6 +117,8 @@ abstract class AbstractPart
 
         trigger_deprecation('symfony/mime', '7.4', 'Passing more than just key "headers" to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', self::class, get_debug_type($this));
 
+        self::rejectStringCasts(static::class, $data);
+
         \Closure::bind(function ($data) use ($wakeup) {
             foreach ($data as $key => $value) {
                 $this->{("\0" === $key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key} = $value;
@@ -166,6 +168,20 @@ abstract class AbstractPart
             \Closure::bind(function () use ($name, $value) {
                 $this->$name = $value;
             }, $this, $class)();
+        }
+    }
+
+    /**
+     * Rejects the \Stringable values that would be cast to string when assigned by name in the scope of the class.
+     */
+    private static function rejectStringCasts(string $class, array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $name = "\0" === ($key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key;
+
+            if ($value instanceof \Stringable && property_exists($class, $name) && self::castsToString(new \ReflectionProperty($class, $name), $value)) {
+                throw new \BadMethodCallException('Cannot unserialize '.$class);
+            }
         }
     }
 

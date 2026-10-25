@@ -194,6 +194,8 @@ class DataPart extends TextPart
 
         trigger_deprecation('symfony/mime', '7.4', 'Passing extra keys to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', self::class, get_debug_type($this));
 
+        (new \ReflectionMethod(AbstractPart::class, 'rejectStringCasts'))->invoke(null, static::class, $data);
+
         \Closure::bind(function ($data) use ($wakeup) {
             foreach ($data as $key => $value) {
                 $this->{("\0" === $key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key} = $value;

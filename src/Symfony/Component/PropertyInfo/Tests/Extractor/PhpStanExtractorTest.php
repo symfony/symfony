@@ -454,6 +454,7 @@ class PhpStanExtractorTest extends TestCase
         yield ['literalString', Type::string()];
         yield ['positiveInt', Type::intRange(1, null)];
         yield ['negativeInt', Type::intRange(null, -1)];
+        yield ['nonZeroInt', Type::union(Type::intRange(null, -1), Type::intRange(1, null))];
         yield ['nonEmptyArray', Type::array()];
         yield ['nonEmptyList', Type::list()];
         yield ['scalar', Type::union(Type::int(), Type::float(), Type::string(), Type::bool())];

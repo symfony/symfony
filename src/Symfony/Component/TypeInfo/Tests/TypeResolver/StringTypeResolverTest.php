@@ -156,7 +156,6 @@ class StringTypeResolverTest extends TestCase
         yield [Type::false(), 'false'];
         yield [Type::int(), 'int'];
         yield [Type::int(), 'integer'];
-        yield [Type::int(), 'non-zero-int'];
         yield [Type::float(), 'float'];
         yield [Type::float(), 'double'];
         yield [Type::string(), 'string'];
@@ -430,6 +429,9 @@ class StringTypeResolverTest extends TestCase
         yield [Type::intRange(null, -1), 'negative-int'];
         yield [Type::intRange(null, 0), 'non-positive-int'];
         yield [Type::intRange(0, null), 'non-negative-int'];
+        yield [Type::union(Type::intRange(null, -1), Type::intRange(1, null)), 'non-zero-int'];
+        yield [Type::nullable(Type::union(Type::intRange(null, -1), Type::intRange(1, null))), '?non-zero-int'];
+        yield [Type::union(Type::intRange(null, -1), Type::intRange(1, null), Type::string()), 'non-zero-int|string'];
         yield [Type::intRange(0, 10), 'int<0, 10>'];
         yield [Type::intRange(null, 5), 'int<min, 5>'];
         yield [Type::intRange(-5, null), 'int<-5, max>'];
@@ -464,6 +466,7 @@ class StringTypeResolverTest extends TestCase
 
         $this->assertEquals(Type::string(), $resolver->resolve("'draft'"));
         $this->assertEquals(Type::int(), $resolver->resolve('positive-int'));
+        $this->assertEquals(Type::int(), $resolver->resolve('non-zero-int'));
         $this->assertEquals(Type::int(), $resolver->resolve('int<0, 10>'));
     }
 

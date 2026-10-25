@@ -148,6 +148,7 @@ class BinaryFileResponseTest extends ResponseTestCase
             ['bytes=0-', 0, 35, 'bytes 0-34/35'],
             ['bytes=0-34', 0, 35, 'bytes 0-34/35'],
             ['bytes=-35', 0, 35, 'bytes 0-34/35'],
+            ['bytes=-40', 0, 35, 'bytes 0-34/35'],
             ['bytes=1-4', 1, 4, 'bytes 1-4/35'],
             ['bytes=-5', 30, 5, 'bytes 30-34/35'],
             ['bytes=30-', 30, 5, 'bytes 30-34/35'],
@@ -265,7 +266,6 @@ class BinaryFileResponseTest extends ResponseTestCase
     public static function provideInvalidRanges()
     {
         return [
-            ['bytes=-40'],
             ['bytes=40-50'],
         ];
     }

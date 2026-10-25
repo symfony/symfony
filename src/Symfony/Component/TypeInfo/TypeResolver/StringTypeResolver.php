@@ -510,13 +510,23 @@ final class StringTypeResolver implements TypeResolverInterface
             default => 10,
         };
 
-        $magnitude = \intval($digits, $base);
+        // the sign is parsed along, as the magnitude of PHP_INT_MIN does not fit in an integer on its own
+        $integer = \intval($sign.$digits, $base);
 
         // intval() saturates on overflow, while PHP reads such a literal as a float
-        if (\PHP_INT_MAX === $magnitude && ltrim(strtolower($digits), '0') !== base_convert((string) \PHP_INT_MAX, 10, $base)) {
-            throw new \DomainException(\sprintf('"%s" does not fit in an integer.', $value));
+        if (\PHP_INT_MAX === $integer || \PHP_INT_MIN === $integer) {
+            $limit = match ($base) {
+                16 => dechex($integer),
+                8 => decoct($integer),
+                2 => decbin($integer),
+                default => ltrim((string) $integer, '-'),
+            };
+
+            if (ltrim(strtolower($digits), '0') !== $limit) {
+                throw new \DomainException(\sprintf('"%s" does not fit in an integer.', $value));
+            }
         }
 
-        return '-' === $sign ? -$magnitude : $magnitude;
+        return $integer;
     }
 }

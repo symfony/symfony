@@ -422,6 +422,11 @@ class StringTypeResolverTest extends TestCase
         yield [Type::literal("a\n\"b"), '"a\\n\\"b"'];
         if (8 === \PHP_INT_SIZE) {
             yield [Type::literal(\PHP_INT_MAX), '0x7FFFFFFFFFFFFFFF'];
+            yield [Type::literal(\PHP_INT_MIN), '-9223372036854775808'];
+            yield [Type::literal(\PHP_INT_MIN), '-0x8000000000000000'];
+            yield [Type::literal(\PHP_INT_MIN), '-0o1000000000000000000000'];
+            yield [Type::literal(\PHP_INT_MIN), '-0b1'.str_repeat('0', 63)];
+            yield [Type::intRange(\PHP_INT_MIN, 0), 'int<-9223372036854775808, 0>'];
         }
         yield [Type::literal(1.5), '1.5'];
         yield [Type::union(Type::literal('draft'), Type::literal('published')), "'draft'|'published'"];
@@ -456,6 +461,8 @@ class StringTypeResolverTest extends TestCase
         yield ['int<max, 5>'];
         yield ['9223372036854775808'];
         yield ['0x8000000000000000'];
+        yield ['-9223372036854775809'];
+        yield ['-0x8000000000000001'];
     }
 
     #[Group('legacy')]

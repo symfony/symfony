@@ -874,6 +874,9 @@ class JsonStreamReaderTest extends TestCase
         yield ['[{"id":1,"id":2}]', Type::list(Type::nullable(Type::object(ClassicDummy::class)))];
         yield ['[{"dummies":{"first":{"id":1,"id":2}}}]', Type::list(Type::object(DummyWithGenericDummies::class))];
         yield ['[{"items":{"a":{"items":{"b":{"items":{},"items":{}}}}}}]', Type::list(Type::object(SelfReferencingDummyList::class))];
+        yield ['[{"dummies":[{"id":1}],"dummies":[]}]', Type::list(Type::object(DummyWithDummiesAndDummy::class))];
+        yield ['[{"dummies":{"first":{"id":1}},"dummies":[]}]', Type::list(Type::object(DummyWithGenericDummies::class))];
+        yield ['[{"items":{"a":{"items":{}}},"items":{"a":{}}}]', Type::list(Type::object(SelfReferencingDummyList::class))];
     }
 
     public function testReadStreamCollectionItemsRejectDuplicateKeysWhenReadLazily()

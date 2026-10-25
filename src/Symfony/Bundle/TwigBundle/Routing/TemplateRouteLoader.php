@@ -46,6 +46,10 @@ final class TemplateRouteLoader implements LoaderInterface
                 throw new \InvalidArgumentException(\sprintf('The route "%s" must not define both the "_template" default and the "template" default.', $name));
             }
 
+            if (\in_array('template', $route->compile()->getVariables(), true)) {
+                throw new \InvalidArgumentException(\sprintf('The route "%s" must not define both the "_template" default and a "{template}" placeholder.', $name));
+            }
+
             $defaults = $route->getDefaults();
             unset($defaults['_template']);
             $route->setDefaults(['_controller' => TemplateController::class.'::templateAction', 'template' => $template] + $defaults);

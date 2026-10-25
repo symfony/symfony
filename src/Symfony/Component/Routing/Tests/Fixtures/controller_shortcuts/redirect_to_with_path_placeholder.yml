@@ -1,0 +1,3 @@
+go:
+    path: /go/{path<.+>}
+    redirect_to: /home

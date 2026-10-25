@@ -218,6 +218,9 @@ class YamlFileLoaderTest extends TestCase
         yield ['template_with_template_default.yml', 'must not specify both the "template" key and the defaults key "_template" for "faq".'];
         yield ['redirect_to_route_with_route_default.yml', 'must not specify both the "redirect_to_route" key and the defaults key "route" for "doc".'];
         yield ['redirect_to_with_path_default.yml', 'must not specify both the "redirect_to" key and the defaults key "path" for "doc".'];
+        yield ['redirect_to_route_with_route_placeholder.yml', 'must not specify both the "redirect_to_route" key and a "{route}" placeholder for "doc".'];
+        yield ['redirect_to_with_path_placeholder.yml', 'must not specify both the "redirect_to" key and a "{path}" placeholder for "go".'];
+        yield ['redirect_to_with_path_host_placeholder.yml', 'must not specify both the "redirect_to" key and a "{path}" placeholder for "go".'];
     }
 
     #[DataProvider('provideFilesImportingRoutesWithControllers')]

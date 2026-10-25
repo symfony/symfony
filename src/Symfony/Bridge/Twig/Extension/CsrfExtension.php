@@ -24,6 +24,7 @@ final class CsrfExtension extends AbstractExtension
     {
         return [
             new TwigFunction('csrf_token', [CsrfRuntime::class, 'getCsrfToken']),
+            new TwigFunction('csrf_input_field', [CsrfRuntime::class, 'renderCsrfInputField'], ['needs_environment' => true, 'is_safe' => ['html']]),
         ];
     }
 }

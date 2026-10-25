@@ -487,6 +487,8 @@ class StringTypeResolverTest extends TestCase
         yield ['0x8000000000000000'];
         yield ['-9223372036854775809'];
         yield ['-0x8000000000000001'];
+        yield ['1e400'];
+        yield ['-1e400'];
         yield ['int<0, PHP_VERSION>'];
         yield ['int<0, '.DummyWithConstants::class.'::DUMMY_STRING_A>'];
         yield ['int<0, '.DummyWithConstants::class.'::UNDEFINED>'];

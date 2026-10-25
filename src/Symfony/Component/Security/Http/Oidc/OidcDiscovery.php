@@ -264,10 +264,10 @@ final class OidcDiscovery implements ResetInterface
 
     private function checkIssuer(array $configuration): void
     {
-        if (null !== $this->issuer
-            && rtrim((string) ($configuration['issuer'] ?? ''), '/') !== $this->issuer
-        ) {
-            throw new AuthenticationException(\sprintf('The OIDC provider announced the issuer "%s", which does not match the configured issuer "%s".', $configuration['issuer'] ?? '', $this->issuer));
+        $issuer = \is_string($configuration['issuer'] ?? null) ? $configuration['issuer'] : '';
+
+        if (null !== $this->issuer && rtrim($issuer, '/') !== $this->issuer) {
+            throw new AuthenticationException(\sprintf('The OIDC provider announced the issuer "%s", which does not match the configured issuer "%s".', $issuer, $this->issuer));
         }
     }
 

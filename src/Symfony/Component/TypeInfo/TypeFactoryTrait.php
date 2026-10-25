@@ -301,11 +301,11 @@ trait TypeFactoryTrait
     }
 
     /**
-     * @template T of int|float|string
+     * @template U of int|float|string
      *
-     * @param T $value
+     * @param U $value
      *
-     * @return LiteralType<T>
+     * @return LiteralType<U>
      */
     public static function literal(int|float|string $value): LiteralType
     {

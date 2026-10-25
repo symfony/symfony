@@ -28,6 +28,9 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  */
 final class LiteralType extends Type implements WrappingTypeInterface
 {
+    /**
+     * @var BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::FLOAT>|BuiltinType<TypeIdentifier::STRING>
+     */
     private readonly BuiltinType $type;
 
     /**
@@ -40,7 +43,11 @@ final class LiteralType extends Type implements WrappingTypeInterface
             throw new InvalidArgumentException(\sprintf('Cannot create "%s" with a non-finite float.', self::class));
         }
 
-        $this->type = Type::builtin(get_debug_type($value));
+        $this->type = match (true) {
+            \is_int($value) => Type::int(),
+            \is_float($value) => Type::float(),
+            default => Type::string(),
+        };
     }
 
     /**
@@ -71,22 +78,26 @@ final class LiteralType extends Type implements WrappingTypeInterface
 
     public function __toString(): string
     {
-        if (\is_int($this->value)) {
-            return (string) $this->value;
+        // a plain union, as the template type is not narrowed by the checks below
+        /** @var int|float|string $value */
+        $value = $this->value;
+
+        if (\is_int($value)) {
+            return (string) $value;
         }
 
         // var_export() keeps floats such as 1.0 distinguishable from integers
-        if (\is_float($this->value)) {
-            return var_export($this->value, true);
+        if (\is_float($value)) {
+            return var_export($value, true);
         }
 
         // escape control characters, double quotes and backslashes using their hexadecimal notation, such as "\x0A" for "\n"
-        if (preg_match('/[\x00-\x1F\x7F]/', $this->value)) {
-            $escaped = preg_replace_callback('/[\x00-\x1F\x7F"\\\\]/', static fn (array $m): string => \sprintf('\x%02X', \ord($m[0])), $this->value);
+        if (preg_match('/[\x00-\x1F\x7F]/', $value)) {
+            $escaped = preg_replace_callback('/[\x00-\x1F\x7F"\\\\]/', static fn (array $m): string => \sprintf('\x%02X', \ord($m[0])), $value);
 
             return '"'.$escaped.'"';
         }
 
-        return "'".addcslashes($this->value, "'\\")."'";
+        return "'".addcslashes($value, "'\\")."'";
     }
 }

@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\Encrypted;
@@ -29,6 +30,7 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\Encrypted;
  *
  * Explicit keys use types collected during container compilation, including matching configured declarations.
  * Columns whose key is omitted get their scope from resolved ORM metadata after the entity manager is constructed.
+ * Their types are found once per entity manager and kept in the "cache.key_management.encrypted_columns" pool, which doesn't exist in debug mode.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
@@ -39,6 +41,7 @@ final class RegisterEncryptedColumnsPass implements CompilerPassInterface
     private const string TAG = 'key_management.encrypted_column';
     private const string LISTENER = 'key_management.encrypted_column_listener';
     private const string TYPES = 'key_management.doctrine_dbal.encrypted_types';
+    private const string CACHE = 'cache.key_management.encrypted_columns';
 
     /**
      * Tags a class mapped by the ORM with the key and the type of each of its encrypted columns.
@@ -107,15 +110,17 @@ final class RegisterEncryptedColumnsPass implements CompilerPassInterface
         $container->getDefinition(self::LISTENER)->setArgument(0, $names);
 
         if ($automatic) {
-            $container->getDefinition(self::LISTENER)->setArgument(1, new LazyProxyArgument(new Reference('key_management.stored_envelope_encrypter')));
+            $container->getDefinition(self::LISTENER)
+                ->setArgument(1, new LazyProxyArgument(new Reference('key_management.stored_envelope_encrypter')))
+                ->setArgument(2, new Reference(self::CACHE, ContainerInterface::NULL_ON_INVALID_REFERENCE));
 
-            foreach ($container->hasParameter('doctrine.entity_managers') ? $container->getParameter('doctrine.entity_managers') : [] as $id) {
+            foreach ($container->hasParameter('doctrine.entity_managers') ? $container->getParameter('doctrine.entity_managers') : [] as $name => $id) {
                 $manager = $container->findDefinition($id);
                 $previous = $manager->getConfigurator();
                 $configurator = null === $previous ? null : (new Definition(\Closure::class))->setFactory([\Closure::class, 'fromCallable'])->setArguments([$previous]);
-                $name = '.key_management.configure_encrypted_columns.'.$id;
-                $container->register($name, ConfigureEncryptedColumns::class)->setArguments([new Reference(self::LISTENER), $configurator]);
-                $manager->setConfigurator([new Reference($name), '__invoke']);
+                $configuratorId = '.key_management.configure_encrypted_columns.'.$id;
+                $container->register($configuratorId, ConfigureEncryptedColumns::class)->setArguments([new Reference(self::LISTENER), $name, $configurator]);
+                $manager->setConfigurator([new Reference($configuratorId), '__invoke']);
             }
         }
 

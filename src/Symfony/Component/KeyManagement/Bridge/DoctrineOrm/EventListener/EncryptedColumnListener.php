@@ -14,6 +14,8 @@ namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\Encrypted;
 use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
@@ -25,6 +27,8 @@ use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
  * Explicit keys use types registered before the first query.
  * Omitted keys use a data key store and a scope derived from the physical column.
  * Call register() after creating the entity manager to register these types from cold or cached metadata.
+ * Give the listener a cache to find these types once instead of loading all the metadata each time.
+ * Add the listener after the listeners that rename tables or columns, so that it computes scopes from the final names.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
@@ -35,12 +39,19 @@ final class EncryptedColumnListener
     private const string AUTOMATIC_TYPE_PREFIX = 'key_management_auto_v1_';
 
     /**
+     * The metadata factory that register() uses while it finds the types.
+     */
+    private ?ClassMetadataFactory $factory = null;
+
+    /**
      * @param array<string, array<string, string>>                         $types              The names of the encrypted types, by key and by the type they wrap
      * @param (EnvelopeEncrypterInterface&EnvelopeDecrypterInterface)|null $automaticEnvelopes Store-backed encrypter for columns whose key is omitted
+     * @param CacheItemPoolInterface|null                                  $cache              Keeps the types of the columns whose key is omitted, by entity manager
      */
     public function __construct(
         private readonly array $types,
         private readonly (EnvelopeEncrypterInterface&EnvelopeDecrypterInterface)|null $automaticEnvelopes = null,
+        private readonly ?CacheItemPoolInterface $cache = null,
     ) {
     }
 
@@ -81,25 +92,73 @@ final class EncryptedColumnListener
             }
         }
 
-        $this->registerAutomaticTypes($metadata, $event->getEntityManager());
+        $this->registerAutomaticTypes($this->automaticTypes($metadata, $event->getEntityManager()), $event->getEntityManager());
     }
 
     /**
      * Registers automatically scoped types from resolved metadata, including cached mappings.
+     *
+     * Finding these types loads the metadata of every mapped class.
+     * With a cache, the types found are saved under the name of the entity manager, and the next calls load no metadata.
+     *
+     * The metadata is loaded with a factory of its own, so the factory of the manager stays empty.
+     * The metadata cache warmer of DoctrineBundle requires this.
+     * When a listener added after this one renamed a table or a column, the metadata cache has names that aren't the final ones.
+     * The types are then not cached, and the metadata of the manager is loaded to fix the names in it.
+     *
+     * @param string $name The name of the entity manager, which keys its types in the cache
      */
-    public function register(EntityManagerInterface $manager): void
+    public function register(EntityManagerInterface $manager, string $name = 'default'): void
     {
-        foreach ($manager->getMetadataFactory()->getAllMetadata() as $metadata) {
-            $this->registerAutomaticTypes($metadata, $manager);
-        }
-    }
+        $item = $this->cache?->getItem('automatic_types.'.hash('xxh128', $name));
 
-    private function registerAutomaticTypes(ClassMetadata $metadata, EntityManagerInterface $manager): void
-    {
-        if ($metadata->isMappedSuperclass || $metadata->isEmbeddedClass) {
+        if ($item?->isHit()) {
+            $this->registerAutomaticTypes($item->get(), $manager);
+
             return;
         }
 
+        $configuration = $manager->getConfiguration();
+        $this->factory = new ($configuration->getClassMetadataFactoryName())();
+        $this->factory->setEntityManager($manager);
+        if (null !== $metadataCache = $configuration->getMetadataCache()) {
+            $this->factory->setCache($metadataCache);
+        }
+
+        $types = [];
+        $renamed = false;
+        try {
+            foreach ($this->factory->getAllMetadata() as $metadata) {
+                $types += $this->automaticTypes($metadata, $manager, $renamed);
+            }
+        } finally {
+            $this->factory = null;
+        }
+
+        if ($renamed) {
+            $types = [];
+            foreach ($manager->getMetadataFactory()->getAllMetadata() as $metadata) {
+                $types += $this->automaticTypes($metadata, $manager);
+            }
+        } elseif (null !== $item) {
+            $this->cache->save($item->set($types));
+        }
+
+        $this->registerAutomaticTypes($types, $manager);
+    }
+
+    /**
+     * @param bool $renamed Set to true when a column had another type name, computed before a table or a column was renamed
+     *
+     * @return array<string, array{type: string, key: string}>
+     */
+    private function automaticTypes(ClassMetadata $metadata, EntityManagerInterface $manager, bool &$renamed = false): array
+    {
+        if ($metadata->isMappedSuperclass || $metadata->isEmbeddedClass) {
+            return [];
+        }
+
+        $types = [];
         foreach ($metadata->fieldMappings as $mapping) {
             $property = new \ReflectionProperty($mapping->originalClass ?? $mapping->declared ?? $metadata->getName(), $mapping->originalField ?? $mapping->fieldName);
             $attribute = $property->getAttributes(Encrypted::class)[0] ?? null;
@@ -112,7 +171,7 @@ final class EncryptedColumnListener
                 throw new \LogicException(\sprintf('The encrypted column "%s::$%s" omits its key and needs a data key store: configure "key_management.store", or set an explicit key.', $metadata->getName(), $mapping->fieldName));
             }
 
-            $owner = $metadata->isInheritanceTypeJoined() && isset($mapping->inherited) ? $manager->getClassMetadata($mapping->inherited) : $metadata;
+            $owner = $metadata->isInheritanceTypeJoined() && isset($mapping->inherited) ? ($this->factory ?? $manager->getMetadataFactory())->getMetadataFor($mapping->inherited) : $metadata;
             $hash = hash('sha256', serialize([$owner->getSchemaName(), $owner->getTableName(), $mapping->columnName]));
             $scope = 'orm:'.$hash;
             $parent = $mapping->type;
@@ -126,8 +185,21 @@ final class EncryptedColumnListener
             }
 
             $name = self::AUTOMATIC_TYPE_PREFIX.base64_encode($parent).'.'.$hash;
-            (new EncryptedTypes($this->automaticEnvelopes, [$name => ['type' => $parent, 'key' => $scope]]))->register($manager->getConnection());
+            $types[$name] = ['type' => $parent, 'key' => $scope];
+            $renamed = $renamed || $name !== $mapping->type;
             $mapping->type = $name;
+        }
+
+        return $types;
+    }
+
+    /**
+     * @param array<string, array{type: string, key: string}> $types
+     */
+    private function registerAutomaticTypes(array $types, EntityManagerInterface $manager): void
+    {
+        if ($types) {
+            (new EncryptedTypes($this->automaticEnvelopes, $types))->register($manager->getConnection());
         }
     }
 }

@@ -993,7 +993,7 @@ class KeyManagementBundleExtensionTest extends TestCase
 
         $listener = $container->getDefinition('key_management.encrypted_column_listener');
         $this->assertSame(EncryptedColumnListener::class, $listener->getClass());
-        $this->assertSame([['event' => 'loadClassMetadata']], $listener->getTag('doctrine.event_listener'));
+        $this->assertSame([['event' => 'loadClassMetadata', 'priority' => -1024]], $listener->getTag('doctrine.event_listener'));
         $this->assertSame(['speaker.contact' => ['string' => 'encrypted_string@speaker.contact']], $listener->getArgument(0));
     }
 
@@ -1008,6 +1008,43 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
 
         $this->assertSame([], $container->getDefinition('key_management.encrypted_column_listener')->getArgument(0), 'the listener reports an entity the container did not scan.');
+    }
+
+    public function testTheTypesOfAutomaticColumnsAreCachedInASystemPool()
+    {
+        if (!class_exists(EncryptedColumnListener::class)) {
+            $this->markTestSkipped('symfony/doctrine-orm-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('cache.system', \stdClass::class)->setAbstract(true);
+            $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=AAAA']]);
+        });
+
+        $pool = $container->getDefinition('cache.key_management.encrypted_columns');
+        $this->assertInstanceOf(ChildDefinition::class, $pool);
+        $this->assertSame('cache.system', $pool->getParent());
+        $this->assertTrue($pool->hasTag('cache.pool'));
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=AAAA']]);
+        });
+
+        $this->assertFalse($container->hasDefinition('cache.key_management.encrypted_columns'));
+    }
+
+    public function testTheTypesOfAutomaticColumnsAreNotCachedInDebugMode()
+    {
+        if (!class_exists(EncryptedColumnListener::class)) {
+            $this->markTestSkipped('symfony/doctrine-orm-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('cache.system', \stdClass::class)->setAbstract(true);
+            $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=AAAA']]);
+        }, true);
+
+        $this->assertFalse($container->hasDefinition('cache.key_management.encrypted_columns'));
     }
 
     public function testEncryptedColumnsWithoutAStoreNorADefaultClientAreRefused()

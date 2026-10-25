@@ -6,14 +6,13 @@ CHANGELOG
 
  * Limit read-ahead for active responses in `CurlHttpClient`, `AmpHttpClient` and `NativeHttpClient`
  * Default the `http_client.recorder.enabled` option to `true` when `framework.test` is enabled
- * Tag the `cache.http_client.pool` cache pool with `kernel.test_state`, so that `KernelTestCase` clears it at the end of each test
  * Add `HttpClientBundle`, which provides the `http_client` configuration and the services previously provided by `FrameworkBundle` under `framework.http_client`
  * Add the `max_connect_duration` option to the `http_client` configuration
  * Add the `retry_failed.base_uris` option of scoped clients to retry a failed request against the next URI in the list
  * Add `RecorderHttpClient` to record HTTP exchanges into HAR files and replay them
  * Make `HarFileResponseFactory` replay repeated entries in the order they were recorded
  * Add the `extra.cache_policy` option to `CachingHttpClient` to tag cached responses and force their lifetime
- * Allow passing a stream or a closure to `HttpOptions::buffer()`
+ * [BC BREAK] Allow passing a stream or a closure to `HttpOptions::buffer()`
  * Add `QUERY` to the list of cacheable HTTP methods in `CachingHttpClient`
  * Add `ScopingHttpClient::forBaseUris()` to scope a client to several base URIs at once
  * Collect the duration and the transferred sizes of each request in `HttpClientDataCollector`, and add `HttpClientDataCollector::getTotalTime()`

@@ -16,7 +16,7 @@ CHANGELOG
  * Add multi-select support to `SelectListWidget`
  * Make `SelectListWidget` wrap option labels and descriptions in aligned columns, and vertically expandable
  * Add `TabsWidget`
- * [BC BREAK] Add `$multiselect` as the third argument of `SelectListWidget::__construct()`, moving `$keybindings` to fourth position
+ * Add `$multiselect` as the third argument of `SelectListWidget::__construct()`, moving `$keybindings` to fourth position
  * Add `KeyBindingWidget` to display the keybindings of the focused widget
  * Add the `super`, `hyper` and `meta` modifiers to key ids, and `Key::super()`
  * Make a key id naming an unknown modifier match nothing instead of the bare key

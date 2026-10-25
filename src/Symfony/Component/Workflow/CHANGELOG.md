@@ -5,14 +5,15 @@ CHANGELOG
 ---
 
  * Add `supports`, `support_strategy` and `source_class` attributes to the `workflow` service tag
- * Add the `#[AsWorkflow]`, `#[Place]` and `#[Transition]` attributes and the `WorkflowTrait` to define workflows and state machines in a class; these attributes have a `description` argument stored in their metadata, and can be extended to carry typed metadata
+ * Add the `#[AsWorkflow]`, `#[Place]` and `#[Transition]` attributes and the `WorkflowTrait` to define workflows and state machines in a class
  * Make the `As*Listener` attributes listen to the workflow of their class by default when it uses `#[AsWorkflow]`
  * Add the `WorkflowType` enum
  * Allow configuring a workflow without `supports` nor `support_strategy`, to use it by injection only
  * Add argument `$context` to `WorkflowInterface::getMarking()`
  * Cache the parsed guard expressions in a `cache.system` pool, and compile them when warming up the cache
  * Accept any `ExpressionLanguage` in `GuardListener`
- * Add `before` and `after` to the `#[As*Listener]` attributes, whose `$priority` is now nullable
+ * Add `before` and `after` to the `#[As*Listener]` attributes
+ * [BC BREAK] Make the `$priority` of the `#[As*Listener]` attributes nullable, defaulting to `null`
  * Add `WorkflowBundle`, which provides the `workflow` configuration and the services previously provided by `FrameworkBundle` under `framework.workflows`
  * Allow prefixing an event with `!` in the `events_to_dispatch` option and in the `$eventsToDispatch` argument of `Workflow` and `StateMachine` to disable it
 

@@ -6,10 +6,10 @@ CHANGELOG
 
  * Add `#[AsMessageMiddleware]` and the `messenger.middleware` tag to add a middleware to a bus, placed with `before` and `after`
  * Add `before` and `after` to `#[AsMessageHandler]` and the `messenger.message_handler` tag to order handlers
+ * [BC BREAK] Make `AsMessageHandler::$priority` nullable, defaulting to `null`
  * Add the `messages` option of buses and the `$messageTypes` argument of `MessageBus`, to restrict the types of the messages the application can dispatch on a bus
  * Add the `unwrap_exceptions` option of buses and the `$unwrapExceptions` argument of `MessageBus`, to throw the exception of the failing handler instead of `HandlerFailedException` when the application dispatches a message
- * Add `InteropSerializer` and the `messenger.transport.interop_serializer` service to exchange messages with other applications
- * Add `StampHeaderMapperInterface`, `IdentityStampHeaderMapper` and the `messenger.stamp_header_mapper` tag to let `InteropSerializer` exchange stamps as plain headers
+ * Add `InteropSerializer`, the `messenger.transport.interop_serializer` service, and `StampHeaderMapperInterface`, `IdentityStampHeaderMapper` and the `messenger.stamp_header_mapper` tag to exchange messages and their stamps with other applications
  * Add `RedispatchStamp` to make a worker send a received message to its senders instead of handling it
  * Deprecate `RedispatchMessageHandler`, dispatch the message wrapped in the `RedispatchMessage` with a `TransportNamesStamp` instead
  * Add the listeners of a `messenger:consume` or `messenger:failed:retry` run to a `ScopedEventDispatcher` instead of to the event dispatcher of the application
@@ -43,7 +43,7 @@ CHANGELOG
  * Add the `sign` option of transports and the `$acceptUnverified` argument of `SigningSerializer` to sign every message of a transport
  * Deprecate passing a list of message types to `SigningSerializer`, pass the algorithm instead to sign every message
  * Deprecate signing only the messages whose handlers have the `sign` option, set the `sign` option of their transports instead
- * Deprecate `MessageTypeAwareSerializerInterface` and the `getMessageType()` method of `PhpSerializer`, `Serializer`, `ClaimCheckSerializer` and `InteropSerializer`
+ * Deprecate `MessageTypeAwareSerializerInterface` and the `getMessageType()` method of `PhpSerializer` and `Serializer`
  * Make `SigningSerializer` sign the messages it did not verify as unverified, and refuse such a message when its type requires a signature
  * Make `SigningSerializer` sign every header written by the serializer it decorates, except `Content-Type`, and pass only the signed headers to that serializer
  * Add `TrustStamp`, for transports that yield messages created in the same process to have `SigningSerializer` sign them as verified and `SendMessageMiddleware` honor their `RedispatchStamp`
@@ -64,8 +64,6 @@ CHANGELOG
  * Add `SenderStampInterface` for the non-sendable stamps that an outbox keeps for the sender of the messages it forwards
  * Add a `--stop-when-empty` option to the `messenger:consume` command and a `stop_when_empty` option to `Worker::run()` to handle the pending messages and exit instead of waiting for new ones
  * Add `InboxInterface`, `InboxMiddleware` and the `inbox` option of transports to skip the handlers of the messages that the inbox of their transport recorded already
- * Make `DispatchAfterCurrentBusMiddleware` dispatch at once the messages sent only to outboxes, and refuse the other ones, while an inbox records the current message
- * Make the `messenger:setup-transports` command set up the inboxes of the transports
  * Add the `cooldown_strategy` option of transports, `CooldownStrategyInterface`, `CooldownStatus`, `MultiplierCooldownStrategy` and `WorkerTransportCoolingDownEvent` to stop consuming a transport for a while after messages received from it fail or fetching from it fails
  * Add the `$cooldownStrategies` argument to `Worker` and the `$cooldownStrategyLocator` argument to `ConsumeMessagesCommand`
  * Log the names of the consumed transports when a worker starts

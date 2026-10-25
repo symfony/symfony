@@ -4,7 +4,6 @@ CHANGELOG
 8.2
 ---
 
- * Tag the `cache.rate_limiter` pool with `kernel.test_state`, so that `KernelTestCase` clears it at the end of each test
  * Add `RateLimiterBundle`, which provides the `rate_limiter` configuration and the services previously provided by `FrameworkBundle` under `framework.rate_limiter`
  * Add `RateLimitExceededEvent`
  * Make `CompoundLimiter::consume()` stop at the first limiter that rejects the request

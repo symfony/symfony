@@ -8,7 +8,7 @@ CHANGELOG
  * Add `Store::clear()` to remove all the entries of the HTTP cache store
  * Add the `lint:expressions` command to lint the expressions of controller attributes and the ones listed in the configuration
  * Log exceptions whose HTTP status code is below 500 (client errors) at the `warning` level instead of `error`
- * [BC BREAK] Answer a scheme redirect from `RouterListener` itself, so that no other listener runs on a request whose route is not served over the requested scheme
+ * Answer a scheme redirect from `RouterListener` itself, so that no other listener runs on a request whose route is not served over the requested scheme
  * Add the `cache_status` option to `HttpCache` to emit the RFC 9211 `Cache-Status` header
  * Add `#[AsControllerAttributeListener]` attribute to declare event listeners for controller attributes
  * Add the `$expiration` argument to `FragmentUriGenerator::__construct()` and sign fragment URIs with a 5-year expiration by default

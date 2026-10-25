@@ -4,10 +4,11 @@ CHANGELOG
 8.2
 ---
 
- * Make `#[AutowireCallable]` and `#[AutowireMethodOf]` lazy by default
+ * [BC BREAK] Make `#[AutowireCallable]` and `#[AutowireMethodOf]` lazy by default
  * Add the `on_shutdown` attribute on `kernel.reset` tags to pass a shutdown flag or call a method only on shutdown
- * Add argument `$shutdown` to `Container::reset()`, `ServicesResetter::reset()` and `ServicesResetterInterface::reset()`
- * Add return type `void` to `ServicesResetterInterface::reset()`
+ * Add argument `$shutdown` to `Container::reset()`
+ * [BC BREAK] Add argument `$shutdown` to `ServicesResetter::reset()` and `ServicesResetterInterface::reset()`
+ * [BC BREAK] Add return type `void` to `ServicesResetterInterface::reset()`
  * Mark `ServicesResetter` as `@final`
  * Make `Container::reset()` use only `services_resetter` when available
  * Add an autowiring alias for `Symfony\Contracts\EventDispatcher\ListenerIntrospectionInterface`
@@ -16,6 +17,7 @@ CHANGELOG
  * Pass top-level extension values that are not arrays to the extension instead of replacing them with an empty array
  * Add the `before` and `after` tag attributes and `#[AsTaggedItem]` arguments to order tagged services, and `BeforeAfterSorter`
  * Add `within` and `around` to `#[AsDecorator]` and `#[AsTagDecorator]`, the `decoration_within` and `decoration_around` keys and the `container.decoration_order` tag, to order decorators
+ * [BC BREAK] Make `AsDecorator::$priority` and `AsTagDecorator::$priority` nullable, defaulting to `null`
  * Name the package to install when an extension is missing, for the configuration keys declared in the `.container.extension_packages` build parameter
  * Add the `container.remove_if_missing` tag to drop a definition when a service, a class or a package it needs is not there
  * Add `ContainerBuilder::setExtensionConfig()`

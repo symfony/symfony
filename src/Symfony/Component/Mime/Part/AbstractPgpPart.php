@@ -41,4 +41,20 @@ abstract class AbstractPgpPart extends AbstractPart
     {
         return 'application';
     }
+
+    public function __serialize(): array
+    {
+        return parent::__serialize() + ['body' => $this->body];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        if (!\is_string($data['body'] ?? null)) {
+            throw new \BadMethodCallException('Cannot unserialize '.self::class);
+        }
+
+        $this->body = $data['body'];
+        unset($data['body']);
+        parent::__unserialize($data);
+    }
 }

@@ -23,6 +23,8 @@ use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\TypeInfo\Exception\ExceptionInterface;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\IntRangeType;
+use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
@@ -116,6 +118,10 @@ final class TypeInfoFormTypeGuesser implements FormTypeGuesserInterface
         $required = $type->isNullable() || ($type instanceof BuiltinType && TypeIdentifier::BOOL === $type->getTypeIdentifier()) ? false : null;
 
         if ($type instanceof NullableType) {
+            $type = $type->getWrappedType();
+        }
+
+        if ($type instanceof IntRangeType || $type instanceof LiteralType) {
             $type = $type->getWrappedType();
         }
 

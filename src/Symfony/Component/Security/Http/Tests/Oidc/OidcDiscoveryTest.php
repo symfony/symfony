@@ -139,6 +139,18 @@ class OidcDiscoveryTest extends TestCase
         $discovery->getConfiguration();
     }
 
+    public function testGetConfigurationRejectsAnIssuerThatIsNotAString()
+    {
+        $httpClient = new MockHttpClient(new JsonMockResponse(['issuer' => [self::ISSUER]] + self::CONFIGURATION));
+
+        $discovery = new OidcDiscovery($httpClient, new ArrayAdapter(), self::URL, self::ISSUER);
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('The OIDC provider announced the issuer "", which does not match the configured issuer "https://provider.example.com".');
+
+        $discovery->getConfiguration();
+    }
+
     #[DataProvider('provideSharedCacheKeys')]
     public function testGetConfigurationRejectsACachedDocumentForAnotherIssuer(?string $cacheKey)
     {

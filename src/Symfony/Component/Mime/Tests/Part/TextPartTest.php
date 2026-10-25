@@ -66,6 +66,32 @@ class TextPartTest extends TestCase
         yield ['encoding'];
     }
 
+    #[DataProvider('provideNonStringValues')]
+    public function testUnserializeRejectsNonStringValue(string $key, mixed $value)
+    {
+        $template = (new TextPart('body content'))->__serialize();
+        $template[$key] = $value;
+        $payload = \sprintf('O:%d:"%s":%d:{', \strlen(TextPart::class), TextPart::class, \count($template));
+        foreach ($template as $k => $v) {
+            $payload .= serialize($k).serialize($v);
+        }
+
+        $this->expectException(\BadMethodCallException::class);
+
+        unserialize($payload.'}');
+    }
+
+    public static function provideNonStringValues(): iterable
+    {
+        foreach (['charset', 'subtype', 'disposition', 'name', 'encoding'] as $key) {
+            yield $key.' int' => [$key, 123];
+            yield $key.' object' => [$key, new \stdClass()];
+        }
+
+        yield 'subtype null' => ['subtype', null];
+        yield 'encoding null' => ['encoding', null];
+    }
+
     public function testConstructor()
     {
         $p = new TextPart('content');

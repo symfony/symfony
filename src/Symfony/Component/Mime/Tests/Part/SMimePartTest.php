@@ -56,4 +56,28 @@ class SMimePartTest extends TestCase
         yield ['type'];
         yield ['subtype'];
     }
+
+    #[DataProvider('provideNonStringValues')]
+    public function testUnserializeRejectsNonStringValue(string $key, mixed $value)
+    {
+        $template = (new SMimePart('body content', 'application', 'pkcs7-mime', []))->__serialize();
+        $template[$key] = $value;
+        $payload = \sprintf('O:%d:"%s":%d:{', \strlen(SMimePart::class), SMimePart::class, \count($template));
+        foreach ($template as $k => $v) {
+            $payload .= serialize($k).serialize($v);
+        }
+
+        $this->expectException(\BadMethodCallException::class);
+
+        unserialize($payload.'}');
+    }
+
+    public static function provideNonStringValues(): iterable
+    {
+        foreach (['type', 'subtype'] as $key) {
+            yield $key.' int' => [$key, 123];
+            yield $key.' object' => [$key, new \stdClass()];
+            yield $key.' null' => [$key, null];
+        }
+    }
 }

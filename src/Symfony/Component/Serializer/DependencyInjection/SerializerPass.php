@@ -21,12 +21,9 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
-use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -162,6 +159,7 @@ class SerializerPass implements CompilerPassInterface
     {
         $defaultSerializerNameConverter = $container->hasParameter('.serializer.name_converter')
             ? $container->getParameter('.serializer.name_converter') : null;
+        $nestedNormalizers = [];
 
         foreach ($container->getParameter('.serializer.named_serializers') as $serializerName => $config) {
             $config += ['default_context' => [], 'name_converter' => null];
@@ -181,12 +179,17 @@ class SerializerPass implements CompilerPassInterface
 
             $debug = $container->getParameter('kernel.debug') && $container->hasDefinition('debug.serializer');
             $children = [];
-            $taggedIds = array_flip(array_map('strval', [...$normalizers, ...$encoders]));
             $normalizers = $this->buildChildDefinitions($container, $serializerName, $normalizers, $config, $children);
             $encoders = $this->buildChildDefinitions($container, $serializerName, $encoders, $config, $children);
 
             $this->bindDefaultContext($container, $children, $config['default_context'], $circularReferenceHandler, $maxDepthHandler);
-            $this->setSerializerOnNestedChildren($container, array_diff_key($children, $taggedIds), new Reference($debug ? 'debug.'.$serializerId.'.inner' : $serializerId));
+
+            $nestedNormalizers[$serializerName] = [
+                'serializer' => $debug ? 'debug.'.$serializerId.'.inner' : $serializerId,
+                'name_converter' => $config['name_converter'],
+                'default_context' => $config['default_context'],
+                'children' => array_map('strval', $children),
+            ];
 
             $container->registerChild($serializerId, 'serializer')->setArgument('$defaultContext', $config['default_context']);
             $container->registerAliasForArgument($serializerId, SerializerInterface::class, $serializerName.'.serializer');
@@ -205,6 +208,12 @@ class SerializerPass implements CompilerPassInterface
                     ->replaceArgument(2, $serializerName);
             }
         }
+
+        $container->setParameter('.serializer.nested_normalizers', [
+            'circular_reference_handler' => $circularReferenceHandler,
+            'max_depth_handler' => $maxDepthHandler,
+            'named_serializers' => $nestedNormalizers,
+        ]);
     }
 
     private function buildChildNameConverterDefinition(ContainerBuilder $container, ?string $nameConverter): ?string
@@ -254,48 +263,10 @@ class SerializerPass implements CompilerPassInterface
 
             if (self::NAME_CONVERTER_METADATA_AWARE_ID === (string) $argument) {
                 $definition->replaceArgument($index, new Reference($config['name_converter']));
-            } elseif ($this->isNormalizer($container, (string) $argument)) {
-                $child = $this->buildChildDefinition($container, $serializerName, (string) $argument, $config, $children);
-                $definition->replaceArgument($index, new Reference((string) $child, $argument->getInvalidBehavior()));
             }
         }
 
         return $children[$id];
-    }
-
-    /**
-     * @param array<string, Reference> $children
-     */
-    private function setSerializerOnNestedChildren(ContainerBuilder $container, array $children, Reference $serializer): void
-    {
-        foreach ($children as $id => $child) {
-            $class = $this->resolveClass($container, $id);
-            $definition = $container->getDefinition((string) $child);
-
-            if (is_a($class, SerializerAwareInterface::class, true)) {
-                $definition->addMethodCall('setSerializer', [$serializer]);
-            }
-
-            if (is_a($class, DenormalizerAwareInterface::class, true)) {
-                $definition->addMethodCall('setDenormalizer', [$serializer]);
-            }
-
-            if (is_a($class, NormalizerAwareInterface::class, true)) {
-                $definition->addMethodCall('setNormalizer', [$serializer]);
-            }
-        }
-    }
-
-    private function isNormalizer(ContainerBuilder $container, string $id): bool
-    {
-        if (!$container->hasDefinition($id)) {
-            return false;
-        }
-
-        $class = $this->resolveClass($container, $id);
-
-        return (is_a($class, NormalizerInterface::class, true) || is_a($class, DenormalizerInterface::class, true))
-            && !is_a($class, SerializerInterface::class, true);
     }
 
     private function resolveArguments(ContainerBuilder $container, string $id): array

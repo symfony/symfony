@@ -88,6 +88,9 @@ class TypeInfoFormTypeGuesserTest extends TestCase
         yield 'nullable int range' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), 'nullableIntRange'];
         yield 'int literal' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), 'intLiteral'];
         yield 'string literal' => [null, 'stringLiteral'];
+        yield 'non-zero-int' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), 'nonZeroInt'];
+        yield 'int literal union' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), 'intLiteralUnion'];
+        yield 'mixed literal union' => [null, 'mixedLiteralUnion'];
     }
 
     #[DataProvider('provideGuessRequiredCases')]

@@ -508,7 +508,8 @@ final class PhpGenerator
                 .$this->line('    foreach (\\'.Splitter::class.'::'.$splitMethod.'($stream, $offset, $length) as $k => $v) {', $context);
             $child = $node->getItemNode();
             if ($this->isStructured($child)) {
-                $php .= $this->line('        $validators['.var_export($child->getIdentifier(), true).']($stream, $v[0], $v[1], \\is_array($data) ? $data[$k] : $data->{$k});', $context);
+                // json_decode() keeps the last value of a duplicated key, so the keys of the first value can be missing
+                $php .= $this->line('        $validators['.var_export($child->getIdentifier(), true).']($stream, $v[0], $v[1], \\is_array($data) ? ($data[$k] ?? null) : ($data->{$k} ?? null));', $context);
             }
             $php .= $this->line('    }', $context).$this->line('}', $context);
             $children[] = $child;
@@ -524,7 +525,7 @@ final class PhpGenerator
             if ($structured) {
                 $php .= $this->line('        match ($k) {', $context);
                 foreach ($structured as $name => $child) {
-                    $php .= $this->line('            '.var_export((string) $name, true).' => $validators['.var_export($child->getIdentifier(), true).']($stream, $v[0], $v[1], $data->{$k}),', $context);
+                    $php .= $this->line('            '.var_export((string) $name, true).' => $validators['.var_export($child->getIdentifier(), true).']($stream, $v[0], $v[1], $data->{$k} ?? null),', $context);
                     $children[] = $child;
                 }
                 $php .= $this->line('            default => null,', $context).$this->line('        };', $context);

@@ -53,7 +53,7 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
         if ($data instanceof \stdClass) {
             foreach (\Symfony\Component\JsonStreamer\Read\Splitter::splitDict($stream, $offset, $length) as $k => $v) {
                 match ($k) {
-                    'items' => $validators['array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>']($stream, $v[0], $v[1], $data->{$k}),
+                    'items' => $validators['array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>']($stream, $v[0], $v[1], $data->{$k} ?? null),
                     default => null,
                 };
             }
@@ -62,7 +62,7 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
     $validators['array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>'] = static function ($stream, $offset, $length, $data) use (&$validators) {
         if (\is_array($data) || $data instanceof \stdClass) {
             foreach (\Symfony\Component\JsonStreamer\Read\Splitter::splitCollection($stream, $offset, $length) as $k => $v) {
-                $validators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList']($stream, $v[0], $v[1], \is_array($data) ? $data[$k] : $data->{$k});
+                $validators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList']($stream, $v[0], $v[1], \is_array($data) ? ($data[$k] ?? null) : ($data->{$k} ?? null));
             }
         }
     };

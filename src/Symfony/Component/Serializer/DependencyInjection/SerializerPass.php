@@ -21,9 +21,12 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -176,11 +179,14 @@ class SerializerPass implements CompilerPassInterface
                 ? $this->buildChildNameConverterDefinition($container, $config['name_converter'])
                 : self::NAME_CONVERTER_METADATA_AWARE_ID;
 
+            $debug = $container->getParameter('kernel.debug') && $container->hasDefinition('debug.serializer');
             $children = [];
+            $taggedIds = array_flip(array_map('strval', [...$normalizers, ...$encoders]));
             $normalizers = $this->buildChildDefinitions($container, $serializerName, $normalizers, $config, $children);
             $encoders = $this->buildChildDefinitions($container, $serializerName, $encoders, $config, $children);
 
             $this->bindDefaultContext($container, $children, $config['default_context'], $circularReferenceHandler, $maxDepthHandler);
+            $this->setSerializerOnNestedChildren($container, array_diff_key($children, $taggedIds), new Reference($debug ? 'debug.'.$serializerId.'.inner' : $serializerId));
 
             $container->registerChild($serializerId, 'serializer')->setArgument('$defaultContext', $config['default_context']);
             $container->registerAliasForArgument($serializerId, SerializerInterface::class, $serializerName.'.serializer');
@@ -192,7 +198,7 @@ class SerializerPass implements CompilerPassInterface
 
             $this->configureSerializer($container, $serializerId, $normalizers, $encoders, $serializerName);
 
-            if ($container->getParameter('kernel.debug') && $container->hasDefinition('debug.serializer')) {
+            if ($debug) {
                 $container->registerChild($debugId = 'debug.'.$serializerId, 'debug.serializer')
                     ->setDecoratedService($serializerId)
                     ->replaceArgument(0, new Reference($debugId.'.inner'))
@@ -255,6 +261,29 @@ class SerializerPass implements CompilerPassInterface
         }
 
         return $children[$id];
+    }
+
+    /**
+     * @param array<string, Reference> $children
+     */
+    private function setSerializerOnNestedChildren(ContainerBuilder $container, array $children, Reference $serializer): void
+    {
+        foreach ($children as $id => $child) {
+            $class = $this->resolveClass($container, $id);
+            $definition = $container->getDefinition((string) $child);
+
+            if (is_a($class, SerializerAwareInterface::class, true)) {
+                $definition->addMethodCall('setSerializer', [$serializer]);
+            }
+
+            if (is_a($class, DenormalizerAwareInterface::class, true)) {
+                $definition->addMethodCall('setDenormalizer', [$serializer]);
+            }
+
+            if (is_a($class, NormalizerAwareInterface::class, true)) {
+                $definition->addMethodCall('setNormalizer', [$serializer]);
+            }
+        }
     }
 
     private function isNormalizer(ContainerBuilder $container, string $id): bool

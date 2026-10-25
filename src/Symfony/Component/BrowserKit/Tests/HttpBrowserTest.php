@@ -23,6 +23,21 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class HttpBrowserTest extends AbstractBrowserTest
 {
+    public function testIgnoresSecureCookiesReceivedOverHttp()
+    {
+        $client = new MockHttpClient([
+            new MockResponse('', ['response_headers' => ['Set-Cookie: sid=value; Secure']]),
+            function ($method, $url, $options) {
+                $this->assertArrayNotHasKey('cookie', $options['normalized_headers']);
+
+                return new MockResponse();
+            },
+        ]);
+        $browser = new HttpBrowser($client);
+        $browser->request('GET', 'http://example.com/');
+        $browser->request('GET', 'http://example.com/');
+    }
+
     public function getBrowser(array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
         return new TestHttpClient($server, $history, $cookieJar);

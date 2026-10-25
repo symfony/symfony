@@ -58,10 +58,34 @@ class CookieTest extends TestCase
         ];
     }
 
-    public function testFromStringIgnoreSecureFlag()
+    public function testFromStringPreservesSecureFlagWithoutUrl()
     {
-        $this->assertFalse(Cookie::fromString('foo=bar; secure')->isSecure());
-        $this->assertFalse(Cookie::fromString('foo=bar; secure', 'http://example.com/')->isSecure());
+        $this->assertTrue(Cookie::fromString('foo=bar; secure')->isSecure());
+    }
+
+    public function testFromStringRejectsSecureCookiesOverHttp()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Cookie::fromString('foo=bar; secure', 'http://example.com/');
+    }
+
+    public function testFromStringIgnoresInvalidSameSiteValues()
+    {
+        $this->assertNull(Cookie::fromString('foo=bar; SameSite=unknown')->getSameSite());
+        $this->assertSame('Lax', Cookie::fromString('foo=bar; SameSite=Lax; SameSite=unknown')->getSameSite());
+    }
+
+    public function testFromStringAcceptsHostPrefixWithoutUrl()
+    {
+        $this->assertSame('__Host-sid', Cookie::fromString('__Host-sid=value; Secure; Path=/')->getName());
+    }
+
+    public function testFromStringRejectsHostPrefixWithDomainWithoutUrl()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Cookie::fromString('__Host-sid=value; Secure; Domain=example.com; Path=/');
     }
 
     #[DataProvider('getExpireCookieStrings')]
@@ -122,7 +146,7 @@ class CookieTest extends TestCase
 
     public function testFromStringIgnoresUnknownAttributes()
     {
-        $cookie = Cookie::fromString('foo=bar; name=baz; value=qux; secure=1; unknown=value', 'http://example.com/');
+        $cookie = Cookie::fromString('foo=bar; name=baz; value=qux; unknown=value', 'http://example.com/');
 
         $this->assertSame('foo', $cookie->getName());
         $this->assertSame('bar', $cookie->getValue());
@@ -139,8 +163,6 @@ class CookieTest extends TestCase
         $cookie = Cookie::fromString('foo=bar; Secure; Secure=; HttpOnly; HttpOnly =', 'https://example.com/');
         $this->assertTrue($cookie->isSecure());
         $this->assertTrue($cookie->isHttpOnly());
-
-        $this->assertFalse(Cookie::fromString('foo=bar; Secure=1', 'http://example.com/')->isSecure());
     }
 
     public function testFromStringWithMaxAge()

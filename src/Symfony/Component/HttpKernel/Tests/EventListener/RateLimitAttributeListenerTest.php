@@ -95,6 +95,19 @@ class RateLimitAttributeListenerTest extends TestCase
         }
     }
 
+    public function testDefaultKeyDoesNotDependOnTheMethod()
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+
+        $keys = [];
+        foreach (['GET', 'HEAD', 'POST', 'FOO'] as $method) {
+            $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit('api'), Request::create('/login', $method, server: ['REMOTE_ADDR' => '1.2.3.4'])));
+            $keys[] = $usedKey;
+        }
+
+        $this->assertSame(['1.2.3.4~/login'], array_unique($keys));
+    }
+
     public function testExpressionKey()
     {
         $listener = $this->makeListenerCapturingKey($usedKey);

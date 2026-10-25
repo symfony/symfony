@@ -110,15 +110,18 @@ class LocalesTest extends ResourceBundleTestCase
 
     public function testGetNameWithAliasLocale()
     {
-        $this->assertSame(Locales::getName('tl_PH'), Locales::getName('fil_PH'));
+        $this->assertSame('Tagalog (Philippines)', Locales::getName('tl_PH'));
+        $this->assertSame('Filipino (Philippines)', Locales::getName('fil_PH'));
     }
 
     public function testExists()
     {
         $this->assertTrue(Locales::exists('nl_NL'));
         $this->assertTrue(Locales::exists('tl_PH'));
-        $this->assertTrue(Locales::exists('fil_PH')); // alias for "tl_PH"
+        $this->assertTrue(Locales::exists('fil_PH'));
         $this->assertTrue(Locales::exists('es_419'));
+        $this->assertTrue(Locales::exists('ckb'));
+        $this->assertTrue(Locales::exists('yue_Hant_HK'));
         $this->assertFalse(Locales::exists('zxx_ZZ'));
     }
 }

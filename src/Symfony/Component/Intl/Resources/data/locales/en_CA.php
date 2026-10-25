@@ -24,6 +24,8 @@ return [
         'fr_PM' => 'French (Saint-Pierre-et-Miquelon)',
         'fr_WF' => 'French (Wallis and Futuna)',
         'hr_BA' => 'Croatian (Bosnia and Herzegovina)',
+        'mfe' => 'Mauritian Creole',
+        'mfe_MU' => 'Mauritian Creole (Mauritius)',
         'nb_SJ' => 'Norwegian Bokmål (Svalbard and Jan Mayen)',
         'pt_ST' => 'Portuguese (São Tomé and Príncipe)',
         'sh_BA' => 'Serbo-Croatian (Bosnia and Herzegovina)',

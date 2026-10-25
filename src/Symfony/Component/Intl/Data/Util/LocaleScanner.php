@@ -17,12 +17,10 @@ namespace Symfony\Component\Intl\Data\Util;
  * The name of each file with the extension ".txt" is considered, if it "looks"
  * like a locale:
  *
- *  - the name must start with two letters;
- *  - the two letters may optionally be followed by an underscore and any
- *    sequence of other symbols.
+ *  - the name must start with two or three letters;
+ *  - these letters may optionally be followed by an underscore and any sequence of other symbols.
  *
- * For example, "de" and "de_DE" are considered to be locales. "root" and "meta"
- * are not.
+ * For example, "de", "de_DE" and "ckb_IQ" are considered to be locales. "root" and "meta" are not.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
@@ -46,7 +44,7 @@ class LocaleScanner
         array_walk($locales, static function (&$locale) { $locale = basename($locale, '.txt'); });
 
         // Remove non-locales
-        $locales = array_filter($locales, static fn ($locale) => preg_match('/^[a-z]{2}(_.+)?$/', $locale));
+        $locales = array_filter($locales, static fn ($locale) => preg_match('/^[a-z]{2,3}(_.+)?$/', $locale));
 
         sort($locales);
 

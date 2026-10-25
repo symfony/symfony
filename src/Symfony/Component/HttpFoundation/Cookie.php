@@ -77,11 +77,13 @@ class Cookie
             if (\in_array($attributeName, ['secure', 'httponly', 'partitioned'], true)) {
                 $attributeValue = true;
             } elseif ('expires' === $attributeName) {
-                if (false === $attributeValue = strtotime((string) $attributeValue)) {
+                if (is_numeric($attributeValue)) {
+                    $attributeValue = self::expiresTimestamp($attributeValue);
+                } elseif (false === $attributeValue = strtotime((string) $attributeValue)) {
                     continue;
+                } else {
+                    $attributeValue = max(1, $attributeValue);
                 }
-
-                $attributeValue = max(1, $attributeValue);
             } elseif ('max-age' === $attributeName) {
                 if (!\is_string($attributeValue) || !preg_match('/^-?\d+$/D', $attributeValue)) {
                     continue;

@@ -297,6 +297,22 @@ class MongoDbAdapterDsnTest extends TestCase
         yield 'question mark in user information' => ['mongodb://user:p?ss@localhost/app'];
     }
 
+    public function testHostListWithoutLastPortIsRejectedWithAHint()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The given MongoDB DSN is invalid. When it lists several hosts, add the port of the last one too.');
+
+        (new \ReflectionMethod(MongoDbAdapter::class, 'parseDsn'))->invoke(null, 'mongodb://host1:27017,host2/app', []);
+    }
+
+    public function testInvalidDsnWithoutHostListHasNoHint()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/^The given MongoDB DSN is invalid\.$/');
+
+        (new \ReflectionMethod(MongoDbAdapter::class, 'parseDsn'))->invoke(null, 'mongodb://user:p?ss@localhost/app?readPreferenceTags=dc:ny,rack:1', []);
+    }
+
     public function testCreateConnectionReturnsConfiguredCollection()
     {
         if (str_contains((new \ReflectionClass(Client::class))->getFileName(), \DIRECTORY_SEPARATOR.'stubs'.\DIRECTORY_SEPARATOR)) {

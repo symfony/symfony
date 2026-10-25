@@ -452,7 +452,7 @@ class Connection
     private static function parseDsn(#[\SensitiveParameter] string $dsn): array
     {
         if (false === $params = parse_url($dsn)) {
-            throw new InvalidArgumentException('The given MongoDB DSN is invalid.');
+            throw new InvalidArgumentException('The given MongoDB DSN is invalid.'.(preg_match('{^[^:/?#]++://(?:[^/?#@]*+@)?[^/?#,]*+,}', $dsn) ? ' When it lists several hosts, add the port of the last one too.' : ''));
         }
 
         if ('' === ($params['host'] ?? '')) {

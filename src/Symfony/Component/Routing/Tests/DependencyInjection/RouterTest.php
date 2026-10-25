@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Routing\DependencyInjection\Router;
+use Symfony\Component\Routing\Exception\LogicException;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -612,6 +613,35 @@ class RouterTest extends TestCase
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(['GET', 'POST'], $route->getMethods());
+    }
+
+    public function testTemplateWithoutControllerThrowsOnEachLoad()
+    {
+        $routes = new RouteCollection();
+        $routes->add('faq', new Route('/faq.html', ['_template' => 'pages/faq.html.twig']));
+
+        $router = new Router($this->getServiceContainer($routes), 'foo');
+
+        try {
+            $router->getRouteCollection();
+            $this->fail('A LogicException should be thrown.');
+        } catch (LogicException) {
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "faq" route has a template but no controller to render it.');
+
+        $router->getRouteCollection();
+    }
+
+    public function testTemplateWithControllerIsKept()
+    {
+        $routes = new RouteCollection();
+        $routes->add('faq', new Route('/faq.html', ['_controller' => 'App\FaqController', '_template' => 'pages/faq.html.twig']));
+
+        $router = new Router($this->getServiceContainer($routes), 'foo');
+
+        $this->assertSame('pages/faq.html.twig', $router->getRouteCollection()->get('faq')->getDefault('_template'));
     }
 
     public static function getContainerParameterForRoute()

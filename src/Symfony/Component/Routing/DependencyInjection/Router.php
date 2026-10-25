@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainer
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Component\Routing\Exception\LogicException;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router as BaseRouter;
@@ -70,7 +71,15 @@ final class Router extends BaseRouter implements WarmableInterface, ServiceSubsc
     public function getRouteCollection(): RouteCollection
     {
         if (!isset($this->collection)) {
-            $this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
+            $collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
+
+            foreach ($collection as $name => $route) {
+                if (null !== $route->getDefault('_template') && !$route->hasDefault('_controller')) {
+                    throw new LogicException(\sprintf('The "%s" route has a template but no controller to render it.', $name));
+                }
+            }
+
+            $this->collection = $collection;
             $this->resolveParameters($this->collection);
             $this->collection->addResource(new ContainerParametersResource($this->collectedParameters));
 

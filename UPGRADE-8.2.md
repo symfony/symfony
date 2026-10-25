@@ -640,6 +640,7 @@ TypeInfo
 
  * Deprecate not passing `true` for the `$resolveRefinements` argument of `StringTypeResolver::__construct()` and `TypeResolver::create()`, and not setting the `type_info.resolve_refinements` option to `true`; PHPDoc refinements will always be resolved in 9.0.
    Literals and integer ranges are then resolved as `LiteralType` and `IntRangeType`, which wrap a `BuiltinType`.
+   `non-zero-int` is resolved as the union `int<min, -1>|int<1, max>`, so unwrapping alone does not turn it back into an `int`.
    Before enabling them, replace `instanceof BuiltinType` checks and `getTypeIdentifier()` calls with `isIdentifiedBy()`, or unwrap the `WrappingTypeInterface` types:
 
    ```yaml

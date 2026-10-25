@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
@@ -171,6 +172,50 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertEquals(['foo@foo.com'], $form->getData());
     }
 
+    public function testDeleteEmptyKeepsExistingEntriesOfAClonedForm()
+    {
+        $form = clone $this->factory->create(static::TESTED_TYPE, ['foo@foo.com', 'bar@bar.com'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'delete_empty' => true,
+        ]);
+
+        $form->submit(['foo@foo.com', '']);
+
+        $this->assertSame(['foo@foo.com', null], $form->getData());
+    }
+
+    public function testDeleteEmptyRemovesNullEntriesLeftEmpty()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [null, null], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'delete_empty' => true,
+        ]);
+
+        $form->submit(['foo@foo.com', '']);
+
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertSame(['foo@foo.com'], $form->getData());
+    }
+
+    public function testDontAddEmptyEntriesToAnObjectCollectionIfDeleteEmpty()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'entry_type' => AuthorType::class,
+            'allow_add' => true,
+            'delete_empty' => static fn (?Author $author) => !$author?->firstName,
+        ]);
+
+        $form->setData($authors = new ArrayCollection([new Author('first', 'last')]));
+        $form->submit([
+            ['firstName' => 's_first', 'lastName' => 's_last'],
+            ['firstName' => '', 'lastName' => ''],
+        ]);
+
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals([new Author('s_first', 's_last')], $authors->toArray());
+    }
+
     public function testNoDeleteEmptyIfDeleteNotAllowed()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -184,6 +229,20 @@ class CollectionTypeTest extends BaseTypeTestCase
 
         $this->assertTrue($form->has('0'));
         $this->assertEquals('', $form[0]->getData());
+    }
+
+    public function testNoDeleteEmptyOfAnArrayObjectIfDeleteNotAllowed()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, new \ArrayObject(['foo@foo.com']), [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_delete' => false,
+            'delete_empty' => true,
+        ]);
+
+        $form->submit(['']);
+
+        $this->assertTrue($form->has('0'));
+        $this->assertSame([null], $form->getData()->getArrayCopy());
     }
 
     public function testResizedDownIfSubmittedWithCompoundEmptyDataAndDeleteEmpty()

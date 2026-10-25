@@ -19,6 +19,7 @@ use AsyncAws\Sqs\Enum\MessageSystemAttributeName;
 use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
 use AsyncAws\Sqs\SqsClient;
+use AsyncAws\Sqs\ValueObject\Message;
 use AsyncAws\Sqs\ValueObject\MessageAttributeValue;
 use AsyncAws\Sqs\ValueObject\MessageSystemAttributeValue;
 use Psr\Log\LoggerInterface;
@@ -272,31 +273,87 @@ class Connection
         }
 
         foreach ($this->currentResponse->getMessages() as $message) {
-            $headers = [];
-            $attributes = $message->getMessageAttributes();
-            if (isset($attributes[self::MESSAGE_ATTRIBUTE_NAME]) && 'String' === $attributes[self::MESSAGE_ATTRIBUTE_NAME]->getDataType()) {
-                $headers = json_decode($attributes[self::MESSAGE_ATTRIBUTE_NAME]->getStringValue(), true);
-                unset($attributes[self::MESSAGE_ATTRIBUTE_NAME]);
-            }
-            foreach ($attributes as $name => $attribute) {
-                if ('String' !== $attribute->getDataType()) {
-                    continue;
-                }
-
-                $headers[$name] = $attribute->getStringValue();
-            }
-
-            $this->buffer[] = [
-                'id' => $message->getReceiptHandle(),
-                'body' => $message->getBody(),
-                'headers' => $headers,
-                'system_attributes' => $message->getAttributes(),
-            ];
+            $this->buffer[] = $this->decodeMessage($message);
         }
 
         $this->currentResponse = null;
 
         return true;
+    }
+
+    /**
+     * Receives the messages of the queue one batch after the other, then makes them visible again.
+     *
+     * SQS cannot list messages: the ones received are hidden from the other consumers until the
+     * traversal ends, and they are made visible again in an order that SQS does not guarantee.
+     *
+     * @return \Generator<array>
+     */
+    public function findAll(?int $limit = null): \Generator
+    {
+        if ($this->configuration['auto_setup']) {
+            $this->setup();
+        }
+
+        $receiptHandles = [];
+
+        try {
+            while (null === $limit || 0 < $limit) {
+                $messages = $this->holdSignals(fn () => $this->client->receiveMessage([
+                    'QueueUrl' => $this->getQueueUrl(),
+                    'VisibilityTimeout' => $this->configuration['visibility_timeout'],
+                    'MaxNumberOfMessages' => min($limit ?? 10, 10), // SQS limitation
+                    'MessageAttributeNames' => ['All'],
+                    'MessageSystemAttributeNames' => [MessageSystemAttributeName::ALL],
+                    'WaitTimeSeconds' => $this->configuration['wait_time'],
+                ])->getMessages());
+
+                $newMessages = [];
+                foreach ($messages as $message) {
+                    // a message is received again when its visibility timeout expired during the traversal
+                    if (!isset($receiptHandles[$message->getMessageId()])) {
+                        $newMessages[] = $message;
+                    }
+                    // the whole batch is made visible again, even when the traversal stops in the middle of it
+                    $receiptHandles[$message->getMessageId()] = $message->getReceiptHandle();
+                }
+
+                if (!$newMessages) {
+                    return;
+                }
+
+                foreach ($newMessages as $message) {
+                    yield $this->decodeMessage($message);
+
+                    if (null !== $limit && 0 >= --$limit) {
+                        return;
+                    }
+                }
+            }
+        } finally {
+            foreach ($receiptHandles as $receiptHandle) {
+                try {
+                    $this->holdSignals(fn () => $this->client->changeMessageVisibility([
+                        'QueueUrl' => $this->getQueueUrl(),
+                        'ReceiptHandle' => $receiptHandle,
+                        'VisibilityTimeout' => 0,
+                    ]));
+                } catch (AsyncAwsException) {
+                    // the message was deleted during the traversal, or its visibility timeout already expired
+                }
+            }
+        }
+    }
+
+    public function find(string $messageId): ?array
+    {
+        foreach ($this->findAll() as $message) {
+            if ($messageId === $message['message_id']) {
+                return $message;
+            }
+        }
+
+        return null;
     }
 
     public function setup(): void
@@ -500,6 +557,31 @@ class Connection
                 ]);
             }
         });
+    }
+
+    private function decodeMessage(Message $message): array
+    {
+        $headers = [];
+        $attributes = $message->getMessageAttributes();
+        if (isset($attributes[self::MESSAGE_ATTRIBUTE_NAME]) && 'String' === $attributes[self::MESSAGE_ATTRIBUTE_NAME]->getDataType()) {
+            $headers = json_decode($attributes[self::MESSAGE_ATTRIBUTE_NAME]->getStringValue(), true);
+            unset($attributes[self::MESSAGE_ATTRIBUTE_NAME]);
+        }
+        foreach ($attributes as $name => $attribute) {
+            if ('String' !== $attribute->getDataType()) {
+                continue;
+            }
+
+            $headers[$name] = $attribute->getStringValue();
+        }
+
+        return [
+            'id' => $message->getReceiptHandle(),
+            'message_id' => $message->getMessageId(),
+            'body' => $message->getBody(),
+            'headers' => $headers,
+            'system_attributes' => $message->getAttributes(),
+        ];
     }
 
     private function getMessageParameters(string $body, array $headers, ?int $delay = null, ?string $messageGroupId = null, ?string $messageDeduplicationId = null, ?string $xrayTraceId = null): array

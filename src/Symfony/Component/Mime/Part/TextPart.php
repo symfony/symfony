@@ -276,8 +276,10 @@ class TextPart extends AbstractPart
 
     public function __unserialize(array $data): void
     {
-        foreach (['charset', 'subtype', 'disposition', 'name', 'encoding'] as $prop) {
-            if (($data[$prop] ?? $data["\0".self::class."\0".$prop] ?? $data["\0*\0".$prop] ?? null) instanceof \Stringable) {
+        foreach (['charset' => true, 'subtype' => false, 'disposition' => true, 'name' => true, 'encoding' => false] as $prop => $nullable) {
+            $value = $data[$prop] ?? $data["\0".self::class."\0".$prop] ?? $data["\0*\0".$prop] ?? null;
+
+            if (!\is_string($value) && (!$nullable || null !== $value)) {
                 throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
             }
         }
@@ -328,6 +330,8 @@ class TextPart extends AbstractPart
         }
 
         trigger_deprecation('symfony/mime', '7.4', 'Passing extra keys to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', self::class, get_debug_type($this));
+
+        (new \ReflectionMethod(AbstractPart::class, 'rejectStringCasts'))->invoke(null, static::class, $data);
 
         \Closure::bind(function ($data) use ($wakeup) {
             foreach ($data as $key => $value) {

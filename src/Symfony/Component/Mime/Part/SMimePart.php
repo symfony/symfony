@@ -119,10 +119,11 @@ class SMimePart extends AbstractPart
 
     public function __unserialize(array $data): void
     {
-        foreach (['body', 'type', 'subtype'] as $prop) {
-            if (($data[$prop] ?? $data["\0".self::class."\0".$prop] ?? $data["\0*\0".$prop] ?? null) instanceof \Stringable) {
-                throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-            }
+        if (($data['body'] ?? $data["\0".self::class."\0body"] ?? $data["\0*\0body"] ?? null) instanceof \Stringable
+            || !\is_string($data['type'] ?? $data["\0".self::class."\0type"] ?? $data["\0*\0type"] ?? null)
+            || !\is_string($data['subtype'] ?? $data["\0".self::class."\0subtype"] ?? $data["\0*\0subtype"] ?? null)
+        ) {
+            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
         }
 
         if ($wakeup = self::class !== (new \ReflectionMethod($this, '__wakeup'))->class && self::class === (new \ReflectionMethod($this, '__unserialize'))->class) {
@@ -162,6 +163,8 @@ class SMimePart extends AbstractPart
         }
 
         trigger_deprecation('symfony/mime', '7.4', 'Passing extra keys to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', self::class, get_debug_type($this));
+
+        (new \ReflectionMethod(AbstractPart::class, 'rejectStringCasts'))->invoke(null, static::class, $data);
 
         \Closure::bind(function ($data) use ($wakeup) {
             foreach ($data as $key => $value) {

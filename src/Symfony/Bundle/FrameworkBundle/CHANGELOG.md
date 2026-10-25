@@ -5,12 +5,10 @@ CHANGELOG
 ---
 
  * Set the default locale of the intl extension to `framework.default_locale` when a console command starts, like HTTP requests do
- * Resolve the env vars of the `framework.disallow_search_engine_index` option while the container is compiled
- * Resolve the env vars of the `framework.test` option while the container is compiled
+ * Resolve the env vars of the `framework.disallow_search_engine_index` and `framework.test` options while the container is compiled
  * Default `framework.session.storage_factory_id` to `session.storage.factory.mock_file` when `framework.test` is `true`
  * Add `KernelBrowser::sendWebhook()` to post a webhook signed as its `webhook.routing` entry expects
  * Add `WebhookAssertionsTrait` to `KernelTestCase` to assert on the webhooks sent with the `webhook.transport` service
- * Tag the `http_cache.store` service with `kernel.test_state`, so that `KernelTestCase` clears it at the end of each test
  * Make `MailerAssertionsTrait` and `NotificationAssertionsTrait` see the emails and notifications sent during the previous requests of the test client
  * Add the `kernel.test_state` tag to call a method of a service when a test ends, or to keep a copy of the service before each reset until the test ends
  * Pass the token of `KernelBrowser::loginUser()` with each request, so that stateless firewalls can read it
@@ -56,8 +54,7 @@ CHANGELOG
  * Don't use the secrets vault as an env var loader when its directory is in the project but does not exist at build time
  * Add the `framework.request.serializer` and `framework.response.serializer` options
  * Add support for the `#[Lock]` attribute on controllers when the Lock component is enabled
- * Add support for the `map` option of the `#[Serialize]` attribute when the ObjectMapper component is installed
- * Add support for the `stream` option of the `#[Serialize]` attribute when the JsonStreamer component is installed
+ * Add support for the `map` and `stream` options of the `#[Serialize]` attribute when the ObjectMapper and JsonStreamer components are installed
  * Register `RateLimitValueResolver` when the rate limiter is enabled
  * Close the lazy Redis connection of the session handler created from `framework.session.handler_id` when the kernel shuts down
 

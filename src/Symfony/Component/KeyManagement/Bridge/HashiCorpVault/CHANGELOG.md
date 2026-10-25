@@ -5,4 +5,3 @@ CHANGELOG
 ---
 
  * Add the bridge as experimental
- * Frame the AAD in a versioned derivation context

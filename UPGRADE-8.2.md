@@ -17,8 +17,8 @@ AssetMapper
 BrowserKit
 ----------
 
- * [BC BREAK] `CookieJar::updateFromSetCookie()` and `updateFromResponse()` ignore a cookie whose `Domain` attribute does not match the host of the response, as browsers do
- * [BC BREAK] `CookieJar` sends a cookie set without a `Domain` attribute only to the host that set it, not to its subdomains, as browsers do
+ * `CookieJar::updateFromSetCookie()` and `updateFromResponse()` ignore a cookie whose `Domain` attribute does not match the host of the response, as browsers do
+ * `CookieJar` sends a cookie set without a `Domain` attribute only to the host that set it, not to its subdomains, as browsers do
 
 Cache
 -----
@@ -28,7 +28,7 @@ Cache
 Config
 ------
 
- * [BC BREAK] The `enabled` node of the sections created with `canBeEnabled()` or `canBeDisabled()` is declared
+ * The `enabled` node of the sections created with `canBeEnabled()` or `canBeDisabled()` is declared
    with `resolvesAtCompileTime()`: its env vars are read while the container is compiled, where the extension
    used to get a placeholder that was always truthy. A section configured with `enabled: '%env(bool:FOO)%'` is
    now really disabled when `FOO` is false, and compiling fails when `FOO` has no value at that point
@@ -36,11 +36,11 @@ Config
 Console
 -------
 
- * [BC BREAK] A token that names a registered sub-command runs it instead of binding to an argument of its
+ * A token that names a registered sub-command runs it instead of binding to an argument of its
    parent: with both `app:import` and `app:import:users` registered, `app:import users` and `app import users`
    now run `app:import:users`, where `users` was bound to the `file` argument of `app:import`. Write
    `app:import -- users` to bind it as an argument
- * [BC BREAK] Positional `ArrayInput` parameters bind to the argument slots in order, where they were validated
+ * Positional `ArrayInput` parameters bind to the argument slots in order, where they were validated
    by index and never read: `new ArrayInput(['foo'])` binds `foo` to the first argument of the definition
  * A bare namespace does not dispatch `ConsoleEvents::ERROR` anymore when it lists its commands: nothing fails,
    the listing is still written on the error output and the exit code is still `1`
@@ -55,7 +55,7 @@ DependencyInjection
 -------------------
 
  * [BC BREAK] `#[AutowireCallable]` and `#[AutowireMethodOf]` now instantiate the target service when the callable is first called. Pass `lazy: false` to keep instantiation at injection time, or when the target class or method cannot be reflected
- * [BC BREAK] A top-level extension key that holds a value which is not an array is now passed to that
+ * A top-level extension key that holds a value which is not an array is now passed to that
    extension instead of being replaced by an empty array. `lock: 'redis://example.com'` configures the lock,
    where it used to be ignored. An extension whose configuration tree does not accept the value now reports
    an `InvalidTypeException` instead of ignoring it
@@ -67,13 +67,12 @@ DependencyInjection
    dispatcher of the application, which must not be mutated at runtime, so the type to ask for is the one
    that only dispatches. A service that needs to read the listeners of the dispatcher, a debug tool for
    instance, can still be given the `event_dispatcher` service explicitly
- * `AsDecorator::$priority` and `AsTagDecorator::$priority` are now `?int` and default to `null`, which means "no priority declared".
+ * [BC BREAK] `AsDecorator::$priority` and `AsTagDecorator::$priority` are now `?int` and default to `null`, which means "no priority declared".
    Code that read the properties as an `int` should read `$attribute->priority ?? 0`
  * `AbstractKernel::shutdown()` now resets the container. Code that keeps a reference to the container of a kernel
    that was shut down gets new service instances from it
  * Add argument `$shutdown` to `Container::reset()`
- * [BC BREAK] Add optional argument `bool $shutdown = false` to `ServicesResetter::reset()` and `ServicesResetterInterface::reset()`
- * [BC BREAK] Add return type `void` to `ServicesResetterInterface::reset()`
+ * [BC BREAK] Add the optional `bool $shutdown = false` argument to `ServicesResetter::reset()` and `ServicesResetterInterface::reset()`, and the `void` return type to `ServicesResetterInterface::reset()`
  * Deprecate extending `ServicesResetter`, implement `ServicesResetterInterface` instead
  * When a `services_resetter` service exists, `Container::reset()` now uses only its configured callbacks.
    Add a `kernel.reset` tag to services that still need to be reset
@@ -122,7 +121,7 @@ EventDispatcher
 
    A test that adds a listener to the `event_dispatcher` service is the most likely place to meet this deprecation; register a listener service in the test container instead
  * `TraceableEventDispatcher` calls the listeners itself instead of calling `dispatch()` on the dispatcher it decorates, so the dispatching logic of a custom dispatcher is bypassed in debug mode
- * `AsEventListener::$priority` and the `$priority` of the Workflow `As*Listener` attributes are now `?int` and default to `null`, which means "no priority declared"; the `kernel.event_listener` tags they produce carry `null` too, and code that read the property as an `int` should read `$attribute->priority ?? 0`
+ * [BC BREAK] `AsEventListener::$priority` and the `$priority` of the Workflow `As*Listener` attributes are now `?int` and default to `null`, which means "no priority declared"; the `kernel.event_listener` tags they produce carry `null` too, and code that read the property as an `int` should read `$attribute->priority ?? 0`
 
 ExpressionLanguage
 ------------------
@@ -150,7 +149,7 @@ Form
  * Add `createStepGroup()` method to `FormFlowBuilderInterface`; implementations not extending the default `FormFlowBuilder` must implement it
  * Add `setGroup()`, `addStep()` and `removeStep()` methods to `StepFlowBuilderConfigInterface`; implementations not extending the default `StepFlowBuilder` must implement them
  * Add `isGroup()`, `getSteps()`, `hasStep()` and `getStep()` methods to `StepFlowConfigInterface`; implementations not extending the default `StepFlowBuilder` must implement them
- * [BC BREAK] Children that use the `form_attr` option now carry the id the themes render on the `<form>`
+ * Children that use the `form_attr` option now carry the id the themes render on the `<form>`
    element instead of the id of the element wrapping the fields, so that the reference resolves. That id is
    the `attr.id` of the root form when the application set one, the string given to `form_attr` when the
    option is a string, wherever it sits in the form tree, and `form_<root id>` otherwise. Forms that do not
@@ -179,7 +178,7 @@ FrameworkBundle
  * Deprecate passing the `$debug` argument to `DependencyInjection\Configuration::__construct()`, the config tree no longer depends on `kernel.debug`
  * BrowserKit assertions are no longer verbose by default. Failed response assertions no longer include the response body unless `setBrowserKitAssertionsAsVerbose(true)` is called or `verbose: true` is passed to the assertion.
  * `MailerAssertionsTrait` and `NotificationAssertionsTrait` now see the emails and notifications sent during the previous requests of the test client. They used to see only the ones sent during the last request. A test that expects no email after a second request must now account for the emails sent before it
- * `KernelTestCase::ensureKernelShutdown()` no longer removes the `http_cache` directory of the share dir. It calls `clear()` on the `http_cache.store` service instead, through the `kernel.test_state` tag, when `framework.test` is enabled. A service that replaces `http_cache.store` needs this tag to be cleared between tests, and a service that decorates it receives the tag, so it needs a `clear()` method
+ * When `framework.test` is enabled, `KernelTestCase::ensureKernelShutdown()` clears the services tagged with `kernel.test_state`, for instance the cache pools of the HTTP client, of the rate limiters, of the stateful schedules and of the login links, and the HTTP cache store, which replaces removing the `http_cache` directory of the share dir. A test that relied on the state left by a previous test, or before a kernel shutdown in the same test, should create that state itself. A service that replaces `http_cache.store` needs the tag to be cleared between tests, and a service that decorates it receives the tag, so it needs a `clear()` method
  * When `framework.test` is `true`, `framework.session.storage_factory_id` now defaults to `session.storage.factory.mock_file`. Set it explicitly to keep the previous value
  * Deprecate the `framework.fragments.hinclude_default_template` config option and the `fragment.renderer.hinclude.global_template` parameter; use the `esi` or `inline` fragment renderer, or [Symfony UX Turbo](https://ux.symfony.com/turbo), instead
  * Most of what this bundle configured now lives in a bundle shipped by the component itself: `asset`,
@@ -206,20 +205,15 @@ FrameworkBundle
  * Deprecate `CacheWarmer\AbstractPhpFileCacheWarmer`, `CacheWarmer\CachePoolClearerCacheWarmer`, `Command\CachePoolClearCommand`, `Command\CachePoolDeleteCommand`, `Command\CachePoolInvalidateTagsCommand`, `Command\CachePoolListCommand` and `Command\CachePoolPruneCommand`, use their counterparts from the Cache component instead
  * Deprecate `CacheWarmer\RouterCacheWarmer`, `Command\RouterMatchCommand`, `Routing\AttributeRouteControllerLoader`, `Routing\DelegatingLoader`, `Routing\RedirectableCompiledUrlMatcher`, `Routing\Router` and `Routing\Attribute\AsRoutingConditionService`, use their counterparts from the Routing component instead.
    The `AsRoutingConditionService` attribute no longer tags subclasses of annotated classes
- * Deprecate `Controller\RedirectController`, use the `redirect_to_route` or `redirect_to` route key in YAML and PHP array configurations.
-   Use `redirect_to_route` for route names and `redirect_to` for paths or URLs.
-   In fluent PHP configurations, use `->redirectToRoute()` or `->redirectTo()`.
-   You can also use `Symfony\Component\Routing\Controller\RedirectController` directly.
-   The old service id remains a deprecated alias
+ * Deprecate `Controller\RedirectController`, use the `redirect_to_route` key for route names or the `redirect_to` key for paths and URLs in YAML and PHP array configurations, and `->redirectToRoute()` or `->redirectTo()` in fluent PHP configurations.
+   You can also use `Symfony\Component\Routing\Controller\RedirectController` directly; the old service id remains a deprecated alias
  * Deprecate `Routing\RouteLoaderInterface`, use the `#[AsRouteLoader]` attribute from the Routing component instead. Unlike the interface, the attribute is not inherited: a class extending an annotated one has to carry it too
  * Deprecate `CacheWarmer\TranslationsCacheWarmer`, `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand`, `DependencyInjection\Compiler\TranslationLintCommandPass`, `DependencyInjection\Compiler\TranslationUpdateCommandPass` and `Translation\Translator`, use their counterparts from the Translation component instead
  * Deprecate `CacheWarmer\SerializerCacheWarmer`, use the one from the Serializer component instead
  * Deprecate `CacheWarmer\ValidatorCacheWarmer`, use the one from the Validator component instead
  * Deprecate `DependencyInjection\Compiler\AssetsContextPass`, use the one from the Asset component instead
  * Deprecate `DependencyInjection\Compiler\JsonPathPass`, use the one from the JsonPath component instead
- * Deprecate `Controller\TemplateController`, use the `template` route key in YAML and PHP array configurations.
-   In fluent PHP configurations, use `->template()`.
-   In custom route loaders, set the `_template` route default.
+ * Deprecate `Controller\TemplateController`, use the `template` key in YAML and PHP array configurations, `->template()` in fluent PHP configurations, or the `_template` route default in custom route loaders.
    The service now requires TwigBundle to be registered, and the old service id remains a deprecated alias
  * The secrets vault no longer loads env vars when its directory is in the project but does not exist when the container is built (`config/secrets/` by default). The env var of `framework.secret` is then not derived from `SYMFONY_DECRYPTION_SECRET` anymore when it is empty or not defined: define it, or create the vault. In non-debug environments, clear the cache after creating the first vault
  * The env vars of the `framework.test` option are now read while the container is compiled. With `test: '%env(bool:FOO)%'`, the test services are not loaded anymore when `FOO` is false. They used to be loaded whatever the value of `FOO`. The container also fails to compile when `FOO` is not defined
@@ -230,9 +224,8 @@ HttpClient
 ----------
 
  * [BC BREAK] Widen the type of the `$buffer` argument of `HttpOptions::buffer()` from `bool` to `mixed`, so that the stream and closure forms the option accepts can be passed; a class extending `HttpOptions` and overriding that method must widen it too
- * [BC BREAK] An explicit `http_version` of `2.0` makes `CurlHttpClient` and `AmpHttpClient` require HTTP/2: they use prior knowledge on `http://` URLs instead of offering an upgrade, and offer only `h2` during the TLS handshake on `https://` URLs (with curl 8.10 or higher); servers that speak only HTTP/1.1 are not reachable that way anymore, unset the option for them
- * [BC BREAK] Redirects from `https://` to `http://` URLs are not followed anymore. The 3xx response is returned instead, and its `redirect_url` info contains the target URL. Request that URL yourself if you want to follow the redirect
- * `KernelTestCase::ensureKernelShutdown()` now clears the responses cached in the `cache.http_client` pool when `framework.test` is enabled, so that each test starts with no cached response. A test that relied on a response cached by a previous test, or before a kernel shutdown in the same test, should request it itself
+ * An explicit `http_version` of `2.0` makes `CurlHttpClient` and `AmpHttpClient` require HTTP/2: they use prior knowledge on `http://` URLs instead of offering an upgrade, and offer only `h2` during the TLS handshake on `https://` URLs (with curl 8.10 or higher); servers that speak only HTTP/1.1 are not reachable that way anymore, unset the option for them
+ * Redirects from `https://` to `http://` URLs are not followed anymore. The 3xx response is returned instead, and its `redirect_url` info contains the target URL. Request that URL yourself if you want to follow the redirect
  * Add argument `$shutdown` to `reset()` in `DecoratorTrait`, `ScopingHttpClient` and `ThrottlingHttpClient`
 
 HttpFoundation
@@ -268,7 +261,7 @@ HttpKernel
 ----------
 
  * Controllers with a `void` return type now return an empty HTTP 204 response when no `kernel.view` listener provides a response
- * [BC BREAK] When a route matches the request path but declares a `scheme` the request does not use,
+ * When a route matches the request path but declares a `scheme` the request does not use,
    `RouterListener` now returns the redirect response itself at priority 32, instead of setting
    `_route` and `_controller` and letting the request continue to `RedirectController`. The response
    is unchanged, but listeners registered below priority 32, the firewall included, no longer run on
@@ -296,7 +289,7 @@ JsonStreamer
 Ldap
 ----
 
- * [BC BREAK] `EntryManager::update()` now sends only the attributes that were set since the entry was fetched. Updating a fetched entry that was not modified does nothing. To write all the attributes of a fetched entry, pass `new Entry($entry->getDn(), $entry->getAttributes())` instead
+ * `EntryManager::update()` now sends only the attributes that were set since the entry was fetched. Updating a fetched entry that was not modified does nothing. To write all the attributes of a fetched entry, pass `new Entry($entry->getDn(), $entry->getAttributes())` instead
 
 Lock
 ----
@@ -373,7 +366,7 @@ Messenger
    // after
    $bus->dispatch($message, [new TransportNamesStamp('async')]);
    ```
- * [BC BREAK] Messages are signed by a serializer created for each transport, instead of by decorators of the serializer services.
+ * Messages are signed by a serializer created for each transport, instead of by decorators of the serializer services.
    Encoding a message with `messenger.default_serializer`, or with another serializer service, does not sign it anymore, and decoding with it does not check the signature.
    Send and receive the messages through their transport instead
  * Deprecate signing only the messages whose handlers have the `sign` option.
@@ -402,14 +395,14 @@ Messenger
    // after
    new SigningSerializer($serializer, $signingKey);
    ```
- * Deprecate `MessageTypeAwareSerializerInterface` and the `getMessageType()` method of `PhpSerializer`, `Serializer`, `ClaimCheckSerializer` and `InteropSerializer`.
+ * Deprecate `MessageTypeAwareSerializerInterface` and the `getMessageType()` method of `PhpSerializer` and `Serializer`.
    `SigningSerializer` does not read the type of a message when it signs every message
  * `SigningSerializer` signs every header written by the serializer it decorates, except `Content-Type`.
    When it verifies a signature, the serializer it decorates only gets the signed headers and `Content-Type`.
    A message with headers other than `type`, `Content-Type` and the `X-Message-Stamp-*` ones gets a `Sign-Headers` header, and earlier versions refuse it.
    When your serializer writes such headers, upgrade the applications that consume a signing transport before the ones that send to it
  * Add argument `$timeout` to `MessageExecutionStrategyInterface::wait()`
- * `AsMessageHandler::$priority` is now `?int` and defaults to `null`, which means "no priority declared";
+ * [BC BREAK] `AsMessageHandler::$priority` is now `?int` and defaults to `null`, which means "no priority declared";
    the `messenger.message_handler` tags it produces carry `null` too. Code that read the property as an
    `int` should read `$attribute->priority ?? 0`
 
@@ -451,7 +444,6 @@ RateLimiter
 
  * `CompoundLimiter::consume()` now stops consuming at the first limiter that rejects the request;
    list limiters from the most specific to the most global to spare shared quotas from rejected hits
- * `KernelTestCase::ensureKernelShutdown()` now clears the `cache.rate_limiter` pool when `framework.test` is enabled, so that rate limiters start fresh in each test. A test that relied on the tokens consumed by a previous test, or before a kernel shutdown in the same test, should consume them itself
 
 Routing
 -------
@@ -498,13 +490,12 @@ Scheduler
  * `MessageContext::$trigger` is a `SerializedTrigger` once its message has crossed a transport. Triggers can hold
    closures or any other non-serializable state, so only their description travels, and `getNextRunDate()` throws
    on the receiving side
- * `KernelTestCase::ensureKernelShutdown()` now clears the `cache.scheduler` pool when `framework.test` is enabled, so that stateful schedules start fresh in each test. A test that relied on the runs recorded by a previous test, or before a kernel shutdown in the same test, should run the schedule itself
 
 Security
 --------
 
  * When `use_referer` is enabled, a failed login now saves the referer as the target path of the firewall, unless a target path is already saved. The next successful login redirects there, even when it is submitted from another page
- * [BC BREAK] A failing `#[IsCsrfTokenValid]` attribute now throws
+ * A failing `#[IsCsrfTokenValid]` attribute now throws
    `Symfony\Component\Security\Http\Exception\InvalidCsrfTokenException`, which extends `HttpException` and
    carries a 403 status, instead of `Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException`, which
    extends `AuthenticationException`. The firewall no longer turns the failure into a login redirect or a 401, and
@@ -526,17 +517,17 @@ Security
  * `AccessTokenAuthenticator` now implements `FallbackAuthenticationEntryPointInterface`, so it becomes the
    entry point of a firewall that declares no other one: an unauthenticated request now gets a 401 carrying
    the RFC 6750 `WWW-Authenticate: Bearer` challenge, where it used to get a 401 with no such header
- * [BC BREAK] The `oauth2` access token handler now refuses an introspection response reporting an `exp` in the
+ * The `oauth2` access token handler now refuses an introspection response reporting an `exp` in the
    past, or an `nbf` or an `iat` in the future, and one whose `exp`, `nbf` or `iat` is not a number it can read as
    a timestamp
  * Deprecate `ExceptionListener::register()`, `ExceptionListener::unregister()` and the `$dispatcher` argument
    of `Firewall::__construct()`. The firewall listens to `kernel.exception` itself and calls the exception
    listener of the firewall that matched the request, instead of adding that listener to the dispatcher on
    every request and removing it again
- * [BC BREAK] `ContextListener` does not register its `onKernelResponse()` method on the event dispatcher
+ * `ContextListener` does not register its `onKernelResponse()` method on the event dispatcher
    anymore. An application built on the Security component alone must register it on the `kernel.response`
    event; SecurityBundle already registers it and is not affected
- * [BC BREAK] An `#[IsGranted]` attribute whose subject reads an argument mapped with `#[MapRequestPayload]`, `#[MapQueryString]` or `#[MapUploadedFile]` now maps and validates that argument before voting.
+ * An `#[IsGranted]` attribute whose subject reads an argument mapped with `#[MapRequestPayload]`, `#[MapQueryString]` or `#[MapUploadedFile]` now maps and validates that argument before voting.
    Voters receive the mapped value instead of the attribute, and the attributes declared before it still run before the request is mapped.
    A voter that read the attribute, for instance its `metadata` property, to vote before the request is mapped needs a subject that does not read the mapped argument instead
  * `OidcTokenHandler` logs the tokens it rejects at the `debug` level instead of `error`, including the ones signed with a key that does not match the configured one, after a key rotation for instance; errors while fetching the discovery document or the JWKS are still logged at the `error` level
@@ -572,7 +563,6 @@ SecurityBundle
  * Deprecate the `Symfony\Component\Security\Http\Firewall` autowiring alias, the firewall listens to kernel events and is not meant to be injected
  * Deprecate the `ExpressionCacheWarmer` class, as the expressions of `access_control` rules are compiled when warming up the cache
  * The `security.expression_language` service is decorated by a `CompiledExpressionLanguage`; inject it as a `Symfony\Component\ExpressionLanguage\ExpressionLanguage`, not as a `Symfony\Component\Security\Core\Authorization\ExpressionLanguage`
- * `KernelTestCase::ensureKernelShutdown()` now clears the `security.authenticator.cache.expired_links` pool when `framework.test` is enabled, so that the `max_uses` option of login links counts the uses of each test only. A test that relied on a login link used by a previous test, or before a kernel shutdown in the same test, should use the link itself
  * Deprecate the `security.route_loader.logout` service, import `security.route_loader` instead. The new service also loads the routes of the `oidc_login` and `access_token` authenticators
 
    ```yaml
@@ -616,7 +606,7 @@ Translation
 Tui
 ---
 
- * [BC BREAK] Add argument `$multiselect` as the third argument of `SelectListWidget::__construct()`, moving `$keybindings` to fourth position
+ * Add argument `$multiselect` as the third argument of `SelectListWidget::__construct()`, moving `$keybindings` to fourth position
 
 TwigBridge
 ----------

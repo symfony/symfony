@@ -57,6 +57,30 @@ class MongoDbStoreDsnTest extends TestCase
         }
     }
 
+    public function testHostLists()
+    {
+        foreach ([
+            'mongodb://h1:27017,h2/db?collection=locks' => 'mongodb://h1:27017,h2/db',
+            'mongodb://h1,h2:27018/db?replicaSet=rs&collection=locks' => 'mongodb://h1,h2:27018/db?replicaSet=rs',
+            'mongodb://user:p%40ss@h1:27017,h2/db?collection=locks&authSource=admin' => 'mongodb://user:p%40ss@h1:27017,h2/db?authSource=admin',
+            'mongodb://[::1]:27017,[::1]/db?collection=locks' => 'mongodb://[::1]:27017,[::1]/db',
+        ] as $uri => $expectedUri) {
+            $store = new MongoDbStore($uri);
+            $reflection = new \ReflectionObject($store);
+
+            $this->assertSame('db.locks', $reflection->getProperty('namespace')->getValue($store));
+            $this->assertSame($expectedUri, $reflection->getProperty('uri')->getValue($store));
+        }
+    }
+
+    public function testMissingHostIsInvalid()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('is invalid.');
+
+        new MongoDbStore('mongodb:///db?collection=locks');
+    }
+
     public function testMissingDatabaseRequiresAnOption()
     {
         $this->expectException(InvalidArgumentException::class);

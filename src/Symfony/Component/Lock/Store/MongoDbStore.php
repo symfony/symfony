@@ -160,7 +160,14 @@ class MongoDbStore implements PersistingStoreInterface
             throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid. Expecting "mongodb://" or "mongodb+srv://".', $uri));
         }
 
-        if (false === $params = parse_url($uri)) {
+        $params = parse_url($uri);
+
+        // parse_url() rejects valid host lists such as "host1:27017,host2"
+        if (false === $params && preg_match('{^mongodb(?:\+srv)?://(?:[^/?#@]*+@)?+(?<host>(?:\[[^]/?#]++]|[^,:/?#@[\]]++)(?::\d++)?)(?:,(?&host))*+(?<path>/[^?#]*+)?(?:[?#]|$)}', $uri, $matches)) {
+            $params = ['path' => $matches['path'] ?? ''];
+        }
+
+        if (false === $params) {
             throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
         }
         $pathDb = rawurldecode(ltrim($params['path'] ?? '', '/'));

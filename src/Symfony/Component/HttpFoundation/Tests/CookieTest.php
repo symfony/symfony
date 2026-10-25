@@ -542,6 +542,16 @@ class CookieTest extends TestCase
         $this->assertTrue($cookie->isHttpOnly());
     }
 
+    public function testFromStringReadsTimestampExpires()
+    {
+        $expire = time() + 3600;
+
+        $this->assertSame($expire, Cookie::fromString('foo=bar; Expires='.$expire)->getExpiresTime());
+        $this->assertSame(1234567890, Cookie::fromString('foo=bar; Expires=1234567890')->getExpiresTime());
+        $this->assertSame(2000000000, Cookie::fromString('foo=bar; Expires=2000000000')->getExpiresTime());
+        $this->assertSame(0, Cookie::fromString('foo=bar; Expires=0')->getExpiresTime());
+    }
+
     public function testFromStringIgnoresInvalidSameSite()
     {
         $cookie = Cookie::fromString('foo=bar; SameSite=future; Secure; HttpOnly');

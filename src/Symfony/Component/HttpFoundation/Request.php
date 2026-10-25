@@ -1714,7 +1714,7 @@ class Request
         $combinations = array_merge(...array_map($this->getLanguageCombinations(...), $preferredLanguages));
         foreach ($combinations as $combination) {
             foreach ($locales as $locale) {
-                if (str_starts_with($locale, $combination)) {
+                if ($locale === $combination || str_starts_with($locale, $combination.'_')) {
                     return $locale;
                 }
             }

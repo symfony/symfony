@@ -62,7 +62,7 @@ final class StreamWriterGenerator
      */
     public function generate(Type $type, array $options = []): string
     {
-        $path = \sprintf('%s%s%s.%s.php', $this->streamWritersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type), self::cacheVariant($options));
+        $path = \sprintf('%s%s%s.%s.php', $this->streamWritersDir, \DIRECTORY_SEPARATOR, hash('xxh128', StreamerDumper::FORMAT_VERSION.$type), self::cacheVariant($options));
         $generateContent = function () use ($type, $options): string {
             $this->phpGenerator ??= new PhpGenerator($this->transformers);
 

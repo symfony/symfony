@@ -20,6 +20,7 @@ use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
+use Symfony\Component\JsonStreamer\StreamerDumper;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
@@ -631,11 +632,25 @@ class JsonStreamReaderTest extends TestCase
         }
 
         file_put_contents(
-            \sprintf('%s%s%s.json.php', $this->streamReadersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) Type::bool())),
+            \sprintf('%s%s%s.json.php', $this->streamReadersDir, \DIRECTORY_SEPARATOR, hash('xxh128', StreamerDumper::FORMAT_VERSION.Type::bool())),
             '<?php return static function () { return "CACHED"; };'
         );
 
         $this->assertSame('CACHED', $reader->read('true', Type::bool()));
+    }
+
+    public function testIgnoreStreamReadersGeneratedByPreviousVersions()
+    {
+        mkdir($this->streamReadersDir, recursive: true);
+
+        foreach (['json', 'json.stream'] as $suffix) {
+            file_put_contents(
+                \sprintf('%s%s%s.%s.php', $this->streamReadersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) Type::bool()), $suffix),
+                '<?php return static function () { return "STALE"; };'
+            );
+        }
+
+        $this->assertRead(JsonStreamReader::create([], $this->streamReadersDir), $this->assertTrue(...), 'true', Type::bool());
     }
 
     public function testReadNestedStream()

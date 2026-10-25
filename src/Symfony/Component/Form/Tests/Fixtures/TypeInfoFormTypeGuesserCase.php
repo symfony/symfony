@@ -43,6 +43,12 @@ class TypeInfoFormTypeGuesserCase
     public int $intLiteral;
     /** @var 'draft' */
     public string $stringLiteral;
+    /** @var non-zero-int */
+    public int $nonZeroInt;
+    /** @var 1|2|3 */
+    public int $intLiteralUnion;
+    /** @var 1|'one' */
+    public int|string $mixedLiteralUnion;
 }
 
 class TypeInfoFormTypeGuesserCaseDateTime extends \DateTimeImmutable

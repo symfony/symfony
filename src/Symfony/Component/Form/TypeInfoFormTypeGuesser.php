@@ -22,11 +22,13 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\TypeInfo\Exception\ExceptionInterface;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\IntRangeType;
 use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
@@ -121,9 +123,7 @@ final class TypeInfoFormTypeGuesser implements FormTypeGuesserInterface
             $type = $type->getWrappedType();
         }
 
-        if ($type instanceof IntRangeType || $type instanceof LiteralType) {
-            $type = $type->getWrappedType();
-        }
+        $type = self::unwrapRefinement($type);
 
         if ($type instanceof BuiltinType) {
             return match ($type->getTypeIdentifier()) {
@@ -146,5 +146,40 @@ final class TypeInfoFormTypeGuesser implements FormTypeGuesserInterface
             \DateInterval::class => [DateIntervalType::class, [], $required],
             default => [null, [], $required],
         };
+    }
+
+    /**
+     * Unwraps a literal or an integer range to its builtin type, and a union of them when all parts share one builtin type.
+     */
+    private static function unwrapRefinement(Type $type): Type
+    {
+        if ($type instanceof IntRangeType || $type instanceof LiteralType) {
+            return $type->getWrappedType();
+        }
+
+        if (!$type instanceof UnionType) {
+            return $type;
+        }
+
+        // a union such as non-zero-int or 1|2|3 is a plain int to a form,
+        // while a union of different builtin types such as 1|'one' is left as is
+        $builtinType = null;
+
+        foreach ($type->getTypes() as $part) {
+            $part = self::unwrapRefinement($part);
+
+            if (!$part instanceof BuiltinType) {
+                return $type;
+            }
+
+            // the first part sets the builtin type every other part must match
+            $builtinType ??= $part;
+
+            if ($part->getTypeIdentifier() !== $builtinType->getTypeIdentifier()) {
+                return $type;
+            }
+        }
+
+        return $builtinType ?? $type;
     }
 }

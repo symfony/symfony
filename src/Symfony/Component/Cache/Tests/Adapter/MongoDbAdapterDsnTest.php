@@ -103,6 +103,15 @@ class MongoDbAdapterDsnTest extends TestCase
             'mongodb://user:pass@host1:27017,host2:27017/app?retryWrites=true',
         ];
 
+        yield 'last host without port' => [
+            'mongodb://user:pass@host1:27017,host2/app?retryWrites=true&collection=cache#x',
+            [],
+            'app',
+            'cache',
+            '',
+            'mongodb://user:pass@host1:27017,host2/app?retryWrites=true#x',
+        ];
+
         yield 'percent-encoded database in the path' => [
             'mongodb://localhost/my%2Ddb',
             [],
@@ -293,7 +302,7 @@ class MongoDbAdapterDsnTest extends TestCase
 
     public static function provideInvalidDsn(): iterable
     {
-        yield 'last host without port' => ['mongodb://host1:27017,host2/app'];
+        yield 'empty host in a host list' => ['mongodb://host1:27017,/app'];
         yield 'question mark in user information' => ['mongodb://user:p?ss@localhost/app'];
     }
 

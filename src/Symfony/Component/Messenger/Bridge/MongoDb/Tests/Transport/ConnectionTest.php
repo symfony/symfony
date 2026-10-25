@@ -123,6 +123,13 @@ class ConnectionTest extends TestCase
             'mongodb://user:pass@host1:27017,host2:27017/db?retryWrites=true',
         ];
 
+        yield 'last host without port' => [
+            'mongodb://user:pass@host1:27017,host2/db?retryWrites=true&collection=messenger_messages#x',
+            [],
+            $defaultConfiguration,
+            'mongodb://user:pass@host1:27017,host2/db?retryWrites=true#x',
+        ];
+
         yield 'percent-encoded database in the path' => [
             'mongodb://localhost/my%2Ddb',
             [],
@@ -239,8 +246,8 @@ class ConnectionTest extends TestCase
             'The given MongoDB Messenger DSN is invalid. Expecting "mongodb://" or "mongodb+srv://".',
         ];
 
-        yield 'last host without port' => [
-            'mongodb://host1:27017,host2/db',
+        yield 'empty host in a host list' => [
+            'mongodb://host1:27017,/db',
             [],
             'The given MongoDB DSN is invalid.',
         ];

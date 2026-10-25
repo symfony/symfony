@@ -451,7 +451,14 @@ class Connection
      */
     private static function parseDsn(#[\SensitiveParameter] string $dsn): array
     {
-        if (false === $params = parse_url($dsn)) {
+        $params = parse_url($dsn);
+
+        // parse_url() rejects valid host lists such as "host1:27017,host2"
+        if (false === $params && preg_match('{^mongodb(?:\+srv)?://(?:[^/?#@]*+@)?+(?<host>(?:\[[^]/?#]++]|[^,:/?#@[\]]++)(?::\d++)?)(?:,(?&host))*+(?<path>/[^?#]*+)?(?:\?(?<query>[^#]*+))?(?:#|$)}', $dsn, $matches, \PREG_UNMATCHED_AS_NULL)) {
+            $params = ['host' => $matches['host'], 'path' => $matches['path'], 'query' => $matches['query']];
+        }
+
+        if (false === $params) {
             throw new InvalidArgumentException('The given MongoDB DSN is invalid.');
         }
 

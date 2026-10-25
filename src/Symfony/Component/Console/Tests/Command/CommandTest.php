@@ -606,6 +606,22 @@ class CommandTest extends TestCase
         $this->assertStringContainsString('The option "--deprecated|-d" is deprecated.', $tester->getErrorOutput());
     }
 
+    #[TestWith(['--deprecated'])]
+    #[TestWith(['--no-deprecated'])]
+    #[TestWith(['-d'])]
+    #[TestWith(['-D'])]
+    public function testDeprecatedOptionWritesAMessageWhenTheNegationOrAnyShortcutIsUsed(string $name)
+    {
+        $command = new Command('foo');
+        $command->addOption('deprecated', 'd|D', InputOption::VALUE_NEGATABLE | InputOption::DEPRECATED, 'A deprecated option');
+        $command->setCode(static fn (): int => 0);
+
+        $tester = new CommandTester($command);
+        $tester->execute([$name => true], ['capture_stderr_separately' => true]);
+
+        $this->assertStringContainsString('The option "--deprecated|--no-deprecated|-d|-D" is deprecated.', $tester->getErrorOutput());
+    }
+
     public function testDeprecatedOptionWritesNoMessageWhenNotUsed()
     {
         $tester = new CommandTester($this->createCommandWithDeprecatedOption());

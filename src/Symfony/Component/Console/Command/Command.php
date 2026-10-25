@@ -695,8 +695,13 @@ class Command implements SignalableCommandInterface
             }
 
             $names = ['--'.$option->getName()];
+            if ($option->isNegatable()) {
+                $names[] = '--no-'.$option->getName();
+            }
             if (null !== $option->getShortcut()) {
-                $names[] = '-'.$option->getShortcut();
+                foreach (explode('|', $option->getShortcut()) as $shortcut) {
+                    $names[] = '-'.$shortcut;
+                }
             }
 
             if ($input->hasParameterOption($names, true)) {

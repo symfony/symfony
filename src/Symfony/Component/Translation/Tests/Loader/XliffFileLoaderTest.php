@@ -511,6 +511,38 @@ class XliffFileLoaderTest extends TestCase
         );
     }
 
+    public function testLoadVersion22WithPgsNotes()
+    {
+        $xml = <<<XLIFF
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" xmlns:pgs="urn:oasis:names:tc:xliff:pgs:1.0"
+                   version="2.2" srcLang="en" trgLang="fr">
+                <file id="f1">
+                    <unit id="tu1" name="file_deleted" pgs:switch="plural:file_count">
+                        <notes>
+                            <note category="context" priority="2">Shown after a deletion</note>
+                            <note>Keep it short</note>
+                        </notes>
+                        <segment id="seg1" pgs:case="other">
+                            <source>You deleted # files.</source>
+                            <target>Vous avez supprimé # fichiers.</target>
+                        </segment>
+                    </unit>
+                </file>
+            </xliff>
+            XLIFF;
+
+        $catalogue = new XliffFileLoader()->load($xml, 'fr', 'domain1');
+
+        $this->assertSame([
+            'pgs-switch' => 'plural:file_count',
+            'notes' => [
+                ['category' => 'context', 'priority' => '2', 'content' => 'Shown after a deletion'],
+                ['content' => 'Keep it short'],
+            ],
+        ], $catalogue->getMetadata('file_deleted', 'domain1'.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX));
+    }
+
     public function testLoadVersion22WithPgsCombined()
     {
         $catalogue = new XliffFileLoader()->load(__DIR__.'/../Fixtures/resources-2.2-pgs-combined.xlf', 'fr', 'domain1');

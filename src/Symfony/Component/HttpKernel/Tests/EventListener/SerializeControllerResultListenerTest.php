@@ -305,7 +305,7 @@ class SerializeControllerResultListenerTest extends TestCase
         $streamWriter = JsonStreamWriter::create([], $this->streamWritersDir);
 
         $viewEvent = $this->createViewEvent([new ProductCreated(1)], $controller);
-        $listener = new SerializeControllerResultAttributeListener(null, null, $streamWriter, TypeResolver::create(), $cache);
+        $listener = new SerializeControllerResultAttributeListener(null, null, $streamWriter, TypeResolver::create(null, true), $cache);
         $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
 
         self::assertSame('[{"productId":1}]', self::getStreamedContent($viewEvent->getResponse()));
@@ -327,7 +327,7 @@ class SerializeControllerResultListenerTest extends TestCase
     {
         $viewEvent = $this->createViewEvent(new ProductCreated(10), static fn (): ProductCreated => new ProductCreated(10));
 
-        $listener = new SerializeControllerResultAttributeListener(null, null, JsonStreamWriter::create([], $this->streamWritersDir), TypeResolver::create(), fn () => $this->fail('The type cache should not be resolved.'));
+        $listener = new SerializeControllerResultAttributeListener(null, null, JsonStreamWriter::create([], $this->streamWritersDir), TypeResolver::create(null, true), fn () => $this->fail('The type cache should not be resolved.'));
         $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
 
         self::assertSame('{"productId":10}', self::getStreamedContent($viewEvent->getResponse()));
@@ -341,7 +341,7 @@ class SerializeControllerResultListenerTest extends TestCase
 
         $viewEvent = $this->createViewEvent(new ProductCreated(10), [new StreamApiController(), 'untyped']);
 
-        $listener = new SerializeControllerResultAttributeListener(null, null, JsonStreamWriter::create([], $this->streamWritersDir), TypeResolver::create(), $cache);
+        $listener = new SerializeControllerResultAttributeListener(null, null, JsonStreamWriter::create([], $this->streamWritersDir), TypeResolver::create(null, true), $cache);
 
         try {
             $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
@@ -398,7 +398,7 @@ class SerializeControllerResultListenerTest extends TestCase
         $viewEvent = $this->createViewEvent(new ProductCreated(10), [new StreamApiController(), 'show']);
         $unexpected = fn () => $this->fail('The dependency should not be resolved.');
 
-        $listener = new SerializeControllerResultAttributeListener($unexpected, $unexpected, fn () => JsonStreamWriter::create([], $this->streamWritersDir), static fn () => TypeResolver::create());
+        $listener = new SerializeControllerResultAttributeListener($unexpected, $unexpected, fn () => JsonStreamWriter::create([], $this->streamWritersDir), static fn () => TypeResolver::create(null, true));
         $listener->onView(new ControllerAttributeEvent(new Serialize(stream: true), $viewEvent));
 
         self::assertSame('{"productId":10}', self::getStreamedContent($viewEvent->getResponse()));

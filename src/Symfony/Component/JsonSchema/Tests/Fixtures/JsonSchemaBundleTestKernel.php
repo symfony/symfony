@@ -59,6 +59,8 @@ class JsonSchemaBundleTestKernel extends AbstractKernel
 
     private function configureContainer(ContainerConfigurator $container): void
     {
+        $container->extension('type_info', ['resolve_refinements' => true]);
+
         foreach ($this->extensionConfigs as $name => $config) {
             $container->extension($name, $config);
         }

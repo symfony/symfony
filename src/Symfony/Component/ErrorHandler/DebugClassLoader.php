@@ -1416,8 +1416,8 @@ class DebugClassLoader
         }
 
         foreach (['template', 'template-covariant'] as $k) {
-            foreach ($tags[$k] ?? [] as $i => $v) {
-                $tags[$k][$i] = substr($v, 0, strpos($v, ' ') ?: \strlen($v));
+            if ($templates = [...$tags[$k] ?? [], ...$tags['phpstan-'.$k] ?? [], ...$tags['psalm-'.$k] ?? []]) {
+                $tags[$k] = array_map(static fn ($v) => substr($v, 0, strpos($v, ' ') ?: \strlen($v)), $templates);
             }
         }
 

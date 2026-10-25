@@ -24,6 +24,7 @@ class ChoiceFormField extends FormField
     private bool $multiple;
     private array $options;
     private ?int $selectedOption = null;
+    private array $selectedOptions = [];
     private bool $validationDisabled = false;
     private ?int $checkedRadio = null;
 
@@ -142,6 +143,16 @@ class ChoiceFormField extends FormField
 
             if (\is_array($value)) {
                 $this->value = $value;
+                $this->selectedOptions = [];
+                foreach ($value as $key => $v) {
+                    foreach ($this->options as $i => $option) {
+                        if ($option['value'] == $v && !\in_array($i, $this->selectedOptions, true)) {
+                            $this->selectedOptions[$key] = $i;
+
+                            break;
+                        }
+                    }
+                }
             } else {
                 parent::setValue($value);
 
@@ -184,6 +195,7 @@ class ChoiceFormField extends FormField
         if ($node->hasAttribute('select' === $this->type ? 'selected' : 'checked')) {
             if ($this->multiple) {
                 $this->value[] = $option['value'];
+                $this->selectedOptions[array_key_last($this->value)] = array_key_last($this->options);
             } else {
                 $this->value = $option['value'];
                 if ('radio' === $this->type) {
@@ -193,6 +205,29 @@ class ChoiceFormField extends FormField
                 }
             }
         }
+    }
+
+    /**
+     * Returns the value to submit, without the values of the selected options that are disabled.
+     *
+     * @internal
+     */
+    public function getSubmittedValue(): string|array|null
+    {
+        $value = $this->getValue();
+
+        if (!$this->multiple) {
+            return $value;
+        }
+
+        $isList = array_is_list($value);
+        foreach ($this->selectedOptions as $key => $i) {
+            if ($this->options[$i]['disabled']) {
+                unset($value[$key]);
+            }
+        }
+
+        return $isList ? array_values($value) : $value;
     }
 
     /**
@@ -228,6 +263,7 @@ class ChoiceFormField extends FormField
 
         $this->value = null;
         $this->selectedOption = null;
+        $this->selectedOptions = [];
         $this->options = [];
         $this->multiple = false;
         $this->checkedRadio = null;
@@ -258,6 +294,7 @@ class ChoiceFormField extends FormField
                     $found = true;
                     if ($this->multiple) {
                         $this->value[] = $optionValue['value'];
+                        $this->selectedOptions[] = \count($this->options) - 1;
                     } else {
                         $this->value = $optionValue['value'];
                         $this->selectedOption = \count($this->options) - 1;

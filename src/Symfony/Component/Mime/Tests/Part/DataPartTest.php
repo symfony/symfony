@@ -236,6 +236,25 @@ class DataPartTest extends TestCase
         $this->assertSame($cid, $unserialized->getContentId());
     }
 
+    public function testUnserializeNativePayloadWithContentId()
+    {
+        $data = [
+            "\0*\0_headers" => new Headers(),
+            "\0*\0_parent" => ['body' => 'content', 'charset' => null, 'subtype' => 'pdf', 'disposition' => 'attachment', 'name' => 'file.pdf', 'encoding' => 'base64'],
+            "\0".DataPart::class."\0filename" => 'file.pdf',
+            "\0".DataPart::class."\0mediaType" => 'application',
+            "\0".DataPart::class."\0cid" => 'foo@example.com',
+        ];
+        $payload = \sprintf('O:%d:"%s":%d:{', \strlen(DataPart::class), DataPart::class, \count($data));
+        foreach ($data as $key => $value) {
+            $payload .= serialize($key).serialize($value);
+        }
+
+        $part = unserialize($payload.'}');
+
+        $this->assertSame((new DataPart('content', 'file.pdf', 'application/pdf'))->setContentId('foo@example.com')->toString(), $part->toString());
+    }
+
     #[DataProvider('provideTrampolineKeys')]
     public function testUnserializeRejectsObjectInTypedStringProperty(string $key)
     {
@@ -262,6 +281,31 @@ class DataPartTest extends TestCase
         yield ['filename'];
         yield ['mediaType'];
         yield ['cid'];
+    }
+
+    #[DataProvider('provideNonStringValues')]
+    public function testUnserializeRejectsNonStringValue(string $key, mixed $value)
+    {
+        $template = (new DataPart('content'))->__serialize();
+        $template[$key] = $value;
+        $payload = \sprintf('O:%d:"%s":%d:{', \strlen(DataPart::class), DataPart::class, \count($template));
+        foreach ($template as $k => $v) {
+            $payload .= serialize($k).serialize($v);
+        }
+
+        $this->expectException(\BadMethodCallException::class);
+
+        unserialize($payload.'}');
+    }
+
+    public static function provideNonStringValues(): iterable
+    {
+        foreach (['filename', 'mediaType', 'cid'] as $key) {
+            yield $key.' int' => [$key, 123];
+            yield $key.' object' => [$key, new \stdClass()];
+        }
+
+        yield 'mediaType null' => ['mediaType', null];
     }
 }
 

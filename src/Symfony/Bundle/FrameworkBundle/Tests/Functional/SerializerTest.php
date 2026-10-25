@@ -11,10 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TranslatableBackedEnum;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\app\AppKernel;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Serializer\DependencyInjection\NamedSerializerNestedNormalizersPass;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -78,6 +80,23 @@ class SerializerTest extends AbstractWebTestCase
 
         self::assertArrayHasKey('fake_context_option', $defaultContext);
         self::assertEquals('bar', $defaultContext['fake_context_option']);
+    }
+
+    #[TestWith(['api', 'bar'])]
+    #[TestWith(['minimal', 'baz'])]
+    public function testAutowiredNestedNormalizerOfNamedSerializerUsesItsDefaultContextConfigOption(string $serializerName, string $expected)
+    {
+        if (!class_exists(NamedSerializerNestedNormalizersPass::class)) {
+            self::markTestSkipped('The installed version of symfony/serializer does not copy the autowired nested normalizers.');
+        }
+
+        static::bootKernel(['test_case' => 'Serializer', 'root_config' => 'default_context.yaml']);
+
+        $normalizer = static::getContainer()->get('serializer.normalizer.autowired_nested.'.$serializerName.'.alias')->normalizer;
+
+        $defaultContext = (new \ReflectionProperty($normalizer, 'defaultContext'))->getValue($normalizer);
+
+        self::assertSame($expected, $defaultContext['fake_context_option']);
     }
 
     protected static function getKernelClass(): string

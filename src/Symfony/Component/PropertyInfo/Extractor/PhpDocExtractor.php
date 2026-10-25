@@ -139,7 +139,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     {
         $types = [];
 
-        if ($docBlock = $this->getDocBlockFromConstructor($class, $property)) {
+        if ([$docBlock] = $this->getDocBlockFromConstructor($class, $property)) {
             /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
             foreach ($docBlock->getTagsByName('param') as $tag) {
                 if ($tag instanceof InvalidTag || !$tagType = $tag->getType()) {
@@ -163,7 +163,10 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return $this->findDocBlock($class, $property)[0];
     }
 
-    private function getDocBlockFromConstructor(string $class, string $property): ?DocBlock
+    /**
+     * @return array{DocBlock, string}|null
+     */
+    private function getDocBlockFromConstructor(string $class, string $property): ?array
     {
         try {
             $reflectionClass = new \ReflectionClass($class);
@@ -177,7 +180,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         try {
             $docBlock = $this->docBlockFactory->create($reflectionConstructor, $this->contextFactory->createFromReflector($reflectionConstructor));
 
-            return $this->filterDocBlockParams($docBlock, $property);
+            return [$this->filterDocBlockParams($docBlock, $property), $reflectionConstructor->class];
         } catch (\InvalidArgumentException) {
             return null;
         }
@@ -210,8 +213,8 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         $ucFirstProperty = ucfirst($property);
 
-        if ($reflectionProperty?->isPromoted() && $docBlock = $this->getDocBlockFromConstructor($reflectionProperty->class, $property)) {
-            $data = [$docBlock, self::MUTATOR, null, $reflectionProperty->class];
+        if ($reflectionProperty?->isPromoted() && [$docBlock, $declaringClass] = $this->getDocBlockFromConstructor($reflectionProperty->class, $property)) {
+            $data = [$docBlock, self::MUTATOR, null, $declaringClass];
         } elseif ([$docBlock, $declaringClass] = $this->getDocBlockFromProperty($class, $property)) {
             $data = [$docBlock, self::PROPERTY, null, $declaringClass];
         } else {

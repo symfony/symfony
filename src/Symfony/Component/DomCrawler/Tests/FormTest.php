@@ -541,6 +541,63 @@ class FormTest extends TestCase
         $this->assertSame(['choice' => 'foo'], $form->getValues());
     }
 
+    public function testMultipleSelectSkipsSelectedDisabledOptions()
+    {
+        $form = $this->createForm('<form><select name="choice[]" multiple><option selected disabled>foo</option><optgroup disabled><option selected>bar</option></optgroup><option selected>baz</option><option>qux</option></select><input type="submit" /></form>');
+        $this->assertSame(['foo', 'bar', 'baz'], $form['choice']->getValue());
+        $this->assertFalse($form['choice']->isDisabled());
+        $this->assertSame(['choice' => ['baz']], $form->getValues());
+        $this->assertSame(['choice' => ['baz']], $form->getPhpValues());
+        $this->assertSame('http://example.com/?choice%5B0%5D=baz', $form->getUri());
+
+        $form['choice']->select(['foo', 'qux']);
+        $this->assertSame(['foo', 'qux'], $form['choice']->getValue());
+        $this->assertSame(['choice' => ['qux']], $form->getPhpValues());
+
+        $form['choice']->setValue('bar');
+        $this->assertSame(['bar'], $form['choice']->getValue());
+        $this->assertSame([], $form->getPhpValues());
+
+        $form->setValues(['choice' => ['qux', 'foo', 'baz']]);
+        $this->assertSame(['choice' => ['qux', 'baz']], $form->getPhpValues());
+
+        $form->disableValidation();
+        $form['choice']->select(['foo', 'unknown', 'baz']);
+        $this->assertSame(['foo', 'unknown', 'baz'], $form['choice']->getValue());
+        $this->assertSame(['choice' => ['unknown', 'baz']], $form->getPhpValues());
+    }
+
+    public function testMultipleSelectDisabledOptionsWithDuplicateValues()
+    {
+        $form = $this->createForm('<form><select name="choice[]" multiple><option selected disabled>foo</option><option selected>foo</option></select><input type="submit" /></form>');
+        $this->assertSame(['foo', 'foo'], $form['choice']->getValue());
+        $this->assertSame(['choice' => ['foo']], $form->getValues());
+
+        $form['choice']->select(['foo']);
+        $this->assertSame([], $form->getPhpValues());
+        $form['choice']->select(['foo', 'foo']);
+        $this->assertSame(['choice' => ['foo']], $form->getPhpValues());
+
+        $form = $this->createForm('<form><select name="choice[]" multiple><option>foo</option><option selected disabled>foo</option></select><input type="submit" /></form>');
+        $this->assertSame(['foo'], $form['choice']->getValue());
+        $this->assertSame([], $form->getPhpValues());
+
+        $form['choice']->select(['foo']);
+        $this->assertSame(['choice' => ['foo']], $form->getPhpValues());
+    }
+
+    public function testMultipleSelectSkipsAddedDisabledOption()
+    {
+        $form = $this->createForm('<form><select name="choice[]" multiple><option selected>foo</option></select><input type="submit" /></form>');
+        $option = $form->getFormNode()->ownerDocument->createElement('option', 'bar');
+        $option->setAttribute('selected', 'selected');
+        $option->setAttribute('disabled', 'disabled');
+        $form['choice']->addChoice($option);
+
+        $this->assertSame(['foo', 'bar'], $form['choice']->getValue());
+        $this->assertSame(['choice' => ['foo']], $form->getValues());
+    }
+
     public function testSetValues()
     {
         $form = $this->createForm('<form><input type="checkbox" name="foo" value="foo" checked="checked" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');

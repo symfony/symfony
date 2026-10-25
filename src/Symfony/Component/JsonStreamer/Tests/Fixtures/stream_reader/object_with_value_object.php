@@ -5,9 +5,7 @@
  */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $transformers, \Symfony\Component\JsonStreamer\Read\Instantiator $instantiator, array $options): mixed {
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes'] = static function ($data) use ($options, $transformers, $instantiator, &$providers) {
-        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes::class, \array_filter(['interface' => \array_key_exists('interface', $data) ? $providers['DateTimeInterface']($data['interface']) : '_symfony_missing_value', 'immutable' => \array_key_exists('immutable', $data) ? $providers['DateTimeImmutable']($data['immutable']) : '_symfony_missing_value', 'union' => \array_key_exists('union', $data) ? $providers['DateTimeImmutable|int']($data['union']) : '_symfony_missing_value'], static function ($v) {
-            return '_symfony_missing_value' !== $v;
-        }));
+        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes::class, [...(\array_key_exists('interface', $data) ? ['interface' => $providers['DateTimeInterface']($data['interface'])] : []), ...(\array_key_exists('immutable', $data) ? ['immutable' => $providers['DateTimeImmutable']($data['immutable'])] : []), ...(\array_key_exists('union', $data) ? ['union' => $providers['DateTimeImmutable|int']($data['union'])] : [])]);
     };
     $providers['DateTimeInterface'] = static function ($data) use ($options, $transformers, $instantiator, &$providers) {
         return $transformers->get('DateTimeInterface')->reverseTransform($data, $options);

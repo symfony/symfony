@@ -240,6 +240,32 @@ class StringTypeResolverTest extends TestCase
         yield [Type::collection(Type::object(\IteratorAggregate::class), Type::bool(), Type::string()), \IteratorAggregate::class.'<string, bool>'];
         yield [Type::collection(Type::object(DummyCollection::class), Type::bool(), Type::string()), DummyCollection::class.'<string, bool>'];
 
+        yield [Type::string(), 'String'];
+        yield [Type::int(), 'Int'];
+        yield [Type::int(), 'Integer'];
+        yield [Type::bool(), 'Bool'];
+        yield [Type::bool(), 'Boolean'];
+        yield [Type::float(), 'Double'];
+        yield [Type::mixed(), 'MIXED'];
+        yield [Type::null(), 'NULL'];
+        yield [Type::string(), 'Non-Empty-String'];
+        yield [Type::array(), 'Array'];
+        yield [Type::list(Type::string()), 'List<String>'];
+        yield 'mixed-case value-of enum' => [Type::string(), \sprintf('Value-Of<%s>', DummyBackedEnum::class)];
+        yield 'mixed-case value-of list' => [Type::bool(), 'Value-Of<list<Bool>>'];
+        yield 'mixed-case key-of array' => [Type::string(), 'Key-Of<array<String, Bool>>'];
+        yield 'uppercase key-of list' => [Type::int(), 'KEY-OF<LIST<Bool>>'];
+        yield 'nested mixed-case generic keywords' => [Type::array(Type::bool(), Type::string()), 'array<Key-Of<array<string, bool>>, VALUE-OF<list<Bool>>>'];
+        yield [Type::array(Type::list(Type::int()), Type::string()), 'Array<String, List<Integer>>'];
+        yield [Type::arrayShape(['Array' => Type::string(), 'List' => ['type' => Type::int(), 'optional' => true], 'NON-EMPTY-ARRAY' => Type::bool()]), 'array{Array: String, List?: Integer, NON-EMPTY-ARRAY: Bool}'];
+        yield [Type::arrayShape(['Array{' => Type::string()]), "array{'Array{': String}"];
+        yield [Type::arrayShape(['KEY' => Type::arrayShape(['NESTED' => Type::string()])]), 'array{KEY: array{NESTED: String}}'];
+        yield [Type::nullable(Type::int()), '?Int'];
+        yield [Type::object(Dummy::class), 'Self', $typeContextFactory->createFromClassName(Dummy::class)];
+        yield [Type::object(Dummy::class), 'Number', new TypeContext(Dummy::class, Dummy::class, null, ['Number' => Dummy::class])];
+        yield [Type::template('Number', Type::bool()), 'Number', new TypeContext(Dummy::class, Dummy::class, null, [], ['Number' => Type::bool()])];
+        yield [Type::string(), 'Number', new TypeContext(Dummy::class, Dummy::class, null, [], [], ['Number' => Type::string()])];
+
         // type aliases
         yield [Type::int(), 'CustomInt', $typeContextFactory->createFromClassName(DummyWithTypeAliases::class)];
         yield [Type::string(), 'CustomString', $typeContextFactory->createFromClassName(DummyWithTypeAliases::class)];
@@ -252,6 +278,117 @@ class StringTypeResolverTest extends TestCase
 
         $this->assertEquals(Type::int(), $resolver->resolve('CustomAlias'));
         $this->assertEquals(Type::arrayShape([Type::int(), Type::int()]), $resolver->resolve('CustomPair'));
+    }
+
+    public function testDeclaredIdentifierTakesPrecedenceOverKeywordCase()
+    {
+        $resolver = new StringTypeResolver(null, null, ['Number' => 'string']);
+
+        $this->assertEquals(Type::string(), $resolver->resolve('Number'));
+        $this->assertEquals(Type::union(Type::int(), Type::float()), $resolver->resolve('number'));
+    }
+
+    public function testDeclaredGenericAliasesTakePrecedenceOverKeywordCase()
+    {
+        $resolver = new StringTypeResolver(null, null, ['Value-Of' => \DateTime::class, 'Key-Of' => \DateTime::class]);
+
+        foreach (['Value-Of', 'Key-Of'] as $name) {
+            $this->assertEquals(Type::generic(Type::object(\DateTime::class), Type::string()), $resolver->resolve($name.'<string>'));
+        }
+    }
+
+    public function testContextGenericAliasesTakePrecedenceOverKeywordCase()
+    {
+        $context = new TypeContext(Dummy::class, Dummy::class, null, [], [], ['Value-Of' => Type::object(\DateTime::class), 'Key-Of' => Type::object(\DateTime::class)]);
+
+        foreach (['Value-Of', 'Key-Of'] as $name) {
+            $this->assertEquals(Type::generic(Type::object(\DateTime::class), Type::string()), $this->resolver->resolve($name.'<string>', $context));
+        }
+    }
+
+    #[DataProvider('uppercaseShapeDataProvider')]
+    public function testCannotResolveUppercaseShape(string $subject, string $keyword)
+    {
+        $this->expectException(UnsupportedException::class);
+
+        try {
+            $this->resolver->resolve($subject);
+        } catch (UnsupportedException $e) {
+            $this->assertSame(\sprintf('Use "%s{...}" instead of "%s{...}" for shape types.', strtolower($keyword), $keyword), $e->getPrevious()->getMessage());
+
+            throw $e;
+        }
+    }
+
+    public static function uppercaseShapeDataProvider(): iterable
+    {
+        yield ['Array{KEY: String}', 'Array'];
+        yield ['Array {KEY: String}', 'Array'];
+        yield ["Array\n{KEY: String}", 'Array'];
+        yield ["Array\n *  {KEY: String}", 'Array'];
+        yield ["List\t{String}", 'List'];
+        yield ['ARRAY{KEY?: String, ...<String, Integer>}', 'ARRAY'];
+        yield ['List{String, Integer}', 'List'];
+        yield ['Non-Empty-Array{KEY: String}', 'Non-Empty-Array'];
+        yield ['Non-Empty-List{String}', 'Non-Empty-List'];
+        yield ['?Array{KEY: String}', 'Array'];
+        yield ['String|Array{KEY: String}', 'Array'];
+    }
+
+    public function testUnknownIdentifierIsReportedAsWritten()
+    {
+        $this->expectException(UnsupportedException::class);
+
+        try {
+            $this->resolver->resolve('UnknownClass');
+        } catch (UnsupportedException $e) {
+            $this->assertSame('Unhandled "UnknownClass" identifier.', $e->getPrevious()->getMessage());
+
+            throw $e;
+        }
+    }
+
+    public function testExtraTypeAliasNamesAreCaseSensitive()
+    {
+        $resolver = new StringTypeResolver(null, null, ['custom' => 'string']);
+
+        $this->expectException(UnsupportedException::class);
+        $resolver->resolve('Custom');
+    }
+
+    public function testTypeAliasNamesAreCaseSensitive()
+    {
+        $context = new TypeContext(Dummy::class, Dummy::class, null, [], [], ['custom' => Type::string()]);
+
+        $this->expectException(UnsupportedException::class);
+        $this->resolver->resolve('Custom', $context);
+    }
+
+    public function testTemplateNamesAreCaseSensitive()
+    {
+        $context = new TypeContext(Dummy::class, Dummy::class, null, [], ['t' => Type::string()]);
+
+        $this->expectException(UnsupportedException::class);
+        $this->resolver->resolve('T', $context);
+    }
+
+    public function testClassNamesArePassedToAutoloadersAsWritten()
+    {
+        $autoloadedClasses = [];
+        $autoload = static function (string $class) use (&$autoloadedClasses): void {
+            $autoloadedClasses[] = $class;
+        };
+        spl_autoload_register($autoload);
+
+        try {
+            $this->resolver->resolve('UnknownClassWithOriginalCase');
+            $this->fail('An unknown class cannot be resolved.');
+        } catch (UnsupportedException) {
+            $this->assertContains('UnknownClassWithOriginalCase', $autoloadedClasses);
+            $this->assertNotContains('unknownclasswithoriginalcase', $autoloadedClasses);
+        } finally {
+            spl_autoload_unregister($autoload);
+        }
     }
 
     public function testThrowWhenResolvingRecursiveExtraTypeAlias()

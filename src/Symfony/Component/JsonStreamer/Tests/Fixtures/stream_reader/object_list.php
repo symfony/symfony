@@ -13,9 +13,7 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
         return \iterator_to_array($iterable($data));
     };
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'] = static function ($data) use ($options, $transformers, $instantiator, &$providers) {
-        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy::class, \array_filter(['id' => isset($data['id']) ? $data['id'] : '_symfony_missing_value', 'name' => isset($data['name']) ? $data['name'] : '_symfony_missing_value'], static function ($v) {
-            return '_symfony_missing_value' !== $v;
-        }));
+        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy::class, [...(isset($data['id']) ? ['id' => $data['id']] : []), ...(isset($data['name']) ? ['name' => $data['name']] : [])]);
     };
     return $providers['list<Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy>'](\Symfony\Component\JsonStreamer\Read\Decoder::decodeString((string) $string));
 };

@@ -143,9 +143,9 @@ class DataPart extends TextPart
 
     public function __unserialize(array $data): void
     {
-        if (($data['filename'] ?? $data["\0".self::class."\0filename"] ?? null) instanceof \Stringable
-            || ($data['mediaType'] ?? $data["\0".self::class."\0mediaType"] ?? null) instanceof \Stringable
-            || ($data['cid'] ?? $data["\0".self::class."\0cid"] ?? null) instanceof \Stringable
+        if (!\is_string($data['filename'] ?? $data["\0".self::class."\0filename"] ?? '')
+            || !\is_string($data['mediaType'] ?? $data["\0".self::class."\0mediaType"] ?? null)
+            || !\is_string($data['cid'] ?? $data["\0".self::class."\0cid"] ?? '')
         ) {
             throw new \BadMethodCallException('Cannot unserialize '.self::class);
         }

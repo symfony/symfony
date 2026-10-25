@@ -129,6 +129,20 @@ class OrderedHashMapTest extends TestCase
         $this->assertSame(['1 as a string' => '1 as a string'], iterator_to_array($map));
     }
 
+    public function testUnsetFromLooselyEqualNumericStringKeysHashMap()
+    {
+        $map = new OrderedHashMap();
+        $map['01'] = 'first';
+        $map['1'] = 'second';
+        $map['1e1'] = 'third';
+        $map['10'] = 'fourth';
+
+        unset($map['1'], $map['10']);
+
+        $this->assertSame(['01' => 'first', '1e1' => 'third'], iterator_to_array($map));
+        $this->assertCount(2, $map);
+    }
+
     public function testUnsetNonExistingSucceeds()
     {
         $map = new OrderedHashMap();

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithStaticProperty;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
@@ -28,5 +29,12 @@ class PropertyMetadataLoaderTest extends TestCase
             'id' => new PropertyMetadata('id', Type::int()),
             'name' => new PropertyMetadata('name', Type::string()),
         ], $loader->load(ClassicDummy::class));
+    }
+
+    public function testSkipStaticProperties()
+    {
+        $loader = new PropertyMetadataLoader(TypeResolver::create());
+
+        $this->assertEquals(['id' => new PropertyMetadata('id', Type::int())], $loader->load(DummyWithStaticProperty::class));
     }
 }

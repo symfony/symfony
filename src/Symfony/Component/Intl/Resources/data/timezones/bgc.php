@@ -1,0 +1,32 @@
+<?php
+
+return [
+    'Names' => [
+        'Africa/Abidjan' => 'ग्रीनविच मीन टाइम (Abidjan)',
+        'Africa/Accra' => 'ग्रीनविच मीन टाइम (Accra)',
+        'Africa/Bamako' => 'ग्रीनविच मीन टाइम (Bamako)',
+        'Africa/Banjul' => 'ग्रीनविच मीन टाइम (Banjul)',
+        'Africa/Bissau' => 'ग्रीनविच मीन टाइम (Bissau)',
+        'Africa/Conakry' => 'ग्रीनविच मीन टाइम (Conakry)',
+        'Africa/Dakar' => 'ग्रीनविच मीन टाइम (Dakar)',
+        'Africa/Freetown' => 'ग्रीनविच मीन टाइम (Freetown)',
+        'Africa/Lome' => 'ग्रीनविच मीन टाइम (Lomé)',
+        'Africa/Monrovia' => 'ग्रीनविच मीन टाइम (Monrovia)',
+        'Africa/Nouakchott' => 'ग्रीनविच मीन टाइम (Nouakchott)',
+        'Africa/Ouagadougou' => 'ग्रीनविच मीन टाइम (Ouagadougou)',
+        'Africa/Sao_Tome' => 'ग्रीनविच मीन टाइम (São Tomé)',
+        'America/Danmarkshavn' => 'ग्रीनविच मीन टाइम (Danmarkshavn)',
+        'Antarctica/Troll' => 'ग्रीनविच मीन टाइम (Troll)',
+        'Asia/Calcutta' => 'भारत समय (Kolkata)',
+        'Asia/Kolkata' => 'भारत समय (Kolkata)',
+        'Atlantic/Reykjavik' => 'ग्रीनविच मीन टाइम (Reykjavik)',
+        'Atlantic/St_Helena' => 'ग्रीनविच मीन टाइम (St. Helena)',
+        'Etc/GMT' => 'ग्रीनविच मीन टाइम',
+        'Europe/Dublin' => 'ग्रीनविच मीन टाइम (Dublin)',
+        'Europe/Guernsey' => 'ग्रीनविच मीन टाइम (Guernsey)',
+        'Europe/Isle_of_Man' => 'ग्रीनविच मीन टाइम (Isle of Man)',
+        'Europe/Jersey' => 'ग्रीनविच मीन टाइम (Jersey)',
+        'Europe/London' => 'ग्रीनविच मीन टाइम (London)',
+    ],
+    'Meta' => [],
+];

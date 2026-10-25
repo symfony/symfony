@@ -191,7 +191,7 @@ class YamlReferenceDumper
 
         foreach ($array as $key => $value) {
             if (\is_array($value)) {
-                $val = '';
+                $val = $value ? '' : '[]';
             } else {
                 $val = $value;
             }
@@ -201,7 +201,7 @@ class YamlReferenceDumper
             if ($isIndexed) {
                 $this->writeLine($prefix.'- '.$val, $depth * 4);
             } else {
-                $this->writeLine(\sprintf('%s%-20s %s', $prefix, $key.':', $val), $depth * 4);
+                $this->writeLine(\sprintf('%s%-20s %s', $prefix, Inline::dump($key).':', $val), $depth * 4);
             }
 
             if (\is_array($value)) {

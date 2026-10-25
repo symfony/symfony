@@ -5,14 +5,10 @@
  */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $transformers, \Symfony\Component\JsonStreamer\Read\Instantiator $instantiator, array $options): mixed {
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNullableRepeatedDummies'] = static function ($data) use ($options, $transformers, $instantiator, &$providers) {
-        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies::class, \array_filter(['first' => \array_key_exists('first', $data) ? $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy|null']($data['first']) : '_symfony_missing_value', 'second' => \array_key_exists('second', $data) ? $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy|null']($data['second']) : '_symfony_missing_value'], static function ($v) {
-            return '_symfony_missing_value' !== $v;
-        }));
+        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies::class, [...(\array_key_exists('first', $data) ? ['first' => $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy|null']($data['first'])] : []), ...(\array_key_exists('second', $data) ? ['second' => $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy|null']($data['second'])] : [])]);
     };
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'] = static function ($data) use ($options, $transformers, $instantiator, &$providers) {
-        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy::class, \array_filter(['id' => isset($data['id']) ? $data['id'] : '_symfony_missing_value', 'name' => isset($data['name']) ? $data['name'] : '_symfony_missing_value'], static function ($v) {
-            return '_symfony_missing_value' !== $v;
-        }));
+        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy::class, [...(isset($data['id']) ? ['id' => $data['id']] : []), ...(isset($data['name']) ? ['name' => $data['name']] : [])]);
     };
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy|null'] = static function ($data) use ($options, $transformers, $instantiator, &$providers) {
         if (\is_array($data)) {

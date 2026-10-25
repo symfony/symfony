@@ -1008,6 +1008,19 @@ class CrawlerTest extends TestCase
         $crawler->filterXPath('//li/text()')->form();
     }
 
+    public function testFormSkipsSelectedDisabledOptionsOfMultipleSelect()
+    {
+        $crawler = $this->createCrawler(null, 'http://example.com');
+        $crawler->addHtmlContent(static::getDoctype().'<html><body><form><select name="choice[]" multiple><option selected disabled>foo</option><optgroup disabled><option selected>bar</option></optgroup><option selected>baz</option><option>qux</option></select><button type="submit">Send</button></form></body></html>');
+        $form = $crawler->filter('form')->form();
+
+        $this->assertSame(['foo', 'bar', 'baz'], $form['choice']->getValue());
+        $this->assertSame(['choice' => ['baz']], $form->getPhpValues());
+
+        $form['choice']->select(['bar', 'qux']);
+        $this->assertSame(['choice' => ['qux']], $form->getPhpValues());
+    }
+
     public function testLast()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');

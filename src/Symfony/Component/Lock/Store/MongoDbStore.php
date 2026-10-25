@@ -156,8 +156,8 @@ class MongoDbStore implements PersistingStoreInterface
         if (false === $params = parse_url($uri)) {
             throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
         }
-        $pathDb = ltrim($params['path'] ?? '', '/') ?: null;
-        if (null !== $pathDb) {
+        $pathDb = rawurldecode(ltrim($params['path'] ?? '', '/'));
+        if ('' !== $pathDb) {
             $this->options['database'] = $pathDb;
         }
 

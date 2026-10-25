@@ -655,6 +655,19 @@ class RateLimitAttributeListenerTest extends TestCase
         }
     }
 
+    public function testDefaultKeyDoesNotDependOnTheMethod()
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+
+        $keys = [];
+        foreach (['GET', 'HEAD', 'POST', 'FOO'] as $method) {
+            $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit('api'), Request::create('/login', $method, server: ['REMOTE_ADDR' => '1.2.3.4'])));
+            $keys[] = $usedKey;
+        }
+
+        $this->assertSame(['1.2.3.4~/login'], array_unique($keys));
+    }
+
     public function testExpressionKey()
     {
         $listener = $this->makeListenerCapturingKey($usedKey);
@@ -788,7 +801,7 @@ class RateLimitAttributeListenerTest extends TestCase
         $this->assertInstanceOf(RateLimitExceededEvent::class, $dispatchedEvent);
         $this->assertSame($result, $dispatchedEvent->getRateLimit());
         $this->assertSame('api', $dispatchedEvent->getLimiterName());
-        $this->assertSame('9.9.9.9~GET~/', $dispatchedEvent->getKey());
+        $this->assertSame('9.9.9.9~/', $dispatchedEvent->getKey());
     }
 
     public function testAcceptedDoesNotDispatchEvent()
@@ -836,7 +849,7 @@ class RateLimitAttributeListenerTest extends TestCase
 
     public static function provideKeysNotReadingArguments(): iterable
     {
-        yield 'default key' => [null, '1.2.3.4~GET~/'];
+        yield 'default key' => [null, '1.2.3.4~/'];
         yield 'literal key' => ['shared', 'shared'];
         yield 'key with placeholders' => ['user-{id}', 'user-42'];
         yield 'expression not reading args' => [new Expression('request.getClientIp()'), '1.2.3.4'];
@@ -925,11 +938,11 @@ class RateLimitAttributeListenerTest extends TestCase
     public static function provideIfConditions(): iterable
     {
         yield 'false' => [false, null];
-        yield 'true' => [true, '1.2.3.4~GET~/'];
+        yield 'true' => [true, '1.2.3.4~/'];
         yield 'closure evaluating to false' => [static fn ($args, Request $request) => $request->isMethod('POST'), null];
-        yield 'closure evaluating to true' => [static fn ($args, Request $request) => $request->isMethod('GET'), '1.2.3.4~GET~/'];
+        yield 'closure evaluating to true' => [static fn ($args, Request $request) => $request->isMethod('GET'), '1.2.3.4~/'];
         yield 'expression evaluating to false' => [new Expression('request.isMethod("POST")'), null];
-        yield 'expression evaluating to true' => [new Expression('request.isMethod("GET")'), '1.2.3.4~GET~/'];
+        yield 'expression evaluating to true' => [new Expression('request.isMethod("GET")'), '1.2.3.4~/'];
     }
 
     #[DataProvider('provideIfConditions')]
@@ -992,7 +1005,7 @@ class RateLimitAttributeListenerTest extends TestCase
         $this->assertNull($usedKey, 'the condition reads the arguments, so it cannot be answered yet');
 
         $listener->onKernelControllerAttribute(new ControllerAttributeEvent($attribute, new ControllerArgumentsEvent($kernel, $controller, ['42'], $request, null), new ExpressionLanguage()));
-        $this->assertSame('1.2.3.4~GET~/', $usedKey);
+        $this->assertSame('1.2.3.4~/', $usedKey);
     }
 
     public static function provideConditionsReadingArguments(): iterable
@@ -1008,7 +1021,7 @@ class RateLimitAttributeListenerTest extends TestCase
         $attribute = new RateLimit('api', if: new Expression('request.isMethod("GET")'));
 
         $listener->onKernelControllerAttribute($this->makeControllerEvent($attribute, $request, new ExpressionLanguage()));
-        $this->assertSame('1.2.3.4~GET~/', $usedKey);
+        $this->assertSame('1.2.3.4~/', $usedKey);
 
         $usedKey = null;
         $listener->onKernelControllerAttribute($this->makeEvent($attribute, $request, new ExpressionLanguage()));

@@ -29,6 +29,7 @@ return [
         'eu' => 'Ikibasiki',
         'fa' => 'Inyeperisi',
         'fi' => 'Igifinilande',
+        'fil' => 'Ikinyafilipine',
         'fo' => 'Inyefaroyizi',
         'fr' => 'Igifaransa',
         'fr_RW' => 'Igifaransa (U Rwanda)',

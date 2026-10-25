@@ -37,6 +37,10 @@ class UriResolverTest extends TestCase
             ['foo', 'http://localhost/bar/foo', 'http://localhost/bar/foo'],
 
             ['', 'http://localhost/bar/', 'http://localhost/bar/'],
+            ['', 'http://localhost/bar#foo', 'http://localhost/bar'],
+            ['', 'http://localhost/bar?a=b#foo', 'http://localhost/bar?a=b'],
+            ['0', 'http://a/b/c/d;p?q', 'http://a/b/c/0'],
+            [' 0 ', 'http://a/b/c/d;p?q', 'http://a/b/c/0'],
             ['#', 'http://localhost/bar/', 'http://localhost/bar/#'],
             ['#bar', 'http://localhost/bar?a=b', 'http://localhost/bar?a=b#bar'],
             ['#bar', 'http://localhost/bar/#foo', 'http://localhost/bar/#bar'],
@@ -88,6 +92,18 @@ class UriResolverTest extends TestCase
             ['/foo:123', 'http://localhost', 'http://localhost/foo:123'],
             ['foo:123', 'http://localhost/', 'foo:123'],
             ['foo/bar:1/baz', 'http://localhost/', 'http://localhost/foo/bar:1/baz'],
+
+            ['/./g', 'http://a/b/c/d;p?q', 'http://a/g'],
+            ['/../g', 'http://a/b/c/d;p?q', 'http://a/g'],
+            ['/..//g', 'http://a/b/c/d;p?q', 'http://a//g'],
+            ['../../..//g', 'http://a/b/c/d;p?q', 'http://a//g'],
+            ['g.', 'http://a/b/c/d;p?q', 'http://a/b/c/g.'],
+            ['g..', 'http://a/b/c/d;p?q', 'http://a/b/c/g..'],
+            ['g?y/./x', 'http://a/b/c/d;p?q', 'http://a/b/c/g?y/./x'],
+            ['g?y/../x', 'http://a/b/c/d;p?q', 'http://a/b/c/g?y/../x'],
+            ['g#s/./x', 'http://a/b/c/d;p?q', 'http://a/b/c/g#s/./x'],
+            ['g#s/../x', 'http://a/b/c/d;p?q', 'http://a/b/c/g#s/../x'],
+            ['download?file=docs/../readme.txt', 'http://localhost/foo/bar', 'http://localhost/foo/download?file=docs/../readme.txt'],
         ];
     }
 }

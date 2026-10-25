@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
@@ -30,6 +31,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Serializer\Attribute as SerializerMapping;
 use Symfony\Component\Serializer\Attribute\ExtendsSerializationFor;
 use Symfony\Component\Serializer\DependencyInjection\AttributeMetadataPass;
+use Symfony\Component\Serializer\DependencyInjection\NamedSerializerNestedNormalizersPass;
 use Symfony\Component\Serializer\DependencyInjection\RemoveMissingDependenciesPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
@@ -60,6 +62,7 @@ class SerializerBundle extends AbstractBundle
         // must run first so that SerializerPass does not wire what it removes
         $container->addCompilerPass(new RemoveMissingDependenciesPass());
         $container->addCompilerPass(new SerializerPass());
+        $container->addCompilerPass(new NamedSerializerNestedNormalizersPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new AttributeMetadataPass());
     }
 

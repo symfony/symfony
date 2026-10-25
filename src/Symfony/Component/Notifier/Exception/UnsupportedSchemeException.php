@@ -387,7 +387,7 @@ class UnsupportedSchemeException extends LogicException
         }
 
         if (!$name && $package && \in_array($dsn->getScheme(), ['fakechat+email', 'fakechat+logger', 'fakesms+email', 'fakesms+logger', 'mercure'], true)) {
-            parent::__construct(\sprintf('The "%s" scheme requires a configured "%s" factory. Pass it to "new Transport([$factory])" instead of using "Transport::fromDsn()" or "Transport::fromDsns()".', $dsn->getScheme(), $package['class']), 0, $previous);
+            parent::__construct(\sprintf('The "%s" scheme requires a configured "%s" factory. When using "Transport::fromDsn()" or "Transport::fromDsns()", pass it to "new Transport([$factory])" instead.', $dsn->getScheme(), $package['class']), 0, $previous);
 
             return;
         }

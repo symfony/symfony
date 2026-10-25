@@ -602,10 +602,9 @@ trait RedisTrait
             $prefixLen = \strlen($prefix ?? '');
             $pattern = addcslashes($prefix.$namespace, '*?[]\\').'*';
             foreach ($this->redis->_masters() as $ipAndPort) {
-                $address = implode(':', $ipAndPort);
                 $cursor = null;
                 do {
-                    $keys = $this->redis->scan($cursor, $address, $pattern, 1000);
+                    $keys = $this->redis->scan($cursor, $ipAndPort, $pattern, 1000);
                     if (isset($keys[1]) && \is_array($keys[1])) {
                         $cursor = $keys[0];
                         $keys = $keys[1];

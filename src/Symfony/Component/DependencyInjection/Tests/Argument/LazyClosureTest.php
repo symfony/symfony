@@ -88,6 +88,27 @@ class LazyClosureTest extends TestCase
         }
     }
 
+    public function testLazyClosureWithStaticInNullableOrUnionReturnType()
+    {
+        $container = new ContainerBuilder();
+        $container->register('target', InheritedStaticCallable::class)->setPublic(true);
+        foreach (['nullable' => 'createOrNull', 'union' => 'createOrFalse'] as $id => $method) {
+            $container->register($id, \Closure::class)
+                ->setPublic(true)
+                ->setFactory(['Closure', 'fromCallable'])
+                ->setArguments([[new Reference('target'), $method]])
+                ->setLazy(true);
+        }
+        $container->compile();
+
+        eval('?>'.(new PhpDumper($container))->dump(['class' => 'Symfony_DI_LazyClosure_StaticInNullableOrUnion']));
+
+        foreach ([$container, new \Symfony_DI_LazyClosure_StaticInNullableOrUnion()] as $container) {
+            $this->assertInstanceOf(InheritedStaticCallable::class, $container->get('nullable')());
+            $this->assertInstanceOf(InheritedStaticCallable::class, $container->get('union')());
+        }
+    }
+
     public function testLazyClosureWithNeverReturnType()
     {
         $container = new ContainerBuilder();
@@ -137,6 +158,16 @@ interface NonFunctionalInterface
 class StaticCallable
 {
     public static function create(): static
+    {
+        return new static();
+    }
+
+    public static function createOrNull(): ?static
+    {
+        return new static();
+    }
+
+    public function createOrFalse(): static|false
     {
         return new static();
     }

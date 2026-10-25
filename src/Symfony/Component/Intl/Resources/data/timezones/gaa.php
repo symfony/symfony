@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'Names' => [
+        'Africa/Abidjan' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Abidjan)',
+        'Africa/Accra' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Accra)',
+        'Africa/Bamako' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Bamako)',
+        'Africa/Banjul' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Banjul)',
+        'Africa/Bissau' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Bissau)',
+        'Africa/Conakry' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Conakry)',
+        'Africa/Dakar' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Dakar)',
+        'Africa/Freetown' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Freetown)',
+        'Africa/Lome' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Lomé)',
+        'Africa/Monrovia' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Monrovia)',
+        'Africa/Nouakchott' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Nouakchott)',
+        'Africa/Ouagadougou' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Ouagadougou)',
+        'Africa/Sao_Tome' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (São Tomé)',
+        'America/Danmarkshavn' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Danmarkshavn)',
+        'Antarctica/Troll' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Troll)',
+        'Atlantic/Reykjavik' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Reykjavik)',
+        'Atlantic/St_Helena' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (St. Helena)',
+        'Etc/GMT' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ',
+        'Europe/Dublin' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Dublin)',
+        'Europe/Guernsey' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Guernsey)',
+        'Europe/Isle_of_Man' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Isle of Man)',
+        'Europe/Jersey' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (Jersey)',
+        'Europe/London' => 'Betsɔɔmɔ ni ka ŋɛlɛ kome nɔ (London)',
+    ],
+    'Meta' => [],
+];

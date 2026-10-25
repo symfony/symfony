@@ -50,7 +50,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     private StringTypeResolver $stringTypeResolver;
     private TypeContextFactory $typeContextFactory;
 
-    /** @var array<string, array{PhpDocNode|null, int|null, string|null, string|null}> */
+    /** @var array<string, array{PhpDocNode|null, int|null, string|null, string|null, string|null}> */
     private array $docBlocks = [];
     /** @var array<string, array{PhpDocNode, string}|false> */
     private array $constructorDocBlocks = [];
@@ -354,7 +354,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     }
 
     /**
-     * @return array{PhpDocNode|null, int|null, string|null, string|null}
+     * @return array{PhpDocNode|null, int|null, string|null, string|null, string|null}
      */
     private function getDocBlock(string $class, string $property): array
     {
@@ -366,27 +366,27 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
 
         $ucFirstProperty = ucfirst($property);
 
-        if ([$docBlock, $constructorDocBlock, $source, $declaringClass] = $this->getDocBlockFromProperty($class, $property)) {
+        if ([$docBlock, $constructorDocBlock, $source, $declaringClass, $selfClass] = $this->getDocBlockFromProperty($class, $property)) {
             if (!$docBlock?->getTagsByName('@var') && $constructorDocBlock) {
                 $docBlock = $constructorDocBlock;
             }
 
-            $data = [$docBlock, $source, null, $declaringClass];
+            $data = [$docBlock, $source, null, $declaringClass, $selfClass];
         } elseif ([$docBlock, $_, $declaringClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR)) {
-            $data = [$docBlock, self::ACCESSOR, null, $declaringClass];
+            $data = [$docBlock, self::ACCESSOR, null, $declaringClass, $declaringClass];
         } elseif ([$docBlock, $prefix, $declaringClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR)) {
-            $data = [$docBlock, self::MUTATOR, $prefix, $declaringClass];
+            $data = [$docBlock, self::MUTATOR, $prefix, $declaringClass, $declaringClass];
         } else {
-            $data = [null, null, null, null];
+            $data = [null, null, null, null, null];
         }
 
         return $this->docBlocks[$propertyHash] = $data;
     }
 
     /**
-     * @return array{?PhpDocNode, ?PhpDocNode, int, string}|null
+     * @return array{?PhpDocNode, ?PhpDocNode, int, string, string}|null
      */
-    private function getDocBlockFromProperty(string $class, string $property): ?array
+    private function getDocBlockFromProperty(string $class, string $property, ?string $selfClass = null): ?array
     {
         // Use a ReflectionProperty instead of $class to get the parent class if applicable
         try {
@@ -403,7 +403,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
 
         foreach ($reflector->getTraits() as $trait) {
             if ($trait->hasProperty($property)) {
-                return $this->getDocBlockFromProperty($trait->getName(), $property);
+                return $this->getDocBlockFromProperty($trait->getName(), $property, $reflector->isTrait() ? $selfClass : $reflector->getName());
             }
         }
 
@@ -424,7 +424,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             return null;
         }
 
-        return [$phpDocNode, $constructorPhpDocNode, $source, $reflectionProperty->class];
+        return [$phpDocNode, $constructorPhpDocNode, $source, $reflectionProperty->class, $reflector->isTrait() ? $selfClass ?? $class : $reflectionProperty->class];
     }
 
     /**
@@ -503,5 +503,19 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
         } catch (\ReflectionException) {
             return false;
         }
+    }
+
+    /**
+     * Creates a type context that reads class names where the docblock is written, and that resolves "self" to the class using a trait.
+     */
+    private function createTypeContext(string $class, ?string $declaringClass, ?string $selfClass): TypeContext
+    {
+        $typeContext = $this->typeContextFactory->createFromClassName($class, $declaringClass);
+
+        if (null === $selfClass || $selfClass === $typeContext->declaringClassName) {
+            return $typeContext;
+        }
+
+        return new TypeContext($typeContext->calledClassName, $selfClass, $typeContext->namespace, $typeContext->uses, $typeContext->templates, $typeContext->typeAliases);
     }
 }

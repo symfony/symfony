@@ -41,6 +41,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullablePropert
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullablePropertyWithDefault;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNulName;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNumericStreamedNames;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNumericStreamedObject;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPrivateConstructor;
@@ -262,6 +263,16 @@ class JsonStreamReaderTest extends TestCase
         }, '{"@id": 10}', Type::object(DummyWithNameAttributes::class));
     }
 
+    public function testReadObjectWithNumericStreamedNames()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithNumericStreamedNames::class, $read);
+            $this->assertSame([10, 20, 'twelve'], [$read->first, $read->second, $read->third]);
+        }, '{"0": 10, "1": 20, "12": "twelve"}', Type::object(DummyWithNumericStreamedNames::class));
+    }
+
     public function testReadObjectWithValueTransformer()
     {
         $reader = JsonStreamReader::create([
@@ -394,6 +405,13 @@ class JsonStreamReaderTest extends TestCase
             $this->assertContainsOnlyInstancesOf(DummyWithNameAttributes::class, $read->arrayOfDummies);
             $this->assertArrayHasKey('key', $read->arrayOfDummies);
         }, '{"arrayOfDummies":{"key":{"@id":10,"name":"dummy"}}}', Type::object(DummyWithPhpDoc::class));
+    }
+
+    public function testReadObjectPropertyMatchingTheLegacyMissingValueMarker()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->assertSame('_symfony_missing_value', $reader->read('{"name": "_symfony_missing_value"}', Type::object(ClassicDummy::class))->name);
     }
 
     public function testReadObjectWithNullableProperties()

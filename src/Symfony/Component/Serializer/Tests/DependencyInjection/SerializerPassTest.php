@@ -16,20 +16,25 @@ use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Serializer\DataCollector\SerializerDataCollector;
 use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
 use Symfony\Component\Serializer\Debug\TraceableSerializer;
+use Symfony\Component\Serializer\DependencyInjection\NamedSerializerNestedNormalizersPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\MimeMessageNormalizer;
@@ -38,6 +43,9 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\DeepObjectPopulateChildDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\DeepObjectPopulateChildNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\DeepObjectPopulateChildTypedNormalizer;
 
 /**
  * Tests for the SerializerPass class.
@@ -917,8 +925,7 @@ class SerializerPassTest extends TestCase
             ->addTag('serializer.encoder', ['serializer' => '*'])
         ;
 
-        $serializerPass = new SerializerPass();
-        $serializerPass->process($container);
+        self::processNamedSerializers($container);
 
         $this->assertEquals(new Reference('serializer.normalizer.property'), $container->getDefinition('n')->getArgument(0));
         $this->assertEquals(new Reference('serializer.normalizer.property.api'), $container->getDefinition('n.api')->getArgument(0));
@@ -949,8 +956,7 @@ class SerializerPassTest extends TestCase
             ->addTag('serializer.encoder', ['serializer' => '*'])
         ;
 
-        $serializerPass = new SerializerPass();
-        $serializerPass->process($container);
+        self::processNamedSerializers($container);
 
         $this->assertEquals(new Reference('serializer.normalizer.property.api'), $container->getDefinition('n.api')->getArgument(0));
         $this->assertContainsEquals(new Reference('serializer.normalizer.property.api'), $container->getDefinition('serializer.api')->getArgument(0));
@@ -959,7 +965,7 @@ class SerializerPassTest extends TestCase
         $this->assertEquals(new BoundArgument(['foo' => 'bar'], false), $bindings['array $defaultContext']);
     }
 
-    public function testNamedSerializerDefaultContextIsBoundOnTheNormalizersItsNormalizersDependOn()
+    public function testNamedSerializerDefaultContextIsSetOnTheNormalizersItsNormalizersDependOn()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -977,12 +983,35 @@ class SerializerPassTest extends TestCase
             ->addTag('serializer.encoder', ['serializer' => '*'])
         ;
 
-        $serializerPass = new SerializerPass();
-        $serializerPass->process($container);
-        (new ResolveChildDefinitionsPass())->process($container);
+        self::processNamedSerializers($container);
 
         $this->assertEquals(new BoundArgument(['foo' => 'default'], false), $container->getDefinition('serializer.normalizer.property')->getBindings()['array $defaultContext']);
-        $this->assertEquals(new BoundArgument(['foo' => 'api'], false), $container->getDefinition('serializer.normalizer.property.api')->getBindings()['array $defaultContext']);
+        $this->assertSame([], $container->getDefinition('serializer.normalizer.property')->getArguments());
+        $this->assertSame([null, null, null, null, null, ['foo' => 'api']], $container->getDefinition('serializer.normalizer.property.api')->getArguments());
+    }
+
+    public function testNamedSerializerKeepsTheExplicitDefaultContextOfTheNormalizersItsNormalizersDependOn()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('.serializer.named_serializers', [
+            'api' => ['default_context' => ['foo' => 'api']],
+        ]);
+
+        $container->register('serializer')->setArguments([null, null, []]);
+        $container->register('serializer.normalizer.property', PropertyNormalizer::class)
+            ->setArguments([null, null, null, null, null, ['foo' => 'explicit']])
+            ->setBindings(['array $defaultContext' => new BoundArgument(['foo' => 'default'], false)])
+        ;
+        $container->register('n')
+            ->setArguments([new Reference('serializer.normalizer.property')])
+            ->addTag('serializer.normalizer', ['serializer' => '*'])
+            ->addTag('serializer.encoder', ['serializer' => '*'])
+        ;
+
+        self::processNamedSerializers($container);
+
+        $this->assertSame(['foo' => 'explicit'], $container->getDefinition('serializer.normalizer.property.api')->getArgument(5));
     }
 
     public function testNamedSerializerNormalizersKeepReferencesToSerializers()
@@ -1001,10 +1030,10 @@ class SerializerPassTest extends TestCase
             ->addTag('serializer.encoder', ['serializer' => '*'])
         ;
 
-        $serializerPass = new SerializerPass();
-        $serializerPass->process($container);
+        self::processNamedSerializers($container);
 
-        $this->assertSame([], $container->getDefinition('n.api')->getArguments());
+        $this->assertEquals([new Reference('serializer'), new Reference('app.serializer')], $container->getDefinition('n.api')->getArguments());
+        $this->assertFalse($container->hasDefinition('serializer.api.api'));
         $this->assertFalse($container->hasDefinition('app.serializer.api'));
     }
 
@@ -1024,8 +1053,7 @@ class SerializerPassTest extends TestCase
             ->addTag('serializer.normalizer', ['serializer' => '*'])
             ->addTag('serializer.encoder', ['serializer' => '*']);
 
-        (new SerializerPass())->process($container);
-        (new ResolveChildDefinitionsPass())->process($container);
+        self::processNamedSerializers($container);
 
         $arguments = $container->getDefinition('n.api')->getArguments();
         $this->assertSame(ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE, $arguments[0]->getInvalidBehavior());
@@ -1068,6 +1096,7 @@ class SerializerPassTest extends TestCase
 
         (new SerializerPass())->process($container);
         $container->getDefinition('serializer.api')->setPublic(true);
+        $container->addCompilerPass(new NamedSerializerNestedNormalizersPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->compile();
 
         $container->get($namedSerializerFirst ? 'serializer.api' : 'serializer');
@@ -1083,6 +1112,92 @@ class SerializerPassTest extends TestCase
         $this->assertArrayHasKey('text_charset', $namedData);
         $this->assertArrayNotHasKey('html', $namedData);
         $this->assertSame('2020', $namedData['headers']['date'][0]['date_time']);
+    }
+
+    #[TestWith([false, ['serializer.api']])]
+    #[TestWith([false, ['serializer', 'serializer.api']])]
+    #[TestWith([false, ['serializer.api', 'serializer']])]
+    #[TestWith([true, ['serializer.api']])]
+    #[TestWith([true, ['serializer', 'serializer.api']])]
+    #[TestWith([true, ['serializer.api', 'serializer']])]
+    public function testNamedSerializerIsSetOnItsCopiesOfTheNormalizersItDoesNotInclude(bool $debug, array $serializerIds)
+    {
+        $container = self::createContainerWithObjectNormalizer($debug, false);
+        $container->register('app.normalizer', DeepObjectPopulateChildNormalizer::class)
+            ->setArguments([new Reference('serializer.normalizer.object')])
+            ->addTag('serializer.normalizer', ['serializer' => '*']);
+
+        $this->assertEachSerializerNormalizesWithItsOwnContext($container, $serializerIds);
+    }
+
+    #[DataProvider('provideAutowiredNestedNormalizers')]
+    public function testNamedSerializerGetsItsOwnInstanceOfAutowiredNestedNormalizers(string $class, bool $includeBuiltInNormalizers, bool $lazy, bool $debug, array $serializerIds)
+    {
+        $container = self::createContainerWithObjectNormalizer($debug, $includeBuiltInNormalizers);
+        $container->getDefinition('serializer.normalizer.object')->setLazy($lazy);
+        $container->setAlias(ObjectNormalizer::class, 'serializer.normalizer.object');
+        $container->register('app.normalizer', $class)
+            ->setAutowired(true)
+            ->addTag('serializer.normalizer', ['serializer' => '*']);
+
+        $this->assertEachSerializerNormalizesWithItsOwnContext($container, $serializerIds);
+    }
+
+    public static function provideAutowiredNestedNormalizers(): iterable
+    {
+        foreach ([DeepObjectPopulateChildTypedNormalizer::class, DeepObjectPopulateChildNormalizer::class] as $class) {
+            foreach ([false, true] as $debug) {
+                foreach ([['serializer.api'], ['serializer', 'serializer.api'], ['serializer.api', 'serializer']] as $serializerIds) {
+                    yield [$class, false, false, $debug, $serializerIds];
+                }
+            }
+
+            yield [$class, true, false, false, ['serializer.api']];
+
+            yield [$class, false, true, false, ['serializer.api', 'serializer']];
+        }
+    }
+
+    #[TestWith([['serializer.api']])]
+    #[TestWith([['serializer', 'serializer.api']])]
+    #[TestWith([['serializer.api', 'serializer']])]
+    public function testNamedSerializerGetsItsOwnInstanceOfDecoratedNestedNormalizers(array $serializerIds)
+    {
+        $container = self::createContainerWithObjectNormalizer(false, false);
+        $container->register('serializer.data_collector', SerializerDataCollector::class);
+        $container->register('app.decorator', TraceableNormalizer::class)
+            ->setDecoratedService('serializer.normalizer.object')
+            ->setArguments([new Reference('app.decorator.inner'), new Reference('serializer.data_collector'), 'default']);
+        $container->register('app.normalizer', DeepObjectPopulateChildNormalizer::class)
+            ->setAutowired(true)
+            ->addTag('serializer.normalizer', ['serializer' => '*']);
+
+        $this->assertEachSerializerNormalizesWithItsOwnContext($container, $serializerIds);
+        $this->assertArrayHasKey('app.decorator.api', $container->getRemovedIds());
+        $this->assertArrayHasKey('app.decorator.inner.api', $container->getRemovedIds());
+    }
+
+    public function testNamedSerializerIsSetOnItsCopiesOfTheNormalizersItDoesNotIncludeThroughTheirAwareInterfaces()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('.serializer.named_serializers', ['api' => []]);
+
+        $container->register('serializer')->setArguments([null, null, []]);
+        $container->register('dependency', TraceableNormalizer::class);
+        $container->register('denormalizer', ArrayDenormalizer::class);
+        $container->register('n')
+            ->setArguments([new Reference('dependency'), new Reference('denormalizer')])
+            ->addTag('serializer.normalizer', ['serializer' => '*'])
+            ->addTag('serializer.encoder', ['serializer' => '*']);
+
+        self::processNamedSerializers($container);
+
+        $serializer = new Reference('serializer.api');
+        $this->assertEquals([['setSerializer', [$serializer]], ['setDenormalizer', [$serializer]], ['setNormalizer', [$serializer]]], $container->getDefinition('dependency.api')->getMethodCalls());
+        $this->assertEquals([['setDenormalizer', [$serializer]]], $container->getDefinition('denormalizer.api')->getMethodCalls());
+        $this->assertSame([], $container->getDefinition('n.api')->getMethodCalls());
+        $this->assertSame([], $container->getDefinition('dependency')->getMethodCalls());
     }
 
     public function testCircularParentDefinitionsAreLeftToResolveChildDefinitionsPass()
@@ -1106,5 +1221,68 @@ class SerializerPassTest extends TestCase
         $this->expectException(ServiceCircularReferenceException::class);
 
         (new ResolveChildDefinitionsPass())->process($container);
+    }
+
+    private static function processNamedSerializers(ContainerBuilder $container): void
+    {
+        (new SerializerPass())->process($container);
+        (new ResolveChildDefinitionsPass())->process($container);
+        (new NamedSerializerNestedNormalizersPass())->process($container);
+    }
+
+    private static function createContainerWithObjectNormalizer(bool $debug, bool $includeBuiltInNormalizers): ContainerBuilder
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', $debug);
+        $container->setParameter('.serializer.named_serializers', [
+            'api' => ['include_built_in_normalizers' => $includeBuiltInNormalizers, 'default_context' => ['datetime_format' => 'Y']],
+        ]);
+
+        $container->register('serializer', Serializer::class)->setArguments([[], [], []])->setPublic(true);
+        $container->register('serializer.normalizer.object', ObjectNormalizer::class)
+            ->setArguments([null, null, null, null, null, null])
+            ->addTag('serializer.normalizer', ['built_in' => true, 'priority' => -1000]);
+        $container->register('serializer.normalizer.datetime', DateTimeNormalizer::class)
+            ->addTag('serializer.normalizer', ['serializer' => '*']);
+        $container->register('serializer.encoder.json', JsonEncoder::class)
+            ->setArguments([null, null])
+            ->addTag('serializer.encoder', ['serializer' => '*']);
+
+        if ($debug) {
+            $container->register('serializer.data_collector', SerializerDataCollector::class);
+            $container->register('debug.serializer', TraceableSerializer::class)
+                ->setDecoratedService('serializer')
+                ->setArguments([new Reference('debug.serializer.inner'), new Reference('serializer.data_collector'), 'default']);
+        }
+
+        return $container;
+    }
+
+    private function assertEachSerializerNormalizesWithItsOwnContext(ContainerBuilder $container, array $serializerIds): void
+    {
+        (new SerializerPass())->process($container);
+        $container->getDefinition('serializer.api')->setPublic(true);
+        $container->addCompilerPass(new NamedSerializerNestedNormalizersPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->compile();
+
+        $class = 'NamedSerializerContainer'.md5($this->name().$this->dataName());
+        eval('?>'.(new PhpDumper($container))->dump(['class' => $class]));
+
+        $child = new DeepObjectPopulateChildDummy();
+        $child->foo = new \DateTimeImmutable('2020-01-02 03:04:05 +00:00');
+        $expected = [
+            'serializer' => ['foo' => '2020-01-02T03:04:05+00:00', 'bar' => null],
+            'serializer.api' => ['foo' => '2020', 'bar' => null],
+        ];
+
+        foreach ([new $class(), $container] as $compiledContainer) {
+            foreach ($serializerIds as $id) {
+                $compiledContainer->get($id);
+            }
+
+            foreach ($serializerIds as $id) {
+                $this->assertSame($expected[$id], $compiledContainer->get($id)->normalize($child));
+            }
+        }
     }
 }

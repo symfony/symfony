@@ -1046,6 +1046,23 @@ class CrawlerTest extends TestCase
         }
     }
 
+    public function testSelectByTextKeepsDuplicateOptionIdentityOfMultipleSelects()
+    {
+        foreach ([
+            '<option value="same" disabled>Disabled</option><option value="same">Enabled</option>',
+            '<option value="same">Enabled</option><option value="same" disabled>Disabled</option>',
+        ] as $options) {
+            $crawler = $this->createCrawler('<form><select name="choice[]" multiple>'.$options.'</select></form>', 'http://example.com/');
+            $form = $crawler->filter('form')->form();
+
+            $form['choice']->selectByText(['Disabled']);
+            $this->assertSame([], $form->getPhpValues());
+
+            $form['choice']->selectByText(['Enabled']);
+            $this->assertSame(['choice' => ['same']], $form->getPhpValues());
+        }
+    }
+
     public function testSelectByTextKeepsFirstMatchingDisabledOption()
     {
         $crawler = $this->createCrawler('<form><select name="choice"><option value="same" disabled>Same text</option><option value="same" selected>Same text</option></select></form>', 'http://example.com/');
@@ -1078,6 +1095,19 @@ class CrawlerTest extends TestCase
         $this->expectExceptionMessage('The selected node should be instance of DOMElement');
         $crawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler->filterXPath('//li/text()')->form();
+    }
+
+    public function testFormSkipsSelectedDisabledOptionsOfMultipleSelect()
+    {
+        $crawler = $this->createCrawler(null, 'http://example.com');
+        $crawler->addHtmlContent(static::getDoctype().'<html><body><form><select name="choice[]" multiple><option selected disabled>foo</option><optgroup disabled><option selected>bar</option></optgroup><option selected>baz</option><option>qux</option></select><button type="submit">Send</button></form></body></html>');
+        $form = $crawler->filter('form')->form();
+
+        $this->assertSame(['foo', 'bar', 'baz'], $form['choice']->getValue());
+        $this->assertSame(['choice' => ['baz']], $form->getPhpValues());
+
+        $form['choice']->select(['bar', 'qux']);
+        $this->assertSame(['choice' => ['qux']], $form->getPhpValues());
     }
 
     public function testLast()

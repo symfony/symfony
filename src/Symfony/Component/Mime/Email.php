@@ -573,7 +573,7 @@ class Email extends Message
      */
     public function __unserialize(array $data): void
     {
-        if (($data[1] ?? null) instanceof \Stringable || ($data[3] ?? null) instanceof \Stringable) {
+        if (!\is_string($data[1] ?? '') || !\is_string($data[3] ?? '')) {
             throw new \BadMethodCallException('Cannot unserialize '.self::class);
         }
 

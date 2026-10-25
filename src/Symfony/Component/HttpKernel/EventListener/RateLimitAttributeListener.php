@@ -93,7 +93,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         }
 
         if (null === $attribute->key) {
-            $key = ($request->getClientIp() ?? 'unknown').'~'.$request->getMethod().'~'.$request->getPathInfo();
+            $key = ($request->getClientIp() ?? 'unknown').'~'.$request->getPathInfo();
         } elseif (\is_string($key = $attribute->key) && str_contains($key, '{')) {
             $key = KeyPlaceholderResolver::resolve($key, $event);
         } elseif (!\is_string($key = $event->evaluate($key))) {

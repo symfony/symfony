@@ -1,0 +1,36 @@
+<?php
+
+return [
+    'Names' => [
+        'Africa/Abidjan' => 'oa do meridian de Greenwich (Abidjan)',
+        'Africa/Accra' => 'oa do meridian de Greenwich (Accra)',
+        'Africa/Bamako' => 'oa do meridian de Greenwich (Bamako)',
+        'Africa/Banjul' => 'oa do meridian de Greenwich (Banjul)',
+        'Africa/Bissau' => 'oa do meridian de Greenwich (Bissau)',
+        'Africa/Conakry' => 'oa do meridian de Greenwich (Conakry)',
+        'Africa/Dakar' => 'oa do meridian de Greenwich (Dakar)',
+        'Africa/Freetown' => 'oa do meridian de Greenwich (Freetown)',
+        'Africa/Lome' => 'oa do meridian de Greenwich (Lomé)',
+        'Africa/Monrovia' => 'oa do meridian de Greenwich (Monrovia)',
+        'Africa/Nouakchott' => 'oa do meridian de Greenwich (Nouakchott)',
+        'Africa/Ouagadougou' => 'oa do meridian de Greenwich (Ouagadougou)',
+        'Africa/Sao_Tome' => 'oa do meridian de Greenwich (São Tomé)',
+        'America/Danmarkshavn' => 'oa do meridian de Greenwich (Danmarkshavn)',
+        'Antarctica/Troll' => 'oa do meridian de Greenwich (Troll)',
+        'Atlantic/Reykjavik' => 'oa do meridian de Greenwich (Reykjavik)',
+        'Atlantic/St_Helena' => 'oa do meridian de Greenwich (St. Helena)',
+        'Etc/GMT' => 'oa do meridian de Greenwich',
+        'Europe/Dublin' => 'oa do meridian de Greenwich (Dublin)',
+        'Europe/Guernsey' => 'oa do meridian de Greenwich (Guernsey)',
+        'Europe/Isle_of_Man' => 'oa do meridian de Greenwich (Isle of Man)',
+        'Europe/Jersey' => 'oa do meridian de Greenwich (Jersey)',
+        'Europe/London' => 'oa do meridian de Greenwich (London)',
+        'Europe/Monaco' => 'oa: Monego (Monaco)',
+        'Europe/Paris' => 'oa: Fransa (Paris)',
+        'Europe/Rome' => 'oa: Italia (Rome)',
+    ],
+    'Meta' => [
+        'GmtFormat' => 'UTC%s',
+        'HourFormatNeg' => '−%02d:%02d',
+    ],
+];

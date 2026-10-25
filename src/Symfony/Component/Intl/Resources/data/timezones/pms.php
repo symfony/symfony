@@ -1,0 +1,31 @@
+<?php
+
+return [
+    'Names' => [
+        'Africa/Abidjan' => 'Ora dë Greenwich (Abidjan)',
+        'Africa/Accra' => 'Ora dë Greenwich (Accra)',
+        'Africa/Bamako' => 'Ora dë Greenwich (Bamako)',
+        'Africa/Banjul' => 'Ora dë Greenwich (Banjul)',
+        'Africa/Bissau' => 'Ora dë Greenwich (Bissau)',
+        'Africa/Conakry' => 'Ora dë Greenwich (Conakry)',
+        'Africa/Dakar' => 'Ora dë Greenwich (Dakar)',
+        'Africa/Freetown' => 'Ora dë Greenwich (Freetown)',
+        'Africa/Lome' => 'Ora dë Greenwich (Lomé)',
+        'Africa/Monrovia' => 'Ora dë Greenwich (Monrovia)',
+        'Africa/Nouakchott' => 'Ora dë Greenwich (Nouakchott)',
+        'Africa/Ouagadougou' => 'Ora dë Greenwich (Ouagadougou)',
+        'Africa/Sao_Tome' => 'Ora dë Greenwich (São Tomé)',
+        'America/Danmarkshavn' => 'Ora dë Greenwich (Danmarkshavn)',
+        'Antarctica/Troll' => 'Ora dë Greenwich (Troll)',
+        'Atlantic/Reykjavik' => 'Ora dë Greenwich (Reykjavik)',
+        'Atlantic/St_Helena' => 'Ora dë Greenwich (St. Helena)',
+        'Etc/GMT' => 'Ora dë Greenwich',
+        'Europe/Dublin' => 'Ora dë Greenwich (Dublin)',
+        'Europe/Guernsey' => 'Ora dë Greenwich (Guernsey)',
+        'Europe/Isle_of_Man' => 'Ora dë Greenwich (Isle of Man)',
+        'Europe/Jersey' => 'Ora dë Greenwich (Jersey)',
+        'Europe/London' => 'Ora dë Greenwich (London)',
+        'Europe/Rome' => 'Ora Italia (Rome)',
+    ],
+    'Meta' => [],
+];

@@ -38,10 +38,12 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedListDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNumericStreamedNames;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithQuotes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSpecialCharacterNamedProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithStaticProperty;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUids;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
@@ -257,6 +259,11 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('{"id":10,"name":"dummy name"}', $dummy, Type::object(ClassicDummy::class));
     }
 
+    public function testWriteObjectWithStaticProperty()
+    {
+        $this->assertWritten('{"id":1}', new DummyWithStaticProperty(), Type::object(DummyWithStaticProperty::class));
+    }
+
     public function testWriteObjectWithGenerics()
     {
         $nestedDummy = new DummyWithNameAttributes();
@@ -276,6 +283,11 @@ class JsonStreamWriterTest extends TestCase
         $dummy->name = 'dummy name';
 
         $this->assertWritten('{"@id":10,"name":"dummy name"}', $dummy, Type::object(DummyWithNameAttributes::class));
+    }
+
+    public function testWriteObjectWithNumericStreamedNames()
+    {
+        $this->assertWritten('{"0":1,"1":2,"12":"three"}', new DummyWithNumericStreamedNames(), Type::object(DummyWithNumericStreamedNames::class));
     }
 
     public function testWriteObjectWithValueTransformer()

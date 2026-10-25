@@ -145,6 +145,18 @@ class ProfilerControllerTest extends WebTestCase
         ];
     }
 
+    public function testOpenActionWithProfilerDisabled()
+    {
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('The profiler must be enabled.');
+
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $twig = $this->createMock(Environment::class);
+
+        $controller = new ProfilerController($urlGenerator, null, $twig, [], null, __DIR__.'/../..');
+        $controller->openAction(Request::create('/_profiler/open', Request::METHOD_GET, ['file' => 'README.md']));
+    }
+
     /**
      * @dataProvider getOpenFileCases
      */

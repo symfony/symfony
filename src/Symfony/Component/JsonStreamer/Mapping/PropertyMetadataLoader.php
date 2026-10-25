@@ -39,7 +39,7 @@ final class PropertyMetadataLoader implements PropertyMetadataLoaderInterface
         }
 
         foreach ($classReflection->getProperties() as $reflectionProperty) {
-            if (!$reflectionProperty->isPublic()) {
+            if (!$reflectionProperty->isPublic() || $reflectionProperty->isStatic()) {
                 continue;
             }
 

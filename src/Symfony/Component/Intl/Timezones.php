@@ -32,7 +32,7 @@ final class Timezones extends ResourceBundle
     public static function exists(string $timezone): bool
     {
         try {
-            self::readEntry(['Names', $timezone]);
+            self::readName($timezone);
 
             return true;
         } catch (MissingResourceException) {
@@ -51,7 +51,7 @@ final class Timezones extends ResourceBundle
      */
     public static function getName(string $timezone, ?string $displayLocale = null): string
     {
-        return self::readEntry(['Names', $timezone], $displayLocale);
+        return self::readName($timezone, $displayLocale);
     }
 
     /**
@@ -59,7 +59,7 @@ final class Timezones extends ResourceBundle
      */
     public static function getNames(?string $displayLocale = null): array
     {
-        return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
+        return self::asort(self::readNames($displayLocale), $displayLocale);
     }
 
     /**

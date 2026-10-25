@@ -39,6 +39,11 @@ class BundleEntryReader implements BundleEntryReaderInterface
     private array $localeParents = [];
 
     /**
+     * A cache of the fallback locales of locales that have several subtags.
+     */
+    private array $fallbackLocales = [];
+
+    /**
      * Creates an entry reader based on the given resource bundle reader.
      */
     public function __construct(
@@ -84,7 +89,10 @@ class BundleEntryReader implements BundleEntryReaderInterface
         return $this->reader->read($path, $locale);
     }
 
-    public function readEntry(string $path, string $locale, array $indices, bool $fallback = true): mixed
+    /**
+     * @param bool $defaultFallback Whether to fall back to the default locale (e.g. "en" for "fr") once the parents of the locale are exhausted
+     */
+    public function readEntry(string $path, string $locale, array $indices, bool $fallback = true, bool $defaultFallback = true): mixed
     {
         $entry = null;
         $isMultiValued = false;
@@ -124,7 +132,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
 
                 // If previously read entry was multi-valued too, merge them
                 if ($isCurrentMultiValued && $isMultiValued) {
-                    $currentEntry = array_merge($currentEntry, $entry);
+                    $currentEntry = array_replace($currentEntry, $entry);
                 }
 
                 // Keep the previous entry if the current entry is NULL
@@ -154,7 +162,15 @@ class BundleEntryReader implements BundleEntryReaderInterface
             }
 
             // Then determine fallback locale
-            $currentLocale = $this->localeParents[$currentLocale] ?? Locale::getFallback($currentLocale);
+            if (isset($this->localeParents[$currentLocale])) {
+                $currentLocale = $this->localeParents[$currentLocale];
+            } elseif (str_contains($currentLocale, '_')) {
+                $currentLocale = $this->fallbackLocales[$currentLocale] ??= Locale::getFallback($currentLocale);
+            } elseif ($defaultFallback) {
+                $currentLocale = Locale::getFallback($currentLocale);
+            } else {
+                break;
+            }
         }
 
         // Multi-valued entry was merged

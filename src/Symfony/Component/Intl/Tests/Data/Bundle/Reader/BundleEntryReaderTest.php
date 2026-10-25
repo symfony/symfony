@@ -189,7 +189,8 @@ class BundleEntryReaderTest extends TestCase
             [['foo', 'bar'], [], ['foo', 'bar']],
             [null, ['baz'], ['baz']],
             [[], ['baz'], ['baz']],
-            [['foo', 'bar'], ['baz'], ['baz', 'foo', 'bar']],
+            [['foo', 'bar'], ['baz'], ['foo', 'bar']],
+            [[1 => 'foo'], ['bar', 'baz'], ['bar', 'foo']],
         ];
     }
 
@@ -456,6 +457,54 @@ class BundleEntryReaderTest extends TestCase
         $reader->setLocaleParents(['zh_Hant' => 'root']);
 
         $this->assertSame('Lah', $reader->readEntry(self::RES_DIR, 'zh_Hant', ['Entries', 'Bam']));
+    }
+
+    public function testDontFallbackToDefaultLocaleIfDisabled()
+    {
+        $series = [
+            [[self::RES_DIR, 'fr_CA'], self::DATA],
+            [[self::RES_DIR, 'fr'], self::DATA],
+        ];
+
+        $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
+        $readerImpl->expects($this->exactly(2))
+            ->method('read')
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            })
+        ;
+
+        $this->expectException(MissingResourceException::class);
+
+        $this->getReader($readerImpl)->readEntry(self::RES_DIR, 'fr_CA', ['Entries', 'Bam'], true, false);
+    }
+
+    public function testFollowLocaleParentsIfDefaultFallbackDisabled()
+    {
+        $series = [
+            [[self::RES_DIR, 'hi_Latn'], self::DATA],
+            [[self::RES_DIR, 'en_IN'], self::DATA],
+            [[self::RES_DIR, 'en'], self::FALLBACK_DATA],
+        ];
+
+        $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
+        $readerImpl->expects($this->exactly(3))
+            ->method('read')
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            })
+        ;
+
+        $reader = $this->getReader($readerImpl);
+        $reader->setLocaleParents(['hi_Latn' => 'en_IN']);
+
+        $this->assertSame('Lah', $reader->readEntry(self::RES_DIR, 'hi_Latn', ['Entries', 'Bam'], true, false));
     }
 
     private function getReader(?BundleEntryReaderInterface $entryReader = null): BundleEntryReader

@@ -32,7 +32,7 @@ final class Scripts extends ResourceBundle
     public static function exists(string $script): bool
     {
         try {
-            self::readEntry(['Names', $script]);
+            self::readName($script);
 
             return true;
         } catch (MissingResourceException) {
@@ -45,7 +45,7 @@ final class Scripts extends ResourceBundle
      */
     public static function getName(string $script, ?string $displayLocale = null): string
     {
-        return self::readEntry(['Names', $script], $displayLocale);
+        return self::readName($script, $displayLocale);
     }
 
     /**
@@ -53,7 +53,7 @@ final class Scripts extends ResourceBundle
      */
     public static function getNames(?string $displayLocale = null): array
     {
-        return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
+        return self::asort(self::readNames($displayLocale), $displayLocale);
     }
 
     protected static function getPath(): string

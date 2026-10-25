@@ -70,9 +70,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         $localeBundle = $reader->read($tempDir, $displayLocale);
 
         if (isset($localeBundle['Currencies']) && null !== $localeBundle['Currencies']) {
-            $data = [
-                'Names' => $this->generateSymbolNamePairs($localeBundle),
-            ];
+            $data = $this->generateNamesAndSymbols($localeBundle);
 
             $this->currencyCodes = array_merge($this->currencyCodes, array_keys($data['Names']));
 
@@ -84,11 +82,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
 
     protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
-        $rootBundle = $reader->read($tempDir, 'root');
-
-        return [
-            'Names' => $this->generateSymbolNamePairs($rootBundle),
-        ];
+        return $this->generateNamesAndSymbols($reader->read($tempDir, 'root'));
     }
 
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
@@ -112,12 +106,24 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         return $data;
     }
 
-    private function generateSymbolNamePairs(ArrayAccessibleResourceBundle $rootBundle): array
+    private function generateNamesAndSymbols(ArrayAccessibleResourceBundle $localeBundle): array
     {
-        $symbolNamePairs = array_map(static fn ($pair) => \array_slice(iterator_to_array($pair), 0, 2), iterator_to_array($rootBundle['Currencies']));
+        $data = ['Names' => [], 'Symbols' => []];
 
-        // Remove unwanted currencies
-        return array_diff_key($symbolNamePairs, self::DENYLIST);
+        foreach ($localeBundle['Currencies'] as $currency => $symbolAndName) {
+            // Remove unwanted currencies
+            if (isset(self::DENYLIST[$currency])) {
+                continue;
+            }
+
+            [$symbol, $name] = iterator_to_array($symbolAndName);
+
+            $data['Names'][$currency] = $name;
+            // Store an empty symbol when the symbol is the currency code
+            $data['Symbols'][$currency] = $currency === $symbol ? '' : $symbol;
+        }
+
+        return $data;
     }
 
     private function generateCurrencyMeta(ArrayAccessibleResourceBundle $supplementalDataBundle): array

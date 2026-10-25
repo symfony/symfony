@@ -95,11 +95,11 @@ jobs:
 
       - name: Test intl-data with compressed data
         run: |
-          [ -f src/Symfony/Component/Intl/Resources/data/locales/en.php ]
-          [ ! -f src/Symfony/Component/Intl/Resources/data/locales/en.php.gz ]
+          [ -f src/Symfony/Component/Intl/Resources/data/languages/en.php ]
+          [ ! -f src/Symfony/Component/Intl/Resources/data/languages/en.php.gz ]
           src/Symfony/Component/Intl/Resources/bin/compress
-          [ ! -f src/Symfony/Component/Intl/Resources/data/locales/en.php ]
-          [ -f src/Symfony/Component/Intl/Resources/data/locales/en.php.gz ]
+          [ ! -f src/Symfony/Component/Intl/Resources/data/languages/en.php ]
+          [ -f src/Symfony/Component/Intl/Resources/data/languages/en.php.gz ]
           ./phpunit src/Symfony/Component/Intl
 
       - name: Run Emoji tests

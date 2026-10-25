@@ -417,6 +417,46 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSame([], $schema->getDefinitions());
     }
 
+    public function testIntRangeBecomesBounds()
+    {
+        $generator = SchemaGenerator::create();
+
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 0, 'maximum' => 100], $generator->generate(Type::intRange(0, 100))->getRoot());
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 1], $generator->generate(Type::intRange(1, null))->getRoot());
+        $this->assertSameSchema(['type' => 'integer', 'maximum' => -1], $generator->generate(Type::intRange(null, -1))->getRoot());
+    }
+
+    public function testLiteralBecomesConst()
+    {
+        $generator = SchemaGenerator::create();
+
+        $this->assertSameSchema(['type' => 'string', 'const' => 'draft'], $generator->generate(Type::literal('draft'))->getRoot());
+        $this->assertSameSchema(['type' => 'integer', 'const' => 1], $generator->generate(Type::literal(1))->getRoot());
+        $this->assertSameSchema(['type' => 'number', 'const' => 1.5], $generator->generate(Type::literal(1.5))->getRoot());
+        $this->assertSameSchema(['anyOf' => [['type' => 'string', 'const' => 'draft'], ['type' => 'string', 'const' => 'live']]], $generator->generate(Type::union(Type::literal('draft'), Type::literal('live')))->getRoot());
+    }
+
+    public function testNullableLiteralBecomesEnum()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::nullable(Type::literal('draft')));
+
+        $this->assertSameSchema(['type' => ['string', 'null'], 'enum' => ['draft', null]], $schema->getRoot());
+    }
+
+    public function testOpenApi30LiteralBecomesEnum()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::literal('draft'), new Configuration(dialect: Dialect::openApi30()));
+
+        $this->assertSameSchema(['type' => 'string', 'enum' => ['draft']], $schema->getRoot());
+    }
+
+    public function testCollectionWithLiteralStringKeyBecomesAnObject()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::array(Type::int(), Type::literal('a')));
+
+        $this->assertSameSchema(['type' => 'object', 'additionalProperties' => ['type' => 'integer']], $schema->getRoot());
+    }
+
     public function testArrayShapeBecomesAnInlineObject()
     {
         $schema = SchemaGenerator::create()->generate(Type::arrayShape(['name' => Type::string(), 'age' => ['type' => Type::int(), 'optional' => true]]));

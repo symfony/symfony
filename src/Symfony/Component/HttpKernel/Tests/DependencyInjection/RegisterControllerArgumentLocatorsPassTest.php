@@ -510,6 +510,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
 
         $container->register('some.id', \stdClass::class)->setPublic(true);
+        $container->register('some.callable', CallableService::class);
         $container->setParameter('some.parameter', 'foo');
 
         $container->register('foo', WithAutowireAttribute::class)
@@ -536,7 +537,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame('foo', $locator->get('customAutowire'));
         $this->assertInstanceOf(FooInterface::class, $autowireCallable = $locator->get('autowireCallable'));
         $this->assertInstanceOf(LazyClosure::class, $autowireCallable);
-        $this->assertInstanceOf(\stdClass::class, $autowireCallable->service);
+        $this->assertInstanceOf(CallableService::class, $autowireCallable->service);
         $this->assertFalse($locator->has('service2'));
     }
 
@@ -968,6 +969,13 @@ interface FooInterface
     public function foo();
 }
 
+class CallableService
+{
+    public function bar()
+    {
+    }
+}
+
 class WithAutowireAttribute
 {
     public function fooAction(
@@ -989,7 +997,7 @@ class WithAutowireAttribute
         string $escapedRawValue,
         #[CustomAutowire('some.parameter')]
         string $customAutowire,
-        #[AutowireCallable(service: 'some.id', method: 'bar')]
+        #[AutowireCallable(service: 'some.callable', method: 'bar')]
         FooInterface $autowireCallable,
     ) {
     }

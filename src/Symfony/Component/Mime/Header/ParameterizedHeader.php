@@ -176,7 +176,7 @@ final class ParameterizedHeader extends UnstructuredHeader
     {
         $forceHttpQuoting = 'form-data' === $this->getValue() && 'content-disposition' === strtolower($this->getName());
         if ($forceHttpQuoting || !preg_match('/^'.self::TOKEN_REGEX.'$/D', $value)) {
-            $value = '"'.$value.'"';
+            $value = '"'.addcslashes($value, '"\\').'"';
         }
         $prepend = '=';
         if ($encoded) {

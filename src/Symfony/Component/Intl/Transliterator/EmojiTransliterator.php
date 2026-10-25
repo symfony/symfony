@@ -126,11 +126,27 @@ if (!class_exists(\Transliterator::class)) {
             $cookie ??= hash('xxh128', random_bytes(8));
             $this->transliterator ??= clone $transliterator ??= \Transliterator::createFromRules('[:any:]* > '.$cookie);
 
+            // ICU can loop forever on a slice that splits a surrogate pair, so the slice is extended to the whole characters it splits
+            if ((-1 === $end ? 0 < $start : $start < $end) && \is_string($units = \UConverter::transcode($string, 'UTF-16BE', 'UTF-8'))) {
+                if (0 < $start && isset($units[2 * $start]) && "\xDC" <= $units[2 * $start] && "\xDF" >= $units[2 * $start]) {
+                    --$start;
+                }
+                if (-1 !== $end && isset($units[2 * $end]) && "\xDC" <= $units[2 * $end] && "\xDF" >= $units[2 * $end]) {
+                    ++$end;
+                }
+            }
+
             if (false === $result = $this->transliterator->transliterate($string, $start, $end)) {
                 return false;
             }
 
             $parts = explode($cookie, $result);
+
+            // no cookie means that the slice is empty
+            if (!isset($parts[1])) {
+                return $result;
+            }
+
             $start = \strlen($parts[0]);
             $length = -\strlen($parts[1]) ?: null;
             $string = substr($string, $start, $length);

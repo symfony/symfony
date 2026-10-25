@@ -49,9 +49,17 @@ class LazyClosureTest extends TestCase
     public function testThrowsOnUnknownMethodInInterface()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Cannot create lazy closure for service "bar" because its corresponding callable is invalid.');
+        $this->expectExceptionMessage('Cannot create lazy closure for service "bar" because method "Symfony\Component\DependencyInjection\Tests\Argument\FunctionalInterface::bar()" does not exist.');
 
         LazyClosure::getCode('bar', [new Definition(FunctionalInterface::class), 'bar'], \Closure::class, new ContainerBuilder(), 'bar');
+    }
+
+    public function testThrowsOnMethodHandledByMagicCall()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Cannot create lazy closure for service "bar" because method "Symfony\Component\DependencyInjection\Tests\Argument\MagicCallable::foo()" does not exist. A lazy closure cannot forward calls to "__call()": if it comes from "#[AutowireCallable]" or "#[AutowireMethodOf]", pass "lazy: false" to create it eagerly.');
+
+        LazyClosure::getCode('bar', [new Definition(MagicCallable::class), 'foo'], \Closure::class, new ContainerBuilder(), 'bar');
     }
 
     public function testLazyClosureWithStaticMethod()
@@ -148,5 +156,13 @@ class NeverReturningCallable
     public function __invoke(): never
     {
         throw new \DomainException('Call failed.');
+    }
+}
+
+class MagicCallable
+{
+    public function __call(string $name, array $arguments): string
+    {
+        return $name;
     }
 }

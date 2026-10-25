@@ -566,6 +566,18 @@ final class StringTypeResolver implements TypeResolverInterface
             default => 10,
         };
 
+        // intval() stops at the first digit that is not valid in the base
+        $invalidDigit = match ($base) {
+            16 => '/[^0-9a-f]/i',
+            8 => '/[^0-7]/',
+            2 => '/[^01]/',
+            default => '/[^0-9]/',
+        };
+
+        if (preg_match($invalidDigit, $digits)) {
+            throw new \DomainException(\sprintf('"%s" is not a valid integer.', $value));
+        }
+
         // the sign is parsed along, as the magnitude of PHP_INT_MIN does not fit in an integer on its own
         $integer = \intval($sign.$digits, $base);
 

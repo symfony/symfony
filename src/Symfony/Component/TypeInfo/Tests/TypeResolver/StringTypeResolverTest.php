@@ -418,6 +418,8 @@ class StringTypeResolverTest extends TestCase
         yield [Type::literal(26), '0x1A'];
         yield [Type::literal(15), '0o17'];
         yield [Type::literal(5), '0b101'];
+        yield [Type::literal(15), '017'];
+        yield [Type::literal(0), '0'];
         yield [Type::literal("it's"), "'it\\'s'"];
         yield [Type::literal("a\n\"b"), '"a\\n\\"b"'];
         if (8 === \PHP_INT_SIZE) {
@@ -487,6 +489,9 @@ class StringTypeResolverTest extends TestCase
         yield ['0x8000000000000000'];
         yield ['-9223372036854775809'];
         yield ['-0x8000000000000001'];
+        yield ['09'];
+        yield ['-0129'];
+        yield ['int<09, 10>'];
         yield ['1e400'];
         yield ['-1e400'];
         yield ['int<0, PHP_VERSION>'];

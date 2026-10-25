@@ -66,7 +66,7 @@ abstract class AbstractPart
     public function __serialize(): array
     {
         if (!method_exists($this, '__sleep')) {
-            return ['headers' => $this->headers];
+            return ['headers' => $this->headers] + $this->getSubclassState();
         }
 
         trigger_deprecation('symfony/mime', '7.4', 'Implementing "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
@@ -87,12 +87,26 @@ abstract class AbstractPart
 
     public function __unserialize(array $data): void
     {
-        if ($wakeup = method_exists($this, '__wakeup') && self::class === (new \ReflectionMethod($this, '__unserialize'))->class) {
+        if ($wakeup = method_exists($this, '__wakeup') && \in_array((new \ReflectionMethod($this, '__unserialize'))->class, [self::class, AbstractMultipartPart::class], true)) {
             trigger_deprecation('symfony/mime', '7.4', 'Implementing "%s::__wakeup()" is deprecated, use "__unserialize()" instead.', get_debug_type($this));
         }
 
         if (['headers'] === array_keys($data)) {
             $this->headers = $data['headers'];
+
+            if ($wakeup) {
+                $this->__wakeup();
+            }
+
+            return;
+        }
+
+        // the payload comes from __serialize() for a subclass that declares properties, or from the native serialization of Symfony < 7.4
+        $headersKey = \array_key_exists('headers', $data) ? 'headers' : "\0".self::class."\0headers";
+        if (\array_key_exists($headersKey, $data) && self::isCoreClass((new \ReflectionMethod($this, '__unserialize'))->class) && self::isCoreClass((new \ReflectionMethod($this, '__serialize'))->class)) {
+            $this->headers = $data[$headersKey];
+            unset($data[$headersKey]);
+            $this->setSubclassState($data);
 
             if ($wakeup) {
                 $this->__wakeup();
@@ -112,5 +126,71 @@ abstract class AbstractPart
                 $this->__wakeup();
             }
         }, $this, static::class)($data);
+    }
+
+    /**
+     * Returns the properties declared by subclasses that are not part of Symfony, keyed like the native serialization does.
+     */
+    private function getSubclassState(): array
+    {
+        if (self::isCoreClass(static::class)) {
+            return [];
+        }
+
+        $state = [];
+        foreach ((array) $this as $key => $value) {
+            if (!str_starts_with($key, "\0".__NAMESPACE__.'\\')) {
+                $state[$key] = $value;
+            }
+        }
+
+        return $state;
+    }
+
+    private function setSubclassState(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            [$class, $name] = "\0" === ($key[0] ?? '') ? explode("\0", substr($key, 1), 2) + [1 => ''] : ['*', $key];
+            $class = '*' === $class ? static::class : $class;
+
+            if (!$this instanceof $class) {
+                throw new \BadMethodCallException('Cannot unserialize '.static::class);
+            }
+
+            $property = property_exists($class, $name) ? new \ReflectionProperty($class, $name) : null;
+
+            if (self::isCoreClass($property?->class ?? $class) || ($property && $value instanceof \Stringable && self::castsToString($property, $value))) {
+                throw new \BadMethodCallException('Cannot unserialize '.static::class);
+            }
+
+            \Closure::bind(function () use ($name, $value) {
+                $this->$name = $value;
+            }, $this, $class)();
+        }
+    }
+
+    private static function isCoreClass(string $class): bool
+    {
+        return str_starts_with($class, __NAMESPACE__.'\\');
+    }
+
+    private static function castsToString(\ReflectionProperty $property, object $value): bool
+    {
+        $type = $property->getType();
+        $string = false;
+
+        foreach ($type instanceof \ReflectionUnionType ? $type->getTypes() : [$type] as $t) {
+            if (!$t instanceof \ReflectionNamedType) {
+                continue;
+            }
+
+            if ('string' === $t->getName()) {
+                $string = true;
+            } elseif ('object' === $t->getName() || (!$t->isBuiltin() && $value instanceof ($t->getName()))) {
+                return false;
+            }
+        }
+
+        return $string;
     }
 }

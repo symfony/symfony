@@ -13,6 +13,9 @@ namespace Symfony\Component\Mime\Tests\Part\Multipart;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
+use Symfony\Component\Mime\Header\Headers;
+use Symfony\Component\Mime\Part\AbstractMultipartPart;
+use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\Mime\Part\TextPart;
@@ -242,6 +245,40 @@ class FormDataPartTest extends TestCase
             '/^Content-Type: multipart\/form-data; boundary=[a-zA-Z0-9\-_]{8}$/',
             $headers[0]
         );
+    }
+
+    public function testSerialize()
+    {
+        $part = new FormDataPart([
+            'foo' => 'bar',
+            'baz' => ['qux' => 'quux'],
+            'file' => new DataPart('data', 'data.csv', 'text/csv'),
+        ]);
+        $expected = $part->bodyToString();
+
+        $unserialized = unserialize(serialize($part));
+
+        $this->assertEquals($part->getParts(), $unserialized->getParts());
+        $this->assertSame($expected, $unserialized->bodyToString());
+    }
+
+    public function testUnserializeNativePayload()
+    {
+        $data = [
+            "\0".AbstractPart::class."\0headers" => new Headers(),
+            "\0".AbstractMultipartPart::class."\0boundary" => 'native-boundary',
+            "\0".AbstractMultipartPart::class."\0parts" => [],
+            "\0".FormDataPart::class."\0fields" => ['foo' => 'bar'],
+        ];
+        $payload = \sprintf('O:%d:"%s":%d:{', \strlen(FormDataPart::class), FormDataPart::class, \count($data));
+        foreach ($data as $key => $value) {
+            $payload .= serialize($key).serialize($value);
+        }
+
+        $part = unserialize($payload.'}');
+
+        $this->assertEquals((new FormDataPart(['foo' => 'bar']))->getParts(), $part->getParts());
+        $this->assertStringStartsWith("--native-boundary\r\n", $part->bodyToString());
     }
 
     public function testGetPartsThrowsOnUnexpectedFieldType()

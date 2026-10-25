@@ -11,13 +11,16 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 use Symfony\Component\Form\Tests\Fixtures\BlockPrefixedFooTextType;
@@ -93,6 +96,78 @@ class CollectionTypeTest extends BaseTypeTestCase
 
         $this->assertTrue($form->has('0'));
         $this->assertTrue($form->has('foo'));
+    }
+
+    public function testEntriesAreCreatedFromTheKeysOfTheViewData()
+    {
+        $builder = $this->factory->createBuilder(static::TESTED_TYPE, [5 => 'tea', 9 => 'milk'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+        ]);
+        $builder->addModelTransformer(new CallbackTransformer(static fn (array $value) => array_combine(['x', 'y'], $value), static fn (array $value) => array_combine([5, 9], $value)));
+        $builder->addViewTransformer(new CallbackTransformer(static fn (array $value) => array_combine([5, 9], $value), static fn (array $value) => array_combine(['x', 'y'], $value)));
+
+        $view = $builder->getForm()->createView();
+
+        $this->assertSame([5 => 'tea', 9 => 'milk'], array_map(static fn (FormView $entry) => $entry->vars['value'], $view->children));
+    }
+
+    public function testEntriesAreCreatedFromAnArrayViewDataWhenTheNormDataIsAString()
+    {
+        $builder = $this->factory->createBuilder(static::TESTED_TYPE, ['tea', 'milk'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+        ]);
+        $builder->addModelTransformer(new CallbackTransformer(static fn (array $value) => json_encode($value), static fn (string $value) => json_decode($value, true)));
+        $builder->addViewTransformer(new CallbackTransformer(static fn (string $value) => json_decode($value, true), static fn (array $value) => json_encode($value)));
+
+        $view = $builder->getForm()->createView();
+
+        $this->assertSame(['tea', 'milk'], array_map(static fn (FormView $entry) => $entry->vars['value'], $view->children));
+    }
+
+    public function testSubmittedEntriesAreMatchedWithTheKeysOfTheViewData()
+    {
+        $builder = $this->factory->createBuilder(static::TESTED_TYPE, ['a' => 'A', 'b' => 'B', 'c' => 'C'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_add' => true,
+            'allow_delete' => true,
+            'delete_empty' => true,
+        ]);
+        $builder->addViewTransformer(new CallbackTransformer(static fn (array $value) => array_combine(array_map(static fn ($key) => 'v'.$key, array_keys($value)), $value), static fn (array $value) => array_combine(array_map(static fn ($key) => substr($key, 1), array_keys($value)), $value)));
+        $form = $builder->getForm();
+
+        $form->submit(['va' => 'A2', 'vb' => '', 'vd' => 'D', 've' => '']);
+
+        $this->assertSame(['a' => 'A2', 'd' => 'D'], $form->getData());
+    }
+
+    public function testDeleteEmptyKeepsExistingEntriesOfTheViewDataIfDeleteNotAllowed()
+    {
+        $builder = $this->factory->createBuilder(static::TESTED_TYPE, ['a' => 'A', 'b' => 'B', 'c' => 'C'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_add' => true,
+            'delete_empty' => true,
+        ]);
+        $builder->addViewTransformer(new CallbackTransformer(static fn (array $value) => array_combine(array_map(static fn ($key) => 'v'.$key, array_keys($value)), $value), static fn (array $value) => array_combine(array_map(static fn ($key) => substr($key, 1), array_keys($value)), $value)));
+        $form = $builder->getForm();
+
+        $form->submit(['va' => 'A', 'vb' => '', 'vc' => 'C', 'vd' => '']);
+
+        $this->assertSame(['a' => 'A', 'b' => null, 'c' => 'C'], $form->getData());
+    }
+
+    public function testSubmitAnArrayViewDataWhenTheNormDataIsAString()
+    {
+        $builder = $this->factory->createBuilder(static::TESTED_TYPE, ['a' => 'A', 'b' => 'B'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_delete' => true,
+        ]);
+        $builder->addModelTransformer(new CallbackTransformer(static fn (array $value) => json_encode($value), static fn (string $value) => json_decode($value, true)));
+        $builder->addViewTransformer(new CallbackTransformer(static fn (string $value) => json_decode($value, true), static fn (array $value) => json_encode($value)));
+        $form = $builder->getForm();
+
+        $form->submit(['a' => 'A2']);
+
+        $this->assertSame(['a' => 'A2'], $form->getData());
     }
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
@@ -206,6 +281,70 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertEquals(['foo@foo.com'], $form->getData());
     }
 
+    public function testDeleteEmptyKeepsExistingEntriesOfAClonedForm()
+    {
+        $form = clone $this->factory->create(static::TESTED_TYPE, ['foo@foo.com', 'bar@bar.com'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'delete_empty' => true,
+        ]);
+
+        $form->submit(['foo@foo.com', '']);
+
+        $this->assertSame(['foo@foo.com', null], $form->getData());
+    }
+
+    public function testDeleteEmptyRemovesNullEntriesLeftEmpty()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [null, null], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'delete_empty' => true,
+        ]);
+
+        $form->submit(['foo@foo.com', '']);
+
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertSame(['foo@foo.com'], $form->getData());
+    }
+
+    public function testDontAddEmptyEntriesToAnObjectCollectionIfDeleteEmpty()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'entry_type' => AuthorType::class,
+            'allow_add' => true,
+            'delete_empty' => static fn (?Author $author) => !$author?->firstName,
+        ]);
+
+        $form->setData($authors = new ArrayCollection([new Author('first', 'last')]));
+        $form->submit([
+            ['firstName' => 's_first', 'lastName' => 's_last'],
+            ['firstName' => '', 'lastName' => ''],
+        ]);
+
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals([new Author('s_first', 's_last')], $authors->toArray());
+    }
+
+    public function testDontAddEmptyEntriesIfDeleteEmptyAndTheModelTransformerReturnsAnObject()
+    {
+        $builder = $this->factory->createBuilder(static::TESTED_TYPE, null, [
+            'entry_type' => AuthorType::class,
+            'allow_add' => true,
+            'delete_empty' => static fn (?Author $author) => !$author?->firstName,
+        ]);
+        $builder->addModelTransformer(new CallbackTransformer(static fn (?array $value) => new ArrayCollection($value ?? []), static fn (ArrayCollection $value) => $value->toArray()));
+        $form = $builder->getForm();
+
+        $form->setData([new Author('first', 'last')]);
+        $form->submit([
+            ['firstName' => 's_first', 'lastName' => 's_last'],
+            ['firstName' => '', 'lastName' => ''],
+        ]);
+
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals([new Author('s_first', 's_last')], $form->getData());
+    }
+
     public function testNoDeleteEmptyIfDeleteNotAllowed()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -219,6 +358,20 @@ class CollectionTypeTest extends BaseTypeTestCase
 
         $this->assertTrue($form->has('0'));
         $this->assertEquals('', $form[0]->getData());
+    }
+
+    public function testNoDeleteEmptyOfAnArrayObjectIfDeleteNotAllowed()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, new \ArrayObject(['foo@foo.com']), [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_delete' => false,
+            'delete_empty' => true,
+        ]);
+
+        $form->submit(['']);
+
+        $this->assertTrue($form->has('0'));
+        $this->assertSame([null], $form->getData()->getArrayCopy());
     }
 
     public function testResizedDownIfSubmittedWithCompoundEmptyDataAndDeleteEmpty()
@@ -779,6 +932,21 @@ class CollectionTypeTest extends BaseTypeTestCase
     {
         yield [false];
         yield [true];
+    }
+
+    public function testEntryNameWithAModelTransformer()
+    {
+        $builder = $this->factory->createBuilder(static::TESTED_TYPE, null, [
+            'entry_name' => static fn (string $value) => $value,
+            'allow_add' => true,
+        ]);
+        $builder->addModelTransformer(new CallbackTransformer(static fn (?array $value) => array_values($value ?? []), static fn (array $value) => $value));
+        $form = $builder->getForm();
+
+        $form->setData([5 => 'tea', 9 => 'milk']);
+        $form->submit(['tea' => 'tea', 'milk' => 'milk', 'new_1' => 'coffee']);
+
+        $this->assertSame(['tea', 'milk', 'coffee'], $form->getData());
     }
 
     public function testEntryNameDoesNotRenameThePrototype()

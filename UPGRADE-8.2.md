@@ -167,6 +167,10 @@ Form
    designating the same choice, but reading it back returns the offered identifier
  * `TimezoneType` now resolves `UTC` and `Etc/UTC` to each other, the `intl` option deciding which one is
    offered, where submitting the one the option does not offer used to be rejected
+ * `CollectionType` now creates its entries from the view data instead of the model data.
+   A model transformer can then turn a JSON string into an array of entries, for example.
+   A model transformer that sorts or filters the entries also changes the rendered rows.
+   The `allow_delete` and `delete_empty` options now remove the entries from the view data instead of the norm data
 
 FrameworkBundle
 ---------------

@@ -82,7 +82,15 @@ Only a null key selects the automatic scope; explicit `''` and `'0'` remain expl
 Omitting the key without a store fails, since a self-contained encrypter has no default master key.
 
 With DoctrineBundle, the bundle registers these automatic types after constructing each entity manager, including when metadata is cached.
-This loads all mapped metadata at manager creation when the container finds any omitted-key attribute.
+To find them, it loads the metadata of every mapped class once, and keeps the types in the `cache.key_management.encrypted_columns` pool, a child of `cache.system`.
+The next entity managers register the types from that pool and load no metadata.
+In debug mode, the bundle doesn't define that pool, so that a change to the mapping is seen without clearing the cache.
+The metadata is loaded with a metadata factory of its own, so the factory of the entity manager stays empty.
+The metadata cache warmer of DoctrineBundle requires this.
+
+The listener runs after the other `loadClassMetadata` listeners, so it computes each scope from the final table and column names.
+When a listener that runs later still renames a table or a column, the types aren't cached.
+Each entity manager then loads all the metadata again, to fix the names in it.
 Applications using only explicit keys keep registration at connection creation.
 The connection's type provider must be a writable `TypeRegistry`.
 Generated automatic type names use an internal namespace, `key_management_auto_v1_<base64-parent>.<64-hex-hash>`.
@@ -91,11 +99,16 @@ Don't use that full name format for your own parent aliases.
 Without DoctrineBundle, give the listener a store-backed encrypter and register after constructing the manager:
 
 ```php
-$listener = new EncryptedColumnListener($explicitTypes, $storedEnvelopeEncrypter);
+$listener = new EncryptedColumnListener($explicitTypes, $storedEnvelopeEncrypter, $cache);
 $eventManager->addEventListener(Events::loadClassMetadata, $listener);
 $entityManager = new EntityManager($connection, $configuration, $eventManager);
-$listener->register($entityManager);
+$listener->register($entityManager, 'default');
 ```
+
+`register()` loads the metadata of every mapped class to find the types.
+With a cache, it does so once and saves the types under the name of the entity manager, `default` here.
+Clear that cache when the mapping changes, like the metadata cache.
+Add the listener after the listeners that rename tables or columns.
 
 In a Symfony application, the `KeyManagementBundle` registers explicit-key types when DoctrineBundle creates a connection.
 When the container is compiled, the bundle finds the `#[Encrypted]` columns and collects one type per explicit key and type.

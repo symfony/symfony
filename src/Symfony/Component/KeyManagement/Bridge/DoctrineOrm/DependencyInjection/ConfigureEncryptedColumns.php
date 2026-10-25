@@ -21,6 +21,7 @@ final class ConfigureEncryptedColumns
 {
     public function __construct(
         private readonly EncryptedColumnListener $listener,
+        private readonly string $name,
         private readonly ?\Closure $previous = null,
     ) {
     }
@@ -31,6 +32,6 @@ final class ConfigureEncryptedColumns
             ($this->previous)($manager);
         }
 
-        $this->listener->register($manager);
+        $this->listener->register($manager, $this->name);
     }
 }

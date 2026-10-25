@@ -279,6 +279,9 @@ class KeyManagementBundle extends AbstractBundle
 
         if ($container->getParameter('kernel.debug')) {
             $configurator->import('Resources/config/key_management_debug.php');
+
+            // so that a change to the mapping is seen without clearing the cache
+            $container->removeDefinition('cache.key_management.encrypted_columns');
         }
 
         if (class_exists(Application::class)) {

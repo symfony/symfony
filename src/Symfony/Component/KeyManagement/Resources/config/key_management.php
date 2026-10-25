@@ -94,7 +94,16 @@ return static function (ContainerConfigurator $container) {
         // kept when the container finds no encrypted column, so that a column it missed is reported instead of being stored in clear
         ->set('key_management.encrypted_column_listener', EncryptedColumnListener::class)
             ->args([[]])
-            ->tag('doctrine.event_listener', ['event' => 'loadClassMetadata'])
+            // after the listeners that rename tables or columns, since the scope of a column that omits its key comes from the final names
+            ->tag('doctrine.event_listener', ['event' => 'loadClassMetadata', 'priority' => -1024])
+            ->tag('container.remove_if_missing', ['class' => EncryptedColumnListener::class, 'package' => 'symfony/doctrine-orm-key-management', 'parent_packages' => ['symfony/key-management']])
+
+        // keeps the types of the columns whose key is omitted, so that finding them loads all the metadata once
+        ->set('cache.key_management.encrypted_columns')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
+            ->tag('container.remove_if_missing', ['service' => 'cache.system'])
             ->tag('container.remove_if_missing', ['class' => EncryptedColumnListener::class, 'package' => 'symfony/doctrine-orm-key-management', 'parent_packages' => ['symfony/key-management']])
     ;
 };

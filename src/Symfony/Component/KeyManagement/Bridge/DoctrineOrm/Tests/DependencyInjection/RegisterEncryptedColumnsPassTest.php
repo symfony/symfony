@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping\Entity;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
@@ -181,10 +182,12 @@ class RegisterEncryptedColumnsPassTest extends TestCase
 
         (new RegisterEncryptedColumnsPass())->process($container);
 
-        $this->assertNotSame('app_configure_manager', $container->getDefinition('app.manager')->getConfigurator());
+        [$configurator] = $container->getDefinition('app.manager')->getConfigurator();
+        $this->assertSame('default', $container->getDefinition((string) $configurator)->getArgument(1));
         $this->assertFalse($container->hasDefinition('key_management.doctrine_dbal.encrypted_types'));
         $this->assertSame([], $container->getDefinition('key_management.encrypted_column_listener')->getArgument(0));
         $this->assertNotNull($container->getDefinition('key_management.encrypted_column_listener')->getArgument(1));
+        $this->assertEquals(new Reference('cache.key_management.encrypted_columns', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('key_management.encrypted_column_listener')->getArgument(2));
     }
 
     public function testTheCompiledConfiguratorPreservesThePreviousCallback()

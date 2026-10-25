@@ -330,6 +330,104 @@ class AutomaticEncryptedColumnTest extends TestCase
         $reader->find(AutomaticRecord::class, 1);
     }
 
+    #[TestWith([false], 'global registry')]
+    #[TestWith([true], 'connection registry')]
+    public function testCachedTypesAreRegisteredWithoutLoadingMetadata(bool $connectionRegistry)
+    {
+        if ($connectionRegistry && !method_exists($this->connection->getConfiguration(), 'setTypeProvider')) {
+            $this->markTestSkipped('doctrine/dbal < 4.6 cannot replace the type provider of a connection.');
+        }
+
+        $metadataCache = new ArrayAdapter(0, true);
+        $queryCache = new ArrayAdapter(0, true);
+        $typesCache = new ArrayAdapter(0, true);
+        $dql = 'SELECT r.first FROM '.AutomaticRecord::class.' r';
+        $manager = $this->manager([AutomaticRecord::class], $metadataCache, null, new EncryptedColumnListener([], new StoredEnvelopeEncrypter($this->store), $typesCache));
+        $manager->getConfiguration()->setQueryCache($queryCache);
+        $metadata = $manager->getClassMetadata(AutomaticRecord::class);
+        (new SchemaTool($manager))->createSchema([$metadata]);
+        $record = new AutomaticRecord();
+        $record->first = 'first secret';
+        $manager->persist($record);
+        $manager->flush();
+        $this->assertSame([['first' => 'first secret']], $manager->createQuery($dql)->getArrayResult());
+        if ($connectionRegistry) {
+            $this->connection->getConfiguration()->setTypeProvider(new TypeRegistry());
+        } else {
+            $this->registry()->override($metadata->getTypeOfField('first'), new StringType());
+        }
+        $this->store->forget();
+
+        $reader = $this->manager([AutomaticRecord::class], $metadataCache, null, new EncryptedColumnListener([], new StoredEnvelopeEncrypter($this->store), $typesCache), true);
+        $reader->getConfiguration()->setQueryCache($queryCache);
+
+        $this->assertSame([], $reader->getMetadataFactory()->getLoadedMetadata());
+        $this->assertSame([['first' => 'first secret']], $reader->createQuery($dql)->getArrayResult());
+        $this->assertSame([], $reader->getMetadataFactory()->getLoadedMetadata());
+        $this->assertSame('first secret', $reader->find(AutomaticRecord::class, 1)->first);
+    }
+
+    #[TestWith([false], 'without a types cache')]
+    #[TestWith([true], 'with a types cache')]
+    public function testFindingTheTypesLeavesTheMetadataOfTheManagerUnloaded(bool $typesCache)
+    {
+        $listener = new EncryptedColumnListener([], new StoredEnvelopeEncrypter($this->store), $typesCache ? new ArrayAdapter(0, true) : null);
+        $manager = $this->manager([JoinedRecord::class, JoinedChild::class], new ArrayAdapter(0, true), null, $listener);
+
+        $this->assertSame([], $manager->getMetadataFactory()->getLoadedMetadata());
+
+        (new SchemaTool($manager))->createSchema([$manager->getClassMetadata(JoinedRecord::class), $manager->getClassMetadata(JoinedChild::class)]);
+        $record = new JoinedChild();
+        $record->rootValue = 'root secret';
+        $record->childValue = 'child secret';
+        $manager->persist($record);
+        $manager->flush();
+        $manager->clear();
+        $read = $manager->find(JoinedChild::class, 1);
+
+        $this->assertSame('root secret', $read->rootValue);
+        $this->assertSame('child secret', $read->childValue);
+    }
+
+    public function testAListenerRenamingColumnsAfterThisOneKeepsValuesReadableFromWarmCaches()
+    {
+        $metadataCache = new ArrayAdapter(0, true);
+        $typesCache = new ArrayAdapter(0, true);
+        $writer = $this->renamingManager($metadataCache, $typesCache, false);
+        (new SchemaTool($writer))->createSchema([$writer->getClassMetadata(AutomaticRecord::class)]);
+        $record = new AutomaticRecord();
+        $record->first = 'first secret';
+        $record->second = 'second secret';
+        $writer->persist($record);
+        $writer->flush();
+        $this->store->forget();
+
+        $reader = $this->renamingManager($metadataCache, $typesCache, false);
+
+        $this->assertSame('first secret', $reader->find(AutomaticRecord::class, 1)->first);
+        $this->assertSame('second secret', $this->manager([MutatedRecord::class])->find(MutatedRecord::class, 1)->second);
+    }
+
+    public function testAListenerRenamingColumnsBeforeThisOneLetsTheTypesBeCached()
+    {
+        $metadataCache = new ArrayAdapter(0, true);
+        $typesCache = new ArrayAdapter(0, true);
+        $writer = $this->renamingManager($metadataCache, $typesCache, true);
+        (new SchemaTool($writer))->createSchema([$writer->getClassMetadata(AutomaticRecord::class)]);
+        $record = new AutomaticRecord();
+        $record->first = 'first secret';
+        $record->second = 'second secret';
+        $writer->persist($record);
+        $writer->flush();
+        $this->store->forget();
+
+        $reader = $this->renamingManager($metadataCache, $typesCache, true);
+
+        $this->assertSame([], $reader->getMetadataFactory()->getLoadedMetadata());
+        $this->assertSame('first secret', $reader->find(AutomaticRecord::class, 1)->first);
+        $this->assertSame('second secret', $this->manager([MutatedRecord::class])->find(MutatedRecord::class, 1)->second);
+    }
+
     public function testOmittingTheKeyWithoutAStoreExplainsTheMissingConfiguration()
     {
         $this->expectException(\LogicException::class);
@@ -427,7 +525,7 @@ class AutomaticEncryptedColumnTest extends TestCase
         $events->addEventListener(Events::loadClassMetadata, $listener);
         $manager = new EntityManager($this->connection, $this->configuration([AutomaticRecord::class]), $events);
         $called = false;
-        $configure = new ConfigureEncryptedColumns($listener, function (EntityManagerInterface $configured) use ($manager, &$called): void {
+        $configure = new ConfigureEncryptedColumns($listener, 'default', function (EntityManagerInterface $configured) use ($manager, &$called): void {
             $this->assertSame($manager, $configured);
             $this->assertSame([], $configured->getMetadataFactory()->getLoadedMetadata());
             $called = true;
@@ -450,6 +548,32 @@ class AutomaticEncryptedColumnTest extends TestCase
         $listener ??= new EncryptedColumnListener([], new StoredEnvelopeEncrypter($this->store));
         $events->addEventListener(Events::loadClassMetadata, $listener);
         $manager = new EntityManager($this->connection, $this->configuration($classes, $cache, $strategy, $cacheOnly), $events);
+        $listener->register($manager);
+
+        return $manager;
+    }
+
+    private function renamingManager(ArrayAdapter $metadataCache, ArrayAdapter $typesCache, bool $renamesFirst): EntityManagerInterface
+    {
+        $listener = new EncryptedColumnListener([], new StoredEnvelopeEncrypter($this->store), $typesCache);
+        $renamer = new class {
+            public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
+            {
+                $metadata = $event->getClassMetadata();
+                if (AutomaticRecord::class !== $metadata->getName()) {
+                    return;
+                }
+
+                $metadata->setPrimaryTable(['name' => 'mutated_record']);
+                $metadata->setAttributeOverride('first', ['columnName' => 'renamed_first']);
+                $metadata->setAttributeOverride('second', ['columnName' => 'renamed_second']);
+            }
+        };
+        $events = new EventManager();
+        foreach ($renamesFirst ? [$renamer, $listener] : [$listener, $renamer] as $subscriber) {
+            $events->addEventListener(Events::loadClassMetadata, $subscriber);
+        }
+        $manager = new EntityManager($this->connection, $this->configuration([AutomaticRecord::class], $metadataCache), $events);
         $listener->register($manager);
 
         return $manager;

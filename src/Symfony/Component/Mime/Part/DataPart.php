@@ -203,17 +203,37 @@ class DataPart extends TextPart
 
         trigger_deprecation('symfony/mime', '7.4', 'Passing extra keys to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', self::class, get_debug_type($this));
 
-        (new \ReflectionMethod(AbstractPart::class, 'rejectStringCasts'))->invoke(null, static::class, $data);
+        $headers = $data['_headers'] ?? $data["\0*\0_headers"] ?? null;
+        $parent = $data['_parent'] ?? $data["\0*\0_parent"] ?? null;
+        unset($data['_headers'], $data["\0*\0_headers"], $data['_parent'], $data["\0*\0_parent"]);
 
-        \Closure::bind(function ($data) use ($wakeup) {
-            foreach ($data as $key => $value) {
-                $this->{("\0" === $key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key} = $value;
-            }
+        $state = [];
+        foreach (['filename', 'mediaType', 'cid'] as $name) {
+            $key = \array_key_exists($name, $data) ? $name : "\0".self::class."\0".$name;
+            $state[$name] = $data[$key] ?? null;
+            unset($data[$key]);
+        }
 
-            if ($wakeup) {
-                $this->__wakeup();
-            }
-        }, $this, static::class)($data);
+        if (!\is_array($parent)) {
+            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        }
+
+        (new \ReflectionMethod(AbstractPart::class, 'setSubclassState'))->invoke($this, $data);
+
+        if ($wakeup) {
+            $this->_headers = $headers;
+            $this->_parent = $parent;
+        } else {
+            parent::__unserialize(['_headers' => $headers, ...$parent]);
+        }
+
+        foreach ($state as $name => $value) {
+            $this->$name = $value;
+        }
+
+        if ($wakeup) {
+            $this->__wakeup();
+        }
     }
 
     /**

@@ -258,7 +258,8 @@ class BinaryFileResponse extends Response
                     $end = ('' === $end) ? $fileSize - 1 : (int) $end;
 
                     if ('' === $start) {
-                        $start = $fileSize - $end;
+                        // a suffix longer than the file selects the whole file, see RFC 9110 section 14.1.2
+                        $start = max(0, $fileSize - $end);
                         $end = $fileSize - 1;
                     } else {
                         $start = (int) $start;

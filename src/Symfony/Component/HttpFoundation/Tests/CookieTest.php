@@ -138,10 +138,12 @@ class CookieTest extends TestCase
         Cookie::create('MyCookie')->withDomain($domain);
     }
 
-    public function testFromStringThrowsExceptionIfPathContainsSpecialCharacters()
+    public function testFromStringEndsQuotedPathsAtTheNextSemicolon()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        Cookie::fromString('foo=bar; path="/p; SameSite=None"');
+        $cookie = Cookie::fromString('foo=bar; path="/p; SameSite=None"');
+
+        $this->assertSame('"/p', $cookie->getPath());
+        $this->assertNull($cookie->getSameSite());
     }
 
     public static function validPathsAndDomains()
@@ -531,6 +533,37 @@ class CookieTest extends TestCase
             [' foo = "bar" ; path=/', false, '"bar"'],
             ['foo="bar%20baz"; path=/', true, '"bar baz"'],
         ];
+    }
+
+    public function testFromStringIgnoresQuotesWhenSplittingAttributes()
+    {
+        $cookie = Cookie::fromString('foo="a;b"; path=/x; secure; httponly');
+
+        $this->assertSame('"a', $cookie->getValue());
+        $this->assertSame('/x', $cookie->getPath());
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+    }
+
+    public function testFromStringKeepsQuotesInAttributeValues()
+    {
+        $cookie = Cookie::fromString('foo=bar; Path="/x"; Domain="example.com"; SameSite="Lax"; Max-Age="10"');
+
+        $this->assertSame('"/x"', $cookie->getPath());
+        $this->assertSame('"example.com"', $cookie->getDomain());
+        $this->assertNull($cookie->getSameSite());
+        $this->assertSame(0, $cookie->getExpiresTime());
+    }
+
+    public function testFromStringIgnoresQuotesInExpires()
+    {
+        $this->assertSame(strtotime('Fri, 20 May 2011 15:25:52 GMT'), Cookie::fromString('foo=bar; Expires="Fri, 20 May 2011 15:25:52 GMT"')->getExpiresTime());
+        $this->assertSame(1234567890, Cookie::fromString('foo=bar; Expires="1234567890"')->getExpiresTime());
+    }
+
+    public function testFromStringUsesTheDefaultPathForAPathWithoutValue()
+    {
+        $this->assertSame('/', Cookie::fromString('foo=bar; Path; Secure')->getPath());
     }
 
     public function testFromStringIgnoresInvalidExpires()

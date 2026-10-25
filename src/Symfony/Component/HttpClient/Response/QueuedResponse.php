@@ -186,6 +186,9 @@ final class QueuedResponse implements ResponseInterface, StreamableInterface
         return $info;
     }
 
+    /**
+     * @return resource
+     */
     public function toStream(bool $throw = true)
     {
         if ($throw) {

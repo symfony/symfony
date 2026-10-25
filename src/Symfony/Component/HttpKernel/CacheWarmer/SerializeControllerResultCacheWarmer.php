@@ -44,7 +44,7 @@ final class SerializeControllerResultCacheWarmer extends AbstractPhpFileCacheWar
             return false;
         }
 
-        $this->typeResolver ??= TypeResolver::create();
+        $this->typeResolver ??= TypeResolver::create(null, true);
 
         foreach ($this->controllers as $controller) {
             $class = new \ReflectionClass($controller);

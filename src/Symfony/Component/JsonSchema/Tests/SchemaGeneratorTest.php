@@ -65,6 +65,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingDefinitionPolicy;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingDefinitionProcessor;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingNameConverter;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingPropertyListExtractor;
+use Symfony\Component\JsonSchema\Tests\Fixtures\RefinedProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ScalarProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SearchTool;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SelfReferencingCategory;
@@ -441,6 +442,16 @@ class SchemaGeneratorTest extends TestCase
         $schema = SchemaGenerator::create()->generate(Type::nullable(Type::literal('draft')));
 
         $this->assertSameSchema(['type' => ['string', 'null'], 'enum' => ['draft', null]], $schema->getRoot());
+    }
+
+    public function testRefinedPhpDocTypesAreDescribed()
+    {
+        $properties = SchemaGenerator::create()->generate(Type::object(RefinedProperties::class))->getDefinitions()['RefinedProperties']['properties'];
+
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 1], $properties['page']);
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 1], $properties['quantity']);
+        $this->assertSameSchema(['type' => ['integer', 'null'], 'minimum' => 0, 'maximum' => 100], $properties['percentage']);
+        $this->assertSameSchema(['anyOf' => [['type' => 'string', 'const' => 'draft'], ['type' => 'string', 'const' => 'live']]], $properties['status']);
     }
 
     public function testOpenApi30LiteralBecomesEnum()
@@ -1010,7 +1021,7 @@ class SchemaGeneratorTest extends TestCase
     {
         $reflectionExtractor = new ReflectionExtractor();
 
-        return new PropertyInfoExtractor([$reflectionExtractor], [new PhpStanExtractor(), $reflectionExtractor], [], [$reflectionExtractor], [$reflectionExtractor]);
+        return new PropertyInfoExtractor([$reflectionExtractor], [new PhpStanExtractor(null, null, null, true, true), $reflectionExtractor], [], [$reflectionExtractor], [$reflectionExtractor]);
     }
 
     private function assertSameSchema(array $expected, array|Schema $actual): void

@@ -114,7 +114,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         $descriptionExtractors = [];
 
         if (class_exists(PhpDocParser::class) && class_exists(ContextFactory::class)) {
-            $phpStanExtractor = new PhpStanExtractor();
+            $phpStanExtractor = new PhpStanExtractor(null, null, null, true, true);
             array_unshift($typeExtractors, $phpStanExtractor);
             $descriptionExtractors[] = $phpStanExtractor;
         }
@@ -179,7 +179,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
         foreach ($parameters as $parameter) {
             try {
-                $type = ($this->typeResolver ??= TypeResolver::create())->resolve($parameter);
+                $type = ($this->typeResolver ??= TypeResolver::create(null, true))->resolve($parameter);
             } catch (UnsupportedException) {
                 $type = null;
             }

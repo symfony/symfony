@@ -91,7 +91,7 @@ final class Address
             return '';
         }
 
-        return sprintf('"%s"', preg_replace('/"/u', '\"', $this->getName()));
+        return sprintf('"%s"', preg_replace('/["\\\\]/', '\\\\$0', $this->getName()));
     }
 
     /**

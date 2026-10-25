@@ -133,7 +133,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
 
     public function offsetUnset(mixed $key): void
     {
-        if (false !== ($position = array_search((string) $key, $this->orderedKeys))) {
+        if (false !== $position = array_search((string) $key, $this->orderedKeys, true)) {
             array_splice($this->orderedKeys, $position, 1);
             unset($this->elements[$key]);
 

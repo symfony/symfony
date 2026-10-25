@@ -129,8 +129,8 @@ class HttpBrowser extends AbstractBrowser
             }
         }
         $cookies = [];
-        foreach ($this->getCookieJar()->allRawValues($request->getUri()) as $name => $value) {
-            $cookies[] = $name.'='.$value;
+        foreach ($this->getCookieJar()->allForUri($request->getUri()) as $cookie) {
+            $cookies[] = ('' === $cookie->getName() ? '' : $cookie->getName().'=').$cookie->getRawValue();
         }
         if ($cookies) {
             $headers['cookie'] = implode('; ', $cookies);

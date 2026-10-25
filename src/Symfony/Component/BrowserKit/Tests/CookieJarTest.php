@@ -32,6 +32,92 @@ class CookieJarTest extends TestCase
         $this->assertNull($cookieJar->get('foo'), '->get() returns null if the cookie is expired');
     }
 
+    public function testHostOnlyAndDomainCookiesAreDistinct()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['sid=host'], 'https://example.com/');
+        $cookieJar->updateFromSetCookie(['sid=domain; Domain=example.com'], 'https://example.com/');
+
+        $this->assertCount(2, $cookieJar->all());
+        $this->assertSame(['sid' => 'domain'], $cookieJar->allValues('https://www.example.com/'));
+
+        $cookieJar->updateFromSetCookie(['sid=deleted; Max-Age=0'], 'https://example.com/');
+
+        $this->assertCount(1, $cookieJar->all());
+        $this->assertSame('domain', $cookieJar->get('sid')->getValue());
+
+        $cookieJar->expire('sid', '/', 'example.com');
+
+        $this->assertSame([], $cookieJar->all());
+    }
+
+    public function testHostOnlyCookieKeysDoNotCollideWithArtificialCookieNames()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['sid=host'], 'https://example.com/');
+        $cookieJar->set(new Cookie("\0sid", 'artificial', null, '/', 'example.com'));
+
+        $this->assertCount(2, $cookieJar->all());
+        $this->assertSame('host', $cookieJar->get('sid')->getValue());
+        $this->assertSame('artificial', $cookieJar->get("\0sid")->getValue());
+    }
+
+    public function testAllForUriKeepsDuplicateNamesInPathAndCreationOrder()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['sid=root; Domain=example.com; Path=/'], 'https://www.example.com/');
+        $cookieJar->updateFromSetCookie(['sid=deep; Path=/login'], 'https://www.example.com/');
+        $cookieJar->updateFromSetCookie(['later=value; Path=/'], 'https://www.example.com/');
+        $cookieJar->updateFromSetCookie(['sid=replaced; Domain=example.com; Path=/'], 'https://www.example.com/');
+
+        $this->assertSame(['deep', 'replaced', 'value'], array_map(static fn (Cookie $cookie) => $cookie->getValue(), $cookieJar->allForUri('https://www.example.com/login')));
+        $this->assertSame(['sid' => 'deep', 'later' => 'value'], $cookieJar->allValues('https://www.example.com/login'));
+    }
+
+    public function testAllForUriFiltersCookies()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['host=value', 'secure=value; Secure', 'other=value; Path=/other', 'expired=value; Max-Age=0'], 'https://example.com/');
+        $cookieJar->updateFromSetCookie(['foreign=value'], 'https://other.example/');
+        $cookieJar->set(new Cookie('artificial', 'value'));
+
+        $this->assertSame(['host', 'artificial'], array_map(static fn (Cookie $cookie) => $cookie->getName(), $cookieJar->allForUri('http://example.com/')));
+        $this->assertSame(['artificial'], array_map(static fn (Cookie $cookie) => $cookie->getName(), $cookieJar->allForUri('https://www.example.com/')));
+    }
+
+    public function testAllForUriPreservesCreationOrderAfterSerialization()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['first=old'], 'https://www.example.com/');
+        $cookieJar->updateFromSetCookie(['second=old; Domain=example.com'], 'https://www.example.com/');
+        $cookieJar->updateFromSetCookie(['third=old'], 'https://www.example.com/');
+        $cookieJar = unserialize(serialize($cookieJar));
+
+        $this->assertSame(['first', 'second', 'third'], array_map(static fn (Cookie $cookie) => $cookie->getName(), $cookieJar->allForUri('https://www.example.com/')));
+    }
+
+    public function testAllForUriUpdatesCreationOrderAfterRemoval()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['first=expired; Max-Age=0', 'second=value'], 'https://example.com/');
+
+        $this->assertCount(1, $cookieJar->allForUri('https://example.com/'));
+
+        $cookieJar->updateFromSetCookie(['first=new'], 'https://example.com/');
+
+        $this->assertSame(['second', 'first'], array_map(static fn (Cookie $cookie) => $cookie->getName(), $cookieJar->allForUri('https://example.com/')));
+
+        $cookieJar->expire('second');
+        $cookieJar->updateFromSetCookie(['second=new'], 'https://example.com/');
+
+        $this->assertSame(['first', 'second'], array_map(static fn (Cookie $cookie) => $cookie->getName(), $cookieJar->allForUri('https://example.com/')));
+
+        $cookieJar->clear();
+        $cookieJar->updateFromSetCookie(['second=new', 'first=new'], 'https://example.com/');
+
+        $this->assertSame(['second', 'first'], array_map(static fn (Cookie $cookie) => $cookie->getName(), $cookieJar->allForUri('https://example.com/')));
+    }
+
     public function testExpire()
     {
         $cookieJar = new CookieJar();

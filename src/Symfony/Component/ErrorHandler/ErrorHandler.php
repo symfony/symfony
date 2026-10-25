@@ -533,9 +533,19 @@ class ErrorHandler
         } elseif ([$this, 'renderException'] === $this->exceptionHandler && !$this->customExceptionHandlerCalled && !isset($this->loggers[$type][0]) && !$exception instanceof FatalError && (error_reporting() & \E_ERROR) && filter_var(\ini_get('log_errors'), \FILTER_VALIDATE_BOOL)) {
             // renderException() replaces PHP's native handler, so log the exception like PHP does. PHP already logged fatal errors.
             // In CLI, PHP logs to STDERR when error_log is empty, and renderException() already displays the exception.
-            if (\ini_get('error_log') || !\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+            // PHP logs this line with the error priority. error_log() uses the notice one, except with the SAPI logger.
+            if (($errorLog = \ini_get('error_log')) || !\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
                 try {
-                    error_log(\sprintf("PHP Fatal error:  Uncaught %s\n  thrown in %s on line %d", $this->parseAnonymousClass((string) $exception), $exception->getFile(), $exception->getLine()));
+                    $message = \sprintf("PHP Fatal error:  Uncaught %s\n  thrown in %s on line %d", $this->parseAnonymousClass((string) $exception), $exception->getFile(), $exception->getLine());
+
+                    if ('syslog' === $errorLog && \function_exists('openlog') && \function_exists('syslog')) {
+                        $facility = \ini_get('syslog.facility');
+                        $facility = 'security' === $facility ? 'LOG_AUTH' : (str_starts_with($facility, 'LOG_') ? $facility : 'LOG_'.strtoupper($facility));
+                        openlog(\ini_get('syslog.ident'), 0, \defined($facility) ? \constant($facility) : \LOG_USER);
+                        syslog(\LOG_ERR, $message);
+                    } else {
+                        error_log($message, $errorLog ? 0 : 4);
+                    }
                 } catch (\Throwable) {
                 }
             }

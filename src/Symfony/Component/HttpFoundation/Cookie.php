@@ -59,9 +59,10 @@ class Cookie
         $name = $decode ? urldecode($name) : $name;
         $value = $decode && null !== $value ? urldecode($value) : $value;
 
-        foreach (HeaderUtils::split($attributes, ';=') as $attribute) {
-            $attributeName = strtolower($attribute[0]);
-            $attributeValue = $attribute[1] ?? true;
+        foreach (explode(';', $attributes) as $attribute) {
+            $attribute = explode('=', $attribute, 2);
+            $attributeName = strtolower(trim($attribute[0]));
+            $attributeValue = trim($attribute[1] ?? '');
 
             if ('raw' === $attributeName || !\array_key_exists($attributeName, $data) && 'max-age' !== $attributeName) {
                 continue;
@@ -70,17 +71,22 @@ class Cookie
             if (\in_array($attributeName, ['secure', 'httponly', 'partitioned'], true)) {
                 $attributeValue = true;
             } elseif ('expires' === $attributeName) {
-                if (false === $attributeValue = strtotime((string) $attributeValue)) {
-                    continue;
-                }
+                // double quotes are delimiters in cookie dates, see RFC 6265, section 5.1.1
+                $attributeValue = str_replace('"', '', $attributeValue);
 
-                $attributeValue = max(1, $attributeValue);
+                if (is_numeric($attributeValue)) {
+                    $attributeValue = self::expiresTimestamp($attributeValue);
+                } elseif (false === $attributeValue = strtotime($attributeValue)) {
+                    continue;
+                } else {
+                    $attributeValue = max(1, $attributeValue);
+                }
             } elseif ('max-age' === $attributeName) {
-                if (!\is_string($attributeValue) || !preg_match('/^-?\d+$/D', $attributeValue)) {
+                if (!preg_match('/^-?\d+$/D', $attributeValue)) {
                     continue;
                 }
             } elseif ('samesite' === $attributeName) {
-                $attributeValue = strtolower((string) $attributeValue);
+                $attributeValue = strtolower($attributeValue);
 
                 if (!\in_array($attributeValue, [self::SAMESITE_LAX, self::SAMESITE_STRICT, self::SAMESITE_NONE], true)) {
                     continue;

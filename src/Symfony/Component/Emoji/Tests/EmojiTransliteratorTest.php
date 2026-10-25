@@ -128,6 +128,19 @@ class EmojiTransliteratorTest extends TestCase
         $this->assertSame('😀grinning face', $tr->transliterate('😀😀', 2));
     }
 
+    public function testEmptySlice()
+    {
+        $tr = EmojiTransliterator::create('emoji-en');
+        $this->assertSame('😀😀', $tr->transliterate('😀😀', 2, 2));
+    }
+
+    public function testSliceEndingInsideASurrogatePair()
+    {
+        $tr = EmojiTransliterator::create('emoji-en');
+        $this->assertSame('grinning face😀', $tr->transliterate('😀😀', 0, 1));
+        $this->assertSame('😀grinning face', $tr->transliterate('😀😀', 2, 3));
+    }
+
     public function testNotUtf8()
     {
         $tr = EmojiTransliterator::create('emoji-en');

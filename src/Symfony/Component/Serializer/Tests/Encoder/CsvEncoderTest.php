@@ -336,6 +336,23 @@ class CsvEncoderTest extends TestCase
         );
     }
 
+    public function testEncodeFormulasInHeaders()
+    {
+        $this->encoder = new CsvEncoder([CsvEncoder::ESCAPE_FORMULAS_KEY => true]);
+
+        $this->assertSame(<<<'CSV'
+            '=1+2,a.=3,'-b
+            1,2,3
+
+            CSV, $this->encoder->encode([['=1+2' => 1, 'a' => ['=3' => 2], '-b' => 3]], 'csv'));
+
+        $this->assertSame(<<<'CSV'
+            '@c,d
+            ,
+
+            CSV, $this->encoder->encode([[]], 'csv', [CsvEncoder::HEADERS_KEY => ['@c', 'd']]));
+    }
+
     public function testDoNotEncodeFormulas()
     {
         $this->assertSame(<<<'CSV'

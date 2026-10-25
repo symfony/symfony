@@ -242,9 +242,26 @@ class ParameterBag implements \IteratorAggregate, \Countable
         $nullOnFailure = $options['flags'] & \FILTER_NULL_ON_FAILURE;
         $options['flags'] |= \FILTER_NULL_ON_FAILURE;
 
-        $value = filter_var($value, $filter, $options);
+        $invalid = false;
+        $forceArray = !\is_array($value) && ($options['flags'] & \FILTER_FORCE_ARRAY) && !($options['flags'] & \FILTER_REQUIRE_ARRAY);
 
-        if (null !== $value || $nullOnFailure) {
+        if (!$nullOnFailure && \is_array($value) && $value && !($options['flags'] & \FILTER_REQUIRE_SCALAR) && ($options['flags'] & (\FILTER_REQUIRE_ARRAY | \FILTER_FORCE_ARRAY))) {
+            $options['flags'] &= ~(\FILTER_REQUIRE_ARRAY | \FILTER_FORCE_ARRAY);
+            $value = self::filterArray($value, $filter, $options, $invalid);
+        } else {
+            if ($forceArray) {
+                $options['flags'] &= ~\FILTER_FORCE_ARRAY;
+            }
+
+            $value = filter_var($value, $filter, $options);
+            $invalid = null === $value;
+
+            if ($forceArray) {
+                $value = [$value];
+            }
+        }
+
+        if (!$invalid || $nullOnFailure) {
             return $value;
         }
 
@@ -267,5 +284,32 @@ class ParameterBag implements \IteratorAggregate, \Countable
     public function count(): int
     {
         return \count($this->parameters);
+    }
+
+    private static function filterArray(array $value, int $filter, array $options, bool &$invalid, array &$references = []): array
+    {
+        foreach ($value as $key => $item) {
+            if (!\is_array($item)) {
+                $value[$key] = filter_var($item, $filter, $options);
+                $invalid = $invalid || null === $value[$key];
+                continue;
+            }
+
+            $id = \ReflectionReference::fromArrayElement($value, $key)?->getId();
+            if (null !== $id && isset($references[$id])) {
+                continue;
+            }
+            if (null !== $id) {
+                $references[$id] = true;
+            }
+
+            $value[$key] = self::filterArray($item, $filter, $options, $invalid, $references);
+
+            if (null !== $id) {
+                unset($references[$id]);
+            }
+        }
+
+        return $value;
     }
 }

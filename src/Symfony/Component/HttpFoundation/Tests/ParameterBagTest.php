@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Exception\UnexpectedValueException;
@@ -277,6 +278,46 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(['bang'], $bag->filter('array', ''), '->filter() gets a value of parameter as an array');
     }
 
+    public function testFilterArrayWithCycle()
+    {
+        $value = ['value' => '12'];
+        $value['cycle'] = &$value;
+        $calls = 0;
+        $bag = new ParameterBag(['foo' => $value]);
+
+        $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => static function ($value) use (&$calls) {
+            ++$calls;
+
+            return (int) $value;
+        }]);
+
+        $this->assertSame(2, $calls);
+        $this->assertSame(12, $result['value']);
+        $this->assertSame(12, $result['cycle']['value']);
+        $result['cycle']['value'] = 99;
+        $this->assertSame(99, $result['cycle']['cycle']['value']);
+        $this->assertSame(12, $result['value']);
+    }
+
+    public function testFilterArrayWithSharedScalarReference()
+    {
+        $value = '12';
+        $calls = 0;
+        $bag = new ParameterBag(['foo' => ['first' => &$value, 'second' => &$value]]);
+
+        $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => static function ($value) use (&$calls) {
+            ++$calls;
+
+            return (int) $value;
+        }]);
+
+        $this->assertSame(2, $calls);
+        $this->assertSame(['first' => 12, 'second' => 12], $result);
+        $this->assertSame(12, $value);
+        $result['first'] = 99;
+        $this->assertSame(99, $result['second']);
+    }
+
     public function testFilterCallback()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -292,6 +333,83 @@ class ParameterBagTest extends TestCase
         $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => strtoupper(...)]);
 
         $this->assertSame('BAR', $result);
+    }
+
+    #[DataProvider('provideInvalidFilterArrayValues')]
+    public function testFilterArrayWithInvalidValue($value, int $filter, $options, array $expected)
+    {
+        $bag = new ParameterBag(['foo' => $value]);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Parameter value "foo" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+
+        $bag->filter('foo', null, $filter, $options);
+    }
+
+    #[DataProvider('provideInvalidFilterArrayValues')]
+    public function testFilterArrayWithNullOnFailure($value, int $filter, $options, array $expected)
+    {
+        if (!\is_array($options)) {
+            $options = ['flags' => $options];
+        }
+        $options['flags'] |= \FILTER_NULL_ON_FAILURE;
+        $bag = new ParameterBag(['foo' => $value]);
+
+        $this->assertSame($expected, $bag->filter('foo', null, $filter, $options));
+    }
+
+    public static function provideInvalidFilterArrayValues(): iterable
+    {
+        yield 'flat integers' => [['valid' => '12', 'invalid' => 'bad'], \FILTER_VALIDATE_INT, \FILTER_REQUIRE_ARRAY, ['valid' => 12, 'invalid' => null]];
+        yield 'nested integers' => [['values' => ['valid' => '12', 'invalid' => 'bad']], \FILTER_VALIDATE_INT, \FILTER_REQUIRE_ARRAY, ['values' => ['valid' => 12, 'invalid' => null]]];
+        yield 'forced scalar integer' => ['bad', \FILTER_VALIDATE_INT, \FILTER_FORCE_ARRAY, [null]];
+
+        $callback = static fn ($value) => 'bad' === $value ? null : (int) $value;
+        yield 'flat callback' => [['valid' => '12', 'invalid' => 'bad'], \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => $callback], ['valid' => 12, 'invalid' => null]];
+        yield 'nested callback' => [['values' => ['valid' => '12', 'invalid' => 'bad']], \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => $callback], ['values' => ['valid' => 12, 'invalid' => null]]];
+        yield 'forced scalar callback' => ['bad', \FILTER_CALLBACK, ['flags' => \FILTER_FORCE_ARRAY, 'options' => $callback], [null]];
+        yield 'nested object' => [['values' => [new \stdClass()]], \FILTER_VALIDATE_INT, \FILTER_REQUIRE_ARRAY, ['values' => [null]]];
+        // FILTER_CALLBACK ignores the flags before PHP 8.2.12
+        if (\PHP_VERSION_ID >= 80212) {
+            yield 'nested object with callback' => [['values' => [new \stdClass()]], \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => static function () {
+                throw new \LogicException('Non-stringable objects must not reach the callback.');
+            }], ['values' => [null]]];
+        }
+    }
+
+    #[DataProvider('provideValidFilterArrayValues')]
+    public function testFilterArrayWithValidValue($value, int $filter, $options, array $expected)
+    {
+        $bag = new ParameterBag(['foo' => $value]);
+
+        $this->assertSame($expected, $bag->filter('foo', null, $filter, $options));
+    }
+
+    public static function provideValidFilterArrayValues(): iterable
+    {
+        yield 'false boolean' => [['false', 'true'], \FILTER_VALIDATE_BOOLEAN, \FILTER_REQUIRE_ARRAY, [false, true]];
+        yield 'nested false boolean' => [[['false']], \FILTER_VALIDATE_BOOLEAN, \FILTER_REQUIRE_ARRAY, [[false]]];
+        yield 'forced scalar false boolean' => ['false', \FILTER_VALIDATE_BOOLEAN, \FILTER_FORCE_ARRAY, [false]];
+        yield 'empty array' => [[], \FILTER_VALIDATE_INT, \FILTER_REQUIRE_ARRAY, []];
+        yield 'false callback' => [['value'], \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => static fn () => false], [false]];
+
+        $callback = static fn () => ['optional' => null];
+        yield 'callback returning array' => [['value'], \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => $callback], [['optional' => null]]];
+        yield 'nested callback returning array' => [[['value']], \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => $callback], [[['optional' => null]]]];
+        yield 'forced scalar callback returning array' => ['value', \FILTER_CALLBACK, ['flags' => \FILTER_FORCE_ARRAY, 'options' => $callback], [['optional' => null]]];
+        yield 'array default' => [['bad'], \FILTER_VALIDATE_INT, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => ['default' => ['optional' => null]]], [['optional' => null]]];
+        yield 'nested array default' => [[['bad']], \FILTER_VALIDATE_INT, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => ['default' => ['optional' => null]]], [[['optional' => null]]]];
+        yield 'forced scalar array default' => ['bad', \FILTER_VALIDATE_INT, ['flags' => \FILTER_FORCE_ARRAY, 'options' => ['default' => ['optional' => null]]], [['optional' => null]]];
+    }
+
+    public function testFilterArrayWithInvalidValueWithoutFlags()
+    {
+        $bag = new ParameterBag(['foo' => ['12', 'bad']]);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Parameter value "foo" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+
+        $bag->filter('foo', null, \FILTER_VALIDATE_INT);
     }
 
     public function testGetIterator()

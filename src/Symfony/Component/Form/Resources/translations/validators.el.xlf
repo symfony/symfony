@@ -18,9 +18,9 @@
                 <source>This value is not a valid HTML5 color.</source>
                 <target>Αυτή η τιμή δέν έναι έγκυρο χρώμα HTML5.</target>
             </trans-unit>
-            <trans-unit id="100">
-                <source>Please enter a valid birthdate.</source>
-                <target>Παρακαλόυμε ειχάγεται μία έγκυρη ημερομηνία γέννησης.</target>
+            <trans-unit id="100" resname="Please enter a valid birthdate.">
+                <source>This value is not a valid birthdate.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρη ημερομηνία γέννησης.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
@@ -30,113 +30,113 @@
                 <source>The collection is invalid.</source>
                 <target>Η συλλογή δέν είναι έγκυρη.</target>
             </trans-unit>
-            <trans-unit id="103">
-                <source>Please select a valid color.</source>
-                <target>Παρακαλούμε επιλέξτε ένα έγκυρο χρώμα.</target>
+            <trans-unit id="103" resname="Please select a valid color.">
+                <source>This value is not a valid color.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρο χρώμα.</target>
             </trans-unit>
-            <trans-unit id="104">
-                <source>Please select a valid country.</source>
-                <target>Παρακαλούμε επιλέξτε μία έγκυρη χώρα.</target>
+            <trans-unit id="104" resname="Please select a valid country.">
+                <source>This value is not a valid country.</source>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε μια έγκυρη χώρα.</target>
             </trans-unit>
-            <trans-unit id="105">
-                <source>Please select a valid currency.</source>
-                <target>Παρακαλούμε επιλέξτε ένα έγυρο νόμισμα.</target>
+            <trans-unit id="105" resname="Please select a valid currency.">
+                <source>This value is not a valid currency.</source>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε έγκυρο νόμισμα.</target>
             </trans-unit>
-            <trans-unit id="106">
-                <source>Please choose a valid date interval.</source>
-                <target>Παρακαλούμε επιλέξτε ένα έγκυρο διάστημα ημερομηνίας.</target>
+            <trans-unit id="106" resname="Please choose a valid date interval.">
+                <source>This value is not a valid date interval.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρο διάστημα ημερομηνίας.</target>
             </trans-unit>
-            <trans-unit id="107">
-                <source>Please enter a valid date and time.</source>
-                <target>Παρακαλούμε εισαγάγετε μια έγκυρη ημερομηνία και ώρα.</target>
+            <trans-unit id="107" resname="Please enter a valid date and time.">
+                <source>This value is not a valid date and time.</source>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε έγκυρη ημερομηνία και ώρα.</target>
             </trans-unit>
-            <trans-unit id="108">
-                <source>Please enter a valid date.</source>
-                <target>Παρακαλούμε εισάγετε μία έγκυρη ημερομηνία.</target>
+            <trans-unit id="108" resname="Please enter a valid date.">
+                <source>This value is not a valid date.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρη ημερομηνία.</target>
             </trans-unit>
-            <trans-unit id="109">
-                <source>Please select a valid file.</source>
-                <target>Παρακαλούμε επιλέξτε ένα έγκυρο αρχείο.</target>
+            <trans-unit id="109" resname="Please select a valid file.">
+                <source>This value is not a valid file.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρο αρχείο.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The hidden field is invalid.</source>
                 <target>Το κρυφό πεδίο δέν είναι έγκυρο.</target>
             </trans-unit>
-            <trans-unit id="111">
-                <source>Please enter an integer.</source>
-                <target>Παρακαλούμε εισάγετε έναν ακέραιο αριθμό.</target>
+            <trans-unit id="111" resname="Please enter an integer.">
+                <source>This value is not a valid integer.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρος ακέραιος αριθμός.</target>
             </trans-unit>
-            <trans-unit id="112">
-                <source>Please select a valid language.</source>
-                <target>Παρακαλούμε επιλέξτε μία έγκυρη γλώσσα.</target>
+            <trans-unit id="112" resname="Please select a valid language.">
+                <source>This value is not a valid language.</source>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε μια έγκυρη γλώσσα.</target>
             </trans-unit>
-            <trans-unit id="113">
-                <source>Please select a valid locale.</source>
-                <target>Παρακαλούμε επιλέξτε μία έγκυρη τοπικοποίηση.</target>
+            <trans-unit id="113" resname="Please select a valid locale.">
+                <source>This value is not a valid locale.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρη τοπικοποίηση.</target>
             </trans-unit>
-            <trans-unit id="114">
-                <source>Please enter a valid money amount.</source>
-                <target>Παρακαλούμε εισάγετε ένα έγκυρο χρηματικό ποσό.</target>
+            <trans-unit id="114" resname="Please enter a valid money amount.">
+                <source>This value is not a valid money amount.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρο χρηματικό ποσό.</target>
             </trans-unit>
-            <trans-unit id="115">
-                <source>Please enter a number.</source>
-                <target>Παρακαλούμε εισάγετε έναν αριθμό.</target>
+            <trans-unit id="115" resname="Please enter a number.">
+                <source>This value is not a valid number.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρος αριθμός.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>The password is invalid.</source>
                 <target>Ο κωδικός δέν είναι έγκυρος.</target>
             </trans-unit>
-            <trans-unit id="117">
-                <source>Please enter a percentage value.</source>
-                <target>Παρακαλούμε εισάγετε μία ποσοστιαία τιμή.</target>
+            <trans-unit id="117" resname="Please enter a percentage value.">
+                <source>This value is not a valid percentage.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρη ποσοστιαία τιμή.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>The values do not match.</source>
                 <target>Οι τιμές δέν ταιριάζουν.</target>
             </trans-unit>
-            <trans-unit id="119">
-                <source>Please enter a valid time.</source>
-                <target>Παρακαλούμε εισάγετε μία έγκυρη ώρα.</target>
+            <trans-unit id="119" resname="Please enter a valid time.">
+                <source>This value is not a valid time.</source>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε έγκυρη ώρα.</target>
             </trans-unit>
-            <trans-unit id="120">
-                <source>Please select a valid timezone.</source>
-                <target>Παρακαλούμε επιλέξτε μία έγυρη ζώνη ώρας.</target>
+            <trans-unit id="120" resname="Please select a valid timezone.">
+                <source>This value is not a valid timezone.</source>
+                <target>Αυτή η τιμή δεν είναι έγκυρη ζώνη ώρας.</target>
             </trans-unit>
-            <trans-unit id="121">
-                <source>Please enter a valid URL.</source>
-                <target>Παρακαλούμε εισάγετε μια έγκυρη διεύθυνση URL.</target>
+            <trans-unit id="121" resname="Please enter a valid URL.">
+                <source>This value is not a valid URL.</source>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε έγκυρο σύνδεσμο.</target>
             </trans-unit>
-            <trans-unit id="122">
-                <source>Please enter a valid search term.</source>
-                <target>Παρακαλούμε εισάγετε έναν έγκυρο όρο αναζήτησης.</target>
+            <trans-unit id="122" resname="Please enter a valid search term.">
+                <source>This value is not a valid search term.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρος όρος αναζήτησης.</target>
             </trans-unit>
-            <trans-unit id="123">
-                <source>Please provide a valid phone number.</source>
-                <target>Παρακαλούμε καταχωρίστε έναν έγκυρο αριθμό τηλεφώνου.</target>
+            <trans-unit id="123" resname="Please provide a valid phone number.">
+                <source>This value is not a valid phone number.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρος αριθμός τηλεφώνου.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The checkbox has an invalid value.</source>
                 <target>Το πλαίσιο ελέγχου έχει μή έγκυρη τιμή.</target>
             </trans-unit>
-            <trans-unit id="125">
-                <source>Please enter a valid email address.</source>
-                <target>Παρακαλούμε εισάγετε μία έγκυρη ηλεκτρονική διεύθυνση.</target>
+            <trans-unit id="125" resname="Please enter a valid email address.">
+                <source>This value is not a valid email address.</source>
+                <target>Αυτή η τιμή δεν αντιστοιχεί σε έγκυρη διεύθυνση ηλεκτρονικού ταχυδρομίου.</target>
             </trans-unit>
-            <trans-unit id="126">
-                <source>Please select a valid option.</source>
-                <target>Παρακαλούμε επιλέξτε μία έγκυρη επιλογή.</target>
+            <trans-unit id="126" resname="Please select a valid option.">
+                <source>This value is not a valid option.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρη επιλογή.</target>
             </trans-unit>
-            <trans-unit id="127">
-                <source>Please select a valid range.</source>
-                <target>Παρακαλούμε επιλέξτε ένα έγυρο εύρος.</target>
+            <trans-unit id="127" resname="Please select a valid range.">
+                <source>This value is not a valid range.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρο εύρος.</target>
             </trans-unit>
-            <trans-unit id="128">
-                <source>Please enter a valid week.</source>
-                <target>Παρακαλούμε εισάγετε μία έγκυρη εβδομάδα.</target>
+            <trans-unit id="128" resname="Please enter a valid week.">
+                <source>This value is not a valid week.</source>
+                <target>Αυτή η τιμή δεν είναι έγκυρη εβδομάδα.</target>
             </trans-unit>
-            <trans-unit id="129">
-                <source>Please enter a valid UUID.</source>
-                <target>Παρακαλούμε εισάγετε ένα έγκυρο UUID.</target>
+            <trans-unit id="129" resname="Please enter a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target state="needs-review-translation">Αυτή η τιμή δεν είναι έγκυρο UUID.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>

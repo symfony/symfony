@@ -101,7 +101,15 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $endOfLine = $context[self::END_OF_LINE] ?? $this->defaultContext[self::END_OF_LINE];
 
         if (!($context[self::NO_HEADERS_KEY] ?? $this->defaultContext[self::NO_HEADERS_KEY])) {
-            fputcsv($handle, $headers, $delimiter, $enclosure, $escapeChar);
+            $headerRow = $headers;
+            if ($escapeFormulas) {
+                foreach ($headerRow as $i => $header) {
+                    if (\in_array(substr((string) $header, 0, 1), self::FORMULAS_START_CHARACTERS, true)) {
+                        $headerRow[$i] = "'".$header;
+                    }
+                }
+            }
+            fputcsv($handle, $headerRow, $delimiter, $enclosure, $escapeChar);
             if ("\n" !== $endOfLine && 0 === fseek($handle, -1, \SEEK_CUR)) {
                 fwrite($handle, $endOfLine);
             }

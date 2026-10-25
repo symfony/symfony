@@ -81,7 +81,7 @@ class Form extends Link implements \ArrayAccess
             }
 
             if (!$field instanceof Field\FileFormField && $field->hasValue()) {
-                $values[$name] = $field->getValue();
+                $values[$name] = $field instanceof ChoiceFormField ? $field->getSubmittedValue() : $field->getValue();
             }
         }
 

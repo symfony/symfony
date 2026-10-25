@@ -78,7 +78,7 @@ class WeekToArrayTransformer implements DataTransformerInterface
         }
 
         // The 28th December is always in the last week of the year
-        if (date('W', strtotime('28th December '.$value['year'])) < $value['week']) {
+        if ($value['week'] < 1 || date('W', strtotime('28th December '.$value['year'])) < $value['week']) {
             throw new TransformationFailedException(\sprintf('Week "%d" does not exist for year "%d".', $value['week'], $value['year']));
         }
 

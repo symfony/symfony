@@ -30,9 +30,11 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyPropertyAndGetterWithDifferentTypes;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyUnionType;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithTemplateAndParent;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithSelfDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyInDifferentNs;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyWithStaticGetterInDifferentNs;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyWithTemplateAndParentInDifferentNs;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ParentWithSelfDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\PromotedPropertiesWithDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IFace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy;
@@ -401,6 +403,18 @@ class PhpStanExtractorTest extends TestCase
             [ParentDummy::class, 'parentAnnotationNoParent', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'parent')]],
             [Dummy::class, 'parentAnnotation', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)]],
         ];
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testClassKeywordsInCollectionTypesLegacy()
+    {
+        $parent = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, ParentWithSelfDocBlock::class);
+        $child = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, ChildWithSelfDocBlock::class);
+
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), $parent)], $this->extractor->getTypes(ParentWithSelfDocBlock::class, 'selfCollectionProp'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_STRING), $child)], $this->extractor->getTypes(ChildWithSelfDocBlock::class, 'staticCollectionProp'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), $parent)], $this->extractor->getTypes(ChildWithSelfDocBlock::class, 'parentCollectionProp'));
     }
 
     #[IgnoreDeprecations]

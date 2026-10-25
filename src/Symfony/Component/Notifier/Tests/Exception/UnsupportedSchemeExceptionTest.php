@@ -123,7 +123,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         ClassExistsMock::withMockedClasses([$factoryClass => true]);
 
         $this->expectException(UnsupportedSchemeException::class);
-        $this->expectExceptionMessage(\sprintf('The "%s" scheme requires a configured "%s" factory. Pass it to "new Transport([$factory])" instead of using "Transport::fromDsn()" or "Transport::fromDsns()".', $scheme, $factoryClass));
+        $this->expectExceptionMessage(\sprintf('The "%s" scheme requires a configured "%s" factory. When using "Transport::fromDsn()" or "Transport::fromDsns()", pass it to "new Transport([$factory])" instead.', $scheme, $factoryClass));
 
         if ($multiple) {
             Transport::fromDsns([$scheme.'://default']);

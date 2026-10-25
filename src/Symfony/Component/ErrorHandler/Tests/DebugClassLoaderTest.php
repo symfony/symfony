@@ -688,6 +688,9 @@ class ClassLoader
                 public function classTemplate() { }
                 public function nullableClassTemplate() { }
                 public function methodTemplate($value) { }
+                public function phpStanClassTemplate() { }
+                public function psalmClassTemplate() { }
+                public function psalmMethodTemplate($value) { }
                 public function arrayOfTemplates() { }
                 public function notTemplated() { }
                 public function virtualMethod() { }

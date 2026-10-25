@@ -377,11 +377,11 @@ class ProfilerController
      */
     public function openAction(Request $request): Response
     {
+        $this->denyAccessIfProfilerDisabled();
+
         if (null === $this->baseDir) {
             throw new NotFoundHttpException('The base dir should be set.');
         }
-
-        $this->profiler?->disable();
 
         $file = $request->query->get('file');
         $line = $request->query->get('line');

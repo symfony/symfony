@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'Names' => [
+        'Arab' => 'Arabiš',
+        'Armn' => 'Armeniš',
+        'Beng' => 'Bengališ',
+        'Cyrl' => 'Kirilliš',
+        'Deva' => 'Devanagari',
+        'Ethi' => 'Ethiopiš',
+        'Geor' => 'Georgiš',
+        'Grek' => 'Gričiš',
+        'Gujr' => 'Gujarati',
+        'Hans' => 'Vereifačt',
+        'Hant' => 'Traditionell',
+        'Hebr' => 'Hebräiš',
+        'Jpan' => 'Japaniš',
+        'Khmr' => 'Khmer',
+        'Knda' => 'Kannada',
+        'Kore' => 'Korianiš',
+        'Laoo' => 'Laotiš',
+        'Latn' => 'Latiniš',
+        'Mlym' => 'Malaisiš',
+        'Mymr' => 'Burmesiš',
+        'Orya' => 'Oriya',
+        'Sinh' => 'Singalesiš',
+        'Taml' => 'Tamiliš',
+        'Telu' => 'Telugu',
+        'Thaa' => 'Thána',
+        'Thai' => 'Thai',
+        'Zxxx' => 'Schriftlos',
+    ],
+];

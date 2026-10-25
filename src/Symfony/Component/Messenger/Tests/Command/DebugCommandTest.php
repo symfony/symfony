@@ -22,6 +22,8 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyCommand;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandWithDescription;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandWithDescriptionHandler;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandWithTagOnlyDocComment;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandWithTagOnlyDocCommentHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyQuery;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage;
@@ -125,6 +127,39 @@ class DebugCommandTest extends TestCase
                   handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler (when alias=legacy)  
                                                                                                                          
              ----------------------------------------------------------------------------------------------------------- 
+
+
+            TXT,
+            $tester->getDisplay(true)
+        );
+    }
+
+    public function testOutputIgnoresTagOnlyDocComments()
+    {
+        $command = new DebugCommand([
+            'command_bus' => [
+                DummyCommandWithTagOnlyDocComment::class => [[DummyCommandWithTagOnlyDocCommentHandler::class, []]],
+            ],
+        ]);
+
+        $tester = new CommandTester($command);
+        $tester->execute([], ['decorated' => false]);
+
+        $this->assertSame(<<<TXT
+
+            Messenger
+            =========
+
+            command_bus
+            -----------
+
+             The following messages can be dispatched:
+
+             ---------------------------------------------------------------------------------------------------- 
+              Symfony\Component\Messenger\Tests\Fixtures\DummyCommandWithTagOnlyDocComment                        
+                  handled by Symfony\Component\Messenger\Tests\Fixtures\DummyCommandWithTagOnlyDocCommentHandler  
+                                                                                                                  
+             ---------------------------------------------------------------------------------------------------- 
 
 
             TXT,

@@ -244,6 +244,8 @@ return [
         'fa_IR' => 'Isi-Persia (E-Iran)',
         'fi' => 'Isi-Finnish',
         'fi_FI' => 'Isi-Finnish (EFinland)',
+        'fil' => 'Isi-Taglog',
+        'fil_PH' => 'Isi-Taglog (EPhilippines)',
         'fo' => 'Isi-Faroese',
         'fo_DK' => 'Isi-Faroese (EDenmark)',
         'fo_FO' => 'Isi-Faroese (EFaroe Islands)',

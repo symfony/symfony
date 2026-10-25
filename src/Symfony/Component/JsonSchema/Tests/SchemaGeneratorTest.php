@@ -13,6 +13,7 @@ namespace Symfony\Component\JsonSchema\Tests;
 
 use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -508,6 +509,7 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSame([], $schema->getDefinitions());
     }
 
+    #[RequiresMethod(Type::class, 'intRange')]
     public function testIntRangeBecomesBounds()
     {
         $generator = SchemaGenerator::create();
@@ -517,6 +519,7 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['type' => 'integer', 'maximum' => -1], $generator->generate(Type::intRange(null, -1))->getRoot());
     }
 
+    #[RequiresMethod(Type::class, 'literal')]
     public function testLiteralBecomesConst()
     {
         $generator = SchemaGenerator::create();
@@ -527,6 +530,7 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['anyOf' => [['type' => 'string', 'const' => 'draft'], ['type' => 'string', 'const' => 'live']]], $generator->generate(Type::union(Type::literal('draft'), Type::literal('live')))->getRoot());
     }
 
+    #[RequiresMethod(Type::class, 'literal')]
     public function testNullableLiteralBecomesEnum()
     {
         $schema = SchemaGenerator::create()->generate(Type::nullable(Type::literal('draft')));
@@ -536,6 +540,10 @@ class SchemaGeneratorTest extends TestCase
 
     public function testRefinedPhpDocTypesAreDescribed()
     {
+        if ((new \ReflectionMethod(PhpStanExtractor::class, '__construct'))->getNumberOfParameters() < 5) {
+            $this->markTestSkipped('Resolving refinements needs symfony/property-info 8.2 or higher.');
+        }
+
         $properties = SchemaGenerator::create()->generate(Type::object(RefinedProperties::class))->getDefinitions()['RefinedProperties']['properties'];
 
         $this->assertSameSchema(['type' => 'integer', 'minimum' => 1], $properties['page']);
@@ -544,6 +552,7 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['anyOf' => [['type' => 'string', 'const' => 'draft'], ['type' => 'string', 'const' => 'live']]], $properties['status']);
     }
 
+    #[RequiresMethod(Type::class, 'literal')]
     public function testOpenApi30LiteralBecomesEnum()
     {
         $schema = SchemaGenerator::create()->generate(Type::literal('draft'), new Configuration(dialect: Dialect::openApi30()));
@@ -551,6 +560,7 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['type' => 'string', 'enum' => ['draft']], $schema->getRoot());
     }
 
+    #[RequiresMethod(Type::class, 'literal')]
     public function testCollectionWithLiteralStringKeyBecomesAnObject()
     {
         $schema = SchemaGenerator::create()->generate(Type::array(Type::int(), Type::literal('a')));

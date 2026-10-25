@@ -22,6 +22,7 @@ CHANGELOG
  * Add the `entry_name` option to `CollectionType` and `PolymorphicCollectionType` to name the entry forms after a property of the entries instead of their keys
  * Pass the data of the fields to the constructor of the `data_class` when it has required arguments or promoted readonly properties
  * Replace the data of a form with a new instance when a field mapped to one of its promoted readonly properties changes
+ * Make `FormTypeGuesserChain` remember its guesses for each class and property, guessers should not depend on the current request or user
 
 8.1
 ---

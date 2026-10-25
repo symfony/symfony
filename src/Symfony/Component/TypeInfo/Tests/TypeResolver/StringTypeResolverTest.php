@@ -421,7 +421,9 @@ class StringTypeResolverTest extends TestCase
         yield [Type::literal(5), '0b101'];
         yield [Type::literal("it's"), "'it\\'s'"];
         yield [Type::literal("a\n\"b"), '"a\\n\\"b"'];
-        yield [Type::literal(\PHP_INT_MAX), '0x7FFFFFFFFFFFFFFF'];
+        if (8 === \PHP_INT_SIZE) {
+            yield [Type::literal(\PHP_INT_MAX), '0x7FFFFFFFFFFFFFFF'];
+        }
         yield [Type::literal(1.5), '1.5'];
         yield [Type::union(Type::literal('draft'), Type::literal('published')), "'draft'|'published'"];
         yield [Type::intRange(1, null), 'positive-int'];

@@ -51,18 +51,18 @@ class StreamerCacheWarmerTest extends TestCase
         ])->warmUp('useless');
 
         $this->assertSame([
-            \sprintf('%s/13791ba3dc4369dc488ec78466326979.json.php', $this->streamWritersDir),
-            \sprintf('%s/30812f0966dfa8321b2976fca874c2c6.json.php', $this->streamWritersDir),
-            \sprintf('%s/3d6bea319060b50305c349746ac6cabc.json.php', $this->streamWritersDir),
+            \sprintf('%s/0298ebfc1e506bf5ee0c524f00cf5f84.json.php', $this->streamWritersDir),
+            \sprintf('%s/4b8ee05a4df30791c5432398e4658476.json.php', $this->streamWritersDir),
+            \sprintf('%s/620465ac8aabc3bbf686ee39e0e9f195.json.php', $this->streamWritersDir),
         ], glob($this->streamWritersDir.'/*'));
 
         $this->assertSame([
-            \sprintf('%s/13791ba3dc4369dc488ec78466326979.json.php', $this->streamReadersDir),
-            \sprintf('%s/13791ba3dc4369dc488ec78466326979.json.stream.php', $this->streamReadersDir),
-            \sprintf('%s/30812f0966dfa8321b2976fca874c2c6.json.php', $this->streamReadersDir),
-            \sprintf('%s/30812f0966dfa8321b2976fca874c2c6.json.stream.php', $this->streamReadersDir),
-            \sprintf('%s/3d6bea319060b50305c349746ac6cabc.json.php', $this->streamReadersDir),
-            \sprintf('%s/3d6bea319060b50305c349746ac6cabc.json.stream.php', $this->streamReadersDir),
+            \sprintf('%s/0298ebfc1e506bf5ee0c524f00cf5f84.json.php', $this->streamReadersDir),
+            \sprintf('%s/0298ebfc1e506bf5ee0c524f00cf5f84.json.stream.php', $this->streamReadersDir),
+            \sprintf('%s/4b8ee05a4df30791c5432398e4658476.json.php', $this->streamReadersDir),
+            \sprintf('%s/4b8ee05a4df30791c5432398e4658476.json.stream.php', $this->streamReadersDir),
+            \sprintf('%s/620465ac8aabc3bbf686ee39e0e9f195.json.php', $this->streamReadersDir),
+            \sprintf('%s/620465ac8aabc3bbf686ee39e0e9f195.json.stream.php', $this->streamReadersDir),
         ], glob($this->streamReadersDir.'/*'));
     }
 

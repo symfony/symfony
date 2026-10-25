@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\JsonStreamer\Exception\NotEncodableValueException;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
+use Symfony\Component\JsonStreamer\StreamerDumper;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
@@ -770,11 +771,23 @@ class JsonStreamWriterTest extends TestCase
         }
 
         file_put_contents(
-            \sprintf('%s%s%s.json.php', $this->streamWritersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) Type::bool())),
+            \sprintf('%s%s%s.json.php', $this->streamWritersDir, \DIRECTORY_SEPARATOR, hash('xxh128', StreamerDumper::FORMAT_VERSION.Type::bool())),
             '<?php return static function ($data): \Traversable { yield "CACHED"; };'
         );
 
         $this->assertSame('CACHED', (string) $writer->write(true, Type::bool()));
+    }
+
+    public function testIgnoreStreamWritersGeneratedByPreviousVersions()
+    {
+        mkdir($this->streamWritersDir, recursive: true);
+
+        file_put_contents(
+            \sprintf('%s%s%s.json.php', $this->streamWritersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) Type::bool())),
+            '<?php return static function ($data): \Traversable { yield "STALE"; };'
+        );
+
+        $this->assertWritten('true', true, Type::bool());
     }
 
     /**

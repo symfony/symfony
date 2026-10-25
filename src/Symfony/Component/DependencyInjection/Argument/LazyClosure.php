@@ -84,7 +84,10 @@ class LazyClosure
             if ($methodReflector->isStatic()) {
                 $code = preg_replace('/ static /', ' ', $code, 1);
             }
-            $code = ' { '.preg_replace('/: static$/', ': \\'.$r->name, $code);
+            if (null !== $returnType = ProxyHelper::exportType($methodReflector)) {
+                $code = substr($code, 0, -\strlen($returnType)).preg_replace('/(?<![\w\\\\])static(?![\w\\\\])/', '\\'.$r->name, $returnType);
+            }
+            $code = ' { '.$code;
         } else {
             $code = ' implements \\'.$r->name.' { '.$code;
         }

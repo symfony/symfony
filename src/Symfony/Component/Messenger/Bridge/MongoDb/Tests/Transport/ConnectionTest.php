@@ -242,7 +242,7 @@ class ConnectionTest extends TestCase
         yield 'last host without port' => [
             'mongodb://host1:27017,host2/db',
             [],
-            'The given MongoDB DSN is invalid.',
+            'The given MongoDB DSN is invalid. When it lists several hosts, add the port of the last one too.',
         ];
 
         yield 'question mark in user information' => [

@@ -207,7 +207,11 @@ final class StringTypeResolver implements TypeResolverInterface
                 };
 
                 if (null !== $literal) {
-                    return Type::literal($literal);
+                    try {
+                        return Type::literal($literal);
+                    } catch (InvalidArgumentException $e) {
+                        throw new \DomainException($e->getMessage(), 0, $e);
+                    }
                 }
             }
 

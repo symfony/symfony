@@ -148,6 +148,11 @@ abstract class KernelTestCase extends TestCase
             $container = static::$kernel->getContainer();
 
             if ($container->has('test.service_container')) {
+                // resetting the container removes the kernel, but the state that services keep outside of the container still has to be reset
+                if (!$container->initialized('kernel')) {
+                    $container->set('kernel', static::$kernel);
+                }
+
                 $container->get('test.service_container')->resetState();
             }
 

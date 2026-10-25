@@ -98,8 +98,6 @@ class TestServiceContainerTest extends AbstractWebTestCase
 
         $this->assertFalse($container->initialized('private_service'));
         $this->assertFalse($container->initialized(PrivateService::class));
-
-        static::$kernel->getContainer()->set('kernel', static::$kernel);
     }
 
     public function testPublicServicesAreInitializedThroughPrivateAliases()
@@ -243,6 +241,17 @@ class TestServiceContainerTest extends AbstractWebTestCase
         static::bootKernel(['test_case' => 'TestServiceContainer']);
 
         $this->assertSame(0, TestStateService::$clearCount);
+
+        static::ensureKernelShutdown();
+
+        $this->assertSame(1, TestStateService::$clearCount);
+    }
+
+    public function testServicesTaggedWithAMethodAreCalledWhenTheKernelIsShutDownAfterAContainerReset()
+    {
+        TestStateService::$clearCount = 0;
+        static::bootKernel(['test_case' => 'TestServiceContainer']);
+        static::$kernel->getContainer()->reset();
 
         static::ensureKernelShutdown();
 

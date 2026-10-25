@@ -56,7 +56,11 @@ class LiteralTypeTest extends TestCase
         $this->assertSame("'draft'", (string) new LiteralType('draft'));
         $this->assertSame("'it\\'s'", (string) new LiteralType("it's"));
         $this->assertSame('1.0', (string) new LiteralType(1.0));
-        $this->assertSame('-9223372036854775808', (string) new LiteralType(\PHP_INT_MIN));
+
+        if (8 === \PHP_INT_SIZE) {
+            $this->assertSame('-9223372036854775808', (string) new LiteralType(\PHP_INT_MIN));
+        }
+
         $this->assertSame('"a\\x0Ab"', (string) new LiteralType("a\nb"));
     }
 }

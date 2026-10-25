@@ -427,6 +427,7 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['type' => 'integer', 'minimum' => 0, 'maximum' => 100], $generator->generate(Type::intRange(0, 100))->getRoot());
         $this->assertSameSchema(['type' => 'integer', 'minimum' => 1], $generator->generate(Type::intRange(1, null))->getRoot());
         $this->assertSameSchema(['type' => 'integer', 'maximum' => -1], $generator->generate(Type::intRange(null, -1))->getRoot());
+        $this->assertSameSchema(['anyOf' => [['type' => 'integer', 'minimum' => 1], ['type' => 'integer', 'maximum' => -1]]], $generator->generate(Type::union(Type::intRange(null, -1), Type::intRange(1, null)))->getRoot());
     }
 
     #[RequiresMethod(Type::class, 'literal')]
@@ -459,6 +460,7 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['type' => 'integer', 'minimum' => 1], $properties['page']);
         $this->assertSameSchema(['type' => 'integer', 'minimum' => 1], $properties['quantity']);
         $this->assertSameSchema(['type' => ['integer', 'null'], 'minimum' => 0, 'maximum' => 100], $properties['percentage']);
+        $this->assertSameSchema(['anyOf' => [['type' => 'integer', 'minimum' => 1], ['type' => 'integer', 'maximum' => -1]]], $properties['offset']);
         $this->assertSameSchema(['anyOf' => [['type' => 'string', 'const' => 'draft'], ['type' => 'string', 'const' => 'live']]], $properties['status']);
     }
 

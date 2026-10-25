@@ -24,11 +24,13 @@
         "symfony/cache": "^7.4.8|^8.0.8",
         "symfony/config": "^8.2",
         "symfony/dependency-injection": "^8.2",
+        "symfony/http-kernel": "^7.4|^8.0",
         "symfony/lock": "^7.4|^8.0"
     },
     "conflict": {
         "symfony/config": "<8.2",
-        "symfony/dependency-injection": "<8.2"
+        "symfony/dependency-injection": "<8.2",
+        "symfony/web-profiler-bundle": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\RateLimiter\\": "" },

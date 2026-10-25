@@ -19,6 +19,8 @@ class RefinedProperties
     public int $quantity;
     /** @var int<0, 100>|null */
     public ?int $percentage;
+    /** @var non-zero-int */
+    public int $offset;
     /** @var 'draft'|'live' */
     public string $status;
 }

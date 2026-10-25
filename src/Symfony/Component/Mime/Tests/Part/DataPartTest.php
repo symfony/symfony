@@ -12,6 +12,8 @@
 namespace Symfony\Component\Mime\Tests\Part;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Header\Headers;
@@ -306,6 +308,59 @@ class DataPartTest extends TestCase
         }
 
         yield 'mediaType null' => ['mediaType', null];
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    #[DataProvider('provideSubclassesImplementingSleep')]
+    public function testSerializeSubclassImplementingSleep(string $class)
+    {
+        $part = (new $class('content', 'state'))->setContentId('foo@example.com');
+        $part->getHeaders()->addTextHeader('X-Foo', 'bar');
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/mime 7.4: Passing extra keys to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', DataPart::class, $class));
+
+        $unserialized = unserialize(serialize($part));
+
+        $this->assertSame('state', $unserialized->getState());
+        $this->assertSame('foo@example.com', $unserialized->getContentId());
+        $this->assertSame($part->toString(), $unserialized->toString());
+    }
+
+    public static function provideSubclassesImplementingSleep(): iterable
+    {
+        yield [DataPartTestSleepPart::class];
+        yield [DataPartTestWakeupPart::class];
+    }
+}
+
+class DataPartTestSleepPart extends DataPart
+{
+    protected ?string $state = null;
+
+    public function __construct(string $body, string $state)
+    {
+        parent::__construct($body, 'file.txt', 'text/plain');
+
+        $this->state = $state;
+    }
+
+    public function getState(): ?string
+    {
+        return $this->state;
+    }
+
+    public function __sleep(): array
+    {
+        return [...parent::__sleep(), 'state'];
+    }
+}
+
+class DataPartTestWakeupPart extends DataPartTestSleepPart
+{
+    public function __wakeup(): void
+    {
+        parent::__wakeup();
     }
 }
 

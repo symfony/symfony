@@ -164,17 +164,31 @@ class SMimePart extends AbstractPart
 
         trigger_deprecation('symfony/mime', '7.4', 'Passing extra keys to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', self::class, get_debug_type($this));
 
-        (new \ReflectionMethod(AbstractPart::class, 'rejectStringCasts'))->invoke(null, static::class, $data);
+        $headers = $data['_headers'] ?? $data["\0*\0_headers"] ?? null;
+        unset($data['_headers'], $data["\0*\0_headers"]);
 
-        \Closure::bind(function ($data) use ($wakeup) {
-            foreach ($data as $key => $value) {
-                $this->{("\0" === $key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key} = $value;
-            }
+        $state = [];
+        foreach (['body', 'type', 'subtype', 'parameters'] as $name) {
+            $key = \array_key_exists($name, $data) ? $name : "\0".self::class."\0".$name;
+            $state[$name] = $data[$key] ?? null;
+            unset($data[$key]);
+        }
 
-            if ($wakeup) {
-                $this->__wakeup();
-            }
-        }, $this, static::class)($data);
+        (new \ReflectionMethod(AbstractPart::class, 'setSubclassState'))->invoke($this, $data);
+
+        if ($wakeup) {
+            $this->_headers = $headers;
+        } else {
+            parent::__unserialize(['headers' => $headers]);
+        }
+
+        foreach ($state as $name => $value) {
+            $this->$name = $value;
+        }
+
+        if ($wakeup) {
+            $this->__wakeup();
+        }
     }
 
     /**

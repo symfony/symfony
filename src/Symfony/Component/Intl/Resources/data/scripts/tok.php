@@ -1,0 +1,29 @@
+<?php
+
+return [
+    'Names' => [
+        'Arab' => 'sitelen Alapi',
+        'Beng' => 'sitelen Panla',
+        'Cyrl' => 'sitelen Kililisa',
+        'Grek' => 'sitelen Elin',
+        'Gujr' => 'sitelen Kusalasi',
+        'Hang' => 'sitelen Anku',
+        'Hani' => 'sitelen An',
+        'Hans' => 'linja lili',
+        'Hant' => 'linja mute',
+        'Hebr' => 'sitelen Iwi',
+        'Java' => 'sitelen Sowa',
+        'Jpan' => 'sitelen Nijon',
+        'Khmr' => 'sitelen Kame',
+        'Latn' => 'sitelen Lasina',
+        'Mymr' => 'sitelen Mijama',
+        'Telu' => 'sitelen Teluku',
+        'Thai' => 'sitelen Tawi',
+        'Zinh' => 'sitelen poka',
+        'Zmth' => 'sitelen nanpa',
+        'Zsye' => 'sitelen Emosi',
+        'Zsym' => 'sitelen ijo',
+        'Zxxx' => 'sitelen ala',
+        'Zyyy' => 'sitelen ale',
+    ],
+];

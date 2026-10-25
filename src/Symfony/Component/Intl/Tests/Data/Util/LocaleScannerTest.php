@@ -41,6 +41,8 @@ class LocaleScannerTest extends TestCase
         $this->filesystem->touch($this->directory.'/fr.txt');
         $this->filesystem->touch($this->directory.'/fr_alias.txt');
         $this->filesystem->touch($this->directory.'/fr_child.txt');
+        $this->filesystem->touch($this->directory.'/fil.txt');
+        $this->filesystem->touch($this->directory.'/fil_PH.txt');
         $this->filesystem->touch($this->directory.'/root.txt');
         $this->filesystem->touch($this->directory.'/supplementalData.txt');
         $this->filesystem->touch($this->directory.'/supplementaldata.txt');
@@ -61,7 +63,7 @@ class LocaleScannerTest extends TestCase
 
     public function testScanLocales()
     {
-        $sortedLocales = ['de', 'de_alias', 'de_child', 'en', 'en_alias', 'en_child', 'fr', 'fr_alias', 'fr_child'];
+        $sortedLocales = ['de', 'de_alias', 'de_child', 'en', 'en_alias', 'en_child', 'fil', 'fil_PH', 'fr', 'fr_alias', 'fr_child'];
 
         $this->assertSame($sortedLocales, $this->scanner->scanLocales($this->directory));
     }

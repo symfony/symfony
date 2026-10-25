@@ -224,7 +224,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
         $options['flags'] |= \FILTER_NULL_ON_FAILURE;
 
         $invalid = false;
-        $forceArray = !$nullOnFailure && !\is_array($value) && ($options['flags'] & \FILTER_FORCE_ARRAY) && !($options['flags'] & \FILTER_REQUIRE_ARRAY);
+        $forceArray = !\is_array($value) && ($options['flags'] & \FILTER_FORCE_ARRAY) && !($options['flags'] & \FILTER_REQUIRE_ARRAY);
 
         if (!$nullOnFailure && \is_array($value) && $value && !($options['flags'] & \FILTER_REQUIRE_SCALAR) && ($options['flags'] & (\FILTER_REQUIRE_ARRAY | \FILTER_FORCE_ARRAY))) {
             $options['flags'] &= ~(\FILTER_REQUIRE_ARRAY | \FILTER_FORCE_ARRAY);

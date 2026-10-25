@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-25T08:44:04Z
+
+Thanks for the review! I moved the commit of #67442 here, so that both go in together.
+
+The Validator and Security changes look good to me. The Form ones go the wrong way though. #67330 changed "Please enter a valid birthdate." into "This value is not a valid birthdate.", and the same for the others. The `resname` keeps the old text because it's the key, but the message is the `<target>` of `validators.en.xlf`. Could you translate the new messages instead, following the Validator ones like `ค่านี้ไม่ใช่ UUID ที่ถูกต้อง`?
+
+---------------------------------------------------------------------------
+
+by Warayuth014 at 2026-10-25T09:30:14Z
+
+Thanks, good catch! I've translated the new `<source>` messages for Form now, following the Validator wording (e.g. `ค่านี้ไม่ใช่วันเกิดที่ถูกต้อง`, `ค่านี้ไม่ใช่ UUID ที่ถูกต้อง`).

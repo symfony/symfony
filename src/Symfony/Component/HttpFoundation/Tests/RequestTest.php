@@ -1711,6 +1711,8 @@ b'])]
         yield '"hi_Latn_IN" is selected as "hi_IN" is a similar dialect' => ['hi_Latn_IN', 'fr-fr,hi_IN;q=0.5', ['hi_Latn_IN', 'en_US']];
         yield '"en_US" is selected as "en_Latn_US+variants+extensions" is a similar dialect' => ['en_US', 'en-latn-us-fonapi-u-nu-numerical-x-private,fr;q=0.5', ['fr_FR', 'en_US']];
         yield '"zh_Hans" is selected over "zh_TW" as the script as a greater priority over the region' => ['zh_Hans', 'zh-hans-tw, zh-hant-tw', ['zh_Hans', 'zh_tw']];
+        yield '"en" is selected as "fil" is another language than "fi"' => ['en', 'fi', ['en', 'fil']];
+        yield '"fil" is selected as "fil_PH" is a similar dialect' => ['fil', 'fi, fil-ph;q=0.5', ['en', 'fil']];
     }
 
     public function testIsXmlHttpRequest()

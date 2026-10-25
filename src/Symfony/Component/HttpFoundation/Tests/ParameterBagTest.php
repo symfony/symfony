@@ -380,9 +380,12 @@ class ParameterBagTest extends TestCase
         yield 'nested callback' => [['values' => ['valid' => '12', 'invalid' => 'bad']], \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => $callback], ['values' => ['valid' => 12, 'invalid' => null]]];
         yield 'forced scalar callback' => ['bad', \FILTER_CALLBACK, ['flags' => \FILTER_FORCE_ARRAY, 'options' => $callback], [null]];
         yield 'nested object' => [['values' => [new \stdClass()]], \FILTER_VALIDATE_INT, \FILTER_REQUIRE_ARRAY, ['values' => [null]]];
-        yield 'nested object with callback' => [['values' => [new \stdClass()]], \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => static function () {
-            throw new \LogicException('Non-stringable objects must not reach the callback.');
-        }], ['values' => [null]]];
+        // FILTER_CALLBACK ignores the flags before PHP 8.1.25 and 8.2.12
+        if (\PHP_VERSION_ID >= 80125 && \PHP_VERSION_ID < 80200 || \PHP_VERSION_ID >= 80212) {
+            yield 'nested object with callback' => [['values' => [new \stdClass()]], \FILTER_CALLBACK, ['flags' => \FILTER_REQUIRE_ARRAY, 'options' => static function () {
+                throw new \LogicException('Non-stringable objects must not reach the callback.');
+            }], ['values' => [null]]];
+        }
     }
 
     /**

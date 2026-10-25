@@ -317,8 +317,13 @@ class PredisClusterPipelineTest extends TestCase
 
     private function createCluster(\Closure $route): RedisCluster|Predis2RedisCluster
     {
-        $connection = $this->createMock(class_exists(Predis2RedisCluster::class) ? Predis2RedisCluster::class : RedisCluster::class);
-        $connection->method('getConnectionByCommand')->willReturnCallback($route);
+        if (class_exists(Predis2RedisCluster::class)) {
+            $connection = $this->createMock(Predis2RedisCluster::class);
+            $connection->method('getConnectionByCommand')->willReturnCallback($route);
+        } else {
+            $connection = $this->createMock(RedisCluster::class);
+            $connection->method('getConnection')->willReturnCallback($route);
+        }
 
         return $connection;
     }

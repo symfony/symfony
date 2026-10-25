@@ -876,8 +876,9 @@ trait RedisTrait
         } else {
             try {
                 $pipelines = $positions = [];
+                $cluster = $redis->getConnection();
                 foreach ($commands as $i => $command) {
-                    $node = $redis->getConnection()->getConnectionByCommand($command);
+                    $node = $cluster instanceof Predis2RedisCluster ? $cluster->getConnectionByCommand($command) : $cluster->getConnection($command);
                     $nodeId = spl_object_id($node);
                     $pipelines[$nodeId] ??= (new \Predis\Client($node, $redis->getOptions()))->pipeline();
                     $pipelines[$nodeId]->executeCommand($command);

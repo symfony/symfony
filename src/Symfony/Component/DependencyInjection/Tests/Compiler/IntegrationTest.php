@@ -1820,7 +1820,7 @@ class IntegrationTest extends TestCase
         $container->compile();
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Cannot create lazy closure for service "app.loaders::loadAdults" because its corresponding callable is invalid.');
+        $this->expectExceptionMessage('Cannot create lazy closure for service "app.loaders::loadAdults" because method "Symfony\Component\DependencyInjection\Tests\Fixtures\RegisterCallableServicesPass\IncompleteDecorator::loadAdults()" does not exist.');
 
         // the container no longer dumps, the adapter cannot be written for a method the decorator lacks
         (new PhpDumper($container))->dump();

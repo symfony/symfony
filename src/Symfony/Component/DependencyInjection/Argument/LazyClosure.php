@@ -73,8 +73,12 @@ class LazyClosure
                 throw new RuntimeException(\sprintf("Cannot create adapter{$id} because interface \"%s\" doesn't have exactly one method.", $class));
             }
             $method = $method[0]->name;
-        } elseif (!$r || !$r->hasMethod($method)) {
-            throw new RuntimeException("Cannot create lazy closure{$id} because its corresponding callable is invalid.");
+        } elseif (!$r) {
+            throw new RuntimeException(\sprintf('Cannot create lazy closure%s because class "%s" cannot be found.', $id, $class));
+        } elseif (!$r->hasMethod($method)) {
+            $hint = $r->hasMethod('__call') ? ' A lazy closure cannot forward calls to "__call()": if it comes from "#[AutowireCallable]" or "#[AutowireMethodOf]", pass "lazy: false" to create it eagerly.' : '';
+
+            throw new RuntimeException(\sprintf('Cannot create lazy closure%s because method "%s::%s()" does not exist.%s', $id, $r->name, $method, $hint));
         }
 
         $methodReflector = $r->getMethod($method);

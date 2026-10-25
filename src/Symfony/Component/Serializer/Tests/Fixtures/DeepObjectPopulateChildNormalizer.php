@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class DeepObjectPopulateChildNormalizer implements NormalizerInterface
 {
     public function __construct(
+        #[Autowire(service: 'serializer.normalizer.object')]
         private NormalizerInterface $normalizer,
     ) {
     }

@@ -13,6 +13,10 @@ framework:
                 include_built_in_normalizers: true
                 default_context:
                     fake_context_option: bar
+            minimal:
+                include_built_in_normalizers: false
+                default_context:
+                    fake_context_option: baz
 
 services:
     serializer.normalizer.property.tagged:
@@ -20,6 +24,20 @@ services:
         class: Symfony\Component\Serializer\Normalizer\PropertyNormalizer
         tags:
             - { name: serializer.normalizer, serializer: api }
+
+    serializer.normalizer.autowired_nested:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Serializer\AutowiredNestedNormalizer
+        autowire: true
+        tags:
+            - { name: serializer.normalizer, serializer: [api, minimal] }
+
+    serializer.normalizer.autowired_nested.api.alias:
+        alias: serializer.normalizer.autowired_nested.api
+        public: true
+
+    serializer.normalizer.autowired_nested.minimal.alias:
+        alias: serializer.normalizer.autowired_nested.minimal
+        public: true
 
     serializer.normalizer.constraint_violation_list.alias:
         alias: serializer.normalizer.constraint_violation_list

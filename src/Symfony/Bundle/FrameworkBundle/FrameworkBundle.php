@@ -67,6 +67,7 @@ use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
 use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
 use Symfony\Component\Serializer\DependencyInjection\AttributeMetadataPass as SerializerAttributeMetadataPass;
+use Symfony\Component\Serializer\DependencyInjection\NamedSerializerNestedNormalizersPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass;
 use Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass;
@@ -182,6 +183,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, TranslationDumperPass::class);
         $container->addCompilerPass(new FragmentRendererPass());
         $this->addCompilerPassIfExists($container, SerializerPass::class);
+        $this->addCompilerPassIfExists($container, NamedSerializerNestedNormalizersPass::class, PassConfig::TYPE_BEFORE_REMOVING);
         $this->addCompilerPassIfExists($container, SerializerAttributeMetadataPass::class);
         $this->addCompilerPassIfExists($container, PropertyInfoPass::class);
         $this->addCompilerPassIfExists($container, PropertyInfoConstructorPass::class);

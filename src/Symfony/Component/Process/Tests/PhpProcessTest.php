@@ -13,8 +13,10 @@ namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\PhpProcess;
+use Symfony\Component\Process\Process;
 
 class PhpProcessTest extends TestCase
 {
@@ -60,6 +62,22 @@ class PhpProcessTest extends TestCase
         $process = new PhpProcess($script, null, null, 60, $php);
         $process->run();
         $this->assertEquals($expected, $process->getOutput());
+    }
+
+    public function testForkDoesNotRemoveTheScriptOfPhpdbg()
+    {
+        if (!$phpdbg = (new ExecutableFinder())->find('phpdbg')) {
+            $this->markTestSkipped('phpdbg is required.');
+        }
+
+        $process = new Process([$phpdbg, '-qrr', __DIR__.'/Fixtures/phpdbg_fork.php']);
+        $process->run();
+
+        if (str_contains($process->getOutput(), 'pcntl_fork')) {
+            $this->markTestSkipped('phpdbg has no pcntl extension.');
+        }
+
+        $this->assertSame('OK', $process->getOutput(), $process->getErrorOutput());
     }
 
     public function testProcessCannotBeCreatedUsingFromShellCommandLine()

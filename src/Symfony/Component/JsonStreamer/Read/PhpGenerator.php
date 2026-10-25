@@ -224,14 +224,12 @@ final class PhpGenerator
                     [$isSetPhp, $propertyValuePhp] = $this->canBeDecodedWithJsonDecode($property['value'], $decodeFromStream)
                         ? ["isset(\$data[$quotedStreamedName])", "\$data[$quotedStreamedName]"]
                         : ["\\array_key_exists($quotedStreamedName, \$data)", '$providers['.var_export($property['value']->getIdentifier(), true)."](\$data[$quotedStreamedName])"];
-                    $propertiesValuePhp .= $separator.var_export($property['name'], true)." => $isSetPhp ? ".$property['accessor']($propertyValuePhp)." : '_symfony_missing_value'";
+                    $propertiesValuePhp .= $separator."...($isSetPhp ? [".var_export($property['name'], true).' => '.$property['accessor']($propertyValuePhp).'] : [])';
                     $separator = ', ';
                 }
                 $propertiesValuePhp .= ']';
 
-                $php .= $this->line('return $instantiator->instantiate(\\'.$node->getType()->getClassName()."::class, \\array_filter($propertiesValuePhp, static function (\$v) {", $context)
-                    .$this->line('    return \'_symfony_missing_value\' !== $v;', $context)
-                    .$this->line('}));', $context);
+                $php .= $this->line('return $instantiator->instantiate(\\'.$node->getType()->getClassName()."::class, $propertiesValuePhp);", $context);
             }
 
             --$context['indentation_level'];

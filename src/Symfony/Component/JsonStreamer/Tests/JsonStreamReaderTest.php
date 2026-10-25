@@ -313,6 +313,13 @@ class JsonStreamReaderTest extends TestCase
         }, '{"arrayOfDummies":{"key":{"@id":10,"name":"dummy"}}}', Type::object(DummyWithPhpDoc::class));
     }
 
+    public function testReadObjectPropertyMatchingTheLegacyMissingValueMarker()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->assertSame('_symfony_missing_value', $reader->read('{"name": "_symfony_missing_value"}', Type::object(ClassicDummy::class))->name);
+    }
+
     public function testReadObjectWithNullableProperties()
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);

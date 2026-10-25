@@ -26,12 +26,14 @@ final class NameScope
     private string $namespace;
     /** @var array<string, string> alias(string) => fullName(string) */
     private array $uses;
+    private string $selfClassName;
 
-    public function __construct(string $calledClassName, string $namespace, array $uses = [])
+    public function __construct(string $calledClassName, string $namespace, array $uses = [], ?string $selfClassName = null)
     {
         $this->calledClassName = $calledClassName;
         $this->namespace = $namespace;
         $this->uses = $uses;
+        $this->selfClassName = $selfClassName ?? $calledClassName;
     }
 
     public function resolveStringName(string $name): string
@@ -60,6 +62,16 @@ final class NameScope
 
     public function resolveRootClass(): string
     {
-        return $this->resolveStringName($this->calledClassName);
+        return $this->calledClassName;
+    }
+
+    public function resolveSelfClass(): string
+    {
+        return $this->selfClassName;
+    }
+
+    public function resolveParentClass(): ?string
+    {
+        return get_parent_class($this->selfClassName) ?: null;
     }
 }

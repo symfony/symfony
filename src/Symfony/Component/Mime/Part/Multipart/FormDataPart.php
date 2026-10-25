@@ -44,6 +44,24 @@ final class FormDataPart extends AbstractMultipartPart
         return $this->prepareFields($this->fields);
     }
 
+    public function __serialize(): array
+    {
+        return parent::__serialize() + ['fields' => $this->fields];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        foreach (['fields', "\0".self::class."\0fields"] as $key) {
+            if (\array_key_exists($key, $data)) {
+                $this->fields = $data[$key];
+                unset($data[$key]);
+                break;
+            }
+        }
+
+        parent::__unserialize($data);
+    }
+
     private function prepareFields(array $fields): array
     {
         $values = [];

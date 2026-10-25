@@ -88,6 +88,47 @@ abstract class AbstractMultipartPart extends AbstractPart
         return $str;
     }
 
+    public function __serialize(): array
+    {
+        $data = parent::__serialize();
+
+        if (!method_exists($this, '__sleep')) {
+            $data['boundary'] = $this->boundary;
+            $data['parts'] = $this->parts;
+        }
+
+        return $data;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        foreach (['', "\0".self::class."\0"] as $prefix) {
+            if (!\array_key_exists($prefix.'parts', $data)) {
+                continue;
+            }
+
+            $boundary = $data[$prefix.'boundary'] ?? null;
+            $parts = $data[$prefix.'parts'];
+            unset($data[$prefix.'boundary'], $data[$prefix.'parts']);
+
+            if ((null !== $boundary && !\is_string($boundary)) || !\is_array($parts)) {
+                throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+            }
+
+            foreach ($parts as $part) {
+                if (!$part instanceof AbstractPart) {
+                    throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+                }
+            }
+
+            $this->boundary = $boundary;
+            $this->parts = $parts;
+            break;
+        }
+
+        parent::__unserialize($data);
+    }
+
     private function getBoundary(): string
     {
         return $this->boundary ??= strtr(base64_encode(random_bytes(6)), '+/', '-_');

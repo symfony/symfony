@@ -25,6 +25,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Tests\Fixtures\TypeInfoFormTypeGuesserCase;
 use Symfony\Component\Form\Tests\Fixtures\TypeInfoFormTypeGuesserChildCase;
 use Symfony\Component\Form\TypeInfoFormTypeGuesser;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
 class TypeInfoFormTypeGuesserTest extends TestCase
@@ -71,6 +72,22 @@ class TypeInfoFormTypeGuesserTest extends TestCase
         yield 'nullable DateTimeImmutable' => [new TypeGuess(DateTimeType::class, ['input' => 'datetime_immutable'], Guess::MEDIUM_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'dateTimeImmutable'];
         yield 'DatePoint' => [new TypeGuess(DateTimeType::class, ['input' => 'date_point'], Guess::MEDIUM_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'datePoint'];
         yield 'DateInterval' => [new TypeGuess(DateIntervalType::class, [], Guess::MEDIUM_CONFIDENCE), TypeInfoFormTypeGuesserCase::class, 'dateInterval'];
+    }
+
+    #[DataProvider('provideGuessRefinedTypeCases')]
+    public function testGuessRefinedType(?TypeGuess $expected, string $property)
+    {
+        $guesser = new TypeInfoFormTypeGuesser(TypeResolver::create(null, true));
+
+        $this->assertEquals($expected, $guesser->guessType(TypeInfoFormTypeGuesserCase::class, $property));
+    }
+
+    public static function provideGuessRefinedTypeCases(): iterable
+    {
+        yield 'positive-int' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), 'positiveInt'];
+        yield 'nullable int range' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), 'nullableIntRange'];
+        yield 'int literal' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), 'intLiteral'];
+        yield 'string literal' => [null, 'stringLiteral'];
     }
 
     #[DataProvider('provideGuessRequiredCases')]

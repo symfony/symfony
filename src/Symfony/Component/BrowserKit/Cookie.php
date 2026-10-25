@@ -126,17 +126,27 @@ class Cookie
      */
     public static function fromString(string $cookie, ?string $url = null): static
     {
-        $parts = explode(';', $cookie);
-
-        if (!str_contains($parts[0], '=')) {
-            throw new InvalidArgumentException(\sprintf('The cookie string "%s" is not valid.', $parts[0]));
+        if (preg_match('/[\x00-\x08\x0A-\x1F\x7F]/', $cookie)) {
+            throw new InvalidArgumentException('The cookie string contains invalid control characters.');
         }
 
-        [$name, $value] = explode('=', array_shift($parts), 2);
+        $parts = explode(';', $cookie);
+        $pair = array_shift($parts);
+        [$name, $value] = str_contains($pair, '=') ? explode('=', $pair, 2) : ['', $pair];
+        $name = trim($name, " \t");
+        $value = trim($value, " \t");
+
+        if ('' === $name && '' === $value) {
+            throw new InvalidArgumentException('The cookie name and value cannot both be empty.');
+        }
+
+        if (\strlen($name) + \strlen($value) > 4096) {
+            throw new InvalidArgumentException('The cookie name and value exceed 4096 bytes.');
+        }
 
         $values = [
-            'name' => trim($name),
-            'value' => trim($value),
+            'name' => $name,
+            'value' => $value,
             'expires' => null,
             'path' => '/',
             'domain' => '',
@@ -151,7 +161,7 @@ class Cookie
                 throw new InvalidArgumentException(\sprintf('The URL "%s" is not valid.', $url));
             }
 
-            $values['domain'] = $urlParts['host'];
+            $values['domain'] = strtolower($urlParts['host']);
             $values['path'] = isset($urlParts['path']) ? substr($urlParts['path'], 0, strrpos($urlParts['path'], '/')) : '';
         }
 
@@ -161,6 +171,11 @@ class Cookie
         foreach ($parts as $part) {
             $elements = explode('=', $part, 2);
             $attribute = strtolower(trim($elements[0]));
+            $attributeValue = isset($elements[1]) ? trim($elements[1], " \t") : '';
+
+            if (\strlen($attributeValue) > 1024) {
+                continue;
+            }
 
             if ('secure' === $attribute) {
                 // Ignore the secure flag if the original URI is not given or is not HTTPS
@@ -180,8 +195,6 @@ class Cookie
             }
 
             if (2 === \count($elements)) {
-                $attributeValue = trim($elements[1]);
-
                 if ('expires' === $attribute) {
                     $attributeValue = self::parseDate($attributeValue);
                 } elseif ('max-age' === $attribute) {
@@ -196,6 +209,14 @@ class Cookie
                     continue;
                 } elseif (!\in_array($attribute, ['domain', 'path', 'samesite'], true)) {
                     continue;
+                }
+
+                if ('domain' === $attribute) {
+                    $attributeValue = strtolower(str_starts_with($attributeValue, '.') ? substr($attributeValue, 1) : $attributeValue);
+
+                    if ('' === $attributeValue) {
+                        throw new InvalidArgumentException('The cookie domain is not valid.');
+                    }
                 }
 
                 $hostOnly = $hostOnly && 'domain' !== $attribute;

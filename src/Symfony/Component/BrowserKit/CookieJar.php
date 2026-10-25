@@ -24,7 +24,7 @@ class CookieJar
 
     public function set(Cookie $cookie): void
     {
-        $this->cookieJar[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
+        $this->cookieJar[strtolower(ltrim($cookie->getDomain(), '.'))][$cookie->getPath()][$cookie->getName()] = $cookie;
     }
 
     /**
@@ -40,6 +40,10 @@ class CookieJar
     public function get(string $name, string $path = '/', ?string $domain = null): ?Cookie
     {
         $this->flushExpiredCookies();
+
+        if (null !== $domain) {
+            $domain = strtolower(ltrim($domain, '.'));
+        }
 
         $match = null;
 
@@ -83,16 +87,16 @@ class CookieJar
             // this should never happen but it allows for a better BC
             $domains = array_keys($this->cookieJar);
         } else {
-            $domains = [$domain];
+            $domains = [strtolower(ltrim($domain, '.'))];
         }
 
         foreach ($domains as $domain) {
             unset($this->cookieJar[$domain][$path][$name]);
 
-            if (empty($this->cookieJar[$domain][$path])) {
+            if ([] === ($this->cookieJar[$domain][$path] ?? [])) {
                 unset($this->cookieJar[$domain][$path]);
 
-                if (empty($this->cookieJar[$domain])) {
+                if ([] === ($this->cookieJar[$domain] ?? [])) {
                     unset($this->cookieJar[$domain]);
                 }
             }
@@ -114,21 +118,9 @@ class CookieJar
      */
     public function updateFromSetCookie(array $setCookies, ?string $uri = null): void
     {
-        $cookies = [];
-
-        foreach ($setCookies as $cookie) {
-            foreach (explode(',', $cookie) as $i => $part) {
-                if (0 === $i || preg_match('/^(?P<token>\s*[0-9A-Za-z!#\$%\&\'\*\+\-\.^_`\|~]+)=/', $part)) {
-                    $cookies[] = ltrim($part);
-                } else {
-                    $cookies[\count($cookies) - 1] .= ','.$part;
-                }
-            }
-        }
-
         $host = null !== $uri ? parse_url($uri, \PHP_URL_HOST) : null;
 
-        foreach ($cookies as $cookie) {
+        foreach ($setCookies as $cookie) {
             try {
                 $cookie = Cookie::fromString($cookie, $uri);
             } catch (InvalidArgumentException) {
@@ -179,6 +171,9 @@ class CookieJar
         $this->flushExpiredCookies();
 
         $parts = array_replace(['path' => '/'], parse_url($uri));
+        if (isset($parts['host'])) {
+            $parts['host'] = strtolower($parts['host']);
+        }
         $cookies = [];
         foreach ($this->cookieJar as $domain => $pathCookies) {
             if ($domain) {

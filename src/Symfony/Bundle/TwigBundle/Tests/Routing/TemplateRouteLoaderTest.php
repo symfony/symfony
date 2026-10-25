@@ -54,6 +54,16 @@ class TemplateRouteLoaderTest extends TestCase
         ]);
     }
 
+    public function testTemplateDefaultConflictsWithTemplatePlaceholder()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The route "page" must not define both the "_template" default and a "{template}" placeholder.');
+
+        $this->load([
+            'page' => new Route('/pages/{template}', ['_template' => 'pages/faq.html.twig']),
+        ]);
+    }
+
     /**
      * @param array<string, Route> $routes
      */

@@ -1,0 +1,3 @@
+doc:
+    path: /doc/{route}
+    redirect_to_route: doc_page

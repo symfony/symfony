@@ -265,6 +265,12 @@ trait ContentLoaderTrait
         if (isset($config['redirect_to']) && isset($config['defaults']['path'])) {
             throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "redirect_to" key and the defaults key "path" for "%s".', $path, $name));
         }
+        if (isset($config['redirect_to_route']) && $this->hasPlaceholder($config, 'route')) {
+            throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "redirect_to_route" key and a "{route}" placeholder for "%s".', $path, $name));
+        }
+        if (isset($config['redirect_to']) && $this->hasPlaceholder($config, 'path')) {
+            throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "redirect_to" key and a "{path}" placeholder for "%s".', $path, $name));
+        }
         if (isset($config['stateless']) && isset($config['defaults']['_stateless'])) {
             throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "stateless" key and the defaults key "_stateless" for "%s".', $path, $name));
         }
@@ -296,5 +302,18 @@ trait ContentLoaderTrait
                 }
             }
         }
+    }
+
+    private function hasPlaceholder(array $config, string $placeholder): bool
+    {
+        foreach (['path', 'host'] as $key) {
+            foreach ((array) ($config[$key] ?? []) as $pattern) {
+                if (preg_match('#\{!?'.$placeholder.'[}<?]#', $pattern)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

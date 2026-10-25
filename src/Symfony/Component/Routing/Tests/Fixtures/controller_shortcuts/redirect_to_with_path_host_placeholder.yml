@@ -1,0 +1,4 @@
+go:
+    path: /go
+    host: '{path}.example.com'
+    redirect_to: /home

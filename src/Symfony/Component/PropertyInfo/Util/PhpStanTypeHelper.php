@@ -189,9 +189,9 @@ final class PhpStanTypeHelper
                 'non-empty-list' => [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT))],
                 'non-empty-array' => [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)],
                 'mixed' => [], // mixed seems to be ignored in all other extractors
-                'parent' => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $node->name)],
-                'static',
-                'self' => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $nameScope->resolveRootClass())],
+                'parent' => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $nameScope->resolveParentClass() ?? $node->name)],
+                'static' => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $nameScope->resolveRootClass())],
+                'self' => [new Type(Type::BUILTIN_TYPE_OBJECT, false, $nameScope->resolveSelfClass())],
                 'class-string',
                 'html-escaped-string',
                 'lowercase-string',

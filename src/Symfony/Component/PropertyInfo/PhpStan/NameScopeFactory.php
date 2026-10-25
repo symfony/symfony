@@ -20,18 +20,15 @@ use phpDocumentor\Reflection\Types\ContextFactory;
  */
 final class NameScopeFactory
 {
-    public function create(string $calledClassName, ?string $declaringClassName = null): NameScope
+    public function create(string $calledClassName, ?string $declaringClassName = null, ?string $selfClassName = null): NameScope
     {
         $declaringClassName ??= $calledClassName;
-
-        $path = explode('\\', $calledClassName);
-        $calledClassName = array_pop($path);
 
         $declaringReflection = new \ReflectionClass($declaringClassName);
         [$declaringNamespace, $declaringUses] = $this->extractFromFullClassName($declaringReflection);
         $declaringUses = array_merge($declaringUses, $this->collectUses($declaringReflection));
 
-        return new NameScope($calledClassName, $declaringNamespace, $declaringUses);
+        return new NameScope($calledClassName, $declaringNamespace, $declaringUses, $selfClassName ?? $declaringClassName);
     }
 
     private function collectUses(\ReflectionClass $reflection): array

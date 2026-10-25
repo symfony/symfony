@@ -20,6 +20,8 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyGeneric;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithSelfDocBlock;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ParentWithSelfDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IFace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
@@ -360,6 +362,16 @@ class PhpStanExtractorTest extends TestCase
             [ParentDummy::class, 'parentAnnotationNoParent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'parent')]],
             [Dummy::class, 'parentAnnotation', [new Type(Type::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)]],
         ];
+    }
+
+    public function testClassKeywordsInCollectionTypes()
+    {
+        $parent = new Type(Type::BUILTIN_TYPE_OBJECT, false, ParentWithSelfDocBlock::class);
+        $child = new Type(Type::BUILTIN_TYPE_OBJECT, false, ChildWithSelfDocBlock::class);
+
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $parent)], $this->extractor->getTypes(ParentWithSelfDocBlock::class, 'selfCollectionProp'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), $child)], $this->extractor->getTypes(ChildWithSelfDocBlock::class, 'staticCollectionProp'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $parent)], $this->extractor->getTypes(ChildWithSelfDocBlock::class, 'parentCollectionProp'));
     }
 
     /**

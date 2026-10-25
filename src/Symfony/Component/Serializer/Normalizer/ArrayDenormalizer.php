@@ -64,7 +64,7 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
                     $t = $t->getWrappedType();
                 }
 
-                return $t->getTypeIdentifier()->value;
+                return $t instanceof BuiltinType ? $t->getTypeIdentifier()->value : (string) $t;
             }, $keyTypes);
         }
 

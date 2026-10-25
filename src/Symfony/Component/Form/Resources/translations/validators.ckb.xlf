@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="ckb" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="28">
+                <source>This form should not contain extra fields.</source>
+                <target>ئەم فۆرمە نابێت خانەی زیادەی تێدابێت.</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>The uploaded file was too large. Please try to upload a smaller file.</source>
+                <target>فایلی بارکراو زۆر گەورە بوو. تکایە هەوڵبدە فایلێکی بچووکتر بار بکەیت.</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
+                <target>تۆکنی CSRF نادروستە. تکایە دووبارە فۆرمەکە بنێرەوە.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid HTML5 color.</source>
+                <target>ئەم بەهایە ڕەنگێکی دروستی HTML5 نییە.</target>
+            </trans-unit>
+            <trans-unit id="100" resname="Please enter a valid birthdate.">
+                <source>This value is not a valid birthdate.</source>
+                <target>ئەم بەهایە بەرواری لەدایکبوونێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>The selected choice is invalid.</source>
+                <target>هەڵبژاردەی دیاریکراو نادروستە.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>The collection is invalid.</source>
+                <target>کۆمەڵەکە نادروستە.</target>
+            </trans-unit>
+            <trans-unit id="103" resname="Please select a valid color.">
+                <source>This value is not a valid color.</source>
+                <target>ئەم بەهایە ڕەنگێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="104" resname="Please select a valid country.">
+                <source>This value is not a valid country.</source>
+                <target>ئەم بەهایە وڵاتێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="105" resname="Please select a valid currency.">
+                <source>This value is not a valid currency.</source>
+                <target>ئەم بەهایە دراوێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="106" resname="Please choose a valid date interval.">
+                <source>This value is not a valid date interval.</source>
+                <target>ئەم بەهایە ماوەیەکی بەرواریی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="107" resname="Please enter a valid date and time.">
+                <source>This value is not a valid date and time.</source>
+                <target>ئەم بەهایە بەروار و کاتێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="108" resname="Please enter a valid date.">
+                <source>This value is not a valid date.</source>
+                <target>ئەم بەهایە بەروارێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="109" resname="Please select a valid file.">
+                <source>This value is not a valid file.</source>
+                <target>ئەم بەهایە فایلێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The hidden field is invalid.</source>
+                <target>خانە شاراوەکە نادروستە.</target>
+            </trans-unit>
+            <trans-unit id="111" resname="Please enter an integer.">
+                <source>This value is not a valid integer.</source>
+                <target>ئەم بەهایە ژمارەیەکی تەواوی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="112" resname="Please select a valid language.">
+                <source>This value is not a valid language.</source>
+                <target>ئەم بەهایە زمانێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="113" resname="Please select a valid locale.">
+                <source>This value is not a valid locale.</source>
+                <target>ئەم بەهایە ناوچەبەندێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="114" resname="Please enter a valid money amount.">
+                <source>This value is not a valid money amount.</source>
+                <target>ئەم بەهایە بڕە پارەیەکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="115" resname="Please enter a number.">
+                <source>This value is not a valid number.</source>
+                <target>ئەم بەهایە ژمارەیەکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>The password is invalid.</source>
+                <target>وشەی نهێنییەکە نادروستە.</target>
+            </trans-unit>
+            <trans-unit id="117" resname="Please enter a percentage value.">
+                <source>This value is not a valid percentage.</source>
+                <target>ئەم بەهایە ڕێژەیەکی سەدیی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>The values do not match.</source>
+                <target>بەهاکان وەک یەک نین.</target>
+            </trans-unit>
+            <trans-unit id="119" resname="Please enter a valid time.">
+                <source>This value is not a valid time.</source>
+                <target>ئەم بەهایە کاتێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="120" resname="Please select a valid timezone.">
+                <source>This value is not a valid timezone.</source>
+                <target>ئەم بەهایە ناوچەیەکی کاتیی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="121" resname="Please enter a valid URL.">
+                <source>This value is not a valid URL.</source>
+                <target>ئەم بەهایە بەستەرێکی (URL) دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="122" resname="Please enter a valid search term.">
+                <source>This value is not a valid search term.</source>
+                <target>ئەم بەهایە وشەیەکی گەڕانی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="123" resname="Please provide a valid phone number.">
+                <source>This value is not a valid phone number.</source>
+                <target>ئەم بەهایە ژمارە تەلەفۆنێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The checkbox has an invalid value.</source>
+                <target>بەهای خانەی نیشانەکردن نادروستە.</target>
+            </trans-unit>
+            <trans-unit id="125" resname="Please enter a valid email address.">
+                <source>This value is not a valid email address.</source>
+                <target>ئەم بەهایە ناونیشانێکی ئیمەیڵی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="126" resname="Please select a valid option.">
+                <source>This value is not a valid option.</source>
+                <target>ئەم بەهایە بژاردەیەکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="127" resname="Please select a valid range.">
+                <source>This value is not a valid range.</source>
+                <target>ئەم بەهایە مەودایەکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="128" resname="Please enter a valid week.">
+                <source>This value is not a valid week.</source>
+                <target>ئەم بەهایە هەفتەیەکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="129" resname="Please enter a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>ئەم بەهایە ناسنامەیەکی دروستی UUID نییە.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>The lower bound must not be greater than the upper bound.</source>
+                <target>سنووری خوارەوە نابێت لە سنووری سەرەوە گەورەتر بێت.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

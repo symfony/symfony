@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="ckb" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1">
+                <source>This value should be false.</source>
+                <target>ئەم بەهایە دەبێت نادروست (false) بێت.</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>This value should be true.</source>
+                <target>ئەم بەهایە دەبێت دروست (true) بێت.</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>This value should be of type {{ type }}.</source>
+                <target>ئەم بەهایە دەبێت لە جۆری {{ type }} بێت.</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>This value should be blank.</source>
+                <target>ئەم بەهایە دەبێت بەتاڵ بێت.</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>The value you selected is not a valid choice.</source>
+                <target>ئەو بەهایەی هەڵتبژاردووە هەڵبژاردەیەکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <target>دەبێت لانیکەم {{ limit }} هەڵبژاردە دیاری بکەیت.|دەبێت لانیکەم {{ limit }} هەڵبژاردە دیاری بکەیت.</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <target>دەبێت لانیزۆر {{ limit }} هەڵبژاردە دیاری بکەیت.|دەبێت لانیزۆر {{ limit }} هەڵبژاردە دیاری بکەیت.</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>One or more of the given values is invalid.</source>
+                <target>یەک یان زیاتر لە بەها دراوەکان نادروستن.</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>This field was not expected.</source>
+                <target>ئەم خانەیە چاوەڕوان نەدەکرا.</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>This field is missing.</source>
+                <target>ئەم خانەیە بوونی نییە.</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>This value is not a valid date.</source>
+                <target>ئەم بەهایە بەروارێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>This value is not a valid datetime.</source>
+                <target>ئەم بەهایە بەروار و کاتێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>This value is not a valid email address.</source>
+                <target>ئەم بەهایە ناونیشانێکی ئیمەیڵی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>The file could not be found.</source>
+                <target>فایلەکە نەدۆزرایەوە.</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>The file is not readable.</source>
+                <target>فایلەکە ناخوێندرێتەوە.</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>فایلەکە زۆر گەورەیە ({{ size }} {{ suffix }}). زۆرترین قەبارەی ڕێگەپێدراو: {{ limit }} {{ suffix }}.</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
+                <target>جۆری MIME ی فایلەکە نادروستە ({{ type }}). جۆرە ڕێگەپێدراوەکانی MIME: {{ types }}.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>This value should be {{ limit }} or less.</source>
+                <target>ئەم بەهایە دەبێت {{ limit }} یان کەمتر بێت.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
+                <target>ئەم بەهایە زۆر درێژە. دەبێت {{ limit }} نووسە یان کەمتری هەبێت.|ئەم بەهایە زۆر درێژە. دەبێت {{ limit }} نووسە یان کەمتری هەبێت.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>This value should be {{ limit }} or more.</source>
+                <target>ئەم بەهایە دەبێت {{ limit }} یان زیاتر بێت.</target>
+            </trans-unit>
+            <trans-unit id="21">
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
+                <target>ئەم بەهایە زۆر کورتە. دەبێت {{ limit }} نووسە یان زیاتری هەبێت.|ئەم بەهایە زۆر کورتە. دەبێت {{ limit }} نووسە یان زیاتری هەبێت.</target>
+            </trans-unit>
+            <trans-unit id="22">
+                <source>This value should not be blank.</source>
+                <target>ئەم بەهایە نابێت بەتاڵ بێت.</target>
+            </trans-unit>
+            <trans-unit id="23">
+                <source>This value should not be null.</source>
+                <target>ئەم بەهایە نابێت null بێت.</target>
+            </trans-unit>
+            <trans-unit id="24">
+                <source>This value should be null.</source>
+                <target>ئەم بەهایە دەبێت null بێت.</target>
+            </trans-unit>
+            <trans-unit id="25">
+                <source>This value is not valid.</source>
+                <target>ئەم بەهایە دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="26">
+                <source>This value is not a valid time.</source>
+                <target>ئەم بەهایە کاتێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="27">
+                <source>This value is not a valid URL.</source>
+                <target>ئەم بەهایە بەستەرێکی (URL) دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="31">
+                <source>The two values should be equal.</source>
+                <target>هەردوو بەهاکە دەبێت یەکسان بن.</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>فایلەکە زۆر گەورەیە. زۆرترین قەبارەی ڕێگەپێدراو: {{ limit }} {{ suffix }}.</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large.</source>
+                <target>فایلەکە زۆر گەورەیە.</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded.</source>
+                <target>فایلەکە بار نەکرا.</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number.</source>
+                <target>ئەم بەهایە دەبێت ژمارەیەکی دروست بێت.</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image.</source>
+                <target>ئەم فایلە وێنەیەکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target>ئەم بەهایە ناونیشانێکی دروستی IP نییە.</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language.</source>
+                <target>ئەم بەهایە زمانێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale.</source>
+                <target>ئەم بەهایە ناوچەبەندێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>ئەم بەهایە وڵاتێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used.</source>
+                <target>ئەم بەهایە پێشتر بەکارهاتووە.</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected.</source>
+                <target>قەبارەی وێنەکە نەناسرایەوە.</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>پانیی وێنەکە زۆر گەورەیە ({{ width }}px). زۆرترین پانیی ڕێگەپێدراو: {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>پانیی وێنەکە زۆر بچووکە ({{ width }}px). کەمترین پانیی پێویست: {{ min_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>بەرزیی وێنەکە زۆر گەورەیە ({{ height }}px). زۆرترین بەرزیی ڕێگەپێدراو: {{ max_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>بەرزیی وێنەکە زۆر بچووکە ({{ height }}px). کەمترین بەرزیی پێویست: {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user's current password.</source>
+                <target>ئەم بەهایە دەبێت وشەی نهێنیی ئێستای بەکارهێنەر بێت.</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
+                <target>ئەم بەهایە دەبێت ڕێک {{ limit }} نووسەی هەبێت.|ئەم بەهایە دەبێت ڕێک {{ limit }} نووسەی هەبێت.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded.</source>
+                <target>تەنها بەشێک لە فایلەکە بارکرا.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded.</source>
+                <target>هیچ فایلێک بار نەکرا.</target>
+            </trans-unit>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target>هیچ بوخچەیەکی کاتی لە php.ini دا ڕێکنەخراوە، یان ئەو بوخچەیەی ڕێکخراوە بوونی نییە.</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk.</source>
+                <target>ناتوانرێت فایلی کاتی لەسەر دیسک بنووسرێت.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>پاشکۆیەکی PHP بووە هۆی شکستی بارکردنەکە.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
+                <target>ئەم کۆمەڵەیە دەبێت {{ limit }} توخم یان زیاتری تێدابێت.|ئەم کۆمەڵەیە دەبێت {{ limit }} توخم یان زیاتری تێدابێت.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
+                <target>ئەم کۆمەڵەیە دەبێت {{ limit }} توخم یان کەمتری تێدابێت.|ئەم کۆمەڵەیە دەبێت {{ limit }} توخم یان کەمتری تێدابێت.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
+                <target>ئەم کۆمەڵەیە دەبێت ڕێک {{ limit }} توخمی تێدابێت.|ئەم کۆمەڵەیە دەبێت ڕێک {{ limit }} توخمی تێدابێت.</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>ژمارەی کارت نادروستە.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>جۆری کارت پشتگیری ناکرێت یان ژمارەی کارت نادروستە.</target>
+            </trans-unit>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target>ئەم بەهایە ژمارەیەکی دروستی هەژماری بانکیی نێودەوڵەتی (IBAN) نییە.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>ئەم بەهایە ژمارەیەکی دروستی ISBN-10 نییە.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>ئەم بەهایە ژمارەیەکی دروستی ISBN-13 نییە.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>ئەم بەهایە ژمارەیەکی دروستی ISBN-10 یان ISBN-13 نییە.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>ئەم بەهایە ژمارەیەکی دروستی ISSN نییە.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>ئەم بەهایە دراوێکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>ئەم بەهایە دەبێت یەکسان بێت بە {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>ئەم بەهایە دەبێت گەورەتر بێت لە {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>ئەم بەهایە دەبێت گەورەتر یان یەکسان بێت بە {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>ئەم بەهایە دەبێت ڕێک وەک {{ compared_value_type }} {{ compared_value }} بێت.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>ئەم بەهایە دەبێت بچووکتر بێت لە {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>ئەم بەهایە دەبێت بچووکتر یان یەکسان بێت بە {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>ئەم بەهایە نابێت یەکسان بێت بە {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>ئەم بەهایە نابێت ڕێک وەک {{ compared_value_type }} {{ compared_value }} بێت.</target>
+            </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>ڕێژەی وێنەکە زۆر گەورەیە ({{ ratio }}). زۆرترین ڕێژەی ڕێگەپێدراو: {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>ڕێژەی وێنەکە زۆر بچووکە ({{ ratio }}). کەمترین ڕێژەی پێویست: {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>وێنەکە چوارگۆشەیە ({{ width }}x{{ height }}px). وێنەی چوارگۆشە ڕێگەپێنەدراوە.</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>وێنەکە ئاسۆییە ({{ width }}x{{ height }}px). وێنەی ئاسۆیی ڕێگەپێنەدراوە.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>وێنەکە ستوونییە ({{ width }}x{{ height }}px). وێنەی ستوونی ڕێگەپێنەدراوە.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>فایلی بەتاڵ ڕێگەپێنەدراوە.</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>هۆستەکە نەدۆزرایەوە.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>ئەم بەهایە لەگەڵ کۆمەڵەپیتی چاوەڕوانکراوی {{ charset }} ناگونجێت.</target>
+            </trans-unit>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target>ئەم بەهایە کۆدێکی دروستی ناسینەوەی بازرگانی (BIC) نییە.</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>هەڵە</target>
+            </trans-unit>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>ئەم بەهایە ناسنامەیەکی دروستی UUID نییە.</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>ئەم بەهایە دەبێت چەند ئەوەندەی {{ compared_value }} بێت.</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
+                <target>ئەم کۆدی ناسینەوەی بازرگانییە (BIC) پەیوەست نییە بە ژمارەی IBAN: {{ iban }}.</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>ئەم بەهایە دەبێت دەقێکی دروستی JSON بێت.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>ئەم کۆمەڵەیە نابێت توخمی دووبارەی تێدابێت.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>ئەم بەهایە دەبێت ئەرێنی بێت.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>ئەم بەهایە دەبێت ئەرێنی یان سفر بێت.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>ئەم بەهایە دەبێت نەرێنی بێت.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>ئەم بەهایە دەبێت نەرێنی یان سفر بێت.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>ئەم بەهایە ناوچەیەکی کاتیی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>ئەم وشەی نهێنییە لە دزەکردنی زانیارییەکدا ئاشکرا بووە، نابێت بەکاربهێنرێت. تکایە وشەی نهێنییەکی تر بەکاربهێنە.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>ئەم بەهایە دەبێت لە نێوان {{ min }} و {{ max }} دا بێت.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>ئەم بەهایە ناوێکی دروستی هۆست نییە.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>ژمارەی توخمەکانی ئەم کۆمەڵەیە دەبێت چەند ئەوەندەی {{ compared_value }} بێت.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>ئەم بەهایە دەبێت لانیکەم یەکێک لەم مەرجانەی خوارەوە جێبەجێ بکات:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>هەر توخمێکی ئەم کۆمەڵەیە دەبێت کۆمەڵە مەرجەکانی خۆی جێبەجێ بکات.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>ئەم بەهایە ژمارەیەکی دروستی ناسینەوەی نێودەوڵەتیی پشک و قەواڵەکان (ISIN) نییە.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>ئەم بەهایە دەبێت دەربڕینێکی دروست بێت.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>ئەم بەهایە ڕەنگێکی دروستی CSS نییە.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>ئەم بەهایە بە شێوازێکی دروستی CIDR نەنووسراوە.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>بەهای ماسکی تۆڕ (netmask) دەبێت لە نێوان {{ min }} و {{ max }} دا بێت.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>ناوی فایلەکە زۆر درێژە. دەبێت {{ filename_max_length }} نووسە یان کەمتری هەبێت.|ناوی فایلەکە زۆر درێژە. دەبێت {{ filename_max_length }} نووسە یان کەمتری هەبێت.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>هێزی وشەی نهێنییەکە زۆر کەمە. تکایە وشەی نهێنییەکی بەهێزتر بەکاربهێنە.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>ئەم بەهایە نووسەی تێدایە کە ئاستی سنووردارکردنی ئێستا ڕێگەیان پێنادات.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>بەکارهێنانی نووسەی نادیار ڕێگەپێنەدراوە.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>تێکەڵکردنی ژمارەی سیستەمی نووسینی جیاواز ڕێگەپێنەدراوە.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>بەکارهێنانی نووسە شاراوەکانی سەرپۆش ڕێگەپێنەدراوە.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>پاشگری فایلەکە نادروستە ({{ extension }}). پاشگرە ڕێگەپێدراوەکان: {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>کۆدکردنی پیتی دۆزراوە نادروستە ({{ detected }}). کۆدکردنە ڕێگەپێدراوەکان: {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target>ئەم بەهایە ناونیشانێکی دروستی MAC نییە.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>ئەم بەستەرە (URL) دۆمەینی سەرەکی (top-level domain) تێدا نییە.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
+                <target>ئەم بەهایە زۆر کورتە. دەبێت لانیکەم {{ min }} وشەی تێدابێت.|ئەم بەهایە زۆر کورتە. دەبێت لانیکەم {{ min }} وشەی تێدابێت.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
+                <target>ئەم بەهایە زۆر درێژە. دەبێت {{ max }} وشە یان کەمتری تێدابێت.|ئەم بەهایە زۆر درێژە. دەبێت {{ max }} وشە یان کەمتری تێدابێت.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>This value does not represent a valid week in the ISO 8601 format.</source>
+                <target>ئەم بەهایە هەفتەیەکی دروست بە فۆرماتی ISO 8601 پیشان نادات.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>This value is not a valid week.</source>
+                <target>ئەم بەهایە هەفتەیەکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>This value should not be before week "{{ min }}".</source>
+                <target>ئەم بەهایە نابێت پێش هەفتەی "{{ min }}" بێت.</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>This value should not be after week "{{ max }}".</source>
+                <target>ئەم بەهایە نابێت دوای هەفتەی "{{ max }}" بێت.</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>This value is not a valid Twig template.</source>
+                <target>ئەم بەهایە قاڵبێکی دروستی Twig نییە.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>This file is not a valid video.</source>
+                <target>ئەم فایلە ڤیدیۆیەکی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>The size of the video could not be detected.</source>
+                <target>قەبارەی ڤیدیۆکە نەناسرایەوە.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>پانیی ڤیدیۆکە زۆر گەورەیە ({{ width }}px). زۆرترین پانیی ڕێگەپێدراو: {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>پانیی ڤیدیۆکە زۆر بچووکە ({{ width }}px). کەمترین پانیی پێویست: {{ min_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>بەرزیی ڤیدیۆکە زۆر گەورەیە ({{ height }}px). زۆرترین بەرزیی ڕێگەپێدراو: {{ max_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>بەرزیی ڤیدیۆکە زۆر بچووکە ({{ height }}px). کەمترین بەرزیی پێویست: {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>ڤیدیۆکە پیکسڵی زۆر کەمی هەیە ({{ pixels }} پیکسڵ). کەمترین بڕی پێویست: {{ min_pixels }} پیکسڵ.</target>
+            </trans-unit>
+            <trans-unit id="129">
+                <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>ڤیدیۆکە پیکسڵی زۆر زۆری هەیە ({{ pixels }} پیکسڵ). زۆرترین بڕی ڕێگەپێدراو: {{ max_pixels }} پیکسڵ.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>ڕێژەی ڤیدیۆکە زۆر گەورەیە ({{ ratio }}). زۆرترین ڕێژەی ڕێگەپێدراو: {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="131">
+                <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>ڕێژەی ڤیدیۆکە زۆر بچووکە ({{ ratio }}). کەمترین ڕێژەی پێویست: {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="132">
+                <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
+                <target>ڤیدیۆکە چوارگۆشەیە ({{ width }}x{{ height }}px). ڤیدیۆی چوارگۆشە ڕێگەپێنەدراوە.</target>
+            </trans-unit>
+            <trans-unit id="133">
+                <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
+                <target>ڤیدیۆکە ئاسۆییە ({{ width }}x{{ height }}px). ڤیدیۆی ئاسۆیی ڕێگەپێنەدراوە.</target>
+            </trans-unit>
+            <trans-unit id="134">
+                <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
+                <target>ڤیدیۆکە ستوونییە ({{ width }}x{{ height }}px). ڤیدیۆی ستوونی ڕێگەپێنەدراوە.</target>
+            </trans-unit>
+            <trans-unit id="135">
+                <source>The video file is corrupted.</source>
+                <target>فایلی ڤیدیۆکە تێکچووە.</target>
+            </trans-unit>
+            <trans-unit id="136">
+                <source>The video contains multiple streams. Only one stream is allowed.</source>
+                <target>ڤیدیۆکە چەند ستریمێکی تێدایە. تەنها یەک ستریم ڕێگەپێدراوە.</target>
+            </trans-unit>
+            <trans-unit id="137">
+                <source>Unsupported video codec "{{ codec }}".</source>
+                <target>کۆدێکی ڤیدیۆی "{{ codec }}" پشتگیری ناکرێت.</target>
+            </trans-unit>
+            <trans-unit id="138">
+                <source>Unsupported video container "{{ container }}".</source>
+                <target>کۆنتەینەری ڤیدیۆی "{{ container }}" پشتگیری ناکرێت.</target>
+            </trans-unit>
+            <trans-unit id="139">
+                <source>The image file is corrupted.</source>
+                <target>فایلی وێنەکە تێکچووە.</target>
+            </trans-unit>
+            <trans-unit id="140">
+                <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>وێنەکە پیکسڵی زۆر کەمی هەیە ({{ pixels }} پیکسڵ). کەمترین بڕی پێویست: {{ min_pixels }} پیکسڵ.</target>
+            </trans-unit>
+            <trans-unit id="141">
+                <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>وێنەکە پیکسڵی زۆر زۆری هەیە ({{ pixels }} پیکسڵ). زۆرترین بڕی ڕێگەپێدراو: {{ max_pixels }} پیکسڵ.</target>
+            </trans-unit>
+            <trans-unit id="142">
+                <source>This filename does not match the expected charset.</source>
+                <target>ناوی ئەم فایلە لەگەڵ کۆمەڵەپیتی چاوەڕوانکراو ناگونجێت.</target>
+            </trans-unit>
+            <trans-unit id="143">
+                <source>This value is not valid XML.</source>
+                <target>ئەم بەهایە دەقێکی دروستی XML نییە.</target>
+            </trans-unit>
+            <trans-unit id="144">
+                <source>This value does not conform to the expected XSD schema.</source>
+                <target>ئەم بەهایە لەگەڵ سکیمای چاوەڕوانکراوی XSD ناگونجێت.</target>
+            </trans-unit>
+            <trans-unit id="145">
+                <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
+                <target>قەبارەی ئەم داتایەی XML زۆر گەورەیە ({{ size }} بایت): لە سنووری {{ limit }} بایت تێدەپەڕێت.</target>
+            </trans-unit>
+            <trans-unit id="146">
+                <source>This value is not a valid cron expression.</source>
+                <target>ئەم بەهایە دەربڕینێکی دروستی cron نییە.</target>
+            </trans-unit>
+            <trans-unit id="147">
+                <source>The referenced entity does not exist.</source>
+                <target>ئەو تۆمارەی ئاماژەی پێکراوە بوونی نییە.</target>
+            </trans-unit>
+            <trans-unit id="148" resname="This is not a valid ULID.">
+                <source>This value is not a valid ULID.</source>
+                <target>ئەم بەهایە ناسنامەیەکی دروستی ULID نییە.</target>
+            </trans-unit>
+            <trans-unit id="149">
+                <source>This file is not a valid audio file.</source>
+                <target>ئەم فایلە فایلێکی دەنگیی دروست نییە.</target>
+            </trans-unit>
+            <trans-unit id="150">
+                <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
+                <target>دەنگەکە زۆر کورتە ({{ duration }} چرکە). کەمترین ماوەی پێویست: {{ min_duration }} چرکە.</target>
+            </trans-unit>
+            <trans-unit id="151">
+                <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
+                <target>دەنگەکە زۆر درێژە ({{ duration }} چرکە). زۆرترین ماوەی ڕێگەپێدراو: {{ max_duration }} چرکە.</target>
+            </trans-unit>
+            <trans-unit id="152">
+                <source>The duration of the audio could not be detected.</source>
+                <target>ماوەی دەنگەکە نەناسرایەوە.</target>
+            </trans-unit>
+            <trans-unit id="153">
+                <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
+                <target>بیتڕەیتی دەنگەکە زۆر نزمە ({{ bitrate }} bps). کەمترین بیتڕەیتی پێویست: {{ min_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="154">
+                <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
+                <target>بیتڕەیتی دەنگەکە زۆر بەرزە ({{ bitrate }} bps). زۆرترین بیتڕەیتی ڕێگەپێدراو: {{ max_bitrate }} bps.</target>
+            </trans-unit>
+            <trans-unit id="155">
+                <source>The bitrate of the audio could not be detected.</source>
+                <target>بیتڕەیتی دەنگەکە نەناسرایەوە.</target>
+            </trans-unit>
+            <trans-unit id="156">
+                <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
+                <target>ڕێژەی نموونەبردنەوەی دەنگەکە پشتگیری ناکرێت ({{ sample_rate }} Hz).</target>
+            </trans-unit>
+            <trans-unit id="157">
+                <source>The sample rate of the audio could not be detected.</source>
+                <target>ڕێژەی نموونەبردنەوەی دەنگەکە نەناسرایەوە.</target>
+            </trans-unit>
+            <trans-unit id="158">
+                <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
+                <target>دەنگەکە کەناڵی زۆر کەمی هەیە ({{ channels }}). کەمترین ژمارەی پێویست: {{ min_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="159">
+                <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
+                <target>دەنگەکە کەناڵی زۆر زۆری هەیە ({{ channels }}). زۆرترین ژمارەی ڕێگەپێدراو: {{ max_channels }}.</target>
+            </trans-unit>
+            <trans-unit id="160">
+                <source>The number of audio channels could not be detected.</source>
+                <target>ژمارەی کەناڵەکانی دەنگەکە نەناسرایەوە.</target>
+            </trans-unit>
+            <trans-unit id="161">
+                <source>The audio file is corrupted.</source>
+                <target>فایلی دەنگەکە تێکچووە.</target>
+            </trans-unit>
+            <trans-unit id="162">
+                <source>The audio contains multiple streams. Only one stream is allowed.</source>
+                <target>دەنگەکە چەند ستریمێکی تێدایە. تەنها یەک ستریم ڕێگەپێدراوە.</target>
+            </trans-unit>
+            <trans-unit id="163">
+                <source>Unsupported audio codec "{{ codec }}".</source>
+                <target>کۆدێکی دەنگیی "{{ codec }}" پشتگیری ناکرێت.</target>
+            </trans-unit>
+            <trans-unit id="164">
+                <source>Unsupported audio container "{{ container }}".</source>
+                <target>کۆنتەینەری دەنگیی "{{ container }}" پشتگیری ناکرێت.</target>
+            </trans-unit>
+            <trans-unit id="165">
+                <source>The file does not contain any audio stream.</source>
+                <target>فایلەکە هیچ ستریمێکی دەنگی تێدا نییە.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

@@ -183,6 +183,25 @@ class LazyExtensionPassTest extends TestCase
         $this->assertTrue($container->getDefinition('globals')->isLazy());
     }
 
+    public function testSubclassesOfAttributeExtensionAreRegisteredAsRuntimes()
+    {
+        if ((new \ReflectionClass(AttributeExtension::class))->isFinal()) {
+            $this->markTestSkipped('This version of Twig does not allow extending AttributeExtension.');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register('twig', Environment::class)
+            ->addMethodCall('addExtension', [new Reference('extension')]);
+        $container->register('extension', AttributeExtensionSubclass::class)
+            ->addArgument(new Reference('router'));
+
+        (new LazyExtensionPass())->process($container);
+
+        $this->assertEquals([['addExtension', [new Definition(AttributeExtension::class, [AttributeExtensionSubclass::class])]]], $container->getDefinition('twig')->getMethodCalls());
+        $this->assertTrue($container->getDefinition('extension')->hasTag('twig.runtime'));
+        $this->assertFalse($container->getDefinition('extension')->isLazy());
+    }
+
     private static function twigReturnsRuntimeExtensions(): bool
     {
         $extension = new class extends AbstractExtension {};
@@ -251,5 +270,20 @@ class AttributeOnlyExtension extends AbstractExtension
     public function baz(): string
     {
         return 'baz';
+    }
+}
+
+if (!(new \ReflectionClass(AttributeExtension::class))->isFinal()) {
+    class AttributeExtensionSubclass extends AttributeExtension
+    {
+        public function __construct(object $dependency)
+        {
+        }
+
+        #[AsTwigFunction('qux')]
+        public function qux(): string
+        {
+            return 'qux';
+        }
     }
 }

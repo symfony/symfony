@@ -22,16 +22,14 @@ class CurlCasterTest extends TestCase
 
     public function testCastCurl()
     {
-        $ch = curl_init('http://example.com');
-        curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
-        curl_exec($ch);
+        $ch = curl_init('http://example.com/');
 
         $this->assertDumpMatchesFormat(
             <<<'EODUMP'
                 CurlHandle {
                   url: "http://example.com/"
-                  content_type: "text/html%S"
-                  http_code: %d
+                  content_type: null
+                  http_code: 0
                 %A
                 }
                 EODUMP,

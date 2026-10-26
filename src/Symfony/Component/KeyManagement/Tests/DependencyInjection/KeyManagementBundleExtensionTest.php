@@ -264,6 +264,47 @@ class KeyManagementBundleExtensionTest extends TestCase
         $encrypter = $container->getDefinition('key_management.stored_envelope_encrypter')->getArguments();
         $this->assertSame('key_management.store', (string) $encrypter[0]);
         $this->assertNull($encrypter[1], 'a payload carrying its own data key bypasses the store, so reading one is asked for rather than inherited from having a default client.');
+
+        $rewrap = $container->getDefinition('console.command.key_management_rewrap_data_keys')->getArguments();
+        $this->assertSame('app', $rewrap[2]);
+        $this->assertSame('alias/app-key', $rewrap[3]);
+    }
+
+    public function testAStoreWithoutASecretIsReportedWhenTheContainerIsCompiled()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "key_management.store" needs a secret to authenticate its data keys: set "key_management.store.secret", or define the "kernel.secret" parameter, for example with "framework.secret".');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->getParameterBag()->remove('kernel.secret');
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'app'],
+            ]);
+        });
+    }
+
+    public function testAStoreSecretMakesTheKernelSecretUnnecessary()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->getParameterBag()->remove('kernel.secret');
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'app', 'secret' => 'store-secret'],
+            ]);
+        });
+
+        $this->assertSame(['store-secret'], $container->getDefinition('key_management.store')->getArgument(4));
     }
 
     public function testTheStoreSecretCanBeRotated()
@@ -1149,7 +1190,7 @@ class KeyManagementBundleExtensionTest extends TestCase
 
     private function createContainerFromClosure(\Closure $closure, bool $debug = false, bool $optimize = false): ContainerBuilder
     {
-        $container = new ContainerBuilder(new EnvPlaceholderParameterBag(['kernel.debug' => $debug, 'kernel.project_dir' => __DIR__]));
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag(['kernel.debug' => $debug, 'kernel.project_dir' => __DIR__, 'kernel.secret' => 'kernel-secret']));
         $bundle = new KeyManagementBundle();
         $bundle->build($container);
         $container->registerExtension($bundle->getContainerExtension());

@@ -70,6 +70,12 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 
           <info>%command.invocation% --to=azure --key-id=my-vault-key</info>
 
+        Without <comment>--to</comment>, the keys are re-wrapped under the client of the store.
+        Without <comment>--key-id</comment>, they are re-wrapped under the master key of the store,
+        when <comment>--to</comment> is that client:
+
+          <info>%command.invocation%</info>
+
         Restrict the run to the keys a given client still holds, which is what a provider
         migration looks like while both clients are configured:
 
@@ -82,13 +88,10 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
         Move them over once with <comment>--accept-unbound</comment>, which also reads the keys wrapped
         under no context. Every key is re-wrapped under the context of the store, never under none:
 
-          <info>%command.invocation% --to=vault --key-id=app-dek --accept-unbound</info>
+          <info>%command.invocation% --accept-unbound</info>
 
         Every key is also bound again under the first secret of the store. To retire an
-        old secret, run the command once with the current client and master key, then
-        remove the old secret:
-
-          <info>%command.invocation% --to=aws --key-id=alias/app-key</info>
+        old secret, run the command once, then remove the old secret.
         HELP,
 )]
 final class RewrapDataKeysCommand
@@ -97,18 +100,22 @@ final class RewrapDataKeysCommand
 
     /**
      * @param ServiceProviderInterface<EncrypterInterface&DecrypterInterface>|null $clients Clients trusted by the store
+     * @param string|null                                                          $client  The client of the store, which --to defaults to
+     * @param string|null                                                          $keyId   The master key of the store, which --key-id defaults to when --to is the client of the store
      */
     public function __construct(
         private readonly ?RewrappableDataKeyStoreInterface $store = null,
         private readonly ?ServiceProviderInterface $clients = null,
+        private readonly ?string $client = null,
+        private readonly ?string $keyId = null,
     ) {
     }
 
     public function __invoke(
         SymfonyStyle $io,
-        #[Option(description: 'Name of the KMS client that must wrap the keys from now on', suggestedValues: [self::class, 'suggestClients'])]
+        #[Option(description: 'Name of the KMS client that must wrap the keys from now on, the client of the store by default', suggestedValues: [self::class, 'suggestClients'])]
         ?string $to = null,
-        #[Option(name: 'key-id', description: 'Master key on that client (backend-specific: alias, ARN, key URL, ...)')]
+        #[Option(name: 'key-id', description: 'Master key on that client (backend-specific: alias, ARN, key URL, ...), the master key of the store by default for the client of the store')]
         ?string $keyId = null,
         #[Option(description: 'Only move the keys currently wrapped by this client; all of them when omitted', suggestedValues: [self::class, 'suggestClients'])]
         ?string $from = null,
@@ -123,6 +130,11 @@ final class RewrapDataKeysCommand
             $errorIo->error('No data key store is registered, so there is nothing to re-wrap.');
 
             return Command::FAILURE;
+        }
+
+        $to ??= $this->client;
+        if (null !== $to && $to === $this->client) {
+            $keyId ??= $this->keyId;
         }
 
         if (null === $keyId) {

@@ -267,6 +267,29 @@ class RewrapDataKeysCommandTest extends TestCase
         $this->assertStringContainsString('--key-id option is required', $tester->getDisplay());
     }
 
+    public function testWithoutOptionsTheKeysMoveToTheClientAndTheMasterKeyOfTheStore()
+    {
+        $encrypter = new StoredEnvelopeEncrypter($this->store);
+        $envelope = $encrypter->encrypt('user.email', 'survives the move');
+
+        $tester = new CommandTester(new RewrapDataKeysCommand($this->store, $this->locator(), 'azure', 'app'));
+        $tester->execute([]);
+        $this->store->forget();
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame('azure', iterator_to_array($this->store->all(), false)[0]->client);
+        $this->assertSame('survives the move', $encrypter->decrypt($envelope));
+    }
+
+    public function testTheMasterKeyOfTheStoreIsNotTheDefaultForAnotherClient()
+    {
+        $tester = new CommandTester(new RewrapDataKeysCommand($this->store, $this->locator(), 'aws', 'app'));
+        $exit = $tester->execute(['--to' => 'azure']);
+
+        $this->assertSame(Command::INVALID, $exit);
+        $this->assertStringContainsString('--key-id option is required', $tester->getDisplay());
+    }
+
     public function testAnUnknownTargetClientIsRejected()
     {
         $tester = $this->tester();

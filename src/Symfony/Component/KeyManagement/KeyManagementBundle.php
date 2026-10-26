@@ -41,6 +41,7 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\Regis
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\DependencyInjection\RegisterEncryptedColumnsPass;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener;
 use Symfony\Component\KeyManagement\Bridge\Flysystem\DependencyInjection\RegisterFlysystemStoragesPass;
+use Symfony\Component\KeyManagement\DependencyInjection\CheckDataKeyStoreSecretPass;
 use Symfony\Component\KeyManagement\DependencyInjection\KeyManagementPass;
 use Symfony\Component\KeyManagement\DependencyInjection\RegisterDoctrineDbalTypesPass;
 use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
@@ -88,6 +89,7 @@ class KeyManagementBundle extends AbstractBundle
     {
         // the container can drop the data collector this pass looks for, so run after it
         $container->addCompilerPass(new KeyManagementPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
+        $container->addCompilerPass(new CheckDataKeyStoreSecretPass());
 
         if (class_exists(RegisterFlysystemStoragesPass::class)) {
             $container->addCompilerPass(new RegisterFlysystemStoragesPass());
@@ -470,6 +472,12 @@ class KeyManagementBundle extends AbstractBundle
                 $config['bind_wrapping_context'],
             ])
             ->addTag('kernel.reset', ['method' => 'forget']);
+
+        if ($container->hasDefinition('console.command.key_management_rewrap_data_keys')) {
+            $container->getDefinition('console.command.key_management_rewrap_data_keys')
+                ->setArgument(2, $client)
+                ->setArgument(3, $config['key_id']);
+        }
 
         $container->register('key_management.stored_envelope_encrypter', StoredEnvelopeEncrypter::class)
             ->setArguments([

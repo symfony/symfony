@@ -73,4 +73,123 @@ class SodiumVaultTest extends TestCase
 
         $this->assertSame([], $vault->list());
     }
+
+    public function testRotateWithoutPlaintextDoesNotReplaceKeys()
+    {
+        $vault = new SodiumVault($this->secretsDir);
+        $vault->generateKeys();
+        $vault->seal('FOO', 'foo');
+
+        $privateKey = file_get_contents($this->secretsDir.'/test.decrypt.private.php');
+
+        $this->assertFalse($vault->rotate([]));
+        $this->assertStringContainsString('could not be decrypted', (string) $vault->getLastMessage());
+        $this->assertStringEqualsFile($this->secretsDir.'/test.decrypt.private.php', $privateKey);
+        $this->assertSame('foo', $vault->reveal('FOO'));
+        $this->assertFileDoesNotExist($this->secretsDir.'/test.decrypt.private.old.php');
+    }
+
+    public function testRevealFallsBackToTheOldKeyOfAnInterruptedRotation()
+    {
+        $newKey = $this->interruptRotation();
+        $files = $this->readFiles();
+
+        $this->assertSame(['BAR' => 'bar', 'FOO' => 'foo'], (new SodiumVault($this->secretsDir))->list(true));
+        $this->assertSame(['BAR' => 'bar', 'FOO' => 'foo'], (new SodiumVault($this->secretsDir, $newKey))->list(true));
+        $this->assertSame($files, $this->readFiles());
+    }
+
+    public function testRotateResumesAnInterruptedRotationWithItsNewKey()
+    {
+        $newKey = $this->interruptRotation();
+
+        $this->assertTrue((new SodiumVault($this->secretsDir))->rotate(['BAR' => 'bar', 'FOO' => 'foo']));
+        $this->assertSame($newKey, include $this->secretsDir.'/test.decrypt.private.php');
+        $this->assertFileDoesNotExist($this->secretsDir.'/test.decrypt.private.old.php');
+        $this->assertSame(['BAR' => 'bar', 'FOO' => 'foo'], (new SodiumVault($this->secretsDir, $newKey))->list(true));
+    }
+
+    public function testRotateGeneratesNewKeysWhenTheInterruptedRotationDidNotWriteThem()
+    {
+        $vault = new SodiumVault($this->secretsDir);
+        $vault->generateKeys();
+        $vault->seal('FOO', 'foo');
+
+        $privateKey = file_get_contents($this->secretsDir.'/test.decrypt.private.php');
+        copy($this->secretsDir.'/test.decrypt.private.php', $this->secretsDir.'/test.decrypt.private.old.php');
+
+        $this->assertTrue((new SodiumVault($this->secretsDir))->rotate(['FOO' => 'foo']));
+        $this->assertStringNotEqualsFile($this->secretsDir.'/test.decrypt.private.php', $privateKey);
+        $this->assertFileDoesNotExist($this->secretsDir.'/test.decrypt.private.old.php');
+        $this->assertSame('foo', (new SodiumVault($this->secretsDir))->reveal('FOO'));
+    }
+
+    public function testRotateIgnoresAnIncompleteOldKey()
+    {
+        $vault = new SodiumVault($this->secretsDir);
+        $vault->generateKeys();
+        $vault->seal('FOO', 'foo');
+
+        $privateKey = file_get_contents($this->secretsDir.'/test.decrypt.private.php');
+        touch($this->secretsDir.'/test.decrypt.private.old.php');
+
+        $this->assertSame('foo', (new SodiumVault($this->secretsDir))->reveal('FOO'));
+        $this->assertTrue((new SodiumVault($this->secretsDir))->rotate(['FOO' => 'foo']));
+        $this->assertStringNotEqualsFile($this->secretsDir.'/test.decrypt.private.php', $privateKey);
+        $this->assertFileDoesNotExist($this->secretsDir.'/test.decrypt.private.old.php');
+        $this->assertSame('foo', (new SodiumVault($this->secretsDir))->reveal('FOO'));
+    }
+
+    public function testProvidedDecryptionKeyStaysInUseWhenARotationIsInterrupted()
+    {
+        (new SodiumVault($this->secretsDir))->generateKeys();
+        $oldKey = include $this->secretsDir.'/test.decrypt.private.php';
+        $this->interruptRotation();
+
+        $locked = new SodiumVault($this->secretsDir, $oldKey);
+
+        $this->assertSame('bar', $locked->reveal('BAR'));
+        $this->assertNull($locked->reveal('FOO'));
+        $this->assertStringContainsString('wrong decryption key', (string) $locked->getLastMessage());
+    }
+
+    private function interruptRotation(): string
+    {
+        if (!is_file($this->secretsDir.'/test.decrypt.private.php')) {
+            (new SodiumVault($this->secretsDir))->generateKeys();
+        }
+
+        $vault = new SodiumVault($this->secretsDir);
+        $vault->seal('FOO', 'foo');
+        $vault->seal('BAR', 'bar');
+
+        $newKey = sodium_crypto_box_keypair();
+        $newPublicKey = sodium_crypto_box_publickey($newKey);
+        copy($this->secretsDir.'/test.decrypt.private.php', $this->secretsDir.'/test.decrypt.private.old.php');
+        $this->writeEncodedFile($this->secretsDir.'/test.decrypt.private.php', $newKey);
+        $this->writeEncodedFile($this->secretsDir.'/test.encrypt.public.php', $newPublicKey);
+        $this->writeEncodedFile($this->secretPath('FOO'), sodium_crypto_box_seal('foo', $newPublicKey));
+
+        return $newKey;
+    }
+
+    private function readFiles(): array
+    {
+        $files = [];
+        foreach (glob($this->secretsDir.'/*') as $file) {
+            $files[basename($file)] = file_get_contents($file);
+        }
+
+        return $files;
+    }
+
+    private function secretPath(string $name): string
+    {
+        return $this->secretsDir.'/test.'.$name.'.'.substr(md5($name), 0, 6).'.php';
+    }
+
+    private function writeEncodedFile(string $path, string $raw): void
+    {
+        file_put_contents($path, "<?php\n\nreturn \"".str_replace('%', '\x', rawurlencode($raw))."\";\n");
+    }
 }

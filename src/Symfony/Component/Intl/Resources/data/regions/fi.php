@@ -203,7 +203,7 @@ return [
         'SD' => 'Sudan',
         'SE' => 'Ruotsi',
         'SG' => 'Singapore',
-        'SH' => 'Saint Helena',
+        'SH' => 'Saint Helena, Ascension ja Tristan da Cunha',
         'SI' => 'Slovenia',
         'SJ' => 'Huippuvuoret ja Jan Mayen',
         'SK' => 'Slovakia',

@@ -9,6 +9,7 @@ return [
         'HM' => 'Heard Island and McDonald Islands',
         'KN' => 'St Kitts and Nevis',
         'PM' => 'St Pierre and Miquelon',
+        'SH' => 'St Helena, Ascension and Tristan da Cunha',
         'SJ' => 'Svalbard and Jan Mayen',
         'ST' => 'São Tomé and Príncipe',
         'TC' => 'Turks and Caicos Islands',

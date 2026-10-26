@@ -266,10 +266,6 @@ return [
             'CNH',
             'Yuwã Xinawara (offshore)',
         ],
-        'CNX' => [
-            'CNX',
-            'Dóra Bãku Pupulari Xinawara suí',
-        ],
         'CNY' => [
             'CN¥',
             'Yuwã Xinawara',

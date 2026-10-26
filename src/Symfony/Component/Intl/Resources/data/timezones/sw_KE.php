@@ -63,7 +63,6 @@ return [
         'Asia/Singapore' => 'Saa za Wastani za Singapoo',
         'Asia/Tashkent' => 'Saa za Uzbekistani (Tashkent)',
         'Asia/Tbilisi' => 'Saa za Jiojia (Tbilisi)',
-        'Asia/Tehran' => 'Saa za Irani (Tehran)',
         'Asia/Thimphu' => 'Saa za Butani (Thimphu)',
         'Asia/Tokyo' => 'Saa za Japani (Tokyo)',
         'Asia/Ulaanbaatar' => 'Saa za Ulaanbataar (Ulaanbaatar)',

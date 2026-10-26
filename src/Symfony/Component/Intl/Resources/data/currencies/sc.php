@@ -266,10 +266,6 @@ return [
             'CNH',
             'renminbi tzinesu (extracontinentale)',
         ],
-        'CNX' => [
-            'CNX',
-            'dòllaru de sa Banca Popolare Tzinesa',
-        ],
         'CNY' => [
             'CN¥',
             'renminbi tzinesu',

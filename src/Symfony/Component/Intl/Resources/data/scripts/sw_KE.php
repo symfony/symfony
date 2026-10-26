@@ -10,7 +10,6 @@ return [
         'Ethi' => 'Kihabeshi',
         'Hanb' => 'Kihan chenye Kibopomofo',
         'Hans' => 'Kilichorahisishwa',
-        'Hira' => 'Kihiragana',
         'Hrkt' => 'Silabi za Kijapani',
         'Jamo' => 'Kijamo',
         'Khmr' => 'Kikhema',

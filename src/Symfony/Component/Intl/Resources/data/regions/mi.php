@@ -109,7 +109,7 @@ return [
         'IE' => 'Airani',
         'IL' => 'Iharaira',
         'IM' => 'Te Moutere Mana',
-        'IN' => 'Inia',
+        'IN' => 'Īnia',
         'IO' => 'Te Rohe o te Moana Īniana Piritihi',
         'IQ' => 'Irāka',
         'IR' => 'Irāna',

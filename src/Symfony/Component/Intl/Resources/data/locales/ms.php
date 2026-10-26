@@ -668,6 +668,8 @@ return [
         'pcm_NG' => 'Nigerian Pidgin (Nigeria)',
         'pl' => 'Poland',
         'pl_PL' => 'Poland (Poland)',
+        'pms' => 'Piedmont',
+        'pms_IT' => 'Piedmont (Itali)',
         'prg' => 'Prusia',
         'prg_PL' => 'Prusia (Poland)',
         'ps' => 'Pashto',

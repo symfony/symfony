@@ -11,7 +11,7 @@ return [
         'cs' => 'Kichecki',
         'de' => 'Kĩnjeremani',
         'el' => 'Kigiriki',
-        'en' => 'Gĩthungũ',
+        'en' => 'Gĩthũngũ',
         'es' => 'Kihispania',
         'fa' => 'Kiajemi',
         'fr' => 'Kĩbaranja',
@@ -23,7 +23,7 @@ return [
         'it' => 'Kĩtaliano',
         'ja' => 'Kĩnjabani',
         'jv' => 'Kijava',
-        'ki' => 'Gikuyu',
+        'ki' => 'Gĩgĩkũyũ',
         'km' => 'Kikambodia',
         'ko' => 'Kikorea',
         'ms' => 'Kimalesia',
@@ -48,5 +48,7 @@ return [
         'zh' => 'Kĩcaina',
         'zu' => 'Kizulu',
     ],
-    'LocalizedNames' => [],
+    'LocalizedNames' => [
+        'hi_Latn' => 'Kĩhĩndĩ (Kĩratini)',
+    ],
 ];

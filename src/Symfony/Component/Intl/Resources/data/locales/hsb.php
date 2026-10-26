@@ -670,6 +670,8 @@ return [
         'pcm_NG' => 'nigerijanski pidgin (Nigerija)',
         'pl' => 'pólšćina',
         'pl_PL' => 'pólšćina (Pólska)',
+        'pms' => 'piemonšćina',
+        'pms_IT' => 'piemonšćina (Italska)',
         'prg' => 'prušćina',
         'prg_PL' => 'prušćina (Pólska)',
         'ps' => 'paštunšćina',

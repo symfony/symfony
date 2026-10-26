@@ -248,7 +248,7 @@ return [
         'VN' => 'Vjetnam',
         'VU' => 'Vanuatu',
         'WF' => 'Wallis- og Futunaoyggjar',
-        'WS' => 'Samoa',
+        'WS' => 'Sámoa',
         'YE' => 'Jemen',
         'YT' => 'Mayotte',
         'ZA' => 'Suðurafrika',

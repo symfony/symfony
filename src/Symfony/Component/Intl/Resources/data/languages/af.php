@@ -318,6 +318,7 @@ return [
         'phn' => 'Fenisies',
         'pis' => 'Pijin',
         'pl' => 'Pools',
+        'pms' => 'Piëmontees',
         'pqm' => 'Maliseet-Passamaquoddy',
         'prg' => 'Pruisies',
         'ps' => 'Pasjtoe',
@@ -452,6 +453,7 @@ return [
     'LocalizedNames' => [
         'ar_001' => 'Moderne Standaardarabies',
         'fa_AF' => 'Dari',
+        'hi_Latn' => 'Hindi (Latynse alfabet)',
         'nds_NL' => 'Nedersaksies',
         'nl_BE' => 'Vlaams',
     ],

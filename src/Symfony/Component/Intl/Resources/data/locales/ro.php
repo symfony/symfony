@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'pidgin nigerian (Nigeria)',
         'pl' => 'poloneză',
         'pl_PL' => 'poloneză (Polonia)',
+        'pms' => 'piemonteză',
+        'pms_IT' => 'piemonteză (Italia)',
         'prg' => 'prusacă',
         'prg_PL' => 'prusacă (Polonia)',
         'ps' => 'paștună',

@@ -11,7 +11,7 @@ return [
         'Pacific/Enderbury' => 'hora de las islas Fénix (Isla Kanton)',
         'Pacific/Kanton' => 'hora de las islas Fénix (Isla Kanton)',
         'Pacific/Guam' => 'hora de Chamorro (Guam)',
-        'Pacific/Honolulu' => 'hora estándar de Hawái-Aleutianas (Honolulu)',
+        'Pacific/Honolulu' => 'hora estándar de Hawái y Aleutianas (Honolulu)',
         'Pacific/Marquesas' => 'hora de las islas Marquesas',
         'Pacific/Saipan' => 'hora de Chamorro (Saipán)',
     ],

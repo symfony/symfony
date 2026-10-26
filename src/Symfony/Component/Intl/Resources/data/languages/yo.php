@@ -299,6 +299,7 @@ return [
         'pcm' => 'Èdè Pijini ti Naijiriya',
         'pis' => 'Èdè Piji',
         'pl' => 'Èdè Póláǹdì',
+        'pms' => 'Èdè Pídímọ̀ntísì',
         'pqm' => 'Èdè Maliseti-Pasamkodi',
         'prg' => 'Púrúṣíànù',
         'ps' => 'Páshítò',

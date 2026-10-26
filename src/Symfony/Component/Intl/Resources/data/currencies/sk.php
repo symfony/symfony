@@ -266,10 +266,6 @@ return [
             'CNH',
             'čínsky jüan (pobrežný)',
         ],
-        'CNX' => [
-            'CNX',
-            'čínsky dolár ČĽB',
-        ],
         'CNY' => [
             'CNY',
             'čínsky jüan',

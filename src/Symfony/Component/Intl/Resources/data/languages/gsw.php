@@ -170,7 +170,7 @@ return [
         'io' => 'Ido',
         'is' => 'Iisländisch',
         'it' => 'Italiänisch',
-        'iu' => 'Inukitut',
+        'iu' => 'Inuktitut',
         'ja' => 'Japanisch',
         'jbo' => 'Lojbanisch',
         'jpr' => 'Jüüdisch-Persisch',

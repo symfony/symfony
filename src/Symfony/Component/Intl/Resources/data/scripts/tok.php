@@ -15,6 +15,7 @@ return [
         'Java' => 'sitelen Sowa',
         'Jpan' => 'sitelen Nijon',
         'Khmr' => 'sitelen Kame',
+        'Kore' => 'sitelen Koli',
         'Latn' => 'sitelen Lasina',
         'Mymr' => 'sitelen Mijama',
         'Telu' => 'sitelen Teluku',

@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'Pidgin na Najeriya (Nijeriya)',
         'pl' => 'Harshen Polan',
         'pl_PL' => 'Harshen Polan (Polan)',
+        'pms' => 'Harshen Piedmontese',
+        'pms_IT' => 'Harshen Piedmontese (Italiya)',
         'prg' => 'Yaren Prussia',
         'prg_PL' => 'Yaren Prussia (Polan)',
         'ps' => 'Pashtanci',

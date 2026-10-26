@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'Nigērijas pidžinvaloda (Nigērija)',
         'pl' => 'poļu',
         'pl_PL' => 'poļu (Polija)',
+        'pms' => 'pjemontiešu',
+        'pms_IT' => 'pjemontiešu (Itālija)',
         'prg' => 'prūšu',
         'prg_PL' => 'prūšu (Polija)',
         'ps' => 'puštu',

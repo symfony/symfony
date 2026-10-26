@@ -266,10 +266,6 @@ return [
             'CNH',
             'Yuan Sìneach (far-thìreach)',
         ],
-        'CNX' => [
-            'CNX',
-            'Dolar an t-sluagh-bhanca Shìnich',
-        ],
         'CNY' => [
             'CN¥',
             'Yuan Sìneach',

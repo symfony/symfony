@@ -31,6 +31,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         'XBC' => true, // European Unit of Account (XBC)
         'XBD' => true, // European Unit of Account (XBD)
         'XUA' => true, // ADB Unit of Account
+        'XAD' => true, // Arab Accounting Dinar
         'XAU' => true, // Gold
         'XAG' => true, // Silver
         'XPT' => true, // Platinum

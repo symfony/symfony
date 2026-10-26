@@ -408,6 +408,7 @@ return [
         'pi' => 'Pali',
         'pis' => 'Pijin',
         'pl' => 'Polski',
+        'pms' => 'Piemonte',
         'pon' => 'Pohnpeia',
         'pqm' => 'Maliseet-Passamaquoddy',
         'prg' => 'Prusia',

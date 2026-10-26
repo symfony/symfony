@@ -2,6 +2,6 @@
 
 return [
     'Names' => [
-        'Latn' => 'Selatine',
+        'Latn' => 'Latin',
     ],
 ];

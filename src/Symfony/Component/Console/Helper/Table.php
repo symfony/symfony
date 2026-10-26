@@ -52,6 +52,8 @@ class Table
     private array $configuredColumnWidths = [];
     private array $columnMaxWidths = [];
     private array $renderedLines = [];
+    private array $tagStyles = [];
+    private ?\WeakMap $rowspanLines = null;
     private string $displayOrientation = self::DISPLAY_ORIENTATION_DEFAULT;
 
     private static array $styles;
@@ -357,13 +359,13 @@ class Table
         $rows = [];
         if ($horizontal) {
             foreach ($this->headers[0] ?? [] as $i => $header) {
-                $rows[$i] = [$header];
+                $rows[$i] = [$this->closeStyles($header)];
                 foreach ($this->rows as $row) {
                     if ($row instanceof TableSeparator) {
                         continue;
                     }
                     if (isset($row[$i])) {
-                        $rows[$i][] = $row[$i];
+                        $rows[$i][] = $this->closeStyles($row[$i]);
                     } elseif ($isCellWithColspan($rows[$i][0])) {
                         // Noop, there is a "title"
                     } else {
@@ -373,7 +375,8 @@ class Table
             }
         } elseif ($vertical) {
             $formatter = $this->output->getFormatter();
-            $maxHeaderLength = array_reduce($this->headers[0] ?? [], static fn ($max, $header) => max($max, Helper::width(Helper::removeDecoration($formatter, $header))), 0);
+            $headers = array_map($this->closeStyles(...), $this->headers[0] ?? []);
+            $maxHeaderLength = array_reduce($headers, static fn ($max, $header) => max($max, Helper::width(Helper::removeDecoration($formatter, $header))), 0);
 
             foreach ($this->rows as $row) {
                 if ($row instanceof TableSeparator) {
@@ -391,13 +394,12 @@ class Table
                     }
                 }
 
-                $headers = $this->headers[0] ?? [];
                 $maxRows = max(\count($headers), \count($row));
                 for ($i = 0; $i < $maxRows; ++$i) {
-                    $cell = (string) ($row[$i] ?? '');
+                    $cell = (string) $this->closeStyles($row[$i] ?? '');
 
                     $eol = str_contains($cell, "\r\n") ? "\r\n" : "\n";
-                    $parts = explode($eol, $cell);
+                    $parts = explode($eol, $this->closeStyles($cell, $eol));
                     foreach ($parts as $idx => $part) {
                         if ($headers && !$containsColspan) {
                             if (0 === $idx) {
@@ -421,7 +423,8 @@ class Table
                 }
             }
         } else {
-            $rows = array_merge($this->headers, [$divider], $this->rows);
+            $closeStyles = $this->closeStyles(...);
+            $rows = array_map(static fn ($row) => $row instanceof TableSeparator ? $row : array_map($closeStyles, $row), array_merge($this->headers, [$divider], $this->rows));
         }
 
         $this->calculateNumberOfColumns($rows);
@@ -655,33 +658,24 @@ class Table
         }
 
         // str_pad won't work properly with multi-byte strings, we need to fix the padding
-        $width += \strlen($cell) - Helper::width($cell) - substr_count($cell, "\0");
+        $width += \strlen($cell) - Helper::width(Helper::removeDecoration($this->output->getFormatter(), $cell));
         $style = $this->getColumnStyle($column);
 
         if ($cell instanceof TableSeparator) {
             return \sprintf($style->getBorderFormat(), str_repeat($style->getBorderChars()[2], $width));
         }
 
-        $width += Helper::length($cell) - Helper::length(Helper::removeDecoration($this->output->getFormatter(), $cell));
         $content = \sprintf($style->getCellRowContentFormat(), $cell);
 
         $padType = $style->getPadType();
         if ($cell instanceof TableCell && $cell->getStyle() instanceof TableCellStyle) {
-            $isNotStyledByTag = !preg_match('/^<(\w+|(\w+=[\w,]+;?)*)>.+<\/(\w+|(\w+=\w+;?)*)?>$/', $cell);
+            // the lines of a cell that spans rows get the style of the cell, even when a tag wraps them
+            $isNotStyledByTag = isset($this->rowspanLines[$cell]) || !preg_match('/^<(\w+|(\w+=[\w,]+;?)*)>.+<\/(\w+|(\w+=\w+;?)*)?>$/', $cell);
             if ($isNotStyledByTag) {
                 $cellFormat = $cell->getStyle()->getCellFormat();
                 if (!\is_string($cellFormat)) {
                     $tag = http_build_query($cell->getStyle()->getTagOptions(), '', ';');
                     $cellFormat = '<'.$tag.'>%s</>';
-                }
-
-                if (str_contains($content, '</>')) {
-                    $content = str_replace('</>', '', $content);
-                    $width -= 3;
-                }
-                if (str_contains($content, '<fg=default;bg=default>')) {
-                    $content = str_replace('<fg=default;bg=default>', '', $content);
-                    $width -= \strlen('<fg=default;bg=default>');
                 }
             }
 
@@ -742,8 +736,9 @@ class Table
                 }
 
                 $cellWidth = Helper::width(Helper::removeDecoration($formatter, $cell));
-                if ($minWrappedWidth && $cellWidth > $minWrappedWidth) {
-                    $cell = $formatter->formatAndWrap($cell, $minWrappedWidth);
+                if ($wrapped = $minWrappedWidth && $cellWidth > $minWrappedWidth) {
+                    // the wrapped cell is already formatted and gets formatted again when rendered
+                    $cell = str_replace(['<', '>'], ['\\<', '\\>'], $formatter->formatAndWrap($cell, $minWrappedWidth));
                 }
                 // update minimal columnWidths for spanned columns
                 if ($colspan > 1 && $minWrappedWidth > 0) {
@@ -776,13 +771,12 @@ class Table
 
                     continue;
                 }
-                if (!str_contains($cell ?? '', "\n")) {
+                if (!$wrapped && !str_contains($cell ?? '', "\n")) {
                     continue;
                 }
-                $eol = str_contains($cell ?? '', "\r\n") ? "\r\n" : "\n";
-                $escaped = implode($eol, array_map(OutputFormatter::escapeTrailingBackslash(...), explode($eol, $cell)));
+                $escaped = implode("\n", array_map(OutputFormatter::escapeTrailingBackslash(...), preg_split('/\r?\n/', $wrapped ? $cell : $this->closeStyles(str_replace("\r\n", "\n", $cell), "\n"))));
                 $cell = $cell instanceof TableCell ? new TableCell($escaped, ['colspan' => $cell->getColspan()]) : $escaped;
-                $lines = explode($eol, str_replace($eol, '<fg=default;bg=default></>'.$eol, $cell));
+                $lines = explode("\n", str_replace("\n", '<fg=default;bg=default></>'."\n", $cell));
                 foreach ($lines as $lineKey => $line) {
                     if ($colspan > 1) {
                         $line = new TableCell($line, ['colspan' => $colspan]);
@@ -820,6 +814,7 @@ class Table
      */
     private function fillNextRows(array $rows, int $line): array
     {
+        $this->rowspanLines ??= new \WeakMap();
         $unmergedRows = [];
         foreach ($rows[$line] as $column => $cell) {
             if (null !== $cell && !$cell instanceof TableCell && !\is_scalar($cell) && !$cell instanceof \Stringable) {
@@ -830,10 +825,11 @@ class Table
                 $lines = [$cell];
                 if (str_contains($cell, "\n")) {
                     $eol = str_contains($cell, "\r\n") ? "\r\n" : "\n";
-                    $lines = explode($eol, str_replace($eol, '<fg=default;bg=default>'.$eol.'</>', $cell));
+                    $lines = explode($eol, $this->closeStyles($cell, $eol));
                     $nbLines = \count($lines) > $nbLines ? substr_count($cell, $eol) : $nbLines;
 
                     $rows[$line][$column] = new TableCell($lines[0], ['colspan' => $cell->getColspan(), 'style' => $cell->getStyle()]);
+                    $this->rowspanLines[$rows[$line][$column]] = true;
                     unset($lines[0]);
                 }
 
@@ -842,6 +838,7 @@ class Table
                 foreach ($unmergedRows as $unmergedRowKey => $unmergedRow) {
                     $value = $lines[$unmergedRowKey - $line] ?? '';
                     $unmergedRows[$unmergedRowKey][$column] = new TableCell($value, ['colspan' => $cell->getColspan(), 'style' => $cell->getStyle()]);
+                    $this->rowspanLines[$unmergedRows[$unmergedRowKey][$column]] = true;
                     if ($nbLines === $unmergedRowKey - $line) {
                         break;
                     }
@@ -908,6 +905,77 @@ class Table
     }
 
     /**
+     * Closes the styles that a cell leaves open at its end.
+     *
+     * With $eol, closes the styles that span a line break at the end of each line, and reopens them on the next line.
+     */
+    private function closeStyles(mixed $cell, ?string $eol = null): mixed
+    {
+        if (!\is_string($cell) && !$cell instanceof \Stringable || !str_contains($value = (string) $cell, '<') || null !== $eol && !str_contains($value, $eol) || !($formatter = $this->output->getFormatter()) instanceof OutputFormatter) {
+            return $cell;
+        }
+
+        $lines = null === $eol ? [$value] : explode($eol, $value);
+        // the tags that are open at the start of each line, then at the end of the last one, with the codes of their style and their closing tag
+        $openTags = [[]];
+        foreach ($lines as $i => $line) {
+            $tags = $openTags[$i];
+            preg_match_all('#<(?:[a-z](?:[^\\\\<>]*+|\\\\.)*|/(?:[a-z][^<>]*+)?)>#i', $line, $matches, \PREG_OFFSET_CAPTURE);
+
+            foreach ($matches[0] as [$tag, $offset]) {
+                if ($offset && '\\' === $line[$offset - 1]) {
+                    continue;
+                }
+
+                if ('</>' !== $tag) {
+                    // the formatter pushes the style of a style tag, and prints any other tag as is
+                    $name = ltrim(substr($tag, 1), '/');
+                    $this->tagStyles[$name] ??= '' === $formatter->format('<'.$name) ? $formatter->getStyleStack()->pop()->apply('') : false;
+                    if (false === $style = $this->tagStyles[$name]) {
+                        continue;
+                    }
+
+                    if ('/' !== $tag[1]) {
+                        // a closing tag cannot contain an escaped "<" or ">"
+                        $tags[] = [$tag, $style, strpbrk(substr($tag, 1, -1), '<>') ? '</>' : '</'.substr($tag, 1)];
+                        continue;
+                    }
+                }
+
+                if (!$tags) {
+                    continue;
+                } elseif ('</>' === $tag) {
+                    array_pop($tags);
+                } else {
+                    // like the formatter, close the last tag that has the same style, and the ones opened after it
+                    for ($j = \count($tags) - 1; $j >= 0; --$j) {
+                        if ($style === $tags[$j][1]) {
+                            array_splice($tags, $j);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            $openTags[] = $tags;
+        }
+
+        if (!array_filter(\array_slice($openTags, 1, null === $eol ? null : -1))) {
+            return $cell;
+        }
+
+        foreach ($lines as $i => $line) {
+            // closing tags go before the trailing backslashes of the line, which would escape them otherwise
+            $text = rtrim($line, '\\');
+            $line = $text.implode('', array_reverse(array_column($openTags[$i + 1], 2))).substr($line, \strlen($text));
+            $lines[$i] = implode('', array_column($openTags[$i], 0)).$line;
+        }
+        $value = implode($eol ?? '', $lines);
+
+        return $cell instanceof TableCell ? new TableCell($value, ['rowspan' => $cell->getRowspan(), 'colspan' => $cell->getColspan(), 'style' => $cell->getStyle()]) : $value;
+    }
+
+    /**
      * Gets number of columns by row.
      */
     private function getNumberOfColumns(array $row): int
@@ -956,7 +1024,7 @@ class Table
                             if ($textLength > 0) {
                                 $contentColumns = mb_str_split($textContent, ceil($textLength / $cell->getColspan()));
                                 foreach ($contentColumns as $position => $content) {
-                                    $row[$i + $position] = $content;
+                                    $row[$i + $position] = OutputFormatter::escape($content);
                                 }
                             }
                         }
@@ -996,6 +1064,8 @@ class Table
     private function cleanup(): void
     {
         $this->effectiveColumnWidths = [];
+        $this->tagStyles = [];
+        $this->rowspanLines = null;
         unset($this->numberOfColumns);
     }
 

@@ -78,10 +78,6 @@ return [
             'Rs',
             'Seychellois Rupee',
         ],
-        'SLL' => [
-            'SLL',
-            'Sierra Leonean Leone (1964–2022)',
-        ],
         'SRD' => [
             'SRD',
             'Suriname Dollar',

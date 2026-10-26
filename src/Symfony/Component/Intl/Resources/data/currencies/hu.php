@@ -260,7 +260,7 @@ return [
         ],
         'CRC' => [
             'CRC',
-            'Costa Rica-i colon',
+            'Costa Rica-i colón',
         ],
         'CSD' => [
             'CSD',

@@ -262,10 +262,6 @@ return [
             'CLP',
             'chilega peso',
         ],
-        'CNX' => [
-            'CNX',
-            'tsainatɔwo ƒe gadzraɖoƒe dollar',
-        ],
         'CNY' => [
             'CN¥',
             'Chinesega yuan',

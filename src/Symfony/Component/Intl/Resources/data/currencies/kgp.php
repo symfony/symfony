@@ -266,10 +266,6 @@ return [
             'CNH',
             'Sĩnỹ Yvỹn (offshore)',
         ],
-        'CNX' => [
-            'CNX',
-            'Nórar vẽnhkar mỹ máko mĩ Sĩnỹ tá',
-        ],
         'CNY' => [
             'CN¥',
             'Sĩnỹ Yvỹn',

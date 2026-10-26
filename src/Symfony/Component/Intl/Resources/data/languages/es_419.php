@@ -18,9 +18,7 @@ return [
         'mni' => 'manipuri',
         'nr' => 'ndebele del sur',
         'nso' => 'sesotho del norte',
-        'prg' => 'prusiano antiguo',
-        'rm' => 'retorrománico',
-        'sd' => 'sindhi',
+        'raj' => 'rayastani',
         'shu' => 'árabe (Chad)',
         'sma' => 'sami del sur',
         'st' => 'sesotho del sur',
@@ -34,6 +32,7 @@ return [
         'zun' => 'zuni',
     ],
     'LocalizedNames' => [
+        'hi_Latn' => 'hindi (latino)',
         'sw_CD' => 'swahili (Congo)',
     ],
 ];

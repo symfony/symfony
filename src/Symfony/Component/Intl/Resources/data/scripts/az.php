@@ -4,7 +4,7 @@ return [
     'Names' => [
         'Adlm' => 'adlam',
         'Arab' => 'ərəb',
-        'Aran' => 'aran',
+        'Aran' => 'nəstəliq',
         'Armi' => 'armi',
         'Armn' => 'erməni',
         'Avst' => 'avestan',

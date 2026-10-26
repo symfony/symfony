@@ -69,7 +69,6 @@ return [
         'tog' => 'tonga (Nyasa)',
         'ttm' => 'nordleg tutchone',
         'tvl' => 'tuvalu',
-        'tyv' => 'tuvinisk',
         'tzm' => 'sentral-tamazight',
         'udm' => 'udmurt',
         'war' => 'waray',

@@ -10,9 +10,9 @@ return [
             '$',
             'US Dollar',
         ],
-        'VEF' => [
-            'VEF',
-            'Venezuelan Bolívar',
+        'VES' => [
+            'VES',
+            'Venezuelan Bolivar',
         ],
         'XCG' => [
             'Cg.',

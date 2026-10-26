@@ -226,7 +226,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function handleRouteRequirements(string $pathinfo, string $name, Route $route, array $routeParameters): array
     {
         // expression condition
-        if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), [
+        if ('' !== $route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), [
             'context' => $this->context,
             'request' => $this->request ?: $this->createRequest($pathinfo),
             'params' => $routeParameters,

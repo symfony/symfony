@@ -43,7 +43,6 @@ return [
         'ojb' => 'ojibwa del noroeste',
         'ojw' => 'ojibwa del oeste',
         'pis' => 'pijín',
-        'rm' => 'romanche',
         'se' => 'sami del norte',
         'shu' => 'árabe chadiano',
         'slh' => 'lushootseed del sur',

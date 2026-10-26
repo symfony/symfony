@@ -57,7 +57,7 @@ return [
         'CR' => 'Kuusita Ríkà',
         'CU' => 'Kúbà',
         'CV' => 'Etíokun Kápé féndè',
-        'CW' => 'Curaçao',
+        'CW' => 'Kírósáwù',
         'CX' => 'Erékùsù Christmas',
         'CY' => 'Kúrúsì',
         'CZ' => 'Ṣẹ́ẹ́kì',

@@ -1,5 +1,7 @@
 <?php
 
 return [
-    'Names' => [],
+    'Names' => [
+        'Latn' => 'lātiniskan',
+    ],
 ];

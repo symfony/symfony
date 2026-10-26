@@ -25,7 +25,7 @@ return [
         'Hans' => 'Rahisi',
         'Hant' => 'Cha jadi',
         'Hebr' => 'Kiebrania',
-        'Hira' => 'Hiragana',
+        'Hira' => 'Kihiragana',
         'Hrkt' => 'Hati za Kijapani',
         'Jpan' => 'Kijapani',
         'Kana' => 'Kikatakana',

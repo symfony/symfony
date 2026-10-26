@@ -443,6 +443,24 @@ class MessageGeneratorTest extends TestCase
         }
     }
 
+    public function testRunIsDispatchedWhenStateIsLostWhileWorkerIsRunning()
+    {
+        $clock = new MockClock(self::makeDateTime('22:12:00'));
+        $cache = new ArrayAdapter();
+        $message = (object) ['id' => 'message'];
+        $generator = new MessageGenerator((new Schedule())->add(RecurringMessage::every('1 minute', $message))->stateful($cache), 'dummy', $clock);
+
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+        $clock->sleep(60.5);
+        $this->assertSame([$message], iterator_to_array($generator->getMessages(), false));
+
+        $cache->clear();
+        $clock->sleep(60);
+        $this->assertSame([$message], iterator_to_array($generator->getMessages(), false));
+        $clock->sleep(60);
+        $this->assertSame([$message], iterator_to_array($generator->getMessages(), false));
+    }
+
     public function testThrowsWhenTriggerDoesNotMoveTheRunDateForward()
     {
         $clock = new MockClock(self::makeDateTime('22:12:00'));

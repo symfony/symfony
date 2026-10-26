@@ -56,7 +56,7 @@ return [
         'Hira' => 'hiragana',
         'Hluw' => 'geroglifici anatolici',
         'Hmng' => 'pahawn hmong',
-        'Hrkt' => 'katanaka o hiragana',
+        'Hrkt' => 'katakana o hiragana',
         'Hung' => 'antico ungherese',
         'Inds' => 'indu',
         'Ital' => 'italico antico',

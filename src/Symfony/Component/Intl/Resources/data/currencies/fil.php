@@ -376,7 +376,7 @@ return [
         ],
         'MKD' => [
             'MKD',
-            'Denar ng Macedonia',
+            'Macedonian Denar',
         ],
         'MMK' => [
             'MMK',

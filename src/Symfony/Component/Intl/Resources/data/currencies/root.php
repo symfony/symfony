@@ -14,6 +14,10 @@ return [
             'CA$',
             'CAD',
         ],
+        'CHF' => [
+            'CHF',
+            'CHF',
+        ],
         'CNY' => [
             'CN¥',
             'CNY',

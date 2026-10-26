@@ -95,7 +95,7 @@ final class SecretsGenerateKeysCommand extends Command
             $secrets[$name] = $value;
         }
 
-        if (!$vault->generateKeys(true)) {
+        if (!$vault->rotate($secrets)) {
             $io->warning($vault->getLastMessage());
 
             return 1;
@@ -104,10 +104,6 @@ final class SecretsGenerateKeysCommand extends Command
         $io->success($vault->getLastMessage());
 
         if ($secrets) {
-            foreach ($secrets as $name => $value) {
-                $vault->seal($name, $value);
-            }
-
             $io->comment('Existing secrets have been rotated to the new keys.');
         }
 

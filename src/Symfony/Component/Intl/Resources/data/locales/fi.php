@@ -250,7 +250,7 @@ return [
         'en_SD' => 'englanti (Sudan)',
         'en_SE' => 'englanti (Ruotsi)',
         'en_SG' => 'englanti (Singapore)',
-        'en_SH' => 'englanti (Saint Helena)',
+        'en_SH' => 'englanti (Saint Helena, Ascension ja Tristan da Cunha)',
         'en_SI' => 'englanti (Slovenia)',
         'en_SK' => 'englanti (Slovakia)',
         'en_SL' => 'englanti (Sierra Leone)',

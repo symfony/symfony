@@ -145,7 +145,9 @@ class BinaryFileResponseTest extends ResponseTestCase
             ['bytes=0-', 0, 35, 'bytes 0-34/35'],
             ['bytes=0-34', 0, 35, 'bytes 0-34/35'],
             ['bytes=-35', 0, 35, 'bytes 0-34/35'],
+            ['bytes=-40', 0, 35, 'bytes 0-34/35'],
             ['bytes=1-4', 1, 4, 'bytes 1-4/35'],
+            ['Bytes=1-4', 1, 4, 'bytes 1-4/35'],
             ['bytes=-5', 30, 5, 'bytes 30-34/35'],
             ['bytes=30-', 30, 5, 'bytes 30-34/35'],
             ['bytes=30-30', 30, 1, 'bytes 30-30/35'],
@@ -200,6 +202,19 @@ class BinaryFileResponseTest extends ResponseTestCase
             // Syntactical invalid range-request should also return the full resource
             ['bytes=20-10'],
             ['bytes=50-40'],
+            ['bytes=-'],
+            ['bytes=abc-def'],
+            ['bytes=1-2-3'],
+            ['bytes=-5-10'],
+            ['bytes=+5-10'],
+            ['bytes=0x10-20'],
+            ['bytes=1e1-20'],
+            // lists of ranges are not supported and must be ignored
+            ['bytes=0-4,10-14'],
+            ['bytes=0-4, 10-14'],
+            ['bytes=0-4 ,10-14'],
+            ['bytes=-5,0-4'],
+            ['bytes=0-,10-14'],
             // range units other than bytes must be ignored
             ['unknown=10-20'],
         ];
@@ -258,7 +273,6 @@ class BinaryFileResponseTest extends ResponseTestCase
     public static function provideInvalidRanges()
     {
         return [
-            ['bytes=-40'],
             ['bytes=40-50'],
         ];
     }

@@ -140,6 +140,7 @@ return [
         'Ougr' => 'vanha uiguurilainen',
         'Palm' => 'palmyralainen',
         'Pauc' => 'zotuallai',
+        'Pcun' => 'protonuolenpääkirjoitus',
         'Perm' => 'muinaispermiläinen',
         'Phag' => 'phags-pa',
         'Phli' => 'piirtokirjoituspahlavilainen',

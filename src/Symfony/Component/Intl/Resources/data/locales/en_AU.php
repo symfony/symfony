@@ -13,6 +13,7 @@ return [
         'en_AG' => 'English (Antigua and Barbuda)',
         'en_GS' => 'English (South Georgia and South Sandwich Islands)',
         'en_KN' => 'English (St Kitts and Nevis)',
+        'en_SH' => 'English (St Helena, Ascension and Tristan da Cunha)',
         'en_TC' => 'English (Turks and Caicos Islands)',
         'en_TT' => 'English (Trinidad and Tobago)',
         'en_VC' => 'English (St Vincent and the Grenadines)',

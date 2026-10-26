@@ -13,7 +13,6 @@ namespace Symfony\Component\Webhook;
 
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
@@ -168,17 +167,20 @@ class WebhookBundle extends AbstractBundle
         $clientId = $config['http_client'];
 
         if ($config['no_private_network']['enabled']) {
-            if (!class_exists(NoPrivateNetworkHttpClient::class)) {
-                throw new LogicException('Configuring "webhook.no_private_network" requires the HttpClient component. Try running "composer require symfony/http-client".');
-            }
-
-            $container->register('webhook.http_client', NoPrivateNetworkHttpClient::class)
+            $httpClient = $container->register('webhook.http_client', NoPrivateNetworkHttpClient::class)
                 ->setArguments([
                     new Reference($clientId),
                     $config['no_private_network']['subnets'],
                     $config['no_private_network']['allow_list'],
                 ])
                 ->addTag('kernel.reset', ['method' => 'reset']);
+
+            // Fail when sending only, so that apps that only receive webhooks don't need the HttpClient component
+            if (!class_exists(NoPrivateNetworkHttpClient::class)) {
+                $httpClient
+                    ->addError('Configuring "webhook.no_private_network" requires the HttpClient component. Try running "composer require symfony/http-client".')
+                    ->addTag('container.error');
+            }
 
             $clientId = 'webhook.http_client';
         }

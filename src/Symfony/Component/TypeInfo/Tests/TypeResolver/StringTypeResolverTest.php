@@ -284,7 +284,7 @@ class StringTypeResolverTest extends TestCase
 
     public function testDeclaredIdentifierTakesPrecedenceOverKeywordCase()
     {
-        $resolver = new StringTypeResolver(null, null, ['Number' => 'string']);
+        $resolver = new StringTypeResolver(null, null, ['Number' => 'string'], true);
 
         $this->assertEquals(Type::string(), $resolver->resolve('Number'));
         $this->assertEquals(Type::union(Type::int(), Type::float()), $resolver->resolve('number'));
@@ -292,7 +292,7 @@ class StringTypeResolverTest extends TestCase
 
     public function testDeclaredGenericAliasesTakePrecedenceOverKeywordCase()
     {
-        $resolver = new StringTypeResolver(null, null, ['Value-Of' => \DateTime::class, 'Key-Of' => \DateTime::class]);
+        $resolver = new StringTypeResolver(null, null, ['Value-Of' => \DateTime::class, 'Key-Of' => \DateTime::class], true);
 
         foreach (['Value-Of', 'Key-Of'] as $name) {
             $this->assertEquals(Type::generic(Type::object(\DateTime::class), Type::string()), $resolver->resolve($name.'<string>'));
@@ -352,7 +352,7 @@ class StringTypeResolverTest extends TestCase
 
     public function testExtraTypeAliasNamesAreCaseSensitive()
     {
-        $resolver = new StringTypeResolver(null, null, ['custom' => 'string']);
+        $resolver = new StringTypeResolver(null, null, ['custom' => 'string'], true);
 
         $this->expectException(UnsupportedException::class);
         $resolver->resolve('Custom');

@@ -162,7 +162,7 @@ abstract class Helper implements HelperInterface
     {
         $string ??= '';
 
-        if (!str_contains($string, '<') && !str_contains($string, "\033")) {
+        if (!str_contains($string, '<') && !str_contains($string, "\033") && !str_contains($string, '\\>') && !str_contains($string, "\0")) {
             return $string;
         }
 

@@ -1973,6 +1973,24 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    public function testEscapedCharacters()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table->setRows([[OutputFormatter::escape('a->b')], ['abcd']]);
+        $table->render();
+
+        $expected =
+            <<<TABLE
+                +------+
+                | a->b |
+                | abcd |
+                +------+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
     public function testColumnMaxWidthsHeaders()
     {
         $table = new Table($output = $this->getOutputStream());

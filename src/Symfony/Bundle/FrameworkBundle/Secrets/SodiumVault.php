@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Secrets;
 
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\VarExporter\VarExporter;
 
@@ -75,18 +76,96 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         return true;
     }
 
-    public function seal(string $name, string $value): void
+    /**
+     * Seals the given secrets with a new pair of keys.
+     *
+     * The previous private key is kept in a side file until every secret is sealed with the new public key, so that secrets stay readable and the rotation can be resumed if it is interrupted.
+     *
+     * @param array<string, string> $secrets Plain values keyed by secret name
+     *
+     * @internal
+     */
+    public function rotate(#[\SensitiveParameter] array $secrets): bool
+    {
+        $this->lastMessage = null;
+
+        if (null === $this->encryptionKey && '' !== $this->decryptionKey = (string) $this->decryptionKey) {
+            $this->lastMessage = 'Cannot generate keys when a decryption key has been provided while instantiating the vault.';
+
+            return false;
+        }
+
+        $plaintexts = [];
+        foreach ($this->list() as $name => $value) {
+            if (!\is_string($plaintexts[$name] = $secrets[$name] ?? null)) {
+                $this->lastMessage = \sprintf('Cannot rotate secrets because "%s" could not be decrypted.', $name);
+
+                return false;
+            }
+        }
+
+        try {
+            $this->loadKeys();
+        } catch (\RuntimeException) {
+            // ignore failures to load keys
+        }
+
+        $oldKeyFile = $this->pathPrefix.'decrypt.private.old.php';
+        $currentKey = \SODIUM_CRYPTO_BOX_KEYPAIRBYTES === \strlen($this->decryptionKey) ? $this->decryptionKey : null;
+
+        $newKey = sodium_crypto_box_keypair();
+
+        if (null === $oldKey = $this->loadOldKey()) {
+            if (null !== $currentKey && $plaintexts) {
+                if (false !== $mode = @fileperms($this->pathPrefix.'decrypt.private.php')) {
+                    @touch($oldKeyFile);
+                    @chmod($oldKeyFile, $mode & 0o777);
+                }
+
+                $this->export('decrypt.private.old', $currentKey);
+            }
+        } elseif (null !== $currentKey && $currentKey !== $oldKey) {
+            // The interrupted rotation already wrote its new key and might have sealed some secrets with it
+            $newKey = $currentKey;
+        }
+
+        $this->decryptionKey = $newKey;
+        $this->encryptionKey = sodium_crypto_box_publickey($newKey);
+
+        if ($newKey !== $currentKey) {
+            $this->export('decrypt.private', $newKey);
+        }
+
+        $this->export('encrypt.public', $this->encryptionKey);
+
+        foreach ($plaintexts as $name => $value) {
+            $this->seal($name, $value);
+        }
+
+        if (is_file($oldKeyFile) && !@unlink($oldKeyFile)) {
+            throw new \RuntimeException(\sprintf('Unable to remove the previous decryption key "%s".', $oldKeyFile));
+        }
+
+        $this->lastMessage = \sprintf('Sodium keys have been generated at "%s*.public/private.php".', $this->getPrettyPath($this->pathPrefix));
+
+        return true;
+    }
+
+    public function seal(string $name, #[\SensitiveParameter] string $value): void
     {
         $this->lastMessage = null;
         $this->validateName($name);
         $this->loadKeys();
         $filename = $this->getFilename($name);
-        $this->export($filename, sodium_crypto_box_seal($value, $this->encryptionKey ?? sodium_crypto_box_publickey($this->decryptionKey)));
+        $this->export($filename, sodium_crypto_box_seal($value, $this->encryptionKey ?? sodium_crypto_box_publickey($this->decryptionKey)), true);
 
         $list = $this->list();
-        $list[$name] = null;
-        uksort($list, 'strnatcmp');
-        file_put_contents($this->pathPrefix.'list.php', \sprintf("<?php\n\nreturn %s;\n", VarExporter::export($list)), \LOCK_EX);
+
+        if (!\array_key_exists($name, $list)) {
+            $list[$name] = null;
+            uksort($list, 'strnatcmp');
+            file_put_contents($this->pathPrefix.'list.php', \sprintf("<?php\n\nreturn %s;\n", VarExporter::export($list)), \LOCK_EX);
+        }
 
         $this->lastMessage = \sprintf('Secret "%s" encrypted in "%s"; you can commit it.', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
     }
@@ -117,7 +196,14 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
             return null;
         }
 
-        if (false === $value = sodium_crypto_box_seal_open(include $file, $this->decryptionKey)) {
+        $sealed = include $file;
+
+        if (false === ($value = sodium_crypto_box_seal_open($sealed, $this->decryptionKey)) && null !== $oldKey = $this->loadOldKey()) {
+            // A rotation was interrupted before every secret was sealed with the new key
+            $value = sodium_crypto_box_seal_open($sealed, $oldKey);
+        }
+
+        if (false === $value) {
             $this->lastMessage = \sprintf('Secret "%s" cannot be revealed as the wrong decryption key was provided for "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return null;
@@ -194,6 +280,11 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
             $this->decryptionKey = (string) include $this->pathPrefix.'decrypt.private.php';
         }
 
+        if (\SODIUM_CRYPTO_BOX_KEYPAIRBYTES !== \strlen($this->decryptionKey) && null !== $oldKey = $this->loadOldKey()) {
+            // A rotation was interrupted while writing the new private key
+            $this->decryptionKey = $oldKey;
+        }
+
         if (is_file($this->pathPrefix.'encrypt.public.php')) {
             $this->encryptionKey = (string) include $this->pathPrefix.'encrypt.public.php';
         } elseif ('' !== $this->decryptionKey) {
@@ -203,7 +294,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         }
     }
 
-    private function export(string $filename, string $data): void
+    private function export(string $filename, string $data, bool $atomic = false): void
     {
         $b64 = 'decrypt.private' === $filename ? '// SYMFONY_DECRYPTION_SECRET='.base64_encode($data)."\n" : '';
         $name = basename($this->pathPrefix.$filename);
@@ -212,10 +303,24 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
         $this->createSecretsDir();
 
-        if (false === file_put_contents($this->pathPrefix.$filename.'.php', $data, \LOCK_EX)) {
+        if ($atomic) {
+            // A secret file truncated by an interruption could not be recovered
+            (new Filesystem())->dumpFile($this->pathPrefix.$filename.'.php', $data);
+        } elseif (false === file_put_contents($this->pathPrefix.$filename.'.php', $data, \LOCK_EX)) {
             $e = error_get_last();
             throw new \ErrorException($e['message'] ?? 'Failed to write secrets data.', 0, $e['type'] ?? \E_USER_WARNING);
         }
+    }
+
+    private function loadOldKey(): ?string
+    {
+        if (!is_file($file = $this->pathPrefix.'decrypt.private.old.php')) {
+            return null;
+        }
+
+        $key = include $file;
+
+        return \is_string($key) && \SODIUM_CRYPTO_BOX_KEYPAIRBYTES === \strlen($key) ? $key : null;
     }
 
     private function createSecretsDir(): void

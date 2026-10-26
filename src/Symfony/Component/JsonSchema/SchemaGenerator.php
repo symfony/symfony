@@ -325,8 +325,8 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         $valueSchema = $this->buildTypeSchema($type->getCollectionValueType(), $config, $parent, $document);
         $keyType = $type->getCollectionKeyType();
 
-        // symfony/type-info < 8.2 has no refinements to remove
-        if (method_exists($keyType, 'withoutRefinements')) {
+        // the lowest symfony/type-info has no refinements to remove
+        if (method_exists($keyType, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
             $keyType = $keyType->withoutRefinements();
         }
 

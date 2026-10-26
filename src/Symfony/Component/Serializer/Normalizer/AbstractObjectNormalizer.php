@@ -985,7 +985,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $collectionValueType = $collectionValueType instanceof NullableType ? $collectionValueType->getWrappedType() : $collectionValueType->getCollectionValueType();
             }
 
-            $collectionValueBaseType = $collectionValueType->withoutRefinements();
+            // the lowest symfony/type-info has no refinements to remove
+            if (method_exists($collectionValueType, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+                $collectionValueType = $collectionValueType->withoutRefinements();
+            }
+
+            $collectionValueBaseType = $collectionValueType;
         }
 
         return $collectionValueBaseType instanceof BuiltinType && \in_array($collectionValueBaseType->getTypeIdentifier(), [TypeIdentifier::BOOL, TypeIdentifier::FLOAT, TypeIdentifier::INT, TypeIdentifier::STRING], true);

@@ -64,7 +64,10 @@ trait PhpGeneratorTrait
 
     private static function getCollectionKeyTypeIdentifier(Type $type): ?TypeIdentifier
     {
-        $type = $type->withoutRefinements();
+        // the lowest symfony/type-info has no refinements to remove
+        if (method_exists($type, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+            $type = $type->withoutRefinements();
+        }
 
         return $type instanceof BuiltinType ? $type->getTypeIdentifier() : null;
     }

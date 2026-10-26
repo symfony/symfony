@@ -6,10 +6,13 @@
 return static function (mixed $stream, \Psr\Container\ContainerInterface $transformers, \Symfony\Component\JsonStreamer\Read\LazyInstantiator $instantiator, array $options): mixed {
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList'] = static function ($stream, $offset, $length) use ($options, $transformers, $instantiator, &$providers) {
         $data = \Symfony\Component\JsonStreamer\Read\Splitter::splitDict($stream, $offset, $length);
+        if (null === $data) {
+            throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList'));
+        }
         return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyList::class, static function ($object) use ($stream, $data, $options, $transformers, $instantiator, &$providers) {
             foreach ($data as $k => $v) {
                 match ($k) {
-                    'items' => $object->items = $providers['array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>']($stream, $v[0], $v[1]),
+                    'items' => $object->items = (\Symfony\Component\JsonStreamer\Read\Decoder::isNull($stream, $v[0]) ? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList::$items".') : $providers['array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>']($stream, $v[0], $v[1])),
                     default => \Symfony\Component\JsonStreamer\Read\Decoder::validateStream($stream, $v[0], $v[1]),
                 };
             }
@@ -17,6 +20,9 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
     };
     $providers['array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>'] = static function ($stream, $offset, $length) use ($options, $transformers, $instantiator, &$providers, &$readers) {
         $data = \Symfony\Component\JsonStreamer\Read\Splitter::splitCollection($stream, $offset, $length);
+        if (null === $data) {
+            throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>'));
+        }
         $collection = [];
         foreach ($data as $k => $v) {
             $collection[$k] = $readers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList']($stream, $v[0], $v[1]);
@@ -30,7 +36,7 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
         $data = (array) $data;
         $object = (new \ReflectionClass(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyList::class))->newInstanceWithoutConstructor();
         if (\array_key_exists('items', $data)) {
-            $value = $denormalizers['array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>']($data['items']);
+            $value = $denormalizers['array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>'](($data['items'] ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList::$items".')));
             try {
                 $object->{'items'} = $value;
             } catch (\TypeError $e) {

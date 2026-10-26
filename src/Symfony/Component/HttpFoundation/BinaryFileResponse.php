@@ -265,13 +265,15 @@ class BinaryFileResponse extends Response
             if (!$request->headers->has('If-Range') || $this->hasValidIfRangeHeader($request->headers->get('If-Range'))) {
                 $range = $request->headers->get('Range');
 
-                if (str_starts_with($range, 'bytes=')) {
-                    [$start, $end] = explode('-', substr($range, 6), 2) + [1 => 0];
+                if (preg_match('/^bytes=(\d*)-(\d*)$/i', $range, $matches) && ('' !== $matches[1] || '' !== $matches[2])) {
+                    $start = $matches[1];
+                    $end = $matches[2];
 
                     $end = ('' === $end) ? $fileSize - 1 : (int) $end;
 
                     if ('' === $start) {
-                        $start = $fileSize - $end;
+                        // a suffix longer than the file selects the whole file, see RFC 9110 section 14.1.2
+                        $start = max(0, $fileSize - $end);
                         $end = $fileSize - 1;
                     } else {
                         $start = (int) $start;

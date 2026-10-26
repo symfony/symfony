@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'Nigeriese Pidgin (Nigerië)',
         'pl' => 'Pools',
         'pl_PL' => 'Pools (Pole)',
+        'pms' => 'Piëmontees',
+        'pms_IT' => 'Piëmontees (Italië)',
         'prg' => 'Pruisies',
         'prg_PL' => 'Pruisies (Pole)',
         'ps' => 'Pasjtoe',

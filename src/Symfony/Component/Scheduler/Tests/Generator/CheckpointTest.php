@@ -255,6 +255,49 @@ class CheckpointTest extends TestCase
         $checkpoint->acquire(new \DateTimeImmutable('2020-02-20 20:20:20Z'));
     }
 
+    public function testWithCacheKeepStateWhenCacheIsCleared()
+    {
+        $checkpoint = new Checkpoint('cache', new NoLock(), $cache = new ArrayAdapter());
+        $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
+
+        $checkpoint->acquire($startTime = $now->modify('-1 hour'));
+        $checkpoint->save($savedTime = $now->modify('-1 min'), 3);
+        $cache->clear();
+
+        $this->assertTrue($checkpoint->acquire($now));
+        $this->assertEquals($savedTime, $checkpoint->time());
+        $this->assertSame(3, $checkpoint->index());
+        $this->assertEquals($startTime, $checkpoint->from());
+        $this->assertEquals([$savedTime, 3, $startTime], $cache->get('cache', static fn () => []));
+    }
+
+    public function testWithLockAndCacheResetStateWhenCacheIsClearedAfterLockedAcquiring()
+    {
+        $concurrentLock = new Lock(new Key('locked'), $store = new InMemoryStore(), autoRelease: false);
+        $concurrentLock->acquire();
+
+        $lock = new Lock(new Key('locked'), $store, autoRelease: false);
+        $checkpoint = new Checkpoint('locked', $lock, $cache = new ArrayAdapter());
+        $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
+
+        $checkpoint->save($now->modify('-2 min'), 0);
+        $this->assertFalse($checkpoint->acquire($now->modify('-1 min')));
+
+        $concurrentLock->release();
+        $cache->clear();
+
+        $this->assertTrue($checkpoint->acquire($now));
+        $this->assertEquals($now, $checkpoint->time());
+        $this->assertSame(-1, $checkpoint->index());
+
+        $checkpoint->save($savedTime = $now->modify('+1 min'), 0);
+        $cache->clear();
+
+        $this->assertTrue($checkpoint->acquire($now->modify('+2 min')));
+        $this->assertEquals($savedTime, $checkpoint->time());
+        $this->assertSame(0, $checkpoint->index());
+    }
+
     public function testWithLockKeepLock()
     {
         $lock = new Lock(new Key('lock'), new InMemoryStore());

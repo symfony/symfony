@@ -59,6 +59,8 @@ class HelperTest extends TestCase
             ['abc<fg=default;bg=default>', 'abc'],
             ["a\033[1;36mbc", 'abc'],
             ["a\033]8;;http://url\033\\b\033]8;;\033\\c", 'abc'],
+            ['a-\\>b', 'a->b'],
+            ["a\0", 'a\\'],
         ];
     }
 

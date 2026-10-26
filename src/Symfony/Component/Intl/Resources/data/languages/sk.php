@@ -389,6 +389,7 @@ return [
         'pi' => 'pálí',
         'pis' => 'pidžin',
         'pl' => 'poľština',
+        'pms' => 'piedmončina',
         'pon' => 'pohnpeiština',
         'pqm' => 'maliseet-passamaquoddy',
         'prg' => 'pruština',

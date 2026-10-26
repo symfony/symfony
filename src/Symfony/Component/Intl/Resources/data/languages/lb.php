@@ -225,7 +225,7 @@ return [
         'io' => 'Ido-Sprooch',
         'is' => 'Islännesch',
         'it' => 'Italienesch',
-        'iu' => 'Inukitut',
+        'iu' => 'Inuktitut',
         'izh' => 'Ischoresch',
         'ja' => 'Japanesch',
         'jam' => 'Jamaikanesch-Kreolesch',

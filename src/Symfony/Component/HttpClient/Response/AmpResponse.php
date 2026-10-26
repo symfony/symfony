@@ -100,12 +100,12 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             $onProgress((int) $info['size_download'], ((int) (1 + $info['download_content_length']) ?: 1) - 1, (array) $info);
         };
 
-        $pause = 0.0;
+        $pauseExpiry = &$this->pauseExpiry;
         $this->id = $id = self::$nextId;
         self::$nextId = str_increment(self::$nextId);
 
-        $info['pause_handler'] = static function (float $duration) use (&$pause) {
-            $pause = $duration;
+        $info['pause_handler'] = static function (float $duration) use (&$pauseExpiry) {
+            $pauseExpiry = 0 < $duration ? hrtime(true) / 1E9 + $duration : min($pauseExpiry, hrtime(true) / 1E9);
         };
 
         $multi->lastTimeout = null;
@@ -120,8 +120,8 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             $paused?->complete();
         });
 
-        EventLoop::queue(static function () use ($request, $multi, $id, &$info, &$headers, $canceller, &$options, $onProgress, &$handle, $logger, &$pause, &$pendingSize) {
-            self::generateResponse($request, $multi, $id, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pause, $pendingSize);
+        EventLoop::queue(static function () use ($request, $multi, $id, &$info, &$headers, $canceller, &$options, $onProgress, &$handle, $logger, &$pauseExpiry, &$pendingSize) {
+            self::generateResponse($request, $multi, $id, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pauseExpiry, $pendingSize);
         });
     }
 
@@ -224,7 +224,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         return 1;
     }
 
-    private static function generateResponse(Request $request, AmpClientState $multi, string $id, array &$info, array &$headers, DeferredCancellation $canceller, array &$options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, float &$pause, int &$pendingSize): void
+    private static function generateResponse(Request $request, AmpClientState $multi, string $id, array &$info, array &$headers, DeferredCancellation $canceller, array &$options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, float &$pauseExpiry, int &$pendingSize): void
     {
         $request->setInformationalResponseHandler(static function (Response $response) use ($multi, $id, &$info, &$headers) {
             self::addResponseHeaders($response, $info, $headers);
@@ -238,7 +238,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
             if (null === $response = self::getPushedResponse($request, $multi, $info, $headers, $canceller, $options, $logger)) {
                 $logger?->info(\sprintf('Request: "%s %s"', $info['http_method'], $info['url']));
 
-                $response = self::followRedirects($request, $multi, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pause);
+                $response = self::followRedirects($request, $multi, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pauseExpiry);
             }
 
             $options = null;
@@ -275,7 +275,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                     }
                 }
 
-                if (0 < $pause) {
+                if (0 < $pause = $pauseExpiry - hrtime(true) / 1E9) {
                     delay($pause, true, $canceller->getCancellation());
                 }
 
@@ -306,9 +306,9 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         }
     }
 
-    private static function followRedirects(Request $originRequest, AmpClientState $multi, array &$info, array &$headers, DeferredCancellation $canceller, array $options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, float &$pause): ?Response
+    private static function followRedirects(Request $originRequest, AmpClientState $multi, array &$info, array &$headers, DeferredCancellation $canceller, array $options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, float &$pauseExpiry): ?Response
     {
-        if (0 < $pause) {
+        if (0 < $pause = $pauseExpiry - hrtime(true) / 1E9) {
             delay($pause, true, $canceller->getCancellation());
         }
 
@@ -392,7 +392,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
                 $request->removeHeader('host');
             }
 
-            if (0 < $pause) {
+            if (0 < $pause = $pauseExpiry - hrtime(true) / 1E9) {
                 delay($pause, true, $canceller->getCancellation());
             }
 

@@ -96,6 +96,18 @@ class DecoderTest extends TestCase
         }
     }
 
+    public function testIsNull()
+    {
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, '[null,"null",{"n":1},[null]]');
+        rewind($resource);
+
+        $this->assertTrue(Decoder::isNull($resource, 1));
+        $this->assertFalse(Decoder::isNull($resource, 6));
+        $this->assertFalse(Decoder::isNull($resource, 13));
+        $this->assertFalse(Decoder::isNull($resource, 21));
+    }
+
     private function assertDecoded(mixed $decoded, string $encoded, int $offset = 0, ?int $length = null): void
     {
         if (0 === $offset && null === $length) {

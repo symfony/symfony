@@ -59,7 +59,7 @@ return [
         'SO' => 'ma Somali',
         'SV' => 'ma Sawato',
         'SY' => 'ma Suli',
-        'SZ' => 'ma Suwasi',
+        'SZ' => 'ma Sawasi',
         'TH' => 'ma Tawi',
         'TR' => 'ma Tuki',
         'TW' => 'ma Tawan',

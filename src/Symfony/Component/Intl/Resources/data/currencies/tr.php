@@ -266,10 +266,6 @@ return [
             'CNH',
             'Çin yuanı (offshore)',
         ],
-        'CNX' => [
-            'CNX',
-            'Çin Halk Cumhuriyeti Merkez Bankası Doları',
-        ],
         'CNY' => [
             'CN¥',
             'Çin yuanı',

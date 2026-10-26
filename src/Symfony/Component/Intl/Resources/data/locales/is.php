@@ -674,6 +674,8 @@ return [
         'pcm_NG' => 'nígerískt pidgin (Nígería)',
         'pl' => 'pólska',
         'pl_PL' => 'pólska (Pólland)',
+        'pms' => 'piedmontíska',
+        'pms_IT' => 'piedmontíska (Ítalía)',
         'prg' => 'prússneska',
         'prg_PL' => 'prússneska (Pólland)',
         'ps' => 'pastú',

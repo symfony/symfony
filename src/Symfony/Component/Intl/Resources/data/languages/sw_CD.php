@@ -29,7 +29,6 @@ return [
         'shu' => 'Kiarabu cha Chadi',
         'srn' => 'Kitongo cha Sranan',
         'swb' => 'Kikomoro',
-        'syr' => 'Kisiria',
         'udm' => 'Kiudumurti',
         'yi' => 'Kiyidi',
     ],

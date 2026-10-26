@@ -262,10 +262,6 @@ return [
             'CLP',
             'pesu chilenu',
         ],
-        'CNX' => [
-            'CNX',
-            'Dólar del Bancu Popular Chinu',
-        ],
         'CNY' => [
             'CN¥',
             'Yuan chinu',

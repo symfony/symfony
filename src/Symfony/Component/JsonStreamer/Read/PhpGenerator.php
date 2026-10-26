@@ -68,7 +68,7 @@ final class PhpGenerator
                 .$this->line('return static function (mixed $stream, \\'.ContainerInterface::class.' $transformers, \\'.LazyInstantiator::class.' $instantiator, array $options): mixed {', $context)
                 .$providers
                 .($this->canBeDecodedWithJsonDecode($dataModel, false)
-                    ? $this->line('    return \\'.Decoder::class.'::decodeStream($stream, 0, null);', $context)
+                    ? $this->line('    return '.$this->generateNullGuard($dataModel, '\\'.Decoder::class.'::decodeStream($stream, 0, null)').';', $context)
                     : $this->line('    return $providers['.var_export($dataModel->getIdentifier(), true).']($stream, 0, null);', $context))
                 .$this->line('};', $context);
         }
@@ -81,7 +81,7 @@ final class PhpGenerator
             .$this->line('return static function (string|\\Stringable $string, \\'.ContainerInterface::class.' $transformers, array $options): mixed {', $context)
             .$providers
             .($this->canBeDecodedWithJsonDecode($dataModel, true)
-                ? $this->line('    return \\'.Decoder::class.'::decodeString((string) $string);', $context)
+                ? $this->line('    return '.$this->generateNullGuard($dataModel, '\\'.Decoder::class.'::decodeString((string) $string)').';', $context)
                 : $this->line('    return $providers['.var_export($dataModel->getIdentifier(), true).'](\\'.Decoder::class.'::decodeString((string) $string));', $context))
             .$this->line('};', $context);
     }
@@ -124,7 +124,7 @@ final class PhpGenerator
             $arguments = $decodeFromStream ? '$stream, $offset, $length' : '$data';
 
             return $this->line("$providerAccessor = static function ($arguments) {", $context)
-                .$this->line('    return '.$this->generateValueFormat($node, $accessor).';', $context)
+                .$this->line('    return '.$this->generateValueFormat($node, $this->generateNullGuard($node, $accessor)).';', $context)
                 .$this->line('};', $context);
         }
 
@@ -184,11 +184,14 @@ final class PhpGenerator
             };
 
             if ($decodeFromStream) {
-                $php .= $this->line('$data = \\'.Splitter::class.'::'.$splitMethod.'($stream, $offset, $length);', $context);
+                $php .= $this->line('$data = \\'.Splitter::class.'::'.$splitMethod.'($stream, $offset, $length);', $context)
+                    .$this->generateTypeGuard($node, true, $context);
             } elseif ($denormalize) {
                 $php .= $this->line('if (!('.$this->generateCollectionCondition($node->getType(), '$data').')) {', $context)
                     .$this->line('    '.$this->generateUnexpectedValueThrow($node, '$data').';', $context)
                     .$this->line('}', $context);
+            } else {
+                $php .= $this->generateTypeGuard($node, false, $context);
             }
 
             if ($this->canBeDecodedWithJsonDecode($itemNode, $keepDecodedCollections)) {
@@ -246,9 +249,9 @@ final class PhpGenerator
 
             if ($valueObjectTransformerId = $this->getValueObjectTransformerId($node->getType()->getClassName())) {
                 $data = match (true) {
-                    $decodeFromStream => '\\'.Decoder::class.'::decodeStream($stream, $offset, $length)',
-                    $denormalize => $this->generateCheckedScalarValue($node, '$data'),
-                    default => '$data',
+                    $decodeFromStream => $this->generateNullGuard($node, '\\'.Decoder::class.'::decodeStream($stream, $offset, $length)'),
+                    $denormalize => $this->generateCheckedScalarValue($node, $this->generateNullGuard($node, '$data')),
+                    default => $this->generateNullGuard($node, '$data'),
                 };
                 $php .= $this->line('return $transformers->get('.var_export($valueObjectTransformerId, true).")->reverseTransform($data, \$options);", $context);
 
@@ -257,7 +260,11 @@ final class PhpGenerator
                 return $php.$this->line('};', $context);
             }
 
-            $php .= $decodeFromStream ? $this->line('$data = \\'.Splitter::class.'::splitDict($stream, $offset, $length);', $context) : '';
+            $php .= match (true) {
+                $decodeFromStream => $this->line('$data = \\'.Splitter::class.'::splitDict($stream, $offset, $length);', $context).$this->generateTypeGuard($node, true, $context),
+                $denormalize => '',
+                default => $this->generateTypeGuard($node, false, $context),
+            };
 
             if ($decodeFromStream) {
                 $php .= $this->line('return $instantiator->instantiate(\\'.$node->getType()->getClassName().'::class, static function ($object) use ($stream, $data, $options, $transformers, $instantiator, &$providers) {', $context)
@@ -265,9 +272,13 @@ final class PhpGenerator
                     .$this->line('        match ($k) {', $context);
 
                 foreach ($node->getProperties() as $streamedName => $property) {
-                    $propertyValuePhp = $this->canBeDecodedWithJsonDecode($property['value'], $keepDecodedCollections)
-                        ? $this->generateValueFormat($property['value'], '\\'.Decoder::class.'::decodeStream($stream, $v[0], $v[1])')
-                        : $this->providerAccessor($property['value'], $context).'($stream, $v[0], $v[1])';
+                    $subject = $node->getType()->getClassName().'::$'.$property['name'];
+                    $providerPhp = $this->providerAccessor($property['value'], $context).'($stream, $v[0], $v[1])';
+                    $propertyValuePhp = match (true) {
+                        $this->canBeDecodedWithJsonDecode($property['value'], $keepDecodedCollections) => $this->generateValueFormat($property['value'], $this->generateNullGuard($property['value'], '\\'.Decoder::class.'::decodeStream($stream, $v[0], $v[1])', $subject)),
+                        $property['value']->getType()->isNullable() => $providerPhp,
+                        default => '(\\'.Decoder::class.'::isNull($stream, $v[0]) ? '.$this->generateUnexpectedNullThrow($subject).' : '.$providerPhp.')',
+                    };
 
                     // numeric streamed names are int array keys, while split dict keys are strings
                     $php .= $this->line('            '.var_export((string) $streamedName, true).' => $object->'.$property['name'].' = '.$property['accessor']($propertyValuePhp).',', $context);
@@ -289,12 +300,14 @@ final class PhpGenerator
 
                 foreach ($node->getProperties() as $streamedName => $property) {
                     $quotedStreamedName = var_export($streamedName, true);
-                    // denormalizers set null values, string readers skip them
-                    [$isSetPhp, $propertyValuePhp] = $this->canBeDecodedWithJsonDecode($property['value'], $keepDecodedCollections)
-                        ? ($denormalize ? ["\\array_key_exists($quotedStreamedName, \$data)", $this->generateCheckedScalarValue($property['value'], "\$data[$quotedStreamedName]")] : ["isset(\$data[$quotedStreamedName])", "\$data[$quotedStreamedName]"])
-                        : ["\\array_key_exists($quotedStreamedName, \$data)", $this->providerAccessor($property['value'], $context)."(\$data[$quotedStreamedName])"];
+                    $valuePhp = $this->generateNullGuard($property['value'], "\$data[$quotedStreamedName]", $node->getType()->getClassName().'::$'.$property['name']);
+                    $propertyValuePhp = match (true) {
+                        !$this->canBeDecodedWithJsonDecode($property['value'], $keepDecodedCollections) => $this->providerAccessor($property['value'], $context)."($valuePhp)",
+                        $denormalize => $this->generateCheckedScalarValue($property['value'], $valuePhp),
+                        default => $valuePhp,
+                    };
 
-                    $php .= $this->line("if ($isSetPhp) {", $context)
+                    $php .= $this->line("if (\\array_key_exists($quotedStreamedName, \$data)) {", $context)
                         .$this->line('    $value = '.$property['accessor']($propertyValuePhp).';', $context)
                         .$this->line('    try {', $context)
                         .$this->line('        $object->{'.var_export($property['name'], true).'} = $value;', $context)
@@ -354,6 +367,36 @@ final class PhpGenerator
     private function generateUnexpectedValueThrow(DataModelNodeInterface $node, string $accessor): string
     {
         return 'throw new \\'.UnexpectedValueException::class."(\\sprintf('Unexpected \"%s\" value for \"%s\".', \\get_debug_type($accessor), ".var_export($node->getIdentifier(), true).'))';
+    }
+
+    /**
+     * @param string|null $subject what the value is read for, the node identifier when null
+     */
+    private function generateNullGuard(DataModelNodeInterface $node, string $accessor, ?string $subject = null): string
+    {
+        if ($node->getType()->isNullable()) {
+            return $accessor;
+        }
+
+        return "($accessor ?? ".$this->generateUnexpectedNullThrow($subject ?? $node->getIdentifier()).')';
+    }
+
+    private function generateUnexpectedNullThrow(string $subject): string
+    {
+        return 'throw new \\'.UnexpectedValueException::class.'('.var_export(\sprintf('Unexpected "null" value for "%s".', $subject), true).')';
+    }
+
+    /**
+     * Ensures that the data of an object or a collection node can be split or iterated.
+     *
+     * @param array<string, mixed> $context
+     */
+    private function generateTypeGuard(DataModelNodeInterface $node, bool $decodeFromStream, array $context): string
+    {
+        // "Splitter" returns null for a JSON null, and throws for any other non splittable value
+        return $this->line('if ('.($decodeFromStream ? 'null === $data' : '!\\is_array($data)').') {', $context)
+            .$this->line('    '.$this->generateUnexpectedValueThrow($node, '$data').';', $context)
+            .$this->line('}', $context);
     }
 
     private function generateCompositeNodeItemCondition(DataModelNodeInterface $node, string $accessor, bool $denormalize): string

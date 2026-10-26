@@ -36,6 +36,7 @@ return [
         'oc' => 'Èdè Ɔ̀kísítáànì',
         'om' => 'Òròmɔ́',
         'os' => 'Ɔshɛ́tíìkì',
+        'pms' => 'Èdè Pídímɔ̀ntísì',
         'prg' => 'Púrúshíànù',
         'pt' => 'Èdè Pɔtogí',
         'qu' => 'Kúɛ́ńjùà',

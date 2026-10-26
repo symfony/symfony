@@ -218,10 +218,6 @@ return [
             'CNH',
             'yuan Sina (diavaez)',
         ],
-        'CNX' => [
-            'CNX',
-            'dollar Bank poblel Sina',
-        ],
         'CNY' => [
             'CNY',
             'yuan Sina',
@@ -966,6 +962,10 @@ return [
             'XCD',
             'dollar Karib ar reter',
         ],
+        'XCG' => [
+            'Cg.',
+            'florin karibean',
+        ],
         'XEU' => [
             'XEU',
             'unanenn jediñ europat',
@@ -1021,6 +1021,10 @@ return [
         'ZWD' => [
             'ZWD',
             'dollar Zimbabwe (1980–2008)',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'aour Zimbabwe',
         ],
         'ZWL' => [
             'ZWL',

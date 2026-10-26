@@ -85,7 +85,7 @@ return [
         'GD' => 'Grenada',
         'GE' => 'Georgia',
         'GF' => 'Guyane Ffrengig',
-        'GG' => 'Ynys y Garn',
+        'GG' => 'Guernsey',
         'GH' => 'Ghana',
         'GI' => 'Gibraltar',
         'GL' => 'Yr Ynys Las',

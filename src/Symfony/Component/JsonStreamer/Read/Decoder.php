@@ -100,4 +100,15 @@ final class Decoder
 
         return $count;
     }
+
+    /**
+     * Tells if the JSON value starting at $offset is null, without reading it entirely.
+     *
+     * @param resource $stream
+     */
+    public static function isNull($stream, int $offset): bool
+    {
+        // "n" can only start a JSON null
+        return 'n' === stream_get_contents($stream, 1, $offset);
+    }
 }

@@ -5,6 +5,9 @@
  */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $transformers, array $options): mixed {
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithUnionProperties'] = static function ($data) use ($options, $transformers, &$providers) {
+        if (!\is_array($data)) {
+            throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithUnionProperties'));
+        }
         $object = new \Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties();
         if (\array_key_exists('value', $data)) {
             $value = $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum|null|string']($data['value']);
@@ -17,7 +20,7 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
         return $object;
     };
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum'] = static function ($data) {
-        return \Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum::from($data);
+        return \Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum::from(($data ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum".')));
     };
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum|null|string'] = static function ($data) use ($options, $transformers, &$providers) {
         if (\is_int($data)) {

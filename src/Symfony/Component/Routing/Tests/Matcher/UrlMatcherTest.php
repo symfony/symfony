@@ -538,6 +538,36 @@ class UrlMatcherTest extends TestCase
         $this->assertSame(['_route' => 'foo'], $this->getUrlMatcher($coll)->match('/foo'));
     }
 
+    public function testZeroCondition()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', [], [], [], '', [], [], '0'));
+        $coll->add('bar', new Route('/bar/{id}', [], [], [], '', [], [], '0'));
+        $matcher = $this->getUrlMatcher($coll);
+
+        try {
+            $matcher->match('/foo');
+            $this->fail('A static route whose condition is "0" must not match.');
+        } catch (ResourceNotFoundException $e) {
+        }
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/bar/1');
+    }
+
+    public function testZeroConditionNextToOtherConditions()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', [], [], [], '', [], [], '0'));
+        $coll->add('bar', new Route('/bar', [], [], [], '', [], [], '1'));
+        $matcher = $this->getUrlMatcher($coll);
+
+        $this->assertEquals(['_route' => 'bar'], $matcher->match('/bar'));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/foo');
+    }
+
     public function testRequestCondition()
     {
         $coll = new RouteCollection();

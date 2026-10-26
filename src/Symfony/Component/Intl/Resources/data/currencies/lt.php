@@ -266,10 +266,6 @@ return [
             'CNH',
             'Kinijos Užsienio juanis',
         ],
-        'CNX' => [
-            'CNX',
-            'Kinijos "People" banko doleris',
-        ],
         'CNY' => [
             'CNY',
             'Kinijos ženminbi juanis',

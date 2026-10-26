@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'pixhinishte nigeriane (Nigeri)',
         'pl' => 'polonisht',
         'pl_PL' => 'polonisht (Poloni)',
+        'pms' => 'piedmontezisht',
+        'pms_IT' => 'piedmontezisht (Itali)',
         'prg' => 'prusisht',
         'prg_PL' => 'prusisht (Poloni)',
         'ps' => 'pashtoisht',

@@ -43,10 +43,14 @@ final class Checkpoint implements CheckpointInterface
         }
 
         if ($this->cache) {
-            [$this->time, $this->index, $this->from] = $this->cache->get($this->name, static function (CacheItemInterface $item) use ($now) {
+            // When the cache lost the state, restore the local one, unless another Worker held the Lock in the meantime.
+            $state = !$this->reset && isset($this->time) ? [$this->time, $this->index, $this->from] : [$now, -1, $now];
+            $this->reset = false;
+
+            [$this->time, $this->index, $this->from] = $this->cache->get($this->name, static function (CacheItemInterface $item) use ($state) {
                 $item->expiresAfter(self::CACHE_EXPIRY);
 
-                return [$now, -1, $now];
+                return $state;
             }) + [2 => $now];
             $this->save($this->time, $this->index);
         } elseif ($this->reset) {

@@ -9,7 +9,7 @@ return [
         'bgc' => 'Hariyaanvi',
         'bgc_IN' => 'Hariyaanvi (Bharat)',
         'bho_IN' => 'भोजपुरी (Bharat)',
-        'bn_IN' => 'बंगाली (Bharat)',
+        'bn_IN' => 'बांग्ला (Bharat)',
         'bo' => 'Tibbati',
         'bo_CN' => 'Tibbati (चीन)',
         'bo_IN' => 'Tibbati (Bharat)',

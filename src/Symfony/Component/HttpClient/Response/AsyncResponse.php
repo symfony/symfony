@@ -41,6 +41,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
     private ?\Iterator $stream = null;
     private ?int $yieldedState = null;
     private bool $hasThrown = false;
+    private float $maxDurationExpiry = 0.0;
 
     /**
      * @param ?callable(ChunkInterface, AsyncContext): ?\Iterator $passthru
@@ -341,7 +342,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
     {
         $r->stream = null;
         $response = $r->response;
-        $context = new AsyncContext($r->passthru, $client, $r->response, $r->info, $r->content, $r->offset);
+        $context = new AsyncContext($r->passthru, $client, $r->response, $r->info, $r->content, $r->offset, $r->maxDurationExpiry);
         if (null === $stream = ($r->passthru)($chunk, $context)) {
             if ($r->response === $response && (null !== $chunk->getError() || $chunk->isLast())) {
                 throw new \LogicException('A chunk passthru cannot swallow the last chunk.');

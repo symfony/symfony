@@ -5,6 +5,9 @@
  */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $transformers, array $options): mixed {
     $providers['iterable<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy>'] = static function ($data) use ($options, $transformers, &$providers) {
+        if (!\is_array($data)) {
+            throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'iterable<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy>'));
+        }
         $iterable = static function ($data) use ($options, $transformers, &$providers) {
             foreach ($data as $k => $v) {
                 yield $k => $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy']($v);
@@ -13,17 +16,20 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
         return $iterable($data);
     };
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'] = static function ($data) use ($options, $transformers, &$providers) {
+        if (!\is_array($data)) {
+            throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy'));
+        }
         $object = new \Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy();
-        if (isset($data['id'])) {
-            $value = $data['id'];
+        if (\array_key_exists('id', $data)) {
+            $value = ($data['id'] ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy::$id".'));
             try {
                 $object->{'id'} = $value;
             } catch (\TypeError $e) {
                 throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
             }
         }
-        if (isset($data['name'])) {
-            $value = $data['name'];
+        if (\array_key_exists('name', $data)) {
+            $value = ($data['name'] ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\ClassicDummy::$name".'));
             try {
                 $object->{'name'} = $value;
             } catch (\TypeError $e) {

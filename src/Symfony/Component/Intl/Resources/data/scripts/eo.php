@@ -48,6 +48,7 @@ return [
         'Syrc' => 'siria',
         'Taml' => 'tamila',
         'Telu' => 'telugua',
+        'Tfng' => 'tifinaĥa',
         'Thaa' => 'maldiva',
         'Thai' => 'taja',
         'Tibt' => 'tibeta',

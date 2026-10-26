@@ -5,6 +5,9 @@
  */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $transformers, array $options): mixed {
     $providers['list<Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum>'] = static function ($data) use ($options, $transformers, &$providers) {
+        if (!\is_array($data)) {
+            throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'list<Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum>'));
+        }
         $collection = [];
         foreach ($data as $k => $v) {
             $collection[$k] = $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum']($v);
@@ -12,20 +15,23 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
         return $collection;
     };
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum'] = static function ($data) {
-        return \Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum::from($data);
+        return \Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum::from(($data ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum".')));
     };
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNameAttributes'] = static function ($data) use ($options, $transformers, &$providers) {
+        if (!\is_array($data)) {
+            throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNameAttributes'));
+        }
         $object = new \Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes();
-        if (isset($data['@id'])) {
-            $value = $data['@id'];
+        if (\array_key_exists('@id', $data)) {
+            $value = ($data['@id'] ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNameAttributes::$id".'));
             try {
                 $object->{'id'} = $value;
             } catch (\TypeError $e) {
                 throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
             }
         }
-        if (isset($data['name'])) {
-            $value = $data['name'];
+        if (\array_key_exists('name', $data)) {
+            $value = ($data['name'] ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNameAttributes::$name".'));
             try {
                 $object->{'name'} = $value;
             } catch (\TypeError $e) {

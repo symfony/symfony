@@ -300,6 +300,7 @@ return [
         'pcm' => 'Pidgin Nigeriano Simi',
         'pis' => 'Pijin Simi',
         'pl' => 'Polaco Simi',
+        'pms' => 'Piedmontese',
         'pqm' => 'Maliseet-Passamaquoddy Simi',
         'prg' => 'Prusiano Simi',
         'ps' => 'Pashto Simi',

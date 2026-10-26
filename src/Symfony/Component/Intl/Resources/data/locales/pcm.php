@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'Naijíriá Píjin (Naijíria)',
         'pl' => 'Pólánd Lángwej',
         'pl_PL' => 'Pólánd Lángwej (Póland)',
+        'pms' => 'Píedmọ́ntís Lángwej',
+        'pms_IT' => 'Píedmọ́ntís Lángwej (Ítáli)',
         'prg' => 'Prúshia',
         'prg_PL' => 'Prúshia (Póland)',
         'ps' => 'Páshto',

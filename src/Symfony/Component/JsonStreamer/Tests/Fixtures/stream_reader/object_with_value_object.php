@@ -5,9 +5,12 @@
  */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $transformers, array $options): mixed {
     $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes'] = static function ($data) use ($options, $transformers, &$providers) {
+        if (!\is_array($data)) {
+            throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes'));
+        }
         $object = new \Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes();
         if (\array_key_exists('interface', $data)) {
-            $value = $providers['DateTimeInterface']($data['interface']);
+            $value = $providers['DateTimeInterface'](($data['interface'] ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes::$interface".')));
             try {
                 $object->{'interface'} = $value;
             } catch (\TypeError $e) {
@@ -15,7 +18,7 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
             }
         }
         if (\array_key_exists('immutable', $data)) {
-            $value = $providers['DateTimeImmutable']($data['immutable']);
+            $value = $providers['DateTimeImmutable'](($data['immutable'] ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes::$immutable".')));
             try {
                 $object->{'immutable'} = $value;
             } catch (\TypeError $e) {
@@ -23,7 +26,7 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
             }
         }
         if (\array_key_exists('union', $data)) {
-            $value = $providers['DateTimeImmutable|int']($data['union']);
+            $value = $providers['DateTimeImmutable|int'](($data['union'] ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes::$union".')));
             try {
                 $object->{'union'} = $value;
             } catch (\TypeError $e) {
@@ -33,10 +36,10 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
         return $object;
     };
     $providers['DateTimeInterface'] = static function ($data) use ($options, $transformers, &$providers) {
-        return $transformers->get('DateTimeInterface')->reverseTransform($data, $options);
+        return $transformers->get('DateTimeInterface')->reverseTransform(($data ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "DateTimeInterface".')), $options);
     };
     $providers['DateTimeImmutable'] = static function ($data) use ($options, $transformers, &$providers) {
-        return $transformers->get('DateTimeInterface')->reverseTransform($data, $options);
+        return $transformers->get('DateTimeInterface')->reverseTransform(($data ?? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "DateTimeImmutable".')), $options);
     };
     $providers['DateTimeImmutable|int'] = static function ($data) use ($options, $transformers, &$providers) {
         if (\is_string($data)) {

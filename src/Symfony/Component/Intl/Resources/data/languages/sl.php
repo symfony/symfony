@@ -377,6 +377,7 @@ return [
         'pi' => 'palijščina',
         'pis' => 'pidžin',
         'pl' => 'poljščina',
+        'pms' => 'piemontščina',
         'pon' => 'ponpejščina',
         'pqm' => 'maliseet-passamaquoddščina',
         'prg' => 'stara pruščina',

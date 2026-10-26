@@ -13,7 +13,7 @@ return [
         'en_GS' => 'English (South Georgia and South Sandwich Islands)',
         'en_KN' => 'English (Saint Kitts and Nevis)',
         'en_LC' => 'English (Saint Lucia)',
-        'en_SH' => 'English (Saint Helena)',
+        'en_SH' => 'English (Saint Helena, Ascension & Tristan da Cunha)',
         'en_TC' => 'English (Turks and Caicos Islands)',
         'en_TT' => 'English (Trinidad and Tobago)',
         'en_UM' => 'English (US Outlying Islands)',

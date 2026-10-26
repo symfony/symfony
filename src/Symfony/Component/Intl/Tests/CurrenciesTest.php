@@ -89,7 +89,6 @@ class CurrenciesTest extends ResourceBundleTestCase
         'CLF',
         'CLP',
         'CNH',
-        'CNX',
         'CNY',
         'COP',
         'COU',
@@ -876,9 +875,9 @@ class CurrenciesTest extends ResourceBundleTestCase
         $this->assertTrue(Currencies::isValidInCountry('CH', 'CHE', false, null));
     }
 
-    public function testInactiveCurrenciesOfChinaIn2025()
+    public function testInactiveCurrenciesOfFranceIn2025()
     {
-        $this->assertSame(['CNX'], Currencies::forCountry('CN', null, false, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+        $this->assertSame(['FRF'], Currencies::forCountry('FR', null, false, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
     }
 
     public function testUsdCurrencyDoesNotExistInFranceIn2025()

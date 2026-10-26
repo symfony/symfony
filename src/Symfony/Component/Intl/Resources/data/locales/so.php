@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'Bidjinka Nayjeeriya (Nayjeeriya)',
         'pl' => 'Boolish',
         'pl_PL' => 'Boolish (Booland)',
+        'pms' => 'Piedmontiis',
+        'pms_IT' => 'Piedmontiis (Talyaani)',
         'prg' => 'Brashiyaan',
         'prg_PL' => 'Brashiyaan (Booland)',
         'ps' => 'Bashtuu',

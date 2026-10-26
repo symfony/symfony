@@ -220,7 +220,7 @@ return [
         ],
         'CNH' => [
             'CNH',
-            'renmimbi cinese offshore',
+            'yuan cinese offshore',
         ],
         'CNY' => [
             'CN¥',

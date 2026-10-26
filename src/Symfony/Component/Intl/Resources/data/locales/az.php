@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'niger kreol (Nigeriya)',
         'pl' => 'polyak',
         'pl_PL' => 'polyak (Polşa)',
+        'pms' => 'Pyemont',
+        'pms_IT' => 'Pyemont (İtaliya)',
         'prg' => 'pruss',
         'prg_PL' => 'pruss (Polşa)',
         'ps' => 'puştu',

@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmpSql\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\AmpSqlTransport;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\AmpSqlTransportFactory;
+use Symfony\Component\Messenger\Bridge\AmpSql\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -103,6 +104,24 @@ final class AmpSqlTransportFactoryTest extends TestCase
             $transport->close();
             @unlink($path);
         }
+    }
+
+    #[DataProvider('provideMysqlDsn')]
+    public function testMysqlConnectionsDisableNagleAlgorithm(string $dsn)
+    {
+        $transport = (new AmpSqlTransportFactory())->createTransport($dsn, [], new PhpSerializer());
+        $connection = (new \ReflectionProperty(AmpSqlTransport::class, 'connection'))->getValue($transport);
+        $connectionFactory = (new \ReflectionProperty(Connection::class, 'connectionFactory'))->getValue($connection);
+        $config = (new \ReflectionFunction($connectionFactory))->getClosureUsedVariables()['config'];
+
+        self::assertTrue($config->getConnectContext()->hasTcpNoDelay());
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function provideMysqlDsn(): iterable
+    {
+        yield 'without TLS' => ['amp-mysql://user:pass@localhost/app'];
+        yield 'with TLS' => ['amp-mysql://user:pass@localhost/app?tls_ca=/path/to/ca.pem'];
     }
 
     public function testTheTransportCanBeUsedAgainAfterBeingClosed()

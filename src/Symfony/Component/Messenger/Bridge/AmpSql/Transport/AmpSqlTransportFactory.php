@@ -113,7 +113,7 @@ final class AmpSqlTransportFactory implements TransportFactoryInterface
         }
         $params = $this->parseDsn($dsn, 'amp-mysql', true);
         $configuration = $this->configure($params, $options, ['tls_ca', 'tls_cert', 'tls_key']);
-        $context = null;
+        $context = (new ConnectContext())->withTcpNoDelay();
         if (isset($configuration['tls_ca']) || isset($configuration['tls_cert']) || isset($configuration['tls_key'])) {
             $tls = new ClientTlsContext($params['host']);
             if (isset($configuration['tls_ca'])) {
@@ -124,7 +124,7 @@ final class AmpSqlTransportFactory implements TransportFactoryInterface
             } elseif (isset($configuration['tls_key'])) {
                 throw new InvalidArgumentException('The "tls_key" option requires "tls_cert".');
             }
-            $context = (new ConnectContext())->withTlsContext($tls);
+            $context = $context->withTlsContext($tls);
         }
         $config = new MysqlConfig($params['host'], $params['port'] ?? MysqlConfig::DEFAULT_PORT, $params['user'] ?? null, $params['pass'] ?? null, $params['database'], $context);
         $poolFactory = static fn () => new MysqlConnectionPool($config, $configuration['max_connections'], $configuration['idle_timeout'], transactionIsolation: SqlTransactionIsolationLevel::Committed);

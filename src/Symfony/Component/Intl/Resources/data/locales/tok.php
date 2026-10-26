@@ -65,7 +65,7 @@ return [
         'en_PT' => 'toki Inli (ma Potuke)',
         'en_SE' => 'toki Inli (ma Sensa)',
         'en_SG' => 'toki Inli (ma Sinkapo)',
-        'en_SZ' => 'toki Inli (ma Suwasi)',
+        'en_SZ' => 'toki Inli (ma Sawasi)',
         'en_TZ' => 'toki Inli (ma Tansanija)',
         'en_UA' => 'toki Inli (ma Ukawina)',
         'en_US' => 'toki Inli (ma Mewika)',

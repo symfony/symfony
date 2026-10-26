@@ -25,7 +25,6 @@ return [
         'sc' => 'sardinsk',
         'st' => 'sørsotho',
         'syr' => 'syrisk',
-        'tyv' => 'tuvinisk',
         'tzm' => 'sentral-tamazight',
         'zgh' => 'standard marokkansk tamazight',
     ],

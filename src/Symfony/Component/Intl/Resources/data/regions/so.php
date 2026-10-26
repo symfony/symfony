@@ -38,7 +38,7 @@ return [
         'BR' => 'Baraasiil',
         'BS' => 'Bahaamas',
         'BT' => 'Buutan',
-        'BV' => 'Buufet Island',
+        'BV' => 'Jasiiradda Bouvet',
         'BW' => 'Botuswaana',
         'BY' => 'Belarus',
         'BZ' => 'Beliis',

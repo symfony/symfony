@@ -242,10 +242,6 @@ return [
             'CNH',
             'Yuan Tsieina (ar y môr)',
         ],
-        'CNX' => [
-            'CNX',
-            'Doler Banc Pobl Tsieina',
-        ],
         'CNY' => [
             'CN¥',
             'Yuan Tsieina',

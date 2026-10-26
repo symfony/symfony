@@ -22,11 +22,7 @@ return [
         'Atlantic/Reykjavik' => 'ग्रीन विच मीन टाइम (Reykjavik)',
         'Atlantic/St_Helena' => 'ग्रीन विच मीन टाइम (St. Helena)',
         'Etc/GMT' => 'ग्रीन विच मीन टाइम',
-        'Europe/Dublin' => 'ग्रीन विच मीन टाइम (Dublin)',
-        'Europe/Guernsey' => 'ग्रीन विच मीन टाइम (Guernsey)',
-        'Europe/Isle_of_Man' => 'ग्रीन विच मीन टाइम (Isle of Man)',
-        'Europe/Jersey' => 'ग्रीन विच मीन टाइम (Jersey)',
-        'Europe/London' => 'ग्रीन विच मीन टाइम (London)',
+        'Etc/UTC' => 'Coordinated Universal Time',
     ],
     'Meta' => [],
 ];

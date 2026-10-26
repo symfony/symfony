@@ -305,6 +305,7 @@ return [
         'pcm' => 'pixhinishte nigeriane',
         'pis' => 'pixhinisht',
         'pl' => 'polonisht',
+        'pms' => 'piedmontezisht',
         'pqm' => 'malisit-pasamakuadisht',
         'prg' => 'prusisht',
         'ps' => 'pashtoisht',

@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'nigeriansk pidgin (Nigeria)',
         'pl' => 'polsk',
         'pl_PL' => 'polsk (Polen)',
+        'pms' => 'piemontesisk',
+        'pms_IT' => 'piemontesisk (Italien)',
         'prg' => 'preussisk',
         'prg_PL' => 'preussisk (Polen)',
         'ps' => 'pashto',

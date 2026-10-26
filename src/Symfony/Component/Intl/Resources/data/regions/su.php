@@ -8,7 +8,7 @@ return [
         'DE' => 'Jérman',
         'FR' => 'Prancis',
         'GB' => 'Britania Raya',
-        'ID' => 'Indonesia',
+        'ID' => 'Basa Indonesia',
         'IN' => 'India',
         'IT' => 'Italia',
         'JP' => 'Jepang',

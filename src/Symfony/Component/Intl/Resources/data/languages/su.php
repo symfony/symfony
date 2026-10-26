@@ -3,7 +3,7 @@
 return [
     'Names' => [
         'de' => 'Jérman',
-        'en' => 'Inggris',
+        'en' => 'Basa Inggris',
         'es' => 'Spanyol',
         'fr' => 'Prancis',
         'it' => 'Italia',

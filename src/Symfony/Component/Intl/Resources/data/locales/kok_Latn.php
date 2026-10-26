@@ -609,6 +609,7 @@ return [
         'pcm_NG' => 'Nigerian Pidgin (Naigeria)',
         'pl' => 'Polandez',
         'pl_PL' => 'Polandez (Poland)',
+        'pms_IT' => 'पिएडमॉन्टीस (Italia)',
         'prg' => 'Prussian',
         'prg_PL' => 'Prussian (Poland)',
         'ps' => 'Pashto',

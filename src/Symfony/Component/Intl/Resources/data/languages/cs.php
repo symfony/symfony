@@ -310,7 +310,7 @@ return [
         'kxv' => 'kúvi',
         'ky' => 'kyrgyzština',
         'la' => 'latina',
-        'lad' => 'ladinština',
+        'lad' => 'ladino',
         'lag' => 'langi',
         'lah' => 'lahndština',
         'lam' => 'lambština',

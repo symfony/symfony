@@ -300,6 +300,7 @@ return [
         'pcm' => 'Pidgin na Najeriya',
         'pis' => 'Pijin',
         'pl' => 'Harshen Polan',
+        'pms' => 'Harshen Piedmontese',
         'pqm' => 'Maliseet-Passamaquoddy',
         'prg' => 'Yaren Prussia',
         'ps' => 'Pashtanci',

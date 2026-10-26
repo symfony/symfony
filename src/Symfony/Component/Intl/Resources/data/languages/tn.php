@@ -2,7 +2,7 @@
 
 return [
     'Names' => [
-        'en' => 'Sekgoa',
+        'en' => 'English',
         'tn' => 'Setswana',
     ],
     'LocalizedNames' => [],

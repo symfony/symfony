@@ -189,7 +189,7 @@ return [
         'en_GB' => 'Saesneg (Y Deyrnas Unedig)',
         'en_GD' => 'Saesneg (Grenada)',
         'en_GE' => 'Saesneg (Georgia)',
-        'en_GG' => 'Saesneg (Ynys y Garn)',
+        'en_GG' => 'Saesneg (Guernsey)',
         'en_GH' => 'Saesneg (Ghana)',
         'en_GI' => 'Saesneg (Gibraltar)',
         'en_GM' => 'Saesneg (Gambia)',

@@ -322,6 +322,7 @@ return [
         'lil' => 'Lillooet',
         'liv' => 'Livisch',
         'lkt' => 'Lakota',
+        'lld' => 'Ladinisch',
         'lmo' => 'Lombardisch',
         'ln' => 'Lingala',
         'lo' => 'Laotisch',

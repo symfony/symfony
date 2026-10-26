@@ -340,6 +340,7 @@ return [
         'pi' => 'Páilis',
         'pis' => 'Pijin',
         'pl' => 'Polainnis',
+        'pms' => 'de chuid Phíodmant',
         'pqm' => 'Maliseet-Passamaquoddy',
         'prg' => 'Prúisis',
         'ps' => 'Paistis',

@@ -300,6 +300,7 @@ return [
         'pcm' => 'Naijíriá Píjin',
         'pis' => 'Píjín Lángwej',
         'pl' => 'Pólánd Lángwej',
+        'pms' => 'Píedmọ́ntís Lángwej',
         'pqm' => 'Malisiít Pasamákódí Lángwej',
         'prg' => 'Prúshia',
         'ps' => 'Páshto',

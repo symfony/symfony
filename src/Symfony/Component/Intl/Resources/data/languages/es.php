@@ -393,6 +393,7 @@ return [
         'pi' => 'pali',
         'pis' => 'pidgin salomonense',
         'pl' => 'polaco',
+        'pms' => 'piamontés',
         'pon' => 'pohnpeiano',
         'pqm' => 'maliseet-passamaquoddy',
         'prg' => 'prusiano',

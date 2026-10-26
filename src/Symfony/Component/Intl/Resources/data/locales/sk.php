@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'nigerijský pidžin (Nigéria)',
         'pl' => 'poľština',
         'pl_PL' => 'poľština (Poľsko)',
+        'pms' => 'piedmončina',
+        'pms_IT' => 'piedmončina (Taliansko)',
         'prg' => 'pruština',
         'prg_PL' => 'pruština (Poľsko)',
         'ps' => 'paštčina',

@@ -389,6 +389,7 @@ return [
         'pi' => 'pāli',
         'pis' => 'pidžinvaloda',
         'pl' => 'poļu',
+        'pms' => 'pjemontiešu',
         'pon' => 'ponapiešu',
         'pqm' => 'malisetu-pasamakvodi',
         'prg' => 'prūšu',

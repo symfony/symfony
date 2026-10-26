@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'Nigeriako pidgina (Nigeria)',
         'pl' => 'poloniera',
         'pl_PL' => 'poloniera (Polonia)',
+        'pms' => 'piemontera',
+        'pms_IT' => 'piemontera (Italia)',
         'prg' => 'prusiera',
         'prg_PL' => 'prusiera (Polonia)',
         'ps' => 'paxtunera',

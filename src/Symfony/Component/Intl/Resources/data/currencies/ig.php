@@ -144,7 +144,7 @@ return [
         ],
         'CVE' => [
             'CVE',
-            'Escudo Caboverdiano',
+            'Ego escudos Cape Verdean',
         ],
         'CZK' => [
             'CZK',
@@ -400,7 +400,7 @@ return [
         ],
         'NGN' => [
             '₦',
-            'Naịra',
+            'Nigerian Naira',
         ],
         'NIO' => [
             'NIO',
@@ -536,7 +536,7 @@ return [
         ],
         'TJS' => [
             'TJS',
-            'Who Somoni obodo Tajikistan',
+            'Ego Somoni obodo Tajikistan',
         ],
         'TMT' => [
             'TMT',

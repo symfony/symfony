@@ -306,6 +306,7 @@ return [
         'pcm' => 'nigerijanski pidgin',
         'pis' => 'pijinšćina',
         'pl' => 'pólšćina',
+        'pms' => 'piemontšćina',
         'pqm' => 'maliseet-passamaquoddyšćina',
         'prg' => 'prusčina',
         'ps' => 'paštunšćina',

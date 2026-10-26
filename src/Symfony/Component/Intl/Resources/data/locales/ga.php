@@ -674,6 +674,8 @@ return [
         'pcm_NG' => 'Pidsean na Nigéire (an Nigéir)',
         'pl' => 'Polainnis',
         'pl_PL' => 'Polainnis (an Pholainn)',
+        'pms' => 'de chuid Phíodmant',
+        'pms_IT' => 'de chuid Phíodmant (an Iodáil)',
         'prg' => 'Prúisis',
         'prg_PL' => 'Prúisis (an Pholainn)',
         'ps' => 'Paistis',

@@ -258,10 +258,6 @@ return [
             'CNH',
             'Kineski juan (izvanteritorijalni)',
         ],
-        'CNX' => [
-            'CNX',
-            'Dolar kineske narodne banke',
-        ],
         'CNY' => [
             'CNY',
             'Kineski juan',

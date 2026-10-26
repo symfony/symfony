@@ -199,7 +199,7 @@ return [
             'belizisk dollar',
         ],
         'CAD' => [
-            'CA$',
+            'CAD',
             'canadisk dollar',
         ],
         'CDF' => [
@@ -923,7 +923,7 @@ return [
             'ugandisk shilling',
         ],
         'USD' => [
-            'US$',
+            'USD',
             'amerikansk dollar',
         ],
         'USN' => [

@@ -89,7 +89,6 @@ class CurrenciesTest extends ResourceBundleTestCase
         'CLF',
         'CLP',
         'CNH',
-        'CNX',
         'CNY',
         'COP',
         'COU',

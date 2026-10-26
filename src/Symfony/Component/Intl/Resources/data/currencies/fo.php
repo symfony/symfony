@@ -460,7 +460,7 @@ return [
         ],
         'QAR' => [
             'QAR',
-            'Katar rial',
+            'Katar rialur',
         ],
         'RON' => [
             'RON',

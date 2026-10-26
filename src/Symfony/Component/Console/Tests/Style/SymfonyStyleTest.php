@@ -35,11 +35,14 @@ class SymfonyStyleTest extends TestCase
     protected Command $command;
     protected CommandTester $tester;
     private string|false $colSize;
+    private string|false $term;
 
     protected function setUp(): void
     {
         $this->colSize = getenv('COLUMNS');
         putenv('COLUMNS=121');
+        $this->term = getenv('TERM');
+        putenv('TERM=xterm');
         $this->command = new Command('sfstyle');
         $this->tester = new CommandTester($this->command);
     }
@@ -47,6 +50,7 @@ class SymfonyStyleTest extends TestCase
     protected function tearDown(): void
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
+        putenv($this->term ? 'TERM='.$this->term : 'TERM');
     }
 
     #[DataProvider('inputCommandToOutputFilesProvider')]

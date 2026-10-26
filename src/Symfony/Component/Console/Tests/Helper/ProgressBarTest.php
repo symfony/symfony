@@ -25,16 +25,20 @@ use Symfony\Component\Console\Output\StreamOutput;
 class ProgressBarTest extends TestCase
 {
     private string|false $colSize;
+    private string|false $term;
 
     protected function setUp(): void
     {
         $this->colSize = getenv('COLUMNS');
         putenv('COLUMNS=120');
+        $this->term = getenv('TERM');
+        putenv('TERM=xterm');
     }
 
     protected function tearDown(): void
     {
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
+        putenv($this->term ? 'TERM='.$this->term : 'TERM');
     }
 
     public function testMultipleStart()

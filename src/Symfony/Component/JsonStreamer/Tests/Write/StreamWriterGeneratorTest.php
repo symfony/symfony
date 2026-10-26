@@ -161,6 +161,23 @@ class StreamWriterGeneratorTest extends TestCase
         $generator->generate(Type::intersection(Type::object(\Traversable::class), Type::object(\Stringable::class)));
     }
 
+    #[DataProvider('refinedTypeDataProvider')]
+    public function testGenerateRefinedTypesAsTheirBaseType(Type $type, Type $baseType)
+    {
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamWritersDir);
+
+        $this->assertStringEqualsFile($generator->generate($baseType), file_get_contents($generator->generate($type)));
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: Type}>
+     */
+    public static function refinedTypeDataProvider(): iterable
+    {
+        yield [Type::list(Type::nullable(Type::union(Type::literal('draft'), Type::literal('archived')))), Type::list(Type::nullable(Type::string()))];
+        yield [Type::array(Type::list(Type::bool()), Type::union(Type::intRange(null, -1), Type::intRange(1, null))), Type::array(Type::list(Type::bool()), Type::int())];
+    }
+
     public function testDoNotSupportEnumType()
     {
         $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamWritersDir);

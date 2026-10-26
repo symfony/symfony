@@ -12,6 +12,8 @@
 namespace Symfony\Component\TypeInfo;
 
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\IntRangeType;
+use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
@@ -109,6 +111,16 @@ abstract class Type implements \Stringable
     public function map(callable $mapper): self
     {
         return $mapper($this);
+    }
+
+    /**
+     * Replaces the literals and integer ranges in the type, and in its parts, with their builtin type.
+     *
+     * Parts that become identical are merged, so "1|2" becomes "int" and "?non-zero-int" becomes "?int".
+     */
+    public function withoutRefinements(): self
+    {
+        return $this->map(static fn (self $type): self => $type instanceof LiteralType || $type instanceof IntRangeType ? $type->getWrappedType() : $type);
     }
 
     /**

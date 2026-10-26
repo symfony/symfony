@@ -31,8 +31,6 @@ use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
-use Symfony\Component\TypeInfo\Type\IntRangeType;
-use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 
@@ -104,9 +102,7 @@ final class StreamReaderGenerator
             throw new UnsupportedException(\sprintf('Intersection types are not supported ("%s").', (string) $type));
         }
 
-        if ($type instanceof LiteralType || $type instanceof IntRangeType) {
-            $type = $type->getWrappedType();
-        }
+        $type = $type->withoutRefinements();
 
         if ($type instanceof UnionType) {
             $nodes = [];

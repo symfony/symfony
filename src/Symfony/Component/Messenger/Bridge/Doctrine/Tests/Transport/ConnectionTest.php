@@ -918,6 +918,7 @@ class ConnectionTest extends TestCase
         $result = $this->createStub(Result::class);
         $neverDelivered = array_map(static fn (int $id) => ['id' => $id, 'body' => '{}', 'headers' => '[]', 'available_at' => '2019-03-15 12:00:00', 'delivered_at' => null], range(1, 100));
         $deliveryTimedOut = array_map(static fn (int $id) => ['id' => $id, 'body' => '{}', 'headers' => '[]', 'available_at' => '2019-03-15 12:00:00', 'delivered_at' => '2019-03-15 13:00:00'], range(101, 200));
+        $result->method('fetchOne')->willReturn(500);
         $result->method('fetchAllAssociative')->willReturnOnConsecutiveCalls($neverDelivered, [], [], $deliveryTimedOut, [], [], []);
 
         $statements = [];
@@ -930,58 +931,59 @@ class ConnectionTest extends TestCase
         $connection = new Connection([], $driverConnection);
 
         $this->assertCount(200, iterator_to_array($connection->findAllInBatches(), false));
-        $this->assertSame([$neverDeliveredSql, $sameAvailableAtSql, $nextAvailableAtSql, $deliveryTimedOutSql, $sameDeliveredAtSql, $nextDeliveredAtSql, $nextTimedOutAvailableAtSql], array_column($statements, 0));
-        $this->assertSame(['2019-03-15 12:00:00', 100], \array_slice($statements[1][1], 2));
-        $this->assertSame(['2019-03-15 12:00:00'], \array_slice($statements[2][1], 2));
-        $this->assertSame(['2019-03-15 12:00:00', '2019-03-15 13:00:00', 200], \array_slice($statements[4][1], 3));
-        $this->assertSame(['2019-03-15 12:00:00', '2019-03-15 13:00:00'], \array_slice($statements[5][1], 3));
-        $this->assertSame(['2019-03-15 12:00:00'], \array_slice($statements[6][1], 3));
+        $this->assertSame(['SELECT MAX(m.id) FROM messenger_messages m', $neverDeliveredSql, $sameAvailableAtSql, $nextAvailableAtSql, $deliveryTimedOutSql, $sameDeliveredAtSql, $nextDeliveredAtSql, $nextTimedOutAvailableAtSql], array_column($statements, 0));
+        $this->assertSame(array_fill(0, 7, 500), array_column(array_column(\array_slice($statements, 1), 1), 2));
+        $this->assertSame(['2019-03-15 12:00:00', 100], \array_slice($statements[2][1], 3));
+        $this->assertSame(['2019-03-15 12:00:00'], \array_slice($statements[3][1], 3));
+        $this->assertSame(['2019-03-15 12:00:00', '2019-03-15 13:00:00', 200], \array_slice($statements[5][1], 4));
+        $this->assertSame(['2019-03-15 12:00:00', '2019-03-15 13:00:00'], \array_slice($statements[6][1], 4));
+        $this->assertSame(['2019-03-15 12:00:00'], \array_slice($statements[7][1], 4));
     }
 
     public static function provideFindAllInBatchesSqlGeneratedByPlatform(): iterable
     {
         yield 'MySQL' => [
             new MySQLPlatform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at > ?) ORDER BY m.delivered_at, m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at > ?) ORDER BY m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
         ];
 
         yield 'PostgreSQL' => [
             new PostgreSQLPlatform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at > ?) ORDER BY m.delivered_at, m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at > ?) ORDER BY m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
         ];
 
         yield 'SQL Server' => [
             new SQLServerPlatform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at > ?) ORDER BY m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at > ?) ORDER BY m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
         ];
 
         yield 'Oracle' => [
             new OraclePlatform(),
-            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at > ?) ORDER BY m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.delivered_at < ?) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at > ?) ORDER BY m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
         ];
     }
 

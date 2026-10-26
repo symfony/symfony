@@ -377,6 +377,30 @@ final class AmpSqlTransportTest extends TestCase
         }
     }
 
+    public function testListingDoesNotListTheMessagesSentDuringTheListing()
+    {
+        $transport = $this->createTransport();
+
+        try {
+            $transport->sendBatch(array_map(static fn (int $number) => new Envelope(new DummyMessage((string) $number), [new DelayStamp(-60_000)]), range(1, 150)));
+
+            $messages = [];
+            foreach ($transport->all() as $envelope) {
+                $messages[] = self::messageValue($envelope);
+
+                if (300 === \count($messages)) {
+                    break;
+                }
+
+                $transport->send(new Envelope($envelope->getMessage(), [new DelayStamp(-60_000)]));
+            }
+
+            self::assertSame(array_map(strval(...), range(1, 150)), $messages);
+        } finally {
+            $transport->close();
+        }
+    }
+
     public function testListingDoesNotListAgainTheMessagesReceivedDuringTheListing()
     {
         $transport = $this->createTransport(['redeliver_timeout' => 0]);

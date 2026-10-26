@@ -471,6 +471,12 @@ class KeyManagementBundle extends AbstractBundle
             ])
             ->addTag('kernel.reset', ['method' => 'forget']);
 
+        if ($container->hasDefinition('console.command.key_management_rewrap_data_keys')) {
+            $container->getDefinition('console.command.key_management_rewrap_data_keys')
+                ->setArgument(2, $client)
+                ->setArgument(3, $config['key_id']);
+        }
+
         $container->register('key_management.stored_envelope_encrypter', StoredEnvelopeEncrypter::class)
             ->setArguments([
                 new Reference('key_management.store'),

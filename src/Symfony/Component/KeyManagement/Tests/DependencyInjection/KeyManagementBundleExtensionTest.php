@@ -264,6 +264,10 @@ class KeyManagementBundleExtensionTest extends TestCase
         $encrypter = $container->getDefinition('key_management.stored_envelope_encrypter')->getArguments();
         $this->assertSame('key_management.store', (string) $encrypter[0]);
         $this->assertNull($encrypter[1], 'a payload carrying its own data key bypasses the store, so reading one is asked for rather than inherited from having a default client.');
+
+        $rewrap = $container->getDefinition('console.command.key_management_rewrap_data_keys')->getArguments();
+        $this->assertSame('app', $rewrap[2]);
+        $this->assertSame('alias/app-key', $rewrap[3]);
     }
 
     public function testTheStoreSecretCanBeRotated()

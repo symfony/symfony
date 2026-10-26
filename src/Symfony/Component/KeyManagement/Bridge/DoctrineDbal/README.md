@@ -232,7 +232,8 @@ Keep the secret out of the database, like your other application secrets.
 
 To change the secret, add the new secret at the top of the list and keep the old one.
 The store signs new keys with the first secret and accepts keys signed with any of them.
-Then run `key-management:rewrap-data-keys` with the current client and master key to bind every key under the new secret.
+Then run `key-management:rewrap-data-keys` to bind every key under the new secret.
+Without options, it re-wraps the keys under the client and the master key of the store.
 Remove the old secret after that run.
 Removing it earlier makes the keys bound under it unreadable.
 This includes changing `kernel.secret` when the store uses it.
@@ -367,8 +368,8 @@ wrapped by every member at once and read through whichever answers. When a
 member is lost for good, rows with a wrapping from a surviving member stay
 readable after the member list changes. New writes use the new list. Stored
 keys need rewrapping under a replacement member to regain redundancy;
-`key-management:rewrap-data-keys --from=main --to=main --key-id=...` writes
-them under the current active members.
+`key-management:rewrap-data-keys --from=main` writes them under the current
+active members when `main` is the client of the store.
 
 A member's name is stored in each wrapping. When replacing a member, list its
 old name under the composite client's `retired` option to read old values

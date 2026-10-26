@@ -153,6 +153,73 @@ class SodiumVaultTest extends TestCase
         $this->assertStringContainsString('wrong decryption key', (string) $locked->getLastMessage());
     }
 
+    public function testGenerateKeysLeavesNoPublicKeyWhenThePrivateKeyCannotBeWritten()
+    {
+        // A directory in place of the private key makes writing it fail
+        mkdir($this->secretsDir.'/test.decrypt.private.php', 0o777, true);
+
+        try {
+            @(new SodiumVault($this->secretsDir))->generateKeys();
+            $this->fail('Writing the private key should have failed.');
+        } catch (\ErrorException) {
+        }
+
+        rmdir($this->secretsDir.'/test.decrypt.private.php');
+
+        $vault = new SodiumVault($this->secretsDir);
+        $this->assertTrue($vault->generateKeys());
+        $vault->seal('FOO', 'foo');
+        $this->assertSame('foo', (new SodiumVault($this->secretsDir))->reveal('FOO'));
+    }
+
+    public function testOverridingKeysKeepsAMatchingPairWhenThePrivateKeyCannotBeWritten()
+    {
+        $vault = new SodiumVault($this->secretsDir);
+        $vault->generateKeys();
+        $vault->seal('FOO', 'foo');
+
+        // A directory in place of the private key makes writing it fail
+        rename($this->secretsDir.'/test.decrypt.private.php', $this->secretsDir.'/private.php');
+        mkdir($this->secretsDir.'/test.decrypt.private.php');
+
+        try {
+            @$vault->generateKeys(true);
+            $this->fail('Writing the private key should have failed.');
+        } catch (\ErrorException) {
+        }
+
+        rmdir($this->secretsDir.'/test.decrypt.private.php');
+        rename($this->secretsDir.'/private.php', $this->secretsDir.'/test.decrypt.private.php');
+
+        (new SodiumVault($this->secretsDir))->seal('BAR', 'bar');
+        $this->assertSame(['BAR' => 'bar', 'FOO' => 'foo'], (new SodiumVault($this->secretsDir))->list(true));
+    }
+
+    public function testListIsReplacedInsteadOfRewritten()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows cannot replace a file that is open.');
+        }
+
+        $vault = new SodiumVault($this->secretsDir);
+        $vault->generateKeys();
+        $vault->seal('FOO', 'foo');
+
+        $list = file_get_contents($file = $this->secretsDir.'/test.list.php');
+        $handle = fopen($file, 'r');
+        $vault->seal('BAR', 'bar');
+        $this->assertSame($list, stream_get_contents($handle));
+        fclose($handle);
+
+        $list = file_get_contents($file);
+        $handle = fopen($file, 'r');
+        $vault->remove('FOO');
+        $this->assertSame($list, stream_get_contents($handle));
+        fclose($handle);
+
+        $this->assertSame(['BAR' => null], $vault->list());
+    }
+
     private function interruptRotation(): string
     {
         if (!is_file($this->secretsDir.'/test.decrypt.private.php')) {

@@ -28,6 +28,11 @@ final class PostgresBackend implements BackendInterface
         return ' FOR UPDATE SKIP LOCKED';
     }
 
+    public function getNeverDeliveredOrderBy(): string
+    {
+        return 'delivered_at ASC, id ASC';
+    }
+
     public function validateVersion(SqlConnection $connection): void
     {
         $version = $connection->query("SELECT current_setting('server_version_num') AS version")->fetchRow()['version'] ?? null;

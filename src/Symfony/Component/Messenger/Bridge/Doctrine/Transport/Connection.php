@@ -437,19 +437,22 @@ class Connection implements ResetInterface
                 $queryBuilder->andWhere('m.delivered_at < ?');
                 $parameters[] = $now->modify(\sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
                 $types[] = Types::DATETIME_IMMUTABLE;
+                $orderBy = 'm.delivered_at, m.id';
                 $nextQueryBuilders = [
                     [(clone $queryBuilder)->andWhere('m.available_at = ?')->andWhere('m.delivered_at = ?')->andWhere('m.id > ?')->orderBy('m.id'), ['available_at', 'delivered_at', 'id']],
-                    [(clone $queryBuilder)->andWhere('m.available_at = ?')->andWhere('m.delivered_at > ?')->orderBy('m.delivered_at')->addOrderBy('m.id'), ['available_at', 'delivered_at']],
+                    [(clone $queryBuilder)->andWhere('m.available_at = ?')->andWhere('m.delivered_at > ?')->orderBy($orderBy), ['available_at', 'delivered_at']],
                 ];
             } else {
+                // MySQL sorts the messages when "delivered_at" is in the ORDER BY, PostgreSQL and Oracle when it is not
+                $orderBy = $this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform ? 'm.id' : 'm.delivered_at, m.id';
                 $nextQueryBuilders = [
-                    [(clone $queryBuilder)->andWhere('m.delivered_at IS NULL')->andWhere('m.available_at = ?')->andWhere('m.id > ?')->orderBy('m.id'), ['available_at', 'id']],
+                    [(clone $queryBuilder)->andWhere('m.delivered_at IS NULL')->andWhere('m.available_at = ?')->andWhere('m.id > ?')->orderBy($orderBy), ['available_at', 'id']],
                 ];
                 // SQLite sorts the messages that have the same "available_at" unless "delivered_at" is in the ORDER BY and its condition is not written "IS NULL"
                 $queryBuilder->andWhere('NOT (m.delivered_at IS NOT NULL)');
             }
 
-            $queryBuilder->orderBy('m.available_at')->addOrderBy('m.delivered_at')->addOrderBy('m.id')->setMaxResults(self::LISTING_BATCH_SIZE);
+            $queryBuilder->orderBy('m.available_at, '.$orderBy)->setMaxResults(self::LISTING_BATCH_SIZE);
             $doctrineEnvelopes = $this->executeQuery($queryBuilder->getSQL(), $parameters, $types)->fetchAllAssociative();
             $nextQueryBuilders[] = [$queryBuilder->andWhere('m.available_at > ?'), ['available_at']];
 

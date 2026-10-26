@@ -386,7 +386,7 @@ final class Connection
                 [' AND available_at = ? AND delivered_at = ? AND id > ? ORDER BY id ASC', [$after['available_at'], $after['delivered_at'], $after['id']]],
                 [' AND available_at = ? AND delivered_at > ? ORDER BY delivered_at ASC, id ASC', [$after['available_at'], $after['delivered_at']]],
             ] : [
-                [' AND delivered_at IS NULL AND available_at = ? AND id > ? ORDER BY id ASC', [$after['available_at'], $after['id']]],
+                [' AND delivered_at IS NULL AND available_at = ? AND id > ? ORDER BY '.$this->backend->getNeverDeliveredOrderBy(), [$after['available_at'], $after['id']]],
             ];
 
             foreach ($nextQueries as [$condition, $values]) {
@@ -402,7 +402,7 @@ final class Connection
         }
 
         // SQLite sorts the rows that have the same "available_at" unless "delivered_at" is in the ORDER BY and its condition is not written "IS NULL"
-        $sql .= ($deliveryTimedOut ? '' : ' AND NOT (delivered_at IS NOT NULL)').' ORDER BY available_at ASC, delivered_at ASC, id ASC LIMIT ?';
+        $sql .= ($deliveryTimedOut ? ' ORDER BY available_at ASC, delivered_at ASC, id ASC' : ' AND NOT (delivered_at IS NOT NULL) ORDER BY available_at ASC, '.$this->backend->getNeverDeliveredOrderBy()).' LIMIT ?';
 
         return [...$rows, ...iterator_to_array($this->getConnection()->execute($sql, [...$params, self::LISTING_BATCH_SIZE - \count($rows)]), false)];
     }

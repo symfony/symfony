@@ -196,7 +196,8 @@ final class ConnectionTest extends TestCase
         }
     }
 
-    public function testFindAllInBatchesFollowsTheOrderOfTheIndex()
+    #[DataProvider('provideNeverDeliveredOrderBy')]
+    public function testFindAllInBatchesFollowsTheOrderOfTheIndex(BackendInterface $backend, string $serverVersion, string $neverDeliveredOrderBy, string $sameAvailableAtOrderBy)
     {
         $neverDelivered = array_map(static fn (int $id) => ['id' => $id, 'body' => base64_encode('body '.$id), 'headers' => '[]', 'available_at' => 1000, 'delivered_at' => null], range(1, 100));
         $deliveryTimedOut = array_map(static fn (int $id) => ['id' => $id, 'body' => base64_encode('body '.$id), 'headers' => '[]', 'available_at' => 1000, 'delivered_at' => 2000], range(101, 200));
@@ -237,22 +238,30 @@ final class ConnectionTest extends TestCase
                 }
             };
         });
-        $backend = $this->createStub(BackendInterface::class);
-        $backend->method('getNowExpression')->willReturn('NOW()');
+        $version = $this->createStub(SqlResult::class);
+        $version->method('fetchRow')->willReturn(['version' => $serverVersion]);
+        $connection->method('query')->willReturn($version);
 
         $messages = iterator_to_array((new Connection(static fn () => $connection, $backend, ['auto_setup' => false, 'table_name' => 'messages', 'queue_name' => 'queue', 'redeliver_timeout' => 60]))->findAllInBatches(), false);
 
         self::assertCount(200, $messages);
         self::assertSame([
-            ['SELECT NOW() AS now, (SELECT MAX(id) FROM messages) AS max_id', []],
-            ['SELECT id, body, headers, available_at, delivered_at FROM messages WHERE queue_name = ? AND available_at <= ? AND id <= ? AND NOT (delivered_at IS NOT NULL) ORDER BY available_at ASC, delivered_at ASC, id ASC LIMIT ?', ['queue', 100000, 500, 100]],
-            ['SELECT id, body, headers, available_at, delivered_at FROM messages WHERE queue_name = ? AND available_at <= ? AND id <= ? AND delivered_at IS NULL AND available_at = ? AND id > ? ORDER BY id ASC LIMIT ?', ['queue', 100000, 500, 1000, 100, 100]],
-            ['SELECT id, body, headers, available_at, delivered_at FROM messages WHERE queue_name = ? AND available_at <= ? AND id <= ? AND available_at > ? AND NOT (delivered_at IS NOT NULL) ORDER BY available_at ASC, delivered_at ASC, id ASC LIMIT ?', ['queue', 100000, 500, 1000, 100]],
+            [\sprintf('SELECT %s AS now, (SELECT MAX(id) FROM messages) AS max_id', $backend->getNowExpression()), []],
+            ['SELECT id, body, headers, available_at, delivered_at FROM messages WHERE queue_name = ? AND available_at <= ? AND id <= ? AND NOT (delivered_at IS NOT NULL) ORDER BY '.$neverDeliveredOrderBy.' LIMIT ?', ['queue', 100000, 500, 100]],
+            ['SELECT id, body, headers, available_at, delivered_at FROM messages WHERE queue_name = ? AND available_at <= ? AND id <= ? AND delivered_at IS NULL AND available_at = ? AND id > ? ORDER BY '.$sameAvailableAtOrderBy.' LIMIT ?', ['queue', 100000, 500, 1000, 100, 100]],
+            ['SELECT id, body, headers, available_at, delivered_at FROM messages WHERE queue_name = ? AND available_at <= ? AND id <= ? AND available_at > ? AND NOT (delivered_at IS NOT NULL) ORDER BY '.$neverDeliveredOrderBy.' LIMIT ?', ['queue', 100000, 500, 1000, 100]],
             ['SELECT id, body, headers, available_at, delivered_at FROM messages WHERE queue_name = ? AND available_at <= ? AND id <= ? AND delivered_at < ? ORDER BY available_at ASC, delivered_at ASC, id ASC LIMIT ?', ['queue', 100000, 500, 40000, 100]],
             ['SELECT id, body, headers, available_at, delivered_at FROM messages WHERE queue_name = ? AND available_at <= ? AND id <= ? AND delivered_at < ? AND available_at = ? AND delivered_at = ? AND id > ? ORDER BY id ASC LIMIT ?', ['queue', 100000, 500, 40000, 1000, 2000, 200, 100]],
             ['SELECT id, body, headers, available_at, delivered_at FROM messages WHERE queue_name = ? AND available_at <= ? AND id <= ? AND delivered_at < ? AND available_at = ? AND delivered_at > ? ORDER BY delivered_at ASC, id ASC LIMIT ?', ['queue', 100000, 500, 40000, 1000, 2000, 100]],
             ['SELECT id, body, headers, available_at, delivered_at FROM messages WHERE queue_name = ? AND available_at <= ? AND id <= ? AND delivered_at < ? AND available_at > ? ORDER BY available_at ASC, delivered_at ASC, id ASC LIMIT ?', ['queue', 100000, 500, 40000, 1000, 100]],
         ], $statements);
+    }
+
+    public static function provideNeverDeliveredOrderBy(): iterable
+    {
+        yield 'MySQL' => [new MysqlBackend(), '8.4.0', 'available_at ASC, id ASC', 'id ASC'];
+        yield 'PostgreSQL' => [new PostgresBackend(), '160000', 'available_at ASC, delivered_at ASC, id ASC', 'delivered_at ASC, id ASC'];
+        yield 'SQLite' => [new SqliteBackend(), '3.45.0', 'available_at ASC, delivered_at ASC, id ASC', 'delivered_at ASC, id ASC'];
     }
 
     public function testMysqlInsertBatchUsesOneStatementWithoutIds()

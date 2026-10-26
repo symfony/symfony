@@ -21,6 +21,11 @@ interface BackendInterface
 
     public function getClaimLockSql(): string;
 
+    /**
+     * Returns the order of the never-delivered messages that have the same "available_at", written so that the database reads them in the order of the index.
+     */
+    public function getNeverDeliveredOrderBy(): string;
+
     public function validateVersion(SqlConnection $connection): void;
 
     public function setup(SqlConnection $connection, string $table): void;

@@ -42,8 +42,6 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
-use Symfony\Component\TypeInfo\Type\IntRangeType;
-use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
@@ -998,11 +996,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $collectionValueType = $collectionValueType instanceof NullableType ? $collectionValueType->getWrappedType() : $collectionValueType->getCollectionValueType();
             }
 
-            if ($collectionValueType instanceof LiteralType || $collectionValueType instanceof IntRangeType) {
-                $collectionValueType = $collectionValueType->getWrappedType();
-            }
-
-            $collectionValueBaseType = $collectionValueType;
+            $collectionValueBaseType = $collectionValueType->withoutRefinements();
         }
 
         return $collectionValueBaseType instanceof BuiltinType && \in_array($collectionValueBaseType->getTypeIdentifier(), [TypeIdentifier::BOOL, TypeIdentifier::FLOAT, TypeIdentifier::INT, TypeIdentifier::STRING], true);

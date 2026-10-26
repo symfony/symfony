@@ -11,17 +11,20 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmpSql\Tests\Transport;
 
+use Amp\Postgres\PostgresConfig;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmpSql\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\AmpSqlTransport;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\AmpSqlTransportFactory;
+use Symfony\Component\Messenger\Bridge\AmpSql\Transport\Backend\PostgresBackend;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
 use function Amp\async;
+use function Amp\Postgres\connect;
 
 #[Group('integration')]
 final class AmpSqlDatabaseIntegrationTest extends TestCase
@@ -99,6 +102,23 @@ final class AmpSqlDatabaseIntegrationTest extends TestCase
             }
         } finally {
             $transport->close();
+        }
+    }
+
+    public function testPostgresUsesTheIndexToSkipTheDelayedMessages()
+    {
+        $dsn = parse_url(self::getAvailableDsn('AMP_SQL_POSTGRES_DSN', 'amp-postgres://postgres:password@127.0.0.1:5432/postgres'));
+        $connection = connect(new PostgresConfig($dsn['host'], $dsn['port'] ?? PostgresConfig::DEFAULT_PORT, $dsn['user'] ?? null, $dsn['pass'] ?? null, substr($dsn['path'] ?? '', 1)));
+        $backend = new PostgresBackend();
+
+        try {
+            $backend->setup($connection, 'messenger_amp_test');
+            $connection->query('SET enable_seqscan = off');
+            $plan = $connection->query(\sprintf("EXPLAIN SELECT id FROM messenger_amp_test WHERE queue_name = 'test' AND available_at <= %s", $backend->getNowExpression()));
+
+            self::assertMatchesRegularExpression('/Index Cond: .*available_at <=/', implode("\n", array_column(iterator_to_array($plan, false), 'QUERY PLAN')));
+        } finally {
+            $connection->close();
         }
     }
 

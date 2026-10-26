@@ -20,7 +20,8 @@ final class PostgresBackend implements BackendInterface
 {
     public function getNowExpression(): string
     {
-        return 'CAST(EXTRACT(EPOCH FROM clock_timestamp()) * 1000 AS BIGINT)';
+        // statement_timestamp() is computed once per statement, so the database can search the index with it; now() would return the start of the transaction
+        return 'CAST(EXTRACT(EPOCH FROM statement_timestamp()) * 1000 AS BIGINT)';
     }
 
     public function getClaimLockSql(): string

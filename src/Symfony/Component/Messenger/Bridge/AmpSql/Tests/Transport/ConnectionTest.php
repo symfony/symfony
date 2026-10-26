@@ -129,6 +129,19 @@ final class ConnectionTest extends TestCase
         (new MysqlBackend())->setup($connection, 'messages');
     }
 
+    #[DataProvider('provideNowExpression')]
+    public function testNowIsTheTimeAtWhichTheStatementStarted(BackendInterface $backend, string $now)
+    {
+        self::assertSame($now, $backend->getNowExpression());
+    }
+
+    public static function provideNowExpression(): iterable
+    {
+        yield 'MySQL' => [new MysqlBackend(), 'CAST(ROUND(UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000) AS SIGNED)'];
+        yield 'PostgreSQL' => [new PostgresBackend(), 'CAST(EXTRACT(EPOCH FROM statement_timestamp()) * 1000 AS BIGINT)'];
+        yield 'SQLite' => [new SqliteBackend(), "CAST(unixepoch('subsec') * 1000 AS INTEGER)"];
+    }
+
     public function testSendBatchInsertsTheMessagesInOneTransaction()
     {
         $transaction = $this->createMock(SqlTransaction::class);

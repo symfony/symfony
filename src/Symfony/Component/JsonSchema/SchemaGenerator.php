@@ -325,8 +325,9 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         $valueSchema = $this->buildTypeSchema($type->getCollectionValueType(), $config, $parent, $document);
         $keyType = $type->getCollectionKeyType();
 
-        if ($keyType instanceof LiteralType) {
-            $keyType = $keyType->getWrappedType();
+        // symfony/type-info < 8.2 has no refinements to remove
+        if (method_exists($keyType, 'withoutRefinements')) {
+            $keyType = $keyType->withoutRefinements();
         }
 
         if (!$type->isList() && $keyType instanceof BuiltinType && TypeIdentifier::STRING === $keyType->getTypeIdentifier()) {

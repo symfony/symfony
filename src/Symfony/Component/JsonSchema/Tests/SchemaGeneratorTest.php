@@ -480,6 +480,14 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['type' => 'object', 'additionalProperties' => ['type' => 'integer']], $schema->getRoot());
     }
 
+    #[RequiresMethod(Type::class, 'withoutRefinements')]
+    public function testCollectionWithLiteralStringUnionKeyBecomesAnObject()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::array(Type::int(), Type::union(Type::literal('en'), Type::literal('de'))));
+
+        $this->assertSameSchema(['type' => 'object', 'additionalProperties' => ['type' => 'integer']], $schema->getRoot());
+    }
+
     public function testArrayShapeBecomesAnInlineObject()
     {
         $schema = SchemaGenerator::create()->generate(Type::arrayShape(['name' => Type::string(), 'age' => ['type' => Type::int(), 'optional' => true]]));

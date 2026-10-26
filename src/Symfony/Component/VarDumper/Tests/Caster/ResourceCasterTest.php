@@ -29,9 +29,7 @@ class ResourceCasterTest extends TestCase
     #[RequiresPhpExtension('curl')]
     public function testCastCurlIsDeprecated()
     {
-        $ch = curl_init('http://example.com');
-        curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
-        curl_exec($ch);
+        $ch = curl_init('http://example.com/');
 
         $this->expectUserDeprecationMessage('Since symfony/var-dumper 7.3: The "Symfony\Component\VarDumper\Caster\ResourceCaster::castCurl()" method is deprecated without replacement.');
 

@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="100" resname="Please enter a valid birthdate.">
                 <source>This value is not a valid birthdate.</source>
-                <target state="needs-review-translation">هذه القيمة ليست تاريخ ميلاد صالحًا.</target>
+                <target>هذه القيمة ليست تاريخ ميلاد صالحًا.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
@@ -32,31 +32,31 @@
             </trans-unit>
             <trans-unit id="103" resname="Please select a valid color.">
                 <source>This value is not a valid color.</source>
-                <target state="needs-review-translation">هذه القيمة ليست لونًا صالحًا.</target>
+                <target>هذه القيمة ليست لونًا صالحًا.</target>
             </trans-unit>
             <trans-unit id="104" resname="Please select a valid country.">
                 <source>This value is not a valid country.</source>
-                <target state="needs-review-translation">هذه القيمة ليست بلدًا صالحًا.</target>
+                <target>هذه القيمة ليست بلدًا صالحًا.</target>
             </trans-unit>
             <trans-unit id="105" resname="Please select a valid currency.">
                 <source>This value is not a valid currency.</source>
-                <target state="needs-review-translation">هذه القيمة ليست عملة صالحة.</target>
+                <target>هذه القيمة ليست عملة صالحة.</target>
             </trans-unit>
             <trans-unit id="106" resname="Please choose a valid date interval.">
                 <source>This value is not a valid date interval.</source>
-                <target state="needs-review-translation">هذه القيمة ليست فاصلاً زمنيًا صالحًا.</target>
+                <target>هذه القيمة ليست فترة زمنية صالحة.</target>
             </trans-unit>
             <trans-unit id="107" resname="Please enter a valid date and time.">
                 <source>This value is not a valid date and time.</source>
-                <target state="needs-review-translation">هذه القيمة ليست تاريخًا ووقتًا صالحين.</target>
+                <target>هذه القيمة ليست تاريخًا ووقتًا صالحين.</target>
             </trans-unit>
             <trans-unit id="108" resname="Please enter a valid date.">
                 <source>This value is not a valid date.</source>
-                <target state="needs-review-translation">هذه القيمة ليست تاريخًا صالحًا.</target>
+                <target>هذه القيمة ليست تاريخًا صالحًا.</target>
             </trans-unit>
             <trans-unit id="109" resname="Please select a valid file.">
                 <source>This value is not a valid file.</source>
-                <target state="needs-review-translation">هذه القيمة ليست ملفًا صالحًا.</target>
+                <target>هذه القيمة ليست ملفًا صالحًا.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The hidden field is invalid.</source>
@@ -64,11 +64,11 @@
             </trans-unit>
             <trans-unit id="111" resname="Please enter an integer.">
                 <source>This value is not a valid integer.</source>
-                <target state="needs-review-translation">هذه القيمة ليست عددًا صحيحًا صالحًا.</target>
+                <target>هذه القيمة ليست عددًا صحيحًا صالحًا.</target>
             </trans-unit>
             <trans-unit id="112" resname="Please select a valid language.">
                 <source>This value is not a valid language.</source>
-                <target state="needs-review-translation">هذه القيمة ليست لغة صالحة.</target>
+                <target>هذه القيمة ليست لغة صالحة.</target>
             </trans-unit>
             <trans-unit id="113" resname="Please select a valid locale.">
                 <source>This value is not a valid locale.</source>
@@ -76,11 +76,11 @@
             </trans-unit>
             <trans-unit id="114" resname="Please enter a valid money amount.">
                 <source>This value is not a valid money amount.</source>
-                <target state="needs-review-translation">هذه القيمة ليست مبلغًا ماليًا صالحًا.</target>
+                <target>هذه القيمة ليست مبلغًا ماليًا صالحًا.</target>
             </trans-unit>
             <trans-unit id="115" resname="Please enter a number.">
                 <source>This value is not a valid number.</source>
-                <target state="needs-review-translation">هذه القيمة ليست رقمًا صالحًا.</target>
+                <target>هذه القيمة ليست عددًا صالحًا.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>The password is invalid.</source>
@@ -88,7 +88,7 @@
             </trans-unit>
             <trans-unit id="117" resname="Please enter a percentage value.">
                 <source>This value is not a valid percentage.</source>
-                <target state="needs-review-translation">هذه القيمة ليست نسبة مئوية صالحة.</target>
+                <target>هذه القيمة ليست نسبة مئوية صالحة.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>The values do not match.</source>
@@ -96,23 +96,23 @@
             </trans-unit>
             <trans-unit id="119" resname="Please enter a valid time.">
                 <source>This value is not a valid time.</source>
-                <target state="needs-review-translation">هذه القيمة ليست وقتًا صالحًا.</target>
+                <target>هذه القيمة ليست وقتًا صالحًا.</target>
             </trans-unit>
             <trans-unit id="120" resname="Please select a valid timezone.">
                 <source>This value is not a valid timezone.</source>
-                <target state="needs-review-translation">هذه القيمة ليست منطقة زمنية صالحة.</target>
+                <target>هذه القيمة ليست منطقة زمنية صالحة.</target>
             </trans-unit>
             <trans-unit id="121" resname="Please enter a valid URL.">
                 <source>This value is not a valid URL.</source>
-                <target state="needs-review-translation">هذه القيمة ليست عنوان URL صالحًا.</target>
+                <target>هذه القيمة ليست عنوان URL صالحًا.</target>
             </trans-unit>
             <trans-unit id="122" resname="Please enter a valid search term.">
                 <source>This value is not a valid search term.</source>
-                <target state="needs-review-translation">هذه القيمة ليست عبارة بحث صالحة.</target>
+                <target>هذه القيمة ليست عبارة بحث صالحة.</target>
             </trans-unit>
             <trans-unit id="123" resname="Please provide a valid phone number.">
                 <source>This value is not a valid phone number.</source>
-                <target state="needs-review-translation">هذه القيمة ليست رقم هاتف صالحًا.</target>
+                <target>هذه القيمة ليست رقم هاتف صالحًا.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The checkbox has an invalid value.</source>
@@ -120,15 +120,15 @@
             </trans-unit>
             <trans-unit id="125" resname="Please enter a valid email address.">
                 <source>This value is not a valid email address.</source>
-                <target state="needs-review-translation">هذه القيمة ليست بريدًا إلكترونيًا صالحًا.</target>
+                <target>هذه القيمة ليست بريدًا إلكترونيًا صالحًا.</target>
             </trans-unit>
             <trans-unit id="126" resname="Please select a valid option.">
                 <source>This value is not a valid option.</source>
-                <target state="needs-review-translation">هذه القيمة ليست خيارًا صالحًا.</target>
+                <target>هذه القيمة ليست خيارًا صالحًا.</target>
             </trans-unit>
             <trans-unit id="127" resname="Please select a valid range.">
                 <source>This value is not a valid range.</source>
-                <target state="needs-review-translation">هذه القيمة ليست نطاقًا صالحًا.</target>
+                <target>هذه القيمة ليست نطاقًا صالحًا.</target>
             </trans-unit>
             <trans-unit id="128" resname="Please enter a valid week.">
                 <source>This value is not a valid week.</source>

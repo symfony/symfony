@@ -686,8 +686,8 @@ class TableTest extends TestCase
                     | [37;41mDont break[39;49m         |
                     | [37;41mhere[39;49m               |
                     +-------+------------+
-                    [39;49m| foo   | [39;49m[37;41mDont break[39;49m[39;49m |[39;49m
-                    [39;49m| bar   | [39;49m[37;41mhere[39;49m       |
+                    | foo   | [37;41mDont break[39;49m |
+                    | bar   | [37;41mhere[39;49m       |
                     +-------+------------+
 
                     TABLE,
@@ -832,8 +832,8 @@ class TableTest extends TestCase
                 'default',
                 <<<'TABLE'
                     +---------------+---------------+-------------------------------------------+
-                    [39;49m| [39;49m[31m978[39m[39;49m           | De Monarchia  |[39;49m[31;42m             Dante Alighieri               [39;49m[39;49m|[39;49m
-                    [39;49m| [39;49m[32m99921-58-10-7[39m[39;49m | Divine Comedy |[39;49m[31;42m spans multiple rows rows Dante Alighieri  [39;49m[39;49m|[39;49m
+                    | [31m978[39m           | De Monarchia  |[31;42m             Dante Alighieri               [39;49m|
+                    | [32m99921-58-10-7[39m | Divine Comedy |[31;42m spans multiple rows rows Dante Alighieri  [39;49m|
                     |               |               |[31;42m         spans multiple rows rows          [39;49m|
                     +---------------+---------------+-------------------------------------------+
                     |             [37;41mtest[39;49m              |[31;42m                                      tttt [39;49m|
@@ -888,7 +888,7 @@ class TableTest extends TestCase
                     +----------------+---------------+---------------------+
                     |[30;46m ISBN           [39;49m|[32m Title         [39m|[32m Author              [39m|
                     +----------------+---------------+---------------------+
-                    [39;49m| 978-0521567817 | De Monarchia  |[39;49m[32m Dante Alighieri     [39m[39;49m|[39;49m
+                    | 978-0521567817 | De Monarchia  |[32m Dante Alighieri     [39m|
                     | 978-0804169127 | Divine Comedy |[32m spans multiple rows [39m|
                     |[37;41m test                           [39;49m| tttt                |
                     +--------------------------------+---------------------+
@@ -2848,6 +2848,121 @@ class TableTest extends TestCase
             false,
             'vertical',
             17,
+        ];
+
+        yield 'header spanning rows, starting with an empty line' => [
+            <<<TABLE
+                +-------+---+
+                |       | b |
+                +-------+---+
+                | Title |   |
+                +-------+---+
+                | x     | y |
+                +-------+---+
+
+                TABLE,
+            [new TableCell("\nTitle", ['rowspan' => 2]), 'b'],
+            [['x', 'y']],
+            false,
+        ];
+
+        yield 'header spanning rows, with an empty line' => [
+            <<<TABLE
+                +---+---+
+                | a | b |
+                +---+---+
+                |   |   |
+                +---+---+
+                | c |   |
+                +---+---+
+                | x | y |
+                +---+---+
+
+                TABLE,
+            [new TableCell("a\n\nc", ['rowspan' => 2]), 'b'],
+            [['x', 'y']],
+            false,
+        ];
+
+        yield 'header spanning rows, decorated' => [
+            <<<TABLE
+                +---+---+
+                |\033[32m a \033[39m|\033[32m b \033[39m|
+                +---+---+
+                |\033[32m c \033[39m|\033[32m   \033[39m|
+                +---+---+
+                | x | y |
+                +---+---+
+
+                TABLE,
+            [new TableCell("a\nc", ['rowspan' => 2]), 'b'],
+            [['x', 'y']],
+            true,
+        ];
+
+        yield 'cell with a style and a tag spanning rows, decorated' => [
+            <<<TABLE
+                +---+---+
+                |\033[39;44m \033[39;49m\033[32ma\033[39m\033[39;44m \033[39;49m| x |
+                |\033[39;44m \033[39;49m\033[32mb\033[39m\033[39;44m \033[39;49m| y |
+                +---+---+
+
+                TABLE,
+            [],
+            [[new TableCell("<info>a\nb</info>", ['rowspan' => 2, 'style' => new TableCellStyle(['bg' => 'blue'])]), 'x'], ['y']],
+            true,
+        ];
+
+        yield 'escaped closing tag in a cell spanning rows' => [
+            <<<TABLE
+                +----------+---+
+                | </info>a | x |
+                | b        | y |
+                +----------+---+
+
+                TABLE,
+            [],
+            [[new TableCell("\\</info>a\nb", ['rowspan' => 2]), 'x'], ['y']],
+            false,
+        ];
+
+        yield 'escaped tag in a cell spanning columns' => [
+            <<<TABLE
+                +-------------------+
+                | <info>abcdefgh    |
+                | x       | y       |
+                +---------+---------+
+
+                TABLE,
+            [],
+            [[new TableCell('\\<info>abcdefgh', ['colspan' => 2])], ['x', 'y']],
+            true,
+        ];
+
+        yield 'escaped tag in a cell without options' => [
+            <<<TABLE
+                +-----------+---+
+                | <info>abc | x |
+                | y         | z |
+                +-----------+---+
+
+                TABLE,
+            [],
+            [[new TableCell('\\<info>abc'), 'x'], ['y', 'z']],
+            false,
+        ];
+
+        yield 'escaped tag in a cell with a style' => [
+            <<<TABLE
+                +-----------+---+
+                | <info>abc | x |
+                | y         | z |
+                +-----------+---+
+
+                TABLE,
+            [],
+            [[new TableCell('\\<info>abc', ['style' => new TableCellStyle(['align' => 'right'])]), 'x'], ['y', 'z']],
+            false,
         ];
     }
 

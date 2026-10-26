@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -25,6 +26,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Tests\Fixtures\TypeInfoFormTypeGuesserCase;
 use Symfony\Component\Form\Tests\Fixtures\TypeInfoFormTypeGuesserChildCase;
 use Symfony\Component\Form\TypeInfoFormTypeGuesser;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
@@ -89,8 +91,15 @@ class TypeInfoFormTypeGuesserTest extends TestCase
         yield 'int literal' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), 'intLiteral'];
         yield 'string literal' => [null, 'stringLiteral'];
         yield 'non-zero-int' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), 'nonZeroInt'];
-        yield 'int literal union' => [new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), 'intLiteralUnion'];
         yield 'mixed literal union' => [null, 'mixedLiteralUnion'];
+    }
+
+    #[RequiresMethod(Type::class, 'withoutRefinements')]
+    public function testGuessIntLiteralUnion()
+    {
+        $guesser = new TypeInfoFormTypeGuesser(TypeResolver::create(null, true));
+
+        $this->assertEquals(new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE), $guesser->guessType(TypeInfoFormTypeGuesserCase::class, 'intLiteralUnion'));
     }
 
     #[DataProvider('provideGuessRequiredCases')]

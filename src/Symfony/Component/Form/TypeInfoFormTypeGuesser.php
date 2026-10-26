@@ -120,8 +120,8 @@ final class TypeInfoFormTypeGuesser implements FormTypeGuesserInterface
             $type = $type->getWrappedType();
         }
 
-        // symfony/type-info < 8.2 has no refinements to remove
-        if (method_exists($type, 'withoutRefinements')) {
+        // the lowest symfony/type-info has no refinements to remove
+        if (method_exists($type, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
             $type = $type->withoutRefinements();
         }
 

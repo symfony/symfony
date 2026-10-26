@@ -250,7 +250,7 @@ return [
         'en_SD' => 'English (Sudan)',
         'en_SE' => 'English (Sweden)',
         'en_SG' => 'English (Singapore)',
-        'en_SH' => 'English (St. Helena)',
+        'en_SH' => 'English (St. Helena, Ascension & Tristan da Cunha)',
         'en_SI' => 'English (Slovenia)',
         'en_SK' => 'English (Slovakia)',
         'en_SL' => 'English (Sierra Leone)',

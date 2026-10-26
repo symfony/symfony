@@ -672,6 +672,8 @@ return [
         'pcm_NG' => 'Pidgin Nigeriano Simi (Nigeria)',
         'pl' => 'Polaco Simi',
         'pl_PL' => 'Polaco Simi (Polonia)',
+        'pms' => 'Piedmontese',
+        'pms_IT' => 'Piedmontese (Italia)',
         'prg' => 'Prusiano Simi',
         'prg_PL' => 'Prusiano Simi (Polonia)',
         'ps' => 'Pashto Simi',

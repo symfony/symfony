@@ -266,10 +266,6 @@ return [
             'CNH',
             'Renminbi-Yuan (Offshore)',
         ],
-        'CNX' => [
-            'CNX',
-            'Dollar der Chinesischen Volksbank',
-        ],
         'CNY' => [
             'CN¥',
             'Renminbi Yuan',

@@ -5,7 +5,7 @@ return [
         'Cyrl' => 'Sirilik',
         'Hans' => 'Sederhana',
         'Hant' => 'Tradisional',
-        'Latn' => 'Latin',
+        'Latn' => 'Basa Latin',
         'Zxxx' => 'Non-tulisan',
     ],
 ];

@@ -23,11 +23,6 @@ return [
         'Europe/Amsterdam' => 'Nedderlannen-Tiet (Amsterdam)',
         'Europe/Berlin' => 'Düütschland-Tiet (Berlin)',
         'Europe/Busingen' => 'Düütschland-Tiet (Büsingen)',
-        'Europe/Dublin' => 'Gröönwisch-Welttiet (Dublin)',
-        'Europe/Guernsey' => 'Gröönwisch-Welttiet (Guernsey)',
-        'Europe/Isle_of_Man' => 'Gröönwisch-Welttiet (Isle of Man)',
-        'Europe/Jersey' => 'Gröönwisch-Welttiet (Jersey)',
-        'Europe/London' => 'Gröönwisch-Welttiet (London)',
     ],
     'Meta' => [
         'GmtFormat' => 'UTC%s',

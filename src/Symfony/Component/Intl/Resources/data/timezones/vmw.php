@@ -21,11 +21,6 @@ return [
         'Atlantic/Reykjavik' => 'okathi oolikana wa Greenwich (Reykjavik)',
         'Atlantic/St_Helena' => 'okathi oolikana wa Greenwich (St. Helena)',
         'Etc/GMT' => 'okathi oolikana wa Greenwich',
-        'Europe/Dublin' => 'okathi oolikana wa Greenwich (Dublin)',
-        'Europe/Guernsey' => 'okathi oolikana wa Greenwich (Guernsey)',
-        'Europe/Isle_of_Man' => 'okathi oolikana wa Greenwich (Isle of Man)',
-        'Europe/Jersey' => 'okathi oolikana wa Greenwich (Jersey)',
-        'Europe/London' => 'okathi oolikana wa Greenwich (London)',
     ],
     'Meta' => [
         'HourFormatPos' => '+%d:%02d',

@@ -22,10 +22,6 @@ return [
             'KZT',
             'tenge kazajo',
         ],
-        'MWK' => [
-            'MWK',
-            'kwacha malauí',
-        ],
         'NIO' => [
             'NIO',
             'córdoba nicaragüense',

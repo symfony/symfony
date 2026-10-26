@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
+use Symfony\Component\HttpClient\Exception\TimeoutException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
@@ -325,6 +326,85 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         }
 
         $this->assertLessThan(0.9, min($durations));
+    }
+
+    public function testPauseLongerThanTimeout()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/', ['timeout' => 0.5]);
+
+        $time = hrtime(true);
+        $response->getInfo('pause_handler')(1);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertGreaterThanOrEqual(0.9, (hrtime(true) - $time) / 1E9);
+    }
+
+    public function testPauseDuringBodyLongerThanTimeout()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/timeout-body', ['timeout' => 0.3]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $response->getInfo('pause_handler')(0.8);
+        $this->assertSame('<1><2>', $response->getContent());
+    }
+
+    public function testPauseCountsTowardMaxDuration()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/', ['max_duration' => 1]);
+
+        $time = hrtime(true);
+        $response->getInfo('pause_handler')(3);
+
+        try {
+            $response->getStatusCode();
+            $this->fail(TransportException::class.' expected');
+        } catch (TransportException $e) {
+            $this->assertSame('Max duration was reached for "http://localhost:8057/".', $e->getMessage());
+        }
+
+        $this->assertGreaterThanOrEqual(0.9, (hrtime(true) - $time) / 1E9);
+        $this->assertLessThan(2.5, (hrtime(true) - $time) / 1E9);
+    }
+
+    public function testTransferAfterPauseCountsTowardMaxDuration()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/timeout-header', ['max_duration' => 1]);
+
+        $response->getInfo('pause_handler')(0.8);
+
+        try {
+            $response->getStatusCode();
+            $this->fail(TransportException::class.' expected');
+        } catch (TransportException $e) {
+            $this->assertNotInstanceOf(TimeoutException::class, $e);
+        }
+    }
+
+    #[Group('transient-on-windows')]
+    public function testPauseDoesNotDelayTheTimeoutOfOtherResponses()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $paused = $client->request('GET', 'http://localhost:8057/', ['timeout' => 0.2]);
+        $paused->getInfo('pause_handler')(1.2);
+        $idle = $client->request('GET', 'http://localhost:8057/timeout-body', ['timeout' => 0.2]);
+
+        $time = hrtime(true);
+        $timeouts = [];
+
+        foreach ($client->stream([$paused, $idle]) as $response => $chunk) {
+            if ($chunk->isTimeout()) {
+                $timeouts[] = [$response, (hrtime(true) - $time) / 1E9];
+            }
+        }
+
+        $this->assertCount(1, $timeouts);
+        $this->assertSame($idle, $timeouts[0][0]);
+        $this->assertLessThan(1, $timeouts[0][1]);
+        $this->assertSame(200, $paused->getStatusCode());
+        $this->assertGreaterThanOrEqual(1.1, (hrtime(true) - $time) / 1E9);
     }
 
     public function testHttp2PushVulcainWithUnusedResponse()

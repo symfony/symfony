@@ -306,6 +306,7 @@ return [
         'pcm' => 'Nigeriako pidgina',
         'pis' => 'pijina',
         'pl' => 'poloniera',
+        'pms' => 'piemontera',
         'pqm' => 'maliseet-passamaquoddyera',
         'prg' => 'prusiera',
         'ps' => 'paxtunera',

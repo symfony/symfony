@@ -300,6 +300,7 @@ return [
         'pcm' => 'Bidjinka Nayjeeriya',
         'pis' => 'Pijin',
         'pl' => 'Boolish',
+        'pms' => 'Piedmontiis',
         'pqm' => 'Maliseet-Passamaquoddy',
         'prg' => 'Brashiyaan',
         'ps' => 'Bashtuu',

@@ -2,9 +2,9 @@
 
 return [
     'Names' => [
-        'en' => 'Sekgoa',
-        'en_BW' => 'Sekgoa (Botswana)',
-        'en_ZA' => 'Sekgoa (Aforika Borwa)',
+        'en' => 'English',
+        'en_BW' => 'English (Botswana)',
+        'en_ZA' => 'English (Aforika Borwa)',
         'tn' => 'Setswana',
         'tn_BW' => 'Setswana (Botswana)',
         'tn_ZA' => 'Setswana (Aforika Borwa)',

@@ -1144,7 +1144,7 @@ return [
         ],
         'ZWG' => [
             'ZWG',
-            'Zimbabwean Gold',
+            'Zimbabwe Gold',
         ],
         'ZWL' => [
             'ZWL',

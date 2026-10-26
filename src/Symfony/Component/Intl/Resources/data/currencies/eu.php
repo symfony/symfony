@@ -266,10 +266,6 @@ return [
             'CNH',
             'yuan txinatarra (itsasoz haraindikoa)',
         ],
-        'CNX' => [
-            'CNX',
-            'Txinako Herri Bankuaren dolarra',
-        ],
         'CNY' => [
             'CN¥',
             'yuan txinatarra',

@@ -340,6 +340,7 @@ return [
         'pcm' => 'Nigerian Pidgin',
         'pis' => 'Pijin',
         'pl' => 'Poland',
+        'pms' => 'Piedmont',
         'pqm' => 'Maliseet-Passamaquoddy',
         'prg' => 'Prusia',
         'ps' => 'Pashto',

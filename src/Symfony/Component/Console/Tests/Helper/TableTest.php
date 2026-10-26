@@ -807,11 +807,11 @@ class TableTest extends TestCase
                 'default',
                 <<<'TABLE'
                     +--------------------+
-                    [37;41m| [39;49m[37;41mDont break[39;49m[37;41m         |[39;49m
-                    [37;41m| here[39;49m               |
+                    | [37;41mDont break[39;49m         |
+                    | [37;41mhere[39;49m               |
                     +-------+------------+
-                    [39;49m| foo   | [39;49m[37;41mDont break[39;49m[39;49m |[39;49m
-                    [39;49m| bar   | [39;49m[37;41mhere[39;49m       |
+                    | foo   | [37;41mDont break[39;49m |
+                    | bar   | [37;41mhere[39;49m       |
                     +-------+------------+
 
                     TABLE,
@@ -956,8 +956,8 @@ class TableTest extends TestCase
                 'default',
                 <<<'TABLE'
                     +---------------+---------------+-------------------------------------------+
-                    [39;49m| [39;49m[31m978[39m[39;49m           | De Monarchia  |[39;49m[31;42m             Dante Alighieri               [39;49m[39;49m|[39;49m
-                    [39;49m| [39;49m[32m99921-58-10-7[39m[39;49m | Divine Comedy |[39;49m[31;42m spans multiple rows rows Dante Alighieri  [39;49m[39;49m|[39;49m
+                    | [31m978[39m           | De Monarchia  |[31;42m             Dante Alighieri               [39;49m|
+                    | [32m99921-58-10-7[39m | Divine Comedy |[31;42m spans multiple rows rows Dante Alighieri  [39;49m|
                     |               |               |[31;42m         spans multiple rows rows          [39;49m|
                     +---------------+---------------+-------------------------------------------+
                     |             [37;41mtest[39;49m              |[31;42m                                      tttt [39;49m|
@@ -1012,7 +1012,7 @@ class TableTest extends TestCase
                     +----------------+---------------+---------------------+
                     |[30;46m ISBN           [39;49m|[32m Title         [39m|[32m Author              [39m|
                     +----------------+---------------+---------------------+
-                    [39;49m| 978-0521567817 | De Monarchia  |[39;49m[32m Dante Alighieri     [39m[39;49m|[39;49m
+                    | 978-0521567817 | De Monarchia  |[32m Dante Alighieri     [39m|
                     | 978-0804169127 | Divine Comedy |[32m spans multiple rows [39m|
                     |[37;41m test                           [39;49m| tttt                |
                     +--------------------------------+---------------------+
@@ -2026,6 +2026,137 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    public function testColumnMaxWidthsWithWindowsLineEndings()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setColumnMaxWidth(0, 5)
+            ->setRows([
+                ["Lorem ipsum\r\ndolor sit amet", 'x'],
+                ["foo\r\nbar\nbaz", 'y'],
+                ["<info>ab</info>cde\r\nfgh", 'z'],
+                ["abcde \r\n", 'w'],
+            ])
+            ->render()
+        ;
+
+        $expected =
+            <<<'TABLE'
+                +-------+---+
+                | Lorem | x |
+                | ipsum |   |
+                | dolor |   |
+                | sit   |   |
+                | amet  |   |
+                | foo   | y |
+                | bar   |   |
+                | baz   |   |
+                | abcde | z |
+                | fgh   |   |
+                | abcde | w |
+                |       |   |
+                +-------+---+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthsWithWideCharacters()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setColumnMaxWidth(0, 4)
+            ->setRows([
+                ['字字字字字', 'x'],
+                ['ab 字字 c', 'y'],
+                ['a字\<字', 'z'],
+            ])
+            ->render()
+        ;
+
+        $expected =
+            <<<'TABLE'
+                +------+---+
+                | 字字 | x |
+                | 字字 |   |
+                | 字   |   |
+                | ab   | y |
+                | 字字 |   |
+                | c    |   |
+                | a字< | z |
+                | 字   |   |
+                +------+---+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthsWithControlCharacters()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setColumnMaxWidth(0, 5)
+            ->setRows([
+                ["abcdefg\n\e[32m\t\e[39m", 'x'],
+                ["12\\\n34567\n1\\\\", 'y'],
+            ])
+            ->render()
+        ;
+
+        $expected =
+            <<<TABLE
+                +-------+---+
+                | abcde | x |
+                | fg    |   |
+                | \e[32m\t\e[39m     |   |
+                | 12\\   | y |
+                | 34567 |   |
+                | 1\\\\   |   |
+                +-------+---+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthsWithTrailingWhitespace()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setColumnMaxWidth(0, 6)
+            ->setRows([['abcdef ', 'x']])
+            ->render()
+        ;
+
+        $expected =
+            <<<'TABLE'
+                +--------+---+
+                | abcdef | x |
+                +--------+---+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthsWithStyledLineFollowedByWhitespace()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setColumnMaxWidth(0, 6)
+            ->setRows([['<info>abcdef</info> ', 'x']])
+            ->render()
+        ;
+
+        $expected =
+            <<<'TABLE'
+                +--------+---+
+                | abcdef | x |
+                |        |   |
+                +--------+---+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
     public function testColumnMaxWidthsWithTrailingBackslash()
     {
         (new Table($output = $this->getOutputStream()))
@@ -2638,6 +2769,437 @@ class TableTest extends TestCase
         $this->assertEquals($expectedOutput, $this->getOutputContent($output));
     }
 
+    #[DataProvider('provideCellStyles')]
+    public function testCellStyles(string $expected, array $headers, array $rows, bool $decorated, string $layout = 'default', int $maxWidth = 0)
+    {
+        $table = new Table($output = $this->getOutputStream($decorated));
+        $table
+            ->setHeaders($headers)
+            ->setRows($rows)
+        ;
+
+        if ('vertical' === $layout) {
+            $table->setVertical();
+        } elseif ('horizontal' === $layout) {
+            $table->setHorizontal();
+        }
+        if ($maxWidth) {
+            $table->setColumnMaxWidth(0, $maxWidth);
+        }
+
+        $table->render();
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public static function provideCellStyles(): iterable
+    {
+        yield 'decorated' => [
+            <<<TABLE
+                +-----+---+
+                | \033[32mfoo\033[39m | x |
+                | \033[32mbar\033[39m |   |
+                +-----+---+
+
+                TABLE,
+            [],
+            [["<info>foo\nbar</info>", 'x']],
+            true,
+        ];
+
+        yield 'hyperlink with a backreference in its URL' => [
+            <<<TABLE
+                +---+---+
+                | a | x |
+                | b |   |
+                +---+---+
+
+                TABLE,
+            [],
+            [["<href=https://example.com/\\2024/\$1>a\nb</>", 'x']],
+            false,
+        ];
+
+        yield 'closed on the next line' => [
+            <<<TABLE
+                +----+---+
+                | mq | x |
+                |    |   |
+                | sj |   |
+                +----+---+
+
+                TABLE,
+            [],
+            [["<fg=red>mq\n</><comment>\nsj</comment>", 'x']],
+            false,
+        ];
+
+        yield 'closed on the next line, decorated' => [
+            <<<TABLE
+                +----+---+
+                | \033[31mmq\033[39m | x |
+                |    |   |
+                | \033[33msj\033[39m |   |
+                +----+---+
+
+                TABLE,
+            [],
+            [["<fg=red>mq\n</><comment>\nsj</comment>", 'x']],
+            true,
+        ];
+
+        yield 'closing tag inside the text of a tag' => [
+            <<<TABLE
+                +-----------+---+
+                | <fg=red>x | y |
+                | z         | w |
+                +-----------+---+
+
+                TABLE,
+            [],
+            [['<fg=re</>d>x<fg=default;bg=default>', 'y'], ['z', 'w']],
+            true,
+        ];
+
+        yield 'cell with a style spanning rows' => [
+            <<<TABLE
+                +-----+---+
+                |  a  | x |
+                | bcd | y |
+                +-----+---+
+
+                TABLE,
+            [],
+            [[new TableCell("<info><comment>a\nbcd</comment></info>", ['rowspan' => 2, 'style' => new TableCellStyle(['align' => 'center'])]), 'x'], ['y']],
+            false,
+        ];
+
+        yield 'cell with a style spanning rows and default colors left open' => [
+            <<<TABLE
+                +----+
+                | a  |
+                | bc |
+                | x  |
+                +----+
+
+                TABLE,
+            [],
+            [[new TableCell("a\n<fg=default;bg=default>bc", ['rowspan' => 2, 'style' => new TableCellStyle(['align' => 'left'])])], ['x']],
+            false,
+        ];
+
+        yield 'cell with a style spanning rows and a hyperlink left open' => [
+            <<<TABLE
+                +----+
+                | a  |
+                | bc |
+                | x  |
+                +----+
+
+                TABLE,
+            [],
+            [[new TableCell("a\n<href=https://example.com/a\\<b>bc", ['rowspan' => 2, 'style' => new TableCellStyle(['align' => 'left'])])], ['x']],
+            false,
+        ];
+
+        yield 'unclosed' => [
+            <<<TABLE
+                +-----+---+
+                | \033[32mfoo\033[39m | x |
+                | \033[32mbar\033[39m |   |
+                | y   | z |
+                +-----+---+
+
+                TABLE,
+            [],
+            [["<info>foo\nbar", 'x'], ['y', 'z']],
+            true,
+        ];
+
+        yield 'unclosed on a single line' => [
+            <<<TABLE
+                +-----+---+
+                | \033[32mfoo\033[39m | x |
+                | y   | z |
+                +-----+---+
+
+                TABLE,
+            [],
+            [['<info>foo', 'x'], ['y', 'z']],
+            true,
+        ];
+
+        yield 'unclosed with max width' => [
+            <<<TABLE
+                +-----+---+
+                | \033[32mfoo\033[39m | x |
+                | \033[32mbar\033[39m |   |
+                | y   | z |
+                +-----+---+
+
+                TABLE,
+            [],
+            [['<info>foobar', 'x'], ['y', 'z']],
+            true,
+            'default',
+            3,
+        ];
+
+        yield 'closing tag that closes nothing in its cell' => [
+            <<<TABLE
+                +-----+
+                | \033[32mfoo\033[39m |
+                | \033[32mbar\033[39m |
+                | \033[33mx\033[39m   |
+                |     |
+                +-----+
+
+                TABLE,
+            [],
+            [["<info>foo\nbar"], ['<comment>x'], ['</info>']],
+            true,
+        ];
+
+        yield 'horizontal, unclosed header' => [
+            <<<TABLE
+                +---+---+---+
+                |\033[32m \033[39m\033[32ma\033[39m\033[32m \033[39m| b | c |
+                +---+---+---+
+
+                TABLE,
+            ['<info>a'],
+            [['b'], ['c']],
+            true,
+            'horizontal',
+        ];
+
+        yield 'vertical, unclosed header' => [
+            <<<TABLE
+                +--------+
+                | \033[32mfoo\033[39m: x |
+                +--------+
+
+                TABLE,
+            ['<info>foo'],
+            [['x']],
+            true,
+            'vertical',
+        ];
+
+        yield 'vertical, decorated' => [
+            <<<TABLE
+                +-----+
+                | \033[32mfoo\033[39m |
+                | \033[32mbar\033[39m |
+                | x   |
+                +-----+
+
+                TABLE,
+            [],
+            [["<info>foo\nbar</info>", 'x']],
+            true,
+            'vertical',
+        ];
+
+        yield 'trailing backslash' => [
+            <<<TABLE
+                +----+
+                | \033[32ma\033[39m\\ |
+                | \033[32mb\033[39m  |
+                +----+
+
+                TABLE,
+            [],
+            [["<info>a\\\nb</info>"]],
+            true,
+        ];
+
+        yield 'vertical, trailing backslash' => [
+            <<<TABLE
+                +----+
+                | \033[32ma\033[39m\\ |
+                | \033[32mb\033[39m  |
+                +----+
+
+                TABLE,
+            [],
+            [["<info>a\\\nb</info>"]],
+            true,
+            'vertical',
+        ];
+
+        yield 'vertical, multi-line header' => [
+            <<<TABLE
+                +--------+
+                | \033[33mfoo\033[39m    |
+                | \033[33mbar\033[39m: x |
+                +--------+
+
+                TABLE,
+            ["foo\nbar"],
+            [['x']],
+            true,
+            'vertical',
+        ];
+
+        yield 'vertical with max width' => [
+            <<<TABLE
+                +-------------------+
+                |                   |
+                | https://example.c |
+                | om/doc            |
+                |-------------------|
+                | abcdefghijklmnopq |
+                | rstuvwxyz         |
+                | ab                |
+                +-------------------+
+
+                TABLE,
+            [],
+            [["<error>\nhttps://example.com/doc</error>"], ["abcdefghijklmnopqrstuvwxyz<info>\nab</info>"]],
+            false,
+            'vertical',
+            17,
+        ];
+
+        yield 'header spanning rows, starting with an empty line' => [
+            <<<TABLE
+                +-------+---+
+                |       | b |
+                +-------+---+
+                | Title |   |
+                +-------+---+
+                | x     | y |
+                +-------+---+
+
+                TABLE,
+            [new TableCell("\nTitle", ['rowspan' => 2]), 'b'],
+            [['x', 'y']],
+            false,
+        ];
+
+        yield 'header spanning rows, with an empty line' => [
+            <<<TABLE
+                +---+---+
+                | a | b |
+                +---+---+
+                |   |   |
+                +---+---+
+                | c |   |
+                +---+---+
+                | x | y |
+                +---+---+
+
+                TABLE,
+            [new TableCell("a\n\nc", ['rowspan' => 2]), 'b'],
+            [['x', 'y']],
+            false,
+        ];
+
+        yield 'header spanning rows, decorated' => [
+            <<<TABLE
+                +---+---+
+                |\033[32m a \033[39m|\033[32m b \033[39m|
+                +---+---+
+                |\033[32m c \033[39m|\033[32m   \033[39m|
+                +---+---+
+                | x | y |
+                +---+---+
+
+                TABLE,
+            [new TableCell("a\nc", ['rowspan' => 2]), 'b'],
+            [['x', 'y']],
+            true,
+        ];
+
+        yield 'cell with a style and a tag spanning rows, decorated' => [
+            <<<TABLE
+                +---+---+
+                |\033[39;44m \033[39;49m\033[32ma\033[39m\033[39;44m \033[39;49m| x |
+                |\033[39;44m \033[39;49m\033[32mb\033[39m\033[39;44m \033[39;49m| y |
+                +---+---+
+
+                TABLE,
+            [],
+            [[new TableCell("<info>a\nb</info>", ['rowspan' => 2, 'style' => new TableCellStyle(['bg' => 'blue'])]), 'x'], ['y']],
+            true,
+        ];
+
+        yield 'escaped closing tag in a cell spanning rows' => [
+            <<<TABLE
+                +----------+---+
+                | </info>a | x |
+                | b        | y |
+                +----------+---+
+
+                TABLE,
+            [],
+            [[new TableCell("\\</info>a\nb", ['rowspan' => 2]), 'x'], ['y']],
+            false,
+        ];
+
+        yield 'escaped tag in a cell spanning columns' => [
+            <<<TABLE
+                +-------------------+
+                | <info>abcdefgh    |
+                | x       | y       |
+                +---------+---------+
+
+                TABLE,
+            [],
+            [[new TableCell('\\<info>abcdefgh', ['colspan' => 2])], ['x', 'y']],
+            true,
+        ];
+
+        yield 'escaped tag in a cell without options' => [
+            <<<TABLE
+                +-----------+---+
+                | <info>abc | x |
+                | y         | z |
+                +-----------+---+
+
+                TABLE,
+            [],
+            [[new TableCell('\\<info>abc'), 'x'], ['y', 'z']],
+            false,
+        ];
+
+        yield 'escaped tag in a cell with a style' => [
+            <<<TABLE
+                +-----------+---+
+                | <info>abc | x |
+                | y         | z |
+                +-----------+---+
+
+                TABLE,
+            [],
+            [[new TableCell('\\<info>abc', ['style' => new TableCellStyle(['align' => 'right'])]), 'x'], ['y', 'z']],
+            false,
+        ];
+    }
+
+    public function testClosingTagDoesNotCloseStyleOfAnotherCell()
+    {
+        $table = new Table($this->getOutputStream());
+        // the style of the second cell is open around its content
+        $table->setRows([['<comment>a', new TableCell('</comment>b', ['style' => new TableCellStyle(['fg' => 'red'])])]]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Incorrectly nested style tag found.');
+
+        $table->render();
+    }
+
+    public function testDefaultColorsOpenedInStyledCellSpanningRows()
+    {
+        $table = new Table($this->getOutputStream());
+        $table->setRows([[new TableCell("<fg=default;bg=default>a\nb", ['rowspan' => 2, 'style' => new TableCellStyle(['bg' => 'blue'])]), 'x'], ['y']]);
+
+        $this->expectNotToPerformAssertions();
+
+        $table->render();
+    }
+
     public function testWithHyperlinkAndMaxWidth()
     {
         $table = new Table($output = $this->getOutputStream(true));
@@ -2658,6 +3220,25 @@ class TableTest extends TestCase
                 | \033]8;;Lorem\033\\adipiscing elit, sed\033]8;;\033\\ |
                 | \033]8;;Lorem\033\\do eiusmod tempor\033]8;;\033\\    |
                 +----------------------+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testWithHyperlinkAndEscapedLessThanAndMaxWidth()
+    {
+        $table = new Table($output = $this->getOutputStream(true));
+        $table->setRows([['<href=Lorem>abcd\<x</>']]);
+        $table->setColumnMaxWidth(0, 4);
+        $table->render();
+
+        $expected =
+            <<<TABLE
+                +------+
+                | \033]8;;Lorem\033\\abcd\033]8;;\033\\ |
+                | \033]8;;Lorem\033\\<x\033]8;;\033\\   |
+                +------+
 
                 TABLE;
 

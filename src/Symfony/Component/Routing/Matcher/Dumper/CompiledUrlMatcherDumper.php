@@ -82,7 +82,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
 
         [$staticRoutes, $dynamicRoutes] = $this->groupStaticRoutes($routes);
 
-        $conditions = [null];
+        $conditions = ['' => null];
         $compiledRoutes[] = $this->compileStaticRoutes($staticRoutes, $conditions);
         $chunkLimit = \count($dynamicRoutes);
 
@@ -104,7 +104,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
         if ($forDump) {
             $compiledRoutes[2] = $compiledRoutes[4];
         }
-        unset($conditions[0]);
+        unset($conditions['']);
 
         if ($conditions) {
             foreach ($conditions as $expression => $condition) {
@@ -427,7 +427,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
             unset($defaults['_canonical_route']);
         }
 
-        if ($condition = $route->getCondition()) {
+        if ('' !== $condition = $route->getCondition()) {
             $condition = $this->getExpressionLanguage()->compile($condition, ['context', 'request', 'params']);
             $condition = $conditions[$condition] ??= (str_contains($condition, '$request') ? 1 : -1) * \count($conditions);
         } else {

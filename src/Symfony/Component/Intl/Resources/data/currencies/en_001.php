@@ -38,6 +38,10 @@ return [
             'SHP',
             'St Helena Pound',
         ],
+        'SLL' => [
+            'SLL',
+            'Sierra Leonean Leone (1964–2022)',
+        ],
         'TJR' => [
             'TJR',
             'Tajikistani Rouble',

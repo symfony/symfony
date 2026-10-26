@@ -268,7 +268,7 @@ return [
         'en_VG' => 'enskt (Stóra Bretlands Jomfrúoyggjar)',
         'en_VI' => 'enskt (Sambandsríki Amerikas Jomfrúoyggjar)',
         'en_VU' => 'enskt (Vanuatu)',
-        'en_WS' => 'enskt (Samoa)',
+        'en_WS' => 'enskt (Sámoa)',
         'en_ZA' => 'enskt (Suðurafrika)',
         'en_ZM' => 'enskt (Sambia)',
         'en_ZW' => 'enskt (Simbabvi)',

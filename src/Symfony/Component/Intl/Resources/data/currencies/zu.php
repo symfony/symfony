@@ -636,7 +636,7 @@ return [
         ],
         'XCG' => [
             'Cg.',
-            'Caribbean guilder',
+            'i-Caribbean guilder',
         ],
         'XOF' => [
             'F CFA',
@@ -664,7 +664,7 @@ return [
         ],
         'ZWG' => [
             'ZWG',
-            'Zimbabwean Gold',
+            'igolide laseZimbabwe',
         ],
     ],
 ];

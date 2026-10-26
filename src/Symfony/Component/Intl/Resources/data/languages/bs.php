@@ -390,6 +390,7 @@ return [
         'pi' => 'pali',
         'pis' => 'pidžin',
         'pl' => 'poljski',
+        'pms' => 'pijemontski',
         'pon' => 'ponpejski',
         'pqm' => 'malisit-pasamakvodi',
         'prg' => 'pruski',

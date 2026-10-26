@@ -29,6 +29,7 @@ final class AsyncContext
     private $passthru;
     private ResponseInterface $response;
     private array $info = [];
+    private float $maxDurationExpiry;
 
     /**
      * @param resource|null $content
@@ -40,10 +41,12 @@ final class AsyncContext
         array &$info,
         private $content,
         private int $offset,
+        float &$maxDurationExpiry = 0.0,
     ) {
         $this->passthru = &$passthru;
         $this->response = &$response;
         $this->info = &$info;
+        $this->maxDurationExpiry = &$maxDurationExpiry;
     }
 
     /**
@@ -96,6 +99,12 @@ final class AsyncContext
         if (\is_callable($pause = $this->response->getInfo('pause_handler'))) {
             $pause($duration);
         } elseif (0 < $duration) {
+            if ($this->maxDurationExpiry && $this->maxDurationExpiry <= hrtime(true) / 1E9 + $duration) {
+                usleep((int) max(0, 1E6 * ($this->maxDurationExpiry - hrtime(true) / 1E9)));
+
+                throw new TransportException(\sprintf('Max duration was reached for "%s".', $this->getInfo('url')));
+            }
+
             usleep((int) (1E6 * $duration));
         }
     }
@@ -164,10 +173,11 @@ final class AsyncContext
                 $onProgress($dlNow, $dlSize, $thisInfo + $info);
             };
         }
-        if (0 < ($info['max_duration'] ?? 0) && 0 < ($info['total_time'] ?? 0)) {
-            if (0 >= $options['max_duration'] = $info['max_duration'] - $info['total_time']) {
-                throw new TransportException(\sprintf('Max duration was reached for "%s".', $info['url']));
-            }
+        if (!$this->maxDurationExpiry && 0 < ($info['max_duration'] ?? 0)) {
+            $this->maxDurationExpiry = hrtime(true) / 1E9 + $info['max_duration'] - ($info['total_time'] ?? 0);
+        }
+        if ($this->maxDurationExpiry && 0 >= $options['max_duration'] = $this->maxDurationExpiry - hrtime(true) / 1E9) {
+            throw new TransportException(\sprintf('Max duration was reached for "%s".', $info['url']));
         }
 
         return $this->response = $this->client->request($method, $url, ['buffer' => false] + $options);

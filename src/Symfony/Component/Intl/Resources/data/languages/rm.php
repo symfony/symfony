@@ -347,6 +347,7 @@ return [
         'phn' => 'fenizian',
         'pi' => 'pali',
         'pl' => 'polac',
+        'pms' => 'piemuntais',
         'pon' => 'ponapean',
         'prg' => 'prussian',
         'pro' => 'provenzal vegl',

@@ -13,7 +13,7 @@ return [
         'MF' => 'Saint Martin',
         'PM' => 'Saint-Pierre-et-Miquelon',
         'PS' => 'Palestinian territories',
-        'SH' => 'Saint Helena',
+        'SH' => 'Saint Helena, Ascension & Tristan da Cunha',
         'SJ' => 'Svalbard and Jan Mayen',
         'ST' => 'São Tomé and Príncipe',
         'TC' => 'Turks and Caicos Islands',

@@ -393,6 +393,7 @@ return [
         'pi' => 'pali',
         'pis' => 'pijin',
         'pl' => 'polsk',
+        'pms' => 'piemontesisk',
         'pon' => 'ponape',
         'pqm' => 'maliseet-passamaquoddy',
         'prg' => 'preussisk',

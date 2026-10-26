@@ -204,7 +204,7 @@ return [
         ],
         'GHS' => [
             'GHS',
-            'Gano sedisi',
+            'Gana sedisi',
         ],
         'GIP' => [
             'GIP',
@@ -416,7 +416,7 @@ return [
         ],
         'NOK' => [
             'NOK',
-            'Norwegiýa kronasy',
+            'Norweg kronasy',
         ],
         'NPR' => [
             'NPR',

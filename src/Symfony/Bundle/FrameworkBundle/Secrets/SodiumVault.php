@@ -68,8 +68,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         $this->decryptionKey = sodium_crypto_box_keypair();
         $this->encryptionKey = sodium_crypto_box_publickey($this->decryptionKey);
 
-        $this->export('encrypt.public', $this->encryptionKey);
-        $this->export('decrypt.private', $this->decryptionKey);
+        $this->exportKeys();
 
         $this->lastMessage = \sprintf('Sodium keys have been generated at "%s*.public/private.php".', $this->getPrettyPath($this->pathPrefix));
 
@@ -133,10 +132,10 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         $this->encryptionKey = sodium_crypto_box_publickey($newKey);
 
         if ($newKey !== $currentKey) {
-            $this->export('decrypt.private', $newKey);
+            $this->exportKeys();
+        } else {
+            $this->export('encrypt.public', $this->encryptionKey);
         }
-
-        $this->export('encrypt.public', $this->encryptionKey);
 
         foreach ($plaintexts as $name => $value) {
             $this->seal($name, $value);
@@ -164,7 +163,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         if (!\array_key_exists($name, $list)) {
             $list[$name] = null;
             uksort($list, 'strnatcmp');
-            file_put_contents($this->pathPrefix.'list.php', \sprintf("<?php\n\nreturn %s;\n", VarExporter::export($list)), \LOCK_EX);
+            $this->exportList($list);
         }
 
         $this->lastMessage = \sprintf('Secret "%s" encrypted in "%s"; you can commit it.', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
@@ -226,7 +225,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
 
         $list = $this->list();
         unset($list[$name]);
-        file_put_contents($this->pathPrefix.'list.php', \sprintf("<?php\n\nreturn %s;\n", VarExporter::export($list)), \LOCK_EX);
+        $this->exportList($list);
 
         $this->lastMessage = \sprintf('Secret "%s" removed from "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
@@ -310,6 +309,20 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
             $e = error_get_last();
             throw new \ErrorException($e['message'] ?? 'Failed to write secrets data.', 0, $e['type'] ?? \E_USER_WARNING);
         }
+    }
+
+    private function exportKeys(): void
+    {
+        // Until the public key is written again after the private key, loadKeys() derives it from the private key, so that the two always match
+        @unlink($this->pathPrefix.'encrypt.public.php');
+        $this->export('decrypt.private', $this->decryptionKey);
+        $this->export('encrypt.public', $this->encryptionKey);
+    }
+
+    private function exportList(array $list): void
+    {
+        // An interrupted write never leaves a truncated list behind
+        (new Filesystem())->dumpFile($this->pathPrefix.'list.php', \sprintf("<?php\n\nreturn %s;\n", VarExporter::export($list)));
     }
 
     private function loadOldKey(): ?string

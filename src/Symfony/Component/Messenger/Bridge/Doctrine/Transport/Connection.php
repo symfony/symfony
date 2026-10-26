@@ -420,12 +420,17 @@ class Connection implements ResetInterface
     {
         $now = \DateTimeImmutable::createFromTimestamp(microtime(true));
 
+        if (null === $maxId = $this->executeQuery($this->createQueryBuilder()->select('MAX(m.id)')->getSQL())->fetchOne()) {
+            return;
+        }
+
         foreach ([false, true] as $deliveryTimedOut) {
             $queryBuilder = $this->createQueryBuilder()
                 ->where('m.queue_name = ?')
-                ->andWhere('m.available_at <= ?');
-            $parameters = [$this->configuration['queue_name'], $now];
-            $types = [Types::STRING, Types::DATETIME_IMMUTABLE];
+                ->andWhere('m.available_at <= ?')
+                ->andWhere('m.id <= ?');
+            $parameters = [$this->configuration['queue_name'], $now, $maxId];
+            $types = [Types::STRING, Types::DATETIME_IMMUTABLE, Types::BIGINT];
 
             // the next batches are read in the order of the index, so the database does not sort the messages that have the same "available_at"
             if ($deliveryTimedOut) {

@@ -269,9 +269,13 @@ final class Connection
         $this->ensureSetup();
 
         try {
-            $now = $this->getConnection()->execute(\sprintf('SELECT %s AS now', $this->backend->getNowExpression()))->fetchRow()['now'] ?? null;
+            $start = $this->getConnection()->execute(\sprintf('SELECT %s AS now, (SELECT MAX(id) FROM %s) AS max_id', $this->backend->getNowExpression(), $this->tableName))->fetchRow();
         } catch (\Throwable $e) {
             throw $this->createTransportException('Could not list messages in AMPHP SQL.', $e);
+        }
+
+        if (null === $maxId = $start['max_id'] ?? null) {
+            return;
         }
 
         foreach ([false, true] as $deliveryTimedOut) {
@@ -279,7 +283,7 @@ final class Connection
 
             do {
                 try {
-                    $rows = $this->findAvailableRows($now, $deliveryTimedOut, $after);
+                    $rows = $this->findAvailableRows($start['now'], $maxId, $deliveryTimedOut, $after);
                     $messages = array_map(self::normalizeRow(...), $rows);
                 } catch (\Throwable $e) {
                     throw $this->createTransportException('Could not list messages in AMPHP SQL.', $e);
@@ -364,10 +368,10 @@ final class Connection
      *
      * @return list<array<string, mixed>>
      */
-    private function findAvailableRows(mixed $now, bool $deliveryTimedOut, ?array $after): array
+    private function findAvailableRows(mixed $now, mixed $maxId, bool $deliveryTimedOut, ?array $after): array
     {
-        $sql = \sprintf('SELECT id, body, headers, available_at, delivered_at FROM %s WHERE queue_name = ? AND available_at <= ?', $this->tableName);
-        $params = [$this->queueName, $now];
+        $sql = \sprintf('SELECT id, body, headers, available_at, delivered_at FROM %s WHERE queue_name = ? AND available_at <= ? AND id <= ?', $this->tableName);
+        $params = [$this->queueName, $now, $maxId];
 
         if ($deliveryTimedOut) {
             $sql .= ' AND delivered_at < ?';

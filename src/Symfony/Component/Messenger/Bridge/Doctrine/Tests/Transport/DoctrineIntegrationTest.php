@@ -283,7 +283,27 @@ class DoctrineIntegrationTest extends TestCase
 
         $bodies = array_column(iterator_to_array($messages, false), 'body');
 
-        $this->assertSame(array_map(strval(...), [...array_diff(range(1, 1100), [130, 1050]), 1101]), $bodies);
+        $this->assertSame(array_map(strval(...), array_values(array_diff(range(1, 1100), [130, 1050]))), $bodies);
+    }
+
+    public function testFindAllInBatchesDoesNotListTheMessagesSentDuringTheListing()
+    {
+        $this->connection->setup();
+        $availableAt = new \DateTimeImmutable('2019-03-15 12:00:00', new \DateTimeZone('UTC'));
+        $this->insertMessages(range(1, 150), $availableAt);
+
+        $bodies = [];
+        foreach ($this->connection->findAllInBatches() as $message) {
+            $bodies[] = $message['body'];
+
+            if (300 === \count($bodies)) {
+                break;
+            }
+
+            $this->insertMessages([$message['body']], $availableAt);
+        }
+
+        $this->assertSame(array_map(strval(...), range(1, 150)), $bodies);
     }
 
     public function testTheTransportIsSetupOnGet()

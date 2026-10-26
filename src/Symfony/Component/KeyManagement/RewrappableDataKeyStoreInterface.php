@@ -12,6 +12,7 @@
 namespace Symfony\Component\KeyManagement;
 
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
+use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 
 /**
  * A {@see DataKeyStoreInterface} whose stored keys can be enumerated and re-wrapped.
@@ -39,14 +40,15 @@ interface RewrappableDataKeyStoreInterface extends DataKeyStoreInterface
     /**
      * Replaces the wrapping of a stored key.
      *
-     * Its reference and its scope are left untouched, so that payloads referring to it keep
-     * resolving.
+     * `$rewrapped` contains the data key of `$row` and its new wrapping.
+     * A data key that doesn't match the binding of the row is refused, {@see StoredDataKey::$binding}.
+     * Otherwise, the store computes the binding again, which is how it moves rows to a new secret.
+     * The reference and the scope stay the same, so payloads referring to the key keep resolving.
      *
-     * Only the wrapping moves: the binding of the row, {@see StoredDataKey::$binding}, stays valid since it is keyed by the data key, which rewrapping does not change.
-     *
-     * @throws DataKeyNotFoundException If no stored key matches `$reference`
+     * @throws DataKeyNotFoundException  If no stored key matches `$row`
+     * @throws DecryptionFailedException If `$rewrapped` doesn't contain the data key `$row` is bound to
      */
-    public function rewrap(string $reference, Ciphertext $wrapped, string $client): void;
+    public function rewrap(StoredDataKey $row, DataKey $rewrapped, string $client): void;
 
     /**
      * The authenticated data this store wraps `$row` with, empty when its backend authenticates nothing.

@@ -376,9 +376,9 @@ class CompositeKmsTest extends TestCase
             {
             }
 
-            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
             {
-                return $this->inner->encrypt($keyId, $plaintext, $aad, $deterministic);
+                return $this->inner->encrypt($keyId, $plaintext, $aad);
             }
 
             public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
@@ -431,15 +431,6 @@ class CompositeKmsTest extends TestCase
 
         $this->expectException(DecryptionFailedException::class);
         $kms->decrypt($ciphertext, 'other');
-    }
-
-    public function testTheDeterministicFlagReachesEveryMember()
-    {
-        $this->kms()->encrypt('app', 'secret', deterministic: true);
-
-        $this->assertSame([true], $this->aws->deterministic);
-        $this->assertSame([true], $this->azure->deterministic);
-        $this->assertSame([true], $this->gcp->deterministic);
     }
 
     public function testADataKeyIsWrappedByEveryMemberAndUnwrappedByAny()
@@ -639,9 +630,9 @@ class CompositeKmsTest extends TestCase
             {
             }
 
-            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
             {
-                return $this->members->encrypt($keyId, $plaintext, $aad, $deterministic);
+                return $this->members->encrypt($keyId, $plaintext, $aad);
             }
 
             public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
@@ -683,9 +674,9 @@ class CompositeKmsTest extends TestCase
             {
             }
 
-            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
             {
-                return $this->members->encrypt($keyId, $plaintext, $aad, $deterministic);
+                return $this->members->encrypt($keyId, $plaintext, $aad);
             }
 
             public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
@@ -769,9 +760,9 @@ class CompositeKmsTest extends TestCase
             {
             }
 
-            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
             {
-                return new Ciphertext('encrypt:'.$this->inner->encrypt($keyId, $plaintext, $aad, $deterministic)->blob, $keyId);
+                return new Ciphertext('encrypt:'.$this->inner->encrypt($keyId, $plaintext, $aad)->blob, $keyId);
             }
 
             public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
@@ -816,9 +807,9 @@ class CompositeKmsTest extends TestCase
                 $this->inner = new InMemoryKms();
             }
 
-            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
             {
-                return $this->inner->encrypt($keyId, $plaintext, $aad, $deterministic);
+                return $this->inner->encrypt($keyId, $plaintext, $aad);
             }
 
             public function decrypt(Ciphertext $ciphertext, string $aad = ''): string

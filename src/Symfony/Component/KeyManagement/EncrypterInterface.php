@@ -31,21 +31,6 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
  * {@see UnsupportedOperationException} when a non-empty AAD is provided
  * rather than silently ignore it.
  *
- * The `$deterministic` flag selects between two encryption modes:
- *   - random (default): a fresh nonce is drawn for every call, so the same
- *     plaintext encrypts to a different ciphertext each time. Use this for
- *     anything that does not need to be searched.
- *   - deterministic: the nonce is derived from the AAD and the plaintext
- *     keyed by the master key (typically HMAC-SHA512 truncated, or BLAKE2b
- *     keyed for libsodium), so the same (key, AAD, plaintext) triple always
- *     produces the same ciphertext. Enables exact-match indexing in
- *     databases. The AAD MUST take part in that derivation, and MUST do so
- *     unambiguously: two encryptions differing only by their AAD would
- *     otherwise reuse a nonce under the same key, which hands an attacker
- *     the authentication key of the AEAD. Backends that cannot offer this
- *     mode MUST throw {@see UnsupportedOperationException} when
- *     `$deterministic` is `true`.
- *
  * Most backends implement {@see DecrypterInterface} as well; some
  * deployments only expose the encrypting half (e.g. a write-only host that
  * holds only the public key of an asymmetric scheme).
@@ -58,8 +43,8 @@ interface EncrypterInterface
 {
     /**
      * @throws KeyNotFoundException          If `$keyId` is unknown to the backend
-     * @throws UnsupportedOperationException If `$aad` is non-empty and the backend cannot enforce it, or if `$deterministic` is true and the backend cannot offer it
+     * @throws UnsupportedOperationException If `$aad` is non-empty and the backend cannot enforce it
      * @throws RuntimeException              On any other backend failure
      */
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext;
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext;
 }

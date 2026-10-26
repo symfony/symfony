@@ -23,6 +23,7 @@ use Doctrine\DBAL\Schema\Table;
 use Psr\Clock\ClockInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\KeyManagement\Ciphertext;
+use Symfony\Component\KeyManagement\DataKey;
 use Symfony\Component\KeyManagement\DataKeyGeneratorInterface;
 use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
@@ -56,7 +57,9 @@ use Symfony\Component\Uid\UuidV7;
  * configured at once, each row says who can unwrap it, and
  * {@see RewrappableDataKeyStoreInterface::rewrap()} moves it over without touching a payload.
  *
- * Every key is bound to its reference and scope, {@see StoredDataKey::bindingFor()}, so a row edited or copied underneath it is refused once the key is open.
+ * Every key is bound to its reference, its scope and the secret of the store, {@see StoredDataKey::bindingFor()}.
+ * A row edited, copied or inserted underneath is refused once its key is open.
+ * This holds even for a key wrapped under a public key, or under a master key of the attacker.
  * The check is the store's and not the backend's, which lets a client that cannot enforce authenticated data hold one.
  * A store whose backend can authenticate the wrapping itself says so, and the same pair is then bound as the authenticated data of every wrap and unwrap, {@see StoredDataKey::wrappingContextFor()}.
  *
@@ -108,24 +111,38 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     private array $retiresAt = [];
 
     /**
-     * @param ContainerInterface $clients             KMS clients, each a {@see DataKeyGeneratorInterface}, indexed by name
-     * @param string             $client              Name of the client wrapping the keys this store creates
-     * @param string             $masterKeyId         Master key wrapping the keys this store creates
-     * @param positive-int       $keyBytes            Length of the data keys to generate
-     * @param int<0, max>|null   $maxAgeSeconds       Age past which {@see current()} rotates; `null` never rotates, which leaves the bound {@see DEFAULT_MAX_AGE_SECONDS} describes to whoever asked for it
-     * @param bool               $bindWrappingContext Whether the wrapping of a data key is authenticated by the backend, {@see StoredDataKey::wrappingContextFor()}
+     * @var non-empty-list<string>
+     */
+    private readonly array $secrets;
+
+    /**
+     * @param ContainerInterface            $clients             Trusted KMS clients, each a {@see DataKeyGeneratorInterface}, indexed by name
+     * @param string                        $client              Name of the client wrapping the keys this store creates
+     * @param string                        $masterKeyId         Master key wrapping the keys this store creates
+     * @param string|non-empty-list<string> $secret              Secret authenticating the stored keys, or a list of secrets to rotate it: the first one signs, all of them verify
+     * @param positive-int                  $keyBytes            Length of the data keys to generate
+     * @param int<0, max>|null              $maxAgeSeconds       Age past which {@see current()} rotates; `null` never rotates, which leaves the bound {@see DEFAULT_MAX_AGE_SECONDS} describes to whoever asked for it
+     * @param bool                          $bindWrappingContext Whether the wrapping of a data key is authenticated by the backend, {@see StoredDataKey::wrappingContextFor()}
+     *
+     * @throws InvalidArgumentException If no secret is given or a secret is empty
      */
     public function __construct(
         private readonly Connection $connection,
         private readonly ContainerInterface $clients,
         private readonly string $client,
         private readonly string $masterKeyId,
+        #[\SensitiveParameter] string|array $secret,
         private readonly string $table = self::DEFAULT_TABLE,
         private readonly int $keyBytes = 32,
         private readonly ?int $maxAgeSeconds = self::DEFAULT_MAX_AGE_SECONDS,
         private readonly ?ClockInterface $clock = null,
         private readonly bool $bindWrappingContext = false,
     ) {
+        $this->secrets = \is_array($secret) ? array_values($secret) : [$secret];
+
+        if (!$this->secrets || \in_array('', $this->secrets, true)) {
+            throw new InvalidArgumentException('A data key store needs a secret, and none of its secrets can be empty.');
+        }
     }
 
     /**
@@ -166,9 +183,10 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
             return $this->rotate($scope);
         }
 
+        $handle = $this->handleFor($stored);
         $this->current[$scope] = $stored->reference;
 
-        return $this->handleFor($stored);
+        return $handle;
     }
 
     /**
@@ -211,17 +229,30 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
      *
      * Rewrapping changes how the data key is protected, not the key itself, so anything already
      * encrypted with it stays valid.
+     *
+     * The row is only updated if it still has the scope and the binding of `$row`.
+     * A row edited since it was listed is left alone.
      */
-    public function rewrap(string $reference, Ciphertext $wrapped, string $client): void
+    public function rewrap(StoredDataKey $row, DataKey $rewrapped, string $client): void
     {
+        $this->clientFor($client);
+        $secrets = $this->secrets;
+        $binding = $rewrapped->use(static function (#[\SensitiveParameter] string $plaintext) use ($row, $secrets): string {
+            if (!self::isBound($row, $plaintext, $secrets)) {
+                throw new DecryptionFailedException();
+            }
+
+            return StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext, $secrets[0]);
+        });
+
         $updated = $this->connection->executeStatement(
-            \sprintf('UPDATE %s SET key_material = ?, master_key_id = ?, client = ? WHERE id = ?', $this->table),
-            [$wrapped->blob, $wrapped->keyId, $client, $reference],
-            [ParameterType::BINARY, ParameterType::STRING, ParameterType::STRING, ParameterType::BINARY],
+            \sprintf('UPDATE %s SET key_material = ?, master_key_id = ?, client = ?, binding = ? WHERE id = ? AND scope = ? AND binding = ?', $this->table),
+            [$rewrapped->wrapped->blob, $rewrapped->wrapped->keyId, $client, $binding, $row->reference, $row->scope, $row->binding],
+            [ParameterType::BINARY, ParameterType::STRING, ParameterType::STRING, ParameterType::BINARY, ParameterType::BINARY, ParameterType::STRING, ParameterType::BINARY],
         );
 
         if (0 === $updated) {
-            throw new DataKeyNotFoundException($reference);
+            throw new DataKeyNotFoundException($row->reference);
         }
     }
 
@@ -238,6 +269,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
         $reference = (new UuidV7(UuidV7::generate($this->clock?->now())))->toBinary();
         $dataKey = $this->clientFor($this->client)->generateDataKey($this->masterKeyId, $this->keyBytes, $this->wrappingContext($reference, $scope));
         $handle = new DataKeyHandle($reference, $dataKey);
+        $secret = $this->secrets[0];
 
         $this->connection->insert($this->table, [
             'id' => $reference,
@@ -245,7 +277,7 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
             'key_material' => $dataKey->wrapped->blob,
             'master_key_id' => $dataKey->wrapped->keyId,
             'client' => $this->client,
-            'binding' => $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($reference, $scope, $plaintext)),
+            'binding' => $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($reference, $scope, $plaintext, $secret)),
         ], [
             'id' => ParameterType::BINARY,
             'key_material' => ParameterType::BINARY,
@@ -422,19 +454,28 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
 
     private function handleFor(StoredDataKey $row): DataKeyHandle
     {
-        if (isset($this->handles[$row->reference]) && !$this->handles[$row->reference]->isReleased()) {
-            return $this->handles[$row->reference];
+        $client = $this->clientFor($row->client);
+        $handle = $this->handles[$row->reference] ?? null;
+        if (null === $handle || $handle->isReleased()) {
+            $handle = new DataKeyHandle($row->reference, $client->unwrapDataKey($row->wrapped, $this->wrappingContext($row->reference, $row->scope)));
         }
 
-        $handle = new DataKeyHandle($row->reference, $this->clientFor($row->client)->unwrapDataKey($row->wrapped, $this->wrappingContext($row->reference, $row->scope)));
-
-        if (!$handle->use(static fn (#[\SensitiveParameter] string $plaintext): bool => hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext)))) {
+        $secrets = $this->secrets;
+        if (!$handle->use(static fn (#[\SensitiveParameter] string $plaintext): bool => self::isBound($row, $plaintext, $secrets))) {
             $handle->release();
 
             throw new DecryptionFailedException();
         }
 
         return $this->handles[$row->reference] = $handle;
+    }
+
+    /**
+     * @param non-empty-list<string> $secrets
+     */
+    private static function isBound(StoredDataKey $row, #[\SensitiveParameter] string $plaintext, #[\SensitiveParameter] array $secrets): bool
+    {
+        return array_any($secrets, static fn (#[\SensitiveParameter] string $secret): bool => hash_equals($row->binding, StoredDataKey::bindingFor($row->reference, $row->scope, $plaintext, $secret)));
     }
 
     /**

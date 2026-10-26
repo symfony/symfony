@@ -38,10 +38,6 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
  *     bugs in tests: a real KMS has key material of its own, and this one
  *     has its name instead, random unless given.
  *
- * The `$deterministic` flag is accepted for interface compliance but has no
- * observable effect: this fixture is no-crypto and the produced blob is
- * already a pure function of `(name, keyId, aad, plaintext)`.
- *
  * MUST NOT be used outside test fixtures.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
@@ -64,7 +60,7 @@ final class InMemoryKms implements DecrypterInterface, EncrypterInterface, DataK
         $this->name = $name ?? bin2hex(random_bytes(8));
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
         ++$this->calls;
 

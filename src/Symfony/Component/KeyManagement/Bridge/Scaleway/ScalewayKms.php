@@ -20,7 +20,6 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
-use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -51,12 +50,8 @@ final class ScalewayKms implements DecrypterInterface, EncrypterInterface, DataK
     ) {
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
-        if ($deterministic) {
-            throw new UnsupportedOperationException('Scaleway Key Manager does not expose deterministic encryption.');
-        }
-
         $data = $this->request($keyId, 'encrypt', ['plaintext' => base64_encode($plaintext)] + self::associatedData($aad));
 
         if (!isset($data['ciphertext']) || !\is_string($data['ciphertext'])) {

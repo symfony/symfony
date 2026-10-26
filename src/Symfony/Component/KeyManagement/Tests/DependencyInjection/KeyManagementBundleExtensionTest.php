@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\KeyManagement\Base64UrlSafe;
@@ -155,7 +156,7 @@ class KeyManagementBundleExtensionTest extends TestCase
 
         $arguments = $container->getDefinition('console.command.key_management_rewrap_data_keys')->getArguments();
         $this->assertSame('key_management.store', (string) $arguments[0]);
-        $this->assertInstanceOf(ServiceLocatorArgument::class, $arguments[1]);
+        $this->assertSame('.key_management.store.clients', (string) $arguments[1]);
     }
 
     public function testFlysystemFactoryIsWiredWithTaggedLocator()
@@ -249,21 +250,72 @@ class KeyManagementBundleExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('key_management.store'));
         $arguments = $container->getDefinition('key_management.store')->getArguments();
         $this->assertSame('app.dbal', (string) $arguments[0]);
-        $this->assertInstanceOf(ServiceLocatorArgument::class, $arguments[1]);
-        $this->assertSame('key_management.client', $arguments[1]->getTaggedIteratorArgument()->getTag(), 'a data key can be rewrapped under any tagged client, not only under a configured one.');
-        $this->assertSame('key', $arguments[1]->getTaggedIteratorArgument()->getIndexAttribute());
+        $this->assertSame('.key_management.store.clients', (string) $arguments[1]);
         $this->assertSame('app', $arguments[2]);
         $this->assertSame('alias/app-key', $arguments[3]);
-        $this->assertSame('deks', $arguments[4]);
-        $this->assertSame(3600, $arguments[6]);
-        $this->assertSame('clock', (string) $arguments[7]);
-        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $arguments[7]->getInvalidBehavior());
-        $this->assertFalse($arguments[8], 'a store wraps under no authenticated data unless the deployment states that its backend enforces some.');
+        $this->assertEquals(new Parameter('kernel.secret'), $arguments[4]);
+        $this->assertSame('deks', $arguments[5]);
+        $this->assertSame(3600, $arguments[7]);
+        $this->assertSame('clock', (string) $arguments[8]);
+        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $arguments[8]->getInvalidBehavior());
+        $this->assertFalse($arguments[9], 'a store wraps under no authenticated data unless the deployment states that its backend enforces some.');
         $this->assertSame([['method' => 'forget']], $container->getDefinition('key_management.store')->getTag('kernel.reset'), 'the retained plaintexts must not survive a unit of work in a long-running process.');
 
         $encrypter = $container->getDefinition('key_management.stored_envelope_encrypter')->getArguments();
         $this->assertSame('key_management.store', (string) $encrypter[0]);
         $this->assertNull($encrypter[1], 'a payload carrying its own data key bypasses the store, so reading one is asked for rather than inherited from having a default client.');
+    }
+
+    public function testTheStoreSecretCanBeRotated()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'app', 'secret' => ['new', 'old']],
+            ]);
+        });
+
+        $this->assertSame(['new', 'old'], $container->getDefinition('key_management.store')->getArgument(4));
+    }
+
+    public function testASingleStoreSecretIsAccepted()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'app', 'secret' => 'store-secret'],
+            ]);
+        });
+
+        $this->assertSame(['store-secret'], $container->getDefinition('key_management.store')->getArgument(4));
+    }
+
+    public function testAnUnknownAllowedStoreClientIsRejected()
+    {
+        if (!class_exists(DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The KMS client "missing" set in "key_management.store.allowed_clients" is not registered');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                'store' => ['client' => 'app', 'key_id' => 'app', 'allowed_clients' => ['missing']],
+            ]);
+        });
     }
 
     public function testReadingSelfContainedPayloadsNeedsAClientToReadThemWith()
@@ -303,7 +355,7 @@ class KeyManagementBundleExtensionTest extends TestCase
             ]);
         });
 
-        $this->assertTrue($container->getDefinition('key_management.store')->getArgument(8));
+        $this->assertTrue($container->getDefinition('key_management.store')->getArgument(9));
     }
 
     public function testStoreBringsTheListenerThatPutsItsTableInTheSchema()
@@ -341,7 +393,7 @@ class KeyManagementBundleExtensionTest extends TestCase
             ]);
         });
 
-        $this->assertSame(DataKeyStore::DEFAULT_MAX_AGE_SECONDS, $container->getDefinition('key_management.store')->getArgument(6));
+        $this->assertSame(DataKeyStore::DEFAULT_MAX_AGE_SECONDS, $container->getDefinition('key_management.store')->getArgument(7));
     }
 
     public function testStoreNeverRotatesWhenTheMaxAgeIsNull()
@@ -358,7 +410,7 @@ class KeyManagementBundleExtensionTest extends TestCase
             ]);
         });
 
-        $this->assertNull($container->getDefinition('key_management.store')->getArgument(6));
+        $this->assertNull($container->getDefinition('key_management.store')->getArgument(7));
     }
 
     public function testWithoutAStoreRegistersNoSchemaListener()

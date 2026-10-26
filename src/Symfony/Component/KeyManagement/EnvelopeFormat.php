@@ -25,8 +25,7 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  * is the encrypter's job.
  *
  * Ids are a wire contract: once a format ships, its id and its layout are frozen, and a change of
- * cipher, of lengths or of layout is a new format with a new id rather than an edit to an existing
- * one.
+ * cipher, of lengths, of layout or of authenticated fields needs a new format id.
  *
  * Nor are formats a configuration point. Each encrypter owns the one matching its shape, and
  * {@see fromId()} resolves nothing but the formats shipped here, so a payload written anywhere

@@ -18,6 +18,7 @@ use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\TypeRegistry;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
@@ -89,6 +90,73 @@ class EncryptedTypesTest extends TestCase
 
         $this->assertNotSame($first, self::type($name));
         $this->assertSame('x', self::type($name)->convertToPHPValue(self::type($name)->convertToDatabaseValue('x', new SQLitePlatform()), new SQLitePlatform()));
+    }
+
+    #[TestWith([1])]
+    #[TestWith([2])]
+    #[TestWith([3])]
+    public function testCircularParentsAreRejectedBeforeChangingTheRegistry(int $length)
+    {
+        $valid = self::uniqueName();
+        $types = [$valid => ['type' => 'string', 'key' => 'app']];
+        $parents = [];
+
+        for ($i = 0; $i < $length; ++$i) {
+            $name = self::uniqueName();
+            $parents[$name] = new StringType();
+            self::registry()->register($name, $parents[$name]);
+        }
+
+        $names = array_keys($parents);
+        foreach ($names as $i => $name) {
+            $types[$name] = ['type' => $names[($i + 1) % $length], 'key' => 'app'];
+        }
+
+        try {
+            (new EncryptedTypes($this->envelopes, $types))->register();
+            $this->fail('Circular parent types must be rejected.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringContainsString('circular parent type', $e->getMessage());
+        }
+
+        $this->assertFalse(self::registry()->has($valid));
+        foreach ($parents as $name => $parent) {
+            $this->assertSame($parent, self::type($name));
+        }
+    }
+
+    public function testAChildCanBeDeclaredBeforeItsParent()
+    {
+        $inner = self::uniqueName();
+        $outer = self::uniqueName();
+        $types = new EncryptedTypes($this->envelopes, [
+            $outer => ['type' => $inner, 'key' => 'other'],
+            $inner => ['type' => 'string', 'key' => 'app'],
+        ]);
+        $platform = new SQLitePlatform();
+
+        $types->register();
+        $written = self::type($outer)->convertToDatabaseValue('a secret', $platform);
+
+        $this->assertSame('a secret', self::type($outer)->convertToPHPValue($written, $platform));
+        $this->assertSame('a secret', self::type($inner)->convertToPHPValue(self::type($inner)->convertToDatabaseValue('a secret', $platform), $platform));
+    }
+
+    public function testDependentDeclarationsRemainReadableAfterRegisteringTwice()
+    {
+        $inner = self::uniqueName();
+        $outer = self::uniqueName();
+        $types = new EncryptedTypes($this->envelopes, [
+            $inner => ['type' => 'string', 'key' => 'app'],
+            $outer => ['type' => $inner, 'key' => 'other'],
+        ]);
+        $platform = new SQLitePlatform();
+        $types->register();
+        $written = self::type($outer)->convertToDatabaseValue('a secret', $platform);
+
+        $types->register();
+
+        $this->assertSame('a secret', self::type($outer)->convertToPHPValue($written, $platform));
     }
 
     public function testTheParentTypeIsTheOneTheConnectionResolves()
@@ -242,11 +310,22 @@ class EncryptedTypesTest extends TestCase
         (new EncryptedTypes($this->envelopes, ['app_email' => ['key' => 'app']]))->register();
     }
 
-    public function testAnUnknownParentTypeIsReported()
+    public function testAnUnknownParentTypeLeavesTheRegistryUnchanged()
     {
-        $this->expectException(\Throwable::class);
+        $valid = self::uniqueName();
 
-        (new EncryptedTypes($this->envelopes, [self::uniqueName() => ['type' => 'no_such_type', 'key' => 'app']]))->register();
+        try {
+            (new EncryptedTypes($this->envelopes, [
+                $valid => ['type' => 'string', 'key' => 'app'],
+                self::uniqueName() => ['type' => 'no_such_type', 'key' => 'app'],
+            ]))->register();
+        } catch (\Throwable) {
+            $this->assertFalse(self::registry()->has($valid));
+
+            return;
+        }
+
+        $this->fail('An unknown parent type must be rejected.');
     }
 
     private static function uniqueName(): string

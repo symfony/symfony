@@ -79,12 +79,8 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
     ) {
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
-        if ($deterministic) {
-            throw new UnsupportedOperationException('Vault Transit cannot offer per-call deterministic encryption: convergent mode must be set at key creation (`derived=true, convergent_encryption=true`).');
-        }
-
         $body = ['plaintext' => base64_encode($plaintext), 'context' => base64_encode($this->contextFor($keyId, $aad, false))];
 
         $data = $this->request('POST', \sprintf('%s/encrypt/%s', self::encodePath($this->mountPoint), rawurlencode($keyId)), $body, $keyId);

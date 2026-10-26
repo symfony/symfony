@@ -82,7 +82,7 @@ final class EncryptedTypes
      * A type authenticates its key and the parent type's registry name.
      * Renaming the encrypted declaration leaves every value readable, {@see EncryptedType}.
      *
-     * @throws InvalidArgumentException If a declaration names no Doctrine type or no key, or the registry is not writable
+     * @throws InvalidArgumentException If a declaration is invalid, has circular parents, or the registry is not writable
      */
     public function register(?Connection $connection = null): void
     {
@@ -99,10 +99,33 @@ final class EncryptedTypes
                     throw new InvalidArgumentException(\sprintf('The encrypted type "%s" must declare a "%s" as a string.', $name, $required));
                 }
             }
+        }
 
-            $type = new EncryptedType($registry->get($definition['type']), $this->envelopes, $definition['key'], $definition['type']);
+        $types = [];
+        foreach ($this->types as $name => $definition) {
+            $types[$name] ??= $this->build($name, $registry, $types, []);
+        }
 
+        foreach ($types as $name => $type) {
             $registry->has($name) ? $registry->override($name, $type) : $registry->register($name, $type);
         }
+    }
+
+    /**
+     * Builds the parent first when it is declared here too, whatever the order of the declarations.
+     *
+     * @param array<string, EncryptedType> $types
+     * @param array<string, true>          $children
+     */
+    private function build(string $name, TypeRegistry $registry, array &$types, array $children): EncryptedType
+    {
+        if (isset($children[$name])) {
+            throw new InvalidArgumentException(\sprintf('The encrypted type "%s" has a circular parent type definition.', $name));
+        }
+
+        $parent = $this->types[$name]['type'];
+        $parentType = isset($this->types[$parent]) ? $types[$parent] ?? $this->build($parent, $registry, $types, $children + [$name => true]) : $registry->get($parent);
+
+        return $types[$name] = new EncryptedType($parentType, $this->envelopes, $this->types[$name]['key'], $parent);
     }
 }

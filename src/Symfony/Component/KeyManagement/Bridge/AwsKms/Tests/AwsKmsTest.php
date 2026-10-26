@@ -34,7 +34,6 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
-use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 class AwsKmsTest extends TestCase
 {
@@ -262,14 +261,6 @@ class AwsKmsTest extends TestCase
 
         $this->expectException(KeyNotFoundException::class);
         (new AwsKms($client))->generateDataKey('alias/missing');
-    }
-
-    public function testDeterministicModeIsRejected()
-    {
-        $client = $this->createStub(KmsClient::class);
-
-        $this->expectException(UnsupportedOperationException::class);
-        (new AwsKms($client))->encrypt('alias/app-key', 'hello', deterministic: true);
     }
 
     public function testUnwrapDataKeyRoutesThroughDecrypt()

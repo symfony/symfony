@@ -23,7 +23,7 @@ use Symfony\Component\KeyManagement\EncrypterInterface;
  */
 final class RemoteKms implements EncrypterInterface, DecrypterInterface
 {
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
     {
         return new Ciphertext('remote/'.$plaintext, $keyId);
     }

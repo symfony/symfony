@@ -95,7 +95,7 @@ class EncryptedColumnTest extends TestCase
 
     private function store(): DataKeyStore
     {
-        $store = new DataKeyStore($this->connection, new ServiceLocator(['default' => fn (): InMemoryKms => $this->kms]), 'default', 'app');
+        $store = new DataKeyStore($this->connection, new ServiceLocator(['default' => fn (): InMemoryKms => $this->kms]), 'default', 'app', 'secret');
 
         if (!$this->connection->createSchemaManager()->tablesExist([DataKeyStore::DEFAULT_TABLE])) {
             $store->createTable();

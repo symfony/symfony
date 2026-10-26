@@ -24,12 +24,11 @@ use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
-use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 
 /**
  * Encrypts and decrypts with AES-GCM under a symmetric key a KMIP server holds.
  *
- * Build it with {@see KmipKmsFactory}. Each operation opens a verified mutual TLS connection. Direct encryption sends the plaintext to the server, and {@see generateDataKey()} sends a locally generated data key; the master key stays there. Deterministic encryption is unsupported.
+ * Build it with {@see KmipKmsFactory}. Each operation opens a verified mutual TLS connection. Direct encryption sends the plaintext to the server, and {@see generateDataKey()} sends a locally generated data key; the master key stays there.
  *
  * The caller's AAD is authenticated together with the header of the stored ciphertext, see {@see AesGcm}.
  *
@@ -83,11 +82,8 @@ final class KmipKms implements EncrypterInterface, DecrypterInterface, DataKeyGe
         $this->cipher = new AesGcm($ivLength);
     }
 
-    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, #[\SensitiveParameter] string $aad = '', bool $deterministic = false): Ciphertext
+    public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, #[\SensitiveParameter] string $aad = ''): Ciphertext
     {
-        if ($deterministic) {
-            throw new UnsupportedOperationException('KMIP encryption does not support deterministic encryption.');
-        }
         self::validateKeyId($keyId);
 
         try {

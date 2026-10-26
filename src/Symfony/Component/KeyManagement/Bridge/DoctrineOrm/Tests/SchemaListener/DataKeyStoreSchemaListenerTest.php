@@ -84,7 +84,7 @@ class DataKeyStoreSchemaListenerTest extends TestCase
 
     private static function store(Connection $connection, string $table = DataKeyStore::DEFAULT_TABLE): DataKeyStore
     {
-        return new DataKeyStore($connection, new ServiceLocator([]), 'app', 'app-key', $table);
+        return new DataKeyStore($connection, new ServiceLocator([]), 'app', 'app-key', 'secret', $table);
     }
 
     private function event(Connection $connection, Schema $schema): GenerateSchemaEventArgs

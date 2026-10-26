@@ -23,6 +23,7 @@ use Doctrine\DBAL\Types\BlobType;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
 use Psr\Log\AbstractLogger;
@@ -30,6 +31,7 @@ use Symfony\Component\Clock\MockClock;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
 use Symfony\Component\KeyManagement\Ciphertext;
+use Symfony\Component\KeyManagement\DataKey;
 use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\Exception\DataKeyNotFoundException;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
@@ -37,6 +39,7 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
+use Symfony\Component\KeyManagement\Local\SealedBoxKms;
 use Symfony\Component\KeyManagement\StoredDataKey;
 use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Test\InMemoryKms;
@@ -46,6 +49,8 @@ use Symfony\Component\Uid\UuidV7;
 #[RequiresPhpExtension('pdo_sqlite')]
 class DataKeyStoreTest extends TestCase
 {
+    private const string SECRET = 'secret';
+
     private Connection $connection;
 
     protected function setUp(): void
@@ -321,7 +326,7 @@ class DataKeyStoreTest extends TestCase
 
     public function testAStoreThatWasToldNothingRetiresAKeyOlderThanTheDefaultAge()
     {
-        $store = new DataKeyStore($this->connection, new ServiceLocator(['default' => static fn (): object => new InMemoryKms()]), 'default', 'app');
+        $store = new DataKeyStore($this->connection, new ServiceLocator(['default' => static fn (): object => new InMemoryKms()]), 'default', 'app', self::SECRET);
         $store->createTable();
 
         $aged = $this->age($store, 'user.email', DataKeyStore::DEFAULT_MAX_AGE_SECONDS + 86400);
@@ -414,11 +419,118 @@ class DataKeyStoreTest extends TestCase
     public function testRewrapOnAnUnknownReferenceThrows()
     {
         $store = $this->store();
-        $store->current('user.email');
+        $plaintext = self::plaintextOf($store->current('user.email'));
         $row = iterator_to_array($store->all(), false)[0];
+        $unknown = str_repeat("\x00", 16);
+        $binding = StoredDataKey::bindingFor($unknown, $row->scope, $plaintext, self::SECRET);
 
         $this->expectException(DataKeyNotFoundException::class);
-        $store->rewrap(str_repeat("\x00", 16), $row->wrapped, 'default');
+        $store->rewrap(new StoredDataKey($unknown, $row->scope, $row->wrapped, $row->client, $binding), new DataKey($plaintext, $row->wrapped), 'default');
+    }
+
+    public function testARowEditedSinceItWasListedIsNotRewrapped()
+    {
+        $kms = new InMemoryKms();
+        $store = $this->store(clients: ['default' => $kms]);
+        $plaintext = self::plaintextOf($store->current('user.email'));
+        $row = iterator_to_array($store->all(), false)[0];
+        $this->connection->executeStatement(\sprintf('UPDATE %s SET scope = ?', DataKeyStore::DEFAULT_TABLE), ['user.phone']);
+
+        $this->expectException(DataKeyNotFoundException::class);
+        $store->rewrap($row, new DataKey($plaintext, $kms->encrypt('app', $plaintext)), 'default');
+    }
+
+    public function testRewrappingAKeyThatDoesNotMatchItsRowIsRefused()
+    {
+        $kms = new InMemoryKms();
+        $store = $this->store(clients: ['default' => $kms]);
+        $store->current('user.email');
+        $row = iterator_to_array($store->all(), false)[0];
+        $before = $this->connection->fetchAssociative('SELECT * FROM key_management_data_keys');
+        $planted = str_repeat('A', 32);
+
+        try {
+            $store->rewrap($row, new DataKey($planted, $kms->encrypt('app', $planted)), 'default');
+            $this->fail('A key that does not match the binding of its row must be refused.');
+        } catch (DecryptionFailedException) {
+        }
+
+        $this->assertSame($before, $this->connection->fetchAssociative('SELECT * FROM key_management_data_keys'));
+    }
+
+    public function testRewrappingBindsTheKeyAgainUnderTheFirstSecret()
+    {
+        $kms = new InMemoryKms();
+        $handle = $this->store(clients: ['default' => $kms], secret: 'old')->current('user.email');
+        $plaintext = self::plaintextOf($handle);
+
+        $store = $this->reopen(['default' => $kms], ['new', 'old']);
+        $store->rewrap(iterator_to_array($store->all(), false)[0], new DataKey($plaintext, $kms->encrypt('app', $plaintext)), 'default');
+
+        $this->assertSame($plaintext, self::plaintextOf($this->reopen(['default' => $kms], 'new')->get($handle->reference)));
+    }
+
+    public function testAKeyBoundUnderAPreviousSecretIsStillRead()
+    {
+        $kms = new InMemoryKms();
+        $handle = $this->store(clients: ['default' => $kms], secret: 'old')->current('user.email');
+
+        $this->assertSame(self::plaintextOf($handle), self::plaintextOf($this->reopen(['default' => $kms], ['new', 'old'])->get($handle->reference)));
+
+        $this->expectException(DecryptionFailedException::class);
+        $this->reopen(['default' => $kms], 'new')->get($handle->reference);
+    }
+
+    public function testANewKeyIsBoundUnderTheFirstSecret()
+    {
+        $kms = new InMemoryKms();
+        $handle = $this->store(clients: ['default' => $kms], secret: ['new', 'old'])->current('user.email');
+
+        $this->assertSame(self::plaintextOf($handle), self::plaintextOf($this->reopen(['default' => $kms], 'new')->get($handle->reference)));
+    }
+
+    #[TestWith([''])]
+    #[TestWith([[]])]
+    #[TestWith([['secret', '']])]
+    public function testAStoreNeedsANonEmptySecret(string|array $secret)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->reopen([], $secret);
+    }
+
+    #[RequiresPhpExtension('openssl')]
+    public function testAKeyWrappedUnderAMasterKeyOfTheAttackerIsRefused()
+    {
+        $attackerKey = random_bytes(32);
+        $store = $this->store(clients: ['default' => new OpenSslKms(new InMemoryKeyLoader(['app' => random_bytes(32), 'shared-by-the-attacker' => $attackerKey]))]);
+        $store->current('user.email');
+        $store->forget();
+        $planted = str_repeat('A', 32);
+        $wrapped = new OpenSslKms(new InMemoryKeyLoader(['shared-by-the-attacker' => $attackerKey]))->encrypt('shared-by-the-attacker', $planted);
+        $reference = $this->plant('user.email', $wrapped, $planted);
+
+        try {
+            $store->current('user.email');
+            $this->fail('A key wrapped by the attacker must not become the current key of its scope.');
+        } catch (DecryptionFailedException) {
+        }
+
+        $this->expectException(DecryptionFailedException::class);
+        $store->get($reference);
+    }
+
+    #[RequiresPhpExtension('sodium')]
+    public function testAKeyWrappedUnderThePublicKeyOfASealedBoxIsRefused()
+    {
+        $keypair = sodium_crypto_box_keypair();
+        $store = $this->store(clients: ['default' => new SealedBoxKms(new InMemoryKeyLoader(['app' => $keypair]))]);
+        $store->current('user.email');
+        $store->forget();
+        $planted = str_repeat('A', 32);
+        $this->plant('user.email', new Ciphertext(sodium_crypto_box_seal($planted, sodium_crypto_box_publickey($keypair)), 'app'), $planted);
+
+        $this->expectException(DecryptionFailedException::class);
+        $store->current('user.email');
     }
 
     #[RequiresPhpExtension('openssl')]
@@ -434,7 +546,7 @@ class DataKeyStoreTest extends TestCase
 
         foreach ($store->all('aws') as $row) {
             $plaintext = $aws->decrypt($row->wrapped);
-            $store->rewrap($row->reference, $azure->encrypt('app', $plaintext), 'azure');
+            $store->rewrap($row, new DataKey($plaintext, $azure->encrypt('app', $plaintext)), 'azure');
         }
         $store->forget();
 
@@ -451,10 +563,11 @@ class DataKeyStoreTest extends TestCase
             'aws' => new OpenSslKms(new InMemoryKeyLoader(['app' => random_bytes(32)])),
             'azure' => new OpenSslKms(new InMemoryKeyLoader(['app' => random_bytes(32)])),
         ], client: 'aws');
-        $reference = $store->current('user.email')->reference;
+        $handle = $store->current('user.email');
+        $reference = $handle->reference;
         $row = iterator_to_array($store->all(), false)[0];
 
-        $store->rewrap($reference, $row->wrapped, 'azure');
+        $store->rewrap($row, new DataKey(self::plaintextOf($handle), $row->wrapped), 'azure');
         $store->forget();
 
         $this->expectException(DecryptionFailedException::class);
@@ -510,6 +623,58 @@ class DataKeyStoreTest extends TestCase
         $store->current('user.email');
     }
 
+    public function testRewrappingUnderAnUntrustedClientLeavesTheRowUnchanged()
+    {
+        $store = $this->store();
+        $plaintext = self::plaintextOf($store->current('user.email'));
+        $row = $this->connection->fetchAssociative('SELECT * FROM key_management_data_keys');
+
+        try {
+            $store->rewrap(iterator_to_array($store->all(), false)[0], new DataKey($plaintext, new Ciphertext('untrusted', 'app')), 'untrusted');
+            $this->fail('An untrusted client must be refused.');
+        } catch (LogicException) {
+        }
+
+        $this->assertSame($row, $this->connection->fetchAssociative('SELECT * FROM key_management_data_keys'));
+    }
+
+    public function testACachedKeyCannotBeMovedToAnotherScope()
+    {
+        $store = $this->store();
+        $reference = $store->current('user.email')->reference;
+        $this->connection->executeStatement(
+            \sprintf('UPDATE %s SET scope = ? WHERE id = ?', DataKeyStore::DEFAULT_TABLE),
+            ['user.phone', $reference],
+            [ParameterType::STRING, ParameterType::BINARY],
+        );
+
+        for ($attempt = 0; $attempt < 2; ++$attempt) {
+            try {
+                $store->current('user.phone');
+                $this->fail('A changed scope must be authenticated on every lookup.');
+            } catch (DecryptionFailedException) {
+            }
+        }
+
+        $this->assertSame(1, $this->rowCount());
+    }
+
+    public function testACachedKeyCannotUseAnUntrustedClientWhenResolvingAScope()
+    {
+        $store = $this->store();
+        $reference = $store->current('user.email')->reference;
+        $store->forget();
+        $store->get($reference);
+        $this->connection->executeStatement(
+            \sprintf('UPDATE %s SET client = ? WHERE id = ?', DataKeyStore::DEFAULT_TABLE),
+            ['untrusted', $reference],
+            [ParameterType::STRING, ParameterType::BINARY],
+        );
+
+        $this->expectException(LogicException::class);
+        $store->current('user.email');
+    }
+
     public function testAStoreThatWasNotToldToBindAContextWrapsWithNone()
     {
         $store = $this->store(clients: ['default' => new InMemoryKms('aws')]);
@@ -548,7 +713,7 @@ class DataKeyStoreTest extends TestCase
         $store = $this->store(clients: ['default' => new InMemoryKms('aws')], bindWrappingContext: true);
         $handle = $store->current('user.email');
         $reference = $handle->reference;
-        $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($reference, 'user.phone', $plaintext));
+        $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($reference, 'user.phone', $plaintext, self::SECRET));
         $store->forget();
 
         $this->connection->executeStatement(
@@ -576,10 +741,10 @@ class DataKeyStoreTest extends TestCase
         $kms = new InMemoryKms('aws');
         $plaintext = self::plaintextOf($this->store(clients: ['default' => $kms])->current('user.email'));
 
-        $bound = new DataKeyStore($this->connection, new ServiceLocator(['default' => static fn (): object => $kms]), 'default', 'app', DataKeyStore::DEFAULT_TABLE, 32, DataKeyStore::DEFAULT_MAX_AGE_SECONDS, null, true);
+        $bound = new DataKeyStore($this->connection, new ServiceLocator(['default' => static fn (): object => $kms]), 'default', 'app', self::SECRET, DataKeyStore::DEFAULT_TABLE, 32, DataKeyStore::DEFAULT_MAX_AGE_SECONDS, null, true);
         $row = iterator_to_array($bound->all(), false)[0];
         $context = $bound->wrappingContextOf($row);
-        $bound->rewrap($row->reference, $kms->unwrapDataKey($row->wrapped)->use(static fn (#[\SensitiveParameter] string $dek): Ciphertext => $kms->encrypt('app', $dek, $context)), 'default');
+        $bound->rewrap($row, $kms->unwrapDataKey($row->wrapped)->use(static fn (#[\SensitiveParameter] string $dek): DataKey => new DataKey($dek, $kms->encrypt('app', $dek, $context))), 'default');
 
         $this->assertSame($plaintext, self::plaintextOf($bound->get($row->reference)));
     }
@@ -659,31 +824,59 @@ class DataKeyStoreTest extends TestCase
     /**
      * @param array<string, object>|null $clients
      */
-    private function store(?array $clients = null, string $client = 'default', string $table = DataKeyStore::DEFAULT_TABLE, ?int $maxAgeSeconds = DataKeyStore::DEFAULT_MAX_AGE_SECONDS, ?ClockInterface $clock = null, bool $bindWrappingContext = false): DataKeyStore
+    private function store(?array $clients = null, string $client = 'default', string $table = DataKeyStore::DEFAULT_TABLE, ?int $maxAgeSeconds = DataKeyStore::DEFAULT_MAX_AGE_SECONDS, ?ClockInterface $clock = null, bool $bindWrappingContext = false, string|array $secret = self::SECRET): DataKeyStore
     {
-        $factories = [];
-        foreach ($clients ?? ['default' => new InMemoryKms()] as $name => $kms) {
-            $factories[$name] = static fn (): object => $kms;
-        }
-
-        $store = new DataKeyStore($this->connection, new ServiceLocator($factories), $client, 'app', $table, 32, $maxAgeSeconds, $clock, $bindWrappingContext);
+        $store = $this->reopen($clients ?? ['default' => new InMemoryKms()], $secret, $client, $table, $maxAgeSeconds, $clock, $bindWrappingContext);
         $store->createTable();
 
         return $store;
+    }
+
+    /**
+     * @param array<string, object> $clients
+     */
+    private function reopen(array $clients, string|array $secret, string $client = 'default', string $table = DataKeyStore::DEFAULT_TABLE, ?int $maxAgeSeconds = DataKeyStore::DEFAULT_MAX_AGE_SECONDS, ?ClockInterface $clock = null, bool $bindWrappingContext = false): DataKeyStore
+    {
+        $factories = [];
+        foreach ($clients as $name => $kms) {
+            $factories[$name] = static fn (): object => $kms;
+        }
+
+        return new DataKeyStore($this->connection, new ServiceLocator($factories), $client, 'app', $secret, $table, 32, $maxAgeSeconds, $clock, $bindWrappingContext);
+    }
+
+    private function plant(string $scope, Ciphertext $wrapped, #[\SensitiveParameter] string $key): string
+    {
+        $reference = new UuidV7(UuidV7::generate(new \DateTimeImmutable('+1 second')))->toBinary();
+
+        $this->connection->insert(DataKeyStore::DEFAULT_TABLE, [
+            'id' => $reference,
+            'scope' => $scope,
+            'key_material' => $wrapped->blob,
+            'master_key_id' => $wrapped->keyId,
+            'client' => 'default',
+            'binding' => StoredDataKey::bindingFor($reference, $scope, $key, 'not the secret of the store'),
+        ], [
+            'id' => ParameterType::BINARY,
+            'key_material' => ParameterType::BINARY,
+            'binding' => ParameterType::BINARY,
+        ]);
+
+        return $reference;
     }
 
     private function storeWithoutTable(string $table = DataKeyStore::DEFAULT_TABLE): DataKeyStore
     {
         $kms = new InMemoryKms();
 
-        return new DataKeyStore($this->connection, new ServiceLocator(['default' => static fn (): object => $kms]), 'default', 'app', $table);
+        return new DataKeyStore($this->connection, new ServiceLocator(['default' => static fn (): object => $kms]), 'default', 'app', self::SECRET, $table);
     }
 
     private function age(DataKeyStore $store, string $scope, int $seconds): string
     {
         $handle = $store->current($scope);
         $backdated = Uuid::fromString(UuidV7::generate(\DateTimeImmutable::createFromTimestamp(time() - $seconds)))->toBinary();
-        $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($backdated, $scope, $plaintext));
+        $binding = $handle->use(static fn (#[\SensitiveParameter] string $plaintext): string => StoredDataKey::bindingFor($backdated, $scope, $plaintext, self::SECRET));
 
         $this->connection->executeStatement(
             \sprintf('UPDATE %s SET id = ?, binding = ? WHERE id = ?', DataKeyStore::DEFAULT_TABLE),

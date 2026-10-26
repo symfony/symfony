@@ -72,6 +72,16 @@ class EnvelopeFormatTest extends TestCase
         $this->assertSame($original->ciphertext, $reparsed->ciphertext);
     }
 
+    #[DataProvider('provideShippedFormats')]
+    public function testParsingAFrameWithAnotherIdIsRejected(EnvelopeFormat $format)
+    {
+        $bytes = (string) self::envelopeFor($format);
+        $bytes[0] = "\x2a";
+
+        $this->expectException(InvalidArgumentException::class);
+        $format->parse($bytes);
+    }
+
     public function testAStoredFrameCarriesOnlyItsReference()
     {
         $envelope = self::envelopeFor(new StoredFormat());

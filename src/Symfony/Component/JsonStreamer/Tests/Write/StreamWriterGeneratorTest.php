@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonStreamer\Tests\Write;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
@@ -161,21 +162,17 @@ class StreamWriterGeneratorTest extends TestCase
         $generator->generate(Type::intersection(Type::object(\Traversable::class), Type::object(\Stringable::class)));
     }
 
-    #[DataProvider('refinedTypeDataProvider')]
-    public function testGenerateRefinedTypesAsTheirBaseType(Type $type, Type $baseType)
+    #[RequiresMethod(Type::class, 'withoutRefinements')]
+    public function testGenerateRefinedTypesAsTheirBaseType()
     {
         $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamWritersDir);
 
-        $this->assertStringEqualsFile($generator->generate($baseType), file_get_contents($generator->generate($type)));
-    }
-
-    /**
-     * @return iterable<array{0: Type, 1: Type}>
-     */
-    public static function refinedTypeDataProvider(): iterable
-    {
-        yield [Type::list(Type::nullable(Type::union(Type::literal('draft'), Type::literal('archived')))), Type::list(Type::nullable(Type::string()))];
-        yield [Type::array(Type::list(Type::bool()), Type::union(Type::intRange(null, -1), Type::intRange(1, null))), Type::array(Type::list(Type::bool()), Type::int())];
+        foreach ([
+            [Type::list(Type::nullable(Type::union(Type::literal('draft'), Type::literal('archived')))), Type::list(Type::nullable(Type::string()))],
+            [Type::array(Type::list(Type::bool()), Type::union(Type::intRange(null, -1), Type::intRange(1, null))), Type::array(Type::list(Type::bool()), Type::int())],
+        ] as [$type, $baseType]) {
+            $this->assertStringEqualsFile($generator->generate($baseType), file_get_contents($generator->generate($type)));
+        }
     }
 
     public function testDoNotSupportEnumType()

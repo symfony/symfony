@@ -98,19 +98,21 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         }
 
         $execCounter = $multi->execCounter;
-        $this->info['pause_handler'] = static function (float $duration) use ($ch, $multi, $execCounter) {
+        $pauseExpiry = &$this->pauseExpiry;
+        $this->info['pause_handler'] = static function (float $duration) use ($ch, $multi, $execCounter, &$pauseExpiry) {
             if (0 < $duration) {
                 if ($execCounter === $multi->execCounter) {
                     curl_multi_remove_handle($multi->handle, $ch);
                 }
 
                 $lastExpiry = end($multi->pauseExpiries);
-                $multi->pauseExpiries[(int) $ch] = $duration += hrtime(true) / 1E9;
+                $multi->pauseExpiries[(int) $ch] = $pauseExpiry = $duration += hrtime(true) / 1E9;
                 if (false !== $lastExpiry && $lastExpiry > $duration) {
                     asort($multi->pauseExpiries);
                 }
                 curl_pause($ch, \CURLPAUSE_ALL);
             } else {
+                $pauseExpiry = min($pauseExpiry, hrtime(true) / 1E9);
                 unset($multi->pauseExpiries[(int) $ch]);
                 curl_pause($ch, \CURLPAUSE_CONT);
                 curl_multi_add_handle($multi->handle, $ch);

@@ -33,7 +33,7 @@ class PropertyMetadataLoaderTest extends TestCase
 
     public function testSkipStaticProperties()
     {
-        $loader = new PropertyMetadataLoader(TypeResolver::create());
+        $loader = new PropertyMetadataLoader(TypeResolver::create(null, true));
 
         $this->assertEquals(['id' => new PropertyMetadata('id', Type::int())], $loader->load(DummyWithStaticProperty::class));
     }

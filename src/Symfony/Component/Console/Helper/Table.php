@@ -643,14 +643,13 @@ class Table
         }
 
         // str_pad won't work properly with multi-byte strings, we need to fix the padding
-        $width += \strlen($cell) - Helper::width($cell) - substr_count($cell, "\0");
+        $width += \strlen($cell) - Helper::width(Helper::removeDecoration($this->output->getFormatter(), $cell));
         $style = $this->getColumnStyle($column);
 
         if ($cell instanceof TableSeparator) {
             return \sprintf($style->getBorderFormat(), str_repeat($style->getBorderChars()[2], $width));
         }
 
-        $width += Helper::length($cell) - Helper::length(Helper::removeDecoration($this->output->getFormatter(), $cell));
         $content = \sprintf($style->getCellRowContentFormat(), $cell);
 
         $padType = $style->getPadType();
@@ -726,7 +725,8 @@ class Table
 
                 $cellWidth = Helper::width(Helper::removeDecoration($formatter, $cell));
                 if ($wrapped = $minWrappedWidth && $cellWidth > $minWrappedWidth) {
-                    $cell = $formatter->formatAndWrap($cell, $minWrappedWidth);
+                    // the wrapped cell is already formatted and gets formatted again when rendered
+                    $cell = str_replace(['<', '>'], ['\\<', '\\>'], $formatter->formatAndWrap($cell, $minWrappedWidth));
                 }
                 // update minimal columnWidths for spanned columns
                 if ($colspan > 1 && $minWrappedWidth > 0) {
@@ -752,14 +752,12 @@ class Table
                         $this->columnWidths[$i] = max($this->configuredColumnWidths[$i] ?? 0, $cellWidth + $lengthColumnBorder);
                     }
                 }
-                if (!str_contains($cell ?? '', "\n")) {
+                if (!$wrapped && !str_contains($cell ?? '', "\n")) {
                     continue;
                 }
-                $eol = str_contains($cell ?? '', "\r\n") ? "\r\n" : "\n";
-                // a wrapped cell is already formatted
-                $escaped = implode($eol, array_map(OutputFormatter::escapeTrailingBackslash(...), explode($eol, $wrapped ? $cell : $this->closeStyles($cell, $eol))));
+                $escaped = implode("\n", array_map(OutputFormatter::escapeTrailingBackslash(...), preg_split('/\r?\n/', $wrapped ? $cell : $this->closeStyles(str_replace("\r\n", "\n", $cell), "\n"))));
                 $cell = $cell instanceof TableCell ? new TableCell($escaped, ['colspan' => $cell->getColspan()]) : $escaped;
-                $lines = explode($eol, str_replace($eol, '<fg=default;bg=default></>'.$eol, $cell));
+                $lines = explode("\n", str_replace("\n", '<fg=default;bg=default></>'."\n", $cell));
                 foreach ($lines as $lineKey => $line) {
                     if ($colspan > 1) {
                         $line = new TableCell($line, ['colspan' => $colspan]);

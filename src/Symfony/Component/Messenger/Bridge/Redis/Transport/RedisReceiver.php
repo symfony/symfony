@@ -127,7 +127,7 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
 
     public function all(?int $limit = null): iterable
     {
-        $messages = $this->connection->findAll($limit);
+        $messages = null === $limit ? $this->connection->findAllInBatches() : $this->connection->findAll($limit);
 
         foreach ($messages as $message) {
             if (null !== $envelope = $this->createEnvelopeFromData($message['id'], $message['data'] ?? null)) {

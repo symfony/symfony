@@ -138,7 +138,7 @@ class ShowMessagesCommand extends Command
 
     private function listMessages(ListableReceiverInterface $receiver, string $transportName, SymfonyStyle $io, SymfonyStyle $errorIo, int $max, ?string $classFilter): void
     {
-        $envelopes = $receiver->all($max);
+        $envelopes = $classFilter ? $this->filterByClass($receiver, $classFilter, $max) : $receiver->all($max);
 
         $rows = [];
 
@@ -149,13 +149,7 @@ class ShowMessagesCommand extends Command
         $this->phpSerializer?->acceptPhpIncompleteClass();
         try {
             foreach ($envelopes as $envelope) {
-                $currentClassName = $envelope->getMessage()::class;
-
-                if ($classFilter && $classFilter !== $currentClassName) {
-                    continue;
-                }
-
-                $rows[] = [$this->getMessageId($envelope), $currentClassName];
+                $rows[] = [$this->getMessageId($envelope), $envelope->getMessage()::class];
             }
         } finally {
             $this->phpSerializer?->rejectPhpIncompleteClass();
@@ -182,7 +176,7 @@ class ShowMessagesCommand extends Command
 
     private function listMessagesPerClass(ListableReceiverInterface $receiver, SymfonyStyle $io, ?int $max, ?string $classFilter): void
     {
-        $envelopes = $receiver->all($max);
+        $envelopes = $classFilter ? $this->filterByClass($receiver, $classFilter, $max) : $receiver->all($max);
 
         $countPerClass = [];
 
@@ -190,10 +184,6 @@ class ShowMessagesCommand extends Command
         try {
             foreach ($envelopes as $envelope) {
                 $c = $envelope->getMessage()::class;
-
-                if ($classFilter && $classFilter !== $c) {
-                    continue;
-                }
 
                 if (!isset($countPerClass[$c])) {
                     $countPerClass[$c] = [$c, 0];
@@ -212,6 +202,27 @@ class ShowMessagesCommand extends Command
         }
 
         $io->table(['Class', 'Count'], $countPerClass);
+    }
+
+    /**
+     * @return \Generator<Envelope>
+     */
+    private function filterByClass(ListableReceiverInterface $receiver, string $class, ?int $max): \Generator
+    {
+        if (null !== $max && 1 > $max) {
+            return;
+        }
+
+        $count = 0;
+        foreach ($receiver->all() as $envelope) {
+            if ($class === $envelope->getMessage()::class) {
+                yield $envelope;
+
+                if (null !== $max && ++$count >= $max) {
+                    return;
+                }
+            }
+        }
     }
 
     private function showMessage(ListableReceiverInterface $receiver, string $id, SymfonyStyle $io, SymfonyStyle $errorIo): void

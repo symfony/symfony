@@ -39,6 +39,7 @@ final class Connection
     private const MAX_BATCH_ROWS = 100;
     // keeps the statements of a batch below the packet size limit of the server
     private const MAX_BATCH_SIZE = 1048576;
+    private const LISTING_BATCH_SIZE = 100;
 
     private bool $autoSetup;
     private string $queueName;
@@ -255,6 +256,44 @@ final class Connection
         }
     }
 
+    /**
+     * Reads the available messages in batches, so that they are not all loaded in memory at once.
+     *
+     * The messages that were never delivered come first, then the ones whose delivery timed out.
+     * The messages that become available after the listing started are not listed.
+     *
+     * @return \Generator<int, array{id: int|string, body: string, headers: array<string, string>}>
+     */
+    public function findAllInBatches(): \Generator
+    {
+        $this->ensureSetup();
+
+        try {
+            $now = $this->getConnection()->execute(\sprintf('SELECT %s AS now', $this->backend->getNowExpression()))->fetchRow()['now'] ?? null;
+        } catch (\Throwable $e) {
+            throw $this->createTransportException('Could not list messages in AMPHP SQL.', $e);
+        }
+
+        foreach ([false, true] as $deliveryTimedOut) {
+            $after = null;
+
+            do {
+                try {
+                    $rows = $this->findAvailableRows($now, $deliveryTimedOut, $after);
+                    $messages = array_map(self::normalizeRow(...), $rows);
+                } catch (\Throwable $e) {
+                    throw $this->createTransportException('Could not list messages in AMPHP SQL.', $e);
+                }
+
+                foreach ($messages as $message) {
+                    yield $message;
+                }
+
+                $after = end($rows);
+            } while (self::LISTING_BATCH_SIZE === \count($rows));
+        }
+    }
+
     /** @return array{id: int|string, body: string, headers: array<string, string>}|null */
     public function find(mixed $id): ?array
     {
@@ -318,6 +357,50 @@ final class Connection
             \sprintf('queue_name = ? AND available_at <= %s AND (delivered_at IS NULL OR delivered_at < %s - ?)', $now, $now),
             [$this->queueName, $this->redeliverTimeout * 1000],
         ];
+    }
+
+    /**
+     * @param array<string, mixed>|null $after The last row of the previous batch
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function findAvailableRows(mixed $now, bool $deliveryTimedOut, ?array $after): array
+    {
+        $sql = \sprintf('SELECT id, body, headers, available_at, delivered_at FROM %s WHERE queue_name = ? AND available_at <= ?', $this->tableName);
+        $params = [$this->queueName, $now];
+
+        if ($deliveryTimedOut) {
+            $sql .= ' AND delivered_at < ?';
+            $params[] = $now - $this->redeliverTimeout * 1000;
+        }
+
+        $rows = [];
+
+        if (null !== $after) {
+            // the next rows are read in the order of the index, so the database does not sort the rows that have the same "available_at"
+            $nextQueries = $deliveryTimedOut ? [
+                [' AND available_at = ? AND delivered_at = ? AND id > ? ORDER BY id ASC', [$after['available_at'], $after['delivered_at'], $after['id']]],
+                [' AND available_at = ? AND delivered_at > ? ORDER BY delivered_at ASC, id ASC', [$after['available_at'], $after['delivered_at']]],
+            ] : [
+                [' AND delivered_at IS NULL AND available_at = ? AND id > ? ORDER BY id ASC', [$after['available_at'], $after['id']]],
+            ];
+
+            foreach ($nextQueries as [$condition, $values]) {
+                array_push($rows, ...iterator_to_array($this->getConnection()->execute($sql.$condition.' LIMIT ?', [...$params, ...$values, self::LISTING_BATCH_SIZE - \count($rows)]), false));
+
+                if (self::LISTING_BATCH_SIZE === \count($rows)) {
+                    return $rows;
+                }
+            }
+
+            $sql .= ' AND available_at > ?';
+            $params[] = $after['available_at'];
+        }
+
+        // SQLite sorts the rows that have the same "available_at" unless "delivered_at" is in the ORDER BY and its condition is not written "IS NULL"
+        $sql .= ($deliveryTimedOut ? '' : ' AND NOT (delivered_at IS NOT NULL)').' ORDER BY available_at ASC, delivered_at ASC, id ASC LIMIT ?';
+
+        return [...$rows, ...iterator_to_array($this->getConnection()->execute($sql, [...$params, self::LISTING_BATCH_SIZE - \count($rows)]), false)];
     }
 
     private function ensureSupportedVersion(): void

@@ -315,6 +315,133 @@ final class AmpSqlTransportTest extends TestCase
         }
     }
 
+    public function testListingReadsTheMessagesInBatchesInTheOrderOfTheirAvailability()
+    {
+        $transport = $this->createTransport();
+
+        try {
+            $transport->sendBatch(array_map(static fn (int $number) => new Envelope(new DummyMessage((string) $number)), range(1, 150)));
+            $transport->sendBatch(array_map(static fn (int $number) => new Envelope(new DummyMessage((string) $number), [new DelayStamp(-60_000)]), range(151, 250)));
+
+            /** @var list<Envelope> $messages */
+            $messages = iterator_to_array($transport->all(), false);
+            self::assertSame(array_map(strval(...), [...range(151, 250), ...range(1, 150)]), array_map(static fn (Envelope $envelope) => self::messageValue($envelope), $messages));
+        } finally {
+            $transport->close();
+        }
+    }
+
+    public function testListingReadsTheMessagesBatchByBatch()
+    {
+        $transport = $this->createTransport();
+
+        try {
+            $transport->sendBatch(array_map(static fn (int $number) => new Envelope(new DummyMessage((string) $number)), range(1, 150)));
+
+            /** @var list<Envelope> $messages */
+            $messages = iterator_to_array($transport->all(), false);
+            $listing = $transport->all();
+            self::assertInstanceOf(\Generator::class, $listing);
+            self::assertSame('1', self::messageValue($listing->current()));
+
+            $transport->reject($messages[149]);
+            $transport->send(new Envelope(new DummyMessage('151')));
+
+            self::assertSame(array_map(strval(...), range(1, 149)), array_map(static fn (Envelope $envelope) => self::messageValue($envelope), iterator_to_array($listing, false)));
+        } finally {
+            $transport->close();
+        }
+    }
+
+    public function testListingEndsWhenEachListedMessageIsSentAgain()
+    {
+        $transport = $this->createTransport();
+
+        try {
+            $transport->sendBatch(array_map(static fn (int $number) => new Envelope(new DummyMessage((string) $number)), range(1, 150)));
+
+            $messages = [];
+            foreach ($transport->all() as $envelope) {
+                $messages[] = self::messageValue($envelope);
+
+                if (300 === \count($messages)) {
+                    break;
+                }
+
+                $transport->send(new Envelope($envelope->getMessage()));
+            }
+
+            self::assertSame(array_map(strval(...), range(1, 150)), $messages);
+        } finally {
+            $transport->close();
+        }
+    }
+
+    public function testListingDoesNotListAgainTheMessagesReceivedDuringTheListing()
+    {
+        $transport = $this->createTransport(['redeliver_timeout' => 0]);
+
+        try {
+            $transport->send(new Envelope(new DummyMessage('first')));
+            $transport->send(new Envelope(new DummyMessage('second')));
+
+            $listing = $transport->all();
+            self::assertInstanceOf(\Generator::class, $listing);
+            self::assertSame('first', self::messageValue($listing->current()));
+
+            iterator_to_array($transport->get(2));
+            delay(0.1);
+
+            self::assertSame(['first', 'second'], array_map(static fn (Envelope $envelope) => self::messageValue($envelope), iterator_to_array($listing, false)));
+        } finally {
+            $transport->close();
+        }
+    }
+
+    public function testListingListsTheMessagesWhoseDeliveryTimedOutLast()
+    {
+        $transport = $this->createTransport(['redeliver_timeout' => 0]);
+
+        try {
+            $transport->send(new Envelope(new DummyMessage('timed out')));
+            $transport->send(new Envelope(new DummyMessage('first')));
+            $transport->send(new Envelope(new DummyMessage('second')));
+            iterator_to_array($transport->get());
+            delay(0.1);
+
+            /** @var list<Envelope> $messages */
+            $messages = iterator_to_array($transport->all(), false);
+            self::assertSame(['first', 'second', 'timed out'], array_map(static fn (Envelope $envelope) => self::messageValue($envelope), $messages));
+        } finally {
+            $transport->close();
+        }
+    }
+
+    public function testListingListsTheMessagesWhoseDeliveryTimedOutByDeliveryDate()
+    {
+        $transport = $this->createTransport(['redeliver_timeout' => 0]);
+
+        try {
+            $transport->sendBatch(array_map(static fn (int $number) => new Envelope(new DummyMessage((string) $number)), range(1, 100)));
+            $transport->sendBatch(array_map(static fn (int $number) => new Envelope(new DummyMessage((string) $number), [new DelayStamp(-60_000)]), range(101, 150)));
+            $received = [];
+            foreach ($transport->get(150) as $envelope) {
+                $received[self::messageValue($envelope)] = $envelope;
+            }
+            foreach (['3', '2', '1'] as $value) {
+                delay(0.01);
+                $transport->keepalive($received[$value]);
+            }
+            delay(0.1);
+
+            /** @var list<Envelope> $messages */
+            $messages = iterator_to_array($transport->all(), false);
+            self::assertSame(array_map(strval(...), [...range(101, 150), ...range(4, 100), 3, 2, 1]), array_map(static fn (Envelope $envelope) => self::messageValue($envelope), $messages));
+        } finally {
+            $transport->close();
+        }
+    }
+
     private static function messageValue(Envelope $envelope): string
     {
         $message = $envelope->getMessage();

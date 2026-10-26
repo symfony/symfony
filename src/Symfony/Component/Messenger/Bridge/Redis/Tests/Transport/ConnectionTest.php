@@ -151,7 +151,7 @@ class ConnectionTest extends TestCase
     {
         $exception = new \RedisClusterException('Unable to send command to the specified node');
         $redis = $this->createStub(\RedisCluster::class);
-        foreach (['xgroup', 'xreadgroup', 'xack', 'xclaim', 'xadd', 'xRange', 'rawCommand'] as $method) {
+        foreach (['xgroup', 'xreadgroup', 'xack', 'xclaim', 'xadd', 'xRange', 'xRevRange', 'rawCommand'] as $method) {
             $redis->method($method)->willThrowException($exception);
         }
 
@@ -167,6 +167,7 @@ class ConnectionTest extends TestCase
             'add delayed' => static fn () => $connection->add('body', [], 1000),
             'find' => static fn () => $connection->find('1-0'),
             'findAll' => static fn () => $connection->findAll(),
+            'findAllInBatches' => static fn () => iterator_to_array($connection->findAllInBatches()),
         ];
 
         foreach ($operations as $name => $operation) {
@@ -1201,6 +1202,28 @@ class ConnectionTest extends TestCase
 
         $this->assertCount(1, $messages);
         $this->assertEquals('1234567890-0', $messages[0]['id']);
+    }
+
+    public function testFindAllInBatchesReadsTheStreamInBatches()
+    {
+        $redis = $this->createRedisMock();
+        $entries = [];
+        foreach (range(0, 149) as $sequence) {
+            $entries['1234567890-'.$sequence] = ['message' => json_encode(['body' => (string) $sequence, 'headers' => []])];
+        }
+
+        $calls = [];
+        $redis->expects($this->once())->method('xRevRange')->with('queue', '+', '-', 1)->willReturn(\array_slice($entries, -1, 1, true));
+        $redis->method('xRange')->willReturnCallback(static function (string $stream, string $start, string $end, int $count) use ($entries, &$calls) {
+            $calls[] = [$stream, $start, $end, $count];
+
+            return \array_slice($entries, '-' === $start ? 0 : (int) explode('-', $start)[1], $count);
+        });
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+
+        $this->assertSame(array_keys($entries), array_column(iterator_to_array($connection->findAllInBatches(), false), 'id'));
+        $this->assertSame([['queue', '-', '1234567890-149', 100], ['queue', '1234567890-100', '1234567890-149', 100]], $calls);
     }
 
     public function testFindAllWhenRedisExceptionOccurs()

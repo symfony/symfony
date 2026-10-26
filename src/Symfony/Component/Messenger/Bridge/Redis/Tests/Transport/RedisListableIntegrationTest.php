@@ -84,6 +84,48 @@ class RedisListableIntegrationTest extends TestCase
         $this->assertCount(1, $envelopes);
     }
 
+    public function testAllReadsTheStreamInBatches()
+    {
+        foreach (range(1, 150) as $i) {
+            $this->addEnvelope(new Envelope(new DummyMessage((string) $i)));
+        }
+
+        $envelopes = $this->createReceiver()->all();
+        $this->assertEquals(new DummyMessage('1'), $envelopes->current()->getMessage());
+
+        $this->redis->xDel($this->streamName, [$this->connection->findAll()[119]['id']]);
+        $this->addEnvelope(new Envelope(new DummyMessage('151')));
+
+        $messages = array_map(static fn (Envelope $envelope) => $envelope->getMessage()->getMessage(), iterator_to_array($envelopes, false));
+
+        $this->assertSame(array_map(strval(...), [...range(1, 119), ...range(121, 150)]), $messages);
+    }
+
+    public function testAllEndsWhenEachListedMessageIsAddedAgain()
+    {
+        foreach (range(1, 150) as $i) {
+            $this->addEnvelope(new Envelope(new DummyMessage((string) $i)));
+        }
+
+        $messages = [];
+        foreach ($this->createReceiver()->all() as $envelope) {
+            $messages[] = $envelope->getMessage()->getMessage();
+
+            if (300 === \count($messages)) {
+                break;
+            }
+
+            $this->addEnvelope(new Envelope($envelope->getMessage()));
+        }
+
+        $this->assertSame(array_map(strval(...), range(1, 150)), $messages);
+    }
+
+    public function testAllListsNothingWhenTheStreamIsEmpty()
+    {
+        $this->assertSame([], iterator_to_array($this->createReceiver()->all(), false));
+    }
+
     public function testFindReturnsMessageById()
     {
         $this->addEnvelope(new Envelope(new DummyMessage('Hi')));

@@ -31,6 +31,7 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -263,6 +264,25 @@ class FailedMessagesShowCommandTest extends TestCase
         $tester->execute(['--class-filter' => 'namespace\otherClass']);
         $this->assertStringContainsString('[OK] No failed messages were found.', $tester->getDisplay(true));
         $this->assertStringContainsString('Displaying only \'namespace\otherClass\' messages', $tester->getDisplay(true));
+    }
+
+    public function testListMessagesAppliesMaxAfterClassFilter()
+    {
+        $transport = new InMemoryTransport();
+        foreach ([\stdClass::class, \ArrayObject::class, \stdClass::class, \stdClass::class] as $i => $class) {
+            $transport->send(new Envelope(new $class(), [ErrorDetailsStamp::create(new \RuntimeException('Error '.($i + 1)))]));
+        }
+
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $transport]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--class-filter' => 'stdClass', '--max' => 2]);
+
+        $display = $tester->getDisplay(true);
+        $this->assertStringContainsString('Error 1', $display);
+        $this->assertStringContainsString('Error 3', $display);
+        $this->assertStringNotContainsString('Error 4', $display);
+        $this->assertStringContainsString('Showing first 2 messages.', $display);
     }
 
     public function testListMessagesReturnsCountByClassName()

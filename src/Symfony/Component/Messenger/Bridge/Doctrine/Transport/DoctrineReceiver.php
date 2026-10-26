@@ -119,13 +119,11 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
     public function all(?int $limit = null): iterable
     {
         try {
-            $doctrineEnvelopes = $this->connection->findAll($limit);
+            foreach (null === $limit ? $this->connection->findAllInBatches() : $this->connection->findAll($limit) as $doctrineEnvelope) {
+                yield $this->createEnvelopeFromData($doctrineEnvelope);
+            }
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
-        }
-
-        foreach ($doctrineEnvelopes as $doctrineEnvelope) {
-            yield $this->createEnvelopeFromData($doctrineEnvelope);
         }
     }
 

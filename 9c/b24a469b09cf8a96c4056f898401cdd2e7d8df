@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-26T09:01:13Z
+
+Thank you @cestercian. I pushed a simpler take on the same idea. The old private key now stays in a side file until every secret is sealed with the new one. This replaces the staged files and the marker. With them, a request reading the vault during a rotation could delete the staged files. Reads now never write anything, which also matters for read-only deployments. I killed the command at every step of a rotation. Every secret stayed readable, and a second run always finished the job. Your interruption tests are still there, adapted to the new file.

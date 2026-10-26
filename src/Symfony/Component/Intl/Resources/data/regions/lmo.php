@@ -2,7 +2,5 @@
 
 return [
     'UserAssignedNames' => [],
-    'Names' => [
-        'IT' => 'Italia',
-    ],
+    'Names' => [109 => 'Italia'],
 ];

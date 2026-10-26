@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'ETB' => [
-            'Br',
-            'Birta Itoobbiya',
-        ],
-    ],
+    'Names' => [91 => 'Birta Itoobbiya'],
+    'Symbols' => [91 => 'Br'],
 ];

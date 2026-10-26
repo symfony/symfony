@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'ANG' => [
-            'NAf.',
-            'Nederlands-Antilliaanse gulden',
-        ],
-    ],
+    'Names' => [7 => 'Nederlands-Antilliaanse gulden'],
+    'Symbols' => [7 => 'NAf.'],
 ];

@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'MDL' => [
-            'L',
-            'leu moldovenesc',
-        ],
-    ],
+    'Names' => [160 => 'leu moldovenesc'],
+    'Symbols' => [160 => 'L'],
 ];

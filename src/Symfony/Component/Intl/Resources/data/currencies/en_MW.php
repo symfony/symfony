@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'MWK' => [
-            'MK',
-            'Malawian Kwacha',
-        ],
-    ],
+    'Names' => [176 => 'Malawian Kwacha'],
+    'Symbols' => [176 => 'MK'],
 ];

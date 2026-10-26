@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'GEL' => [
-            '₾',
-            'Georgian Lari',
-        ],
-    ],
+    'Names' => [99 => 'Georgian Lari'],
+    'Symbols' => [99 => '₾'],
 ];

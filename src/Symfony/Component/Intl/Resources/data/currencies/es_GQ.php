@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'XAF' => [
-            'FCFA',
-            'franco CFA de África Central',
-        ],
-    ],
+    'Names' => [268 => 'franco CFA de África Central'],
+    'Symbols' => [268 => 'FCFA'],
 ];

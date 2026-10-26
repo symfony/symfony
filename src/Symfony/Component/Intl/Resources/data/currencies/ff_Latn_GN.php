@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'GNF' => [
-            'FG',
-            'GNF',
-        ],
-    ],
+    'Names' => [104 => 'GNF'],
+    'Symbols' => [104 => 'FG'],
 ];

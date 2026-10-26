@@ -2,7 +2,5 @@
 
 return [
     'UserAssignedNames' => [],
-    'Names' => [
-        'GS' => 'Îles Géorgie du Sud et Sandwich du Sud',
-    ],
+    'Names' => [89 => 'Îles Géorgie du Sud et Sandwich du Sud'],
 ];

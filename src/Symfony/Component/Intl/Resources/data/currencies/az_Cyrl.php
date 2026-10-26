@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'AZN' => [
-            '₼',
-            'AZN',
-        ],
-    ],
+    'Names' => [21 => 'AZN'],
+    'Symbols' => [21 => '₼'],
 ];

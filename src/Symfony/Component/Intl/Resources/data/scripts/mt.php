@@ -1,17 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Arab' => 'Għarbi',
-        'Brai' => 'Braille',
-        'Cyrl' => 'Ċirilliku',
-        'Grek' => 'Grieg',
-        'Hans' => 'Simplifikat',
-        'Hant' => 'Tradizzjonali',
-        'Jpan' => 'Ġappuniż',
-        'Latn' => 'Latin',
-        'Xpeo' => 'Persjan Antik',
-        'Zxxx' => 'Mhux Miktub',
-        'Zyyy' => 'Komuni',
-    ],
+    'Names' => [4 => 'Għarbi', 19 => 'Braille', 32 => 'Ċirilliku', 53 => 'Grieg', 61 => 'Simplifikat', 'Tradizzjonali', 76 => 'Ġappuniż', 94 => 'Latin', 204 => 'Persjan Antik', 213 => 'Mhux Miktub', 'Komuni'],
 ];

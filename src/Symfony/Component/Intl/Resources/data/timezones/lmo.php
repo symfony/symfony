@@ -2,26 +2,8 @@
 
 return [
     'Names' => [
-        'Africa/Abidjan' => 'Temp Medi de Greenwich (Abidjan)',
-        'Africa/Accra' => 'Temp Medi de Greenwich (Accra)',
-        'Africa/Bamako' => 'Temp Medi de Greenwich (Bamako)',
-        'Africa/Banjul' => 'Temp Medi de Greenwich (Banjul)',
-        'Africa/Bissau' => 'Temp Medi de Greenwich (Bissau)',
-        'Africa/Conakry' => 'Temp Medi de Greenwich (Conakry)',
-        'Africa/Dakar' => 'Temp Medi de Greenwich (Dakar)',
-        'Africa/Freetown' => 'Temp Medi de Greenwich (Freetown)',
-        'Africa/Lome' => 'Temp Medi de Greenwich (Lomé)',
-        'Africa/Monrovia' => 'Temp Medi de Greenwich (Monrovia)',
-        'Africa/Nouakchott' => 'Temp Medi de Greenwich (Nouakchott)',
-        'Africa/Ouagadougou' => 'Temp Medi de Greenwich (Ouagadougou)',
-        'Africa/Sao_Tome' => 'Temp Medi de Greenwich (São Tomé)',
-        'America/Danmarkshavn' => 'Temp Medi de Greenwich (Danmarkshavn)',
-        'Antarctica/Troll' => 'Temp Medi de Greenwich (Troll)',
-        'Atlantic/Reykjavik' => 'Temp Medi de Greenwich (Reykjavik)',
-        'Atlantic/St_Helena' => 'Temp Medi de Greenwich (St. Helena)',
-        'Etc/GMT' => 'Temp Medi de Greenwich',
-        'Etc/UTC' => 'Temp Universàl Coordinàa',
-        'Europe/Rome' => 'Italia (Rome)',
+        'Temp Medi de Greenwich (Abidjan)', 'Temp Medi de Greenwich (Accra)', 6 => 'Temp Medi de Greenwich (Bamako)', 8 => 'Temp Medi de Greenwich (Banjul)', 'Temp Medi de Greenwich (Bissau)', 16 => 'Temp Medi de Greenwich (Conakry)', 'Temp Medi de Greenwich (Dakar)', 22 => 'Temp Medi de Greenwich (Freetown)', 33 => 'Temp Medi de Greenwich (Lomé)', 42 => 'Temp Medi de Greenwich (Monrovia)', 46 => 'Temp Medi de Greenwich (Nouakchott)', 'Temp Medi de Greenwich (Ouagadougou)',
+        49 => 'Temp Medi de Greenwich (São Tomé)', 100 => 'Temp Medi de Greenwich (Danmarkshavn)', 215 => 'Temp Medi de Greenwich (Troll)', 311 => 'Temp Medi de Greenwich (Reykjavik)', 313 => 'Temp Medi de Greenwich (St. Helena)', 326 => 'Temp Medi de Greenwich', 'Temp Universàl Coordinàa', 367 => 'Italia (Rome)',
     ],
     'Meta' => [],
 ];

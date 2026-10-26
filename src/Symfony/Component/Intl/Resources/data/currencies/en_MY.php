@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'MYR' => [
-            'RM',
-            'Malaysian Ringgit',
-        ],
-    ],
+    'Names' => [180 => 'Malaysian Ringgit'],
+    'Symbols' => [180 => 'RM'],
 ];

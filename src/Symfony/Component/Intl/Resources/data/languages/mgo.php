@@ -1,8 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'mgo' => 'metaʼ',
-    ],
+    'Names' => [365 => 'metaʼ'],
     'LocalizedNames' => [],
 ];

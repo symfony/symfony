@@ -2,7 +2,5 @@
 
 return [
     'UserAssignedNames' => [],
-    'Names' => [
-        'UM' => 'Islas menores alejadas de EE. UU.',
-    ],
+    'Names' => [231 => 'Islas menores alejadas de EE. UU.'],
 ];

@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'KES' => [
-            'Ksh',
-            'Shilingka Kenya',
-        ],
-    ],
+    'Names' => [132 => 'Shilingka Kenya'],
+    'Symbols' => [132 => 'Ksh'],
 ];

@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'SYP' => [
-            'LS',
-            'livre syrienne',
-        ],
-    ],
+    'Names' => [233 => 'livre syrienne'],
+    'Symbols' => [233 => 'LS'],
 ];

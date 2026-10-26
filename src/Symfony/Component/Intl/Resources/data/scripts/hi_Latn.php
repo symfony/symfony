@@ -1,10 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Bali' => 'Baali',
-        'Inds' => 'Sindhu',
-        'Mymr' => 'Burmese',
-        'Talu' => 'Naya Tai Lue',
-    ],
+    'Names' => [9 => 'Baali', 72 => 'Sindhu', 120 => 'Burmese', 179 => 'Naya Tai Lue'],
 ];

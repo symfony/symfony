@@ -1,7 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Hrkt' => 'Japanese Syllabaries',
-    ],
+    'Names' => [70 => 'Japanese Syllabaries'],
 ];

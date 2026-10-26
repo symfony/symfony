@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'GNF' => [
-            'FG',
-            'franc guinéen',
-        ],
-    ],
+    'Names' => [104 => 'franc guinéen'],
+    'Symbols' => [104 => 'FG'],
 ];

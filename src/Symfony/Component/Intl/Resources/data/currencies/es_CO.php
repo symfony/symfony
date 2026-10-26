@@ -1,14 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'COP' => [
-            '$',
-            'peso colombiano',
-        ],
-        'USD' => [
-            'US$',
-            'dólar estadounidense',
-        ],
-    ],
+    'Names' => [67 => 'peso colombiano', 252 => 'dólar estadounidense'],
+    'Symbols' => [67 => '$', 252 => 'US$'],
 ];

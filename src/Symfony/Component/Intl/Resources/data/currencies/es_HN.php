@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'HNL' => [
-            'L',
-            'lempira hondureño',
-        ],
-    ],
+    'Names' => [113 => 'lempira hondureño'],
+    'Symbols' => [113 => 'L'],
 ];

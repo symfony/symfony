@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'AUD' => [
-            '$',
-            'Australian Dollar',
-        ],
-    ],
+    'Names' => [18 => 'Australian Dollar'],
+    'Symbols' => [18 => '$'],
 ];

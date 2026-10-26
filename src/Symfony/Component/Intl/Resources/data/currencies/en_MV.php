@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'MVR' => [
-            'Rf',
-            'Maldivian Rufiyaa',
-        ],
-    ],
+    'Names' => [175 => 'Maldivian Rufiyaa'],
+    'Symbols' => [175 => 'Rf'],
 ];

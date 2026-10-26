@@ -1,15 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'Asia/Aqtobe' => 'kazakstansk tid (Aktobe)',
-        'Asia/Oral' => 'kazakstansk tid (Uralsk)',
-        'Asia/Qostanay' => 'kazakstansk tid (Kustanaj)',
-        'Asia/Qyzylorda' => 'kazakstansk tid (Kyzylorda)',
-        'Asia/Saigon' => 'indokinesisk tid (Hô Chi Minh-staden)',
-        'Asia/Ho_Chi_Minh' => 'indokinesisk tid (Hô Chi Minh-staden)',
-        'Europe/Astrakhan' => 'Samaratid (Astrahan)',
-        'Indian/Cocos' => 'Kokosöarnas tid',
-    ],
+    'Names' => [223 => 'kazakstansk tid (Aktobe)', 245 => 'indokinesisk tid (Hô Chi Minh-staden)', 272 => 'kazakstansk tid (Uralsk)', 277 => 'kazakstansk tid (Kustanaj)', 'kazakstansk tid (Kyzylorda)', 281 => 'indokinesisk tid (Hô Chi Minh-staden)', 330 => 'Samaratid (Astrahan)', 390 => 'Kokosöarnas tid'],
     'Meta' => [],
 ];

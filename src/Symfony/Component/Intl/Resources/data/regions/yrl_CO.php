@@ -2,12 +2,5 @@
 
 return [
     'UserAssignedNames' => [],
-    'Names' => [
-        'BL' => 'San Batulumeu',
-        'BT' => 'Butan',
-        'CR' => 'Koñta Rika',
-        'GA' => 'Gaban',
-        'KN' => 'San Kirituwan suí Newi',
-        'PM' => 'San Peduru asuí Mikelan',
-    ],
+    'Names' => [25 => 'San Batulumeu', 32 => 'Butan', 49 => 'Koñta Rika', 75 => 'Gaban', 119 => 'San Kirituwan suí Newi', 179 => 'San Peduru asuí Mikelan'],
 ];

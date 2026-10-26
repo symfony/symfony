@@ -1,7 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Latn' => 'Niŋmaa Ni Asharaa Yiteŋ',
-    ],
+    'Names' => [94 => 'Niŋmaa Ni Asharaa Yiteŋ'],
 ];

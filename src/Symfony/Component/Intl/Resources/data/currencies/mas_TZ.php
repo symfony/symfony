@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'TZS' => [
-            'TSh',
-            'Iropiyianí e Tanzania',
-        ],
-    ],
+    'Names' => [247 => 'Iropiyianí e Tanzania'],
+    'Symbols' => [247 => 'TSh'],
 ];

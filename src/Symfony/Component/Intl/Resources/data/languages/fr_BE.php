@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'frp' => 'franco-provençal',
-        'goh' => 'ancien haut-allemand',
-        'gu' => 'gujarati',
-    ],
+    'Names' => [179 => 'franco-provençal', 198 => 'ancien haut-allemand', 205 => 'gujarati'],
     'LocalizedNames' => [],
 ];

@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'DKK' => [
-            'kr.',
-            'donsk króna',
-        ],
-    ],
+    'Names' => [80 => 'donsk króna'],
+    'Symbols' => [80 => 'kr.'],
 ];

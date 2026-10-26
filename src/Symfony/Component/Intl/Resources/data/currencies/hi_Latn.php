@@ -1,30 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'CRC' => [
-            'CRC',
-            'Costa Rican colon',
-        ],
-        'ISK' => [
-            'ISK',
-            'Icelandic krona',
-        ],
-        'NIO' => [
-            'NIO',
-            'Nicaraguan cordoba',
-        ],
-        'RUB' => [
-            'RUB',
-            'Russian ruble',
-        ],
-        'STN' => [
-            'STN',
-            'Sao Tome & Principe Dobra',
-        ],
-        'VES' => [
-            'VES',
-            'Venezuelan bolivar',
-        ],
-    ],
+    'Names' => [69 => 'Costa Rican colon', 127 => 'Icelandic krona', 187 => 'Nicaraguan cordoba', 209 => 'Russian ruble', 230 => 'Sao Tome & Principe Dobra', 263 => 'Venezuelan bolivar'],
+    'Symbols' => [69 => '', 127 => '', 187 => '', 209 => '', 230 => '', 263 => ''],
 ];

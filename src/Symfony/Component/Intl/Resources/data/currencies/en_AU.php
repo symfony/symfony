@@ -2,121 +2,13 @@
 
 return [
     'Names' => [
-        'AUD' => [
-            '$',
-            'Australian Dollar',
-        ],
-        'BAM' => [
-            'BAM',
-            'Bosnia-Herzegovina Convertible Marka',
-        ],
-        'BBD' => [
-            'BBD',
-            'Barbados Dollar',
-        ],
-        'BMD' => [
-            'BMD',
-            'Bermuda Dollar',
-        ],
-        'BOB' => [
-            'BOB',
-            'Bolivian boliviano',
-        ],
-        'BRL' => [
-            'BRL',
-            'Brazilian Real',
-        ],
-        'CAD' => [
-            'CAD',
-            'Canadian Dollar',
-        ],
-        'CNY' => [
-            'CNY',
-            'Chinese Yuan',
-        ],
-        'EUR' => [
-            'EUR',
-            'Euro',
-        ],
-        'GBP' => [
-            'GBP',
-            'British Pound',
-        ],
-        'HKD' => [
-            'HKD',
-            'Hong Kong Dollar',
-        ],
-        'ILS' => [
-            'ILS',
-            'Israeli Shekel',
-        ],
-        'INR' => [
-            'INR',
-            'Indian Rupee',
-        ],
-        'JPY' => [
-            'JPY',
-            'Japanese Yen',
-        ],
-        'KRW' => [
-            'KRW',
-            'South Korean Won',
-        ],
-        'MXN' => [
-            'MXN',
-            'Mexican Peso',
-        ],
-        'NZD' => [
-            'NZD',
-            'New Zealand Dollar',
-        ],
-        'PHP' => [
-            'PHP',
-            'Philippine Peso',
-        ],
-        'SCR' => [
-            'Rs',
-            'Seychellois Rupee',
-        ],
-        'SRD' => [
-            'SRD',
-            'Suriname Dollar',
-        ],
-        'TWD' => [
-            'TWD',
-            'New Taiwan Dollar',
-        ],
-        'USD' => [
-            'USD',
-            'US Dollar',
-        ],
-        'UYU' => [
-            'UYU',
-            'Peso Uruguayo',
-        ],
-        'VES' => [
-            'VES',
-            'Venezuelan bolívar',
-        ],
-        'VND' => [
-            'VND',
-            'Vietnamese Dong',
-        ],
-        'XAF' => [
-            'XAF',
-            'Central African CFA Franc',
-        ],
-        'XCD' => [
-            'XCD',
-            'East Caribbean Dollar',
-        ],
-        'XOF' => [
-            'XOF',
-            'West African CFA Franc',
-        ],
-        'XPF' => [
-            'CFP',
-            'CFP Franc',
-        ],
+        18 => 'Australian Dollar', 23 => 'Bosnia-Herzegovina Convertible Marka', 25 => 'Barbados Dollar', 36 => 'Bermuda Dollar', 38 => 'Bolivian boliviano', 45 => 'Brazilian Real', 57 => 'Canadian Dollar', 66 => 'Chinese Yuan', 92 => 'Euro', 97 => 'British Pound',
+        112 => 'Hong Kong Dollar', 122 => 'Israeli Shekel', 'Indian Rupee', 131 => 'Japanese Yen', 139 => 'South Korean Won', 177 => 'Mexican Peso', 191 => 'New Zealand Dollar', 198 => 'Philippine Peso', 214 => 'Seychellois Rupee', 226 => 'Suriname Dollar',
+        246 => 'New Taiwan Dollar', 252 => 'US Dollar', 257 => 'Peso Uruguayo', 263 => 'Venezuelan bolívar', 'Vietnamese Dong', 268 => 'Central African CFA Franc', 'East Caribbean Dollar', 274 => 'West African CFA Franc', 'CFP Franc',
+    ],
+    'Symbols' => [
+        18 => '$', 23 => '', 25 => '', 36 => '', 38 => '', 45 => '', 57 => '', 66 => '', 92 => '', 97 => '',
+        112 => '', 122 => '', '', 131 => '', 139 => '', 177 => '', 191 => '', 198 => '', 214 => 'Rs', 226 => '',
+        246 => '', 252 => '', 257 => '', 263 => '', '', 268 => '', '', 274 => '', 'CFP',
     ],
 ];

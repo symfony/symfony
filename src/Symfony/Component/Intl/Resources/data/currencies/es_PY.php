@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'PYG' => [
-            'Gs.',
-            'guaraní paraguayo',
-        ],
-    ],
+    'Names' => [203 => 'guaraní paraguayo'],
+    'Symbols' => [203 => 'Gs.'],
 ];

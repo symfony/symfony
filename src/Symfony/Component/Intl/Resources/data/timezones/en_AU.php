@@ -1,9 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'Indian/Kerguelen' => 'French Southern and Antarctic Time (Kerguelen Islands)',
-        'Pacific/Wallis' => 'Wallis & Futuna Time (Wallis and Futuna)',
-    ],
+    'Names' => [392 => 'French Southern and Antarctic Time (Kerguelen Islands)', 438 => 'Wallis & Futuna Time (Wallis and Futuna)'],
     'Meta' => [],
 ];

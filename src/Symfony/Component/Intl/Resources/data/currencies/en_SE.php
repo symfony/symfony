@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'SEK' => [
-            'kr',
-            'Swedish Krona',
-        ],
-    ],
+    'Names' => [218 => 'Swedish Krona'],
+    'Symbols' => [218 => 'kr'],
 ];

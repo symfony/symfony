@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'AWG' => [
-            'Afl.',
-            'Arubaanse gulden',
-        ],
-    ],
+    'Names' => [19 => 'Arubaanse gulden'],
+    'Symbols' => [19 => 'Afl.'],
 ];

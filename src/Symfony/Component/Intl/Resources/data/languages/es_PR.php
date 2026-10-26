@@ -1,14 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'ace' => 'acehnés',
-        'arp' => 'arapaho',
-        'bho' => 'bhojpuri',
-        'grc' => 'griego antiguo',
-        'nso' => 'sotho septentrional',
-        'ss' => 'siswati',
-        'wo' => 'wolof',
-    ],
+    'Names' => [2 => 'acehnés', 29 => 'arapaho', 63 => 'bhojpuri', 203 => 'griego antiguo', 419 => 'sotho septentrional', 539 => 'siswati', 625 => 'wolof'],
     'LocalizedNames' => [],
 ];

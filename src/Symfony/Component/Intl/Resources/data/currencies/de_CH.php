@@ -1,22 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'BYN' => [
-            'BYN',
-            'Weissrussischer Rubel',
-        ],
-        'BYR' => [
-            'BYR',
-            'Weissrussischer Rubel (2000–2016)',
-        ],
-        'EUR' => [
-            'EUR',
-            'Euro',
-        ],
-        'STN' => [
-            'STN',
-            'São-toméischer Dobra (2018)',
-        ],
-    ],
+    'Names' => [54 => 'Weissrussischer Rubel', 'Weissrussischer Rubel (2000–2016)', 92 => 'Euro', 230 => 'São-toméischer Dobra (2018)'],
+    'Symbols' => [54 => '', '', 92 => '', 230 => ''],
 ];

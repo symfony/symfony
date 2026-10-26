@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'ZMW' => [
-            'K',
-            'Zambian Kwacha',
-        ],
-    ],
+    'Names' => [286 => 'Zambian Kwacha'],
+    'Symbols' => [286 => 'K'],
 ];

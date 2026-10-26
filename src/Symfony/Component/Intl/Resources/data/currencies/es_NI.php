@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'NIO' => [
-            'C$',
-            'córdoba nicaragüense',
-        ],
-    ],
+    'Names' => [187 => 'córdoba nicaragüense'],
+    'Symbols' => [187 => 'C$'],
 ];

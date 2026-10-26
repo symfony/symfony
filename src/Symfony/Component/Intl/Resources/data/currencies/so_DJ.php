@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'DJF' => [
-            'Fdj',
-            'Faran Jabuuti',
-        ],
-    ],
+    'Names' => [79 => 'Faran Jabuuti'],
+    'Symbols' => [79 => 'Fdj'],
 ];

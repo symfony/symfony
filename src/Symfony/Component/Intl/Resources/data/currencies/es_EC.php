@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'USD' => [
-            '$',
-            'dólar estadounidense',
-        ],
-    ],
+    'Names' => [252 => 'dólar estadounidense'],
+    'Symbols' => [252 => '$'],
 ];

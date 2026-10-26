@@ -2,22 +2,8 @@
 
 return [
     'Names' => [
-        'br' => 'beretan',
-        'chn' => 'yarigan xinoki',
-        'de' => 'areman',
-        'gmh' => 'areman iwaté médiu',
-        'goh' => 'areman arkaiku iwaté',
-        'gsw' => 'areman (Suisa)',
-        'lv' => 'retan',
-        'wa' => 'waran',
-        'yrl' => 'ñengatú',
-        'zgh' => 'tamasiriti marukinu padran',
-        'zh' => 'xinañeẽga',
+        77 => 'beretan', 102 => 'yarigan xinoki', 132 => 'areman', 196 => 'areman iwaté médiu', 198 => 'areman arkaiku iwaté', 204 => 'areman (Suisa)', 346 => 'retan', 619 => 'waran', 639 => 'ñengatú', 646 => 'tamasiriti marukinu padran',
+        'xinañeẽga',
     ],
-    'LocalizedNames' => [
-        'de_CH' => 'areman iwaté (Suisa)',
-        'nds_NL' => 'sakisan yatuka',
-        'zh_Hans' => 'xinañeẽga iwasuĩma',
-        'zh_Hant' => 'xinañeẽga katuwa',
-    ],
+    'LocalizedNames' => ['de_CH' => 'areman iwaté (Suisa)', 'nds_NL' => 'sakisan yatuka', 'zh_Hans' => 'xinañeẽga iwasuĩma', 'zh_Hant' => 'xinañeẽga katuwa'],
 ];

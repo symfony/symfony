@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'GTQ' => [
-            'Q',
-            'quetzal',
-        ],
-    ],
+    'Names' => [108 => 'quetzal'],
+    'Symbols' => [108 => 'Q'],
 ];

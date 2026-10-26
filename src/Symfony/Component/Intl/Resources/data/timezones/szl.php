@@ -2,25 +2,8 @@
 
 return [
     'Names' => [
-        'Africa/Abidjan' => 'uniwersalnego czasu (Abidjan)',
-        'Africa/Accra' => 'uniwersalnego czasu (Accra)',
-        'Africa/Bamako' => 'uniwersalnego czasu (Bamako)',
-        'Africa/Banjul' => 'uniwersalnego czasu (Banjul)',
-        'Africa/Bissau' => 'uniwersalnego czasu (Bissau)',
-        'Africa/Conakry' => 'uniwersalnego czasu (Conakry)',
-        'Africa/Dakar' => 'uniwersalnego czasu (Dakar)',
-        'Africa/Freetown' => 'uniwersalnego czasu (Freetown)',
-        'Africa/Lome' => 'uniwersalnego czasu (Lomé)',
-        'Africa/Monrovia' => 'uniwersalnego czasu (Monrovia)',
-        'Africa/Nouakchott' => 'uniwersalnego czasu (Nouakchott)',
-        'Africa/Ouagadougou' => 'uniwersalnego czasu (Ouagadougou)',
-        'Africa/Sao_Tome' => 'uniwersalnego czasu (São Tomé)',
-        'America/Danmarkshavn' => 'uniwersalnego czasu (Danmarkshavn)',
-        'Antarctica/Troll' => 'uniwersalnego czasu (Troll)',
-        'Atlantic/Reykjavik' => 'uniwersalnego czasu (Reykjavik)',
-        'Atlantic/St_Helena' => 'uniwersalnego czasu (St. Helena)',
-        'Etc/GMT' => 'uniwersalnego czasu',
-        'Europe/Warsaw' => 'czas: Polska (Warsaw)',
+        'uniwersalnego czasu (Abidjan)', 'uniwersalnego czasu (Accra)', 6 => 'uniwersalnego czasu (Bamako)', 8 => 'uniwersalnego czasu (Banjul)', 'uniwersalnego czasu (Bissau)', 16 => 'uniwersalnego czasu (Conakry)', 'uniwersalnego czasu (Dakar)', 22 => 'uniwersalnego czasu (Freetown)', 33 => 'uniwersalnego czasu (Lomé)', 42 => 'uniwersalnego czasu (Monrovia)', 46 => 'uniwersalnego czasu (Nouakchott)', 'uniwersalnego czasu (Ouagadougou)',
+        49 => 'uniwersalnego czasu (São Tomé)', 100 => 'uniwersalnego czasu (Danmarkshavn)', 215 => 'uniwersalnego czasu (Troll)', 311 => 'uniwersalnego czasu (Reykjavik)', 313 => 'uniwersalnego czasu (St. Helena)', 326 => 'uniwersalnego czasu', 384 => 'czas: Polska (Warsaw)',
     ],
     'Meta' => [],
 ];

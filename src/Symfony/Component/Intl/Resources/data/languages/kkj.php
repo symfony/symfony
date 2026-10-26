@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'en' => 'yaman',
-        'fr' => 'numbu buy',
-        'kkj' => 'kakɔ',
-    ],
+    'Names' => [156 => 'yaman', 175 => 'numbu buy', 285 => 'kakɔ'],
     'LocalizedNames' => [],
 ];

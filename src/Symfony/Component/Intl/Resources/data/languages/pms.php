@@ -1,12 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'ar' => 'arabich',
-        'en' => 'inglèis',
-        'pms' => 'piemontèis',
-    ],
-    'LocalizedNames' => [
-        'ar_001' => 'arabich modern stàndar',
-    ],
+    'Names' => [25 => 'arabich', 156 => 'inglèis', 456 => 'piemontèis'],
+    'LocalizedNames' => ['ar_001' => 'arabich modern stàndar'],
 ];

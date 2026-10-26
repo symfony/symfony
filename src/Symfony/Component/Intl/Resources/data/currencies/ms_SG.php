@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'SGD' => [
-            '$',
-            'Dolar Singapura',
-        ],
-    ],
+    'Names' => [219 => 'Dolar Singapura'],
+    'Symbols' => [219 => '$'],
 ];

@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'UGX' => [
-            'USh',
-            'Shilingi ya Uganda',
-        ],
-    ],
+    'Names' => [251 => 'Shilingi ya Uganda'],
+    'Symbols' => [251 => 'USh'],
 ];

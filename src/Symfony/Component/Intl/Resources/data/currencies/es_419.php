@@ -2,53 +2,11 @@
 
 return [
     'Names' => [
-        'ANG' => [
-            'ANG',
-            'florín de las Antillas Neerlandesas',
-        ],
-        'BMD' => [
-            'BMD',
-            'dólar de Bermudas',
-        ],
-        'EUR' => [
-            'EUR',
-            'euro',
-        ],
-        'HTG' => [
-            'HTG',
-            'gourde haitiano',
-        ],
-        'KZT' => [
-            'KZT',
-            'tenge kazajo',
-        ],
-        'NIO' => [
-            'NIO',
-            'córdoba nicaragüense',
-        ],
-        'SLE' => [
-            'SLE',
-            'leone',
-        ],
-        'SLL' => [
-            'SLL',
-            'leones (1964—2022)',
-        ],
-        'THB' => [
-            'THB',
-            'baht tailandes',
-        ],
-        'USD' => [
-            'USD',
-            'dólar estadounidense',
-        ],
-        'UZS' => [
-            'UZS',
-            'som uzbeko',
-        ],
-        'VND' => [
-            'VND',
-            'dong vietnamita',
-        ],
+        7 => 'florín de las Antillas Neerlandesas', 36 => 'dólar de Bermudas', 92 => 'euro', 116 => 'gourde haitiano', 142 => 'tenge kazajo', 187 => 'córdoba nicaragüense', 223 => 'leone', 'leones (1964—2022)', 235 => 'baht tailandes', 252 => 'dólar estadounidense',
+        259 => 'som uzbeko', 264 => 'dong vietnamita',
+    ],
+    'Symbols' => [
+        7 => '', 36 => '', 92 => '', 116 => '', 142 => '', 187 => '', 223 => '', '', 235 => '', 252 => '',
+        259 => '', 264 => '',
     ],
 ];

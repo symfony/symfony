@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'MZN' => [
-            'MTn',
-            'metical moçambicano',
-        ],
-    ],
+    'Names' => [183 => 'metical moçambicano'],
+    'Symbols' => [183 => 'MTn'],
 ];

@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'ANG' => [
-            'NAf.',
-            'Netherlands Antillean Guilder',
-        ],
-    ],
+    'Names' => [7 => 'Netherlands Antillean Guilder'],
+    'Symbols' => [7 => 'NAf.'],
 ];

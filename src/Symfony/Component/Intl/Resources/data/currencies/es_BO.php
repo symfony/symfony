@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'BOB' => [
-            'Bs',
-            'boliviano',
-        ],
-    ],
+    'Names' => [38 => 'boliviano'],
+    'Symbols' => [38 => 'Bs'],
 ];

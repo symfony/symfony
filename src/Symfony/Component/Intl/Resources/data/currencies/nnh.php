@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'XAF' => [
-            'FCFA',
-            'feláŋ CFA',
-        ],
-    ],
+    'Names' => [268 => 'feláŋ CFA'],
+    'Symbols' => [268 => 'FCFA'],
 ];

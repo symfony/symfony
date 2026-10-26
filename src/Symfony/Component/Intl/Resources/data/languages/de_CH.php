@@ -1,16 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'ach' => 'Acholi-Sprache',
-        'bik' => 'Bikol-Sprache',
-        'chb' => 'Chibcha-Sprache',
-        'din' => 'Dinka-Sprache',
-        'fan' => 'Pangwe-Sprache',
-        'gba' => 'Gbaya-Sprache',
-        'prg' => 'Altpreussisch',
-        'rhg' => 'Rohingya',
-        'tgx' => 'Tagisch',
-    ],
+    'Names' => [3 => 'Acholi-Sprache', 65 => 'Bikol-Sprache', 98 => 'Chibcha-Sprache', 136 => 'Dinka-Sprache', 166 => 'Pangwe-Sprache', 189 => 'Gbaya-Sprache', 460 => 'Altpreussisch', 472 => 'Rohingya', 564 => 'Tagisch'],
     'LocalizedNames' => [],
 ];

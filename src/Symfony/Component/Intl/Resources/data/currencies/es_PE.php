@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'PEN' => [
-            'S/',
-            'sol peruano',
-        ],
-    ],
+    'Names' => [195 => 'sol peruano'],
+    'Symbols' => [195 => 'S/'],
 ];

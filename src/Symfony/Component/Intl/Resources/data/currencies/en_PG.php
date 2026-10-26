@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'PGK' => [
-            'K',
-            'Papua New Guinean Kina',
-        ],
-    ],
+    'Names' => [197 => 'Papua New Guinean Kina'],
+    'Symbols' => [197 => 'K'],
 ];

@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'MOP' => [
-            'MOP$',
-            'pataca macaense',
-        ],
-    ],
+    'Names' => [168 => 'pataca macaense'],
+    'Symbols' => [168 => 'MOP$'],
 ];

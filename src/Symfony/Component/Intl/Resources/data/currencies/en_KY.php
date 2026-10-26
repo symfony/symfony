@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'KYD' => [
-            '$',
-            'Cayman Islands Dollar',
-        ],
-    ],
+    'Names' => [141 => 'Cayman Islands Dollar'],
+    'Symbols' => [141 => '$'],
 ];

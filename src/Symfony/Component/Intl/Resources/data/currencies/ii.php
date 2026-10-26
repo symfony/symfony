@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'CNY' => [
-            '¥',
-            'CNY',
-        ],
-    ],
+    'Names' => [66 => 'CNY'],
+    'Symbols' => [66 => '¥'],
 ];

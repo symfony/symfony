@@ -1,8 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'Asia/Kabul' => 'Afgʻoniston vaqti (کابل)',
-    ],
+    'Names' => [252 => 'Afgʻoniston vaqti (کابل)'],
     'Meta' => [],
 ];

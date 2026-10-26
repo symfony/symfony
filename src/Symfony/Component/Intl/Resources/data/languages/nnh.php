@@ -2,23 +2,8 @@
 
 return [
     'Names' => [
-        'bas' => 'Shwóŋò pʉa mbasǎ',
-        'bax' => 'Shwóŋò pamom',
-        'bbj' => 'Shwóŋò pʉa nzsekàʼa',
-        'bfd' => 'Shwóŋò pafud',
-        'bkm' => 'Shwóŋò pʉ̀a njinikom',
-        'bss' => 'Shwóŋò pakɔsi',
-        'bum' => 'Shwóŋò mbulu',
-        'byv' => 'Shwóŋò ngáŋtÿɔʼ',
-        'de' => 'nzǎmɔ̂ɔn',
-        'en' => 'ngilísè',
-        'ewo' => 'Shwóŋò pʉa Yɔɔnmendi',
-        'ff' => 'Shwóŋò menkesaŋ',
-        'fr' => 'felaŋsée',
-        'kkj' => 'Shwóŋò pʉa shÿó Bɛgtùa',
-        'nnh' => 'Shwóŋò ngiembɔɔn',
-        'yav' => 'Shwóŋò pʉa shÿó Mbafìa',
-        'ybb' => 'Shwóŋò Tsaŋ',
+        49 => 'Shwóŋò pʉa mbasǎ', 'Shwóŋò pamom', 52 => 'Shwóŋò pʉa nzsekàʼa', 58 => 'Shwóŋò pafud', 68 => 'Shwóŋò pʉ̀a njinikom', 82 => 'Shwóŋò pakɔsi', 85 => 'Shwóŋò mbulu', 87 => 'Shwóŋò ngáŋtÿɔʼ', 132 => 'nzǎmɔ̂ɔn', 156 => 'ngilísè',
+        163 => 'Shwóŋò pʉa Yɔɔnmendi', 168 => 'Shwóŋò menkesaŋ', 175 => 'felaŋsée', 285 => 'Shwóŋò pʉa shÿó Bɛgtùa', 411 => 'Shwóŋò ngiembɔɔn', 635 => 'Shwóŋò pʉa shÿó Mbafìa', 'Shwóŋò Tsaŋ',
     ],
     'LocalizedNames' => [],
 ];

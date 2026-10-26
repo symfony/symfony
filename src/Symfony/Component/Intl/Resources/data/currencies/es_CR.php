@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'CRC' => [
-            '₡',
-            'colón costarricense',
-        ],
-    ],
+    'Names' => [69 => 'colón costarricense'],
+    'Symbols' => [69 => '₡'],
 ];

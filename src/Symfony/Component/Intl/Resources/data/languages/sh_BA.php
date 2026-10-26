@@ -2,23 +2,8 @@
 
 return [
     'Names' => [
-        'be' => 'bjeloruski',
-        'bm' => 'bamanankan',
-        'bn' => 'bangla',
-        'crl' => 'sjeveroistočni kri',
-        'de' => 'njemački',
-        'frr' => 'sjevernofrizijski',
-        'gsw' => 'njemački (Švajcarska)',
-        'ht' => 'haićanski kreolski',
-        'lrc' => 'sjeverni luri',
-        'nd' => 'sjeverni ndebele',
-        'nds' => 'niskonjemački',
-        'nso' => 'sjeverni soto',
-        'ojb' => 'sjeverozapadni odžibva',
-        'se' => 'sjeverni sami',
-        'ttm' => 'sjeverni tučon',
+        53 => 'bjeloruski', 72 => 'bamanankan', 'bangla', 118 => 'sjeveroistočni kri', 132 => 'njemački', 180 => 'sjevernofrizijski', 204 => 'njemački (Švajcarska)', 228 => 'haićanski kreolski', 335 => 'sjeverni luri', 400 => 'sjeverni ndebele', 'niskonjemački',
+        419 => 'sjeverni soto', 430 => 'sjeverozapadni odžibva', 502 => 'sjeverni sami', 591 => 'sjeverni tučon',
     ],
-    'LocalizedNames' => [
-        'de_CH' => 'švajcarski visoki njemački',
-    ],
+    'LocalizedNames' => ['de_CH' => 'švajcarski visoki njemački'],
 ];

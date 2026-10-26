@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'MKD' => [
-            'den',
-            'Denari maqedonas',
-        ],
-    ],
+    'Names' => [163 => 'Denari maqedonas'],
+    'Symbols' => [163 => 'den'],
 ];

@@ -1,8 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'ksh' => 'কোলোনিয়ান',
-    ],
+    'Names' => [305 => 'কোলোনিয়ান'],
     'LocalizedNames' => [],
 ];

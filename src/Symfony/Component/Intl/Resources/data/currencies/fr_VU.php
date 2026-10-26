@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'VUV' => [
-            'VT',
-            'vatu vanuatuan',
-        ],
-    ],
+    'Names' => [266 => 'vatu vanuatuan'],
+    'Symbols' => [266 => 'VT'],
 ];

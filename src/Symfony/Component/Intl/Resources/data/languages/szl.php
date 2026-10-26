@@ -1,9 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'en' => 'angelski',
-        'szl' => 'ślōnski',
-    ],
+    'Names' => [156 => 'angelski', 554 => 'ślōnski'],
     'LocalizedNames' => [],
 ];

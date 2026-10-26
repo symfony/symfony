@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'MRU' => [
-            'UM',
-            'Ugiyya Muritani',
-        ],
-    ],
+    'Names' => [170 => 'Ugiyya Muritani'],
+    'Symbols' => [170 => 'UM'],
 ];

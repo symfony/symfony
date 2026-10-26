@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'WST' => [
-            'WS$',
-            'Samoan Tala',
-        ],
-    ],
+    'Names' => [267 => 'Samoan Tala'],
+    'Symbols' => [267 => 'WS$'],
 ];

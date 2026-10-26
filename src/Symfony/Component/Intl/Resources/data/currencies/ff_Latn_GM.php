@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'GMD' => [
-            'D',
-            'Dalasi Gammbi',
-        ],
-    ],
+    'Names' => [103 => 'Dalasi Gammbi'],
+    'Symbols' => [103 => 'D'],
 ];

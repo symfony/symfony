@@ -1,14 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'GBP' => [
-            'GB£',
-            'British Pound',
-        ],
-        'GIP' => [
-            '£',
-            'Gibraltar Pound',
-        ],
-    ],
+    'Names' => [97 => 'British Pound', 102 => 'Gibraltar Pound'],
+    'Symbols' => [97 => 'GB£', 102 => '£'],
 ];

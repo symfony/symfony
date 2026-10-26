@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'IDR' => [
-            'Rp',
-            'Indonesian Rupiah',
-        ],
-    ],
+    'Names' => [118 => 'Indonesian Rupiah'],
+    'Symbols' => [118 => 'Rp'],
 ];

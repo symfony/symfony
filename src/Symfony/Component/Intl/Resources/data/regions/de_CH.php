@@ -2,12 +2,5 @@
 
 return [
     'UserAssignedNames' => [],
-    'Names' => [
-        'BN' => 'Brunei',
-        'BW' => 'Botswana',
-        'CV' => 'Kapverden',
-        'SB' => 'Salomon-Inseln',
-        'TL' => 'Osttimor',
-        'ZW' => 'Zimbabwe',
-    ],
+    'Names' => [27 => 'Brunei', 34 => 'Botswana', 51 => 'Kapverden', 193 => 'Salomon-Inseln', 220 => 'Osttimor', 248 => 'Zimbabwe'],
 ];

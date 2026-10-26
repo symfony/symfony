@@ -28,6 +28,7 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.debug'),
                 param('kernel.debug'),
                 null, // Deprecation logger if different from the one above
+                false, // Log each deprecation message only once, enabled when kernel.debug is false
             ])
             ->tag('monolog.logger', ['channel' => 'php'])
 

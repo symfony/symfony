@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmpSql\Tests\Transport;
 
+use Amp\Parallel\Context\ProcessContextFactory;
 use Amp\Sql\SqlConnection;
 use Amp\Sql\SqlConnectionException;
 use Amp\Sql\SqlQueryError;
 use Amp\Sql\SqlResult;
 use Amp\Sql\SqlTransaction;
+use Fabpot\Amp\Sqlite\SqliteConfig;
+use Fabpot\Amp\Sqlite\SqliteConnector;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmpSql\Transport\Backend\BackendInterface;
@@ -196,6 +199,64 @@ final class ConnectionTest extends TestCase
         }
     }
 
+    #[DataProvider('provideBackendWithClaimLock')]
+    public function testGetClaimsTheMessagesInTheOrderOfTheIndex(BackendInterface $backend, string $version, string $lock)
+    {
+        self::assertSame([
+            [\sprintf('SELECT id, body, headers FROM messages WHERE queue_name = ? AND available_at <= %1$s AND (delivered_at IS NULL OR delivered_at < %1$s - ?) ORDER BY available_at ASC, delivered_at ASC, id ASC LIMIT ?%2$s', $backend->getNowExpression(), $lock), ['queue', 60000, 10]],
+        ], $this->getClaimStatements($backend, $version));
+    }
+
+    public static function provideBackendWithClaimLock(): iterable
+    {
+        yield 'MySQL' => [new MysqlBackend(), '8.4.0', ' FOR UPDATE SKIP LOCKED'];
+        yield 'PostgreSQL' => [new PostgresBackend(), '160000', ' FOR UPDATE SKIP LOCKED'];
+        yield 'SQLite' => [new SqliteBackend(), '3.45.1', ''];
+    }
+
+    #[DataProvider('provideBackend')]
+    public function testFindAllReadsTheMessagesInTheOrderOfTheIndex(BackendInterface $backend, string $version)
+    {
+        $result = $this->createStub(SqlResult::class);
+        $result->method('fetchRow')->willReturn(['version' => $version]);
+        $statements = [];
+        $connection = $this->createStub(SqlConnection::class);
+        $connection->method('query')->willReturn($result);
+        $connection->method('execute')->willReturnCallback(function (string $sql, array $params) use (&$statements): SqlResult {
+            $statements[] = [$sql, $params];
+
+            return $this->createStub(SqlResult::class);
+        });
+
+        (new Connection(static fn () => $connection, $backend, ['auto_setup' => false, 'table_name' => 'messages', 'queue_name' => 'queue', 'redeliver_timeout' => 60]))->findAll(50);
+
+        self::assertSame([
+            [\sprintf('SELECT id, body, headers FROM messages WHERE queue_name = ? AND available_at <= %1$s AND (delivered_at IS NULL OR delivered_at < %1$s - ?) ORDER BY available_at ASC, delivered_at ASC, id ASC LIMIT ?', $backend->getNowExpression()), ['queue', 60000, 50]],
+        ], $statements);
+    }
+
+    public static function provideBackend(): iterable
+    {
+        yield 'MySQL' => [new MysqlBackend(), '8.4.0'];
+        yield 'PostgreSQL' => [new PostgresBackend(), '160000'];
+        yield 'SQLite' => [new SqliteBackend(), '3.45.1'];
+    }
+
+    public function testSqliteClaimsTheMessagesWithoutSortingThem()
+    {
+        [[$sql, $params]] = $this->getClaimStatements(new SqliteBackend(), '3.45.1');
+        $connection = (new SqliteConnector(new ProcessContextFactory(null, [], null, 30)))->connect(new SqliteConfig(':memory:'));
+
+        try {
+            (new SqliteBackend())->setup($connection, 'messages');
+            $plan = iterator_to_array($connection->execute('EXPLAIN QUERY PLAN '.$sql, $params), false);
+
+            self::assertSame(['SEARCH messages USING INDEX messages_available_idx (queue_name=? AND available_at<?)'], array_column($plan, 'detail'));
+        } finally {
+            $connection->close();
+        }
+    }
+
     #[DataProvider('provideNeverDeliveredOrderBy')]
     public function testFindAllInBatchesFollowsTheOrderOfTheIndex(BackendInterface $backend, string $serverVersion, string $neverDeliveredOrderBy, string $sameAvailableAtOrderBy)
     {
@@ -275,5 +336,25 @@ final class ConnectionTest extends TestCase
             ->willReturn($this->createStub(SqlResult::class));
 
         self::assertSame([], $backend->insertBatch($transaction, 'messages', [['body a', '{"type":"A"}', 0], ['body b', '[]', 500]], 'queue'));
+    }
+
+    private function getClaimStatements(BackendInterface $backend, string $version): array
+    {
+        $result = $this->createStub(SqlResult::class);
+        $result->method('fetchRow')->willReturn(['version' => $version]);
+        $statements = [];
+        $transaction = $this->createStub(SqlTransaction::class);
+        $transaction->method('execute')->willReturnCallback(function (string $sql, array $params) use (&$statements): SqlResult {
+            $statements[] = [$sql, $params];
+
+            return $this->createStub(SqlResult::class);
+        });
+        $connection = $this->createStub(SqlConnection::class);
+        $connection->method('query')->willReturn($result);
+        $connection->method('beginTransaction')->willReturn($transaction);
+
+        (new Connection(static fn () => $connection, $backend, ['auto_setup' => false, 'table_name' => 'messages', 'queue_name' => 'queue', 'redeliver_timeout' => 60]))->get(10);
+
+        return $statements;
     }
 }

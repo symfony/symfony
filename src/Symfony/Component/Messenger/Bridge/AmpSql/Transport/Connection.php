@@ -143,7 +143,7 @@ final class Connection
             $now = $this->backend->getNowExpression();
             [$criteria, $params] = $this->getAvailabilityCriteria($now);
             $result = $transaction->execute(
-                \sprintf('SELECT id, body, headers FROM %s WHERE %s ORDER BY available_at ASC, id ASC LIMIT ?%s', $this->tableName, $criteria, $this->backend->getClaimLockSql()),
+                \sprintf('SELECT id, body, headers FROM %s WHERE %s ORDER BY available_at ASC, delivered_at ASC, id ASC LIMIT ?%s', $this->tableName, $criteria, $this->backend->getClaimLockSql()),
                 [...$params, max(1, $fetchSize)],
             );
 
@@ -239,7 +239,7 @@ final class Connection
 
         try {
             [$criteria, $params] = $this->getAvailabilityCriteria($this->backend->getNowExpression());
-            $sql = \sprintf('SELECT id, body, headers FROM %s WHERE %s ORDER BY available_at ASC, id ASC', $this->tableName, $criteria);
+            $sql = \sprintf('SELECT id, body, headers FROM %s WHERE %s ORDER BY available_at ASC, delivered_at ASC, id ASC', $this->tableName, $criteria);
             if (null !== $limit) {
                 $sql .= ' LIMIT ?';
                 $params[] = max(0, $limit);

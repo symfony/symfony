@@ -29,6 +29,12 @@ final class MysqlBackend implements BackendInterface
         return ' FOR UPDATE SKIP LOCKED';
     }
 
+    public function getNeverDeliveredOrderBy(): string
+    {
+        // MySQL sorts the messages when "delivered_at" is in the ORDER BY, although it is NULL for all of them
+        return 'id ASC';
+    }
+
     public function validateVersion(SqlConnection $connection): void
     {
         $version = $connection->query('SELECT VERSION() AS version')->fetchRow()['version'] ?? null;

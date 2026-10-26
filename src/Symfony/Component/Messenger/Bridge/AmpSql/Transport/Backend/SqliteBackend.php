@@ -28,6 +28,11 @@ final class SqliteBackend implements BackendInterface
         return '';
     }
 
+    public function getNeverDeliveredOrderBy(): string
+    {
+        return 'delivered_at ASC, id ASC';
+    }
+
     public function validateVersion(SqlConnection $connection): void
     {
         $version = $connection->query('SELECT sqlite_version() AS version')->fetchRow()['version'] ?? null;

@@ -21,6 +21,7 @@ use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -944,9 +945,20 @@ class ConnectionTest extends TestCase
     {
         yield 'MySQL' => [
             new MySQLPlatform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.id LIMIT 100',
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at > ?) ORDER BY m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+        ];
+
+        yield 'MariaDB' => [
+            new MariaDBPlatform(),
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.id LIMIT 100',
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at > ?) ORDER BY m.delivered_at, m.id LIMIT 100',
@@ -956,7 +968,18 @@ class ConnectionTest extends TestCase
         yield 'PostgreSQL' => [
             new PostgreSQLPlatform(),
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at > ?) ORDER BY m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+        ];
+
+        yield 'SQLite' => [
+            new SQLitePlatform(),
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.delivered_at, m.id LIMIT 100',
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id LIMIT 100',
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id LIMIT 100',
@@ -967,7 +990,7 @@ class ConnectionTest extends TestCase
         yield 'SQL Server' => [
             new SQLServerPlatform(),
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
             'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY',
@@ -978,7 +1001,7 @@ class ConnectionTest extends TestCase
         yield 'Oracle' => [
             new OraclePlatform(),
             'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) ORDER BY m.available_at, m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
-            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.id FETCH NEXT 100 ROWS ONLY',
+            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at IS NULL) AND (m.available_at = ?) AND (m.id > ?) ORDER BY m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
             'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (NOT (m.delivered_at IS NOT NULL)) AND (m.available_at > ?) ORDER BY m.available_at, m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
             'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) ORDER BY m.available_at, m.delivered_at, m.id FETCH NEXT 100 ROWS ONLY',
             'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.available_at <= ?) AND (m.id <= ?) AND (m.delivered_at < ?) AND (m.available_at = ?) AND (m.delivered_at = ?) AND (m.id > ?) ORDER BY m.id FETCH NEXT 100 ROWS ONLY',

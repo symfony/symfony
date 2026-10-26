@@ -784,7 +784,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         );
     }
 
-    public function testNonDecoratedOutput()
+    public function testNonDecoratedOutputIsSuppressed()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(false), 200, 0);
         $bar->start();
@@ -797,22 +797,12 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
 
         rewind($output->getStream());
         $this->assertEquals(
-            '   0/200 [>---------------------------]   0%'.\PHP_EOL.
-            '  20/200 [==>-------------------------]  10%'.\PHP_EOL.
-            '  40/200 [=====>----------------------]  20%'.\PHP_EOL.
-            '  60/200 [========>-------------------]  30%'.\PHP_EOL.
-            '  80/200 [===========>----------------]  40%'.\PHP_EOL.
-            ' 100/200 [==============>-------------]  50%'.\PHP_EOL.
-            ' 120/200 [================>-----------]  60%'.\PHP_EOL.
-            ' 140/200 [===================>--------]  70%'.\PHP_EOL.
-            ' 160/200 [======================>-----]  80%'.\PHP_EOL.
-            ' 180/200 [=========================>--]  90%'.\PHP_EOL.
-            ' 200/200 [============================] 100%',
+            '',
             stream_get_contents($output->getStream())
         );
     }
 
-    public function testNonDecoratedOutputWithClear()
+    public function testNonDecoratedOutputWithClearIsSuppressed()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(false), 50, 0);
         $bar->start();
@@ -823,14 +813,12 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
 
         rewind($output->getStream());
         $this->assertEquals(
-            '  0/50 [>---------------------------]   0%'.\PHP_EOL.
-            ' 25/50 [==============>-------------]  50%'.\PHP_EOL.
-            ' 50/50 [============================] 100%',
+            '',
             stream_get_contents($output->getStream())
         );
     }
 
-    public function testNonDecoratedOutputWithoutMax()
+    public function testNonDecoratedOutputWithoutMaxIsSuppressed()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(false), 0, 0);
         $bar->start();
@@ -838,10 +826,31 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
 
         rewind($output->getStream());
         $this->assertEquals(
-            '    0 [>---------------------------]'.\PHP_EOL.
-            '    1 [->--------------------------]',
+            '',
             stream_get_contents($output->getStream())
         );
+    }
+
+    public function testOutputIsSuppressedWhenTermIsNotSetEvenIfDecorationIsForced()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('$TERM is not used to detect a real terminal on Windows.');
+        }
+
+        $term = getenv('TERM');
+        putenv('TERM');
+
+        try {
+            $bar = new ProgressBar($output = $this->getOutputStream(true), 50, 0);
+            $bar->start();
+            $bar->advance(50);
+            $bar->finish();
+
+            rewind($output->getStream());
+            $this->assertEquals('', stream_get_contents($output->getStream()));
+        } finally {
+            putenv(false !== $term ? 'TERM='.$term : 'TERM');
+        }
     }
 
     public function testParallelBars()

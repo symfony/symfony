@@ -85,15 +85,14 @@ class SymfonyStyleTest extends TestCase
     {
         $code = require __DIR__.'/../Fixtures/Style/SymfonyStyle/progress/command_progress_iterate.php';
 
-        if ('\\' === \DIRECTORY_SEPARATOR || 'Hyper' === getenv('TERM_PROGRAM')) {
-            $outputFilepath = __DIR__.'/../Fixtures/Style/SymfonyStyle/progress/output_progress_iterate_no_shade.txt';
-        } else {
-            $outputFilepath = __DIR__.'/../Fixtures/Style/SymfonyStyle/progress/output_progress_iterate_shade.txt';
-        }
+        $completeChar = '\\' === \DIRECTORY_SEPARATOR && 'Hyper' !== getenv('TERM_PROGRAM') ? '=' : '▓';
 
         $this->command->setCode($code);
-        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
-        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
+        $this->tester->execute([], ['interactive' => false, 'decorated' => true]);
+        $output = $this->tester->getDisplay(true);
+
+        $this->assertMatchesRegularExpression('~10/10\s+\['.$completeChar.'+]\s+100%~u', $output);
+        $this->assertStringContainsString('end of progressbar', $output);
     }
 
     public function testProgressIterateWithCustomFormat()
@@ -109,7 +108,7 @@ class SymfonyStyleTest extends TestCase
         };
 
         $this->command->setCode($code);
-        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+        $this->tester->execute([], ['interactive' => false, 'decorated' => true]);
 
         $this->assertMatchesRegularExpression('/\d+(\.\d+)? (GiB|MiB|KiB|B)/', $this->tester->getDisplay(true));
     }
@@ -126,7 +125,7 @@ class SymfonyStyleTest extends TestCase
         };
 
         $this->command->setCode($code);
-        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+        $this->tester->execute([], ['interactive' => false, 'decorated' => true]);
 
         $this->assertMatchesRegularExpression('/\d+(\.\d+)? (GiB|MiB|KiB|B)/', $this->tester->getDisplay(true));
     }

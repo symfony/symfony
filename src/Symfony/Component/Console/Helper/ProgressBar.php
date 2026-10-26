@@ -467,12 +467,25 @@ final class ProgressBar
             return;
         }
 
+        if (!$this->hasInteractiveTerminal()) {
+            return;
+        }
+
         if (null === $this->format) {
             $this->setRealFormat($this->internalFormat ?: $this->determineBestFormat());
         }
 
         $this->overwrite($this->buildLine());
         $this->writeOscProgress();
+    }
+
+    /**
+     * On Windows, the TERM environment variable may not be set even when
+     * running in an interactive terminal.
+     */
+    private function hasInteractiveTerminal(): bool
+    {
+        return $this->output->isDecorated() && ('\\' === \DIRECTORY_SEPARATOR || false !== getenv('TERM'));
     }
 
     /**

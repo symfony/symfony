@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Suppress `ProgressBar` redraws when the output is not decorated or `$TERM` indicates no real terminal is attached.
  * Add `CommandInvocation` and the `%command.invocation%` help placeholder to include the PHP executable or Symfony CLI launcher
  * Add `CompletionSuggestions::suggestPaths()`, `suggestDirectories()` and `getPathSuggestion()` to let the shell complete file system paths, as `InputFile` arguments and options now do
  * Pass the `CompletionSuggestions` to the `suggestedValues` closures of arguments and options

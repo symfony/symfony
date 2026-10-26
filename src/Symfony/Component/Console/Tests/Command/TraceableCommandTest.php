@@ -35,7 +35,7 @@ class TraceableCommandTest extends TestCase
     {
         $command = $this->application->find('app:loop:example');
         $commandTester = new CommandTester($command);
-        $commandTester->execute([]);
+        $commandTester->execute([], ['decorated' => true]);
         $commandTester->assertCommandIsSuccessful();
 
         $output = $commandTester->getDisplay();
@@ -53,7 +53,7 @@ class TraceableCommandTest extends TestCase
         $this->application->addCommand($traceableCommand);
 
         $commandTester = new CommandTester($traceableCommand);
-        $commandTester->execute([]);
+        $commandTester->execute([], ['decorated' => true]);
         $commandTester->assertCommandIsSuccessful();
 
         $output = $commandTester->getDisplay();

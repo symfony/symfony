@@ -13,8 +13,6 @@ namespace Symfony\Component\JsonStreamer;
 
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
-use Symfony\Component\TypeInfo\Type\IntRangeType;
-use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
@@ -66,9 +64,7 @@ trait PhpGeneratorTrait
 
     private static function getCollectionKeyTypeIdentifier(Type $type): ?TypeIdentifier
     {
-        if ($type instanceof LiteralType || $type instanceof IntRangeType) {
-            $type = $type->getWrappedType();
-        }
+        $type = $type->withoutRefinements();
 
         return $type instanceof BuiltinType ? $type->getTypeIdentifier() : null;
     }

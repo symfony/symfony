@@ -243,7 +243,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         }
 
         // expression condition
-        if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), [
+        if ('' !== $route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), [
             'context' => $this->context,
             'request' => $this->request ?: $this->createRequest($pathinfo),
             'params' => $routeParameters,

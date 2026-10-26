@@ -406,6 +406,54 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertFalse($limiter->consume()->isAccepted());
     }
 
+    public function testRefundGivesBackAllConsumedTokens()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume(3);
+        $this->assertSame(7, $rateLimit->getRemainingTokens());
+
+        $refundedRateLimit = $limiter->refund($rateLimit);
+
+        $this->assertSame(10, $refundedRateLimit->getRemainingTokens());
+        $this->assertSame(10, $limiter->consume(0)->getRemainingTokens());
+    }
+
+    public function testRefundIsIgnoredOnceTheBucketRefilledBeforeTheRoundedResetTime()
+    {
+        ClockMock::withClockMock(1000.4);
+        $limiter = $this->createLimiter(3, Rate::perSecond(1));
+
+        $rateLimit = $limiter->consume();
+        usleep(1_200_000);
+        $limiter->consume(3);
+
+        $limiter->refund($rateLimit);
+
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundIsIgnoredWhenNoTokenWasConsumed()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+
+        $rateLimit = $limiter->consume(0);
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundIsIgnoredForARateLimitFromAnotherLimiter()
+    {
+        $limiter = $this->createLimiter();
+        $otherLimiter = new TokenBucketLimiter('other', 10, Rate::perSecond(10), $this->storage);
+        $rateLimit = $otherLimiter->consume();
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+        $this->assertSame(9, $otherLimiter->consume(0)->getRemainingTokens());
+    }
+
     public function testRefundIsIgnoredWhenTheRateLimitWasRejected()
     {
         $limiter = $this->createLimiter(1, Rate::perSecond(1));

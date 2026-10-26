@@ -259,6 +259,67 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertFalse($limiter->consume()->isAccepted());
     }
 
+    public function testRefundGivesBackAllConsumedTokens()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume(3);
+        $this->assertSame(7, $rateLimit->getRemainingTokens());
+
+        $refundedRateLimit = $limiter->refund($rateLimit);
+
+        $this->assertSame(10, $refundedRateLimit->getRemainingTokens());
+        $this->assertSame(10, $limiter->consume(0)->getRemainingTokens());
+    }
+
+    public function testRefundDoesNotEraseHitsFromTheCurrentWindowAfterTheWindowSlid()
+    {
+        ClockMock::withClockMock(1000.4);
+        $limiter = new SlidingWindowLimiter('id', 3, new \DateInterval('PT2S'), $this->storage);
+
+        $rateLimit = $limiter->consume();
+        usleep(2_200_000);
+        $limiter->consume(3);
+
+        $limiter->refund($rateLimit);
+
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundCarriesTheRemainingHitsIntoTheNextWindow()
+    {
+        ClockMock::withClockMock(1000.4);
+        $limiter = new SlidingWindowLimiter('id', 3, new \DateInterval('PT2S'), $this->storage);
+
+        $rateLimit = $limiter->consume();
+        usleep(2_200_000);
+        $limiter->refund($rateLimit);
+
+        $this->assertTrue($limiter->consume(3)->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundIsIgnoredWhenNoTokenWasConsumed()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+
+        $rateLimit = $limiter->consume(0);
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundIsIgnoredForARateLimitFromAnotherLimiter()
+    {
+        $limiter = $this->createLimiter();
+        $otherLimiter = new SlidingWindowLimiter('other', 10, new \DateInterval('PT12S'), $this->storage);
+        $rateLimit = $otherLimiter->consume();
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+        $this->assertSame(9, $otherLimiter->consume(0)->getRemainingTokens());
+    }
+
     public function testRefundIsIgnoredWhenTheRateLimitWasRejected()
     {
         $limiter = $this->createLimiter();

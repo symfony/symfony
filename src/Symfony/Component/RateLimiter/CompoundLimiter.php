@@ -45,7 +45,11 @@ final class CompoundLimiter implements LimiterInterface
             if (!$rateLimit->isAccepted()) {
                 // consuming is all-or-nothing: give back the tokens of the limiters that accepted
                 foreach ($accepted as $acceptedIndex => $acceptedRateLimit) {
-                    $this->limiters[$acceptedIndex]->refund($acceptedRateLimit);
+                    $acceptedLimiter = $this->limiters[$acceptedIndex];
+
+                    if (method_exists($acceptedLimiter, 'refund')) {
+                        $acceptedLimiter->refund($acceptedRateLimit);
+                    }
                 }
 
                 return $rateLimit;
@@ -58,27 +62,37 @@ final class CompoundLimiter implements LimiterInterface
             }
         }
 
-        return $minimalRateLimit;
+        return new CompoundRateLimit($accepted, $minimalRateLimit);
     }
 
     /**
-     * Gives back one token of a consume() call that should not count.
+     * Gives back the tokens a consume() call took, when that call should not count.
      *
-     * Each sub-limiter ignores the refund when it gave the token back on its own already.
+     * Each sub-limiter receives the rate limit of its own consume() call and ignores
+     * the refund when it gave the tokens back on its own already.
      */
     public function refund(RateLimit $rateLimit): RateLimit
     {
         $minimalRateLimit = null;
+        $rateLimits = $rateLimit instanceof CompoundRateLimit ? $rateLimit->getRateLimits() : null;
 
-        foreach ($this->limiters as $limiter) {
-            $refundedRateLimit = $limiter->refund($rateLimit);
+        foreach ($this->limiters as $index => $limiter) {
+            if (null !== $rateLimits && !isset($rateLimits[$index])) {
+                continue;
+            }
 
-            if (null === $minimalRateLimit || $refundedRateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
-                $minimalRateLimit = $refundedRateLimit;
+            $subRateLimit = $rateLimits[$index] ?? $rateLimit;
+
+            if (method_exists($limiter, 'refund')) {
+                $subRateLimit = $limiter->refund($subRateLimit);
+            }
+
+            if (null === $minimalRateLimit || $subRateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
+                $minimalRateLimit = $subRateLimit;
             }
         }
 
-        return $minimalRateLimit;
+        return $minimalRateLimit ?? $rateLimit;
     }
 
     public function reset(): void

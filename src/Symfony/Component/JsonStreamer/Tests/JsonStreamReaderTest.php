@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\JsonStreamer\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\JsonStreamer\Exception\InvalidStreamException;
+use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
@@ -23,7 +25,9 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithIterable;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNonNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullablePropertiesAndDefaults;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeatedDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNumericStreamedNames;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
@@ -246,9 +250,10 @@ class JsonStreamReaderTest extends TestCase
             DivideStringAndCastToIntValueTransformer::class => new DivideStringAndCastToIntValueTransformer(),
         ], $this->streamReadersDir, $this->lazyGhostsDir);
 
-        $read = $reader->read('{"id": "20", "active": "true", "name": null, "range": "0..1"}', Type::object(DummyWithValueTransformerAttributes::class), ['scale' => 1]);
-        $this->assertSame(10, $read->id);
-        $this->assertSame('DUMMY', $read->name);
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage(\sprintf('Unexpected "null" value for "%s::$name".', DummyWithValueTransformerAttributes::class));
+
+        $reader->read('{"id": "20", "active": "true", "name": null, "range": "0..1"}', Type::object(DummyWithValueTransformerAttributes::class), ['scale' => 1]);
     }
 
     public function testReadObjectWithBackedEnumValueTransformerAndMissingProperty()
@@ -329,6 +334,92 @@ class JsonStreamReaderTest extends TestCase
             $this->assertNull($read->name);
             $this->assertNull($read->enum);
         }, '{"name":null,"enum":null}', Type::object(DummyWithNullableProperties::class));
+    }
+
+    public function testReadObjectWithExplicitNullOnNullableProperties()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertNull($read->name);
+            $this->assertNull($read->enum);
+            $this->assertNull($read->mixed);
+            $this->assertNull($read->list);
+        }, '{"name":null,"enum":null,"mixed":null,"list":null}', Type::object(DummyWithNullablePropertiesAndDefaults::class));
+    }
+
+    #[DataProvider('throwWhenReadingNullOnNonNullablePropertyDataProvider')]
+    public function testThrowWhenReadingNullOnNonNullableProperty(string $property)
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+        $json = \sprintf('{"%s":null}', $property);
+
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, $json);
+        rewind($resource);
+
+        foreach ([$json, $resource] as $input) {
+            try {
+                // objects read from a stream are lazy, so the property must be accessed
+                $reader->read($input, Type::object(DummyWithNonNullableProperties::class))->{$property};
+                $this->fail(\sprintf('Expected "%s" to be thrown.', UnexpectedValueException::class));
+            } catch (UnexpectedValueException $e) {
+                $this->assertSame(\sprintf('Unexpected "null" value for "%s::$%s".', DummyWithNonNullableProperties::class, $property), $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * @return iterable<array{0: string}>
+     */
+    public static function throwWhenReadingNullOnNonNullablePropertyDataProvider(): iterable
+    {
+        yield ['name'];
+        yield ['union'];
+        yield ['enum'];
+        yield ['dummy'];
+        yield ['date'];
+        yield ['list'];
+    }
+
+    #[DataProvider('throwWhenReadingNullOnNonNullableTypeDataProvider')]
+    public function testThrowWhenReadingNullOnNonNullableType(Type $type)
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, 'null');
+        rewind($resource);
+
+        foreach (['null', $resource] as $input) {
+            try {
+                $reader->read($input, $type);
+                $this->fail(\sprintf('Expected "%s" to be thrown.', UnexpectedValueException::class));
+            } catch (UnexpectedValueException $e) {
+                $this->assertSame(\sprintf('Unexpected "null" value for "%s".', $type), $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * @return iterable<array{0: Type}>
+     */
+    public static function throwWhenReadingNullOnNonNullableTypeDataProvider(): iterable
+    {
+        yield [Type::int()];
+        yield [Type::list(Type::int())];
+        yield [Type::object(ClassicDummy::class)];
+        yield [Type::object(\DateTimeImmutable::class)];
+    }
+
+    public function testThrowWhenReadingObjectFromNonArrayString()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage(\sprintf('Unexpected "string" value for "%s".', ClassicDummy::class));
+
+        $reader->read('"foo"', Type::object(ClassicDummy::class));
     }
 
     public function testReadObjectWithNullableRepeatedObjects()

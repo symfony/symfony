@@ -38,4 +38,15 @@ final class Decoder
     {
         return self::decodeString(stream_get_contents($stream, $length ?? -1, $offset));
     }
+
+    /**
+     * Tells if the JSON value starting at $offset is null, without reading it entirely.
+     *
+     * @param resource $stream
+     */
+    public static function isNull($stream, int $offset): bool
+    {
+        // "n" can only start a JSON null
+        return 'n' === stream_get_contents($stream, 1, $offset);
+    }
 }

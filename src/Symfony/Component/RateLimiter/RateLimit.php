@@ -24,6 +24,9 @@ class RateLimit
         private bool $accepted,
         private int $limit,
         private ?\DateTimeImmutable $resetAt = null,
+        private int $consumedTokens = 0,
+        private ?float $hitTime = null,
+        private ?string $limiterId = null,
     ) {
     }
 
@@ -67,6 +70,33 @@ class RateLimit
     public function getResetAt(): ?\DateTimeImmutable
     {
         return $this->resetAt;
+    }
+
+    /**
+     * Returns the number of tokens this rate limit took from its limiter when it was accepted.
+     *
+     * A rejected rate limit, or one created without consuming any token, returns zero.
+     */
+    public function getConsumedTokens(): int
+    {
+        return $this->consumedTokens;
+    }
+
+    /**
+     * Returns the time at which the tokens were taken, as a Unix timestamp with microseconds, or null
+     * when the rate limit was not created by a limiter (which makes it unrefundable).
+     */
+    public function getHitTime(): ?float
+    {
+        return $this->hitTime;
+    }
+
+    /**
+     * @internal
+     */
+    public function getLimiterId(): ?string
+    {
+        return $this->limiterId;
     }
 
     public function wait(): void

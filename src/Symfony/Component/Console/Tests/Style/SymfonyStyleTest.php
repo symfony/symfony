@@ -374,6 +374,31 @@ class SymfonyStyleTest extends TestCase
         $this->assertInstanceOf(SymfonyStyle::class, $style->getErrorStyle());
     }
 
+    public function testFormattingHelpersRespectVerbosity()
+    {
+        $output = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL);
+        $style = new SymfonyStyle(new ArrayInput([]), $output);
+
+        $style->title('Hidden title', verbosity: OutputInterface::VERBOSITY_VERBOSE);
+        $style->text('Hidden text', verbosity: OutputInterface::VERBOSITY_VERBOSE);
+        $style->success('Hidden success', verbosity: OutputInterface::VERBOSITY_VERBOSE);
+        $style->outlineInfo('Hidden info', verbosity: OutputInterface::VERBOSITY_VERBOSE);
+        $style->table(['Header'], [['Value']], verbosity: OutputInterface::VERBOSITY_VERBOSE);
+        $this->assertSame('', $output->fetch());
+
+        $style->title('Visible title', verbosity: OutputInterface::VERBOSITY_NORMAL);
+        $style->text('Visible text', verbosity: OutputInterface::VERBOSITY_NORMAL);
+        $style->success('Visible success', verbosity: OutputInterface::VERBOSITY_NORMAL);
+        $visible = $output->fetch();
+        $this->assertStringContainsString('Visible title', $visible);
+        $this->assertStringContainsString('Visible text', $visible);
+        $this->assertStringContainsString('Visible success', $visible);
+
+        $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+        $style->info('Now visible', verbosity: OutputInterface::VERBOSITY_VERBOSE);
+        $this->assertStringContainsString('Now visible', $output->fetch());
+    }
+
     public function testMemoryConsumption()
     {
         $io = new SymfonyStyle(new ArrayInput([]), new NullOutput());

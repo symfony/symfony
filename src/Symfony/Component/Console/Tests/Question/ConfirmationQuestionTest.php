@@ -29,6 +29,30 @@ class ConfirmationQuestionTest extends TestCase
         }
     }
 
+    public function testLocalizedConfirmationLabelsAndRegex()
+    {
+        $question = new ConfirmationQuestion('هل تريد المتابعة؟', false, '/^(?:نعم|ن)$/u', 'نعم', 'لا');
+
+        $this->assertSame('نعم', $question->getTrueLabel());
+        $this->assertSame('لا', $question->getFalseLabel());
+
+        $normalize = $question->getNormalizer();
+        $this->assertTrue($normalize('نعم'));
+        $this->assertTrue($normalize('ن'));
+        $this->assertFalse($normalize('لا'));
+        $this->assertFalse($normalize(''));
+    }
+
+    public function testLocalizedConfirmationPreservesTrueDefault()
+    {
+        $question = new ConfirmationQuestion('Continue?', true, '/^oui$/iu', 'oui', 'non');
+        $normalize = $question->getNormalizer();
+
+        $this->assertTrue($normalize(''));
+        $this->assertTrue($normalize('OUI'));
+        $this->assertFalse($normalize('non'));
+    }
+
     public static function normalizerUsecases()
     {
         return [

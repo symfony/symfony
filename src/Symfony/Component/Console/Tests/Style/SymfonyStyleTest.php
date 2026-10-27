@@ -389,6 +389,30 @@ class SymfonyStyleTest extends TestCase
         $this->assertSame(0, memory_get_usage() - $start);
     }
 
+    #[DataProvider('localizedConfirmationProvider')]
+    public function testLocalizedConfirmation(string $answer, bool $default, bool $expected)
+    {
+        $this->command->setCode(static function (InputInterface $input, OutputInterface $output) use ($default): int {
+            $io = new SymfonyStyle($input, $output);
+
+            return $io->confirm('هل تريد المتابعة؟', $default, '/^نعم$/u', 'نعم', 'لا') ? Command::SUCCESS : Command::FAILURE;
+        });
+
+        $this->tester->setInputs([$answer]);
+        $this->assertSame($expected ? Command::SUCCESS : Command::FAILURE, $this->tester->execute([], ['interactive' => true, 'decorated' => false]));
+        $this->assertStringContainsString('هل تريد المتابعة؟ (نعم/لا) ['.($default ? 'نعم' : 'لا').']:', $this->tester->getDisplay());
+    }
+
+    public static function localizedConfirmationProvider(): array
+    {
+        return [
+            'arabic yes' => ['نعم', false, true],
+            'arabic no' => ['لا', true, false],
+            'default yes' => ['', true, true],
+            'default no' => ['', false, false],
+        ];
+    }
+
     public function testAskAndClearExpectFullSectionCleared()
     {
         $answer = 'Answer';

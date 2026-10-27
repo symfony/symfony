@@ -16,7 +16,9 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Translates messages into HTML: the tags of a message are rendered as HTML elements, everything else is escaped.
+ * Translates messages into HTML: basic MF2 markup in a message is rendered as HTML elements, everything else is escaped.
+ *
+ * Only basic markup is supported, not MF2 expressions, options, attributes or escapes.
  *
  * @author Hugo Alliaume <hugo@alliau.me>
  */
@@ -53,7 +55,7 @@ class HtmlTranslator
             }
 
             if (\is_string($value) || $value instanceof \Stringable) {
-                $parameters[$key] = htmlspecialchars((string) $value, \ENT_QUOTES | \ENT_SUBSTITUTE, $this->charset);
+                $parameters[$key] = strtr(htmlspecialchars((string) $value, \ENT_QUOTES | \ENT_SUBSTITUTE, $this->charset), ['{' => '&#123;', '}' => '&#125;']);
             }
         }
 
@@ -134,7 +136,7 @@ class HtmlTranslator
         }
 
         $names = implode('|', array_keys($wrappers));
-        $parts = preg_split('#<(/?)('.$names.')\s*(/?)>#', $translated, -1, \PREG_SPLIT_DELIM_CAPTURE);
+        $parts = preg_split('~\{([#/])('.$names.')\s*(/?)\}~', $translated, -1, \PREG_SPLIT_DELIM_CAPTURE);
 
         $html = htmlspecialchars(array_shift($parts), \ENT_QUOTES | \ENT_SUBSTITUTE, $this->charset, false);
         $opened = [];

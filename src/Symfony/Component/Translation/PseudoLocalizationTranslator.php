@@ -91,17 +91,18 @@ final class PseudoLocalizationTranslator implements TranslatorInterface, Transla
         $visibleText = '';
 
         foreach ($this->getParts($this->translator->trans($id, $parameters, $domain, $locale)) as [$visible, $localizable, $text]) {
-            if ($visible) {
-                $visibleText .= $text;
+            // Preserve MF2 markup tags and escaped parameter entities, excluding markup tags from the visible text length.
+            foreach (preg_split('/(\{(?:\#[a-zA-Z][\w-]*\s*\/?|\/[a-zA-Z][\w-]*\s*)\}|&(?:\#\d+|\#x[\da-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);)/', $text, -1, \PREG_SPLIT_DELIM_CAPTURE) as $i => $part) {
+                if ($visible && (0 === $i % 2 || str_starts_with($part, '&'))) {
+                    $visibleText .= $part;
+                }
+
+                if (!$localizable || $i % 2) {
+                    $trans .= $part;
+                } else {
+                    $this->addAccents($trans, $part);
+                }
             }
-
-            if (!$localizable) {
-                $trans .= $text;
-
-                continue;
-            }
-
-            $this->addAccents($trans, $text);
         }
 
         $this->expand($trans, $visibleText);
@@ -149,6 +150,8 @@ final class PseudoLocalizationTranslator implements TranslatorInterface, Transla
             return [[true, true, $originalTrans]];
         }
 
+        // Keep escaped parameter braces inert after the HTML parser decodes entities.
+        $originalTrans = str_replace(['&#123;', '&#125;'], ['&amp;#123;', '&amp;#125;'], $originalTrans);
         $html = mb_encode_numericentity($originalTrans, [0x80, 0x10FFFF, 0, 0x1FFFFF], mb_detect_encoding($originalTrans, null, true) ?: 'UTF-8');
 
         $useInternalErrors = libxml_use_internal_errors(true);

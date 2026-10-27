@@ -570,6 +570,23 @@ class TranslationExtensionTest extends TestCase
             "{{ 'xss'|trans_html(tags: { b: { tag: 'strong' } }) }}",
             '&lt;script&gt;alert(1)&lt;/script&gt; and <strong>bold</strong>',
         ];
+        yield 'Markup in the translation does not get converted to tags' => [
+            "{{ 'xss2'|trans_html(tags: { b: { tag: 'strong' } }) }}",
+            '{#script}alert(1){/script} and <strong>bold</strong>',
+        ];
+
+        yield 'parameter markup is escaped' => [
+            "{{ 'hello'|trans_html({ strong: { tag: 'b' } }, { '%name%': '{#strong}x{/strong}{#strong/}' }) }}",
+            'Hello <b>&#123;#strong&#125;x&#123;/strong&#125;&#123;#strong/&#125;</b>!',
+        ];
+        yield 'translatable parameter markup is escaped' => [
+            "{{ t('hello', { '%name%': '{#strong/}' })|trans_html({ strong: { tag: 'b' } }) }}",
+            'Hello <b>&#123;#strong/&#125;</b>!',
+        ];
+        yield 'old markers are escaped' => [
+            "{{ '<b>x</b><b/>'|trans_html({ b: { tag: 'strong' } }) }}",
+            '&lt;b&gt;x&lt;/b&gt;&lt;b/&gt;',
+        ];
 
         yield 'no arguments' => [
             "{{ 'plain'|trans_html({}) }}",
@@ -608,7 +625,7 @@ class TranslationExtensionTest extends TestCase
         ];
         yield 'markup parameter is kept as is in an unbalanced message' => [
             "{% set name %}<i>x</i>{% endset %}{{ 'unclosed'|trans_html({ strong: { tag: 'b' } }, { '%name%': name }) }}",
-            'Hello &lt;strong&gt;<i>x</i>',
+            'Hello {#strong}<i>x</i>',
         ];
         yield 'several markup parameters' => [
             "{% set first %}<i>1</i>{% endset %}{% set second %}<i>2</i>{% endset %}{{ 'two_params'|trans_html({}, { '%first%': first, '%second%': second }) }}",
@@ -662,7 +679,7 @@ class TranslationExtensionTest extends TestCase
 
         yield 'trans filter is still escaped' => [
             "{{ 'hello'|trans({ '%name%': 'Fabien' }) }}",
-            'Hello &lt;strong&gt;Fabien&lt;/strong&gt;!',
+            'Hello {#strong}Fabien{/strong}!',
         ];
     }
 
@@ -757,7 +774,7 @@ class TranslationExtensionTest extends TestCase
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', ['hello' => "Caf\xE9 <b>%name%</b>"], 'en');
+        $translator->addResource('array', ['hello' => "Caf\xE9 {#b}%name%{/b}"], 'en');
 
         $twig = new Environment(new TwigArrayLoader(['index' => "{{ 'hello'|trans_html({ b: { tag: 'strong', attr: { title: name } } }, { '%name%': name }) }}"]), ['charset' => 'ISO-8859-1']);
         $twig->addExtension(new TranslationExtension($translator));
@@ -785,9 +802,9 @@ class TranslationExtensionTest extends TestCase
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', ['foo' => '<b>foo</b> (messages)'], 'en');
-        $translator->addResource('array', ['foo' => '<b>foo</b> (custom)'], 'en', 'custom');
-        $translator->addResource('array', ['foo' => '<b>foo</b> (foo)'], 'en', 'foo');
+        $translator->addResource('array', ['foo' => '{#b}foo{/b} (messages)'], 'en');
+        $translator->addResource('array', ['foo' => '{#b}foo{/b} (custom)'], 'en', 'custom');
+        $translator->addResource('array', ['foo' => '{#b}foo{/b} (foo)'], 'en', 'foo');
 
         $template = $this->getTemplate('
             {%- trans_default_domain "foo" %}
@@ -798,7 +815,7 @@ class TranslationExtensionTest extends TestCase
             {{- "foo"|trans_html(domain: "custom", tags: { b: { tag: "i" } }) }}
         ', $translator);
 
-        $this->assertSame('&lt;b&gt;foo&lt;/b&gt; (foo)&lt;b&gt;foo&lt;/b&gt; (custom)<i>foo</i> (foo)<i>foo</i> (foo)<i>foo</i> (custom)', trim($template->render()));
+        $this->assertSame('{#b}foo{/b} (foo){#b}foo{/b} (custom)<i>foo</i> (foo)<i>foo</i> (foo)<i>foo</i> (custom)', trim($template->render()));
     }
 
     private function getPlaceholderSpyTranslator(): TranslatorInterface
@@ -829,18 +846,19 @@ class TranslationExtensionTest extends TestCase
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', [
-            'hello' => 'Hello <strong>%name%</strong>!',
+            'hello' => 'Hello {#strong}%name%{/strong}!',
             'plain' => 'Tom & Jerry <3',
-            'xss' => '<script>alert(1)</script> and <b>bold</b>',
+            'xss' => '<script>alert(1)</script> and {#b}bold{/b}',
+            'xss2' => '{#script}alert(1){/script} and {#b}bold{/b}',
             'outer' => 'Outer: %inner%',
-            'inner' => '<b>%name%</b>',
+            'inner' => '{#b}%name%{/b}',
             'two_params' => '%first% %second%',
-            'unclosed' => 'Hello <strong>%name%',
-            'apples' => '{1} <b>one</b> apple|]1,Inf[ <b>%count%</b> apples',
+            'unclosed' => 'Hello {#strong}%name%',
+            'apples' => '{1} {#b}one{/b} apple|]1,Inf[ {#b}%count%{/b} apples',
         ], 'en');
-        $translator->addResource('array', ['hello' => 'Hi <strong>%name%</strong>!'], 'en', 'custom');
+        $translator->addResource('array', ['hello' => 'Hi {#strong}%name%{/strong}!'], 'en', 'custom');
         $translator->addResource('array', [
-            'hello' => 'Bonjour <strong>%name%</strong> !',
+            'hello' => 'Bonjour {#strong}%name%{/strong} !',
         ], 'fr');
 
         return $translator;

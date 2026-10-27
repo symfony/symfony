@@ -27,6 +27,43 @@ class IntlFormatterTest extends TestCase
         $this->assertEquals($expected, trim((new IntlFormatter())->formatIntl($message, 'en', $arguments)));
     }
 
+    #[DataProvider('provideMarkup')]
+    public function testMarkup(string $expected, string $message, array $parameters = [])
+    {
+        $formatter = new IntlFormatter();
+
+        $this->assertSame($expected, $formatter->formatIntl($message, 'en', $parameters));
+        $this->assertSame($expected, $formatter->formatIntl($message, 'en', $parameters));
+    }
+
+    public static function provideMarkup(): iterable
+    {
+        yield ['#2{#b/}', "{n,number,'#'0}{#b/}", ['n' => 2]];
+        yield ['year 1970{#b/}', "{n,date,'year' yyyy}{#b/}", ['n' => 2]];
+        yield ['{2}{#b/}', "{n,number,'{'0'}'}{#b/}", ['n' => 2]];
+        yield ['{#b}1.5{/b}', '{#b}{n, number}{/b}', ['n' => 1.5]];
+        yield ["'#' {#b/}", "'#' {#b/}"];
+        yield ["'|' {#b/}", "'|' {#b/}"];
+        yield ['{#b}2nd{/b}', '{n, selectordinal, one {{#b}#st{/b}} two {{#b}#nd{/b}} other {{#b}#th{/b}}}', ['n' => 2]];
+        yield ['{#b}many{/b}', '{n, choice, 0#none|1#one|1<{#b}many{/b}}', ['n' => 2]];
+        yield ['{#b }x{/b }{#br /}', '{#b }x{/b }{#br /}'];
+        yield ['{#b}#{/b} 2', "{数量, plural, other {{#b}'#'{/b} #}}", ['数量' => 2]];
+        yield ['foo {#bar} baz', 'foo {#bar} baz'];
+        yield ['{#b}Ada{/b}{#br/}', '{#b}{name}{/b}{#br/}', ['name' => 'Ada']];
+        yield ['{#a}{#b}x{/b}{/a}', '{#a}{#b}x{/b}{/a}'];
+        yield ['{#b}x{/b}', "'{#b}'x'{/b}'"];
+        yield ['{#a}{#b/}{/a}', "{#a}'{#b/}'{/a}"];
+        yield ["It's {#b}Ada{/b}", "It's {#b}{name}{/b}", ['name' => 'Ada']];
+        yield ["It's {#b}Ada{/b}", "It''s {#b}{name}{/b}", ['name' => 'Ada']];
+        yield ["'{#b}Ada{/b}'", "''{#b}{name}{/b}''", ['name' => 'Ada']];
+        yield ['{#b}{name}{/b}', "'{#b}{name}{/b}'"];
+        yield ["{#b}It's {name}{/b}", "'{#b}It''s {name}{/b}'"];
+        yield ["{#b}It's", "'{#b}It''s"];
+        yield ['{#b}2{/b} items', '{n, plural, one {{#b}#{/b} item} other {{#b}#{/b} items}}', ['n' => 2]];
+        yield ['{#b}2{/b}', '{gender, select, female {{n, plural, one {{#b}#{/b}} other {{#b}#{/b}}}} other {{#b}other{/b}}}', ['gender' => 'female', 'n' => 2]];
+        yield ['{#b}#{/b} 2', "{n, plural, other {{#b}'#'{/b} #}}", ['n' => 2]];
+    }
+
     public function testInvalidFormat()
     {
         $this->expectException(InvalidArgumentException::class);

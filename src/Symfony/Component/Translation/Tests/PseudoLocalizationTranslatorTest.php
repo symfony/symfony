@@ -28,6 +28,12 @@ final class PseudoLocalizationTranslatorTest extends TestCase
     public static function provideTrans(): array
     {
         return [
+            ['[ƒöö{#b}ƀåŕ{/b}{#br/}]', 'foo{#b}bar{/b}{#br/}'],
+            ['[ƒöö{#b}ƀåŕ{/b}{#br/}]', 'foo{#b}bar{/b}{#br/}', ['parse_html' => true]],
+            ['foo {#p}bar{/p} ~~~ ~~', 'foo {#p}bar{/p}', self::getIsolatedOptions(['expansion_factor' => 2.0])],
+            ['foo {#p}bar{/p} ~~~ ~~', 'foo {#p}bar{/p}', self::getIsolatedOptions(['parse_html' => true, 'expansion_factor' => 2.0])],
+            ['[&#123;♯ƀ⁄&#125;]', '&#123;#b/&#125;'],
+            ['[&#123;♯ƀ⁄&#125;]', '&#123;#b/&#125;', ['parse_html' => true]],
             ['[ƒöö⭐ ≤þ≥ƁÅŔ≤⁄þ≥]', 'foo⭐ <p>BAR</p>'], // Test defaults
             ['before <div data-label="fcy"><a href="#" title="bar" data-content="ccc">foo</a></div> after', 'before <div data-label="fcy"><a href="#" title="bar" data-content="ccc">foo</a></div> after', self::getIsolatedOptions(['parse_html' => true])],
             ['ƀéƒöŕé <div data-label="fcyéé"><a href="#" title="bar" data-content="ccc">ƒöö éé</a></div> åƒţéŕ', 'before <div data-label="fcyéé"><a href="#" title="bar" data-content="ccc">foo éé</a></div> after', self::getIsolatedOptions(['parse_html' => true, 'accents' => true])],

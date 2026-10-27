@@ -44,43 +44,60 @@ class HtmlTranslatorTest extends TestCase
             }
         };
 
-        yield 'tag' => ['Hello <em>Fabien</em>!', 'Hello <strong>%name%</strong>!', ['%name%' => 'Fabien'], ['strong' => ['tag' => 'em']]];
-        yield 'tag with attributes' => ['Hello <span class="underline" data-id="42">Fabien</span>!', 'Hello <strong>%name%</strong>!', ['%name%' => 'Fabien'], ['strong' => ['tag' => 'span', 'attr' => ['class' => 'underline', 'data-id' => 42]]]];
-        yield 'attribute values are escaped' => ['<a href="&quot; onclick=&quot;alert(1)&amp;">here</a>', '<link>here</link>', [], ['link' => ['tag' => 'a', 'attr' => ['href' => '" onclick="alert(1)&']]]];
-        yield 'boolean and null attributes' => ['<button disabled>OK</button>', '<b>OK</b>', [], ['b' => ['tag' => 'button', 'attr' => ['disabled' => true, 'hidden' => false, 'title' => null]]]];
-        yield 'float and stringable attribute values' => ['<span data-price="1.5" title="&lt;i&gt;">OK</span>', '<b>OK</b>', [], ['b' => ['tag' => 'span', 'attr' => ['data-price' => 1.5, 'title' => $stringable]]]];
-        yield 'list of elements from the outermost to the innermost' => ['Ships on <span class="underline"><time datetime="2026-05-05">May 5</time></span>', 'Ships on <date>%date%</date>', ['%date%' => 'May 5'], ['date' => [['tag' => 'span', 'attr' => ['class' => 'underline']], ['tag' => 'time', 'attr' => ['datetime' => '2026-05-05']]]]];
-        yield 'tag names with underscores and hyphens' => ['<a href="/login">sign in</a> or <a href="/register">sign up</a>', '<signin_link>sign in</signin_link> or <sign-up>sign up</sign-up>', [], ['signin_link' => ['tag' => 'a', 'attr' => ['href' => '/login']], 'sign-up' => ['tag' => 'a', 'attr' => ['href' => '/register']]]];
-        yield 'custom element' => ['<my-element>OK</my-element>', '<b>OK</b>', [], ['b' => ['tag' => 'my-element']]];
-        yield 'escapable raw text element' => ['<textarea>&lt;/textarea&gt;</textarea>', '<b>%value%</b>', ['%value%' => '</textarea>'], ['b' => ['tag' => 'textarea']]];
+        yield 'tag' => ['Hello <em>Fabien</em>!', 'Hello {#strong}%name%{/strong}!', ['%name%' => 'Fabien'], ['strong' => ['tag' => 'em']]];
+        yield 'tag with attributes' => ['Hello <span class="underline" data-id="42">Fabien</span>!', 'Hello {#strong}%name%{/strong}!', ['%name%' => 'Fabien'], ['strong' => ['tag' => 'span', 'attr' => ['class' => 'underline', 'data-id' => 42]]]];
+        yield 'attribute values are escaped' => ['<a href="&quot; onclick=&quot;alert(1)&amp;">here</a>', '{#link}here{/link}', [], ['link' => ['tag' => 'a', 'attr' => ['href' => '" onclick="alert(1)&']]]];
+        yield 'boolean and null attributes' => ['<button disabled>OK</button>', '{#b}OK{/b}', [], ['b' => ['tag' => 'button', 'attr' => ['disabled' => true, 'hidden' => false, 'title' => null]]]];
+        yield 'float and stringable attribute values' => ['<span data-price="1.5" title="&lt;i&gt;">OK</span>', '{#b}OK{/b}', [], ['b' => ['tag' => 'span', 'attr' => ['data-price' => 1.5, 'title' => $stringable]]]];
+        yield 'list of elements from the outermost to the innermost' => ['Ships on <span class="underline"><time datetime="2026-05-05">May 5</time></span>', 'Ships on {#date}%date%{/date}', ['%date%' => 'May 5'], ['date' => [['tag' => 'span', 'attr' => ['class' => 'underline']], ['tag' => 'time', 'attr' => ['datetime' => '2026-05-05']]]]];
+        yield 'tag names with underscores and hyphens' => ['<a href="/login">sign in</a> or <a href="/register">sign up</a>', '{#signin_link}sign in{/signin_link} or {#sign-up}sign up{/sign-up}', [], ['signin_link' => ['tag' => 'a', 'attr' => ['href' => '/login']], 'sign-up' => ['tag' => 'a', 'attr' => ['href' => '/register']]]];
+        yield 'custom element' => ['<my-element>OK</my-element>', '{#b}OK{/b}', [], ['b' => ['tag' => 'my-element']]];
+        yield 'escapable raw text element' => ['<textarea>&lt;/textarea&gt;</textarea>', '{#b}%value%{/b}', ['%value%' => '</textarea>'], ['b' => ['tag' => 'textarea']]];
 
         yield 'no tags' => ['Tom &amp; Jerry &lt;3', 'Tom & Jerry <3'];
         yield 'empty message' => ['', ''];
 
-        yield 'parameter with HTML is escaped' => ['Hello <b>&lt;script&gt;alert(1)&lt;/script&gt;</b>!', 'Hello <strong>%name%</strong>!', ['%name%' => '<script>alert(1)</script>'], ['strong' => ['tag' => 'b']]];
-        yield 'parameter with a declared tag is escaped' => ['Hello <b>&lt;strong&gt;pwned&lt;/strong&gt;</b>!', 'Hello <strong>%name%</strong>!', ['%name%' => '<strong>pwned</strong>'], ['strong' => ['tag' => 'b']]];
-        yield 'parameter with quotes and ampersands is escaped' => ['Hello <b>&quot;Tom&quot; &amp; &#039;Jerry&#039;</b>!', 'Hello <strong>%name%</strong>!', ['%name%' => '"Tom" & \'Jerry\''], ['strong' => ['tag' => 'b']]];
-        yield 'parameter with an entity is escaped' => ['Hello <b>&amp;lt;b&amp;gt;</b>!', 'Hello <strong>%name%</strong>!', ['%name%' => '&lt;b&gt;'], ['strong' => ['tag' => 'b']]];
-        yield 'stringable parameter is escaped' => ['Hello <b>&lt;i&gt;</b>!', 'Hello <strong>%name%</strong>!', ['%name%' => $stringable], ['strong' => ['tag' => 'b']]];
+        yield 'parameter with HTML is escaped' => ['Hello <b>&lt;script&gt;alert(1)&lt;/script&gt;</b>!', 'Hello {#strong}%name%{/strong}!', ['%name%' => '<script>alert(1)</script>'], ['strong' => ['tag' => 'b']]];
+        yield 'parameter with a declared tag is escaped' => ['Hello <b>&lt;strong&gt;pwned&lt;/strong&gt;</b>!', 'Hello {#strong}%name%{/strong}!', ['%name%' => '<strong>pwned</strong>'], ['strong' => ['tag' => 'b']]];
+        yield 'parameter with quotes and ampersands is escaped' => ['Hello <b>&quot;Tom&quot; &amp; &#039;Jerry&#039;</b>!', 'Hello {#strong}%name%{/strong}!', ['%name%' => '"Tom" & \'Jerry\''], ['strong' => ['tag' => 'b']]];
+        yield 'parameter with an entity is escaped' => ['Hello <b>&amp;lt;b&amp;gt;</b>!', 'Hello {#strong}%name%{/strong}!', ['%name%' => '&lt;b&gt;'], ['strong' => ['tag' => 'b']]];
+        yield 'stringable parameter is escaped' => ['Hello <b>&lt;i&gt;</b>!', 'Hello {#strong}%name%{/strong}!', ['%name%' => $stringable], ['strong' => ['tag' => 'b']]];
         yield 'translatable parameter is translated then escaped' => ['From &lt;b&gt;&lt;i&gt;&lt;/b&gt;', 'From %who%', ['%who%' => new TranslatableMessage('<b>%name%</b>', ['%name%' => '<i>'])], ['b' => ['tag' => 'strong']]];
-        yield 'count' => ['<strong>3</strong> apples', '{1} <b>one</b> apple|]1,Inf[ <b>%count%</b> apples', ['%count%' => 3], ['b' => ['tag' => 'strong']]];
+        yield 'parameter markup is escaped' => ['<b>&#123;#strong&#125;x&#123;/strong&#125;&#123;#strong/&#125;</b>', '{#strong}%name%{/strong}', ['%name%' => '{#strong}x{/strong}{#strong/}'], ['strong' => ['tag' => 'b']]];
+        yield 'old markers are escaped' => ['&lt;b&gt;x&lt;/b&gt;&lt;b/&gt;', '<b>x</b><b/>', [], ['b' => ['tag' => 'strong']]];
+        yield 'translatable markup parameter is escaped' => ['&#123;#b&#125;x&#123;/b&#125;', '%name%', ['%name%' => new TranslatableMessage('{#b}x{/b}')], ['b' => ['tag' => 'strong']]];
+        yield 'stringable markup parameter is escaped' => ['&#123;#b/&#125;', '%name%', ['%name%' => new class implements \Stringable {
+            public function __toString(): string
+            {
+                return '{#b/}';
+            }
+        }], ['b' => ['tag' => 'strong']]];
+        yield 'encoded parameter markup stays encoded' => ['&amp;#123;#b/&amp;#125;', '%name%', ['%name%' => '&#123;#b/&#125;'], ['b' => ['tag' => 'strong']]];
+        yield 'namespaced markup is literal' => ['{#ns:b}x{/ns:b}', '{#ns:b}x{/ns:b}', [], ['b' => ['tag' => 'strong']]];
+        yield 'markup options are literal' => ['{#b option=value/}', '{#b option=value/}', [], ['b' => ['tag' => 'strong']]];
+        yield 'markup attributes are literal' => ['{#b @attr=value/}', '{#b @attr=value/}', [], ['b' => ['tag' => 'strong']]];
+        yield 'leading whitespace is literal' => ['{ #b/}', '{ #b/}', [], ['b' => ['tag' => 'strong']]];
+        yield 'mismatched closing markup' => ['{#b}x{/a}', '{#b}x{/a}', [], ['a' => ['tag' => 'em'], 'b' => ['tag' => 'strong']]];
+        yield 'self-closing closing markup' => ['{#b}x{/b/}', '{#b}x{/b/}', [], ['b' => ['tag' => 'strong']]];
+        yield 'fallback still escapes text' => ['{#b}&lt;x&gt;&amp;', '{#b}<x>&', [], ['b' => ['tag' => 'strong']]];
+        yield 'count' => ['<strong>3</strong> apples', '{1} {#b}one{/b} apple|]1,Inf[ {#b}%count%{/b} apples', ['%count%' => 3], ['b' => ['tag' => 'strong']]];
 
         yield 'HTML in the message is escaped' => ['&lt;script&gt;alert(1)&lt;/script&gt;&lt;img src=x onerror=alert(2)&gt; &quot;double&quot; &#039;single&#039;', '<script>alert(1)</script><img src=x onerror=alert(2)> "double" \'single\'', [], ['b' => ['tag' => 'strong']]];
         yield 'entities in the message are kept' => ['Tom &amp; Jerry &copy; 2026', 'Tom &amp; Jerry &copy; 2026'];
-        yield 'undeclared tag is escaped' => ['Hello &lt;em&gt;Fabien&lt;/em&gt; and <b>you</b>', 'Hello <em>%name%</em> and <strong>you</strong>', ['%name%' => 'Fabien'], ['strong' => ['tag' => 'b']]];
-        yield 'tag names are case-sensitive' => ['Hello &lt;STRONG&gt;you&lt;/STRONG&gt;', 'Hello <STRONG>you</STRONG>', [], ['strong' => ['tag' => 'b']]];
-        yield 'tag with attributes in the message is not replaced' => ['Click &lt;link href=&quot;javascript:alert(1)&quot;&gt;here&lt;/link&gt;', 'Click <link href="javascript:alert(1)">here</link>', [], ['link' => ['tag' => 'a', 'attr' => ['href' => '/docs']]]];
-        yield 'repeated tags' => ['<strong>one</strong>, <strong>two</strong>', '<b>one</b>, <b>two</b>', [], ['b' => ['tag' => 'strong']]];
-        yield 'nested tags' => ['<a href="/docs">Read <strong>the docs</strong></a>', '<link>Read <b>the docs</b></link>', [], ['link' => ['tag' => 'a', 'attr' => ['href' => '/docs']], 'b' => ['tag' => 'strong']]];
-        yield 'nested identical tags' => ['<strong>bold <strong>bolder</strong></strong>', '<b>bold <b>bolder</b></b>', [], ['b' => ['tag' => 'strong']]];
-        yield 'whitespace inside tags' => ['<strong>a</strong> b<br>c<br>', '<b >a</b > b<br />c<br/>', [], ['b' => ['tag' => 'strong'], 'br' => ['tag' => 'br']]];
-        yield 'void element' => ['Line 1<br>Line 2', 'Line 1<br>Line 2', [], ['br' => ['tag' => 'br']]];
-        yield 'self-closing tag' => ['Icon: <i class="icon"></i>', 'Icon: <icon/>', [], ['icon' => ['tag' => 'i', 'attr' => ['class' => 'icon']]]];
+        yield 'undeclared markup is literal' => ['Hello {#em}Fabien{/em} and <b>you</b>', 'Hello {#em}%name%{/em} and {#strong}you{/strong}', ['%name%' => 'Fabien'], ['strong' => ['tag' => 'b']]];
+        yield 'tag names are case-sensitive' => ['Hello {#STRONG}you{/STRONG}', 'Hello {#STRONG}you{/STRONG}', [], ['strong' => ['tag' => 'b']]];
+        yield 'tag with attributes in the message is not replaced' => ['Click {#link href=&quot;javascript:alert(1)&quot;}here{/link}', 'Click {#link href="javascript:alert(1)"}here{/link}', [], ['link' => ['tag' => 'a', 'attr' => ['href' => '/docs']]]];
+        yield 'repeated tags' => ['<strong>one</strong>, <strong>two</strong>', '{#b}one{/b}, {#b}two{/b}', [], ['b' => ['tag' => 'strong']]];
+        yield 'nested tags' => ['<a href="/docs">Read <strong>the docs</strong></a>', '{#link}Read {#b}the docs{/b}{/link}', [], ['link' => ['tag' => 'a', 'attr' => ['href' => '/docs']], 'b' => ['tag' => 'strong']]];
+        yield 'nested identical tags' => ['<strong>bold <strong>bolder</strong></strong>', '{#b}bold {#b}bolder{/b}{/b}', [], ['b' => ['tag' => 'strong']]];
+        yield 'whitespace inside tags' => ['<strong>a</strong> b<br>c<br>', '{#b }a{/b } b{#br /}c{#br/}', [], ['b' => ['tag' => 'strong'], 'br' => ['tag' => 'br']]];
+        yield 'void element' => ['Line 1<br>Line 2', 'Line 1{#br}Line 2', [], ['br' => ['tag' => 'br']]];
+        yield 'self-closing tag' => ['Icon: <i class="icon"></i>', 'Icon: {#icon/}', [], ['icon' => ['tag' => 'i', 'attr' => ['class' => 'icon']]]];
 
-        yield 'unclosed tag escapes the whole message' => ['Hello &lt;strong&gt;Fabien', 'Hello <strong>%name%', ['%name%' => 'Fabien'], ['strong' => ['tag' => 'b']]];
-        yield 'unopened tag escapes the whole message' => ['Hello Fabien&lt;/strong&gt;', 'Hello %name%</strong>', ['%name%' => 'Fabien'], ['strong' => ['tag' => 'b']]];
-        yield 'crossed tags escape the whole message' => ['&lt;a&gt;x&lt;b&gt;y&lt;/a&gt;z&lt;/b&gt;', '<a>x<b>y</a>z</b>', [], ['a' => ['tag' => 'em'], 'b' => ['tag' => 'strong']]];
-        yield 'closed void element escapes the whole message' => ['Line 1&lt;br&gt;&lt;/br&gt;Line 2', 'Line 1<br></br>Line 2', [], ['br' => ['tag' => 'br']]];
+        yield 'unclosed tag escapes the whole message' => ['Hello {#strong}Fabien', 'Hello {#strong}%name%', ['%name%' => 'Fabien'], ['strong' => ['tag' => 'b']]];
+        yield 'unopened tag escapes the whole message' => ['Hello Fabien{/strong}', 'Hello %name%{/strong}', ['%name%' => 'Fabien'], ['strong' => ['tag' => 'b']]];
+        yield 'crossed tags escape the whole message' => ['{#a}x{#b}y{/a}z{/b}', '{#a}x{#b}y{/a}z{/b}', [], ['a' => ['tag' => 'em'], 'b' => ['tag' => 'strong']]];
+        yield 'closed void element escapes the whole message' => ['Line 1{#br}{/br}Line 2', 'Line 1{#br}{/br}Line 2', [], ['br' => ['tag' => 'br']]];
     }
 
     #[DataProvider('provideInvalidTags')]
@@ -133,27 +150,27 @@ class HtmlTranslatorTest extends TestCase
     public function testTransEscapesGlobalParameters()
     {
         $translator = $this->createTranslator();
-        $translator->addGlobalParameter('%site%', '<b>pwn</b>');
+        $translator->addGlobalParameter('%site%', '{#b}pwn{/b}');
 
-        $this->assertSame('Welcome to <strong>&lt;b&gt;pwn&lt;/b&gt;</strong>', (new HtmlTranslator($translator))->trans('welcome', ['b' => ['tag' => 'strong']]));
+        $this->assertSame('Welcome to <strong>&#123;#b&#125;pwn&#123;/b&#125;</strong>', (new HtmlTranslator($translator))->trans('welcome', ['b' => ['tag' => 'strong']]));
     }
 
     public function testTransEscapesGlobalParametersThroughDecorators()
     {
         $translator = $this->createTranslator();
-        $translator->addGlobalParameter('%site%', '<b>pwn</b>');
+        $translator->addGlobalParameter('%site%', '{#b}pwn{/b}');
         $translator = new DataCollectorTranslator(new LoggingTranslator($translator, $this->createStub(LoggerInterface::class)));
 
-        $this->assertSame('Welcome to <strong>&lt;b&gt;pwn&lt;/b&gt;</strong>', (new HtmlTranslator($translator))->trans('welcome', ['b' => ['tag' => 'strong']]));
+        $this->assertSame('Welcome to <strong>&#123;#b&#125;pwn&#123;/b&#125;</strong>', (new HtmlTranslator($translator))->trans('welcome', ['b' => ['tag' => 'strong']]));
     }
 
     public function testTransEscapesGlobalParametersThroughPseudoLocalization()
     {
         $translator = $this->createTranslator();
-        $translator->addGlobalParameter('%site%', '<b>pwn</b>');
+        $translator->addGlobalParameter('%site%', '{#b}pwn{/b}');
         $translator = new PseudoLocalizationTranslator($translator, ['accents' => false, 'expansion_factor' => 1.0, 'brackets' => false, 'parse_html' => false]);
 
-        $this->assertSame('Welcome to <strong>&lt;b&gt;pwn&lt;/b&gt;</strong>', (new HtmlTranslator($translator))->trans('welcome', ['b' => ['tag' => 'strong']]));
+        $this->assertSame('Welcome to <strong>&#123;#b&#125;pwn&#123;/b&#125;</strong>', (new HtmlTranslator($translator))->trans('welcome', ['b' => ['tag' => 'strong']]));
     }
 
     public function testTransTranslatesTranslatableGlobalParameters()
@@ -206,7 +223,7 @@ class HtmlTranslatorTest extends TestCase
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', ['hello' => "Caf\xE9 <b>%name%</b> &eacute;"], 'en');
+        $translator->addResource('array', ['hello' => "Caf\xE9 {#b}%name%{/b} &eacute;"], 'en');
 
         $this->assertSame("Caf\xE9 <strong title=\"\xE9\">Jos\xE9 &amp; co</strong> &eacute;", (new HtmlTranslator($translator, 'ISO-8859-1'))->trans('hello', ['b' => ['tag' => 'strong', 'attr' => ['title' => "\xE9"]]], ['%name%' => "Jos\xE9 & co"]));
     }
@@ -215,7 +232,41 @@ class HtmlTranslatorTest extends TestCase
     {
         $translator = new PseudoLocalizationTranslator(new IdentityTranslator(), ['parse_html' => true, 'accents' => true, 'expansion_factor' => 1.0, 'brackets' => false]);
 
-        $this->assertSame("ĥéļļö\u{2003}<strong>ƒöö</strong>", (new HtmlTranslator($translator))->trans('hello <b>foo</b>', ['b' => ['tag' => 'strong']]));
+        $this->assertSame("ĥéļļö\u{2003}<strong>ƒöö</strong>", (new HtmlTranslator($translator))->trans('hello {#b}foo{/b}', ['b' => ['tag' => 'strong']]));
+    }
+
+    #[DataProvider('providePseudoLocalizationOptions')]
+    public function testMarkupParametersWithPseudoLocalization(bool $parseHtml)
+    {
+        $translator = $this->createTranslator();
+        $translator->addGlobalParameter('%site%', '{#b}x{/b}{#b/}');
+        $translator = new PseudoLocalizationTranslator($translator, ['parse_html' => $parseHtml, 'brackets' => false]);
+
+        $this->assertSame("Ŵéļçöɱé\u{2003}ţö\u{2003}<strong>&#123;♯ƀ&#125;ẋ&#123;⁄ƀ&#125;&#123;♯ƀ⁄&#125;</strong>", (new HtmlTranslator($translator))->trans('welcome', ['b' => ['tag' => 'strong']]));
+    }
+
+    public static function providePseudoLocalizationOptions(): iterable
+    {
+        yield [false];
+        yield [true];
+    }
+
+    public function testTransWithLocaleFallback()
+    {
+        $translator = $this->createTranslator();
+        $translator->setFallbackLocales(['fr']);
+
+        $this->assertSame('Bienvenue sur <strong>Symfony</strong>', (new HtmlTranslator($translator))->trans('welcome', ['b' => ['tag' => 'strong']], ['%site%' => 'Symfony'], null, 'de'));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testOrdinaryIntlTranslationPreservesUnbalancedMarkup()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['foo' => 'foo {#bar} baz'], 'en', 'messages+intl-icu');
+
+        $this->assertSame('foo {#bar} baz', $translator->trans('foo'));
     }
 
     #[DataProvider('provideTransWithIntlMessages')]
@@ -225,10 +276,10 @@ class HtmlTranslatorTest extends TestCase
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', [
-            'hello' => 'Hello <strong>{name}</strong>!',
-            'plural' => '{count, plural, one {<strong>#</strong> item} other {<strong>#</strong> items}}',
-            'select' => '{gender, select, female {<strong>She</strong> replied} other {<strong>They</strong> replied}}',
-            'apostrophe' => 'It\'\'s <strong>{name}</strong>',
+            'hello' => 'Hello {#strong}{name}{/strong}!',
+            'plural' => '{count, plural, one {{#strong}#{/strong} item} other {{#strong}#{/strong} items}}',
+            'select' => '{gender, select, female {{#strong}She{/strong} replied} other {{#strong}They{/strong} replied}}',
+            'apostrophe' => 'It\'\'s {#strong}{name}{/strong}',
         ], 'en', 'messages'.MessageCatalogue::INTL_DOMAIN_SUFFIX);
 
         $this->assertSame($expected, (new HtmlTranslator($translator))->trans($id, ['strong' => ['tag' => 'b']], $parameters));
@@ -236,6 +287,7 @@ class HtmlTranslatorTest extends TestCase
 
     public static function provideTransWithIntlMessages(): iterable
     {
+        yield 'markup argument' => ['Hello <b>&#123;#strong/&#125;</b>!', 'hello', ['name' => '{#strong/}']];
         yield 'argument' => ['Hello <b>&lt;i&gt;</b>!', 'hello', ['name' => '<i>']];
         yield 'plural (one)' => ['<b>1</b> item', 'plural', ['count' => 1]];
         yield 'plural (other)' => ['<b>1,234</b> items', 'plural', ['count' => 1234]];
@@ -247,8 +299,8 @@ class HtmlTranslatorTest extends TestCase
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', ['welcome' => 'Welcome to <b>%site%</b>', 'from' => 'From <b>%who%</b>', 'world' => 'the <world>'], 'en');
-        $translator->addResource('array', ['welcome' => 'Bienvenue sur <b>%site%</b>', 'from' => 'De <b>%who%</b>', 'world' => 'le <monde>'], 'fr');
+        $translator->addResource('array', ['welcome' => 'Welcome to {#b}%site%{/b}', 'from' => 'From {#b}%who%{/b}', 'world' => 'the <world>'], 'en');
+        $translator->addResource('array', ['welcome' => 'Bienvenue sur {#b}%site%{/b}', 'from' => 'De {#b}%who%{/b}', 'world' => 'le <monde>'], 'fr');
 
         return $translator;
     }

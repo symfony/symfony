@@ -27,6 +27,8 @@ use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
 use Psr\Log\AbstractLogger;
+use Symfony\Bridge\PhpUnit\Attribute\TimeSensitive;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
@@ -393,6 +395,21 @@ class DataKeyStoreTest extends TestCase
 
         $this->assertSame($references[2], $store->current('user.email')->reference);
         $this->assertSame($references, array_map(static fn (StoredDataKey $row): string => $row->reference, iterator_to_array($store->all(), false)));
+    }
+
+    #[TimeSensitive(UuidV7::class)]
+    public function testTheNewestRowStaysTheCurrentOneWhenTheClockGoesBackwards()
+    {
+        ClockMock::withClockMock($now = time() + .1239);
+        $store = $this->store();
+        $store->current('user.email');
+
+        // the clock goes back by 800 microseconds, without leaving the millisecond
+        ClockMock::withClockMock($now - .0008);
+        $fresh = $store->rotate('user.email')->reference;
+        $store->forget();
+
+        $this->assertSame($fresh, $store->current('user.email')->reference);
     }
 
     public function testAnUnknownReferenceIsReportedAsSuch()

@@ -58,6 +58,7 @@ class ImportMapOutdatedCommandTest extends TestCase
         $display = $commandTester->getDisplay(true);
         $this->assertSame(Command::FAILURE, $commandTester->getStatusCode());
         $this->assertStringContainsString('Withheld', $display);
+        $this->assertStringContainsString('"asset_mapper.minimum_release_age"', $display);
         $this->assertMatchesRegularExpression('/bootstrap\s+5\.3\.1\s+5\.3\.2\s+5\.3\.3/', $display);
     }
 

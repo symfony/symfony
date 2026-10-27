@@ -130,7 +130,7 @@ final class ImportMapOutdatedCommand extends Command
             $table->render();
 
             if ($withheldColumn) {
-                $io->comment('Versions in the "Withheld" column are published but too recent for "framework.asset_mapper.minimum_release_age".');
+                $io->comment('Versions in the "Withheld" column are published but too recent for "asset_mapper.minimum_release_age".');
             }
         }
 

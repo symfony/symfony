@@ -343,6 +343,46 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
         );
     }
 
+    #[DataProvider('providePullSynchronizationOptions')]
+    public function testPullSynchronizationOptions(bool $force, bool $deleteMissing, string $expectedYaml)
+    {
+        $file = $this->createYamlFile([
+            'shared' => 'Local',
+            'local_only' => 'Keep me',
+        ]);
+        $providerBag = new TranslatorBag();
+        $providerBag->addCatalogue((new ArrayLoader())->load([
+            'shared' => 'Remote',
+            'remote_only' => 'New',
+        ], 'en'));
+
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('read')
+            ->with(['messages'], ['en'])
+            ->willReturn($providerBag);
+        $provider->method('__toString')->willReturn('null://default');
+
+        $tester = $this->createCommandTester($provider);
+        $tester->execute([
+            '--locales' => ['en'],
+            '--domains' => ['messages'],
+            '--format' => 'yml',
+            '--force' => $force,
+            '--delete-missing' => $deleteMissing,
+        ]);
+
+        $this->assertSame($expectedYaml, file_get_contents($file));
+    }
+
+    public static function providePullSynchronizationOptions(): iterable
+    {
+        yield 'append only' => [false, false, "local_only: Keep me\\nremote_only: New\\nshared: Local\\n"];
+        yield 'overwrite without deletion' => [true, false, "local_only: Keep me\\nremote_only: New\\nshared: Remote\\n"];
+        yield 'delete without overwriting' => [false, true, "remote_only: New\\nshared: Local\\n"];
+        yield 'overwrite and delete' => [true, true, "remote_only: New\\nshared: Remote\\n"];
+    }
+
     public function testPullForceMessages()
     {
         $arrayLoader = new ArrayLoader();

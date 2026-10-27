@@ -179,9 +179,11 @@ final class TranslationPullCommand extends Command
                 }
             } else {
                 if ($force) {
-                    // addBag() merges into its incoming catalogues: provider values take priority.
-                    $providerTranslations->addBag($localTranslations);
-                    $localTranslations = $providerTranslations;
+                    // Preserve local-only keys while using the provider's values for shared keys.
+                    foreach ($providerTranslations->getCatalogues() as $catalogue) {
+                        $localCatalogue = $localTranslations->getCatalogue($catalogue->getLocale());
+                        $localCatalogue->addCatalogue($catalogue);
+                    }
                 } else {
                     // Append only translations that do not already exist locally.
                     $localTranslations->addBag($providerTranslations->diff($localTranslations));

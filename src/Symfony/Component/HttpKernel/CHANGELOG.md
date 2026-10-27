@@ -4,7 +4,7 @@ CHANGELOG
 8.3
 ---
 
- * Add the `#[RateLimitFixedWindow]`, `#[RateLimitSlidingWindow]` and `#[RateLimitTokenBucket]` attributes to rate limit controllers with a limiter configured inline
+ * Allow passing a `PolicyInterface` instead of a limiter name to `#[RateLimit]`, to configure a limiter that only its controller uses
 
 8.2
 ---

@@ -399,6 +399,16 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringContainsString('Now visible', $output->fetch());
     }
 
+    public function testSuccessPreservesLegacyExtraStringArgument()
+    {
+        $output = new BufferedOutput();
+        $style = new SymfonyStyle(new ArrayInput([]), $output);
+
+        $style->success('Legacy success', 'TEST');
+
+        $this->assertStringContainsString('Legacy success', $output->fetch());
+    }
+
     public function testMemoryConsumption()
     {
         $io = new SymfonyStyle(new ArrayInput([]), new NullOutput());

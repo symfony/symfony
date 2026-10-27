@@ -404,13 +404,13 @@ abstract class BaseNode implements NodeInterface
             $value = $closure($value);
         }
 
+        // the node declared that it resolves at compile time, so there is no dynamic value to validate
+        if ($this->getAttribute('resolves_at_compile_time', false) && self::containsPlaceholder($value)) {
+            return $value;
+        }
+
         // resolve placeholder value
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
-            // the node declared that it resolves at compile time, so there is no dynamic value to validate
-            if ($this->getAttribute('resolves_at_compile_time', false)) {
-                return $value;
-            }
-
             // the types of the placeholder are not known yet, but no type fits a node that accepts no placeholder
             if (!$placeholders && !$this->allowPlaceholders()) {
                 $this->handlingPlaceholder = $value;
@@ -469,11 +469,11 @@ abstract class BaseNode implements NodeInterface
             $value = (self::$placeholderResolver)($value, $this->getPath());
         }
 
-        if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
-            if ($this->getAttribute('resolves_at_compile_time', false)) {
-                return $value;
-            }
+        if ($this->getAttribute('resolves_at_compile_time', false) && self::containsPlaceholder($value)) {
+            return $value;
+        }
 
+        if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
             foreach ($placeholders as $placeholder) {
                 $this->handlingPlaceholder = $value;
                 try {
@@ -553,6 +553,30 @@ abstract class BaseNode implements NodeInterface
     protected function getValidPlaceholderTypes(): array
     {
         return [];
+    }
+
+    /**
+     * Tells whether a value is a placeholder or holds one inside a string, as "http://%env(HOST)%/" does.
+     */
+    private static function containsPlaceholder(mixed $value): bool
+    {
+        if (!\is_string($value)) {
+            return false;
+        }
+
+        foreach (self::$placeholderUniquePrefixes as $placeholderUniquePrefix) {
+            if (str_contains($value, $placeholderUniquePrefix)) {
+                return true;
+            }
+        }
+
+        foreach (self::$placeholders as $placeholder => $values) {
+            if (str_contains($value, $placeholder)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static function resolvePlaceholderValue(mixed $value): mixed

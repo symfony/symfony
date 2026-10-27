@@ -53,8 +53,13 @@ final class ProtectedResourceMetadataController
         $metadata = $this->metadata[$firewallName];
 
         // the "resource" identifier is REQUIRED by RFC 9728, Section 2; when the firewall
-        // does not pin one, the resource is the origin this document is being served from
-        $metadata = ['resource' => $metadata['resource'] ?? $request->getSchemeAndHttpHost()] + $metadata;
+        // does not pin one, the resource is the origin this document is being served from,
+        // and a path is resolved against that origin
+        $metadata = ['resource' => match (true) {
+            !isset($metadata['resource']) => $request->getSchemeAndHttpHost(),
+            str_starts_with($metadata['resource'], '/') => $request->getUriForPath($metadata['resource']),
+            default => $metadata['resource'],
+        }] + $metadata;
 
         // every other discovery document is served with plain slashes, and RFC 9728,
         // Section 3.3 has the consumer compare the "resource" value character by character

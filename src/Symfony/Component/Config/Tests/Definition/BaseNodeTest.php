@@ -150,6 +150,31 @@ class BaseNodeTest extends TestCase
         $this->assertSame(['mode' => 'env_test_FOO'], $finalized);
     }
 
+    public function testInlinedEnvVarsInsideAStringAreNotValidatedAsPlaceholders()
+    {
+        $tree = (new TreeBuilder('root'))
+            ->getRootNode()
+                ->children()
+                    ->scalarNode('url')
+                        ->resolvesAtCompileTime()
+                        ->validate()->ifTrue(static fn ($v) => !str_starts_with($v, 'http://localhost/'))->thenInvalid('Not a local URL.')->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->buildTree()
+        ;
+
+        BaseNode::setPlaceholder('env_test_HOST', ['string' => '']);
+
+        try {
+            $finalized = $tree->finalize($tree->normalize(['url' => 'http://env_test_HOST/api']));
+        } finally {
+            BaseNode::resetPlaceholders();
+        }
+
+        $this->assertSame(['url' => 'http://env_test_HOST/api'], $finalized);
+    }
+
     public function testInlinedEnvVarsCanBeArrays()
     {
         $tree = (new TreeBuilder('root'))

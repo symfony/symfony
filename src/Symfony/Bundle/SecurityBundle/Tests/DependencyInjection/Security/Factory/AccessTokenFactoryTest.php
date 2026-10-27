@@ -1407,13 +1407,13 @@ class AccessTokenFactoryTest extends TestCase
 
     public static function provideInvalidResourceIdentifiers(): iterable
     {
-        // the well-known path is derived from the path component of the identifier when the
-        // route is declared, so a value the container cannot parse cannot be served
-        yield 'an environment variable used as the whole value' => ['env_2b0d1a_API_RESOURCE_4f8c'];
+        yield 'a host without a scheme' => ['api.example.com/v1'];
         yield 'not HTTPS' => ['http://api.example.com'];
         yield 'a test domain over HTTP' => ['http://api.example.test'];
         yield 'with a fragment' => ['https://api.example.com/v1#api'];
         yield 'no URL at all' => ['https://api.example.com:port/v1'];
+        yield 'a path with a fragment' => ['/v1#api'];
+        yield 'a network-path reference' => ['//api.example.com/v1'];
     }
 
     #[DataProvider('provideValidResourceIdentifiers')]
@@ -1439,8 +1439,9 @@ class AccessTokenFactoryTest extends TestCase
         yield 'a localhost subdomain over HTTP' => ['http://api.localhost', '/.well-known/oauth-protected-resource', 'http://api.localhost/.well-known/oauth-protected-resource'];
         // a query is only a SHOULD NOT, and RFC 9728, Section 3.1 keeps it after the path
         yield 'with a query' => ['https://api.example.com/v1?tenant=acme', '/.well-known/oauth-protected-resource/v1', 'https://api.example.com/.well-known/oauth-protected-resource/v1?tenant=acme'];
-        // an environment variable interpolated into the URL still leaves the path readable
-        yield 'an environment variable inside a URL' => ['https://env_2b0d1a_API_HOST_4f8c/v1', '/.well-known/oauth-protected-resource/v1', 'https://env_2b0d1a_API_HOST_4f8c/.well-known/oauth-protected-resource/v1'];
+        // a path is resolved against the origin of the request, as the default identifier is
+        yield 'a path' => ['/v1/', '/.well-known/oauth-protected-resource/v1', '/.well-known/oauth-protected-resource/v1'];
+        yield 'a path with a query' => ['/v1?tenant=acme', '/.well-known/oauth-protected-resource/v1', '/.well-known/oauth-protected-resource/v1?tenant=acme'];
     }
 
     #[DataProvider('provideBuiltInTokenHandlers')]

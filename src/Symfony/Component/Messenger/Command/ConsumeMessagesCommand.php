@@ -310,7 +310,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             $options['queues'] = $queues;
         }
 
-        if (1 > $fetchSize = (int) $input->getOption('fetch-size')) {
+        if (false === $fetchSize = filter_var($input->getOption('fetch-size'), \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
             throw new \InvalidArgumentException(\sprintf('The "--fetch-size" option must be a positive integer, "%s" given.', $input->getOption('fetch-size')));
         }
 

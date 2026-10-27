@@ -41,6 +41,15 @@ final class ProtectedResourceMetadataController
             throw new NotFoundHttpException(\sprintf('No protected resource metadata is configured for the "%s" firewall.', $firewallName));
         }
 
+        // the document is public, so clients that run in a browser can read it from any origin
+        if ($request->isMethod('OPTIONS')) {
+            return new Response(null, Response::HTTP_NO_CONTENT, [
+                'Access-Control-Allow-Origin' => '*',
+                'Access-Control-Allow-Methods' => 'GET',
+                'Access-Control-Allow-Headers' => '*',
+            ]);
+        }
+
         $metadata = $this->metadata[$firewallName];
 
         // the "resource" identifier is REQUIRED by RFC 9728, Section 2; when the firewall
@@ -49,6 +58,6 @@ final class ProtectedResourceMetadataController
 
         // every other discovery document is served with plain slashes, and RFC 9728,
         // Section 3.3 has the consumer compare the "resource" value character by character
-        return (new JsonResponse($metadata))->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | \JSON_UNESCAPED_SLASHES);
+        return (new JsonResponse($metadata, Response::HTTP_OK, ['Access-Control-Allow-Origin' => '*']))->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | \JSON_UNESCAPED_SLASHES);
     }
 }

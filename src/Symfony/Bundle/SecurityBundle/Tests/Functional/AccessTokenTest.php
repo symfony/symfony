@@ -79,6 +79,28 @@ class AccessTokenTest extends AbstractWebTestCase
         ], json_decode($response->getContent(), true));
     }
 
+    public function testTheProtectedResourceMetadataCanBeReadFromAnyOrigin()
+    {
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_resource_metadata.yml']);
+
+        $client->request('OPTIONS', '/.well-known/oauth-protected-resource', [], [], [
+            'HTTP_ORIGIN' => 'https://client.example.org',
+            'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'GET',
+            'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' => 'mcp-protocol-version',
+        ]);
+        $response = $client->getResponse();
+
+        $this->assertSame(204, $response->getStatusCode());
+        $this->assertSame('*', $response->headers->get('Access-Control-Allow-Origin'));
+        $this->assertSame('*', $response->headers->get('Access-Control-Allow-Headers'));
+
+        $client->request('GET', '/.well-known/oauth-protected-resource', [], [], ['HTTP_ORIGIN' => 'https://client.example.org']);
+        $response = $client->getResponse();
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('*', $response->headers->get('Access-Control-Allow-Origin'));
+    }
+
     public function testNoProtectedResourceMetadataRouteWithoutTheConfiguration()
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_header_default.yml']);

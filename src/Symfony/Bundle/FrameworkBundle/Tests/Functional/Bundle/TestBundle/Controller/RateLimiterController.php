@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Cont
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
-use Symfony\Component\HttpKernel\Attribute\RateLimitFixedWindow;
+use Symfony\Component\RateLimiter\Policy\FixedWindowPolicy;
 
 class RateLimiterController
 {
@@ -29,7 +29,7 @@ class RateLimiterController
         return new Response('ticket');
     }
 
-    #[RateLimitFixedWindow(5, '1 hour')]
+    #[RateLimit(new FixedWindowPolicy(5, '1 hour'))]
     public function inline(): Response
     {
         return new Response('ticket');

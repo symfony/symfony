@@ -18,12 +18,8 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\AbstractInlineRateLimit;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
-use Symfony\Component\HttpKernel\Attribute\RateLimitFixedWindow;
-use Symfony\Component\HttpKernel\Attribute\RateLimitSlidingWindow;
-use Symfony\Component\HttpKernel\Attribute\RateLimitTokenBucket;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -45,7 +41,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Tests\HttpCache\HttpCacheTestCase;
 use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
 use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Component\RateLimiter\Policy\FixedWindowPolicy;
 use Symfony\Component\RateLimiter\Policy\NoLimiter;
+use Symfony\Component\RateLimiter\Policy\SlidingWindowPolicy;
+use Symfony\Component\RateLimiter\Policy\TokenBucketPolicy;
 use Symfony\Component\RateLimiter\RateLimit as RateLimitResult;
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
@@ -95,7 +94,7 @@ class RateLimitAttributeListenerTest extends TestCase
         return new RateLimitAttributeListener($locator);
     }
 
-    private function makeEvent(RateLimit|AbstractInlineRateLimit $attribute, Request $request, ?ExpressionLanguage $el = null): ControllerAttributeEvent
+    private function makeEvent(RateLimit $attribute, Request $request, ?ExpressionLanguage $el = null): ControllerAttributeEvent
     {
         return new ControllerAttributeEvent($attribute, new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
@@ -1064,15 +1063,11 @@ class RateLimitAttributeListenerTest extends TestCase
         $this->assertSame('0', $anonymousAgain->headers->get('X-RateLimit-Remaining'));
     }
 
-    private function makeInlineKernel(): HttpKernel
+    private function makePolicyKernel(?EventDispatcher $dispatcher = null): HttpKernel
     {
-        $dispatcher = new EventDispatcher();
+        $dispatcher ??= new EventDispatcher();
         $dispatcher->addSubscriber(new ControllerAttributesListener([
-            KernelEvents::CONTROLLER_ARGUMENTS => [
-                RateLimitFixedWindow::class => true,
-                RateLimitSlidingWindow::class => true,
-                RateLimitTokenBucket::class => true,
-            ],
+            KernelEvents::CONTROLLER_ARGUMENTS => [RateLimit::class => true],
         ]));
         $dispatcher->addSubscriber(new RateLimitAttributeListener($this->createStub(ServiceProviderInterface::class), builder: new RateLimiterBuilder(new InMemoryStorage())));
         $dispatcher->addSubscriber(new ErrorListener(static fn () => new Response('error')));
@@ -1080,17 +1075,17 @@ class RateLimitAttributeListenerTest extends TestCase
         return new HttpKernel($dispatcher, new ControllerResolver(), null, new ArgumentResolver());
     }
 
-    public static function provideInlineRateLimitedControllers(): iterable
+    public static function providePolicyControllers(): iterable
     {
-        yield 'fixed_window' => [new FixedWindowRateLimitedController()];
-        yield 'sliding_window' => [new SlidingWindowRateLimitedController()];
-        yield 'token_bucket' => [new TokenBucketRateLimitedController()];
+        yield 'fixed_window' => [new FixedWindowPolicyController()];
+        yield 'sliding_window' => [new SlidingWindowPolicyController()];
+        yield 'token_bucket' => [new TokenBucketPolicyController()];
     }
 
-    #[DataProvider('provideInlineRateLimitedControllers')]
-    public function testInlineAttributeThroughARealKernel(object $controller)
+    #[DataProvider('providePolicyControllers')]
+    public function testPolicyThroughARealKernel(object $controller)
     {
-        $kernel = $this->makeInlineKernel();
+        $kernel = $this->makePolicyKernel();
 
         foreach ([1, 0] as $remaining) {
             $response = $this->handleThrough($kernel, $controller);
@@ -1103,43 +1098,33 @@ class RateLimitAttributeListenerTest extends TestCase
         $this->assertSame(429, $this->handleThrough($kernel, $controller)->getStatusCode());
     }
 
-    public function testInlineAttributesOfDifferentControllersDoNotShareABucket()
+    public function testPoliciesOfDifferentControllersDoNotShareABucket()
     {
-        $kernel = $this->makeInlineKernel();
+        $kernel = $this->makePolicyKernel();
 
-        $this->handleThrough($kernel, new FixedWindowRateLimitedController());
-        $this->handleThrough($kernel, new FixedWindowRateLimitedController());
-        $this->assertSame(429, $this->handleThrough($kernel, new FixedWindowRateLimitedController())->getStatusCode());
+        $this->handleThrough($kernel, new FixedWindowPolicyController());
+        $this->handleThrough($kernel, new FixedWindowPolicyController());
+        $this->assertSame(429, $this->handleThrough($kernel, new FixedWindowPolicyController())->getStatusCode());
 
-        $this->assertSame(200, $this->handleThrough($kernel, new SlidingWindowRateLimitedController())->getStatusCode());
-        $this->assertSame(200, $this->handleThrough($kernel, new OtherFixedWindowRateLimitedController())->getStatusCode());
+        $this->assertSame(200, $this->handleThrough($kernel, new OtherFixedWindowPolicyController())->getStatusCode());
     }
 
-    public function testInlineAttributesWithTheSameIdShareABucket()
+    public function testStackedPoliciesDoNotShareABucket()
     {
-        $kernel = $this->makeInlineKernel();
-
-        $this->assertSame(200, $this->handleThrough($kernel, new SharedBucketController())->getStatusCode());
-        $this->assertSame(200, $this->handleThrough($kernel, new OtherSharedBucketController())->getStatusCode());
-        $this->assertSame(429, $this->handleThrough($kernel, new SharedBucketController())->getStatusCode());
-    }
-
-    public function testStackedInlineAttributesOfDifferentPoliciesDoNotShareABucket()
-    {
-        $kernel = $this->makeInlineKernel();
+        $kernel = $this->makePolicyKernel();
 
         foreach ([1, 0] as $remaining) {
-            $response = $this->handleThrough($kernel, new StackedInlineRateLimitController());
+            $response = $this->handleThrough($kernel, new StackedPolicyController());
 
             $this->assertSame(200, $response->getStatusCode());
             $this->assertSame('2', $response->headers->get('X-RateLimit-Limit'));
             $this->assertSame((string) $remaining, $response->headers->get('X-RateLimit-Remaining'));
         }
 
-        $this->assertSame(429, $this->handleThrough($kernel, new StackedInlineRateLimitController())->getStatusCode());
+        $this->assertSame(429, $this->handleThrough($kernel, new StackedPolicyController())->getStatusCode());
     }
 
-    public function testRejectedInlineAttributeDispatchesRateLimitExceededEventWithItsId()
+    public function testRejectedPolicyDispatchesRateLimitExceededEventNamedAfterTheController()
     {
         if (!class_exists(RateLimitExceededEvent::class)) {
             $this->markTestSkipped('The installed "symfony/rate-limiter" does not provide RateLimitExceededEvent.');
@@ -1150,27 +1135,22 @@ class RateLimitAttributeListenerTest extends TestCase
         $dispatcher->addListener(RateLimitExceededEvent::class, static function (RateLimitExceededEvent $event) use (&$limiterNames) {
             $limiterNames[] = $event->getLimiterName();
         });
+        $kernel = $this->makePolicyKernel($dispatcher);
 
-        $listener = new RateLimitAttributeListener($this->createStub(ServiceProviderInterface::class), builder: new RateLimiterBuilder(new InMemoryStorage()));
-        $attribute = new RateLimitFixedWindow(1, '1 minute', id: 'login');
-
-        $listener->onKernelControllerAttribute($this->makeEvent($attribute, Request::create('/')), null, $dispatcher);
-
-        try {
-            $listener->onKernelControllerAttribute($this->makeEvent($attribute, Request::create('/')), null, $dispatcher);
-            $this->fail('Expected TooManyRequestsHttpException');
-        } catch (TooManyRequestsHttpException) {
+        foreach (range(1, 3) as $i) {
+            $this->handleThrough($kernel, new FixedWindowPolicyController());
         }
 
-        $this->assertSame(['login'], $limiterNames);
+        $this->assertCount(1, $limiterNames);
+        $this->assertMatchesRegularExpression('/^'.preg_quote(FixedWindowPolicyController::class.'::__invoke#', '/').'[0-9a-f]{32}$/', $limiterNames[0]);
     }
 
-    public function testInlineAttributeRequiresTheBuilder()
+    public function testPolicyRequiresTheBuilder()
     {
         $listener = new RateLimitAttributeListener($this->createStub(ServiceProviderInterface::class));
 
         $this->expectException(\LogicException::class);
-        $listener->onKernelControllerAttribute($this->makeEvent(new RateLimitFixedWindow(1, '1 minute'), Request::create('/')));
+        $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit(new FixedWindowPolicy(1, '1 minute')), Request::create('/')));
     }
 }
 
@@ -1277,64 +1257,46 @@ class ConditionallyRateLimitedController
     }
 }
 
-class FixedWindowRateLimitedController
+class FixedWindowPolicyController
 {
-    #[RateLimitFixedWindow(2, '1 minute', exposeHeaders: true)]
+    #[RateLimit(new FixedWindowPolicy(2, '1 minute'), exposeHeaders: true)]
     public function __invoke(): Response
     {
         return new Response('ok');
     }
 }
 
-class OtherFixedWindowRateLimitedController
+class OtherFixedWindowPolicyController
 {
-    #[RateLimitFixedWindow(2, '1 minute', exposeHeaders: true)]
+    #[RateLimit(new FixedWindowPolicy(2, '1 minute'), exposeHeaders: true)]
     public function __invoke(): Response
     {
         return new Response('ok');
     }
 }
 
-class SlidingWindowRateLimitedController
+class SlidingWindowPolicyController
 {
-    #[RateLimitSlidingWindow(2, '1 minute', exposeHeaders: true)]
+    #[RateLimit(new SlidingWindowPolicy(2, '1 minute'), exposeHeaders: true)]
     public function __invoke(): Response
     {
         return new Response('ok');
     }
 }
 
-class TokenBucketRateLimitedController
+class TokenBucketPolicyController
 {
-    #[RateLimitTokenBucket(2, '1 minute', exposeHeaders: true)]
+    #[RateLimit(new TokenBucketPolicy(2, '1 minute'), exposeHeaders: true)]
     public function __invoke(): Response
     {
         return new Response('ok');
     }
 }
 
-class SharedBucketController
+class StackedPolicyController
 {
-    #[RateLimitFixedWindow(2, '1 minute', id: 'shared')]
-    public function __invoke(): Response
-    {
-        return new Response('ok');
-    }
-}
-
-class OtherSharedBucketController
-{
-    #[RateLimitFixedWindow(2, '1 minute', id: 'shared')]
-    public function __invoke(): Response
-    {
-        return new Response('ok');
-    }
-}
-
-class StackedInlineRateLimitController
-{
-    #[RateLimitFixedWindow(2, '1 minute', key: 'k', exposeHeaders: true)]
-    #[RateLimitTokenBucket(5, '1 minute', key: 'k', exposeHeaders: true)]
+    #[RateLimit(new SlidingWindowPolicy(2, '1 minute'), key: 'k', exposeHeaders: true)]
+    #[RateLimit(new SlidingWindowPolicy(5, '1 minute'), key: 'k', exposeHeaders: true)]
     public function __invoke(): Response
     {
         return new Response('ok');

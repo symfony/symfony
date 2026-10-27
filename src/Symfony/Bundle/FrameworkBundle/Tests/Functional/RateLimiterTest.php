@@ -49,7 +49,7 @@ class RateLimiterTest extends AbstractWebTestCase
         self::assertResponseStatusCodeSame(429);
     }
 
-    public function testInlineLimiter()
+    public function testPolicy()
     {
         $client = self::createClient(['test_case' => 'RateLimiter']);
 

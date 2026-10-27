@@ -33,6 +33,15 @@ class RouterContextMiddleware implements MiddlewareInterface
         $context = $this->router->getContext();
 
         if (!$envelope->last(ConsumedByWorkerStamp::class) || !$contextStamp = $envelope->last(RouterContextStamp::class)) {
+            $parameters = [];
+            foreach ($context->getParameters() as $name => $value) {
+                if ($value instanceof \Stringable) {
+                    $parameters[$name] = (string) $value;
+                } elseif (null === $value || \is_scalar($value)) {
+                    $parameters[$name] = $value;
+                }
+            }
+
             $envelope = $envelope->with(new RouterContextStamp(
                 $context->getBaseUrl(),
                 $context->getMethod(),
@@ -41,7 +50,8 @@ class RouterContextMiddleware implements MiddlewareInterface
                 $context->getHttpPort(),
                 $context->getHttpsPort(),
                 $context->getPathInfo(),
-                $context->getQueryString()
+                $context->getQueryString(),
+                $parameters,
             ));
 
             return $stack->next()->handle($envelope, $stack);
@@ -57,6 +67,7 @@ class RouterContextMiddleware implements MiddlewareInterface
             httpsPort: $contextStamp->getHttpsPort(),
             pathInfo: $contextStamp->getPathInfo(),
             queryString: $contextStamp->getQueryString(),
+            parameters: array_replace($context->getParameters(), $contextStamp->getParameters()),
         );
     }
 }

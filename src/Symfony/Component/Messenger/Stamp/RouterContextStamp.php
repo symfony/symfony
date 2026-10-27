@@ -16,6 +16,12 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 class RouterContextStamp implements StampInterface
 {
+    // Not promoted, so that stamps serialized before this property existed get an empty array
+    private array $parameters = [];
+
+    /**
+     * @param array<string, bool|float|int|string|null> $parameters
+     */
     public function __construct(
         private string $baseUrl,
         private string $method,
@@ -25,7 +31,9 @@ class RouterContextStamp implements StampInterface
         private int $httpsPort,
         private string $pathInfo,
         private string $queryString,
+        array $parameters = [],
     ) {
+        $this->parameters = $parameters;
     }
 
     public function getBaseUrl(): string
@@ -66,5 +74,13 @@ class RouterContextStamp implements StampInterface
     public function getQueryString(): string
     {
         return $this->queryString;
+    }
+
+    /**
+     * @return array<string, bool|float|int|string|null>
+     */
+    public function getParameters(): array
+    {
+        return $this->parameters;
     }
 }

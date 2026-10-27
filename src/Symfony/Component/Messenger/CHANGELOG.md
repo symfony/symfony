@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Pass serializable router context parameters, including `_locale`, to async Messenger handlers using `RouterContextMiddleware`
  * Add `#[AsMessageMiddleware]` and the `messenger.middleware` tag to add a middleware to a bus, placed with `before` and `after`
  * Add `before` and `after` to `#[AsMessageHandler]` and the `messenger.message_handler` tag to order handlers
  * [BC BREAK] Make `AsMessageHandler::$priority` nullable, defaulting to `null`

@@ -39,7 +39,7 @@ class IntlFormatterTest extends TestCase
     public static function provideMarkup(): iterable
     {
         yield ['#2{#b/}', "{n,number,'#'0}{#b/}", ['n' => 2]];
-        yield ['year 1970{#b/}', "{n,date,'year' yyyy}{#b/}", ['n' => 2]];
+        yield ['year 1970{#b/}', "{n,date,'year' yyyy}{#b/}", ['n' => gmmktime(12, 0, 0, 6, 15, 1970)]];
         yield ['{2}{#b/}', "{n,number,'{'0'}'}{#b/}", ['n' => 2]];
         yield ['{#b}1.5{/b}', '{#b}{n, number}{/b}', ['n' => 1.5]];
         yield ["'#' {#b/}", "'#' {#b/}"];

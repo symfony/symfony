@@ -248,7 +248,8 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertSame([8], $receiver->getFetchSizes());
     }
 
-    public function testRunWithInvalidFetchSizeOption()
+    #[DataProvider('provideInvalidFetchSizes')]
+    public function testRunWithInvalidFetchSizeOption(string $fetchSize)
     {
         $receiverLocator = new Container();
         $receiverLocator->set('dummy-receiver', new \stdClass());
@@ -260,11 +261,18 @@ class ConsumeMessagesCommandTest extends TestCase
         $tester = new CommandTester($application->get('messenger:consume'));
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "--fetch-size" option must be a positive integer, "0" given.');
+        $this->expectExceptionMessage(\sprintf('The "--fetch-size" option must be a positive integer, "%s" given.', $fetchSize));
         $tester->execute([
             'receivers' => ['dummy-receiver'],
-            '--fetch-size' => '0',
+            '--fetch-size' => $fetchSize,
         ]);
+    }
+
+    public static function provideInvalidFetchSizes(): iterable
+    {
+        yield 'zero' => ['0'];
+        yield 'fraction' => ['1.5'];
+        yield 'scientific notation' => ['1e2'];
     }
 
     public function testRunWithoutReceiverInNonInteractiveMode()

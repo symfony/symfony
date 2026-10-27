@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-27T16:12:56Z
+
+I pushed a commit to fix two things. Stamps that were serialized before this change made the worker crash, because the promoted `$parameters` property was left uninitialized. And `Stringable` parameters are now kept, cast to strings, since that's how `UrlGenerator` uses them anyway.

@@ -332,6 +332,19 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertFalse($limiter->consume()->isAccepted());
     }
 
+    public function testRefundIsIgnoredWhenCalledTwice()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume();
+        $limiter->consume(9);
+
+        $limiter->refund($rateLimit);
+        $limiter->refund($rateLimit);
+
+        $this->assertSame(1, $limiter->consume(0)->getRemainingTokens());
+    }
+
     private function createLimiter(): SlidingWindowLimiter
     {
         return new SlidingWindowLimiter('test', 10, new \DateInterval('PT12S'), $this->storage);

@@ -466,6 +466,19 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertFalse($limiter->consume()->isAccepted());
     }
 
+    public function testRefundIsIgnoredWhenCalledTwice()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume();
+        $limiter->consume(9);
+
+        $limiter->refund($rateLimit);
+        $limiter->refund($rateLimit);
+
+        $this->assertSame(1, $limiter->consume(0)->getRemainingTokens());
+    }
+
     private function createLimiter($initialTokens = 10, ?Rate $rate = null)
     {
         return new TokenBucketLimiter('test', $initialTokens, $rate ?? Rate::perSecond(10), $this->storage);

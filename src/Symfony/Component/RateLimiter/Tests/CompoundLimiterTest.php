@@ -183,6 +183,23 @@ class CompoundLimiterTest extends TestCase
         (new CompoundLimiter([$this->createLimiter(4, new \DateInterval('PT1S'))]))->reserve();
     }
 
+    public function testRefundIsIgnoredWhenCalledTwice()
+    {
+        $limiter1 = $this->createLimiter(4, new \DateInterval('PT1S'));
+        $limiter2 = $this->createLimiter(8, new \DateInterval('PT10S'));
+        $limiter = new CompoundLimiter([$limiter1, $limiter2]);
+
+        $rateLimit = $limiter->consume();
+        $limiter1->consume(3);
+        $limiter2->consume(3);
+
+        $limiter->refund($rateLimit);
+        $limiter->refund($rateLimit);
+
+        $this->assertSame(1, $limiter1->consume(0)->getRemainingTokens());
+        $this->assertSame(5, $limiter2->consume(0)->getRemainingTokens());
+    }
+
     private function createLimiter(int $limit, \DateInterval $interval): FixedWindowLimiter
     {
         return new FixedWindowLimiter('test'.$limit, $limit, $interval, $this->storage);

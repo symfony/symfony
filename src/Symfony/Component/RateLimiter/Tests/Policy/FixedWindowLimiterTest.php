@@ -746,6 +746,19 @@ class FixedWindowLimiterTest extends TestCase
         yield ['P1Y'];
     }
 
+    public function testRefundIsIgnoredWhenCalledTwice()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume();
+        $limiter->consume(9);
+
+        $limiter->refund($rateLimit);
+        $limiter->refund($rateLimit);
+
+        $this->assertSame(1, $limiter->consume(0)->getRemainingTokens());
+    }
+
     private function createLimiter(string $dateIntervalString = 'PT1M'): FixedWindowLimiter
     {
         return new FixedWindowLimiter('test', 10, new \DateInterval($dateIntervalString), $this->storage);

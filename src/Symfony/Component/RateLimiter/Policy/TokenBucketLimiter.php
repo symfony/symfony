@@ -162,6 +162,7 @@ final class TokenBucketLimiter implements LimiterInterface
 
             $availableTokens = min($this->maxBurst, $bucket->getAvailableTokens($now) + $tokensToRefund);
             $bucket->setTokens($availableTokens);
+            $rateLimit->markRefunded();
             $this->storage->save($bucket);
 
             return new RateLimit($availableTokens, \DateTimeImmutable::createFromTimestamp((int) ceil($now)), true, $this->maxBurst, $this->resetAt($availableTokens, $now), 0, null, $this->id);

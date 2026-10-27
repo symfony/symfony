@@ -149,6 +149,7 @@ final class SlidingWindowLimiter implements LimiterInterface
                 }
 
                 $window->add(-$rateLimit->getConsumedTokens());
+                $rateLimit->markRefunded();
 
                 if ($now >= $windowEnd) {
                     // the window expired in the meantime, carry the remaining hits into the new one
@@ -160,6 +161,7 @@ final class SlidingWindowLimiter implements LimiterInterface
                 }
 
                 $window->addForLastWindow(-$rateLimit->getConsumedTokens());
+                $rateLimit->markRefunded();
             } else {
                 return $rateLimit;
             }

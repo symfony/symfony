@@ -17,7 +17,7 @@ use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @method RateLimit refund(RateLimit $rateLimit) Gives back the tokens a consume() call took when that call should not count. Pass the RateLimit returned by consume(); refunding a rejected limit, one that consumed no token, one from another limiter, or one whose tokens the policy already gave back has no effect. Not implementing it is deprecated since Symfony 8.2.
+ * @method RateLimit refund(RateLimit $rateLimit) Gives back the tokens a consume() call took when that call should not count. Pass the RateLimit returned by consume(); refunding a rejected limit, one that consumed no token, one from another limiter, one whose tokens the policy already gave back, or the same RateLimit more than once has no effect. Not implementing it is deprecated since Symfony 8.2.
  */
 interface LimiterInterface
 {

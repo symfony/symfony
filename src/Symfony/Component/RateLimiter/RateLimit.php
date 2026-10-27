@@ -99,6 +99,16 @@ class RateLimit
         return $this->limiterId;
     }
 
+    /**
+     * Marks this rate limit as already refunded, so a second refund has no effect.
+     *
+     * @internal
+     */
+    public function markRefunded(): void
+    {
+        $this->consumedTokens = 0;
+    }
+
     public function wait(): void
     {
         $delta = (\PHP_INT_SIZE >= 8 ? $this->retryAfter->getTimestamp() + $this->retryAfter->getMicrosecond() / 1e6 : (float) $this->retryAfter->format('U.u')) - microtime(true);

@@ -200,8 +200,8 @@ class OutputFormatter implements WrappableOutputFormatterInterface
      */
     private function createStyleFromString(string $string): ?OutputFormatterStyleInterface
     {
-        if (isset($this->styles[$string])) {
-            return $this->styles[$string];
+        if (isset($this->styles[$lowerString = strtolower($string)])) {
+            return $this->styles[$lowerString];
         }
 
         if (!preg_match_all('/([^=]+)=([^;]+)(;|$)/', $string, $matches, \PREG_SET_ORDER)) {

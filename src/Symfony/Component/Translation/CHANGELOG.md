@@ -12,7 +12,7 @@ CHANGELOG
  * Add `translation:update-xliff-sources` command to fill the `<source>` tags of XLIFF files with the default locale's translations
  * Add support for ternary, null-coalescing and `match` expressions, interpolated strings, variables and values returned by methods when extracting translation messages from PHP files
  * Add argument `$skipValidationDirs` to `XliffFileLoader` to load the XLIFF files of these directories without validating them against the schema
- * Add `HtmlTranslator` to translate messages whose basic MF2 markup is replaced by HTML elements while everything else is escaped
+ * Add `HtmlTranslator` to translate messages whose basic MessageFormat 2 (MF2) markup is replaced by HTML elements while everything else is escaped
  * Add `getGlobalParameters()` to `LoggingTranslator` and `PseudoLocalizationTranslator`
 
 8.1

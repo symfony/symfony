@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-20T14:02:39Z
+
+PHPStan is red on `$this->getApplication()->getKernel()`. That's the same call as in the other FrameworkBundle commands, where it's already known to the analysis baseline. A FrameworkBundle command always runs in FrameworkBundle's `Application`, so I'd rather not add an assert just for the tool.

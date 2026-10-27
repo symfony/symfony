@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Yoruxyv at 2026-10-27T14:14:57Z
+
+Thanks for pointing that out! I agree that consistency is important. I prefer "valid" for validation messages, since "sah" sounds more formal and is often associated with legal or official contexts rather than everyday software validation. Valid is still an Indonesian word with exact meaning as English
+
+I'll update the remaining occurrences of "sah" in the Form catalogue and leave the Validator catalogue for a separate PR.
+
+---------------------------------------------------------------------------
+
+by Yoruxyv at 2026-10-27T14:17:15Z
+
+Quick update, i've updated remaining "sah" into "valid", please let me know if something is still unclear. tysm!

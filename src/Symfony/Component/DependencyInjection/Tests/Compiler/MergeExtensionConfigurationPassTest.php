@@ -27,12 +27,28 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\UndefinedExtensionHandler;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 class MergeExtensionConfigurationPassTest extends TestCase
 {
+    public function testExtensionLogsArePreservedDuringCompilation()
+    {
+        $extension = new LoggingExtension();
+        $container = new ContainerBuilder();
+        $container->registerExtension($extension);
+        $container->loadFromExtension('logging');
+        $container->compile();
+
+        $this->assertSame([
+            LoggingExtension::class.': Prepending configuration',
+            LoggingExtension::class.': Loading services'."\n".LoggingExtension::class.': Configuring aliases',
+            LoggingExtension::class.': Using %env(DI_EXTENSION_LOG_TEST)%',
+        ], array_values(array_filter($container->getCompiler()->getLog(), static fn (string $message) => str_starts_with($message, LoggingExtension::class.': '))));
+    }
+
     public function testExpressionLanguageProviderForwarding()
     {
         $tmpProviders = [];
@@ -680,5 +696,19 @@ final class RawConfigExtension extends Extension
     public function load(array $configs, ContainerBuilder $container): void
     {
         $container->setParameter('raw_config.bool_node', $configs[0]['bool_node']);
+    }
+}
+
+final class LoggingExtension extends Extension implements PrependExtensionInterface
+{
+    public function prepend(ContainerBuilder $container): void
+    {
+        $container->log($this, 'Prepending configuration');
+    }
+
+    public function load(array $configs, ContainerBuilder $container): void
+    {
+        $container->log($this, "Loading services\nConfiguring aliases");
+        $container->log($this, 'Using '.$container->getParameter('env(DI_EXTENSION_LOG_TEST)'));
     }
 }

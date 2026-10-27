@@ -408,7 +408,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
             'bar.error' => 'Bar error',
         ], 'en', 'validators'));
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
-            'foo.error' => 'Valeur invalide',
+            'foo.error' => 'Valeur incorrecte',
             'bar.error' => 'Bar erreur',
         ], 'fr', 'validators'));
 
@@ -503,7 +503,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
                     <body>
                         <trans-unit id="nYScnTy" resname="foo.error">
                             <source>foo.error</source>
-                            <target>Valeur invalide</target>
+                            <target>Valeur incorrecte</target>
                         </trans-unit>
                         <trans-unit id="fe0ouWC" resname="bar.error">
                             <source>bar.error</source>

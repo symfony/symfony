@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonPath\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonPath\Exception\InvalidArgumentException;
 use Symfony\Component\JsonPath\Exception\InvalidJsonStringInputException;
@@ -230,6 +231,18 @@ class JsonCrawlerTest extends TestCase
             'Sayings of the Century',
             'Moby Dick',
         ], [$result[0]['title'], $result[1]['title']]);
+    }
+
+    #[TestWith(['$..id'])]
+    #[TestWith(['$[*]..id'])]
+    #[TestWith(['$[*]..["id"]'])]
+    public function testRecursiveQueriesPreserveOrderAcrossNodesAndCalls(string $query)
+    {
+        $crawler = new JsonCrawler('[{"id":0,"children":[{"id":null}]},{"id":false,"children":[{"id":0}]}]');
+
+        $this->assertSame([0, null, false, 0], $crawler->find($query));
+        $this->assertSame([0, null, false, 0], $crawler->find($query));
+        $this->assertSame([], $crawler->find('$..missing'));
     }
 
     public function testRecursiveWildcard()

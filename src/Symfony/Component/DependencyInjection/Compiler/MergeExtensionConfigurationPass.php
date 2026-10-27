@@ -265,7 +265,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                         throw new InvalidArgumentException(\sprintf('The "%s.%s" configuration must be an array or null, "%s" given.', $name, $key, get_debug_type($value)));
                     }
 
-                    $forwarded[$alias][] = $value;
+                    $forwarded[] = [$i, $alias, $value];
                     unset($config[$configKey]);
                 }
 
@@ -278,10 +278,8 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
 
             $container->setExtensionConfig($name, $configs);
 
-            foreach ($forwarded as $alias => $values) {
-                foreach (array_reverse($values) as $value) {
-                    $container->prependExtensionConfig($alias, $value);
-                }
+            foreach ($forwarded as [$i, $alias, $value]) {
+                $container->forwardExtensionConfig($name, $i, $alias, $value);
             }
         }
 

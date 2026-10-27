@@ -58,8 +58,10 @@ class ContainerConfigurator extends AbstractConfigurator
                 return;
             }
 
+            // reserve the first place in the load order, as prependExtensionConfig() accepts only arrays
+            $this->container->prependExtensionConfig($namespace, []);
             $configs = $this->container->getExtensionConfig($namespace);
-            array_unshift($configs, $config);
+            $configs[0] = $config;
             $this->container->setExtensionConfig($namespace, $configs);
 
             return;

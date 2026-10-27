@@ -98,6 +98,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private array $extensionConfigs = [];
 
+    /**
+     * @var array<string, list<int>> The rank of each extension config in the load order, negative when prepended
+     */
+    private array $extensionConfigRanks = [];
+    private int $lastExtensionConfigRank = 0;
+
     private Compiler $compiler;
     private bool $trackResources;
     private InstantiatorInterface $proxyInstantiator;
@@ -504,6 +510,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $namespace = $this->getExtension($extension)->getAlias();
 
         $this->extensionConfigs[$namespace][] = $values ?? [];
+        $this->extensionConfigRanks[$namespace][] = ++$this->lastExtensionConfigRank;
 
         return $this;
     }
@@ -710,7 +717,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $this->extensionConfigs[$name] = [];
             }
 
-            $this->extensionConfigs[$name] = array_merge($this->extensionConfigs[$name], $container->getExtensionConfig($name));
+            foreach ($container->getExtensionConfig($name) as $config) {
+                $this->extensionConfigs[$name][] = $config;
+                $this->extensionConfigRanks[$name][] = ++$this->lastExtensionConfigRank;
+            }
         }
 
         if ($parameterBag instanceof EnvPlaceholderParameterBag && $otherBag instanceof EnvPlaceholderParameterBag) {
@@ -778,6 +788,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         array_unshift($this->extensionConfigs[$name], $config);
+        $this->extensionConfigRanks[$name] ??= [];
+        array_unshift($this->extensionConfigRanks[$name], -++$this->lastExtensionConfigRank);
     }
 
     /**
@@ -786,11 +798,41 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * An element is usually an array, but it can hold any value the configuration
      * tree of the extension accepts at its root.
      *
+     * The config at each index is considered loaded where the previous config at that index was.
+     *
      * @param list<mixed> $configs
      */
     public function setExtensionConfig(string $name, array $configs): void
     {
         $this->extensionConfigs[$name] = array_values($configs);
+        $ranks = \array_slice($this->extensionConfigRanks[$name] ?? [], 0, \count($configs));
+
+        while (\count($ranks) < \count($configs)) {
+            $ranks[] = ++$this->lastExtensionConfigRank;
+        }
+
+        $this->extensionConfigRanks[$name] = $ranks;
+    }
+
+    /**
+     * Adds a config to the configs of an extension, at the place of a config of another extension in the load order.
+     *
+     * @internal
+     */
+    public function forwardExtensionConfig(string $from, int $index, string $to, mixed $config): void
+    {
+        $rank = $this->extensionConfigRanks[$from][$index] ?? ++$this->lastExtensionConfigRank;
+        $ranks = $this->extensionConfigRanks[$to] ?? [];
+        $i = \count($ranks);
+
+        while ($i && $ranks[$i - 1] > $rank) {
+            --$i;
+        }
+
+        $this->extensionConfigs[$to] ??= [];
+        array_splice($this->extensionConfigs[$to], $i, 0, [$config]);
+        array_splice($ranks, $i, 0, [$rank]);
+        $this->extensionConfigRanks[$to] = $ranks;
     }
 
     /**
@@ -860,6 +902,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         $this->extensionConfigs = [];
+        $this->extensionConfigRanks = [];
 
         if ($bag instanceof EnvPlaceholderParameterBag) {
             if ($resolveEnvPlaceholders) {

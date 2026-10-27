@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `prune` script to remove the data of the locales that an application doesn't use
+
 8.0
 ---
 

@@ -7,6 +7,12 @@ If you have the zlib extension enabled, you can compress the data by running:
 
     php vendor/symfony/intl/Resources/bin/compress
 
+If your application uses only some locales, you can remove the data of the other ones by running:
+
+    php vendor/symfony/intl/Resources/bin/prune en fr
+
+The removed locales then fall back to English.
+
 Sponsor
 -------
 

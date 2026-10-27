@@ -1,0 +1,73 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+if ('cli' !== PHP_SAPI) {
+    throw new Exception('This script must be run from the command line.');
+}
+
+if (1 === $argc) {
+    fwrite(STDERR, "Usage: {$argv[0]} <locale>...\n\nRemoves the data of all locales but the given ones, their regional variants and English.\n");
+    exit(1);
+}
+
+$dataDir = dirname(__DIR__).'/data';
+$meta = require $dataDir.'/locales/meta.php';
+
+// English is the default fallback locale, it provides the names that other locales don't translate
+$locales = ['en'];
+
+foreach (array_slice($argv, 1) as $locale) {
+    $locale = $meta['Aliases'][$locale] ?? $locale;
+
+    if (!in_array($locale, $meta['Locales'], true)) {
+        fwrite(STDERR, sprintf("Unknown locale \"%s\".\n", $locale));
+        exit(1);
+    }
+
+    $locales[] = $locale;
+
+    foreach ($meta['Locales'] as $variant) {
+        if (str_starts_with($variant, $locale.'_')) {
+            $locales[] = $variant;
+        }
+    }
+}
+
+// Keep the locales the kept ones fall back to, e.g. "es_419" for "es_MX" or "no" for "nb"
+$keep = ['meta' => true, 'root' => true];
+
+foreach ($locales as $locale) {
+    while (!isset($keep[$locale = $meta['Aliases'][$locale] ?? $locale])) {
+        $keep[$locale] = true;
+
+        if ('root' !== $parent = $meta['Parents'][$locale] ?? 'root') {
+            $locale = $parent;
+        } elseif (false !== $i = strrpos($locale, '_')) {
+            $locale = substr($locale, 0, $i);
+        }
+    }
+}
+
+$iterator = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator(
+        $dataDir,
+        FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::SKIP_DOTS
+    )
+);
+
+foreach ($iterator as $file) {
+    if (!preg_match('/^(.+)\.php(?:\.gz)?$/', $file->getFilename(), $m) || isset($keep[$m[1]])) {
+        continue;
+    }
+
+    unlink($file);
+}

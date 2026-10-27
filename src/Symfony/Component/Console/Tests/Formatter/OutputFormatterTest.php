@@ -162,6 +162,15 @@ class OutputFormatterTest extends TestCase
         $this->assertEquals("\033[34;47msome custom msg\033[39;49m", $formatter->format('<info>some custom msg</info>'));
     }
 
+    public function testStyleNameIsCaseInsensitive()
+    {
+        $formatter = new OutputFormatter(true);
+        $formatter->setStyle('myStyle', new OutputFormatterStyle('blue', 'white'));
+
+        $this->assertEquals("\033[34;47msome custom msg\033[39;49m", $formatter->format('<myStyle>some custom msg</myStyle>'));
+        $this->assertEquals("\033[32msome info\033[39m", $formatter->format('<INFO>some info</INFO>'));
+    }
+
     public function testInlineStyle()
     {
         $formatter = new OutputFormatter(true);

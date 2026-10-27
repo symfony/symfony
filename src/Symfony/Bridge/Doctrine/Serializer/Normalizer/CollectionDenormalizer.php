@@ -155,6 +155,11 @@ final class CollectionDenormalizer implements DenormalizerInterface, Denormalize
             return [];
         }
 
+        // a refined key, such as "positive-int" or "'en'|'de'", is validated against its builtin type; the lowest symfony/type-info has no refinements to remove
+        if (method_exists($keyType, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+            $keyType = $keyType->withoutRefinements();
+        }
+
         $identifiers = [];
 
         foreach ($keyType instanceof UnionType ? $keyType->getTypes() : [$keyType] as $t) {

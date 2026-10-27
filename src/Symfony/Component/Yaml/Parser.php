@@ -15,7 +15,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 
 /**
- * Parser parses YAML strings to convert them to PHP arrays.
+ * Parser parses YAML strings to convert them to PHP values.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *

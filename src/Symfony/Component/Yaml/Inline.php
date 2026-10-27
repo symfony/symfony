@@ -208,7 +208,7 @@ class Inline
     }
 
     /**
-     * Check if given array is hash or just normal indexed array.
+     * Checks whether the given value should be dumped as a YAML mapping.
      */
     public static function isHash(array|\ArrayObject|\stdClass $value): bool
     {

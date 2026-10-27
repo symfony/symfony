@@ -12,6 +12,8 @@
 namespace Symfony\Component\Yaml\Tag;
 
 /**
+ * Represents a YAML tagged value, storing its tag and the value associated with it.
+ *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Guilhem N. <egetick@gmail.com>
  */

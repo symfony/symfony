@@ -2,19 +2,8 @@
 
 return [
     'Names' => [
-        'bm' => 'bamanankan',
-        'bn' => 'bangla',
-        'ff' => 'fulah',
-        'gsw' => 'švajcarski nemački',
-        'ht' => 'haićanski kreolski',
-        'lo' => 'laoški',
-        'moh' => 'mohok',
-        'nqo' => 'n’ko',
-        'shi' => 'južni šilha',
-        'si' => 'sinhalski',
-        'xh' => 'isikosa',
-        'zgh' => 'standardni marokanski tamašek',
-        'zu' => 'isizulu',
+        72 => 'bamanankan', 'bangla', 168 => 'fulah', 204 => 'švajcarski nemački', 228 => 'haićanski kreolski', 331 => 'laoški', 378 => 'mohok', 417 => 'n’ko', 512 => 'južni šilha', 515 => 'sinhalski',
+        629 => 'isikosa', 646 => 'standardni marokanski tamašek', 648 => 'isizulu',
     ],
     'LocalizedNames' => [],
 ];

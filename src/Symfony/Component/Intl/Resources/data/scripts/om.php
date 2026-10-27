@@ -1,14 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Arab' => 'Arabiffa',
-        'Cyrl' => 'Saayiriilik',
-        'Hans' => 'Salphifame',
-        'Hant' => 'Kan Durii',
-        'Jpan' => 'Afaan Jaappaan',
-        'Kore' => 'Afaan Kooriyaa',
-        'Latn' => 'Laatinii',
-        'Zxxx' => 'Kan Hin Barreeffamne',
-    ],
+    'Names' => [4 => 'Arabiffa', 32 => 'Saayiriilik', 61 => 'Salphifame', 'Kan Durii', 76 => 'Afaan Jaappaan', 86 => 'Afaan Kooriyaa', 94 => 'Laatinii', 213 => 'Kan Hin Barreeffamne'],
 ];

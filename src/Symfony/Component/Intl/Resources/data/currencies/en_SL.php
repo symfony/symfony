@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'SLE' => [
-            'Le',
-            'Sierra Leonean Leone',
-        ],
-    ],
+    'Names' => [223 => 'Sierra Leonean Leone'],
+    'Symbols' => [223 => 'Le'],
 ];

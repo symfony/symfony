@@ -178,7 +178,7 @@ final class Countries extends ResourceBundle
             }
         }
 
-        return self::readEntry(['Names', $country], $displayLocale);
+        return self::readName($country, $displayLocale);
     }
 
     /**
@@ -199,10 +199,10 @@ final class Countries extends ResourceBundle
     public static function getNames(?string $displayLocale = null): array
     {
         if (!self::withUserAssigned()) {
-            return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
+            return self::asort(self::readNames($displayLocale), $displayLocale);
         }
 
-        return self::asort(array_merge(self::readEntry(['Names'], $displayLocale), self::readEntry(['UserAssignedNames'], $displayLocale)), $displayLocale);
+        return self::asort(array_merge(self::readNames($displayLocale), self::readEntry(['UserAssignedNames'], $displayLocale)), $displayLocale);
     }
 
     /**

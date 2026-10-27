@@ -2,15 +2,5 @@
 
 return [
     'UserAssignedNames' => [],
-    'Names' => [
-        'BL' => 'St Barthélemy',
-        'KN' => 'St Kitts & Nevis',
-        'LC' => 'St Lucia',
-        'MF' => 'St Martin',
-        'PM' => 'St Pierre & Miquelon',
-        'SH' => 'St Helena, Ascension & Tristan da Cunha',
-        'UM' => 'US Outlying Islands',
-        'VC' => 'St Vincent & the Grenadines',
-        'VI' => 'US Virgin Islands',
-    ],
+    'Names' => [25 => 'St Barthélemy', 119 => 'St Kitts & Nevis', 127 => 'St Lucia', 140 => 'St Martin', 179 => 'St Pierre & Miquelon', 198 => 'St Helena, Ascension & Tristan da Cunha', 231 => 'US Outlying Islands', 236 => 'St Vincent & the Grenadines', 239 => 'US Virgin Islands'],
 ];

@@ -1,9 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Adlm' => 'adlam',
-        'Hrkt' => 'silabarios del japonés',
-        'Rohg' => 'hanafí',
-    ],
+    'Names' => ['adlam', 70 => 'silabarios del japonés', 150 => 'hanafí'],
 ];

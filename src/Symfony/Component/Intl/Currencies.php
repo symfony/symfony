@@ -21,8 +21,6 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
  */
 final class Currencies extends ResourceBundle
 {
-    private const INDEX_SYMBOL = 0;
-    private const INDEX_NAME = 1;
     private const INDEX_FRACTION_DIGITS = 0;
     private const INDEX_ROUNDING_INCREMENT = 1;
     private const INDEX_CASH_FRACTION_DIGITS = 2;
@@ -39,7 +37,7 @@ final class Currencies extends ResourceBundle
     public static function exists(string $currency): bool
     {
         try {
-            self::readEntry(['Names', $currency, self::INDEX_NAME]);
+            self::readName($currency);
 
             return true;
         } catch (MissingResourceException) {
@@ -52,7 +50,7 @@ final class Currencies extends ResourceBundle
      */
     public static function getName(string $currency, ?string $displayLocale = null): string
     {
-        return self::readEntry(['Names', $currency, self::INDEX_NAME], $displayLocale);
+        return self::readName($currency, $displayLocale);
     }
 
     /**
@@ -66,17 +64,7 @@ final class Currencies extends ResourceBundle
         // 3-letter codes (e.g. 32 => "ARA", "ARP", "ARS")
         // ====================================================================
 
-        $names = self::readEntry(['Names'], $displayLocale);
-
-        if ($names instanceof \Traversable) {
-            $names = iterator_to_array($names);
-        }
-
-        array_walk($names, static function (&$value) {
-            $value = $value[self::INDEX_NAME];
-        });
-
-        return self::asort($names, $displayLocale);
+        return self::asort(self::readNames($displayLocale), $displayLocale);
     }
 
     /**
@@ -84,7 +72,10 @@ final class Currencies extends ResourceBundle
      */
     public static function getSymbol(string $currency, ?string $displayLocale = null): string
     {
-        return self::readEntry(['Names', $currency, self::INDEX_SYMBOL], $displayLocale);
+        $symbol = self::readEntry(['Symbols', self::getPosition($currency)], $displayLocale);
+
+        // An empty symbol means that the symbol is the currency code
+        return '' !== $symbol ? $symbol : $currency;
     }
 
     public static function getFractionDigits(string $currency): int

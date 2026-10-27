@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'SCR' => [
-            'SR',
-            'Seychellois Rupee',
-        ],
-    ],
+    'Names' => [214 => 'Seychellois Rupee'],
+    'Symbols' => [214 => 'SR'],
 ];

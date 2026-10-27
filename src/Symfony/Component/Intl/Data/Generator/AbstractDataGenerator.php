@@ -57,29 +57,56 @@ abstract class AbstractDataGenerator
 
         $this->preGenerate();
 
-        foreach ($locales as $locale) {
-            $localeData = $this->generateDataForLocale($reader, $tempDir, $locale);
+        $data = [];
 
-            if (null !== $localeData) {
-                foreach ($writers as $targetDir => $writer) {
-                    $writer->write($targetDir.'/'.$this->dirName, $locale, $localeData);
-                }
+        foreach ($locales as $locale) {
+            if (null !== $localeData = $this->generateDataForLocale($reader, $tempDir, $locale)) {
+                $data[$locale] = $localeData;
             }
         }
 
-        $rootData = $this->generateDataForRoot($reader, $tempDir);
-
-        if (null !== $rootData) {
-            foreach ($writers as $targetDir => $writer) {
-                $writer->write($targetDir.'/'.$this->dirName, 'root', $rootData);
-            }
+        if (null !== $rootData = $this->generateDataForRoot($reader, $tempDir)) {
+            $data['root'] = $rootData;
         }
 
         $metaData = $this->generateDataForMeta($reader, $tempDir);
 
+        // Store names at the position of their code in a shared index, so that opcache can store them as packed arrays
+        $index = [];
+
+        foreach ($data as $localeData) {
+            $index += $localeData['Names'] ?? [];
+        }
+
+        if ($index) {
+            ksort($index, \SORT_STRING);
+            $index = array_flip(array_keys($index));
+            $metaData['Index'] = $index;
+
+            foreach ($data as $locale => $localeData) {
+                // Currency symbols use the same index as currency names
+                foreach (['Names', 'Symbols'] as $key) {
+                    if (isset($localeData[$key])) {
+                        $values = [];
+
+                        foreach ($localeData[$key] as $code => $value) {
+                            $values[$index[$code]] = $value;
+                        }
+
+                        ksort($values);
+                        $data[$locale][$key] = $values;
+                    }
+                }
+            }
+        }
+
         if (null !== $metaData) {
+            $data['meta'] = $metaData;
+        }
+
+        foreach ($data as $locale => $localeData) {
             foreach ($writers as $targetDir => $writer) {
-                $writer->write($targetDir.'/'.$this->dirName, 'meta', $metaData);
+                $writer->write($targetDir.'/'.$this->dirName, $locale, $localeData);
             }
         }
 

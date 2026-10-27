@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'MZN' => [
-            'MTn',
-            'MZN',
-        ],
-    ],
+    'Names' => [183 => 'MZN'],
+    'Symbols' => [183 => 'MTn'],
 ];

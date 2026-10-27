@@ -785,6 +785,17 @@ class CurrenciesTest extends ResourceBundleTestCase
         Currencies::getName('foo');
     }
 
+    public function testGetSymbolAndNameOfLocalizedSymbols()
+    {
+        $this->assertSame('ARS', Currencies::getSymbol('ARS', 'en'));
+        $this->assertSame('$AR', Currencies::getSymbol('ARS', 'fr'));
+        $this->assertSame('peso argentin', Currencies::getName('ARS', 'fr'));
+        $this->assertSame('A$', Currencies::getSymbol('AUD', 'en'));
+        $this->assertSame('$AU', Currencies::getSymbol('AUD', 'fr'));
+        $this->assertSame("\$\u{A0}AU", Currencies::getSymbol('AUD', 'fr_CA'));
+        $this->assertSame('dollar australien', Currencies::getName('AUD', 'fr_CA'));
+    }
+
     public function testExists()
     {
         $this->assertTrue(Currencies::exists('EUR'));

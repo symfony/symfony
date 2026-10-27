@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'XCD' => [
-            '$',
-            'East Caribbean Dollar',
-        ],
-    ],
+    'Names' => [269 => 'East Caribbean Dollar'],
+    'Symbols' => [269 => '$'],
 ];

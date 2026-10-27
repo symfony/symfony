@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'LUF' => [
-            'F',
-            'Luxemburgischer Franc',
-        ],
-    ],
+    'Names' => [151 => 'Luxemburgischer Franc'],
+    'Symbols' => [151 => 'F'],
 ];

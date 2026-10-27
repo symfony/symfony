@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'PKR' => [
-            'Rs',
-            'Pakistani Rupee',
-        ],
-    ],
+    'Names' => [199 => 'Pakistani Rupee'],
+    'Symbols' => [199 => 'Rs'],
 ];

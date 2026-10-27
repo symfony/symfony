@@ -1,14 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'GBP' => [
-            'GB£',
-            'British Pound',
-        ],
-        'SSP' => [
-            '£',
-            'South Sudanese Pound',
-        ],
-    ],
+    'Names' => [97 => 'British Pound', 228 => 'South Sudanese Pound'],
+    'Symbols' => [97 => 'GB£', 228 => '£'],
 ];

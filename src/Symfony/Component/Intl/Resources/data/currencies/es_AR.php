@@ -1,14 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'ARS' => [
-            '$',
-            'peso argentino',
-        ],
-        'USD' => [
-            'US$',
-            'dólar estadounidense',
-        ],
-    ],
+    'Names' => [16 => 'peso argentino', 252 => 'dólar estadounidense'],
+    'Symbols' => [16 => '$', 252 => 'US$'],
 ];

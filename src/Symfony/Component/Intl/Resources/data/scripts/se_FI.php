@@ -1,11 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Arab' => 'arábalaš',
-        'Hani' => 'kiinnálaš',
-        'Hans' => 'álkes kiinnálaš',
-        'Hant' => 'árbevirolaš kiinnálaš',
-        'Zxxx' => 'orrut čállojuvvot',
-    ],
+    'Names' => [4 => 'arábalaš', 59 => 'kiinnálaš', 61 => 'álkes kiinnálaš', 'árbevirolaš kiinnálaš', 213 => 'orrut čállojuvvot'],
 ];

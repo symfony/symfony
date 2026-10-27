@@ -1,14 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'PEN' => [
-            'PEN',
-            'Sol Peruano',
-        ],
-        'USD' => [
-            '$',
-            'Dólar Americano',
-        ],
-    ],
+    'Names' => [195 => 'Sol Peruano', 252 => 'Dólar Americano'],
+    'Symbols' => [195 => '', 252 => '$'],
 ];

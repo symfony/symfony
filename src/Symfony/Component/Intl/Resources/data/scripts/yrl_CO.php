@@ -1,7 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Visp' => 'ñeẽga xipiawera',
-    ],
+    'Names' => [199 => 'ñeẽga xipiawera'],
 ];

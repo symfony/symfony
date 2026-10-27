@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'GHS' => [
-            'GH₵',
-            'Ghanaian Cedi',
-        ],
-    ],
+    'Names' => [101 => 'Ghanaian Cedi'],
+    'Symbols' => [101 => 'GH₵'],
 ];

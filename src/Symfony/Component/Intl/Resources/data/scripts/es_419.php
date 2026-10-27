@@ -1,11 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Hrkt' => 'katakana o hiragana',
-        'Latn' => 'latín',
-        'Mlym' => 'malabar',
-        'Mtei' => 'manipuri',
-        'Syrc' => 'siríaco',
-    ],
+    'Names' => [70 => 'katakana o hiragana', 94 => 'latín', 113 => 'malabar', 118 => 'manipuri', 172 => 'siríaco'],
 ];

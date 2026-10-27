@@ -1,8 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'kw' => 'kernewek',
-    ],
+    'Names' => [310 => 'kernewek'],
     'LocalizedNames' => [],
 ];

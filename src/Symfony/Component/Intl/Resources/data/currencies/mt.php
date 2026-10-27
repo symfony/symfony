@@ -1,18 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'EUR' => [
-            '€',
-            'ewro',
-        ],
-        'MTL' => [
-            'MTL',
-            'Lira Maltija',
-        ],
-        'PHP' => [
-            'PHP',
-            'PHP',
-        ],
-    ],
+    'Names' => [92 => 'ewro', 171 => 'Lira Maltija', 198 => 'PHP'],
+    'Symbols' => [92 => '€', 171 => '', 198 => ''],
 ];

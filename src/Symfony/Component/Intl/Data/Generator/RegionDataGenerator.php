@@ -98,6 +98,13 @@ class RegionDataGenerator extends AbstractDataGenerator
      */
     private array $regionCodes = [];
 
+    /**
+     * The numeric regions that locales use, e.g. "419" in "es_419".
+     *
+     * @var array<string, true>
+     */
+    private array $numericRegions = [];
+
     public static function isValidCountryCode(int|string|null $region): bool
     {
         if (isset(self::DENYLIST[$region]) || isset(self::USER_ASSIGNED[$region])) {
@@ -119,6 +126,14 @@ class RegionDataGenerator extends AbstractDataGenerator
 
     protected function scanLocales(LocaleScanner $scanner, string $sourceDir): array
     {
+        $this->numericRegions = [];
+
+        foreach ($scanner->scanLocales($sourceDir.'/locales') as $locale) {
+            if (ctype_digit($region = (string) \Locale::getRegion($locale))) {
+                $this->numericRegions[$region] = true;
+            }
+        }
+
         return $scanner->scanLocales($sourceDir.'/region');
     }
 
@@ -206,6 +221,12 @@ class RegionDataGenerator extends AbstractDataGenerator
         $regionNames = ['UserAssignedNames' => [], 'Names' => []];
 
         foreach ($unfilteredRegionNames as $region => $regionName) {
+            // Locales::getName() needs these names, e.g. for "es_419"
+            if (isset($this->numericRegions[$region])) {
+                $regionNames['NumericNames'][$region] = $regionName;
+                continue;
+            }
+
             if (!self::isValidCountryCode($region) && !self::isUserAssignedCountryCode($region)) {
                 continue;
             }

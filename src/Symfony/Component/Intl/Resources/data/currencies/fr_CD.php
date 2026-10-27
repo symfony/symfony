@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'CDF' => [
-            'FC',
-            'franc congolais',
-        ],
-    ],
+    'Names' => [58 => 'franc congolais'],
+    'Symbols' => [58 => 'FC'],
 ];

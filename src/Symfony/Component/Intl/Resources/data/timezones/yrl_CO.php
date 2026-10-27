@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'America/Miquelon' => 'Sã Peduru asuí Mikiran Hurariyu (Mikirũ)',
-        'America/St_Kitts' => 'Atalãtiku Hurariyu (Sã Kirituwan)',
-        'Asia/Thimphu' => 'Butan Hurariyu (Tĩpu)',
-    ],
+    'Names' => [157 => 'Sã Peduru asuí Mikiran Hurariyu (Mikirũ)', 192 => 'Atalãtiku Hurariyu (Sã Kirituwan)', 292 => 'Butan Hurariyu (Tĩpu)'],
     'Meta' => [],
 ];

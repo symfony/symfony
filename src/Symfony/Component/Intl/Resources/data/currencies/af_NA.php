@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'NAD' => [
-            '$',
-            'Namibiese dollar',
-        ],
-    ],
+    'Names' => [184 => 'Namibiese dollar'],
+    'Symbols' => [184 => '$'],
 ];

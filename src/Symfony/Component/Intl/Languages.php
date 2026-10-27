@@ -41,7 +41,7 @@ final class Languages extends ResourceBundle
     public static function exists(string $language): bool
     {
         try {
-            self::readEntry(['Names', $language]);
+            self::readName($language);
 
             return true;
         } catch (MissingResourceException) {
@@ -59,7 +59,7 @@ final class Languages extends ResourceBundle
     public static function getName(string $language, ?string $displayLocale = null): string
     {
         try {
-            return self::readEntry(['Names', $language], $displayLocale);
+            return self::readName($language, $displayLocale);
         } catch (MissingResourceException) {
             try {
                 return self::readEntry(['LocalizedNames', $language], $displayLocale);
@@ -80,7 +80,7 @@ final class Languages extends ResourceBundle
      */
     public static function getNames(?string $displayLocale = null): array
     {
-        return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
+        return self::asort(self::readNames($displayLocale), $displayLocale);
     }
 
     /**

@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'NZD' => [
-            '$',
-            'New Zealand Dollar',
-        ],
-    ],
+    'Names' => [191 => 'New Zealand Dollar'],
+    'Symbols' => [191 => '$'],
 ];

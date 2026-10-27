@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'BAM' => [
-            'KM',
-            'konvertibilna marka',
-        ],
-    ],
+    'Names' => [23 => 'konvertibilna marka'],
+    'Symbols' => [23 => 'KM'],
 ];

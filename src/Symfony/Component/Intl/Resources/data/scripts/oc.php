@@ -1,7 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Latn' => 'latin',
-    ],
+    'Names' => [94 => 'latin'],
 ];

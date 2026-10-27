@@ -1,13 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Arab' => 'Farsi Orbi',
-        'Beng' => 'Bangla',
-        'Cyrl' => 'Cyrili',
-        'Deva' => 'Devanagari',
-        'Grek' => 'Grik',
-        'Hebr' => 'Hebrev',
-        'Latn' => 'Romi',
-    ],
+    'Names' => [4 => 'Farsi Orbi', 13 => 'Bangla', 32 => 'Cyrili', 34 => 'Devanagari', 53 => 'Grik', 64 => 'Hebrev', 94 => 'Romi'],
 ];

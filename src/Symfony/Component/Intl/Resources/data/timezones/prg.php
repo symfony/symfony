@@ -2,25 +2,8 @@
 
 return [
     'Names' => [
-        'Africa/Abidjan' => 'Greenwich kerdā (Abidjan)',
-        'Africa/Accra' => 'Greenwich kerdā (Accra)',
-        'Africa/Bamako' => 'Greenwich kerdā (Bamako)',
-        'Africa/Banjul' => 'Greenwich kerdā (Banjul)',
-        'Africa/Bissau' => 'Greenwich kerdā (Bissau)',
-        'Africa/Conakry' => 'Greenwich kerdā (Conakry)',
-        'Africa/Dakar' => 'Greenwich kerdā (Dakar)',
-        'Africa/Freetown' => 'Greenwich kerdā (Freetown)',
-        'Africa/Lome' => 'Greenwich kerdā (Lomé)',
-        'Africa/Monrovia' => 'Greenwich kerdā (Monrovia)',
-        'Africa/Nouakchott' => 'Greenwich kerdā (Nouakchott)',
-        'Africa/Ouagadougou' => 'Greenwich kerdā (Ouagadougou)',
-        'Africa/Sao_Tome' => 'Greenwich kerdā (São Tomé)',
-        'America/Danmarkshavn' => 'Greenwich kerdā (Danmarkshavn)',
-        'Antarctica/Troll' => 'Greenwich kerdā (Troll)',
-        'Atlantic/Reykjavik' => 'Greenwich kerdā (Reykjavik)',
-        'Atlantic/St_Helena' => 'Greenwich kerdā (St. Helena)',
-        'Etc/GMT' => 'Greenwich kerdā',
-        'Europe/Warsaw' => 'Kerdā: Pōli (Warsaw)',
+        'Greenwich kerdā (Abidjan)', 'Greenwich kerdā (Accra)', 6 => 'Greenwich kerdā (Bamako)', 8 => 'Greenwich kerdā (Banjul)', 'Greenwich kerdā (Bissau)', 16 => 'Greenwich kerdā (Conakry)', 'Greenwich kerdā (Dakar)', 22 => 'Greenwich kerdā (Freetown)', 33 => 'Greenwich kerdā (Lomé)', 42 => 'Greenwich kerdā (Monrovia)', 46 => 'Greenwich kerdā (Nouakchott)', 'Greenwich kerdā (Ouagadougou)',
+        49 => 'Greenwich kerdā (São Tomé)', 100 => 'Greenwich kerdā (Danmarkshavn)', 215 => 'Greenwich kerdā (Troll)', 311 => 'Greenwich kerdā (Reykjavik)', 313 => 'Greenwich kerdā (St. Helena)', 326 => 'Greenwich kerdā', 384 => 'Kerdā: Pōli (Warsaw)',
     ],
     'Meta' => [],
 ];

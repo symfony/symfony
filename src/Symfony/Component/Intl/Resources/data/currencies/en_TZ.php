@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'TZS' => [
-            'TSh',
-            'Tanzanian Shilling',
-        ],
-    ],
+    'Names' => [247 => 'Tanzanian Shilling'],
+    'Symbols' => [247 => 'TSh'],
 ];

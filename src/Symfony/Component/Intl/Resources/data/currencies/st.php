@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'ZAR' => [
-            'R',
-            'ZAR',
-        ],
-    ],
+    'Names' => [284 => 'ZAR'],
+    'Symbols' => [284 => 'R'],
 ];

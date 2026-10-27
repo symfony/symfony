@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'MUR' => [
-            'Rs',
-            'roupie mauricienne',
-        ],
-    ],
+    'Names' => [173 => 'roupie mauricienne'],
+    'Symbols' => [173 => 'Rs'],
 ];

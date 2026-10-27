@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'HTG' => [
-            'G',
-            'gourde haïtienne',
-        ],
-    ],
+    'Names' => [116 => 'gourde haïtienne'],
+    'Symbols' => [116 => 'G'],
 ];

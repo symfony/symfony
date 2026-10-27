@@ -2,19 +2,7 @@
 
 return [
     'Names' => [
-        'Armn' => 'Àmɛ́níà',
-        'Cyrl' => 'èdè ilɛ̀ Rɔ́shíà',
-        'Deva' => 'Dɛfanagárì',
-        'Ethi' => 'Ɛtiópíìkì',
-        'Geor' => 'Jɔ́jíànù',
-        'Hanb' => 'Han pɛ̀lú Bopomófò',
-        'Hans' => 'tí wɔ́n mú rɔrùn.',
-        'Hrkt' => 'ìlànà àfɔwɔ́kɔ ará Jàpánù',
-        'Khmr' => 'Kɛmɛ̀',
-        'Plrd' => 'Fonɛtiiki Polaadi',
-        'Zmth' => 'Àmì Ìshèsìrò',
-        'Zsym' => 'Àwɔn àmì',
-        'Zxxx' => 'Aikɔsilɛ',
-        'Zyyy' => 'Wɔ́pɔ̀',
+        7 => 'Àmɛ́níà', 32 => 'èdè ilɛ̀ Rɔ́shíà', 34 => 'Dɛfanagárì', 44 => 'Ɛtiópíìkì', 47 => 'Jɔ́jíànù', 57 => 'Han pɛ̀lú Bopomófò', 61 => 'tí wɔ́n mú rɔrùn.', 70 => 'ìlànà àfɔwɔ́kɔ ará Jàpánù', 82 => 'Kɛmɛ̀', 146 => 'Fonɛtiiki Polaadi',
+        210 => 'Àmì Ìshèsìrò', 212 => 'Àwɔn àmì', 'Aikɔsilɛ', 'Wɔ́pɔ̀',
     ],
 ];

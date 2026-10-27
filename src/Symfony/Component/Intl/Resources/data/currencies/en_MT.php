@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'GBP' => [
-            'GB£',
-            'British Pound',
-        ],
-    ],
+    'Names' => [97 => 'British Pound'],
+    'Symbols' => [97 => 'GB£'],
 ];

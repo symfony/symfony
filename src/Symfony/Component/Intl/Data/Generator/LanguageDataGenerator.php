@@ -117,6 +117,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
     protected function generateDataForLocale(BundleEntryReaderInterface $reader, string $tempDir, string $displayLocale): ?array
     {
         $localeBundle = $reader->read($tempDir, $displayLocale);
+        $data = [];
 
         // isset() on \ResourceBundle returns true even if the value is null
         if (isset($localeBundle['Languages']) && null !== $localeBundle['Languages']) {
@@ -131,18 +132,18 @@ class LanguageDataGenerator extends AbstractDataGenerator
                 }
             }
 
-            return [
+            $data = [
                 'Names' => $names,
                 'LocalizedNames' => $localizedNames,
             ];
         }
 
-        return null;
+        return $data + self::generateLocaleDisplayPatterns($localeBundle) ?: null;
     }
 
     protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
-        return null;
+        return self::generateLocaleDisplayPatterns($reader->read($tempDir, 'root')) ?: null;
     }
 
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
@@ -159,6 +160,22 @@ class LanguageDataGenerator extends AbstractDataGenerator
             'Alpha2ToAlpha3' => $this->generateAlpha2ToAlpha3Mapping($metadataBundle),
             'Alpha3ToAlpha2' => $this->generateAlpha3ToAlpha2Mapping($metadataBundle),
         ];
+    }
+
+    /**
+     * Generates the patterns that build locale names from language, script and region names, e.g. "{0} ({1})".
+     */
+    private static function generateLocaleDisplayPatterns(ArrayAccessibleResourceBundle $localeBundle): array
+    {
+        $patterns = [];
+
+        foreach (['pattern' => 'Pattern', 'separator' => 'Separator'] as $key => $name) {
+            if (null !== $pattern = $localeBundle['localeDisplayPattern'][$key] ?? null) {
+                $patterns[$name] = $pattern;
+            }
+        }
+
+        return $patterns;
     }
 
     private static function generateLanguageNames(ArrayAccessibleResourceBundle $localeBundle): array

@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'STN' => [
-            'Db',
-            'dobra de São Tomé e Príncipe',
-        ],
-    ],
+    'Names' => [230 => 'dobra de São Tomé e Príncipe'],
+    'Symbols' => [230 => 'Db'],
 ];

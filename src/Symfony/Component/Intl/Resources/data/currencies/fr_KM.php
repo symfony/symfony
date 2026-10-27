@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'KMF' => [
-            'CF',
-            'franc comorien',
-        ],
-    ],
+    'Names' => [135 => 'franc comorien'],
+    'Symbols' => [135 => 'CF'],
 ];

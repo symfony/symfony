@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'PAB' => [
-            'B/.',
-            'balboa panameño',
-        ],
-    ],
+    'Names' => [193 => 'balboa panameño'],
+    'Symbols' => [193 => 'B/.'],
 ];

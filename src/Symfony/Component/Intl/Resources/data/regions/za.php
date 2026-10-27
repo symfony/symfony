@@ -2,7 +2,5 @@
 
 return [
     'UserAssignedNames' => [],
-    'Names' => [
-        'CN' => 'Cunghgoz',
-    ],
+    'Names' => [47 => 'Cunghgoz'],
 ];

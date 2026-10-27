@@ -2,17 +2,5 @@
 
 return [
     'UserAssignedNames' => [],
-    'Names' => [
-        'BY' => 'Bjelorusija',
-        'CG' => 'Kongo',
-        'CZ' => 'Češka Republika',
-        'DE' => 'Njemačka',
-        'KN' => 'Sveti Kits i Nevis',
-        'PM' => 'Sveti Pjer i Mikelon',
-        'RE' => 'Reunion',
-        'UM' => 'Manja udaljena ostrva SAD',
-        'VC' => 'Sveti Vinsent i Grenadini',
-        'VG' => 'Britanska Djevičanska Ostrva',
-        'VI' => 'Američka Djevičanska Ostrva',
-    ],
+    'Names' => [35 => 'Bjelorusija', 41 => 'Kongo', 55 => 'Češka Republika', 'Njemačka', 119 => 'Sveti Kits i Nevis', 179 => 'Sveti Pjer i Mikelon', 187 => 'Reunion', 231 => 'Manja udaljena ostrva SAD', 236 => 'Sveti Vinsent i Grenadini', 238 => 'Britanska Djevičanska Ostrva', 'Američka Djevičanska Ostrva'],
 ];

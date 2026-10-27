@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'MGA' => [
-            'Ar',
-            'Malagasy Ariary',
-        ],
-    ],
+    'Names' => [161 => 'Malagasy Ariary'],
+    'Symbols' => [161 => 'Ar'],
 ];

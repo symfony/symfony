@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'SZL' => [
-            'E',
-            'Swazi Lilangeni',
-        ],
-    ],
+    'Names' => [234 => 'Swazi Lilangeni'],
+    'Symbols' => [234 => 'E'],
 ];

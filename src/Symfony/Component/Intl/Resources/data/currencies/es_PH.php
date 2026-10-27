@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'PHP' => [
-            '₱',
-            'peso filipino',
-        ],
-    ],
+    'Names' => [198 => 'peso filipino'],
+    'Symbols' => [198 => '₱'],
 ];

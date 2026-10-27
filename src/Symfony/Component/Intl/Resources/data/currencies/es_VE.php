@@ -1,14 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'VEF' => [
-            'Bs.',
-            'bolívar venezolano (2008–2018)',
-        ],
-        'VES' => [
-            'Bs.S',
-            'bolívar soberano',
-        ],
-    ],
+    'Names' => [262 => 'bolívar venezolano (2008–2018)', 'bolívar soberano'],
+    'Symbols' => [262 => 'Bs.', 'Bs.S'],
 ];

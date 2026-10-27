@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'TND' => [
-            'DT',
-            'dinar tunisien',
-        ],
-    ],
+    'Names' => [240 => 'dinar tunisien'],
+    'Symbols' => [240 => 'DT'],
 ];

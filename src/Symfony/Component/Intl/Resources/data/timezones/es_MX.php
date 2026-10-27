@@ -2,18 +2,8 @@
 
 return [
     'Names' => [
-        'Africa/Bujumbura' => 'hora de África central (Buyumbura)',
-        'Africa/Dar_es_Salaam' => 'hora de África oriental (Dar es-Salaam)',
-        'America/Rio_Branco' => 'hora de Acre (Rio Branco)',
-        'Asia/Almaty' => 'hora de Kazajistán (Almatý)',
-        'Asia/Aqtobe' => 'hora de Kazajistán (Aktobé)',
-        'Asia/Atyrau' => 'hora de Kazajistán (Atirau)',
-        'Atlantic/Stanley' => 'hora de Islas Malvinas (Stanley)',
-        'Indian/Christmas' => 'hora de la isla de Navidad',
-        'Pacific/Easter' => 'hora de Isla de Pascua',
-        'Pacific/Honolulu' => 'hora estándar de Hawái y Aleutianas (Honolulu)',
-        'Pacific/Tarawa' => 'hora de las Islas Gilbert (Tarawa)',
-        'Pacific/Wake' => 'hora de la Isla Wake',
+        12 => 'hora de África central (Buyumbura)', 18 => 'hora de África oriental (Dar es-Salaam)', 183 => 'hora de Acre (Rio Branco)', 219 => 'hora de Kazajistán (Almatý)', 223 => 'hora de Kazajistán (Aktobé)', 225 => 'hora de Kazajistán (Atirau)', 314 => 'hora de Islas Malvinas (Stanley)', 389 => 'hora de la isla de Navidad', 403 => 'hora de Isla de Pascua', 413 => 'hora estándar de Hawái y Aleutianas (Honolulu)',
+        434 => 'hora de las Islas Gilbert (Tarawa)', 437 => 'hora de la Isla Wake',
     ],
     'Meta' => [],
 ];

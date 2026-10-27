@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'BWP' => [
-            'P',
-            'Botswanan Pula',
-        ],
-    ],
+    'Names' => [52 => 'Botswanan Pula'],
+    'Symbols' => [52 => 'P'],
 ];

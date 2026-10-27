@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'DZD' => [
-            'DA',
-            'dinar algérien',
-        ],
-    ],
+    'Names' => [82 => 'dinar algérien'],
+    'Symbols' => [82 => 'DA'],
 ];

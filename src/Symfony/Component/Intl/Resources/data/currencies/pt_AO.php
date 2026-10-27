@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'AOA' => [
-            'Kz',
-            'kwanza angolano',
-        ],
-    ],
+    'Names' => [8 => 'kwanza angolano'],
+    'Symbols' => [8 => 'Kz'],
 ];

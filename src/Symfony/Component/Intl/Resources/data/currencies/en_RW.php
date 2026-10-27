@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'RWF' => [
-            'RF',
-            'Rwandan Franc',
-        ],
-    ],
+    'Names' => [211 => 'Rwandan Franc'],
+    'Symbols' => [211 => 'RF'],
 ];

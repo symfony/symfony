@@ -1,14 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Arab' => 'Arabic',
-        'Cyrl' => 'Cyrillic',
-        'Hans' => 'Pinasimple',
-        'Hant' => 'Tradisyonal',
-        'Jpan' => 'Japanese',
-        'Kore' => 'Korean',
-        'Latn' => 'Latin',
-        'Zxxx' => 'Dili Sinulat',
-    ],
+    'Names' => [4 => 'Arabic', 32 => 'Cyrillic', 61 => 'Pinasimple', 'Tradisyonal', 76 => 'Japanese', 86 => 'Korean', 94 => 'Latin', 213 => 'Dili Sinulat'],
 ];

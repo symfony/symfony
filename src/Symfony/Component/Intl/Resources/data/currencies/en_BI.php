@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'Names' => [
-        'BIF' => [
-            'FBu',
-            'Burundian Franc',
-        ],
-    ],
+    'Names' => [35 => 'Burundian Franc'],
+    'Symbols' => [35 => 'FBu'],
 ];

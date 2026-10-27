@@ -2,11 +2,5 @@
 
 return [
     'UserAssignedNames' => [],
-    'Names' => [
-        'BA' => 'Bosnia y Herzegovina',
-        'CI' => 'Côte d’Ivoire',
-        'GG' => 'Guernsey',
-        'SZ' => 'Eswatini',
-        'UM' => 'Islas menores alejadas de EE. UU.',
-    ],
+    'Names' => [16 => 'Bosnia y Herzegovina', 43 => 'Côte d’Ivoire', 80 => 'Guernsey', 212 => 'Eswatini', 231 => 'Islas menores alejadas de EE. UU.'],
 ];

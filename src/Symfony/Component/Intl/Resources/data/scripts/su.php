@@ -1,11 +1,5 @@
 <?php
 
 return [
-    'Names' => [
-        'Cyrl' => 'Sirilik',
-        'Hans' => 'Sederhana',
-        'Hant' => 'Tradisional',
-        'Latn' => 'Basa Latin',
-        'Zxxx' => 'Non-tulisan',
-    ],
+    'Names' => [32 => 'Sirilik', 61 => 'Sederhana', 'Tradisional', 94 => 'Basa Latin', 213 => 'Non-tulisan'],
 ];

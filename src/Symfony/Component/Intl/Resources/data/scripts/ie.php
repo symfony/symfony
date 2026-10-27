@@ -2,20 +2,7 @@
 
 return [
     'Names' => [
-        'Arab' => 'arabic',
-        'Aran' => 'nastalik',
-        'Brai' => 'Braille',
-        'Cyrl' => 'cirillic',
-        'Hans' => 'simplificat',
-        'Hant' => 'traditional',
-        'Hrkt' => 'japanesi sillabariums',
-        'Jpan' => 'japanesi',
-        'Kore' => 'korean',
-        'Latn' => 'latin',
-        'Mong' => 'mongolian',
-        'Zmth' => 'matematic notation',
-        'Zsye' => 'emoji',
-        'Zsym' => 'simboles',
-        'Zxxx' => 'ínscrit',
+        4 => 'arabic', 'nastalik', 19 => 'Braille', 32 => 'cirillic', 61 => 'simplificat', 'traditional', 70 => 'japanesi sillabariums', 76 => 'japanesi', 86 => 'korean', 94 => 'latin', 115 => 'mongolian',
+        210 => 'matematic notation', 'emoji', 'simboles', 'ínscrit',
     ],
 ];

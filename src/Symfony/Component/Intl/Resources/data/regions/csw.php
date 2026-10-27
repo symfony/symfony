@@ -2,8 +2,6 @@
 
 return [
     'UserAssignedNames' => [],
-    'Names' => [
-        'CA' => 'ᑳᓇᑕ',
-        'US' => 'ᑭᐦᒋ ᒨᑯᒫᓂᕽ',
-    ],
+    'Names' => [37 => 'ᑳᓇᑕ', 232 => 'ᑭᐦᒋ ᒨᑯᒫᓂᕽ'],
+    'NumericNames' => ['001' => 'ᐊᐢᑭᕀ'],
 ];

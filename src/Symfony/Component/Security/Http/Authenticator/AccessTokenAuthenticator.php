@@ -123,16 +123,15 @@ class AccessTokenAuthenticator implements AuthenticatorInterface, FallbackAuthen
             return $this->failureHandler->onAuthenticationFailure($request, $exception);
         }
 
-        if (null !== $this->translator) {
-            $errorMessage = $this->translator->trans($exception->getMessageKey(), $exception->getMessageData(), 'security');
-        } else {
-            $errorMessage = strtr($exception->getMessageKey(), $exception->getMessageData());
-        }
+        $errorMessage = $this->getErrorMessage($exception);
 
         return new Response(
-            null,
+            $errorMessage,
             Response::HTTP_UNAUTHORIZED,
-            ['WWW-Authenticate' => $this->getAuthenticateHeader($request, 'invalid_token', $errorMessage, $exception)]
+            [
+                'Content-Type' => 'text/plain',
+                'WWW-Authenticate' => $this->getAuthenticateHeader($request, 'invalid_token', $errorMessage, $exception),
+            ]
         );
     }
 
@@ -142,9 +141,12 @@ class AccessTokenAuthenticator implements AuthenticatorInterface, FallbackAuthen
         // holds no error code, as an error code describes a token the client did send. This is
         // the request an RFC 9728 client makes to discover where to get a token from.
         return new Response(
-            null,
+            null !== $authException ? $this->getErrorMessage($authException) : null,
             Response::HTTP_UNAUTHORIZED,
-            ['WWW-Authenticate' => $this->getAuthenticateHeader($request, null, null, $authException)]
+            [
+                'Content-Type' => 'text/plain',
+                'WWW-Authenticate' => $this->getAuthenticateHeader($request, null, null, $authException),
+            ]
         );
     }
 
@@ -205,5 +207,14 @@ class AccessTokenAuthenticator implements AuthenticatorInterface, FallbackAuthen
         }
 
         return $values ? $scheme.' '.implode(',', $values) : $scheme;
+    }
+
+    private function getErrorMessage(AuthenticationException $exception): string
+    {
+        if (null !== $this->translator) {
+            return $this->translator->trans($exception->getMessageKey(), $exception->getMessageData(), 'security');
+        }
+
+        return strtr($exception->getMessageKey(), $exception->getMessageData());
     }
 }

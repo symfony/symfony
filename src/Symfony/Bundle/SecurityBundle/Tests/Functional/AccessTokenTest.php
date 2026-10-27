@@ -55,6 +55,8 @@ class AccessTokenTest extends AbstractWebTestCase
 
         $this->assertSame(401, $response->getStatusCode());
         $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials.",resource_metadata="http://localhost/.well-known/oauth-protected-resource"', $response->headers->get('WWW-Authenticate'));
+        $this->assertSame('text/plain; charset=UTF-8', $response->headers->get('Content-Type'));
+        $this->assertSame('Invalid credentials.', $response->getContent());
 
         // the primary RFC 9728 discovery flow: a client holding no token yet is told where
         // the document is, which the firewall can only answer as its entry point
@@ -63,6 +65,8 @@ class AccessTokenTest extends AbstractWebTestCase
 
         $this->assertSame(401, $response->getStatusCode());
         $this->assertSame('Bearer realm="My API",resource_metadata="http://localhost/.well-known/oauth-protected-resource"', $response->headers->get('WWW-Authenticate'));
+        $this->assertSame('text/plain; charset=UTF-8', $response->headers->get('Content-Type'));
+        $this->assertSame('Not privileged to request the resource.', $response->getContent());
 
         $client->request('GET', '/.well-known/oauth-protected-resource');
         $response = $client->getResponse();
@@ -142,6 +146,8 @@ class AccessTokenTest extends AbstractWebTestCase
 
         $this->assertSame(403, $response->getStatusCode());
         $this->assertSame('Bearer realm="My API",error="insufficient_scope",error_description="The request requires higher privileges than provided by the access token.",scope="openid profile:read"', $response->headers->get('WWW-Authenticate'));
+        $this->assertSame('text/plain; charset=UTF-8', $response->headers->get('Content-Type'));
+        $this->assertSame('The request requires higher privileges than provided by the access token.', $response->getContent());
     }
 
     /**
@@ -241,7 +247,6 @@ class AccessTokenTest extends AbstractWebTestCase
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(401, $response->getStatusCode());
-        $this->assertSame('', $response->getContent());
         $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $response->headers->get('WWW-Authenticate'));
     }
 
@@ -330,7 +335,6 @@ class AccessTokenTest extends AbstractWebTestCase
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(401, $response->getStatusCode());
-        $this->assertSame('', $response->getContent());
         $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $response->headers->get('WWW-Authenticate'));
     }
 
@@ -422,7 +426,6 @@ class AccessTokenTest extends AbstractWebTestCase
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(401, $response->getStatusCode());
-        $this->assertSame('', $response->getContent());
         $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $response->headers->get('WWW-Authenticate'));
     }
 

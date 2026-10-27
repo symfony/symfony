@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Collect one profile per message consumed by `messenger:consume --profile`, linked to the profile that sent the message through `ProfilerTokenStamp`
+
 8.2
 ---
 

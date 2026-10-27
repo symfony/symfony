@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\Messenger\Stamp\ProfilerTokenStamp;
+use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
@@ -94,6 +96,11 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
             'caller' => $tracedMessage['caller'],
         ];
 
+        if (null !== $token = $this->getSentProfilerToken($tracedMessage)) {
+            $debugRepresentation['profiler_token'] = $token;
+            $debugRepresentation['message_class'] = $message::class;
+        }
+
         if (isset($tracedMessage['exception'])) {
             $exception = $tracedMessage['exception'];
 
@@ -104,6 +111,28 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         }
 
         return $debugRepresentation;
+    }
+
+    /**
+     * Returns the token stamped on a message sent to transports, which the profiles of the workers handling it refer to.
+     */
+    private function getSentProfilerToken(array $tracedMessage): ?string
+    {
+        $countSentStamps = static fn (array $stamps): int => \count(array_filter($stamps, static fn ($stamp) => $stamp instanceof SentStamp));
+
+        // a received message is sent again when relayed by an outbox or redispatched, but not when a sync transport handles it
+        if ($countSentStamps($tracedMessage['stamps_after_dispatch'] ?? []) <= $countSentStamps($tracedMessage['stamps'] ?? [])) {
+            return null;
+        }
+
+        $token = null;
+        foreach ($tracedMessage['stamps_after_dispatch'] as $stamp) {
+            if ($stamp instanceof ProfilerTokenStamp) {
+                $token = $stamp->getToken();
+            }
+        }
+
+        return $token;
     }
 
     public function getExceptionsCount(?string $bus = null): int

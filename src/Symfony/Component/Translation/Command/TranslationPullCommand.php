@@ -167,7 +167,8 @@ final class TranslationPullCommand extends Command
             if ($deleteMissing) {
                 // Keep only provider keys, but preserve local values unless --force is set.
                 foreach ($providerTranslations->getCatalogues() as $catalogue) {
-                    $result = (new TargetOperation(new MessageCatalogue($catalogue->getLocale()), $catalogue))->getResult();
+                    $result = new MessageCatalogue($catalogue->getLocale());
+                    $result->addCatalogue($catalogue);
                     $localCatalogue = $localTranslations->getCatalogue($catalogue->getLocale());
                     foreach ($result->all() as $domain => $messages) {
                         foreach ($messages as $id => $message) {

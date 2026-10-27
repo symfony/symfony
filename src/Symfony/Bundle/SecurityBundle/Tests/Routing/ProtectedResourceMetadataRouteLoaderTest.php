@@ -35,7 +35,7 @@ class ProtectedResourceMetadataRouteLoaderTest extends TestCase
         $expected = static fn (string $path, string $firewallName): Route => (new Route($path, [
             '_controller' => 'security.authenticator.access_token.protected_resource_metadata_controller',
             'firewallName' => $firewallName,
-        ]))->setMethods(['GET']);
+        ]))->setMethods(['GET', 'OPTIONS']);
 
         self::assertEquals($expected('/.well-known/oauth-protected-resource', 'main'), $collection->get('_oauth_protected_resource_metadata_main'));
         self::assertEquals($expected('/.well-known/oauth-protected-resource/admin', 'admin'), $collection->get('_oauth_protected_resource_metadata_admin'));

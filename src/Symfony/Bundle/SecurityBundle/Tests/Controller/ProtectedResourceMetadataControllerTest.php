@@ -53,6 +53,36 @@ class ProtectedResourceMetadataControllerTest extends TestCase
         $this->assertSame('{"resource":"https://api.example.com"}', $response->getContent());
     }
 
+    public function testAnyOriginCanReadTheDocument()
+    {
+        $controller = new ProtectedResourceMetadataController([
+            'main' => ['resource' => 'https://api.example.com'],
+        ]);
+
+        $response = $controller(Request::create('https://api.example.com/.well-known/oauth-protected-resource', 'GET', [], [], [], ['HTTP_ORIGIN' => 'https://client.example.org']), 'main');
+
+        $this->assertSame('*', $response->headers->get('Access-Control-Allow-Origin'));
+    }
+
+    public function testAnswersThePreflightOfAnyOrigin()
+    {
+        $controller = new ProtectedResourceMetadataController([
+            'main' => ['resource' => 'https://api.example.com'],
+        ]);
+
+        $response = $controller(Request::create('https://api.example.com/.well-known/oauth-protected-resource', 'OPTIONS', [], [], [], [
+            'HTTP_ORIGIN' => 'https://client.example.org',
+            'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'GET',
+            'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' => 'mcp-protocol-version',
+        ]), 'main');
+
+        $this->assertSame(204, $response->getStatusCode());
+        $this->assertSame('', $response->getContent());
+        $this->assertSame('*', $response->headers->get('Access-Control-Allow-Origin'));
+        $this->assertSame('GET', $response->headers->get('Access-Control-Allow-Methods'));
+        $this->assertSame('*', $response->headers->get('Access-Control-Allow-Headers'));
+    }
+
     public function testServesThePinnedResourceOfAFirewallCoveringAPath()
     {
         $controller = new ProtectedResourceMetadataController([

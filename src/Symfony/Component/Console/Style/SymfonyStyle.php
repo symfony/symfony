@@ -67,8 +67,12 @@ class SymfonyStyle extends OutputStyle
     /**
      * Formats a message as a block of text.
      */
-    public function block(string|array $messages, ?string $type = null, ?string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true): void
+    public function block(string|array $messages, ?string $type = null, ?string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = true, int $verbosity = self::VERBOSITY_NORMAL): void
     {
+        if ($this->getVerbosity() < $verbosity) {
+            return;
+        }
+
         $messages = \is_array($messages) ? array_values($messages) : [$messages];
 
         $this->autoPrependBlock();
@@ -76,8 +80,12 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    public function title(string $message): void
+    public function title(string $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
+        if ($this->getVerbosity() < $verbosity) {
+            return;
+        }
+
         $this->autoPrependBlock();
         $this->writeln([
             \sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
@@ -86,8 +94,12 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    public function section(string $message): void
+    public function section(string $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
+        if ($this->getVerbosity() < $verbosity) {
+            return;
+        }
+
         $this->autoPrependBlock();
         $this->writeln([
             \sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
@@ -96,8 +108,12 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    public function listing(array $elements): void
+    public function listing(array $elements, int $verbosity = self::VERBOSITY_NORMAL): void
     {
+        if ($this->getVerbosity() < $verbosity) {
+            return;
+        }
+
         $this->autoPrependText();
         $elements = array_map(static fn ($element) => \sprintf(' * %s', $element), $elements);
 
@@ -105,8 +121,12 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    public function text(string|array $message): void
+    public function text(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
+        if ($this->getVerbosity() < $verbosity) {
+            return;
+        }
+
         $this->autoPrependText();
 
         $messages = \is_array($message) ? array_values($message) : [$message];
@@ -118,42 +138,42 @@ class SymfonyStyle extends OutputStyle
     /**
      * Formats a command comment.
      */
-    public function comment(string|array $message): void
+    public function comment(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->block($message, null, null, '<fg=default;bg=default> // </>', false, false);
+        $this->block($message, null, null, '<fg=default;bg=default> // </>', false, false, verbosity: $verbosity);
     }
 
-    public function success(string|array $message): void
+    public function success(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->block($message, 'OK', 'fg=black;bg=green', ' ', true);
+        $this->block($message, 'OK', 'fg=black;bg=green', ' ', true, verbosity: $verbosity);
     }
 
-    public function error(string|array $message): void
+    public function error(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->block($message, 'ERROR', 'fg=white;bg=red', ' ', true);
+        $this->block($message, 'ERROR', 'fg=white;bg=red', ' ', true, verbosity: $verbosity);
     }
 
-    public function warning(string|array $message): void
+    public function warning(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->block($message, 'WARNING', 'fg=black;bg=yellow', ' ', true);
+        $this->block($message, 'WARNING', 'fg=black;bg=yellow', ' ', true, verbosity: $verbosity);
     }
 
-    public function note(string|array $message): void
+    public function note(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->block($message, 'NOTE', 'fg=yellow', ' ! ');
+        $this->block($message, 'NOTE', 'fg=yellow', ' ! ', verbosity: $verbosity);
     }
 
     /**
      * Formats an info message.
      */
-    public function info(string|array $message): void
+    public function info(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->block($message, 'INFO', 'fg=green', ' ', true);
+        $this->block($message, 'INFO', 'fg=green', ' ', true, verbosity: $verbosity);
     }
 
-    public function caution(string|array $message): void
+    public function caution(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ', true);
+        $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ', true, verbosity: $verbosity);
     }
 
     /**
@@ -162,8 +182,12 @@ class SymfonyStyle extends OutputStyle
      * Unlike block(), this renders colored borders instead of colored backgrounds,
      * improving readability across terminal color schemes.
      */
-    public function outlineBlock(string|array $messages, ?string $type = null, ?string $style = null, bool $padding = true, bool $escape = true): void
+    public function outlineBlock(string|array $messages, ?string $type = null, ?string $style = null, bool $padding = true, bool $escape = true, int $verbosity = self::VERBOSITY_NORMAL): void
     {
+        if ($this->getVerbosity() < $verbosity) {
+            return;
+        }
+
         $messages = \is_array($messages) ? array_values($messages) : [$messages];
 
         $this->autoPrependBlock();
@@ -171,38 +195,42 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
     }
 
-    public function outlineSuccess(string|array $message): void
+    public function outlineSuccess(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->outlineBlock($message, '✅ Success', 'fg=green');
+        $this->outlineBlock($message, '✅ Success', 'fg=green', verbosity: $verbosity);
     }
 
-    public function outlineError(string|array $message): void
+    public function outlineError(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->outlineBlock($message, '❌ Error', 'fg=red');
+        $this->outlineBlock($message, '❌ Error', 'fg=red', verbosity: $verbosity);
     }
 
-    public function outlineWarning(string|array $message): void
+    public function outlineWarning(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->outlineBlock($message, '⚠️ Warning', 'fg=yellow');
+        $this->outlineBlock($message, '⚠️ Warning', 'fg=yellow', verbosity: $verbosity);
     }
 
-    public function outlineNote(string|array $message): void
+    public function outlineNote(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->outlineBlock($message, '📝 Note', 'fg=blue');
+        $this->outlineBlock($message, '📝 Note', 'fg=blue', verbosity: $verbosity);
     }
 
-    public function outlineInfo(string|array $message): void
+    public function outlineInfo(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->outlineBlock($message, 'ℹ️ Info', 'fg=green');
+        $this->outlineBlock($message, 'ℹ️ Info', 'fg=green', verbosity: $verbosity);
     }
 
-    public function outlineCaution(string|array $message): void
+    public function outlineCaution(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->outlineBlock($message, '🚨 Caution', 'fg=red');
+        $this->outlineBlock($message, '🚨 Caution', 'fg=red', verbosity: $verbosity);
     }
 
-    public function table(array $headers, array $rows): void
+    public function table(array $headers, array $rows, int $verbosity = self::VERBOSITY_NORMAL): void
     {
+        if ($this->getVerbosity() < $verbosity) {
+            return;
+        }
+
         $this->createTable()
             ->setHeaders($headers)
             ->setRows($rows)
@@ -215,8 +243,12 @@ class SymfonyStyle extends OutputStyle
     /**
      * Formats a horizontal table.
      */
-    public function horizontalTable(array $headers, array $rows): void
+    public function horizontalTable(array $headers, array $rows, int $verbosity = self::VERBOSITY_NORMAL): void
     {
+        if ($this->getVerbosity() < $verbosity) {
+            return;
+        }
+
         $this->createTable()
             ->setHorizontal(true)
             ->setHeaders($headers)

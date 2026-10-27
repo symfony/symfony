@@ -932,4 +932,24 @@ class TimezonesTest extends ResourceBundleTestCase
         $this->assertSame(7200, Timezones::getRawOffset('Europe/Paris', (new \DateTimeImmutable('2022-07-16 00:00:00+00:00'))->getTimestamp()));
         $this->assertSame(3600, Timezones::getRawOffset('Europe/Paris', (new \DateTimeImmutable('2022-02-16 00:00:00+00:00'))->getTimestamp()));
     }
+
+    public function testGetRawOffsetAroundTransitionsDoesNotDependOnDefaultTimezone()
+    {
+        $defaultTimezone = date_default_timezone_get();
+
+        try {
+            foreach (['UTC', 'Asia/Tokyo', 'America/New_York'] as $timezone) {
+                date_default_timezone_set($timezone);
+
+                // Europe/Paris switches to summer time on 2022-03-27 at 01:00 UTC and back on 2022-10-30 at 01:00 UTC
+                $this->assertSame(3600, Timezones::getRawOffset('Europe/Paris', (new \DateTimeImmutable('2022-03-27 00:30:00+00:00'))->getTimestamp()));
+                $this->assertSame(7200, Timezones::getRawOffset('Europe/Paris', (new \DateTimeImmutable('2022-03-27 01:30:00+00:00'))->getTimestamp()));
+                $this->assertSame(7200, Timezones::getRawOffset('Europe/Paris', (new \DateTimeImmutable('2022-10-30 00:30:00+00:00'))->getTimestamp()));
+                $this->assertSame(3600, Timezones::getRawOffset('Europe/Paris', (new \DateTimeImmutable('2022-10-30 01:30:00+00:00'))->getTimestamp()));
+                $this->assertSame('GMT+02:00', Timezones::getGmtOffset('Europe/Paris', (new \DateTimeImmutable('2022-03-27 01:30:00+00:00'))->getTimestamp()));
+            }
+        } finally {
+            date_default_timezone_set($defaultTimezone);
+        }
+    }
 }

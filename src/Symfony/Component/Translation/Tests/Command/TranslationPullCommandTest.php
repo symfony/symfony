@@ -26,6 +26,7 @@ use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Component\Translation\Writer\TranslationWriter;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
@@ -344,7 +345,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
     }
 
     #[DataProvider('providePullSynchronizationOptions')]
-    public function testPullSynchronizationOptions(bool $force, bool $deleteMissing, string $expectedYaml)
+    public function testPullSynchronizationOptions(bool $force, bool $deleteMissing, array $expectedMessages)
     {
         $file = $this->createYamlFile([
             'shared' => 'Local',
@@ -372,15 +373,15 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
             '--delete-missing' => $deleteMissing,
         ]);
 
-        $this->assertSame($expectedYaml, file_get_contents($file));
+        $this->assertSame($expectedMessages, Yaml::parseFile($file));
     }
 
     public static function providePullSynchronizationOptions(): iterable
     {
-        yield 'append only' => [false, false, "local_only: Keep me\\nremote_only: New\\nshared: Local\\n"];
-        yield 'overwrite without deletion' => [true, false, "local_only: Keep me\\nremote_only: New\\nshared: Remote\\n"];
-        yield 'delete without overwriting' => [false, true, "remote_only: New\\nshared: Local\\n"];
-        yield 'overwrite and delete' => [true, true, "remote_only: New\\nshared: Remote\\n"];
+        yield 'append only' => [false, false, ['shared' => 'Local', 'local_only' => 'Keep me', 'remote_only' => 'New']];
+        yield 'overwrite without deletion' => [true, false, ['shared' => 'Remote', 'local_only' => 'Keep me', 'remote_only' => 'New']];
+        yield 'delete without overwriting' => [false, true, ['shared' => 'Local', 'remote_only' => 'New']];
+        yield 'overwrite and delete' => [true, true, ['shared' => 'Remote', 'remote_only' => 'New']];
     }
 
     public function testPullForceMessages()

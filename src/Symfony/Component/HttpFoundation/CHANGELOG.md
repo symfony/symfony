@@ -16,7 +16,7 @@ CHANGELOG
  * Drop HTTP method override support for methods GET, HEAD, CONNECT and TRACE
  * Add argument `$subtypeFallback` to `Request::getFormat()`
  * Remove the following deprecated session options from `NativeSessionStorage`: `referer_check`, `use_only_cookies`, `use_trans_sid`, `sid_length`, `sid_bits_per_character`, `trans_sid_hosts`, `trans_sid_tags`
- * Trigger PHP warning when using `Request::sendHeaders()` after headers have already been sent; use a `StreamedResponse` instead
+ * Trigger PHP warning when using `Response::sendHeaders()` after headers have already been sent; use a `StreamedResponse` instead
  * Add arguments `$v4Bytes` and `$v6Bytes` to `IpUtils::anonymize()`
  * Add argument `$partitioned` to `ResponseHeaderBag::clearCookie()`
  * Add argument `$expiration` to `UriSigner::sign()`
@@ -30,7 +30,7 @@ CHANGELOG
  * Add support for the `QUERY` HTTP method
  * Add support for structured MIME suffix
  * Add `Request::set/getAllowedHttpMethodOverride()` to list which HTTP methods can be overridden
- * Deprecate using `Request::sendHeaders()` after headers have already been sent; use a `StreamedResponse` instead
+ * Deprecate using `Response::sendHeaders()` after headers have already been sent; use a `StreamedResponse` instead
  * Deprecate method `Request::get()`, use properties `->attributes`, `query` or `request` directly instead
  * Make `Request::createFromGlobals()` parse the body of PUT, DELETE, PATCH and QUERY requests
  * Deprecate HTTP method override for methods GET, HEAD, CONNECT and TRACE; it will be ignored in Symfony 8.0

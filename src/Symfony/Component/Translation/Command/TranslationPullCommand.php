@@ -83,7 +83,8 @@ final class TranslationPullCommand extends Command
         $this
             ->setDefinition([
                 new InputArgument('provider', null !== $defaultProvider ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'The provider to pull translations from.', $defaultProvider),
-                new InputOption('force', null, InputOption::VALUE_NONE, 'Override existing translations with provider ones (it will delete not synchronized messages).'),
+                new InputOption('force', null, InputOption::VALUE_NONE, 'Override existing translations with provider ones.'),
+                new InputOption('delete-missing', null, InputOption::VALUE_NONE, 'Delete local translations that are not on the provider.'),
                 new InputOption('intl-icu', null, InputOption::VALUE_NONE, 'Associated to --force option, it will write messages in "%domain%+intl-icu.%locale%.xlf" files.'),
                 new InputOption('domains', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Specify the domains to pull.'),
                 new InputOption('locales', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Specify the locales to pull.'),
@@ -94,17 +95,19 @@ final class TranslationPullCommand extends Command
                 The <info>%command.name%</> command pulls translations from the given provider. Only
                 new translations are pulled, existing ones are not overwritten.
 
-                You can overwrite existing translations (and remove the missing ones on local side) by using the <info>--force</> flag:
+                To overwrite existing local translations while preserving keys not on the provider, use <info>--force</>:
 
-                  <info>%command.invocation% --force provider</>
+                  <info>%command.invocation% provider --force</>
 
-                Full example:
+                To delete local translations that are missing from the provider, use <info>--delete-missing</>:
 
-                  <info>%command.invocation% provider --force --domains=messages --domains=validators --locales=en</>
+                  <info>%command.invocation% provider --delete-missing</>
 
-                This command pulls all translations associated with the <info>messages</> and <info>validators</> domains for the <info>en</> locale.
-                Local translations for the specified domains and locale are deleted if they're not present on the provider and overwritten if it's the case.
-                Local translations for others domains and locales are ignored.
+                Both options can be combined to replace the local catalogue completely:
+
+                  <info>%command.invocation% provider --force --delete-missing --domains=messages --locales=en</>
+
+                Other domains and locales are not affected.
 
                 EOF
             )
@@ -117,6 +120,7 @@ final class TranslationPullCommand extends Command
 
         $provider = $this->providerCollection->get($input->getArgument('provider'));
         $force = $input->getOption('force');
+        $deleteMissing = $input->getOption('delete-missing');
         $intlIcu = $input->getOption('intl-icu');
         $locales = $input->getOption('locales') ?: $this->enabledLocales;
         $domains = $input->getOption('domains');
@@ -148,7 +152,8 @@ final class TranslationPullCommand extends Command
 
         $providerTranslations = $provider->read($domains, $locales);
 
-        if ($force) {
+        if ($force && $deleteMissing) {
+            // Replace the selected catalogues with the provider's messages.
             foreach ($providerTranslations->getCatalogues() as $catalogue) {
                 $operation = new TargetOperation(new MessageCatalogue($catalogue->getLocale()), $catalogue);
                 if ($intlIcu) {
@@ -156,22 +161,48 @@ final class TranslationPullCommand extends Command
                 }
                 $this->writer->write($operation->getResult(), $format, $writeOptions);
             }
+        } else {
+            $localTranslations = $this->readLocalTranslations($locales, $domains, $this->transPaths);
 
+            if ($deleteMissing) {
+                // Keep only provider keys, but preserve local values unless --force is set.
+                foreach ($providerTranslations->getCatalogues() as $catalogue) {
+                    $localCatalogue = $localTranslations->getCatalogue($catalogue->getLocale());
+                    foreach ($catalogue->all() as $domain => $messages) {
+                        foreach ($messages as $id => $message) {
+                            if ($localCatalogue->defines($id, $domain)) {
+                                $catalogue->set($id, $localCatalogue->get($id, $domain), $domain);
+                            }
+                        }
+                    }
+                    $this->writer->write($catalogue, $format, $writeOptions);
+                }
+            } else {
+                if ($force) {
+                    // addBag() merges into its incoming catalogues: provider values take priority.
+                    $providerTranslations->addBag($localTranslations);
+                    $localTranslations = $providerTranslations;
+                } else {
+                    // Append only translations that do not already exist locally.
+                    $localTranslations->addBag($providerTranslations->diff($localTranslations));
+                }
+
+                foreach ($localTranslations->getCatalogues() as $catalogue) {
+                    if ($force && $intlIcu) {
+                        $operation = new TargetOperation(new MessageCatalogue($catalogue->getLocale()), $catalogue);
+                        $operation->moveMessagesToIntlDomainsIfPossible();
+                        $catalogue = $operation->getResult();
+                    }
+                    $this->writer->write($catalogue, $format, $writeOptions);
+                }
+            }
+        }
+
+        if ($force || $deleteMissing) {
             $io->success(\sprintf('Local translations has been updated from "%s" (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
-
-            return 0;
+        } else {
+            $io->success(\sprintf('New translations from "%s" has been written locally (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
         }
-
-        $localTranslations = $this->readLocalTranslations($locales, $domains, $this->transPaths);
-
-        // Append pulled translations to local ones.
-        $localTranslations->addBag($providerTranslations->diff($localTranslations));
-
-        foreach ($localTranslations->getCatalogues() as $catalogue) {
-            $this->writer->write($catalogue, $format, $writeOptions);
-        }
-
-        $io->success(\sprintf('New translations from "%s" has been written locally (for "%s" locale(s), and "%s" domain(s)).', parse_url($provider, \PHP_URL_SCHEME), implode(', ', $locales), implode(', ', $domains)));
 
         return 0;
     }

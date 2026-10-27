@@ -74,4 +74,9 @@ class FooController
     public function firewall()
     {
     }
+
+    #[Route('/deprecated', deprecation: ['since' => '2026-10-01', 'sunset' => '2027-06-30', 'link' => 'https://example.com/deprecation'])]
+    public function deprecation()
+    {
+    }
 }

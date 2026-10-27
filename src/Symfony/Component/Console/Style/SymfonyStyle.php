@@ -143,9 +143,10 @@ class SymfonyStyle extends OutputStyle
         $this->block($message, null, null, '<fg=default;bg=default> // </>', false, false, verbosity: $verbosity);
     }
 
-    public function success(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void
+    public function success(string|array $message, int|string $verbosity = self::VERBOSITY_NORMAL): void
     {
-        $this->block($message, 'OK', 'fg=black;bg=green', ' ', true, verbosity: $verbosity);
+        // Extra positional arguments were previously ignored by PHP.
+        $this->block($message, 'OK', 'fg=black;bg=green', ' ', true, verbosity: \is_int($verbosity) ? $verbosity : self::VERBOSITY_NORMAL);
     }
 
     public function error(string|array $message, int $verbosity = self::VERBOSITY_NORMAL): void

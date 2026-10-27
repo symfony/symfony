@@ -373,7 +373,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
             '--delete-missing' => $deleteMissing,
         ]);
 
-        $this->assertSame($expectedMessages, Yaml::parseFile($file));
+        $this->assertEqualsCanonicalizing($expectedMessages, Yaml::parseFile($file));
     }
 
     public static function providePullSynchronizationOptions(): iterable

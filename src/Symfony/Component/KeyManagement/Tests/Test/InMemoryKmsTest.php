@@ -111,4 +111,13 @@ class InMemoryKmsTest extends TestCase
 
         $this->assertSame($expected, $kms->unwrapDataKey($dataKey->wrapped)->use(static fn (string $p): string => $p));
     }
+
+    public function testAWrappedDataKeyIsWhatEncryptWrites()
+    {
+        $kms = new InMemoryKms('vault');
+        $wrapped = $kms->wrapDataKey('app', 'a data key', 'tenant=acme');
+
+        $this->assertSame('encrypted/vault/app/'.bin2hex('tenant=acme').'/a data key', $wrapped->blob);
+        $this->assertSame('a data key', $kms->unwrapDataKey($wrapped, 'tenant=acme')->use(static fn (string $p): string => $p));
+    }
 }

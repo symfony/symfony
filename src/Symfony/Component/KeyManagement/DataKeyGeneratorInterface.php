@@ -57,10 +57,24 @@ interface DataKeyGeneratorInterface
     public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey;
 
     /**
+     * Wraps a DEK the caller already holds, the way {@see generateDataKey()} wraps the one it mints.
+     *
+     * {@see EncrypterInterface::encrypt()} is no substitute: Azure Key Vault encrypts and wraps
+     * through two operations, each under its own algorithm, and {@see unwrapDataKey()} reads the second.
+     *
+     * @param string $aad Bound to the wrapped form, must match on unwrap
+     *
+     * @throws KeyNotFoundException          If `$keyId` is unknown to the backend
+     * @throws UnsupportedOperationException If `$aad` is non-empty and the backend cannot enforce it
+     * @throws RuntimeException              On any other backend failure
+     */
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext;
+
+    /**
      * Unwraps a previously-wrapped DEK and returns it as a {@see DataKey}.
      *
-     * This is the inverse of {@see generateDataKey()}: the recovered plaintext is subject to the
-     * same auto-wipe semantics as a freshly generated one.
+     * This is the inverse of {@see generateDataKey()} and {@see wrapDataKey()}: the recovered
+     * plaintext is subject to the same auto-wipe semantics as a freshly generated one.
      *
      * @param string $aad Must match the AAD supplied at wrap time
      *

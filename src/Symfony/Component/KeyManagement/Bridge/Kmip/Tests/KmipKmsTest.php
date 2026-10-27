@@ -243,6 +243,35 @@ final class KmipKmsTest extends TestCase
         $this->assertSame([self::AES_GCM_CIPHERTEXT_HEADER."\x0c".'context', self::AES_GCM_CIPHERTEXT_HEADER."\x0c".'context'], $client->associatedData);
     }
 
+    public function testWrapDataKeyEncryptsTheKeyUnderTheSameAuthenticatedData()
+    {
+        $client = new class implements RequestClientInterface {
+            public array $requests = [];
+
+            public function request(int $operation, #[\SensitiveParameter] string $payload): array
+            {
+                $fields = [];
+                foreach (Ttlv::items($payload, ProtocolVersion::Version20) as $item) {
+                    $fields[$item['tag']] = $item;
+                }
+                $this->requests[] = [$operation, $fields];
+
+                return [
+                    ProtocolClient::UNIQUE_IDENTIFIER => ['tag' => ProtocolClient::UNIQUE_IDENTIFIER, 'type' => Ttlv::TEXT, 'value' => 'key'],
+                    ProtocolClient::DATA => ['tag' => ProtocolClient::DATA, 'type' => Ttlv::BYTES, 'value' => str_repeat('e', \strlen($fields[ProtocolClient::DATA]['value']))],
+                    ProtocolClient::TAG => ['tag' => ProtocolClient::TAG, 'type' => Ttlv::BYTES, 'value' => str_repeat('t', 16)],
+                ];
+            }
+        };
+
+        $wrapped = (new KmipKms($client))->wrapDataKey('key', str_repeat("\xAA", self::DEFAULT_DATA_KEY_LENGTH), 'context');
+
+        $this->assertStringStartsWith(self::AES_GCM_CIPHERTEXT_HEADER."\x0c", $wrapped->blob);
+        $this->assertSame([ProtocolClient::ENCRYPT], array_column($client->requests, 0));
+        $this->assertSame(str_repeat("\xAA", self::DEFAULT_DATA_KEY_LENGTH), $client->requests[0][1][ProtocolClient::DATA]['value']);
+        $this->assertSame(self::AES_GCM_CIPHERTEXT_HEADER."\x0c".'context', $client->requests[0][1][ProtocolClient::AAD]['value']);
+    }
+
     public function testFactorySetsTheIvLength()
     {
         foreach (['' => 12, '&iv_length=12' => 12, '&iv_length=16' => 16] as $option => $ivLength) {

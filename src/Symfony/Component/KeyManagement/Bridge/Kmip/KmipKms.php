@@ -129,6 +129,11 @@ final class KmipKms implements EncrypterInterface, DecrypterInterface, DataKeyGe
         return new DataKey($plaintext, $this->encrypt($keyId, $plaintext, $aad));
     }
 
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, #[\SensitiveParameter] string $aad = ''): Ciphertext
+    {
+        return $this->encrypt($keyId, $dataKey, $aad);
+    }
+
     public function unwrapDataKey(#[\SensitiveParameter] Ciphertext $wrapped, #[\SensitiveParameter] string $aad = ''): DataKey
     {
         return new DataKey($this->decrypt($wrapped, $aad), $wrapped);

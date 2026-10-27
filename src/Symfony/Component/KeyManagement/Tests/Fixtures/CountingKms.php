@@ -25,6 +25,8 @@ final class CountingKms implements DataKeyGeneratorInterface
 {
     public int $generated = 0;
 
+    public int $wrapped = 0;
+
     public int $unwrapped = 0;
 
     public function __construct(
@@ -37,6 +39,13 @@ final class CountingKms implements DataKeyGeneratorInterface
         ++$this->generated;
 
         return $this->inner->generateDataKey($keyId, $length, $aad);
+    }
+
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
+        ++$this->wrapped;
+
+        return $this->inner->wrapDataKey($keyId, $dataKey, $aad);
     }
 
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey

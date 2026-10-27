@@ -24,9 +24,10 @@ class SwitchableKmsTest extends TestCase
         $this->assertSame('secret', $kms->decrypt($kms->encrypt('app', 'secret', 'aad'), 'aad'));
         $dataKey = $kms->generateDataKey('app', 16);
         $this->assertSame(16, \strlen($kms->unwrapDataKey($dataKey->wrapped)->use(static fn (string $key): string => $key)));
+        $this->assertSame('a data key', $kms->unwrapDataKey($kms->wrapDataKey('other', 'a data key'))->use(static fn (string $key): string => $key));
 
-        $this->assertSame(['encrypt' => 1, 'decrypt' => 1, 'generateDataKey' => 1, 'unwrapDataKey' => 1], $kms->calls);
-        $this->assertSame(['app', 'app'], $kms->keyIds);
+        $this->assertSame(['encrypt' => 1, 'decrypt' => 1, 'generateDataKey' => 1, 'unwrapDataKey' => 2, 'wrapDataKey' => 1], $kms->calls);
+        $this->assertSame(['app', 'app', 'other'], $kms->keyIds);
     }
 
     public function testEveryCallThrowsWhileDown()
@@ -40,6 +41,7 @@ class SwitchableKmsTest extends TestCase
             static fn () => $kms->encrypt('app', 'secret'),
             static fn () => $kms->decrypt($ciphertext),
             static fn () => $kms->generateDataKey('app'),
+            static fn () => $kms->wrapDataKey('app', 'a data key'),
             static fn () => $kms->unwrapDataKey($ciphertext),
         ] as $call) {
             try {
@@ -50,7 +52,7 @@ class SwitchableKmsTest extends TestCase
             }
         }
 
-        $this->assertSame(['encrypt' => 2, 'decrypt' => 1, 'generateDataKey' => 1, 'unwrapDataKey' => 1], $kms->calls, 'a call is counted whether it went through or not.');
+        $this->assertSame(['encrypt' => 2, 'decrypt' => 1, 'generateDataKey' => 1, 'wrapDataKey' => 1, 'unwrapDataKey' => 1], $kms->calls, 'a call is counted whether it went through or not.');
     }
 
     public function testTheDefaultFailureIsAPlainRuntimeException()

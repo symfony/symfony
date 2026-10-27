@@ -61,6 +61,29 @@ final class TraceableDataKeyGenerator extends TraceableKms implements DataKeyGen
         }
     }
 
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
+        $start = $this->enter();
+        $call = [
+            'key' => $keyId,
+            'aad' => $aad,
+            'in' => \strlen($dataKey),
+        ];
+
+        try {
+            $wrapped = $this->generator->wrapDataKey($keyId, $dataKey, $aad);
+            $call['out'] = \strlen($wrapped->blob);
+
+            return $wrapped;
+        } catch (\Throwable $e) {
+            $call['error'] = self::describe($e);
+
+            throw $e;
+        } finally {
+            $this->record(KeyManagementDataCollector::LAYER_KMS, 'wrap_data_key', $start, $call);
+        }
+    }
+
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         $start = $this->enter();

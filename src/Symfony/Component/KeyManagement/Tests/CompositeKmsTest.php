@@ -40,6 +40,7 @@ use Symfony\Component\KeyManagement\Test\InMemoryKms;
 use Symfony\Component\KeyManagement\Test\SwitchableKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\EncryptOnlyKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\RedactedTraceAssertionsTrait;
+use Symfony\Component\KeyManagement\Tests\Fixtures\TwoOperationsKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\UnreachableKms;
 
 class CompositeKmsTest extends TestCase
@@ -397,6 +398,11 @@ class CompositeKmsTest extends TestCase
                 return $this->inner->generateDataKey($keyId, $length, $aad);
             }
 
+            public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+            {
+                return $this->inner->wrapDataKey($keyId, $dataKey, $aad);
+            }
+
             public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
             {
                 return $this->inner->unwrapDataKey($wrapped, $aad);
@@ -645,6 +651,11 @@ class CompositeKmsTest extends TestCase
                 return $this->members->generateDataKey($keyId, $length, $aad);
             }
 
+            public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+            {
+                return $this->members->wrapDataKey($keyId, $dataKey, $aad);
+            }
+
             public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
             {
                 return $this->members->unwrapDataKey($wrapped, $aad);
@@ -689,6 +700,11 @@ class CompositeKmsTest extends TestCase
                 return $this->members->generateDataKey($keyId, $length, $aad);
             }
 
+            public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+            {
+                return $this->members->wrapDataKey($keyId, $dataKey, $aad);
+            }
+
             public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
             {
                 return $this->members->unwrapDataKey($wrapped, $aad);
@@ -725,8 +741,8 @@ class CompositeKmsTest extends TestCase
 
     public function testAWrappingIsReadBackByTheOperationThatWroteIt()
     {
-        $aws = new SwitchableKms(self::twoOperations(new InMemoryKms('aws')));
-        $azure = new SwitchableKms(self::twoOperations(new InMemoryKms('azure')));
+        $aws = new SwitchableKms(new TwoOperationsKms(new InMemoryKms('aws')));
+        $azure = new SwitchableKms(new TwoOperationsKms(new InMemoryKms('azure')));
         $kms = new CompositeKms(self::locator(['aws' => $aws, 'azure' => $azure]), ['aws' => null, 'azure' => 'backup']);
 
         $dataKey = $kms->generateDataKey('app');
@@ -741,6 +757,25 @@ class CompositeKmsTest extends TestCase
         $this->assertSame(['encrypt' => 1, 'decrypt' => 1], $azure->calls, 'the other members read their wrapping back with decrypt(), which is what wrote it.');
     }
 
+    public function testAWrappedDataKeyIsReadBackByTheOperationThatWroteIt()
+    {
+        $aws = new SwitchableKms(new TwoOperationsKms(new InMemoryKms('aws')));
+        $azure = new SwitchableKms(new TwoOperationsKms(new InMemoryKms('azure')));
+        $kms = new CompositeKms(self::locator(['aws' => $aws, 'azure' => $azure]), ['aws' => null, 'azure' => 'backup']);
+
+        $wrapped = $kms->wrapDataKey('app', 'a data key', 'aad');
+
+        $this->assertSame('app', $wrapped->keyId);
+        $this->assertSame('a data key', $kms->unwrapDataKey($wrapped, 'aad')->use(static fn (string $key): string => $key));
+        $this->assertSame(['wrapDataKey' => 1, 'unwrapDataKey' => 1], $aws->calls, 'the first member wraps the key and reads it back the same way.');
+
+        $aws->down = true;
+
+        $this->assertSame('a data key', $kms->unwrapDataKey($wrapped, 'aad')->use(static fn (string $key): string => $key));
+        $this->assertSame(['encrypt' => 1, 'decrypt' => 1], $azure->calls, 'the other members encrypt it, as they do a minted key.');
+        $this->assertSame([['app'], ['backup']], [$aws->keyIds, $azure->keyIds]);
+    }
+
     public function testTheDataKeyReadThroughAnyMemberRefersToTheCompositeCiphertext()
     {
         $kms = $this->kms();
@@ -751,44 +786,6 @@ class CompositeKmsTest extends TestCase
         $this->aws->down = true;
 
         $this->assertSame($dataKey->wrapped, $kms->unwrapDataKey($dataKey->wrapped)->wrapped);
-    }
-
-    private static function twoOperations(InMemoryKms $inner): DataKeyGeneratorInterface&DecrypterInterface&EncrypterInterface
-    {
-        return new class($inner) implements DataKeyGeneratorInterface, DecrypterInterface, EncrypterInterface {
-            public function __construct(private readonly InMemoryKms $inner)
-            {
-            }
-
-            public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
-            {
-                return new Ciphertext('encrypt:'.$this->inner->encrypt($keyId, $plaintext, $aad)->blob, $keyId);
-            }
-
-            public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
-            {
-                return $this->inner->decrypt($this->strip('encrypt:', $ciphertext), $aad);
-            }
-
-            public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
-            {
-                return $this->inner->generateDataKey($keyId, $length, $aad)->use(fn (#[\SensitiveParameter] string $plaintext): DataKey => new DataKey($plaintext, new Ciphertext('wrap:'.$this->inner->encrypt($keyId, $plaintext, $aad)->blob, $keyId)));
-            }
-
-            public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
-            {
-                return $this->inner->unwrapDataKey($this->strip('wrap:', $wrapped), $aad);
-            }
-
-            private function strip(string $operation, Ciphertext $ciphertext): Ciphertext
-            {
-                if (!str_starts_with($ciphertext->blob, $operation)) {
-                    throw new DecryptionFailedException();
-                }
-
-                return new Ciphertext(substr($ciphertext->blob, \strlen($operation)), $ciphertext->keyId);
-            }
-        };
     }
 
     private function kms(): CompositeKms
@@ -820,6 +817,11 @@ class CompositeKmsTest extends TestCase
             public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
             {
                 return $this->minted = new DataKey($this->known, $this->inner->encrypt($keyId, $this->known, $aad));
+            }
+
+            public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+            {
+                return $this->inner->wrapDataKey($keyId, $dataKey, $aad);
             }
 
             public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey

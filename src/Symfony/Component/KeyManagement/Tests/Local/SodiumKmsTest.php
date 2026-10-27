@@ -200,6 +200,16 @@ class SodiumKmsTest extends TestCase
         $this->assertSame($captured, $recovered->use(static fn (string $p): string => $p));
     }
 
+    public function testAWrappedDataKeyIsUnwrappedUnderTheSameAad()
+    {
+        $wrapped = $this->kms->wrapDataKey('app', str_repeat("\xAA", 32), 'tenant=acme');
+
+        $this->assertSame(str_repeat("\xAA", 32), $this->kms->unwrapDataKey($wrapped, 'tenant=acme')->use(static fn (string $p): string => $p));
+
+        $this->expectException(DecryptionFailedException::class);
+        $this->kms->unwrapDataKey($wrapped, 'tenant=globex');
+    }
+
     public function testUnwrapDataKeyOnTamperedCiphertextFails()
     {
         $wrapped = $this->kms->generateDataKey('app', 32)->wrapped;

@@ -105,6 +105,11 @@ final class SodiumKms implements DecrypterInterface, EncrypterInterface, DataKey
         return new DataKey($plaintext, $this->encrypt($keyId, $plaintext, $aad));
     }
 
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
+        return $this->encrypt($keyId, $dataKey, $aad);
+    }
+
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         return new DataKey($this->decrypt($wrapped, $aad), $wrapped);

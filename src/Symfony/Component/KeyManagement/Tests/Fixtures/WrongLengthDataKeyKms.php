@@ -41,6 +41,11 @@ final class WrongLengthDataKeyKms implements DataKeyGeneratorInterface
         return $this->kms->generateDataKey($keyId, $this->length, $aad);
     }
 
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
+        return $this->kms->wrapDataKey($keyId, $dataKey, $aad);
+    }
+
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         $key = $this->kms->unwrapDataKey($wrapped, $aad)->use(static fn (string $key): string => $key);

@@ -349,12 +349,13 @@ class TransitKmsTest extends TestCase
         $kms->encrypt('app', 'hello');
         $kms->decrypt(new Ciphertext('vault:v1:wrapped', 'app'));
         $kms->generateDataKey('app', 32);
+        $kms->wrapDataKey('app', str_repeat("\xAA", 32));
         $kms->unwrapDataKey(new Ciphertext('vault:v1:wrapped', 'app'));
 
-        $this->assertCount(4, $contexts);
+        $this->assertCount(5, $contexts);
         $this->assertIsString($contexts[0]);
         $this->assertNotSame('', $contexts[0]);
-        $this->assertSame([$contexts[0]], array_unique($contexts), 'a data key wrapped on one path is rewrapped on another, so all four must bind the same.');
+        $this->assertSame([$contexts[0]], array_unique($contexts), 'a data key wrapped on one path is rewrapped on another, so all five must bind the same.');
     }
 
     public function testTheDataKeyPathBindsAContextTheWrapAndTheUnwrapShare()
@@ -463,6 +464,22 @@ class TransitKmsTest extends TestCase
         (new TransitKms($client, new StaticTokenProvider('t')))->generateDataKey('app', $byteLength);
 
         $this->assertSame($expectedBits, $captured['bits']);
+    }
+
+    public function testWrapDataKeyRoutesThroughEncrypt()
+    {
+        $captured = null;
+        $client = new MockHttpClient(static function ($m, $u, $o) use (&$captured) {
+            $captured = [$u, json_decode($o['body'], true)];
+
+            return new MockResponse(json_encode(['data' => ['ciphertext' => 'vault:v1:wrapped']]));
+        }, 'https://vault.local/v1/');
+
+        $wrapped = (new TransitKms($client, new StaticTokenProvider('t')))->wrapDataKey('app', str_repeat("\xCC", 32));
+
+        $this->assertSame(['https://vault.local/v1/transit/encrypt/app', ['plaintext' => base64_encode(str_repeat("\xCC", 32)), 'context' => base64_encode("symfony/key-management/hashicorp-vault/transit/v1\0")]], $captured);
+        $this->assertSame('vault:v1:wrapped', $wrapped->blob);
+        $this->assertSame('app', $wrapped->keyId);
     }
 
     public function testUnwrapDataKeyRoutesThroughDecrypt()

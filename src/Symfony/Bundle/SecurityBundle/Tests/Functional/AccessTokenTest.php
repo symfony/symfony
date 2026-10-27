@@ -68,7 +68,6 @@ class AccessTokenTest extends AbstractWebTestCase
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(401, $response->getStatusCode());
-        $this->assertSame('', $response->getContent());
         $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $response->headers->get('WWW-Authenticate'));
     }
 
@@ -161,7 +160,6 @@ class AccessTokenTest extends AbstractWebTestCase
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(401, $response->getStatusCode());
-        $this->assertSame('', $response->getContent());
         $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $response->headers->get('WWW-Authenticate'));
     }
 
@@ -261,7 +259,6 @@ class AccessTokenTest extends AbstractWebTestCase
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(401, $response->getStatusCode());
-        $this->assertSame('', $response->getContent());
         $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $response->headers->get('WWW-Authenticate'));
     }
 

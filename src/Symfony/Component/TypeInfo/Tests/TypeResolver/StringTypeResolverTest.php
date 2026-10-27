@@ -500,16 +500,39 @@ class StringTypeResolverTest extends TestCase
         yield ['int<0, UndefinedClass::MAX>'];
     }
 
+    #[DataProvider('disabledRefinementDataProvider')]
     #[Group('legacy')]
     #[IgnoreDeprecations]
-    public function testDoNotResolveRefinementsWhenDisabled()
+    public function testDoNotResolveRefinementsWhenDisabled(Type $expectedType, string $string)
     {
         $resolver = new StringTypeResolver(null, null, [], false);
 
-        $this->assertEquals(Type::string(), $resolver->resolve("'draft'"));
-        $this->assertEquals(Type::int(), $resolver->resolve('positive-int'));
-        $this->assertEquals(Type::int(), $resolver->resolve('non-zero-int'));
-        $this->assertEquals(Type::int(), $resolver->resolve('int<0, 10>'));
+        $this->assertEquals($expectedType, $resolver->resolve($string));
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: string}>
+     */
+    public static function disabledRefinementDataProvider(): iterable
+    {
+        yield [Type::string(), "'draft'"];
+        yield [Type::union(Type::string(), Type::string()), "'draft'|'live'"];
+        yield [Type::float(), '1.5'];
+        yield [Type::int(), '-1'];
+        yield [Type::int(), 'positive-int'];
+        yield [Type::int(), 'non-zero-int'];
+        yield [Type::nullable(Type::int()), '?non-zero-int'];
+        yield [Type::int(), 'int<0, 10>'];
+        yield [Type::int(), 'int<0, PHP_INT_MAX>'];
+        yield [Type::arrayShape(['a b' => Type::int()]), "array{'a b': 1}"];
+        yield [Type::array(Type::string(), Type::union(Type::string(), Type::string())), "array<'en'|'de', string>"];
+        yield [Type::list(Type::int()), 'list<positive-int>'];
+
+        // rejected when refinements are resolved
+        yield [Type::int(), 'int<5, 1>'];
+        yield [Type::int(), "int<'a', 5>"];
+        yield [Type::float(), '1e400'];
+        yield [Type::int(), '09'];
     }
 
     #[Group('legacy')]

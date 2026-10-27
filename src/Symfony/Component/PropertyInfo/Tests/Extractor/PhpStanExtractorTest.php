@@ -527,6 +527,16 @@ class PhpStanExtractorTest extends TestCase
         $this->assertEquals(Type::int(), (new PhpStanExtractor(null, null, null, true, false))->getType(IntRangeDummy::class, 'a'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testDoNotResolveLiteralsWhenDisabled()
+    {
+        $extractor = new PhpStanExtractor(null, null, null, true, false);
+
+        $this->assertEquals(Type::union(Type::string(), Type::string()), $extractor->getType(LiteralDummy::class, 'status'));
+        $this->assertEquals(Type::arrayShape(['quoted key' => Type::string()]), $extractor->getType(LiteralDummy::class, 'shape'));
+    }
+
     #[DataProvider('php80TypesProvider')]
     public function testExtractPhp80Type(string $class, string $property, ?Type $type)
     {

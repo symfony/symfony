@@ -108,6 +108,20 @@ class ProtectedResourceMetadataControllerTest extends TestCase
         ], json_decode($response->getContent(), true));
     }
 
+    public function testAResourcePathIsResolvedAgainstTheOriginTheDocumentIsServedFrom()
+    {
+        $controller = new ProtectedResourceMetadataController([
+            'mcp' => ['resource' => '/mcp', 'authorization_servers' => ['https://accounts.example.com']],
+        ]);
+
+        $response = $controller(Request::create('https://api.example.com:8443/.well-known/oauth-protected-resource/mcp'), 'mcp');
+
+        $this->assertSame([
+            'resource' => 'https://api.example.com:8443/mcp',
+            'authorization_servers' => ['https://accounts.example.com'],
+        ], json_decode($response->getContent(), true));
+    }
+
     public function testThrowsNotFoundForAnUnknownFirewall()
     {
         $controller = new ProtectedResourceMetadataController([]);

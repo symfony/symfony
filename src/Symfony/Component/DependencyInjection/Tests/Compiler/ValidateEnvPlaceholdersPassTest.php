@@ -387,6 +387,23 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame('safe', $ext->getConfig()['mode']);
     }
 
+    public function testInlinedEnvVarsInsideAStringAreValidatedByTheirValue()
+    {
+        $_ENV['INLINED_HOST'] = 'localhost';
+
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension(new ConfigurationWithInlinedEnvVars()));
+        $container->prependExtensionConfig('env_extension', ['url' => 'http://%env(INLINED_HOST)%/api']);
+
+        try {
+            $this->doProcess($container);
+        } finally {
+            unset($_ENV['INLINED_HOST']);
+        }
+
+        $this->assertSame('http://localhost/api', $ext->getConfig()['url']);
+    }
+
     public function testInlinedEnvVarsAreRejectedByTheirValue()
     {
         $_ENV['INLINED_MODE'] = 'fast';
@@ -597,6 +614,10 @@ class ConfigurationWithInlinedEnvVars implements ConfigurationInterface
                     ->attribute('resolves_at_compile_time', true)
                     ->values(['fast', 'safe'])
                     ->validate()->ifTrue(static fn ($v) => 'fast' === $v)->thenInvalid('Not that fast.')->end()
+                ->end()
+                ->scalarNode('url')
+                    ->attribute('resolves_at_compile_time', true)
+                    ->validate()->ifTrue(static fn ($v) => !str_starts_with($v, 'http://localhost/'))->thenInvalid('Not a local URL.')->end()
                 ->end()
                 ->scalarNode('dynamic')->end()
                 ->arrayNode('locales')

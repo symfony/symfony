@@ -111,18 +111,25 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                 ->children()
                     ->scalarNode('resource')
                         ->defaultNull()
-                        ->info('The resource identifier of this firewall: an HTTPS URL, without a fragment (e.g. "https://api.example.com" or "https://example.com/api"). Its path component is inserted after the well-known path, as RFC 9728, Section 3.1 prescribes, so that one host can serve the metadata of several protected resources. Defaults to the origin the document is served from, which is what a firewall covering a whole application wants.')
+                        ->resolvesAtCompileTime()
+                        ->info('The resource identifier of this firewall: an HTTPS URL without a fragment (e.g. "https://example.com/api"), read when the container is compiled, or a path (e.g. "/api") resolved against the origin of the request. Its path is inserted after the well-known path, as RFC 9728, Section 3.1 prescribes. Defaults to the origin of the request, which is what a firewall covering a whole application wants.')
                         ->validate()
                             ->ifTrue(static function ($v): bool {
                                 if (false === $parts = parse_url((string) $v)) {
                                     return true;
                                 }
 
+                                // a path is resolved against the origin the document is served from, as the
+                                // default identifier is, so that one value fits every host of the application
+                                if (!isset($parts['scheme']) && !isset($parts['host']) && str_starts_with((string) $v, '/')) {
+                                    return isset($parts['fragment']);
+                                }
+
                                 // RFC 9728, Section 3.1 derives the well-known path from the path
                                 // component of this identifier, and the route carrying that path is
                                 // declared at build time, so a value parsing as no URL at all leaves
-                                // the document and the route disagreeing; an environment variable
-                                // interpolated into the URL keeps the path readable and is accepted
+                                // the document and the route disagreeing; its env vars are resolved
+                                // before this check, which is why the node resolves at compile time
                                 if (!isset($parts['scheme'], $parts['host'])) {
                                     return true;
                                 }
@@ -131,7 +138,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                                 // relaxes for the cases that need one, so it is accepted here
                                 return isset($parts['fragment']) || !OidcDiscovery::isSecureUrl((string) $v);
                             })
-                            ->thenInvalid('The protected resource "resource" identifier must be an HTTPS URL without a fragment (got %s), as RFC 9728, Section 1.2 requires. A loopback host (localhost, 127.0.0.1, ::1, *.localhost) is accepted over HTTP for local development. It is read when the route is declared, so an environment variable holding the whole value leaves the path unknown: interpolate it into the URL instead, as in "https://%%env(API_HOST)%%/v1".')
+                            ->thenInvalid('The protected resource "resource" identifier must be an HTTPS URL without a fragment, as RFC 9728, Section 1.2 requires, or a path (got %s). A loopback host (localhost, 127.0.0.1, ::1, *.localhost) is accepted over HTTP for local development. The value is read when the container is compiled, so the container must be rebuilt when its env vars change; give a path (e.g. "/v1") to resolve it against the origin of the request instead.')
                         ->end()
                     ->end()
                     ->arrayNode('authorization_servers', 'authorization_server')
@@ -325,17 +332,13 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
     private function createResourceMetadata(ContainerBuilder $container, string $firewallName, array $config, array $extractors, array $dpop, array $tokenHandler): string
     {
         $parts = null === $config['resource'] ? [] : parse_url($config['resource']);
-        $origin = isset($parts['scheme'], $parts['host']) ? $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '') : null;
 
-        if (null === $origin) {
-            // the identifier pins no origin, so the URL can only be resolved against the request
-            $path = $uri = self::WELL_KNOWN_PATH;
-        } else {
-            // RFC 9728, Section 3.1: the well-known path is inserted between the host component
-            // and the path and query components, the terminating slash of the host removed first
-            $path = self::WELL_KNOWN_PATH.rtrim($parts['path'] ?? '', '/');
-            $uri = $origin.$path.(isset($parts['query']) ? '?'.$parts['query'] : '');
-        }
+        // RFC 9728, Section 3.1: the well-known path is inserted between the host component
+        // and the path and query components, the terminating slash of the host removed first;
+        // an identifier that pins no origin leaves the URL to be resolved against the request
+        $origin = isset($parts['host']) ? $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '') : '';
+        $path = self::WELL_KNOWN_PATH.rtrim($parts['path'] ?? '', '/');
+        $uri = $origin.$path.(isset($parts['query']) ? '?'.$parts['query'] : '');
 
         $paths = $container->hasParameter('security.access_token.resource_metadata_paths') ? (array) $container->getParameter('security.access_token.resource_metadata_paths') : [];
         $paths[$firewallName] = $path;

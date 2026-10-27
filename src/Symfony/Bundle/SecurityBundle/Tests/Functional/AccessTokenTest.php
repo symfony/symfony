@@ -22,6 +22,7 @@ use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\Serializer\CompactSerializer as JwsCompactSerializer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AccessTokenBundle\Security\Handler\IntrospectionResponseFactory;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -112,6 +113,51 @@ class AccessTokenTest extends AbstractWebTestCase
         $client->request('GET', '/.well-known/oauth-protected-resource');
 
         $this->assertSame(404, $client->getResponse()->getStatusCode());
+    }
+
+    #[TestWith(['config_resource_metadata_env.yml', 'RESOURCE_URL', 'http://localhost/foo'])]
+    #[TestWith(['config_resource_metadata_env_host.yml', 'RESOURCE_HOST', 'localhost'])]
+    public function testTheEnvVarsOfTheResourceAreResolvedWhenTheContainerIsCompiled(string $rootConfig, string $name, string $value)
+    {
+        $_ENV[$name] = $value;
+
+        try {
+            // in debug mode, the routes of the other configurations of this test case are not reused
+            $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => $rootConfig, 'debug' => true]);
+        } finally {
+            unset($_ENV[$name]);
+        }
+
+        $client->request('GET', '/foo');
+
+        $this->assertSame('Bearer resource_metadata="http://localhost/.well-known/oauth-protected-resource/foo"', $client->getResponse()->headers->get('WWW-Authenticate'));
+
+        $client->request('GET', '/.well-known/oauth-protected-resource/foo');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame('http://localhost/foo', json_decode($client->getResponse()->getContent(), true)['resource']);
+    }
+
+    #[TestWith(['http://localhost'])]
+    #[TestWith(['https://api.example.com'])]
+    public function testAResourcePathIsResolvedAgainstTheOriginOfTheRequest(string $origin)
+    {
+        // in debug mode, the routes of the other configurations of this test case are not reused
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_resource_metadata_path.yml', 'debug' => true]);
+
+        $client->request('GET', $origin.'/foo');
+
+        $this->assertSame(401, $client->getResponse()->getStatusCode());
+        $this->assertSame('Bearer resource_metadata="'.$origin.'/.well-known/oauth-protected-resource/foo"', $client->getResponse()->headers->get('WWW-Authenticate'));
+
+        $client->request('GET', $origin.'/.well-known/oauth-protected-resource/foo');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame([
+            'resource' => $origin.'/foo',
+            'authorization_servers' => ['https://accounts.example.com'],
+            'bearer_methods_supported' => ['header'],
+        ], json_decode($client->getResponse()->getContent(), true));
     }
 
     public function testAccessControlGrantedOnTheScopesTheTokenCarries()

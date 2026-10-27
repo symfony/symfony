@@ -58,7 +58,7 @@ class RateLimiterTest extends AbstractWebTestCase
         self::assertSame(['request.isMethod("POST")'], array_keys(require $kernel->getBuildDir().'/expression_language/controller.expression_language.php'));
     }
 
-    public function testInlineLimiter()
+    public function testPolicy()
     {
         $client = self::createClient(['test_case' => 'RateLimiter']);
 

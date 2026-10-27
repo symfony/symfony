@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\Attribute;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
+use Symfony\Component\RateLimiter\Policy\SlidingWindowPolicy;
 
 class RateLimitTest extends TestCase
 {
@@ -25,6 +26,13 @@ class RateLimitTest extends TestCase
         $this->assertSame(1, $rl->tokens);
         $this->assertSame([], $rl->methods);
         $this->assertFalse($rl->exposeHeaders);
+    }
+
+    public function testPolicy()
+    {
+        $policy = new SlidingWindowPolicy(3, '1 hour');
+
+        $this->assertSame($policy, (new RateLimit($policy))->limiter);
     }
 
     public function testTokensMustBePositive()

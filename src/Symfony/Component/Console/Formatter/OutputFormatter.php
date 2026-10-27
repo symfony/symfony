@@ -200,7 +200,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
      */
     private function createStyleFromString(string $string): ?OutputFormatterStyleInterface
     {
-        if (isset($this->styles[$string])) {
+        if (isset($this->styles[$string = strtolower($string)])) {
             return $this->styles[$string];
         }
 

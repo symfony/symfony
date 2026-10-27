@@ -176,6 +176,12 @@
                     </div>
                 </td>
             </tr>
+            {% if dispatchCall.profiler_token is defined and dispatchCall.profiler_token %}
+                <tr>
+                    <th scope="row" class="font-normal">Worker profiles <span class="block text-muted">with <code>--profile</code></span></th>
+                    <td><a href="{{ path('_profiler_search_results', {token: 'empty', limit: 10, type: 'worker_message', ip: dispatchCall.profiler_token, url: dispatchCall.message_class|default(null)}) }}">Search</a></td>
+                </tr>
+            {% endif %}
             {% if showBus %}
                 <tr>
                     <th scope="row" class="font-normal">Bus</th>

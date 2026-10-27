@@ -4,6 +4,8 @@
             <label for="ip">
                 {% if 'command' == profile_type %}
                     Application
+                {% elseif 'worker_message' == profile_type %}
+                    Sent from
                 {% else %}
                     IP
                 {% endif %}
@@ -16,10 +18,15 @@
                 <label for="method">
                     {% if 'command' == profile_type %}
                         Mode
+                    {% elseif 'worker_message' == profile_type %}
+                        Transport
                     {% else %}
                         Method
                     {% endif %}
                 </label>
+                {% if 'worker_message' == profile_type %}
+                <input type="text" name="method" id="method" value="{{ method }}">
+                {% else %}
                 <select name="method" id="method">
                     <option value="">Any</option>
                     {% if 'command' == profile_type %}
@@ -31,6 +38,7 @@
                         <option {{ m == method ? 'selected="selected"' }}>{{ m }}</option>
                     {% endfor %}
                 </select>
+                {% endif %}
             </div>
 
             <div class="form-group">
@@ -38,6 +46,9 @@
                     {% if 'command' == profile_type %}
                         Exit code
                         {% set min_and_max = 'min=%d max=%d'|format(0, 255) %}
+                    {% elseif 'worker_message' == profile_type %}
+                        Result
+                        {% set min_and_max = 'min=%d max=%d'|format(0, 3) %}
                     {% else %}
                         Status
                         {% set min_and_max = 'min=%d max=%d'|format(100, 599) %}
@@ -51,6 +62,8 @@
             <label for="url">
                 {% if 'command' == profile_type %}
                     Command
+                {% elseif 'worker_message' == profile_type %}
+                    Message
                 {% else %}
                     URL
                 {% endif %}

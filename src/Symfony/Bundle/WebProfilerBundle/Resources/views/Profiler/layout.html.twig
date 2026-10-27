@@ -12,6 +12,7 @@
                 {{ include('@WebProfiler/Profiler/_%s_summary.html.twig'|format(profile_type), {
                     profile: profile,
                     command_collector: profile.collectors.command|default(false),
+                    worker_message_collector: profile.collectors.worker_message|default(false),
                     request_collector: request_collector,
                     request: request,
                     token: token,
@@ -38,9 +39,11 @@
                                 <nav aria-label="Profiler menu">
                                 <ul id="menu-profiler">
                                     {% if 'request' is same as(profile_type) %}
-                                        {% set excludes = ['command'] %}
+                                        {% set excludes = ['command', 'worker_message'] %}
                                     {% elseif 'command' is same as(profile_type) %}
-                                        {% set excludes = ['request', 'router'] %}
+                                        {% set excludes = ['request', 'router', 'worker_message'] %}
+                                    {% elseif 'worker_message' is same as(profile_type) %}
+                                        {% set excludes = ['request', 'router', 'command'] %}
                                     {% endif %}
 
                                     {% for name, template in templates|filter((t, n) => n not in excludes) %}

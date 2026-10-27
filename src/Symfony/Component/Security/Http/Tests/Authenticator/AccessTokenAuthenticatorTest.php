@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenExtractorInterface;
@@ -27,6 +28,8 @@ use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
 use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Translator;
 
 class AccessTokenAuthenticatorTest extends TestCase
 {
@@ -328,6 +331,38 @@ class AccessTokenAuthenticatorTest extends TestCase
         $response = $authenticator->start(Request::create('https://api.example.com/foo'));
 
         $this->assertSame('Bearer', $response->headers->get('WWW-Authenticate'));
+    }
+
+    public function testTheFailureResponseTellsWhyInItsBody()
+    {
+        $authenticator = new AccessTokenAuthenticator($this->createStub(AccessTokenHandlerInterface::class), new HeaderAccessTokenExtractor());
+
+        $response = $authenticator->onAuthenticationFailure(Request::create('/test'), new BadCredentialsException());
+
+        $this->assertSame('Invalid credentials.', $response->getContent());
+        $this->assertSame('text/plain', $response->headers->get('Content-Type'));
+    }
+
+    public function testTheResponseOfARequestCarryingNoTokenTellsWhyInItsBody()
+    {
+        $authenticator = new AccessTokenAuthenticator($this->createStub(AccessTokenHandlerInterface::class), new HeaderAccessTokenExtractor());
+
+        $response = $authenticator->start(Request::create('/test'), new InsufficientAuthenticationException());
+
+        $this->assertSame('Not privileged to request the resource.', $response->getContent());
+        $this->assertSame('text/plain', $response->headers->get('Content-Type'));
+    }
+
+    public function testTheBodyOfTheResponseOfARequestCarryingNoTokenIsTranslated()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['Not privileged to request the resource.' => 'foo'], 'en', 'security');
+
+        $authenticator = new AccessTokenAuthenticator($this->createStub(AccessTokenHandlerInterface::class), new HeaderAccessTokenExtractor());
+        $authenticator->setTranslator($translator);
+
+        $this->assertSame('foo', $authenticator->start(Request::create('/test'), new InsufficientAuthenticationException())->getContent());
     }
 
     #[DataProvider('provideScopeClaims')]

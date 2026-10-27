@@ -28,6 +28,14 @@ class InsufficientScopeAccessDeniedHandlerTest extends TestCase
         $this->assertSame('Bearer realm="My API",error="insufficient_scope",error_description="The request requires higher privileges than provided by the access token.",scope="profile:read"', $response->headers->get('WWW-Authenticate'));
     }
 
+    public function testTheBodyIsTheErrorDescription()
+    {
+        $response = (new InsufficientScopeAccessDeniedHandler())->handle(Request::create('/test'), $this->createException(['OAUTH2_SCOPE(profile:read)']));
+
+        $this->assertSame('The request requires higher privileges than provided by the access token.', $response->getContent());
+        $this->assertSame('text/plain', $response->headers->get('Content-Type'));
+    }
+
     public function testTheRealmIsOptional()
     {
         $response = (new InsufficientScopeAccessDeniedHandler())->handle(Request::create('/test'), $this->createException(['OAUTH2_SCOPE(profile:read)']));

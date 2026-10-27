@@ -61,9 +61,12 @@ class InsufficientScopeAccessDeniedHandler implements AccessDeniedHandlerInterfa
         }
 
         return new Response(
-            null,
+            self::ERROR_DESCRIPTION,
             Response::HTTP_FORBIDDEN,
-            ['WWW-Authenticate' => $this->getAuthenticateHeader($request, $scopes)]
+            [
+                'Content-Type' => 'text/plain',
+                'WWW-Authenticate' => $this->getAuthenticateHeader($request, $scopes),
+            ]
         );
     }
 

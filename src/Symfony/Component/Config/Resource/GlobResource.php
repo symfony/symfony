@@ -108,13 +108,14 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
             }
         }
 
-        $this->prefix = array_shift($data);
-        $this->pattern = array_shift($data);
-        $this->recursive = array_shift($data);
-        $this->hash = array_shift($data);
-        $this->forExclusion = array_shift($data);
-        $this->excludedPrefixes = array_shift($data);
-        $this->directories = array_shift($data);
+        $data = array_values($data);
+        $this->prefix = $data[0] ?? null;
+        $this->pattern = $data[1] ?? null;
+        $this->recursive = $data[2] ?? null;
+        $this->hash = $data[3] ?? null;
+        $this->forExclusion = $data[4] ?? null;
+        $this->excludedPrefixes = $data[5] ?? null;
+        $this->directories = $data[6] ?? null;
         $this->globBrace = \defined('GLOB_BRACE') ? \GLOB_BRACE : 0;
     }
 

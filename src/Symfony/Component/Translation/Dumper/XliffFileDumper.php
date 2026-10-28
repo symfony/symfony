@@ -42,8 +42,8 @@ class XliffFileDumper extends FileDumper
         if ('1.2' === $xliffVersion) {
             return $this->dumpXliff1($defaultLocale, $messages, $domain, $options);
         }
-        if ('2.0' === $xliffVersion) {
-            return $this->dumpXliff2($defaultLocale, $messages, $domain);
+        if (\in_array($xliffVersion, ['2.0', '2.1', '2.2'], true)) {
+            return $this->dumpXliff2($defaultLocale, $messages, $domain, $xliffVersion);
         }
 
         throw new InvalidArgumentException(\sprintf('No support implemented for dumping XLIFF version "%s".', $xliffVersion));
@@ -140,14 +140,15 @@ class XliffFileDumper extends FileDumper
         return $dom->saveXML();
     }
 
-    private function dumpXliff2(string $defaultLocale, MessageCatalogue $messages, ?string $domain): string
+    private function dumpXliff2(string $defaultLocale, MessageCatalogue $messages, ?string $domain, string $xliffVersion): string
     {
         $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
 
         $xliff = $dom->appendChild($dom->createElement('xliff'));
-        $xliff->setAttribute('xmlns', 'urn:oasis:names:tc:xliff:document:2.0');
-        $xliff->setAttribute('version', '2.0');
+        $namespaceVersion = '2.2' === $xliffVersion ? '2.2' : '2.0';
+        $xliff->setAttribute('xmlns', 'urn:oasis:names:tc:xliff:document:'.$namespaceVersion);
+        $xliff->setAttribute('version', $xliffVersion);
         $xliff->setAttribute('srcLang', str_replace('_', '-', $defaultLocale));
         $xliff->setAttribute('trgLang', str_replace('_', '-', $messages->getLocale()));
 

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Limit read-ahead for active responses in `CurlHttpClient`, `AmpHttpClient` and `NativeHttpClient`
+ * Allow `CURLOPT_HTTPAUTH` in `extra.curl` for authentication methods without a dedicated HttpClient option
  * Default the `http_client.recorder.enabled` option to `true` when `framework.test` is enabled
  * Add `HttpClientBundle`, which provides the `http_client` configuration and the services previously provided by `FrameworkBundle` under `framework.http_client`
  * Add the `max_connect_duration` option to the `http_client` configuration

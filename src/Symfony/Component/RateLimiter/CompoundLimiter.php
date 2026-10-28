@@ -75,6 +75,7 @@ final class CompoundLimiter implements LimiterInterface
     {
         $minimalRateLimit = null;
         $rateLimits = $rateLimit instanceof CompoundRateLimit ? $rateLimit->getRateLimits() : null;
+        $refunded = false;
 
         foreach ($this->limiters as $index => $limiter) {
             if (null !== $rateLimits && !isset($rateLimits[$index])) {
@@ -87,9 +88,17 @@ final class CompoundLimiter implements LimiterInterface
                 $subRateLimit = $limiter->refund($subRateLimit);
             }
 
+            if ($subRateLimit->isRefunded()) {
+                $refunded = true;
+            }
+
             if (null === $minimalRateLimit || $subRateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
                 $minimalRateLimit = $subRateLimit;
             }
+        }
+
+        if ($refunded) {
+            $rateLimit->markRefunded();
         }
 
         return $minimalRateLimit ?? $rateLimit;

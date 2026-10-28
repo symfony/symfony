@@ -124,7 +124,7 @@ final class SlidingWindowLimiter implements LimiterInterface
      */
     public function refund(RateLimit $rateLimit): RateLimit
     {
-        if (!$rateLimit->isAccepted() || 0 >= $rateLimit->getConsumedTokens() || null === $rateLimit->getHitTime() || $this->id !== $rateLimit->getLimiterId()) {
+        if (!$rateLimit->isAccepted() || 0 >= $rateLimit->getConsumedTokens() || null === $rateLimit->getHitTime() || $this->id !== $rateLimit->getLimiterId() || $rateLimit->isRefunded()) {
             return $rateLimit;
         }
 

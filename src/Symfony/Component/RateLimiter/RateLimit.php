@@ -27,6 +27,7 @@ class RateLimit
         private int $consumedTokens = 0,
         private ?float $hitTime = null,
         private ?string $limiterId = null,
+        private bool $refunded = false,
     ) {
     }
 
@@ -100,13 +101,23 @@ class RateLimit
     }
 
     /**
+     * Returns whether this rate limit has already been refunded.
+     *
+     * @internal
+     */
+    public function isRefunded(): bool
+    {
+        return $this->refunded;
+    }
+
+    /**
      * Marks this rate limit as already refunded, so a second refund has no effect.
      *
      * @internal
      */
     public function markRefunded(): void
     {
-        $this->consumedTokens = 0;
+        $this->refunded = true;
     }
 
     public function wait(): void

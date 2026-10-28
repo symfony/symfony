@@ -7,6 +7,392 @@ in 7.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v7.4.0...v7.4.1
 
+## 7.4.22 (2026-10-28)
+
+### AssetMapper
+
+ * bug #67240 [AssetMapper] Fix `importmap:update` and `importmap:remove` deleting vendor files when they fail (nicolas-grekas)
+
+### BrowserKit
+
+ * bug #67235 [BrowserKit] Send a Content-Length header when uploading files (nicolas-grekas)
+ * bug #67104 [BrowserKit] Fix HttpBrowser ignoring UploadedFile instances (nicolas-grekas)
+ * bug #67102 [BrowserKit] Fix URI resolution for mixed-case schemes and base URIs without path (nicolas-grekas)
+
+### Cache
+
+ * bug #67574 [Cache] Fix items losing their tags when saved after a concurrent invalidation (nicolas-grekas)
+ * bug #67412 [Cache] Fix Relay Cluster node selection when clearing pools (nicolas-grekas)
+ * bug #67036 [Cache] Detect ElastiCache Serverless eviction policy (nicolas-grekas)
+ * bug #67027 [Cache] Fix overriding the adapter of a cache pool that has a provider (nicolas-grekas)
+ * bug #66991 [Cache] Fix RedisTagAwareAdapter returning invalidated items from Relay's memory (nicolas-grekas)
+ * bug #66978 [Cache] Fix PhpArrayAdapter::warmUp() when another process creates the cache directory (nicolas-grekas)
+
+### Config
+
+ * bug #67242 [Config] Quote the default values of arrays in the YAML reference (nicolas-grekas)
+
+### Console
+
+ * bug #67575 [Console] Fix raw token stripping when an option value matches the command (ahbaqdadi)
+ * bug #67576 [Console] Don't format escaped tags again when sections measure their lines (nicolas-grekas)
+ * bug #67542 [Console] Fix style names with uppercase letters not being applied (wfatih)
+ * bug #67533 [Console] Fix `Table` header cells that span rows and escaped tags in `TableCell` (nicolas-grekas)
+ * bug #67523 [Console] Fix the alignment of wrapped `Table` cells and newlines around style tags (nicolas-grekas)
+ * bug #67522 [Console] Fix styles that leak out of `Table` cells (nicolas-grekas)
+ * bug #67373 [Console] Fix shell completion when a global option conflicts with an option of _complete (lyrixx)
+ * bug #67329 [Console] Fix StringInput dropping quotes inside a quoted option value (mkantautas)
+ * bug #67161 [Console] Fix invalid null device redirection on Windows (laloona)
+ * bug #67146 [Console] Fix locking a command again after acquiring its lock failed (nicolas-grekas)
+ * bug #67147 [Console] Lock an invokable command on the name of the command that runs it (nicolas-grekas)
+ * bug #67144 [Console] Stop a failed release from wedging the lock of a command (HypeMC)
+ * bug #67143 [Console] Lock an invokable command on its name alone, not on its aliases (HypeMC)
+ * bug #67132 [Console] Fix markdown tables with colspan cells or several header rows (nicolas-grekas)
+ * bug #67128 [Console] Always write a valid header and delimiter row in markdown tables (ybai08)
+ * bug #67092 [Console] Only rewrite the changed lines when appending a table row (semx)
+ * bug #67111 [Console] Fix several bugs when sections count the rows of their lines (nicolas-grekas)
+ * bug #67099 [Console] Fix clearing section lines that are wider than the terminal (nicolas-grekas)
+ * bug #67088 [Console] Fix hyperlinks next to a literal `<` or `>` (nicolas-grekas)
+ * bug #67039 [Console] Preserve ANSI sequences when wrapping output (nicolas-grekas)
+ * bug #66981 [Console] Fix two state bugs in OutputFormatterStyle (nicolas-grekas)
+ * bug #66971 [Console] Fix how sections count and redraw their lines (nicolas-grekas)
+ * bug #66942 [Console] Escape pipes and newlines in markdown tables (lazerg)
+ * bug #66943 [Console] Fix nested applications exiting on signals handled by the outer application (nicolas-grekas)
+ * minor #67482 [Console][SecurityBundle] Fix two tests that fail on every 5.4 pull request (nicolas-grekas)
+
+### CssSelector
+
+ * bug #67119 [CssSelector] Fix more bugs in the translation to XPath (nicolas-grekas)
+ * bug #67097 [CssSelector] Fix :is() and :where() ignoring combinators and structural pseudo-classes (nicolas-grekas)
+ * bug #67096 [CssSelector] Fix several bugs in the translation to XPath (nicolas-grekas)
+
+### DependencyInjection
+
+ * bug #67376 [DependencyInjection] Preserve XML schema temporary files in forked processes (mbeccati)
+ * bug #67300 [DependencyInjection] Fix lazy closures for static and never-returning methods (nicolas-grekas)
+ * bug #67269 [DependencyInjection] Fix `process()` running twice on extensions also registered as compiler passes (HypeMC)
+ * bug #67239 [DependencyInjection] Fix env vars reported as never used when overriding an extension service (nicolas-grekas)
+ * bug #67134 [DependencyInjection] Keep lazy closures lazy when their service is part of a circular reference (nicolas-grekas)
+ * bug #67117 [DependencyInjection] Fix `#[AutowireServiceClosure]` ignoring `#[Target]` (nicolas-grekas)
+ * bug #67079 [DependencyInjection] Fix the proxy tags of lazy arguments typed as a nullable intersection (nicolas-grekas)
+ * bug #67078 [DependencyInjection] Fix lazy nullable arguments whose service is missing (nicolas-grekas)
+ * bug #67053 [DependencyInjection] Allow `#[Lazy]` with an interface on union types (HypeMC)
+ * bug #67017 [DependencyInjection] Release the closures that reference the container when resetting it (nicolas-grekas)
+ * bug #67009 [DependencyInjection] Don't initialize lazy services when resetting the container (nicolas-grekas)
+
+### Doctrine
+
+ * minor #67056 [Doctrine][Messenger] Handle disabled `pcntl_signal_dispatch` when receiving messages (aragon999)
+
+### DoctrineBridge
+
+ * bug #67116 [DoctrineBridge] Fix dispatching events after a lazy listener failed to initialize (nicolas-grekas)
+ * bug #67029 [DoctrineBridge] Collect queries executed during request termination (nicolas-grekas)
+
+### DomCrawler
+
+ * bug #67443 [DomCrawler] Drop the base fragment when resolving an empty URI (wleeaf)
+ * bug #67440 [DomCrawler] Resolve `0` as a relative URI (nicolas-grekas)
+ * bug #67438 [DomCrawler] Fix dot segment handling in UriResolver (wleeaf)
+ * bug #67396 [DomCrawler] Exclude script text from option values (nicolas-grekas)
+ * bug #67397 [DomCrawler] Fix select defaults and disabled options with duplicate values (nicolas-grekas)
+ * bug #67395 [DomCrawler] Do not submit fields inside a disabled fieldset (randomsymbols)
+ * bug #67394 [DomCrawler] Skip disabled options when choosing the default value of a select (randomsymbols)
+ * bug #67392 [DomCrawler] Do not submit reset inputs (randomsymbols)
+ * bug #67393 [DomCrawler] Strip and collapse whitespace in option text used as value (randomsymbols)
+ * bug #67385 [DomCrawler][HttpKernel][Process][Translation] Fix cleanup after forking (nicolas-grekas)
+ * bug #67200 [DomCrawler] Ignore documents without a root element in addNode() (nicolas-grekas)
+ * bug #67035 [DomCrawler] Remove temporary uploads at shutdown (nicolas-grekas)
+
+### ErrorHandler
+
+ * bug #67238 [ErrorHandler] Fix DebugClassLoader suggesting template types as native return types (nicolas-grekas)
+ * bug #67236 [ErrorHandler] Log uncaught exceptions like PHP does when no logger is set (nicolas-grekas)
+
+### ExpressionLanguage
+
+ * security #cve-2026-109449 [ExpressionLanguage] Bound the nesting level of parsed expressions (nicolas-grekas, lazerg)
+
+### Finder
+
+ * bug #67157 [Finder] Match symlinks against their own path in ignoreVCSIgnored() (nicolas-grekas)
+ * bug #67152 [Finder] Respect `.git/info/exclude` in `ignoreVCSIgnored()` (ephpicman)
+ * bug #67113 [Finder] Fix `followLinks()` looping on circular symlinks (nicolas-grekas)
+ * bug #67109 [Finder] Fix negated bracket expressions in gitignore patterns (nicolas-grekas)
+ * bug #67094 [Finder] Treat unclosed brackets and braces in glob patterns as literal characters (nicolas-grekas)
+ * bug #67026 [Finder] Only treat patterns that compile as regexps (nicolas-grekas)
+ * bug #67075 [Finder] Fix wildcards and escapes inside glob bracket expressions (nicolas-grekas)
+ * bug #67074 [Finder] Fix backslash escapes in gitignore patterns (nicolas-grekas)
+ * bug #67066 [Finder] Fix escaped brackets in glob patterns (wfatih)
+
+### Form
+
+ * bug #67495 [Form] Fix `delete_empty` with object collections (nicolas-grekas)
+ * bug #67410 [Form] Reject week numbers lower than 1 in WeekToArrayTransformer (wfatih)
+ * bug #67101 [Form] Invalidate cached resources when a block hierarchy changes (drewmt)
+ * bug #67110 [Form] Fix where `collection_entry` is inserted in the block prefixes of a collection prototype (nicolas-grekas)
+ * bug #67007 [Form] Fix `debug:form` for types calling `addNormalizer()`, `setDeprecated()`, `setInfo()` or `getInfo()` on inherited options (andyexeter)
+ * bug #67010 [Form] Fix `debug:form` listing an overridden option twice (nicolas-grekas)
+ * bug #66958 [Form] Fix rendering the parent block twice from a form theme block (nicolas-grekas)
+ * bug #66956 [Form] Clear the renderer state when rendering a block fails (KevinMartinsDev)
+ * minor #67589 [Form] Refine Persian date interval and locale translations (ephpicman)
+ * minor #67566 [Form] Improve Persian validator translations (ephpicman)
+ * minor #67546 [Form] Review Indonesian validator translations (Yoruxyv)
+ * minor #67531 [Form] Review Arabic translations (MohannadElemary)
+ * minor #67519 [Form] Review Swedish translations (JakobHallin)
+ * minor #67517 [Form][Validator] Review Latvian translations (k0d3r1s)
+ * minor #67498 [Form] Review pt_BR translations (anderson-oliveira-git)
+ * minor #67502 [Form] Remove needs-review-translation state from Spanish translations (abp002)
+ * minor #67449 [Form][Security][Validator] Add Central Kurdish (ckb) translations (RawanD201)
+ * minor #67441 [Form][Security][Validator] Review Thai translations (Warayuth014)
+ * minor #67437 [Form] Review Russian translations (lazerg)
+ * minor #67330 [Form] Change the validator translations to use neutral messages. (Fan2Shrek)
+ * minor #67354 [Form][Security][Validator] Correct Arabic translations (malekkadri)
+
+### FrameworkBundle
+
+ * bug #67516 [FrameworkBundle] Make secrets key generation and list updates safe to interrupt (nicolas-grekas)
+ * bug #67511 [FrameworkBundle] Make secrets key rotation safe to interrupt (cestercian)
+ * bug #67494 [FrameworkBundle][Serializer] Fix autowired normalizers being shared between named serializers (nicolas-grekas)
+ * bug #67288 [FrameworkBundle] Fix `TestContainer::initialized()` for private services (nicolas-grekas)
+ * bug #60091 [FrameworkBundle][Serializer] Fix nested normalizers being shared between named serializers (HypeMC)
+ * bug #67245 [FrameworkBundle] Fix describing classes whose docblock only has a tag (nicolas-grekas)
+ * bug #67179 [FrameworkBundle][HttpKernel] Collect garbage cycles in the callers of `Kernel::shutdown()` (nicolas-grekas)
+ * bug #66989 [FrameworkBundle] Reset the whole request context, not only its parameters (nicolas-grekas)
+ * bug #66944 [FrameworkBundle] Fix request context parameters leaking between requests (nicolas-grekas)
+
+### HtmlSanitizer
+
+ * bug #67227 [HtmlSanitizer] Don't cut a multibyte character when truncating the input to its maximum length (nicolas-grekas)
+ * bug #67226 [HtmlSanitizer] Ignore meta charset declarations in NativeParser (lazerg)
+
+### HttpClient
+
+ * bug #67513 [HttpClient] Fix retry delays longer than the idle timeout (nicolas-grekas)
+ * bug #67223 [HttpClient] Fix NativeHttpClient sending paused requests up to one second late (nicolas-grekas)
+ * bug #67112 [HttpClient] Fix `AmpHttpClient` reporting completed responses up to one second late (nicolas-grekas)
+ * bug #67052 [HttpClient] Fix CurlHttpClient leaking temp file streams (bakugo)
+ * bug #67085 [HttpClient] Fix CurlHttpClient leaking the curl handle of responses closed while performing (nicolas-grekas)
+ * bug #66938 [HttpClient] Don't add the `query` option again to redirect targets in `NoPrivateNetworkHttpClient` (nicolas-grekas)
+
+### HttpFoundation
+
+ * security #cve-2026-108082 [HttpFoundation] Remove the ambiguity that makes HeaderUtils::split() backtrack (nicolas-grekas)
+ * bug #67504 [HttpFoundation] Ignore malformed and multiple ranges in BinaryFileResponse (jack-worman)
+ * bug #67501 [HttpFoundation] Don't reject suffix ranges longer than the file in BinaryFileResponse (jack-worman)
+ * bug #67496 [HttpFoundation] Match whole subtags in `Request::getPreferredLanguage()` (nicolas-grekas)
+ * bug #67296 [HttpFoundation] Handle filter failures in array values (nicolas-grekas)
+ * bug #67345 [HttpFoundation] Fix cookie names and header parsing (nicolas-grekas)
+ * bug #67126 [HttpFoundation] Fix MigratingSessionHandler sending needless cookies to delete empty sessions (nicolas-grekas)
+ * bug #67123 [HttpFoundation] Destroy empty sessions in updateTimestamp() of the Redis, Memcached, MongoDb and Pdo session handlers (PhilETaylor)
+ * bug #67125 [HttpFoundation] Don't marshall empty session data in MarshallingSessionHandler (nicolas-grekas)
+ * bug #67059 [HttpFoundation] Don't announce a Content-Length on non-successful BinaryFileResponse (lazerg)
+ * bug #67060 [HttpFoundation] Register the session shutdown function only once in NativeSessionStorage (lazerg)
+
+### HttpKernel
+
+ * bug #67581 [HttpKernel] Don't keep the stale container when rebuilding it fails (lazerg)
+ * bug #67120 [HttpKernel] Fix transient failures in ResponseCacheStrategyTest (nicolas-grekas)
+ * bug #67114 [HttpKernel] Fix `ExceptionEvent::isKernelTerminating()` for exceptions thrown by terminate listeners (nicolas-grekas)
+ * bug #67083 [HttpKernel] Make `Kernel::terminate()` go through `http_cache` like `handle()` does (nicolas-grekas)
+ * bug #66997 [HttpKernel] Fix FileProfilerStorage not removing some expired profiles (nicolas-grekas)
+ * bug #66992 [HttpKernel] Don't list expired profiles in the profiler search (javiereguiluz)
+ * bug #66922 [HttpKernel] Reset the default logger between requests (KevinMartinsDev)
+
+### Intl
+
+ * bug #67543 [Intl] Fix Timezones::getRawOffset() depending on the default timezone around DST transitions (wfatih)
+ * bug #67485 [Intl] Add the locales that have a three-letter language code (nicolas-grekas)
+ * bug #67476 [Intl] Fix EmojiTransliterator on empty slices and on slices that split a surrogate pair (nicolas-grekas)
+ * minor #67509 [Intl] Update the ICU data to 79.1 (nicolas-grekas)
+
+### JsonStreamer
+
+ * bug #67587 [JsonStreamer] Reject scalar values of the wrong type instead of converting them (nicolas-grekas)
+ * bug #67515 [JsonStreamer] Fix explicit `null` handling in the string reader and reject it on non-nullable types (mtarld)
+ * bug #67467 [JsonStreamer] Ignore static properties when reading and writing objects (nicolas-grekas)
+ * bug #67466 [JsonStreamer] Stop ignoring properties set to the internal missing value marker (nicolas-grekas)
+ * bug #67415 [JsonStreamer] Fix numeric streamed names (mtarld)
+ * bug #67381 [JsonStreamer] Fix string validation and non-seekable stream reads (nicolas-grekas)
+ * bug #67351 [JsonStreamer] Fix exponential data model on unions of already generated classes (mtarld)
+ * bug #67339 [JsonStreamer] Fix value transformers called on missing properties (mtarld)
+ * bug #67349 [JsonStreamer] Fix reading JSON lists as non-list arrays from streams (mtarld)
+
+### Lock
+
+ * bug #67401 [Lock] Fix database names parsed from MongoDB URIs (nicolas-grekas)
+
+### Mailer
+
+ * bug #67264 [Mailer] Throw a TransportException when proc_open() is not available (Amoifr)
+ * bug #67023 [Mailer] Accept Brevo marketing webhook payloads (nicolas-grekas)
+
+### Messenger
+
+ * bug #67456 [Messenger] Fix describing classes whose docblock only has a tag in `debug:messenger` (nicolas-grekas)
+ * bug #67362 [Messenger] Release deduplication lock after failed dispatch (dalerazimov)
+ * bug #67231 [Messenger] Fix the `user_id`, `CC` and `expiration` of republished or delayed AMQP messages (nicolas-grekas)
+ * bug #67230 [Messenger] Do not inherit AMQP expiration when sending to another transport (dalerazimov)
+ * bug #67150 [Messenger] Never reuse the received AMQP routing key when sending to another transport (dalerazimov)
+ * bug #67115 [Messenger][WebProfilerBundle] Fix tracing messages dispatched from internal functions (nicolas-grekas)
+ * bug #67038 [Messenger] Acknowledge messages sent for retry (nicolas-grekas)
+ * bug #67002 [Messenger] Fix the Redis transport after a lost connection (nicolas-grekas)
+ * bug #67000 [Messenger] Fix the Amazon SQS connection rethrowing the same error after a failed receive (nicolas-grekas)
+ * bug #66973 [Messenger] Fix the Doctrine transport not retrying ack() and reject() on deadlocks (nicolas-grekas)
+ * bug #66974 [Messenger] Fix PostgreSqlConnection throwing from its destructor when the database is gone (nicolas-grekas)
+ * bug #66975 [Messenger] Fix the worker looping without sleeping just before its time limit (nicolas-grekas)
+ * bug #66955 [Messenger] Fix the Beanstalkd transport using the "default" tube after a failed reconnect (nicolas-grekas)
+ * bug #66935 [Messenger] Fix DispatchAfterCurrentBusMiddleware staying in a root dispatch after an \Error (KevinMartinsDev)
+ * bug #66914 [Messenger] Prevent losing delayed Redis messages on migration failure (dalerazimov)
+ * minor #67582 [Messenger] Allow installing the Redis bridge with only ext-relay (lazerg)
+ * minor #67072 [Messenger] Fix the Amazon SQS and Beanstalkd transports when `pcntl_signal_dispatch()` is disabled (nicolas-grekas)
+
+### Mime
+
+ * security #cve-2026-45070 [Mime] Reject parameter names containing non-token characters (alexandre-daubois)
+ * bug #67497 [Mime] Fix unserializing subclasses of TextPart, DataPart and SMimePart that implement __sleep() (nicolas-grekas)
+ * bug #67493 [Mime] Reject non-string values when unserializing TextPart, SMimePart and Email (nicolas-grekas)
+ * bug #67472 [Mime] Fix unserializing DataPart payloads created by 6.4 and reject non-string values (nicolas-grekas)
+ * bug #67471 [Mime] Fix losing the content of multipart and custom parts when serializing them (nicolas-grekas)
+ * bug #67478 [Mime] Escape backslashes in Address::getEncodedName() (munzzyy)
+ * bug #67444 [Mime] Escape quotes and backslashes in quoted parameter values (wleeaf)
+
+### MonologBridge
+
+ * bug #67248 [MonologBridge] Fix NotifierHandler not raising levels below Error with Monolog 3 (nicolas-grekas)
+
+### Notifier
+
+ * bug #67307 [Notifier] Fix Transport::fromDsn() when some bridges are installed (javiereguiluz)
+ * bug #66998 [Notifier][Sevenio] Fix response code 101 being reported as a success (nicolas-grekas)
+ * minor #67261 [Notifier][Brevo] Update the Brevo API documentation link (lbonnet-gda)
+
+### ObjectMapper
+
+ * bug #67268 [ObjectMapper] Remove ``@internal`` from `Mapping` (nikophil)
+ * bug #67142 [ObjectMapper] Fix losing the value mapped to a promoted property when a later #[Map] is skipped (nicolas-grekas)
+ * bug #67063 [ObjectMapper] Fix the metadata of a property leaking into a class whose name continues the class name (javiereguiluz)
+
+### OptionsResolver
+
+ * bug #67069 [OptionsResolver] Ensure remove() also unsets nested options (wfatih)
+
+### PhpUnitBridge
+
+ * bug #67033 [PhpUnitBridge] Honor --stderr for listener output (nicolas-grekas)
+
+### PropertyAccess
+
+ * bug #67512 [PropertyAccess] Fix writing `SimpleXMLElement` children and dynamic properties of `#[AllowDynamicProperties]` classes (nicolas-grekas)
+ * bug #66965 [PropertyAccess] Fix using custom PropertyPathInterface implementations on objects (nicolas-grekas)
+ * bug #66932 [PropertyAccess] Fix using custom PropertyPathInterface implementations (HawkForge)
+
+### PropertyInfo
+
+ * bug #67249 [PropertyInfo] Fix resolution of `self`, `static` and `parent` with TypeInfo (nicolas-grekas)
+ * bug #67234 [PropertyInfo] Fix resolution of `self`, `static` and `parent` in collection types (nicolas-grekas)
+
+### RateLimiter
+
+ * bug #67204 [RateLimiter] Fix early retry and expiry times, and three consume() edge cases (nicolas-grekas)
+ * bug #67203 [RateLimiter] Fix SlidingWindow wait duration when refused by the hits of the current window (florentdestremau)
+ * bug #67087 [RateLimiter] Apply updated configuration to stored fixed windows (nicolas-grekas)
+ * bug #67022 [RateLimiter] Apply updated configuration to stored token buckets (nicolas-grekas)
+ * bug #67021 [RateLimiter] Reject refill intervals below one second (nicolas-grekas)
+
+### Routing
+
+ * bug #67508 [Routing] Don't ignore route conditions that are "0" (nicolas-grekas)
+ * bug #67337 [Routing] Remove the "deprecated" key from route definitions in routing.schema.json (momito69)
+ * bug #67093 [Routing] Fix HEAD-only routes with UrlMatcher and scheme redirections when both trailing slash variants exist (nicolas-grekas)
+
+### Runtime
+
+ * bug #67174 [Runtime] Don't terminate the last request twice when a FrankenPHP worker stops (nicolas-grekas)
+
+### Scheduler
+
+ * bug #67503 [Scheduler] Fix skipping a run when the cache loses the checkpoint of a running worker (nicolas-grekas)
+
+### Security
+
+ * bug #67560 [Security] Stop logging router errors when a check path does not match the request (nicolas-grekas)
+ * bug #67145 [Security][SecurityBundle] Decide the checks of an expression for the token being voted on (Neirda24)
+ * bug #67148 [Security] Fix TraceableAccessDecisionManager reusing a finished access decision (nicolas-grekas)
+ * bug #67080 [Security] Fix `use_referer` redirecting to the check path (nicolas-grekas)
+
+### SecurityBundle
+
+ * minor #67551 [SecurityBundle] Stop asserting an empty body for the 401 of a rejected access token (nicolas-grekas)
+
+### Serializer
+
+ * bug #67459 [Serializer] Escape formulas in the header row of CSV files (nicolas-grekas)
+ * bug #67243 [Serializer] Fix denormalizing a scalar into a union with an object type (nicolas-grekas)
+ * bug #67232 [Serializer] Fix normalizing a file that `DataUriNormalizer` denormalized (nicolas-grekas)
+ * bug #67139 [Serializer] Fix denormalizing string-keyed collections and unions from XML (nicolas-grekas)
+ * bug #67055 [Serializer] Fix the first normalized object deciding whether property paths are normalized (HypeMC)
+ * bug #67034 [Serializer] Apply ignored attributes to setter and adder aliases (nicolas-grekas)
+ * bug #66986 [Serializer] Fix normalizing discriminated classes that have no properties (nicolas-grekas)
+
+### String
+
+ * bug #67361 [String] Fix hyphenated locales in AsciiSlugger (malekkadri)
+ * bug #67380 [String] Fix slugger cache changing parent locale transliteration (nicolas-grekas)
+ * bug #67284 [String] Preserve text after emoji joiners in width calculations (nicolas-grekas)
+ * bug #67068 [String] Fix trim(), trimStart() and trimEnd() with empty chars on unicode strings (wfatih)
+ * bug #67091 [String] Fix trim(), trimStart() and trimEnd() with ".." ranges on unicode strings (nicolas-grekas)
+ * bug #66994 [String] Fix slice(), splice() and chunk() with very large offsets or lengths (nicolas-grekas)
+ * bug #66969 [String] Fix UnicodeString::replace() and split() with ignorable characters like U+200B (nicolas-grekas)
+
+### Translation
+
+ * bug #67352 [Translation] Check XLIFF 2 target language when linting filenames (malekkadri)
+ * bug #66980 [Translation] Fix FileDumper::dump() when another process creates the target directory (nicolas-grekas)
+
+### TwigBridge
+
+ * bug #66990 [TwigBridge] Fix form_label() with a literal label and non-literal variables (nicolas-grekas)
+
+### TypeInfo
+
+ * bug #67404 [TypeInfo] Resolve keywords case-insensitively in `StringTypeResolver` (DerManoMann)
+
+### Validator
+
+ * bug #67070 [Validator] Fix the Video constraint for rotated videos and thumbnails (GromNaN)
+ * bug #67032 [Validator] Compare integer ranges without losing precision (nicolas-grekas)
+ * bug #67076 [Validator] Fix Collection with groups failing on fields that have no groups (nicolas-grekas)
+ * bug #67067 [Validator] Fix Count::$divisibleBy being ignored in groups other than Default (wfatih)
+ * minor #67540 [Validator] Fix Arabic validation messages and six-form plurals (malekkadri)
+ * minor #66933 [Validator] Review Italian translations (mrCabez)
+
+### VarDumper
+
+ * bug #66966 [VarDumper] Fix source excerpts of files with CRLF line endings (nicolas-grekas)
+
+### VarExporter
+
+ * bug #67301 [VarExporter] Preserve named variadic arguments in lazy proxies (nicolas-grekas)
+
+### WebProfilerBundle
+
+ * bug #67450 [WebProfilerBundle] Check that the profiler is enabled before opening files (nicolas-grekas)
+ * bug #67081 [WebProfilerBundle] Fix the toolbar hiding unhandled fetch() rejections and leaving 0 ms requests loading (nicolas-grekas)
+ * bug #67016 [WebProfilerBundle] Fix the form and translation panels with Twig 4 (nicolas-grekas)
+
+### Yaml
+
+ * security #cve-2026-109413 [Yaml] Bound recursion depth in the inline lexer (nicolas-grekas)
+ * bug #67106 [Yaml] Fix dumping control characters and invalid UTF-8 in multi-line literal blocks (nicolas-grekas)
+ * bug #66954 [Yaml] Fix TypeErrors, a PHP warning and wrong results for !php/const keys and merge keys (nicolas-grekas)
+
+### Other
+
+ * minor #67379 Add PHP 8.7 to CI (nicolas-grekas)
+ * minor #67061 Refine Portuguese translations in validators.pt.xlf (lucascamp)
+ * minor #67065 Resolve grammar and vocabulary issues in pt-PT (1PedroSoares)
+
 ## 7.4.21 (2026-10-14)
 
 ### AssetMapper

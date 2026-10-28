@@ -226,7 +226,7 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
         }
 
         if (!$acquired) {
-            throw new ConcurrentRequestHttpException($key, $attribute->factory);
+            throw new ConcurrentRequestHttpException($key, $attribute->factory, new LockConflictedException());
         }
     }
 

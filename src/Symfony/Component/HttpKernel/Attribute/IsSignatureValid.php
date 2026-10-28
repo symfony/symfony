@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Attribute;
 
+use Symfony\Component\HttpFoundation\Exception\SignedUriException;
+
 /**
  * Validates the request signature for specific HTTP methods.
  *
@@ -19,12 +21,13 @@ namespace Symfony\Component\HttpKernel\Attribute;
  * of the specified methods (or if no methods are specified), the signature
  * is checked.
  *
- * If the signature is invalid, a {@see \Symfony\Component\HttpFoundation\Exception\SignedUriException}
+ * If the signature is invalid, a {@see SignedUriException}
  * is thrown during validation.
  *
  * @author Santiago San Martin <sanmartindev@gmail.com>
  */
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
+#[RecoverableAttribute(SignedUriException::class)]
 final class IsSignatureValid
 {
     /** @var string[] */

@@ -4,6 +4,9 @@ CHANGELOG
 8.2
 ---
 
+ * Add `#[RecoverableAttribute]` to declare the exceptions of a controller attribute that are passed to the controller parameter typed to receive them instead of being thrown
+ * Make `#[RateLimit]`, `#[Lock]` and `#[IsSignatureValid]` recoverable, so a controller can receive a `RateLimitExceededException`, `LockConflictedException` or `SignedUriException`
+ * Add `ControllerArgumentsEvent::getControllerReflector()`
  * Return an HTTP 204 response for controllers with a `void` return type
  * Add `Store::clear()` to remove all the entries of the HTTP cache store
  * Add the `lint:expressions` command to lint the expressions of controller attributes and the ones listed in the configuration

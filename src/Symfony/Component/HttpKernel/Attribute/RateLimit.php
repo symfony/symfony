@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Attribute;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
 
 /**
  * Rate limits the controller.
@@ -28,6 +29,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  * @author Ayyoub AFW-ALLAH <ayyoub.afwallah@gmail.com>
  */
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
+#[RecoverableAttribute(RateLimitExceededException::class)]
 final class RateLimit
 {
     /** @var string[] */

@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\EventListener;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -271,6 +274,21 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
 
         $listener = new IsCsrfTokenValidAttributeListener($csrfTokenManager);
         $listener->onKernelControllerArguments($event);
+    }
+
+    public function testInvalidTokenIsPassedToTheControllerParameterTypedToReceiveIt()
+    {
+        $csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->method('isTokenValid')->willReturn(false);
+
+        $attributesListener = new ControllerAttributesListener([KernelEvents::CONTROLLER_ARGUMENTS => [IsCsrfTokenValid::class => true]]);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new IsCsrfTokenValidAttributeListener($csrfTokenManager));
+        $event = new ControllerArgumentsEvent($this->createStub(HttpKernelInterface::class), #[IsCsrfTokenValid('foo')] static fn (?InvalidCsrfTokenException $exception = null) => null, [null], new Request([], ['_token' => 'bar']), HttpKernelInterface::MAIN_REQUEST);
+
+        $attributesListener->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, $dispatcher);
+
+        $this->assertInstanceOf(InvalidCsrfTokenException::class, $event->getArguments()[0]);
     }
 
     public function testIsCsrfTokenValidThrowExceptionWhenMissingRequestToken()

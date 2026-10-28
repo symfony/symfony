@@ -54,12 +54,20 @@ final class CalendarAlignedWindow implements LimiterStateInterface
         return max(0, $this->getPeriodBoundary($periods)->getTimestamp() - time());
     }
 
-    public function configure(\DateInterval $interval, \DateTimeImmutable $anchor, float $now): void
+    public function configure(\DateInterval $interval, int $maxSize, \DateTimeImmutable $anchor, float $now): void
     {
         $this->interval = $interval;
         $this->anchor = $anchor;
         $this->periodStart = $this->periodStart->setTimezone($anchor->getTimezone());
         $this->periodEnd = $this->periodEnd->setTimezone($anchor->getTimezone());
+
+        if ($maxSize !== $this->maxSize && $this->hitCount > 0) {
+            // Like for Window, full periods stay full and the last one is capped at the new size.
+            $fullPeriods = intdiv($this->hitCount - 1, $this->maxSize);
+            $this->hitCount = $fullPeriods * $maxSize + min($this->hitCount - $fullPeriods * $this->maxSize, $maxSize);
+        }
+
+        $this->maxSize = $maxSize;
 
         while ($this->periodEnd->getTimestamp() <= $now) {
             $this->periodStart = $this->periodEnd;

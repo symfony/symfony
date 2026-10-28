@@ -41,8 +41,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Tests\HttpCache\HttpCacheTestCase;
 use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
 use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Component\RateLimiter\Policy\FixedWindowPolicy;
 use Symfony\Component\RateLimiter\Policy\NoLimiter;
+use Symfony\Component\RateLimiter\Policy\SlidingWindowPolicy;
+use Symfony\Component\RateLimiter\Policy\TokenBucketPolicy;
 use Symfony\Component\RateLimiter\RateLimit as RateLimitResult;
+use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
@@ -1058,6 +1062,96 @@ class RateLimitAttributeListenerTest extends TestCase
         $this->assertSame('2', $anonymousAgain->headers->get('X-RateLimit-Limit'));
         $this->assertSame('0', $anonymousAgain->headers->get('X-RateLimit-Remaining'));
     }
+
+    private function makePolicyKernel(?EventDispatcher $dispatcher = null): HttpKernel
+    {
+        $dispatcher ??= new EventDispatcher();
+        $dispatcher->addSubscriber(new ControllerAttributesListener([
+            KernelEvents::CONTROLLER_ARGUMENTS => [RateLimit::class => true],
+        ]));
+        $dispatcher->addSubscriber(new RateLimitAttributeListener($this->createStub(ServiceProviderInterface::class), builder: new RateLimiterBuilder(new InMemoryStorage())));
+        $dispatcher->addSubscriber(new ErrorListener(static fn () => new Response('error')));
+
+        return new HttpKernel($dispatcher, new ControllerResolver(), null, new ArgumentResolver());
+    }
+
+    public static function providePolicyControllers(): iterable
+    {
+        yield 'fixed_window' => [new FixedWindowPolicyController()];
+        yield 'sliding_window' => [new SlidingWindowPolicyController()];
+        yield 'token_bucket' => [new TokenBucketPolicyController()];
+    }
+
+    #[DataProvider('providePolicyControllers')]
+    public function testPolicyThroughARealKernel(object $controller)
+    {
+        $kernel = $this->makePolicyKernel();
+
+        foreach ([1, 0] as $remaining) {
+            $response = $this->handleThrough($kernel, $controller);
+
+            $this->assertSame(200, $response->getStatusCode());
+            $this->assertSame('2', $response->headers->get('X-RateLimit-Limit'));
+            $this->assertSame((string) $remaining, $response->headers->get('X-RateLimit-Remaining'));
+        }
+
+        $this->assertSame(429, $this->handleThrough($kernel, $controller)->getStatusCode());
+    }
+
+    public function testPoliciesOfDifferentControllersDoNotShareABucket()
+    {
+        $kernel = $this->makePolicyKernel();
+
+        $this->handleThrough($kernel, new FixedWindowPolicyController());
+        $this->handleThrough($kernel, new FixedWindowPolicyController());
+        $this->assertSame(429, $this->handleThrough($kernel, new FixedWindowPolicyController())->getStatusCode());
+
+        $this->assertSame(200, $this->handleThrough($kernel, new OtherFixedWindowPolicyController())->getStatusCode());
+    }
+
+    public function testStackedPoliciesDoNotShareABucket()
+    {
+        $kernel = $this->makePolicyKernel();
+
+        foreach ([1, 0] as $remaining) {
+            $response = $this->handleThrough($kernel, new StackedPolicyController());
+
+            $this->assertSame(200, $response->getStatusCode());
+            $this->assertSame('2', $response->headers->get('X-RateLimit-Limit'));
+            $this->assertSame((string) $remaining, $response->headers->get('X-RateLimit-Remaining'));
+        }
+
+        $this->assertSame(429, $this->handleThrough($kernel, new StackedPolicyController())->getStatusCode());
+    }
+
+    public function testRejectedPolicyDispatchesRateLimitExceededEventNamedAfterTheController()
+    {
+        if (!class_exists(RateLimitExceededEvent::class)) {
+            $this->markTestSkipped('The installed "symfony/rate-limiter" does not provide RateLimitExceededEvent.');
+        }
+
+        $limiterNames = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(RateLimitExceededEvent::class, static function (RateLimitExceededEvent $event) use (&$limiterNames) {
+            $limiterNames[] = $event->getLimiterName();
+        });
+        $kernel = $this->makePolicyKernel($dispatcher);
+
+        foreach (range(1, 3) as $i) {
+            $this->handleThrough($kernel, new FixedWindowPolicyController());
+        }
+
+        $this->assertCount(1, $limiterNames);
+        $this->assertMatchesRegularExpression('/^'.preg_quote(FixedWindowPolicyController::class.'::__invoke#', '/').'[0-9a-f]{32}$/', $limiterNames[0]);
+    }
+
+    public function testPolicyRequiresTheBuilder()
+    {
+        $listener = new RateLimitAttributeListener($this->createStub(ServiceProviderInterface::class));
+
+        $this->expectException(\LogicException::class);
+        $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit(new FixedWindowPolicy(1, '1 minute')), Request::create('/')));
+    }
 }
 
 class RateLimitedController
@@ -1157,6 +1251,52 @@ class ConditionallyRateLimitedController
 {
     #[RateLimit('anonymous', key: 'k', exposeHeaders: true, if: new Expression('!request.headers.has("Authorization")'))]
     #[RateLimit('authenticated', key: 'k', exposeHeaders: true, if: new Expression('request.headers.has("Authorization")'))]
+    public function __invoke(): Response
+    {
+        return new Response('ok');
+    }
+}
+
+class FixedWindowPolicyController
+{
+    #[RateLimit(new FixedWindowPolicy(2, '1 minute'), exposeHeaders: true)]
+    public function __invoke(): Response
+    {
+        return new Response('ok');
+    }
+}
+
+class OtherFixedWindowPolicyController
+{
+    #[RateLimit(new FixedWindowPolicy(2, '1 minute'), exposeHeaders: true)]
+    public function __invoke(): Response
+    {
+        return new Response('ok');
+    }
+}
+
+class SlidingWindowPolicyController
+{
+    #[RateLimit(new SlidingWindowPolicy(2, '1 minute'), exposeHeaders: true)]
+    public function __invoke(): Response
+    {
+        return new Response('ok');
+    }
+}
+
+class TokenBucketPolicyController
+{
+    #[RateLimit(new TokenBucketPolicy(2, '1 minute'), exposeHeaders: true)]
+    public function __invoke(): Response
+    {
+        return new Response('ok');
+    }
+}
+
+class StackedPolicyController
+{
+    #[RateLimit(new SlidingWindowPolicy(2, '1 minute'), key: 'k', exposeHeaders: true)]
+    #[RateLimit(new SlidingWindowPolicy(5, '1 minute'), key: 'k', exposeHeaders: true)]
     public function __invoke(): Response
     {
         return new Response('ok');

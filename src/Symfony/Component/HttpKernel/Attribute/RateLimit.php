@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Attribute;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\RateLimiter\Policy\PolicyInterface;
 
 /**
  * Rate limits the controller.
@@ -34,7 +35,7 @@ final class RateLimit
     public readonly array $methods;
 
     /**
-     * @param string                          $limiter       The configured limiter name
+     * @param string|PolicyInterface          $limiter       The configured limiter name, or a policy creating a limiter that only this controller uses
      * @param string|Expression|\Closure|null $key           A string where {name} is replaced by the "name" request attribute, such as a route parameter, or an Expression or a Closure evaluating to a string; null means client IP + path
      * @param int                             $tokens        The number of tokens to consume
      * @param string[]|string                 $methods       HTTP methods to rate limit; empty means all methods
@@ -42,7 +43,7 @@ final class RateLimit
      * @param bool|Expression|\Closure        $if            Whether the rate limit applies: a boolean, or an Expression or a Closure evaluating to one
      */
     public function __construct(
-        public readonly string $limiter,
+        public readonly string|PolicyInterface $limiter,
         public readonly string|Expression|\Closure|null $key = null,
         public readonly int $tokens = 1,
         array|string $methods = [],

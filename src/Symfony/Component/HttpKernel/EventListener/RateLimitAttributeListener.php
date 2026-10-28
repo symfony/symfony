@@ -26,6 +26,8 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\RateLimiter\AppliedRateLimit;
 use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
+use Symfony\Component\RateLimiter\Policy\PolicyInterface;
+use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
@@ -48,10 +50,12 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
     /**
      * @param ServiceProviderInterface<RateLimiterFactoryInterface> $limiters
      * @param ExpressionLanguage|null                               $expressionLanguage The one that evaluates the keys and the conditions, which knows the variables of the expressions it compiled
+     * @param RateLimiterBuilder|null                               $builder            Creates the limiters of the attributes configured with a policy
      */
     public function __construct(
         private readonly ServiceProviderInterface $limiters,
         private ?ExpressionLanguage $expressionLanguage = null,
+        private readonly ?RateLimiterBuilder $builder = null,
     ) {
         $this->consumedBeforeArguments = new \WeakMap();
     }
@@ -88,7 +92,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$this->limiters->has($attribute->limiter)) {
+        if (\is_string($attribute->limiter) && !$this->limiters->has($attribute->limiter)) {
             throw new \InvalidArgumentException(\sprintf('Rate limiter "%s" does not exist. Did you forget to configure it? Available limiters: "%s".', $attribute->limiter, implode('", "', array_keys($this->limiters->getProvidedServices()))));
         }
 
@@ -100,7 +104,14 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
             throw new \TypeError(\sprintf('The value of the "$key" option of the "%s" attribute must evaluate to a string, "%s" given.', RateLimit::class, get_debug_type($key)));
         }
 
-        $rateLimit = $this->limiters->get($attribute->limiter)->create($key)->consume($attribute->tokens);
+        if (\is_string($name = $attribute->limiter)) {
+            $factory = $this->limiters->get($name);
+        } else {
+            $name = $this->getPolicyLimiterId($event->kernelEvent->getController(), $attribute->limiter);
+            $factory = $attribute->limiter->createFactory($this->builder ?? throw new \LogicException(\sprintf('Configuring "#[RateLimit]" with a policy requires a "%s"; is the RateLimiter component enabled?', RateLimiterBuilder::class)), $name);
+        }
+
+        $rateLimit = $factory->create($key)->consume($attribute->tokens);
 
         $candidate = new AppliedRateLimit($rateLimit, $attribute->tokens, $attribute->exposeHeaders);
 
@@ -111,11 +122,22 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
 
         if (!$rateLimit->isAccepted()) {
             if ($dispatcher && class_exists(RateLimitExceededEvent::class)) {
-                $dispatcher->dispatch(new RateLimitExceededEvent($rateLimit, $attribute->limiter, $key));
+                $dispatcher->dispatch(new RateLimitExceededEvent($rateLimit, $name, $key));
             }
 
             throw new TooManyRequestsHttpException(max(0, $rateLimit->getRetryAfter()->getTimestamp() - time()));
         }
+    }
+
+    /**
+     * Policies are keyed by their controller and configuration, so that each gets its own window or bucket.
+     */
+    private function getPolicyLimiterId(callable $controller, PolicyInterface $policy): string
+    {
+        $r = new \ReflectionFunction($controller(...));
+        $name = !$r->isAnonymous() && ($class = $r->getClosureCalledClass()) ? $class->name.'::'.$r->name : $r->name;
+
+        return $name.'#'.hash('xxh128', serialize($policy));
     }
 
     /**

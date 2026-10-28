@@ -8,6 +8,7 @@ CHANGELOG
  * Add `RateLimitExceededEvent`
  * Make `CompoundLimiter::consume()` stop at the first limiter that rejects the request
  * Add `RateLimiterBuilder` and the `rate_limiter.builder` option
+ * Add `PolicyInterface`, `FixedWindowPolicy`, `SlidingWindowPolicy` and `TokenBucketPolicy` to configure a rate limiter that `RateLimiterBuilder` creates on the fly
  * Allow `\DateInterval` for the `interval` and `rate.interval` options of `RateLimiterFactory`
  * Add `RateLimit::getResetAt()`
  * Add a `$keys` argument to `CompoundRateLimiterFactory`, and accept a map in the `limiters` option of a compound rate limiter, to fix the key of some of its sub-limiters

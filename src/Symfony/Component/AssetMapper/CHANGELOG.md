@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add a `$cache` argument to `CompiledAssetMapperConfigReader` to keep the decoded compiled files in a cache pool
  * Add `asset_mapper.metadata_dir` option to choose where `asset-map:compile` writes its metadata
+ * Add a `$logger` argument to `ImportMapGenerator` to warn when the import map is not compiled
  * Add `AssetMapperBundle`, which provides the `asset_mapper` configuration and the services previously provided by `FrameworkBundle` under `framework.asset_mapper`
  * Add the `asset_mapper.importmap_entries` option and the `$entries` argument of `ImportMapGenerator` to restrict the import map to the entries reachable from the rendered entrypoints
  * Sort importmap entries alphabetically

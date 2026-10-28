@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\ImportMap;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\AssetMapper\Exception\LogicException;
@@ -42,6 +43,7 @@ class ImportMapGenerator
         private readonly ImportMapConfigReader $importMapConfigReader,
         private readonly array $integrityHashAlgorithms = [],
         private readonly string $entries = self::ENTRIES_ALL,
+        private readonly ?LoggerInterface $logger = null,
     ) {
         if ($unsupportedAlgorithms = array_diff($this->integrityHashAlgorithms, self::INTEGRITY_HASH_ALGORITHMS)) {
             throw new LogicException(\sprintf('Unsupported integrity hash algorithm "%s". Supported ones are "%s".', implode('", "', $unsupportedAlgorithms), implode('", "', self::INTEGRITY_HASH_ALGORITHMS)));
@@ -85,6 +87,10 @@ class ImportMapGenerator
      */
     public function getImportMapData(array $entrypointNames, ?string $polyfillImportName = null): array
     {
+        if ($this->logger && !$this->compiledConfigReader->configExists(self::IMPORT_MAP_CACHE_FILENAME)) {
+            $this->logger->warning('The import map is computed on each request because "{file}" was not found. Run "asset-map:compile" when deploying, and deploy the files it generates with the application.', ['file' => self::IMPORT_MAP_CACHE_FILENAME]);
+        }
+
         $rawImportMapData = $this->getRawImportMapData();
         $eagerImports = [];
         $reachableImports = [];

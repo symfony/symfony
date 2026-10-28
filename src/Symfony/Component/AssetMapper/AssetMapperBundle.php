@@ -19,6 +19,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
@@ -261,6 +262,8 @@ class AssetMapperBundle extends AbstractBundle
             ->getDefinition('asset_mapper.importmap.generator')
             ->replaceArgument(3, $config['importmap_integrity_algorithms'])
             ->setArgument(4, $config['importmap_entries'])
+            // without debug and without the dev server, the import map is expected to be compiled
+            ->setArgument(5, $server || $container->getParameter('kernel.debug') ? null : new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE))
         ;
 
         $container

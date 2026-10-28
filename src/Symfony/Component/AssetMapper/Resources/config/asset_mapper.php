@@ -177,6 +177,7 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper.importmap.config_reader'),
                 abstract_arg('integrity hash algorithms'),
             ])
+            ->tag('monolog.logger', ['channel' => 'asset_mapper'])
 
         ->set('asset_mapper.importmap.remote_package_storage', RemotePackageStorage::class)
             ->args([

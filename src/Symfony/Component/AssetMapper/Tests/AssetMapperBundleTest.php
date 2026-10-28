@@ -127,6 +127,19 @@ class AssetMapperBundleTest extends TestCase
         $this->assertSame($mode, $container->getDefinition('asset_mapper.compiler.javascript_import_path_compiler')->getArgument(1));
     }
 
+    #[TestWith([[], true, false])]
+    #[TestWith([[], false, true])]
+    #[TestWith([['server' => true], false, false])]
+    public function testTheImportMapGeneratorLogsOnlyWhenTheImportMapShouldBeCompiled(array $config, bool $debug, bool $expected)
+    {
+        $container = $this->createContainer($config, $debug);
+
+        $this->assertEquals(
+            $expected ? new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE) : null,
+            $container->getDefinition('asset_mapper.importmap.generator')->getArgument(5),
+        );
+    }
+
     public function testTheAssetPackageSkipsTheVersionOfMappedAssets()
     {
         $definition = $this->createContainer(['server' => false, 'public_prefix' => '/assets_path/'])->getDefinition('asset_mapper.asset_package');

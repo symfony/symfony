@@ -163,7 +163,7 @@ class TranslationExtractCommand extends Command
                 $foundBundle = $kernel->getBundle($input->getArgument('bundle'));
                 $bundleDir = $foundBundle->getPath();
                 $transPaths = [is_dir($bundleDir.'/Resources/translations') ? $bundleDir.'/Resources/translations' : $bundleDir.'/translations'];
-                $codePaths = [is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundleDir.'/templates'];
+                $codePaths = [$bundleDir];
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath;
                 }
@@ -187,7 +187,7 @@ class TranslationExtractCommand extends Command
         $io->title('Translation Messages Extractor and Dumper');
         $io->comment(\sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
 
-        $io->comment('Parsing templates...');
+        $io->comment('Parsing source files...');
         $prefix = $input->getOption('no-fill') ? self::NO_FILL_PREFIX : $input->getOption('prefix');
         $extractedCatalogue = $this->extractMessages($input->getArgument('locale'), $codePaths, $prefix);
 

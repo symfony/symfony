@@ -76,10 +76,11 @@ final class FixedWindowLimiter implements LimiterInterface
 
             if (null !== $this->anchorAt) {
                 $nowDt = new \DateTimeImmutable(\sprintf('@%d', $now));
-                if (!$window instanceof CalendarAlignedWindow || $nowDt < $window->getPeriodStart() || $nowDt >= $window->getPeriodEnd()) {
+                if (!$window instanceof CalendarAlignedWindow || $nowDt < $window->getPeriodStart()) {
                     [$periodStart, $periodEnd] = $this->computePeriod($nowDt);
-                    $window = new CalendarAlignedWindow($this->id, $this->limit, $periodStart, $periodEnd);
+                    $window = new CalendarAlignedWindow($this->id, $this->limit, $periodStart, $periodEnd, $this->interval);
                 }
+                $window->configure($this->interval, $this->anchorAt, $now);
             } elseif (!$window instanceof Window) {
                 $window = new Window($this->id, $this->intervalInSeconds, $this->limit);
             } else {

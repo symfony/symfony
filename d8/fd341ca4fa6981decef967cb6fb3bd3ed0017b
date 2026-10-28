@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-28T01:21:15Z
+
+Two things before this can be merged:
+
+- The update removes every zero-width non-joiner and the tanwin: `بارگذاری‌شده` becomes `بارگذاری شده`, `بزرگ‌تر` becomes `بزرگتر`, `لطفاً` becomes `لطفا`. The Validator catalogue keeps them, so could you keep them too?
+- The English sources now say "This value is not a valid X.", and the Validator catalogue translates them as `این مقدار یک X معتبر نیست`. The new targets mix three patterns (`X معتبر نیست`, `X انتخاب شده معتبر نیست` and `مقدار ... معتبر نیست`) and two adjectives (`معتبر` and `صحیح`). Could you pick one pattern, ideally the one of the Validator catalogue, and use `معتبر` everywhere?
+
+Also, 99 lost "HTML5".
+
+Thanks for working on this!
+
+---------------------------------------------------------------------------
+
+by ephpicman at 2026-10-28T06:50:15Z
+
+> Two things before this can be merged:
+>
+>     * The update removes every zero-width non-joiner and the tanwin: `بارگذاری‌شده` becomes `بارگذاری شده`, `بزرگ‌تر` becomes `بزرگتر`, `لطفاً` becomes `لطفا`. The Validator catalogue keeps them, so could you keep them too?
+>
+>     * The English sources now say "This value is not a valid X.", and the Validator catalogue translates them as `این مقدار یک X معتبر نیست`. The new targets mix three patterns (`X معتبر نیست`, `X انتخاب شده معتبر نیست` and `مقدار ... معتبر نیست`) and two adjectives (`معتبر` and `صحیح`). Could you pick one pattern, ideally the one of the Validator catalogue, and use `معتبر` everywhere?
+>
+>
+> Also, 99 lost "HTML5".
+>
+> Thanks for working on this!
+
+Thanks for the review, Nicolas.
+
+In my initial changes, I aimed to make the Persian translations more natural and consistent from a Persian-language and user-interface perspective, rather than translating the English source messages too literally.
+
+A couple of the initial changes were deliberate:
+- **Tanwin:** I omitted tanwin marks because they are Arabic diacritics and are generally not used in standard contemporary Persian writing.
+- **Zero-width non-joiners:** I removed them because their rendering can be inconsistent across fonts and UI environments, potentially affecting the visual consistency of the interface.
+
+Following your feedback, I revisited the translations to improve consistency with the existing Validator catalogue and address the specific points you raised:
+
+- Standardized validity-related messages to follow the catalogue’s wording pattern, using `معتبر` consistently.
+- Restored zero-width non-joiners and tanwin marks to align with the existing Validator translations.
+- Restored `HTML5` in translation ID 99.
+- Retained the `needs-review-translation` markers on IDs 106 and 113 for further review.
+
+These updates have been committed to the same branch. Thanks again for the detailed feedback.

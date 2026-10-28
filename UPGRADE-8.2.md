@@ -638,6 +638,8 @@ Validator
  * [BC BREAK] Remove the `GroupSequence::$cascadedGroup` property, it has had no effect since the validator stopped reading it in 2014, and reading it has thrown since 7.4 typed it without a default
  * The `File` constraint checks the `extensions` and `mimeTypes` options independently, where the configured `mimeTypes` used to be narrowed to the mime types derived from the matching extension
  * When `framework.test` is enabled, the `NotCompromisedPassword` constraint accepts every password unless the `validation.not_compromised_password.enabled` option is set to `true`
+ * Deprecate using `*` as a validation group name, in the `groups` option of constraints, in group sequences and in the groups passed to the validator.
+   The name is reserved for future use, rename the group
 
 Webhook
 -------

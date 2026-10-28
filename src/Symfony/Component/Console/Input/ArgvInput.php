@@ -271,6 +271,13 @@ class ArgvInput extends Input
 
     public function getFirstArgument(): ?string
     {
+        $position = $this->getFirstArgumentPosition();
+
+        return null === $position ? null : $this->tokens[$position];
+    }
+
+    private function getFirstArgumentPosition(): ?int
+    {
         $isOption = false;
         foreach ($this->tokens as $i => $token) {
             if ($token && '-' === $token[0]) {
@@ -295,7 +302,7 @@ class ArgvInput extends Input
                 continue;
             }
 
-            return $token;
+            return $i;
         }
 
         return null;
@@ -364,20 +371,9 @@ class ArgvInput extends Input
             return $this->tokens;
         }
 
-        $parameters = [];
-        $keep = false;
-        foreach ($this->tokens as $value) {
-            if (!$keep && $value === $this->getFirstArgument()) {
-                $keep = true;
+        $position = $this->getFirstArgumentPosition();
 
-                continue;
-            }
-            if ($keep) {
-                $parameters[] = $value;
-            }
-        }
-
-        return $parameters;
+        return null === $position ? [] : \array_slice($this->tokens, $position + 1);
     }
 
     /**

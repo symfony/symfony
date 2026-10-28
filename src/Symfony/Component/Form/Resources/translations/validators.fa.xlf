@@ -4,15 +4,15 @@
         <body>
             <trans-unit id="28">
                 <source>This form should not contain extra fields.</source>
-                <target>این فرم نباید شامل فیلدهای اضافی باشد.</target>
+                <target>این فرم نباید فیلدهای اضافی داشته باشد.</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file.</source>
-                <target>فایل بارگذاری‌شده بسیار بزرگ است. لطفاً فایل کوچک‌تری را بارگذاری نمایید.</target>
+                <target>فایل بارگذاری‌شده بیش از حد بزرگ است. لطفاً فایل کوچک‌تری بارگذاری نمایید.</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>توکن CSRF نامعتبر است. لطفاً فرم را دوباره ارسال نمایید.</target>
+                <target>توکن امنیتی فرم معتبر نیست. لطفاً فرم را مجدداً ارسال نمایید.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>
@@ -20,115 +20,115 @@
             </trans-unit>
             <trans-unit id="100" resname="Please enter a valid birthdate.">
                 <source>This value is not a valid birthdate.</source>
-                <target state="needs-review-translation">این مقدار یک تاریخ تولد معتبر نیست.</target>
+                <target>این مقدار یک تاریخ تولد معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
-                <target>گزینه‌ انتخاب‌ شده نامعتبر است.</target>
+                <target>گزینه انتخاب‌شده معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>The collection is invalid.</source>
-                <target>این مجموعه نامعتبر است.</target>
+                <target>این مجموعه معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="103" resname="Please select a valid color.">
                 <source>This value is not a valid color.</source>
-                <target state="needs-review-translation">این مقدار یک رنگ معتبر نیست.</target>
+                <target>این مقدار یک رنگ معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="104" resname="Please select a valid country.">
                 <source>This value is not a valid country.</source>
-                <target>این مقدار یک کشور معتبر نمی‌باشد.</target>
+                <target>این مقدار یک کشور معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="105" resname="Please select a valid currency.">
                 <source>This value is not a valid currency.</source>
-                <target>این مقدار یک واحد پول معتبر نمی‌باشد.</target>
+                <target>این مقدار یک واحد پول معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="106" resname="Please choose a valid date interval.">
                 <source>This value is not a valid date interval.</source>
-                <target state="needs-review-translation">این مقدار یک بازه‌ زمانی معتبر نیست.</target>
+                <target state="needs-review-translation">بازه زمانی انتخاب‌شده معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="107" resname="Please enter a valid date and time.">
                 <source>This value is not a valid date and time.</source>
-                <target>این مقدار یک تاریخ و زمان معتبر نمی‌باشد.</target>
+                <target>این مقدار یک تاریخ و زمان معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="108" resname="Please enter a valid date.">
                 <source>This value is not a valid date.</source>
-                <target>این مقدار یک تاریخ معتبر نمی‌باشد.</target>
+                <target>این مقدار یک تاریخ معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="109" resname="Please select a valid file.">
                 <source>This value is not a valid file.</source>
-                <target state="needs-review-translation">این مقدار یک فایل معتبر نیست.</target>
+                <target>این مقدار یک فایل معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The hidden field is invalid.</source>
-                <target>فیلد مخفی نامعتبر است.</target>
+                <target>مقدار فیلد مخفی معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="111" resname="Please enter an integer.">
                 <source>This value is not a valid integer.</source>
-                <target state="needs-review-translation">این مقدار یک عدد صحیح معتبر نیست.</target>
+                <target>این مقدار یک عدد صحیح معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="112" resname="Please select a valid language.">
                 <source>This value is not a valid language.</source>
-                <target>این مقدار یک زبان معتبر نمی‌باشد.</target>
+                <target>این مقدار یک زبان معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="113" resname="Please select a valid locale.">
                 <source>This value is not a valid locale.</source>
-                <target state="needs-review-translation">این مقدار یک منطقه‌جغرافیایی (locale) معتبر نیست.</target>
+                <target state="needs-review-translation">این مقدار یک زبان و منطقه معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="114" resname="Please enter a valid money amount.">
                 <source>This value is not a valid money amount.</source>
-                <target state="needs-review-translation">این مقدار یک مقدار پول معتبر نیست.</target>
+                <target>این مقدار یک مبلغ معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="115" resname="Please enter a number.">
                 <source>This value is not a valid number.</source>
-                <target state="needs-review-translation">این مقدار یک عدد معتبر نیست.</target>
+                <target>این مقدار یک عدد معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>The password is invalid.</source>
-                <target>رمزعبور نامعتبر است.</target>
+                <target>رمز عبور معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="117" resname="Please enter a percentage value.">
                 <source>This value is not a valid percentage.</source>
-                <target state="needs-review-translation">این مقدار یک مقدار درصدی معتبر نیست.</target>
+                <target>این مقدار یک درصد معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>The values do not match.</source>
-                <target>مقادیر تطابق ندارند.</target>
+                <target>مقادیر با هم مطابقت ندارند.</target>
             </trans-unit>
             <trans-unit id="119" resname="Please enter a valid time.">
                 <source>This value is not a valid time.</source>
-                <target>این مقدار یک زمان معتبر نمی‌باشد.</target>
+                <target>این مقدار یک زمان معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="120" resname="Please select a valid timezone.">
                 <source>This value is not a valid timezone.</source>
-                <target>این مقدار یک منطقه‌زمانی (timezone) معتبر نیست.</target>
+                <target>این مقدار یک منطقه زمانی معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="121" resname="Please enter a valid URL.">
                 <source>This value is not a valid URL.</source>
-                <target>این مقدار یک URL معتبر نمی‌باشد.</target>
+                <target>این مقدار یک نشانی اینترنتی معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="122" resname="Please enter a valid search term.">
                 <source>This value is not a valid search term.</source>
-                <target state="needs-review-translation">این مقدار یک عبارت جستجوی معتبر نیست.</target>
+                <target>این مقدار یک عبارت جستجوی معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="123" resname="Please provide a valid phone number.">
                 <source>This value is not a valid phone number.</source>
-                <target state="needs-review-translation">این مقدار یک شماره تلفن معتبر نیست.</target>
+                <target>این مقدار یک شماره تلفن معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The checkbox has an invalid value.</source>
-                <target>چک‌باکس (checkbox) دارای مقداری نامعتبر است.</target>
+                <target>مقدار کادر انتخاب معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="125" resname="Please enter a valid email address.">
                 <source>This value is not a valid email address.</source>
-                <target>این مقدار یک آدرس رایانامه (ایمیل) معتبر نمی‌باشد.</target>
+                <target>این مقدار یک نشانی ایمیل معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="126" resname="Please select a valid option.">
                 <source>This value is not a valid option.</source>
-                <target state="needs-review-translation">این مقدار یک گزینه‌ معتبر نیست.</target>
+                <target>این مقدار یک گزینه معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="127" resname="Please select a valid range.">
                 <source>This value is not a valid range.</source>
-                <target state="needs-review-translation">این مقدار یک بازه معتبر نیست.</target>
+                <target>این مقدار یک بازه معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="128" resname="Please enter a valid week.">
                 <source>This value is not a valid week.</source>
@@ -136,11 +136,11 @@
             </trans-unit>
             <trans-unit id="129" resname="Please enter a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target>این مقدار یک UUID معتبر نیست.</target>
+                <target>این مقدار یک شناسه یکتا معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>
-                <target>کران پایین نباید بزرگ‌تر از کران بالا باشد.</target>
+                <target>حد پایین نباید بزرگ‌تر از حد بالا باشد.</target>
             </trans-unit>
         </body>
     </file>

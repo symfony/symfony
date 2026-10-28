@@ -212,6 +212,47 @@ class GlobResourceTest extends TestCase
         $this->assertEquals($p->getValue($resource), $p->getValue($newResource));
     }
 
+    #[TestWith([['prefix', 'pattern', 'recursive', 'hash', 'forExclusion', 'excludedPrefixes', 'directories'], true])]
+    #[TestWith([[0, 1, 2, 3, 4, 5, 6], true])]
+    #[TestWith([[2, 4, 6, 8, 10, 12, 14], true])]
+    #[TestWith([['prefix', 'pattern', 'recursive', 'hash', 'forExclusion', 'excludedPrefixes'], false])]
+    public function testUnserializePreservesValueOrder(array $keys, bool $withDirectories)
+    {
+        $resource = new GlobResource(__DIR__, '/*.php', true, true, [__DIR__.'/excluded' => true]);
+        $expected = $resource->__serialize();
+        $data = $expected;
+        if (!$withDirectories) {
+            unset($data['directories']);
+            $expected['directories'] = null;
+        }
+        $data = array_combine($keys, array_values($data));
+        if ($withDirectories) {
+            $data['extra'] = 'ignored';
+        }
+
+        $restored = (new \ReflectionClass(GlobResource::class))->newInstanceWithoutConstructor();
+        $restored->__unserialize($data);
+
+        $this->assertSame($expected, $restored->__serialize());
+    }
+
+    public function testUnserializeRejectsStringableExtraValue()
+    {
+        $resource = new GlobResource(__DIR__, '/*.php', true);
+        $data = $resource->__serialize();
+        $data['extra'] = new class implements \Stringable {
+            public function __toString(): string
+            {
+                throw new \LogicException('Must not be called.');
+            }
+        };
+
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Cannot unserialize '.GlobResource::class);
+
+        $resource->__unserialize($data);
+    }
+
     public function testPhar()
     {
         $s = \DIRECTORY_SEPARATOR;

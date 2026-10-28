@@ -44,6 +44,6 @@ final class DialectKeywords
     {
         return true === ($schema['nullable'] ?? false)
             || \in_array('null', (array) ($schema['type'] ?? []), true)
-            || array_any($schema['anyOf'] ?? [], static fn (array $branch): bool => self::allowsNull($branch));
+            || array_any($schema['anyOf'] ?? [], static fn (array|bool $branch): bool => \is_bool($branch) ? $branch : self::allowsNull($branch));
     }
 }

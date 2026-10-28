@@ -808,6 +808,22 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSameSchema(['type' => 'string'], $definition['properties']['shelf']);
     }
 
+    #[DataProvider('provideBooleanItemsSchemas')]
+    public function testChoiceOfManyRestrictsBooleanItemsSchemas(bool $items, array|bool $expectedItems)
+    {
+        $generator = SchemaGenerator::create(null, [], [new FixedPropertySchemaProvider(ContactWithFormatConstraints::class, 'channels', ['type' => 'array', 'items' => $items])]);
+
+        $definition = $generator->generate(Type::object(ContactWithFormatConstraints::class))->getDefinitions()['ContactWithFormatConstraints'];
+
+        $this->assertSame($expectedItems, $definition['properties']['channels']['items']);
+    }
+
+    public static function provideBooleanItemsSchemas(): iterable
+    {
+        yield 'any item' => [true, ['enum' => ['email', 'sms', 'push']]];
+        yield 'no item' => [false, false];
+    }
+
     public function testDefinitionNameReplacesTheGroupsSuffix()
     {
         $schema = SchemaGenerator::create()->generate(Type::object(GroupedProduct::class), new Configuration(groups: ['product:read'], definitionName: 'Custom'));

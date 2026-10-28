@@ -29,5 +29,7 @@ class DialectKeywordsTest extends TestCase
         yield 'type union' => [['type' => ['string', 'null']], ['a', 'b', null]];
         yield 'nullable flag' => [['type' => 'string', 'nullable' => true], ['a', 'b', null]];
         yield 'anyOf branch' => [['anyOf' => [['$ref' => '#/$defs/Code'], ['type' => 'null']]], ['a', 'b', null]];
+        yield 'true anyOf branch' => [['anyOf' => [['type' => 'string'], true]], ['a', 'b', null]];
+        yield 'false anyOf branch' => [['anyOf' => [['type' => 'string'], false]], ['a', 'b']];
     }
 }

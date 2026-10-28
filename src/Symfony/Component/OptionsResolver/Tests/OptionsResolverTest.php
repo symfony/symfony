@@ -787,6 +787,29 @@ class OptionsResolverTest extends TestCase
         $this->assertSame(['foo' => '1'], $options);
     }
 
+    public function testCallableCanBecomeValidOnTheSecondAutoloadAttempt()
+    {
+        $class = __NAMESPACE__.'\\CallableLoadedAfterSecondAttempt';
+        $attempts = 0;
+        $loader = static function (string $name) use ($class, &$attempts): void {
+            if ($class === $name && 2 === ++$attempts) {
+                class_alias(Assert::class, $class);
+            }
+        };
+        spl_autoload_register($loader, true, true);
+
+        try {
+            $callable = $class.'::assertTrue';
+            $this->resolver->setDefined('foo');
+            $this->resolver->setAllowedTypes('foo', 'callable');
+
+            $this->assertSame(['foo' => $callable], $this->resolver->resolve(['foo' => $callable]));
+            $this->assertSame(2, $attempts);
+        } finally {
+            spl_autoload_unregister($loader);
+        }
+    }
+
     public function testResolveTypedWithUnionAndWhitespaces()
     {
         $this->resolver->setDefined('foo');

@@ -16,9 +16,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\Routing\Router;
 
 /**
  * Encapsulates the logic needed to create sub-requests, redirect the user, and match URLs.
@@ -215,10 +217,18 @@ class HttpUtils
 
         unset($parameters['_route'], $parameters['_controller']);
 
+        // a parameter that doesn't match the requirements of the route should fail the check instead of logging an error
+        $generator = $this->urlGenerator instanceof Router ? $this->urlGenerator->getGenerator() : $this->urlGenerator;
+        $generator = $generator instanceof ConfigurableRequirementsInterface ? $generator : null;
+        $strictRequirements = $generator?->isStrictRequirements();
+        $generator?->setStrictRequirements(true);
+
         try {
             $url = $this->urlGenerator->generate($route, $parameters);
         } catch (ExceptionInterface) {
             return false;
+        } finally {
+            $generator?->setStrictRequirements($strictRequirements);
         }
 
         return $url === $request->getBaseUrl().$request->getPathInfo();

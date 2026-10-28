@@ -113,6 +113,28 @@ trait TagAwareTestTrait
         $this->assertTrue($pool->getItem('k')->isHit());
     }
 
+    public function testTagsAreKeptOnSaveAfterConcurrentRemoval()
+    {
+        $pool = $this->createCachePool();
+        $pool->save($pool->getItem('k')->tag('foo'));
+
+        $i = $pool->getItem('k');
+        $this->createCachePool()->invalidateTags(['foo']);
+        $pool->save($i->tag('foo'));
+        $pool->invalidateTags(['foo']);
+
+        $this->assertFalse($pool->getItem('k')->isHit());
+
+        $pool->save($pool->getItem('k')->tag('foo'));
+
+        $i = $pool->getItem('k');
+        $this->createCachePool()->deleteItem('k');
+        $pool->save($i->tag('foo'));
+        $pool->invalidateTags(['foo']);
+
+        $this->assertFalse($pool->getItem('k')->isHit());
+    }
+
     public function testTagItemExpiry()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {

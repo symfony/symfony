@@ -203,7 +203,7 @@ class ProfilerController
             $this->twig->render('@WebProfiler/Profiler/search.html.twig', [
                 'token' => $request->query->get('token', $session?->get('_profiler_search_token')),
                 'ip' => $request->query->get('ip', $session?->get('_profiler_search_ip')),
-                'method' => $request->query->get('method', $session?->get('_profiler_search_method')),
+                'method' => $this->getMethods($request) ?: array_filter(explode(',', $session?->get('_profiler_search_method') ?? '')),
                 'status_code' => $request->query->get('status_code', $session?->get('_profiler_search_status_code')),
                 'url' => $request->query->get('url', $session?->get('_profiler_search_url')),
                 'start' => $request->query->get('start', $session?->get('_profiler_search_start')),
@@ -231,7 +231,7 @@ class ProfilerController
         $profile = $this->profiler->loadProfile($token);
 
         $ip = $request->query->get('ip');
-        $method = $request->query->get('method');
+        $method = implode(',', $this->getMethods($request)) ?: null;
         $statusCode = $request->query->get('status_code');
         $url = $request->query->get('url');
         $start = $request->query->get('start', null);
@@ -266,7 +266,7 @@ class ProfilerController
         $this->denyAccessIfProfilerDisabled();
 
         $ip = $request->query->get('ip');
-        $method = $request->query->get('method');
+        $method = implode(',', $this->getMethods($request)) ?: null;
         $statusCode = $request->query->get('status_code');
         $url = $request->query->get('url');
         $start = $request->query->get('start', null);
@@ -402,6 +402,17 @@ class ProfilerController
     protected function getTemplateManager(): TemplateManager
     {
         return $this->templateManager ??= new TemplateManager($this->profiler, $this->twig, $this->templates);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getMethods(Request $request): array
+    {
+        $methods = $request->query->all()['method'] ?? [];
+
+        // accepts both "method[]=GET&method[]=POST" and "method=GET,POST"
+        return array_values(array_filter(array_map('trim', explode(',', implode(',', (array) $methods)))));
     }
 
     /**

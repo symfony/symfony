@@ -10,6 +10,7 @@ CHANGELOG
  * Add a Key Management panel
  * Display the duration and the transferred sizes of each request in the HTTP Client panel
  * Show the descriptions of workflows, places and transitions in the Workflow panel
+ * Allow selecting multiple HTTP methods in the profiler search form
 
 8.1
 ---

@@ -21,6 +21,8 @@ use Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator;
 use Symfony\Bundle\WebProfilerBundle\Tests\Functional\WebProfilerBundleKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
@@ -416,6 +418,103 @@ class ProfilerControllerTest extends WebTestCase
 
         $this->assertStringContainsString('results found', $client->getResponse()->getContent());
         $this->assertStringContainsString(\sprintf('<a href="/_profiler/%s">%s</a>', $token, $token), $client->getResponse()->getContent());
+    }
+
+    #[DataProvider('provideMultipleMethodsQueries')]
+    public function testSearchActionWithMultipleMethods(array $query)
+    {
+        $profiler = $this->createMock(Profiler::class);
+        $profiler->expects($this->once())
+            ->method('find')
+            ->with(null, null, null, 'GET,POST')
+            ->willReturn([]);
+
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator->expects($this->once())
+            ->method('generate')
+            ->with('_profiler_search_results', $this->callback(static fn (array $parameters) => 'GET,POST' === $parameters['method']))
+            ->willReturn('/_profiler/empty/search/results');
+
+        $controller = new ProfilerController($urlGenerator, $profiler, new Environment(new ArrayLoader()), []);
+
+        $response = $controller->searchAction(Request::create('/_profiler/search', 'GET', $query));
+
+        $this->assertSame(302, $response->getStatusCode());
+    }
+
+    public static function provideMultipleMethodsQueries(): iterable
+    {
+        yield 'array' => [['method' => ['GET', 'POST']]];
+        yield 'comma separated' => [['method' => 'GET,POST']];
+    }
+
+    #[DataProvider('provideMultipleMethodsQueries')]
+    public function testSearchResultsActionWithMultipleMethods(array $query)
+    {
+        $profiler = $this->createMock(Profiler::class);
+        $profiler->expects($this->once())
+            ->method('find')
+            ->with(null, null, null, 'GET,POST')
+            ->willReturn([]);
+
+        $twig = $this->createMock(Environment::class);
+        $twig->expects($this->once())
+            ->method('render')
+            ->with($this->stringEndsWith('results.html.twig'), $this->callback(static fn (array $variables) => 'GET,POST' === $variables['method']))
+            ->willReturn('');
+
+        $controller = $this->createController($profiler, $twig, false);
+
+        $response = $controller->searchResultsAction(Request::create('/_profiler/empty/search/results', 'GET', $query), 'empty');
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testSearchActionStoresMethodsInSession()
+    {
+        $profiler = $this->createStub(Profiler::class);
+        $profiler->method('find')->willReturn([]);
+
+        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
+        $urlGenerator->method('generate')->willReturn('/_profiler/empty/search/results');
+
+        $controller = new ProfilerController($urlGenerator, $profiler, new Environment(new ArrayLoader()), []);
+
+        $request = Request::create('/_profiler/search', 'GET', ['method' => ['GET', 'POST']]);
+        $request->setSession($session = new Session(new MockArraySessionStorage()));
+
+        $controller->searchAction($request);
+
+        $this->assertSame('GET,POST', $session->get('_profiler_search_method'));
+    }
+
+    #[DataProvider('provideSearchBarMethods')]
+    public function testSearchBarActionMethods(array $query, ?string $sessionMethod, array $expected)
+    {
+        $twig = $this->createMock(Environment::class);
+        $twig->expects($this->once())
+            ->method('render')
+            ->with($this->stringEndsWith('search.html.twig'), $this->callback(static fn (array $variables) => $expected === $variables['method']))
+            ->willReturn('');
+
+        $controller = $this->createController($this->createStub(Profiler::class), $twig, false);
+
+        $request = Request::create('/_profiler/search_bar', 'GET', $query);
+        $request->setSession($session = new Session(new MockArraySessionStorage()));
+        if (null !== $sessionMethod) {
+            $session->set('_profiler_search_method', $sessionMethod);
+        }
+
+        $this->assertSame(200, $controller->searchBarAction($request)->getStatusCode());
+    }
+
+    public static function provideSearchBarMethods(): iterable
+    {
+        yield 'no filter' => [[], null, []];
+        yield 'from the query' => [['method' => ['GET', 'POST']], null, ['GET', 'POST']];
+        yield 'from the session' => [[], 'GET,POST', ['GET', 'POST']];
+        yield 'the query wins over the session' => [['method' => ['PUT']], 'GET,POST', ['PUT']];
+        yield 'empty values are ignored' => [['method' => ['', 'GET']], null, ['GET']];
     }
 
     public function testPhpinfoActionWithProfilerDisabled()

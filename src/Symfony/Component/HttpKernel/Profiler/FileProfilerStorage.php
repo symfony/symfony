@@ -64,6 +64,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
             $offset = 0;
         }
 
+        $methods = $method ? explode(',', $method) : [];
+
         $result = [];
         while (\count($result) < $limit && ftell($file) > $offset && $line = $this->readLineFromFile($file)) {
             $values = str_getcsv($line, ',', '"', '\\');
@@ -81,7 +83,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $urlFilter = str_starts_with($url, '!') ? str_contains($csvUrl, substr($url, 1)) : !str_contains($csvUrl, $url);
             }
 
-            if ($ip && !str_contains($csvIp, $ip) || $urlFilter || $method && !str_contains($csvMethod, $method) || $statusCode && !str_contains($csvStatusCode, $statusCode)) {
+            if ($ip && !str_contains($csvIp, $ip) || $urlFilter || $methods && !\in_array($csvMethod, $methods, true) || $statusCode && !str_contains($csvStatusCode, $statusCode)) {
                 continue;
             }
 

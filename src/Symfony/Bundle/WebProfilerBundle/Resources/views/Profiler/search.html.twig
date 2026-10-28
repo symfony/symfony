@@ -13,24 +13,39 @@
 
         <div class="form-group-row">
             <div class="form-group">
-                <label for="method">
+                <label id="method-label">
                     {% if 'command' == profile_type %}
                         Mode
                     {% else %}
                         Method
                     {% endif %}
                 </label>
-                <select name="method" id="method">
-                    <option value="">Any</option>
-                    {% if 'command' == profile_type %}
-                        {% set methods = ['BATCH', 'INTERACTIVE'] %}
-                    {% else %}
-                        {% set methods = ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT', 'QUERY'] %}
-                    {% endif %}
-                    {% for m in methods %}
-                        <option {{ m == method ? 'selected="selected"' }}>{{ m }}</option>
-                    {% endfor %}
-                </select>
+                {% if 'command' == profile_type %}
+                    {% set methods = ['BATCH', 'INTERACTIVE'] %}
+                {% else %}
+                    {% set methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', 'QUERY'] %}
+                {% endif %}
+                <details id="method" class="method-filter">
+                    <summary>
+                        <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
+                        <span class="method-filter-label">All</span>
+                        <span class="method-filter-count"></span>
+                    </summary>
+
+                    <div class="method-filter-content" role="group" aria-labelledby="method-label">
+                        <div class="method-filter-actions">
+                            <button type="button" class="btn btn-link select-all">Select All</button>
+                            <button type="button" class="btn btn-link select-none">Select None</button>
+                        </div>
+
+                        {% for m in methods %}
+                            <div class="method-filter-option">
+                                <input type="checkbox" name="method[]" id="method-{{ m }}" value="{{ m }}" {{ m in method ? 'checked' }}>
+                                <label for="method-{{ m }}">{{ m }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </details>
             </div>
 
             <div class="form-group">

@@ -353,6 +353,24 @@ class FileProfilerStorageTest extends TestCase
         $this->storage->purge();
     }
 
+    public function testRetrieveByMultipleMethods()
+    {
+        foreach (['POST', 'GET', 'OPTIONS'] as $method) {
+            for ($i = 0; $i < 3; ++$i) {
+                $profile = new Profile('token_'.$i.$method);
+                $profile->setMethod($method);
+                $this->storage->write($profile);
+            }
+        }
+
+        $this->assertCount(6, $this->storage->find('', '', 10, 'GET,POST'));
+        $this->assertCount(2, $this->storage->find('', '', 2, 'GET,POST'));
+        $this->assertCount(3, $this->storage->find('', '', 10, 'OPTIONS'));
+        $this->assertCount(9, $this->storage->find('', '', 10, ''));
+
+        $this->storage->purge();
+    }
+
     public function testPurge()
     {
         $profile = new Profile('token1');

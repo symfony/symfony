@@ -206,12 +206,15 @@ class DataClassFormIntegrationTest extends TestCase
 
         $this->assertInstanceOf(IntegerType::class, $form->get('minutes')->getConfig()->getType()->getInnerType());
         $this->assertFalse($form->get('minutes')->isRequired());
+        $this->assertInstanceOf(IntegerType::class, $form->get('publicAge')->getConfig()->getType()->getInnerType());
+        $this->assertFalse($form->get('publicAge')->isRequired());
         $this->assertInstanceOf(DateTimeType::class, $form->get('startsAt')->getConfig()->getType()->getInnerType());
 
-        $form->submit(['minutes' => '90', 'startsAt' => '2026-10-10T18:30']);
+        $form->submit(['minutes' => '90', 'publicAge' => '42', 'startsAt' => '2026-10-10T18:30']);
 
         $this->assertTrue($form->isSynchronized());
         $this->assertSame(90, $data->minutes);
+        $this->assertSame(42, $data->internalAge);
         $this->assertInstanceOf(DatePoint::class, $data->startsAt);
         $this->assertSame('2026-10-10 18:30', $data->startsAt->format('Y-m-d H:i'));
     }
@@ -324,6 +327,9 @@ class TypedFieldsData
 {
     #[FormField]
     public ?int $minutes = null;
+
+    #[FormField(name: 'publicAge')]
+    public ?int $internalAge = null;
 
     #[FormField]
     public ?DatePoint $startsAt = null;

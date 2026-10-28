@@ -247,9 +247,10 @@ class FormPass implements CompilerPassInterface
 
             // the parent types add their fields to the form of the child class, so the guessers are called with the child class
             do {
-                foreach ($definition->getArgument(3) as $name => [$type]) {
+                foreach ($definition->getArgument(3) as $name => [$type, $options]) {
                     if (null === $type) {
-                        $fields[$name] = $name;
+                        $propertyPath = $options['property_path'] ?? null;
+                        $fields[$name] = \is_string($propertyPath) && '' !== $propertyPath && false === strpbrk($propertyPath, '.[]?\\') ? $propertyPath : $name;
                     }
                 }
             } while ($definition = $dataClassTypes[$definition->getArgument(1)] ?? null);

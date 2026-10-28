@@ -95,10 +95,12 @@ class FormFactory implements FormFactoryInterface
             return $this->createNamedBuilder($property, TextType::class, $data, $options);
         }
 
-        $typeGuess = $guesser->guessType($class, $property);
-        $maxLengthGuess = $guesser->guessMaxLength($class, $property);
-        $requiredGuess = $guesser->guessRequired($class, $property);
-        $patternGuess = $guesser->guessPattern($class, $property);
+        $guessProperty = isset($options['property_path']) ? self::resolveWriteProperty($options['property_path']) ?? $property : $property;
+
+        $typeGuess = $guesser->guessType($class, $guessProperty);
+        $maxLengthGuess = $guesser->guessMaxLength($class, $guessProperty);
+        $requiredGuess = $guesser->guessRequired($class, $guessProperty);
+        $patternGuess = $guesser->guessPattern($class, $guessProperty);
 
         $type = $typeGuess ? $typeGuess->getType() : TextType::class;
 

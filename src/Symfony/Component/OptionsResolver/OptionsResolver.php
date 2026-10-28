@@ -1145,6 +1145,15 @@ class OptionsResolver implements Options
             return true;
         }
 
+        // Autoloading can make the second is_callable() check return a different result.
+        if ('callable' !== $type && ']' !== ($type[-1] ?? '') && (isset(self::VALIDATION_FUNCTIONS[$type]) || false === strpbrk($type, "|()[] \t\n\r\0\x0B"))) {
+            if (\is_array($invalidTypes) && (!$invalidTypes || $level > 0)) {
+                $invalidTypes[get_debug_type($value)] = true;
+            }
+
+            return false;
+        }
+
         $type = trim($type);
         $allowedTypes = $this->splitOutsideParenthesis($type);
         if (\count($allowedTypes) > 1) {

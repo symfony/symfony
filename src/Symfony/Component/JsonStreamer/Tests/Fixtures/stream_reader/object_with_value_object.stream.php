@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @return Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes
  */
@@ -10,13 +12,21 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
             throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes'));
         }
         return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes::class, static function ($object) use ($stream, $data, $options, $transformers, $instantiator, &$providers) {
+            $properties = [];
             foreach ($data as $k => $v) {
                 match ($k) {
-                    'interface' => $object->interface = (\Symfony\Component\JsonStreamer\Read\Decoder::isNull($stream, $v[0]) ? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes::$interface".') : $providers['DateTimeInterface']($stream, $v[0], $v[1])),
-                    'immutable' => $object->immutable = (\Symfony\Component\JsonStreamer\Read\Decoder::isNull($stream, $v[0]) ? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes::$immutable".') : $providers['DateTimeImmutable']($stream, $v[0], $v[1])),
-                    'union' => $object->union = (\Symfony\Component\JsonStreamer\Read\Decoder::isNull($stream, $v[0]) ? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes::$union".') : $providers['DateTimeImmutable|int']($stream, $v[0], $v[1])),
+                    'interface' => $properties['interface'] = (\Symfony\Component\JsonStreamer\Read\Decoder::isNull($stream, $v[0]) ? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes::$interface".') : $providers['DateTimeInterface']($stream, $v[0], $v[1])),
+                    'immutable' => $properties['immutable'] = (\Symfony\Component\JsonStreamer\Read\Decoder::isNull($stream, $v[0]) ? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes::$immutable".') : $providers['DateTimeImmutable']($stream, $v[0], $v[1])),
+                    'union' => $properties['union'] = (\Symfony\Component\JsonStreamer\Read\Decoder::isNull($stream, $v[0]) ? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithDateTimes::$union".') : $providers['DateTimeImmutable|int']($stream, $v[0], $v[1])),
                     default => null,
                 };
+            }
+            foreach ($properties as $name => $value) {
+                try {
+                    $object->{$name} = $value;
+                } catch (\TypeError $e) {
+                    throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
+                }
             }
         });
     };

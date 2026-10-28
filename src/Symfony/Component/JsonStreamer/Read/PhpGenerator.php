@@ -60,6 +60,8 @@ final class PhpGenerator
         if ($decodeFromStream) {
             return $this->line('<?php', $context)
                 .$this->line('', $context)
+                .$this->line('declare(strict_types=1);', $context)
+                .$this->line('', $context)
                 .$this->line('/**', $context)
                 .$this->line(' * @return '.$docType, $context)
                 .$this->line(' */', $context)
@@ -72,6 +74,8 @@ final class PhpGenerator
         }
 
         return $this->line('<?php', $context)
+            .$this->line('', $context)
+            .$this->line('declare(strict_types=1);', $context)
             .$this->line('', $context)
             .$this->line('/**', $context)
             .$this->line(' * @return '.$docType, $context)
@@ -209,6 +213,7 @@ final class PhpGenerator
 
             if ($decodeFromStream) {
                 $php .= $this->line('return $instantiator->instantiate(\\'.$node->getType()->getClassName().'::class, static function ($object) use ($stream, $data, $options, $transformers, $instantiator, &$providers) {', $context)
+                    .$this->line('    $properties = [];', $context)
                     .$this->line('    foreach ($data as $k => $v) {', $context)
                     .$this->line('        match ($k) {', $context);
 
@@ -222,28 +227,41 @@ final class PhpGenerator
                     };
 
                     // numeric streamed names are int array keys, while split dict keys are strings
-                    $php .= $this->line('            '.var_export((string) $streamedName, true).' => $object->'.$property['name'].' = '.$property['accessor']($propertyValuePhp).',', $context);
+                    $php .= $this->line('            '.var_export((string) $streamedName, true).' => $properties['.var_export($property['name'], true).'] = '.$property['accessor']($propertyValuePhp).',', $context);
                 }
 
                 $php .= $this->line('            default => null,', $context)
                     .$this->line('        };', $context)
                     .$this->line('    }', $context)
+                    .$this->line('    foreach ($properties as $name => $value) {', $context)
+                    .$this->line('        try {', $context)
+                    .$this->line('            $object->{$name} = $value;', $context)
+                    .$this->line('        } catch (\\TypeError $e) {', $context)
+                    .$this->line('            throw new \\'.UnexpectedValueException::class.'($e->getMessage(), 0, $e);', $context)
+                    .$this->line('        }', $context)
+                    .$this->line('    }', $context)
                     .$this->line('});', $context);
             } else {
-                $propertiesValuePhp = '[';
-                $separator = '';
+                $php .= $this->line('$object = new \\'.$node->getType()->getClassName().'();', $context);
+
                 foreach ($node->getProperties() as $streamedName => $property) {
                     $quotedStreamedName = var_export($streamedName, true);
                     $propertyValuePhp = $this->generateNullGuard($property['value'], "\$data[$quotedStreamedName]", $node->getType()->getClassName().'::$'.$property['name']);
                     if (!$this->canBeDecodedWithJsonDecode($property['value'], $decodeFromStream)) {
                         $propertyValuePhp = '$providers['.var_export($property['value']->getIdentifier(), true)."]($propertyValuePhp)";
                     }
-                    $propertiesValuePhp .= $separator."...(\\array_key_exists($quotedStreamedName, \$data) ? [".var_export($property['name'], true).' => '.$property['accessor']($propertyValuePhp).'] : [])';
-                    $separator = ', ';
-                }
-                $propertiesValuePhp .= ']';
 
-                $php .= $this->line('return $instantiator->instantiate(\\'.$node->getType()->getClassName()."::class, $propertiesValuePhp);", $context);
+                    $php .= $this->line("if (\\array_key_exists($quotedStreamedName, \$data)) {", $context)
+                        .$this->line('    $value = '.$property['accessor']($propertyValuePhp).';', $context)
+                        .$this->line('    try {', $context)
+                        .$this->line('        $object->{'.var_export($property['name'], true).'} = $value;', $context)
+                        .$this->line('    } catch (\\TypeError $e) {', $context)
+                        .$this->line('        throw new \\'.UnexpectedValueException::class.'($e->getMessage(), 0, $e);', $context)
+                        .$this->line('    }', $context)
+                        .$this->line('}', $context);
+                }
+
+                $php .= $this->line('return $object;', $context);
             }
 
             --$context['indentation_level'];

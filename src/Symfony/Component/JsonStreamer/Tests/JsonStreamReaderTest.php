@@ -34,6 +34,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableRepeate
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNumericStreamedNames;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithQuotes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithScalarProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjects;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
@@ -435,6 +436,50 @@ class JsonStreamReaderTest extends TestCase
         $this->expectExceptionMessage(\sprintf('Unexpected "string" value for "%s".', ClassicDummy::class));
 
         $reader->read('"foo"', Type::object(ClassicDummy::class));
+    }
+
+    #[DataProvider('throwWhenReadingMistypedScalarPropertyDataProvider')]
+    public function testThrowWhenReadingMistypedScalarProperty(string $json)
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $resource = fopen('php://temp', 'w');
+        fwrite($resource, $json);
+        rewind($resource);
+
+        foreach ([$json, $resource] as $input) {
+            try {
+                // objects read from a stream are lazy, so a property must be accessed
+                $reader->read($input, Type::object(DummyWithScalarProperties::class))->name;
+                $this->fail(\sprintf('Expected "%s" to be thrown.', UnexpectedValueException::class));
+            } catch (UnexpectedValueException $e) {
+                $this->assertInstanceOf(\TypeError::class, $e->getPrevious());
+            }
+        }
+    }
+
+    /**
+     * @return iterable<array{0: string}>
+     */
+    public static function throwWhenReadingMistypedScalarPropertyDataProvider(): iterable
+    {
+        yield ['{"active":"no"}'];
+        yield ['{"active":1}'];
+        yield ['{"count":"99"}'];
+        yield ['{"count":7.9}'];
+        yield ['{"count":true}'];
+        yield ['{"ratio":"1.5"}'];
+        yield ['{"name":123}'];
+        yield ['{"name":true}'];
+    }
+
+    public function testReadIntegerIntoFloatProperty()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertSame(2.0, $read->ratio);
+        }, '{"ratio":2}', Type::object(DummyWithScalarProperties::class));
     }
 
     public function testReadObjectWithNullableRepeatedObjects()

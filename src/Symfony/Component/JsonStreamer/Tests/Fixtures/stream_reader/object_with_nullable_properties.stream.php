@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @return Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties
  */
@@ -10,12 +12,20 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
             throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNullableProperties'));
         }
         return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties::class, static function ($object) use ($stream, $data, $options, $transformers, $instantiator, &$providers) {
+            $properties = [];
             foreach ($data as $k => $v) {
                 match ($k) {
-                    'name' => $object->name = \Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $v[0], $v[1]),
-                    'enum' => $object->enum = $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum|null']($stream, $v[0], $v[1]),
+                    'name' => $properties['name'] = \Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $v[0], $v[1]),
+                    'enum' => $properties['enum'] = $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum|null']($stream, $v[0], $v[1]),
                     default => null,
                 };
+            }
+            foreach ($properties as $name => $value) {
+                try {
+                    $object->{$name} = $value;
+                } catch (\TypeError $e) {
+                    throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
+                }
             }
         });
     };

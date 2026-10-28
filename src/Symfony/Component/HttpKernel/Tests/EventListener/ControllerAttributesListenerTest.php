@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\RecoverableAttribute;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
@@ -366,6 +367,150 @@ class ControllerAttributesListenerTest extends TestCase
         ], $dispatchedEvents);
     }
 
+    public function testFailureOfARecoverableAttributeIsPassedToTheControllerParameterTypedToReceiveIt()
+    {
+        $failure = new \DomainException();
+        $event = $this->createGuardedArgumentsEvent(#[RecoverableGuard] static fn (\RangeException|\DomainException|null $exception = null) => null);
+
+        $this->createGuardListener()->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, $this->createFailingDispatcher(KernelEvents::CONTROLLER_ARGUMENTS, $failure));
+
+        $this->assertSame([$failure], $event->getArguments());
+    }
+
+    public function testFirstRecoverableExceptionOfTheChainIsPassed()
+    {
+        $previous = new \DomainException();
+        $event = $this->createGuardedArgumentsEvent(#[RecoverableGuard] static fn (?\DomainException $exception = null) => null);
+
+        $this->createGuardListener()->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, $this->createFailingDispatcher(KernelEvents::CONTROLLER_ARGUMENTS, new \RuntimeException('', 0, $previous)));
+
+        $this->assertSame([$previous], $event->getArguments());
+    }
+
+    public function testFailureIsThrownWhenTheParameterTypeIsBroaderThanTheRecoverableExceptions()
+    {
+        $failure = new \DomainException();
+        $event = $this->createGuardedArgumentsEvent(#[RecoverableGuard] static fn (?\Exception $exception = null) => null);
+
+        $this->expectExceptionObject($failure);
+
+        $this->createGuardListener()->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, $this->createFailingDispatcher(KernelEvents::CONTROLLER_ARGUMENTS, $failure));
+    }
+
+    public function testFailureBeforeTheArgumentsAreResolvedIsThrownWhenTheParameterTypeIsBroaderThanTheRecoverableExceptions()
+    {
+        $failure = new \DomainException();
+        $event = new ControllerEvent($this->createStub(HttpKernelInterface::class), #[RecoverableGuard] static fn (?\Exception $exception = null) => null, new Request(), HttpKernelInterface::MAIN_REQUEST);
+
+        $this->expectExceptionObject($failure);
+
+        $this->createGuardListener()->beforeController($event, KernelEvents::CONTROLLER, $this->createFailingDispatcher(KernelEvents::CONTROLLER, $failure));
+    }
+
+    public function testFailureIsThrownWhenNoParameterIsTypedToReceiveIt()
+    {
+        $failure = new \DomainException();
+        $event = $this->createGuardedArgumentsEvent(#[RecoverableGuard] static fn (?\RangeException $exception = null) => null);
+
+        $this->expectExceptionObject($failure);
+
+        $this->createGuardListener()->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, $this->createFailingDispatcher(KernelEvents::CONTROLLER_ARGUMENTS, $failure));
+    }
+
+    public function testAttributeExtendingARecoverableOneIsRecoverable()
+    {
+        $failure = new \DomainException();
+        $event = $this->createGuardedArgumentsEvent(#[ChildRecoverableGuard] static fn (?\DomainException $exception = null) => null);
+
+        $this->createGuardListener()->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, $this->createFailingDispatcher(KernelEvents::CONTROLLER_ARGUMENTS, $failure));
+
+        $this->assertSame([$failure], $event->getArguments());
+    }
+
+    public function testFailureOfANonRecoverableAttributeIsThrown()
+    {
+        $failure = new \DomainException();
+        $event = $this->createGuardedArgumentsEvent(#[Guard] static fn (?\DomainException $exception = null) => null);
+
+        $this->expectExceptionObject($failure);
+
+        $this->createGuardListener()->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, $this->createFailingDispatcher(KernelEvents::CONTROLLER_ARGUMENTS, $failure));
+    }
+
+    public function testFailureNotDeclaredAsRecoverableIsThrown()
+    {
+        $failure = new \RuntimeException();
+        $event = $this->createGuardedArgumentsEvent(#[RecoverableGuard] static fn (?\Throwable $exception = null) => null);
+
+        $this->expectExceptionObject($failure);
+
+        $this->createGuardListener()->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, $this->createFailingDispatcher(KernelEvents::CONTROLLER_ARGUMENTS, $failure));
+    }
+
+    public function testFailureIsThrownOnceTheParameterReceivedAnotherOne()
+    {
+        $second = new \DomainException();
+        $event = $this->createGuardedArgumentsEvent(#[RecoverableGuard, RecoverableGuard] static fn (?\DomainException $exception = null) => null);
+
+        $this->expectExceptionObject($second);
+
+        $this->createGuardListener()->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, $this->createFailingDispatcher(KernelEvents::CONTROLLER_ARGUMENTS, new \DomainException(), $second));
+    }
+
+    public function testFailureBeforeTheArgumentsAreResolvedIsPassedOnceTheyAre()
+    {
+        $failure = new \DomainException();
+        $controller = #[RecoverableGuard] static fn (?\DomainException $exception = null) => null;
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $request = new Request();
+        $listener = $this->createGuardListener();
+
+        $listener->beforeController(new ControllerEvent($kernel, $controller, $request, HttpKernelInterface::MAIN_REQUEST), KernelEvents::CONTROLLER, $this->createFailingDispatcher(KernelEvents::CONTROLLER, $failure));
+
+        $event = new ControllerArgumentsEvent($kernel, $controller, [null], $request, HttpKernelInterface::MAIN_REQUEST);
+        $listener->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, new EventDispatcher());
+
+        $this->assertSame([$failure], $event->getArguments());
+    }
+
+    public function testFailureBeforeTheArgumentsAreResolvedIsThrownWhenNoParameterIsTypedToReceiveIt()
+    {
+        $failure = new \DomainException();
+        $event = new ControllerEvent($this->createStub(HttpKernelInterface::class), #[RecoverableGuard] static fn (?\RangeException $exception = null) => null, new Request(), HttpKernelInterface::MAIN_REQUEST);
+
+        $this->expectExceptionObject($failure);
+
+        $this->createGuardListener()->beforeController($event, KernelEvents::CONTROLLER, $this->createFailingDispatcher(KernelEvents::CONTROLLER, $failure));
+    }
+
+    private function createGuardListener(): ControllerAttributesListener
+    {
+        $guards = [RecoverableGuard::class => true, Guard::class => true];
+
+        return new ControllerAttributesListener([KernelEvents::CONTROLLER => $guards, KernelEvents::CONTROLLER_ARGUMENTS => $guards]);
+    }
+
+    private function createGuardedArgumentsEvent(\Closure $controller): ControllerArgumentsEvent
+    {
+        return new ControllerArgumentsEvent($this->createStub(HttpKernelInterface::class), $controller, [null], new Request(), HttpKernelInterface::MAIN_REQUEST);
+    }
+
+    /**
+     * Each guard dispatched throws the next failure.
+     */
+    private function createFailingDispatcher(string $eventName, \Throwable ...$failures): EventDispatcher
+    {
+        $fail = static function () use (&$failures) {
+            throw array_shift($failures);
+        };
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener($eventName.'.'.RecoverableGuard::class, $fail);
+        $dispatcher->addListener($eventName.'.'.Guard::class, $fail);
+
+        return $dispatcher;
+    }
+
     private function createListener(?array $attributesWithListenersByEvent = null): ControllerAttributesListener
     {
         return new ControllerAttributesListener($attributesWithListenersByEvent ?? [
@@ -420,4 +565,20 @@ class ControllerAttributesListenerTest extends TestCase
             $controllerMetadata
         );
     }
+}
+
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_FUNCTION)]
+#[RecoverableAttribute(\DomainException::class)]
+class RecoverableGuard
+{
+}
+
+#[\Attribute(\Attribute::TARGET_FUNCTION)]
+class ChildRecoverableGuard extends RecoverableGuard
+{
+}
+
+#[\Attribute(\Attribute::TARGET_FUNCTION)]
+class Guard
+{
 }

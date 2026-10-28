@@ -12,12 +12,15 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Exception\SignedUriException;
 use Symfony\Component\HttpFoundation\Exception\UnsignedUriException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Attribute\IsSignatureValid;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
+use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
 use Symfony\Component\HttpKernel\EventListener\IsSignatureValidAttributeListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -131,6 +134,18 @@ class IsSignatureValidAttributeListenerTest extends TestCase
 
         $this->expectException(UnsignedUriException::class);
         $listener->onKernelControllerArguments($event);
+    }
+
+    public function testInvalidSignatureIsPassedToTheControllerParameterTypedToReceiveIt()
+    {
+        $attributesListener = new ControllerAttributesListener([KernelEvents::CONTROLLER_ARGUMENTS => [IsSignatureValid::class => true]]);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new IsSignatureValidAttributeListener(new UriSigner('secret')));
+        $event = new ControllerArgumentsEvent($this->createStub(HttpKernelInterface::class), #[IsSignatureValid] static fn (?SignedUriException $exception = null) => null, [null], Request::create('/'), HttpKernelInterface::MAIN_REQUEST);
+
+        $attributesListener->beforeController($event, KernelEvents::CONTROLLER_ARGUMENTS, $dispatcher);
+
+        $this->assertInstanceOf(UnsignedUriException::class, $event->getArguments()[0]);
     }
 
     public function testMultipleAttributesAllValid()

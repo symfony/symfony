@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Attribute;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 
 /**
  * Prevents concurrent requests from running the controller.
@@ -24,6 +25,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  * @see https://symfony.com/doc/current/lock.html
  */
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
+#[RecoverableAttribute(LockConflictedException::class)]
 final class Lock
 {
     /** @var string[] */

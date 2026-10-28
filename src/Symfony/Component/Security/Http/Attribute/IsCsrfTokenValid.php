@@ -13,8 +13,11 @@ namespace Symfony\Component\Security\Http\Attribute;
 
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\RecoverableAttribute;
+use Symfony\Component\Security\Http\Exception\InvalidCsrfTokenException;
 
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
+#[RecoverableAttribute(InvalidCsrfTokenException::class)]
 final class IsCsrfTokenValid
 {
     public const SOURCE_PAYLOAD = 0b0001;

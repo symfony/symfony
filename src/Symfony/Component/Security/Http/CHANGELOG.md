@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Make `#[IsCsrfTokenValid]` recoverable, so a controller can receive an `InvalidCsrfTokenException`
  * Add `RedirectAuthenticationEntryPoint`, redirecting to a path or a route to start the authentication
  * Add a `$firewallName` argument to `DefaultAuthenticationFailureHandler` to retain the referer after failed authentication
  * Allow the issuers announced by the discovery documents when `OidcTokenHandler` is given an empty list of issuers

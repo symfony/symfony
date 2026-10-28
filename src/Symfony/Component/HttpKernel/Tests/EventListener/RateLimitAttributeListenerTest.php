@@ -40,6 +40,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Tests\HttpCache\HttpCacheTestCase;
 use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
+use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\Policy\NoLimiter;
 use Symfony\Component\RateLimiter\RateLimit as RateLimitResult;
@@ -655,6 +656,22 @@ class RateLimitAttributeListenerTest extends TestCase
         }
     }
 
+    public function testRejectionThroughARealKernelIsHandedToTheControllerParameterTypedToReceiveIt()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new ControllerAttributesListener([
+            KernelEvents::CONTROLLER => [RateLimit::class => true],
+            KernelEvents::CONTROLLER_ARGUMENTS => [RateLimit::class => true],
+        ]));
+        $dispatcher->addSubscriber($this->makeListener(false));
+        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), null, new ArgumentResolver());
+
+        $response = $this->handleThrough($kernel, new RateLimitedControllerReceivingTheRejection());
+
+        $this->assertStringStartsWith('limited for ', $response->getContent());
+        $this->assertSame('0', $response->headers->get('X-RateLimit-Remaining'));
+    }
+
     public function testDefaultKeyDoesNotDependOnTheMethod()
     {
         $listener = $this->makeListenerCapturingKey($usedKey);
@@ -1160,5 +1177,14 @@ class ConditionallyRateLimitedController
     public function __invoke(): Response
     {
         return new Response('ok');
+    }
+}
+
+class RateLimitedControllerReceivingTheRejection
+{
+    #[RateLimit('api', exposeHeaders: true)]
+    public function __invoke(?RateLimitExceededException $exception = null): Response
+    {
+        return new Response($exception ? 'limited for '.$exception->getRateLimit()->getRetryAfter()->getTimestamp() : 'ok');
     }
 }

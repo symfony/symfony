@@ -54,6 +54,11 @@ final class ControllerArgumentsEvent extends KernelEvent
         return $this->controllerEvent->getController();
     }
 
+    public function getControllerReflector(): \ReflectionFunctionAbstract
+    {
+        return $this->controllerEvent->getControllerReflector();
+    }
+
     /**
      * Replaces the controller and the attributes that apply to it.
      *

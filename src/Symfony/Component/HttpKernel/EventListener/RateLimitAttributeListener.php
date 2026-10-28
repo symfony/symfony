@@ -26,6 +26,7 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\RateLimiter\AppliedRateLimit;
 use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
+use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
@@ -114,7 +115,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
                 $dispatcher->dispatch(new RateLimitExceededEvent($rateLimit, $attribute->limiter, $key));
             }
 
-            throw new TooManyRequestsHttpException(max(0, $rateLimit->getRetryAfter()->getTimestamp() - time()));
+            throw new TooManyRequestsHttpException(max(0, $rateLimit->getRetryAfter()->getTimestamp() - time()), '', new RateLimitExceededException($rateLimit));
         }
     }
 
@@ -176,10 +177,11 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
      */
     private function getMostRestrictiveExposedRateLimit(array $applied): ?AppliedRateLimit
     {
-        // Rejection stops attribute processing, so the rejecting result is last and takes precedence.
-        $last = end($applied);
-        if ($last instanceof AppliedRateLimit && !$last->rateLimit->isAccepted()) {
-            return $last->exposeHeaders && null !== $last->rateLimit->getResetAt() ? $last : null;
+        // the first rejection takes precedence: it either stopped attribute processing or was handed to the controller
+        foreach ($applied as $candidate) {
+            if ($candidate instanceof AppliedRateLimit && !$candidate->rateLimit->isAccepted()) {
+                return $candidate->exposeHeaders && null !== $candidate->rateLimit->getResetAt() ? $candidate : null;
+            }
         }
 
         $selected = null;

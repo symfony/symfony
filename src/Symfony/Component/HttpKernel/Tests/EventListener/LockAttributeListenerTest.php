@@ -363,8 +363,20 @@ class LockAttributeListenerTest extends TestCase
             $this->assertSame(409, $e->getStatusCode());
             $this->assertSame('foo', $e->key);
             $this->assertSame('default', $e->factory);
-            $this->assertNull($e->getPrevious());
+            $this->assertInstanceOf(LockConflictedException::class, $e->getPrevious());
         }
+    }
+
+    public function testKernelHandsTheConcurrentRequestToTheControllerParameterTypedToReceiveIt()
+    {
+        $held = new LockFactory($this->store)->createLock('foo');
+        $held->acquire();
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', #[Lock('foo')] static fn (?LockConflictedException $exception = null) => new Response($exception ? 'conflict' : 'ok'));
+
+        $this->assertSame('conflict', $this->makeKernel()->handle($request)->getContent());
+        $this->assertTrue($held->isAcquired());
     }
 
     public function testLockConflictedExceptionIsConvertedTo409()

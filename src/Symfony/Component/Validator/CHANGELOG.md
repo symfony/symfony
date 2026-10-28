@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Deprecate using `*` as a validation group name
+
 8.2
 ---
 

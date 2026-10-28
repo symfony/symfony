@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @return Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties
  */
@@ -10,11 +12,19 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $valueT
             throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithUnionProperties'));
         }
         return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties::class, static function ($object) use ($stream, $data, $options, $valueTransformers, $instantiator, &$providers) {
+            $properties = [];
             foreach ($data as $k => $v) {
                 match ($k) {
-                    'value' => $object->value = $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum|null|string']($stream, $v[0], $v[1]),
+                    'value' => $properties['value'] = $providers['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum|null|string']($stream, $v[0], $v[1]),
                     default => null,
                 };
+            }
+            foreach ($properties as $name => $value) {
+                try {
+                    $object->{$name} = $value;
+                } catch (\TypeError $e) {
+                    throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
+                }
             }
         });
     };

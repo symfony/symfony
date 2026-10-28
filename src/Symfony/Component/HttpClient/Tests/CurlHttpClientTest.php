@@ -16,6 +16,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
+use Symfony\Component\Process\Process;
 
 /**
  * @requires extension curl
@@ -396,6 +397,15 @@ class CurlHttpClientTest extends HttpClientTestCase
         } catch (ClientException $e) {
             self::assertNotEmpty($e->getResponse()->getInfo('debug'));
         }
+    }
+
+    public function testCancelFromOnProgressWritesNothingToStderr()
+    {
+        $process = new Process([\PHP_BINARY, __DIR__.'/Fixtures/cancel_from_on_progress.php']);
+        $process->mustRun();
+
+        self::assertSame('Response has been canceled.', $process->getOutput());
+        self::assertSame('', $process->getErrorOutput());
     }
 
     /**

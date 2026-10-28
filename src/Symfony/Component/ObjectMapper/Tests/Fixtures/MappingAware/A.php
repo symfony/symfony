@@ -18,4 +18,7 @@ class A
 {
     #[Map(target: 'bar', transform: MappingAwareTransformer::class)]
     public string $foo = 'value';
+
+    #[Map(transform: MappingAwareTransformer::class)]
+    public string $baz = 'value';
 }

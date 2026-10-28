@@ -25,6 +25,6 @@ class MappingAwareTransformer implements MappingAwareTransformCallableInterface
             return $value;
         }
 
-        return $mapping->target ?? 'source:'.$mapping->source;
+        return $mapping->source.'->'.$mapping->target;
     }
 }

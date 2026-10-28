@@ -14,4 +14,5 @@ namespace Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware;
 class B
 {
     public string $bar = 'unset';
+    public string $baz = 'unset';
 }

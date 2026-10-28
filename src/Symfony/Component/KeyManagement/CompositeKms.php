@@ -166,13 +166,29 @@ final class CompositeKms implements DataKeyGeneratorInterface, DecrypterInterfac
     }
 
     /**
+     * The first member wraps the data key and the others encrypt it, as in {@see generateDataKey()}.
+     */
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
+        $first = array_key_first($this->members);
+        $wrappings = [];
+        foreach ($this->members as $name => $memberKeyId) {
+            $wrappings[$name] = $name === $first
+                ? $this->member($name)->wrapDataKey($memberKeyId ?? $keyId, $dataKey, $aad)
+                : $this->member($name)->encrypt($memberKeyId ?? $keyId, $dataKey, $aad);
+        }
+
+        return new Ciphertext(self::frame($wrappings), $keyId);
+    }
+
+    /**
      * Each wrapping is read back by the operation that wrote it.
      *
-     * Only the first wrapping of the frame came out of `generateDataKey()`, the others out of
-     * `encrypt()` on the minted plaintext: on a backend where wrapping a key and encrypting a
-     * payload are two operations, Azure Key Vault for one, they answer to different permissions
-     * and algorithms. The DataKey handed back refers to the composite ciphertext, whichever
-     * member read it.
+     * Only the first wrapping of the frame came out of `generateDataKey()` or `wrapDataKey()`, the
+     * others out of `encrypt()` on the same plaintext: on a backend where wrapping a key and
+     * encrypting a payload are two operations, Azure Key Vault for one, they answer to different
+     * permissions and algorithms. The DataKey handed back refers to the composite ciphertext,
+     * whichever member read it.
      */
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
@@ -200,7 +216,7 @@ final class CompositeKms implements DataKeyGeneratorInterface, DecrypterInterfac
      *
      * @template T
      *
-     * @param \Closure(DataKeyGeneratorInterface&DecrypterInterface&EncrypterInterface, Ciphertext, bool): T $read Given the member, its wrapping, and whether the wrapping is the one the member minted
+     * @param \Closure(DataKeyGeneratorInterface&DecrypterInterface&EncrypterInterface, Ciphertext, bool): T $read Given the member, its wrapping, and whether the member wrapped it as a data key
      *
      * @return T
      */

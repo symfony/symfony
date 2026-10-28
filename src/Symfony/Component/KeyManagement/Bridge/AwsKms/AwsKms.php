@@ -151,6 +151,11 @@ final class AwsKms implements DecrypterInterface, EncrypterInterface, DataKeyGen
         return new DataKey($plaintext, new Ciphertext($blob, self::keyArn($keyArn)));
     }
 
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
+        return $this->encrypt($keyId, $dataKey, $aad);
+    }
+
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         return new DataKey($this->decrypt($wrapped, $aad), $wrapped);

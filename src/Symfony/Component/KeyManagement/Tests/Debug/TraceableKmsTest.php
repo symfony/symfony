@@ -22,6 +22,7 @@ use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Test\InMemoryKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\EncryptOnlyKms;
+use Symfony\Component\KeyManagement\Tests\Fixtures\UnreachableKms;
 
 class TraceableKmsTest extends TestCase
 {
@@ -114,6 +115,37 @@ class TraceableKmsTest extends TestCase
         $this->assertSame('app', $key['label']);
         $this->assertSame(['generate_data_key' => 1, 'unwrap_data_key' => 1], $key['operations']);
         $this->assertSame(2, $this->collector->getKmsCallCount());
+    }
+
+    public function testDataKeyWrappingIsCollectedWithoutTheKey()
+    {
+        $traceable = TraceableKms::wrap(new InMemoryKms(), $this->collector, 'default');
+        $traceable->wrapDataKey('app', 'correct horse battery staple', 'user:42');
+        $this->collector->lateCollect();
+
+        $key = $this->collector->getKeys()[0];
+
+        $this->assertSame(['wrap_data_key' => 1], $key['operations']);
+        $this->assertSame(1, $key['aad']);
+        $this->assertSame(28, $key['in']);
+        $this->assertGreaterThan(0, $key['out']);
+        $this->assertStringNotContainsString('correct horse battery staple', serialize($this->collector));
+    }
+
+    public function testADataKeyWrappingFailureIsCollectedAndRethrown()
+    {
+        $traceable = TraceableKms::wrap(new UnreachableKms(), $this->collector, 'default');
+
+        try {
+            $traceable->wrapDataKey('app', 'a data key');
+            $this->fail('The failure must reach the caller.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('The backend is down.', $e->getMessage());
+        }
+
+        $this->collector->lateCollect();
+
+        $this->assertSame(\RuntimeException::class, $this->collector->getKeys()[0]['error']['class']);
     }
 
     public function testNeitherThePlaintextNorTheCiphertextIsCollected()

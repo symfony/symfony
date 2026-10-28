@@ -236,6 +236,22 @@ class ScalewayKmsTest extends TestCase
         (new ScalewayKms($client, 'scw-secret'))->generateDataKey(self::KEY_ID, 8);
     }
 
+    public function testWrapDataKeyEncryptsTheKeyWithItsAad()
+    {
+        $captured = null;
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$captured): MockResponse {
+            $captured = [$url, json_decode($options['body'], true)];
+
+            return new MockResponse(json_encode(['key_id' => self::KEY_ID, 'ciphertext' => 'd3JhcHBlZA==']));
+        }, self::BASE_URI);
+
+        $wrapped = (new ScalewayKms($client, 'scw-secret'))->wrapDataKey(self::KEY_ID, str_repeat("\xCC", 32), 'opaque-aad');
+
+        $this->assertSame([self::BASE_URI.'keys/'.self::KEY_ID.'/encrypt', ['plaintext' => base64_encode(str_repeat("\xCC", 32)), 'associated_data' => base64_encode('opaque-aad')]], $captured);
+        $this->assertSame('d3JhcHBlZA==', $wrapped->blob);
+        $this->assertSame(self::KEY_ID, $wrapped->keyId);
+    }
+
     public function testUnwrapDataKeyDecryptsTheWrappedKeyWithItsAad()
     {
         $captured = null;

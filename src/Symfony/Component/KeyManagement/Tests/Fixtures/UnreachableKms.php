@@ -51,6 +51,11 @@ final class UnreachableKms implements DataKeyGeneratorInterface, DecrypterInterf
         throw null !== $this->failure ? ($this->failure)() : new \RuntimeException('The backend is down.');
     }
 
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
+        throw null !== $this->failure ? ($this->failure)() : new \RuntimeException('The backend is down.');
+    }
+
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         throw null !== $this->failure ? ($this->failure)() : new \RuntimeException('The backend is down.');

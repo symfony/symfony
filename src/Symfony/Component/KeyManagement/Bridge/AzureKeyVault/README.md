@@ -64,9 +64,10 @@ The bridge accepts two configurable algorithms:
     `RSA-OAEP`, `RSA1_5` and the AEAD variants `A128GCM`/`A192GCM`/`A256GCM`
     are also accepted (the AEAD variants require a symmetric key, available
     on Managed HSM or Key Vault Premium in preview).
-  * `wrapAlgorithm` (default `RSA-OAEP-256`): used by `generateDataKey()` and
-    `unwrapDataKey()`. Same algorithm set as above; with a symmetric key you
-    can use `A128KW` / `A192KW` / `A256KW` by setting it explicitly.
+  * `wrapAlgorithm` (default `RSA-OAEP-256`): used by `generateDataKey()`,
+    `wrapDataKey()` and `unwrapDataKey()`. Same algorithm set as above; with a
+    symmetric key you can use `A128KW` / `A192KW` / `A256KW` by setting it
+    explicitly.
 
 The DSN factory only accepts the algorithm names Azure Key Vault documents
 (`RSA-OAEP-256`, `RSA-OAEP`, `RSA1_5`, the `A*GCM`, `A*CBC`, `A*CBCPAD` and

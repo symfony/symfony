@@ -31,8 +31,10 @@ use Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface;
 use Symfony\Component\KeyManagement\StoredDataKey;
 use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Test\InMemoryDataKeyStore;
+use Symfony\Component\KeyManagement\Test\InMemoryKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\EncryptOnlyKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\RedactedTraceAssertionsTrait;
+use Symfony\Component\KeyManagement\Tests\Fixtures\TwoOperationsKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\UnreachableKms;
 
 #[RequiresPhpExtension('openssl')]
@@ -89,6 +91,21 @@ class RewrapDataKeysCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         $this->assertSame($plaintext, $store->get($handle->reference)->use(static fn (string $key): string => $key), 'a row re-wrapped without the context its store binds is one that store can no longer open.');
+    }
+
+    public function testTheKeysAreWrappedTheWayTheStoreUnwrapsThem()
+    {
+        $azure = new TwoOperationsKms(new InMemoryKms('azure'));
+        $store = new InMemoryDataKeyStore(['aws' => $this->aws, 'azure' => $azure], 'aws');
+        $handle = $store->current('user.email');
+        $plaintext = $handle->use(static fn (string $key): string => $key);
+
+        $tester = new CommandTester(new RewrapDataKeysCommand($store, new ServiceLocator(['aws' => fn (): OpenSslKms => $this->aws, 'azure' => static fn (): TwoOperationsKms => $azure])));
+        $tester->execute(['--to' => 'azure', '--key-id' => 'app']);
+        $store->forget();
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame($plaintext, $store->get($handle->reference)->use(static fn (string $key): string => $key), 'a key encrypted rather than wrapped is one Azure Key Vault does not unwrap.');
     }
 
     public function testAcceptUnboundMovesTheRowsWrittenBeforeTheStoreBoundAContext()
@@ -448,6 +465,11 @@ class RewrapDataKeysCommandTest extends TestCase
             public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
             {
                 return $this->kms->generateDataKey($keyId, $length, $aad);
+            }
+
+            public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+            {
+                return $this->kms->wrapDataKey($keyId, $dataKey, $aad);
             }
 
             public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey

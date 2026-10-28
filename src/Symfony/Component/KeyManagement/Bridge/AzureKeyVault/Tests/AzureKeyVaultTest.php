@@ -865,6 +865,35 @@ class AzureKeyVaultTest extends TestCase
         $this->assertSame(['alg' => 'A256GCM', 'iv' => 'IV', 'tag' => 'TAG', 'value' => 'CTVAL', 'aad' => Base64UrlSafe::encode('tenant=acme')], $requests[1][1]);
     }
 
+    public function testWrapDataKeyCallsWrapKeyUnderTheWrapAlgorithm()
+    {
+        $requests = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$requests): MockResponse {
+            $requests[] = [$url, json_decode($options['body'], true)];
+
+            return new MockResponse(json_encode(str_contains($url, '/wrapkey?')
+                ? ['kid' => self::VAULT.'keys/app-key/v1', 'value' => 'WrappedDek']
+                : ['value' => Base64UrlSafe::encode(str_repeat("\xAB", 32))]));
+        }, self::VAULT);
+
+        $kms = new AzureKeyVault($client, $this->staticToken('T'), 'RSA-OAEP', 'RSA-OAEP-256');
+        $wrapped = $kms->wrapDataKey('app-key', str_repeat("\xAB", 32));
+        $kms->unwrapDataKey($wrapped);
+
+        $this->assertSame('app-key/v1', $wrapped->keyId);
+        $this->assertSame('WrappedDek', $wrapped->blob);
+        $this->assertSame([self::VAULT.'keys/app-key/wrapkey?api-version=7.4', ['alg' => 'RSA-OAEP-256', 'value' => Base64UrlSafe::encode(str_repeat("\xAB", 32))]], $requests[0]);
+        $this->assertSame([self::VAULT.'keys/app-key/v1/unwrapkey?api-version=7.4', ['alg' => 'RSA-OAEP-256', 'value' => 'WrappedDek']], $requests[1], 'the key is unwrapped under the algorithm it was wrapped with, whatever the encryption one.');
+    }
+
+    public function testWrapDataKeyRejectsAadOnRsa()
+    {
+        $kms = new AzureKeyVault($this->clientThatMustNotBeCalled(), $this->staticToken('T'));
+
+        $this->expectException(UnsupportedOperationException::class);
+        $kms->wrapDataKey('app-key', str_repeat("\xAB", 32), 'tenant=acme');
+    }
+
     public function testGenerateDataKeyRejectsTooShortLengths()
     {
         $kms = new AzureKeyVault(new MockHttpClient([], self::VAULT), $this->staticToken('T'));

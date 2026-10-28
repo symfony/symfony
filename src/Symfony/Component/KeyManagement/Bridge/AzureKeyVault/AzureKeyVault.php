@@ -45,7 +45,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  *
  * `generateDataKey()` is implemented locally (Azure has no `GenerateDataKey`
  * primitive): a fresh DEK is drawn with `random_bytes()` and wrapped via
- * `wrapKey`, mirroring the GCP / Managed HSM pattern.
+ * `wrapKey`, mirroring the GCP / Managed HSM pattern. `wrapDataKey()` goes
+ * through the same `wrapKey`, never through `encrypt`.
  *
  * Key identifier format: `$keyId` is the key name. To select a specific
  * version for a write, append it with a `/` separator (`mykey/abc123def`).
@@ -136,15 +137,21 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
         if ($length < 16) {
             throw new InvalidArgumentException(\sprintf('Data key length must be at least 16 bytes, %d given.', $length));
         }
+
+        $plaintext = random_bytes($length);
+
+        return new DataKey($plaintext, $this->wrapDataKey($keyId, $plaintext, $aad));
+    }
+
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
         if ('' !== $aad && !\in_array($this->wrapAlgorithm, self::AEAD_ALGORITHMS, true)) {
             throw new UnsupportedOperationException(\sprintf('Wrap algorithm "%s" cannot enforce AAD; configure an AEAD wrap algorithm to use AAD with Azure Key Vault.', $this->wrapAlgorithm));
         }
 
-        $plaintext = random_bytes($length);
-
         $body = [
             'alg' => $this->wrapAlgorithm,
-            'value' => Base64UrlSafe::encode($plaintext),
+            'value' => Base64UrlSafe::encode($dataKey),
         ];
         if ('' !== $aad) {
             $body['aad'] = Base64UrlSafe::encode($aad);
@@ -164,7 +171,7 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
             $blob = $this->wrapAlgorithm.'.'.$data['iv'].'.'.$data['tag'].'.'.$data['value'];
         }
 
-        return new DataKey($plaintext, new Ciphertext($blob, $this->resolvedKeyId($data, $keyId)));
+        return new Ciphertext($blob, $this->resolvedKeyId($data, $keyId));
     }
 
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey

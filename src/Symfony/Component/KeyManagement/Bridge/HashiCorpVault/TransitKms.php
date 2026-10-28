@@ -133,6 +133,11 @@ final class TransitKms implements DecrypterInterface, EncrypterInterface, DataKe
         return new DataKey($plaintext, new Ciphertext($data['ciphertext'], $keyId));
     }
 
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
+        return $this->encrypt($keyId, $dataKey, $aad);
+    }
+
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         return new DataKey($this->decrypt($wrapped, $aad), $wrapped);

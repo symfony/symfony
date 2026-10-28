@@ -134,6 +134,11 @@ final class GoogleCloudKms implements DecrypterInterface, EncrypterInterface, Da
         return new DataKey($plaintext, $wrapped);
     }
 
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
+        return $this->encrypt($keyId, $dataKey, $aad);
+    }
+
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         if (!self::isResourceName($wrapped->keyId)) {

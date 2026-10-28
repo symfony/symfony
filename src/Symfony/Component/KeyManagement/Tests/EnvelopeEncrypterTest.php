@@ -112,6 +112,11 @@ class EnvelopeEncrypterTest extends TestCase
                 return new DataKey($dataKey->use(static fn (#[\SensitiveParameter] string $plaintext): string => $plaintext), new Ciphertext($dataKey->wrapped->blob, self::ARN));
             }
 
+            public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+            {
+                return new Ciphertext($this->inner->wrapDataKey($keyId, $dataKey, $aad)->blob, self::ARN);
+            }
+
             public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
             {
                 return $this->inner->unwrapDataKey(new Ciphertext($wrapped->blob, 'alias/app-key'), $aad);
@@ -157,6 +162,13 @@ class EnvelopeEncrypterTest extends TestCase
                 $this->seen[] = $aad;
 
                 return $this->inner->generateDataKey($keyId, $length, $aad);
+            }
+
+            public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+            {
+                $this->seen[] = $aad;
+
+                return $this->inner->wrapDataKey($keyId, $dataKey, $aad);
             }
 
             public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey

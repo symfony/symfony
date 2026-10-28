@@ -196,8 +196,10 @@ final class RewrapDataKeysCommand
      *
      * That keeps the plaintext inside a {@see DataKey}, and the store wipes it after writing the row.
      * The store checks the binding before writing, so a row it refuses to open is reported and left as it is.
+     *
+     * Wraps through {@see DataKeyGeneratorInterface::wrapDataKey()}, not `encrypt()`, since the store unwraps what is written.
      */
-    private function rewrap(StoredDataKey $row, EncrypterInterface $target, string $keyId, string $context, bool $acceptUnbound): DataKey
+    private function rewrap(StoredDataKey $row, DataKeyGeneratorInterface $target, string $keyId, string $context, bool $acceptUnbound): DataKey
     {
         $source = $this->clients?->has($row->client) ? $this->clients->get($row->client) : null;
 
@@ -220,6 +222,6 @@ final class RewrapDataKeysCommand
             }
         }
 
-        return $unwrapped->use(static fn (#[\SensitiveParameter] string $dataKey): DataKey => new DataKey($dataKey, $target->encrypt($keyId, $dataKey, $context)));
+        return $unwrapped->use(static fn (#[\SensitiveParameter] string $dataKey): DataKey => new DataKey($dataKey, $target->wrapDataKey($keyId, $dataKey, $context)));
     }
 }

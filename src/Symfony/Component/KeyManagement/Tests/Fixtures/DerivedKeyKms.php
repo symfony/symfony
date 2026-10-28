@@ -42,6 +42,11 @@ final class DerivedKeyKms implements DataKeyGeneratorInterface
         return $this->kms->generateDataKey($keyId, $length, self::derive($aad));
     }
 
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
+        return $this->kms->wrapDataKey($keyId, $dataKey, self::derive($aad));
+    }
+
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey
     {
         return $this->kms->unwrapDataKey($wrapped, self::derive($aad));

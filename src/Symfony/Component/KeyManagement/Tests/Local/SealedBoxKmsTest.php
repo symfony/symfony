@@ -134,6 +134,16 @@ class SealedBoxKmsTest extends TestCase
         $this->assertSame($captured, $kms->unwrapDataKey($dataKey->wrapped)->use(static fn (string $p): string => $p));
     }
 
+    public function testADataKeyWrappedWithThePublicKeyOnlyIsUnwrappedWithTheKeypair()
+    {
+        $writer = new SealedBoxKms(new InMemoryKeyLoader(['app' => $this->publicKey]));
+        $reader = new SealedBoxKms(new InMemoryKeyLoader(['app' => $this->keypair]));
+
+        $wrapped = $writer->wrapDataKey('app', str_repeat("\xAA", 32));
+
+        $this->assertSame(str_repeat("\xAA", 32), $reader->unwrapDataKey($wrapped)->use(static fn (string $p): string => $p));
+    }
+
     public function testDataKeyGenerationOnEncryptOnlyDeploymentWorks()
     {
         $writer = new SealedBoxKms(new InMemoryKeyLoader(['app' => $this->publicKey]));

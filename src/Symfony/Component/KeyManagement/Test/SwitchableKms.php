@@ -49,7 +49,7 @@ final class SwitchableKms implements DataKeyGeneratorInterface, DecrypterInterfa
     public array $calls = [];
 
     /**
-     * @var list<string> The key id of each encrypt() and generateDataKey() call, in order
+     * @var list<string> The key id of each encrypt(), generateDataKey() and wrapDataKey() call, in order
      */
     public array $keyIds = [];
 
@@ -76,6 +76,13 @@ final class SwitchableKms implements DataKeyGeneratorInterface, DecrypterInterfa
         $this->keyIds[] = $keyId;
 
         return $this->up(__FUNCTION__)->generateDataKey($keyId, $length, $aad);
+    }
+
+    public function wrapDataKey(string $keyId, #[\SensitiveParameter] string $dataKey, string $aad = ''): Ciphertext
+    {
+        $this->keyIds[] = $keyId;
+
+        return $this->up(__FUNCTION__)->wrapDataKey($keyId, $dataKey, $aad);
     }
 
     public function unwrapDataKey(Ciphertext $wrapped, string $aad = ''): DataKey

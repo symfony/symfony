@@ -572,6 +572,22 @@ class GoogleCloudKmsTest extends TestCase
         $kms->generateDataKey(self::KEY, 8);
     }
 
+    public function testWrapDataKeyCallsEncrypt()
+    {
+        $captured = null;
+        $client = new MockHttpClient(static function ($method, $url, array $options) use (&$captured): MockResponse {
+            $captured = [$url, json_decode($options['body'], true)];
+
+            return new MockResponse(json_encode(['ciphertext' => 'WrappedDek']));
+        }, self::BASE);
+
+        $wrapped = (new GoogleCloudKms($client, $this->staticToken('T')))->wrapDataKey(self::KEY, str_repeat("\xAB", 32), 'tenant=acme');
+
+        $this->assertSame([self::BASE.self::KEY.':encrypt', ['plaintext' => base64_encode(str_repeat("\xAB", 32)), 'additionalAuthenticatedData' => base64_encode('tenant=acme')]], $captured);
+        $this->assertSame(self::KEY, $wrapped->keyId);
+        $this->assertSame('WrappedDek', $wrapped->blob);
+    }
+
     public function testUnwrapDataKeyDecodesPlaintext()
     {
         $client = new MockHttpClient(

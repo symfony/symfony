@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-28T07:55:12Z
+
+The `foreach` and the fast path in `getSegments()` are fine, lookups are about 15% faster here. Why the `$unreachable` variable and the `unset($segments)` though? Throwing from inside the loop, as before, looks equivalent to me.
+
+Also, I moved the fix for the Redis test to #67573 on 6.4, crediting you. You can drop it from this PR.

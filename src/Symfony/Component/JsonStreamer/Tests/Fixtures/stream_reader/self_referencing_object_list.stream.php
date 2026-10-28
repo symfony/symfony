@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @return Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyList
  */
@@ -10,11 +12,19 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $transf
             throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList'));
         }
         return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyList::class, static function ($object) use ($stream, $data, $options, $transformers, $instantiator, &$providers) {
+            $properties = [];
             foreach ($data as $k => $v) {
                 match ($k) {
-                    'items' => $object->items = (\Symfony\Component\JsonStreamer\Read\Decoder::isNull($stream, $v[0]) ? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList::$items".') : $providers['array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>']($stream, $v[0], $v[1])),
+                    'items' => $properties['items'] = (\Symfony\Component\JsonStreamer\Read\Decoder::isNull($stream, $v[0]) ? throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException('Unexpected "null" value for "Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList::$items".') : $providers['array<int|string, Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyList>']($stream, $v[0], $v[1])),
                     default => \Symfony\Component\JsonStreamer\Read\Decoder::validateStream($stream, $v[0], $v[1]),
                 };
+            }
+            foreach ($properties as $name => $value) {
+                try {
+                    $object->{$name} = $value;
+                } catch (\TypeError $e) {
+                    throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException($e->getMessage(), 0, $e);
+                }
             }
         });
     };

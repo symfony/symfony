@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @return iterable<int|string, Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>
  */

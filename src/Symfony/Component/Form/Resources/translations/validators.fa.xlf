@@ -44,7 +44,7 @@
             </trans-unit>
             <trans-unit id="106" resname="Please choose a valid date interval.">
                 <source>This value is not a valid date interval.</source>
-                <target state="needs-review-translation">بازه زمانی انتخاب‌شده معتبر نیست.</target>
+                <target>این مقدار یک مدت‌زمان معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="107" resname="Please enter a valid date and time.">
                 <source>This value is not a valid date and time.</source>
@@ -72,7 +72,7 @@
             </trans-unit>
             <trans-unit id="113" resname="Please select a valid locale.">
                 <source>This value is not a valid locale.</source>
-                <target state="needs-review-translation">این مقدار یک زبان و منطقه معتبر نیست.</target>
+                <target>این مقدار یک شناسهٔ محلی معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="114" resname="Please enter a valid money amount.">
                 <source>This value is not a valid money amount.</source>

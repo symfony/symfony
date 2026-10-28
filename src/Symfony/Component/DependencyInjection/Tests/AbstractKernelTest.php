@@ -458,6 +458,27 @@ class AbstractKernelTest extends TestCase
         $this->assertCount(1, $kernel->getBundles());
     }
 
+    public function testBootThrowsAgainWhenRebuildingStaleContainerFails()
+    {
+        $dir = $this->varDir.'/failing_rebuild';
+
+        $kernel = new BuildCallbackKernel('test', true, $dir);
+        $kernel->boot();
+        $this->assertTrue(unlink($kernel->getBuildDir().'/'.$kernel->getTestContainerClass().'.php.meta'));
+
+        $kernel = new BuildCallbackKernel('test', true, $dir, static function () { throw new \RuntimeException('Container build failed'); });
+
+        try {
+            $kernel->boot();
+        } catch (\RuntimeException) {
+        }
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Container build failed');
+
+        $kernel->boot();
+    }
+
     public function testBundleCacheIsUsedInNoDebug()
     {
         $dir = $this->varDir;
@@ -754,6 +775,21 @@ class BuildHookKernel extends TestKernel
     protected function build(ContainerBuilder $container): void
     {
         $container->setParameter('build_hook_called', true);
+    }
+}
+
+class BuildCallbackKernel extends TestKernel
+{
+    public function __construct(string $env, bool $debug, string $dir, private ?\Closure $buildCallback = null)
+    {
+        parent::__construct($env, $debug, $dir);
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        if ($this->buildCallback) {
+            ($this->buildCallback)($container);
+        }
     }
 }
 

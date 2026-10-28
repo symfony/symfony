@@ -472,6 +472,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             error_reporting($errorLevel);
         }
 
+        $this->container = null;
+
         try {
             if ($collectDeprecations = $this->debug && !\defined('PHPUNIT_COMPOSER_INSTALL')) {
                 $collectedLogs = [];

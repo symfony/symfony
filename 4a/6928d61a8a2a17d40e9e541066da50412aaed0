@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-28T12:08:26Z
+
+The fix looks right to me. Since #66053, the "empty_data" guess already follows a simple "property_path", so the type guess should too.
+
+Could you revert the changes to the exception messages though? They're unrelated, and they now quote a whole phrase: `declared on "the #[FormField] attribute of property Foo::$bar"`.

@@ -173,8 +173,7 @@ final class JsonCrawler implements JsonCrawlerInterface
 
                     foreach ($recursiveResults as $recursiveValue) {
                         if (\is_array($recursiveValue) && !array_is_list($recursiveValue) || $recursiveValue instanceof \stdClass) {
-                            $bracketResults = $this->evaluateToken($bracketToken, $recursiveValue);
-                            $next = array_merge($next, $bracketResults);
+                            array_push($next, ...$this->evaluateToken($bracketToken, $recursiveValue));
                         }
                     }
                 }
@@ -182,7 +181,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 ++$i;
             } else {
                 foreach ($current as $value) {
-                    $next = array_merge($next, $this->evaluateToken($token, $value));
+                    array_push($next, ...$this->evaluateToken($token, $value));
                 }
             }
 

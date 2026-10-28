@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mime\Header;
 
 use Symfony\Component\Mime\Encoder\Rfc2231Encoder;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
  * @author Chris Corbyn
@@ -56,6 +57,12 @@ final class ParameterizedHeader extends UnstructuredHeader
      */
     public function setParameters(array $parameters)
     {
+        foreach ($parameters as $k => $v) {
+            if (!preg_match('/^'.self::TOKEN_REGEX.'$/D', $k)) {
+                throw new RfcComplianceException(sprintf('The parameter name "%s" contains non-token characters.', $k));
+            }
+        }
+
         $this->parameters = $parameters;
     }
 

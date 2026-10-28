@@ -7,6 +7,31 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+## 5.4.55 (2026-10-28)
+
+### Console
+
+ * bug #67576 [Console] Don't format escaped tags again when sections measure their lines (nicolas-grekas)
+ * minor #67482 [Console][SecurityBundle] Fix two tests that fail on every 5.4 pull request (nicolas-grekas)
+
+### Mime
+
+ * security #cve-2026-45070 [Mime] Reject parameter names containing non-token characters (alexandre-daubois)
+ * bug #67478 [Mime] Escape backslashes in Address::getEncodedName() (munzzyy)
+ * bug #67444 [Mime] Escape quotes and backslashes in quoted parameter values (wleeaf)
+
+### Routing
+
+ * bug #67508 [Routing] Don't ignore route conditions that are "0" (nicolas-grekas)
+
+### Serializer
+
+ * bug #67459 [Serializer] Escape formulas in the header row of CSV files (nicolas-grekas)
+
+### WebProfilerBundle
+
+ * bug #67450 [WebProfilerBundle] Check that the profiler is enabled before opening files (nicolas-grekas)
+
 ## 5.4.54 (2026-10-15)
 
 ### Cache

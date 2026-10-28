@@ -583,4 +583,24 @@ class ArgvInputTest extends TestCase
         yield [['app/console', '--no-ansi', 'foo:bar', 'foo:bar'], ['foo:bar']];
         yield [['app/console', '--no-ansi', 'foo:bar', '--', 'argument'], ['--', 'argument']];
     }
+
+    #[DataProvider('provideRawTokensAfterOptionValueMatchingCommand')]
+    public function testGetRawTokensAfterOptionValueMatchingCommand(array $argv)
+    {
+        $input = new ArgvInput($argv);
+        $input->bind(new InputDefinition([
+            new InputArgument('command'),
+            new InputArgument('arguments', InputArgument::IS_ARRAY),
+            new InputOption('env', 'e', InputOption::VALUE_REQUIRED),
+        ]));
+
+        $this->assertSame('run', $input->getFirstArgument());
+        $this->assertSame(['task'], $input->getRawTokens(true));
+    }
+
+    public static function provideRawTokensAfterOptionValueMatchingCommand(): iterable
+    {
+        yield 'long option' => [['app/console', '--env', 'run', 'run', 'task']];
+        yield 'short option' => [['app/console', '-e', 'run', 'run', 'task']];
+    }
 }

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-28T07:55:14Z
+
+Nice one. With `['int', 'string']` and a string, resolving 20 options goes from 29 µs to 19 µs here.
+
+The most common order in our form types is `['null', ...]` though (28 times), and `null` isn't in `VALIDATION_FUNCTIONS`, so it still takes the slow path. What about short-circuiting any plain type name instead? This takes `['null', 'string']` from 34 µs to 20 µs:
+
+```php
+if ('callable' !== $type && false === strpbrk($type, "|()[] \t\n\r\0\x0B")) {
+    if (\is_array($invalidTypes) && (!$invalidTypes || $level > 0)) {
+        $invalidTypes[get_debug_type($value)] = true;
+    }
+
+    return false;
+}
+```
+
+Also, I moved the fix for the Redis test to #67573 on 6.4, crediting you. You can drop it from this PR.

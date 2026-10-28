@@ -280,6 +280,8 @@ class ConsumeMessagesCommandTest extends TestCase
         yield 'Zero fetch size' => ['--fetch-size', '0', 'Option "fetch-size" must be a positive integer, "0" passed.'];
         yield 'Negative fetch size' => ['--fetch-size', '-1', 'Option "fetch-size" must be a positive integer, "-1" passed.'];
         yield 'Non-numeric fetch size' => ['--fetch-size', 'abc', 'Option "fetch-size" must be a positive integer, "abc" passed.'];
+        yield 'Fractional fetch size' => ['--fetch-size', '1.5', 'Option "fetch-size" must be a positive integer, "1.5" passed.'];
+        yield 'Fetch size in scientific notation' => ['--fetch-size', '1e2', 'Option "fetch-size" must be a positive integer, "1e2" passed.'];
     }
 
     public function testParallelExecutionRequiresConfiguredConsoleEntryPoint()

@@ -916,4 +916,24 @@ class ArgvInputTest extends TestCase
             "A\nB'C",
         );
     }
+
+    #[DataProvider('provideRawTokensAfterOptionValueMatchingCommand')]
+    public function testGetRawTokensAfterOptionValueMatchingCommand(array $argv)
+    {
+        $input = new ArgvInput($argv);
+        $input->bind(new InputDefinition([
+            new InputArgument('command'),
+            new InputArgument('arguments', InputArgument::IS_ARRAY),
+            new InputOption('env', 'e', InputOption::VALUE_REQUIRED),
+        ]));
+
+        $this->assertSame('run', $input->getFirstArgument());
+        $this->assertSame(['task'], $input->getRawTokens(true));
+    }
+
+    public static function provideRawTokensAfterOptionValueMatchingCommand(): iterable
+    {
+        yield 'long option' => [['app/console', '--env', 'run', 'run', 'task']];
+        yield 'short option' => [['app/console', '-e', 'run', 'run', 'task']];
+    }
 }

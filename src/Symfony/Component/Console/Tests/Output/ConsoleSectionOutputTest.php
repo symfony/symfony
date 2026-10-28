@@ -50,6 +50,19 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.\sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
     }
 
+    public function testEscapedTagsAreNotFormattedAgain()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter(true));
+
+        $output->writeln(OutputFormatter::escape('<fg=red>Foo'));
+        $output->writeln(OutputFormatter::escape('Bar</info>'));
+        $output->writeln('Baz');
+
+        rewind($output->getStream());
+        $this->assertSame('<fg=red>Foo'.\PHP_EOL.'Bar</info>'.\PHP_EOL.'Baz'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
     public function testClearNumberOfLines()
     {
         $sections = [];

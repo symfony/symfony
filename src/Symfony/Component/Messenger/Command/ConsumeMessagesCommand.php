@@ -180,7 +180,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
         }
 
         $fetchSize = $input->getOption('fetch-size');
-        if (null !== $fetchSize && (!is_numeric($fetchSize) || 0 >= (int) $fetchSize)) {
+        if (null !== $fetchSize && false === filter_var($fetchSize, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
             throw new InvalidOptionException(\sprintf('Option "fetch-size" must be a positive integer, "%s" passed.', $fetchSize));
         }
     }

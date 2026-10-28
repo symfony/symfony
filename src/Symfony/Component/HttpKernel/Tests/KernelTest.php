@@ -174,6 +174,24 @@ class KernelTest extends TestCase
         $this->assertFalse($kernel->isLockHeld(), 'The build lock should be released once the kernel is booted.');
     }
 
+    public function testBootThrowsAgainWhenRebuildingStaleContainerFails()
+    {
+        (new CustomProjectDirKernel())->boot();
+        $this->assertTrue(unlink(__DIR__.'/Fixtures/var/cache/custom/Symfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta'));
+
+        $kernel = new CustomProjectDirKernel(static function () { throw new \RuntimeException('Container build failed'); });
+
+        try {
+            $kernel->boot();
+        } catch (\RuntimeException) {
+        }
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Container build failed');
+
+        $kernel->boot();
+    }
+
     public function testBootInitializesBundlesAndContainer()
     {
         $kernel = $this->getKernel(['initializeBundles']);

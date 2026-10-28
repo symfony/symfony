@@ -269,7 +269,7 @@ class RedisExtIntegrationTest extends TestCase
     {
         $headers = ['type' => DummyMessage::class];
         $this->connection->add('{"message": "Hi"}', $headers);
-        $this->redis->rawCommand('ZADD', $this->getConnectionStream($this->connection).'__queue', (string) (int) (microtime(true) * 1000), 'not json');
+        $this->redis->rawCommand('ZADD', $this->getConnectionStream($this->connection).'__queue', '0', 'not json');
 
         $message = $this->connection->get();
         $this->assertSame(['message' => json_encode(['body' => '{"message": "Hi"}', 'headers' => $headers])], $message[0]['data']);

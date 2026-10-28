@@ -82,6 +82,10 @@ class Connection
 
     public function __construct(array $options, \Redis|Relay|\RedisCluster|null $redis = null)
     {
+        if (!\extension_loaded('redis') && !\extension_loaded('relay')) {
+            throw new LogicException('Cannot find the "redis" extension nor the "relay" extension.');
+        }
+
         $options += self::DEFAULT_OPTIONS;
         $host = $options['host'];
         $port = $options['port'];

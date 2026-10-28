@@ -12,6 +12,7 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FormField;
@@ -858,6 +859,20 @@ class FormTest extends TestCase
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->get() throws an \InvalidArgumentException if the field does not exist');
         }
+    }
+
+    #[TestWith(['root[0]', '0'])]
+    #[TestWith(['root[]', ''])]
+    #[TestWith(['root[child][missing]', 'missing'])]
+    #[TestWith(['missing', 'missing'])]
+    public function testGetReportsUnreachablePath(string $name, string $path)
+    {
+        $form = $this->createForm('<form><input name="root[child]" value="value" /><input type="submit" /></form>');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Unreachable field "%s".', $path));
+
+        $form->get($name);
     }
 
     public function testAll()

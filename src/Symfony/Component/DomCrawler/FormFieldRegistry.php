@@ -73,12 +73,19 @@ class FormFieldRegistry
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
-        while ($segments) {
-            $path = array_shift($segments);
+        foreach ($segments as $path) {
             if (!\is_array($target) || !\array_key_exists($path, $target)) {
-                throw new \InvalidArgumentException(\sprintf('Unreachable field "%s".', $path));
+                $unreachable = $path;
+
+                break;
             }
             $target = &$target[$path];
+        }
+
+        if (isset($unreachable)) {
+            unset($segments);
+
+            throw new \InvalidArgumentException(\sprintf('Unreachable field "%s".', $unreachable));
         }
 
         return $target;
@@ -156,6 +163,10 @@ class FormFieldRegistry
      */
     private function getSegments(string $name): array
     {
+        if (!str_contains($name, '[')) {
+            return [$name];
+        }
+
         if (preg_match('/^(?P<base>[^[]+)(?P<extra>(\[.*)|$)/', $name, $m)) {
             $segments = [$m['base']];
             while (!empty($m['extra'])) {

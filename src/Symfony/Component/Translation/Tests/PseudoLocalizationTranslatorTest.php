@@ -36,6 +36,10 @@ final class PseudoLocalizationTranslatorTest extends TestCase
             ['foo <p>bar</p> ~~~~~~~~~~ ~~', 'foo <p>bar</p>', self::getIsolatedOptions(['expansion_factor' => 2.0])],
             ['foo <p>bar</p> ~~~ ~~', 'foo <p>bar</p>', self::getIsolatedOptions(['parse_html' => true, 'expansion_factor' => 2.0])], // Only the visible text length is expanded
             ['foobar ~~', 'foobar', self::getIsolatedOptions(['expansion_factor' => 1.35])], // 6*1.35 = 8.1 but we round up to 9
+            ['<b><i></i></b><em></em>å', '<b><i></i></b><em></em>a', self::getIsolatedOptions(['parse_html' => true, 'accents' => true])],
+            ['å<b>ƀ<i>ç</i>ð</b><em>é</em>ƒ', 'a<b>b<i>c</i>d</b><em>e</em>f', self::getIsolatedOptions(['parse_html' => true, 'accents' => true])],
+            ['å<span title="ƀ &quot;ç&quot; &amp; ð" data-note="e">ƒ</span>ĝ', 'a<span title="b &quot;c&quot; &amp; d" data-note="e">f</span>g', self::getIsolatedOptions(['parse_html' => true, 'accents' => true, 'localizable_html_attributes' => ['title']])],
+            ['<b>foo</b><i>bar</i> ~~~~~', '<b>foo</b><i>bar</i>', self::getIsolatedOptions(['parse_html' => true, 'expansion_factor' => 2.0])],
             ['[foobar]', 'foobar', self::getIsolatedOptions(['brackets' => true])],
             ['[foobar ~~~]', 'foobar', self::getIsolatedOptions(['expansion_factor' => 2.0, 'brackets' => true])], // The added brackets are taken into account in the expansion
             ['<p data-foo="&quot;ççç&lt;å">ƀåŕ</p>', '<p data-foo="&quot;ccc&lt;a">bar</p>', self::getIsolatedOptions(['parse_html' => true, 'localizable_html_attributes' => ['data-foo'], 'accents' => true])],
@@ -45,6 +49,18 @@ final class PseudoLocalizationTranslatorTest extends TestCase
             ['Symfony is an Open Source, community-driven project with thousands of contributors. ~~~~~~~ ~~ ~~~~ ~~~~~~~ ~~~~~~~ ~~ ~~~~ ~~~~~~~~~~~~~ ~~~~~~~~~~~~~ ~~~~~~~ ~~ ~~~', 'Symfony is an Open Source, community-driven project with thousands of contributors.', self::getIsolatedOptions(['expansion_factor' => 2.0])],
             ['<p>👇👇👇👇👇👇👇</p>', '<p>👇👇👇👇👇👇👇</p>', self::getIsolatedOptions(['parse_html' => true])],
         ];
+    }
+
+    public function testHtmlPartsDoNotAccumulateAcrossCalls()
+    {
+        $translator = new PseudoLocalizationTranslator(new IdentityTranslator(), [
+            'parse_html' => true,
+            'brackets' => false,
+        ]);
+
+        $this->assertSame(str_repeat('<b>å<i>ƀ</i>ç</b>', 64), $translator->trans(str_repeat('<b>a<i>b</i>c</b>', 64)));
+        $this->assertSame('ð', $translator->trans('d'));
+        $this->assertSame('', $translator->trans(''));
     }
 
     #[DataProvider('provideInvalidExpansionFactor')]

@@ -194,6 +194,10 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
 
     public function testAskTimeout()
     {
+        if (!@stream_isatty(\STDIN)) {
+            $this->markTestSkipped('The timeout only applies when STDIN is a terminal.');
+        }
+
         $dialog = new QuestionHelper();
 
         $question = new Question('What is your name?');
@@ -824,6 +828,10 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
 
     public function testAskThrowsExceptionOnMissingInputForChoiceQuestion()
     {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
         $this->expectException(MissingInputException::class);
         $this->expectExceptionMessage('Aborted while asking: Choice');
         (new QuestionHelper())->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new ChoiceQuestion('Choice', ['a', 'b']));

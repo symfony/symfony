@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonPath\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonPath\Exception\InvalidArgumentException;
 use Symfony\Component\JsonPath\Exception\InvalidJsonStringInputException;
@@ -56,6 +57,18 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([
             ['title' => 'hello'],
         ], $crawler->find('$.items[?upper(@.title) == "HELLO"]'));
+    }
+
+    #[TestWith(['$.items[*].id', [0, null, false, 0]])]
+    #[TestWith(["$.items[*]['id','id']", [0, 0, null, null, false, false, 0, 0]])]
+    #[TestWith(['$..["id","id"]', [0, 0, null, null, false, false, 0, 0]])]
+    #[TestWith(['$.items[*].missing', []])]
+    public function testSelectorsPreserveOrderAndDuplicatesAcrossNodes(string $query, array $expected)
+    {
+        $crawler = new JsonCrawler('{"items":[{"id":0},{"name":"missing"},{"id":null},{"id":false},{"id":0}]}');
+
+        $this->assertSame($expected, $crawler->find($query));
+        $this->assertSame($expected, $crawler->find($query));
     }
 
     public function testAllAuthors()

@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\AssetMapper\Exception\LogicException;
@@ -503,6 +504,31 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertSame(
             ['app' => ['path' => '/assets/app-live.js', 'type' => 'js']],
             $manager->getRawImportMapData(),
+        );
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testGetImportMapDataWarnsWhenTheImportMapIsNotCompiled(bool $compiled)
+    {
+        $this->compiledConfigReader = new CompiledAssetMapperConfigReader(self::$writableRoot, debug: false);
+        if ($compiled) {
+            $this->compiledConfigReader->saveConfig(ImportMapGenerator::IMPORT_MAP_CACHE_FILENAME, ['app' => ['path' => '/assets/app-d1g35t.js', 'type' => 'js']]);
+            $this->compiledConfigReader->saveConfig(\sprintf(ImportMapGenerator::ENTRYPOINT_CACHE_FILENAME_PATTERN, 'app'), []);
+        }
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($compiled ? $this->never() : $this->once())
+            ->method('warning')
+            ->with('The import map is computed on each request because "{file}" was not found. Run "asset-map:compile" when deploying, and deploy the files it generates with the application.', ['file' => 'importmap.json']);
+
+        $manager = $this->createImportMapGenerator(logger: $logger);
+        $this->mockImportMap([self::createLocalEntry('app', path: 'app.js', isEntrypoint: true)]);
+        $this->mockAssetMapper([new MappedAsset('app.js', '/path/to/app.js', publicPath: '/assets/app-d1g35t.js')]);
+
+        $this->assertSame(
+            ['app' => ['path' => '/assets/app-d1g35t.js', 'type' => 'js', 'preload' => true]],
+            $manager->getImportMapData(['app']),
         );
     }
 
@@ -1137,7 +1163,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertSame(['app.js' => 1, 'admin.js' => 1], $resolvedAssets);
     }
 
-    private function createImportMapGenerator(array $integrityHashAlgorithms = [], string $entries = ImportMapGenerator::ENTRIES_ALL): ImportMapGenerator
+    private function createImportMapGenerator(array $integrityHashAlgorithms = [], string $entries = ImportMapGenerator::ENTRIES_ALL, ?LoggerInterface $logger = null): ImportMapGenerator
     {
         $this->compiledConfigReader ??= $this->createStub(CompiledAssetMapperConfigReader::class);
         $this->assetMapper = $this->createStub(AssetMapperInterface::class);
@@ -1158,6 +1184,7 @@ class ImportMapGeneratorTest extends TestCase
             $this->configReader,
             $integrityHashAlgorithms,
             $entries,
+            $logger,
         );
     }
 

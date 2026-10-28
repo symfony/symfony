@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-28T07:55:10Z
+
+With translation messages, I see no difference here. A sentence with two tags takes about 30 µs either way, and ten of them about 225 µs. The gain only shows with a message of 200 such sentences. There, passing `$parts` by reference does better: 3.2 ms, vs 4.2 ms with this PR and 7.2 ms before. And the diff is much smaller:
+
+```diff
+-    private function parseNode(\DOMNode $node): array
++    private function parseNode(\DOMNode $node, array &$parts = []): array
+     {
+-        $parts = [];
+-
+...
+-            $parts = array_merge($parts, $this->parseNode($childNode));
++            $this->parseNode($childNode, $parts);
+```
+
+Would you mind switching to that?
+
+Also, I moved the fix for the Redis test to #67573 on 6.4, crediting you. You can drop it from this PR.

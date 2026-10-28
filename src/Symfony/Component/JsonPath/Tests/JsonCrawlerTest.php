@@ -245,6 +245,18 @@ class JsonCrawlerTest extends TestCase
         ], [$result[0]['title'], $result[1]['title']]);
     }
 
+    #[TestWith(['$..id'])]
+    #[TestWith(['$[*]..id'])]
+    #[TestWith(['$[*]..["id"]'])]
+    public function testRecursiveQueriesPreserveOrderAcrossNodesAndCalls(string $query)
+    {
+        $crawler = new JsonCrawler('[{"id":0,"children":[{"id":null}]},{"id":false,"children":[{"id":0}]}]');
+
+        $this->assertSame([0, null, false, 0], $crawler->find($query));
+        $this->assertSame([0, null, false, 0], $crawler->find($query));
+        $this->assertSame([], $crawler->find('$..missing'));
+    }
+
     public function testRecursiveWildcard()
     {
         $result = self::getBookstoreCrawler()->find('$..*');

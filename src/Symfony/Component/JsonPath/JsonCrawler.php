@@ -805,20 +805,17 @@ final class JsonCrawler implements JsonCrawlerInterface
         };
     }
 
-    private function evaluateRecursive(mixed $value): array
+    private function evaluateRecursive(mixed $value, array &$result = []): array
     {
         if (!$this->isArrayOrObject($value)) {
-            return [];
+            return $result;
         }
-
-        $result = [];
 
         $result[] = $value;
 
         foreach ($value as $item) {
             if ($this->isArrayOrObject($item)) {
-                $childResults = $this->evaluateRecursive($item);
-                $result = array_merge($result, $childResults);
+                $this->evaluateRecursive($item, $result);
             }
         }
 

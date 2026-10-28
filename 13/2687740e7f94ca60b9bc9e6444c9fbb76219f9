@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-28T01:15:49Z
+
+I like the opt-in through the parameter type. My concern is that a parameter typed `?\Exception` receives the failure of any recoverable attribute, including a class-level `#[IsCsrfTokenValid]`. A controller that checks `$e instanceof RateLimitExceededException` and moves on otherwise would then run with an invalid CSRF token. Should broad types like `\Exception` be ignored, so that each recoverable exception has to be named in the type?
+
+Also, the new property now sits between the `@param` docblock and the constructor, so the docblock no longer applies to it.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-10-28T01:54:15Z
+
+Good point, thanks. I've changed it so the parameter type has to name one of the exceptions the attribute declares, or a subclass of one. `?\Exception` and `?\Throwable` receive nothing now, so the failure is thrown as before. Unions and narrow types like `?ExpiredSignedUriException` still work. I've updated the description to match.
+
+Fixed the docblock too.

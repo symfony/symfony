@@ -209,12 +209,12 @@ class FormPassTest extends TestCase
         $container->compile();
 
         $this->assertSame([
-            UserData::class => ['name', 'publicName'],
-            AdminData::class => ['role', 'name', 'publicName'],
+            UserData::class => ['name', 'internalName'],
+            AdminData::class => ['role', 'name', 'internalName'],
             VehicleData::class => ['name'],
             CarData::class => ['name'],
-            SpeakerData::class => ['email', 'phoneNumber', 'city', 'name', 'company', 'bio'],
-            KeynoteSpeakerData::class => ['talk', 'email', 'phoneNumber', 'city', 'name', 'company', 'bio'],
+            SpeakerData::class => ['email', 'phone', 'city', 'name', 'company', 'bio'],
+            KeynoteSpeakerData::class => ['talk', 'email', 'phone', 'city', 'name', 'company', 'bio'],
         ], $container->getDefinition('form.type_guesser.type_info.cache_warmer')->getArgument(0));
     }
 

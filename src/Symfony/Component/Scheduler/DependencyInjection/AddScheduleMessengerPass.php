@@ -133,7 +133,17 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                     }
                     $message = new Definition(RunCommandMessage::class, [$input]);
                 } else {
-                    $message = new Definition(ServiceCallMessage::class, [$serviceId, $tagAttributes['method'] ?? '__invoke', (array) ($tagAttributes['arguments'] ?? [])]);
+                    $r = $container->getReflectionClass($serviceDefinition->getClass(), false);
+
+                    if ($r && !$r->hasMethod($method) && !$r->hasMethod('__call')) {
+                        if (isset($tagAttributes['method'])) {
+                            throw new InvalidArgumentException(\sprintf('Invalid task service "%s": method "%s::%s()" does not exist.', $serviceId, $r->getName(), $method));
+                        }
+
+                        throw new InvalidArgumentException(\sprintf('Invalid task service "%s": class "%s" has no "__invoke()" method, and the task sets no "method" option. To dispatch a message on a schedule, return a "RecurringMessage" from a schedule provider instead.', $serviceId, $r->getName()));
+                    }
+
+                    $message = new Definition(ServiceCallMessage::class, [$serviceId, $method, (array) ($tagAttributes['arguments'] ?? [])]);
                 }
 
                 if ($stamps = (array) ($tagAttributes['stamps'] ?? [])) {

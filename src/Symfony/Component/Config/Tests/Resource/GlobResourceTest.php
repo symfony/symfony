@@ -236,6 +236,22 @@ class GlobResourceTest extends TestCase
         $this->assertSame($expected, $restored->__serialize());
     }
 
+    public function testUnserializePayloadWrittenBySleep()
+    {
+        $resource = new GlobResource(__DIR__, '/*.php', true, true, [__DIR__.'/excluded' => true]);
+        $expected = $resource->__serialize();
+        $expected['directories'] = null;
+
+        $data = [];
+        foreach (['prefix', 'pattern', 'recursive', 'hash', 'forExclusion', 'excludedPrefixes'] as $name) {
+            $data["\0".GlobResource::class."\0".$name] = $expected[$name];
+        }
+
+        $restored = unserialize('O:'.\strlen(GlobResource::class).':"'.GlobResource::class.'"'.substr(serialize($data), 1));
+
+        $this->assertSame($expected, $restored->__serialize());
+    }
+
     public function testUnserializeRejectsStringableExtraValue()
     {
         $resource = new GlobResource(__DIR__, '/*.php', true);

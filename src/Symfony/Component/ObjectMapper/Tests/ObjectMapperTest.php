@@ -147,6 +147,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\A as MappingAware
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\B as MappingAwareB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\C as MappingAwareC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\D as MappingAwareD;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\E as MappingAwareE;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\F as MappingAwareF;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\MappingAwareTransformer;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\AToBMapper;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\MapStructMapperMetadataFactory;
@@ -818,7 +820,8 @@ final class ObjectMapperTest extends TestCase
         $b = $mapper->map(new MappingAwareA());
 
         $this->assertInstanceOf(MappingAwareB::class, $b);
-        $this->assertSame('bar', $b->bar);
+        $this->assertSame('foo->bar', $b->bar);
+        $this->assertSame('baz->baz', $b->baz);
     }
 
     public function testMappingAwareTransformCallableWithTargetSideMapping()
@@ -829,7 +832,18 @@ final class ObjectMapperTest extends TestCase
         $d = $mapper->map(new MappingAwareC());
 
         $this->assertInstanceOf(MappingAwareD::class, $d);
-        $this->assertSame('source:foo', $d->foo);
+        $this->assertSame('foo->foo', $d->foo);
+    }
+
+    public function testMappingAwareTransformCallableWithMetadataReadFromTarget()
+    {
+        $mapper = new ObjectMapper(
+            transformCallableLocator: $this->getServiceLocator([MappingAwareTransformer::class => new MappingAwareTransformer()]),
+        );
+        $f = $mapper->map(new MappingAwareE(), MappingAwareF::class);
+
+        $this->assertSame('foo->bar', $f->bar);
+        $this->assertSame('baz->baz', $f->baz);
     }
 
     #[DataProvider('validPartialInputProvider')]

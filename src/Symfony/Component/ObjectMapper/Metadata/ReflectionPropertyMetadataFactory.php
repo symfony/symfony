@@ -91,7 +91,7 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
             $targetProperty = $mapping->target ?? $property;
             $declaredSourceProperty = $this->getPropertyFromHierarchy($sourceRefl, $sourceProperty);
             $mappings[] = [
-                'mapping' => $mapping,
+                'mapping' => $this->withPropertyNames($mapping, $sourceProperty, $targetProperty),
                 'sourceProperty' => $sourceProperty,
                 'targetProperty' => $targetProperty,
                 'sourceReadability' => $this->getReadability($sourceRefl, $sourceRefl, $sourceProperty, $declaredSourceProperty, $hasMagicGet),
@@ -173,7 +173,7 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
                 && $property === $mapping->source
                 && ($mapping->target ?? $property) === $property
             ) {
-                return $mapping;
+                return $this->withPropertyNames($mapping, $property, $property);
             }
         }
 
@@ -293,5 +293,17 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
             'enable_magic_methods_extraction' => PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET | PropertyAccessor::MAGIC_CALL,
             'enable_constructor_extraction' => false,
         ];
+    }
+
+    /**
+     * Transformers receive the mapping, so it should name the mapped properties wherever #[Map] is declared.
+     */
+    private function withPropertyNames(Mapping $mapping, string $sourceProperty, string $targetProperty): Mapping
+    {
+        if ($sourceProperty === $mapping->source && $targetProperty === $mapping->target) {
+            return $mapping;
+        }
+
+        return new Mapping($targetProperty, $sourceProperty, $mapping->if, $mapping->transform, $mapping->targetClass);
     }
 }

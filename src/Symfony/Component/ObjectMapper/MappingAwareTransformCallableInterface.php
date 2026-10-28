@@ -16,10 +16,9 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 /**
  * A transformer receiving the #[Map] attribute being applied.
  *
- * The attribute is passed to __invoke() so that the transformer stays stateless and can be used
- * as a service. It is nullable only because an interface cannot add a required parameter to an
- * inherited signature: the mapper always passes it. {@see Map::$target} is null when the mapping
- * is declared on the target side with #[Map(source: ...)].
+ * The attribute is passed to __invoke() so that the transformer stays stateless and can be used as a service.
+ * When a property is mapped, {@see Map::$source} and {@see Map::$target} are the names of the source and target properties, wherever the attribute is declared.
+ * The object mapper always passes the attribute. It is null when other code calls the transformer as a TransformCallableInterface, with three arguments.
  *
  * @template T of object
  * @template T2 of object

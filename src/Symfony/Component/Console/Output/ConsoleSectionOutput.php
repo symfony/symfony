@@ -138,6 +138,7 @@ class ConsoleSectionOutput extends StreamOutput
 
     private function getDisplayLength(string $text): int
     {
-        return Helper::width(Helper::removeDecoration($this->getFormatter(), str_replace("\t", '        ', $text)));
+        // formatting the line again would remove literal tags, so only the ANSI sequences are removed
+        return Helper::width(preg_replace(['/\e\[[^m]*m/', '/\e]8;[^;]*;[^\e]*\e\\\\/'], '', str_replace("\t", '        ', $text)));
     }
 }

@@ -76,6 +76,11 @@ class ContentSecurityPolicyHandler
         $this->cspDisabled = true;
     }
 
+    public function reset(): void
+    {
+        $this->cspDisabled = false;
+    }
+
     /**
      * Cleanup temporary headers and updates Content-Security-Policy headers.
      *

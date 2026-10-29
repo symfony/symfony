@@ -55,6 +55,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 inline_service(NonceGenerator::class),
             ])
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('twig.extension.webprofiler', WebProfilerExtension::class)
             ->args([

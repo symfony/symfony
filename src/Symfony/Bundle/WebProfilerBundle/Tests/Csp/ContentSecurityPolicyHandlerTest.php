@@ -219,4 +219,18 @@ class ContentSecurityPolicyHandlerTest extends TestCase
 
         return $generator;
     }
+
+    public function testResetReEnablesCsp()
+    {
+        $cspHandler = new ContentSecurityPolicyHandler($this->createMock(NonceGenerator::class));
+
+        $cspHandler->disableCsp();
+        $cspHandler->reset();
+
+        $response = new Response();
+        $response->headers->set('Content-Security-Policy', "default-src 'self'");
+        $cspHandler->updateResponseHeaders(new Request(), $response);
+
+        $this->assertTrue($response->headers->has('Content-Security-Policy'));
+    }
 }

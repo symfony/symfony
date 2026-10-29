@@ -23,6 +23,18 @@ final class Schema implements \JsonSerializable
     private const LITERAL_KEYWORDS = ['type', 'enum', 'const', 'default', 'example', 'examples', 'required'];
     private const SCHEMA_LIST_KEYWORDS = ['allOf', 'anyOf', 'oneOf', 'prefixItems'];
     private const SCHEMA_MAP_KEYWORDS = ['properties', 'patternProperties', '$defs', 'definitions', 'dependentSchemas'];
+    private const ANNOTATION_KEYWORDS = ['title', 'description', 'default', 'deprecated', 'readOnly', 'writeOnly', 'example', 'examples', '$comment'];
+    private const MERGEABLE_MAP_KEYWORDS = ['properties', 'patternProperties', 'dependentSchemas'];
+    // the keywords whose meaning depends on other keywords of the same schema
+    private const ADJACENT_KEYWORDS = [
+        'additionalProperties' => ['properties', 'patternProperties'],
+        'items' => ['prefixItems'],
+        'additionalItems' => ['items'],
+        'minContains' => ['contains'],
+        'maxContains' => ['contains'],
+        'then' => ['if'],
+        'else' => ['if'],
+    ];
 
     /**
      * @param array<string, mixed>                $root
@@ -129,12 +141,89 @@ final class Schema implements \JsonSerializable
             }
         }
 
-        // the keywords next to a reference override the ones of the definition, but both lists of required properties apply
-        if (isset($definition['required'], $schema['required'])) {
-            $schema['required'] = array_values(array_unique([...$definition['required'], ...$schema['required']]));
+        return $definition ? $this->merge($definition, $schema) : $schema;
+    }
+
+    /**
+     * Merges a definition with the keywords next to the reference to it, since both apply.
+     *
+     * The annotations next to the reference override the ones of the definition.
+     * When merging would change what a keyword means, the definition is kept in an allOf instead.
+     *
+     * @param array<mixed> $definition
+     * @param array<mixed> $schema
+     *
+     * @return array<mixed>
+     */
+    private function merge(array $definition, array $schema): array
+    {
+        if ($definition === $schema) {
+            return $schema;
         }
 
-        return array_replace($definition, $schema);
+        if (!$this->canMerge($definition, $schema)) {
+            if (isset($schema['$ref']) && !$this->dialect->supportsRefSiblings) {
+                return ['allOf' => [$definition, $schema]];
+            }
+
+            return ['allOf' => [$definition, ...$schema['allOf'] ?? []]] + $schema;
+        }
+
+        foreach ($schema as $keyword => $value) {
+            if (!\array_key_exists($keyword, $definition) || $definition[$keyword] === $value) {
+                $definition[$keyword] = $value;
+            } elseif ('required' === $keyword) {
+                $definition[$keyword] = array_values(array_unique([...$definition[$keyword], ...$value]));
+            } elseif ('allOf' === $keyword) {
+                $definition[$keyword] = [...$definition[$keyword], ...$value];
+            } elseif (\in_array($keyword, self::MERGEABLE_MAP_KEYWORDS, true)) {
+                foreach ($value as $key => $subSchema) {
+                    $definition[$keyword][$key] = match (true) {
+                        !\array_key_exists($key, $definition[$keyword]), true === $definition[$keyword][$key], false === $subSchema => $subSchema,
+                        true === $subSchema, false === $definition[$keyword][$key] => $definition[$keyword][$key],
+                        default => $this->merge($definition[$keyword][$key], $subSchema),
+                    };
+                }
+            } else {
+                $definition[$keyword] = $value;
+            }
+        }
+
+        return $definition;
+    }
+
+    /**
+     * @param array<mixed> $definition
+     * @param array<mixed> $schema
+     */
+    private function canMerge(array $definition, array $schema): bool
+    {
+        foreach ($schema as $keyword => $value) {
+            if (\array_key_exists($keyword, $definition) && $definition[$keyword] !== $value && !self::isAnnotation($keyword) && !\in_array($keyword, ['required', 'allOf', ...self::MERGEABLE_MAP_KEYWORDS], true)) {
+                return false;
+            }
+        }
+
+        foreach ([[$definition, $schema], [$schema, $definition]] as [$side, $otherSide]) {
+            foreach (array_keys($side) as $keyword) {
+                $dependencies = match ($keyword) {
+                    '$ref' => $this->dialect->supportsRefSiblings ? [] : array_keys($otherSide),
+                    'unevaluatedProperties', 'unevaluatedItems' => array_filter(array_keys($otherSide), static fn (string $otherKeyword): bool => !self::isAnnotation($otherKeyword)),
+                    default => array_intersect(array_keys($otherSide), self::ADJACENT_KEYWORDS[$keyword] ?? []),
+                };
+
+                if ($dependencies) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static function isAnnotation(string $keyword): bool
+    {
+        return \in_array($keyword, self::ANNOTATION_KEYWORDS, true) || str_starts_with($keyword, 'x-');
     }
 
     /**

@@ -969,6 +969,15 @@ class Application implements ResetInterface
         if (null !== $this->runningCommand) {
             $output->writeln(\sprintf('<info>%s</info>', OutputFormatter::escape(\sprintf($this->runningCommand->getSynopsis(), $this->getName()))), OutputInterface::VERBOSITY_QUIET);
             $output->writeln('', OutputInterface::VERBOSITY_QUIET);
+
+            foreach ($this->getDefinition()->getOptions() as $option) {
+                if (!$option->isHidden()) {
+                    $output->writeln('Global options are available. Run the command with --help to list them.', OutputInterface::VERBOSITY_QUIET);
+                    $output->writeln('', OutputInterface::VERBOSITY_QUIET);
+
+                    break;
+                }
+            }
         }
     }
 

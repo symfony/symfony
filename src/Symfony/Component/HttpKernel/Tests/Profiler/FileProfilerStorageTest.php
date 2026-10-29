@@ -234,6 +234,19 @@ class FileProfilerStorageTest extends TestCase
         $this->assertCount(1, $this->storage->find(null, null, 10, null, null, null, '404'), '->find() retrieve a record by Status code 404');
     }
 
+    public function testRetrieveByStatusCodeZero()
+    {
+        $succeeded = new Profile('exitcode0');
+        $succeeded->setStatusCode(0);
+        $this->storage->write($succeeded);
+
+        $failed = new Profile('exitcode1');
+        $failed->setStatusCode(1);
+        $this->storage->write($failed);
+
+        $this->assertSame(['exitcode0'], array_column($this->storage->find(null, null, 10, null, null, null, '0'), 'token'), '->find() retrieve a record by exit code 0');
+    }
+
     public function testRetrieveByUrl()
     {
         $profile = new Profile('simple_quote');

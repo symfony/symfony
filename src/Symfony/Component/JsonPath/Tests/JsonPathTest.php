@@ -65,6 +65,26 @@ class JsonPathTest extends TestCase
         $this->assertSame('$["users"][-1]', (string) $path);
     }
 
+    #[DataProvider('provideSlices')]
+    public function testSlice(int $start, ?int $end, ?int $step, string $expectedPath, array $expectedValues)
+    {
+        $path = (new JsonPath())->slice($start, $end, $step);
+
+        $this->assertSame($expectedPath, (string) $path);
+        $this->assertSame($expectedValues, (new JsonCrawler('[0,1,2,3,4]'))->find($path));
+    }
+
+    public static function provideSlices(): iterable
+    {
+        yield 'open end' => [1, null, null, '$[1:]', [1, 2, 3, 4]];
+        yield 'open end with step' => [0, null, 2, '$[0::2]', [0, 2, 4]];
+        yield 'open end with negative step' => [-1, null, -1, '$[-1::-1]', [4, 3, 2, 1, 0]];
+        yield 'open end with zero step' => [0, null, 0, '$[0::0]', []];
+        yield 'bounded' => [1, 3, null, '$[1:3]', [1, 2]];
+        yield 'bounded with step' => [0, 4, 2, '$[0:4:2]', [0, 2]];
+        yield 'zero end' => [0, 0, null, '$[0:0]', []];
+    }
+
     #[DataProvider('provideKeysToEscape')]
     public function testEscapedKey(string $key, string $expectedPath)
     {

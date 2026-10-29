@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="100" resname="Please enter a valid birthdate.">
                 <source>This value is not a valid birthdate.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir doğum tarihi değil.</target>
+                <target>Bu değer geçerli bir doğum tarihi değildir.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>
@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="103" resname="Please select a valid color.">
                 <source>This value is not a valid color.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir renk değil.</target>
+                <target>Bu değer geçerli bir renk değildir.</target>
             </trans-unit>
             <trans-unit id="104" resname="Please select a valid country.">
                 <source>This value is not a valid country.</source>
@@ -44,7 +44,7 @@
             </trans-unit>
             <trans-unit id="106" resname="Please choose a valid date interval.">
                 <source>This value is not a valid date interval.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir tarih aralığı değil.</target>
+                <target>Bu değer geçerli bir tarih aralığı değildir.</target>
             </trans-unit>
             <trans-unit id="107" resname="Please enter a valid date and time.">
                 <source>This value is not a valid date and time.</source>
@@ -56,7 +56,7 @@
             </trans-unit>
             <trans-unit id="109" resname="Please select a valid file.">
                 <source>This value is not a valid file.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir dosya değil.</target>
+                <target>Bu değer geçerli bir dosya değildir.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The hidden field is invalid.</source>
@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="111" resname="Please enter an integer.">
                 <source>This value is not a valid integer.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir tam sayı değil.</target>
+                <target>Bu değer geçerli bir tam sayı değildir.</target>
             </trans-unit>
             <trans-unit id="112" resname="Please select a valid language.">
                 <source>This value is not a valid language.</source>
@@ -72,15 +72,15 @@
             </trans-unit>
             <trans-unit id="113" resname="Please select a valid locale.">
                 <source>This value is not a valid locale.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir yerel ayar değil.</target>
+                <target>Bu değer geçerli bir yerel ayar değildir.</target>
             </trans-unit>
             <trans-unit id="114" resname="Please enter a valid money amount.">
                 <source>This value is not a valid money amount.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir para tutarı değil.</target>
+                <target>Bu değer geçerli bir para tutarı değildir.</target>
             </trans-unit>
             <trans-unit id="115" resname="Please enter a number.">
                 <source>This value is not a valid number.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir sayı değil.</target>
+                <target>Bu değer geçerli bir sayı değildir.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>The password is invalid.</source>
@@ -88,7 +88,7 @@
             </trans-unit>
             <trans-unit id="117" resname="Please enter a percentage value.">
                 <source>This value is not a valid percentage.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir yüzde değeri değil.</target>
+                <target>Bu değer geçerli bir yüzde değildir.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>The values do not match.</source>
@@ -108,11 +108,11 @@
             </trans-unit>
             <trans-unit id="122" resname="Please enter a valid search term.">
                 <source>This value is not a valid search term.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir arama terimi değil.</target>
+                <target>Bu değer geçerli bir arama terimi değildir.</target>
             </trans-unit>
             <trans-unit id="123" resname="Please provide a valid phone number.">
                 <source>This value is not a valid phone number.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir telefon numarası değil.</target>
+                <target>Bu değer geçerli bir telefon numarası değildir.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The checkbox has an invalid value.</source>
@@ -124,11 +124,11 @@
             </trans-unit>
             <trans-unit id="126" resname="Please select a valid option.">
                 <source>This value is not a valid option.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir seçenek değil.</target>
+                <target>Bu değer geçerli bir seçenek değildir.</target>
             </trans-unit>
             <trans-unit id="127" resname="Please select a valid range.">
                 <source>This value is not a valid range.</source>
-                <target state="needs-review-translation">Bu değer, geçerli bir aralık değil.</target>
+                <target>Bu değer geçerli bir aralık değildir.</target>
             </trans-unit>
             <trans-unit id="128" resname="Please enter a valid week.">
                 <source>This value is not a valid week.</source>

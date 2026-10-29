@@ -227,4 +227,29 @@ class SchemaTest extends TestCase
         $this->assertSame('{"type":"object","properties":{"any":{}},"additionalProperties":{},"components":{"schemas":{"Foo":{"type":"array","items":{}}}}}', json_encode($schema->toArray()));
         $this->assertSame('{}', json_encode((new Schema([], [], Dialect::openApi31()))->getRoot()));
     }
+
+    #[DataProvider('provideSchemaMaps')]
+    public function testSchemaMapsAreEncodedAsObjects(array $root, string $expectedJson)
+    {
+        $this->assertSame($expectedJson, json_encode((new Schema($root, [], Dialect::jsonSchema202012()))->getRoot()));
+    }
+
+    public static function provideSchemaMaps(): iterable
+    {
+        yield 'empty maps' => [
+            ['properties' => [], 'patternProperties' => [], '$defs' => [], 'definitions' => [], 'dependentSchemas' => [], 'dependentRequired' => []],
+            '{"properties":{},"patternProperties":{},"$defs":{},"definitions":{},"dependentSchemas":{},"dependentRequired":{}}',
+        ];
+        yield 'maps with list keys' => [
+            ['properties' => ['0' => ['type' => 'string'], '1' => ['type' => 'integer']], 'dependentRequired' => ['0' => ['1']]],
+            '{"properties":{"0":{"type":"string"},"1":{"type":"integer"}},"dependentRequired":{"0":["1"]}}',
+        ];
+    }
+
+    public function testValuesOfKeywordsThatAreNotSchemasAreKeptAsIs()
+    {
+        $schema = new Schema(['dependentRequired' => ['a' => [], 'b' => ['a']], 'x-tags' => [], 'x-meta' => ['ids' => []]], [], Dialect::openApi31());
+
+        $this->assertSame('{"dependentRequired":{"a":[],"b":["a"]},"x-tags":[],"x-meta":{"ids":[]}}', json_encode($schema->getRoot()));
+    }
 }

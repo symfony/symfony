@@ -177,17 +177,32 @@ final class Schema implements \JsonSerializable
         }
 
         foreach ($schema as $keyword => $value) {
-            if (!\is_array($value) || \in_array($keyword, self::LITERAL_KEYWORDS, true)) {
+            // the values of literal keywords and of specification extensions (x-*) are not schemas
+            if (!\is_array($value) || \in_array($keyword, self::LITERAL_KEYWORDS, true) || str_starts_with($keyword, 'x-')) {
                 continue;
             }
 
             $schema[$keyword] = match (true) {
-                \in_array($keyword, self::SCHEMA_LIST_KEYWORDS, true), \in_array($keyword, self::SCHEMA_MAP_KEYWORDS, true) => array_map(self::encodeSchema(...), $value),
+                \in_array($keyword, self::SCHEMA_LIST_KEYWORDS, true) => array_map(self::encodeSchema(...), $value),
+                \in_array($keyword, self::SCHEMA_MAP_KEYWORDS, true) => self::encodeMap(array_map(self::encodeSchema(...), $value)),
+                'dependentRequired' === $keyword => self::encodeMap($value),
                 'components' === $keyword => array_map(static fn (array $schemas): array => array_map(self::encodeSchema(...), $schemas), $value),
                 default => self::encodeSchema($value),
             };
         }
 
         return $schema;
+    }
+
+    /**
+     * Maps must be encoded as JSON objects, also when they are empty or when their keys are 0, 1, 2...
+     *
+     * @param array<mixed> $map
+     *
+     * @return array<mixed>|\ArrayObject<int, mixed>
+     */
+    private static function encodeMap(array $map): array|\ArrayObject
+    {
+        return array_is_list($map) ? new \ArrayObject($map) : $map;
     }
 }

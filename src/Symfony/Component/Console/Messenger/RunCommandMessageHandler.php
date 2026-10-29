@@ -81,11 +81,17 @@ final class RunCommandMessageHandler
             throw new LogicException(\sprintf('Running command "%s" in a separate process requires the console entry point to be configured.', $message->input));
         }
 
-        if (false === $php = (new PhpExecutableFinder())->find(false)) {
+        if (!is_file($this->console)) {
+            throw new LogicException(\sprintf('Running command "%s" in a separate process requires the console entry point to exist, but "%s" does not.', $message->input, $this->console));
+        }
+
+        $finder = new PhpExecutableFinder();
+
+        if (false === $php = $finder->find(false)) {
             throw new RuntimeException('Unable to find the PHP executable.');
         }
 
-        $process = new Process([$php, $this->console, ...(new StringInput($message->input))->getRawTokens()], timeout: $message->timeout);
+        $process = new Process([$php, ...$finder->findArguments(), $this->console, ...(new StringInput($message->input))->getRawTokens()], timeout: $message->timeout);
 
         try {
             $exitCode = $process->run();
@@ -104,6 +110,13 @@ final class RunCommandMessageHandler
 
     private function fetchOutput(Process $process): string
     {
-        return $process->getOutput().$process->getErrorOutput();
+        $output = $process->getOutput();
+        $errorOutput = $process->getErrorOutput();
+
+        if ('' !== $output && '' !== $errorOutput) {
+            $output = rtrim($output, "\n")."\n";
+        }
+
+        return $output.$errorOutput;
     }
 }

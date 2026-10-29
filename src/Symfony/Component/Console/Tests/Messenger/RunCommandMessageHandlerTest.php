@@ -214,6 +214,32 @@ final class RunCommandMessageHandlerTest extends TestCase
         $handler(new RunCommandMessage('test:command', isolated: true));
     }
 
+    public function testIsolatedCommandRequiresAnExistingConsoleEntryPoint()
+    {
+        $handler = new RunCommandMessageHandler($this->createApplicationWithCommand(), '/nonexistent/bin/console');
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Running command "test:command" in a separate process requires the console entry point to exist, but "/nonexistent/bin/console" does not.');
+
+        $handler(new RunCommandMessage('test:command', isolated: true));
+    }
+
+    public function testIsolatedCommandKeepsItsErrorOutputOnItsOwnLine()
+    {
+        $handler = new RunCommandMessageHandler($this->createApplicationWithCommand(), self::CONSOLE);
+        $context = $handler(new RunCommandMessage('test:command --stderr', isolated: true));
+
+        $this->assertSame("some message\nsome error", $context->output);
+    }
+
+    public function testTimeoutMustBePositive()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The timeout of command "test:command" must be a positive number of seconds, or null to let the command run to completion.');
+
+        new RunCommandMessage('test:command', isolated: true, timeout: 0);
+    }
+
     public function testTimeoutRequiresAnIsolatedCommand()
     {
         $this->expectException(InvalidArgumentException::class);

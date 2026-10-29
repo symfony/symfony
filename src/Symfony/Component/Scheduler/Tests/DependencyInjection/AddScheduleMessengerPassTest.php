@@ -522,6 +522,14 @@ class AddScheduleMessengerPassTest extends TestCase
         self::messageOfTaskWithTags(['timeout' => 30.0]);
     }
 
+    public function testNonPositiveTimeoutIsRejected()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid task service "some.task": option "timeout" must be a positive number of seconds, or null to let the command run to completion.');
+
+        self::messageOfTaskWithTags(['isolated' => true, 'timeout' => 0.0]);
+    }
+
     public function testIsolatingAServiceCallIsRejected()
     {
         $this->expectException(InvalidArgumentException::class);

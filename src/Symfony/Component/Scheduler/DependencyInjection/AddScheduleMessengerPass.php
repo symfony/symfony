@@ -115,6 +115,10 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                     throw new InvalidArgumentException(\sprintf('Invalid task service "%s": option "timeout" requires option "isolated" to be true, as a command cannot be interrupted while it runs in the worker consuming the schedule.', $serviceId));
                 }
 
+                if (null !== $timeout && $timeout <= 0) {
+                    throw new InvalidArgumentException(\sprintf('Invalid task service "%s": option "timeout" must be a positive number of seconds, or null to let the command run to completion.', $serviceId));
+                }
+
                 $serviceDefinition = $container->getDefinition($serviceId);
 
                 $commandTags = $serviceDefinition->getTag('console.command');

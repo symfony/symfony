@@ -209,7 +209,41 @@ class ProfilerControllerTest extends WebTestCase
             ['../TwigBundle/README.md', false],
             ['Controller/../README.md', false],
             ['Controller/./ProfilerController.php', false],
+            ['', false],
+            ['Controller', false],
         ];
+    }
+
+    public function testOpeningWithoutFile()
+    {
+        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
+        $twig = $this->createStub(Environment::class);
+        $profiler = $this->createStub(Profiler::class);
+
+        $controller = new ProfilerController($urlGenerator, $profiler, $twig, [], null, __DIR__.'/../..');
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $controller->openAction(Request::create('/_profiler/open'));
+    }
+
+    public function testOpeningPassesTheLineAsAnInteger()
+    {
+        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
+        $profiler = $this->createStub(Profiler::class);
+        $lines = [];
+        $twig = $this->createStub(Environment::class);
+        $twig->method('render')->willReturnCallback(static function (string $template, array $context) use (&$lines): string {
+            $lines[] = $context['line'];
+
+            return '';
+        });
+
+        $controller = new ProfilerController($urlGenerator, $profiler, $twig, [], null, __DIR__.'/../..');
+        $controller->openAction(Request::create('/_profiler/open', Request::METHOD_GET, ['file' => 'README.md', 'line' => '12']));
+        $controller->openAction(Request::create('/_profiler/open', Request::METHOD_GET, ['file' => 'README.md']));
+
+        $this->assertSame([12, 0], $lines);
     }
 
     #[DataProvider('provideCspVariants')]

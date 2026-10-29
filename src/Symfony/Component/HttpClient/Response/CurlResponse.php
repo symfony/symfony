@@ -180,13 +180,21 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $multi->openHandles[$id] = [$ch, $options];
         curl_multi_add_handle($multi->handle, $ch);
 
-        $this->canary = new Canary(static function () use ($ch, $multi, $id) {
+        // Decorators call __destruct() on responses that can still be read (e.g. through toStream()), so the canary closes the debug buffer
+        $this->canary = new Canary(static function () use ($ch, $multi, $id, &$info, $debugBuffer) {
             unset($multi->pauseExpiries[$id], $multi->openHandles[$id], $multi->handlesActivity[$id]);
             curl_setopt($ch, \CURLOPT_PRIVATE, '_0');
             $multi->handlesToRemove[$id] = $ch;
 
             if (!$multi->performing) {
+                // Removing an unfinished handle calls the progress function one last time
                 self::removeHandles($multi);
+            }
+
+            if (\is_resource($debugBuffer)) {
+                rewind($debugBuffer);
+                $info['debug'] = ($info['debug'] ?? '').stream_get_contents($debugBuffer);
+                self::closeDebugBuffer($ch, $debugBuffer);
             }
         });
     }
@@ -204,7 +212,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             }
 
             $info['debug'] ??= '';
-            if ($this->debugBuffer) {
+            if (\is_resource($this->debugBuffer)) {
                 rewind($this->debugBuffer);
                 if (fstat($this->debugBuffer)['size']) {
                     $info['debug'] .= stream_get_contents($this->debugBuffer);
@@ -252,17 +260,20 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             }
         }
 
-        // Not reached when doDestruct() throws, as the exception can keep the response alive
-        if ($this->debugBuffer) {
-            if (isset($this->canary)) {
-                // Removing an unfinished handle calls the progress function one last time
-                $this->canary->cancel();
-            }
-
-            curl_setopt($this->handle, \CURLOPT_STDERR, null);
-            fclose($this->debugBuffer);
-            $this->debugBuffer = null;
+        // Unused pushed responses have no canary to close their debug buffer
+        if (!isset($this->canary) && \is_resource($this->debugBuffer)) {
+            self::closeDebugBuffer($this->handle, $this->debugBuffer);
         }
+    }
+
+    /**
+     * @param resource $debugBuffer
+     */
+    private static function closeDebugBuffer(\CurlHandle $ch, $debugBuffer): void
+    {
+        curl_setopt($ch, \CURLOPT_VERBOSE, false);
+        curl_setopt($ch, \CURLOPT_STDERR, null);
+        fclose($debugBuffer);
     }
 
     private static function schedule(self $response, array &$runningResponses): void

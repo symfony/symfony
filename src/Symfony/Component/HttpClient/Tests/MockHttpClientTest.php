@@ -494,6 +494,11 @@ class MockHttpClientTest extends HttpClientTestCase
         return new MockHttpClient($responses);
     }
 
+    public function testGetContentThrowsWhenCanceledDuringTheBody()
+    {
+        $this->markTestSkipped('MockResponse calls "on_progress" for the whole body before returning the headers.');
+    }
+
     public function testHttp2PushVulcain()
     {
         $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');

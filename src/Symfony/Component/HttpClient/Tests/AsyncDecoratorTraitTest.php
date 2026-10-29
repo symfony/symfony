@@ -12,12 +12,14 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\AsyncDecoratorTrait;
+use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\DecoratorTrait;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
+use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -54,11 +56,6 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
                 return new AsyncResponse($this->client, $method, $url, $options, $this->chunkFilter);
             }
         };
-    }
-
-    public function testGetContentThrowsWhenCanceledDuringTheBody()
-    {
-        $this->markTestSkipped('AsyncResponse throws a LogicException when the wrapped response is canceled before it yields a chunk.');
     }
 
     public function testTimeoutOnDestruct()
@@ -359,6 +356,30 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Instance of "Symfony\Component\HttpClient\Response\NativeResponse" is already consumed and cannot be managed by "Symfony\Component\HttpClient\Response\AsyncResponse". A decorated client should not call any of the response\'s methods in its "request()" method.');
         $response->getStatusCode();
+    }
+
+    /**
+     * @requires extension curl
+     */
+    public function testCancelFromOnProgressEndsTheStream()
+    {
+        foreach ([$this->getHttpClient(__FUNCTION__, null, new CurlHttpClient()), new RetryableHttpClient(new CurlHttpClient(), null, 0)] as $client) {
+            $cancel = false;
+            $response = $client->request('GET', 'http://localhost:8057/max-duration', ['max_duration' => 10, 'on_progress' => static function (int $dlNow) use (&$response, &$cancel) {
+                if ($cancel && $dlNow) {
+                    $cancel = false;
+                    $response->cancel();
+                }
+            }]);
+
+            $this->assertSame(200, $response->getStatusCode());
+            $cancel = true;
+
+            foreach ($client->stream($response) as $chunk) {
+            }
+
+            $this->assertSame('Response has been canceled.', $response->getInfo('error'));
+        }
     }
 
     public function testMaxDuration()

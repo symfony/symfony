@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Symfony\Bridge\PhpUnit\Attribute\TimeSensitive;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
@@ -1672,6 +1673,7 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals([$a, $b, $c], $resources, '->getResources() returns an array of resources read for the current configuration');
     }
 
+    #[TimeSensitive(FileResource::class)]
     public function testVendorPathsAreTrackedByTheInstalledJsonFile()
     {
         $vendorFile = (new \ReflectionClass(PsrContainerInterface::class))->getFileName();

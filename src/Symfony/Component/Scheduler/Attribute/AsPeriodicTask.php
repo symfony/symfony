@@ -33,7 +33,7 @@ class AsPeriodicTask
      * @param string[]|string|null     $transports One or many transports through which the message scheduling the task will go
      * @param string[]|string          $env        One or many environments the task is scheduled in; all of them when empty
      * @param array<mixed>|string      $stamps     One or many Messenger stamps to add to the message scheduling the task, as class names, each optionally mapped to the arguments its constructor takes
-     * @param bool                     $isolated   Whether to run the command in a separate PHP process; only for tasks that are console commands
+     * @param bool                     $isolated   Whether to run the command in a separate PHP process; only for tasks that are console commands; the worker still waits for the command to finish, use the "--concurrency" option of "messenger:consume" to run tasks in parallel
      * @param float|null               $timeout    The number of seconds the command may run for before it is killed, or null to let it run to completion; requires "isolated"
      */
     public function __construct(

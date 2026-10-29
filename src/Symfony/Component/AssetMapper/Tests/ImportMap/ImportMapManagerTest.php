@@ -299,6 +299,35 @@ class ImportMapManagerTest extends TestCase
         yield 'package listed twice' => [['lodash', 'lodash'], 'lodash'];
     }
 
+    public function testRemoveOnlyDeletesDownloadedFiles()
+    {
+        $manager = $this->createImportMapManager();
+        $this->writeFile('assets/app.js', 'app contents');
+        $this->writeFile('vendor/symfony/stimulus-bundle/assets/dist/loader.js', 'loader contents');
+        $this->writeFile('assets/vendor/lodash.js', 'lodash contents');
+        $this->assetMapper
+            ->method('getAssetFromSourcePath')
+            ->willReturnCallback(static fn (string $sourcePath) => new MappedAsset(basename($sourcePath), $sourcePath))
+        ;
+        $this->configReader
+            ->method('convertPathToFilesystemPath')
+            ->willReturnCallback(static fn (string $path) => str_starts_with($path, './') ? self::$writableRoot.substr($path, 1) : $path)
+        ;
+        $this->mockImportMap([
+            self::createLocalEntry('app', './assets/app.js'),
+            self::createLocalEntry('@symfony/stimulus-bundle', './vendor/symfony/stimulus-bundle/assets/dist/loader.js'),
+            self::createRemoteEntry('lodash', '1.2.3', self::$writableRoot.'/assets/vendor/lodash.js'),
+        ]);
+
+        $this->configReader->expects($this->once())->method('writeEntries');
+
+        $manager->remove(['app', '@symfony/stimulus-bundle', 'lodash']);
+
+        $this->assertFileExists(self::$writableRoot.'/assets/app.js');
+        $this->assertFileExists(self::$writableRoot.'/vendor/symfony/stimulus-bundle/assets/dist/loader.js');
+        $this->assertFileDoesNotExist(self::$writableRoot.'/assets/vendor/lodash.js');
+    }
+
     public function testUpdateAll()
     {
         $this->packageResolver = $this->createMock(PackageResolverInterface::class);

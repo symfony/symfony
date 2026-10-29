@@ -205,6 +205,10 @@ class ImportMapManager
 
     private function cleanupPackageFiles(ImportMapEntry $entry): void
     {
+        if (!$entry->isRemotePackage()) {
+            return;
+        }
+
         $asset = $this->findAsset($entry->path);
 
         if ($asset && is_file($asset->sourcePath)) {

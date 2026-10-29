@@ -101,22 +101,14 @@ final class Schema implements \JsonSerializable
      */
     private function inline(array $schema, array $stack, array &$cyclic): array
     {
+        $definition = [];
         if (null !== $name = $this->getReferencedDefinition($schema)) {
             if (isset($stack[$name])) {
                 $cyclic[$name] = true;
-
-                return $schema;
+            } else {
+                unset($schema['$ref']);
+                $definition = $this->inline($this->definitions[$name], $stack + [$name => true], $cyclic);
             }
-
-            unset($schema['$ref']);
-            $definition = $this->inline($this->definitions[$name], $stack + [$name => true], $cyclic);
-
-            // the keywords next to a reference override the ones of the definition, but both lists of required properties apply
-            if (isset($definition['required'], $schema['required'])) {
-                $schema['required'] = array_values(array_unique([...$definition['required'], ...$schema['required']]));
-            }
-
-            return [...$definition, ...$schema];
         }
 
         foreach ($schema as $keyword => $value) {
@@ -137,7 +129,12 @@ final class Schema implements \JsonSerializable
             }
         }
 
-        return $schema;
+        // the keywords next to a reference override the ones of the definition, but both lists of required properties apply
+        if (isset($definition['required'], $schema['required'])) {
+            $schema['required'] = array_values(array_unique([...$definition['required'], ...$schema['required']]));
+        }
+
+        return array_replace($definition, $schema);
     }
 
     /**

@@ -100,6 +100,59 @@ class SchemaTest extends TestCase
         $this->assertSame(['radius', 'kind'], $schema->flatten()->getRoot()['required']);
     }
 
+    public function testFlattenInlinesReferencesBesideAReference()
+    {
+        $schema = new Schema(
+            ['$ref' => '#/$defs/Base', 'allOf' => [['$ref' => '#/$defs/WithId']]],
+            ['Base' => ['type' => 'object'], 'WithId' => ['required' => ['id']]],
+            Dialect::jsonSchema202012(),
+        );
+
+        $flattened = $schema->flatten();
+
+        $this->assertSame(['type' => 'object', 'allOf' => [['required' => ['id']]]], $flattened->getRoot());
+        $this->assertSame([], $flattened->getDefinitions());
+    }
+
+    public function testFlattenDoesNotTreatSiblingReferencesAsCycles()
+    {
+        $schema = new Schema(
+            ['$ref' => '#/$defs/Base', 'properties' => ['child' => ['$ref' => '#/$defs/Base']]],
+            ['Base' => ['type' => 'object']],
+            Dialect::jsonSchema202012(),
+        );
+
+        $flattened = $schema->flatten();
+
+        $this->assertSame(['type' => 'object', 'properties' => ['child' => ['type' => 'object']]], $flattened->getRoot());
+        $this->assertSame([], $flattened->getDefinitions());
+    }
+
+    public function testFlattenInlinesReferencesBesideACyclicReference()
+    {
+        $schema = new Schema(
+            ['$ref' => '#/$defs/Node'],
+            [
+                'Node' => ['type' => 'object', 'properties' => ['child' => ['$ref' => '#/$defs/Node', 'allOf' => [['$ref' => '#/$defs/WithId']]]]],
+                'WithId' => ['required' => ['id']],
+            ],
+            Dialect::jsonSchema202012(),
+        );
+
+        $flattened = $schema->flatten();
+        $expected = ['type' => 'object', 'properties' => ['child' => ['$ref' => '#/$defs/Node', 'allOf' => [['required' => ['id']]]]]];
+
+        $this->assertSame($expected, $flattened->getRoot());
+        $this->assertSame(['Node' => $expected], $flattened->getDefinitions());
+    }
+
+    public function testFlattenKeepsIntegerKeysOfKeywordsThatAreNotSchemas()
+    {
+        $schema = new Schema(['type' => 'object', 'dependentRequired' => ['2' => ['1']]], [], Dialect::jsonSchema202012());
+
+        $this->assertSame(['type' => 'object', 'dependentRequired' => ['2' => ['1']]], $schema->flatten()->getRoot());
+    }
+
     public function testFlattenKeepsReferencesThatCloseACycle()
     {
         $schema = new Schema(

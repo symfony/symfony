@@ -46,6 +46,7 @@ class WebProfilerBundleKernel extends Kernel
         $routes->import(__DIR__.'/../../Resources/config/routing/profiler.xml')->prefix('/_profiler');
         $routes->import(__DIR__.'/../../Resources/config/routing/wdt.xml')->prefix('/_wdt');
         $routes->add('_', '/')->controller('kernel::homepageController');
+        $routes->add('csp', '/csp')->controller('kernel::cspController');
     }
 
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
@@ -91,5 +92,10 @@ class WebProfilerBundleKernel extends Kernel
     public function homepageController(): Response
     {
         return new Response('<html><head></head><body>Homepage Controller.</body></html>');
+    }
+
+    public function cspController(): Response
+    {
+        return new Response('<html><head></head><body>CSP Controller.</body></html>', 200, ['Content-Security-Policy' => "default-src 'self'"]);
     }
 }

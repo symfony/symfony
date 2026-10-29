@@ -239,6 +239,7 @@ return static function (ContainerConfigurator $container) {
         ->set('console.messenger.execute_command_handler', RunCommandMessageHandler::class)
             ->args([
                 service('console.messenger.application'),
+                param('kernel.project_dir').'/bin/console',
             ])
             ->tag('messenger.message_handler', ['sign' => true])
     ;

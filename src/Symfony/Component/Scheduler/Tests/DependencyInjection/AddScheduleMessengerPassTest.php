@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
+use Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -474,6 +475,59 @@ class AddScheduleMessengerPassTest extends TestCase
 
         $this->assertSame(ServiceCallMessage::class, $message->getClass());
         $this->assertSame('anything', $message->getArgument(1));
+    }
+
+    public function testIsolatedCommandCarriesItsOptionsOnTheMessage()
+    {
+        $message = self::messageOfTaskWithTags(['isolated' => true, 'timeout' => 30.0]);
+
+        $this->assertSame(RunCommandMessage::class, $message->getClass());
+        $this->assertTrue($message->getArgument('$isolated'));
+        $this->assertSame(30.0, $message->getArgument('$timeout'));
+    }
+
+    public function testIsolatedCommandWithoutTimeoutRunsToCompletion()
+    {
+        $this->assertNull(self::messageOfTaskWithTags(['isolated' => true])->getArgument('$timeout'));
+    }
+
+    public function testCommandThatIsNotIsolatedKeepsItsMessageUntouched()
+    {
+        $this->assertSame(['schedulable'], self::messageOfTaskWithTags([])->getArguments());
+    }
+
+    public function testIsolatedCommandMessageIsInstantiable()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = new Definition(SchedulableCommand::class);
+        $definition->addTag('console.command');
+        $definition->addTag('scheduler.task', ['trigger' => 'every', 'frequency' => '1 hour', 'isolated' => true, 'timeout' => 30.0]);
+        $container->setDefinition('some.task', $definition);
+
+        (new AddScheduleMessengerPass())->process($container);
+
+        $message = $container->getDefinition('scheduler.provider.default')->getMethodCalls()[0][1][0]->getArgument('$message');
+
+        (new ResolveNamedArgumentsPass())->process($container);
+
+        $this->assertEquals(new RunCommandMessage('schedulable', isolated: true, timeout: 30.0), new RunCommandMessage(...$message->getArguments()));
+    }
+
+    public function testTimeoutWithoutIsolationIsRejected()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid task service "some.task": option "timeout" requires option "isolated" to be true, as a command cannot be interrupted while it runs in the worker consuming the schedule.');
+
+        self::messageOfTaskWithTags(['timeout' => 30.0]);
+    }
+
+    public function testIsolatingAServiceCallIsRejected()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid task service "some.task": option "isolated" is only supported on console commands, as a service call has no process of its own to run in.');
+
+        self::messageOfTaskWithTags(['isolated' => true], []);
     }
 
     /**

@@ -14,6 +14,8 @@ namespace Symfony\Component\Console\Tests\Messenger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Exception\RunCommandFailedException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -24,12 +26,15 @@ use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
 use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class RunCommandMessageHandlerTest extends TestCase
 {
+    private const CONSOLE = __DIR__.'/../Fixtures/application_isolated_command.php';
+
     public function testExecutesCommand()
     {
         $handler = new RunCommandMessageHandler($this->createApplicationWithCommand());
@@ -141,6 +146,80 @@ final class RunCommandMessageHandlerTest extends TestCase
         }
 
         $this->assertTrue($application->areExceptionsCaught());
+    }
+
+    public function testExecutesIsolatedCommand()
+    {
+        $handler = new RunCommandMessageHandler($this->createApplicationWithCommand(), self::CONSOLE);
+        $context = $handler(new RunCommandMessage('test:command --stderr', isolated: true));
+
+        $this->assertSame(0, $context->exitCode);
+        $this->assertStringContainsString('some message', $context->output);
+        $this->assertStringContainsString('some error', $context->output);
+    }
+
+    public function testExecutesIsolatedCommandInItsOwnProcess()
+    {
+        $application = $this->createApplicationWithCommand();
+        $handler = new RunCommandMessageHandler($application, self::CONSOLE);
+
+        // "--sleep" is only defined on the command of the fixture console, so the
+        // command cannot have run on the application the handler holds
+        $context = $handler(new RunCommandMessage('test:command --sleep=0', isolated: true));
+
+        $this->assertSame(0, $context->exitCode);
+        $this->assertStringContainsString('some message', $context->output);
+    }
+
+    public function testThrowOnNonSuccessForIsolatedCommand()
+    {
+        $handler = new RunCommandMessageHandler($this->createApplicationWithCommand(), self::CONSOLE);
+
+        try {
+            $handler(new RunCommandMessage('test:command --exit=2', isolated: true));
+        } catch (RunCommandFailedException $e) {
+            $this->assertSame(2, $e->context->exitCode);
+            $this->assertStringContainsString('some message', $e->context->output);
+            $this->assertSame('Command "test:command --exit=2" exited with code "2".', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('Exception not thrown.');
+    }
+
+    public function testIsolatedCommandIsKilledOnTimeout()
+    {
+        $handler = new RunCommandMessageHandler($this->createApplicationWithCommand(), self::CONSOLE);
+
+        try {
+            $handler(new RunCommandMessage('test:command --sleep=10', isolated: true, timeout: 0.5));
+        } catch (RunCommandFailedException $e) {
+            $this->assertSame(Command::FAILURE, $e->context->exitCode);
+            $this->assertInstanceOf(ProcessTimedOutException::class, $e->getPrevious());
+
+            return;
+        }
+
+        $this->fail('Exception not thrown.');
+    }
+
+    public function testIsolatedCommandRequiresTheConsoleEntryPoint()
+    {
+        $handler = new RunCommandMessageHandler($this->createApplicationWithCommand());
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Running command "test:command" in a separate process requires the console entry point to be configured.');
+
+        $handler(new RunCommandMessage('test:command', isolated: true));
+    }
+
+    public function testTimeoutRequiresAnIsolatedCommand()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A timeout can only be set on an isolated command, as command "test:command" cannot be interrupted while it runs in the current process.');
+
+        new RunCommandMessage('test:command', timeout: 30);
     }
 
     private function createApplicationWithCommand(): Application

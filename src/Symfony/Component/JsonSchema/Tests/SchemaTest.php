@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonSchema\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonSchema\Dialect;
 use Symfony\Component\JsonSchema\NullSyntax;
@@ -131,6 +132,33 @@ class SchemaTest extends TestCase
             '{"$schema":"https:\/\/json-schema.org\/draft\/2020-12\/schema","$ref":"#\/$defs\/Foo","$defs":{"Foo":{"type":"object","properties":{"any":{}}}}}',
             json_encode($schema),
         );
+    }
+
+    #[DataProvider('provideBooleanSubschemas')]
+    public function testBooleanSubschemasArePreservedByEveryAccessor(array $root, string $expectedJson)
+    {
+        $schema = new Schema($root, ['Foo' => $root], Dialect::openApi31());
+
+        $this->assertSame($expectedJson, json_encode($schema->getRoot()));
+        $this->assertSame('{"Foo":'.$expectedJson.'}', json_encode($schema->getDefinitions()));
+
+        $expectedDocument = json_decode($expectedJson, false, 512, \JSON_THROW_ON_ERROR);
+        $expectedDocument->components = ['schemas' => ['Foo' => json_decode($expectedJson, false, 512, \JSON_THROW_ON_ERROR)]];
+
+        $this->assertSame(json_encode($expectedDocument), json_encode($schema->toArray()));
+        $this->assertSame(json_encode($expectedDocument), json_encode($schema));
+    }
+
+    public static function provideBooleanSubschemas(): iterable
+    {
+        yield 'property schemas' => [
+            ['properties' => ['allowed' => true, 'disabled' => false, 'any' => []]],
+            '{"properties":{"allowed":true,"disabled":false,"any":{}}}',
+        ];
+        yield 'schema lists' => [
+            ['allOf' => [true, false, []]],
+            '{"allOf":[true,false,{}]}',
+        ];
     }
 
     public function testEmptySchemasAreEncodedAsObjectsByEveryAccessor()

@@ -167,10 +167,14 @@ final class Schema implements \JsonSerializable
     /**
      * Empty schemas must be encoded as JSON objects, never as empty JSON arrays.
      *
-     * @param array<mixed> $schema
+     * @param array<mixed>|bool $schema
      */
-    private static function encodeSchema(array $schema): array|\ArrayObject
+    private static function encodeSchema(array|bool $schema): array|\ArrayObject|bool
     {
+        if (\is_bool($schema)) {
+            return $schema;
+        }
+
         if ([] === $schema) {
             return new \ArrayObject();
         }

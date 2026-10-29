@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-28T21:07:14Z
+
+Thanks for the fix @PhilETaylor. I pushed one more change. Calling `cancel()` from an `on_progress` callback made curl write `* Closing connection` to stderr, because the canary closed the buffer while curl was still verbose. `closeDebugBuffer()` now turns verbose mode off first, and a test covers it.

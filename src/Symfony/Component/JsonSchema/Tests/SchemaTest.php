@@ -100,6 +100,118 @@ class SchemaTest extends TestCase
         $this->assertSame(['radius', 'kind'], $schema->flatten()->getRoot()['required']);
     }
 
+    public function testFlattenMergesThePropertiesOfTheDefinitionAndOfTheReference()
+    {
+        $schema = new Schema(
+            ['$ref' => '#/$defs/Address', 'properties' => ['zip' => ['type' => 'string']], 'required' => ['zip']],
+            ['Address' => ['type' => 'object', 'properties' => ['street' => ['type' => 'string']], 'required' => ['street']]],
+            Dialect::jsonSchema202012(),
+        );
+
+        $this->assertSame([
+            'type' => 'object',
+            'properties' => ['street' => ['type' => 'string'], 'zip' => ['type' => 'string']],
+            'required' => ['street', 'zip'],
+        ], $schema->flatten()->getRoot());
+    }
+
+    public function testFlattenMergesThePropertiesDescribedByBothTheDefinitionAndTheReference()
+    {
+        $schema = new Schema(
+            ['$ref' => '#/$defs/Person', 'properties' => ['name' => ['minLength' => 1], 'age' => ['type' => 'string'], 'nickname' => ['type' => 'string'], 'secret' => ['type' => 'string'], 'email' => true]],
+            ['Person' => ['properties' => ['name' => ['type' => 'string'], 'age' => ['type' => 'integer'], 'nickname' => true, 'secret' => false, 'email' => ['format' => 'email']]]],
+            Dialect::jsonSchema202012(),
+        );
+
+        $this->assertSame(['properties' => [
+            'name' => ['type' => 'string', 'minLength' => 1],
+            'age' => ['allOf' => [['type' => 'integer']], 'type' => 'string'],
+            'nickname' => ['type' => 'string'],
+            'secret' => false,
+            'email' => ['format' => 'email'],
+        ]], $schema->flatten()->getRoot());
+    }
+
+    public function testFlattenConcatenatesTheAllOfOfTheDefinitionAndOfTheReference()
+    {
+        $schema = new Schema(
+            ['$ref' => '#/$defs/Named', 'allOf' => [['required' => ['id']]]],
+            ['Named' => ['type' => 'object', 'allOf' => [['required' => ['name']]]]],
+            Dialect::jsonSchema202012(),
+        );
+
+        $this->assertSame(['type' => 'object', 'allOf' => [['required' => ['name']], ['required' => ['id']]]], $schema->flatten()->getRoot());
+    }
+
+    public function testFlattenKeepsTheDefinitionInAnAllOfWhenAKeywordConflicts()
+    {
+        $schema = new Schema(
+            ['$ref' => '#/$defs/Pair', 'type' => 'array', 'description' => 'A pair'],
+            ['Pair' => ['type' => 'object', 'minProperties' => 2]],
+            Dialect::jsonSchema202012(),
+        );
+
+        $this->assertSame(['allOf' => [['type' => 'object', 'minProperties' => 2]], 'type' => 'array', 'description' => 'A pair'], $schema->flatten()->getRoot());
+    }
+
+    public function testFlattenKeepsTheDefinitionInAnAllOfWhenMergingChangesWhatAdditionalPropertiesAppliesTo()
+    {
+        $closed = ['type' => 'object', 'properties' => ['id' => ['type' => 'integer']], 'additionalProperties' => false];
+        $schema = new Schema(['$ref' => '#/$defs/Closed', 'properties' => ['name' => ['type' => 'string']]], ['Closed' => $closed], Dialect::jsonSchema202012());
+
+        $this->assertSame(['allOf' => [$closed], 'properties' => ['name' => ['type' => 'string']]], $schema->flatten()->getRoot());
+
+        $schema = new Schema(['$ref' => '#/$defs/Open', 'unevaluatedProperties' => false], ['Open' => ['properties' => ['id' => ['type' => 'integer']]]], Dialect::jsonSchema202012());
+
+        $this->assertSame(['allOf' => [['properties' => ['id' => ['type' => 'integer']]]], 'unevaluatedProperties' => false], $schema->flatten()->getRoot());
+    }
+
+    public function testFlattenLetsTheAnnotationsNextToTheReferenceOverrideTheOnesOfTheDefinition()
+    {
+        $schema = new Schema(
+            ['$ref' => '#/$defs/Author', 'description' => 'The main author', 'readOnly' => true],
+            ['Author' => ['type' => 'object', 'title' => 'Author', 'description' => 'An author']],
+            Dialect::jsonSchema202012(),
+        );
+
+        $this->assertSame(['type' => 'object', 'title' => 'Author', 'description' => 'The main author', 'readOnly' => true], $schema->flatten()->getRoot());
+    }
+
+    public function testFlattenMergesTheDefinitionWithTheReferenceAlongACycle()
+    {
+        $schema = new Schema(
+            ['$ref' => '#/$defs/Node'],
+            [
+                'Node' => ['$ref' => '#/$defs/Base', 'properties' => ['children' => ['type' => 'array', 'items' => ['$ref' => '#/$defs/Node']]]],
+                'Base' => ['type' => 'object', 'properties' => ['name' => ['type' => 'string'], 'children' => ['type' => 'array']]],
+            ],
+            Dialect::jsonSchema202012(),
+        );
+
+        $flattened = $schema->flatten();
+        $expected = ['type' => 'object', 'properties' => ['name' => ['type' => 'string'], 'children' => ['type' => 'array', 'items' => ['$ref' => '#/$defs/Node']]]];
+
+        $this->assertSame($expected, $flattened->getRoot());
+        $this->assertSame(['Node' => $expected], $flattened->getDefinitions());
+    }
+
+    public function testFlattenPutsNoKeywordNextToAReferenceWhenTheDialectIgnoresThem()
+    {
+        $schema = new Schema(
+            ['$ref' => '#/components/schemas/Node'],
+            [
+                'Node' => ['$ref' => '#/components/schemas/Base', 'properties' => ['parent' => ['$ref' => '#/components/schemas/Node']]],
+                'Base' => ['type' => 'object', 'properties' => ['parent' => ['type' => 'object']]],
+            ],
+            Dialect::openApi30(),
+        );
+
+        $this->assertSame(
+            ['type' => 'object', 'properties' => ['parent' => ['allOf' => [['type' => 'object'], ['$ref' => '#/components/schemas/Node']]]]],
+            $schema->flatten()->getRoot(),
+        );
+    }
+
     public function testFlattenInlinesReferencesBesideAReference()
     {
         $schema = new Schema(

@@ -40,6 +40,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\ConstantNameDefinitionPolicy;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ConstrainedOrder;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ConstructorInitializedShipment;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ContactWithFormatConstraints;
+use Symfony\Component\JsonSchema\Tests\Fixtures\CreditedArticle;
 use Symfony\Component\JsonSchema\Tests\Fixtures\DatedEvent;
 use Symfony\Component\JsonSchema\Tests\Fixtures\DocumentedArticle;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Drawing;
@@ -507,6 +508,16 @@ class SchemaGeneratorTest extends TestCase
             ],
         ], $schema->getRoot());
         $this->assertSame(['SelfReferencingCategory'], array_keys($schema->getDefinitions()));
+    }
+
+    public function testFlattenKeepsThePropertiesOfAReferencedClassWhenASerializedPathAddsOneToIt()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::object(CreditedArticle::class))->flatten();
+
+        $this->assertSameSchema([
+            'type' => 'object',
+            'properties' => ['name' => ['type' => 'string'], 'role' => ['type' => 'string', 'default' => '']],
+        ], $schema->getRoot()['properties']['author']);
     }
 
     public function testOpenApi30UsesNullableFlag()

@@ -407,6 +407,15 @@ class CurlHttpClientTest extends HttpClientTestCase
         }
     }
 
+    public function testCancelFromOnProgressWritesNothingToStderr()
+    {
+        $process = new Process([\PHP_BINARY, __DIR__.'/Fixtures/cancel_from_on_progress.php']);
+        $process->mustRun();
+
+        self::assertSame('Response has been canceled.', $process->getOutput());
+        self::assertSame('', $process->getErrorOutput());
+    }
+
     /**
      * @group integration
      */

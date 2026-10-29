@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-25T11:23:17Z
+
+Thanks for the review. Most reviewed neutral messages in this file are written "Bu değer geçerli bir X değildir.", without the comma (ids 104, 105, 112, 129). The Validator catalogue uses the same form. As a native speaker, would you align these 13 units with it? For 117, that would also avoid repeating "değer": "Bu değer geçerli bir yüzde değildir."
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-29T12:51:12Z
+
+Friendly up @erenbati in case you missed my previous message 🙏
+
+---------------------------------------------------------------------------
+
+by erenbati at 2026-10-29T13:11:34Z
+
+Updated all 13 Turkish Form validator translations in commit `c2ca219` to follow the existing `Bu değer geçerli bir X değildir.` wording, without commas, as requested. Unit 117 now reads `Bu değer geçerli bir yüzde değildir.`
+
+The XLIFF parses successfully; all 35 translation units are present, the 22 unrelated units and the English source texts are unchanged, and `git diff --check` passes. I also updated the PR description to reflect the wording changes. The updated CI run is in progress.
+
+Please take another look when convenient.

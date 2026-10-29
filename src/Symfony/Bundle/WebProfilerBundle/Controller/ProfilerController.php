@@ -369,12 +369,12 @@ class ProfilerController
             throw new NotFoundHttpException('The base dir should be set.');
         }
 
-        $file = $request->query->get('file');
-        $line = $request->query->get('line');
+        $file = $request->query->getString('file');
+        $line = $request->query->getInt('line');
 
         $filename = $this->baseDir.\DIRECTORY_SEPARATOR.$file;
 
-        if (preg_match("'(^|[/\\\\])\.'", $file) || !is_readable($filename)) {
+        if ('' === $file || preg_match("'(^|[/\\\\])\.'", $file) || !is_file($filename) || !is_readable($filename)) {
             throw new NotFoundHttpException(\sprintf('The file "%s" cannot be opened.', $file));
         }
 

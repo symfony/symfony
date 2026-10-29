@@ -315,7 +315,14 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
             }
 
             if (null === $chunk) {
-                throw new \LogicException(\sprintf('"%s" is not compliant with HttpClientInterface: its "stream()" method didn\'t yield any chunks when it should have.', get_debug_type($client)));
+                foreach ($asyncMap as $response) {
+                    if (null !== $asyncMap[$response]->client) {
+                        throw new \LogicException(\sprintf('"%s" is not compliant with HttpClientInterface: its "stream()" method didn\'t yield any chunks when it should have.', get_debug_type($client)));
+                    }
+                }
+
+                // No chunk is yielded for responses canceled while streaming, e.g. from the "on_progress" callback
+                return;
             }
             if (null === $chunk->getError() && $chunk->isLast()) {
                 $r->yieldedState = self::LAST_CHUNK_YIELDED;

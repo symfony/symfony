@@ -391,6 +391,34 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([4, 2, 1], $result);
     }
 
+    public function testNegativeStepSliceStartingBeforeFirstElement()
+    {
+        $crawler = self::getSimpleCollectionCrawler();
+
+        $this->assertSame([], $crawler->find('$.a[-7::-1]'));
+        $this->assertSame([], $crawler->find('$.a[-10:-20:-2]'));
+        $this->assertSame([3], $crawler->find('$.a[-6::-1]'));
+    }
+
+    #[DataProvider('provideInvalidSliceSelectors')]
+    public function testInvalidSliceSelectorThrowsOnObject(string $path, string $message)
+    {
+        $crawler = new JsonCrawler('{"a": {"b": 1}}');
+
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage($message);
+
+        $crawler->find($path);
+    }
+
+    public static function provideInvalidSliceSelectors(): iterable
+    {
+        yield 'leading zero' => ['$.a[01:]', 'slice selector numbers cannot have leading zeros'];
+        yield 'negative zero' => ['$.a[-0:]', 'slice selector cannot contain negative zero'];
+        yield 'integer overflow' => ['$.a[0:9007199254740992]', 'slice selector integer overflow'];
+        yield 'root object' => ['$[1::01]', 'slice selector numbers cannot have leading zeros'];
+    }
+
     public function testBoundaryConditions()
     {
         $crawler = new JsonCrawler(<<<JSON

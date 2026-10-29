@@ -48,26 +48,34 @@ trait CommonResponseTrait
             $this->checkStatusCode();
         }
 
-        if (null === $this->content) {
-            $content = null;
+        $content = null;
+        $isLast = false;
+        $wasCanceled = $this->info['canceled'];
 
+        if (null === $this->content) {
             foreach (self::stream([$this]) as $chunk) {
-                if (!$chunk->isLast()) {
+                if (!$isLast = $chunk->isLast()) {
                     $content .= $chunk->getContent();
                 }
-            }
-
-            if (null !== $content) {
-                return $content;
-            }
-
-            if (null === $this->content) {
-                throw new TransportException('Cannot get the content of the response twice: buffering is disabled.');
             }
         } else {
             foreach (self::stream([$this]) as $chunk) {
                 // Chunks are buffered in $this->content already
+                $isLast = $chunk->isLast();
             }
+        }
+
+        // The stream drops responses that are canceled while it runs, e.g. from the "on_progress" callback
+        if (!$isLast && !$wasCanceled && $this->info['canceled']) {
+            throw new TransportException($this->info['error']);
+        }
+
+        if (null !== $content) {
+            return $content;
+        }
+
+        if (null === $this->content) {
+            throw new TransportException('Cannot get the content of the response twice: buffering is disabled.');
         }
 
         rewind($this->content);

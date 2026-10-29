@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\Policy\CalendarAlignedWindow;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
 use Symfony\Component\RateLimiter\Policy\Window;
@@ -497,6 +498,136 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertSame(5, $rateLimit->getRemainingTokens());
     }
 
+    #[DataProvider('provideCalendarReservationPeriods')]
+    public function testCalendarReservationsUseSuccessivePeriods(string $anchor, string $interval, array $dates)
+    {
+        $anchor = new \DateTimeImmutable($anchor);
+        ClockMock::withClockMock($anchor->getTimestamp());
+        $limiter = new FixedWindowLimiter('cal', 1, new \DateInterval($interval), $this->storage, null, $anchor);
+        $limiter->consume();
+
+        foreach ($dates as $date) {
+            $expected = new \DateTimeImmutable($date, $anchor->getTimezone());
+            $reservation = $limiter->reserve();
+
+            $this->assertSame((float) $expected->getTimestamp(), $reservation->getTimeToAct());
+            $this->assertSame($expected->getTimestamp(), $reservation->getRateLimit()->getRetryAfter()->getTimestamp());
+        }
+    }
+
+    public static function provideCalendarReservationPeriods(): iterable
+    {
+        yield 'months' => ['2026-01-01 UTC', 'P1M', ['2026-02-01', '2026-03-01', '2026-04-01']];
+        yield 'daylight saving' => ['2026-03-05 America/New_York', 'P1M', ['2026-04-05', '2026-05-05', '2026-06-05']];
+        yield 'years' => ['2024-01-01 UTC', 'P1Y', ['2025-01-01', '2026-01-01', '2027-01-01']];
+        yield 'compound interval' => ['2026-01-01 UTC', 'P1M1D', ['2026-02-02', '2026-03-03', '2026-04-04']];
+        yield 'month end' => ['2024-01-31 UTC', 'P1M', ['2024-03-02', '2024-04-02', '2024-05-02']];
+    }
+
+    #[DataProvider('provideCalendarReservationCarryOver')]
+    public function testCalendarReservationsSurvivePeriodBoundaries(string $now, int $remainingTokens)
+    {
+        $anchor = new \DateTimeImmutable('2026-01-01 UTC');
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-01-15 UTC'))->getTimestamp());
+        $limiter = new FixedWindowLimiter('cal', 10, new \DateInterval('P1M'), $this->storage, null, $anchor);
+        $limiter->consume(8);
+        $limiter->reserve(7);
+        $limiter->reserve(10);
+
+        ClockMock::withClockMock((new \DateTimeImmutable($now))->getTimestamp());
+
+        $this->assertSame($remainingTokens, $limiter->consume(0)->getRemainingTokens());
+        $this->assertSame($remainingTokens > 0, $limiter->consume()->isAccepted());
+    }
+
+    public static function provideCalendarReservationCarryOver(): iterable
+    {
+        yield 'next period' => ['2026-02-01 UTC', -5];
+        yield 'multiple elapsed periods' => ['2026-03-01 UTC', 5];
+        yield 'all reservations elapsed' => ['2026-04-01 UTC', 10];
+    }
+
+    public function testCalendarReservationsFillRemainingCapacity()
+    {
+        $anchor = new \DateTimeImmutable('2026-01-01 UTC');
+        ClockMock::withClockMock($anchor->getTimestamp());
+        $limiter = new FixedWindowLimiter('cal', 10, new \DateInterval('P1M'), $this->storage, null, $anchor);
+        $limiter->consume(10);
+
+        $this->assertSame((float) (new \DateTimeImmutable('2026-02-01 UTC'))->getTimestamp(), $limiter->reserve(5)->getTimeToAct());
+        $this->assertSame((float) (new \DateTimeImmutable('2026-02-01 UTC'))->getTimestamp(), $limiter->reserve(3)->getTimeToAct());
+        $this->assertSame((float) (new \DateTimeImmutable('2026-03-01 UTC'))->getTimestamp(), $limiter->reserve(5)->getTimeToAct());
+    }
+
+    public function testCalendarReservationsRespectMaximumWait()
+    {
+        $anchor = new \DateTimeImmutable('2026-01-01 UTC');
+        ClockMock::withClockMock($anchor->getTimestamp());
+        $limiter = new FixedWindowLimiter('cal', 1, new \DateInterval('P1M'), $this->storage, null, $anchor);
+        $limiter->consume();
+        $limiter->reserve();
+
+        $this->expectException(MaxWaitDurationExceededException::class);
+        $limiter->reserve(1, 40 * 86400);
+    }
+
+    #[DataProvider('provideCalendarReservationsBeforeFutureAnchor')]
+    public function testCalendarReservationsBeforeFutureAnchor(string $anchor, string $interval, array $dates)
+    {
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-01-15 UTC'))->getTimestamp());
+        $limiter = new FixedWindowLimiter('cal', 1, new \DateInterval($interval), $this->storage, null, new \DateTimeImmutable($anchor));
+        $limiter->consume();
+
+        foreach ($dates as $date) {
+            $expected = new \DateTimeImmutable($date, new \DateTimeZone('UTC'));
+            $this->assertSame((float) $expected->getTimestamp(), $limiter->reserve()->getTimeToAct());
+        }
+
+        ClockMock::withClockMock((new \DateTimeImmutable($dates[1], new \DateTimeZone('UTC')))->getTimestamp());
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public static function provideCalendarReservationsBeforeFutureAnchor(): iterable
+    {
+        yield 'month end' => ['2026-03-31 UTC', 'P1M', ['2026-02-03', '2026-03-03', '2026-03-31', '2026-05-01']];
+        yield 'compound interval' => ['2026-06-10 UTC', 'P1M15D', ['2026-01-26', '2026-03-10', '2026-04-25', '2026-06-10']];
+    }
+
+    public function testCalendarReservationsRestorePreviousState()
+    {
+        $anchor = new \DateTimeImmutable('2026-03-05 America/New_York');
+        ClockMock::withClockMock($anchor->getTimestamp());
+        $window = (new \ReflectionClass(CalendarAlignedWindow::class))->newInstanceWithoutConstructor();
+        $window->__unserialize([
+            'i' => 'cal',
+            'm' => 1,
+            'h' => 2,
+            's' => '2026-03-05T00:00:00-05:00',
+            'e' => '2026-04-05T00:00:00-04:00',
+        ]);
+        $this->storage->save($window);
+
+        $limiter = new FixedWindowLimiter('cal', 1, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        $this->assertSame((float) (new \DateTimeImmutable('2026-05-05 America/New_York'))->getTimestamp(), $limiter->reserve()->getTimeToAct());
+    }
+
+    public function testCalendarPeriodEndingInRepeatedDstHourSurvivesStorage()
+    {
+        $anchor = new \DateTimeImmutable('2024-12-03 01:30 America/New_York');
+        $periodEnd = new \DateTimeImmutable('2024-11-03 01:30 EST');
+        ClockMock::withClockMock((new \DateTimeImmutable('2024-10-15 UTC'))->getTimestamp());
+        $limiter = new FixedWindowLimiter('cal', 1, new \DateInterval('P1M'), $this->storage, null, $anchor);
+        $limiter->consume();
+
+        ClockMock::withClockMock((new \DateTimeImmutable('2024-11-03 01:45 EDT'))->getTimestamp());
+        $rateLimit = $limiter->consume();
+
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame($periodEnd->getTimestamp(), $rateLimit->getRetryAfter()->getTimestamp());
+        $this->assertSame((float) $periodEnd->getTimestamp(), $limiter->reserve()->getTimeToAct());
+    }
+
     public function testCalendarAlignedWindowSerializationRoundTrip()
     {
         $utc = new \DateTimeZone('UTC');
@@ -505,6 +636,7 @@ class FixedWindowLimiterTest extends TestCase
             7,
             new \DateTimeImmutable('2024-01-05 00:00:00', $utc),
             new \DateTimeImmutable('2024-02-05 00:00:00', $utc),
+            new \DateInterval('P1M'),
         );
         $window->add(3);
 
@@ -609,6 +741,45 @@ class FixedWindowLimiterTest extends TestCase
             (new \DateTimeImmutable('2026-01-01 05:00:00', new \DateTimeZone('UTC')))->getTimestamp(),
             $rateLimit->getRetryAfter()->getTimestamp()
         );
+    }
+
+    public function testLoweredLimitIsAppliedToStoredCalendarWindow()
+    {
+        $anchor = new \DateTimeImmutable('2026-01-01 UTC');
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-01-15 UTC'))->getTimestamp());
+        (new FixedWindowLimiter('cal', 10, new \DateInterval('P1M'), $this->storage, null, $anchor))->consume(3);
+
+        $limiter = new FixedWindowLimiter('cal', 2, new \DateInterval('P1M'), $this->storage, null, $anchor);
+        $rateLimit = $limiter->consume();
+
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+    }
+
+    public function testRaisedLimitIsAppliedToStoredCalendarWindow()
+    {
+        $anchor = new \DateTimeImmutable('2026-01-01 UTC');
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-01-15 UTC'))->getTimestamp());
+        (new FixedWindowLimiter('cal', 2, new \DateInterval('P1M'), $this->storage, null, $anchor))->consume(2);
+
+        $limiter = new FixedWindowLimiter('cal', 5, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        $this->assertSame(3, $limiter->consume(0)->getRemainingTokens());
+        $this->assertTrue($limiter->consume(3)->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRaisedLimitKeepsCalendarReservations()
+    {
+        $anchor = new \DateTimeImmutable('2026-01-01 UTC');
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-01-15 UTC'))->getTimestamp());
+        $limiter = new FixedWindowLimiter('cal', 2, new \DateInterval('P1M'), $this->storage, null, $anchor);
+        $limiter->consume(2);
+        $limiter->reserve(2);
+
+        $limiter = new FixedWindowLimiter('cal', 5, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        $this->assertFalse($limiter->consume()->isAccepted());
     }
 
     public function testConsumeRefusedAtTheEndOfTheWindowDoesNotRecordTheHits()

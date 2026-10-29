@@ -660,6 +660,25 @@ class TableTest extends TestCase
 
                     TABLE,
             ],
+            'Cells with rowspan that start in consecutive rows' => [
+                ['ISBN', 'Title', 'Author'],
+                [
+                    ['99921-58-10-7', new TableCell('Divine Comedy', ['rowspan' => 3]), 'Dante Alighieri'],
+                    [new TableCell('9971-5-0210-0', ['rowspan' => 2]), 'Charles Dickens'],
+                    ['J. R. R. Tolkien'],
+                ],
+                'default',
+                <<<'TABLE'
+                    +---------------+---------------+------------------+
+                    | ISBN          | Title         | Author           |
+                    +---------------+---------------+------------------+
+                    | 99921-58-10-7 | Divine Comedy | Dante Alighieri  |
+                    | 9971-5-0210-0 |               | Charles Dickens  |
+                    |               |               | J. R. R. Tolkien |
+                    +---------------+---------------+------------------+
+
+                    TABLE,
+            ],
             'Cell with rowspan and colspan with separator inside a rowspan' => [
                 ['ISBN', 'Author'],
                 [
@@ -1127,23 +1146,24 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testRenderCellWithRowspanInLastRowWithNonListKeys()
+    public function testRenderHeaderCellWithRowspanWithNonListKeys()
     {
         $table = new Table($output = $this->getOutputStream());
         $table
-            ->setHeaders(['ISBN', 'Title', 'Author'])
-            ->setRow(0, [1 => '9971-5-0210-0', 2 => new TableCell("Divine\nComedy", ['rowspan' => 2]), 3 => 'Dante Alighieri'])
+            ->setHeaders([[1 => 'ISBN', 2 => new TableCell("Title\n(original)", ['rowspan' => 2]), 3 => 'Author']])
+            ->setRows([['9971-5-0210-0', 'Divine Comedy', 'Dante Alighieri']])
         ;
         $table->render();
 
         $expected =
             <<<'TABLE'
-                +---------------+--------+-----------------+
-                | ISBN          | Title  | Author          |
-                +---------------+--------+-----------------+
-                | 9971-5-0210-0 | Divine | Dante Alighieri |
-                |               | Comedy |                 |
-                +---------------+--------+-----------------+
+                +---------------+---------------+-----------------+
+                | ISBN          | Title         | Author          |
+                +---------------+---------------+-----------------+
+                |               | (original)    |                 |
+                +---------------+---------------+-----------------+
+                | 9971-5-0210-0 | Divine Comedy | Dante Alighieri |
+                +---------------+---------------+-----------------+
 
                 TABLE;
 
@@ -1192,6 +1212,28 @@ class TableTest extends TestCase
             ]);
 
         $table->render();
+    }
+
+    public function testSetRowWithStringKeys()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(['ISBN', 'Title'])
+            ->setRow(0, ['isbn' => '9971-5-0210-0', 'title' => 'Divine Comedy'])
+        ;
+        $table->render();
+
+        $expected =
+            <<<'TABLE'
+                +---------------+---------------+
+                | ISBN          | Title         |
+                +---------------+---------------+
+                | 9971-5-0210-0 | Divine Comedy |
+                +---------------+---------------+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testColumnWidth()
@@ -2275,6 +2317,54 @@ class TableTest extends TestCase
                 |                 |                 | or sit amet,    |
                 |                 |                 | consectetur     |
                 +-----------------+-----------------+-----------------+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthOfCellAfterColspan()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(['ISBN', 'Title', 'Author'])
+            ->setRows([[new TableCell('Divine Comedy', ['colspan' => 2]), 'Dante Alighieri']])
+            ->setColumnMaxWidth(2, 9)
+        ;
+        $table->render();
+
+        $expected =
+            <<<'TABLE'
+                +---------+--------+-----------+
+                | ISBN    | Title  | Author    |
+                +---------+--------+-----------+
+                | Divine Comedy    | Dante     |
+                |                  | Alighieri |
+                +------------------+-----------+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthOfCellWithColspanAfterColspan()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(['ISBN', 'Title', 'Author', 'Year'])
+            ->setRows([[new TableCell('Divine Comedy', ['colspan' => 2]), new TableCell('Dante Alighieri, 1265-1321', ['colspan' => 2])]])
+            ->setColumnMaxWidth(2, 8)
+        ;
+        $table->render();
+
+        $expected =
+            <<<'TABLE'
+                +---------+--------+----------+----------+
+                | ISBN    | Title  | Author   | Year     |
+                +---------+--------+----------+----------+
+                | Divine Comedy    | Dante Alighieri,    |
+                |                  | 1265-1321           |
+                +------------------+---------------------+
 
                 TABLE;
 

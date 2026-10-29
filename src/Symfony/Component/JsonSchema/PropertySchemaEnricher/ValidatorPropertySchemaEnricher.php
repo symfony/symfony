@@ -196,7 +196,11 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
 
         return [
             ...$schema,
-            'items' => [...$schema['items'] ?? [], 'enum' => $choices],
+            'items' => match ($items = $schema['items'] ?? true) {
+                true => ['enum' => $choices],
+                false => false,
+                default => [...$items, 'enum' => $choices],
+            },
             ...array_filter(['minItems' => $constraint->min, 'maxItems' => $constraint->max], self::isSet(...)),
         ];
     }

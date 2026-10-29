@@ -20,6 +20,7 @@ use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Component\HttpClient\RetryableHttpClient;
+use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -886,6 +887,19 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             $this->fail('Caught '.$e::class.'('.$e->getMessage().') but destruct should not throw');
         }
         $this->expectNotToPerformAssertions();
+    }
+
+    public function testDestructingATracedResponseKeepsTheResolveOptionOfPendingRequests()
+    {
+        $client = new TraceableHttpClient($this->getHttpClient(__FUNCTION__));
+
+        $response = $client->request('GET', 'http://localhost:8057/');
+        $response->getContent();
+
+        $pending = $client->request('GET', 'http://symfony.invalid:8057/', ['resolve' => ['symfony.invalid' => '127.0.0.1']]);
+        unset($response);
+
+        $this->assertSame(200, $pending->getStatusCode());
     }
 
     public function testHeadRequestWithClosureBody()

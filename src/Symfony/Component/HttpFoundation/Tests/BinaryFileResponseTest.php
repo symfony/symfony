@@ -68,6 +68,22 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertSame('attachment; filename=f__.html; filename*=utf-8\'\'f%C3%B6%C3%B6.html', $response->headers->get('Content-Disposition'));
     }
 
+    public function testSetContentDispositionGeneratesSafeFallbackFilenameForTrailingNewline()
+    {
+        $response = new BinaryFileResponse(__FILE__);
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, "foo\n");
+
+        $this->assertSame('attachment; filename=foo_; filename*=utf-8\'\'foo%0A', $response->headers->get('Content-Disposition'));
+    }
+
+    public function testSetContentDispositionRejectsTrailingNewlineInFallback()
+    {
+        $response = new BinaryFileResponse(__FILE__);
+        $this->expectException(\InvalidArgumentException::class);
+
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'foo', "foo\n");
+    }
+
     public function testSetContentDispositionGeneratesSafeFallbackFilenameForWronglyEncodedFilename()
     {
         $response = new BinaryFileResponse(__FILE__);

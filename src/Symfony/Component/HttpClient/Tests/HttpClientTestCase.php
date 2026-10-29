@@ -1277,7 +1277,12 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
                     $releasePause = false;
                 }
 
-                usleep(1000);
+                if ($client instanceof CurlHttpClient) {
+                    // Give curl time to fill its buffers and pause; other clients only read
+                    // while their event loop runs, so sleeping would just slow the draining
+                    // down, up to the 10s send timeout of PHP's built-in server on busy CIs
+                    usleep(1000);
+                }
             }
 
             $this->assertFalse($releasePause);

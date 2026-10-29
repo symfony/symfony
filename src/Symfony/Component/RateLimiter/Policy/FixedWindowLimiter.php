@@ -80,7 +80,7 @@ final class FixedWindowLimiter implements LimiterInterface
                     [$periodStart, $periodEnd] = $this->computePeriod($nowDt);
                     $window = new CalendarAlignedWindow($this->id, $this->limit, $periodStart, $periodEnd, $this->interval);
                 }
-                $window->configure($this->interval, $this->anchorAt, $now);
+                $window->configure($this->interval, $this->limit, $this->anchorAt, $now);
             } elseif (!$window instanceof Window) {
                 $window = new Window($this->id, $this->intervalInSeconds, $this->limit);
             } else {

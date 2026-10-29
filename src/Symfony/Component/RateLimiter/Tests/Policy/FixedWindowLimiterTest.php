@@ -689,6 +689,45 @@ class FixedWindowLimiterTest extends TestCase
         );
     }
 
+    public function testLoweredLimitIsAppliedToStoredCalendarWindow()
+    {
+        $anchor = new \DateTimeImmutable('2026-01-01 UTC');
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-01-15 UTC'))->getTimestamp());
+        (new FixedWindowLimiter('cal', 10, new \DateInterval('P1M'), $this->storage, null, $anchor))->consume(3);
+
+        $limiter = new FixedWindowLimiter('cal', 2, new \DateInterval('P1M'), $this->storage, null, $anchor);
+        $rateLimit = $limiter->consume();
+
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+    }
+
+    public function testRaisedLimitIsAppliedToStoredCalendarWindow()
+    {
+        $anchor = new \DateTimeImmutable('2026-01-01 UTC');
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-01-15 UTC'))->getTimestamp());
+        (new FixedWindowLimiter('cal', 2, new \DateInterval('P1M'), $this->storage, null, $anchor))->consume(2);
+
+        $limiter = new FixedWindowLimiter('cal', 5, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        $this->assertSame(3, $limiter->consume(0)->getRemainingTokens());
+        $this->assertTrue($limiter->consume(3)->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRaisedLimitKeepsCalendarReservations()
+    {
+        $anchor = new \DateTimeImmutable('2026-01-01 UTC');
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-01-15 UTC'))->getTimestamp());
+        $limiter = new FixedWindowLimiter('cal', 2, new \DateInterval('P1M'), $this->storage, null, $anchor);
+        $limiter->consume(2);
+        $limiter->reserve(2);
+
+        $limiter = new FixedWindowLimiter('cal', 5, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
     public function testConsumeRefusedAtTheEndOfTheWindowDoesNotRecordTheHits()
     {
         $limiter = $this->createLimiter();

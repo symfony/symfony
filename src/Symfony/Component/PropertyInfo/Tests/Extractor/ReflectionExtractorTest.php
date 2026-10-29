@@ -871,6 +871,27 @@ class ReflectionExtractorTest extends TestCase
         $this->assertSame(PropertyWriteInfo::TYPE_NONE, $writeMutatorWithoutConstructor->getType());
     }
 
+    public function testDisabledMagicMethodsDoNotMakePrivatePropertiesAccessible()
+    {
+        $object = new class {
+            private string $value;
+
+            public function __get(string $name): mixed
+            {
+                throw new \LogicException('The magic getter must not be called.');
+            }
+
+            public function __set(string $name, mixed $value): void
+            {
+                throw new \LogicException('The magic setter must not be called.');
+            }
+        };
+        $extractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC, null, ReflectionExtractor::DISALLOW_MAGIC_METHODS);
+
+        $this->assertFalse($extractor->isReadable($object::class, 'value'));
+        $this->assertFalse($extractor->isWritable($object::class, 'value'));
+    }
+
     public function testAsymmetricVisibility()
     {
         $this->assertTrue($this->extractor->isReadable(AsymmetricVisibility::class, 'publicPrivate'));

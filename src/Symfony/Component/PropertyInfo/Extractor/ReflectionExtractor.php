@@ -651,6 +651,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
                     return false;
                 }
 
+                if (\PHP_VERSION_ID >= 80600 && \ReflectionProperty::IS_PUBLIC === $this->propertyReflectionFlags && $reflectionProperty->isPublic()) {
+                    return $reflectionProperty->isWritable(null);
+                }
+
                 if ($reflectionProperty->isProtectedSet()) {
                     return (bool) ($this->propertyReflectionFlags & \ReflectionProperty::IS_PROTECTED);
                 }

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Twig\WebProfilerExtension;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Twig\Environment;
+use Twig\Error\LoaderError;
 use Twig\Loader\ArrayLoader;
 
 class WebProfilerExtensionTest extends TestCase
@@ -36,6 +37,26 @@ class WebProfilerExtensionTest extends TestCase
 
         $dump2 = $webProfilerExtension->dumpData($twigEnvironment, $varCloner->cloneVar([]));
         self::assertSame($dump2HasHeader, str_contains($dump2, $needle));
+    }
+
+    public function testDumpHeaderIsDisplayedAfterResetFollowingATemplateError()
+    {
+        $extension = new WebProfilerExtension();
+        $twig = new Environment(new ArrayLoader([
+            'dump' => '{{ profiler_dump(data) }}',
+            'error' => '{{ include("missing.html.twig") }}',
+        ]));
+        $twig->addExtension($extension);
+        $data = (new VarCloner())->cloneVar([]);
+
+        try {
+            $twig->render('error');
+        } catch (LoaderError) {
+        }
+        $twig->render('dump', ['data' => $data]);
+        $extension->reset();
+
+        $this->assertStringContainsString('window.Sfdump', $twig->render('dump', ['data' => $data]));
     }
 
     public static function provideMessages(): iterable

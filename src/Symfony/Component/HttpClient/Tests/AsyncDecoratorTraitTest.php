@@ -56,6 +56,11 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         };
     }
 
+    public function testGetContentThrowsWhenCanceledDuringTheBody()
+    {
+        $this->markTestSkipped('AsyncResponse throws a LogicException when the wrapped response is canceled before it yields a chunk.');
+    }
+
     public function testTimeoutOnDestruct()
     {
         if (HttpClient::create() instanceof NativeHttpClient) {

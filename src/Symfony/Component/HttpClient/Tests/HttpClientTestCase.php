@@ -447,6 +447,54 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame($expected, $logger->logs);
     }
 
+    public function testGetContentThrowsWhenCanceledBeforeTheHeaders()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/timeout-body');
+        $response->cancel();
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Response has been canceled.');
+
+        $response->getContent();
+    }
+
+    public function testGetContentThrowsWhenCanceledDuringTheBody()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $cancel = false;
+        $response = $client->request('GET', 'http://localhost:8057/max-duration', ['max_duration' => 10, 'on_progress' => static function (int $dlNow) use (&$response, &$cancel) {
+            if ($cancel && $dlNow) {
+                $cancel = false;
+                $response->cancel();
+            }
+        }]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $cancel = true;
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Response has been canceled.');
+
+        $response->getContent();
+    }
+
+    public function testCancelingAResponseWhileStreamingKeepsStreamingTheOthers()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $kept = $client->request('GET', 'http://localhost:8057/chunked');
+        $canceled = $client->request('GET', 'http://localhost:8057/timeout-body');
+
+        foreach ($client->stream([$kept, $canceled]) as $response => $chunk) {
+            if ($chunk->isFirst() && $response === $canceled) {
+                $response->cancel();
+            }
+        }
+
+        $this->assertSame('Symfony is awesome!', $kept->getContent());
+        $this->assertTrue($canceled->getInfo('canceled'));
+    }
+
     public function testDnsFailure()
     {
         $client = $this->getHttpClient(__FUNCTION__);

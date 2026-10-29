@@ -46,6 +46,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
     private static string $nextId = 'a';
 
+    private Canary $countCanary;
     private ?array $options;
     private \Closure $onProgress;
 
@@ -107,6 +108,14 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
         $multi->lastTimeout = null;
         $multi->openHandles[$id] = new DeferredFuture();
         ++$multi->responseCount;
+        // Decorators can call __destruct() before PHP does, so the count is decremented when the response is freed
+        $this->countCanary = new Canary(static function () use ($multi) {
+            // Clear the DNS cache when all requests completed
+            if (0 >= --$multi->responseCount) {
+                $multi->responseCount = 0;
+                $multi->dnsCache = [];
+            }
+        });
 
         $this->canary = new Canary(static function () use ($canceller, $multi, $id) {
             $canceller->cancel();
@@ -136,15 +145,7 @@ final class AmpResponse implements ResponseInterface, StreamableInterface
 
     public function __destruct()
     {
-        try {
-            $this->doDestruct();
-        } finally {
-            // Clear the DNS cache when all requests completed
-            if (0 >= --$this->multi->responseCount) {
-                $this->multi->responseCount = 0;
-                $this->multi->dnsCache = [];
-            }
-        }
+        $this->doDestruct();
     }
 
     private static function schedule(self $response, array &$runningResponses): void

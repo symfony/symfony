@@ -19,6 +19,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
+use Symfony\Component\Process\Process;
 
 #[RequiresPhpExtension('curl')]
 #[Group('dns-sensitive')]
@@ -47,6 +48,14 @@ class CurlHttpClientTest extends HttpClientTestCase
         }
 
         parent::testTimeoutIsNotAFatalError();
+    }
+
+    public function testCancelFromOnProgressInStreamWritesNothingToStdout()
+    {
+        $process = new Process([\PHP_BINARY, __DIR__.'/Fixtures/cancel_from_on_progress_in_stream.php']);
+        $process->mustRun();
+
+        self::assertSame('Response has been canceled.', $process->getOutput());
     }
 
     public function testHandleIsReinitOnReset()
@@ -469,6 +478,15 @@ class CurlHttpClientTest extends HttpClientTestCase
         } catch (ClientException $e) {
             self::assertNotEmpty($e->getResponse()->getInfo('debug'));
         }
+    }
+
+    public function testCancelFromOnProgressWritesNothingToStderr()
+    {
+        $process = new Process([\PHP_BINARY, __DIR__.'/Fixtures/cancel_from_on_progress.php']);
+        $process->mustRun();
+
+        self::assertSame('Response has been canceled.', $process->getOutput());
+        self::assertSame('', $process->getErrorOutput());
     }
 
     #[Group('integration')]

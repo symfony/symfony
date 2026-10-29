@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
@@ -112,6 +114,15 @@ class TraceableHttpClientTest extends TestCase
         $this->assertSame($response, $r);
         $this->assertGreaterThan(1, \count($chunks));
         $this->assertSame('Symfony is awesome!', implode('', $chunks));
+    }
+
+    #[RequiresPhpExtension('curl')]
+    public function testToStreamOutlivesTheResponse()
+    {
+        $sut = new TraceableHttpClient(new CurlHttpClient());
+        $stream = $sut->request('GET', 'http://localhost:8057/chunked')->toStream();
+
+        $this->assertSame('Symfony is awesome!', stream_get_contents($stream));
     }
 
     public function testToArrayChecksStatusCodeBeforeDecoding()

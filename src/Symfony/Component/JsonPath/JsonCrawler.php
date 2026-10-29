@@ -288,10 +288,6 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
 
         if (preg_match('/^(-?\d*+)\s*+:\s*+(-?\d*+)(?:\s*+:\s*+(-?\d*+))?$/', $expr, $matches)) {
-            if (!\is_array($value) || !array_is_list($value)) {
-                return [];
-            }
-
             $startStr = trim($matches[1]);
             $endStr = trim($matches[2]);
             $stepStr = trim($matches[3] ?? '1');
@@ -316,6 +312,10 @@ final class JsonCrawler implements JsonCrawlerInterface
                 throw new JsonCrawlerException($expr, 'slice selector integer overflow');
             }
 
+            if (!\is_array($value) || !array_is_list($value)) {
+                return [];
+            }
+
             $length = \count($value);
             $start = '' !== $startStr ? (int) $startStr : null;
             $end = '' !== $endStr ? (int) $endStr : null;
@@ -336,7 +336,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                     return [];
                 }
 
-                $start = max(0, min($start, $length - 1));
+                $start = max(0 < $step ? 0 : -1, min($start, $length - 1));
             }
 
             if (null === $end) {

@@ -35,6 +35,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
     private ?int $remaining = null;
 
     private ?Dechunker $dechunker;
+    private Canary $countCanary;
 
     /**
      * @internal
@@ -66,6 +67,14 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
         $info['max_duration'] = $options['max_duration'];
         $info['max_connect_duration'] = $options['max_connect_duration'];
         ++$multi->responseCount;
+        // Decorators can call __destruct() before PHP does, so the count is decremented when the response is freed
+        $this->countCanary = new Canary(static function () use ($multi) {
+            // Clear the DNS cache when all requests completed
+            if (0 >= --$multi->responseCount) {
+                $multi->responseCount = 0;
+                $multi->dnsCache = [];
+            }
+        });
 
         $this->initializer = static fn (self $response) => null === $response->remaining;
 
@@ -99,15 +108,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
 
     public function __destruct()
     {
-        try {
-            $this->doDestruct();
-        } finally {
-            // Clear the DNS cache when all requests completed
-            if (0 >= --$this->multi->responseCount) {
-                $this->multi->responseCount = 0;
-                $this->multi->dnsCache = [];
-            }
-        }
+        $this->doDestruct();
     }
 
     private function open(): void

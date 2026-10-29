@@ -350,9 +350,16 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $responses = [$responses];
         }
 
-        if ($this->multi->handle instanceof \CurlMultiHandle) {
+        if ($this->multi->handle instanceof \CurlMultiHandle && !$this->multi->performing) {
             $active = 0;
-            while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active)) {
+            // curl forbids removing handles from its callbacks, which closing a response would do otherwise
+            $this->multi->performing = true;
+
+            try {
+                while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active)) {
+                }
+            } finally {
+                $this->multi->performing = false;
             }
         }
 

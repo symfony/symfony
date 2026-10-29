@@ -60,12 +60,9 @@ final class JsonPath
 
     public function slice(int $start, ?int $end = null, ?int $step = null): static
     {
-        $slice = $start;
-        if (null !== $end) {
-            $slice .= ':'.$end;
-            if (null !== $step) {
-                $slice .= ':'.$step;
-            }
+        $slice = $start.':'.$end;
+        if (null !== $step) {
+            $slice .= ':'.$step;
         }
 
         return new self($this->path.'['.$slice.']');

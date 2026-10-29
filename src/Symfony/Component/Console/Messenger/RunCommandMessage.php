@@ -22,7 +22,7 @@ class RunCommandMessage implements \Stringable
     /**
      * @param bool       $throwOnFailure  If the command has a non-zero exit code, throw {@see RunCommandFailedException}; a command killed by $timeout throws whatever this is set to
      * @param bool       $catchExceptions @see Application::setCatchExceptions(); ignored when $isolated is true, as the command then catches its own exceptions
-     * @param bool       $isolated        Whether to run the command in a separate PHP process instead of the one handling the message
+     * @param bool       $isolated        Whether to run the command in a separate PHP process instead of the one handling the message; an exception thrown by the command cannot cross the process boundary, so a failing isolated command always throws a {@see RunCommandFailedException} that Messenger will retry
      * @param float|null $timeout         The number of seconds the command may run for before it is killed, or null to let it run to completion; requires $isolated
      */
     public function __construct(

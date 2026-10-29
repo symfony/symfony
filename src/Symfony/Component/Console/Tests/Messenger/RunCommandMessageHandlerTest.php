@@ -27,6 +27,8 @@ use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -34,6 +36,7 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 final class RunCommandMessageHandlerTest extends TestCase
 {
     private const CONSOLE = __DIR__.'/../Fixtures/application_isolated_command.php';
+    private const CONSUMER = __DIR__.'/../Fixtures/run_isolated_command_handler.php';
 
     public function testExecutesCommand()
     {
@@ -232,6 +235,81 @@ final class RunCommandMessageHandlerTest extends TestCase
         $this->assertSame("some message\nsome error", $context->output);
     }
 
+    public function testIsolatedCommandThatThrowsUnrecoverableExceptionBecomesRecoverable()
+    {
+        $handler = new RunCommandMessageHandler($this->createApplicationWithCommand(), self::CONSOLE);
+
+        try {
+            $handler(new RunCommandMessage('test:command --throw-unrecoverable', true, false, true));
+        } catch (RunCommandFailedException $e) {
+            // the exception of the command cannot cross the process boundary, so a
+            // failing isolated command is retried like any other failure
+            $this->assertNotInstanceOf(UnrecoverableExceptionInterface::class, $e);
+            $this->assertSame(1, $e->context->exitCode);
+            $this->assertStringContainsString('some message', $e->context->output);
+
+            return;
+        }
+
+        $this->fail('Exception not thrown.');
+    }
+
+    public function testIsolatedCommandsDoNotOverlap()
+    {
+        $handler = new RunCommandMessageHandler($this->createApplicationWithCommand(), self::CONSOLE);
+
+        $start = microtime(true);
+        $handler(new RunCommandMessage('test:command --sleep=1', true, false, true));
+        $handler(new RunCommandMessage('test:command --sleep=1', true, false, true));
+
+        $this->assertGreaterThanOrEqual(2, microtime(true) - $start);
+    }
+
+    public function testIsolatedCommandKilledOnTimeoutDoesNotRunToCompletion()
+    {
+        $markerFile = tempnam(sys_get_temp_dir(), 'sf_isolated_');
+
+        try {
+            $handler = new RunCommandMessageHandler($this->createApplicationWithCommand(), self::CONSOLE);
+
+            try {
+                $handler(new RunCommandMessage('test:command --sleep=2 --marker-file='.$markerFile, true, false, true, 0.5));
+                $this->fail('Exception not thrown.');
+            } catch (RunCommandFailedException) {
+            }
+
+            // a child that survived would finish sleeping and append its marker within this window
+            usleep(2500000);
+
+            $this->assertSame('started', file_get_contents($markerFile));
+        } finally {
+            @unlink($markerFile);
+        }
+    }
+
+    public function testIsolatedCommandRunsToCompletionWhenTheConsumerIsKilled()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows kills the whole process tree.');
+        }
+
+        $markerFile = tempnam(sys_get_temp_dir(), 'sf_isolated_');
+
+        try {
+            $finder = new PhpExecutableFinder();
+            $consumer = new Process([$finder->find(false), ...$finder->findArguments(), self::CONSUMER, self::CONSOLE, 'test:command --sleep=2 --marker-file='.$markerFile]);
+            $consumer->start();
+
+            $this->assertSame('started', self::waitForMarker($markerFile, 'started'));
+
+            $consumer->stop(0, 9); // the consumer dies abruptly, without running destructors
+
+            $this->assertSame('started done', self::waitForMarker($markerFile, 'done'));
+        } finally {
+            @unlink($markerFile);
+        }
+    }
+
     public function testTimeoutMustBePositive()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -246,6 +324,21 @@ final class RunCommandMessageHandlerTest extends TestCase
         $this->expectExceptionMessage('A timeout can only be set on an isolated command, as command "test:command" cannot be interrupted while it runs in the current process.');
 
         new RunCommandMessage('test:command', timeout: 30);
+    }
+
+    private static function waitForMarker(string $markerFile, string $marker): string
+    {
+        $deadline = microtime(true) + 10;
+
+        do {
+            if (str_contains($contents = (string) @file_get_contents($markerFile), $marker)) {
+                return $contents;
+            }
+
+            usleep(50000);
+        } while (microtime(true) < $deadline);
+
+        return $contents;
     }
 
     private function createApplicationWithCommand(): Application

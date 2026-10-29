@@ -17,6 +17,7 @@ use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\TraceableResponse;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -124,6 +125,23 @@ class TraceableHttpClientTest extends TestCase
         $stream = $sut->request('GET', 'http://localhost:8057/chunked')->toStream();
 
         $this->assertSame('Symfony is awesome!', stream_get_contents($stream));
+    }
+
+    public function testDestructLeavesTheWrappedResponseAlone()
+    {
+        $response = new class extends MockResponse {
+            public int $destructCount = 0;
+
+            public function __destruct()
+            {
+                ++$this->destructCount;
+            }
+        };
+        $content = false;
+        $traceableResponse = new TraceableResponse(new MockHttpClient(), $response, $content);
+        unset($traceableResponse);
+
+        $this->assertSame(0, $response->destructCount);
     }
 
     public function testToArrayChecksStatusCodeBeforeDecoding()

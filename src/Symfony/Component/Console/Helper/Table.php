@@ -794,7 +794,8 @@ class Table
     {
         $this->rowspanLines ??= new \WeakMap();
         $unmergedRows = [];
-        foreach ($rows[$line] as $column => $cell) {
+        $column = 0;
+        foreach ($rows[$line] as $cellKey => $cell) {
             if (null !== $cell && !$cell instanceof TableCell && !\is_scalar($cell) && !$cell instanceof \Stringable) {
                 throw new InvalidArgumentException(\sprintf('A cell must be a TableCell, a scalar or an object implementing "__toString()", "%s" given.', get_debug_type($cell)));
             }
@@ -806,8 +807,8 @@ class Table
                     $lines = explode($eol, $this->closeStyles($cell, $eol));
                     $nbLines = \count($lines) > $nbLines ? substr_count($cell, $eol) : $nbLines;
 
-                    $rows[$line][$column] = new TableCell($lines[0], ['colspan' => $cell->getColspan(), 'style' => $cell->getStyle()]);
-                    $this->rowspanLines[$rows[$line][$column]] = true;
+                    $rows[$line][$cellKey] = new TableCell($lines[0], ['colspan' => $cell->getColspan(), 'style' => $cell->getStyle()]);
+                    $this->rowspanLines[$rows[$line][$cellKey]] = true;
                     unset($lines[0]);
                 }
 
@@ -822,20 +823,22 @@ class Table
                     }
                 }
             }
+
+            $column += $cell instanceof TableCell ? $cell->getColspan() : 1;
         }
 
         foreach ($unmergedRows as $unmergedRowKey => $unmergedRow) {
             // we need to know if $unmergedRow will be merged or inserted into $rows
             if (isset($rows[$unmergedRowKey]) && \is_array($rows[$unmergedRowKey]) && ($this->getNumberOfColumns($rows[$unmergedRowKey]) + $this->getNumberOfColumns($unmergedRows[$unmergedRowKey]) <= $this->numberOfColumns)) {
-                foreach ($unmergedRow as $cellKey => $cell) {
-                    // insert cell into row at cellKey position
-                    array_splice($rows[$unmergedRowKey], $cellKey, 0, [$cell]);
+                foreach ($unmergedRow as $column => $cell) {
+                    // insert cell into row at column position
+                    array_splice($rows[$unmergedRowKey], $this->getCellPosition($rows[$unmergedRowKey], $column), 0, [$cell]);
                 }
             } else {
                 $row = $this->copyRow($rows, $unmergedRowKey - 1);
                 foreach ($unmergedRow as $column => $cell) {
                     if (!empty($cell)) {
-                        $row[$column] = $unmergedRow[$column];
+                        array_splice($row, $this->getCellPosition($row, $column), 1, [$cell]);
                     }
                 }
                 array_splice($rows, $unmergedRowKey, 0, [$row]);
@@ -960,6 +963,23 @@ class Table
         }
 
         return $columns;
+    }
+
+    /**
+     * Gets the position in the given row of the cell that starts at the given column.
+     */
+    private function getCellPosition(array $row, int $column): int
+    {
+        $position = 0;
+        foreach ($row as $cell) {
+            if ($column <= 0) {
+                break;
+            }
+            $column -= $cell instanceof TableCell ? $cell->getColspan() : 1;
+            ++$position;
+        }
+
+        return $position;
     }
 
     /**

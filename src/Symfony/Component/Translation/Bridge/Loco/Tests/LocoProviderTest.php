@@ -17,6 +17,8 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Translation\Bridge\Loco\LocoProvider;
+use Symfony\Component\Translation\Dumper\XliffFileDumper;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -840,6 +842,23 @@ class LocoProviderTest extends ProviderTestCase
         $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
     }
 
+    public function testReadDoesNotLoadLocalFiles()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_loco_');
+        file_put_contents($file, (new XliffFileDumper())->formatCatalogue(new MessageCatalogue('en', ['messages' => ['a' => 'local']]), 'messages'));
+
+        $provider = self::createProvider(new MockHttpClient(new MockResponse($file), 'https://localise.biz/api/'), new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'localise.biz/api/');
+
+        $this->expectException(InvalidResourceException::class);
+        $this->expectExceptionMessage('Loco did not return XLIFF content for locale "en" and domain "messages".');
+
+        try {
+            $provider->read(['messages'], ['en']);
+        } finally {
+            unlink($file);
+        }
+    }
+
     public function testDeleteProcess()
     {
         $translatorBag = new TranslatorBag();
@@ -1164,7 +1183,7 @@ class LocoProviderTest extends ProviderTestCase
                     $this->assertSame('https://localise.biz/api/export/locale/fr.xlf?filter=&status=translated%2Cblank-translation', $url);
                     $this->assertSame(['filter' => '', 'status' => 'translated,blank-translation'], $options['query']);
 
-                    return new MockResponse();
+                    return new MockResponse('<?xml version="1.0" encoding="UTF-8"?>');
                 },
             ], 'https://localise.biz/api/'),
             $this->getLoader(),
@@ -1191,7 +1210,7 @@ class LocoProviderTest extends ProviderTestCase
                     $this->assertSame('https://localise.biz/api/export/locale/de.xlf?filter=messages&status=translated%2Cprovisional', $url);
                     $this->assertSame(['filter' => 'messages', 'status' => 'translated,provisional'], $options['query']);
 
-                    return new MockResponse();
+                    return new MockResponse('<?xml version="1.0" encoding="UTF-8"?>');
                 },
             ], 'https://localise.biz/api/'),
             $this->getLoader(),

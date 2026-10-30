@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Bridge\Loco;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\CatalogueMetadataAwareInterface;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -139,6 +140,10 @@ final class LocoProvider implements ProviderInterface
 
                 if (200 !== $response->getStatusCode()) {
                     throw new ProviderException('Unable to read the Loco response: '.$responseContent, $response);
+                }
+
+                if (!str_starts_with($responseContent, '<?xml')) {
+                    throw new InvalidResourceException(\sprintf('Loco did not return XLIFF content for locale "%s" and domain "%s".', $locale, $domain));
                 }
 
                 $locoCatalogue = $this->loader->load($responseContent, $locale, $domain);

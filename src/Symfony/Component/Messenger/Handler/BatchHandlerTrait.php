@@ -72,7 +72,7 @@ trait BatchHandlerTrait
         }
 
         $this->jobs[] = [$message, $ack];
-        if (!$this->shouldFlush()) {
+        if (!$this->shouldFlush() || $ack->deferFlush()) {
             return \count($this->jobs);
         }
 

@@ -28,11 +28,13 @@ class Acknowledger
 
     /**
      * @param \Closure(\Throwable|null, mixed):void|null $ack
+     * @param \Closure():bool|null                       $deferFlush Asks to flush the batch handler in a dispatch of its own, and returns false when it should flush the batch now
      */
     public function __construct(
         private string $handlerClass,
         ?\Closure $ack = null,
         ?ClockInterface $clock = null,
+        private ?\Closure $deferFlush = null,
     ) {
         $this->clock = $clock ?? Clock::get();
         $this->ack = $ack ?? static function () {};
@@ -64,6 +66,19 @@ class Acknowledger
     public function isAcknowledged(): bool
     {
         return null === $this->ack;
+    }
+
+    /**
+     * Asks to flush the batch handler in a dispatch of its own, right after the dispatch of the message.
+     *
+     * A batch handler can call this when its batch is full, so that processing the batch does not depend on the dispatch of the message that filled it.
+     * Its flush() method is then called with $force set to true.
+     *
+     * @return bool Whether the batch handler will be flushed, false when it should flush the batch now
+     */
+    public function deferFlush(): bool
+    {
+        return null !== $this->deferFlush && ($this->deferFlush)();
     }
 
     public function __destruct()

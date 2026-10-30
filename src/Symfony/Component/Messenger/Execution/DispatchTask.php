@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Execution\Message\DeferredEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\DispatchEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\FlushBatchHandlersMessage;
 use Symfony\Component\Messenger\Execution\Message\HandledEnvelopeMessage;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
@@ -72,6 +73,7 @@ final class DispatchTask implements Task
             $acks = [];
             $dispatching = true;
             $batch = null;
+            $flushes = [];
             $combine = static function (array $acks) use (&$batch, &$acked): ?array {
                 if ($ack = DeferredBatchMessageQueue::combineAcks($batch, $acks)) {
                     $acked = true;
@@ -99,6 +101,9 @@ final class DispatchTask implements Task
 
                 self::sendBatchAck($channel, $combine([[$requestId, $handledEnvelope->withoutAll(AckStamp::class), $handledError]]));
             };
+            $deferFlush = static function (HandlerDescriptor $handlerDescriptor) use (&$flushes): void {
+                $flushes[] = new NoAutoAckStamp($handlerDescriptor);
+            };
 
             $envelope = $message->envelope;
 
@@ -110,7 +115,7 @@ final class DispatchTask implements Task
             $heldAcks = [];
 
             try {
-                $envelope = $bus->dispatch($envelope->with(new AckStamp($ack)));
+                $envelope = $bus->dispatch($envelope->with(new AckStamp($ack, $deferFlush)));
             } catch (\Throwable $e) {
                 self::releaseHeldAcks($channel, $heldAcks, true);
 
@@ -124,7 +129,7 @@ final class DispatchTask implements Task
                 $envelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($message->envelope);
                 self::sendHandled($channel, $requestId, $envelope, ParallelExecutionFailureSanitizer::sanitizeError($e, $envelope));
 
-                unset($ack, $acked, $acks, $dispatching, $batch, $combine);
+                unset($ack, $acked, $acks, $dispatching, $batch, $combine, $flushes);
 
                 continue;
             }
@@ -140,7 +145,18 @@ final class DispatchTask implements Task
                 self::sendHandled($channel, $requestId, $envelope->withoutAll(AckStamp::class), null);
             }
 
-            if ($noAutoAckStamp) {
+            if ($flushes) {
+                $heldAcks = [];
+                try {
+                    $bus->dispatch($envelope->withoutAll(AckStamp::class)->withoutAll(NoAutoAckStamp::class)->with(new FlushBatchHandlersStamp(true), ...$flushes));
+                    self::releaseHeldAcks($channel, $heldAcks, false);
+                } catch (\Throwable) {
+                    // the messages that the batch didn't settle wait for the next flush of the worker
+                    self::releaseHeldAcks($channel, $heldAcks, true);
+                }
+            }
+
+            if ($noAutoAckStamp && !$acked) {
                 $channel->send(new DeferredEnvelopeMessage($requestId));
 
                 foreach ($envelope->all(NoAutoAckStamp::class) as $stamp) {
@@ -149,7 +165,7 @@ final class DispatchTask implements Task
             }
 
             // break the shared reference set so that each message tracks its own ack flag and batch
-            unset($ack, $acked, $acks, $dispatching, $batch, $combine);
+            unset($ack, $acked, $acks, $dispatching, $batch, $combine, $flushes);
 
             if ($this->resetInterval > 0 && 0 === ++$count % $this->resetInterval && $container->has('services_resetter')) {
                 $container->get('services_resetter')->reset();

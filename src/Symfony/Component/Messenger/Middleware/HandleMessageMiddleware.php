@@ -104,7 +104,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                         }
 
                         $ackStamp->ack($envelope, $e);
-                    }, $this->clock);
+                    }, $this->clock, static fn () => $ackStamp->deferFlush($handlerDescriptor));
 
                     $result = $this->callHandler($handlerDescriptor, $envelope, $ack);
 

@@ -35,6 +35,7 @@ use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Retry\RetryDecider;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
+use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
@@ -398,6 +399,60 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
         $this->assertNull($envelope->last(NoAutoAckStamp::class));
         $this->assertCount(1, $handler->processedMessages);
+    }
+
+    public function testBatchHandlerLeavesAFullBatchToTheWorkerWhenTheAckStampAllowsIt()
+    {
+        $handler = new class implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            public array $processedMessages = [];
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+            {
+                return $this->handle($message, $ack);
+            }
+
+            private function getBatchSize(): int
+            {
+                return 2;
+            }
+
+            private function process(array $jobs): void
+            {
+                $this->processedMessages = array_column($jobs, 0);
+
+                foreach ($jobs as [$job, $ack]) {
+                    $ack->ack($job);
+                }
+            }
+        };
+
+        $handlerDescriptor = new HandlerDescriptor($handler);
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [$handlerDescriptor],
+        ]));
+
+        $ackedMessages = [];
+        $deferredFlushes = [];
+        $ackStamp = new AckStamp(static function (Envelope $envelope) use (&$ackedMessages) {
+            $ackedMessages[] = $envelope->last(HandledStamp::class)->getResult();
+        }, static function (HandlerDescriptor $handlerDescriptor) use (&$deferredFlushes) {
+            $deferredFlushes[] = $handlerDescriptor;
+        });
+
+        $messages = [new DummyMessage('Hey'), new DummyMessage('Bob')];
+        $middleware->handle(new Envelope($messages[0], [$ackStamp]), new StackMiddleware());
+        $envelope = $middleware->handle(new Envelope($messages[1], [$ackStamp]), new StackMiddleware());
+
+        $this->assertSame([], $handler->processedMessages);
+        $this->assertSame([$handlerDescriptor], $deferredFlushes);
+        $this->assertSame($handlerDescriptor, $envelope->last(NoAutoAckStamp::class)?->getHandlerDescriptor());
+
+        $middleware->handle($envelope->with(new FlushBatchHandlersStamp(true)), new StackMiddleware());
+
+        $this->assertSame($messages, $handler->processedMessages);
+        $this->assertSame($messages, $ackedMessages);
     }
 
     public function testBatchHandlerNoBatch()

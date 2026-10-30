@@ -16,11 +16,15 @@ use Amp\Parallel\Worker\ContextWorkerFactory;
 use Amp\Sync\Channel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Execution\DispatchTask;
+use Symfony\Component\Messenger\Execution\Message\DeferredEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\DispatchEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\FlushBatchHandlersMessage;
 use Symfony\Component\Messenger\Execution\Message\HandledEnvelopeMessage;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\BatchHandlingMiddleware;
 use Symfony\Component\Messenger\Tests\Fixtures\App\HandledByBusStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Contracts\Service\ContainerProviderInterface;
@@ -56,31 +60,65 @@ class DispatchTaskTest extends TestCase
         $this->assertInstanceOf(ContainerProviderInterface::class, $app);
     }
 
+    public function testAFullBatchIsProcessedInADispatchOfItsOwn()
+    {
+        BatchHandlingMiddleware::$log = [];
+
+        $sent = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new DummyMessage('Hey'))), new DispatchEnvelopeMessage(2, new Envelope(new DummyMessage('Bob'))));
+
+        $this->assertSame(['begin Hey', 'end Hey', 'begin Bob', 'end Bob', 'begin flush', 'process Hey,Bob', 'end flush'], BatchHandlingMiddleware::$log);
+        $this->assertSame([DeferredEnvelopeMessage::class, HandledEnvelopeMessage::class, HandledEnvelopeMessage::class], array_map(get_debug_type(...), $sent));
+        $this->assertSame([1, 1, 2], array_map(static fn (object $message) => $message->requestId, $sent));
+    }
+
+    public function testAFullBatchThatFailsIsCalledAgainOnRetry()
+    {
+        BatchHandlingMiddleware::$log = [];
+
+        $sent = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new DummyMessage('Hey'))), new DispatchEnvelopeMessage(2, new Envelope(new DummyMessage('fail'))));
+
+        $this->assertSame(['begin Hey', 'end Hey', 'begin fail', 'end fail', 'begin flush', 'process Hey,fail', 'end flush'], BatchHandlingMiddleware::$log);
+        $this->assertSame([DeferredEnvelopeMessage::class, HandledEnvelopeMessage::class, HandledEnvelopeMessage::class], array_map(get_debug_type(...), $sent));
+        $this->assertSame([1, 1, 2], array_map(static fn (object $message) => $message->requestId, $sent));
+
+        foreach ([$sent[1], $sent[2]] as $handled) {
+            $this->assertInstanceOf(HandlerFailedException::class, $handled->error);
+            $this->assertSame([], $handled->envelope->all(HandledStamp::class));
+        }
+    }
+
     private function runTask(Envelope $envelope): Envelope
     {
-        $result = null;
+        $sent = $this->runTaskWith(new DispatchEnvelopeMessage(1, $envelope), new FlushBatchHandlersMessage(true));
+        $result = end($sent);
 
-        $channel = new class($envelope, $result) implements Channel {
-            private int $received = 0;
+        self::assertInstanceOf(HandledEnvelopeMessage::class, $result);
 
+        return $result->envelope;
+    }
+
+    /**
+     * @return list<object>
+     */
+    private function runTaskWith(object ...$messages): array
+    {
+        $sent = [];
+
+        $channel = new class($messages, $sent) implements Channel {
             public function __construct(
-                private readonly Envelope $envelope,
-                private mixed &$result,
+                private array $messages,
+                private array &$sent,
             ) {
             }
 
             public function send(mixed $data): void
             {
-                $this->result = $data;
+                $this->sent[] = $data;
             }
 
             public function receive(?Cancellation $cancellation = null): mixed
             {
-                return match ($this->received++) {
-                    0 => new DispatchEnvelopeMessage(1, $this->envelope),
-                    1 => new FlushBatchHandlersMessage(true),
-                    default => null,
-                };
+                return array_shift($this->messages);
             }
 
             public function close(): void
@@ -121,8 +159,6 @@ class DispatchTaskTest extends TestCase
 
         $task->run($channel, $cancellation);
 
-        self::assertInstanceOf(HandledEnvelopeMessage::class, $result);
-
-        return $result->envelope;
+        return $sent;
     }
 }

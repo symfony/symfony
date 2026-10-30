@@ -692,9 +692,8 @@ class WorkerTest extends TestCase
         $worker = new Worker([$receiver], $bus, $dispatcher, clock: new MockClock());
         $worker->run();
 
-        $this->assertSame(1, $receiver->getAcknowledgeCount());
-        $this->assertSame(1, $receiver->getRejectCount());
-        $this->assertSame('Bob', $receiver->getRejectedEnvelopes()[0]->getMessage()->getMessage());
+        $this->assertSame(0, $receiver->getAcknowledgeCount());
+        $this->assertSame(['Hey', 'Bob'], array_map(static fn (Envelope $envelope) => $envelope->getMessage()->getMessage(), $receiver->getRejectedEnvelopes()));
     }
 
     public function testBatchWithAFailedMessageIsFlushedInADispatchOfItsOwn()
@@ -704,25 +703,7 @@ class WorkerTest extends TestCase
             [new Envelope(new DummyMessage('Bob'))],
         ]);
 
-        // like doctrine_transaction: rolls back on failure and strips the handled stamps
-        $transaction = new class implements MiddlewareInterface {
-            public array $pending = [];
-            public array $committed = [];
-
-            public function handle(Envelope $envelope, StackInterface $stack): Envelope
-            {
-                try {
-                    $envelope = $stack->next()->handle($envelope, $stack);
-                    array_push($this->committed, ...$this->pending);
-
-                    return $envelope;
-                } catch (HandlerFailedException $e) {
-                    throw new HandlerFailedException($e->getEnvelope()->withoutAll(HandledStamp::class), $e->getWrappedExceptions());
-                } finally {
-                    $this->pending = [];
-                }
-            }
-        };
+        $transaction = $this->createTransactionMiddleware();
 
         $batchHandler = $this->createBatchHandler(static function (array $jobs) use ($transaction) {
             foreach ($jobs as [$message, $ack]) {
@@ -840,6 +821,59 @@ class WorkerTest extends TestCase
         $this->assertCount(1, $failures);
         $this->assertSame(['Handler failed.', 'Flush failed.'], array_map(static fn (\Throwable $e) => $e->getMessage(), array_values($failures[0]->getWrappedExceptions())));
         $this->assertSame([], $failures[0]->getEnvelope()->all(HandledStamp::class));
+    }
+
+    public function testAcksOfABatchFlushedDuringAFailedDispatchBecomeFailures()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Hey'))],
+            [new Envelope(new DummyMessage('Joe'))],
+            [new Envelope(new DummyMessage('Bob'))],
+        ]);
+
+        $transaction = $this->createTransactionMiddleware();
+
+        $batchHandler = $this->createBatchHandler(static function (array $jobs) use ($transaction) {
+            foreach ($jobs as [$message, $ack]) {
+                $transaction->pending[] = $message->getMessage();
+
+                if ('Joe' === $message->getMessage()) {
+                    $ack->nack(new \RuntimeException('Batch failed.'));
+                } else {
+                    $ack->ack('batch result');
+                }
+            }
+        });
+
+        $bus = new MessageBus([$transaction, new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [
+                new HandlerDescriptor($batchHandler),
+                static function (DummyMessage $message) {
+                    if ('Bob' === $message->getMessage()) {
+                        throw new \RuntimeException('Handler failed.');
+                    }
+                },
+            ],
+        ]))]);
+
+        $failures = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(3));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$failures) {
+            $failures[$event->getEnvelope()->getMessage()->getMessage()] = $event->getThrowable();
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+
+        $this->assertSame([], $transaction->committed);
+        $this->assertSame(0, $receiver->getAcknowledgeCount());
+        $this->assertSame(3, $receiver->getRejectCount());
+        $this->assertSame(['Hey', 'Joe', 'Bob'], array_keys($failures));
+
+        $this->assertSame([], $failures['Hey']->getEnvelope()->all(HandledStamp::class));
+        $this->assertStringContainsString('was flushed during the dispatch of another message, and that dispatch failed.', $failures['Hey']->getMessage());
+        $this->assertSame(['Batch failed.'], array_map(static fn (\Throwable $e) => $e->getMessage(), array_values($failures['Joe']->getWrappedExceptions())));
     }
 
     public function testFlushBatchOnIdle()
@@ -1045,6 +1079,29 @@ class WorkerTest extends TestCase
         $this->assertCount(1, $rejectedEnvelopes);
         $rejectedEnvelope = $rejectedEnvelopes[0];
         $this->assertNull($rejectedEnvelope->last(NoAutoAckStamp::class));
+    }
+
+    private function createTransactionMiddleware(): MiddlewareInterface
+    {
+        // like doctrine_transaction: rolls back on failure and strips the handled stamps
+        return new class implements MiddlewareInterface {
+            public array $pending = [];
+            public array $committed = [];
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                try {
+                    $envelope = $stack->next()->handle($envelope, $stack);
+                    array_push($this->committed, ...$this->pending);
+
+                    return $envelope;
+                } catch (HandlerFailedException $e) {
+                    throw new HandlerFailedException($e->getEnvelope()->withoutAll(HandledStamp::class), $e->getWrappedExceptions());
+                } finally {
+                    $this->pending = [];
+                }
+            }
+        };
     }
 
     private function createBatchHandler(\Closure $process): BatchHandlerInterface

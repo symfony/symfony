@@ -182,6 +182,7 @@ class Worker
             $e = null;
             $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName), new ConsumedByWorkerStamp(), new AckStamp($ack)));
         } catch (\Throwable $e) {
+            $this->failHeldAcks();
         }
 
         if ($e instanceof HandlerFailedException && $e->getEnvelope()->last(NoAutoAckStamp::class)) {
@@ -342,6 +343,27 @@ class Worker
     public function getMetadata(): WorkerMetadata
     {
         return $this->metadata;
+    }
+
+    /**
+     * Turns the acks that other messages sent during a failed dispatch into failures.
+     *
+     * Their batch was flushed during that dispatch, so what the batch did for them may have been undone.
+     * The worker sends the acks to the transports after each dispatch, so every ack in the list comes from the failed dispatch.
+     */
+    private function failHeldAcks(): void
+    {
+        foreach ($this->acks as $i => [$transportName, $envelope, $e]) {
+            if (null !== $e || !$stamp = $envelope->last(HandledStamp::class)) {
+                continue;
+            }
+
+            $stamps = $envelope->all(HandledStamp::class);
+            array_pop($stamps);
+            $envelope = $envelope->withoutAll(HandledStamp::class)->with(...$stamps);
+            $e = new RuntimeException(\sprintf('The batch of "%s" was flushed during the dispatch of another message, and that dispatch failed.', $stamp->getHandlerName()));
+            $this->acks[$i] = [$transportName, $envelope, new HandlerFailedException($envelope, [$stamp->getHandlerName() => $e])];
+        }
     }
 
     /**

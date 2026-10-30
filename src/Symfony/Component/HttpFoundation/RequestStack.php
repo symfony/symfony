@@ -66,7 +66,7 @@ class RequestStack
 
     public function getCurrentRequest(): ?Request
     {
-        return end($this->requests) ?: null;
+        return $this->requests[\count($this->requests) - 1] ?? null;
     }
 
     /**
@@ -108,7 +108,8 @@ class RequestStack
      */
     public function getSession(): SessionInterface
     {
-        if ((null !== $request = end($this->requests) ?: null) && $request->hasSession()) {
+        $request = $this->requests[\count($this->requests) - 1] ?? null;
+        if (null !== $request && $request->hasSession()) {
             return $request->getSession();
         }
 

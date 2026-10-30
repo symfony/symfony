@@ -318,6 +318,48 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertCount(1, $dispatched);
     }
 
+    public function testHandlerFailureFlushesTheBatchHandlersThatWaitForTheMessage()
+    {
+        $ackingBatchHandler = new class implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+            {
+                return $this->handle($message, $ack);
+            }
+
+            private function process(array $jobs): void
+            {
+                foreach ($jobs as [, $ack]) {
+                    $ack->ack('batch result');
+                }
+            }
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [
+                new HandlerDescriptor(static fn () => 'handled', ['alias' => 'before']),
+                new HandlerDescriptor($this->createBatchHandlerNackingTheFirstBatch(2), ['alias' => 'nacking']),
+                new HandlerDescriptor($ackingBatchHandler, ['alias' => 'acking']),
+                new HandlerDescriptor(static fn () => throw new \RuntimeException('Handler failed.'), ['alias' => 'after']),
+            ],
+        ]));
+
+        $acks = [];
+        try {
+            $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AckStamp(static function (Envelope $envelope) use (&$acks) {
+                $acks[] = $envelope;
+            })]), new StackMiddleware());
+            $this->fail('The handler should fail.');
+        } catch (HandlerFailedException $e) {
+        }
+
+        $this->assertSame(['Handler failed.', 'Batch failed.'], array_map(static fn (\Throwable $e) => $e->getMessage(), array_values($e->getWrappedExceptions())));
+        $this->assertSame(['handled', 'batch result'], array_map(static fn (HandledStamp $stamp) => $stamp->getResult(), $e->getEnvelope()->all(HandledStamp::class)));
+        $this->assertNull($e->getEnvelope()->last(NoAutoAckStamp::class));
+        $this->assertSame([], $acks);
+    }
+
     public function testBatchHandlerNoAck()
     {
         $handler = new class implements BatchHandlerInterface {

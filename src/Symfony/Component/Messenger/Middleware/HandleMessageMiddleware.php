@@ -53,6 +53,8 @@ class HandleMessageMiddleware implements MiddlewareInterface
         $exceptions = [];
         $alreadyHandled = false;
         $handledStamps = [];
+        $pendingAcks = [];
+        $dispatchFailed = false;
         foreach ($this->handlersLocator->getHandlers($envelope) as $handlerDescriptor) {
             if ($this->messageHasAlreadyBeenHandled($envelope, $handlerDescriptor)) {
                 $alreadyHandled = true;
@@ -68,7 +70,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 /** @var AckStamp $ackStamp */
                 if ($batchHandler && $ackStamp = $envelope->last(AckStamp::class)) {
                     $handledBefore = \count($handledStamps);
-                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (?\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor, &$handledStamps, $handledBefore) {
+                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (?\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor, &$handledStamps, $handledBefore, &$dispatchFailed) {
                         if (null !== $e) {
                             // a retry must skip the handlers that succeeded after this batch handler
                             // a nack sent during the dispatch must not wait for them, since outer middlewares may undo their work
@@ -76,6 +78,10 @@ class HandleMessageMiddleware implements MiddlewareInterface
                             $e = new HandlerFailedException($envelope, [$handlerDescriptor->getName() => $e]);
                         } else {
                             $envelope = $envelope->with(HandledStamp::fromDescriptor($handlerDescriptor, $result));
+                        }
+
+                        if ($dispatchFailed) {
+                            return;
                         }
 
                         $ackStamp->ack($envelope, $e);
@@ -89,6 +95,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
                     if (!$ack->isAcknowledged()) {
                         $ackPending = true;
+                        $pendingAcks[$handlerDescriptor->getName()] = [$handlerDescriptor, $ack];
                         $envelope = $envelope->with(new NoAutoAckStamp($handlerDescriptor));
                     } elseif ($ack->getError()) {
                         throw $ack->getError();
@@ -121,6 +128,29 @@ class HandleMessageMiddleware implements MiddlewareInterface
                     $exceptions[$stamp->getHandlerDescriptor()->getName()] = $e;
                 }
             }
+        }
+
+        if ($exceptions && $pendingAcks) {
+            // flush the batch handlers that wait for this message, so that the exception thrown below reports their outcome
+            $dispatchFailed = true;
+            $stamps = array_filter($envelope->all(HandledStamp::class), static fn (HandledStamp $stamp) => !isset($pendingAcks[$stamp->getHandlerName()]));
+
+            foreach ($pendingAcks as $name => [$handlerDescriptor, $ack]) {
+                try {
+                    $handlerDescriptor->getBatchHandler()->flush(true);
+                } catch (\Throwable $e) {
+                    $exceptions[$name] = $e;
+                    continue;
+                }
+
+                if ($e = $ack->getError()) {
+                    $exceptions[$name] = $e;
+                } elseif ($ack->isAcknowledged()) {
+                    $stamps[] = HandledStamp::fromDescriptor($handlerDescriptor, $ack->getResult());
+                }
+            }
+
+            $envelope = $envelope->withoutAll(HandledStamp::class)->withoutAll(NoAutoAckStamp::class)->with(...$stamps);
         }
 
         if (null === $handler && !$alreadyHandled) {

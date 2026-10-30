@@ -17,9 +17,11 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProvider;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\Test\ProviderTestCase;
@@ -883,6 +885,32 @@ XLIFF
         $this->expectExceptionMessage('Unable to download file content.');
 
         $crowdinProvider->read(['messages'], ['fr']);
+    }
+
+    public function testReadDoesNotLoadLocalFiles()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_crowdin_');
+        file_put_contents($file, (new XliffFileDumper())->formatCatalogue(new MessageCatalogue('fr', ['messages' => ['a' => 'local']]), 'messages'));
+
+        $responses = [
+            'listFiles' => new MockResponse(json_encode(['data' => [['data' => ['id' => 12, 'name' => 'messages.xlf']]]])),
+            'exportProjectTranslations' => new MockResponse(json_encode(['data' => ['url' => 'https://file.url']])),
+            'downloadFile' => new MockResponse($file),
+        ];
+
+        $crowdinProvider = self::createProvider((new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'auth_bearer' => 'API_TOKEN',
+        ]), new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2');
+
+        $this->expectException(InvalidResourceException::class);
+        $this->expectExceptionMessage('Crowdin did not return XLIFF content for locale "fr" and domain "messages".');
+
+        try {
+            $crowdinProvider->read(['messages'], ['fr']);
+        } finally {
+            unlink($file);
+        }
     }
 
     public function testDelete()

@@ -100,6 +100,18 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertSame(404, $client->getResponse()->getStatusCode());
     }
 
+    public function testProfilerPageDoesNotDisableCspOfLaterRequests()
+    {
+        $kernel = new WebProfilerBundleKernel();
+        $client = new KernelBrowser($kernel);
+        $client->disableReboot();
+
+        $client->request('GET', '/_profiler/latest');
+        $client->request('GET', '/csp');
+
+        $this->assertTrue($client->getResponse()->headers->has('Content-Security-Policy'));
+    }
+
     public function testPanelActionWithValidPanelAndToken()
     {
         $kernel = new WebProfilerBundleKernel();

@@ -31,7 +31,18 @@ trait BatchHandlerTrait
 
         if ($jobs = $this->jobs) {
             $this->jobs = [];
-            $this->process($jobs);
+
+            try {
+                $this->process($jobs);
+            } catch (\Throwable $e) {
+                foreach ($jobs as [, $ack]) {
+                    if (!$ack->isAcknowledged()) {
+                        $ack->nack($e);
+                    }
+                }
+
+                throw $e;
+            }
         }
     }
 

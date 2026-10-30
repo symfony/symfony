@@ -24,6 +24,7 @@ use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\EnvelopeAwareExceptionInterface;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
@@ -195,9 +196,9 @@ class Worker
         );
     }
 
-    private function enqueueAck(string $transportName, Envelope $envelope, ?\Throwable $e = null): void
+    private function enqueueAck(string $transportName, Envelope $envelope, ?\Throwable $e = null, ?\Closure $combine = null): void
     {
-        $this->acks[] = [$transportName, $envelope, $e];
+        $this->acks[] = [$transportName, $envelope, $e, $combine];
     }
 
     private function preAck(Envelope $envelope, string $transportName, bool &$acked, ?\Throwable $e = null): void
@@ -208,7 +209,9 @@ class Worker
             $this->acks[] = [$transportName, $envelope, $e];
         } elseif ($noAutoAckStamp) {
             $this->unacks ??= new DeferredBatchMessageQueue();
-            $this->unacks->add($noAutoAckStamp->getHandlerDescriptor()->getBatchHandler(), $transportName, $envelope->withoutAll(AckStamp::class), $acked, (float) $this->clock->now()->format('U.u'));
+            foreach ($envelope->all(NoAutoAckStamp::class) as $stamp) {
+                $this->unacks->add($stamp->getHandlerDescriptor()->getBatchHandler(), $transportName, $envelope, $acked, (float) $this->clock->now()->format('U.u'));
+            }
         }
 
         $this->ack();
@@ -219,7 +222,12 @@ class Worker
         $acks = $this->acks;
         $this->acks = [];
 
-        foreach ($acks as [$transportName, $envelope, $e]) {
+        foreach ($acks as $ack) {
+            if (isset($ack[3]) && !$ack = $ack[3]([$ack])) {
+                continue;
+            }
+
+            [$transportName, $envelope, $e] = $ack;
             $receiver = $this->receivers[$transportName];
 
             if (null !== $e) {
@@ -322,12 +330,29 @@ class Worker
             }
             $transportName = $deferredMessage->transportName;
             $envelope = $deferredMessage->envelope;
+            $heldAcks = \count($this->acks);
             try {
                 $e = null;
-                $this->bus->dispatch($envelope->with(new FlushBatchHandlersStamp(true === $force || !\is_bool($force))));
+                $this->bus->dispatch($envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(true === $force || !\is_bool($force))));
             } catch (\Throwable $e) {
+                $this->failHeldAcks($heldAcks);
+
                 if (!$deferredMessage->acked) {
-                    $this->acks[] = [$transportName, $envelope->withoutAll(NoAutoAckStamp::class), $e];
+                    $envelope = $envelope->withoutAll(NoAutoAckStamp::class);
+
+                    if ($e instanceof HandlerFailedException) {
+                        // a retry must run the batch handlers whose flush failed
+                        $failed = $e->getWrappedExceptions();
+                        $envelope = $envelope->withoutAll(HandledStamp::class)->with(...array_filter($envelope->all(HandledStamp::class), static fn (HandledStamp $stamp) => !isset($failed[$stamp->getHandlerName()])));
+                        $e = new HandlerFailedException($envelope, $failed);
+                    }
+
+                    if ($ackStamp = $envelope->last(AckStamp::class)) {
+                        // the acks that the batch sent during the flush come first, and this failure is ignored when they already gave the message its outcome
+                        $ackStamp->ack($envelope, $e);
+                    } else {
+                        $this->acks[] = [$transportName, $envelope, $e];
+                    }
                 }
                 continue;
             }
@@ -341,7 +366,7 @@ class Worker
                 $this->acks[] = [$transportName, $envelope, $e];
             } elseif ($noAutoAckStamp) {
                 $this->unacks ??= new DeferredBatchMessageQueue();
-                $this->unacks->add($noAutoAckStamp->getHandlerDescriptor()->getBatchHandler(), $transportName, $envelope->withoutAll(AckStamp::class), $deferredMessage->acked, (float) $this->clock->now()->format('U.u'));
+                $this->unacks->add($noAutoAckStamp->getHandlerDescriptor()->getBatchHandler(), $transportName, $envelope, $deferredMessage->acked, (float) $this->clock->now()->format('U.u'));
             }
         }
 
@@ -385,5 +410,26 @@ class Worker
     public function getMetadata(): WorkerMetadata
     {
         return $this->metadata;
+    }
+
+    /**
+     * Turns the acks that messages sent during a failed dispatch into failures.
+     *
+     * Their batch was flushed during that dispatch, so what the batch did for them may have been undone.
+     * The acks held from $offset on are the ones sent during that dispatch.
+     */
+    private function failHeldAcks(int $offset): void
+    {
+        foreach (\array_slice($this->acks, $offset, null, true) as $i => [$transportName, $envelope, $e]) {
+            if (null !== $e || !$stamp = $envelope->last(HandledStamp::class)) {
+                continue;
+            }
+
+            $stamps = $envelope->all(HandledStamp::class);
+            array_pop($stamps);
+            $envelope = $envelope->withoutAll(HandledStamp::class)->with(...$stamps);
+            $e = new RuntimeException(\sprintf('The batch of "%s" was flushed during the dispatch of another message, and that dispatch failed.', $stamp->getHandlerName()));
+            $this->acks[$i] = [$transportName, $envelope, new HandlerFailedException($envelope, [$stamp->getHandlerName() => $e])] + $this->acks[$i];
+        }
     }
 }

@@ -4,15 +4,15 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>该值应为 false 。</target>
+                <target>该值应为 false。</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
-                <target>该值应为 true 。</target>
+                <target>该值应为 true。</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
-                <target>该值的类型应为 {{ type }} 。</target>
+                <target>该值的类型应为 {{ type }}。</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank.</source>
@@ -28,7 +28,7 @@
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>您最多能选择 {{ limit }} 个选项。</target>
+                <target>您最多只能选择 {{ limit }} 个选项。</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime.</source>
-                <target>该值不是一个有效的日期时间（datetime）。</target>
+                <target>该值不是一个有效的日期和时间（datetime）。</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
@@ -64,15 +64,15 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>文件太大 ({{ size }} {{ suffix }})，文件大小不应超过 {{ limit }} {{ suffix }} 。</target>
+                <target>文件太大（{{ size }} {{ suffix }}），大小不应超过 {{ limit }} {{ suffix }}。</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>无效的文件类型 ({{ type }}) ，允许的文件类型有 {{ types }} 。</target>
+                <target>无效的文件类型（{{ type }}），允许的文件类型有 {{ types }}。</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
-                <target>该值应小于或等于 {{ limit }} 。</target>
+                <target>该值应小于或等于 {{ limit }}。</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
@@ -80,7 +80,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
-                <target>该值应大于或等于 {{ limit }} 。</target>
+                <target>该值应大于或等于 {{ limit }}。</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
@@ -92,11 +92,11 @@
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>该值不应为 null 。</target>
+                <target>该值不应为 null。</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
-                <target>该值应为 null 。</target>
+                <target>该值应为 null。</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
@@ -108,15 +108,15 @@
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>该值不是一个有效的 URL 。</target>
+                <target>该值不是一个有效的 URL。</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
-                <target>该两个变量值应相等。</target>
+                <target>两个值应相等。</target>
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>文件太大，文件大小不可以超过 {{ limit }} {{ suffix }} 。</target>
+                <target>文件太大，大小不应超过 {{ limit }} {{ suffix }}。</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>无法上传此文件。</target>
+                <target>无法上传该文件。</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -160,19 +160,19 @@
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target>图片太宽 ({{ width }}px)，最大宽度为 {{ max_width }}px 。</target>
+                <target>图片太宽（{{ width }} 像素），最大宽度为 {{ max_width }} 像素。</target>
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>图片宽度不够 ({{ width }}px)，最小宽度为 {{ min_width }}px 。</target>
+                <target>图片宽度不够（{{ width }} 像素），最小宽度为 {{ min_width }} 像素。</target>
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>图片太高 ({{ height }}px)，最大高度为 {{ max_height }}px 。</target>
+                <target>图片太高（{{ height }} 像素），最大高度为 {{ max_height }} 像素。</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>图片高度不够 ({{ height }}px)，最小高度为 {{ min_height }}px 。</target>
+                <target>图片高度不够（{{ height }} 像素），最小高度为 {{ min_height }} 像素。</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
@@ -184,7 +184,7 @@
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>文件的上传不完整。</target>
+                <target>文件上传不完整。</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
@@ -248,15 +248,15 @@
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
-                <target>该值应等于 {{ compared_value }} 。</target>
+                <target>该值应等于 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="66">
                 <source>This value should be greater than {{ compared_value }}.</source>
-                <target>该值应大于 {{ compared_value }} 。</target>
+                <target>该值应大于 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="67">
                 <source>This value should be greater than or equal to {{ compared_value }}.</source>
-                <target>该值应大于或等于 {{ compared_value }} 。</target>
+                <target>该值应大于或等于 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="68">
                 <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
@@ -264,15 +264,15 @@
             </trans-unit>
             <trans-unit id="69">
                 <source>This value should be less than {{ compared_value }}.</source>
-                <target>该值应小于 {{ compared_value }} 。</target>
+                <target>该值应小于 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>该值应小于或等于 {{ compared_value }} 。</target>
+                <target>该值应小于或等于 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
-                <target>该值不应等于 {{ compared_value }} 。</target>
+                <target>该值不应等于 {{ compared_value }}。</target>
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
@@ -280,23 +280,23 @@
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>图片宽高比太大 ({{ ratio }})。允许的最大宽高比为 {{ max_ratio }} 。</target>
+                <target>图片比例太大（{{ ratio }}），允许的最大比例为 {{ max_ratio }}。</target>
             </trans-unit>
             <trans-unit id="74">
                 <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>图片宽高比太小 ({{ ratio }})。允许的最大宽高比为 {{ min_ratio }} 。</target>
+                <target>图片比例太小（{{ ratio }}），允许的最小比例为 {{ min_ratio }}。</target>
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
-                <target>图片是方形的 ({{ width }}x{{ height }}px)。不允许使用方形的图片。</target>
+                <target>图片是正方形的（{{ width }}x{{ height }} 像素），不允许使用正方形的图片。</target>
             </trans-unit>
             <trans-unit id="76">
                 <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
-                <target>图片是横向的 ({{ width }}x{{ height }}px)。不允许使用横向的图片。</target>
+                <target>图片是横向的（{{ width }}x{{ height }} 像素）。不允许使用横向的图片。</target>
             </trans-unit>
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
-                <target>图片是纵向的 ({{ width }}x{{ height }}px)。不允许使用纵向的图片。</target>
+                <target>图片是纵向的（{{ width }}x{{ height }} 像素）。不允许使用纵向的图片。</target>
             </trans-unit>
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
@@ -304,7 +304,7 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>主机名无法解析。</target>
+                <target>主机名称无法解析。</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target>该值不是有效的 UUID 。</target>
+                <target>该值不是有效的 UUID。</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -332,7 +332,7 @@
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
-                <target>该值应为有效的 JSON 。</target>
+                <target>该值应为有效的 JSON。</target>
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
@@ -360,7 +360,7 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>此密码已被泄露，切勿使用。请更换密码。</target>
+                <target>该密码已被泄露，切勿使用。请更换密码。</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
@@ -388,7 +388,7 @@
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
-                <target>该值应为一个有效的表达式。</target>
+                <target>该值应为有效的表达式。</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
@@ -404,7 +404,7 @@
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target>文件名过长，最长不应超过{{ filename_max_length }} 个字符。</target>
+                <target>文件名过长，最长不应超过 {{ filename_max_length }} 个字符。</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
@@ -428,11 +428,11 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target>文件的扩展名无效 ({{ extension }})。允许的扩展名为 {{ extensions }} 。</target>
+                <target>文件的扩展名无效（{{ extension }}），允许的扩展名为 {{ extensions }}。</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target>检测到的字符编码无效 ({{ detected }})。允许的编码为 {{ encodings }} 。</target>
+                <target>检测到的字符编码无效（{{ detected }}），允许的编码为 {{ encodings }}。</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
@@ -444,11 +444,11 @@
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
-                <target>该值太短，应至少包含一个词。|该值太短，应至少包含 {{ min }} 个词。</target>
+                <target>该值太短，应至少包含 {{ min }} 个词。</target>
             </trans-unit>
             <trans-unit id="115">
                 <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
-                <target>该值太长，应只包含一个词。|该值太长，应只包含 {{ max }} 个或更少个词。</target>
+                <target>该值太长，应只包含 {{ max }} 个或更少个词。</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
@@ -460,11 +460,11 @@
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target>该值不应位于 "{{ min }}" 周之前。</target>
+                <target>该值不应位于 {{ min }} 周之前。</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target>该值不应位于 "{{ max }}"周之后。</target>
+                <target>该值不应位于 {{ max }} 周之后。</target>
             </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
@@ -472,7 +472,7 @@
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target>此文件不是有效的视频。</target>
+                <target>该文件不是有效的视频。</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
@@ -480,47 +480,47 @@
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target>视频宽度过大（{{ width }}px）。允许的最大宽度为 {{ max_width }}px。</target>
+                <target>视频宽度过大（{{ width }} 像素），允许的最大宽度为 {{ max_width }} 像素。</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>视频宽度太小（{{ width }}px）。预期的最小宽度为 {{ min_width }} 像素。</target>
+                <target>视频宽度太小（{{ width }} 像素），预期的最小宽度为 {{ min_width }} 像素。</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>视频高度过大（{{ height }}px）。允许的最大高度为 {{ max_height }}px。</target>
+                <target>视频高度过大（{{ height }} 像素），允许的最大高度为 {{ max_height }} 像素。</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>视频高度太小（{{ height }}px）。期望的最小高度为 {{ min_height }}px。</target>
+                <target>视频高度太小（{{ height }} 像素），期望的最小高度为 {{ min_height }} 像素。</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>该视频像素过少 ({{ pixels }}). 期望的最小值为 {{ min_pixels }}。</target>
+                <target>该视频像素太少（{{ pixels }} 像素），期望的最小值为 {{ min_pixels }} 像素。</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>该视频的像素过多（{{ pixels }}）。预期的最大数量为 {{ max_pixels }}。</target>
+                <target>该视频的像素太多（{{ pixels }} 像素），预期的最大数量为 {{ max_pixels }} 像素。</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>视频纵横比过大（{{ ratio }}）。允许的最大纵横比为 {{ max_ratio }}。</target>
+                <target>视频比例过大（{{ ratio }}），允许的最大比例为 {{ max_ratio }}。</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>视频纵横比过小（{{ ratio }}）。预期的最低比例为 {{ min_ratio }}。</target>
+                <target>视频比例过小（{{ ratio }}），预期的最低比例为 {{ min_ratio }}。</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target>视频为正方形 ({{ width }}x{{ height }}px)。不允许正方形视频。</target>
+                <target>视频为正方形（{{ width }}x{{ height }} 像素），不允许正方形视频。</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target>视频为横向（{{ width }}x{{ height }} 像素）。不允许横向视频。</target>
+                <target>视频为横向（{{ width }}x{{ height }} 像素），不允许横向视频。</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target>该视频为竖屏方向（{{ width }}x{{ height }}px）。不允许竖屏视频。</target>
+                <target>该视频为竖屏方向（{{ width }}x{{ height }} 像素），不允许竖屏视频。</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
@@ -528,15 +528,15 @@
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target>该视频包含多个流。只允许一个流。</target>
+                <target>该视频包含多个流，只允许一个流。</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target>不支持的视频编解码器“{{ codec }}”。</target>
+                <target>不支持的视频编解码器 “{{ codec }}”。</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target>不支持的视频容器 "{{ container }}".</target>
+                <target>不支持的视频容器 “{{ container }}”。</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
@@ -544,11 +544,11 @@
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>图像的像素太少（{{ pixels }}）。预期的最小数量为 {{ min_pixels }}。</target>
+                <target>图像的像素太少（{{ pixels }}），预期的最小数量为 {{ min_pixels }}。</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>图像的像素过多 ({{ pixels }}). 预期的最大数量为 {{ max_pixels }}.</target>
+                <target>图像的像素太多（{{ pixels }}），预期的最大数量为 {{ max_pixels }}。</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
@@ -556,95 +556,95 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">该值不是有效的 XML。</target>
+                <target>该值不是有效的 XML。</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">该值不符合预期的 XSD 架构。</target>
+                <target>该值不符合预期的 XSD 架构。</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">此 XML 负载过大（{{ size }} 字节）：超过了 {{ limit }} 字节的限制。</target>
+                <target>该 XML 负载过大（{{ size }} 字节），超过了 {{ limit }} 字节的限制。</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">该值不是有效的 cron 表达式。</target>
+                <target>该值不是有效的 cron 表达式。</target>
             </trans-unit>
             <trans-unit id="147">
                 <source>The referenced entity does not exist.</source>
-                <target state="needs-review-translation">引用的实体不存在。</target>
+                <target>引用的实体不存在。</target>
             </trans-unit>
             <trans-unit id="148" resname="This is not a valid ULID.">
                 <source>This value is not a valid ULID.</source>
-                <target state="needs-review-translation">该值不是有效的 ULID 。</target>
+                <target>该值不是有效的 ULID。</target>
             </trans-unit>
             <trans-unit id="149">
                 <source>This file is not a valid audio file.</source>
-                <target state="needs-review-translation">此文件不是有效的音频文件。</target>
+                <target>该文件不是有效的音频文件。</target>
             </trans-unit>
             <trans-unit id="150">
                 <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
-                <target state="needs-review-translation">音频时长过短（{{ duration }} 秒）。期望的最小时长为 {{ min_duration }} 秒。</target>
+                <target>音频时长过短（{{ duration }} 秒），最小时长为 {{ min_duration }} 秒。</target>
             </trans-unit>
             <trans-unit id="151">
                 <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
-                <target state="needs-review-translation">音频时长过长（{{ duration }} 秒）。允许的最大时长为 {{ max_duration }} 秒。</target>
+                <target>音频时长过长（{{ duration }} 秒），最大时长为 {{ max_duration }} 秒。</target>
             </trans-unit>
             <trans-unit id="152">
                 <source>The duration of the audio could not be detected.</source>
-                <target state="needs-review-translation">无法检测到音频的时长。</target>
+                <target>无法检测到音频的时长。</target>
             </trans-unit>
             <trans-unit id="153">
                 <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
-                <target state="needs-review-translation">音频比特率过低（{{ bitrate }} bps）。期望的最小比特率为 {{ min_bitrate }} bps。</target>
+                <target>音频比特率过低（{{ bitrate }} bps），最小比特率为 {{ min_bitrate }} bps。</target>
             </trans-unit>
             <trans-unit id="154">
                 <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
-                <target state="needs-review-translation">音频比特率过高（{{ bitrate }} bps）。允许的最大比特率为 {{ max_bitrate }} bps。</target>
+                <target>音频比特率过高（{{ bitrate }} bps），最大比特率为 {{ max_bitrate }} bps。</target>
             </trans-unit>
             <trans-unit id="155">
                 <source>The bitrate of the audio could not be detected.</source>
-                <target state="needs-review-translation">无法检测到音频的比特率。</target>
+                <target>无法检测到音频的比特率。</target>
             </trans-unit>
             <trans-unit id="156">
                 <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
-                <target state="needs-review-translation">不支持的音频采样率（{{ sample_rate }} Hz）。</target>
+                <target>不支持的音频采样率（{{ sample_rate }} Hz）。</target>
             </trans-unit>
             <trans-unit id="157">
                 <source>The sample rate of the audio could not be detected.</source>
-                <target state="needs-review-translation">无法检测到音频的采样率。</target>
+                <target>无法检测到音频的采样率。</target>
             </trans-unit>
             <trans-unit id="158">
                 <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
-                <target state="needs-review-translation">该音频的声道过少（{{ channels }}）。期望的最小数量为 {{ min_channels }}。</target>
+                <target>音频的声道太少（{{ channels }}），最小数量为 {{ min_channels }}。</target>
             </trans-unit>
             <trans-unit id="159">
                 <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
-                <target state="needs-review-translation">该音频的声道过多（{{ channels }}）。期望的最大数量为 {{ max_channels }}。</target>
+                <target>音频的声道太多（{{ channels }}），最大数量为 {{ max_channels }}。</target>
             </trans-unit>
             <trans-unit id="160">
                 <source>The number of audio channels could not be detected.</source>
-                <target state="needs-review-translation">无法检测到音频声道的数量。</target>
+                <target>无法检测到音频声道的数量。</target>
             </trans-unit>
             <trans-unit id="161">
                 <source>The audio file is corrupted.</source>
-                <target state="needs-review-translation">音频文件已损坏。</target>
+                <target>音频文件已损坏。</target>
             </trans-unit>
             <trans-unit id="162">
                 <source>The audio contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">该音频包含多个流。只允许一个流。</target>
+                <target>音频包含多个流，只允许一个流。</target>
             </trans-unit>
             <trans-unit id="163">
                 <source>Unsupported audio codec "{{ codec }}".</source>
-                <target state="needs-review-translation">不支持的音频编解码器“{{ codec }}”。</target>
+                <target>不支持的音频编解码器 “{{ codec }}”。</target>
             </trans-unit>
             <trans-unit id="164">
                 <source>Unsupported audio container "{{ container }}".</source>
-                <target state="needs-review-translation">不支持的音频容器“{{ container }}”。</target>
+                <target>不支持的音频容器 “{{ container }}”。</target>
             </trans-unit>
             <trans-unit id="165">
                 <source>The file does not contain any audio stream.</source>
-                <target state="needs-review-translation">该文件不包含音频流。</target>
+                <target>文件不包含音频流。</target>
             </trans-unit>
         </body>
     </file>

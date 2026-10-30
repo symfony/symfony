@@ -12,7 +12,10 @@
 namespace Symfony\Component\Messenger\Execution;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Execution\Message\DeferredBatchMessage;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 
 /**
  * @internal
@@ -63,5 +66,69 @@ final class DeferredBatchMessageQueue
         $this->messages = $remaining->count() ? $remaining : null;
 
         return $flushable;
+    }
+
+    /**
+     * Combines the acks that the batch handlers of a message sent, once they all did.
+     *
+     * Returns null while some batch handlers didn't send theirs, or when the message already has its outcome.
+     *
+     * @param array{Envelope, list<array>}|null $batch The dispatched envelope and the acks received so far, null once the message has its outcome
+     */
+    public static function combineAcks(?array &$batch, array $acks): ?array
+    {
+        if (null === $batch) {
+            return null;
+        }
+
+        [$envelope, $received] = $batch;
+        foreach ($acks as [$transportName, $ackEnvelope, $e]) {
+            $received[] = [$transportName, $ackEnvelope, $e];
+        }
+
+        $pending = [];
+        $handledStamps = [];
+        foreach ($envelope->all(HandledStamp::class) as $stamp) {
+            $handledStamps[$stamp->getHandlerName()] = $stamp;
+        }
+        foreach ($envelope->all(NoAutoAckStamp::class) as $stamp) {
+            $name = $stamp->getHandlerDescriptor()->getName();
+            $pending[$name] = true;
+            unset($handledStamps[$name]);
+        }
+
+        $exceptions = [];
+        foreach ($received as [, $ackEnvelope, $e]) {
+            if ($e instanceof HandlerFailedException) {
+                foreach ($e->getWrappedExceptions() as $name => $exception) {
+                    unset($pending[$name]);
+                    $exceptions[$name] = $exception;
+                }
+            } elseif (null !== $e) {
+                // an error that isn't tied to a batch handler gives the message its outcome
+                $pending = [];
+                $exceptions[] = $e;
+            } elseif ($stamp = $ackEnvelope->last(HandledStamp::class)) {
+                $name = $stamp->getHandlerName();
+                unset($pending[$name]);
+                $handledStamps[$name] = $stamp;
+            }
+        }
+
+        if ($pending) {
+            $batch = [$envelope, $received];
+
+            return null;
+        }
+
+        $batch = null;
+
+        if (1 === \count($received)) {
+            return $received[0];
+        }
+
+        $envelope = $envelope->withoutAll(NoAutoAckStamp::class)->withoutAll(HandledStamp::class)->with(...array_values($handledStamps));
+
+        return [$received[0][0], $envelope, $exceptions ? new HandlerFailedException($envelope, $exceptions) : null];
     }
 }

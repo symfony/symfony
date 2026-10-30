@@ -85,7 +85,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
 
     public function reverseTransform(mixed $value): ?\DateTime
     {
-        if (!$value) {
+        if (null === $value || '' === $value) {
             return null;
         }
 

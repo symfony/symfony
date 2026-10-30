@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target>V php.ini ni bila nastavljena začasna mapa, ali pa nastavljena mapa ne obstaja.</target>
+                <target>V php.ini ni bila nastavljena začasna mapa ali pa nastavljena mapa ne obstaja.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -360,7 +360,7 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>To geslo je ušlo pri kršitvi varnosti podatkov in ga ne smete uporabljati. Prosimo, uporabite drugo geslo.</target>
+                <target>To geslo je bilo razkrito v varnostnem incidentu in se ne sme uporabiti. Prosimo, uporabite drugo geslo.</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
@@ -556,95 +556,95 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">Ta vrednost ni veljaven XML.</target>
+                <target>Ta vrednost ni veljaven XML.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">Ta vrednost ni skladna s pričakovano shemo XSD.</target>
+                <target>Ta vrednost ni skladna s pričakovano shemo XSD.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">Ta vsebina XML je prevelika ({{ size }} bajtov): presega omejitev {{ limit }} bajtov.</target>
+                <target>Ta vsebina XML je prevelika ({{ size }} bajtov): presega omejitev {{ limit }} bajtov.</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Ta vrednost ni veljaven izraz cron.</target>
+                <target>Ta vrednost ni veljaven cron izraz.</target>
             </trans-unit>
             <trans-unit id="147">
                 <source>The referenced entity does not exist.</source>
-                <target state="needs-review-translation">Referencirana entiteta ne obstaja.</target>
+                <target>Referencirana entiteta ne obstaja.</target>
             </trans-unit>
             <trans-unit id="148" resname="This is not a valid ULID.">
                 <source>This value is not a valid ULID.</source>
-                <target state="needs-review-translation">Ta vrednost ni veljaven ULID.</target>
+                <target>Ta vrednost ni veljaven ULID.</target>
             </trans-unit>
             <trans-unit id="149">
                 <source>This file is not a valid audio file.</source>
-                <target state="needs-review-translation">Ta datoteka ni veljavna zvočna datoteka.</target>
+                <target>Ta datoteka ni veljavna zvočna datoteka.</target>
             </trans-unit>
             <trans-unit id="150">
                 <source>The audio is too short ({{ duration }} seconds). Minimum duration expected is {{ min_duration }} seconds.</source>
-                <target state="needs-review-translation">Zvočni posnetek je prekratek ({{ duration }} sekund). Najmanjše pričakovano trajanje je {{ min_duration }} sekund.</target>
+                <target>Zvočni posnetek je prekratek ({{ duration }} sekund). Najmanjše pričakovano trajanje je {{ min_duration }} sekund.</target>
             </trans-unit>
             <trans-unit id="151">
                 <source>The audio is too long ({{ duration }} seconds). Allowed maximum duration is {{ max_duration }} seconds.</source>
-                <target state="needs-review-translation">Zvočni posnetek je predolg ({{ duration }} sekund). Največje dovoljeno trajanje je {{ max_duration }} sekund.</target>
+                <target>Zvočni posnetek je predolg ({{ duration }} sekund). Največje dovoljeno trajanje je {{ max_duration }} sekund.</target>
             </trans-unit>
             <trans-unit id="152">
                 <source>The duration of the audio could not be detected.</source>
-                <target state="needs-review-translation">Trajanja zvočnega posnetka ni bilo mogoče določiti.</target>
+                <target>Trajanje zvočnega posnetka ni bilo mogoče določiti.</target>
             </trans-unit>
             <trans-unit id="153">
                 <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>
-                <target state="needs-review-translation">Bitna hitrost zvočnega posnetka je prenizka ({{ bitrate }} bps). Najmanjša pričakovana bitna hitrost je {{ min_bitrate }} bps.</target>
+                <target>Bitna hitrost zvočnega posnetka je prenizka ({{ bitrate }} bps). Najmanjša pričakovana bitna hitrost je {{ min_bitrate }} bps.</target>
             </trans-unit>
             <trans-unit id="154">
                 <source>The audio bitrate is too high ({{ bitrate }} bps). Allowed maximum bitrate is {{ max_bitrate }} bps.</source>
-                <target state="needs-review-translation">Bitna hitrost zvočnega posnetka je previsoka ({{ bitrate }} bps). Največja dovoljena bitna hitrost je {{ max_bitrate }} bps.</target>
+                <target>Bitna hitrost zvočnega posnetka je previsoka ({{ bitrate }} bps). Največja dovoljena bitna hitrost je {{ max_bitrate }} bps.</target>
             </trans-unit>
             <trans-unit id="155">
                 <source>The bitrate of the audio could not be detected.</source>
-                <target state="needs-review-translation">Bitne hitrosti zvočnega posnetka ni bilo mogoče določiti.</target>
+                <target>Bitne hitrosti zvočnega posnetka ni bilo mogoče zaznati.</target>
             </trans-unit>
             <trans-unit id="156">
                 <source>Unsupported audio sample rate ({{ sample_rate }} Hz).</source>
-                <target state="needs-review-translation">Nepodprta frekvenca vzorčenja zvoka ({{ sample_rate }} Hz).</target>
+                <target>Nepodprta frekvenca vzorčenja zvoka ({{ sample_rate }} Hz).</target>
             </trans-unit>
             <trans-unit id="157">
                 <source>The sample rate of the audio could not be detected.</source>
-                <target state="needs-review-translation">Frekvence vzorčenja zvočnega posnetka ni bilo mogoče določiti.</target>
+                <target>Hitrosti vzorčenja zvočnega posnetka ni bilo mogoče zaznati.</target>
             </trans-unit>
             <trans-unit id="158">
                 <source>The audio has too few channels ({{ channels }}). Minimum amount expected is {{ min_channels }}.</source>
-                <target state="needs-review-translation">Zvočni posnetek ima premalo kanalov ({{ channels }}). Najmanjše pričakovano število je {{ min_channels }}.</target>
+                <target>Zvočni posnetek ima premalo kanalov ({{ channels }}). Najmanjše pričakovano število je {{ min_channels }}.</target>
             </trans-unit>
             <trans-unit id="159">
                 <source>The audio has too many channels ({{ channels }}). Maximum amount expected is {{ max_channels }}.</source>
-                <target state="needs-review-translation">Zvočni posnetek ima preveč kanalov ({{ channels }}). Največje pričakovano število je {{ max_channels }}.</target>
+                <target>Zvočni posnetek ima preveč kanalov ({{ channels }}). Največje pričakovano število je {{ max_channels }}.</target>
             </trans-unit>
             <trans-unit id="160">
                 <source>The number of audio channels could not be detected.</source>
-                <target state="needs-review-translation">Števila zvočnih kanalov ni bilo mogoče določiti.</target>
+                <target>Števila zvočnih kanalov ni bilo mogoče zaznati.</target>
             </trans-unit>
             <trans-unit id="161">
                 <source>The audio file is corrupted.</source>
-                <target state="needs-review-translation">Zvočna datoteka je poškodovana.</target>
+                <target>Zvočna datoteka je poškodovana.</target>
             </trans-unit>
             <trans-unit id="162">
                 <source>The audio contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">Zvočni posnetek vsebuje več tokov. Dovoljen je le en tok.</target>
+                <target>Zvočni posnetek vsebuje več tokov. Dovoljen je le en tok.</target>
             </trans-unit>
             <trans-unit id="163">
                 <source>Unsupported audio codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Nepodprt zvočni kodek "{{ codec }}".</target>
+                <target>Nepodprt zvočni kodek "{{ codec }}".</target>
             </trans-unit>
             <trans-unit id="164">
                 <source>Unsupported audio container "{{ container }}".</source>
-                <target state="needs-review-translation">Nepodprt zvočni vsebnik "{{ container }}".</target>
+                <target>Nepodprt zvočni vsebnik "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="165">
                 <source>The file does not contain any audio stream.</source>
-                <target state="needs-review-translation">Datoteka ne vsebuje nobenega zvočnega toka.</target>
+                <target>Datoteka ne vsebuje nobenega zvočnega toka.</target>
             </trans-unit>
         </body>
     </file>

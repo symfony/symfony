@@ -146,8 +146,13 @@ class ImpersonateUrlGenerator
         }
 
         if (null !== $path = $switchUserConfig['path'] ?? null) {
-            // the switch happens on a dedicated endpoint, so the page to come back to is carried explicitly
-            $parameters['_target_path'] = $targetUri ?? $request->getRequestUri();
+            // the switch happens on a dedicated endpoint, so the page to come back to is carried explicitly,
+            // unless the listener is left to redirect to the configured target route
+            $targetUri ??= SwitchUserListener::EXIT_VALUE === $identifier || !isset($switchUserConfig['target_route']) ? $request->getRequestUri() : null;
+
+            if (null !== $targetUri) {
+                $parameters['_target_path'] = $targetUri;
+            }
 
             if ('/' !== $path[0]) {
                 if (null === $this->urlGenerator) {

@@ -10,7 +10,6 @@
 //                                        branch; cooldown.default-days grows by one
 //                                        in merge-up order so the lowest branch
 //                                        surfaces first and the review queue is staggered.
-//   - .github/workflows/scorecards.yml   push trigger pinned to the default (highest) branch.
 //   - .github/workflows/unit-tests.yml   LTS test versions for the current branch: cross-test
 //                                        against the latest LTS at or below it, low-deps floor
 //                                        against the LTS one major below that.
@@ -34,7 +33,6 @@ if (!\is_array($branches) || !$branches) {
 }
 
 $branches = array_values($branches);
-$default = end($branches); // highest branch == dev == default
 $check = \in_array('--check', $argv, true);
 
 // Identify the checked-out branch from the source tree itself (robust to detached
@@ -97,19 +95,6 @@ foreach ($branches as $i => $b) {
 }
 
 $dirty = $sync(__DIR__.'/dependabot.yml', rtrim($dependabot)."\n");
-
-// --- .github/workflows/scorecards.yml (push trigger only) -------------------
-
-$scorecards = __DIR__.'/workflows/scorecards.yml';
-$yaml = file_get_contents($scorecards);
-$patched = preg_replace('/^(\s*branches:\s*\[\s*")[^"]*("\s*\])/m', '${1}'.$default.'${2}', $yaml, 1, $count);
-
-if (1 !== $count) {
-    fwrite(\STDERR, "Could not find the push branch trigger in scorecards.yml\n");
-    exit(1);
-}
-
-$dirty = $sync($scorecards, $patched) || $dirty;
 
 // --- .github/workflows/unit-tests.yml (LTS test versions) -------------------
 

@@ -588,6 +588,7 @@ SecurityBundle
 Serializer
 ----------
 
+ * [BC BREAK] With max-depth handling enabled (`AbstractObjectNormalizer::ENABLE_MAX_DEPTH`), YAML `max_depth: 0` and XML `max-depth="0"` mappings now invoke the max-depth handler immediately, or omit the property when no handler is configured. Previously, zero imposed no depth limit in these mappings. Remove the depth setting to preserve the previous unlimited behavior
  * `ObjectNormalizer` now applies `SerializedName` and `SerializedPath` to a property whose name matches its accessor, such as `$isActive` and `isActive()`. The `attributes`, `ignored_attributes` and `callbacks` context options then refer to it as `isActive` instead of `active`. Properties without a serialized name or path keep the existing naming rules
  * Deprecate denormalizing an array that is not a list into a `list`-typed property, in version 9.0 a `Symfony\Component\Serializer\Exception\NotNormalizableValueException` will be thrown when the input does not satisfy `array_is_list()`
  * Denormalize the elements of a union-typed collection, e.g. `array<Foo|Bar>`, instead of returning the raw data. An element that matches no member of the union, or a key whose type does not match, now throws instead of being returned as-is

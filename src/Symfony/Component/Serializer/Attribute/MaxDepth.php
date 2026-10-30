@@ -27,8 +27,8 @@ class MaxDepth
     public function __construct(
         public readonly int $maxDepth,
     ) {
-        if ($maxDepth <= 0) {
-            throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a positive integer.', static::class));
+        if ($maxDepth < 0) {
+            throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a non-negative integer.', static::class));
         }
     }
 }

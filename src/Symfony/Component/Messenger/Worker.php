@@ -167,16 +167,27 @@ class Worker
             return;
         }
 
-        $acked = false;
-        $ack = function (Envelope $envelope, ?\Throwable $e = null) use ($transportName, &$acked) {
-            $acked = true;
-            $this->acks[] = [$transportName, $envelope, $e];
+        $acks = [];
+        $dispatching = true;
+        $ack = function (Envelope $envelope, ?\Throwable $e = null) use ($transportName, &$acks, &$dispatching) {
+            if ($dispatching) {
+                $acks[] = [$transportName, $envelope, $e];
+            } else {
+                $this->acks[] = [$transportName, $envelope, $e];
+            }
         };
 
         try {
             $e = null;
             $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName), new ConsumedByWorkerStamp(), new AckStamp($ack)));
         } catch (\Throwable $e) {
+        }
+
+        // when the bus throws, its exception wins over the acks sent during the dispatch
+        $dispatching = false;
+        $acked = !$e && $acks;
+        if ($acked) {
+            array_push($this->acks, ...$acks);
         }
 
         $noAutoAckStamp = $envelope->last(NoAutoAckStamp::class);

@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -120,6 +121,7 @@ class DataUriNormalizerTest extends TestCase
         yield [self::TEST_GIF_DATA, \SplFileObject::class, self::TEST_GIF_DATA];
         yield [self::TEST_GIF_DATA, File::class, self::TEST_GIF_DATA];
         yield [self::TEST_TXT_DATA, File::class, self::TEST_TXT_DATA];
+        yield ['data:application/octet-stream;base64,YWJj////', File::class, 'data:application/octet-stream;base64,YWJj////'];
         yield ['data:,Hello%2C%20World!', \SplFileObject::class, 'data:text/plain,Hello%2C%20World%21'];
         yield ['data:;base64,SGVsbG8gV29ybGQh', \SplFileObject::class, 'data:text/plain,Hello%20World%21'];
         yield ['data:text/plain;charset=utf-8;base64,SGVsbG8gV29ybGQh', \SplFileObject::class, 'data:text/plain;charset=utf-8,Hello%20World%21'];
@@ -144,6 +146,27 @@ class DataUriNormalizerTest extends TestCase
     public function testNormalizeDataStreamWithSlashes()
     {
         $this->assertSame('data:text/plain,Hello%20World%21', $this->normalizer->normalize(new \SplFileObject('data://text/plain;base64,SGVsbG8gV29ybGQh')));
+    }
+
+    public function testDenormalizeHttpFoundationFileEndingWithSlashes()
+    {
+        $file = $this->normalizer->denormalize('data:application/octet-stream;base64,YWJj////', File::class);
+
+        $this->assertSame("abc\xFF\xFF\xFF", $file->getContent());
+        $this->assertSame("abc\xFF\xFF\xFF", $this->getContent($file->openFile()));
+
+        $file = $this->normalizer->denormalize('data:text/plain,a/b//', File::class);
+
+        $this->assertSame('a/b//', $file->getContent());
+        $this->assertSame('a/b//', $this->getContent($file->openFile()));
+    }
+
+    public function testDenormalizeUndecodableHttpFoundationFileEndingWithSlashes()
+    {
+        $file = $this->normalizer->denormalize('data:text/plain;BASE64,YWJj////', File::class);
+
+        $this->expectException(FileException::class);
+        @$file->getContent();
     }
 
     public function testGiveNotAccessToLocalFiles()

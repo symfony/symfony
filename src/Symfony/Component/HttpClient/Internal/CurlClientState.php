@@ -48,6 +48,7 @@ final class CurlClientState extends ClientState
     public function __construct(
         private int $maxHostConnections,
         private int $maxPendingPushes,
+        private ?int $pipelining = null,
     ) {
         self::$curlVersion ??= curl_version();
         $this->dnsCache = new DnsCache();
@@ -115,9 +116,8 @@ final class CurlClientState extends ClientState
         if ('handle' === $name) {
             $this->handle = curl_multi_init();
 
-            // Don't enable HTTP/1.1 pipelining: it forces responses to be sent in order
             if (\defined('CURLPIPE_MULTIPLEX')) {
-                curl_multi_setopt($this->handle, \CURLMOPT_PIPELINING, \CURLPIPE_MULTIPLEX);
+                curl_multi_setopt($this->handle, \CURLMOPT_PIPELINING, $this->pipelining ?? \CURLPIPE_MULTIPLEX);
             }
             $maxHostConnections = $this->maxHostConnections;
             if (\defined('CURLMOPT_MAX_HOST_CONNECTIONS') && 0 < $maxHostConnections) {

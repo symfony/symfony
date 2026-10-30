@@ -23,8 +23,10 @@ use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Translation\Bridge\Phrase\PhraseProvider;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\ProviderExceptionInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\TranslatorBag;
@@ -242,7 +244,7 @@ class PhraseProviderTest extends TestCase
                 $this->assertArrayHasKey('query', $options);
                 $this->assertSame($query, $options['query']);
 
-                return new MockResponse();
+                return new MockResponse('<?xml version="1.0" encoding="UTF-8"?>');
             },
         ];
 
@@ -261,12 +263,12 @@ class PhraseProviderTest extends TestCase
     {
         $this->getLoader()
             ->method('load')
-            ->willReturnCallback(static fn (string $content, string $locale, string $domain) => new MessageCatalogue($locale, [$domain => ['a' => $content]]));
+            ->willReturnCallback(static fn (string $content, string $locale, string $domain) => new MessageCatalogue($locale, [$domain => ['a' => strip_tags($content)]]));
 
         $responses = [
             'init locales' => $this->getInitLocaleResponseMock(),
-            'download de' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', 'trans_de_a'),
-            'download en-GB' => $this->getDownloadLocaleResponseMock('messages', '13604ec993beefcdaba732812cdb828c', 'trans_en_GB_a'),
+            'download de' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', '<?xml version=\"1.0\" encoding=\"UTF-8\"?>trans_de_a'),
+            'download en-GB' => $this->getDownloadLocaleResponseMock('messages', '13604ec993beefcdaba732812cdb828c', '<?xml version=\"1.0\" encoding=\"UTF-8\"?>trans_en_GB_a'),
         ];
 
         $provider = $this->createProvider(httpClient: $httpClient = (new MockHttpClient($responses))->withOptions([
@@ -289,13 +291,13 @@ class PhraseProviderTest extends TestCase
     {
         $this->getLoader()
             ->method('load')
-            ->willReturnCallback(static fn (string $content, string $locale, string $domain) => new MessageCatalogue($locale, [$domain => ['a' => $content]]));
+            ->willReturnCallback(static fn (string $content, string $locale, string $domain) => new MessageCatalogue($locale, [$domain => ['a' => strip_tags($content)]]));
 
         $responses = [
             'list tags' => $this->getTagsResponseMock(),
             'init locales' => $this->getInitLocaleResponseMock(),
-            'download messages' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', 'trans_de_messages_a'),
-            'download validators' => $this->getDownloadLocaleResponseMock('validators', '5fea6ed5c21767730918a9400e420832', 'trans_de_validators_a'),
+            'download messages' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', '<?xml version=\"1.0\" encoding=\"UTF-8\"?>trans_de_messages_a'),
+            'download validators' => $this->getDownloadLocaleResponseMock('validators', '5fea6ed5c21767730918a9400e420832', '<?xml version=\"1.0\" encoding=\"UTF-8\"?>trans_de_validators_a'),
         ];
 
         $provider = $this->createProvider(httpClient: $httpClient = (new MockHttpClient($responses))->withOptions([
@@ -318,15 +320,15 @@ class PhraseProviderTest extends TestCase
     {
         $this->getLoader()
             ->method('load')
-            ->willReturnCallback(static fn (string $content, string $locale, string $domain) => new MessageCatalogue($locale, [$domain => ['a' => $content]]));
+            ->willReturnCallback(static fn (string $content, string $locale, string $domain) => new MessageCatalogue($locale, [$domain => ['a' => strip_tags($content)]]));
 
         $responses = [
             'init locales' => $this->getInitLocaleResponseMock(),
             'list tags' => $this->getTagsResponseMock(),
-            'download de messages' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', 'trans_de_messages_a'),
-            'download de validators' => $this->getDownloadLocaleResponseMock('validators', '5fea6ed5c21767730918a9400e420832', 'trans_de_validators_a'),
-            'download en-GB messages' => $this->getDownloadLocaleResponseMock('messages', '13604ec993beefcdaba732812cdb828c', 'trans_en_GB_messages_a'),
-            'download en-GB validators' => $this->getDownloadLocaleResponseMock('validators', '13604ec993beefcdaba732812cdb828c', 'trans_en_GB_validators_a'),
+            'download de messages' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', '<?xml version=\"1.0\" encoding=\"UTF-8\"?>trans_de_messages_a'),
+            'download de validators' => $this->getDownloadLocaleResponseMock('validators', '5fea6ed5c21767730918a9400e420832', '<?xml version=\"1.0\" encoding=\"UTF-8\"?>trans_de_validators_a'),
+            'download en-GB messages' => $this->getDownloadLocaleResponseMock('messages', '13604ec993beefcdaba732812cdb828c', '<?xml version=\"1.0\" encoding=\"UTF-8\"?>trans_en_GB_messages_a'),
+            'download en-GB validators' => $this->getDownloadLocaleResponseMock('validators', '13604ec993beefcdaba732812cdb828c', '<?xml version=\"1.0\" encoding=\"UTF-8\"?>trans_en_GB_validators_a'),
         ];
 
         $provider = $this->createProvider(httpClient: $httpClient = (new MockHttpClient($responses))->withOptions([
@@ -345,6 +347,36 @@ class PhraseProviderTest extends TestCase
         $this->assertSame(\count($responses), $httpClient->getRequestsCount());
     }
 
+    public function testReadDoesNotLoadLocalFiles()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_phrase_');
+        file_put_contents($file, (new XliffFileDumper())->formatCatalogue(new MessageCatalogue('de', ['messages' => ['a' => 'local']]), 'messages'));
+
+        $responses = [
+            'init locales' => $this->getInitLocaleResponseMock(),
+            'download locale' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', $file),
+        ];
+
+        $this->loader = new XliffFileLoader();
+
+        $provider = $this->createProvider(httpClient: (new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://api.phrase.com/api/v2/projects/1/',
+            'headers' => [
+                'Authorization' => 'token API_TOKEN',
+                'User-Agent' => 'myProject',
+            ],
+        ]), endpoint: 'api.phrase.com/api/v2');
+
+        $this->expectException(InvalidResourceException::class);
+        $this->expectExceptionMessage('Phrase did not return XLIFF content for locale "de" and domain "messages".');
+
+        try {
+            $provider->read(['messages'], ['de']);
+        } finally {
+            unlink($file);
+        }
+    }
+
     #[DataProvider('cacheKeyProvider')]
     public function testCacheKeyOptionsSort(array $options, string $expectedKey)
     {
@@ -357,7 +389,7 @@ class PhraseProviderTest extends TestCase
             'download locale' => function (string $method): ResponseInterface {
                 $this->assertSame('GET', $method);
 
-                return new MockResponse('', ['http_code' => 200, 'response_headers' => [
+                return new MockResponse('<?xml version="1.0" encoding="UTF-8"?>', ['http_code' => 200, 'response_headers' => [
                     'ETag' => 'W/"625d11cf081b1697cbc216edf6ebb13c"',
                     'Last-Modified' => 'Wed, 28 Dec 2022 13:16:45 GMT',
                 ]]);
@@ -397,7 +429,7 @@ class PhraseProviderTest extends TestCase
                     $this->assertArrayNotHasKey('if-none-match', $options['normalized_headers']);
                 }
 
-                return new MockResponse('', ['http_code' => 200, 'response_headers' => [
+                return new MockResponse('<?xml version="1.0" encoding="UTF-8"?>', ['http_code' => 200, 'response_headers' => [
                     'ETag' => 'W/"625d11cf081b1697cbc216edf6ebb13c"',
                     'Last-Modified' => 'Wed, 28 Dec 2022 13:16:45 GMT',
                 ]]);
@@ -567,7 +599,7 @@ class PhraseProviderTest extends TestCase
                     ],
                 ]);
             },
-            'download locale' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', ''),
+            'download locale' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', '<?xml version="1.0" encoding="UTF-8"?>'),
         ];
 
         $provider = $this->createProvider(httpClient: (new MockHttpClient($responses))->withOptions([
@@ -601,7 +633,7 @@ class PhraseProviderTest extends TestCase
                     'fallback_locale' => null,
                 ], ['http_code' => 201]);
             },
-            'download locale' => $this->getDownloadLocaleResponseMock('messages', 'zWlsCvkeSK0EBgBVmGpZ4cySWbQ0s1Dk4', ''),
+            'download locale' => $this->getDownloadLocaleResponseMock('messages', 'zWlsCvkeSK0EBgBVmGpZ4cySWbQ0s1Dk4', '<?xml version="1.0" encoding="UTF-8"?>'),
         ];
 
         $provider = $this->createProvider(httpClient: (new MockHttpClient($responses))->withOptions([
@@ -628,7 +660,7 @@ class PhraseProviderTest extends TestCase
                     'fallback_locale' => null,
                 ],
             ]),
-            'download locale' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', ''),
+            'download locale' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', '<?xml version="1.0" encoding="UTF-8"?>'),
         ];
 
         $provider = $this->createProvider(httpClient: (new MockHttpClient($responses))->withOptions([
@@ -655,7 +687,7 @@ class PhraseProviderTest extends TestCase
                     'fallback_locale' => null,
                 ],
             ]),
-            'download locale' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', ''),
+            'download locale' => $this->getDownloadLocaleResponseMock('messages', '5fea6ed5c21767730918a9400e420832', '<?xml version="1.0" encoding="UTF-8"?>'),
         ];
 
         $provider = $this->createProvider(httpClient: (new MockHttpClient($responses))->withOptions([
@@ -682,7 +714,7 @@ class PhraseProviderTest extends TestCase
                     'fallback_locale' => null,
                 ],
             ]),
-            'download locale' => $this->getDownloadLocaleResponseMock('messages', '13604ec993beefcdaba732812cdb828c', ''),
+            'download locale' => $this->getDownloadLocaleResponseMock('messages', '13604ec993beefcdaba732812cdb828c', '<?xml version="1.0" encoding="UTF-8"?>'),
         ];
 
         $provider = $this->createProvider(httpClient: (new MockHttpClient($responses))->withOptions([
@@ -724,7 +756,7 @@ class PhraseProviderTest extends TestCase
                 $this->assertStringStartsWith('https://api.phrase.com/api/v2/projects/1/locales/13604ec993beefcdaba732812cdb828c/download?', $url);
                 $this->assertSame('German', $options['query']['fallback_locale_id']);
 
-                return new MockResponse();
+                return new MockResponse('<?xml version="1.0" encoding="UTF-8"?>');
             },
         ];
 

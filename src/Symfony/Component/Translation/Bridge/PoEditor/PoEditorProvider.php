@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Bridge\PoEditor;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\ProviderInterface;
@@ -131,6 +132,10 @@ final class PoEditorProvider implements ProviderInterface
             if (!$responseContent) {
                 $this->logger->error(\sprintf('The exported file "%s" from POEditor is empty.', $fileUrl));
                 continue;
+            }
+
+            if (!str_starts_with($responseContent, '<?xml')) {
+                throw new InvalidResourceException(\sprintf('POEditor did not return XLIFF content for locale "%s" and domain "%s".', $locale, $domain));
             }
 
             $translatorBag->addCatalogue($this->loader->load($responseContent, $locale, $domain));

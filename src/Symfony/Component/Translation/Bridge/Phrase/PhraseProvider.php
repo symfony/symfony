@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\ProviderInterface;
@@ -133,6 +134,11 @@ class PhraseProvider implements ProviderInterface
                 }
 
                 $content = 304 === $statusCode && null !== $cachedResponse ? $cachedResponse['content'] : $response->getContent();
+
+                if (!str_starts_with($content, '<?xml')) {
+                    throw new InvalidResourceException(\sprintf('Phrase did not return XLIFF content for locale "%s" and domain "%s".', $locale, $domain));
+                }
+
                 $translatorBag->addCatalogue($this->loader->load($content, $locale, $domain));
 
                 // using weak etags, responses for requests with fallback locale enabled can not be reliably cached...

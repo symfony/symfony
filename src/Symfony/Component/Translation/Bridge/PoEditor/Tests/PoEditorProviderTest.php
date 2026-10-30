@@ -20,6 +20,8 @@ use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Translation\Bridge\PoEditor\PoEditorHttpClient;
 use Symfony\Component\Translation\Bridge\PoEditor\PoEditorProvider;
+use Symfony\Component\Translation\Dumper\XliffFileDumper;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -326,6 +328,38 @@ class PoEditorProviderTest extends ProviderTestCase
         }
 
         $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
+    }
+
+    public function testReadDoesNotLoadLocalFiles()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_poeditor_');
+        file_put_contents($file, (new XliffFileDumper())->formatCatalogue(new MessageCatalogue('en', ['messages' => ['a' => 'local']]), 'messages'));
+
+        $responses = [
+            self::createSuccessResponse(['languages' => [['code' => 'en']]]),
+            new JsonMockResponse([
+                'response' => [
+                    'status' => 'success',
+                    'code' => '200',
+                    'message' => 'OK',
+                ],
+                'result' => [
+                    'url' => 'https://api.poeditor.com/v2/download/file/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                ],
+            ]),
+            new MockResponse($file),
+        ];
+
+        $provider = self::createProvider(new MockHttpClient($responses, 'https://api.poeditor.com/v2/'), new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.poeditor.com');
+
+        $this->expectException(InvalidResourceException::class);
+        $this->expectExceptionMessage('POEditor did not return XLIFF content for locale "en" and domain "messages".');
+
+        try {
+            $provider->read(['messages'], ['en']);
+        } finally {
+            unlink($file);
+        }
     }
 
     #[DataProvider('getResponsesForManyLocalesAndManyDomains')]

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-10-30T10:00:19Z
+
+Should we also provide such a feature for symfony/console or is it out of scope ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-30T10:05:59Z
+
+FTR, Console already sends OSC 9;4 from `ProgressBar` since #62112, and `QuestionHelper` pauses it while waiting for an answer. OSC 7501 would map well to that. A bar would report working with its percentage, a question would report blocked, and the exit code would give done or failed.
+
+Why does Tui query for support first, BTW? 9;4 is sent blindly, and terminals usually ignore the OSC sequences they don't know. Outside `QuestionHelper`, Console can't read the reply to such a query, so sending blindly would be the only option there.
+
+And the other way around: should Tui also send 9;4? Terminals that only know 9;4 would then show the progress of Tui apps.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2026-10-30T11:37:10Z
+
+> FTR, Console already sends OSC 9;4 from `ProgressBar` since #62112, and `QuestionHelper` pauses it while waiting for an answer. OSC 7501 would map well to that. A bar would report working with its percentage, a question would report blocked, and the exit code would give done or failed.
+>
+> Why does Tui query for support first, BTW? 9;4 is sent blindly, and terminals usually ignore the OSC sequences they don't know. Outside `QuestionHelper`, Console can't read the reply to such a query, so sending blindly would be the only option there.
+>
+> And the other way around: should Tui also send 9;4? Terminals that only know 9;4 would then show the progress of Tui apps.
+
+Done both
+
+---------------------------------------------------------------------------
+
+by fabpot at 2026-10-30T11:40:28Z
+
+Actually, I've removed the OSC 9;4 support as it doesn't make sense after testing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-30T13:52:36Z
+
+I applied the suggestions of my review. Messages and titles are now stripped of escape sequences, so a styled message doesn't show `[31m` anymore. `setProgramStatus()` and `clearProgramStatus()` moved to `TerminalEscapeTrait`, and `toClearEscapeSequence()` isn't internal anymore. I also added tests for the id check on clear and for the title cleanup.
+
+I updated the description too, since it still mentioned the support query.

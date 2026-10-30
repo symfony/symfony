@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -38,6 +39,14 @@ class RequestStackTest extends TestCase
         $this->assertNull($requestStack->getCurrentRequest());
 
         $this->assertNull($requestStack->pop());
+    }
+
+    public function testGetSessionOnEmptyStack()
+    {
+        $requestStack = new RequestStack();
+        $this->expectException(SessionNotFoundException::class);
+
+        $requestStack->getSession();
     }
 
     public function testGetMainRequest()

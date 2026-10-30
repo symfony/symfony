@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Terminal;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Tui\Terminal\ProgramStatus\ProgramStatus;
 
 /**
  * Interface for terminal implementations.
@@ -115,6 +116,16 @@ interface TerminalInterface
      * to produce an audible or visual notification.
      */
     public function bell(): void;
+
+    /**
+     * Report what the program, or one of its tasks, is doing (OSC 7501).
+     */
+    public function setProgramStatus(ProgramStatus $status): void;
+
+    /**
+     * Remove the status of a task and of the tasks beneath it, or every status when no id is given.
+     */
+    public function clearProgramStatus(?string $id = null): void;
 
     /**
      * Whether this is a virtual (non-TTY) terminal.

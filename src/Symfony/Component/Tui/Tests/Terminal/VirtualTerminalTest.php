@@ -16,10 +16,23 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Tui\Event\PasteCompletedEvent;
 use Symfony\Component\Tui\Event\PasteStartedEvent;
+use Symfony\Component\Tui\Terminal\ProgramStatus\ProgramState;
+use Symfony\Component\Tui\Terminal\ProgramStatus\ProgramStatus;
 use Symfony\Component\Tui\Terminal\VirtualTerminal;
 
 class VirtualTerminalTest extends TestCase
 {
+    public function testProgramStatusIsWritten()
+    {
+        $terminal = new VirtualTerminal();
+
+        $terminal->setProgramStatus(new ProgramStatus(ProgramState::Working, app: 'build'));
+        $terminal->clearProgramStatus('test');
+        $terminal->clearProgramStatus();
+
+        $this->assertSame("\x1b]7501;state=working:app=build\x1b\\\x1b]7501;state=clear:id=test\x1b\\\x1b]7501;state=clear\x1b\\", $terminal->getOutput());
+    }
+
     public function testSimulateInputForwardsKeySequences()
     {
         $terminal = new VirtualTerminal();

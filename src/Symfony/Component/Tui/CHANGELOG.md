@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `TerminalInterface::setProgramStatus()` and `TerminalInterface::clearProgramStatus()` to report the status of the program and its tasks with the Program Status Protocol (OSC 7501)
  * Add `Tui::getWidgetRect()` to know where a widget was drawn, so pointer events can be placed
  * Add `CollapsibleWidget` for collapsible detail/summary panels
  * Add `AbstractWidget::off()` to remove listeners registered with `AbstractWidget::on()`

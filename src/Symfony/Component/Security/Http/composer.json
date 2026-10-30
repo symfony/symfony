@@ -26,6 +26,7 @@
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
+        "egulias/email-validator": "^2.1.10|^3|^4",
         "psr/log": "^1|^2|^3",
         "symfony/cache": "^7.4|^8.0",
         "symfony/clock": "^7.4|^8.0",

@@ -54,7 +54,7 @@ class LoginLinkNotificationTest extends TestCase
 
         $message = $notification->asSmsMessage(new Recipient('', '+33612345678'));
 
-        $this->assertSame(\sprintf('Cliquez sur le lien pour confirmer votre connexion. Ce lien expirera dans %s. https://example.com/login/verify', $expiresIn), $message->getSubject());
+        $this->assertSame(\sprintf('Cliquez sur le lien pour vous connecter. Ce lien expirera dans %s. https://example.com/login/verify', $expiresIn), $message->getSubject());
     }
 
     #[TestWith([60, '1 minute'])]
@@ -69,7 +69,7 @@ class LoginLinkNotificationTest extends TestCase
         $email = $notification->asEmailMessage(new Recipient('user@example.com'))->getMessage();
 
         $this->assertSame('Connexion', $email->getSubject());
-        $this->assertSame(\sprintf('Cliquez sur le bouton ci-dessous pour confirmer votre connexion. Ce lien expirera dans %s.', $expiresIn), $email->getContext()['content']);
+        $this->assertSame(\sprintf('Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien expirera dans %s.', $expiresIn), $email->getContext()['content']);
         $this->assertSame('Se connecter', $email->getContext()['action_text']);
         $this->assertSame('https://example.com/login/verify', $email->getContext()['action_url']);
     }
@@ -209,10 +209,10 @@ class LoginLinkNotificationTest extends TestCase
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', [
             'Sign in' => 'Se connecter',
-            'Click on the button below to confirm you want to sign in. This link will expire in %count% minute.|Click on the button below to confirm you want to sign in. This link will expire in %count% minutes.' => 'Cliquez sur le bouton ci-dessous pour confirmer votre connexion. Ce lien expirera dans %count% minute.|Cliquez sur le bouton ci-dessous pour confirmer votre connexion. Ce lien expirera dans %count% minutes.',
-            'Click on the button below to confirm you want to sign in. This link will expire in %count% hour.|Click on the button below to confirm you want to sign in. This link will expire in %count% hours.' => 'Cliquez sur le bouton ci-dessous pour confirmer votre connexion. Ce lien expirera dans %count% heure.|Cliquez sur le bouton ci-dessous pour confirmer votre connexion. Ce lien expirera dans %count% heures.',
-            'Click on the link to confirm you want to sign in. This link will expire in %count% minute.|Click on the link to confirm you want to sign in. This link will expire in %count% minutes.' => 'Cliquez sur le lien pour confirmer votre connexion. Ce lien expirera dans %count% minute.|Cliquez sur le lien pour confirmer votre connexion. Ce lien expirera dans %count% minutes.',
-            'Click on the link to confirm you want to sign in. This link will expire in %count% hour.|Click on the link to confirm you want to sign in. This link will expire in %count% hours.' => 'Cliquez sur le lien pour confirmer votre connexion. Ce lien expirera dans %count% heure.|Cliquez sur le lien pour confirmer votre connexion. Ce lien expirera dans %count% heures.',
+            'Click on the button below to confirm you want to sign in. This link will expire in %count% minute.|Click on the button below to confirm you want to sign in. This link will expire in %count% minutes.' => 'Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien expirera dans %count% minute.|Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien expirera dans %count% minutes.',
+            'Click on the button below to confirm you want to sign in. This link will expire in %count% hour.|Click on the button below to confirm you want to sign in. This link will expire in %count% hours.' => 'Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien expirera dans %count% heure.|Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien expirera dans %count% heures.',
+            'Click on the link to confirm you want to sign in. This link will expire in %count% minute.|Click on the link to confirm you want to sign in. This link will expire in %count% minutes.' => 'Cliquez sur le lien pour vous connecter. Ce lien expirera dans %count% minute.|Cliquez sur le lien pour vous connecter. Ce lien expirera dans %count% minutes.',
+            'Click on the link to confirm you want to sign in. This link will expire in %count% hour.|Click on the link to confirm you want to sign in. This link will expire in %count% hours.' => 'Cliquez sur le lien pour vous connecter. Ce lien expirera dans %count% heure.|Cliquez sur le lien pour vous connecter. Ce lien expirera dans %count% heures.',
         ], 'fr', 'security');
 
         return $translator;

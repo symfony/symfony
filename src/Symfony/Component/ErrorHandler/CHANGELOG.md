@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `ErrorHandler::logDeprecationsOnce()` to log each deprecation message only once
+
 8.2
 ---
 

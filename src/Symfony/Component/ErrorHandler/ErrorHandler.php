@@ -90,6 +90,7 @@ class ErrorHandler
     private int $tracedErrors = 0x77FB; // E_ALL - E_STRICT - E_PARSE
     private int $screamedErrors = 0x55; // E_ERROR + E_CORE_ERROR + E_COMPILE_ERROR + E_PARSE
     private int $loggedErrors = 0;
+    private array $installedLoggers = [];
     private \Closure $configureException;
 
     private bool $isRecursive = false;
@@ -155,7 +156,7 @@ class ErrorHandler
             $handler->setExceptionHandler($prev ?? [$handler, 'renderException']);
         }
 
-        $handler->throwAt(\E_ALL & $handler->thrownErrors, true);
+        $handler->doThrowAt(\E_ALL & $handler->thrownErrors, true);
 
         return $handler;
     }
@@ -192,7 +193,7 @@ class ErrorHandler
     ) {
         if ($bootstrappingLogger) {
             $this->bootstrappingLogger = $bootstrappingLogger;
-            $this->setDefaultLogger($bootstrappingLogger);
+            $this->doSetDefaultLogger($bootstrappingLogger);
         }
         $traceReflector = new \ReflectionProperty(\Exception::class, 'trace');
         $this->configureException = \Closure::bind(static function ($e, $trace, $file = null, $line = null) use ($traceReflector) {
@@ -204,33 +205,87 @@ class ErrorHandler
     }
 
     /**
+     * Configures logging, diagnostic collection and PHP error conversion.
+     *
+     * Diagnostic collection is configured only when a logger is provided.
+     * Previously enabled silenced-error collection is preserved in 8.x.
+     *
+     * @param array|int|null $levels An array map of E_* to LogLevel::* or an integer bit field of E_* constants
+     */
+    public function configure(?LoggerInterface $logger = null, ?LoggerInterface $deprecationLogger = null, bool $debug = false, ?bool $throwErrors = null, array|int|null $levels = \E_ALL): void
+    {
+        if ($logger || $deprecationLogger) {
+            $releasedLoggers = [];
+            foreach ($this->loggers as $type => [$previousLogger]) {
+                if (null !== $previousLogger && $previousLogger !== $this->bootstrappingLogger && $previousLogger === ($this->installedLoggers[$type] ?? null)) {
+                    $releasedLoggers[$type] = [null];
+                }
+            }
+            if ($releasedLoggers) {
+                $this->doSetLoggers($releasedLoggers);
+            }
+
+            $levels ??= \E_ALL;
+            if (\is_array($levels)) {
+                $deprecatedLevels = [];
+                $otherLevels = [];
+                $loggedLevels = 0;
+                foreach ($levels as $type => $logLevel) {
+                    $loggedLevels |= $type;
+                    if (\E_DEPRECATED == $type || \E_USER_DEPRECATED == $type) {
+                        $deprecatedLevels[$type] = $logLevel;
+                    } else {
+                        $otherLevels[$type] = $logLevel;
+                    }
+                }
+            } else {
+                $deprecatedLevels = $levels & (\E_DEPRECATED | \E_USER_DEPRECATED);
+                $otherLevels = $levels & ~\E_DEPRECATED & ~\E_USER_DEPRECATED;
+                $loggedLevels = $levels;
+            }
+
+            if ($deprecationLogger && $deprecatedLevels) {
+                $this->doSetDefaultLogger($deprecationLogger, $deprecatedLevels);
+                $levels = $otherLevels;
+            }
+            if ($logger && $levels) {
+                $this->doSetDefaultLogger($logger, $levels);
+            }
+
+            $this->installedLoggers = [];
+            foreach ($this->loggers as $type => [$installedLogger]) {
+                if ($installedLogger instanceof LoggerInterface && ($installedLogger === $logger || $installedLogger === $deprecationLogger)) {
+                    $this->installedLoggers[$type] = $installedLogger;
+                }
+            }
+
+            if ($debug) {
+                $this->screamedErrors |= $loggedLevels;
+                $this->scopedErrors |= $loggedLevels & ~\E_USER_DEPRECATED & ~\E_DEPRECATED;
+            } else {
+                $this->scopedErrors = 0;
+            }
+        }
+
+        if (null !== $throwErrors) {
+            $this->doThrowAt($throwErrors ? \E_ALL : 0, true);
+        }
+    }
+
+    /**
      * Sets a logger to non assigned errors levels.
      *
      * @param LoggerInterface $logger  A PSR-3 logger to put as default for the given levels
      * @param array|int|null  $levels  An array map of E_* to LogLevel::* or an integer bit field of E_* constants
      * @param bool            $replace Whether to replace or not any existing logger
+     *
+     * @deprecated since Symfony 8.3, use configure() instead
      */
     public function setDefaultLogger(LoggerInterface $logger, array|int|null $levels = \E_ALL, bool $replace = false): void
     {
-        $loggers = [];
+        $this->doSetDefaultLogger($logger, $levels, $replace);
 
-        if (\is_array($levels)) {
-            foreach ($levels as $type => $logLevel) {
-                if (empty($this->loggers[$type][0]) || $replace || $this->loggers[$type][0] === $this->bootstrappingLogger) {
-                    $loggers[$type] = [$logger, $logLevel];
-                }
-            }
-        } else {
-            $levels ??= \E_ALL;
-            foreach ($this->loggers as $type => $log) {
-                if (($type & $levels) && (empty($log[0]) || $replace || $log[0] === $this->bootstrappingLogger)) {
-                    $log[0] = $logger;
-                    $loggers[$type] = $log;
-                }
-            }
-        }
-
-        $this->setLoggers($loggers);
+        trigger_deprecation('symfony/error-handler', '8.3', 'Method "%s::setDefaultLogger()" is deprecated, use "configure()" instead.', self::class);
     }
 
     /**
@@ -239,55 +294,36 @@ class ErrorHandler
      * @param array $loggers Error levels to [LoggerInterface|null, LogLevel::*] map
      *
      * @throws \InvalidArgumentException
+     *
+     * @deprecated since Symfony 8.3, use configure() instead
      */
     public function setLoggers(array $loggers): array
     {
-        $prevLogged = $this->loggedErrors;
-        $prev = $this->loggers;
-        $flush = [];
+        $prev = $this->doSetLoggers($loggers);
 
-        foreach ($loggers as $type => $log) {
-            if (!isset($prev[$type])) {
-                throw new \InvalidArgumentException('Unknown error type: '.$type);
-            }
-            if (!\is_array($log)) {
-                $log = [$log];
-            } elseif (!\array_key_exists(0, $log)) {
-                throw new \InvalidArgumentException('No logger provided.');
-            }
-            if (null === $log[0]) {
-                $this->loggedErrors &= ~$type;
-            } elseif ($log[0] instanceof LoggerInterface) {
-                $this->loggedErrors |= $type;
-            } else {
-                throw new \InvalidArgumentException('Invalid logger provided.');
-            }
-            $this->loggers[$type] = $log + $prev[$type];
-
-            if ($this->bootstrappingLogger && $prev[$type][0] === $this->bootstrappingLogger) {
-                $flush[$type] = $type;
-            }
-        }
-        $this->reRegister($prevLogged | $this->thrownErrors);
-
-        if ($flush) {
-            foreach ($this->bootstrappingLogger->cleanLogs() as $log) {
-                $type = ThrowableUtils::getSeverity($log[2]['exception']);
-                if (!isset($flush[$type])) {
-                    $this->bootstrappingLogger->log($log[0], $log[1], $log[2]);
-                } elseif ($this->loggers[$type][0]) {
-                    $this->loggers[$type][0]->log($this->loggers[$type][1], $log[1], $log[2]);
-                }
-            }
-        }
+        trigger_deprecation('symfony/error-handler', '8.3', 'Method "%s::setLoggers()" is deprecated, use "configure()" instead.', self::class);
 
         return $prev;
     }
 
-    public function setExceptionHandler(?callable $handler): ?callable
+    /**
+     * @param bool $log Whether to keep the current loggers for errors handled by the exception callback
+     */
+    public function setExceptionHandler(?callable $handler, bool $log = true): ?callable
     {
         $prev = $this->exceptionHandler;
         $this->exceptionHandler = $handler;
+
+        if (!$log) {
+            $handledErrors = $this->thrownErrors | \E_ERROR | \E_CORE_ERROR | \E_COMPILE_ERROR | \E_USER_ERROR | \E_RECOVERABLE_ERROR | \E_PARSE;
+            $loggers = [];
+            foreach ($this->loggers as $type => $logger) {
+                if ($type & $handledErrors) {
+                    $loggers[$type] = [null, $logger[1]];
+                }
+            }
+            $this->doSetLoggers($loggers);
+        }
 
         return $prev;
     }
@@ -297,17 +333,14 @@ class ErrorHandler
      *
      * @param int  $levels  A bit field of E_* constants for thrown errors
      * @param bool $replace Replace or amend the previous value
+     *
+     * @deprecated since Symfony 8.3, use configure() instead
      */
     public function throwAt(int $levels, bool $replace = false): int
     {
-        $prev = $this->thrownErrors;
-        $this->thrownErrors = ($levels | \E_RECOVERABLE_ERROR | \E_USER_ERROR) & ~\E_USER_DEPRECATED & ~\E_DEPRECATED;
-        if (!$replace) {
-            $this->thrownErrors |= $prev;
-        }
-        $this->reRegister($prev | $this->loggedErrors);
+        trigger_deprecation('symfony/error-handler', '8.3', 'Method "%s::throwAt()" is deprecated, use "configure()" instead.', self::class);
 
-        return $prev;
+        return $this->doThrowAt($levels, $replace);
     }
 
     /**
@@ -315,9 +348,13 @@ class ErrorHandler
      *
      * @param int  $levels  A bit field of E_* constants for scoped errors
      * @param bool $replace Replace or amend the previous value
+     *
+     * @deprecated since Symfony 8.3, use configure() instead
      */
     public function scopeAt(int $levels, bool $replace = false): int
     {
+        trigger_deprecation('symfony/error-handler', '8.3', 'Method "%s::scopeAt()" is deprecated, use "configure()" instead.', self::class);
+
         $prev = $this->scopedErrors;
         $this->scopedErrors = $levels;
         if (!$replace) {
@@ -332,9 +369,13 @@ class ErrorHandler
      *
      * @param int  $levels  A bit field of E_* constants for traced errors
      * @param bool $replace Replace or amend the previous value
+     *
+     * @deprecated since Symfony 8.3, use configure() instead
      */
     public function traceAt(int $levels, bool $replace = false): int
     {
+        trigger_deprecation('symfony/error-handler', '8.3', 'Method "%s::traceAt()" is deprecated, use "configure()" instead.', self::class);
+
         $prev = $this->tracedErrors;
         $this->tracedErrors = $levels;
         if (!$replace) {
@@ -349,9 +390,13 @@ class ErrorHandler
      *
      * @param int  $levels  A bit field of E_* constants for screamed errors
      * @param bool $replace Replace or amend the previous value
+     *
+     * @deprecated since Symfony 8.3, use configure() instead
      */
     public function screamAt(int $levels, bool $replace = false): int
     {
+        trigger_deprecation('symfony/error-handler', '8.3', 'Method "%s::screamAt()" is deprecated, use "configure()" instead.', self::class);
+
         $prev = $this->screamedErrors;
         $this->screamedErrors = $levels;
         if (!$replace) {
@@ -628,7 +673,7 @@ class ErrorHandler
 
         if ($error && $error['type'] &= \E_PARSE | \E_ERROR | \E_CORE_ERROR | \E_COMPILE_ERROR) {
             // Let's not throw anymore but keep logging
-            $handler->throwAt(0, true);
+            $handler->doThrowAt(0, true);
             // "trace" is set by PHP >= 8.5 when fatal_error_backtraces is enabled
             $trace = $error['trace'] ?? null;
 
@@ -758,5 +803,84 @@ class ErrorHandler
     private function parseAnonymousClass(string $message): string
     {
         return preg_replace_callback('/[a-zA-Z_\x7f-\xff][\\\\a-zA-Z0-9_\x7f-\xff]*+@anonymous\x00.*?\.php(?:0x?|:[0-9]++\$)?[0-9a-fA-F]++/', static fn ($m) => class_exists($m[0], false) ? (get_parent_class($m[0]) ?: key(class_implements($m[0])) ?: 'class').'@anonymous' : $m[0], $message);
+    }
+
+    private function doSetDefaultLogger(LoggerInterface $logger, array|int|null $levels = \E_ALL, bool $replace = false): void
+    {
+        $loggers = [];
+
+        if (\is_array($levels)) {
+            foreach ($levels as $type => $logLevel) {
+                if (empty($this->loggers[$type][0]) || $replace || $this->loggers[$type][0] === $this->bootstrappingLogger) {
+                    $loggers[$type] = [$logger, $logLevel];
+                }
+            }
+        } else {
+            $levels ??= \E_ALL;
+            foreach ($this->loggers as $type => $log) {
+                if (($type & $levels) && (empty($log[0]) || $replace || $log[0] === $this->bootstrappingLogger)) {
+                    $log[0] = $logger;
+                    $loggers[$type] = $log;
+                }
+            }
+        }
+
+        $this->doSetLoggers($loggers);
+    }
+
+    private function doSetLoggers(array $loggers): array
+    {
+        $prevLogged = $this->loggedErrors;
+        $prev = $this->loggers;
+        $flush = [];
+
+        foreach ($loggers as $type => $log) {
+            if (!isset($prev[$type])) {
+                throw new \InvalidArgumentException('Unknown error type: '.$type);
+            }
+            if (!\is_array($log)) {
+                $log = [$log];
+            } elseif (!\array_key_exists(0, $log)) {
+                throw new \InvalidArgumentException('No logger provided.');
+            }
+            if (null === $log[0]) {
+                $this->loggedErrors &= ~$type;
+            } elseif ($log[0] instanceof LoggerInterface) {
+                $this->loggedErrors |= $type;
+            } else {
+                throw new \InvalidArgumentException('Invalid logger provided.');
+            }
+            $this->loggers[$type] = $log + $prev[$type];
+
+            if ($this->bootstrappingLogger && $prev[$type][0] === $this->bootstrappingLogger) {
+                $flush[$type] = $type;
+            }
+        }
+        $this->reRegister($prevLogged | $this->thrownErrors);
+
+        if ($flush) {
+            foreach ($this->bootstrappingLogger->cleanLogs() as $log) {
+                $type = ThrowableUtils::getSeverity($log[2]['exception']);
+                if (!isset($flush[$type])) {
+                    $this->bootstrappingLogger->log($log[0], $log[1], $log[2]);
+                } elseif ($this->loggers[$type][0]) {
+                    $this->loggers[$type][0]->log($this->loggers[$type][1], $log[1], $log[2]);
+                }
+            }
+        }
+
+        return $prev;
+    }
+
+    private function doThrowAt(int $levels, bool $replace = false): int
+    {
+        $prev = $this->thrownErrors;
+        $this->thrownErrors = ($levels | \E_RECOVERABLE_ERROR | \E_USER_ERROR) & ~\E_USER_DEPRECATED & ~\E_DEPRECATED;
+        if (!$replace) {
+            $this->thrownErrors |= $prev;
+        }
+        $this->reRegister($prev | $this->loggedErrors);
+
+        return $prev;
     }
 }

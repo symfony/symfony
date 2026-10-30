@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-29T21:41:27Z
+
+Is the `transient-on-windows` group still needed now that Amp doesn't sleep anymore? It could hide a failure that remains.
+
+---------------------------------------------------------------------------
+
+by clement-ferrier-hcse at 2026-10-29T22:35:20Z
+
+> Is the `transient-on-windows` group still needed now that Amp doesn't sleep anymore? It could hide a failure that remains.
+
+You're right. I misunderstood the feedback from Claude: it told me that both approaches had been used elsewhere. I missed the fact that it was as alternatives, not together...
+Either the tests get the `transient-on-windows` group (#66077, #66610), or the cause is fixed and they keep running on Windows (#66620).
+Since this PR fixes the cause, I removed the group that was overzealously added.
+
+_Edit: i also updated the PR description to remove the outdated reference to PR #66077_

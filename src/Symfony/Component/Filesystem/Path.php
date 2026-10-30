@@ -219,9 +219,9 @@ final class Path
         }
 
         // Maintain scheme
-        if (false !== $schemeSeparatorPosition = strpos($path, '://')) {
-            $scheme = substr($path, 0, $schemeSeparatorPosition + 3);
-            $path = substr($path, $schemeSeparatorPosition + 3);
+        if (preg_match('{^[a-zA-Z0-9+.-]{2,}://}', $path, $m)) {
+            $scheme = $m[0];
+            $path = substr($path, \strlen($scheme));
         } else {
             $scheme = '';
         }
@@ -368,8 +368,8 @@ final class Path
         }
 
         // Strip scheme
-        if (false !== ($schemeSeparatorPosition = strpos($path, '://')) && 1 !== $schemeSeparatorPosition) {
-            $path = substr($path, $schemeSeparatorPosition + 3);
+        if (preg_match('{^[a-zA-Z0-9+.-]{2,}://}', $path, $m)) {
+            $path = substr($path, \strlen($m[0]));
         }
 
         $firstCharacter = $path[0];
@@ -451,9 +451,9 @@ final class Path
             return self::canonicalize($path);
         }
 
-        if (false !== $schemeSeparatorPosition = strpos($basePath, '://')) {
-            $scheme = substr($basePath, 0, $schemeSeparatorPosition + 3);
-            $basePath = substr($basePath, $schemeSeparatorPosition + 3);
+        if (preg_match('{^[a-zA-Z0-9+.-]{2,}://}', $basePath, $m)) {
+            $scheme = $m[0];
+            $basePath = substr($basePath, \strlen($scheme));
         } else {
             $scheme = '';
         }
@@ -574,7 +574,7 @@ final class Path
      */
     public static function isLocal(string $path): bool
     {
-        return '' !== $path && false === strpos($path, '://');
+        return '' !== $path && !preg_match('{^[a-zA-Z0-9+.-]{2,}://}', $path);
     }
 
     /**
@@ -776,9 +776,9 @@ final class Path
         }
 
         // Remember scheme as part of the root, if any
-        if (false !== $schemeSeparatorPosition = strpos($path, '://')) {
-            $root = substr($path, 0, $schemeSeparatorPosition + 3);
-            $path = substr($path, $schemeSeparatorPosition + 3);
+        if (preg_match('{^[a-zA-Z0-9+.-]{2,}://}', $path, $m)) {
+            $root = $m[0];
+            $path = substr($path, \strlen($root));
         } else {
             $root = '';
         }

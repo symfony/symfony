@@ -34,6 +34,37 @@ class BatchHandlerTest extends TestCase
 
         $handler(new \stdClass());
     }
+
+    public function testSynchronousProcessFailureIsRethrown()
+    {
+        $handler = new BatchHandlerTestHandler(null, new \RuntimeException('process failed'));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('process failed');
+
+        $handler(new \stdClass());
+    }
+
+    public function testProcessFailureNacksTheJobsLeftInTheBatch()
+    {
+        $handler = new BatchHandlerTestHandler(null, new \RuntimeException('process failed'), 1);
+        $results = [];
+
+        foreach (['first', 'second'] as $job) {
+            $handler(new \stdClass(), new Acknowledger('handler', static function (?\Throwable $e, $result) use (&$results, $job) {
+                $results[$job] = $e ? $e->getMessage() : $result;
+            }));
+        }
+
+        $error = null;
+        try {
+            $handler->flush(true);
+        } catch (\RuntimeException $error) {
+        }
+
+        $this->assertSame('process failed', $error?->getMessage());
+        $this->assertSame(['first' => 'the result', 'second' => 'process failed'], $results);
+    }
 }
 
 class BatchHandlerTestHandler implements BatchHandlerInterface
@@ -42,6 +73,8 @@ class BatchHandlerTestHandler implements BatchHandlerInterface
 
     public function __construct(
         private ?\Throwable $error = null,
+        private ?\Throwable $processError = null,
+        private int $acksBeforeProcessError = 0,
     ) {
     }
 
@@ -52,7 +85,11 @@ class BatchHandlerTestHandler implements BatchHandlerInterface
 
     private function process(array $jobs): void
     {
-        foreach ($jobs as [, $ack]) {
+        foreach ($jobs as $i => [, $ack]) {
+            if ($this->processError && $i === $this->acksBeforeProcessError) {
+                throw $this->processError;
+            }
+
             if ($this->error) {
                 $ack->nack($this->error);
             } else {

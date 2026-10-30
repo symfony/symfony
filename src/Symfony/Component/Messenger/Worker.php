@@ -178,10 +178,12 @@ class Worker
             }
         };
 
+        $heldAcks = \count($this->acks);
         try {
             $e = null;
             $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName), new ConsumedByWorkerStamp(), new AckStamp($ack)));
         } catch (\Throwable $e) {
+            $this->failHeldAcks($heldAcks);
         }
 
         if ($e instanceof HandlerFailedException && $e->getEnvelope()->last(NoAutoAckStamp::class)) {
@@ -321,11 +323,25 @@ class Worker
 
         foreach ($unacks as $handler) {
             [$envelope, $transportName] = $unacks[$handler];
+            $heldAcks = \count($this->acks);
             try {
                 $this->bus->dispatch($envelope->with(new FlushBatchHandlersStamp($force)));
             } catch (\Throwable $e) {
-                $envelope = $envelope->withoutAll(NoAutoAckStamp::class);
-                $this->acks[] = [$transportName, $envelope, $e];
+                $this->failHeldAcks($heldAcks);
+
+                // when the batch acked or nacked the message during the failed flush, the message already has its failure
+                if (!array_filter(\array_slice($this->acks, $heldAcks), static fn (array $ack) => $ack[1]->getMessage() === $envelope->getMessage())) {
+                    $envelope = $envelope->withoutAll(NoAutoAckStamp::class);
+
+                    if ($e instanceof HandlerFailedException) {
+                        // a retry must run the batch handlers whose flush failed
+                        $failed = $e->getWrappedExceptions();
+                        $envelope = $envelope->withoutAll(HandledStamp::class)->with(...array_filter($envelope->all(HandledStamp::class), static fn (HandledStamp $stamp) => !isset($failed[$stamp->getHandlerName()])));
+                        $e = new HandlerFailedException($envelope, $failed);
+                    }
+
+                    $this->acks[] = [$transportName, $envelope, $e];
+                }
             }
         }
 
@@ -345,6 +361,27 @@ class Worker
     }
 
     /**
+     * Turns the acks that messages sent during a failed dispatch into failures.
+     *
+     * Their batch was flushed during that dispatch, so what the batch did for them may have been undone.
+     * The acks held from $offset on are the ones sent during that dispatch.
+     */
+    private function failHeldAcks(int $offset): void
+    {
+        foreach (\array_slice($this->acks, $offset, null, true) as $i => [$transportName, $envelope, $e]) {
+            if (null !== $e || !$stamp = $envelope->last(HandledStamp::class)) {
+                continue;
+            }
+
+            $stamps = $envelope->all(HandledStamp::class);
+            array_pop($stamps);
+            $envelope = $envelope->withoutAll(HandledStamp::class)->with(...$stamps);
+            $e = new RuntimeException(\sprintf('The batch of "%s" was flushed during the dispatch of another message, and that dispatch failed.', $stamp->getHandlerName()));
+            $this->acks[$i] = [$transportName, $envelope, new HandlerFailedException($envelope, [$stamp->getHandlerName() => $e])];
+        }
+    }
+
+    /**
      * Flushes the batch handlers that still have a failed message in their batch, in a dispatch of their own.
      *
      * Their work for other messages then doesn't depend on the failed dispatch, and their outcome joins the failure.
@@ -354,9 +391,13 @@ class Worker
         $envelope = $e->getEnvelope();
         $exceptions = $e->getWrappedExceptions();
 
+        $heldAcks = \count($this->acks);
         try {
             $this->bus->dispatch($envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(true)));
         } catch (\Throwable $flushError) {
+            // the failed flush may have undone what the batch did, so a retry runs it again
+            $this->failHeldAcks($heldAcks);
+            $acks = [];
             $exceptions += $flushError instanceof HandlerFailedException ? $flushError->getWrappedExceptions() : [$flushError];
         }
 

@@ -61,8 +61,10 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
         $exceptions = [];
         $alreadyHandled = false;
+        $handledStamps = [];
         foreach ($this->handlersLocator->getHandlers($envelope) as $handlerDescriptor) {
-            if ($this->messageHasAlreadyBeenHandled($envelope, $handlerDescriptor)) {
+            // a flush dispatch never runs handlers, since the envelope of a failed message can miss the stamps of the handlers that succeeded
+            if ($envelope->last(FlushBatchHandlersStamp::class) || $this->messageHasAlreadyBeenHandled($envelope, $handlerDescriptor)) {
                 $alreadyHandled = true;
                 continue;
             }
@@ -88,9 +90,13 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
                 if ($batchHandler && $ackStamp = $envelope->last(AckStamp::class)) {
                     $dispatcher = $this->dispatcher;
-                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (?\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor, $dispatcher) {
+                    $handledBefore = \count($handledStamps);
+                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (?\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor, $dispatcher, &$handledStamps, $handledBefore) {
                         if (null !== $e) {
                             $dispatcher?->dispatch(new HandlerFailureEvent($envelope, $handlerDescriptor, $e));
+                            // a retry must skip the handlers that succeeded after this batch handler
+                            // a nack sent during the dispatch must not wait for them, since outer middlewares may undo their work
+                            $envelope = $envelope->with(...\array_slice($handledStamps, $handledBefore));
                             $e = new HandlerFailedException($envelope, [$handlerDescriptor->getName() => $e]);
                         } else {
                             $envelope = $envelope->with(HandledStamp::fromDescriptor($handlerDescriptor, $result));
@@ -120,6 +126,9 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
                 $handledStamp = HandledStamp::fromDescriptor($handlerDescriptor, $result);
                 $envelope = $envelope->with($handledStamp);
+                if (!$ackPending) {
+                    $handledStamps[] = $handledStamp;
+                }
                 $this->logger?->info('Message {class} handled by {handler}', $context + ['handler' => $handledStamp->getHandlerName()]);
             } catch (\Throwable $e) {
                 $exceptions[$handlerDescriptor->getName()] = $e;

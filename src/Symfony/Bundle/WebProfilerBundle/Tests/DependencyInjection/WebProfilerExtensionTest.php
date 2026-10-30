@@ -99,6 +99,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->removeDefinition('web_profiler.controller.exception');
 
         $this->assertFalse($this->container->has('web_profiler.debug_toolbar'));
+        $this->assertSame([['method' => 'reset']], $this->container->getDefinition('twig.extension.webprofiler')->getTag('kernel.reset'));
 
         self::assertSaneContainer($this->getCompiledContainer());
     }

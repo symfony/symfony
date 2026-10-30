@@ -282,7 +282,7 @@ class Table
      */
     public function setRow(int|string $column, array $row): static
     {
-        $this->rows[$column] = $row;
+        $this->rows[$column] = array_values($row);
 
         return $this;
     }
@@ -713,13 +713,15 @@ class Table
             $rows = $this->fillNextRows($rows, $rowKey);
 
             // Remove any new line breaks and replace it with a new line
+            $firstColumn = $colspan = 0;
             foreach ($rows[$rowKey] as $column => $cell) {
+                $firstColumn += $colspan;
                 $colspan = $cell instanceof TableCell ? $cell->getColspan() : 1;
 
                 $minWrappedWidth = 0;
                 $widthApplied = [];
                 $lengthColumnBorder = $this->getColumnSeparatorWidth() + Helper::width($this->style->getCellRowContentFormat()) - 2;
-                for ($i = $column; $i < ($column + $colspan); ++$i) {
+                for ($i = $firstColumn; $i < ($firstColumn + $colspan); ++$i) {
                     if (isset($this->columnMaxWidths[$i])) {
                         $minWrappedWidth += $this->columnMaxWidths[$i];
                         $widthApplied[] = ['type' => 'max', 'column' => $i];
@@ -757,7 +759,7 @@ class Table
                             $cellWidth -= $this->configuredColumnWidths[$item['column']] + $lengthColumnBorder;
                         }
                     }
-                    for ($i = $column; $i < ($column + $colspan); ++$i) {
+                    for ($i = $firstColumn; $i < ($firstColumn + $colspan); ++$i) {
                         if (isset($columnsMinWidthProcessed[$i])) {
                             continue;
                         }
@@ -817,49 +819,44 @@ class Table
     {
         $this->rowspanLines ??= new \WeakMap();
         $unmergedRows = [];
-        foreach ($rows[$line] as $column => $cell) {
+        $column = 0;
+        foreach ($rows[$line] as $cellKey => $cell) {
             if (null !== $cell && !$cell instanceof TableCell && !\is_scalar($cell) && !$cell instanceof \Stringable) {
                 throw new InvalidArgumentException(\sprintf('A cell must be a TableCell, a scalar or an object implementing "__toString()", "%s" given.', get_debug_type($cell)));
             }
             if ($cell instanceof TableCell && $cell->getRowspan() > 1) {
                 $nbLines = $cell->getRowspan() - 1;
-                $lines = [$cell];
+                $value = '';
                 if (str_contains($cell, "\n")) {
                     $eol = str_contains($cell, "\r\n") ? "\r\n" : "\n";
                     $lines = explode($eol, $this->closeStyles($cell, $eol));
                     $nbLines = \count($lines) > $nbLines ? substr_count($cell, $eol) : $nbLines;
 
-                    $rows[$line][$column] = new TableCell($lines[0], ['colspan' => $cell->getColspan(), 'style' => $cell->getStyle()]);
-                    $this->rowspanLines[$rows[$line][$column]] = true;
+                    $rows[$line][$cellKey] = new TableCell($lines[0], ['colspan' => $cell->getColspan(), 'style' => $cell->getStyle()]);
+                    $this->rowspanLines[$rows[$line][$cellKey]] = true;
                     unset($lines[0]);
+                    $value = implode($eol, $lines);
                 }
 
-                // create a two dimensional array (rowspan x colspan)
-                $unmergedRows = array_replace_recursive(array_fill($line + 1, $nbLines, []), $unmergedRows);
-                foreach ($unmergedRows as $unmergedRowKey => $unmergedRow) {
-                    $value = $lines[$unmergedRowKey - $line] ?? '';
-                    $unmergedRows[$unmergedRowKey][$column] = new TableCell($value, ['colspan' => $cell->getColspan(), 'style' => $cell->getStyle()]);
-                    $this->rowspanLines[$unmergedRows[$unmergedRowKey][$column]] = true;
-                    if ($nbLines === $unmergedRowKey - $line) {
-                        break;
-                    }
-                }
+                // only fill the next row, the rows below are filled from that row after its own cells that span rows
+                $unmergedRows[$line + 1][$column] = new TableCell($value, ['rowspan' => $nbLines, 'colspan' => $cell->getColspan(), 'style' => $cell->getStyle()]);
+                $this->rowspanLines[$unmergedRows[$line + 1][$column]] = true;
             }
+
+            $column += $cell instanceof TableCell ? $cell->getColspan() : 1;
         }
 
         foreach ($unmergedRows as $unmergedRowKey => $unmergedRow) {
             // we need to know if $unmergedRow will be merged or inserted into $rows
             if (isset($rows[$unmergedRowKey]) && \is_array($rows[$unmergedRowKey]) && ($this->getNumberOfColumns($rows[$unmergedRowKey]) + $this->getNumberOfColumns($unmergedRow) <= $this->numberOfColumns)) {
-                foreach ($unmergedRow as $cellKey => $cell) {
-                    // insert cell into row at cellKey position
-                    array_splice($rows[$unmergedRowKey], $cellKey, 0, [$cell]);
+                foreach ($unmergedRow as $column => $cell) {
+                    // insert cell into row at column position
+                    array_splice($rows[$unmergedRowKey], $this->getCellPosition($rows[$unmergedRowKey], $column), 0, [$cell]);
                 }
             } else {
                 $row = $this->copyRow($rows, $unmergedRowKey - 1);
                 foreach ($unmergedRow as $column => $cell) {
-                    if ($cell) {
-                        $row[$column] = $cell;
-                    }
+                    array_splice($row, $this->getCellPosition($row, $column), 1, [$cell]);
                 }
                 array_splice($rows, $unmergedRowKey, 0, [$row]);
             }
@@ -987,6 +984,23 @@ class Table
         }
 
         return $columns;
+    }
+
+    /**
+     * Gets the position in the given row of the cell that starts at the given column.
+     */
+    private function getCellPosition(array $row, int $column): int
+    {
+        $position = 0;
+        foreach ($row as $cell) {
+            if ($column <= 0) {
+                break;
+            }
+            $column -= $cell instanceof TableCell ? $cell->getColspan() : 1;
+            ++$position;
+        }
+
+        return $position;
     }
 
     /**

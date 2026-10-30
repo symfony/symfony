@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Contracts\Service\ContainerProviderInterface;
 
@@ -108,6 +109,7 @@ final class BatchHandlingMiddleware implements MiddlewareInterface
     {
         $this->middleware = new HandleMessageMiddleware(new HandlersLocator([
             DummyMessage::class => [new HandlerDescriptor(new BatchSizeReportingHandler())],
+            ChildDummyMessage::class => [new HandlerDescriptor(new BatchSizeReportingHandler(), ['alias' => 'second'])],
         ]));
     }
 

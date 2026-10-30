@@ -15,6 +15,8 @@ use Amp\Cancellation;
 use Amp\Parallel\Worker\Task;
 use Amp\Sync\Channel;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Execution\Message\DeferredEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\DispatchEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\FlushBatchHandlersMessage;
@@ -50,10 +52,11 @@ final class DispatchTask implements Task
         [$bus, $container] = $this->bootstrap();
         $count = 0;
         $unacks = new DeferredBatchMessageQueue();
+        $heldAcks = null;
 
         while ($message = $channel->receive($cancellation)) {
             if ($message instanceof FlushBatchHandlersMessage) {
-                $this->flush($bus, $channel, $message->force, $unacks);
+                $this->flush($bus, $channel, $message->force, $unacks, $heldAcks);
 
                 continue;
             }
@@ -66,15 +69,35 @@ final class DispatchTask implements Task
 
             $requestId = $message->requestId;
             $acked = false;
-            $ack = static function (Envelope $handledEnvelope, ?\Throwable $handledError = null) use (&$acked, $requestId, $channel): void {
-                $acked = true;
+            $acks = [];
+            $dispatching = true;
+            $batch = null;
+            $combine = static function (array $acks) use (&$batch, &$acked): ?array {
+                if ($ack = DeferredBatchMessageQueue::combineAcks($batch, $acks)) {
+                    $acked = true;
+                }
 
+                return $ack;
+            };
+            $ack = static function (Envelope $handledEnvelope, ?\Throwable $handledError = null) use (&$acks, &$dispatching, &$heldAcks, $requestId, $channel, $combine): void {
                 if (null !== $handledError) {
                     $handledEnvelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($handledEnvelope);
                     $handledError = ParallelExecutionFailureSanitizer::sanitizeError($handledError, $handledEnvelope);
                 }
 
-                self::sendHandled($channel, $requestId, $handledEnvelope->withoutAll(AckStamp::class), $handledError);
+                if ($dispatching) {
+                    $acks[] = [$handledEnvelope->withoutAll(AckStamp::class), $handledError];
+
+                    return;
+                }
+
+                if (null !== $heldAcks) {
+                    $heldAcks[] = [$requestId, $handledEnvelope->withoutAll(AckStamp::class), $handledError, $combine];
+
+                    return;
+                }
+
+                self::sendBatchAck($channel, $combine([[$requestId, $handledEnvelope->withoutAll(AckStamp::class), $handledError]]));
             };
 
             $envelope = $message->envelope;
@@ -84,36 +107,56 @@ final class DispatchTask implements Task
                 $envelope = $envelope->withoutAll(TrustStamp::class)->with(TrustStamp::trusted());
             }
 
+            $heldAcks = [];
+
             try {
                 $envelope = $bus->dispatch($envelope->with(new AckStamp($ack)));
-                $envelope = $envelope->withoutAll(AckStamp::class);
             } catch (\Throwable $e) {
+                self::releaseHeldAcks($channel, $heldAcks, true);
+
+                if ($e instanceof HandlerFailedException && $e->getEnvelope()->last(NoAutoAckStamp::class)) {
+                    $acks = [];
+                    $e = self::flushBatchHandlers($bus, $channel, $heldAcks, $e, $acks);
+                }
+
+                // when the bus throws, its exception wins over the acks sent during the dispatch
+                $dispatching = false;
                 $envelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($message->envelope);
                 self::sendHandled($channel, $requestId, $envelope, ParallelExecutionFailureSanitizer::sanitizeError($e, $envelope));
 
-                unset($ack, $acked);
+                unset($ack, $acked, $acks, $dispatching, $batch, $combine);
 
                 continue;
             }
 
+            self::releaseHeldAcks($channel, $heldAcks, false);
+            $dispatching = false;
             $noAutoAckStamp = $envelope->last(NoAutoAckStamp::class);
 
-            if (!$acked && !$noAutoAckStamp) {
-                self::sendHandled($channel, $requestId, $envelope, null);
-            } elseif ($noAutoAckStamp) {
-                $channel->send(new DeferredEnvelopeMessage($requestId));
-                $unacks->add($noAutoAckStamp->getHandlerDescriptor()->getBatchHandler(), $requestId, $envelope, $acked, microtime(true));
+            if ($acks || $noAutoAckStamp) {
+                $batch = [$envelope->withoutAll(AckStamp::class), []];
+                self::sendBatchAck($channel, $combine(array_map(static fn (array $ack) => [$requestId, ...$ack], $acks)));
+            } else {
+                self::sendHandled($channel, $requestId, $envelope->withoutAll(AckStamp::class), null);
             }
 
-            // break the shared reference set so that each message tracks its own ack flag
-            unset($ack, $acked);
+            if ($noAutoAckStamp) {
+                $channel->send(new DeferredEnvelopeMessage($requestId));
+
+                foreach ($envelope->all(NoAutoAckStamp::class) as $stamp) {
+                    $unacks->add($stamp->getHandlerDescriptor()->getBatchHandler(), $requestId, $envelope, $acked, microtime(true));
+                }
+            }
+
+            // break the shared reference set so that each message tracks its own ack flag and batch
+            unset($ack, $acked, $acks, $dispatching, $batch, $combine);
 
             if ($this->resetInterval > 0 && 0 === ++$count % $this->resetInterval && $container->has('services_resetter')) {
                 $container->get('services_resetter')->reset();
             }
 
             if (null !== $this->memoryLimit && memory_get_usage(true) >= $this->memoryLimit) {
-                $this->flush($bus, $channel, true, $unacks);
+                $this->flush($bus, $channel, true, $unacks, $heldAcks);
                 break;
             }
         }
@@ -121,7 +164,7 @@ final class DispatchTask implements Task
         return null;
     }
 
-    private function flush(MessageBusInterface $bus, Channel $channel, bool|float $force, DeferredBatchMessageQueue $unacks): void
+    private function flush(MessageBusInterface $bus, Channel $channel, bool|float $force, DeferredBatchMessageQueue $unacks, ?array &$heldAcks): void
     {
         if (!$unacks->hasPending()) {
             return;
@@ -134,11 +177,30 @@ final class DispatchTask implements Task
             $requestId = $deferredMessage->context;
             $envelope = $deferredMessage->envelope;
 
+            $heldAcks = [];
             try {
-                $envelope = $bus->dispatch($envelope->with(new FlushBatchHandlersStamp(false !== $force)))->withoutAll(AckStamp::class);
+                $bus->dispatch($envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(false !== $force)));
+                self::releaseHeldAcks($channel, $heldAcks, false);
             } catch (\Throwable $e) {
-                $envelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($envelope);
-                self::sendHandled($channel, $requestId, $envelope, ParallelExecutionFailureSanitizer::sanitizeError($e, $envelope));
+                self::releaseHeldAcks($channel, $heldAcks, true);
+
+                if (!$deferredMessage->acked) {
+                    $ackStamp = $envelope->last(AckStamp::class);
+                    $envelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($envelope);
+
+                    if ($e instanceof HandlerFailedException) {
+                        // a retry must run the batch handlers whose flush failed
+                        $failed = $e->getWrappedExceptions();
+                        $envelope = $envelope->withoutAll(HandledStamp::class)->with(...array_filter($envelope->all(HandledStamp::class), static fn (HandledStamp $stamp) => !isset($failed[$stamp->getHandlerName()])));
+                    }
+
+                    if ($ackStamp) {
+                        // the acks that the batch sent during the flush come first, and this failure is ignored when they already gave the message its outcome
+                        $ackStamp->ack($envelope, $e);
+                    } else {
+                        self::sendHandled($channel, $requestId, $envelope, ParallelExecutionFailureSanitizer::sanitizeError($e, $envelope));
+                    }
+                }
 
                 continue;
             }
@@ -146,7 +208,7 @@ final class DispatchTask implements Task
             $noAutoAckStamp = $envelope->last(NoAutoAckStamp::class);
 
             if (!$deferredMessage->acked && !$noAutoAckStamp) {
-                self::sendHandled($channel, $requestId, $envelope, null);
+                self::sendHandled($channel, $requestId, $envelope->withoutAll(AckStamp::class), null);
             } elseif ($noAutoAckStamp) {
                 $unacks->add($noAutoAckStamp->getHandlerDescriptor()->getBatchHandler(), $requestId, $envelope, $deferredMessage->acked, microtime(true));
             }
@@ -237,5 +299,81 @@ final class DispatchTask implements Task
         }
 
         return $app;
+    }
+
+    /**
+     * Flushes the batch handlers that still have a failed message in their batch, in a dispatch of their own.
+     *
+     * Their work for other messages then doesn't depend on the failed dispatch, and their outcome joins the failure.
+     */
+    private static function flushBatchHandlers(MessageBusInterface $bus, Channel $channel, ?array &$heldAcks, HandlerFailedException $e, array &$acks): HandlerFailedException
+    {
+        $envelope = $e->getEnvelope();
+        $exceptions = $e->getWrappedExceptions();
+
+        $heldAcks = [];
+        try {
+            $bus->dispatch($envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(true)));
+            self::releaseHeldAcks($channel, $heldAcks, false);
+        } catch (\Throwable $flushError) {
+            // the failed flush may have undone what the batch did, so a retry runs it again
+            self::releaseHeldAcks($channel, $heldAcks, true);
+            $acks = [];
+            $exceptions += $flushError instanceof HandlerFailedException ? $flushError->getWrappedExceptions() : [$flushError];
+        }
+
+        $pending = array_map(static fn (NoAutoAckStamp $stamp) => $stamp->getHandlerDescriptor()->getName(), $envelope->all(NoAutoAckStamp::class));
+        $stamps = array_filter($envelope->all(HandledStamp::class), static fn (HandledStamp $stamp) => !\in_array($stamp->getHandlerName(), $pending, true));
+
+        foreach ($acks as [$ackEnvelope, $ackError]) {
+            if (null === $ackError) {
+                $stamps[] = $ackEnvelope->last(HandledStamp::class);
+            } elseif ($ackError instanceof HandlerFailedException) {
+                $exceptions += $ackError->getWrappedExceptions();
+            }
+        }
+
+        return new HandlerFailedException($envelope->withoutAll(HandledStamp::class)->with(...$stamps), $exceptions);
+    }
+
+    /**
+     * Releases the acks that other messages sent during a dispatch, as failures when that dispatch failed.
+     *
+     * Their batch was flushed during the failed dispatch, so what the batch did for them may have been undone.
+     */
+    private static function releaseHeldAcks(Channel $channel, ?array &$heldAcks, bool $dispatchFailed): void
+    {
+        $acks = $heldAcks;
+        $heldAcks = null;
+
+        foreach ($acks as [$requestId, $envelope, $e, $combine]) {
+            if ($dispatchFailed && null === $e && $stamp = $envelope->last(HandledStamp::class)) {
+                $stamps = $envelope->all(HandledStamp::class);
+                array_pop($stamps);
+                $envelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($envelope->withoutAll(HandledStamp::class)->with(...$stamps));
+                $e = new HandlerFailedException($envelope, [$stamp->getHandlerName() => new RuntimeException(\sprintf('The batch of "%s" was flushed during the dispatch of another message, and that dispatch failed.', $stamp->getHandlerName()))]);
+            }
+
+            self::sendBatchAck($channel, $combine([[$requestId, $envelope, $e]]));
+        }
+    }
+
+    /**
+     * Sends the outcome of a message once its batch handlers all sent their ack.
+     */
+    private static function sendBatchAck(Channel $channel, ?array $ack): void
+    {
+        if (null === $ack) {
+            return;
+        }
+
+        [$requestId, $envelope, $e] = $ack;
+
+        if (null !== $e) {
+            $envelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($envelope);
+            $e = ParallelExecutionFailureSanitizer::sanitizeError($e, $envelope);
+        }
+
+        self::sendHandled($channel, $requestId, $envelope, $e);
     }
 }

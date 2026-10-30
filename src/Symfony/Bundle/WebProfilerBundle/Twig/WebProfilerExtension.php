@@ -60,6 +60,12 @@ class WebProfilerExtension extends ProfilerExtension
         }
     }
 
+    public function reset(): void
+    {
+        $this->stackLevel = 0;
+        $this->dumper->setOutput($this->output = fopen('php://memory', 'r+'));
+    }
+
     public function getFunctions(): array
     {
         return [

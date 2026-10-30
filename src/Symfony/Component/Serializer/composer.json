@@ -32,7 +32,7 @@
         "symfony/form": "^4.4|^5.0|^6.0",
         "symfony/http-foundation": "^4.4|^5.0|^6.0",
         "symfony/http-kernel": "^4.4|^5.0|^6.0",
-        "symfony/mime": "^4.4|^5.0|^6.0",
+        "symfony/mime": "^5.2|^6.0",
         "symfony/property-access": "^5.4.26|^6.3",
         "symfony/property-info": "^5.4.24|^6.2.11,<6.4.43",
         "symfony/uid": "^5.3|^6.0",

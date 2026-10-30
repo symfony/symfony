@@ -104,7 +104,7 @@
             </trans-unit>
             <trans-unit id="121" resname="Please enter a valid URL.">
                 <source>This value is not a valid URL.</source>
-                <target>该值不是一个有效的 URL 。</target>
+                <target>该值不是一个有效的 URL。</target>
             </trans-unit>
             <trans-unit id="122" resname="Please enter a valid search term.">
                 <source>This value is not a valid search term.</source>
@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="129" resname="Please enter a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target>该值不是有效的 UUID 。</target>
+                <target>该值不是有效的 UUID。</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The lower bound must not be greater than the upper bound.</source>

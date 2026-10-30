@@ -16,6 +16,8 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProvider;
+use Symfony\Component\Translation\Dumper\XliffFileDumper;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -692,6 +694,24 @@ class LokaliseProviderTest extends ProviderTestCase
             foreach ($domains as $domain) {
                 $this->assertEquals($expectedTranslatorBag->getCatalogue($locale)->all($domain), $translatorBag->getCatalogue($locale)->all($domain));
             }
+        }
+    }
+
+    public function testReadDoesNotLoadLocalFiles()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_lokalise_');
+        file_put_contents($file, (new XliffFileDumper())->formatCatalogue(new MessageCatalogue('en', ['messages' => ['a' => 'local']]), 'messages'));
+
+        $response = new MockResponse(json_encode(['files' => ['en' => ['messages.xliff' => ['content' => $file]]]]));
+        $provider = self::createProvider(new MockHttpClient($response, 'https://api.lokalise.com/api2/projects/PROJECT_ID/'), new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+
+        $this->expectException(InvalidResourceException::class);
+        $this->expectExceptionMessage('Lokalise did not return XLIFF content for locale "en" and file "messages.xliff".');
+
+        try {
+            $provider->read(['messages'], ['en']);
+        } finally {
+            unlink($file);
         }
     }
 

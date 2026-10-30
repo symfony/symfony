@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Bridge\Crowdin;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\ProviderInterface;
@@ -162,6 +163,10 @@ final class CrowdinProvider implements ProviderInterface
                 }
 
                 continue;
+            }
+
+            if (!str_starts_with($response->getContent(), '<?xml')) {
+                throw new InvalidResourceException(sprintf('Crowdin did not return XLIFF content for locale "%s" and domain "%s".', $locale, $domain));
             }
 
             $translatorBag->addCatalogue($this->loader->load($response->getContent(), $locale, $domain));

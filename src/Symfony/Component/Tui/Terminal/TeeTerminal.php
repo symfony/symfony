@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Terminal;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Tui\Terminal\ProgramStatus\ProgramStatus;
 
 /**
  * Terminal that delegates to multiple terminals simultaneously.
@@ -131,6 +132,18 @@ final class TeeTerminal implements TerminalInterface
     {
         $this->primary->bell();
         $this->secondary->bell();
+    }
+
+    public function setProgramStatus(ProgramStatus $status): void
+    {
+        $this->primary->setProgramStatus($status);
+        $this->secondary->setProgramStatus($status);
+    }
+
+    public function clearProgramStatus(?string $id = null): void
+    {
+        $this->primary->clearProgramStatus($id);
+        $this->secondary->clearProgramStatus($id);
     }
 
     public function isVirtual(): bool

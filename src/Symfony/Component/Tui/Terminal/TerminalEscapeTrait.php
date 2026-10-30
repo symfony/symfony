@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Tui\Terminal;
 
+use Symfony\Component\Tui\Terminal\ProgramStatus\ProgramStatus;
+
 /**
  * Shares the escape sequences emitted by terminal implementations.
  *
@@ -63,5 +65,15 @@ trait TerminalEscapeTrait
         $safe = preg_replace("/[\x00-\x1f\x7f]|\xc2[\x80-\x9f]/", '', $title);
 
         $this->write("\x1b]0;{$safe}\x07");
+    }
+
+    public function setProgramStatus(ProgramStatus $status): void
+    {
+        $this->write($status->toEscapeSequence());
+    }
+
+    public function clearProgramStatus(?string $id = null): void
+    {
+        $this->write(ProgramStatus::toClearEscapeSequence($id));
     }
 }

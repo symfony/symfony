@@ -27,23 +27,28 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
     {
         $acked = false;
         $error = null;
+        $dispatching = true;
 
-        $ack = function (Envelope $handledEnvelope, ?\Throwable $handledError = null) use (&$envelope, &$acked, &$error, $transportName): void {
-            $envelope = $handledEnvelope;
+        $ack = function (Envelope $handledEnvelope, ?\Throwable $handledError = null) use (&$envelope, &$acked, &$error, &$dispatching, $transportName): void {
+            if ($dispatching) {
+                $envelope = $handledEnvelope;
+                $error = $handledError;
+            }
             $acked = true;
-            $error = $handledError;
             ($this->onAcknowledge)($transportName, $handledEnvelope, $handledError);
         };
 
         try {
             $envelope = $this->bus->dispatch($envelope->with(new AckStamp($ack)));
         } catch (\Throwable $e) {
-            $onHandled($envelope, $transportName, $acked, $e);
-
-            return;
+            $error = $e;
         }
 
+        $dispatching = false;
         $onHandled($envelope, $transportName, $acked, $error);
+
+        // the ack closure references these variables, so they must not keep an envelope or an error that contains its AckStamp
+        $envelope = $error = null;
     }
 
     public function shouldPauseConsumption(): bool

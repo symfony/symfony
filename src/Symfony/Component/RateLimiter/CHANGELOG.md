@@ -6,7 +6,8 @@ CHANGELOG
 
  * Add `RateLimiterBundle`, which provides the `rate_limiter` configuration and the services previously provided by `FrameworkBundle` under `framework.rate_limiter`
  * Add `RateLimitExceededEvent`
- * Make `CompoundLimiter::consume()` stop at the first limiter that rejects the request
+ * Add `LimiterInterface::refund()`, to give back the tokens of a `consume()` call that should not count
+ * Make `CompoundLimiter::consume()` all-or-nothing: it stops at the first limiter that rejects the request and gives back the tokens of the limiters that accepted
  * Add `RateLimiterBuilder` and the `rate_limiter.builder` option
  * Allow `\DateInterval` for the `interval` and `rate.interval` options of `RateLimiterFactory`
  * Add `RateLimit::getResetAt()`

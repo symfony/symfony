@@ -230,6 +230,121 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertSame(98, $rateLimit->getRemainingTokens());
     }
 
+    public function testRefund()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume();
+        $this->assertSame(9, $rateLimit->getRemainingTokens());
+
+        $refundedRateLimit = $limiter->refund($rateLimit);
+
+        $this->assertTrue($refundedRateLimit->isAccepted());
+        $this->assertSame(10, $refundedRateLimit->getRemainingTokens());
+        $this->assertSame(10, $limiter->consume(0)->getRemainingTokens());
+        $this->assertTrue($limiter->consume(10)->isAccepted());
+    }
+
+    public function testRefundIsIgnoredOnceTheHitsFadedOut()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume();
+        sleep(13);
+
+        // the hit has faded out of the window, the token was given back on its own
+        $limiter->consume(10);
+        $limiter->refund($rateLimit);
+
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundGivesBackAllConsumedTokens()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume(3);
+        $this->assertSame(7, $rateLimit->getRemainingTokens());
+
+        $refundedRateLimit = $limiter->refund($rateLimit);
+
+        $this->assertSame(10, $refundedRateLimit->getRemainingTokens());
+        $this->assertSame(10, $limiter->consume(0)->getRemainingTokens());
+    }
+
+    public function testRefundDoesNotEraseHitsFromTheCurrentWindowAfterTheWindowSlid()
+    {
+        ClockMock::withClockMock(1000.4);
+        $limiter = new SlidingWindowLimiter('id', 3, new \DateInterval('PT2S'), $this->storage);
+
+        $rateLimit = $limiter->consume();
+        usleep(2_200_000);
+        $limiter->consume(3);
+
+        $limiter->refund($rateLimit);
+
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundCarriesTheRemainingHitsIntoTheNextWindow()
+    {
+        ClockMock::withClockMock(1000.4);
+        $limiter = new SlidingWindowLimiter('id', 3, new \DateInterval('PT2S'), $this->storage);
+
+        $rateLimit = $limiter->consume();
+        usleep(2_200_000);
+        $limiter->refund($rateLimit);
+
+        $this->assertTrue($limiter->consume(3)->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundIsIgnoredWhenNoTokenWasConsumed()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+
+        $rateLimit = $limiter->consume(0);
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundIsIgnoredForARateLimitFromAnotherLimiter()
+    {
+        $limiter = $this->createLimiter();
+        $otherLimiter = new SlidingWindowLimiter('other', 10, new \DateInterval('PT12S'), $this->storage);
+        $rateLimit = $otherLimiter->consume();
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+        $this->assertSame(9, $otherLimiter->consume(0)->getRemainingTokens());
+    }
+
+    public function testRefundIsIgnoredWhenTheRateLimitWasRejected()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+
+        $this->assertSame($rateLimit, $limiter->refund($rateLimit));
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testRefundIsIgnoredWhenCalledTwice()
+    {
+        $limiter = $this->createLimiter();
+
+        $rateLimit = $limiter->consume();
+        $limiter->consume(9);
+
+        $limiter->refund($rateLimit);
+        $limiter->refund($rateLimit);
+
+        $this->assertSame(1, $limiter->consume(0)->getRemainingTokens());
+    }
+
     private function createLimiter(): SlidingWindowLimiter
     {
         return new SlidingWindowLimiter('test', 10, new \DateInterval('PT12S'), $this->storage);

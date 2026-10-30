@@ -705,6 +705,104 @@ class TableTest extends TestCase
 
                     TABLE,
             ],
+            'Cell with rowspan after a cell with colspan' => [
+                ['ISBN', 'Title', 'Author'],
+                [
+                    [
+                        new TableCell('Divine Comedy', ['colspan' => 2]),
+                        new TableCell('Dante Alighieri', ['rowspan' => 2]),
+                    ],
+                    ['9971-5-0210-0', 'Inferno'],
+                ],
+                'default',
+                <<<'TABLE'
+                    +---------------+---------+-----------------+
+                    | ISBN          | Title   | Author          |
+                    +---------------+---------+-----------------+
+                    | Divine Comedy           | Dante Alighieri |
+                    | 9971-5-0210-0 | Inferno |                 |
+                    +---------------+---------+-----------------+
+
+                    TABLE,
+            ],
+            'Cell with rowspan and line breaks after a cell with colspan' => [
+                ['ISBN', 'Title', 'Author'],
+                [
+                    [
+                        new TableCell('Divine Comedy', ['colspan' => 2]),
+                        new TableCell("Dante\nAlighieri\n1265-1321", ['rowspan' => 2]),
+                    ],
+                    ['9971-5-0210-0', 'Inferno'],
+                ],
+                'default',
+                <<<'TABLE'
+                    +---------------+---------+-----------+
+                    | ISBN          | Title   | Author    |
+                    +---------------+---------+-----------+
+                    | Divine Comedy           | Dante     |
+                    | 9971-5-0210-0 | Inferno | Alighieri |
+                    |               |         | 1265-1321 |
+                    +---------------+---------+-----------+
+
+                    TABLE,
+            ],
+            'Cells with rowspan around a cell with colspan' => [
+                ['ISBN', 'Title', 'Part', 'Author'],
+                [
+                    [
+                        new TableCell('9971-5-0210-0', ['rowspan' => 2]),
+                        new TableCell('Divine Comedy', ['colspan' => 2]),
+                        new TableCell('Dante Alighieri', ['rowspan' => 2]),
+                    ],
+                    ['Inferno', 'Canto I'],
+                ],
+                'default',
+                <<<'TABLE'
+                    +---------------+---------+---------+-----------------+
+                    | ISBN          | Title   | Part    | Author          |
+                    +---------------+---------+---------+-----------------+
+                    | 9971-5-0210-0 | Divine Comedy     | Dante Alighieri |
+                    |               | Inferno | Canto I |                 |
+                    +---------------+---------+---------+-----------------+
+
+                    TABLE,
+            ],
+            'Cell with rowspan above a cell with colspan' => [
+                ['ISBN', 'Title', 'Author', 'Year'],
+                [
+                    ['9971-5-0210-0', 'Divine Comedy', new TableCell('Dante Alighieri', ['rowspan' => 2]), '1320'],
+                    [new TableCell('La Vita Nuova', ['colspan' => 2]), '1294'],
+                ],
+                'default',
+                <<<'TABLE'
+                    +---------------+---------------+-----------------+------+
+                    | ISBN          | Title         | Author          | Year |
+                    +---------------+---------------+-----------------+------+
+                    | 9971-5-0210-0 | Divine Comedy | Dante Alighieri | 1320 |
+                    | La Vita Nuova                 |                 | 1294 |
+                    +-------------------------------+-----------------+------+
+
+                    TABLE,
+            ],
+            'Cells with rowspan that start in consecutive rows' => [
+                ['ISBN', 'Title', 'Author'],
+                [
+                    ['99921-58-10-7', new TableCell('Divine Comedy', ['rowspan' => 3]), 'Dante Alighieri'],
+                    [new TableCell('9971-5-0210-0', ['rowspan' => 2]), 'Charles Dickens'],
+                    ['J. R. R. Tolkien'],
+                ],
+                'default',
+                <<<'TABLE'
+                    +---------------+---------------+------------------+
+                    | ISBN          | Title         | Author           |
+                    +---------------+---------------+------------------+
+                    | 99921-58-10-7 | Divine Comedy | Dante Alighieri  |
+                    | 9971-5-0210-0 |               | Charles Dickens  |
+                    |               |               | J. R. R. Tolkien |
+                    +---------------+---------------+------------------+
+
+                    TABLE,
+            ],
             'Cell with rowspan and colspan with separator inside a rowspan' => [
                 ['ISBN', 'Author'],
                 [
@@ -1172,6 +1270,30 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    public function testRenderHeaderCellWithRowspanWithNonListKeys()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders([[1 => 'ISBN', 2 => new TableCell("Title\n(original)", ['rowspan' => 2]), 3 => 'Author']])
+            ->setRows([['9971-5-0210-0', 'Divine Comedy', 'Dante Alighieri']])
+        ;
+        $table->render();
+
+        $expected =
+            <<<'TABLE'
+                +---------------+---------------+-----------------+
+                | ISBN          | Title         | Author          |
+                +---------------+---------------+-----------------+
+                |               | (original)    |                 |
+                +---------------+---------------+-----------------+
+                | 9971-5-0210-0 | Divine Comedy | Dante Alighieri |
+                +---------------+---------------+-----------------+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
     public function testColumnStyle()
     {
         $table = new Table($output = $this->getOutputStream());
@@ -1214,6 +1336,28 @@ class TableTest extends TestCase
             ]);
 
         $table->render();
+    }
+
+    public function testSetRowWithStringKeys()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(['ISBN', 'Title'])
+            ->setRow(0, ['isbn' => '9971-5-0210-0', 'title' => 'Divine Comedy'])
+        ;
+        $table->render();
+
+        $expected =
+            <<<'TABLE'
+                +---------------+---------------+
+                | ISBN          | Title         |
+                +---------------+---------------+
+                | 9971-5-0210-0 | Divine Comedy |
+                +---------------+---------------+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
     public function testColumnWidth()
@@ -2351,6 +2495,54 @@ class TableTest extends TestCase
                 |                 |                 | or sit amet,    |
                 |                 |                 | consectetur     |
                 +-----------------+-----------------+-----------------+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthOfCellAfterColspan()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(['ISBN', 'Title', 'Author'])
+            ->setRows([[new TableCell('Divine Comedy', ['colspan' => 2]), 'Dante Alighieri']])
+            ->setColumnMaxWidth(2, 9)
+        ;
+        $table->render();
+
+        $expected =
+            <<<'TABLE'
+                +---------+--------+-----------+
+                | ISBN    | Title  | Author    |
+                +---------+--------+-----------+
+                | Divine Comedy    | Dante     |
+                |                  | Alighieri |
+                +------------------+-----------+
+
+                TABLE;
+
+        $this->assertSame($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMaxWidthOfCellWithColspanAfterColspan()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(['ISBN', 'Title', 'Author', 'Year'])
+            ->setRows([[new TableCell('Divine Comedy', ['colspan' => 2]), new TableCell('Dante Alighieri, 1265-1321', ['colspan' => 2])]])
+            ->setColumnMaxWidth(2, 8)
+        ;
+        $table->render();
+
+        $expected =
+            <<<'TABLE'
+                +---------+--------+----------+----------+
+                | ISBN    | Title  | Author   | Year     |
+                +---------+--------+----------+----------+
+                | Divine Comedy    | Dante Alighieri,    |
+                |                  | 1265-1321           |
+                +------------------+---------------------+
 
                 TABLE;
 

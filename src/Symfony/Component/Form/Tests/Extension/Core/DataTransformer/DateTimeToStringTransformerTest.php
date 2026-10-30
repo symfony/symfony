@@ -60,6 +60,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
 
             // seconds since Unix
             ['U', '1265213106', '2010-02-03 16:05:06 UTC'],
+            ['U', '0', '1970-01-01 00:00:00 UTC'],
 
             ['Y-z', '2010-33', '2010-02-03 00:00:00 UTC'],
         ];

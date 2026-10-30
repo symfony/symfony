@@ -21,14 +21,18 @@ use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\Handler\BatchHandlerTrait;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 use Symfony\Component\Messenger\Stamp\AckStamp;
+use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\HandlerArgumentsStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 
 class HandleMessageMiddlewareTest extends MiddlewareTestCase
 {
@@ -250,6 +254,69 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertNull($envelopes[1]->last(NoAutoAckStamp::class));
     }
 
+    public function testBatchHandlerNackOnFlushKeepsTheHandledStampsOfTheOtherHandlers()
+    {
+        $batchHandler = $this->createBatchHandlerNackingTheFirstBatch(2);
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [
+                new HandlerDescriptor(static fn () => 'handled', ['alias' => 'before']),
+                new HandlerDescriptor($batchHandler, ['alias' => 'batch']),
+                new HandlerDescriptor(static fn () => 'handled', ['alias' => 'after']),
+                new HandlerDescriptor(static fn () => 'handled', ['alias' => 'last']),
+            ],
+        ]));
+
+        $acks = [];
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AckStamp(static function (Envelope $envelope, ?\Throwable $e = null) use (&$acks) {
+            $acks[] = [$envelope, $e];
+        })]), new StackMiddleware());
+
+        $this->assertSame([], $acks);
+
+        $batchHandler->flush(true);
+
+        $this->assertCount(1, $acks);
+        [$envelope, $e] = $acks[0];
+        $this->assertInstanceOf(HandlerFailedException::class, $e);
+        $this->assertSame($envelope, $e->getEnvelope());
+        $this->assertSame(['Closure@before', 'Closure@after', 'Closure@last'], array_map(static fn (HandledStamp $stamp) => $stamp->getHandlerName(), $envelope->all(HandledStamp::class)));
+    }
+
+    public function testBatchHandlerNackWhileHandlingTheMessageRunsTheNextHandlersAgainOnRetry()
+    {
+        $dispatched = [];
+        $bus = new MessageBus([
+            new DispatchAfterCurrentBusMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([
+                DummyMessage::class => [
+                    new HandlerDescriptor($this->createBatchHandlerNackingTheFirstBatch(1), ['alias' => 'batch']),
+                    new HandlerDescriptor(static function () use (&$bus) {
+                        $bus->dispatch(new SecondMessage(), [new DispatchAfterCurrentBusStamp()]);
+                    }, ['alias' => 'after']),
+                ],
+                SecondMessage::class => [static function (SecondMessage $message) use (&$dispatched) {
+                    $dispatched[] = $message;
+                }],
+            ])),
+        ]);
+
+        $acks = [];
+        try {
+            $bus->dispatch(new DummyMessage('Hey'), [new AckStamp(static function (Envelope $envelope) use (&$acks) {
+                $acks[] = $envelope;
+            })]);
+            $this->fail('The batch handler should fail.');
+        } catch (HandlerFailedException) {
+        }
+
+        $this->assertSame([], $dispatched);
+        $this->assertCount(1, $acks);
+
+        $bus->dispatch($acks[0]->withoutAll(AckStamp::class));
+
+        $this->assertCount(1, $dispatched);
+    }
+
     public function testBatchHandlerNoAck()
     {
         $handler = new class implements BatchHandlerInterface {
@@ -352,6 +419,43 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $handler->expects($this->once())->method('__invoke')->with($message, 'additional named argument');
 
         $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    private function createBatchHandlerNackingTheFirstBatch(int $batchSize): BatchHandlerInterface
+    {
+        return new class($batchSize) implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            private bool $failed = false;
+
+            public function __construct(
+                private int $batchSize,
+            ) {
+            }
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+            {
+                return $this->handle($message, $ack);
+            }
+
+            private function getBatchSize(): int
+            {
+                return $this->batchSize;
+            }
+
+            private function process(array $jobs): void
+            {
+                foreach ($jobs as [, $ack]) {
+                    if ($this->failed) {
+                        $ack->ack();
+                    } else {
+                        $ack->nack(new \RuntimeException('Batch failed.'));
+                    }
+                }
+
+                $this->failed = true;
+            }
+        };
     }
 }
 

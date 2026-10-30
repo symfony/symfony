@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Bridge\Lokalise;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Exception\RuntimeException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -100,6 +101,10 @@ final class LokaliseProvider implements ProviderInterface
 
         foreach ($translations as $locale => $files) {
             foreach ($files as $filename => $content) {
+                if (!str_starts_with($content['content'], '<?xml')) {
+                    throw new InvalidResourceException(\sprintf('Lokalise did not return XLIFF content for locale "%s" and file "%s".', $locale, $filename));
+                }
+
                 $translatorBag->addCatalogue($this->loader->load($content['content'], $locale, str_replace('.xliff', '', $filename)));
             }
         }

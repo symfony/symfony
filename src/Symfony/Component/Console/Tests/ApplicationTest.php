@@ -1031,6 +1031,53 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('  This is an error.', $tester->getDisplay(true));
     }
 
+    #[BackupGlobals(true)]
+    public function testCatchExceptionsCanBeDisabledByEnvironmentVariable()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(true);
+        $tester = new ApplicationTester($application);
+
+        putenv('SYMFONY_DISABLE_CATCH_EXCEPTIONS=1');
+        try {
+            $tester->run(['command' => 'foo'], ['decorated' => false]);
+            $this->fail('SYMFONY_DISABLE_CATCH_EXCEPTIONS should let the exception bubble up.');
+        } catch (\Exception $e) {
+            $this->assertEquals('Command "foo" is not defined.', $e->getMessage());
+        } finally {
+            putenv('SYMFONY_DISABLE_CATCH_EXCEPTIONS');
+        }
+
+        // unset, the application's own setting is honored again
+        $tester->run(['command' => 'foo'], ['decorated' => false]);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getDisplay(true));
+    }
+
+    #[BackupGlobals(true)]
+    public function testCatchErrorsCanBeDisabledByEnvironmentVariable()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchErrors(true);
+        $application->addCommand((new Command('boom'))->setCode(static fn () => throw new \Error('This is an error.')));
+        $tester = new ApplicationTester($application);
+
+        putenv('SYMFONY_DISABLE_CATCH_ERRORS=1');
+        try {
+            $tester->run(['command' => 'boom']);
+            $this->fail('SYMFONY_DISABLE_CATCH_ERRORS should let the error bubble up.');
+        } catch (\Error $e) {
+            $this->assertSame('This is an error.', $e->getMessage());
+        } finally {
+            putenv('SYMFONY_DISABLE_CATCH_ERRORS');
+        }
+
+        // unset, the application's own setting is honored again
+        $tester->run(['command' => 'boom']);
+        $this->assertStringContainsString('  This is an error.', $tester->getDisplay(true));
+    }
+
     public function testAutoExitSetting()
     {
         $application = new Application();

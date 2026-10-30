@@ -663,6 +663,35 @@ class WorkerTest extends TestCase
         $this->assertSame($expectedMessages, $handler->processedMessages);
     }
 
+    public function testBatchAckDoesNotHideTheFailureOfAnotherHandler()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Hey'))],
+            [new Envelope(new DummyMessage('Bob'))],
+        ]);
+
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [
+                new HandlerDescriptor(new DummyBatchHandler()),
+                static function (DummyMessage $message) {
+                    if ('Bob' === $message->getMessage()) {
+                        throw new \RuntimeException('Handler failed.');
+                    }
+                },
+            ],
+        ]))]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, clock: new MockClock());
+        $worker->run();
+
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertSame(1, $receiver->getRejectCount());
+        $this->assertSame('Bob', $receiver->getRejectedEnvelopes()[0]->getMessage()->getMessage());
+    }
+
     public function testFlushBatchOnIdle()
     {
         $expectedMessages = [

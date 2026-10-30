@@ -86,6 +86,26 @@ class ImpersonateUrlGeneratorTest extends TestCase
         $this->assertSame('http://localhost/switch-user?_switch_user=kuba&_target_path=%2Fprofile%3Fpage%3D2', $generator->generateImpersonationUrl('kuba'));
     }
 
+    public function testUrlsLeaveTheRedirectToTheTargetRouteWhenAPathIsConfigured()
+    {
+        $generator = $this->createGenerator(['parameter' => '_switch_user', 'path' => '/switch-user', 'target_route' => 'app_dashboard']);
+
+        $this->assertSame('/switch-user?_switch_user=kuba', $generator->generateImpersonationPath('kuba'));
+        $this->assertSame('/switch-user?_switch_user=kuba&_target_path=%2Fprofile', $generator->generateImpersonationPath('kuba', '/profile'));
+        $this->assertSame([
+            'action' => '/switch-user',
+            'fields' => ['_switch_user' => 'kuba'],
+            'csrf_field' => null,
+        ], $generator->generateImpersonationForm('kuba'));
+    }
+
+    public function testExitUrlsIgnoreTheTargetRouteWhenAPathIsConfigured()
+    {
+        $generator = $this->createGenerator(['parameter' => '_switch_user', 'path' => '/switch-user', 'target_route' => 'app_dashboard'], true);
+
+        $this->assertSame('/switch-user?_switch_user=_exit&_target_path=%2Fprofile%3Fpage%3D2', $generator->generateExitPath());
+    }
+
     public function testExitUrlsAreBuiltFromTheConfiguredPath()
     {
         $generator = $this->createGenerator(['parameter' => '_switch_user', 'path' => '/switch-user'], true);

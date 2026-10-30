@@ -12,7 +12,9 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 
 class AbstractSessionHandlerTest extends TestCase
 {
@@ -37,6 +39,23 @@ class AbstractSessionHandlerTest extends TestCase
             proc_terminate(self::$server);
             proc_close(self::$server);
         }
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    #[DataProvider('provideEmptySessionMethods')]
+    public function testPhpSerEmptySession(string $method)
+    {
+        $handler = $this->createPartialMock(AbstractSessionHandler::class, ['doRead', 'doWrite', 'doDestroy', 'close', 'gc']);
+        $handler->expects($this->never())->method('doWrite');
+        $handler->expects($this->once())->method('doDestroy')->with('session_id')->willReturn(true);
+
+        $this->assertTrue($handler->$method('session_id', phpser_serialize([])));
+    }
+
+    public static function provideEmptySessionMethods(): iterable
+    {
+        yield ['write'];
+        yield ['updateTimestamp'];
     }
 
     #[DataProvider('provideSession')]

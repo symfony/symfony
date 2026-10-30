@@ -27,6 +27,7 @@
     </projectFiles>
 
     <stubs>
+        <file name=".github/sa-tools/stubs/phpser.php" />
         <file name=".github/sa-tools/stubs/phpunit-13.php" />
     </stubs>
 

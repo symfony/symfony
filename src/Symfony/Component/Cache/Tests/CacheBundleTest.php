@@ -155,6 +155,7 @@ class TestCacheKernel extends AbstractKernel
 
     private function configureContainer(ContainerConfigurator $container): void
     {
+        $container->parameters()->set('kernel.secret', 'secret');
         $container->extension('cache', $this->config);
 
         $container->services()
@@ -188,6 +189,7 @@ class ShutdownCacheKernel extends AbstractKernel
 
     private function configureContainer(ContainerConfigurator $container): void
     {
+        $container->parameters()->set('kernel.secret', 'secret');
         $container->extension('cache', [
             'pools' => [
                 'cache.pdo' => ['adapters' => 'cache.adapter.pdo', 'provider' => 'sqlite:'.$this->dir.'/var/cache.db'],

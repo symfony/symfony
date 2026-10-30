@@ -23,6 +23,13 @@ BrowserKit
 Cache
 -----
 
+ * `DefaultMarshaller` now uses the phpser extension when installed. Pass `false` as its first argument to keep native PHP serialization
+ * Using igbinary in `DefaultMarshaller` and `MemcachedAdapter` is deprecated. Install phpser and use the default marshaller instead.
+   For Memcached, select the `php` serializer so that the marshaller handles phpser serialization
+ * Add the `$signingKey` argument to `DefaultMarshaller` to sign and verify values with phpser's HMAC support.
+   The key must be at least 32 bytes long. When a key is set, unsigned entries and entries signed with another key become cache misses
+ * `cache.default_marshaller` now signs cache values when phpser is installed, using a key derived from `kernel.secret`.
+   You must configure a non-empty `kernel.secret`. Existing unsigned cache entries become cache misses
  * Add argument `$shutdown` to `reset()` in `AbstractAdapter`, `AbstractTagAwareAdapter`, `ChainAdapter`, `PhpArrayAdapter`, `ProxyAdapter`, `Psr16Adapter`, `Psr16Cache`, `TagAwareAdapter` and `TraceableAdapter`
 
 Config
@@ -233,6 +240,8 @@ HttpClient
 HttpFoundation
 --------------
 
+ * Using igbinary for session serialization is deprecated. Set `session.serialize_handler=phpser` to use the phpser extension instead.
+   Switching serializers invalidates existing sessions. Set `phpser.session_key` in PHP's configuration to enable session HMAC signing
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()`
  * Deprecate not passing an expiration to `UriSigner::sign()` when the signer has no default one; pass it, or set a default with the `$defaultExpiration` argument of `UriSigner::__construct()` or the `framework.uri_signer.expiration` option
  * Deprecate the `Request::$trustedHosts` property, it is never populated anymore since trusted hosts are

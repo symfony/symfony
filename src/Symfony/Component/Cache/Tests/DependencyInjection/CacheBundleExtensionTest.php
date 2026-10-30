@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
@@ -42,6 +43,58 @@ class CacheBundleExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('cache.default_clearer'));
         $this->assertTrue($container->hasDefinition('cache.system_clearer'));
         $this->assertTrue($container->hasDefinition('cache.global_clearer'));
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    #[TestWith(['secret'])]
+    #[TestWith(['01234567890123456789012345678901'])]
+    public function testTheDefaultMarshallerSignsWithTheKernelSecret(string $secret)
+    {
+        $container = $this->createContainerFromFile('cache', static function (ContainerBuilder $container) use ($secret) {
+            $container->setParameter('kernel.secret', $secret);
+        });
+        $marshaller = $container->get('test.default_marshaller');
+        $values = $marshaller->marshall(['a' => ['foo' => 'bar']], $failed);
+
+        $this->assertSame([], $failed);
+        $this->assertSame(phpser_serialize_signed(['foo' => 'bar'], hash_hkdf('sha256', $secret, 32, 'symfony.cache')), $values['a']);
+        $this->assertSame(['foo' => 'bar'], $marshaller->unmarshall($values['a']));
+
+        $this->expectException(\DomainException::class);
+        $marshaller->unmarshall(phpser_serialize(['foo' => 'bar']));
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    public function testTheDefaultMarshallerResolvesTheSecretFromAnEnvVar()
+    {
+        $previousSecret = $_ENV['CACHE_SIGNING_SECRET'] ?? null;
+        $_ENV['CACHE_SIGNING_SECRET'] = 'cache-signing-secret';
+
+        try {
+            $container = $this->createContainerFromFile('cache', static function (ContainerBuilder $container) {
+                $container->setParameter('kernel.secret', '%env(CACHE_SIGNING_SECRET)%');
+            }, true);
+            $marshaller = $container->get('test.default_marshaller');
+            $values = $marshaller->marshall(['a' => 'value'], $failed);
+
+            $this->assertSame(phpser_serialize_signed('value', hash_hkdf('sha256', 'cache-signing-secret', 32, 'symfony.cache')), $values['a']);
+        } finally {
+            if (null === $previousSecret) {
+                unset($_ENV['CACHE_SIGNING_SECRET']);
+            } else {
+                $_ENV['CACHE_SIGNING_SECRET'] = $previousSecret;
+            }
+        }
+    }
+
+    public function testTheDefaultMarshallerDoesNotNeedASecretWithoutPhpSer()
+    {
+        if (\extension_loaded('phpser')) {
+            $this->markTestSkipped('The "phpser" extension is loaded.');
+        }
+
+        $marshaller = $this->createContainerFromFile('cache')->get('test.default_marshaller');
+        $this->assertSame(['a' => serialize('value')], $marshaller->marshall(['a' => 'value'], $failed));
     }
 
     /**
@@ -108,7 +161,7 @@ class CacheBundleExtensionTest extends TestCase
         $this->assertSame($container->getDefinition('cache.system')->getClass(), $container->getDefinition('cache.acme')->getClass());
     }
 
-    private function createContainerFromFile(string $file, ?\Closure $configure = null): ContainerBuilder
+    private function createContainerFromFile(string $file, ?\Closure $configure = null, bool $resolveEnvPlaceholders = false): ContainerBuilder
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
             'kernel.debug' => false,
@@ -120,6 +173,7 @@ class CacheBundleExtensionTest extends TestCase
         ]));
         $container->setResourceTracking(false);
         $container->registerExtension(new CacheBundle()->getContainerExtension());
+        $container->setAlias('test.default_marshaller', 'cache.default_marshaller')->setPublic(true);
         new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures'))->load($file.'.php');
         $configure?->__invoke($container);
         $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
@@ -127,7 +181,7 @@ class CacheBundleExtensionTest extends TestCase
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
-        $container->compile();
+        $container->compile($resolveEnvPlaceholders);
 
         return $container;
     }

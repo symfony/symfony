@@ -233,6 +233,10 @@ HttpClient
 HttpFoundation
 --------------
 
+ * [BC BREAK] `Cookie` serialization rejects raw names and values that contain invalid cookie characters. Use the default encoding for arbitrary values
+ * [BC BREAK] `Cookie` serialization rejects paths with control or non-ASCII bytes and invalid domain names. Percent-encode non-ASCII paths and use ASCII domain names
+ * Non-raw cookie names now percent-encode every character outside the HTTP token grammar
+
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()`
  * Deprecate not passing an expiration to `UriSigner::sign()` when the signer has no default one; pass it, or set a default with the `$defaultExpiration` argument of `UriSigner::__construct()` or the `framework.uri_signer.expiration` option
  * Deprecate the `Request::$trustedHosts` property, it is never populated anymore since trusted hosts are

@@ -332,6 +332,14 @@ class Worker
                 // when the batch acked or nacked the message during the failed flush, the message already has its failure
                 if (!array_filter(\array_slice($this->acks, $heldAcks), static fn (array $ack) => $ack[1]->getMessage() === $envelope->getMessage())) {
                     $envelope = $envelope->withoutAll(NoAutoAckStamp::class);
+
+                    if ($e instanceof HandlerFailedException) {
+                        // a retry must run the batch handlers whose flush failed
+                        $failed = $e->getWrappedExceptions();
+                        $envelope = $envelope->withoutAll(HandledStamp::class)->with(...array_filter($envelope->all(HandledStamp::class), static fn (HandledStamp $stamp) => !isset($failed[$stamp->getHandlerName()])));
+                        $e = new HandlerFailedException($envelope, $failed);
+                    }
+
                     $this->acks[] = [$transportName, $envelope, $e];
                 }
             }

@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-30T08:06:02Z
+
+Thanks for the PR @dalerazimov. I pushed an update that keeps the flush part and drops the deferred nack.
+
+When the batch handler nacks while the message is dispatched, that dispatch fails. Outer middlewares can then undo what the next handlers did: `dispatch_after_current_bus` drops the messages they dispatched, and `doctrine_transaction` rolls back their queries. If we keep their handled stamps, a retry skips them and that work is lost. The worker should rather use the exception of the bus in this case, that's #67647.
+
+@andreybolonin two batch handlers on the same message is a separate issue. The transport message is also acked twice there, so I'd keep it out of this PR.

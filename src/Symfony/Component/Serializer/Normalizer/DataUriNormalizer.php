@@ -107,6 +107,12 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
                         throw new InvalidArgumentException(\sprintf('Cannot denormalize to a "%s" without the HttpFoundation component installed. Try running "composer require symfony/http-foundation".', File::class));
                     }
 
+                    // \SplFileInfo trims trailing slashes, but they are part of the data
+                    if (str_ends_with($data, '/') && false !== $content = @file_get_contents($data)) {
+                        $mediaType = preg_replace('/;base64$/i', '', substr($data, 0, strpos($data, ',')));
+                        $data = $mediaType.','.rawurlencode($content);
+                    }
+
                     return new File($data, false);
 
                 case 'SplFileObject':

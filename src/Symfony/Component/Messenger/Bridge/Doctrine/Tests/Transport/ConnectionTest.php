@@ -213,6 +213,18 @@ class ConnectionTest extends TestCase
         $connection->ack('dummy_id');
     }
 
+    public function testItThrowsATransportExceptionIfItCannotKeepAcknowledgedMessage()
+    {
+        $driverConnection = $this->getDBALConnection();
+        $exception = $this->createStub(DBALException::class);
+        $driverConnection->method('update')->willThrowException($exception);
+        $connection = new Connection(['delete_after_ack' => false], $driverConnection);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionObject(new TransportException($exception->getMessage(), 0, $exception));
+        $connection->ack('dummy_id');
+    }
+
     public function testItThrowsATransportExceptionIfItCannotRejectMessage()
     {
         $this->expectException(TransportException::class);
@@ -566,6 +578,22 @@ class ConnectionTest extends TestCase
         return $stmt;
     }
 
+    #[DataProvider('deleteAfterAckProvider')]
+    public function testDeleteAfterAckConfiguration(string $dsn, array $options, bool $expected)
+    {
+        $this->assertSame($expected, Connection::buildConfiguration($dsn, $options)['delete_after_ack']);
+    }
+
+    public static function deleteAfterAckProvider(): iterable
+    {
+        yield ['doctrine://default', [], true];
+        yield ['doctrine://default', ['delete_after_ack' => false], false];
+        yield ['doctrine://default?delete_after_ack=false', [], false];
+        yield ['doctrine://default?delete_after_ack=0', [], false];
+        yield ['doctrine://default?delete_after_ack=true', ['delete_after_ack' => false], true];
+        yield ['doctrine://default?delete_after_ack=1', [], true];
+    }
+
     #[DataProvider('buildConfigurationProvider')]
     public function testBuildConfiguration(string $dsn, array $options, string $expectedConnection, string $expectedTableName, int $expectedRedeliverTimeout, string $expectedQueue, bool $expectedAutoSetup)
     {
@@ -653,14 +681,14 @@ class ConnectionTest extends TestCase
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
+        $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup, delete_after_ack]');
         Connection::buildConfiguration('doctrine://default', ['new_option' => 'woops']);
     }
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
+        $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup, delete_after_ack]');
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }
 
@@ -778,39 +806,39 @@ class ConnectionTest extends TestCase
     {
         yield 'MySQL' => [
             new MySQLPlatform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.acknowledged_at is null) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
         ];
 
         if (class_exists(MySQL80Platform::class)) {
             yield 'MySQL8' => [
                 new MySQL80Platform(),
-                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+                'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.acknowledged_at is null) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
             ];
         }
 
         yield 'MariaDB' => [
             new MariaDBPlatform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.acknowledged_at is null) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
         ];
 
         yield 'MariaDB106' => [
             new MariaDB1060Platform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.acknowledged_at is null) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
         ];
 
         yield 'Postgres' => [
             new PostgreSQLPlatform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.acknowledged_at is null) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED',
         ];
 
         yield 'SQL Server' => [
             new SQLServerPlatform(),
-            'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK, READPAST) WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+            'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK, READPAST) WHERE (m.queue_name = ?) AND (m.acknowledged_at is null) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
         ];
 
         yield 'Oracle' => [
             new OraclePlatform(),
-            'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at" FROM messenger_messages w WHERE w.id IN (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC FETCH NEXT 1 ROWS ONLY) FOR UPDATE SKIP LOCKED',
+            'SELECT w.id AS "id", w.body AS "body", w.headers AS "headers", w.queue_name AS "queue_name", w.created_at AS "created_at", w.available_at AS "available_at", w.delivered_at AS "delivered_at", w.acknowledged_at AS "acknowledged_at" FROM messenger_messages w WHERE w.id IN (SELECT m.id FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.acknowledged_at is null) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY available_at ASC FETCH NEXT 1 ROWS ONLY) FOR UPDATE SKIP LOCKED',
         ];
     }
 
@@ -831,12 +859,12 @@ class ConnectionTest extends TestCase
                 ? array_map(static fn ($ic) => $ic->getColumnName()->toString(), $index->getIndexedColumns())
                 : $index->getColumns();
 
-            if ($columns === ['queue_name', 'available_at', 'delivered_at', 'id']) {
+            if ($columns === ['queue_name', 'acknowledged_at', 'available_at', 'delivered_at', 'id']) {
                 $hasCoveringIndex = true;
                 break;
             }
         }
-        $this->assertTrue($hasCoveringIndex, 'Expected covering index on [queue_name, available_at, delivered_at, id] not found');
+        $this->assertTrue($hasCoveringIndex, 'Expected covering index on [queue_name, acknowledged_at, available_at, delivered_at, id] not found');
     }
 
     public function testConfigureSchemaDifferentDbalConnection()
@@ -890,22 +918,22 @@ class ConnectionTest extends TestCase
     {
         yield 'MySQL' => [
             new MySQLPlatform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) LIMIT 50',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.acknowledged_at is null) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) LIMIT 50',
         ];
 
         yield 'MariaDB' => [
             new MariaDBPlatform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) LIMIT 50',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.acknowledged_at is null) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) LIMIT 50',
         ];
 
         yield 'SQL Server' => [
             new SQLServerPlatform(),
-            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY (SELECT 0) OFFSET 0 ROWS FETCH NEXT 50 ROWS ONLY',
+            'SELECT m.* FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.acknowledged_at is null) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) ORDER BY (SELECT 0) OFFSET 0 ROWS FETCH NEXT 50 ROWS ONLY',
         ];
 
         yield 'Oracle' => [
             new OraclePlatform(),
-            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) FETCH NEXT 50 ROWS ONLY',
+            'SELECT m.id AS "id", m.body AS "body", m.headers AS "headers", m.queue_name AS "queue_name", m.created_at AS "created_at", m.available_at AS "available_at", m.delivered_at AS "delivered_at", m.acknowledged_at AS "acknowledged_at" FROM messenger_messages m WHERE (m.queue_name = ?) AND (m.acknowledged_at is null) AND (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) FETCH NEXT 50 ROWS ONLY',
         ];
     }
 

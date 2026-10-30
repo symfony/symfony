@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `delete_after_ack` option to keep acknowledged messages in the transport table
+
  * Make `DoctrineSender` and `DoctrineTransport` implement `BatchSenderInterface`, inserting several messages per statement
  * Add `DoctrineInbox` to record the handled messages in a database table
  * Make the Doctrine transport reconnect on the next poll after losing its database connection, and replay `ack()` and `reject()` when the connection comes back within 5 seconds

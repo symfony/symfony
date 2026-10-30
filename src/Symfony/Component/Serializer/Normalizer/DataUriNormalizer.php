@@ -99,6 +99,9 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
             throw NotNormalizableValueException::createForUnexpectedDataType('The provided "data:" URI is not valid.', $data, ['string'], $context['deserialization_path'] ?? null, true);
         }
 
+        // PHP opens a "data:" URI as a local path when its scheme is not lowercase
+        $data = 'data:'.substr($data, 5);
+
         try {
             switch ($type) {
                 case File::class:

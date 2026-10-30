@@ -106,6 +106,23 @@ class DataUriNormalizerTest extends TestCase
         $this->assertEquals(file_get_contents(self::TEST_TXT_DATA), $this->getContent($file));
     }
 
+    public function testGiveNotAccessToLocalFilesWithNonLowercaseScheme()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_data_uri_');
+        file_put_contents($file, 'local file content');
+        $path = str_repeat('/..', 32).strtr($file, '\\', '/');
+
+        try {
+            foreach (['DATA:', 'Data:', 'dAtA:'] as $scheme) {
+                $this->assertSame($path, $this->getContent($this->normalizer->denormalize($scheme.','.$path, \SplFileObject::class)));
+                $this->assertSame($path, $this->getContent($this->normalizer->denormalize($scheme.','.$path, \SplFileInfo::class)->openFile()));
+                $this->assertSame($path, $this->getContent($this->normalizer->denormalize($scheme.'text/plain,'.$path, File::class)->openFile()));
+            }
+        } finally {
+            unlink($file);
+        }
+    }
+
     public function testDenormalizeHttpFoundationFile()
     {
         $file = $this->normalizer->denormalize(self::TEST_GIF_DATA, 'Symfony\Component\HttpFoundation\File\File');

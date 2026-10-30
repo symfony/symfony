@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-30T14:22:35Z
+
+I pushed a small change. When PHP can't read the URI, the URI is now kept as is. Before that, `data:text/plain;BASE64,YWJj////` gave an empty file instead of an error, because PHP's `data:` wrapper accepts `;base64` only in lowercase.
+
+---------------------------------------------------------------------------
+
+by ahmed-bhs at 2026-10-30T14:38:05Z
+
+Thanks, good catch on the uppercase ;BASE64! 👍

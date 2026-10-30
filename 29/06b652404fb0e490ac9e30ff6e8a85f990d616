@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-30T11:43:17Z
+
+Thanks @andreybolonin. I pushed an update on top of #67655.
+
+The acks of a message are now combined in `ack()`, after the acks sent during a failed dispatch became failures. Before, they were combined first. A retry then skipped a batch handler whose work `doctrine_transaction` had rolled back.
+
+I also fixed a memory issue in the first version. A closure kept each handled envelope in memory until the garbage collector ran. New tests cover the flush of every pending batch handler and an ack sent after a failed dispatch. Others cover the release of handled envelopes and the case of #67655. I dropped the Psalm rename, since that error is a false positive on a moved line.

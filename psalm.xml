@@ -70,6 +70,12 @@
                 <directory name="src/Symfony" />
             </errorLevel>
         </UnusedConstructor>
+        <UndefinedMethod>
+            <errorLevel type="suppress">
+                <!-- This PHP 8.6 method is guarded by PHP_VERSION_ID >= 80600. -->
+                <referencedMethod name="ReflectionProperty::isWritable"/>
+            </errorLevel>
+        </UndefinedMethod>
         <UndefinedFunction>
             <errorLevel type="suppress">
                 <!-- These functions have been added in PHP 8.5 -->

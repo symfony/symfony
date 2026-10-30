@@ -21,6 +21,10 @@ parameters:
         # these templates are include()'d in HtmlErrorRenderer's scope, so they can't be analyzed standalone
         - src/Symfony/Component/ErrorHandler/Resources/views/*
     ignoreErrors:
+        # ReflectionProperty::isWritable() is guarded by PHP_VERSION_ID >= 80600, but analysis runs on PHP 8.4.
+        -
+            message: '#^Call to an undefined method ReflectionProperty::isWritable\(\)\.$#'
+            path: src/Symfony/Component/PropertyInfo/Extractor/ReflectionExtractor.php
         # Added in PHP 8.4
         - '#^Class BcMath\\Number not found\.$#'
         # DeferredBatchMessage::$acked aliases a bool that batch handlers flip during dispatch()

@@ -407,6 +407,9 @@ Messenger
  * [BC BREAK] `AsMessageHandler::$priority` is now `?int` and defaults to `null`, which means "no priority declared";
    the `messenger.message_handler` tags it produces carry `null` too. Code that read the property as an
    `int` should read `$attribute->priority ?? 0`
+ * When a worker consumes the message that fills the batch of a handler using `BatchHandlerTrait`, the batch is not processed during the dispatch of this message anymore.
+   The worker processes it right after, in a dispatch of its own, so `process()` doesn't run in the database transaction of this message.
+   This message is acknowledged once the batch is processed, like the other messages of the batch
 
 Mime
 ----

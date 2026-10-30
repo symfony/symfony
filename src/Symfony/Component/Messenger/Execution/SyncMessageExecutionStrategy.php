@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Execution;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
@@ -36,6 +37,7 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
         $acks = [];
         $dispatching = true;
         $batch = null;
+        $flushes = [];
         $combine = static function (array $acks) use (&$batch, &$acked): ?array {
             if ($ack = DeferredBatchMessageQueue::combineAcks($batch, $acks)) {
                 $acked = true;
@@ -58,10 +60,14 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
             }
         };
 
+        $deferFlush = static function (HandlerDescriptor $handlerDescriptor) use (&$flushes): void {
+            $flushes[] = new NoAutoAckStamp($handlerDescriptor);
+        };
+
         $this->heldAcks = [];
 
         try {
-            $envelope = $this->bus->dispatch($envelope->with(new AckStamp($ack)));
+            $envelope = $this->bus->dispatch($envelope->with(new AckStamp($ack, $deferFlush)));
         } catch (\Throwable $e) {
             $this->releaseHeldAcks(true);
 
@@ -90,6 +96,17 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
 
         // the ack closure references this list, so emptying it frees the envelopes without waiting for the garbage collector
         $acks = [];
+
+        if ($flushes) {
+            $this->heldAcks = [];
+            try {
+                $this->bus->dispatch($envelope->withoutAll(AckStamp::class)->withoutAll(NoAutoAckStamp::class)->with(new FlushBatchHandlersStamp(true), ...$flushes));
+                $this->releaseHeldAcks(false);
+            } catch (\Throwable) {
+                // the messages that the batch didn't settle wait for the next flush of the worker
+                $this->releaseHeldAcks(true);
+            }
+        }
 
         $onHandled($envelope, $transportName, $acked, null);
     }

@@ -70,6 +70,8 @@ CHANGELOG
  * Log the names of the consumed transports when a worker starts
  * Display the stamps of failed messages with `-vv` in the `messenger:failed:show`, `messenger:failed:retry` and `messenger:failed:remove` commands
  * Close the transports that implement `CloseableTransportInterface` when the kernel shuts down
+ * Add the `$deferFlush` argument and the `deferFlush()` method to `AckStamp` and `Acknowledger`, to flush a full batch in a dispatch of its own
+ * Make `BatchHandlerTrait` leave a full batch to the worker, which flushes it in a dispatch of its own right after the dispatch of the message that filled it
 
 8.1
 ---

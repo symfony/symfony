@@ -65,6 +65,42 @@ class BatchHandlerTest extends TestCase
         $this->assertSame('process failed', $error?->getMessage());
         $this->assertSame(['first' => 'the result', 'second' => 'process failed'], $results);
     }
+
+    public function testFullBatchIsLeftToTheWorkerWhenTheAcknowledgerDefersTheFlush()
+    {
+        $handler = new BatchHandlerTestHandler(null, null, 0, 2);
+        $deferred = 0;
+        $deferFlush = static function () use (&$deferred): bool {
+            ++$deferred;
+
+            return true;
+        };
+        $first = new Acknowledger('handler', static function () {}, null, $deferFlush);
+        $second = new Acknowledger('handler', static function () {}, null, $deferFlush);
+
+        $this->assertSame(1, $handler(new \stdClass(), $first));
+        $this->assertSame(2, $handler(new \stdClass(), $second));
+        $this->assertSame(1, $deferred);
+        $this->assertFalse($first->isAcknowledged());
+        $this->assertFalse($second->isAcknowledged());
+
+        $handler->flush(false);
+
+        $this->assertTrue($first->isAcknowledged());
+        $this->assertTrue($second->isAcknowledged());
+    }
+
+    public function testFullBatchIsFlushedRightAwayWhenTheAcknowledgerCannotDeferTheFlush()
+    {
+        $handler = new BatchHandlerTestHandler(null, null, 0, 1);
+        $first = new Acknowledger('handler', static function () {});
+        $second = new Acknowledger('handler', static function () {}, null, static fn () => false);
+
+        $this->assertSame(0, $handler(new \stdClass(), $first));
+        $this->assertSame(0, $handler(new \stdClass(), $second));
+        $this->assertTrue($first->isAcknowledged());
+        $this->assertTrue($second->isAcknowledged());
+    }
 }
 
 class BatchHandlerTestHandler implements BatchHandlerInterface
@@ -75,12 +111,18 @@ class BatchHandlerTestHandler implements BatchHandlerInterface
         private ?\Throwable $error = null,
         private ?\Throwable $processError = null,
         private int $acksBeforeProcessError = 0,
+        private int $batchSize = 10,
     ) {
     }
 
     public function __invoke(object $message, ?Acknowledger $ack = null): mixed
     {
         return $this->handle($message, $ack);
+    }
+
+    private function getBatchSize(): int
+    {
+        return $this->batchSize;
     }
 
     private function process(array $jobs): void

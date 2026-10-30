@@ -1,7 +1,7 @@
 <?php
 
 // Syncs branch-dependent CI config from the maintained branches published at
-// https://symfony.com/maintained-versions.json (ordered low -> high).
+// https://symfony.com/releases.json (ordered low -> high).
 //
 // Standalone helper: run it by hand whenever the maintained branches change.
 //
@@ -25,8 +25,8 @@ if ('cli' !== PHP_SAPI) {
 }
 
 $self = basename(__FILE__);
-$source = 'https://symfony.com/maintained-versions.json';
-$branches = json_decode(file_get_contents($source), true, 512, \JSON_THROW_ON_ERROR);
+$source = 'https://symfony.com/releases.json';
+$branches = json_decode(file_get_contents($source), true, 512, \JSON_THROW_ON_ERROR)['maintained_versions'] ?? null;
 
 if (!\is_array($branches) || !$branches) {
     fwrite(\STDERR, "No maintained versions found at $source\n");

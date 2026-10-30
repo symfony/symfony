@@ -469,6 +469,24 @@ class StringTypeResolverTest extends TestCase
         $this->resolver->resolve('value-of<int>');
     }
 
+    #[DataProvider('intersectionOfNonObjectTypesDataProvider')]
+    public function testCannotResolveIntersectionOfNonObjectTypes(string $type)
+    {
+        $this->expectException(UnsupportedException::class);
+        $this->resolver->resolve($type);
+    }
+
+    /**
+     * @return iterable<array{0: string}>
+     */
+    public static function intersectionOfNonObjectTypesDataProvider(): iterable
+    {
+        yield ['array{foo?: int}&array{bar?: string}'];
+        yield ['int&string'];
+        yield [\sprintf('%s&array{foo: int}', \DateTime::class)];
+        yield [\sprintf('int|(%s&array{foo: int})', \DateTime::class)];
+    }
+
     public function testCannotResolveListWithKeyType()
     {
         $this->expectException(UnsupportedException::class);

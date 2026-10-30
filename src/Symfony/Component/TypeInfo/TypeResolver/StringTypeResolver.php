@@ -313,7 +313,13 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         if ($node instanceof IntersectionTypeNode) {
-            return Type::intersection(...array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->types));
+            $types = array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->types);
+
+            try {
+                return Type::intersection(...$types);
+            } catch (InvalidArgumentException $e) {
+                throw new \DomainException($e->getMessage(), previous: $e);
+            }
         }
 
         throw new \DomainException(\sprintf('Unhandled "%s" node.', $node::class));

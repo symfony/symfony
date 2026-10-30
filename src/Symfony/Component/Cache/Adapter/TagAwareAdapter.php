@@ -47,6 +47,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     private AdapterInterface $pool;
     private AdapterInterface $tags;
     private array $knownTagVersions = [];
+    private ?\WeakMap $tagVersionSnapshots = null;
 
     private static \Closure $setCacheItemTags;
     private static \Closure $setTagVersions;
@@ -90,11 +91,13 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             CacheItem::class
         );
         self::$getTagsByKey ??= \Closure::bind(
-            static function ($deferred) {
+            static function ($deferred, bool $syncMetadata = true) {
                 $tagsByKey = [];
                 foreach ($deferred as $key => $item) {
                     $tagsByKey[$key] = $item->newMetadata[CacheItem::METADATA_TAGS] ?? [];
-                    $item->metadata = $item->newMetadata;
+                    if ($syncMetadata) {
+                        $item->metadata = $item->newMetadata;
+                    }
                 }
 
                 return $tagsByKey;
@@ -133,6 +136,42 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     public function hasItem(mixed $key): bool
     {
         return $this->getItem($key)->isHit();
+    }
+
+    public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
+    {
+        $computedItem = null;
+
+        try {
+            return $this->doGet($this, $key, $callback, $beta, $metadata, function (CacheItem $item) use (&$computedItem) {
+                $computedItem = $item;
+                $this->tagVersionSnapshots ??= new \WeakMap();
+                $this->tagVersionSnapshots[$item] = ['versions' => $this->knownTagVersions, 'computing' => true];
+            }, function (CacheItem $item) {
+                if (isset($this->tagVersionSnapshots[$item])) {
+                    $snapshot = $this->tagVersionSnapshots[$item];
+                    // Release unrelated versions before refreshing the live map.
+                    $versions = [];
+                    foreach ((self::$getTagsByKey)([$item], false)[0] as $tag => $name) {
+                        if (isset($snapshot['versions'][$tag])) {
+                            $versions[$tag] = $snapshot['versions'][$tag];
+                        }
+                    }
+                    $snapshot['versions'] = $versions;
+                    $this->tagVersionSnapshots[$item] = $snapshot;
+                }
+            });
+        } finally {
+            if (null !== $computedItem && isset($this->tagVersionSnapshots[$computedItem])) {
+                if (($this->deferred[$computedItem->getKey()] ?? null) === $computedItem) {
+                    $snapshot = $this->tagVersionSnapshots[$computedItem];
+                    $snapshot['computing'] = false;
+                    $this->tagVersionSnapshots[$computedItem] = $snapshot;
+                } else {
+                    unset($this->tagVersionSnapshots[$computedItem]);
+                }
+            }
+        }
     }
 
     public function getItem(mixed $key): CacheItem
@@ -248,6 +287,9 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         if (!$item instanceof CacheItem) {
             return false;
         }
+        if (isset($this->tagVersionSnapshots[$item]) && !$this->tagVersionSnapshots[$item]['computing']) {
+            unset($this->tagVersionSnapshots[$item]);
+        }
         $this->deferred[$item->getKey()] = $item;
 
         return $this->commit();
@@ -257,6 +299,9 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     {
         if (!$item instanceof CacheItem) {
             return false;
+        }
+        if (isset($this->tagVersionSnapshots[$item])) {
+            unset($this->tagVersionSnapshots[$item]);
         }
         $this->deferred[$item->getKey()] = $item;
 
@@ -269,13 +314,25 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             return true;
         }
 
-        $tagVersions = $this->getTagVersions((self::$getTagsByKey)($items), true);
-        (self::$setTagVersions)($items, $tagVersions);
+        $tagsByKey = (self::$getTagsByKey)($items);
+        $tagVersions = $this->getTagVersions($tagsByKey, true);
+
+        foreach ($items as $key => $item) {
+            $versions = array_intersect_key($tagVersions, $tagsByKey[$key]);
+            // Keep versions observed before computation so concurrent invalidations still apply.
+            foreach (array_intersect_key($this->tagVersionSnapshots[$item]['versions'] ?? [], $tagsByKey[$key]) as $tag => [, $version]) {
+                $versions[$tag] = $version;
+            }
+            (self::$setTagVersions)([$item], $versions);
+        }
 
         $ok = true;
         foreach ($items as $key => $item) {
             if ($this->pool->saveDeferred($item)) {
                 unset($this->deferred[$key]);
+                if (isset($this->tagVersionSnapshots[$item]) && !$this->tagVersionSnapshots[$item]['computing']) {
+                    unset($this->tagVersionSnapshots[$item]);
+                }
             } else {
                 $ok = false;
             }

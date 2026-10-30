@@ -54,7 +54,8 @@ class HandleMessageMiddleware implements MiddlewareInterface
         $alreadyHandled = false;
         $handledStamps = [];
         foreach ($this->handlersLocator->getHandlers($envelope) as $handlerDescriptor) {
-            if ($this->messageHasAlreadyBeenHandled($envelope, $handlerDescriptor)) {
+            // a flush dispatch never runs handlers, since the envelope of a failed message can miss the stamps of the handlers that succeeded
+            if ($envelope->last(FlushBatchHandlersStamp::class) || $this->messageHasAlreadyBeenHandled($envelope, $handlerDescriptor)) {
                 $alreadyHandled = true;
                 continue;
             }

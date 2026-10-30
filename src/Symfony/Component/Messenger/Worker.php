@@ -24,6 +24,7 @@ use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\EnvelopeAwareExceptionInterface;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Stamp\AckStamp;
@@ -183,6 +184,11 @@ class Worker
         } catch (\Throwable $e) {
         }
 
+        if ($e instanceof HandlerFailedException && $e->getEnvelope()->last(NoAutoAckStamp::class)) {
+            $acks = [];
+            $e = $this->flushBatchHandlers($e, $acks);
+        }
+
         // when the bus throws, its exception wins over the acks sent during the dispatch
         $dispatching = false;
         $acked = !$e && $acks;
@@ -336,5 +342,35 @@ class Worker
     public function getMetadata(): WorkerMetadata
     {
         return $this->metadata;
+    }
+
+    /**
+     * Flushes the batch handlers that still have a failed message in their batch, in a dispatch of their own.
+     *
+     * Their work for other messages then doesn't depend on the failed dispatch, and their outcome joins the failure.
+     */
+    private function flushBatchHandlers(HandlerFailedException $e, array &$acks): HandlerFailedException
+    {
+        $envelope = $e->getEnvelope();
+        $exceptions = $e->getWrappedExceptions();
+
+        try {
+            $this->bus->dispatch($envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(true)));
+        } catch (\Throwable $flushError) {
+            $exceptions += $flushError instanceof HandlerFailedException ? $flushError->getWrappedExceptions() : [$flushError];
+        }
+
+        $pending = array_map(static fn (NoAutoAckStamp $stamp) => $stamp->getHandlerDescriptor()->getName(), $envelope->all(NoAutoAckStamp::class));
+        $stamps = array_filter($envelope->all(HandledStamp::class), static fn (HandledStamp $stamp) => !\in_array($stamp->getHandlerName(), $pending, true));
+
+        foreach ($acks as [, $ackEnvelope, $ackError]) {
+            if (null === $ackError) {
+                $stamps[] = $ackEnvelope->last(HandledStamp::class);
+            } elseif ($ackError instanceof HandlerFailedException) {
+                $exceptions += $ackError->getWrappedExceptions();
+            }
+        }
+
+        return new HandlerFailedException($envelope->withoutAll(HandledStamp::class)->with(...$stamps), $exceptions);
     }
 }

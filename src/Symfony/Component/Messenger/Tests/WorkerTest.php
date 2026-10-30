@@ -30,6 +30,7 @@ use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
@@ -40,9 +41,13 @@ use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
+use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
@@ -692,6 +697,151 @@ class WorkerTest extends TestCase
         $this->assertSame('Bob', $receiver->getRejectedEnvelopes()[0]->getMessage()->getMessage());
     }
 
+    public function testBatchWithAFailedMessageIsFlushedInADispatchOfItsOwn()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Hey'))],
+            [new Envelope(new DummyMessage('Bob'))],
+        ]);
+
+        // like doctrine_transaction: rolls back on failure and strips the handled stamps
+        $transaction = new class implements MiddlewareInterface {
+            public array $pending = [];
+            public array $committed = [];
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                try {
+                    $envelope = $stack->next()->handle($envelope, $stack);
+                    array_push($this->committed, ...$this->pending);
+
+                    return $envelope;
+                } catch (HandlerFailedException $e) {
+                    throw new HandlerFailedException($e->getEnvelope()->withoutAll(HandledStamp::class), $e->getWrappedExceptions());
+                } finally {
+                    $this->pending = [];
+                }
+            }
+        };
+
+        $batchHandler = $this->createBatchHandler(static function (array $jobs) use ($transaction) {
+            foreach ($jobs as [$message, $ack]) {
+                $transaction->pending[] = $message->getMessage();
+                $ack->ack('batch result');
+            }
+        });
+
+        $bus = new MessageBus([$transaction, new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [
+                new HandlerDescriptor($batchHandler),
+                static function (DummyMessage $message) {
+                    if ('Bob' === $message->getMessage()) {
+                        throw new \RuntimeException('Handler failed.');
+                    }
+                },
+            ],
+        ]))]);
+
+        $failures = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(2));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$failures) {
+            $failures[] = $event->getEnvelope();
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+
+        $this->assertSame(['Hey', 'Bob'], $transaction->committed);
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertSame(1, $receiver->getRejectCount());
+        $this->assertCount(1, $failures);
+        $this->assertSame(['batch result'], array_map(static fn (HandledStamp $stamp) => $stamp->getResult(), $failures[0]->all(HandledStamp::class)));
+    }
+
+    public function testBatchHandlerNackJoinsTheFailureOfTheMessage()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Bob'))],
+        ]);
+
+        $processed = [];
+        $batchHandler = $this->createBatchHandler(static function (array $jobs) use (&$processed) {
+            foreach ($jobs as [$message, $ack]) {
+                $processed[] = $message->getMessage();
+                $ack->nack(new \RuntimeException('Batch failed.'));
+            }
+        });
+
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [
+                new HandlerDescriptor(static fn () => null, ['alias' => 'before']),
+                new HandlerDescriptor($batchHandler),
+                static fn () => throw new \RuntimeException('Handler failed.'),
+            ],
+        ]))]);
+
+        $failures = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$failures) {
+            $failures[] = $event->getThrowable();
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+
+        $this->assertSame(['Bob'], $processed);
+        $this->assertSame(0, $receiver->getAcknowledgeCount());
+        $this->assertSame(1, $receiver->getRejectCount());
+        $this->assertCount(1, $failures);
+        $this->assertSame(['Handler failed.', 'Batch failed.'], array_map(static fn (\Throwable $e) => $e->getMessage(), array_values($failures[0]->getWrappedExceptions())));
+        $this->assertSame(['Closure@before'], array_map(static fn (HandledStamp $stamp) => $stamp->getHandlerName(), $failures[0]->getEnvelope()->all(HandledStamp::class)));
+    }
+
+    public function testFailedFlushJoinsTheFailureOfTheMessage()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Bob'))],
+        ]);
+
+        $bus = new class(new HandlerDescriptor(new DummyBatchHandler())) implements MessageBusInterface {
+            public function __construct(
+                private HandlerDescriptor $batchHandler,
+            ) {
+            }
+
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                $envelope = Envelope::wrap($message, $stamps);
+
+                if ($envelope->last(FlushBatchHandlersStamp::class)) {
+                    throw new \RuntimeException('Flush failed.');
+                }
+
+                $envelope->last(AckStamp::class)->ack($envelope->with(new HandledStamp('rolled back', 'other batch handler')));
+
+                throw new HandlerFailedException($envelope->with(new NoAutoAckStamp($this->batchHandler)), ['handler' => new \RuntimeException('Handler failed.')]);
+            }
+        };
+
+        $failures = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$failures) {
+            $failures[] = $event->getThrowable();
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+
+        $this->assertSame(0, $receiver->getAcknowledgeCount());
+        $this->assertSame(1, $receiver->getRejectCount());
+        $this->assertCount(1, $failures);
+        $this->assertSame(['Handler failed.', 'Flush failed.'], array_map(static fn (\Throwable $e) => $e->getMessage(), array_values($failures[0]->getWrappedExceptions())));
+        $this->assertSame([], $failures[0]->getEnvelope()->all(HandledStamp::class));
+    }
+
     public function testFlushBatchOnIdle()
     {
         $expectedMessages = [
@@ -895,6 +1045,33 @@ class WorkerTest extends TestCase
         $this->assertCount(1, $rejectedEnvelopes);
         $rejectedEnvelope = $rejectedEnvelopes[0];
         $this->assertNull($rejectedEnvelope->last(NoAutoAckStamp::class));
+    }
+
+    private function createBatchHandler(\Closure $process): BatchHandlerInterface
+    {
+        return new class($process) implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            public function __construct(
+                private \Closure $process,
+            ) {
+            }
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+            {
+                return $this->handle($message, $ack);
+            }
+
+            private function getBatchSize(): int
+            {
+                return 3;
+            }
+
+            private function process(array $jobs): void
+            {
+                ($this->process)($jobs);
+            }
+        };
     }
 }
 

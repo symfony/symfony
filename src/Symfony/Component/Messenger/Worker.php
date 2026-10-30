@@ -170,11 +170,15 @@ class Worker
 
         $acks = [];
         $dispatching = true;
-        $ack = function (Envelope $envelope, ?\Throwable $e = null) use ($transportName, &$acks, &$dispatching) {
+        $batch = null;
+        $combine = static function (array $acks) use (&$batch): ?array {
+            return self::combineBatchAcks($batch, $acks);
+        };
+        $ack = function (Envelope $envelope, ?\Throwable $e = null) use ($transportName, &$acks, &$dispatching, $combine) {
             if ($dispatching) {
                 $acks[] = [$transportName, $envelope, $e];
             } else {
-                $this->acks[] = [$transportName, $envelope, $e];
+                $this->acks[] = [$transportName, $envelope, $e, $combine];
             }
         };
 
@@ -194,17 +198,26 @@ class Worker
         // when the bus throws, its exception wins over the acks sent during the dispatch
         $dispatching = false;
         $acked = !$e && $acks;
-        if ($acked) {
-            array_push($this->acks, ...$acks);
-        }
-
         $noAutoAckStamp = $envelope->last(NoAutoAckStamp::class);
 
-        if (!$acked && !$noAutoAckStamp) {
+        if ($acked || $noAutoAckStamp) {
+            $batch = [$envelope->withoutAll(AckStamp::class), []];
+
+            if ($batchAck = $combine($acks)) {
+                $this->acks[] = $batchAck;
+            }
+        } else {
             $this->acks[] = [$transportName, $envelope, $e];
-        } elseif ($noAutoAckStamp) {
+        }
+
+        // the ack closure references this list, so emptying it frees the envelopes without waiting for the garbage collector
+        $acks = [];
+
+        if ($noAutoAckStamp) {
             $this->unacks ??= new \SplObjectStorage();
-            $this->unacks[$noAutoAckStamp->getHandlerDescriptor()->getBatchHandler()] = [$envelope->withoutAll(AckStamp::class), $transportName, $this->clock->now()->format('U.u')];
+            foreach ($envelope->all(NoAutoAckStamp::class) as $stamp) {
+                $this->unacks[$stamp->getHandlerDescriptor()->getBatchHandler()] = [$envelope, $transportName, $this->clock->now()->format('U.u')];
+            }
         }
 
         $this->ack();
@@ -215,7 +228,12 @@ class Worker
         $acks = $this->acks;
         $this->acks = [];
 
-        foreach ($acks as [$transportName, $envelope, $e]) {
+        foreach ($acks as $ack) {
+            if (isset($ack[3]) && !$ack = $ack[3]([$ack])) {
+                continue;
+            }
+
+            [$transportName, $envelope, $e] = $ack;
             $receiver = $this->receivers[$transportName];
 
             if (null !== $e) {
@@ -325,21 +343,22 @@ class Worker
             [$envelope, $transportName] = $unacks[$handler];
             $heldAcks = \count($this->acks);
             try {
-                $this->bus->dispatch($envelope->with(new FlushBatchHandlersStamp($force)));
+                $this->bus->dispatch($envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp($force)));
             } catch (\Throwable $e) {
                 $this->failHeldAcks($heldAcks);
+                $envelope = $envelope->withoutAll(NoAutoAckStamp::class);
 
-                // when the batch acked or nacked the message during the failed flush, the message already has its failure
-                if (!array_filter(\array_slice($this->acks, $heldAcks), static fn (array $ack) => $ack[1]->getMessage() === $envelope->getMessage())) {
-                    $envelope = $envelope->withoutAll(NoAutoAckStamp::class);
+                if ($e instanceof HandlerFailedException) {
+                    // a retry must run the batch handlers whose flush failed
+                    $failed = $e->getWrappedExceptions();
+                    $envelope = $envelope->withoutAll(HandledStamp::class)->with(...array_filter($envelope->all(HandledStamp::class), static fn (HandledStamp $stamp) => !isset($failed[$stamp->getHandlerName()])));
+                    $e = new HandlerFailedException($envelope, $failed);
+                }
 
-                    if ($e instanceof HandlerFailedException) {
-                        // a retry must run the batch handlers whose flush failed
-                        $failed = $e->getWrappedExceptions();
-                        $envelope = $envelope->withoutAll(HandledStamp::class)->with(...array_filter($envelope->all(HandledStamp::class), static fn (HandledStamp $stamp) => !isset($failed[$stamp->getHandlerName()])));
-                        $e = new HandlerFailedException($envelope, $failed);
-                    }
-
+                if ($ackStamp = $envelope->last(AckStamp::class)) {
+                    // the acks that the batch sent during the flush come first, and this failure is ignored when they already gave the message its outcome
+                    $ackStamp->ack($envelope, $e);
+                } else {
                     $this->acks[] = [$transportName, $envelope, $e];
                 }
             }
@@ -361,6 +380,70 @@ class Worker
     }
 
     /**
+     * Combines the acks that the batch handlers of a message sent, once they all did.
+     *
+     * Returns null while some batch handlers didn't send theirs, or when the message already has its outcome.
+     *
+     * @param array{Envelope, list<array>}|null $batch The dispatched envelope and the acks received so far, null once the message has its outcome
+     */
+    private static function combineBatchAcks(?array &$batch, array $acks): ?array
+    {
+        if (null === $batch) {
+            return null;
+        }
+
+        [$envelope, $received] = $batch;
+        foreach ($acks as [$transportName, $ackEnvelope, $e]) {
+            $received[] = [$transportName, $ackEnvelope, $e];
+        }
+
+        $pending = [];
+        $handledStamps = [];
+        foreach ($envelope->all(HandledStamp::class) as $stamp) {
+            $handledStamps[$stamp->getHandlerName()] = $stamp;
+        }
+        foreach ($envelope->all(NoAutoAckStamp::class) as $stamp) {
+            $name = $stamp->getHandlerDescriptor()->getName();
+            $pending[$name] = true;
+            unset($handledStamps[$name]);
+        }
+
+        $exceptions = [];
+        foreach ($received as [, $ackEnvelope, $e]) {
+            if ($e instanceof HandlerFailedException) {
+                foreach ($e->getWrappedExceptions() as $name => $exception) {
+                    unset($pending[$name]);
+                    $exceptions[$name] = $exception;
+                }
+            } elseif (null !== $e) {
+                // an error that isn't tied to a batch handler gives the message its outcome
+                $pending = [];
+                $exceptions[] = $e;
+            } elseif ($stamp = $ackEnvelope->last(HandledStamp::class)) {
+                $name = $stamp->getHandlerName();
+                unset($pending[$name]);
+                $handledStamps[$name] = $stamp;
+            }
+        }
+
+        if ($pending) {
+            $batch = [$envelope, $received];
+
+            return null;
+        }
+
+        $batch = null;
+
+        if (1 === \count($received)) {
+            return $received[0];
+        }
+
+        $envelope = $envelope->withoutAll(NoAutoAckStamp::class)->withoutAll(HandledStamp::class)->with(...array_values($handledStamps));
+
+        return [$received[0][0], $envelope, $exceptions ? new HandlerFailedException($envelope, $exceptions) : null];
+    }
+
+    /**
      * Turns the acks that messages sent during a failed dispatch into failures.
      *
      * Their batch was flushed during that dispatch, so what the batch did for them may have been undone.
@@ -377,7 +460,7 @@ class Worker
             array_pop($stamps);
             $envelope = $envelope->withoutAll(HandledStamp::class)->with(...$stamps);
             $e = new RuntimeException(\sprintf('The batch of "%s" was flushed during the dispatch of another message, and that dispatch failed.', $stamp->getHandlerName()));
-            $this->acks[$i] = [$transportName, $envelope, new HandlerFailedException($envelope, [$stamp->getHandlerName() => $e])];
+            $this->acks[$i] = [$transportName, $envelope, new HandlerFailedException($envelope, [$stamp->getHandlerName() => $e])] + $this->acks[$i];
         }
     }
 

@@ -120,13 +120,14 @@ class Worker
 
                 foreach ($envelopes as $envelope) {
                     $envelopeHandled = true;
+                    $receipt = new \stdClass();
 
                     if ($receiver instanceof KeepaliveReceiverInterface) {
-                        $this->keepalives[$envelope->getMessage()] = [$transportName, $envelope];
+                        $this->keepalives[$receipt] = [$transportName, $envelope];
                     }
 
                     $this->rateLimit($transportName);
-                    $this->handleMessage($envelope, $transportName);
+                    $this->handleMessage($envelope, $transportName, $receipt);
                     $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
 
                     if ($this->shouldStop) {
@@ -169,14 +170,14 @@ class Worker
         $this->eventDispatcher?->dispatch(new WorkerStoppedEvent($this));
     }
 
-    private function handleMessage(Envelope $envelope, string $transportName): void
+    private function handleMessage(Envelope $envelope, string $transportName, object $receipt): void
     {
         $event = new WorkerMessageReceivedEvent($envelope, $transportName);
         $this->eventDispatcher?->dispatch($event);
         $envelope = $event->getEnvelope();
 
         if (!$event->shouldHandle()) {
-            unset($this->keepalives[$envelope->getMessage()]);
+            unset($this->keepalives[$receipt]);
 
             return;
         }
@@ -184,8 +185,12 @@ class Worker
         $acks = [];
         $dispatching = true;
         $batch = null;
-        $combine = static function (array $acks) use (&$batch): ?array {
-            return self::combineBatchAcks($batch, $acks);
+        $combine = static function (array $acks) use (&$batch, $receipt): ?array {
+            if ($ack = self::combineBatchAcks($batch, $acks)) {
+                $ack[4] = $receipt;
+            }
+
+            return $ack;
         };
         $ack = function (Envelope $envelope, ?\Throwable $e = null) use ($transportName, &$acks, &$dispatching, $combine) {
             if ($dispatching) {
@@ -220,7 +225,7 @@ class Worker
                 $this->acks[] = $batchAck;
             }
         } else {
-            $this->acks[] = [$transportName, $envelope, $e];
+            $this->acks[] = [$transportName, $envelope, $e, null, $receipt];
         }
 
         // the ack closure references this list, so emptying it frees the envelopes without waiting for the garbage collector
@@ -229,7 +234,7 @@ class Worker
         if ($noAutoAckStamp) {
             $this->unacks ??= new \SplObjectStorage();
             foreach ($envelope->all(NoAutoAckStamp::class) as $stamp) {
-                $this->unacks[$stamp->getHandlerDescriptor()->getBatchHandler()] = [$envelope, $transportName, $this->clock->now()->format('U.u')];
+                $this->unacks[$stamp->getHandlerDescriptor()->getBatchHandler()] = [$envelope, $transportName, $this->clock->now()->format('U.u'), $receipt];
             }
         }
 
@@ -247,13 +252,14 @@ class Worker
             }
 
             [$transportName, $envelope, $e] = $ack;
+            $receipt = $ack[4];
             $receiver = $this->receivers[$transportName];
 
             if (null !== $e) {
                 if ($rejectFirst = $e instanceof RejectRedeliveredMessageException) {
                     // redelivered messages are rejected first so that continuous failures in an event listener or while
                     // publishing for retry does not cause infinite redelivery loops
-                    unset($this->keepalives[$envelope->getMessage()]);
+                    unset($this->keepalives[$receipt]);
                     $receiver->reject($envelope);
                 }
 
@@ -272,7 +278,7 @@ class Worker
                 $envelope = $failedEvent->getEnvelope();
 
                 if (!$rejectFirst) {
-                    unset($this->keepalives[$envelope->getMessage()]);
+                    unset($this->keepalives[$receipt]);
 
                     if ($failedEvent->willRetry()) {
                         $receiver->ack($envelope);
@@ -297,7 +303,7 @@ class Worker
                 $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);
             }
 
-            unset($this->keepalives[$envelope->getMessage()]);
+            unset($this->keepalives[$receipt]);
             $receiver->ack($envelope);
         }
 
@@ -358,7 +364,7 @@ class Worker
         }
 
         foreach ($unacks as $handler) {
-            [$envelope, $transportName] = $unacks[$handler];
+            [$envelope, $transportName, , $receipt] = $unacks[$handler];
             $heldAcks = \count($this->acks);
             try {
                 $this->bus->dispatch($envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp($force)));
@@ -377,7 +383,7 @@ class Worker
                     // the acks that the batch sent during the flush come first, and this failure is ignored when they already gave the message its outcome
                     $ackStamp->ack($envelope, $e);
                 } else {
-                    $this->acks[] = [$transportName, $envelope, $e];
+                    $this->acks[] = [$transportName, $envelope, $e, null, $receipt];
                 }
             }
         }
@@ -394,8 +400,8 @@ class Worker
 
     public function keepalive(?int $seconds): void
     {
-        foreach ($this->keepalives as $message) {
-            [$transportName, $envelope] = $this->keepalives[$message];
+        foreach ($this->keepalives as $receipt) {
+            [$transportName, $envelope] = $this->keepalives[$receipt];
 
             if (!$this->receivers[$transportName] instanceof KeepaliveReceiverInterface) {
                 throw new RuntimeException(\sprintf('Receiver for "%s" does not implement "%s".', $transportName, KeepaliveReceiverInterface::class));

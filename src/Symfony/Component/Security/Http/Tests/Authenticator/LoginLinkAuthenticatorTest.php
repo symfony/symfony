@@ -106,6 +106,31 @@ class LoginLinkAuthenticatorTest extends TestCase
         (new LoginLinkAuthenticator($loginLinkHandler, new HttpUtils(), $this->successHandler, $this->failureHandler, []))->authenticate($request);
     }
 
+    public function testArrayUser()
+    {
+        $request = Request::create('/login/link/check?user[]=alice');
+        $loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
+        $loginLinkHandler->expects($this->never())->method('consumeLoginLink');
+
+        $this->expectException(InvalidLoginLinkAuthenticationException::class);
+        $this->expectExceptionMessage('Invalid user from link.');
+
+        (new LoginLinkAuthenticator($loginLinkHandler, new HttpUtils(), $this->successHandler, $this->failureHandler, []))->authenticate($request);
+    }
+
+    public function testUserWithZeroIdentifier()
+    {
+        $request = Request::create('/login/link/check?user=0');
+        $user = new InMemoryUser('0', 'password');
+        $loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
+        $loginLinkHandler->expects($this->once())->method('consumeLoginLink')->with($request)->willReturn($user);
+
+        $passport = (new LoginLinkAuthenticator($loginLinkHandler, new HttpUtils(), $this->successHandler, $this->failureHandler, []))->authenticate($request);
+
+        $this->assertSame('0', $passport->getBadge(UserBadge::class)->getUserIdentifier());
+        $this->assertSame($user, $passport->getUser());
+    }
+
     public function testPassportBadges()
     {
         $this->setUpAuthenticator();

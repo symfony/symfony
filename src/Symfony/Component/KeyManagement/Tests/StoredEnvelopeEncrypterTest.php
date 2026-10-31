@@ -91,7 +91,7 @@ class StoredEnvelopeEncrypterTest extends TestCase
         $store->method('get')->willReturnCallback(static fn (string $reference): DataKeyHandle => new DataKeyHandle($reference, new DataKey(str_repeat('K', 32), new Ciphertext('wrapped', 'app'))));
         $encrypter = new StoredEnvelopeEncrypter($store);
         $envelope = $encrypter->encrypt('user.email', 'hello', 'context');
-        $aliased = Envelope::referencing('second', $envelope->iv, $envelope->tag, $envelope->ciphertext);
+        $aliased = Envelope::referencing('second', $envelope->iv, $envelope->tag, $envelope->ciphertext, $envelope->salt);
 
         $this->assertSame('hello', $encrypter->decrypt($envelope, 'context'));
         $this->expectException(DecryptionFailedException::class);
@@ -105,7 +105,7 @@ class StoredEnvelopeEncrypterTest extends TestCase
         $store->method('get')->willReturnCallback(static fn (string $reference): DataKeyHandle => new DataKeyHandle($reference, new DataKey(str_repeat('K', 32), new Ciphertext('wrapped', 'app'))));
         $encrypter = new StoredEnvelopeEncrypter($store);
         $envelope = $encrypter->encrypt('user.email', 'hello', 'bc');
-        $shifted = Envelope::referencing('ab', $envelope->iv, $envelope->tag, $envelope->ciphertext);
+        $shifted = Envelope::referencing('ab', $envelope->iv, $envelope->tag, $envelope->ciphertext, $envelope->salt);
 
         $this->assertSame('hello', $encrypter->decrypt($envelope, 'bc'));
         $this->expectException(DecryptionFailedException::class);
@@ -156,7 +156,7 @@ class StoredEnvelopeEncrypterTest extends TestCase
     public function testALostDataKeyIsReportedAsSuch()
     {
         $envelope = $this->encrypter->encrypt('user.email', 'hello');
-        $orphan = Envelope::referencing(str_repeat("\x00", 16), $envelope->iv, $envelope->tag, $envelope->ciphertext);
+        $orphan = Envelope::referencing(str_repeat("\x00", 16), $envelope->iv, $envelope->tag, $envelope->ciphertext, $envelope->salt);
 
         $this->expectException(DataKeyNotFoundException::class);
         $this->encrypter->decrypt($orphan);
@@ -170,6 +170,7 @@ class StoredEnvelopeEncrypterTest extends TestCase
             $envelope->iv,
             $envelope->tag,
             substr_replace($envelope->ciphertext, $envelope->ciphertext[-1] ^ "\x01", -1, 1),
+            $envelope->salt,
         );
 
         $this->expectException(DecryptionFailedException::class);
@@ -185,6 +186,7 @@ class StoredEnvelopeEncrypterTest extends TestCase
             $envelope->iv,
             $envelope->tag,
             substr_replace($envelope->ciphertext, $envelope->ciphertext[-1] ^ "\x01", -1, 1),
+            $envelope->salt,
         );
 
         $trace = self::traceOf(fn () => $this->encrypter->decrypt($tampered));
@@ -228,7 +230,7 @@ class StoredEnvelopeEncrypterTest extends TestCase
     {
         $store = new InMemoryDataKeyStore([], keyBytes: 16);
         $envelope = $this->encrypter->encrypt('user.email', 'hello');
-        $foreign = Envelope::referencing($store->current('user.email')->reference, $envelope->iv, $envelope->tag, $envelope->ciphertext);
+        $foreign = Envelope::referencing($store->current('user.email')->reference, $envelope->iv, $envelope->tag, $envelope->ciphertext, $envelope->salt);
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The data key must be 32 bytes long for "aes-256-gcm", 16 given.');
@@ -269,7 +271,7 @@ class StoredEnvelopeEncrypterTest extends TestCase
     public function testAnEnvelopeRePointedAtAnotherScopesKeyDoesNotDecrypt()
     {
         $envelope = $this->encrypter->encrypt('user.email', 'hello');
-        $swapped = Envelope::referencing($this->store->current('user.phone')->reference, $envelope->iv, $envelope->tag, $envelope->ciphertext);
+        $swapped = Envelope::referencing($this->store->current('user.phone')->reference, $envelope->iv, $envelope->tag, $envelope->ciphertext, $envelope->salt);
 
         $this->expectException(DecryptionFailedException::class);
         $this->encrypter->decrypt($swapped);

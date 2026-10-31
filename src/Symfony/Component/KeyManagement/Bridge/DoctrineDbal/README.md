@@ -188,7 +188,7 @@ Type::getTypeRegistry()->register('app_user_email', new EncryptedType(
 ));
 ```
 
-Rows of that column use the same data key and contain a 16-byte reference to that key.
+Rows of that column share a root data key and contain a 16-byte reference to it plus a 32-byte salt for their payload key.
 To read existing self-contained envelopes during migration, give the store-backed encrypter a fallback, `read_self_contained: true` in the bundle.
 Keep the old configured key string as the new scope and retain the same parent type name.
 The encrypted declaration's name can change.
@@ -258,13 +258,14 @@ follows the collation of the connection: under a case-insensitive one,
 `user.email` and `User.Email` are one scope.
 
 A key is retired thirty days after it was minted, `DEFAULT_MAX_AGE_SECONDS`, and `max_age` controls that age.
-Stored envelopes use AES-256-GCM with random 96-bit IVs.
-NIST SP 800-38D limits this mode to 2^32 encryptions per key across all processes.
-Age-based rotation doesn't count encryptions.
-Choose `max_age` so the total writes under one key stay below that limit.
-The default thirty days covers about 1650 writes per second across all writers of one scope.
+Stored envelopes derive a separate AES-256-GCM key for each payload using [HKDF-SHA-256](https://www.rfc-editor.org/rfc/rfc5869).
+Each envelope carries a fresh random 32-byte salt, alongside its data key reference, random 12-byte IV and 16-byte authentication tag.
+The stored root key is the HKDF input keying material; the info is `symfony/key-management/stored-envelope/v1`.
+The format ID, reference and salt are authenticated together with the caller's AAD.
+This keeps payloads from accumulating random GCM IVs under the same encryption key, while retaining the store's shared root key and KMS cache.
+`max_age` controls the lifetime of that root key.
 Passing `null` disables age-based rotation.
-Rewrapping keeps the same data key and doesn't reset its usage count.
+Rewrapping keeps the root key bytes unchanged, so existing payloads keep deriving the same encryption keys.
 Retiring a key never deletes its row, so existing values stay readable.
 
 `bindWrappingContext: true`, `bind_wrapping_context` in the bundle, has the backend
@@ -462,11 +463,9 @@ Without a data key store, each row is a self-contained envelope:
   * **The master key cannot be rotated** without decrypting and rewriting every
     row that refers to it.
 
-With a store, the first two invert and the third disappears: the KMS is reached
-once per data key and per process, a row carries a 16-byte reference, and moving
-to another master key or another provider rewraps the key rows only. What you
-give up is self-sufficiency, since reading a row now needs the store as well as
-the KMS, and isolation, since a whole scope shares one data key.
+With a store, KMS results are cached across payloads.
+A row carries a 16-byte reference and a 32-byte salt, and moving to another master key or another provider rewraps the key rows only.
+What you give up is self-sufficiency, since reading a row now needs the store as well as the KMS, and isolation, since a whole scope shares one root key.
 
 Either way:
 

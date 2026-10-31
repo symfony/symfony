@@ -43,6 +43,7 @@ final class Envelope implements \Stringable
         public readonly ?string $keyId = null,
         public readonly ?string $wrappedDek = null,
         public readonly ?string $reference = null,
+        public readonly string $salt = '',
     ) {
     }
 
@@ -65,16 +66,17 @@ final class Envelope implements \Stringable
     /**
      * An envelope referring to a data key held by a {@see DataKeyStoreInterface}.
      *
-     * @throws InvalidArgumentException If `$reference` overflows its on-the-wire length field, or if `$iv` or `$tag` do not have the length the format frames them at
+     * @throws InvalidArgumentException If `$reference` overflows its on-the-wire length field, or if `$iv`, `$tag` or `$salt` do not have the length the format frames them at
      */
-    public static function referencing(string $reference, string $iv, string $tag, string $ciphertext): self
+    public static function referencing(string $reference, string $iv, string $tag, string $ciphertext, string $salt): self
     {
         self::assertFits('data key reference', $reference);
         $format = new StoredFormat();
         self::assertLength('iv', $iv, $format->ivBytes());
         self::assertLength('tag', $tag, $format->tagBytes());
+        self::assertLength('salt', $salt, $format->saltBytes());
 
-        return new self($format, $iv, $tag, $ciphertext, reference: $reference);
+        return new self($format, $iv, $tag, $ciphertext, null, null, $reference, $salt);
     }
 
     public function __toString(): string

@@ -56,7 +56,8 @@ $payload = $envelopeEncrypter->decrypt(Envelope::fromBytes(file_get_contents($pa
 
 `EnvelopeEncrypter` authenticates the AAD locally and doesn't pass the AAD to the KMS.
 The local authentication also covers the envelope format, key ID and wrapped data key.
-Stored envelopes authenticate their format and data key reference instead, so rewrapping preserves existing payloads.
+Stored envelopes derive a separate AES key per payload with HKDF-SHA-256 and a fresh random 32-byte salt.
+They authenticate their format, data key reference and salt, so rewrapping preserves existing payloads.
 Earlier experimental implementations used different authenticated data.
 Migrate those envelopes with the previous implementation and the trusted original AAD, then encrypt the plaintext with the current implementation.
 Derived Vault keys also need migration for the new [derivation context framing](Bridge/HashiCorpVault/README.md#migrating-derived-keys).

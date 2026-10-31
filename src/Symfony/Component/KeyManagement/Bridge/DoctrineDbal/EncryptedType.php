@@ -48,10 +48,9 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  * describes. With an {@see EnvelopeEncrypter} it is a master key: every row
  * carries its own data encryption key wrapped inside its envelope, and the KMS
  * is consulted on every read and every write. With a
- * {@see StoredEnvelopeEncrypter} it is a scope: rows of that scope share a
- * stored data key and carry a 16-byte reference to it, so the KMS is consulted
- * once per data key and per process, and that key can later be rewrapped under
- * another provider without rewriting a single row.
+ * {@see StoredEnvelopeEncrypter} it is a scope: rows of that scope share a stored root key, and each payload uses a separate key derived from its salt.
+ * Each row carries a 16-byte reference and a 32-byte salt.
+ * The store caches the root key across payloads, and that key can later be rewrapped under another provider without rewriting a single row.
  *
  * The configured key and `$typeName` are authenticated as the AAD on both paths.
  * Pass a stable parent type name to keep values readable when its PHP class changes.

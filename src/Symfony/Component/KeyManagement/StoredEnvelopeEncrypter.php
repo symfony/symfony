@@ -19,9 +19,10 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  * Envelope encryption over a {@see DataKeyStoreInterface}, in {@see StoredFormat}.
  *
  * Where {@see EnvelopeEncrypter} mints a data key per payload and ships it wrapped inside the
- * envelope, this one asks the store for the data key of a scope and ships a reference to it. Every
- * payload of a scope shares that key, so the KMS is contacted once per key and per process instead
- * of once per payload, and the payload carries a 16-byte reference instead of a wrapped key.
+ * envelope, this one asks the store for the root key of a scope and ships a reference to it.
+ * HKDF-SHA-256 derives a separate AES key for each payload from a fresh 32-byte salt.
+ * The store can retain the root key across payloads, so derivation requires no extra KMS calls.
+ * The payload carries a reference and salt instead of a wrapped key.
  *
  * `$key` is read as the scope: whatever the application decides may share a data key, typically a
  * column, a tenant or a purpose. The master key and the KMS client belong to the store, which
@@ -36,7 +37,7 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  * through the KMS. Without that fallback, a self-contained envelope is refused rather than
  * silently mishandled.
  *
- * The local AEAD authenticates the format id and data key reference alongside the caller's AAD.
+ * The local AEAD authenticates the format id, data key reference and derivation salt alongside the caller's AAD.
  * A stored payload reassembled as a self-contained frame fails authentication, including through the fallback.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
@@ -46,6 +47,8 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
 final class StoredEnvelopeEncrypter implements EnvelopeEncrypterInterface, EnvelopeDecrypterInterface
 {
     use LocalAead;
+
+    private const string KEY_DERIVATION_CONTEXT = 'symfony/key-management/stored-envelope/v1';
 
     private readonly StoredFormat $format;
 
@@ -70,11 +73,22 @@ final class StoredEnvelopeEncrypter implements EnvelopeEncrypterInterface, Envel
     {
         $format = $this->format;
         $dataKey = $this->store->current($key);
+        $salt = random_bytes($format->saltBytes());
         $iv = random_bytes($format->ivBytes());
 
-        [$ciphertext, $tag] = $dataKey->use(static fn (#[\SensitiveParameter] string $dek): array => self::seal($format, $dek, $plaintext, $iv, $aad, $dataKey->reference));
+        [$ciphertext, $tag] = $dataKey->use(static function (#[\SensitiveParameter] string $rootKey) use ($format, $salt, $plaintext, $iv, $aad, $dataKey): array {
+            $payloadKey = self::deriveKey($format, $rootKey, $salt);
 
-        return Envelope::referencing($dataKey->reference, $iv, $tag, $ciphertext);
+            try {
+                return self::seal($format, $payloadKey, $plaintext, $iv, $aad, $dataKey->reference, $salt);
+            } finally {
+                if (\function_exists('sodium_memzero')) {
+                    sodium_memzero($payloadKey);
+                }
+            }
+        });
+
+        return Envelope::referencing($dataKey->reference, $iv, $tag, $ciphertext, $salt);
     }
 
     /**
@@ -87,10 +101,27 @@ final class StoredEnvelopeEncrypter implements EnvelopeEncrypterInterface, Envel
         if (null !== $envelope->reference) {
             $dataKey = $this->store->get($envelope->reference);
 
-            return $dataKey->use(static fn (#[\SensitiveParameter] string $dek): string => self::open($envelope, $dek, $aad));
+            return $dataKey->use(static function (#[\SensitiveParameter] string $rootKey) use ($envelope, $aad): string {
+                $payloadKey = self::deriveKey($envelope->format, $rootKey, $envelope->salt);
+
+                try {
+                    return self::open($envelope, $payloadKey, $aad);
+                } finally {
+                    if (\function_exists('sodium_memzero')) {
+                        sodium_memzero($payloadKey);
+                    }
+                }
+            });
         }
 
         return $this->selfContained?->decrypt($envelope, $aad)
             ?? throw new LogicException(\sprintf('The envelope carries its own data key; give "%s" a decrypter for that format to read it, which is what the "key_management.store.read_self_contained" option does.', self::class));
+    }
+
+    private static function deriveKey(EnvelopeFormat $format, #[\SensitiveParameter] string $rootKey, string $salt): string
+    {
+        self::checkKeyLength($format, $rootKey);
+
+        return hash_hkdf('sha256', $rootKey, $format->keyBytes(), self::KEY_DERIVATION_CONTEXT, $salt);
     }
 }

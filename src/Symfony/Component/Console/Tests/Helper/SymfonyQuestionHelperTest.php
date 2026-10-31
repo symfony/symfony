@@ -19,6 +19,7 @@ use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
 #[Group('tty')]
@@ -171,6 +172,34 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTestCase
         $helper->ask($input, $output = $this->createOutputInterface(), new Question('Question with a trailing \\'));
 
         $this->assertOutputContains('Question with a trailing \\', $output);
+    }
+
+    public function testAskLocalizedConfirmation()
+    {
+        $helper = new SymfonyQuestionHelper();
+        $question = new ConfirmationQuestion('هل تريد المتابعة؟', false, '/^نعم$/u', 'نعم', 'لا');
+
+        $this->assertTrue($helper->ask(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("نعم\n")),
+            $output = $this->createOutputInterface(),
+            $question
+        ));
+
+        $this->assertOutputContains('هل تريد المتابعة؟ (نعم/لا) [لا]:', $output);
+    }
+
+    public function testConfirmationLabelsAreEscaped()
+    {
+        $helper = new SymfonyQuestionHelper();
+        $question = new ConfirmationQuestion('Proceed?', true, '/^y/i', '<info>yes</info>', '<comment>no</comment>');
+
+        $this->assertTrue($helper->ask(
+            $this->createStreamableInputInterfaceMock($this->getInputStream("\n")),
+            $output = $this->createOutputInterface(),
+            $question
+        ));
+
+        $this->assertOutputContains('Proceed? (<info>yes</info>/<comment>no</comment>) [<info>yes</info>]:', $output);
     }
 
     public function testAskThrowsExceptionOnMissingInput()

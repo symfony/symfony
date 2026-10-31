@@ -585,7 +585,7 @@ class QuestionHelper extends Helper
         }
 
         if (!$question->isMultiline()) {
-            $cp = $this->setIOCodepage();
+            $cp = $this->setIOCodepage($inputStream);
             $ret = $this->doReadInput($inputStream);
 
             return $this->resetIOCodepage($cp, $ret);
@@ -596,7 +596,7 @@ class QuestionHelper extends Helper
             return false;
         }
 
-        $cp = $this->setIOCodepage();
+        $cp = $this->setIOCodepage($inputStream);
         $ret = $this->doReadInput($multiLineStreamReader, "\x4");
 
         if (stream_get_meta_data($inputStream)['seekable']) {
@@ -606,9 +606,14 @@ class QuestionHelper extends Helper
         return $this->resetIOCodepage($cp, $ret);
     }
 
-    private function setIOCodepage(): int
+    /**
+     * @param resource $inputStream
+     */
+    private function setIOCodepage($inputStream): int
     {
-        if (\function_exists('sapi_windows_cp_set')) {
+        // Only terminal input needs OEM conversion on Windows. Other streams can
+        // already contain UTF-8 text and must not be converted from the OEM codepage.
+        if ('php://stdin' === (stream_get_meta_data($inputStream)['uri'] ?? null) && \function_exists('sapi_windows_cp_set')) {
             $cp = sapi_windows_cp_get();
             sapi_windows_cp_set(sapi_windows_cp_get('oem'));
 

@@ -204,7 +204,10 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     public function isRequired(): bool
     {
-        if (null === $this->parent || $this->parent->isRequired()) {
+        if (null === $this->parent
+            || $this->parent->isRequired()
+            || !$this->parent->getConfig()->getOption('inherit_required', true)
+        ) {
             return $this->config->getRequired();
         }
 

@@ -12,6 +12,7 @@ CHANGELOG
  * Add `AbstractTransport::setSsl()`, `AbstractTransport::getHttpScheme()`, the `AbstractTransport::SSL` constant and `AbstractTransportFactory::getSsl()` to support the `ssl` DSN option of the bridges
  * Use the global clock of symfony/clock, when installed, for the retry period of `RoundRobinTransport` and `FailoverTransport`
  * Use the global `From` header of the mailer as the sender of the email channel when no envelope sender is configured
+ * Add a `$dispatcher` argument to `EmailChannel` to dispatch a queued Mailer `MessageEvent` before sending an email to the message bus
 
 8.0
 ---

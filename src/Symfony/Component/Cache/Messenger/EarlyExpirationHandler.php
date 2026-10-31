@@ -30,7 +30,7 @@ class EarlyExpirationHandler
     }
 
     /**
-     * @return void
+     * @return EarlyExpirationResult|null
      */
     public function __invoke(EarlyExpirationMessage $message)
     {
@@ -47,11 +47,11 @@ class EarlyExpirationHandler
             $key = $item->getKey();
 
             if (($this->processedNonces[$pool][$key] ?? null) === $processingNonce) {
-                return;
+                return null;
             }
 
             if (microtime(true) >= $expiry) {
-                return;
+                return null;
             }
 
             $this->processedNonces[$pool] = [$key => $processingNonce] + ($this->processedNonces[$pool] ?? []);
@@ -81,5 +81,7 @@ class EarlyExpirationHandler
         $value = $callback($item, $save);
         $setMetadata($item, $startTime);
         $pool->save($item->set($value));
+
+        return new EarlyExpirationResult($item);
     }
 }

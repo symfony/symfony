@@ -1428,7 +1428,7 @@ diff --git a/src/Symfony/Component/Cache/Messenger/EarlyExpirationDispatcher.php
 --- a/src/Symfony/Component/Cache/Messenger/EarlyExpirationDispatcher.php
 +++ b/src/Symfony/Component/Cache/Messenger/EarlyExpirationDispatcher.php
 @@ -38,5 +38,5 @@ class EarlyExpirationDispatcher
-      * @return mixed
+      * @return mixed The computed value, or the cached value when recomputation is deferred or skipped
       */
 -    public function __invoke(callable $callback, CacheItem $item, bool &$save, AdapterInterface $pool, \Closure $setMetadata, ?LoggerInterface $logger = null, ?float $beta = null)
 +    public function __invoke(callable $callback, CacheItem $item, bool &$save, AdapterInterface $pool, \Closure $setMetadata, ?LoggerInterface $logger = null, ?float $beta = null): mixed
@@ -1438,10 +1438,10 @@ diff --git a/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php b/
 --- a/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php
 +++ b/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php
 @@ -33,5 +33,5 @@ class EarlyExpirationHandler
-      * @return void
+      * @return EarlyExpirationResult|null
       */
 -    public function __invoke(EarlyExpirationMessage $message)
-+    public function __invoke(EarlyExpirationMessage $message): void
++    public function __invoke(EarlyExpirationMessage $message): ?EarlyExpirationResult
      {
          $item = $message->getItem();
 diff --git a/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php b/src/Symfony/Component/Cache/Traits/FilesystemCommonTrait.php

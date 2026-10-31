@@ -1429,7 +1429,7 @@ class OidcLoginAuthenticatorTest extends TestCase
         $token = $authenticator->createToken($passport, 'main');
 
         $this->assertSame($idToken, $token->getAttribute('oidc_id_token'));
-        $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('access-123', $token->getAttribute('oauth2_access_token'));
     }
 
     public function testCreateTokenStoresTheRefreshTokenAndTheAccessTokenExpiry()
@@ -1451,8 +1451,8 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         $token = $authenticator->createToken($passport, 'main');
 
-        $this->assertSame('refresh-123', $token->getAttribute('oidc_refresh_token'));
-        $this->assertSame($clock->now()->getTimestamp() + 300, $token->getAttribute('oidc_access_token_expires_at'));
+        $this->assertSame('refresh-123', $token->getAttribute('oauth2_refresh_token'));
+        $this->assertSame($clock->now()->getTimestamp() + 300, $token->getAttribute('oauth2_access_token_expires_at'));
     }
 
     #[Group('time-sensitive')]
@@ -1474,7 +1474,7 @@ class OidcLoginAuthenticatorTest extends TestCase
         sleep(60);
         $token = $authenticator->createToken($passport, 'main');
 
-        $this->assertSame(time() + 300, $token->getAttribute('oidc_access_token_expires_at'));
+        $this->assertSame(time() + 300, $token->getAttribute('oauth2_access_token_expires_at'));
     }
 
     public function testCreateTokenStampsTheAuthenticationTimeFromTheAuthTimeClaim()
@@ -1720,8 +1720,8 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         $token = $authenticator->createToken($passport, 'main');
 
-        $this->assertNull($token->getAttribute('oidc_refresh_token'));
-        $this->assertNull($token->getAttribute('oidc_access_token_expires_at'));
+        $this->assertNull($token->getAttribute('oauth2_refresh_token'));
+        $this->assertNull($token->getAttribute('oauth2_access_token_expires_at'));
     }
 
     public function testSessionClearedEvenWhenExchangeCodeFails()

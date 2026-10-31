@@ -64,11 +64,11 @@ class OidcTokenRefreshListenerTest extends TestCase
 
     public function testDoesNothingWhenTheSecurityTokenCarriesNoRefreshToken()
     {
-        $this->tokenStorage->setToken($token = $this->createToken(['oidc_refresh_token' => null]));
+        $this->tokenStorage->setToken($token = $this->createToken(['oauth2_refresh_token' => null]));
 
         $this->createListener(new JsonMockResponse(['access_token' => 'access-456']))->authenticate($this->createRequestEvent());
 
-        $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('access-123', $token->getAttribute('oauth2_access_token'));
     }
 
     public function testRenewsTheExpiredAccessToken()
@@ -78,7 +78,7 @@ class OidcTokenRefreshListenerTest extends TestCase
         $this->createListener(new JsonMockResponse(['access_token' => 'access-456', 'expires_in' => 300]))->authenticate($this->createRequestEvent());
 
         $this->assertSame($token, $this->tokenStorage->getToken());
-        $this->assertSame('access-456', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('access-456', $token->getAttribute('oauth2_access_token'));
     }
 
     public function testEndsTheSessionWhenTheProviderRejectsTheRefreshToken()
@@ -101,16 +101,16 @@ class OidcTokenRefreshListenerTest extends TestCase
         $this->createListener(new MockResponse('Service Unavailable', ['http_code' => 503]))->authenticate($this->createRequestEvent());
 
         $this->assertSame($token, $this->tokenStorage->getToken());
-        $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('access-123', $token->getAttribute('oauth2_access_token'));
     }
 
     public function testLeavesAValidAccessTokenAlone()
     {
-        $this->tokenStorage->setToken($token = $this->createToken(['oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() + 300]));
+        $this->tokenStorage->setToken($token = $this->createToken(['oauth2_access_token_expires_at' => $this->clock->now()->getTimestamp() + 300]));
 
         $this->createListener(new JsonMockResponse(['access_token' => 'access-456']))->authenticate($this->createRequestEvent());
 
-        $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('access-123', $token->getAttribute('oauth2_access_token'));
     }
 
     private function createRequestEvent(): RequestEvent
@@ -148,9 +148,9 @@ class OidcTokenRefreshListenerTest extends TestCase
     {
         $token = new PostAuthenticationToken(new InMemoryUser('user-42', null), 'main', ['ROLE_USER']);
         $token->setAttributes(array_merge([
-            'oidc_access_token' => 'access-123',
-            'oidc_refresh_token' => 'refresh-123',
-            'oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() - 1,
+            'oauth2_access_token' => 'access-123',
+            'oauth2_refresh_token' => 'refresh-123',
+            'oauth2_access_token_expires_at' => $this->clock->now()->getTimestamp() - 1,
         ], $attributes));
 
         return $token;

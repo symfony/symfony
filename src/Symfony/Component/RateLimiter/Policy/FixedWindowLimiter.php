@@ -12,6 +12,7 @@
 namespace Symfony\Component\RateLimiter\Policy;
 
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimit;
@@ -35,11 +36,15 @@ final class FixedWindowLimiter implements LimiterInterface
             throw new \InvalidArgumentException(\sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', __CLASS__));
         }
 
+        $this->interval = TimeUtil::dateIntervalToSeconds($interval);
+        if ($this->interval < 1) {
+            throw new InvalidIntervalException(\sprintf('The interval must be positive integer, "%d" given.', $this->interval));
+        }
+
         $this->storage = $storage;
         $this->lock = $lock;
         $this->id = $id;
         $this->limit = $limit;
-        $this->interval = TimeUtil::dateIntervalToSeconds($interval);
     }
 
     public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation

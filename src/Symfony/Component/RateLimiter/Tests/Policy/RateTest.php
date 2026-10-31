@@ -60,6 +60,18 @@ class RateTest extends TestCase
         new Rate(\DateInterval::createFromDateString('200 milliseconds'));
     }
 
+    /**
+     * @testWith [0]
+     *           [-1]
+     */
+    public function testRejectRefillAmountBelowOne(int $refillAmount)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The refill amount must be a positive integer, "%d" given.', $refillAmount));
+
+        new Rate(new \DateInterval('PT1S'), $refillAmount);
+    }
+
     public function testCalculateTimeForTokensBelowTheCapIsNotChanged()
     {
         self::assertSame(2147483647, Rate::perSecond(1)->calculateTimeForTokens(2147483647));

@@ -57,14 +57,14 @@ class AzureKeyVaultFactoryTest extends TestCase
     public function testUnknownAlgorithmIsRejected()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "algorithm" option of the "azure-keyvault://" DSN must be one of "RSA-OAEP-256", "RSA-OAEP", "RSA1_5", ');
+        $this->expectExceptionMessage('The "algorithm" option of the "azure-keyvault://" DSN must be one of "RSA-OAEP-256", "A128GCM", "A192GCM", "A256GCM", "RSA-OAEP-265" given.');
         (new AzureKeyVaultFactory())->create(Dsn::fromString('azure-keyvault://id:secret@my-vault.vault.azure.net?tenant=t&algorithm=RSA-OAEP-265'));
     }
 
     public function testUnknownWrapAlgorithmIsRejected()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "wrap_algorithm" option of the "azure-keyvault://" DSN must be one of "RSA-OAEP-256", "RSA-OAEP", "RSA1_5", ');
+        $this->expectExceptionMessage('The "wrap_algorithm" option of the "azure-keyvault://" DSN must be one of "RSA-OAEP-256", "A128GCM", "A192GCM", "A256GCM", "A128KW", "A192KW", "A256KW", "A256GCMKW" given.');
         (new AzureKeyVaultFactory())->create(Dsn::fromString('azure-keyvault://id:secret@my-hsm.managedhsm.azure.net?tenant=t&wrap_algorithm=A256GCMKW'));
     }
 

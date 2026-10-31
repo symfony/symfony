@@ -63,26 +63,7 @@ final class AzureKeyVaultFactory implements KmsFactoryInterface
         '.managedhsm.azure.cn',
     ];
 
-    /**
-     * Azure answers HTTP 400 to an unknown "alg", which the decrypt path masks as a decryption failure.
-     */
-    private const array ALGORITHMS = [
-        'RSA-OAEP-256',
-        'RSA-OAEP',
-        'RSA1_5',
-        'A128GCM',
-        'A192GCM',
-        'A256GCM',
-        'A128CBC',
-        'A192CBC',
-        'A256CBC',
-        'A128CBCPAD',
-        'A192CBCPAD',
-        'A256CBCPAD',
-        'A128KW',
-        'A192KW',
-        'A256KW',
-    ];
+    private const array ALGORITHMS = ['RSA-OAEP-256', 'A128GCM', 'A192GCM', 'A256GCM'];
 
     public function supports(#[\SensitiveParameter] Dsn $dsn): bool
     {
@@ -129,8 +110,9 @@ final class AzureKeyVaultFactory implements KmsFactoryInterface
     private static function algorithmOption(Dsn $dsn, string $option): string
     {
         $algorithm = $dsn->getOption($option, 'RSA-OAEP-256');
-        if (!\in_array($algorithm, self::ALGORITHMS, true)) {
-            throw new InvalidArgumentException(\sprintf('The "%s" option of the "%s://" DSN must be one of "%s", "%s" given.', $option, $dsn->scheme, implode('", "', self::ALGORITHMS), $algorithm));
+        $supported = 'wrap_algorithm' === $option ? [...self::ALGORITHMS, 'A128KW', 'A192KW', 'A256KW'] : self::ALGORITHMS;
+        if (!\in_array($algorithm, $supported, true)) {
+            throw new InvalidArgumentException(\sprintf('The "%s" option of the "%s://" DSN must be one of "%s", "%s" given.', $option, $dsn->scheme, implode('", "', $supported), $algorithm));
         }
 
         return $algorithm;

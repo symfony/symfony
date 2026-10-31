@@ -592,7 +592,7 @@
             </trans-unit>
             <trans-unit id="152">
                 <source>The duration of the audio could not be detected.</source>
-                <target>Trajanje zvočnega posnetka ni bilo mogoče določiti.</target>
+                <target>Trajanja zvočnega posnetka ni bilo mogoče določiti.</target>
             </trans-unit>
             <trans-unit id="153">
                 <source>The audio bitrate is too low ({{ bitrate }} bps). Minimum bitrate expected is {{ min_bitrate }} bps.</source>

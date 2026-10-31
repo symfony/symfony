@@ -65,4 +65,38 @@ class EarlyExpirationHandlerTest extends TestCase
         $this->assertGreaterThan(25, $metadata['ctime']);
         $this->assertGreaterThan(time(), $metadata['expiry']);
     }
+
+    public function testHandleDoesNotSaveWhenCallbackDisablesSaving()
+    {
+        $pool = new FilesystemAdapter();
+        $item = $pool->getItem('bar');
+        $pool->save($item->set(234));
+
+        $computationService = new class implements CallbackInterface {
+            public bool $called = false;
+
+            public function __invoke(CacheItemInterface $item, bool &$save): mixed
+            {
+                $this->called = true;
+                $save = false;
+
+                return 123;
+            }
+        };
+
+        $container = new Container();
+        $container->set('computation_service', $computationService);
+        $container->set('cache_pool', $pool);
+
+        $reverseContainer = new ReverseContainer($container, new ServiceLocator([]));
+
+        $msg = EarlyExpirationMessage::create($reverseContainer, $computationService, $item, $pool);
+
+        $handler = new EarlyExpirationHandler($reverseContainer);
+
+        $handler($msg);
+
+        $this->assertTrue($computationService->called);
+        $this->assertSame(234, $pool->getItem('bar')->get());
+    }
 }

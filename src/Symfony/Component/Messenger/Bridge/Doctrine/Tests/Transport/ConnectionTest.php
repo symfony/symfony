@@ -794,6 +794,33 @@ class ConnectionTest extends TestCase
         $this->assertTrue($hasCoveringIndex, 'Expected covering index on [queue_name, available_at, delivered_at, id] not found');
     }
 
+    public function testSetupRestoresSchemaAssetsFilterWhenSchemaUpdateFails()
+    {
+        $assetFilter = static fn () => true;
+        $configuration = new \Doctrine\DBAL\Configuration();
+        $configuration->setSchemaAssetsFilter($assetFilter);
+
+        $driverConnection = $this->createStub(DBALConnection::class);
+        $driverConnection->method('getConfiguration')->willReturn($configuration);
+        $exception = new \RuntimeException('Schema update failed.');
+        if (method_exists(DBALConnection::class, 'createSchemaManager')) {
+            $driverConnection->method('createSchemaManager')->willThrowException($exception);
+        } else {
+            $driverConnection->method('getSchemaManager')->willThrowException($exception);
+        }
+
+        $connection = new Connection([], $driverConnection);
+
+        try {
+            $connection->setup();
+            $this->fail('An exception should have been thrown.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        $this->assertSame($assetFilter, $configuration->getSchemaAssetsFilter());
+    }
+
     public function testConfigureSchemaDifferentDbalConnection()
     {
         $driverConnection = $this->getDBALConnection();

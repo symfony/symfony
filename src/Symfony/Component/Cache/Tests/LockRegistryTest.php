@@ -63,6 +63,7 @@ class LockRegistryTest extends TestCase
         $previousFiles = LockRegistry::setFiles([$file]);
         $fallback = $this->createStub(AdapterInterface::class);
         $fallback->method('getItem')->willReturnCallback((new ArrayAdapter())->getItem(...));
+        $fallback->method('save')->willReturn(true);
         $pool = $createPool($fallback);
         $pool->setCallbackWrapper(LockRegistry::compute(...));
 

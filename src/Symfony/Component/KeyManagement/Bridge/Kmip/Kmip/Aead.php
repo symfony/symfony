@@ -26,6 +26,7 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
  * The header is sent as the start of the authenticated additional data, so changing any of it makes decryption fail.
  * Storing the algorithm and the mode lets another cipher be added without changing the format.
  * Storing the IV length keeps earlier ciphertexts readable after the configured length changes, as long as the server accepts it.
+ * Vendor modes are accepted for decryption only when they match the configured AES-GCM-SIV mode.
  *
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  *
@@ -55,22 +56,29 @@ final class Aead
 
     private readonly int $algorithm;
     private readonly string $mode;
+    private readonly ?string $vendorMode;
 
     public function __construct(
         private readonly int $ivLength = self::DEFAULT_IV_LENGTH,
         string $cipher = 'aes-gcm',
+        ?string $mode = null,
     ) {
+        if (null !== $mode && !preg_match('/^0x8[0-9A-Fa-f]{7}$/D', $mode)) {
+            throw new InvalidArgumentException('The KMIP AES-GCM-SIV mode must be a hexadecimal value between 0x80000000 and 0x8FFFFFFF.');
+        }
+        $this->vendorMode = null === $mode ? null : pack('H*', substr($mode, 2));
         [$this->algorithm, $this->mode] = match ($cipher) {
             'aes-gcm' => [self::AES_ALGORITHM, self::GCM_BLOCK_CIPHER_MODE],
             'chacha20-poly1305' => [self::CHACHA20_POLY1305_ALGORITHM, self::NO_BLOCK_CIPHER_MODE],
-            default => throw new InvalidArgumentException('Supported KMIP ciphers are "aes-gcm" and "chacha20-poly1305".'),
+            'aes-gcm-siv' => [self::AES_ALGORITHM, $this->vendorMode ?? throw new InvalidArgumentException('The KMIP AES-GCM-SIV cipher requires a vendor mode.')],
+            default => throw new InvalidArgumentException('Supported KMIP ciphers are "aes-gcm", "chacha20-poly1305" and "aes-gcm-siv".'),
         };
         if ('aes-gcm' === $cipher) {
             if ($ivLength < self::MIN_IV_LENGTH || $ivLength > self::MAX_IV_LENGTH) {
                 throw new InvalidArgumentException(\sprintf('The KMIP AES-GCM IV length must be between %d and %d bytes.', self::MIN_IV_LENGTH, self::MAX_IV_LENGTH));
             }
         } elseif (self::DEFAULT_IV_LENGTH !== $ivLength) {
-            throw new InvalidArgumentException('The KMIP ChaCha20-Poly1305 IV length must be 12 bytes.');
+            throw new InvalidArgumentException(\sprintf('The KMIP "%s" IV length must be 12 bytes.', 'aes-gcm-siv' === $cipher ? 'AES-GCM-SIV' : 'ChaCha20-Poly1305'));
         }
     }
 
@@ -111,9 +119,10 @@ final class Aead
         $mode = substr($header, 5, 4);
         $isAesGcm = self::AES_ALGORITHM === $algorithm && self::GCM_BLOCK_CIPHER_MODE === $mode;
         $isChaCha20Poly1305 = self::CHACHA20_POLY1305_ALGORITHM === $algorithm && self::NO_BLOCK_CIPHER_MODE === $mode;
+        $isAesGcmSiv = self::AES_ALGORITHM === $algorithm && null !== $this->vendorMode && hash_equals($this->vendorMode, $mode);
         $ivLength = \ord($header[self::IV_LENGTH_OFFSET]);
 
-        if (self::FORMAT !== $header[0] || !$isAesGcm && !$isChaCha20Poly1305 || $ivLength < self::MIN_IV_LENGTH || !$isAesGcm && self::DEFAULT_IV_LENGTH !== $ivLength || \strlen($blob) < self::HEADER_LENGTH + $ivLength + self::TAG_LENGTH) {
+        if (self::FORMAT !== $header[0] || !$isAesGcm && !$isChaCha20Poly1305 && !$isAesGcmSiv || $ivLength < self::MIN_IV_LENGTH || !$isAesGcm && self::DEFAULT_IV_LENGTH !== $ivLength || \strlen($blob) < self::HEADER_LENGTH + $ivLength + self::TAG_LENGTH) {
             throw new DecryptionFailedException();
         }
 

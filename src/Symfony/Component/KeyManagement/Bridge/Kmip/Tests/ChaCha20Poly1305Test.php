@@ -202,7 +202,7 @@ final class ChaCha20Poly1305Test extends TestCase
     public function testTheCipherRequiresATwelveByteNonce()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The KMIP ChaCha20-Poly1305 IV length must be 12 bytes.');
+        $this->expectExceptionMessage('The KMIP "ChaCha20-Poly1305" IV length must be 12 bytes.');
 
         new KmipKms(self::authenticatedClient(), 16, self::CIPHER);
     }

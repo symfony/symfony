@@ -25,13 +25,13 @@ use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
 /**
  * Builds a {@see KmipKms} from a DSN of the form:
  *
- *     kmip://[<user>:<password>@]<host>[:<port>]?cert=<path>&key=<path>&version=<version>[&ca=<path>][&peer_name=<name>][&passphrase=<passphrase>][&cipher=aes-gcm][&iv_length=12][&timeout=10]
+ *     kmip://[<user>:<password>@]<host>[:<port>]?cert=<path>&key=<path>&version=<version>[&ca=<path>][&peer_name=<name>][&passphrase=<passphrase>][&cipher=aes-gcm][&mode=<vendor-mode>][&iv_length=12][&timeout=10]
  *
  * A client certificate and private key are required even when a username and password are supplied.
  * The `ca` option names a certificate authority file used to verify the server certificate; omitting it uses the system trust store.
  * The `peer_name` option controls the expected server name. The DSN has no path.
  *
- * The KMIP version, 1.4, 2.0 or 2.1, must be selected explicitly. The `cipher` option selects AES-GCM by default or ChaCha20-Poly1305. The `iv_length` option sets the AES-GCM IV length of new ciphertexts, 12 bytes by default.
+ * The KMIP version, 1.4, 2.0 or 2.1, must be selected explicitly. The `cipher` option defaults to AES-GCM and also supports ChaCha20-Poly1305 and AES-GCM-SIV. The `iv_length` option sets the AES-GCM IV length of new ciphertexts, 12 bytes by default. AES-GCM-SIV requires the server's vendor mode in the `mode` option; that mode also enables decryption when AES-GCM or ChaCha20-Poly1305 is selected.
  *
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  *
@@ -52,11 +52,11 @@ final class KmipKmsFactory implements KmsFactoryInterface
     /**
      * @var list<string>
      */
-    private const array SUPPORTED_OPTIONS = ['cert', 'key', 'version', 'cipher', 'iv_length', 'ca', 'peer_name', 'passphrase', 'timeout'];
+    private const array SUPPORTED_OPTIONS = ['cert', 'key', 'version', 'cipher', 'mode', 'iv_length', 'ca', 'peer_name', 'passphrase', 'timeout'];
     /**
      * @var list<string>
      */
-    private const array STRING_OPTIONS = ['version', 'cipher', 'iv_length', 'ca', 'peer_name', 'passphrase', 'timeout'];
+    private const array STRING_OPTIONS = ['version', 'cipher', 'mode', 'iv_length', 'ca', 'peer_name', 'passphrase', 'timeout'];
     /**
      * A hostname containing a slash, colon or whitespace must pass IP address validation.
      */
@@ -145,6 +145,6 @@ final class KmipKmsFactory implements KmsFactoryInterface
 
         $transport = new StreamTransport($host, $port, $clientCertificateFile, $clientPrivateKeyFile, $certificateAuthorityFile, $peerName ?? $host, $dsn->getOption('passphrase'), (float) $timeout);
 
-        return new KmipKms(new ProtocolClient($transport, $version, $dsn->user, $dsn->password), (int) $ivLength, $cipher);
+        return new KmipKms(new ProtocolClient($transport, $version, $dsn->user, $dsn->password), (int) $ivLength, $cipher, $dsn->getOption('mode'));
     }
 }

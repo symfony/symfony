@@ -79,8 +79,9 @@ final class KmipKms implements EncrypterInterface, DecrypterInterface, DataKeyGe
         private readonly RequestClientInterface $requestClient,
         int $ivLength = Aead::DEFAULT_IV_LENGTH,
         string $cipher = 'aes-gcm',
+        ?string $mode = null,
     ) {
-        $this->cipher = new Aead($ivLength, $cipher);
+        $this->cipher = new Aead($ivLength, $cipher, $mode);
     }
 
     public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, #[\SensitiveParameter] string $aad = ''): Ciphertext

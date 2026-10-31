@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add optional `$translator` and `$locale` arguments to `LoginLinkNotification` for translating its default email and SMS messages
  * Make `#[IsCsrfTokenValid]` recoverable, so a controller can receive an `InvalidCsrfTokenException`
  * Add `RedirectAuthenticationEntryPoint`, redirecting to a path or a route to start the authentication
  * Add a `$firewallName` argument to `DefaultAuthenticationFailureHandler` to retain the referer after failed authentication

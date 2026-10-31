@@ -116,6 +116,10 @@ class GenericMetadata implements MetadataInterface
             throw new ConstraintDefinitionException(\sprintf('The constraint "%s" can only be put on classes. Please use "Symfony\Component\Validator\Constraints\Valid" instead.', get_debug_type($constraint)));
         }
 
+        if (\in_array('*', $constraint->groups ?? [], true)) {
+            trigger_deprecation('symfony/validator', '8.2', 'Using "*" as a validation group name in the "%s" constraint is deprecated. This name is reserved for future use.', get_debug_type($constraint));
+        }
+
         if ($constraint instanceof Valid && (null === $constraint->groups || !$constraint->restrictGroups)) {
             $this->cascadingStrategy = CascadingStrategy::CASCADE;
             $this->traversalStrategy = $constraint->traverse ? TraversalStrategy::IMPLICIT : TraversalStrategy::NONE;

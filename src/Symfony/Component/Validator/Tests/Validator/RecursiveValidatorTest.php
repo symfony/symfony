@@ -12,6 +12,8 @@
 namespace Symfony\Component\Validator\Tests\Validator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Translation\IdentityTranslator;
@@ -1090,6 +1092,22 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validate($entity, null, ['Group 1', 'Group 2']);
 
         $this->assertCount(2, $violations);
+    }
+
+    #[DataProvider('provideStarGroups')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyValidateStarGroupIsDeprecated(string|array $groups)
+    {
+        $this->expectUserDeprecationMessage('Since symfony/validator 8.2: Passing "*" as a validation group is deprecated. This name is reserved for future use.');
+
+        $this->validate(new Entity(), null, $groups);
+    }
+
+    public static function provideStarGroups(): iterable
+    {
+        yield 'string' => ['*'];
+        yield 'array' => [['Default', '*']];
     }
 
     #[DataProvider('getInvalidGroups')]

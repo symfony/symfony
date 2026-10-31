@@ -33,7 +33,7 @@ class ServerParams
         $contentLength = $this->getContentLength();
         $maxContentLength = $this->getPostMaxSize();
 
-        return $maxContentLength && $contentLength > $maxContentLength;
+        return $maxContentLength > 0 && $contentLength > $maxContentLength;
     }
 
     /**

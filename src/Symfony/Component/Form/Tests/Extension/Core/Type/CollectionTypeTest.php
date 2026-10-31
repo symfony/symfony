@@ -334,6 +334,33 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertEquals(['foo@bar.com', 'bar@bar.com'], $form->getData());
     }
 
+    public function testIgnoresSubmittedEntriesWithInvalidNameWhenAllowAdd()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_add' => true,
+        ]);
+        $form->submit(['a.b' => 'x', 0 => 'y']);
+
+        $this->assertFalse($form->has('a.b'));
+        $this->assertTrue($form->has('0'));
+        $this->assertSame('y', $form[0]->getData());
+        $this->assertSame(['a.b' => 'x'], $form->getExtraData());
+    }
+
+    public function testIgnoresSubmittedEntriesWithEmptyNameWhenAllowAdd()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_add' => true,
+        ]);
+        $form->submit(['' => 'x', 0 => 'y']);
+
+        $this->assertFalse($form->has(''));
+        $this->assertSame([0 => 'y'], $form->getData());
+        $this->assertSame(['' => 'x'], $form->getExtraData());
+    }
+
     public function testAllowAddButNoPrototype()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

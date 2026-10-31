@@ -35,7 +35,7 @@ class EarlyExpirationDispatcher
     }
 
     /**
-     * @return mixed
+     * @return mixed The computed value, or the cached value when recomputation is deferred or skipped
      */
     public function __invoke(callable $callback, CacheItem $item, bool &$save, AdapterInterface $pool, \Closure $setMetadata, ?LoggerInterface $logger = null, ?float $beta = null)
     {
@@ -58,6 +58,12 @@ class EarlyExpirationDispatcher
 
         // The item's value is not stale, no need to write it to the backend
         $save = false;
+
+        foreach ($envelope->all(HandledStamp::class) as $stamp) {
+            if (($result = $stamp->getResult()) instanceof EarlyExpirationResult && $message->getItem() === $result->item) {
+                return $message->getItem()->get();
+            }
+        }
 
         return $message->getItem()->get() ?? $item->get();
     }

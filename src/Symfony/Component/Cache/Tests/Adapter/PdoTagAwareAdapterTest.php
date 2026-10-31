@@ -63,4 +63,50 @@ class PdoTagAwareAdapterTest extends AbstractPdoAdapterTestCase
             $this->assertFalse(str_contains($query, '?') && preg_match('/:\w/', $query), \sprintf('Query "%s" mixes named and positional parameters.', $query));
         }
     }
+
+    public function testInvalidateTagsCreatesMissingTableWhenExecutionIsDeferred()
+    {
+        $pool = new PdoTagAwareAdapter($this->createConnectionWithMissingTagsTable(false));
+
+        $this->assertTrue($pool->invalidateTags(['unused']));
+    }
+
+    public function testPruneCreatesMissingTagsTableWhenExecutionIsDeferred()
+    {
+        $pool = new PdoTagAwareAdapter($this->createConnectionWithMissingTagsTable(true));
+
+        $this->assertTrue($pool->prune());
+    }
+
+    private function createConnectionWithMissingTagsTable(bool $prune): \PDO
+    {
+        $exception = new \PDOException('The tags table does not exist.');
+        $exception->errorInfo = ['42P01', 7, $exception->getMessage()];
+        $attempts = 0;
+        $statement = $this->createMock(\PDOStatement::class);
+        $statement->expects($this->exactly(2))->method('execute')->willReturnCallback(static function () use ($exception, &$attempts): bool {
+            if (1 === ++$attempts) {
+                throw $exception;
+            }
+
+            return true;
+        });
+        $statements = [$statement];
+
+        if ($prune) {
+            $pruneItems = $this->createStub(\PDOStatement::class);
+            $pruneItems->method('execute')->willReturn(true);
+            array_unshift($statements, $pruneItems);
+        }
+
+        $pdo = $this->createMock(\PDO::class);
+        $pdo->method('getAttribute')->willReturnMap([
+            [\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION],
+            [\PDO::ATTR_DRIVER_NAME, 'pgsql'],
+        ]);
+        $pdo->expects($this->exactly(\count($statements)))->method('prepare')->willReturnOnConsecutiveCalls(...$statements);
+        $pdo->expects($this->exactly(2))->method('exec')->willReturn(0);
+
+        return $pdo;
+    }
 }

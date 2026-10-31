@@ -6,6 +6,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLazy;
+use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -681,3 +683,32 @@ class EnvAutowireWithMissingArgument
     ) {
     }
 }
+
+#[AutowireLazy]
+class AutowireLazyConsumer
+{
+    public function __construct(
+        public A $default,
+        #[Lazy(false)]
+        public Foo $eager,
+        #[Autowire(service: 'custom_a')]
+        public A $explicitService,
+        #[Autowire(service: 'custom_foo', lazy: false)]
+        public Foo $explicitEager,
+        public string $label = 'default',
+    ) {
+    }
+
+    #[Required]
+    public function setOther(A $other): void
+    {
+    }
+}
+
+class AutowireLazyUnannotatedConsumer
+{
+    public function __construct(public A $dependency)
+    {
+    }
+}
+

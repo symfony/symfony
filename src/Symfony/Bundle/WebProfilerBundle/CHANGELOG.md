@@ -10,6 +10,7 @@ CHANGELOG
  * Add a Key Management panel
  * Display the duration and the transferred sizes of each request in the HTTP Client panel
  * Show the descriptions of workflows, places and transitions in the Workflow panel
+ * Add a rate limiter panel with a timeline and per limiter tab
 
 8.1
 ---

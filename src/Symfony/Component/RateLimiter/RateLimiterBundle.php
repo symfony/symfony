@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\RateLimiter\DependencyInjection\DefaultLockFactoryPass;
+use Symfony\Component\RateLimiter\DependencyInjection\RateLimiterTracePass;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 
 /**
@@ -39,6 +40,7 @@ class RateLimiterBundle extends AbstractBundle
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new DefaultLockFactoryPass());
+        $container->addCompilerPass(new RateLimiterTracePass());
     }
 
     public function configure(DefinitionConfigurator $definition): void
@@ -160,6 +162,10 @@ class RateLimiterBundle extends AbstractBundle
 
         $configurator->import('Resources/config/rate_limiter.php');
 
+        if ($container->getParameter('kernel.debug')) {
+            $configurator->import('Resources/config/rate_limiter_debug.php');
+        }
+
         $limiters = [];
         $compoundLimiters = [];
         $lockFactories = [];
@@ -260,7 +266,7 @@ class RateLimiterBundle extends AbstractBundle
             }
         }
 
-        $container->setAlias(RateLimiterBuilder::class, 'limiter_builder');
+        $container->setAlias(RateLimiterBuilderInterface::class, 'limiter_builder');
 
         if ($lockFactories) {
             $container->setParameter('.rate_limiter.lock_factories', $lockFactories);

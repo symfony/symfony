@@ -949,7 +949,7 @@ class MessengerPassTest extends TestCase
         $container->register('messenger.transport.async', DummyReceiver::class)
             ->addTag('messenger.receiver', ['alias' => 'async']);
         $container->register('messenger.transport.sync', DummyReceiver::class)
-            ->addTag('messenger.receiver', ['alias' => 'sync', 'is_consumable' => false]);
+            ->addTag('messenger.receiver', ['alias' => 'sync', 'is_sync' => true, 'is_consumable' => false]);
         $container->register('messenger.receiver_locator', ServiceLocator::class)
             ->setArguments([[]]);
 
@@ -1468,12 +1468,25 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
+    public function testAHandlerThatRequiresASignatureCannotBeBoundToATransportThatIsNotConsumableButDoesNotSignEveryMessage()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('messenger.senders_locator')->addArgument([]);
+        $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async', 'is_consumable' => false]);
+        $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'async', 'sign' => true]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Invalid handler service "%s": it requires a signature, so the "async" transport that its "transport" option refers to must sign every message; set the "sign" option of that transport to true.', DummyHandler::class));
+
+        (new MessengerPass())->process($container);
+    }
+
     public function testAHandlerThatRequiresASignatureCanBeBoundToATransportThatSignsEveryMessageOrHandlesThemInThisProcess()
     {
         $container = $this->getContainerBuilder();
         $container->register('messenger.senders_locator')->addArgument([]);
         $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async', 'sign' => true]);
-        $container->register('messenger.transport.sync', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'sync', 'is_consumable' => false]);
+        $container->register('messenger.transport.sync', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'sync', 'is_sync' => true, 'is_consumable' => false]);
         $container->register('app.async_handler', DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'async', 'sign' => true]);
         $container->register('app.sync_handler', DummyHandler::class)->addTag('messenger.message_handler', ['transport' => 'sync', 'sign' => true]);
 
@@ -1520,7 +1533,7 @@ class MessengerPassTest extends TestCase
         ]);
         $container->register('messenger.transport.async', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'async']);
         $container->register('messenger.transport.signed', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'signed', 'sign' => true]);
-        $container->register('messenger.transport.sync', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'sync', 'is_consumable' => false]);
+        $container->register('messenger.transport.sync', DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'sync', 'is_sync' => true, 'is_consumable' => false]);
         $container->register(DummyHandler::class, DummyHandler::class)->addTag('messenger.message_handler', ['sign' => true]);
         $container->register(DummyCommandHandler::class, DummyCommandHandler::class)->addTag('messenger.message_handler', ['sign' => true]);
 

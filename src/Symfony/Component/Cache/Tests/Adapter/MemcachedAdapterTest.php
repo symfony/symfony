@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
@@ -98,6 +99,19 @@ class MemcachedAdapterTest extends AdapterTestCase
         $this->assertSame(1, $client->getOption(\Memcached::OPT_BINARY_PROTOCOL));
         $this->assertSame(1, $client->getOption(\Memcached::OPT_TCP_NODELAY));
         $this->assertSame(1, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testIgbinarySerializerIsDeprecated()
+    {
+        if (!\Memcached::HAVE_IGBINARY) {
+            $this->markTestSkipped('Memcached::HAVE_IGBINARY required');
+        }
+
+        $client = MemcachedAdapter::createConnection([], ['serializer' => 'igbinary']);
+        $this->expectUserDeprecationMessage('Since symfony/cache 8.2: Using the igbinary serializer with "Symfony\Component\Cache\Adapter\MemcachedAdapter" is deprecated, use the "php" serializer with a phpser marshaller instead.');
+        new MemcachedAdapter($client);
     }
 
     public function testOptionSerializer()

@@ -266,8 +266,9 @@ return static function (ContainerConfigurator $container) {
 
         ->set('cache.default_marshaller', DefaultMarshaller::class)
             ->args([
-                null, // use igbinary_serialize() when available
+                null, // use phpser when available
                 '%kernel.debug%',
+                \extension_loaded('phpser') ? inline_service('string')->factory('hash_hkdf')->args(['sha256', param('kernel.secret'), 32, 'symfony.cache']) : null,
             ])
 
         ->set('cache.early_expiration_handler', EarlyExpirationHandler::class)

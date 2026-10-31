@@ -155,6 +155,9 @@ jobs:
           7z x php_apcu.zip -y >nul
           iwr -outf php_igbinary.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_igbinary-3.2.16-8.4-ts-vs17-x86.zip
           7z x php_igbinary.zip -y >nul
+          iwr -outf php_phpser.zip https://github.com/iliaal/phpser/releases/download/0.10.1/php_phpser-0.10.1-8.4-ts-vs17-x86.zip
+          7z x php_phpser.zip -y >nul
+          Rename-Item php_phpser-0.10.1-8.4-ts-vs17-x86.dll php_phpser.dll
           iwr -outf php_redis.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-6.2.0-8.4-ts-vs17-x86.zip
           7z x php_redis.zip -y >nul
           iwr -outf php_parallel.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_parallel-1.2.15-8.4-ts-vs17-x86.zip
@@ -177,6 +180,7 @@ jobs:
           "extension=php_openssl.dll" >> php.ini
           "extension=php_apcu.dll" >> php.ini
           "extension=php_igbinary.dll" >> php.ini
+          "extension=php_phpser.dll" >> php.ini
           "extension=php_redis.dll" >> php.ini
           "extension=php_parallel.dll" >> php.ini
           "apc.enable_cli=1" >> php.ini
@@ -217,4 +221,4 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
 
-          php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group transient-on-windows --requires-php-extension apcu --requires-php-extension curl --requires-php-extension fileinfo --requires-php-extension igbinary --requires-php-extension intl --requires-php-extension openssl --requires-php-extension pdo_sqlite --requires-php-extension redis --requires-php-extension sodium --requires-php-extension parallel
+          php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group transient-on-windows --requires-php-extension apcu --requires-php-extension curl --requires-php-extension fileinfo --requires-php-extension igbinary --requires-php-extension intl --requires-php-extension openssl --requires-php-extension pdo_sqlite --requires-php-extension redis --requires-php-extension sodium --requires-php-extension parallel --requires-php-extension phpser

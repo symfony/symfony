@@ -58,6 +58,9 @@ class MemcachedAdapter extends AbstractAdapter
             if (\Memcached::SERIALIZER_PHP !== $opt && \Memcached::SERIALIZER_IGBINARY !== $opt) {
                 throw new CacheException('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
             }
+            if (\Memcached::SERIALIZER_IGBINARY === $opt) {
+                trigger_deprecation('symfony/cache', '8.2', 'Using the igbinary serializer with "%s" is deprecated, use the "php" serializer with a phpser marshaller instead.', self::class);
+            }
             $this->maxIdLength -= \strlen($client->getOption(\Memcached::OPT_PREFIX_KEY));
             $this->client = $client;
         } else {
@@ -76,6 +79,8 @@ class MemcachedAdapter extends AbstractAdapter
 
     /**
      * Creates a Memcached instance.
+     *
+     * The "igbinary" serializer is deprecated since Symfony 8.2; use "php" with the default marshaller instead.
      *
      * By default, the binary protocol, no block, and libketama compatible options are enabled.
      *
@@ -322,6 +327,9 @@ class MemcachedAdapter extends AbstractAdapter
         $opt = $this->lazyClient->getOption(\Memcached::OPT_SERIALIZER);
         if (\Memcached::SERIALIZER_PHP !== $opt && \Memcached::SERIALIZER_IGBINARY !== $opt) {
             throw new CacheException('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
+        }
+        if (\Memcached::SERIALIZER_IGBINARY === $opt) {
+            trigger_deprecation('symfony/cache', '8.2', 'Using the igbinary serializer with "%s" is deprecated, use the "php" serializer with a phpser marshaller instead.', self::class);
         }
         if ('' !== $prefix = (string) $this->lazyClient->getOption(\Memcached::OPT_PREFIX_KEY)) {
             throw new CacheException(\sprintf('MemcachedAdapter: "prefix_key" option must be empty when using proxified connections, "%s" given.', $prefix));

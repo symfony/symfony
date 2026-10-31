@@ -9,6 +9,23 @@ It also provides a [PSR-16](https://www.php-fig.org/psr/psr-16/) adapter,
 and implementations for [symfony/cache-contracts](https://github.com/symfony/cache-contracts)'
 `CacheInterface` and `TagAwareCacheInterface`.
 
+`DefaultMarshaller` uses the [phpser extension](https://github.com/iliaal/phpser)
+when installed, and native PHP serialization otherwise. Install phpser in every
+process that reads the same cache. Pass `false` as the first argument to
+`DefaultMarshaller` to keep native PHP serialization.
+
+`CacheBundle` configures `cache.default_marshaller` to use HMAC signing when phpser is installed.
+The signing key is derived from `kernel.secret`, which must be configured and non-empty.
+
+You can pass a key of at least 32 bytes to enable phpser's HMAC signing:
+
+```php
+$marshaller = new DefaultMarshaller(null, false, $signingKey);
+```
+
+The marshaller verifies the signature before decoding values. Existing unsigned
+entries and entries signed with another key become cache misses.
+
 Sponsor
 -------
 

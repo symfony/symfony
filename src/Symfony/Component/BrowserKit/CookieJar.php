@@ -27,7 +27,7 @@ class CookieJar
      */
     public function set(Cookie $cookie)
     {
-        $this->cookieJar[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
+        $this->cookieJar[self::normalizeDomain($cookie->getDomain())][$cookie->getPath()][$cookie->getName()] = $cookie;
     }
 
     /**
@@ -43,6 +43,10 @@ class CookieJar
     public function get(string $name, string $path = '/', ?string $domain = null): ?Cookie
     {
         $this->flushExpiredCookies();
+
+        if (null !== $domain) {
+            $domain = self::normalizeDomain($domain);
+        }
 
         $match = null;
 
@@ -85,7 +89,7 @@ class CookieJar
             // this should never happen but it allows for a better BC
             $domains = array_keys($this->cookieJar);
         } else {
-            $domains = [$domain];
+            $domains = [self::normalizeDomain($domain)];
         }
 
         foreach ($domains as $domain) {
@@ -180,6 +184,9 @@ class CookieJar
         $this->flushExpiredCookies();
 
         $parts = array_replace(['path' => '/'], parse_url($uri));
+        if (isset($parts['host'])) {
+            $parts['host'] = self::normalizeDomain($parts['host']);
+        }
         $cookies = [];
         foreach ($this->cookieJar as $domain => $pathCookies) {
             if ($domain) {
@@ -256,5 +263,23 @@ class CookieJar
         }
 
         return str_starts_with($requestPath, $cookiePath) && (str_ends_with($cookiePath, '/') || '/' === $requestPath[\strlen($cookiePath)]);
+    }
+
+    private static function normalizeDomain(string $domain): string
+    {
+        if (!str_contains($domain, ':') || str_contains($domain, "\0")) {
+            return $domain;
+        }
+
+        $ip = ltrim($domain, '.');
+        $prefix = substr($domain, 0, \strlen($domain) - \strlen($ip));
+        $bracketed = str_starts_with($ip, '[') && str_ends_with($ip, ']');
+        if (false !== $address = @inet_pton($bracketed ? substr($ip, 1, -1) : $ip)) {
+            if (false !== $address = inet_ntop($address)) {
+                return $prefix.($bracketed ? '['.$address.']' : $address);
+            }
+        }
+
+        return $domain;
     }
 }

@@ -40,6 +40,38 @@ class HttpBrowserTest extends AbstractBrowserTest
         $browser->request('GET', 'https://example.com/');
     }
 
+    public function testCookieDomainsWithNullBytesDoNotThrow()
+    {
+        $client = new MockHttpClient([
+            new MockResponse('', ['response_headers' => ["Set-Cookie: sid=value; Domain=[x:\0y]"]]),
+            function ($method, $url, $options) {
+                $this->assertArrayNotHasKey('cookie', $options['normalized_headers']);
+
+                return new MockResponse();
+            },
+        ]);
+        $browser = new HttpBrowser($client);
+        $browser->request('GET', 'https://[::1]/');
+        $browser->request('GET', 'https://[::1]/');
+    }
+
+    public function testReplaysCookiesAfterRedirectToEquivalentIpv6Host()
+    {
+        $client = new MockHttpClient([
+            new MockResponse('', ['http_code' => 302, 'response_headers' => [
+                'Location: https://[::1]/next',
+                'Set-Cookie: sid=value; Path=/',
+            ]]),
+            function ($method, $url, $options) {
+                $this->assertSame(['cookie: sid=value'], $options['normalized_headers']['cookie'] ?? []);
+
+                return new MockResponse();
+            },
+        ]);
+        $browser = new HttpBrowser($client);
+        $browser->request('GET', 'https://[0:0:0:0:0:0:0:1]/');
+    }
+
     public function getBrowser(array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
         return new TestHttpClient($server, $history, $cookieJar);

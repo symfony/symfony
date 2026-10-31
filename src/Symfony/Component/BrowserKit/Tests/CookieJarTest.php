@@ -19,6 +19,17 @@ use Symfony\Component\BrowserKit\Response;
 
 class CookieJarTest extends TestCase
 {
+    public function testCookieStringPreservesHostOnlyScope()
+    {
+        $cookie = Cookie::fromString('sid=value; Path=/', 'https://example.com/');
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie([(string) $cookie], 'https://example.com/');
+
+        $this->assertSame(['sid' => 'value'], $cookieJar->allValues('https://example.com/'));
+        $this->assertSame([], $cookieJar->allValues('https://sub.example.com/'));
+        $this->assertNull($cookieJar->get('sid', '/', 'sub.example.com'));
+    }
+
     public function testSetGet()
     {
         $cookieJar = new CookieJar();

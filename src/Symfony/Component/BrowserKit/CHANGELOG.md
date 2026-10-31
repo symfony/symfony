@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Preserve host-only scope in `Cookie::__toString()`
  * Make `CookieJar` ignore a cookie whose `Domain` attribute does not match the host of the response
  * Add `Cookie::isHostOnly()`
  * Make `CookieJar` send a cookie set without a `Domain` attribute only to the host that set it

@@ -96,7 +96,7 @@ class Cookie
             $cookie .= '; expires='.str_replace('+0000', '', $dateTime->format(self::DATE_FORMATS[0]));
         }
 
-        if ('' !== $this->domain) {
+        if ('' !== $this->domain && !$this->hostOnly) {
             $cookie .= '; domain='.$this->domain;
         }
 

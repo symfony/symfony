@@ -133,16 +133,14 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
                 break;
             case 'oci' === $driver:
                 // DUAL is Oracle specific dummy table
-                $sql = "MERGE INTO $this->tagsTable USING DUAL ON ($this->idCol = :id, $this->tagCol = :tagId) ".
-                    "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->tagCol) VALUES (:id, :tagId) ".
-                    "WHEN MATCHED THEN UPDATE SET $this->idCol = :id, $this->tagCol = :tagId";
+                $sql = "MERGE INTO $this->tagsTable USING DUAL ON ($this->idCol = ? AND $this->tagCol = ?) ".
+                    "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->tagCol) VALUES (?, ?)";
                 break;
             case 'sqlsrv' === $driver && version_compare($this->getServerVersion(), '10', '>='):
                 // MERGE is only available since SQL Server 2008 and must be terminated by semicolon
                 // It also requires HOLDLOCK according to http://weblogs.sqlteam.com/dang/archive/2009/01/31/UPSERT-Race-Condition-With-MERGE.aspx
-                $sql = "MERGE INTO $this->tagsTable WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON ($this->idCol = :id, $this->tagCol = :tagId) ".
-                    "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->tagCol) VALUES (:id, :tagId) ".
-                    "WHEN MATCHED THEN UPDATE SET $this->idCol = :id, $this->tagCol = :tagId;";
+                $sql = "MERGE INTO $this->tagsTable WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON ($this->idCol = ? AND $this->tagCol = ?) ".
+                    "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->tagCol) VALUES (?, ?);";
                 break;
             case 'sqlite' === $driver:
                 $sql = 'INSERT OR REPLACE'.substr($insertSql, 6);
@@ -165,8 +163,15 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
                         $this->createTagsTable();
                     });
 
-                    $stmt->bindParam(':id', $id);
-                    $stmt->bindParam(':tagId', $tagId);
+                    if ('sqlsrv' === $driver || 'oci' === $driver) {
+                        $stmt->bindParam(1, $id);
+                        $stmt->bindParam(2, $tagId);
+                        $stmt->bindParam(3, $id);
+                        $stmt->bindParam(4, $tagId);
+                    } else {
+                        $stmt->bindParam(':id', $id);
+                        $stmt->bindParam(':tagId', $tagId);
+                    }
 
                     $this->executeStatementWithFallback($stmt, function () {
                         $this->createTagsTable();
@@ -213,7 +218,7 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
             }
 
             $placeholders = implode(',', array_fill(0, \count($idList), '?'));
-            $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->tagsTable WHERE $this->tagCol=:tagId AND $this->idCol IN ($placeholders);", function () {
+            $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->tagsTable WHERE $this->tagCol = ? AND $this->idCol IN ($placeholders)", function () {
                 $this->createTagsTable();
             });
 
@@ -231,7 +236,7 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
     protected function doInvalidate(array $tagIds): bool
     {
         $placeholders = implode(',', array_fill(0, \count($tagIds), '?'));
-        $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->table WHERE $this->idCol IN (SELECT $this->idCol FROM $this->tagsTable WHERE $this->tagCol IN ($placeholders));", function () {
+        $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->table WHERE $this->idCol IN (SELECT $this->idCol FROM $this->tagsTable WHERE $this->tagCol IN ($placeholders))", function () {
             $this->createTagsTable();
         });
 

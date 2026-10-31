@@ -19,6 +19,22 @@ use Symfony\Component\BrowserKit\Exception\UnexpectedValueException;
 
 class CookieTest extends TestCase
 {
+    #[DataProvider('provideHostOnlyCookies')]
+    public function testToStringPreservesHostOnlyCookies(string $header)
+    {
+        $cookie = Cookie::fromString($header, 'https://example.com/');
+
+        $this->assertStringNotContainsString('domain=', (string) $cookie);
+        $this->assertEquals($cookie, Cookie::fromString((string) $cookie, 'https://example.com/'));
+    }
+
+    public static function provideHostOnlyCookies(): iterable
+    {
+        yield ['sid=value; Path=/'];
+        yield ['__Host-sid=value; Secure; Path=/'];
+        yield ['__Host-Http-sid=value; Secure; HttpOnly; Path=/'];
+    }
+
     public function testToString()
     {
         $cookie = new Cookie('foo', 'bar', strtotime('Fri, 20-May-2011 15:25:52 GMT'), '/', '.myfoodomain.com', true);
@@ -93,11 +109,11 @@ class CookieTest extends TestCase
 
     public function testFromStringWithUrl()
     {
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com/'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com?foo'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/foo', (string) Cookie::fromString('foo=bar', 'http://www.example.com/foo/bar'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar; path=/', 'http://www.example.com/foo/bar'));
+        $this->assertEquals('foo=bar; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com/'));
+        $this->assertEquals('foo=bar; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com'));
+        $this->assertEquals('foo=bar; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com?foo'));
+        $this->assertEquals('foo=bar; path=/foo', (string) Cookie::fromString('foo=bar', 'http://www.example.com/foo/bar'));
+        $this->assertEquals('foo=bar; path=/', (string) Cookie::fromString('foo=bar; path=/', 'http://www.example.com/foo/bar'));
         $this->assertEquals('foo=bar; domain=www.myotherexample.com; path=/', (string) Cookie::fromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
     }
 
@@ -127,7 +143,7 @@ class CookieTest extends TestCase
         $this->assertSame('foo', $cookie->getName());
         $this->assertSame('bar', $cookie->getValue());
         $this->assertFalse($cookie->isSecure());
-        $this->assertSame('foo=bar; domain=example.com; path=/', (string) $cookie);
+        $this->assertSame('foo=bar; path=/', (string) $cookie);
     }
 
     public function testFromStringIgnoresTheValueOfSecureAndHttpOnly()

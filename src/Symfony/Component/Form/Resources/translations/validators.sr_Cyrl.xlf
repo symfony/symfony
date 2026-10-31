@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="100" resname="Please enter a valid birthdate.">
                 <source>This value is not a valid birthdate.</source>
-                <target state="needs-review-translation">Ова вредност није исправан датум рођења.</target>
+                <target>Ова вредност није исправан датум рођења.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>The selected choice is invalid.</source>

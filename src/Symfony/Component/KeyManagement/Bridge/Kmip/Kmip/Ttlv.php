@@ -24,7 +24,7 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
  * Encoding pads items to that alignment.
  * Decoding checks item boundaries, tag prefixes, type lengths, Boolean values and UTF-8 text before returning the raw item values.
  *
- * The decoder accepts the Date Time Extended type only for KMIP 2.0. It checks TTLV syntax; {@see ProtocolClient} checks the meaning and order of fields in KMIP responses.
+ * The decoder accepts the Date Time Extended type only for KMIP 2.0 and 2.1. It checks TTLV syntax; {@see ProtocolClient} checks the meaning and order of fields in KMIP responses.
  *
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  *

@@ -79,7 +79,7 @@ kmip://[<username>:<password>@]<host>[:<port>]?cert=<client-cert-file>&key=<clie
 timeout to 10 seconds. Supply both username and password or neither, and
 percent-encode reserved characters in credentials and option values.
 
-The bridge supports KMIP 1.4 and 2.0 for authenticated Encrypt and Decrypt.
+The bridge supports KMIP 1.4, 2.0 and 2.1 for authenticated Encrypt and Decrypt.
 Select the server's version in the DSN. KMIP 1.0 and 1.1 lack Encrypt and
 Decrypt; 1.2 and 1.3 lack the authentication tag and associated data fields
 required by this bridge.

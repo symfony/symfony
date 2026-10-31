@@ -18,7 +18,7 @@ namespace Symfony\Component\KeyManagement\Bridge\Kmip\Kmip;
  * KMIP 1.2 and 1.3 define those operations but not the Authenticated Encryption Tag or Authenticated Encryption Additional Data payload fields introduced in 1.4.
  * The tag lets Decrypt detect changed ciphertext. The additional data field carries the caller's AAD so that it is authenticated without being encrypted. Without these fields, the bridge cannot verify its authenticated ciphertext or reject decryption with different AAD.
  *
- * The bridge supports its single-part Encrypt and Decrypt flow on 1.4 and 2.0.
+ * The bridge supports its single-part Encrypt and Decrypt flow on 1.4, 2.0 and 2.1.
  *
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  *
@@ -28,4 +28,5 @@ enum ProtocolVersion: string
 {
     case Version14 = '1.4';
     case Version20 = '2.0';
+    case Version21 = '2.1';
 }

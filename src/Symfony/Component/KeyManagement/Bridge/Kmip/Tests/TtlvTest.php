@@ -96,6 +96,7 @@ final class TtlvTest extends TestCase
     public static function extendedDateTimes(): iterable
     {
         yield '2.0 one second and one microsecond after epoch' => [ProtocolVersion::Version20, '00000000000f4241'];
+        yield '2.1 one microsecond before epoch' => [ProtocolVersion::Version21, 'ffffffffffffffff'];
     }
 
     public function testVersion14RejectsDateTimeExtendedButAcceptsLegacyDateTime()

@@ -372,13 +372,22 @@ final class KmipKmsTest extends TestCase
         $this->assertInstanceOf(KmipKms::class, self::factory()->create(Dsn::fromString('kmip://:@localhost?cert=/missing/cert&key=/missing/key&version=2.0')));
     }
 
+    public function testFactorySelectsVersion21WithoutOpeningAConnection()
+    {
+        $kms = self::factory()->create(Dsn::fromString('kmip://localhost?cert=/missing/cert&key=/missing/key&version=2.1'));
+        $client = (new \ReflectionProperty($kms, 'requestClient'))->getValue($kms);
+        $request = $client->buildRequest(ProtocolClient::ENCRYPT, '');
+
+        $this->assertSame('42006a0200000004000000020000000042006b02000000040000000100000000', bin2hex(substr($request, 24, 32)));
+    }
+
     public function testInvalidVersionMessageListsEverySupportedVersion()
     {
         try {
             self::factory()->create(Dsn::fromString('kmip://localhost?cert=a&key=b&version=unsupported'));
             $this->fail('An unsupported KMIP version must fail.');
         } catch (InvalidArgumentException $e) {
-            $this->assertSame('Supported KMIP versions are 1.4 and 2.0.', $e->getMessage());
+            $this->assertSame('Supported KMIP versions are 1.4, 2.0 and 2.1.', $e->getMessage());
         }
     }
 
@@ -520,7 +529,6 @@ final class KmipKmsTest extends TestCase
         yield 'empty peer name' => ['kmip://localhost?cert=a&key=b&version=2.0&peer_name='];
         yield 'empty certificate authority' => ['kmip://localhost?cert=a&key=b&version=2.0&ca='];
         yield 'cipher' => ['kmip://localhost?cert=a&key=b&version=2.0&cipher=aes-gcm'];
-        yield 'version 2.1' => ['kmip://localhost?cert=a&key=b&version=2.1'];
         yield 'zero timeout' => ['kmip://localhost?cert=a&key=b&version=2.0&timeout=0'];
         yield 'invalid timeout' => ['kmip://localhost?cert=a&key=b&version=2.0&timeout=nan'];
         yield 'password without user' => ['kmip://:pass@localhost?cert=a&key=b&version=2.0'];

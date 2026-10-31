@@ -38,7 +38,7 @@ class FrankenPhpWorkerRunner implements RunnerInterface
         $server['APP_RUNTIME_MODE'] = 'web=1&worker=1';
 
         $terminationException = null;
-        $handler = function () use ($server, &$terminationException): void {
+        $handler = function () use ($server, &$sfRequest, &$sfResponse, &$terminationException): void {
             // Connect to the Xdebug client if it's available
             if (\extension_loaded('xdebug') && \function_exists('xdebug_connect_to_client')) {
                 xdebug_connect_to_client();
@@ -69,6 +69,7 @@ class FrankenPhpWorkerRunner implements RunnerInterface
             if (null !== $terminationException) {
                 throw $terminationException;
             }
+            $sfRequest = $sfResponse = null;
 
             gc_collect_cycles();
         } while ($ret && (0 >= $this->loopMax || ++$loops < $this->loopMax));

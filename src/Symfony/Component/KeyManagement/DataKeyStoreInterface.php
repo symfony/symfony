@@ -31,8 +31,8 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
  *
  * Retirement is deliberately left out of this contract. Implementations are free to retire a key
  * by age, by usage, or never, and {@see current()} is where that decision surfaces. Do bear in
- * mind why it matters: with the random 96-bit nonces of AES-256-GCM, NIST caps a single key at
- * 2^32 encryptions before nonce collisions stop being negligible.
+ * mind the usage limits of any cipher that uses a returned key directly.
+ * {@see StoredEnvelopeEncrypter} instead derives a separate encryption key per payload.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *

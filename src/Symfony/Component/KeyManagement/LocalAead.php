@@ -54,7 +54,7 @@ trait LocalAead
     private static function open(Envelope $envelope, #[\SensitiveParameter] string $dataKey, string $aad): string
     {
         self::checkKeyLength($envelope->format, $dataKey);
-        $fields = null !== $envelope->reference ? [$envelope->reference] : [$envelope->keyId, $envelope->wrappedDek];
+        $fields = null !== $envelope->reference ? [$envelope->reference, $envelope->salt] : [$envelope->keyId, $envelope->wrappedDek];
         $plaintext = openssl_decrypt($envelope->ciphertext, $envelope->format->cipher(), $dataKey, \OPENSSL_RAW_DATA, $envelope->iv, $envelope->tag, self::bind($envelope->format, $aad, ...$fields));
 
         if (false === $plaintext) {
@@ -68,7 +68,7 @@ trait LocalAead
      * Authenticates the envelope header before the caller's AAD.
      *
      * Length prefixes keep the header fields and the caller's bytes separate.
-     * Stored envelopes bind the reference, so rewrapping a stored key leaves its payloads readable.
+     * Stored envelopes bind the reference and derivation salt, so rewrapping a stored key leaves its payloads readable.
      */
     private static function bind(EnvelopeFormat $format, string $aad, string ...$fields): string
     {

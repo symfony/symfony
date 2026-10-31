@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\Author;
@@ -686,5 +687,39 @@ class CollectionTypeTest extends BaseTypeTestCase
     {
         // resize form listener always set an empty array
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
+    }
+
+    public function testKeepAsListSubmitsTheRenumberedEntries()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['a', 'b', 'c'], [
+            'allow_delete' => true,
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit([0 => 'a', 2 => 'z']);
+
+        $this->assertSame(['a', 'z'], $form->getData());
+        $this->assertTrue($form->has('1'));
+        $this->assertFalse($form->has('2'));
+        $this->assertTrue($form->get('1')->isSubmitted());
+        $this->assertSame('z', $form->get('1')->getData());
+    }
+
+    public function testKeepAsListKeepsTheTransformationErrorsOfRenumberedEntries()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
+            'entry_type' => IntegerType::class,
+            'allow_add' => true,
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit([1 => '5', 3 => 'not a number']);
+
+        $this->assertTrue($form->has('1'));
+        $this->assertFalse($form->has('3'));
+        $this->assertTrue($form->get('1')->isSubmitted());
+        $this->assertFalse($form->get('1')->isSynchronized());
+        $this->assertSame('not a number', $form->get('1')->getViewData());
+        $this->assertSame(5, $form->get('0')->getData());
     }
 }

@@ -304,6 +304,23 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->assertSame('DATA', $form->getData());
     }
 
+    /**
+     * @dataProvider methodExceptGetProvider
+     */
+    public function testSubmitZeroStringToSimpleForm($method)
+    {
+        $form = $this->createForm('param1', $method);
+
+        $this->setRequestData($method, [
+            'param1' => '0',
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertSame('0', $form->getData());
+    }
+
     public function testMergeZeroIndexedCollection()
     {
         $form = $this->createForm('root', 'POST', true);

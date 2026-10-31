@@ -949,7 +949,9 @@ class MessengerPassTest extends TestCase
         $container->register('messenger.transport.async', DummyReceiver::class)
             ->addTag('messenger.receiver', ['alias' => 'async']);
         $container->register('messenger.transport.sync', DummyReceiver::class)
-            ->addTag('messenger.receiver', ['alias' => 'sync', 'is_sync' => true, 'is_consumable' => false]);
+            ->addTag('messenger.receiver', ['alias' => 'sync', 'is_consumable' => false]);
+        $container->register('messenger.transport.other_application', DummyReceiver::class)
+            ->addTag('messenger.receiver', ['alias' => 'other_application', 'is_consumable' => false]);
         $container->register('messenger.receiver_locator', ServiceLocator::class)
             ->setArguments([[]]);
 

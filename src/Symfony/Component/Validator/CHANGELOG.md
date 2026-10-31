@@ -17,6 +17,7 @@ CHANGELOG
  * Add the `restrictGroups` option to the `Valid` constraint
  * Add support for `BcMath\Number` values in the `Range` and comparison constraints
  * Add the `Cron` constraint to validate cron expressions
+ * Add the `NotReservedPath` constraint to reject a value colliding with one of the app's route paths
  * Add the `message` option to the `Callback` constraint; the callback must then return a boolean, and a violation is raised when it returns `false`
  * Allow passing `int`, `float`, `\Stringable` and `\DateTimeInterface` values to `ConstraintViolationBuilderInterface::setParameter()`
  * Stop narrowing the `File` constraint's `mimeTypes` option with mime types auto-derived from the matched extension when `extensions` is configured

@@ -80,6 +80,7 @@ class EarlyExpirationHandler
         $save = true;
         $value = $callback($item, $save);
 
+        /** @var bool $save the callback can set it to false to prevent storing the value */
         if ($save) {
             $setMetadata($item, $startTime);
             $pool->save($item->set($value));

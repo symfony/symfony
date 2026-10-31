@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -113,7 +114,7 @@ class ResizeFormListener implements EventSubscriberInterface
         // Add all additional rows
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
-                if (!$form->has($name)) {
+                if (!$form->has($name) && FormConfigBuilder::isValidName((string) $name)) {
                     $form->add($name, $this->type, array_replace([
                         'property_path' => '['.$name.']',
                     ], $this->prototypeOptions));

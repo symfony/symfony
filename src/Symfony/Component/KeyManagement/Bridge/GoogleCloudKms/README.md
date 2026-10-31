@@ -84,6 +84,16 @@ which is integrity-protected through the AEAD cipher used by the master
 key. AAD is treated as opaque bytes; structured callers should serialize
 to a stable form (e.g. canonical JSON) themselves.
 
+Data integrity
+--------------
+
+The bridge follows Google's [data integrity recommendations](https://cloud.google.com/kms/docs/data-integrity-guidelines).
+It sends CRC32C checksums for the request bytes and checks the returned checksums, encryption verification flags and key version.
+Checksum failures are retried up to three attempts in total, reusing the same input and data key.
+An unexpected key version is refused immediately.
+Persistent integrity failures raise `RuntimeException` without including plaintext or checksum values in the error.
+The checksums are exchanged with Cloud KMS and are not included in persisted ciphertexts.
+
 Resources
 ---------
 

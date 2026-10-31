@@ -59,6 +59,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class GoogleCloudKms implements DecrypterInterface, EncrypterInterface, DataKeyGeneratorInterface
 {
+    private const int MAX_INTEGRITY_ATTEMPTS = 3;
+    private const string STATUS_INVALID_ARGUMENT = 'INVALID_ARGUMENT';
+
     /**
      * The key id is spliced into the request path, so only the resource-name shape may go through.
      */
@@ -76,18 +79,41 @@ final class GoogleCloudKms implements DecrypterInterface, EncrypterInterface, Da
             throw new InvalidArgumentException(\sprintf('Google Cloud KMS key id "%s" must be a resource name of the form "projects/<project>/locations/<location>/keyRings/<ring>/cryptoKeys/<key>", optionally followed by "/cryptoKeyVersions/<version>".', $keyId));
         }
 
-        $body = ['plaintext' => base64_encode($plaintext)];
+        $body = ['plaintext' => base64_encode($plaintext), 'plaintextCrc32c' => self::crc32c($plaintext)];
         if ('' !== $aad) {
             $body['additionalAuthenticatedData'] = base64_encode($aad);
+            $body['additionalAuthenticatedDataCrc32c'] = self::crc32c($aad);
         }
 
-        $data = $this->request('POST', $keyId.':encrypt', $body, $keyId);
+        for ($attempt = 0; $attempt < self::MAX_INTEGRITY_ATTEMPTS; ++$attempt) {
+            if (null === $data = $this->request('POST', $keyId.':encrypt', $body, $keyId)) {
+                continue;
+            }
 
-        if (!isset($data['ciphertext']) || !\is_string($data['ciphertext'])) {
-            throw new RuntimeException('Google Cloud KMS returned a malformed response (missing "ciphertext").');
+            $name = $data['name'] ?? null;
+            $key = self::stripVersion($keyId);
+            if (!\is_string($name) || !preg_match('{^'.preg_quote($key, '{').'/cryptoKeyVersions/[1-9][0-9]*$}D', $name) || $key !== $keyId && $name !== $keyId) {
+                throw new RuntimeException('Google Cloud KMS returned an unexpected key version.');
+            }
+
+            if (!isset($data['ciphertext']) || !\is_string($data['ciphertext'])) {
+                throw new RuntimeException('Google Cloud KMS returned a malformed response (missing "ciphertext").');
+            }
+
+            $encrypted = base64_decode($data['ciphertext'], true);
+            if (false === $encrypted) {
+                throw new RuntimeException('Google Cloud KMS returned a non-base64 ciphertext.');
+            }
+
+            if (true === ($data['verifiedPlaintextCrc32c'] ?? null)
+                && ('' === $aad || true === ($data['verifiedAdditionalAuthenticatedDataCrc32c'] ?? null))
+                && self::matchesChecksum($encrypted, $data['ciphertextCrc32c'] ?? null)
+            ) {
+                return new Ciphertext($data['ciphertext'], $keyId);
+            }
         }
 
-        return new Ciphertext($data['ciphertext'], $keyId);
+        throw new RuntimeException('Google Cloud KMS encryption integrity verification failed.');
     }
 
     public function decrypt(Ciphertext $ciphertext, string $aad = ''): string
@@ -96,27 +122,39 @@ final class GoogleCloudKms implements DecrypterInterface, EncrypterInterface, Da
             throw new DecryptionFailedException();
         }
 
-        $body = ['ciphertext' => $ciphertext->blob];
+        $encrypted = base64_decode($ciphertext->blob, true);
+        if (false === $encrypted) {
+            throw new DecryptionFailedException();
+        }
+
+        $body = ['ciphertext' => $ciphertext->blob, 'ciphertextCrc32c' => self::crc32c($encrypted)];
         if ('' !== $aad) {
             $body['additionalAuthenticatedData'] = base64_encode($aad);
+            $body['additionalAuthenticatedDataCrc32c'] = self::crc32c($aad);
         }
 
-        $data = $this->request('POST', self::stripVersion($ciphertext->keyId).':decrypt', $body, $ciphertext->keyId, true);
+        for ($attempt = 0; $attempt < self::MAX_INTEGRITY_ATTEMPTS; ++$attempt) {
+            if (null === $data = $this->request('POST', self::stripVersion($ciphertext->keyId).':decrypt', $body, $ciphertext->keyId, true)) {
+                continue;
+            }
 
-        if (!isset($data['plaintext']) && isset($data['plaintextCrc32c'])) {
-            // proto3 JSON omits an empty bytes field, its checksum is the only trace of it
-            return '';
-        }
-        if (!isset($data['plaintext']) || !\is_string($data['plaintext'])) {
-            throw new RuntimeException('Google Cloud KMS returned a malformed response (missing "plaintext").');
+            // proto3 JSON omits an empty bytes field; its checksum still has to match.
+            $encoded = $data['plaintext'] ?? '';
+            if (!\is_string($encoded)) {
+                throw new RuntimeException('Google Cloud KMS returned a malformed response (invalid "plaintext").');
+            }
+
+            $plaintext = base64_decode($encoded, true);
+            if (false === $plaintext) {
+                throw new RuntimeException('Google Cloud KMS returned a non-base64 plaintext.');
+            }
+
+            if (self::matchesChecksum($plaintext, $data['plaintextCrc32c'] ?? null)) {
+                return $plaintext;
+            }
         }
 
-        $plaintext = base64_decode($data['plaintext'], true);
-        if (false === $plaintext) {
-            throw new RuntimeException('Google Cloud KMS returned a non-base64 plaintext.');
-        }
-
-        return $plaintext;
+        throw new RuntimeException('Google Cloud KMS decryption integrity verification failed.');
     }
 
     public function generateDataKey(string $keyId, int $length = 32, string $aad = ''): DataKey
@@ -151,9 +189,9 @@ final class GoogleCloudKms implements DecrypterInterface, EncrypterInterface, Da
     /**
      * @param array<string, mixed> $body
      *
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null Null when the server reports a checksum mismatch
      */
-    private function request(string $method, string $path, array $body, string $keyId, bool $treatClientErrorAsDecryptionFailure = false): array
+    private function request(string $method, string $path, array $body, string $keyId, bool $treatClientErrorAsDecryptionFailure = false): ?array
     {
         $token = $this->getToken();
         $response = $this->send($method, $path, $body, $token);
@@ -183,6 +221,20 @@ final class GoogleCloudKms implements DecrypterInterface, EncrypterInterface, Da
         }
 
         $status = $response->getStatusCode();
+
+        if (400 === $status && self::isChecksumError($response)) {
+            foreach (['plaintext', 'ciphertext', 'additionalAuthenticatedData'] as $field) {
+                if (!isset($body[$field])) {
+                    continue;
+                }
+                $bytes = base64_decode($body[$field], true);
+                if (false === $bytes || !self::matchesChecksum($bytes, $body[$field.'Crc32c'] ?? null)) {
+                    throw new RuntimeException('Google Cloud KMS request integrity verification failed.');
+                }
+            }
+
+            return null;
+        }
 
         if ($treatClientErrorAsDecryptionFailure && (400 === $status || 404 === $status)) {
             throw new DecryptionFailedException();
@@ -251,5 +303,29 @@ final class GoogleCloudKms implements DecrypterInterface, EncrypterInterface, Da
         $position = strpos($keyId, '/cryptoKeyVersions/');
 
         return false === $position ? $keyId : substr($keyId, 0, $position);
+    }
+
+    private static function crc32c(#[\SensitiveParameter] string $bytes): string
+    {
+        return base_convert(hash('crc32c', $bytes), 16, 10);
+    }
+
+    private static function matchesChecksum(#[\SensitiveParameter] string $bytes, mixed $checksum): bool
+    {
+        return (\is_string($checksum) || \is_int($checksum)) && hash_equals(self::crc32c($bytes), (string) $checksum);
+    }
+
+    private static function isChecksumError(ResponseInterface $response): bool
+    {
+        try {
+            $error = $response->toArray(false)['error'] ?? null;
+        } catch (DecodingExceptionInterface|TransportExceptionInterface) {
+            return false;
+        }
+
+        return \is_array($error) && self::STATUS_INVALID_ARGUMENT === ($error['status'] ?? null)
+            && \is_string($error['message'] ?? null)
+            && str_contains($error['message'], 'checksum')
+            && preg_match('/\b(?:plaintext|ciphertext|additional_authenticated_data)_crc32c\b/', $error['message']);
     }
 }

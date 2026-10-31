@@ -107,7 +107,7 @@ class GoogleCloudKmsFactoryTest extends TestCase
 
             return str_contains($url, 'oauth2.googleapis.com')
                 ? new MockResponse(json_encode(['access_token' => 'TOKEN', 'expires_in' => 3600]))
-                : new MockResponse(json_encode(['name' => $key.'/cryptoKeyVersions/1', 'ciphertext' => 'CipherFromGcp']));
+                : new MockResponse(json_encode(['name' => $key.'/cryptoKeyVersions/1', 'ciphertext' => base64_encode('CipherFromGcp'), 'ciphertextCrc32c' => base_convert(hash('crc32c', 'CipherFromGcp'), 16, 10), 'verifiedPlaintextCrc32c' => true]));
         });
 
         $kms = (new GoogleCloudKmsFactory($client))->create(Dsn::fromString('gcp-kms://kms.local:8443/v2/?credentials='.urlencode($this->credentialsPath)));
@@ -127,7 +127,7 @@ class GoogleCloudKmsFactoryTest extends TestCase
 
             return str_contains($url, 'oauth2.googleapis.com')
                 ? new MockResponse(json_encode(['access_token' => 'TOKEN', 'expires_in' => 3600]))
-                : new MockResponse(json_encode(['name' => $key.'/cryptoKeyVersions/1', 'ciphertext' => 'CipherFromGcp']));
+                : new MockResponse(json_encode(['name' => $key.'/cryptoKeyVersions/1', 'ciphertext' => base64_encode('CipherFromGcp'), 'ciphertextCrc32c' => base_convert(hash('crc32c', 'CipherFromGcp'), 16, 10), 'verifiedPlaintextCrc32c' => true]));
         });
 
         $kms = (new GoogleCloudKmsFactory($client))->create(Dsn::fromString('gcp-kms://default?credentials='.urlencode($this->credentialsPath).'&timeout=2.5&max_duration=7'));
@@ -145,7 +145,7 @@ class GoogleCloudKmsFactoryTest extends TestCase
 
             return str_contains($url, 'oauth2.googleapis.com')
                 ? new MockResponse(json_encode(['access_token' => 'TOKEN', 'expires_in' => 3600]))
-                : new MockResponse(json_encode(['name' => $key.'/cryptoKeyVersions/1', 'ciphertext' => 'CipherFromGcp']));
+                : new MockResponse(json_encode(['name' => $key.'/cryptoKeyVersions/1', 'ciphertext' => base64_encode('CipherFromGcp'), 'ciphertextCrc32c' => base_convert(hash('crc32c', 'CipherFromGcp'), 16, 10), 'verifiedPlaintextCrc32c' => true]));
         }))->withOptions(['timeout' => 42.0, 'max_duration' => 120.0]);
 
         $kms = (new GoogleCloudKmsFactory($client))->create(Dsn::fromString('gcp-kms://default?credentials='.urlencode($this->credentialsPath)));

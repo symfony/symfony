@@ -18,11 +18,15 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  * The frame carries a reference to a data key held by a {@see DataKeyStoreInterface}.
  *
  * Decrypting needs that store, which is the trade-off: an envelope is no longer self-sufficient,
- * and in exchange the KMS is contacted once per data key instead of once per payload, payloads
- * shrink to a 16-byte reference, and rewrapping the stored keys moves an entire dataset to another
- * master key, or to another provider, without reading a single payload.
+ * and in exchange the store can reuse an unwrapped root key across payloads.
+ * Payloads carry a 16-byte reference and a 32-byte salt, and rewrapping the stored keys moves an entire dataset to another master key or provider without reading a single payload.
  *
- * Layout: `[id][2-byte reference length][reference][iv][tag][ciphertext]`.
+ * Layout: `[id][2-byte reference length][reference][32-byte salt][12-byte IV][16-byte tag][ciphertext]`.
+ *
+ * Each payload uses HKDF-SHA-256 to derive a 32-byte AES key from the stored root key and a fresh random salt.
+ * The HKDF info is `symfony/key-management/stored-envelope/v1`.
+ * The GCM AAD is `[id][2-byte reference length][reference][2-byte salt length][salt][caller AAD]`, with lengths in big-endian byte order.
+ * The salt is generated independently of the IV to reduce the risk of reusing a GCM key and IV pair.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -38,6 +42,11 @@ final class StoredFormat extends EnvelopeFormat
     }
 
     public function keyBytes(): int
+    {
+        return 32;
+    }
+
+    public function saltBytes(): int
     {
         return 32;
     }
@@ -66,7 +75,7 @@ final class StoredFormat extends EnvelopeFormat
             throw new LogicException(\sprintf('An envelope framed as "%s" must carry a data key reference.', self::class));
         }
 
-        return $this->head($envelope->reference).$envelope->iv.$envelope->tag.$envelope->ciphertext;
+        return $this->head($envelope->reference).$envelope->salt.$envelope->iv.$envelope->tag.$envelope->ciphertext;
     }
 
     /**
@@ -82,8 +91,10 @@ final class StoredFormat extends EnvelopeFormat
         $offset = 1;
 
         $reference = self::readField($bytes, $offset, $length);
+        $salt = substr($bytes, $offset, $this->saltBytes());
+        $offset += $this->saltBytes();
         [$iv, $tag, $ciphertext] = $this->readTail($bytes, $offset, $length);
 
-        return Envelope::referencing($reference, $iv, $tag, $ciphertext);
+        return Envelope::referencing($reference, $iv, $tag, $ciphertext, $salt);
     }
 }

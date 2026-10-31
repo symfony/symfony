@@ -236,7 +236,7 @@ class KeyManagementBundle extends AbstractBundle
                             ->defaultFalse()
                         ->end()
                         ->variableNode('max_age')
-                            ->info('Seconds after which the current data key of a scope is retired; this does not enforce a usage limit. The default is 30 days; 0 forces rotation on every call and null disables retirement.')
+                            ->info('Seconds after which the current root key of a scope is retired. The default is 30 days; 0 forces rotation on every call and null disables retirement.')
                             ->defaultValue(2592000)
                             ->validate()
                                 ->ifTrue(static fn ($maxAge): bool => null !== $maxAge && (!\is_int($maxAge) || $maxAge < 0))

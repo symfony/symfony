@@ -120,6 +120,6 @@ class EnvelopeTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('Envelope "%s" must be', $field));
-        Envelope::referencing('ref', $iv, $tag, 'ct');
+        Envelope::referencing('ref', $iv, $tag, 'ct', str_repeat('S', 32));
     }
 }

@@ -76,15 +76,8 @@ final class DataKeyStore implements RewrappableDataKeyStoreInterface
     /**
      * Thirty days.
      *
-     * A stored data key is rotated by age because counting what it seals would cost a write per
-     * payload, which is the round trip this store exists to spare. The age is therefore a proxy for
-     * a bound that is really a count: {@see StoredEnvelopeEncrypter} seals every payload with a
-     * random 96-bit IV under AES-256-GCM, and NIST SP 800-38D puts the ceiling for that at 2^32
-     * payloads per key, past which two payloads share an IV with probability above 2^-32 and the
-     * key stops protecting either of them.
-     *
-     * Thirty days keeps a scope writing up to some 1650 payloads per second under that ceiling.
-     * An application writing faster than that, in a single scope, has to say so.
+     * Bounds the lifetime of the root key shared by a scope.
+     * {@see StoredEnvelopeEncrypter} derives a separate AES key per payload, so age-based rotation is a key lifetime policy rather than a proxy for a GCM invocation count.
      */
     public const int DEFAULT_MAX_AGE_SECONDS = 2592000;
 

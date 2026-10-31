@@ -67,6 +67,7 @@ class EnvelopeFormatTest extends TestCase
         $this->assertSame($original->keyId, $reparsed->keyId);
         $this->assertSame($original->wrappedDek, $reparsed->wrappedDek);
         $this->assertSame($original->reference, $reparsed->reference);
+        $this->assertSame($original->salt, $reparsed->salt);
         $this->assertSame($original->iv, $reparsed->iv);
         $this->assertSame($original->tag, $reparsed->tag);
         $this->assertSame($original->ciphertext, $reparsed->ciphertext);
@@ -103,7 +104,7 @@ class EnvelopeFormatTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"data key reference" is too long');
-        Envelope::referencing(str_repeat('r', 65536), str_repeat('I', 12), str_repeat('T', 16), 'ct');
+        Envelope::referencing(str_repeat('r', 65536), str_repeat('I', 12), str_repeat('T', 16), 'ct', str_repeat('S', 32));
     }
 
     public static function provideMalformedStoredFrames(): iterable
@@ -128,7 +129,7 @@ class EnvelopeFormatTest extends TestCase
         $tag = str_repeat("\xCC", $format->tagBytes());
 
         return $format instanceof StoredFormat
-            ? Envelope::referencing(str_repeat("\x11", 16), $iv, $tag, 'opaque')
+            ? Envelope::referencing(str_repeat("\x11", 16), $iv, $tag, 'opaque', str_repeat("\xDD", 32))
             : Envelope::selfContained('app-key', str_repeat("\xAA", 50), $iv, $tag, 'opaque');
     }
 }

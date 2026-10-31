@@ -16,6 +16,7 @@ use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\LockRegistry;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ContractsTrait;
@@ -297,6 +298,8 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
      */
     public function reset()
     {
+        LockRegistry::reset();
+
         try {
             $this->commit();
         } finally {

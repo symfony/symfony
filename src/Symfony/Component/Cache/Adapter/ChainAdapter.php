@@ -15,6 +15,7 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\LockRegistry;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ContractsTrait;
@@ -286,6 +287,8 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
      */
     public function reset()
     {
+        LockRegistry::reset();
+
         foreach ($this->adapters as $adapter) {
             if ($adapter instanceof ResetInterface) {
                 $adapter->reset();

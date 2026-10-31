@@ -15,6 +15,7 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\LockRegistry;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -273,6 +274,8 @@ trait AbstractAdapterTrait
 
     public function reset(): void
     {
+        LockRegistry::reset();
+
         if ($this->deferred) {
             $this->commit();
         }

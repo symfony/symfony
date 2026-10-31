@@ -27,6 +27,8 @@ use Symfony\Contracts\Cache\ItemInterface;
 final class LockRegistry
 {
     private static array $openedFiles = [];
+    private static int $computations = 0;
+    private static bool $resetPending = false;
     private static ?array $lockedFiles = null;
     private static \Exception $signalingException;
     private static \Closure $signalingCallback;
@@ -85,7 +87,36 @@ final class LockRegistry
         return $previousFiles;
     }
 
+    public static function reset(): void
+    {
+        if (self::$computations) {
+            self::$resetPending = true;
+
+            return;
+        }
+
+        self::$resetPending = false;
+        foreach (self::$openedFiles as $file) {
+            if ($file) {
+                fclose($file);
+            }
+        }
+        self::$openedFiles = [];
+    }
+
     public static function compute(callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, ?\Closure $setMetadata = null, ?LoggerInterface $logger = null, ?float $beta = null): mixed
+    {
+        ++self::$computations;
+        try {
+            return self::doCompute($callback, $item, $save, $pool, $setMetadata, $logger, $beta);
+        } finally {
+            if (0 === --self::$computations && self::$resetPending) {
+                self::reset();
+            }
+        }
+    }
+
+    private static function doCompute(callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, ?\Closure $setMetadata = null, ?LoggerInterface $logger = null, ?float $beta = null): mixed
     {
         if ('\\' === \DIRECTORY_SEPARATOR && null === self::$lockedFiles) {
             // disable locking on Windows by default

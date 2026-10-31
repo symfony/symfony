@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Traits;
 
+use Symfony\Component\Cache\LockRegistry;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -30,6 +31,8 @@ trait ProxyTrait
 
     public function reset(): void
     {
+        LockRegistry::reset();
+
         if ($this->pool instanceof ResetInterface) {
             $this->pool->reset();
         }

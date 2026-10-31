@@ -39,6 +39,10 @@ final class SlidingWindowLimiter implements LimiterInterface
 
     public function __construct(string $id, int $limit, \DateInterval $interval, StorageInterface $storage, ?LockInterface $lock = null)
     {
+        if ($limit < 1) {
+            throw new \InvalidArgumentException(\sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', __CLASS__));
+        }
+
         $this->storage = $storage;
         $this->lock = $lock;
         $this->id = $id;

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\Kmip;
 
-use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\AesGcm;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\Aead;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\FrameTooLarge;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\OperationFailed;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\RequestClientInterface;
@@ -26,11 +26,11 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
 
 /**
- * Encrypts and decrypts with AES-GCM under a symmetric key a KMIP server holds.
+ * Encrypts and decrypts with authenticated ciphers under a symmetric key a KMIP server holds.
  *
  * Build it with {@see KmipKmsFactory}. Each operation opens a verified mutual TLS connection. Direct encryption sends the plaintext to the server, and {@see generateDataKey()} sends a locally generated data key; the master key stays there.
  *
- * The caller's AAD is authenticated together with the header of the stored ciphertext, see {@see AesGcm}.
+ * The caller's AAD is authenticated together with the header of the stored ciphertext, see {@see Aead}.
  *
  * When a server reports KMIP General Failure, decrypt and unwrap preserve that operational error. PyKMIP also uses General Failure for a bad authentication tag, so callers using that server may receive {@see \Symfony\Component\KeyManagement\Exception\RuntimeException} rather than {@see DecryptionFailedException} for tampered data or incorrect AAD.
  *
@@ -70,16 +70,17 @@ final class KmipKms implements EncrypterInterface, DecrypterInterface, DataKeyGe
     private const string CONTROL_OR_FORMAT_CHARACTER_PATTERN = '/[\p{Cc}\p{Cf}]/u';
     private const string CONTROL_CHARACTER_ESCAPE_PREFIX = '\\x';
 
-    private readonly AesGcm $cipher;
+    private readonly Aead $cipher;
 
     /**
      * @internal
      */
     public function __construct(
         private readonly RequestClientInterface $requestClient,
-        int $ivLength = AesGcm::DEFAULT_IV_LENGTH,
+        int $ivLength = Aead::DEFAULT_IV_LENGTH,
+        string $cipher = 'aes-gcm',
     ) {
-        $this->cipher = new AesGcm($ivLength);
+        $this->cipher = new Aead($ivLength, $cipher);
     }
 
     public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, #[\SensitiveParameter] string $aad = ''): Ciphertext

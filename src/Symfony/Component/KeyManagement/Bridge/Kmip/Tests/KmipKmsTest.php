@@ -528,7 +528,7 @@ final class KmipKmsTest extends TestCase
         yield 'empty version' => ['kmip://localhost?cert=a&key=b&version='];
         yield 'empty peer name' => ['kmip://localhost?cert=a&key=b&version=2.0&peer_name='];
         yield 'empty certificate authority' => ['kmip://localhost?cert=a&key=b&version=2.0&ca='];
-        yield 'cipher' => ['kmip://localhost?cert=a&key=b&version=2.0&cipher=aes-gcm'];
+        yield 'unknown cipher' => ['kmip://localhost?cert=a&key=b&version=2.0&cipher=unknown'];
         yield 'zero timeout' => ['kmip://localhost?cert=a&key=b&version=2.0&timeout=0'];
         yield 'invalid timeout' => ['kmip://localhost?cert=a&key=b&version=2.0&timeout=nan'];
         yield 'password without user' => ['kmip://:pass@localhost?cert=a&key=b&version=2.0'];

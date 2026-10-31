@@ -72,7 +72,7 @@ Use `passphrase` for an encrypted client private key, and keep it and any KMIP
 password in application secrets.
 
 ```
-kmip://[<username>:<password>@]<host>[:<port>]?cert=<client-cert-file>&key=<client-private-key-file>&version=<version>[&ca=<ca-file>][&peer_name=<name>][&passphrase=<passphrase>][&iv_length=12][&timeout=10]
+kmip://[<username>:<password>@]<host>[:<port>]?cert=<client-cert-file>&key=<client-private-key-file>&version=<version>[&ca=<ca-file>][&peer_name=<name>][&passphrase=<passphrase>][&cipher=aes-gcm][&iv_length=12][&timeout=10]
 ```
 
 `cert`, `key` and `version` are required. The port defaults to 5696 and the
@@ -107,6 +107,19 @@ ciphertexts use a 12-byte IV, as NIST SP 800-38D recommends; set `iv_length`
 ciphertext records the algorithm, the mode and the IV length it was produced
 with, so changing `iv_length` leaves earlier data readable as long as the
 server accepts their IV length.
+
+Encryption ciphers
+------------------
+
+The `cipher` option defaults to `aes-gcm`. To use ChaCha20-Poly1305, set
+`cipher=chacha20-poly1305` and provision a 256-bit ChaCha20Poly1305 key with
+Encrypt and Decrypt in its usage mask. The server must support that algorithm.
+ChaCha20-Poly1305 uses a 12-byte nonce and a 16-byte authentication tag; the
+`iv_length` option is only available with AES-GCM.
+
+Ciphertexts store and authenticate their algorithm, mode and IV length.
+Changing `cipher` affects new ciphertexts; earlier AES-GCM and
+ChaCha20-Poly1305 ciphertexts remain readable if the server and key support them.
 
 Key rotation
 ------------

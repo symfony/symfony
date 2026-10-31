@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\Kmip;
 
-use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\AesGcm;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\Aead;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\ProtocolClient;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\ProtocolVersion;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\StreamTransport;
@@ -25,13 +25,13 @@ use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
 /**
  * Builds a {@see KmipKms} from a DSN of the form:
  *
- *     kmip://[<user>:<password>@]<host>[:<port>]?cert=<path>&key=<path>&version=<version>[&ca=<path>][&peer_name=<name>][&passphrase=<passphrase>][&iv_length=12][&timeout=10]
+ *     kmip://[<user>:<password>@]<host>[:<port>]?cert=<path>&key=<path>&version=<version>[&ca=<path>][&peer_name=<name>][&passphrase=<passphrase>][&cipher=aes-gcm][&iv_length=12][&timeout=10]
  *
  * A client certificate and private key are required even when a username and password are supplied.
  * The `ca` option names a certificate authority file used to verify the server certificate; omitting it uses the system trust store.
  * The `peer_name` option controls the expected server name. The DSN has no path.
  *
- * The KMIP version, 1.4, 2.0 or 2.1, must be selected explicitly. The `iv_length` option sets the AES-GCM IV length of new ciphertexts, 12 bytes by default.
+ * The KMIP version, 1.4, 2.0 or 2.1, must be selected explicitly. The `cipher` option selects AES-GCM by default or ChaCha20-Poly1305. The `iv_length` option sets the AES-GCM IV length of new ciphertexts, 12 bytes by default.
  *
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  *
@@ -52,11 +52,11 @@ final class KmipKmsFactory implements KmsFactoryInterface
     /**
      * @var list<string>
      */
-    private const array SUPPORTED_OPTIONS = ['cert', 'key', 'version', 'iv_length', 'ca', 'peer_name', 'passphrase', 'timeout'];
+    private const array SUPPORTED_OPTIONS = ['cert', 'key', 'version', 'cipher', 'iv_length', 'ca', 'peer_name', 'passphrase', 'timeout'];
     /**
      * @var list<string>
      */
-    private const array STRING_OPTIONS = ['version', 'iv_length', 'ca', 'peer_name', 'passphrase', 'timeout'];
+    private const array STRING_OPTIONS = ['version', 'cipher', 'iv_length', 'ca', 'peer_name', 'passphrase', 'timeout'];
     /**
      * A hostname containing a slash, colon or whitespace must pass IP address validation.
      */
@@ -134,13 +134,17 @@ final class KmipKmsFactory implements KmsFactoryInterface
 
             throw new InvalidArgumentException('Supported KMIP versions are '.$versionList.'.');
         }
-        $ivLength = $dsn->getOption('iv_length', (string) AesGcm::DEFAULT_IV_LENGTH);
+        $cipher = $dsn->getOption('cipher', 'aes-gcm');
+        if ('aes-gcm' !== $cipher && \array_key_exists('iv_length', $dsn->options)) {
+            throw new InvalidArgumentException('The "iv_length" option is only supported with "aes-gcm".');
+        }
+        $ivLength = $dsn->getOption('iv_length', (string) Aead::DEFAULT_IV_LENGTH);
         if (!ctype_digit($ivLength)) {
             throw new InvalidArgumentException('The "iv_length" option of the "kmip://" DSN must be an integer between 12 and 255 bytes.');
         }
 
         $transport = new StreamTransport($host, $port, $clientCertificateFile, $clientPrivateKeyFile, $certificateAuthorityFile, $peerName ?? $host, $dsn->getOption('passphrase'), (float) $timeout);
 
-        return new KmipKms(new ProtocolClient($transport, $version, $dsn->user, $dsn->password), (int) $ivLength);
+        return new KmipKms(new ProtocolClient($transport, $version, $dsn->user, $dsn->password), (int) $ivLength, $cipher);
     }
 }

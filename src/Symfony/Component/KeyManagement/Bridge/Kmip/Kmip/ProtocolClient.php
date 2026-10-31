@@ -19,7 +19,7 @@ use Symfony\Component\KeyManagement\KeyMaterial;
  *
  * Requests contain one batch item and the selected protocol version. Optional username and password credentials are encoded in the request header inside the verified TLS connection.
  *
- * Responses are decoded with the selected TTLV version and checked for required envelope fields, field order, batch count and result status. A successful response must identify the requested operation; a failed response may omit it, but must match it when present. A valid Operation Failed result raises {@see OperationFailed}. {@see AesGcm} checks the cryptographic payload contents after this client has validated the response envelope.
+ * Responses are decoded with the selected TTLV version and checked for required envelope fields, field order, batch count and result status. A successful response must identify the requested operation; a failed response may omit it, but must match it when present. A valid Operation Failed result raises {@see OperationFailed}. {@see Aead} checks the cryptographic payload contents after this client has validated the response envelope.
  *
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  *

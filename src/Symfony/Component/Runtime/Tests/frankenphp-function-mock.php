@@ -22,6 +22,7 @@ if (!function_exists('frankenphp_handle_request')) {
         FrankenPhpWorkerRunnerTest::$handlingRequest = true;
         try {
             $callable();
+            ++FrankenPhpWorkerRunnerTest::$completedRequests;
         } finally {
             FrankenPhpWorkerRunnerTest::$handlingRequest = false;
         }

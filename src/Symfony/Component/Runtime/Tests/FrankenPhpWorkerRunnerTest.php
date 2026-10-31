@@ -28,10 +28,12 @@ class FrankenPhpWorkerRunnerTest extends TestCase
 {
     public static ?int $requests = null;
     public static bool $handlingRequest = false;
+    public static int $completedRequests = 0;
 
     protected function tearDown(): void
     {
         self::$requests = null;
+        self::$completedRequests = 0;
     }
 
     public function testRun()
@@ -86,6 +88,25 @@ class FrankenPhpWorkerRunnerTest extends TestCase
 
         try {
             $this->assertSame(0, (new FrankenPhpWorkerRunner($application, 1))->run());
+        } finally {
+            $_SERVER = $server;
+        }
+    }
+
+    public function testTerminationExceptionIsRethrownAfterTheRequestCompletes()
+    {
+        $exception = new \RuntimeException('Termination failed');
+        $application = $this->createMock(TestAppInterface::class);
+        $application->expects($this->once())->method('handle')->willReturn(new Response());
+        $application->expects($this->once())->method('terminate')->willThrowException($exception);
+        $server = $_SERVER;
+
+        try {
+            (new FrankenPhpWorkerRunner($application, 1))->run();
+            $this->fail('The termination exception must be rethrown.');
+        } catch (\RuntimeException $caught) {
+            $this->assertSame($exception, $caught);
+            $this->assertSame(1, self::$completedRequests);
         } finally {
             $_SERVER = $server;
         }

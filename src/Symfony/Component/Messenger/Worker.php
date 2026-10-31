@@ -176,6 +176,9 @@ class Worker
         $envelope = $event->getEnvelope();
 
         if (!$event->shouldHandle()) {
+            // the listener that skips the message gives it its outcome, so the worker stops keeping it alive
+            unset($this->keepalives[$envelope->getMessage()]);
+
             return;
         }
 

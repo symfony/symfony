@@ -202,6 +202,27 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
+    /**
+     * @dataProvider provideFailurePathsWithoutHost
+     */
+    public function testFailurePathFromRequestWithoutHostIsIgnored(string $failurePath)
+    {
+        $this->request->attributes->set('_failure_path', $failurePath);
+
+        $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), [], new NullLogger());
+        $result = $handler->onAuthenticationFailure($this->request, $this->exception);
+
+        $this->assertSame('https://localhost/login', $result->getTargetUrl());
+    }
+
+    public static function provideFailurePathsWithoutHost(): iterable
+    {
+        yield ['http'];
+        yield ['httpx'];
+        yield ['https:'];
+        yield ['http:///some-path'];
+    }
+
     public function testAbsoluteUrlRedirectionFromRequest()
     {
         $options = ['failure_path_parameter' => '_my_failure_path'];

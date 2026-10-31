@@ -252,6 +252,28 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         $this->assertCount(1, $form->getErrors(false));
     }
 
+    public function testCollectionTypeKeepAsListValidatesTheRenumberedEntries()
+    {
+        $form = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->create(CollectionTypeTest::TESTED_TYPE, [], [
+                'entry_type' => TextTypeTest::TESTED_TYPE,
+                'entry_options' => ['constraints' => [new NotBlank()]],
+                'allow_add' => true,
+                'allow_delete' => true,
+                'keep_as_list' => true,
+            ]);
+
+        $form->submit([1 => 'foo', 3 => '']);
+
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->getErrors(true));
+        $this->assertTrue($form->get('1')->isSubmitted());
+        $this->assertCount(1, $form->get('1')->getErrors());
+        $this->assertCount(0, $form->get('0')->getErrors());
+    }
+
     public function testCollectionTypeKeepAsListOptionTrue()
     {
         $formMetadata = new ClassMetadata(Form::class);

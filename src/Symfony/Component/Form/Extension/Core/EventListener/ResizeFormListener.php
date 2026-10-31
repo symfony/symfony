@@ -167,15 +167,82 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         // Add all additional rows
+        $addedNames = [];
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
                 if (!$form->has($name)) {
                     $form->add($name, $this->type, array_replace([
                         'property_path' => '['.$name.']',
                     ], $this->prototypeOptions));
+                    $addedNames[$name] = true;
                 }
             }
         }
+
+        if ($this->keepAsList && \is_array($event->getData())) {
+            $this->renumberEntries($event, $data, $addedNames);
+        }
+    }
+
+    /**
+     * Renumbers the entries before they are submitted, so that they are validated
+     * and keep their transformation errors like the entries of any other collection.
+     *
+     * @param array<int|string, true> $addedNames
+     */
+    private function renumberEntries(FormEvent $event, array $data, array $addedNames): void
+    {
+        $form = $event->getForm();
+        $children = [];
+        $firstMoved = null;
+        $index = 0;
+        foreach ($form as $name => $child) {
+            if (null === $firstMoved && (string) $name !== (string) $index) {
+                $firstMoved = $index;
+            }
+            $children[$index++] = [$name, $child];
+        }
+
+        if (null === $firstMoved) {
+            return;
+        }
+
+        $initialKeys = $this->deleteEmpty ? ($this->initialKeys[$form] ?? []) : null;
+        $renumberedKeys = [];
+        $renumberedData = [];
+
+        foreach ($children as $index => [$name, $child]) {
+            if (null !== $initialKeys) {
+                $renumberedKeys[$index] = $initialKeys[$name] ?? false;
+            }
+
+            if (\array_key_exists($name, $data)) {
+                $renumberedData[$index] = $data[$name];
+                unset($data[$name]);
+            }
+
+            if ($index < $firstMoved) {
+                continue;
+            }
+
+            $form->remove($name);
+            if (isset($addedNames[$name])) {
+                $form->add($index, $this->type, array_replace([
+                    'property_path' => '['.$index.']',
+                ], $this->prototypeOptions));
+            } else {
+                $form->add($index, $this->type, array_replace([
+                    'property_path' => '['.$index.']',
+                ], $this->options, ['data' => $child->getData()]));
+            }
+        }
+
+        if (null !== $initialKeys) {
+            $this->initialKeys[$form] = $renumberedKeys;
+        }
+
+        // keys that match no entry stay as submitted, to be reported as extra fields
+        $event->setData($renumberedData + $data);
     }
 
     public function onSubmit(FormEvent $event): void
@@ -226,22 +293,19 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         if ($this->keepAsList) {
-            $formReindex = $dataKeys = [];
+            // The entries were renumbered before being submitted: only the data is
+            // turned into a list here, as replacing the submitted entries by new
+            // ones would drop their validation and their transformation errors.
+            $dataKeys = [];
             foreach ($data as $key => $value) {
                 $dataKeys[] = $key;
             }
             foreach ($dataKeys as $key) {
                 unset($data[$key]);
             }
-            foreach ($form as $name => $child) {
-                $formReindex[] = $child;
-                $form->remove($name);
-            }
-            foreach ($formReindex as $index => $child) {
-                $form->add($index, $this->type, array_replace([
-                    'property_path' => '['.$index.']',
-                ], $this->options, ['data' => $child->getData()]));
-                $data[$index] = $child->getData();
+            $index = 0;
+            foreach ($form as $child) {
+                $data[$index++] = $child->getData();
             }
         }
 

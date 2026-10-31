@@ -78,9 +78,12 @@ class EarlyExpirationHandler
         $pool = $message->findPool($this->reverseContainer);
         $callback = $message->findCallback($this->reverseContainer);
         $save = true;
-        $value = $callback($item, $save);
-        $setMetadata($item, $startTime);
-        $pool->save($item->set($value));
+        $item->set($callback($item, $save));
+
+        if ($save) {
+            $setMetadata($item, $startTime);
+            $pool->save($item);
+        }
 
         return new EarlyExpirationResult($item);
     }

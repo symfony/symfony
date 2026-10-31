@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
@@ -21,6 +22,9 @@ use Symfony\Component\HttpKernel\EventListener\CacheAttributeListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\CacheAttributeController;
 
+/**
+ * @group time-sensitive
+ */
 class CacheAttributeListenerTest extends TestCase
 {
     private CacheAttributeListener $listener;
@@ -28,14 +32,21 @@ class CacheAttributeListenerTest extends TestCase
     private Cache $cache;
     private Request $request;
     private ResponseEvent $event;
+    private string $defaultTimezone;
 
     protected function setUp(): void
     {
+        $this->defaultTimezone = date_default_timezone_get();
         $this->listener = new CacheAttributeListener();
         $this->response = new Response();
         $this->cache = new Cache();
         $this->request = $this->createRequest($this->cache);
         $this->event = $this->createEventMock($this->request, $this->response);
+    }
+
+    protected function tearDown(): void
+    {
+        date_default_timezone_set($this->defaultTimezone);
     }
 
     public function testWontReassignResponseWhenResponseIsUnsuccessful()
@@ -166,6 +177,28 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame('86400', $this->response->headers->getCacheControlDirective('s-maxage'));
         $this->assertSame(86400, $this->response->getMaxAge());
         $this->assertSame('86400', $this->response->headers->getCacheControlDirective('max-stale'));
+        $this->assertSame('86400', $this->response->headers->getCacheControlDirective('stale-if-error'));
+    }
+
+    public function testCacheMaxAgeIgnoresDaylightSavingTime()
+    {
+        date_default_timezone_set('America/Los_Angeles');
+        ClockMock::withClockMock((new \DateTimeImmutable('2025-11-01 12:00:00', new \DateTimeZone('America/Los_Angeles')))->getTimestamp());
+
+        $this->request->attributes->set('_cache', [new Cache(
+            maxage: '1 day',
+            smaxage: '1 day',
+            maxStale: '1 day',
+            staleWhileRevalidate: '1 day',
+            staleIfError: '1 day',
+        )]);
+
+        $this->listener->onKernelResponse($this->event);
+
+        $this->assertSame(86400, $this->response->getMaxAge());
+        $this->assertSame('86400', $this->response->headers->getCacheControlDirective('s-maxage'));
+        $this->assertSame('86400', $this->response->headers->getCacheControlDirective('max-stale'));
+        $this->assertSame('86400', $this->response->headers->getCacheControlDirective('stale-while-revalidate'));
         $this->assertSame('86400', $this->response->headers->getCacheControlDirective('stale-if-error'));
     }
 

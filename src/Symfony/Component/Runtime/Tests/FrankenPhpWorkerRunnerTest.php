@@ -27,6 +27,7 @@ interface TestAppInterface extends HttpKernelInterface, TerminableInterface
 class FrankenPhpWorkerRunnerTest extends TestCase
 {
     public static ?int $requests = null;
+    public static bool $handlingRequest = false;
 
     protected function tearDown(): void
     {
@@ -53,6 +54,53 @@ class FrankenPhpWorkerRunnerTest extends TestCase
 
             $runner = new FrankenPhpWorkerRunner($application, 500);
             $this->assertSame(0, $runner->run());
+        } finally {
+            $_SERVER = $server;
+        }
+    }
+
+    public function testKernelTerminatesBeforeTheRequestEnds()
+    {
+        $response = $this->createMock(Response::class);
+        $sent = false;
+        $response->expects($this->once())->method('send')->willReturnCallback(static function () use (&$sent, $response) {
+            $sent = true;
+
+            return $response;
+        });
+        $handledRequest = null;
+        $application = $this->createMock(TestAppInterface::class);
+        $application->expects($this->once())->method('handle')->willReturnCallback(static function (Request $request) use (&$handledRequest, $response) {
+            $handledRequest = $request;
+
+            return $response;
+        });
+        $application->expects($this->once())->method('terminate')->willReturnCallback(function (Request $request, Response $terminatedResponse) use (&$handledRequest, $response, &$sent) {
+            $this->assertTrue(self::$handlingRequest);
+            $this->assertTrue($sent);
+            $this->assertSame($handledRequest, $request);
+            $this->assertSame($response, $terminatedResponse);
+        });
+
+        $server = $_SERVER;
+
+        try {
+            $this->assertSame(0, (new FrankenPhpWorkerRunner($application, 1))->run());
+        } finally {
+            $_SERVER = $server;
+        }
+    }
+
+    public function testRunWithoutATerminableKernelStopsAtTheRequestLimit()
+    {
+        $application = $this->createMock(HttpKernelInterface::class);
+        $application->expects($this->once())->method('handle')->willReturn(new Response());
+        self::$requests = 2;
+        $server = $_SERVER;
+
+        try {
+            $this->assertSame(0, (new FrankenPhpWorkerRunner($application, 1))->run());
+            $this->assertSame(1, self::$requests);
         } finally {
             $_SERVER = $server;
         }

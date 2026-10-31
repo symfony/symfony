@@ -37,7 +37,7 @@ class FrankenPhpWorkerRunner implements RunnerInterface
         $server = array_filter($_SERVER, static fn (string $key) => !str_starts_with($key, 'HTTP_'), \ARRAY_FILTER_USE_KEY);
         $server['APP_RUNTIME_MODE'] = 'web=1&worker=1';
 
-        $handler = function () use ($server, &$sfRequest, &$sfResponse): void {
+        $handler = function () use ($server): void {
             // Connect to the Xdebug client if it's available
             if (\extension_loaded('xdebug') && \function_exists('xdebug_connect_to_client')) {
                 xdebug_connect_to_client();
@@ -50,16 +50,15 @@ class FrankenPhpWorkerRunner implements RunnerInterface
             $sfResponse = $this->kernel->handle($sfRequest);
 
             $sfResponse->send();
+
+            if ($this->kernel instanceof TerminableInterface) {
+                $this->kernel->terminate($sfRequest, $sfResponse);
+            }
         };
 
         $loops = 0;
         do {
             $ret = frankenphp_handle_request($handler);
-
-            if ($this->kernel instanceof TerminableInterface && $sfRequest && $sfResponse) {
-                $this->kernel->terminate($sfRequest, $sfResponse);
-            }
-            $sfRequest = $sfResponse = null;
 
             gc_collect_cycles();
         } while ($ret && (0 >= $this->loopMax || ++$loops < $this->loopMax));

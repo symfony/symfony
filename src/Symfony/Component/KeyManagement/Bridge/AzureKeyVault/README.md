@@ -60,19 +60,20 @@ Algorithms
 
 The bridge accepts two configurable algorithms:
 
-  * `encryptAlgorithm` (default `RSA-OAEP-256`): used by `encrypt()`/`decrypt()`.
-    `RSA-OAEP`, `RSA1_5` and the AEAD variants `A128GCM`/`A192GCM`/`A256GCM`
-    are also accepted (the AEAD variants require a symmetric key, available
-    on Managed HSM or Key Vault Premium in preview).
-  * `wrapAlgorithm` (default `RSA-OAEP-256`): used by `generateDataKey()`,
-    `wrapDataKey()` and `unwrapDataKey()`. Same algorithm set as above; with a
-    symmetric key you can use `A128KW` / `A192KW` / `A256KW` by setting it
-    explicitly.
+  * `encryptAlgorithm` (default `RSA-OAEP-256`): selects the algorithm for `encrypt()`.
+    The AEAD variants `A128GCM`/`A192GCM`/`A256GCM` are also accepted.
+    These require a symmetric key, available on Managed HSM or Key Vault Premium in preview.
+  * `wrapAlgorithm` (default `RSA-OAEP-256`): selects the algorithm for `generateDataKey()` and `wrapDataKey()`.
+    The same algorithms are accepted; with a symmetric key you can also select `A128KW` / `A192KW` / `A256KW` explicitly.
 
-The DSN factory only accepts the algorithm names Azure Key Vault documents
-(`RSA-OAEP-256`, `RSA-OAEP`, `RSA1_5`, the `A*GCM`, `A*CBC`, `A*CBCPAD` and
-`A*KW` families) so that a typo does not surface later as a decryption
-failure, which is how the decrypt path reports Azure's HTTP 400.
+The constructor and DSN factory reject any other algorithm.
+`RSA-OAEP` and `RSA1_5` are excluded following [Microsoft's recommendations](https://learn.microsoft.com/azure/key-vault/keys/about-keys-details#rsa-algorithms).
+CBC variants are excluded because the bridge does not preserve their IV and they do not authenticate ciphertexts.
+AES-KW is accepted only for data-key wrapping.
+
+Every blob records its algorithm, so a configuration change only affects new writes.
+Reads use the recorded algorithm, subject to the same payload or wrapping allowlist.
+Unprefixed blobs and malformed algorithm prefixes are rejected.
 
 `encrypt()` / `decrypt()` go through the RSA path by default and are therefore
 suited to small payloads (config secrets, tokens). For arbitrary-size
@@ -105,7 +106,7 @@ Examples:
 
 ```
 azure-keyvault://CLIENT_ID:CLIENT_SECRET@my-vault.vault.azure.net?tenant=TENANT_ID
-azure-keyvault://CLIENT_ID:CLIENT_SECRET@my-vault.vault.azure.net?tenant=TENANT_ID&algorithm=RSA-OAEP&api_version=7.4
+azure-keyvault://CLIENT_ID:CLIENT_SECRET@my-vault.vault.azure.net?tenant=TENANT_ID&algorithm=RSA-OAEP-256&api_version=7.4
 azure-keyvault://CLIENT_ID:CLIENT_SECRET@my-hsm.managedhsm.azure.net?tenant=TENANT_ID&algorithm=A256GCM&wrap_algorithm=A256KW
 ```
 
@@ -113,15 +114,13 @@ AAD support
 -----------
 
 AEAD algorithms (`A128GCM`/`A192GCM`/`A256GCM`) accept Azure's `aad`
-parameter natively and are integrity-protected. RSA algorithms have no AAD
-concept; passing a non-empty `$aad` to an RSA-configured bridge raises
-`UnsupportedOperationException`.
+parameter natively and are integrity-protected.
+RSA and AES-KW have no AAD support; passing a non-empty `$aad` with either algorithm raises `UnsupportedOperationException`.
 
-For AEAD ciphertexts, this bridge concatenates the algorithm, IV, tag and
-value into a single dot-separated blob (`<alg>.<iv>.<tag>.<value>`, all
-base64url) so callers can store one opaque ciphertext and let the bridge
-recover its parts on decrypt. The pieces themselves are exactly what Azure
-returns; nothing is added to or stripped from them.
+For AEAD ciphertexts and wrapped keys, the blob is `<alg>.<iv>.<tag>.<value>`.
+For RSA ciphertexts and RSA or AES-KW wrapped keys, it is `<alg>.<value>`.
+The IV, tag and value are the base64url fields returned by Azure; the algorithm prefix is added by the bridge and removed before sending a read request.
+Callers store the complete opaque blob, together with its key ID.
 
 Resources
 ---------

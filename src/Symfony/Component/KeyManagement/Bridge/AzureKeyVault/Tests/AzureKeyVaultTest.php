@@ -44,7 +44,7 @@ class AzureKeyVaultTest extends TestCase
         $ciphertext = $kms->encrypt('app-key', 'hello');
 
         $this->assertSame('app-key/v1', $ciphertext->keyId);
-        $this->assertSame('CipherFromAzure', $ciphertext->blob);
+        $this->assertSame('RSA-OAEP-256.CipherFromAzure', $ciphertext->blob);
 
         [$method, $url, $body, $headers] = $captured;
         $this->assertSame('POST', $method);
@@ -538,7 +538,7 @@ class AzureKeyVaultTest extends TestCase
 
         $this->expectException(DecryptionFailedException::class);
         try {
-            $kms->decrypt(new Ciphertext('CipherFromAzure', 'app-key'));
+            $kms->decrypt(new Ciphertext('RSA-OAEP-256.CipherFromAzure', 'app-key'));
         } finally {
             $this->assertSame(2, $tokenRequests);
             $this->assertCount(2, $kmsRequests);
@@ -558,7 +558,7 @@ class AzureKeyVaultTest extends TestCase
         $kms = new AzureKeyVault($client, new ClientCredentialsTokenProvider($client, 'tenant', 'client', 'secret'));
 
         try {
-            $kms->decrypt(new Ciphertext('CipherFromAzure', 'app-key'));
+            $kms->decrypt(new Ciphertext('RSA-OAEP-256.CipherFromAzure', 'app-key'));
             $this->fail('The second 401 should be reported.');
         } catch (RuntimeException $e) {
             $this->assertNotInstanceOf(DecryptionFailedException::class, $e);
@@ -641,7 +641,7 @@ class AzureKeyVaultTest extends TestCase
         $this->assertSame(Base64UrlSafe::encode('tenant=acme'), $captured['aad']);
     }
 
-    public function testDecryptRsaSendsTheBlobBackVerbatim()
+    public function testDecryptRsaSendsTheValueWithoutItsAlgorithmPrefix()
     {
         $captured = null;
         $client = new MockHttpClient(static function ($method, $url, $options) use (&$captured): MockResponse {
@@ -650,7 +650,7 @@ class AzureKeyVaultTest extends TestCase
             return new MockResponse(json_encode(['value' => Base64UrlSafe::encode('hello')]));
         }, self::VAULT);
 
-        $plaintext = (new AzureKeyVault($client, $this->staticToken('T')))->decrypt(new Ciphertext('CipherFromAzure', 'app-key'));
+        $plaintext = (new AzureKeyVault($client, $this->staticToken('T')))->decrypt(new Ciphertext('RSA-OAEP-256.CipherFromAzure', 'app-key'));
 
         $this->assertSame('hello', $plaintext);
         $this->assertSame('CipherFromAzure', $captured['value']);
@@ -722,7 +722,7 @@ class AzureKeyVaultTest extends TestCase
         );
 
         $this->expectException(DecryptionFailedException::class);
-        (new AzureKeyVault($client, $this->staticToken('T')))->decrypt(new Ciphertext('tampered', 'app-key'));
+        (new AzureKeyVault($client, $this->staticToken('T')))->decrypt(new Ciphertext('RSA-OAEP-256.tampered', 'app-key'));
     }
 
     public function testDecryptOnHttp404IsAlsoADecryptionFailure()
@@ -733,7 +733,7 @@ class AzureKeyVaultTest extends TestCase
         );
 
         $this->expectException(DecryptionFailedException::class);
-        (new AzureKeyVault($client, $this->staticToken('T')))->decrypt(new Ciphertext('whatever', 'unknown-key'));
+        (new AzureKeyVault($client, $this->staticToken('T')))->decrypt(new Ciphertext('RSA-OAEP-256.whatever', 'unknown-key'));
     }
 
     public function testEncryptOnHttp404IsKeyNotFound()
@@ -820,7 +820,7 @@ class AzureKeyVaultTest extends TestCase
         $this->assertSame(self::VAULT.'keys/app-key/wrapkey?api-version=7.4', $url);
         $this->assertSame('RSA-OAEP-256', $body['alg']);
         $this->assertSame('app-key/v1', $dataKey->wrapped->keyId);
-        $this->assertSame('WrappedDek', $dataKey->wrapped->blob);
+        $this->assertSame('RSA-OAEP-256.WrappedDek', $dataKey->wrapped->blob);
     }
 
     public function testAeadDataKeyWrapPinsTheVersionAndUnwrapsAfterRotation()
@@ -876,12 +876,12 @@ class AzureKeyVaultTest extends TestCase
                 : ['value' => Base64UrlSafe::encode(str_repeat("\xAB", 32))]));
         }, self::VAULT);
 
-        $kms = new AzureKeyVault($client, $this->staticToken('T'), 'RSA-OAEP', 'RSA-OAEP-256');
+        $kms = new AzureKeyVault($client, $this->staticToken('T'), 'A256GCM', 'RSA-OAEP-256');
         $wrapped = $kms->wrapDataKey('app-key', str_repeat("\xAB", 32));
         $kms->unwrapDataKey($wrapped);
 
         $this->assertSame('app-key/v1', $wrapped->keyId);
-        $this->assertSame('WrappedDek', $wrapped->blob);
+        $this->assertSame('RSA-OAEP-256.WrappedDek', $wrapped->blob);
         $this->assertSame([self::VAULT.'keys/app-key/wrapkey?api-version=7.4', ['alg' => 'RSA-OAEP-256', 'value' => Base64UrlSafe::encode(str_repeat("\xAB", 32))]], $requests[0]);
         $this->assertSame([self::VAULT.'keys/app-key/v1/unwrapkey?api-version=7.4', ['alg' => 'RSA-OAEP-256', 'value' => 'WrappedDek']], $requests[1], 'the key is unwrapped under the algorithm it was wrapped with, whatever the encryption one.');
     }
@@ -909,7 +909,7 @@ class AzureKeyVaultTest extends TestCase
             self::VAULT,
         );
 
-        $dataKey = (new AzureKeyVault($client, $this->staticToken('T')))->unwrapDataKey(new Ciphertext('WrappedDek', 'app-key'));
+        $dataKey = (new AzureKeyVault($client, $this->staticToken('T')))->unwrapDataKey(new Ciphertext('RSA-OAEP-256.WrappedDek', 'app-key'));
 
         $this->assertSame(str_repeat("\xAB", 32), $dataKey->use(static fn (string $p): string => $p));
     }
@@ -951,7 +951,7 @@ class AzureKeyVaultTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('HTTP 200');
-        (new AzureKeyVault($client, $this->staticToken('T')))->decrypt(new Ciphertext('blob', 'app-key'));
+        (new AzureKeyVault($client, $this->staticToken('T')))->decrypt(new Ciphertext('RSA-OAEP-256.blob', 'app-key'));
     }
 
     public function testTransportErrorWhileReadingAnErrorBodySurfacesAsRuntimeException()

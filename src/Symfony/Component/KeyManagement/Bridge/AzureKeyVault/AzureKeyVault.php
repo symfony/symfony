@@ -36,12 +36,12 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * for its audience.
  *
  * Algorithm matrix:
- *   - RSA keys: `RSA-OAEP-256` (default), `RSA-OAEP`, `RSA1_5`. Suited to
+ *   - RSA keys: `RSA-OAEP-256` (default). Suited to
  *     small payloads (config secrets, DEK wrapping). RSA does not support
  *     AAD, so a non-empty `$aad` triggers {@see UnsupportedOperationException}.
  *   - Symmetric AES keys (Managed HSM or Key Vault Premium in preview):
- *     `A256GCM` / `A192GCM` / `A128GCM` are AEAD and accept AAD natively;
- *     CBC variants do not.
+ *     `A256GCM` / `A192GCM` / `A128GCM` are AEAD and accept AAD natively.
+ *     `A128KW` / `A192KW` / `A256KW` are accepted only for data-key wrapping and have no AAD support.
  *
  * `generateDataKey()` is implemented locally (Azure has no `GenerateDataKey`
  * primitive): a fresh DEK is drawn with `random_bytes()` and wrapped via
@@ -66,6 +66,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, DataKeyGeneratorInterface
 {
     private const array AEAD_ALGORITHMS = ['A128GCM', 'A192GCM', 'A256GCM'];
+    private const array ENCRYPT_ALGORITHMS = ['RSA-OAEP-256', ...self::AEAD_ALGORITHMS];
+    private const array WRAP_ALGORITHMS = [...self::ENCRYPT_ALGORITHMS, 'A128KW', 'A192KW', 'A256KW'];
 
     // See https://learn.microsoft.com/azure/key-vault/general/about-keys-secrets-certificates#object-identifiers
     private const string KEY_ID_PATTERN = '~\A([0-9A-Za-z-]{1,127})(?:/(?1))?\z~';
@@ -77,6 +79,8 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
         private readonly string $wrapAlgorithm = 'RSA-OAEP-256',
         private readonly string $apiVersion = '7.4',
     ) {
+        self::validateAlgorithm($encryptAlgorithm, self::ENCRYPT_ALGORITHMS, 'encryption');
+        self::validateAlgorithm($wrapAlgorithm, self::WRAP_ALGORITHMS, 'wrapping');
     }
 
     public function encrypt(string $keyId, #[\SensitiveParameter] string $plaintext, string $aad = ''): Ciphertext
@@ -99,12 +103,14 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
             throw new RuntimeException('Azure Key Vault returned a malformed response (missing "value").');
         }
 
-        $blob = $data['value'];
+        $blob = $this->encryptAlgorithm.'.'.$data['value'];
         if (\in_array($this->encryptAlgorithm, self::AEAD_ALGORITHMS, true)) {
-            if (!isset($data['iv'], $data['tag']) || !\is_string($data['iv']) || !\is_string($data['tag'])) {
+            if (!isset($data['iv'], $data['tag']) || !\is_string($data['iv']) || '' === $data['iv'] || !\is_string($data['tag']) || '' === $data['tag']) {
                 throw new RuntimeException('Azure Key Vault returned a malformed AEAD response (missing "iv"/"tag").');
             }
             $blob = $this->encryptAlgorithm.'.'.$data['iv'].'.'.$data['tag'].'.'.$data['value'];
+        } elseif ('' === $data['value']) {
+            throw new RuntimeException('Azure Key Vault returned an empty ciphertext.');
         }
 
         return new Ciphertext($blob, $this->resolvedKeyId($data, $keyId));
@@ -116,7 +122,7 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
             throw new DecryptionFailedException();
         }
 
-        $body = $this->buildDecryptBody($ciphertext->blob, $aad, $this->encryptAlgorithm);
+        $body = $this->buildDecryptBody($ciphertext->blob, $aad, self::ENCRYPT_ALGORITHMS);
 
         $data = $this->request('POST', $this->keyPath($ciphertext->keyId, 'decrypt'), $body, $ciphertext->keyId, true);
 
@@ -163,12 +169,14 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
             throw new RuntimeException('Azure Key Vault returned a malformed response (missing "value").');
         }
 
-        $blob = $data['value'];
+        $blob = $this->wrapAlgorithm.'.'.$data['value'];
         if (\in_array($this->wrapAlgorithm, self::AEAD_ALGORITHMS, true)) {
-            if (!isset($data['iv'], $data['tag']) || !\is_string($data['iv']) || !\is_string($data['tag'])) {
+            if (!isset($data['iv'], $data['tag']) || !\is_string($data['iv']) || '' === $data['iv'] || !\is_string($data['tag']) || '' === $data['tag']) {
                 throw new RuntimeException('Azure Key Vault returned a malformed AEAD wrap response (missing "iv"/"tag").');
             }
             $blob = $this->wrapAlgorithm.'.'.$data['iv'].'.'.$data['tag'].'.'.$data['value'];
+        } elseif ('' === $data['value']) {
+            throw new RuntimeException('Azure Key Vault returned an empty wrapped data key.');
         }
 
         return new Ciphertext($blob, $this->resolvedKeyId($data, $keyId));
@@ -180,7 +188,7 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
             throw new DecryptionFailedException();
         }
 
-        $body = $this->buildDecryptBody($wrapped->blob, $aad, $this->wrapAlgorithm);
+        $body = $this->buildDecryptBody($wrapped->blob, $aad, self::WRAP_ALGORITHMS);
 
         $data = $this->request('POST', $this->keyPath($wrapped->keyId, 'unwrapkey'), $body, $wrapped->keyId, true);
 
@@ -194,6 +202,16 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
         }
 
         return new DataKey($plaintext, $wrapped);
+    }
+
+    /**
+     * @param list<string> $supported
+     */
+    private static function validateAlgorithm(string $algorithm, array $supported, string $operation): void
+    {
+        if (!\in_array($algorithm, $supported, true)) {
+            throw new InvalidArgumentException(\sprintf('The "%s" algorithm must be one of "%s", "%s" given.', $operation, implode('", "', $supported), $algorithm));
+        }
     }
 
     private function keyPath(string $keyId, string $operation): string
@@ -244,20 +262,27 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
     }
 
     /**
-     * Builds the decrypt/unwrap body.
+     * Builds the decrypt/unwrap body from the algorithm recorded in the blob.
      *
-     * The algorithm is auto-detected from the AEAD blob prefix when present, so
-     * that ciphertexts written under a previous configuration can still be
-     * decoded after a config rotation.
+     * @param list<string> $supported
      *
      * @return array<string, mixed>
      */
-    private function buildDecryptBody(string $blob, string $aad, string $fallbackAlgorithm): array
+    private function buildDecryptBody(string $blob, string $aad, array $supported): array
     {
-        $aeadPrefix = self::detectAeadAlgorithm($blob);
+        $parts = explode('.', $blob, 5);
+        $algorithm = array_shift($parts);
 
-        if (null !== $aeadPrefix) {
-            [$algorithm, $iv, $tag, $value] = $aeadPrefix;
+        if (!\in_array($algorithm, $supported, true)) {
+            throw new DecryptionFailedException();
+        }
+
+        if (\in_array($algorithm, self::AEAD_ALGORITHMS, true)) {
+            if (3 !== \count($parts) || '' === $parts[0] || '' === $parts[1]) {
+                throw new DecryptionFailedException();
+            }
+
+            [$iv, $tag, $value] = $parts;
             $body = ['alg' => $algorithm, 'iv' => $iv, 'tag' => $tag, 'value' => $value];
             if ('' !== $aad) {
                 $body['aad'] = Base64UrlSafe::encode($aad);
@@ -266,31 +291,15 @@ final class AzureKeyVault implements DecrypterInterface, EncrypterInterface, Dat
             return $body;
         }
 
-        if (\in_array($fallbackAlgorithm, self::AEAD_ALGORITHMS, true)) {
+        if (1 !== \count($parts) || '' === $parts[0]) {
             throw new DecryptionFailedException();
         }
 
         if ('' !== $aad) {
-            throw new UnsupportedOperationException(\sprintf('Algorithm "%s" cannot enforce AAD; configure an AEAD algorithm (A128GCM, A192GCM, A256GCM) to use AAD with Azure Key Vault.', $fallbackAlgorithm));
+            throw new UnsupportedOperationException(\sprintf('Algorithm "%s" cannot enforce AAD; configure an AEAD algorithm (A128GCM, A192GCM, A256GCM) to use AAD with Azure Key Vault.', $algorithm));
         }
 
-        return ['alg' => $fallbackAlgorithm, 'value' => $blob];
-    }
-
-    /**
-     * @return array{0: string, 1: string, 2: string, 3: string}|null
-     */
-    private static function detectAeadAlgorithm(string $blob): ?array
-    {
-        if (!str_contains($blob, '.')) {
-            return null;
-        }
-        $parts = explode('.', $blob, 4);
-        if (4 !== \count($parts) || !\in_array($parts[0], self::AEAD_ALGORITHMS, true)) {
-            return null;
-        }
-
-        return $parts;
+        return ['alg' => $algorithm, 'value' => $parts[0]];
     }
 
     /**

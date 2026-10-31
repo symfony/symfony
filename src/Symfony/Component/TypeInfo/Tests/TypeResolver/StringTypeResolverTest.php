@@ -12,6 +12,8 @@
 namespace Symfony\Component\TypeInfo\Tests\TypeResolver;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\LogicException;
@@ -38,7 +40,7 @@ class StringTypeResolverTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->resolver = new StringTypeResolver();
+        $this->resolver = new StringTypeResolver(null, null, [], true);
     }
 
     #[DataProvider('resolveDataProvider')]
@@ -67,7 +69,7 @@ class StringTypeResolverTest extends TestCase
      */
     public static function resolveDataProvider(): iterable
     {
-        $typeContextFactory = new TypeContextFactory(new StringTypeResolver());
+        $typeContextFactory = new TypeContextFactory(new StringTypeResolver(null, null, [], true));
 
         /**
          * @template TFoo of int
@@ -123,10 +125,7 @@ class StringTypeResolverTest extends TestCase
         // const
         yield [Type::array(), 'array[1, 2, 3]'];
         yield [Type::false(), 'false'];
-        yield [Type::float(), '1.23'];
-        yield [Type::int(), '1'];
         yield [Type::null(), 'null'];
-        yield [Type::string(), '"string"'];
         yield [Type::true(), 'true'];
 
         // const fetch
@@ -157,11 +156,6 @@ class StringTypeResolverTest extends TestCase
         yield [Type::false(), 'false'];
         yield [Type::int(), 'int'];
         yield [Type::int(), 'integer'];
-        yield [Type::int(), 'positive-int'];
-        yield [Type::int(), 'negative-int'];
-        yield [Type::int(), 'non-positive-int'];
-        yield [Type::int(), 'non-negative-int'];
-        yield [Type::int(), 'non-zero-int'];
         yield [Type::float(), 'float'];
         yield [Type::float(), 'double'];
         yield [Type::string(), 'string'];
@@ -212,7 +206,6 @@ class StringTypeResolverTest extends TestCase
         // generic
         yield [Type::generic(Type::object(\DateTime::class), Type::string(), Type::bool()), \DateTime::class.'<string, bool>'];
         yield [Type::generic(Type::object(\DateTime::class), Type::generic(Type::object(\Stringable::class), Type::bool())), \sprintf('%s<%s<bool>>', \DateTime::class, \Stringable::class)];
-        yield [Type::int(), 'int<0, 100>'];
         yield [Type::string(), \sprintf('value-of<%s>', DummyBackedEnum::class)];
         yield [Type::int(), 'key-of<list<bool>>'];
         yield [Type::bool(), 'value-of<list<bool>>'];
@@ -274,7 +267,7 @@ class StringTypeResolverTest extends TestCase
 
     public function testResolveWithExtraTypeAlias()
     {
-        $resolver = new StringTypeResolver(null, null, ['CustomAlias' => 'int', 'CustomPair' => 'array{0: CustomAlias, 1: CustomAlias}']);
+        $resolver = new StringTypeResolver(null, null, ['CustomAlias' => 'int', 'CustomPair' => 'array{0: CustomAlias, 1: CustomAlias}'], true);
 
         $this->assertEquals(Type::int(), $resolver->resolve('CustomAlias'));
         $this->assertEquals(Type::arrayShape([Type::int(), Type::int()]), $resolver->resolve('CustomPair'));
@@ -282,7 +275,7 @@ class StringTypeResolverTest extends TestCase
 
     public function testDeclaredIdentifierTakesPrecedenceOverKeywordCase()
     {
-        $resolver = new StringTypeResolver(null, null, ['Number' => 'string']);
+        $resolver = new StringTypeResolver(null, null, ['Number' => 'string'], true);
 
         $this->assertEquals(Type::string(), $resolver->resolve('Number'));
         $this->assertEquals(Type::union(Type::int(), Type::float()), $resolver->resolve('number'));
@@ -290,7 +283,7 @@ class StringTypeResolverTest extends TestCase
 
     public function testDeclaredGenericAliasesTakePrecedenceOverKeywordCase()
     {
-        $resolver = new StringTypeResolver(null, null, ['Value-Of' => \DateTime::class, 'Key-Of' => \DateTime::class]);
+        $resolver = new StringTypeResolver(null, null, ['Value-Of' => \DateTime::class, 'Key-Of' => \DateTime::class], true);
 
         foreach (['Value-Of', 'Key-Of'] as $name) {
             $this->assertEquals(Type::generic(Type::object(\DateTime::class), Type::string()), $resolver->resolve($name.'<string>'));
@@ -350,7 +343,7 @@ class StringTypeResolverTest extends TestCase
 
     public function testExtraTypeAliasNamesAreCaseSensitive()
     {
-        $resolver = new StringTypeResolver(null, null, ['custom' => 'string']);
+        $resolver = new StringTypeResolver(null, null, ['custom' => 'string'], true);
 
         $this->expectException(UnsupportedException::class);
         $resolver->resolve('Custom');
@@ -393,7 +386,7 @@ class StringTypeResolverTest extends TestCase
 
     public function testThrowWhenResolvingRecursiveExtraTypeAlias()
     {
-        $resolver = new StringTypeResolver(null, null, ['Foo' => 'list<Foo>']);
+        $resolver = new StringTypeResolver(null, null, ['Foo' => 'list<Foo>'], true);
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot resolve "Foo" type alias as it is recursive.');
@@ -405,6 +398,159 @@ class StringTypeResolverTest extends TestCase
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve(123);
+    }
+
+    #[DataProvider('resolveRefinementsDataProvider')]
+    public function testResolveRefinements(Type $expectedType, string $string)
+    {
+        $this->assertEquals($expectedType, $this->resolver->resolve($string));
+        $this->assertEquals($expectedType, $this->resolver->resolve((string) $expectedType));
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: string}>
+     */
+    public static function resolveRefinementsDataProvider(): iterable
+    {
+        yield [Type::literal('draft'), "'draft'"];
+        yield [Type::literal(1), '1'];
+        yield [Type::literal(-1), '-1'];
+        yield [Type::literal(26), '0x1A'];
+        yield [Type::literal(15), '0o17'];
+        yield [Type::literal(5), '0b101'];
+        yield [Type::literal(15), '017'];
+        yield [Type::literal(0), '0'];
+        yield [Type::literal("it's"), "'it\\'s'"];
+        yield [Type::literal("a\n\"b"), '"a\\n\\"b"'];
+        if (8 === \PHP_INT_SIZE) {
+            yield [Type::literal(\PHP_INT_MAX), '0x7FFFFFFFFFFFFFFF'];
+            yield [Type::literal(\PHP_INT_MIN), '-9223372036854775808'];
+            yield [Type::literal(\PHP_INT_MIN), '-0x8000000000000000'];
+            yield [Type::literal(\PHP_INT_MIN), '-0o1000000000000000000000'];
+            yield [Type::literal(\PHP_INT_MIN), '-0b1'.str_repeat('0', 63)];
+            yield [Type::intRange(null, 0), 'int<-9223372036854775808, 0>'];
+            yield [Type::intRange(0, null), 'int<0, 0x7FFFFFFFFFFFFFFF>'];
+        }
+        yield [Type::literal(1.5), '1.5'];
+        yield [Type::union(Type::literal('draft'), Type::literal('published')), "'draft'|'published'"];
+        yield [Type::intRange(1, null), 'positive-int'];
+        yield [Type::intRange(null, -1), 'negative-int'];
+        yield [Type::intRange(null, 0), 'non-positive-int'];
+        yield [Type::intRange(0, null), 'non-negative-int'];
+        yield [Type::union(Type::intRange(null, -1), Type::intRange(1, null)), 'non-zero-int'];
+        yield [Type::nullable(Type::union(Type::intRange(null, -1), Type::intRange(1, null))), '?non-zero-int'];
+        yield [Type::union(Type::intRange(null, -1), Type::intRange(1, null), Type::string()), 'non-zero-int|string'];
+        yield [Type::intRange(0, 10), 'int<0, 10>'];
+        yield [Type::intRange(null, 5), 'int<min, 5>'];
+        yield [Type::intRange(-5, null), 'int<-5, max>'];
+        yield [Type::int(), 'int<min, max>'];
+    }
+
+    #[DataProvider('resolveIntRangeWithConstantBoundDataProvider')]
+    public function testResolveIntRangeWithConstantBound(Type $expectedType, string $string, ?TypeContext $typeContext = null)
+    {
+        $this->assertEquals($expectedType, $this->resolver->resolve($string, $typeContext));
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: string, 2?: TypeContext}>
+     */
+    public static function resolveIntRangeWithConstantBoundDataProvider(): iterable
+    {
+        $typeContextFactory = new TypeContextFactory(new StringTypeResolver(null, null, [], true));
+
+        yield [Type::intRange(0, null), 'int<0, PHP_INT_MAX>'];
+        yield [Type::intRange(null, 0), 'int<\\PHP_INT_MIN, 0>'];
+        yield [Type::int(), 'int<PHP_INT_MIN, PHP_INT_MAX>'];
+        yield [Type::intRange(\PHP_INT_MAX, null), 'int<PHP_INT_MAX, max>'];
+        yield [Type::intRange(0, null), 'int<0, PHP_INT_MAX>', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
+        yield [Type::intRange(0, 1), 'int<0, '.DummyWithConstants::class.'::DUMMY_INT_A>'];
+        yield [Type::intRange(1, null), 'int<self::DUMMY_INT_A, max>', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
+        yield [Type::int(), 'int<0, UNDEFINED_CONSTANT>'];
+    }
+
+    #[DataProvider('invalidRefinementDataProvider')]
+    public function testCannotResolveInvalidRefinement(string $string)
+    {
+        $this->expectException(UnsupportedException::class);
+
+        $this->resolver->resolve($string);
+    }
+
+    /**
+     * @return iterable<array{0: string}>
+     */
+    public static function invalidRefinementDataProvider(): iterable
+    {
+        yield ['int<5, 1>'];
+        yield ["int<'a', 5>"];
+        yield ['int<max, 5>'];
+        yield ['9223372036854775808'];
+        yield ['0x8000000000000000'];
+        yield ['-9223372036854775809'];
+        yield ['-0x8000000000000001'];
+        yield ['09'];
+        yield ['-0129'];
+        yield ['int<09, 10>'];
+        yield ['1e400'];
+        yield ['-1e400'];
+        yield ['int<0, PHP_VERSION>'];
+        yield ['int<0, '.DummyWithConstants::class.'::DUMMY_STRING_A>'];
+        yield ['int<0, '.DummyWithConstants::class.'::UNDEFINED>'];
+        yield ['int<0, UndefinedClass::MAX>'];
+    }
+
+    #[DataProvider('disabledRefinementDataProvider')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testDoNotResolveRefinementsWhenDisabled(Type $expectedType, string $string)
+    {
+        $resolver = new StringTypeResolver(null, null, [], false);
+
+        $this->assertEquals($expectedType, $resolver->resolve($string));
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: string}>
+     */
+    public static function disabledRefinementDataProvider(): iterable
+    {
+        yield [Type::string(), "'draft'"];
+        yield [Type::union(Type::string(), Type::string()), "'draft'|'live'"];
+        yield [Type::float(), '1.5'];
+        yield [Type::int(), '-1'];
+        yield [Type::int(), 'positive-int'];
+        yield [Type::int(), 'non-zero-int'];
+        yield [Type::nullable(Type::int()), '?non-zero-int'];
+        yield [Type::int(), 'int<0, 10>'];
+        yield [Type::int(), 'int<0, PHP_INT_MAX>'];
+        yield [Type::arrayShape(['a b' => Type::int()]), "array{'a b': 1}"];
+        yield [Type::array(Type::string(), Type::union(Type::string(), Type::string())), "array<'en'|'de', string>"];
+        yield [Type::list(Type::int()), 'list<positive-int>'];
+
+        // rejected when refinements are resolved
+        yield [Type::int(), 'int<5, 1>'];
+        yield [Type::int(), "int<'a', 5>"];
+        yield [Type::float(), '1e400'];
+        yield [Type::int(), '09'];
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testNotPassingTrueForResolveRefinementsIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/type-info 8.2: Not passing true for the "$resolveRefinements" argument of "Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver::__construct()" is deprecated; PHPDoc refinements will always be resolved in 9.0.');
+
+        new StringTypeResolver();
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testPassingFalseForResolveRefinementsIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/type-info 8.2: Not passing true for the "$resolveRefinements" argument of "Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver::__construct()" is deprecated; PHPDoc refinements will always be resolved in 9.0.');
+
+        new StringTypeResolver(null, null, [], false);
     }
 
     public function testCannotResolveThisWithoutTypeContext()
@@ -505,7 +651,7 @@ class StringTypeResolverTest extends TestCase
          */
         $dummyClass = new class {};
 
-        $typeContextFactory = new TypeContextFactory(new StringTypeResolver());
+        $typeContextFactory = new TypeContextFactory(new StringTypeResolver(null, null, [], true));
 
         $this->expectException(InvalidArgumentException::class);
         $this->resolver->resolve('array<TKey, string>', $typeContextFactory->createFromClassName($dummyClass::class));
@@ -519,7 +665,7 @@ class StringTypeResolverTest extends TestCase
          */
         $dummyClass = new class {};
 
-        $typeContextFactory = new TypeContextFactory(new StringTypeResolver());
+        $typeContextFactory = new TypeContextFactory(new StringTypeResolver(null, null, [], true));
 
         $this->expectException(InvalidArgumentException::class);
         $this->resolver->resolve('array<TFoo|TBar, string>', $typeContextFactory->createFromClassName($dummyClass::class));

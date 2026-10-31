@@ -6,6 +6,8 @@ framework:
     form:
         enabled: true
     test: true
+    type_info:
+        resolve_refinements: true
     default_locale: en
     enabled_locales: ['en', 'fr']
     session:

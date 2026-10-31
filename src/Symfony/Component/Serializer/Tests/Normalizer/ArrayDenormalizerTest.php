@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\TypeInfo\Type;
 
 class ArrayDenormalizerTest extends TestCase
 {
@@ -52,6 +53,18 @@ class ArrayDenormalizerTest extends TestCase
             ],
             $result
         );
+    }
+
+    public function testDenormalizeWithRefinedKeyTypes()
+    {
+        $nestedDenormalizer = $this->createStub(DenormalizerInterface::class);
+        $nestedDenormalizer->method('denormalize')->willReturnArgument(0);
+
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($nestedDenormalizer);
+
+        $this->assertSame([1 => 'a'], $denormalizer->denormalize([1 => 'a'], 'string[]', null, ['key_type' => Type::intRange(1, null)]));
+        $this->assertSame(['a' => 'b'], $denormalizer->denormalize(['a' => 'b'], 'string[]', null, ['key_type' => Type::union(Type::literal('a'), Type::literal('b'))]));
     }
 
     public function testDenormalizeSplitsObjectToPopulatePerItem()

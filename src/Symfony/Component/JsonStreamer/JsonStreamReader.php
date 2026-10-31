@@ -123,13 +123,13 @@ final class JsonStreamReader implements StreamReaderInterface
             }
         };
 
-        $typeContextFactory = new TypeContextFactory(class_exists(PhpDocParser::class) ? new StringTypeResolver() : null);
+        $typeContextFactory = new TypeContextFactory(class_exists(PhpDocParser::class) ? new StringTypeResolver(null, null, [], true) : null);
 
         $propertyMetadataLoader = new GenericTypePropertyMetadataLoader(
             new AttributePropertyMetadataLoader(
-                new PropertyMetadataLoader(TypeResolver::create()),
+                new PropertyMetadataLoader(TypeResolver::create(null, true)),
                 $transformersContainer,
-                TypeResolver::create(),
+                TypeResolver::create(null, true),
             ),
             $typeContextFactory,
         );

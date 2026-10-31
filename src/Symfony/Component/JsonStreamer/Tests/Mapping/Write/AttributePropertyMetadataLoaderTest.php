@@ -32,17 +32,17 @@ class AttributePropertyMetadataLoaderTest extends TestCase
 {
     public function testRetrieveStreamedName()
     {
-        $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), TypeResolver::create());
+        $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), TypeResolver::create(null, true));
 
         $this->assertSame(['@id', 'name'], array_keys($loader->load(DummyWithNameAttributes::class)));
     }
 
     public function testRetrieveValueTransformer()
     {
-        $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer([
+        $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer([
             DoubleIntAndCastToStringValueTransformer::class => new DoubleIntAndCastToStringValueTransformer(),
             BooleanToStringValueTransformer::class => new BooleanToStringValueTransformer(),
-        ]), TypeResolver::create());
+        ]), TypeResolver::create(null, true));
 
         $metadata = $loader->load(DummyWithValueTransformerAttributes::class);
 
@@ -63,7 +63,7 @@ class AttributePropertyMetadataLoaderTest extends TestCase
 
     public function testThrowWhenCannotRetrieveValueTransformer()
     {
-        $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), TypeResolver::create());
+        $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), TypeResolver::create(null, true));
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('You have requested a non-existent property value transformer service "%s". Did you implement "%s"?', DoubleIntAndCastToStringValueTransformer::class, PropertyValueTransformerInterface::class));
@@ -73,9 +73,9 @@ class AttributePropertyMetadataLoaderTest extends TestCase
 
     public function testThrowWhenValueObjectTransformer()
     {
-        $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer([
+        $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer([
             DateTimeValueObjectTransformer::class => new DateTimeValueObjectTransformer(),
-        ]), TypeResolver::create());
+        ]), TypeResolver::create(null, true));
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('"%s" is a "%s" and must not be specified as a property value transformer.', DateTimeValueObjectTransformer::class, ValueObjectTransformerInterface::class));
@@ -85,10 +85,10 @@ class AttributePropertyMetadataLoaderTest extends TestCase
 
     public function testThrowWhenInvalidValueTransformer()
     {
-        $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer([
+        $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer([
             DoubleIntAndCastToStringValueTransformer::class => true,
             BooleanToStringValueTransformer::class => new BooleanToStringValueTransformer(),
-        ]), TypeResolver::create());
+        ]), TypeResolver::create(null, true));
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('The "%s" property value transformer service does not implement "%s".', DoubleIntAndCastToStringValueTransformer::class, PropertyValueTransformerInterface::class));

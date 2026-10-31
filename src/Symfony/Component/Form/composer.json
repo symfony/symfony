@@ -31,6 +31,7 @@
     },
     "require-dev": {
         "doctrine/collections": "^1.0|^2.0",
+        "phpstan/phpdoc-parser": "^1.30|^2.0",
         "symfony/cache": "^7.4|^8.0",
         "symfony/clock": "^7.4|^8.0",
         "symfony/config": "^7.4|^8.0",

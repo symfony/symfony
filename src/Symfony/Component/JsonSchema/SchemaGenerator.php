@@ -52,6 +52,8 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\IntRangeType;
+use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
@@ -112,7 +114,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         $descriptionExtractors = [];
 
         if (class_exists(PhpDocParser::class) && class_exists(ContextFactory::class)) {
-            $phpStanExtractor = new PhpStanExtractor();
+            $phpStanExtractor = new PhpStanExtractor(null, null, null, true, true);
             array_unshift($typeExtractors, $phpStanExtractor);
             $descriptionExtractors[] = $phpStanExtractor;
         }
@@ -177,7 +179,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
         foreach ($parameters as $parameter) {
             try {
-                $type = ($this->typeResolver ??= TypeResolver::create())->resolve($parameter);
+                $type = ($this->typeResolver ??= TypeResolver::create(null, true))->resolve($parameter);
             } catch (UnsupportedException) {
                 $type = null;
             }
@@ -234,6 +236,8 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             $type instanceof ObjectShapeType => $this->buildShapeSchema($type->getShape(), $config, $parent, $document),
             $type instanceof GenericType, $type instanceof TemplateType => $this->buildTypeSchema($type->getWrappedType(), $config, $parent, $document),
             $type instanceof ObjectType => $this->buildObjectSchema($type->getClassName(), $config, $parent, $document),
+            $type instanceof IntRangeType => $this->buildIntRangeSchema($type),
+            $type instanceof LiteralType => $this->buildLiteralSchema($type, $config->dialect),
             $type instanceof BuiltinType => $this->buildBuiltinSchema($type, $config->dialect),
             default => throw new InvalidArgumentException(\sprintf('Cannot generate a JSON Schema for type "%s".', $type)),
         };
@@ -321,6 +325,11 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         $valueSchema = $this->buildTypeSchema($type->getCollectionValueType(), $config, $parent, $document);
         $keyType = $type->getCollectionKeyType();
 
+        // the lowest symfony/type-info has no refinements to remove
+        if (method_exists($keyType, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+            $keyType = $keyType->withoutRefinements();
+        }
+
         if (!$type->isList() && $keyType instanceof BuiltinType && TypeIdentifier::STRING === $keyType->getTypeIdentifier()) {
             return ['type' => 'object', 'additionalProperties' => $valueSchema];
         }
@@ -394,6 +403,32 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             TypeIdentifier::MIXED => [],
             default => throw new InvalidArgumentException(\sprintf('Cannot generate a JSON Schema for type "%s".', $type)),
         };
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildIntRangeSchema(IntRangeType $type): array
+    {
+        $schema = ['type' => 'integer'];
+
+        if (null !== $min = $type->getMin()) {
+            $schema['minimum'] = $min;
+        }
+
+        if (null !== $max = $type->getMax()) {
+            $schema['maximum'] = $max;
+        }
+
+        return $schema;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildLiteralSchema(LiteralType $type, Dialect $dialect): array
+    {
+        return [...$this->buildBuiltinSchema($type->getWrappedType(), $dialect), ...$dialect->const($type->getValue())];
     }
 
     /**

@@ -71,12 +71,18 @@ final class StringTypeResolver implements TypeResolverInterface
 
     /**
      * @param array<string, string> $extraTypeAliases
+     * @param bool|null             $resolveRefinements Whether to resolve PHPDoc refinements, such as literals and integer ranges. Not passing true is deprecated since 8.2, refinements will always be resolved as of 9.0
      */
     public function __construct(
         ?Lexer $lexer = null,
         ?TypeParser $parser = null,
         private readonly array $extraTypeAliases = [],
+        private readonly ?bool $resolveRefinements = null,
     ) {
+        if (true !== $resolveRefinements) {
+            trigger_deprecation('symfony/type-info', '8.2', 'Not passing true for the "$resolveRefinements" argument of "%s()" is deprecated; PHPDoc refinements will always be resolved in 9.0.', __METHOD__);
+        }
+
         if (class_exists(ParserConfig::class)) {
             $this->lexer = $lexer ?? new Lexer(new ParserConfig([]));
             $this->parser = $parser ?? new TypeParser($config = new ParserConfig([]), new ConstExprParser($config));
@@ -160,29 +166,7 @@ final class StringTypeResolver implements TypeResolverInterface
 
         if ($node instanceof ConstTypeNode) {
             if ($node->constExpr instanceof ConstFetchNode) {
-                $classKeyword = strtolower($node->constExpr->className);
-
-                if (null === $typeContext && \in_array($classKeyword, ['self', 'static', 'parent'], true)) {
-                    throw new InvalidArgumentException(\sprintf('A "%s" must be provided to resolve "%s".', TypeContext::class, $classKeyword));
-                }
-
-                $className = match ($classKeyword) {
-                    'self' => $typeContext->getDeclaringClass(),
-                    'static' => $typeContext->getCalledClass(),
-                    'parent' => $typeContext->getParentClass(),
-                    default => null,
-                };
-
-                if (null === $className) {
-                    $classType = $this->resolveCustomIdentifier($node->constExpr->className, $typeContext);
-                    if (!$classType instanceof ObjectType) {
-                        return Type::mixed();
-                    }
-
-                    $className = $classType->getClassName();
-                }
-
-                if (!class_exists($className) && !interface_exists($className)) {
+                if (null === $className = $this->getConstantClassName($node->constExpr, $typeContext)) {
                     return Type::mixed();
                 }
 
@@ -199,6 +183,23 @@ final class StringTypeResolver implements TypeResolverInterface
                 }
 
                 return CollectionType::mergeCollectionValueTypes($types);
+            }
+
+            if ($this->resolveRefinements) {
+                $literal = match (true) {
+                    $node->constExpr instanceof ConstExprStringNode => $node->constExpr->value,
+                    $node->constExpr instanceof ConstExprIntegerNode => self::parseInteger($node->constExpr->value),
+                    $node->constExpr instanceof ConstExprFloatNode => (float) $node->constExpr->value,
+                    default => null,
+                };
+
+                if (null !== $literal) {
+                    try {
+                        return Type::literal($literal);
+                    } catch (InvalidArgumentException $e) {
+                        throw new \DomainException($e->getMessage(), 0, $e);
+                    }
+                }
             }
 
             return match (true) {
@@ -262,9 +263,31 @@ final class StringTypeResolver implements TypeResolverInterface
 
             $type ??= $this->getTypeFromNode($node->type, $typeContext);
 
-            // handle integer ranges as simple integers
             if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
-                return $type;
+                if (!$this->resolveRefinements || !$type instanceof BuiltinType || 2 !== \count($node->genericTypes)) {
+                    return $type;
+                }
+
+                $min = $this->getIntRangeBound($node->genericTypes[0], 'min', $typeContext);
+                $max = $this->getIntRangeBound($node->genericTypes[1], 'max', $typeContext);
+
+                if (false === $min || false === $max) {
+                    return $type;
+                }
+
+                // the integer limits are no bound at all
+                $min = \PHP_INT_MIN === $min ? null : $min;
+                $max = \PHP_INT_MAX === $max ? null : $max;
+
+                if (null === $min && null === $max) {
+                    return $type;
+                }
+
+                try {
+                    return Type::intRange($min, $max);
+                } catch (InvalidArgumentException $e) {
+                    throw new \DomainException($e->getMessage(), 0, $e);
+                }
             }
 
             $variableTypes = array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->genericTypes);
@@ -333,7 +356,12 @@ final class StringTypeResolver implements TypeResolverInterface
             'bool', 'boolean' => Type::bool(),
             'true' => Type::true(),
             'false' => Type::false(),
-            'int', 'integer', 'positive-int', 'negative-int', 'non-positive-int', 'non-negative-int', 'non-zero-int' => Type::int(),
+            'int', 'integer' => Type::int(),
+            'non-zero-int' => $this->resolveRefinements ? Type::union(Type::intRange(null, -1), Type::intRange(1, null)) : Type::int(),
+            'positive-int' => $this->resolveRefinements ? Type::intRange(1, null) : Type::int(),
+            'negative-int' => $this->resolveRefinements ? Type::intRange(null, -1) : Type::int(),
+            'non-positive-int' => $this->resolveRefinements ? Type::intRange(null, 0) : Type::int(),
+            'non-negative-int' => $this->resolveRefinements ? Type::intRange(0, null) : Type::int(),
             'float', 'double' => Type::float(),
             'string',
             'class-string',
@@ -445,5 +473,128 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         return $node;
+    }
+
+    private function getConstantClassName(ConstFetchNode $node, ?TypeContext $typeContext): ?string
+    {
+        $classKeyword = strtolower($node->className);
+
+        if (null === $typeContext && \in_array($classKeyword, ['self', 'static', 'parent'], true)) {
+            throw new InvalidArgumentException(\sprintf('A "%s" must be provided to resolve "%s".', TypeContext::class, $classKeyword));
+        }
+
+        $className = match ($classKeyword) {
+            'self' => $typeContext->getDeclaringClass(),
+            'static' => $typeContext->getCalledClass(),
+            'parent' => $typeContext->getParentClass(),
+            default => null,
+        };
+
+        if (null === $className) {
+            $classType = $this->resolveCustomIdentifier($node->className, $typeContext);
+            if (!$classType instanceof ObjectType) {
+                return null;
+            }
+
+            $className = $classType->getClassName();
+        }
+
+        if (!class_exists($className) && !interface_exists($className)) {
+            return null;
+        }
+
+        return $className;
+    }
+
+    /**
+     * @return int|false|null the bound, null when unbounded, or false when it is a constant that cannot be resolved
+     */
+    private function getIntRangeBound(TypeNode $node, string $unboundedKeyword, ?TypeContext $typeContext): int|false|null
+    {
+        if ($node instanceof ConstTypeNode && $node->constExpr instanceof ConstExprIntegerNode) {
+            return self::parseInteger($node->constExpr->value);
+        }
+
+        if ($node instanceof IdentifierTypeNode && $unboundedKeyword === $node->name) {
+            return null;
+        }
+
+        $value = false;
+
+        if ($node instanceof ConstTypeNode && $node->constExpr instanceof ConstFetchNode && !str_contains($node->constExpr->name, '*')) {
+            if (null === $className = $this->getConstantClassName($node->constExpr, $typeContext)) {
+                return false;
+            }
+
+            if (!\defined($constant = $className.'::'.$node->constExpr->name)) {
+                throw new \DomainException(\sprintf('No "%s" constant found in "%s".', $node->constExpr->name, $className));
+            }
+
+            $value = \constant($constant);
+        } elseif ($node instanceof IdentifierTypeNode && !\in_array($node->name, ['min', 'max'], true)) {
+            $name = ltrim($node->name, '\\');
+
+            // like PHP, an unqualified constant falls back to the global one
+            if ($typeContext?->namespace && !str_starts_with($node->name, '\\') && \defined($typeContext->namespace.'\\'.$name)) {
+                $name = $typeContext->namespace.'\\'.$name;
+            }
+
+            // the constant may be defined by code that has not run yet
+            if (!\defined($name)) {
+                return false;
+            }
+
+            $value = \constant($name);
+        }
+
+        if (!\is_int($value)) {
+            throw new \DomainException(\sprintf('"%s" is not a valid integer range bound.', $node));
+        }
+
+        return $value;
+    }
+
+    private static function parseInteger(string $value): int
+    {
+        preg_match('/^(-?)(0[xbo]|0(?=.))?(.*)$/i', $value, $matches);
+        [, $sign, $prefix, $digits] = $matches;
+
+        $base = match (strtolower($prefix)) {
+            '0x' => 16,
+            '0b' => 2,
+            '0o', '0' => 8,
+            default => 10,
+        };
+
+        // intval() stops at the first digit that is not valid in the base
+        $invalidDigit = match ($base) {
+            16 => '/[^0-9a-f]/i',
+            8 => '/[^0-7]/',
+            2 => '/[^01]/',
+            default => '/[^0-9]/',
+        };
+
+        if (preg_match($invalidDigit, $digits)) {
+            throw new \DomainException(\sprintf('"%s" is not a valid integer.', $value));
+        }
+
+        // the sign is parsed along, as the magnitude of PHP_INT_MIN does not fit in an integer on its own
+        $integer = \intval($sign.$digits, $base);
+
+        // intval() saturates on overflow, while PHP reads such a literal as a float
+        if (\PHP_INT_MAX === $integer || \PHP_INT_MIN === $integer) {
+            $limit = match ($base) {
+                16 => dechex($integer),
+                8 => decoct($integer),
+                2 => decbin($integer),
+                default => ltrim((string) $integer, '-'),
+            };
+
+            if (ltrim(strtolower($digits), '0') !== $limit) {
+                throw new \DomainException(\sprintf('"%s" does not fit in an integer.', $value));
+            }
+        }
+
+        return $integer;
     }
 }

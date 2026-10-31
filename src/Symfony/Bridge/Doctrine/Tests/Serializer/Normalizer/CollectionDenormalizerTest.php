@@ -172,6 +172,27 @@ class CollectionDenormalizerTest extends TestCase
         $serializer->denormalize(['foo' => 'bar'], Collection::class, 'json', ['key_type' => Type::int(), 'value_type' => Type::string()]);
     }
 
+    #[DataProvider('provideRefinedKeyTypes')]
+    public function testDenormalizeRejectsAnInvalidRefinedKeyType(\Closure $keyType, array $data)
+    {
+        if (!method_exists(Type::class, 'intRange')) {
+            $this->markTestSkipped('Refined types need symfony/type-info 8.2 or higher.');
+        }
+
+        $serializer = $this->createSerializer();
+
+        $this->expectException(NotNormalizableValueException::class);
+
+        $serializer->denormalize($data, Collection::class, 'json', ['key_type' => $keyType(), 'value_type' => Type::string()]);
+    }
+
+    public static function provideRefinedKeyTypes(): iterable
+    {
+        yield 'int range' => [static fn () => Type::intRange(1, null), ['foo' => 'bar']];
+        yield 'int literal' => [static fn () => Type::literal(1), ['foo' => 'bar']];
+        yield 'string literals' => [static fn () => Type::union(Type::literal('en'), Type::literal('de')), [0 => 'bar']];
+    }
+
     public function testDenormalizeEntityWithACollectionProperty()
     {
         $serializer = $this->createSerializer();

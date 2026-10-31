@@ -110,4 +110,50 @@ class RateLimiterFactoryTest extends TestCase
             date_default_timezone_set($originalTimezone);
         }
     }
+
+    public function testFixedWindowPreservesLargeLimitsInStorage()
+    {
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers.');
+        }
+
+        $limiter = (new RateLimiterFactory([
+            'id' => 'test',
+            'policy' => 'fixed_window',
+            'limit' => 4294967296,
+            'interval' => '1 minute',
+        ], new InMemoryStorage()))->create();
+
+        $rateLimit = $limiter->consume(4294967295);
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(1, $rateLimit->getRemainingTokens());
+        $this->assertTrue($limiter->consume()->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+        $this->assertSame(1, $limiter->consume(-1)->getRemainingTokens());
+        $this->assertTrue($limiter->consume()->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testSlidingWindowPreservesLargeLimitsInStorage()
+    {
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers.');
+        }
+
+        $limiter = (new RateLimiterFactory([
+            'id' => 'test',
+            'policy' => 'sliding_window',
+            'limit' => 4294967296,
+            'interval' => '1 minute',
+        ], new InMemoryStorage()))->create();
+
+        $rateLimit = $limiter->consume(4294967295);
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(1, $rateLimit->getRemainingTokens());
+        $this->assertTrue($limiter->consume()->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+        $this->assertSame(1, $limiter->consume(-1)->getRemainingTokens());
+        $this->assertTrue($limiter->consume()->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
 }

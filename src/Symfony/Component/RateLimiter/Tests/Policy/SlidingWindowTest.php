@@ -33,6 +33,64 @@ class SlidingWindowTestToStringGadget
  */
 class SlidingWindowTest extends TestCase
 {
+    public function testSerializePreservesLargeHitCount()
+    {
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers.');
+        }
+
+        ClockMock::register(SlidingWindow::class);
+        $window = new SlidingWindow('test', 60);
+        $window->add(4294967296);
+
+        $this->assertEquals($window, unserialize(serialize($window)));
+
+        $window->add(-1);
+
+        $this->assertEquals($window, unserialize(serialize($window)));
+        $this->assertCount(1, $window->__serialize());
+    }
+
+    public function testSerializePreservesLargePreviousHitCount()
+    {
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers.');
+        }
+
+        ClockMock::register(SlidingWindow::class);
+        $window = new SlidingWindow('test', 60);
+        $window->add(4294967296);
+        sleep(60);
+        $window = SlidingWindow::createFromPreviousWindow($window, 60);
+
+        $this->assertEquals($window, unserialize(serialize($window)));
+        $this->assertSame(4294967296, $window->getHitCount());
+    }
+
+    public function testSerializeKeepsCompactRepresentation()
+    {
+        ClockMock::register(SlidingWindow::class);
+        $window = new SlidingWindow('test', 60);
+        $window->add(7);
+
+        $this->assertSame([
+            pack('NNN', 7, 0, 60).'test' => microtime(true) + 60,
+        ], $window->__serialize());
+        $this->assertEquals($window, unserialize(serialize($window)));
+    }
+
+    public function testUnserializeLegacyRepresentation()
+    {
+        ClockMock::register(SlidingWindow::class);
+        $window = new SlidingWindow('test', 60);
+        $window->__unserialize(['legacy', 7, 120, 3, microtime(true) + 120]);
+
+        $this->assertSame('legacy', $window->getId());
+        $this->assertSame(10, $window->getHitCount());
+        $this->assertSame(240, $window->getExpirationTime());
+        $this->assertEquals($window, unserialize(serialize($window)));
+    }
+
     public function testGetExpirationTime()
     {
         $window = new SlidingWindow('foo', 10);

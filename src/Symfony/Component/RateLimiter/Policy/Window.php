@@ -114,6 +114,10 @@ final class Window implements LimiterStateInterface
 
     public function __serialize(): array
     {
+        if ($this->hitCount > 0xFFFFFFFF) {
+            return [$this->id, $this->hitCount, $this->intervalInSeconds, $this->maxSize, $this->timer];
+        }
+
         return [
             $this->id => $this->timer,
             pack('NN', $this->hitCount, $this->intervalInSeconds) => $this->maxSize,

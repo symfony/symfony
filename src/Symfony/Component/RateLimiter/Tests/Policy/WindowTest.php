@@ -28,6 +28,50 @@ class WindowTestToStringGadget
 
 class WindowTest extends TestCase
 {
+    public function testSerializePreservesLargeHitCount()
+    {
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers.');
+        }
+
+        $window = new Window('test', 60, 4294967296, 1000.5);
+        $window->add(4294967296, 1000.5);
+
+        $this->assertEquals($window, unserialize(serialize($window)));
+
+        $window->add(-1, 1000.5);
+
+        $this->assertEquals($window, unserialize(serialize($window)));
+        $this->assertSame([
+            'test' => 1000.5,
+            pack('NN', 4294967295, 60) => 4294967296,
+        ], $window->__serialize());
+    }
+
+    public function testSerializeKeepsCompactRepresentation()
+    {
+        $window = new Window('test', 60, 10, 1000.5);
+        $window->add(7, 1000.5);
+
+        $this->assertSame([
+            'test' => 1000.5,
+            pack('NN', 7, 60) => 10,
+        ], $window->__serialize());
+        $this->assertEquals($window, unserialize(serialize($window)));
+    }
+
+    public function testUnserializeLegacyRepresentation()
+    {
+        $window = new Window('test', 60, 10, 1000.5);
+        $window->__unserialize(['legacy', 7, 120, 20, 2000.5]);
+
+        $this->assertSame('legacy', $window->getId());
+        $this->assertSame(7, $window->getHitCount());
+        $this->assertSame(13, $window->getAvailableTokens(2000.5));
+        $this->assertSame(120, $window->getExpirationTime());
+        $this->assertEquals($window, unserialize(serialize($window)));
+    }
+
     public function testUnserializeRejectsObjectInTypedIdProperty()
     {
         $data = [

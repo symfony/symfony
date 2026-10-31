@@ -118,6 +118,10 @@ final class SlidingWindow implements LimiterStateInterface
 
     public function __serialize(): array
     {
+        if ($this->hitCount > 0xFFFFFFFF || $this->hitCountForLastWindow > 0xFFFFFFFF) {
+            return [$this->id, $this->hitCount, $this->intervalInSeconds, $this->hitCountForLastWindow, $this->windowEndAt];
+        }
+
         return [
             pack('NNN', $this->hitCount, $this->hitCountForLastWindow, $this->intervalInSeconds).$this->id => $this->windowEndAt,
         ];

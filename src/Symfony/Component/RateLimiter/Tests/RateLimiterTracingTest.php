@@ -126,6 +126,25 @@ class RateLimiterTracingTest extends TestCase
         $this->assertInstanceOf(PlainCustomFactory::class, $container->get('limiter.plain'));
     }
 
+    public function testAbstractLimitersAreNotDecorated()
+    {
+        $container = new ContainerBuilder();
+        $container->register('request_stack', RequestStack::class);
+        $container->register('rate_limiter.data_collector', RateLimiterDataCollector::class)->addArgument(new Reference('request_stack'));
+        $container->register('limiter.parent', PlainCustomFactory::class)
+            ->setAbstract(true)
+            ->addTag('rate_limiter', ['name' => 'parent']);
+        $container->setDefinition('limiter.child', new ChildDefinition('limiter.parent'))
+            ->addTag('rate_limiter', ['name' => 'child'])
+            ->setPublic(true);
+
+        (new RateLimiterTracePass())->process($container);
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('debug.limiter.parent'));
+        $this->assertInstanceOf(TraceableRateLimiterFactory::class, $container->get('limiter.child'));
+    }
+
     public function testTheBuilderIsOnlyTracedWhenItExists()
     {
         $container = new ContainerBuilder();

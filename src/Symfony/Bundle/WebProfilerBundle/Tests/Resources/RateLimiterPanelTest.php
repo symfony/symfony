@@ -18,8 +18,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\RateLimiter\DataCollector\RateLimiterDataCollector;
 use Symfony\Component\RateLimiter\Debug\TraceableRateLimiterBuilder;
+use Symfony\Component\RateLimiter\Debug\TraceableRateLimiterFactory;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -61,6 +63,7 @@ class RateLimiterPanelTest extends TestCase
             $builder->fixedWindow('failing', 1, '1 minute')->create('user-42')->consume(2);
         } catch (\InvalidArgumentException) {
         }
+        (new TraceableRateLimiterFactory(new RateLimiterFactory(['id' => 'own', 'policy' => 'no_limit'], new InMemoryStorage()), 'own', $collector))->create()->consume();
         $collector->collect($request, new Response());
         $collector = unserialize(serialize($collector));
 
@@ -72,8 +75,8 @@ class RateLimiterPanelTest extends TestCase
         $panel = $template->renderBlock('panel', ['collector' => $collector]);
         $menu = $template->renderBlock('menu', ['collector' => $collector]);
 
-        $this->assertMatchesRegularExpression('/Rate Limiter <small>8 limiters<\/small>/', $panel);
-        $this->assertMatchesRegularExpression('/<span class="value">12<\/span>\s*<span class="label">Calls/', $panel);
+        $this->assertMatchesRegularExpression('/Rate Limiter <small>9 limiters<\/small>/', $panel);
+        $this->assertMatchesRegularExpression('/<span class="value">13<\/span>\s*<span class="label">Calls/', $panel);
         $this->assertMatchesRegularExpression('/<span class="value rate-limiter-warning">3<\/span>\s*<span class="label">Rejected/', $panel);
         $this->assertMatchesRegularExpression('/<span class="value rate-limiter-error">1<\/span>\s*<span class="label">Failed/', $panel);
         $this->assertStringContainsString('label-status-error', $menu);
@@ -96,9 +99,10 @@ class RateLimiterPanelTest extends TestCase
         }
         $this->assertStringNotContainsString('>ms</th>', $timeline);
 
-        $section = fn (string $name) => $this->extract($panel, '/<div class="rate-limiter-section" id="rate-limiter-limiter-\d+">\s*<h3>\s*<span class="badge">[^<]+<\/span>\s*<span>'.preg_quote($name, '/').'<\/span>.*?<\/table>/s');
+        $section = fn (string $name) => $this->extract($panel, '/<div class="rate-limiter-section" id="rate-limiter-limiter-\d+">\s*<h3>\s*(?:<span class="badge">[^<]+<\/span>\s*)?<span>'.preg_quote($name, '/').'<\/span>.*?<\/table>/s');
 
         $api = $section('api');
+        $this->assertMatchesRegularExpression('/<h3>\s*<span>own<\/span>\s*<\/h3>/', $panel, 'A limiter whose policy is unknown gets no badge.');
         $this->assertMatchesRegularExpression('/<span class="badge">fixed window<\/span>\s*<span>api<\/span>\s*<\/h3>/', $api, 'The policy badge comes before the name.');
         $this->assertSame(1, substr_count($api, '<table'), 'Each limiter has one table.');
         $this->assertMatchesRegularExpression('/<tbody>\s*<tr>\s*<th colspan="4" class="font-normal">user-42<\/th>\s*<\/tr>.*?<\/tbody>\s*<tbody>\s*<tr>\s*<th colspan="4" class="font-normal">no key<\/th>/s', $api, 'Each key is a full-width row heading its calls, like events in the event panel.');
@@ -110,6 +114,9 @@ class RateLimiterPanelTest extends TestCase
         $reservation = $section('reservation');
         $this->assertStringContainsString('<span class="badge">token bucket</span>', $reservation);
         $this->assertMatchesRegularExpression('/<th colspan="4" class="font-normal">user-42<\/th>/', $reservation, 'A limiter with a single key still names it.');
+
+        $this->assertStringContainsString('<strong>compound</strong>', $timeline, 'The timeline names builder compounds "compound", their limiters are listed below.');
+        $this->assertStringNotContainsString('compound(short, long)', $timeline);
 
         $compound = $section('compound(short, long)');
         $this->assertMatchesRegularExpression('/status-success">accepted<\/span><\/td>\s*<td><div class="rate-limiter-chips"><a href="#rate-limiter-limiter-\d+" class="label status-success">short 0\/1<\/a><a href="#rate-limiter-limiter-\d+" class="label status-success">long 4\/5<\/a><\/div><\/td>/', $compound, 'Each call shows the tokens left on each limiter of the compound.');

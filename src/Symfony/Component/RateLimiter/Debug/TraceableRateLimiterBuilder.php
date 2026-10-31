@@ -15,7 +15,11 @@ use Symfony\Component\RateLimiter\DataCollector\RateLimiterDataCollector;
 use Symfony\Component\RateLimiter\RateLimiterBuilderInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
-/** @internal */
+/**
+ * @author Ayyoub AFW-ALLAH <ayyoub.afwallah@gmail.com>
+ *
+ * @internal
+ */
 final class TraceableRateLimiterBuilder implements RateLimiterBuilderInterface
 {
     public function __construct(

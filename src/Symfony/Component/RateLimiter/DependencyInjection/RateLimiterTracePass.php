@@ -22,7 +22,11 @@ use Symfony\Component\RateLimiter\Debug\TraceableRateLimiterBuilder;
 use Symfony\Component\RateLimiter\Debug\TraceableRateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 
-/** @internal */
+/**
+ * @author Ayyoub AFW-ALLAH <ayyoub.afwallah@gmail.com>
+ *
+ * @internal
+ */
 final class RateLimiterTracePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
@@ -38,6 +42,10 @@ final class RateLimiterTracePass implements CompilerPassInterface
             ->setArguments([new Reference('.inner'), $collector]);
 
         foreach ($container->findTaggedServiceIds('rate_limiter') as $id => $tags) {
+            if ($container->getDefinition($id)->isAbstract()) {
+                continue;
+            }
+
             $container->register('debug.'.$id, TraceableRateLimiterFactory::class)
                 ->setDecoratedService($id)
                 ->setArguments([new Reference('.inner'), $tags[0]['name'] ?? $id, $collector, $this->getPolicy($container->getDefinition($id))]);

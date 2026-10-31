@@ -13,6 +13,8 @@ namespace Symfony\Component\RateLimiter;
 
 /**
  * Creates rate limiter factories on the fly, for limits that are not configured up front.
+ *
+ * @author Ayyoub AFW-ALLAH <ayyoub.afwallah@gmail.com>
  */
 interface RateLimiterBuilderInterface
 {

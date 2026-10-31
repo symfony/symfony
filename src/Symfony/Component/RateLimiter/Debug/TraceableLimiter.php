@@ -16,7 +16,11 @@ use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Reservation;
 
-/** @internal */
+/**
+ * @author Ayyoub AFW-ALLAH <ayyoub.afwallah@gmail.com>
+ *
+ * @internal
+ */
 final class TraceableLimiter implements LimiterInterface
 {
     public function __construct(

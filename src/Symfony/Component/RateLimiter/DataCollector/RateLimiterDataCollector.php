@@ -22,7 +22,11 @@ use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Reservation;
 
-/** @internal */
+/**
+ * @author Ayyoub AFW-ALLAH <ayyoub.afwallah@gmail.com>
+ *
+ * @internal
+ */
 final class RateLimiterDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private \WeakMap $recorded;

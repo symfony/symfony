@@ -150,12 +150,20 @@
     {%- endif -%}
 {% endmacro %}
 
+{% macro limiter_name(operation) %}
+    {%- if operation.limiter starts with 'compound(' -%}
+        <strong>compound</strong>
+    {%- else -%}
+        <strong>{{ operation.limiter }}</strong>
+    {%- endif -%}
+{% endmacro %}
+
 {% macro sub_rows(operation, top, depth, expanded) %}
     {%- import _self as helper -%}
     {% for child in operation.children %}
         <tr data-row-of="{{ top }}" class="{{ child.failed ? 'rate-limiter-failed' : child.rejected ? 'rate-limiter-rejected' }}"{% if not expanded %} hidden{% endif %}>
             <td class="rate-limiter-number"><span class="rate-limiter-spacer"></span> <span class="text-muted rate-limiter-mono">{{ child.number }}</span></td>
-            <td style="padding-left: {{ 0.5 + depth * 1.25 }}em"><span class="text-muted" aria-hidden="true">└</span> <strong>{{ child.limiter }}</strong></td>
+            <td style="padding-left: {{ 0.5 + depth * 1.25 }}em"><span class="text-muted" aria-hidden="true">└</span> {{ helper.limiter_name(child) }}</td>
             <td><code>{{ helper.call(child) }}</code></td>
             <td>{{ helper.result(child) }}</td>
             <td>{{ helper.tokens(child) }}</td>
@@ -174,7 +182,6 @@
     {% if collector.operations is empty %}
         <div class="empty empty-panel">
             <p>No rate limiter operations were recorded.</p>
-            <p class="text-muted text-small">Limiters created outside the container or used outside of this request are not traced.</p>
         </div>
     {% else %}
         <div class="metrics">
@@ -228,7 +235,7 @@
                                         <span class="text-muted rate-limiter-mono">{{ operation.number }}</span>
                                     </td>
                                     <td>
-                                        <strong>{{ operation.limiter }}</strong>
+                                        {{ helper.limiter_name(operation) }}
                                         {% if operation.key is not null %}<span class="rate-limiter-key rate-limiter-mono" title="{{ operation.key }}">{{ operation.key }}</span>{% endif %}
                                     </td>
                                     <td><code>{{ helper.call(operation) }}</code></td>
@@ -256,10 +263,9 @@
                         {% set anchors = anchors|merge({(name): 'rate-limiter-limiter-' ~ loop.index}) %}
                     {% endfor %}
                     {% for name, limiter in limiters %}
-                        {% set policy = limiter.policy is null ? 'custom' : limiter.policy|replace({'_': ' '}) %}
                         <div class="rate-limiter-section" id="{{ anchors[name] }}">
                             <h3>
-                                <span class="badge">{{ policy }}</span>
+                                {% if limiter.policy is not null %}<span class="badge">{{ limiter.policy|replace({'_': ' '}) }}</span>{% endif %}
                                 <span>{{ name }}</span>
                             </h3>
 

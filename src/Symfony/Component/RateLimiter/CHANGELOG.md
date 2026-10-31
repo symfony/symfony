@@ -8,10 +8,11 @@ CHANGELOG
  * Add `RateLimiterBundle`, which provides the `rate_limiter` configuration and the services previously provided by `FrameworkBundle` under `framework.rate_limiter`
  * Add `RateLimitExceededEvent`
  * Make `CompoundLimiter::consume()` stop at the first limiter that rejects the request
- * Add `RateLimiterBuilder`, `RateLimiterBuilderInterface` and the `rate_limiter.builder` option
+ * Add `RateLimiterBuilder` and the `rate_limiter.builder` option
  * Allow `\DateInterval` for the `interval` and `rate.interval` options of `RateLimiterFactory`
  * Add `RateLimit::getResetAt()`
  * Add a `$keys` argument to `CompoundRateLimiterFactory`, and accept a map in the `limiters` option of a compound rate limiter, to fix the key of some of its sub-limiters
+ * Add `RateLimiterBuilderInterface`, implemented by `RateLimiterBuilder`
  * Add a rate limiter data collector for the profiler
 
 8.1

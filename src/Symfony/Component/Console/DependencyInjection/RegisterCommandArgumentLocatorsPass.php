@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\DependencyInjection;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\RawInputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -66,6 +67,17 @@ final class RegisterCommandArgumentLocatorsPass implements CompilerPassInterface
             $commandTags = $container->getDefinition($id)->getTag('console.command');
             $manualArguments = [];
 
+            // the class-level name prefixes the names declared on methods, as in AddConsoleCommandPass
+            $prefix = null;
+            foreach ($commandTags as $commandTag) {
+                if ('__invoke' === ($commandTag['method'] ?? '__invoke')) {
+                    $prefix = $commandTag['command'] ?? null;
+                    break;
+                }
+            }
+            $prefix ??= ($r->getAttributes(AsCommand::class)[0] ?? null)?->newInstance()->name;
+            $prefix = explode('|', ltrim($prefix ?? '', '|'))[0];
+
             // Validate and collect explicit per-arguments service references
             foreach ($tags as $attributes) {
                 if (!isset($attributes['argument']) && !isset($attributes['id'])) {
@@ -82,12 +94,6 @@ final class RegisterCommandArgumentLocatorsPass implements CompilerPassInterface
             }
 
             foreach ($commandTags as $commandTag) {
-                $commandName = $commandTag['command'] ?? null;
-
-                if (!$commandName) {
-                    continue;
-                }
-
                 $methodName = $commandTag['method'] ?? '__invoke';
 
                 if (!$r->hasMethod($methodName)) {
@@ -95,6 +101,22 @@ final class RegisterCommandArgumentLocatorsPass implements CompilerPassInterface
                 }
 
                 $method = $r->getMethod($methodName);
+                $attribute = $method->getAttributes(AsCommand::class)[0] ?? null;
+                if ('__invoke' === $methodName) {
+                    $attribute ??= $method->getDeclaringClass()->getAttributes(AsCommand::class)[0] ?? null;
+                }
+
+                // Command::run() resolves aliases and abbreviations before ServiceValueResolver looks up the locator.
+                $commandName = explode('|', ltrim($commandTag['command'] ?? $attribute?->newInstance()->name ?? '', '|'))[0];
+
+                if (!$commandName) {
+                    continue;
+                }
+
+                if ('__invoke' !== $methodName && '' !== $prefix) {
+                    $commandName = $prefix.':'.$commandName;
+                }
+
                 $arguments = [];
                 $erroredIds = 0;
 

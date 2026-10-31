@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\DependencyInjection\RegisterCommandArgumentLocatorsPass;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -195,6 +196,47 @@ class RegisterCommandArgumentLocatorsPassTest extends TestCase
         $this->assertArrayHasKey('test:cmd2', $commands);
     }
 
+    public function testProcessPrefixesMethodCommandsWithClassLevelName()
+    {
+        $container = new ContainerBuilder();
+        $container->register('logger', LoggerInterface::class);
+        $container->register('console.argument_resolver.service')->addArgument(null);
+
+        $command = new Definition(MultiMethodCommand::class);
+        $command->setAutowired(true);
+        $command->addTag('console.command', ['command' => '|test']);
+        $command->addTag('console.command', ['command' => 'cmd1|one', 'method' => 'cmd1']);
+        $command->addTag('console.command.service_arguments');
+        $container->setDefinition('test.command', $command);
+
+        new RegisterCommandArgumentLocatorsPass()->process($container);
+
+        $commandLocatorRef = $container->getDefinition('console.argument_resolver.service')->getArgument(0);
+        $commands = $container->getDefinition((string) $commandLocatorRef)->getArgument(0);
+
+        $this->assertSame(['test:cmd1'], array_keys($commands));
+    }
+
+    public function testProcessPrefixesMethodCommandsWithClassAttributeName()
+    {
+        $container = new ContainerBuilder();
+        $container->register('logger', LoggerInterface::class);
+        $container->register('console.argument_resolver.service')->addArgument(null);
+
+        $command = new Definition(GroupedMethodCommand::class);
+        $command->setAutowired(true);
+        $command->addTag('console.command', ['command' => 'create', 'method' => 'create']);
+        $command->addTag('console.command.service_arguments');
+        $container->setDefinition('test.command', $command);
+
+        new RegisterCommandArgumentLocatorsPass()->process($container);
+
+        $commandLocatorRef = $container->getDefinition('console.argument_resolver.service')->getArgument(0);
+        $commands = $container->getDefinition((string) $commandLocatorRef)->getArgument(0);
+
+        $this->assertSame(['app:user:create'], array_keys($commands));
+    }
+
     public function testProcessForwardsTargetAttribute()
     {
         $container = new ContainerBuilder();
@@ -338,6 +380,14 @@ class MultiMethodCommand
     }
 
     public function cmd2(LoggerInterface $logger): void
+    {
+    }
+}
+
+#[AsCommand('app:user')]
+class GroupedMethodCommand
+{
+    public function create(LoggerInterface $logger): void
     {
     }
 }

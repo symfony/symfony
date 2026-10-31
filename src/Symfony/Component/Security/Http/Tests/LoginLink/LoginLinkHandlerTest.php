@@ -282,6 +282,16 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
+    public function testConsumeLoginLinkWithOverflowingExpiration()
+    {
+        $this->expectException(InvalidLoginLinkException::class);
+        $this->expectExceptionMessage('Invalid "expires" parameter.');
+        $request = Request::create('/login/verify?user=weaverryan&hash=thehash&expires=99999999999999999999');
+
+        $linker = $this->createLinker();
+        $linker->consumeLoginLink($request);
+    }
+
     public function testConsumeLoginLinkWithInvalidHash()
     {
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');

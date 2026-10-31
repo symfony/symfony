@@ -36,14 +36,14 @@ class GoogleCloudKmsTest extends TestCase
         $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$captured): MockResponse {
             $captured = [$method, $url, json_decode($options['body'], true), $options['headers']];
 
-            return new MockResponse(json_encode(['name' => self::KEY.'/cryptoKeyVersions/1', 'ciphertext' => 'CipherFromGcp']));
+            return self::encryptedResponse('Y2lwaGVyRnJvbUdjcA==');
         }, self::BASE);
 
         $kms = new GoogleCloudKms($client, $this->staticToken('TOKEN'));
         $ciphertext = $kms->encrypt(self::KEY, 'hello');
 
         $this->assertSame(self::KEY, $ciphertext->keyId);
-        $this->assertSame('CipherFromGcp', $ciphertext->blob);
+        $this->assertSame('Y2lwaGVyRnJvbUdjcA==', $ciphertext->blob);
 
         [$method, $url, $body, $headers] = $captured;
         $this->assertSame('POST', $method);
@@ -65,7 +65,7 @@ class GoogleCloudKmsTest extends TestCase
 
             return 2 === \count($kmsHeaders)
                 ? new MockResponse(json_encode(['error' => ['message' => 'expired token']]), ['http_code' => 401])
-                : new MockResponse(json_encode(['ciphertext' => 'ciphertext']));
+                : self::encryptedResponse('ciphertext');
         }, self::BASE);
 
         $provider = new ServiceAccountTokenProvider($client, 'sa@my-proj.iam.gserviceaccount.com', file_get_contents(__DIR__.'/Fixtures/private_key.pem'));
@@ -116,7 +116,7 @@ class GoogleCloudKmsTest extends TestCase
         $client = $this->mockClient([
             new MockResponse(json_encode(['error' => ['message' => 'expired']]), ['http_code' => 401]),
             new MockResponse(json_encode(['error' => ['message' => 'replacement rejected']]), ['http_code' => 401]),
-            new MockResponse(json_encode(['ciphertext' => 'ciphertext'])),
+            self::encryptedResponse('ciphertext'),
         ], ['T1', 'T2', 'T3'], $tokenRequests, $kmsRequests);
         $kms = new GoogleCloudKms($client, new ServiceAccountTokenProvider($client, 'sa@my-proj.iam.gserviceaccount.com', file_get_contents(__DIR__.'/Fixtures/private_key.pem')));
 
@@ -181,7 +181,7 @@ class GoogleCloudKmsTest extends TestCase
         $kmsRequests = [];
         $client = $this->mockClient([
             new MockResponse(json_encode(['error' => ['message' => 'request denied']]), ['http_code' => $status]),
-            new MockResponse(json_encode(['ciphertext' => 'ciphertext'])),
+            self::encryptedResponse('ciphertext'),
         ], ['T1'], $tokenRequests, $kmsRequests);
         $kms = new GoogleCloudKms($client, new ServiceAccountTokenProvider($client, 'sa@my-proj.iam.gserviceaccount.com', file_get_contents(__DIR__.'/Fixtures/private_key.pem')));
 
@@ -206,7 +206,7 @@ class GoogleCloudKmsTest extends TestCase
         $kmsRequests = [];
         $client = $this->mockClient([
             new MockResponse(json_encode(['error' => ['message' => 'expired']]), ['http_code' => 401]),
-            new MockResponse(json_encode(['ciphertext' => 'ciphertext'])),
+            self::encryptedResponse('ciphertext'),
         ], ['T1', 'T1', 'T2'], $tokenRequests, $kmsRequests);
         $kms = new GoogleCloudKms($client, new ServiceAccountTokenProvider($client, 'sa@my-proj.iam.gserviceaccount.com', file_get_contents(__DIR__.'/Fixtures/private_key.pem')));
 
@@ -232,7 +232,7 @@ class GoogleCloudKmsTest extends TestCase
         $canceledResponses = 0;
         $client = $this->mockClient([
             new MockResponse(json_encode(['error' => ['message' => 'expired']]), ['http_code' => 401]),
-            new MockResponse(json_encode(['ciphertext' => 'wrapped'])),
+            self::encryptedResponse('wrapped'),
         ], ['T1', 'T2'], $tokenRequests, $kmsRequests)->withOptions(['on_progress' => static function (int $downloaded, int $downloadSize, array $info) use (&$canceledResponses): void {
             if ($info['canceled'] ?? false) {
                 ++$canceledResponses;
@@ -384,7 +384,7 @@ class GoogleCloudKmsTest extends TestCase
 
         $this->expectException(DecryptionFailedException::class);
         try {
-            $kms->decrypt(new Ciphertext('CipherFromGcp', self::KEY));
+            $kms->decrypt(new Ciphertext('Y2lwaGVyRnJvbUdjcA==', self::KEY));
         } finally {
             $this->assertSame(2, $tokenRequests);
             $this->assertCount(2, $kmsRequests);
@@ -404,7 +404,7 @@ class GoogleCloudKmsTest extends TestCase
         $kms = new GoogleCloudKms($client, new ServiceAccountTokenProvider($client, 'sa@my-proj.iam.gserviceaccount.com', file_get_contents(__DIR__.'/Fixtures/private_key.pem')));
 
         try {
-            $kms->decrypt(new Ciphertext('CipherFromGcp', self::KEY));
+            $kms->decrypt(new Ciphertext('Y2lwaGVyRnJvbUdjcA==', self::KEY));
             $this->fail('The second 401 should be reported.');
         } catch (RuntimeException $e) {
             $this->assertNotInstanceOf(DecryptionFailedException::class, $e);
@@ -421,7 +421,7 @@ class GoogleCloudKmsTest extends TestCase
         $client = new MockHttpClient(static function ($method, $url, array $options) use (&$captured): MockResponse {
             $captured = json_decode($options['body'], true);
 
-            return new MockResponse(json_encode(['ciphertext' => 'ct']));
+            return self::encryptedResponse('ct');
         }, self::BASE);
 
         (new GoogleCloudKms($client, $this->staticToken('T')))->encrypt(self::KEY, 'hello', 'tenant=acme');
@@ -432,11 +432,11 @@ class GoogleCloudKmsTest extends TestCase
     public function testDecryptDecodesPlaintext()
     {
         $client = new MockHttpClient(
-            new MockResponse(json_encode(['plaintext' => base64_encode('hello')])),
+            self::decryptedResponse('hello'),
             self::BASE,
         );
 
-        $plaintext = (new GoogleCloudKms($client, $this->staticToken('T')))->decrypt(new Ciphertext('CipherFromGcp', self::KEY));
+        $plaintext = (new GoogleCloudKms($client, $this->staticToken('T')))->decrypt(new Ciphertext('Y2lwaGVyRnJvbUdjcA==', self::KEY));
 
         $this->assertSame('hello', $plaintext);
     }
@@ -447,10 +447,10 @@ class GoogleCloudKmsTest extends TestCase
         $client = new MockHttpClient(static function ($method, $url) use (&$captured): MockResponse {
             $captured = $url;
 
-            return new MockResponse(json_encode(['plaintext' => base64_encode('hello')]));
+            return self::decryptedResponse('hello');
         }, self::BASE);
 
-        (new GoogleCloudKms($client, $this->staticToken('T')))->decrypt(new Ciphertext('CipherFromGcp', self::KEY.'/cryptoKeyVersions/3'));
+        (new GoogleCloudKms($client, $this->staticToken('T')))->decrypt(new Ciphertext('Y2lwaGVyRnJvbUdjcA==', self::KEY.'/cryptoKeyVersions/3'));
 
         $this->assertSame(self::BASE.self::KEY.':decrypt', $captured);
     }
@@ -552,7 +552,7 @@ class GoogleCloudKmsTest extends TestCase
         $client = new MockHttpClient(static function ($method, $url, array $options) use (&$captured): MockResponse {
             $captured = [$url, json_decode($options['body'], true)];
 
-            return new MockResponse(json_encode(['ciphertext' => 'WrappedDek']));
+            return self::encryptedResponse('V3JhcHBlZERlaw==');
         }, self::BASE);
 
         $dataKey = (new GoogleCloudKms($client, $this->staticToken('T')))->generateDataKey(self::KEY, 32);
@@ -560,7 +560,7 @@ class GoogleCloudKmsTest extends TestCase
         [$url, $body] = $captured;
         $this->assertSame(self::BASE.self::KEY.':encrypt', $url);
         $this->assertSame(self::KEY, $dataKey->wrapped->keyId);
-        $this->assertSame('WrappedDek', $dataKey->wrapped->blob);
+        $this->assertSame('V3JhcHBlZERlaw==', $dataKey->wrapped->blob);
         $this->assertSame(32, \strlen(base64_decode($body['plaintext'], true)));
     }
 
@@ -578,24 +578,24 @@ class GoogleCloudKmsTest extends TestCase
         $client = new MockHttpClient(static function ($method, $url, array $options) use (&$captured): MockResponse {
             $captured = [$url, json_decode($options['body'], true)];
 
-            return new MockResponse(json_encode(['ciphertext' => 'WrappedDek']));
+            return self::encryptedResponse('V3JhcHBlZERlaw==');
         }, self::BASE);
 
         $wrapped = (new GoogleCloudKms($client, $this->staticToken('T')))->wrapDataKey(self::KEY, str_repeat("\xAB", 32), 'tenant=acme');
 
-        $this->assertSame([self::BASE.self::KEY.':encrypt', ['plaintext' => base64_encode(str_repeat("\xAB", 32)), 'additionalAuthenticatedData' => base64_encode('tenant=acme')]], $captured);
+        $this->assertSame([self::BASE.self::KEY.':encrypt', ['plaintext' => base64_encode(str_repeat("\xAB", 32)), 'plaintextCrc32c' => base_convert(hash('crc32c', str_repeat("\xAB", 32)), 16, 10), 'additionalAuthenticatedData' => base64_encode('tenant=acme'), 'additionalAuthenticatedDataCrc32c' => '963634433']], $captured);
         $this->assertSame(self::KEY, $wrapped->keyId);
-        $this->assertSame('WrappedDek', $wrapped->blob);
+        $this->assertSame('V3JhcHBlZERlaw==', $wrapped->blob);
     }
 
     public function testUnwrapDataKeyDecodesPlaintext()
     {
         $client = new MockHttpClient(
-            new MockResponse(json_encode(['plaintext' => base64_encode(str_repeat("\xAB", 32))])),
+            self::decryptedResponse(str_repeat("\xAB", 32)),
             self::BASE,
         );
 
-        $dataKey = (new GoogleCloudKms($client, $this->staticToken('T')))->unwrapDataKey(new Ciphertext('WrappedDek', self::KEY));
+        $dataKey = (new GoogleCloudKms($client, $this->staticToken('T')))->unwrapDataKey(new Ciphertext('V3JhcHBlZERlaw==', self::KEY));
 
         $this->assertSame(str_repeat("\xAB", 32), $dataKey->use(static fn (string $p): string => $p));
     }
@@ -653,7 +653,7 @@ class GoogleCloudKmsTest extends TestCase
         $client = new MockHttpClient(static function ($method, $url) use (&$captured): MockResponse {
             $captured = $url;
 
-            return new MockResponse(json_encode(['ciphertext' => 'ct']));
+            return self::encryptedResponse('ct', self::KEY.'/cryptoKeyVersions/3');
         }, self::BASE);
 
         $ciphertext = (new GoogleCloudKms($client, $this->staticToken('T')))->encrypt(self::KEY.'/cryptoKeyVersions/3', 'hello');
@@ -707,6 +707,22 @@ class GoogleCloudKmsTest extends TestCase
         );
 
         $this->assertSame('', (new GoogleCloudKms($client, $this->staticToken('T')))->decrypt(new Ciphertext('blob', self::KEY)));
+    }
+
+    private static function encryptedResponse(string $ciphertext, string $version = self::KEY.'/cryptoKeyVersions/1'): MockResponse
+    {
+        return new MockResponse(json_encode([
+            'name' => $version,
+            'ciphertext' => $ciphertext,
+            'ciphertextCrc32c' => base_convert(hash('crc32c', base64_decode($ciphertext, true)), 16, 10),
+            'verifiedPlaintextCrc32c' => true,
+            'verifiedAdditionalAuthenticatedDataCrc32c' => true,
+        ]));
+    }
+
+    private static function decryptedResponse(string $plaintext): MockResponse
+    {
+        return new MockResponse(json_encode(['plaintext' => base64_encode($plaintext), 'plaintextCrc32c' => base_convert(hash('crc32c', $plaintext), 16, 10)]));
     }
 
     private function clientThatMustNotBeCalled(): MockHttpClient

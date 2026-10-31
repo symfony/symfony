@@ -13,6 +13,7 @@ namespace Symfony\Component\RateLimiter\Tests\Policy;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
 use Symfony\Component\RateLimiter\Policy\Window;
 use Symfony\Component\RateLimiter\RateLimit;
@@ -399,6 +400,33 @@ class FixedWindowLimiterTest extends TestCase
         yield ['P1M'];
 
         yield ['P1Y'];
+    }
+
+    public function testRejectIntervalBelowOneSecond()
+    {
+        $this->expectException(InvalidIntervalException::class);
+        $this->expectExceptionMessage('The interval must be positive integer, "0" given.');
+
+        $this->createLimiter('PT0S');
+    }
+
+    public function testRejectNegativeInterval()
+    {
+        $interval = new \DateInterval('PT1S');
+        $interval->invert = 1;
+
+        $this->expectException(InvalidIntervalException::class);
+        $this->expectExceptionMessage('The interval must be positive integer, "-1" given.');
+
+        new FixedWindowLimiter('test', 10, $interval, $this->storage);
+    }
+
+    public function testRejectSubsecondInterval()
+    {
+        $this->expectException(InvalidIntervalException::class);
+        $this->expectExceptionMessage('The interval must be positive integer, "0" given.');
+
+        new FixedWindowLimiter('test', 10, \DateInterval::createFromDateString('200 milliseconds'), $this->storage);
     }
 
     private function createLimiter(string $dateIntervalString = 'PT1M'): FixedWindowLimiter

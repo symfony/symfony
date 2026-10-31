@@ -13,7 +13,7 @@ namespace Symfony\Component\KeyManagement\Bridge\Kmip\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\AesGcm;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\Aead;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\OperationFailed;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\ProtocolClient;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\ProtocolVersion;
@@ -214,7 +214,7 @@ final class ProtocolClientTest extends TestCase
     #[DataProvider('protocolVersions')]
     public function testEncryptAndDecryptPayloadUseTheSameFixedAesGcmFields(ProtocolVersion $version)
     {
-        $payload = (new \ReflectionMethod(AesGcm::class, 'payload'))->invoke(null, 'key', "\0A", str_repeat("\x01", self::AES_GCM_IV_LENGTH), 'aad');
+        $payload = (new \ReflectionMethod(Aead::class, 'payload'))->invoke(null, 'key', "\0A", str_repeat("\x01", self::AES_GCM_IV_LENGTH), 'aad');
         $expected = '42009407000000036b65790000000000'
             .'42002b0100000040'
             .'42001105000000040000000900000000'

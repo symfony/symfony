@@ -13,7 +13,7 @@ namespace Symfony\Component\KeyManagement\Bridge\Kmip\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\AesGcm;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\Aead;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\ProtocolClient;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\ProtocolVersion;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\RequestClientInterface;
@@ -23,7 +23,7 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
 use Symfony\Component\KeyManagement\Exception\RuntimeException;
 
-final class AesGcmTest extends TestCase
+final class AeadTest extends TestCase
 {
     private const int TAG_BLOCK_CIPHER_MODE = 0x420011;
     private const int TAG_CRYPTOGRAPHIC_ALGORITHM = 0x420028;
@@ -58,7 +58,7 @@ final class AesGcmTest extends TestCase
             ];
         });
 
-        $cipher = new AesGcm($ivLength);
+        $cipher = new Aead($ivLength);
         $encrypted = $cipher->encrypt($client, 'key', 'plaintext', 'aad');
         $header = "\x01".pack('NN', self::ALGORITHM_AES, self::BLOCK_MODE_GCM).\chr($ivLength);
 
@@ -93,7 +93,7 @@ final class AesGcmTest extends TestCase
 
     public function testTheDefaultIvLengthIsTwelveBytes()
     {
-        $encrypted = (new AesGcm())->encrypt(self::encryptingClient(), 'key', 'x', '');
+        $encrypted = (new Aead())->encrypt(self::encryptingClient(), 'key', 'x', '');
 
         $this->assertSame(12, \ord($encrypted->blob[self::HEADER_LENGTH - 1]));
     }
@@ -116,9 +116,9 @@ final class AesGcmTest extends TestCase
             return $response;
         });
 
-        $ciphertext = (new AesGcm($oldLength))->encrypt($client, 'key', 'plaintext', 'aad');
+        $ciphertext = (new Aead($oldLength))->encrypt($client, 'key', 'plaintext', 'aad');
 
-        $this->assertSame('plaintext', (new AesGcm($newLength))->decrypt($client, $ciphertext, 'aad'));
+        $this->assertSame('plaintext', (new Aead($newLength))->decrypt($client, $ciphertext, 'aad'));
         $this->assertSame($requests[0][ProtocolClient::IV]['value'], $requests[1][ProtocolClient::IV]['value']);
         $this->assertSame($requests[0][ProtocolClient::AAD]['value'], $requests[1][ProtocolClient::AAD]['value']);
     }
@@ -135,7 +135,7 @@ final class AesGcmTest extends TestCase
         $client = self::client(static fn (): array => throw new \LogicException('No request should be sent.'));
 
         $this->expectException(DecryptionFailedException::class);
-        (new AesGcm())->decrypt($client, new Ciphertext($blob, 'key'), 'aad');
+        (new Aead())->decrypt($client, new Ciphertext($blob, 'key'), 'aad');
     }
 
     public static function malformedCiphertexts(): iterable
@@ -160,7 +160,7 @@ final class AesGcmTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('KMIP returned invalid authenticated ciphertext.');
-        (new AesGcm())->encrypt($client, 'key', 'x', 'aad');
+        (new Aead())->encrypt($client, 'key', 'x', 'aad');
     }
 
     #[DataProvider('invalidEncryptResponses')]
@@ -186,7 +186,7 @@ final class AesGcmTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage($message);
-        (new AesGcm())->encrypt($client, 'key', 'x', 'aad');
+        (new Aead())->encrypt($client, 'key', 'x', 'aad');
     }
 
     public static function invalidEncryptResponses(): iterable
@@ -207,7 +207,7 @@ final class AesGcmTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('KMIP returned a different key identifier.');
-        (new AesGcm())->decrypt($client, self::ciphertext('x'), 'aad');
+        (new Aead())->decrypt($client, self::ciphertext('x'), 'aad');
     }
 
     public function testDecryptRejectsAChangedPlaintextLength()
@@ -219,7 +219,7 @@ final class AesGcmTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('KMIP returned invalid plaintext length.');
-        (new AesGcm())->decrypt($client, self::ciphertext('x'), 'aad');
+        (new Aead())->decrypt($client, self::ciphertext('x'), 'aad');
     }
 
     #[DataProvider('invalidIvLengths')]
@@ -228,7 +228,7 @@ final class AesGcmTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The KMIP AES-GCM IV length must be between 12 and 255 bytes.');
 
-        new AesGcm($length);
+        new Aead($length);
     }
 
     public static function invalidIvLengths(): iterable

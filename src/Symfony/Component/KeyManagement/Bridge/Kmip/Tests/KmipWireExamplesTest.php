@@ -13,7 +13,7 @@ namespace Symfony\Component\KeyManagement\Bridge\Kmip\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\AesGcm;
+use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\Aead;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\OperationFailed;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\ProtocolClient;
 use Symfony\Component\KeyManagement\Bridge\Kmip\Kmip\ProtocolVersion;
@@ -97,7 +97,7 @@ final class KmipWireExamplesTest extends TestCase
     public function testVersion21EncryptExchangeMatchesCapturedWireFrames()
     {
         $keyId = '99c71963-0c84-426f-919c-6b25c7c06557';
-        $payload = (new \ReflectionMethod(AesGcm::class, 'payload'))->invoke(null, $keyId, 'kmip-2.1-wire-example', hex2bin('000102030405060708090a0b'), 'context');
+        $payload = (new \ReflectionMethod(Aead::class, 'payload'))->invoke(null, $keyId, 'kmip-2.1-wire-example', hex2bin('000102030405060708090a0b'), 'context');
 
         $this->assertSame(KmipWireExamples::bytes(KmipWireExamples::ENCRYPT_REQUEST_VERSION21), self::client(ProtocolVersion::Version21)->buildRequest(ProtocolClient::ENCRYPT, $payload));
 
@@ -139,7 +139,7 @@ final class KmipWireExamplesTest extends TestCase
 
     public function testEncryptRequestMatchesIndependentVectorAcrossVersions()
     {
-        $payload = (new \ReflectionMethod(AesGcm::class, 'payload'))->invoke(null, '1', 'hello', hex2bin('000102030405060708090a0b'), 'aad');
+        $payload = (new \ReflectionMethod(Aead::class, 'payload'))->invoke(null, '1', 'hello', hex2bin('000102030405060708090a0b'), 'aad');
         $version14Request = self::client(ProtocolVersion::Version14)->buildRequest(ProtocolClient::ENCRYPT, $payload);
         $this->assertSame(KmipWireExamples::bytes(KmipWireExamples::ENCRYPT_REQUEST_VERSION14), $version14Request);
 

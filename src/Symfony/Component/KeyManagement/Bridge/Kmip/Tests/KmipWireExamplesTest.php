@@ -81,6 +81,30 @@ final class KmipWireExamplesTest extends TestCase
         yield 'KMIP 1.4 Encrypt permission denied response' => [KmipWireExamples::ENCRYPT_PERMISSION_DENIED_RESPONSE_VERSION14, 200, self::TAG_RESPONSE_MESSAGE, ProtocolVersion::Version14];
         yield 'KMIP 1.4 Get request' => [KmipWireExamples::GET_REQUEST_VERSION14, 208, self::TAG_REQUEST_MESSAGE, ProtocolVersion::Version14];
         yield 'KMIP 1.4 Get response' => [KmipWireExamples::GET_RESPONSE_VERSION14, 280, self::TAG_RESPONSE_MESSAGE, ProtocolVersion::Version14];
+        yield 'KMIP 2.1 Decrypt response' => [KmipWireExamples::DECRYPT_RESPONSE_VERSION21, 200, self::TAG_RESPONSE_MESSAGE, ProtocolVersion::Version21];
+        yield 'KMIP 2.1 Encrypt request' => [KmipWireExamples::ENCRYPT_REQUEST_VERSION21, 296, self::TAG_REQUEST_MESSAGE, ProtocolVersion::Version21];
+        yield 'KMIP 2.1 Encrypt response' => [KmipWireExamples::ENCRYPT_RESPONSE_VERSION21, 240, self::TAG_RESPONSE_MESSAGE, ProtocolVersion::Version21];
+    }
+
+    public function testVersion21DecryptResponseFromOasisTestCase()
+    {
+        $decrypted = self::client(ProtocolVersion::Version21)->parseResponse(KmipWireExamples::bytes(KmipWireExamples::DECRYPT_RESPONSE_VERSION21), ProtocolClient::DECRYPT);
+
+        $this->assertSame('1', $decrypted[ProtocolClient::UNIQUE_IDENTIFIER]['value']);
+        $this->assertSame(hex2bin('010203040506070809101112131415160102030405060708091011121314151601'), $decrypted[ProtocolClient::DATA]['value']);
+    }
+
+    public function testVersion21EncryptExchangeMatchesCapturedWireFrames()
+    {
+        $keyId = '99c71963-0c84-426f-919c-6b25c7c06557';
+        $payload = (new \ReflectionMethod(AesGcm::class, 'payload'))->invoke(null, $keyId, 'kmip-2.1-wire-example', hex2bin('000102030405060708090a0b'), 'context');
+
+        $this->assertSame(KmipWireExamples::bytes(KmipWireExamples::ENCRYPT_REQUEST_VERSION21), self::client(ProtocolVersion::Version21)->buildRequest(ProtocolClient::ENCRYPT, $payload));
+
+        $encrypted = self::client(ProtocolVersion::Version21)->parseResponse(KmipWireExamples::bytes(KmipWireExamples::ENCRYPT_RESPONSE_VERSION21), ProtocolClient::ENCRYPT);
+        $this->assertSame($keyId, $encrypted[ProtocolClient::UNIQUE_IDENTIFIER]['value']);
+        $this->assertSame('01cb8746917945dff89d8855b0b6239a5247c7c58e', bin2hex($encrypted[ProtocolClient::DATA]['value']));
+        $this->assertSame('b496155cbd6ae232fd99749e5b5fda8f', bin2hex($encrypted[ProtocolClient::TAG]['value']));
     }
 
     public function testDiscoverVersionsRequestMatchesIndependentVector()
@@ -121,6 +145,7 @@ final class KmipWireExamplesTest extends TestCase
 
         $version20Request = self::client(ProtocolVersion::Version20)->buildRequest(ProtocolClient::ENCRYPT, $payload);
         $this->assertSame(substr_replace(substr_replace($version14Request, "\x02", self::VERSION_MAJOR_VALUE_BYTE_OFFSET, 1), "\x00", self::VERSION_MINOR_VALUE_BYTE_OFFSET, 1), $version20Request);
+        $this->assertSame(substr_replace($version20Request, "\x01", self::VERSION_MINOR_VALUE_BYTE_OFFSET, 1), self::client(ProtocolVersion::Version21)->buildRequest(ProtocolClient::ENCRYPT, $payload));
     }
 
     public function testIndependentResponsesMapToExpectedFieldsAndReason()

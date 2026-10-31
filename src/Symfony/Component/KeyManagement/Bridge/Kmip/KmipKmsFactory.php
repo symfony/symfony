@@ -31,7 +31,7 @@ use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
  * The `ca` option names a certificate authority file used to verify the server certificate; omitting it uses the system trust store.
  * The `peer_name` option controls the expected server name. The DSN has no path.
  *
- * The KMIP version, 1.4 or 2.0, must be selected explicitly. The `iv_length` option sets the AES-GCM IV length of new ciphertexts, 12 bytes by default.
+ * The KMIP version, 1.4, 2.0 or 2.1, must be selected explicitly. The `iv_length` option sets the AES-GCM IV length of new ciphertexts, 12 bytes by default.
  *
  * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
  *

@@ -124,6 +124,7 @@ final class ProtocolClientTest extends TestCase
     {
         yield '1.4' => [ProtocolVersion::Version14, 1, 4];
         yield '2.0' => [ProtocolVersion::Version20, 2, 0];
+        yield '2.1' => [ProtocolVersion::Version21, 2, 1];
     }
 
     #[DataProvider('protocolVersions')]
@@ -236,6 +237,7 @@ final class ProtocolClientTest extends TestCase
     {
         yield '1.4' => [ProtocolVersion::Version14];
         yield '2.0' => [ProtocolVersion::Version20];
+        yield '2.1' => [ProtocolVersion::Version21];
     }
 
     public function testVendorDefinedFailureReasonIsPreservedOnBothIntegerArchitectures()

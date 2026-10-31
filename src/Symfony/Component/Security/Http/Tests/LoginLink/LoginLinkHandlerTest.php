@@ -282,6 +282,39 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
+    public function testConsumeLoginLinkWithOverflowingExpiration()
+    {
+        $this->expectException(InvalidLoginLinkException::class);
+        $this->expectExceptionMessage('Invalid "expires" parameter.');
+        $request = Request::create('/login/verify?user=weaverryan&hash=thehash&expires=99999999999999999999');
+
+        $linker = $this->createLinker();
+        $linker->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkWithExpirationAboveIntegerRange()
+    {
+        $this->expectException(InvalidLoginLinkException::class);
+        $this->expectExceptionMessage('Invalid "expires" parameter.');
+        $expires = 8 === \PHP_INT_SIZE ? '9223372036854775808' : '2147483648';
+        $request = Request::create('/login/verify?user=weaverryan&hash=thehash&expires='.$expires);
+
+        $this->createLinker()->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkWithTrailingNewlineInExpiration()
+    {
+        $expires = time() + 500;
+        $signature = $this->createSignatureHash('weaverryan', $expires);
+        $request = Request::create(\sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d%%0A', $signature, $expires));
+        $this->userProvider->createUser(new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'));
+
+        $this->expectException(InvalidLoginLinkException::class);
+        $this->expectExceptionMessage('Invalid "expires" parameter.');
+
+        $this->createLinker()->consumeLoginLink($request);
+    }
+
     public function testConsumeLoginLinkWithInvalidHash()
     {
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');

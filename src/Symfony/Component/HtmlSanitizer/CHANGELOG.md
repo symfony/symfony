@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add `HtmlSanitizerBundle`, which provides the `html_sanitizer` configuration and the services previously provided by `FrameworkBundle` under `framework.html_sanitizer`
+ * Use the native URI parser when using PHP 8.5+
+ * Percent-encode non-ASCII characters in URLs, and the ASCII ones that RFC 3986 does not allow
 
 8.0
 ---

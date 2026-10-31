@@ -27,7 +27,7 @@
     },
     "require-dev": {
         "psr/log": "^1|^2|^3",
-        "symfony/cache": "^7.4|^8.0",
+        "symfony/cache": "^7.4.8|^8.0.8",
         "symfony/clock": "^7.4|^8.0",
         "symfony/console": "^7.4|^8.0",
         "symfony/expression-language": "^7.4|^8.0",

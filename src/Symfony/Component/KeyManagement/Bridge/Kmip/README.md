@@ -72,7 +72,7 @@ Use `passphrase` for an encrypted client private key, and keep it and any KMIP
 password in application secrets.
 
 ```
-kmip://[<username>:<password>@]<host>[:<port>]?cert=<client-cert-file>&key=<client-private-key-file>&version=<version>[&ca=<ca-file>][&peer_name=<name>][&passphrase=<passphrase>][&cipher=aes-gcm][&iv_length=12][&timeout=10]
+kmip://[<username>:<password>@]<host>[:<port>]?cert=<client-cert-file>&key=<client-private-key-file>&version=<version>[&ca=<ca-file>][&peer_name=<name>][&passphrase=<passphrase>][&cipher=aes-gcm][&mode=<vendor-mode>][&iv_length=12][&timeout=10]
 ```
 
 `cert`, `key` and `version` are required. The port defaults to 5696 and the
@@ -117,9 +117,20 @@ Encrypt and Decrypt in its usage mask. The server must support that algorithm.
 ChaCha20-Poly1305 uses a 12-byte nonce and a 16-byte authentication tag; the
 `iv_length` option is only available with AES-GCM.
 
+To use AES-GCM-SIV, set `cipher=aes-gcm-siv&mode=<vendor-mode>` and provision an AES key with Encrypt and Decrypt in its usage mask.
+KMIP does not assign a standard Block Cipher Mode to AES-GCM-SIV.
+Use the value documented by the server, written as a hexadecimal string between `0x80000000` and `0x8FFFFFFF`.
+For example, `cipher=aes-gcm-siv&mode=0x80000002` selects a server's documented `0x80000002` mode; that value is not a default for other servers.
+
+AES-GCM-SIV uses a 12-byte nonce and a 16-byte authentication tag.
+
 Ciphertexts store and authenticate their algorithm, mode and IV length.
 Changing `cipher` affects new ciphertexts; earlier AES-GCM and
 ChaCha20-Poly1305 ciphertexts remain readable if the server and key support them.
+
+Decryption accepts a vendor mode only when it matches the configured `mode`.
+Keep that option while ciphertexts using it remain stored.
+It can also be set with `cipher=aes-gcm`, `cipher=chacha20-poly1305` or with the default cipher to retain access to earlier AES-GCM-SIV ciphertexts while writing new ciphertexts with another cipher.
 
 Key rotation
 ------------

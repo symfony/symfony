@@ -385,12 +385,12 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         $tokenData = $passport->getAttribute('oidc_token_data');
         if (\is_array($tokenData)) {
             $token->setAttribute('oidc_id_token', $tokenData['id_token'] ?? null);
-            $token->setAttribute('oidc_access_token', $tokenData['access_token'] ?? null);
+            $token->setAttribute('oauth2_access_token', $tokenData['access_token'] ?? null);
             // the refresh token of RFC 6749, Section 6 and the expiry of the access token
             // it renews; both are null unless the provider issued them, as it only issues
             // a refresh token when it was asked for one, and "expires_in" is optional
-            $token->setAttribute('oidc_refresh_token', $tokenData['refresh_token'] ?? null);
-            $token->setAttribute('oidc_access_token_expires_at', is_numeric($tokenData['expires_in'] ?? null) ? ($this->clock?->now()->getTimestamp() ?? time()) + (int) $tokenData['expires_in'] : null);
+            $token->setAttribute('oauth2_refresh_token', $tokenData['refresh_token'] ?? null);
+            $token->setAttribute('oauth2_access_token_expires_at', is_numeric($tokenData['expires_in'] ?? null) ? ($this->clock?->now()->getTimestamp() ?? time()) + (int) $tokenData['expires_in'] : null);
         }
 
         $token->setAttribute('oidc_acr', $passport->getAttribute('oidc_acr'));

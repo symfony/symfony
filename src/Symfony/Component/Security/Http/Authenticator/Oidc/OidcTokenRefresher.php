@@ -65,8 +65,8 @@ final class OidcTokenRefresher
      */
     public function refreshIfNeeded(TokenInterface $token): bool
     {
-        $refreshToken = $token->hasAttribute('oidc_refresh_token') ? $token->getAttribute('oidc_refresh_token') : null;
-        $expiresAt = $token->hasAttribute('oidc_access_token_expires_at') ? $token->getAttribute('oidc_access_token_expires_at') : null;
+        $refreshToken = $token->hasAttribute('oauth2_refresh_token') ? $token->getAttribute('oauth2_refresh_token') : null;
+        $expiresAt = $token->hasAttribute('oauth2_access_token_expires_at') ? $token->getAttribute('oauth2_access_token_expires_at') : null;
 
         if (!\is_string($refreshToken) || '' === $refreshToken || !is_numeric($expiresAt)) {
             return false;
@@ -92,7 +92,7 @@ final class OidcTokenRefresher
      */
     public function refresh(TokenInterface $token): void
     {
-        $refreshToken = $token->hasAttribute('oidc_refresh_token') ? $token->getAttribute('oidc_refresh_token') : null;
+        $refreshToken = $token->hasAttribute('oauth2_refresh_token') ? $token->getAttribute('oauth2_refresh_token') : null;
         if (!\is_string($refreshToken) || '' === $refreshToken) {
             throw new AuthenticationException('The security token carries no OIDC refresh token: the access token cannot be renewed.');
         }
@@ -114,13 +114,13 @@ final class OidcTokenRefresher
             }
         }
 
-        $token->setAttribute('oidc_access_token', $tokenData['access_token']);
-        $token->setAttribute('oidc_access_token_expires_at', is_numeric($tokenData['expires_in'] ?? null) ? ($this->clock?->now()->getTimestamp() ?? time()) + (int) $tokenData['expires_in'] : null);
+        $token->setAttribute('oauth2_access_token', $tokenData['access_token']);
+        $token->setAttribute('oauth2_access_token_expires_at', is_numeric($tokenData['expires_in'] ?? null) ? ($this->clock?->now()->getTimestamp() ?? time()) + (int) $tokenData['expires_in'] : null);
 
         // RFC 6749, Section 6: issuing a new refresh token is a MAY, and the one just
         // used stays valid until the provider replaces it
         if (\is_string($tokenData['refresh_token'] ?? null) && '' !== $tokenData['refresh_token']) {
-            $token->setAttribute('oidc_refresh_token', $tokenData['refresh_token']);
+            $token->setAttribute('oauth2_refresh_token', $tokenData['refresh_token']);
         }
     }
 

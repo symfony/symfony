@@ -125,9 +125,9 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
     {
         $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_refresh.yml']);
         $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), 'oidc', [
-            'oidc_access_token' => 'access-123',
-            'oidc_refresh_token' => 'refresh-123',
-            'oidc_access_token_expires_at' => time() - 1,
+            'oauth2_access_token' => 'access-123',
+            'oauth2_refresh_token' => 'refresh-123',
+            'oauth2_access_token_expires_at' => time() - 1,
         ]);
         $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient($this->mockProvider([
             'access_token' => 'access-456',
@@ -139,9 +139,9 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
         $client->request('GET', '/oidc/start');
 
         $token = unserialize($client->getRequest()->getSession()->get('_security_oidc'));
-        $this->assertSame('access-456', $token->getAttribute('oidc_access_token'));
-        $this->assertSame('refresh-456', $token->getAttribute('oidc_refresh_token'));
-        $this->assertGreaterThan(time(), $token->getAttribute('oidc_access_token_expires_at'));
+        $this->assertSame('access-456', $token->getAttribute('oauth2_access_token'));
+        $this->assertSame('refresh-456', $token->getAttribute('oauth2_refresh_token'));
+        $this->assertGreaterThan(time(), $token->getAttribute('oauth2_access_token_expires_at'));
     }
 
     /**
@@ -153,9 +153,9 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
     {
         $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_refresh_lazy.yml']);
         $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), 'oidc', [
-            'oidc_access_token' => 'access-123',
-            'oidc_refresh_token' => 'refresh-123',
-            'oidc_access_token_expires_at' => time() - 1,
+            'oauth2_access_token' => 'access-123',
+            'oauth2_refresh_token' => 'refresh-123',
+            'oauth2_access_token_expires_at' => time() - 1,
         ]);
         $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient($this->mockProvider([
             'access_token' => 'access-456',
@@ -167,17 +167,17 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
         $client->request('GET', '/oidc/start');
 
         $token = unserialize($client->getRequest()->getSession()->get('_security_oidc'));
-        $this->assertSame('access-456', $token->getAttribute('oidc_access_token'));
-        $this->assertSame('refresh-456', $token->getAttribute('oidc_refresh_token'));
+        $this->assertSame('access-456', $token->getAttribute('oauth2_access_token'));
+        $this->assertSame('refresh-456', $token->getAttribute('oauth2_refresh_token'));
     }
 
     public function testTheUserIsLoggedOutWhenTheProviderRejectsTheRefreshToken()
     {
         $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_refresh.yml']);
         $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), 'oidc', [
-            'oidc_access_token' => 'access-123',
-            'oidc_refresh_token' => 'refresh-123',
-            'oidc_access_token_expires_at' => time() - 1,
+            'oauth2_access_token' => 'access-123',
+            'oauth2_refresh_token' => 'refresh-123',
+            'oauth2_access_token_expires_at' => time() - 1,
         ]);
         $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient($this->mockProvider(['error' => 'invalid_grant'], 400)));
         $client->getContainer()->get('security.token_storage')->setToken(null);
@@ -191,9 +191,9 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
     {
         $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_refresh_lazy.yml']);
         $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), 'oidc', [
-            'oidc_access_token' => 'access-123',
-            'oidc_refresh_token' => 'refresh-123',
-            'oidc_access_token_expires_at' => time() - 1,
+            'oauth2_access_token' => 'access-123',
+            'oauth2_refresh_token' => 'refresh-123',
+            'oauth2_access_token_expires_at' => time() - 1,
         ]);
         $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient($this->mockProvider(['error' => 'invalid_grant'], 400)));
         $client->getContainer()->get('security.token_storage')->setToken(null);
@@ -207,9 +207,9 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
     {
         $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc.yml']);
         $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), 'oidc', [
-            'oidc_access_token' => 'access-123',
-            'oidc_refresh_token' => 'refresh-123',
-            'oidc_access_token_expires_at' => time() - 1,
+            'oauth2_access_token' => 'access-123',
+            'oauth2_refresh_token' => 'refresh-123',
+            'oauth2_access_token_expires_at' => time() - 1,
         ]);
         $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient($this->mockProvider(['access_token' => 'access-456'])));
         $client->getContainer()->get('security.token_storage')->setToken(null);
@@ -217,7 +217,7 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
         $client->request('GET', '/oidc/start');
 
         $token = unserialize($client->getRequest()->getSession()->get('_security_oidc'));
-        $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('access-123', $token->getAttribute('oauth2_access_token'));
     }
 
     public function testTheStartRouteNamesTheDpopKey()
@@ -235,9 +235,9 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
     {
         $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_dpop.yml']);
         $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), 'oidc', [
-            'oidc_access_token' => 'access-123',
-            'oidc_refresh_token' => 'refresh-123',
-            'oidc_access_token_expires_at' => time() - 1,
+            'oauth2_access_token' => 'access-123',
+            'oauth2_refresh_token' => 'refresh-123',
+            'oauth2_access_token_expires_at' => time() - 1,
         ]);
         $proofs = [];
         $provider = $this->mockProvider(['access_token' => 'access-456', 'token_type' => 'DPoP', 'expires_in' => 300]);
@@ -255,7 +255,7 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
         $client->request('GET', '/oidc/start');
 
         $token = unserialize($client->getRequest()->getSession()->get('_security_oidc'));
-        $this->assertSame('access-456', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('access-456', $token->getAttribute('oauth2_access_token'));
         $this->assertCount(1, $proofs);
         $header = json_decode(base64_decode(strtr(explode('.', $proofs[0])[0], '-_', '+/')), true);
         $this->assertSame('dpop+jwt', $header['typ']);
@@ -266,9 +266,9 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
     {
         $client = $this->createClient(['test_case' => 'OidcLoginRouteLoader', 'root_config' => 'config_oidc_dpop.yml']);
         $client->loginUser(new InMemoryUser('john', 'test', ['ROLE_USER']), 'oidc', [
-            'oidc_access_token' => 'access-123',
-            'oidc_refresh_token' => 'refresh-123',
-            'oidc_access_token_expires_at' => time() - 1,
+            'oauth2_access_token' => 'access-123',
+            'oauth2_refresh_token' => 'refresh-123',
+            'oauth2_access_token_expires_at' => time() - 1,
         ]);
         $client->getContainer()->set(HttpClientInterface::class, new MockHttpClient($this->mockProvider(['access_token' => 'access-456', 'token_type' => 'Bearer', 'expires_in' => 300])));
         $client->getContainer()->get('security.token_storage')->setToken(null);
@@ -276,7 +276,7 @@ class OidcLoginRouteLoaderTest extends AbstractWebTestCase
         $client->request('GET', '/oidc/start');
 
         $token = unserialize($client->getRequest()->getSession()->get('_security_oidc'));
-        $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('access-123', $token->getAttribute('oauth2_access_token'));
     }
 
     private static function dpopKey(): JWK

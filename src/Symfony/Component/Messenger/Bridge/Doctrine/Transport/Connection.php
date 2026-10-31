@@ -306,8 +306,13 @@ class Connection implements ResetInterface
 
             return $tableName === $this->configuration['table_name'];
         });
-        $this->updateSchema();
-        $configuration->setSchemaAssetsFilter($assetFilter);
+
+        try {
+            $this->updateSchema();
+        } finally {
+            $configuration->setSchemaAssetsFilter($assetFilter);
+        }
+
         $this->autoSetup = false;
     }
 

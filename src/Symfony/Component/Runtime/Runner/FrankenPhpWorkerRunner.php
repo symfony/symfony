@@ -37,7 +37,8 @@ class FrankenPhpWorkerRunner implements RunnerInterface
         $server = array_filter($_SERVER, static fn (string $key) => !str_starts_with($key, 'HTTP_'), \ARRAY_FILTER_USE_KEY);
         $server['APP_RUNTIME_MODE'] = 'web=1&worker=1';
 
-        $handler = function () use ($server, &$sfRequest, &$sfResponse): void {
+        $terminationException = null;
+        $handler = function () use ($server, &$sfRequest, &$sfResponse, &$terminationException): void {
             // Connect to the Xdebug client if it's available
             if (\extension_loaded('xdebug') && \function_exists('xdebug_connect_to_client')) {
                 xdebug_connect_to_client();
@@ -50,14 +51,23 @@ class FrankenPhpWorkerRunner implements RunnerInterface
             $sfResponse = $this->kernel->handle($sfRequest);
 
             $sfResponse->send();
+
+            if ($this->kernel instanceof TerminableInterface) {
+                try {
+                    $this->kernel->terminate($sfRequest, $sfResponse);
+                } catch (\Throwable $e) {
+                    // FrankenPHP turns uncaught callback exceptions into fatal errors.
+                    $terminationException = $e;
+                }
+            }
         };
 
         $loops = 0;
         do {
             $ret = frankenphp_handle_request($handler);
 
-            if ($this->kernel instanceof TerminableInterface && $sfRequest && $sfResponse) {
-                $this->kernel->terminate($sfRequest, $sfResponse);
+            if (null !== $terminationException) {
+                throw $terminationException;
             }
             $sfRequest = $sfResponse = null;
 

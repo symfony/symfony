@@ -93,6 +93,16 @@ class CookieJarTest extends TestCase
         $this->assertNull($cookieJar->get('foo'));
     }
 
+    public function testUpdateFromSetCookieDeletesCookiesAtTheUnixEpoch()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=bar'], 'https://example.com/');
+        $cookieJar->updateFromSetCookie(['foo=bar; Expires=Thu, 01 Jan 1970 00:00:00 GMT'], 'https://example.com/');
+
+        $this->assertNull($cookieJar->get('foo'));
+        $this->assertSame([], $cookieJar->allValues('https://example.com/'));
+    }
+
     public function testUpdateFromSetCookieIgnoresAnEmptyDomainAttribute()
     {
         $cookieJar = new CookieJar();

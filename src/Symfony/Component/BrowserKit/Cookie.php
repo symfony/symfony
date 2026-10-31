@@ -205,6 +205,8 @@ class Cookie
             $now = time();
             // 1 is the earliest expiration time, 0 means a session cookie
             $values['expires'] = 0 < $maxAge ? (\PHP_INT_MAX - $now > $maxAge ? $now + $maxAge : \PHP_INT_MAX) : 1;
+        } elseif ('0' === $values['expires']) {
+            $values['expires'] = 1;
         }
 
         return new static(

@@ -22,6 +22,24 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class HttpBrowserTest extends AbstractBrowserTest
 {
+    public function testDoesNotReplayCookiesExpiredAtTheUnixEpochAfterRedirect()
+    {
+        $client = new MockHttpClient([
+            new MockResponse('', ['http_code' => 302, 'response_headers' => [
+                'Location: https://example.com/next',
+                'Set-Cookie: sid=value; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/',
+            ]]),
+            function ($method, $url, $options) {
+                $this->assertArrayNotHasKey('cookie', $options['normalized_headers']);
+
+                return new MockResponse();
+            },
+        ]);
+        $browser = new HttpBrowser($client);
+        $browser->getCookieJar()->updateFromSetCookie(['sid=old'], 'https://example.com/');
+        $browser->request('GET', 'https://example.com/');
+    }
+
     public function getBrowser(array $server = [], ?History $history = null, ?CookieJar $cookieJar = null)
     {
         return new TestHttpClient($server, $history, $cookieJar);

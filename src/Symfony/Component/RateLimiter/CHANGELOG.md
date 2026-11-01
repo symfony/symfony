@@ -11,6 +11,8 @@ CHANGELOG
  * Allow `\DateInterval` for the `interval` and `rate.interval` options of `RateLimiterFactory`
  * Add `RateLimit::getResetAt()`
  * Add a `$keys` argument to `CompoundRateLimiterFactory`, and accept a map in the `limiters` option of a compound rate limiter, to fix the key of some of its sub-limiters
+ * Add `RateLimiterBuilderInterface`, implemented by `RateLimiterBuilder`
+ * Add a rate limiter data collector for the profiler
 
 8.1
 ---

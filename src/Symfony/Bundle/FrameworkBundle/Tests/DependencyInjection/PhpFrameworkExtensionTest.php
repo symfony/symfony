@@ -22,6 +22,7 @@ use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
+use Symfony\Component\RateLimiter\RateLimiterBuilderInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Serializer\SerializerBundle;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
@@ -413,7 +414,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->assertSame('limiter_builder.storage', (string) $builder->getArgument(0));
         $this->assertNull($builder->getArgument(1));
 
-        $this->assertSame('limiter_builder', (string) $container->getAlias(RateLimiterBuilder::class));
+        $this->assertSame('limiter_builder', (string) $container->getAlias(RateLimiterBuilderInterface::class));
     }
 
     public function testRateLimiterBuilderDefaultWithLock()

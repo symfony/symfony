@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T07:33:36Z
+
+The computed value is now returned even when the callback sets `$save` to `false`.

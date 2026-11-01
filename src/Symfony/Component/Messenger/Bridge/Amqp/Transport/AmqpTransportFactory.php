@@ -22,14 +22,14 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class AmqpTransportFactory implements TransportFactoryInterface
 {
-    public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    public function createTransport(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options, SerializerInterface $serializer): TransportInterface
     {
         unset($options['transport_name']);
 
         return new AmqpTransport(Connection::fromDsn($dsn, $options), $serializer);
     }
 
-    public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
+    public function supports(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options): bool
     {
         return str_starts_with($dsn, 'amqp://') || str_starts_with($dsn, 'amqps://');
     }

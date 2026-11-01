@@ -77,6 +77,25 @@ class RedisTransportFactoryTest extends TestCase
         }
     }
 
+    public function testOptionsAreNotExposedInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $factory = new RedisTransportFactory();
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            $factory->createTransport('redis://localhost:999999/queue', ['auth' => 's3cr3t', 'lazy' => true], new PhpSerializer());
+            $this->fail('An exception should have been thrown.');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
+
     private function skipIfRedisUnavailable()
     {
         try {

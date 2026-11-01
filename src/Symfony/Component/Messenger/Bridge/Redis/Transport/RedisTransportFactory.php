@@ -23,14 +23,14 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class RedisTransportFactory implements TransportFactoryInterface
 {
-    public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    public function createTransport(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options, SerializerInterface $serializer): TransportInterface
     {
         unset($options['transport_name']);
 
         return new RedisTransport(Connection::fromDsn($dsn, $options), $serializer);
     }
 
-    public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
+    public function supports(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options): bool
     {
         return str_starts_with($dsn, 'redis:') || str_starts_with($dsn, 'rediss:') || str_starts_with($dsn, 'valkey:') || str_starts_with($dsn, 'valkeys:');
     }

@@ -33,6 +33,7 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
 
     public function execute(Envelope $envelope, string $transportName, callable $onHandled): void
     {
+        $onAcknowledge = $onHandled instanceof MessageExecutionCallback ? $onHandled->acknowledge(...) : $this->onAcknowledge;
         $acked = false;
         $acks = [];
         $dispatching = true;
@@ -46,7 +47,7 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
             return $ack;
         };
 
-        $ack = function (Envelope $handledEnvelope, ?\Throwable $handledError = null) use (&$acks, &$dispatching, $combine, $transportName): void {
+        $ack = function (Envelope $handledEnvelope, ?\Throwable $handledError = null) use (&$acks, &$dispatching, $combine, $transportName, $onAcknowledge): void {
             if ($dispatching) {
                 $acks[] = [$handledEnvelope, $handledError];
 
@@ -54,9 +55,9 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
             }
 
             if (null !== $this->heldAcks) {
-                $this->heldAcks[] = [$transportName, $handledEnvelope, $handledError, $combine];
+                $this->heldAcks[] = [$transportName, $handledEnvelope, $handledError, $combine, $onAcknowledge];
             } else {
-                ($this->onAcknowledge)($transportName, $handledEnvelope, $handledError, $combine);
+                $onAcknowledge($transportName, $handledEnvelope, $handledError, $combine);
             }
         };
 
@@ -90,7 +91,7 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
             $batch = [$envelope->withoutAll(AckStamp::class), []];
 
             if ($batchAck = $combine(array_map(static fn (array $ack) => [$transportName, ...$ack], $acks))) {
-                ($this->onAcknowledge)(...$batchAck);
+                $onAcknowledge(...$batchAck);
             }
         }
 
@@ -175,7 +176,7 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
         $acks = $this->heldAcks;
         $this->heldAcks = null;
 
-        foreach ($acks as [$transportName, $envelope, $e, $combine]) {
+        foreach ($acks as [$transportName, $envelope, $e, $combine, $onAcknowledge]) {
             if ($dispatchFailed && null === $e && $stamp = $envelope->last(HandledStamp::class)) {
                 $stamps = $envelope->all(HandledStamp::class);
                 array_pop($stamps);
@@ -183,7 +184,7 @@ final class SyncMessageExecutionStrategy implements MessageExecutionStrategyInte
                 $e = new HandlerFailedException($envelope, [$stamp->getHandlerName() => new RuntimeException(\sprintf('The batch of "%s" was flushed during the dispatch of another message, and that dispatch failed.', $stamp->getHandlerName()))]);
             }
 
-            ($this->onAcknowledge)($transportName, $envelope, $e, $combine);
+            $onAcknowledge($transportName, $envelope, $e, $combine);
         }
     }
 }

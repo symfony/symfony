@@ -14,18 +14,25 @@ use Symfony\Component\Runtime\Tests\FrankenPhpWorkerRunnerTest;
 if (!function_exists('frankenphp_handle_request')) {
     function frankenphp_handle_request(callable $callable): bool
     {
-        if (null === FrankenPhpWorkerRunnerTest::$requests) {
-            $callable();
-
-            return false;
-        }
-
         // FrankenPHP returns false without calling the handler when the worker stops
         if (0 >= FrankenPhpWorkerRunnerTest::$requests--) {
             return false;
         }
 
-        $callable();
+        FrankenPhpWorkerRunnerTest::$handlingRequest = true;
+        try {
+            $callable();
+            ++FrankenPhpWorkerRunnerTest::$completedRequests;
+        } catch (Throwable $e) {
+            if (null === FrankenPhpWorkerRunnerTest::$reportedExceptions) {
+                throw $e;
+            }
+
+            // FrankenPHP reports an exception escaping the handler and keeps the worker running
+            FrankenPhpWorkerRunnerTest::$reportedExceptions[] = $e;
+        } finally {
+            FrankenPhpWorkerRunnerTest::$handlingRequest = false;
+        }
 
         return true;
     }

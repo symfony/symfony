@@ -835,6 +835,39 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'countable', 'This is a string, \Countable expected.');
     }
 
+    public function testThrowTypeErrorOnSetterOfAnonymousClass()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected argument of type "int", "string" given at property path "foo".');
+        $object = new class {
+            public function setFoo(int $foo): void
+            {
+            }
+        };
+
+        $this->propertyAccessor->setValue($object, 'foo', 'bar');
+    }
+
+    public function testThrowTypeErrorOnPropertyOfAnonymousClassWithSpacesInItsName()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected argument of type "int", "string" given at property path "foo".');
+        // the name of anonymous classes declared in eval()'d code contains spaces
+        $object = eval('return new class { public int $foo = 0; };');
+
+        $this->propertyAccessor->setValue($object, 'foo', 'bar');
+    }
+
+    public function testThrowTypeErrorOnSetterOfAnonymousClassWithSpacesInItsName()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected argument of type "int", "string" given at property path "foo".');
+        // the name of anonymous classes declared in eval()'d code contains spaces
+        $object = eval('return new class { public function setFoo(int $foo): void {} };');
+
+        $this->propertyAccessor->setValue($object, 'foo', 'bar');
+    }
+
     public function testAnonymousClassRead()
     {
         $value = 'bar';

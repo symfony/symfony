@@ -73,4 +73,25 @@ class SessionHandlerFactoryTest extends TestCase
 
         $this->assertInstanceOf(\Closure::class, $reflection->getProperty('ttl')->getValue($handler));
     }
+
+    public function testCredentialsAreNotExposedInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            foreach (['redis://s3cr3t@localhost:999999', 'redis://localhost?auth=s3cr3t&host=foo'] as $dsn) {
+                try {
+                    SessionHandlerFactory::createHandler($dsn, []);
+                    $this->fail('An exception should have been thrown.');
+                } catch (\InvalidArgumentException $e) {
+                    $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+                }
+            }
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
 }

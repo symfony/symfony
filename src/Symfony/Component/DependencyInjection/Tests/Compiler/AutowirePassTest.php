@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveLazyProxyPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPass;
 use Symfony\Component\DependencyInjection\Compiler\TagDecoratorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -1288,6 +1289,23 @@ class AutowirePassTest extends TestCase
             ->setAutowired(true);
 
         (new AutowirePass())->process($container);
+
+        $this->assertSame('image.storage', (string) $container->getDefinition('with_target')->getArgument(0));
+    }
+
+    public function testArgumentWithTargetThatHasTheSameParsedNameAsAnotherOne()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('image.storage', BarInterface::class);
+        $container->register('image_storage', BarInterface::class);
+        $container->registerAliasForArgument('image.storage', BarInterface::class);
+        $container->registerAliasForArgument('image_storage', BarInterface::class);
+        $container->register('with_target', WithTarget::class)
+            ->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+        (new ResolveReferencesToAliasesPass())->process($container);
 
         $this->assertSame('image.storage', (string) $container->getDefinition('with_target')->getArgument(0));
     }

@@ -209,7 +209,7 @@ class LockableTraitTest extends TestCase
     {
         $container = $this->createContainer(['console' => 'flock'], null, false);
 
-        $this->assertSame(LockFactory::class.' $consoleLockFactory', (string) $container->getAlias('.'.LockFactory::class.' $console'));
+        $this->assertSame('lock.console.factory', (string) $container->getAlias('.'.LockFactory::class.' $console'));
         $this->assertSame('lock.console.factory', (string) $container->getAlias(LockFactory::class.' $consoleLockFactory'));
         $this->assertFalse($container->hasAlias(LockFactory::class));
     }

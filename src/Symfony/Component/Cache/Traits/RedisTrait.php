@@ -91,7 +91,7 @@ trait RedisTrait
      *
      * @throws InvalidArgumentException when the DSN is invalid
      */
-    public static function createConnection(#[\SensitiveParameter] string $dsn, array $options = []): \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|Relay|RelayCluster
+    public static function createConnection(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options = []): \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|Relay|RelayCluster
     {
         $scheme = match (true) {
             str_starts_with($dsn, 'redis:') => 'redis',
@@ -697,25 +697,34 @@ trait RedisTrait
             static $del;
             $del ??= (class_exists(UNLINK::class) ? 'unlink' : 'del');
 
-            $this->pipeline(static function () use ($ids, $del) {
+            $results = $this->pipeline(static function () use ($ids, $del) {
                 foreach ($ids as $id) {
                     yield $del => [$id];
                 }
-            })->rewind();
+            });
+
+            foreach ($results as $result) {
+                if ($result instanceof ErrorInterface) {
+                    return false;
+                }
+            }
         } else {
             static $unlink = true;
 
             if ($unlink) {
                 try {
-                    $unlink = false !== $this->redis->unlink($ids);
+                    $result = $this->redis->unlink($ids);
+                    $unlink = false !== $result;
                 } catch (\Throwable) {
                     $unlink = false;
                 }
             }
 
             if (!$unlink) {
-                $this->redis->del($ids);
+                $result = $this->redis->del($ids);
             }
+
+            return false !== $result && !$result instanceof ErrorInterface;
         }
 
         return true;

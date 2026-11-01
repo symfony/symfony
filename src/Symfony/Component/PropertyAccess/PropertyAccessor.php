@@ -199,12 +199,12 @@ class PropertyAccessor implements PropertyAccessorInterface
         if (!isset($trace[$i]['file']) || __FILE__ !== $trace[$i]['file']) {
             return;
         }
-        if (preg_match('/^\S+::\S+\(\): Argument #\d+ \(\$\S+\) must be of type (\S+), (\S+) given/', $message, $matches)) {
+        if (preg_match('/^(?:\S+(?:\0.*)?::\S+|\S+@anonymous)\(\): Argument #\d+ \(\$\S+\) must be of type (\S+), (\S+) given/s', $message, $matches)) {
             [, $expectedType, $actualType] = $matches;
 
             throw new InvalidTypeException($expectedType, $actualType, $propertyPath, $previous);
         }
-        if (preg_match('/^Cannot assign (\S+) to property \S+::\$\S+ of type (\S+)$/', $message, $matches)) {
+        if (preg_match('/^Cannot assign (\S+) to property \S+(?:\0.*)?::\$\S+ of type (\S+)$/s', $message, $matches)) {
             [, $actualType, $expectedType] = $matches;
 
             throw new InvalidTypeException($expectedType, $actualType, $propertyPath, $previous);

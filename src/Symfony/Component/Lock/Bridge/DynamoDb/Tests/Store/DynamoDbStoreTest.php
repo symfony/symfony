@@ -167,7 +167,7 @@ class DynamoDbStoreTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found in DSN: \[foo\]\. Allowed options are \[session_token, |');
 
-        new DynamoDbStore('dynamodb://default?foo=foo');
+        new DynamoDbStore('dynamodb://default?foo=s3cr3t');
     }
 
     public function testFromDsnWithInvalidOption()
@@ -175,7 +175,7 @@ class DynamoDbStoreTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found: \[bar\]\. Allowed options are \[session_token, |');
 
-        new DynamoDbStore('dynamodb://default', ['bar' => 'bar']);
+        new DynamoDbStore('dynamodb://default', ['bar' => 's3cr3t']);
     }
 
     public function testFromDsnWithInvalidQueryStringAndOption()
@@ -183,7 +183,20 @@ class DynamoDbStoreTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found: \[bar\]\. Allowed options are \[session_token, |');
 
-        new DynamoDbStore('dynamodb://default?foo=foo', ['bar' => 'bar']);
+        new DynamoDbStore('dynamodb://default?foo=s3cr3t', ['bar' => 's3cr3t']);
+    }
+
+    public function testOptionsAreNotExposedInTrace()
+    {
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            new DynamoDbStore('dynamodb://default/lock_keys', ['session_token' => 's3cr3t', 'foo' => 'bar']);
+            $this->fail('An exception should have been thrown.');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
     }
 
     public function testDeleteIsScopedToTheOwnerToken()

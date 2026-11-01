@@ -18,6 +18,7 @@ use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
@@ -206,6 +207,33 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertFalse($form->has('1'));
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals(['foo@foo.com'], $form->getData());
+    }
+
+    public function testNotResizedIfSubmittedWithNullDataAndAllowDelete()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['foo@foo.com', 'bar@bar.com'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_delete' => true,
+        ]);
+        $form->submit(['foo@bar.com', null]);
+
+        $this->assertTrue($form->has('1'));
+        $this->assertSame(['foo@bar.com', null], $form->getData());
+        $this->assertSame([], $form->getExtraData());
+    }
+
+    public function testResizedDownIfSubmittedWithNullDataAndDeleteEmpty()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['foo@foo.com', 'bar@bar.com'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_delete' => true,
+            'delete_empty' => true,
+        ]);
+        $form->submit(['foo@foo.com', null]);
+
+        $this->assertFalse($form->has('1'));
+        $this->assertSame(['foo@foo.com'], $form->getData());
+        $this->assertSame([], $form->getExtraData());
     }
 
     public function testDeleteEmptyPreservesUnsubmittedEntries()
@@ -461,6 +489,33 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertEquals('foo@bar.com', $form[0]->getData());
         $this->assertEquals('bar@bar.com', $form[1]->getData());
         $this->assertEquals(['foo@bar.com', 'bar@bar.com'], $form->getData());
+    }
+
+    public function testIgnoresSubmittedEntriesWithInvalidNameWhenAllowAdd()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_add' => true,
+        ]);
+        $form->submit(['a.b' => 'x', 0 => 'y']);
+
+        $this->assertFalse($form->has('a.b'));
+        $this->assertTrue($form->has('0'));
+        $this->assertSame('y', $form[0]->getData());
+        $this->assertSame(['a.b' => 'x'], $form->getExtraData());
+    }
+
+    public function testIgnoresSubmittedEntriesWithEmptyNameWhenAllowAdd()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_add' => true,
+        ]);
+        $form->submit(['' => 'x', 0 => 'y']);
+
+        $this->assertFalse($form->has(''));
+        $this->assertSame([0 => 'y'], $form->getData());
+        $this->assertSame(['' => 'x'], $form->getExtraData());
     }
 
     public function testAllowAddButNoPrototype()
@@ -1010,5 +1065,105 @@ class CollectionTypeTest extends BaseTypeTestCase
     {
         // resize form listener always set an empty array
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
+    }
+
+    public function testKeepAsListSubmitsTheEntriesOfAList()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['a', 'b'], [
+            'allow_add' => true,
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit(['x', 'y', 'z']);
+
+        $this->assertSame(['x', 'y', 'z'], $form->getData());
+        $this->assertTrue($form->get('0')->isSubmitted());
+        $this->assertTrue($form->get('1')->isSubmitted());
+        $this->assertTrue($form->get('2')->isSubmitted());
+    }
+
+    public function testKeepAsListKeepsTheTransformationErrorsOfTheEntries()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
+            'entry_type' => IntegerType::class,
+            'allow_add' => true,
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit(['5', 'not a number']);
+
+        $this->assertSame([5, null], $form->getData());
+        $this->assertTrue($form->get('1')->isSubmitted());
+        $this->assertFalse($form->get('1')->isSynchronized());
+        $this->assertSame('not a number', $form->get('1')->getViewData());
+    }
+
+    public function testKeepAsListRenumbersTheEntriesThatFollowAGap()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['a', 'b', 'c'], [
+            'allow_delete' => true,
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit([0 => 'x', 2 => 'z']);
+
+        $this->assertSame(['x', 'z'], $form->getData());
+        $this->assertTrue($form->get('0')->isSubmitted());
+        $this->assertFalse($form->has('2'));
+        $this->assertSame('z', $form->get('1')->getData());
+        $this->assertSame('[1]', (string) $form->get('1')->getPropertyPath());
+    }
+
+    public function testKeepAsListRenumbersAnEntryAddedUnderTheIndexOfAMovedOne()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [0 => 'a', 2 => 'c'], [
+            'allow_add' => true,
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit([0 => 'a', 2 => 'c', 1 => 'b', 3 => 'd']);
+
+        $this->assertSame(['a', 'c', 'b', 'd'], $form->getData());
+        $this->assertSame([0, 1, 2, 3], array_keys($form->all()));
+        $this->assertSame('c', $form->get('1')->getData());
+        $this->assertSame('b', $form->get('2')->getData());
+    }
+
+    public function testKeepAsListKeepsTheOptionsOfAnEntryThatKeepsItsIndex()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['a', 'b', 'c'], [
+            'keep_as_list' => true,
+        ]);
+        $form->add('1', TextTypeTest::TESTED_TYPE, ['disabled' => true]);
+
+        $form->submit(['x', 'attack', 'z']);
+
+        $this->assertSame(['x', 'b', 'z'], $form->getData());
+        $this->assertTrue($form->get('1')->isDisabled());
+    }
+
+    public function testKeepAsListDoesNotSubmitADisabledEntryThatIsRenumbered()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['a', 'b', 'c'], [
+            'allow_delete' => true,
+            'keep_as_list' => true,
+        ]);
+        $form->add('2', TextTypeTest::TESTED_TYPE, ['disabled' => true]);
+
+        $form->submit([0 => 'a', 2 => 'attack']);
+
+        $this->assertSame(['a', 'c'], $form->getData());
+    }
+
+    public function testKeepAsListKeepsTheExtraFieldsNamedLikeTheNewIndexOfAnEntry()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [2 => 'old'], [
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit([2 => 'new', 0 => 'extra']);
+
+        $this->assertSame(['new'], $form->getData());
+        $this->assertSame([0 => 'extra'], $form->getExtraData());
     }
 }

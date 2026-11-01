@@ -23,7 +23,7 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
  */
 class SessionHandlerFactory
 {
-    public static function createHandler(object|string $connection, array $options = []): AbstractSessionHandler
+    public static function createHandler(#[\SensitiveParameter] object|string $connection, #[\SensitiveParameter] array $options = []): AbstractSessionHandler
     {
         if ($query = \is_string($connection) ? parse_url($connection) : false) {
             parse_str($query['query'] ?? '', $query);

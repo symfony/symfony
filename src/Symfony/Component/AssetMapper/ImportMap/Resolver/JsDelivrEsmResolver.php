@@ -297,7 +297,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         preg_match_all(self::IMPORT_REGEX, $content, $matches);
         $dependencies = [];
         foreach ($matches[2] as $index => $packageName) {
-            $version = $matches[3][$index] ?: null;
+            $version = $matches[3][$index] ? rawurldecode($matches[3][$index]) : null;
             $packageName .= $matches[4][$index]; // add the path if any
 
             $dependencies[] = new PackageRequireOptions($packageName, $version);

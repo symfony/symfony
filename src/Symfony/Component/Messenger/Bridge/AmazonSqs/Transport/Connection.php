@@ -123,7 +123,7 @@ class Connection
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
      * * debug: Log all HTTP requests and responses as LoggerInterface::DEBUG (Default: false)
      */
-    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], ?HttpClientInterface $client = null, ?LoggerInterface $logger = null): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options = [], ?HttpClientInterface $client = null, ?LoggerInterface $logger = null): self
     {
         if (false === $params = parse_url($dsn)) {
             throw new InvalidArgumentException('The given Amazon SQS DSN is invalid.');

@@ -108,4 +108,23 @@ class TransportFactoryTest extends TestCase
             'No transport supports Messenger DSN "amqp://myuser:******@broker:5672/vhost". Run "composer require symfony/amqp-messenger" to install AMQP transport.',
         ];
     }
+
+    public function testOptionsAreNotExposedInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $factory = new TransportFactory([]);
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            $factory->createTransport('foo://localhost', ['password' => 's3cr3t'], $this->createStub(SerializerInterface::class));
+            $this->fail('An exception should have been thrown.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
 }

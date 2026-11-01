@@ -74,12 +74,14 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
 
             try {
                 if (null === $redisEnvelope = $this->decodeRedisEnvelope($message['data'])) {
+                    $envelopes[] = MessageDecodingFailedException::wrap($message['data'], 'Could not decode the Redis stream entry: it should have either a "message" field that contains a JSON object or a "body" field.')->with(...$stamps);
+
                     continue;
                 }
 
                 if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {
                     $envelope = $this->serializer->decode($redisEnvelope = [
-                        'body' => $redisEnvelope['body'],
+                        'body' => \is_string($redisEnvelope['body']) ? $redisEnvelope['body'] : null,
                         'headers' => $redisEnvelope['headers'],
                     ]);
                 } else {
@@ -158,7 +160,7 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
 
             if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {
                 $envelope = $this->serializer->decode([
-                    'body' => $redisEnvelope['body'],
+                    'body' => \is_string($redisEnvelope['body']) ? $redisEnvelope['body'] : null,
                     'headers' => $redisEnvelope['headers'],
                 ]);
             } else {

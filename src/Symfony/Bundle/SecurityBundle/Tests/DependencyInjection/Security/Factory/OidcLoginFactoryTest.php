@@ -787,7 +787,7 @@ class OidcLoginFactoryTest extends TestCase
         $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
 
         $this->assertSame('security.authenticator.oidc_login.client.main', (string) $container->getAlias(OidcClientInterface::class.' $mainOidcClient'));
-        $this->assertSame(OidcClientInterface::class.' $mainOidcClient', (string) $container->getAlias('.'.OidcClientInterface::class.' $main'));
+        $this->assertSame('security.authenticator.oidc_login.client.main', (string) $container->getAlias('.'.OidcClientInterface::class.' $main'));
     }
 
     /**

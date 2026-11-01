@@ -354,7 +354,7 @@ class RegisterCallableServicesPassTest extends TestCase
 
         $this->assertSame('app.exporters::exportCsv', (string) $container->getAlias(ExporterInterface::class.' $csv'));
         $this->assertSame('app.exporters::exportHtml', (string) $container->getAlias('Closure $htmlExporter'));
-        $this->assertSame('Closure $htmlExporter', (string) $container->getAlias('.Closure $html exporter'));
+        $this->assertSame('app.exporters::exportHtml', (string) $container->getAlias('.Closure $html exporter'));
     }
 
     public function testTagsKeyedByNameAreRejected()

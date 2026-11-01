@@ -25,7 +25,7 @@ interface TransportFactoryInterface
     /**
      * @return TTransport
      */
-    public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface;
+    public function createTransport(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options, SerializerInterface $serializer): TransportInterface;
 
-    public function supports(#[\SensitiveParameter] string $dsn, array $options): bool;
+    public function supports(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options): bool;
 }

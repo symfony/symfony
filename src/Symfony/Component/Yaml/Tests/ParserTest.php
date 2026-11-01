@@ -367,6 +367,23 @@ class ParserTest extends TestCase
         $this->assertSame("-\u{A0}foo", $this->parser->parse("-\u{A0}foo"));
     }
 
+    public function testParseStripsByteOrderMarkAtStartOfStream()
+    {
+        $this->assertSame(['foo' => 'bar'], $this->parser->parse("\u{FEFF}foo: bar"));
+        $this->assertSame(['foo' => 'bar'], $this->parser->parse("\u{FEFF}---\nfoo: bar"));
+        $this->assertSame([1, 2], $this->parser->parse("\u{FEFF}[1, 2]"));
+        $this->assertSame('foo', $this->parser->parse("\u{FEFF}foo"));
+        $this->assertSame(['foo' => 'bar'], $this->parser->parse("\u{FEFF}# a comment\nfoo: bar"));
+        $this->assertNull($this->parser->parse("\u{FEFF}"));
+    }
+
+    public function testParseKeepsByteOrderMarkInsideTheDocument()
+    {
+        $this->assertSame(['foo' => ["\u{FEFF}bar" => 'baz']], $this->parser->parse("foo:\n  \u{FEFF}bar: baz"));
+        $this->assertSame([["\u{FEFF}bar" => 'baz']], $this->parser->parse("- \u{FEFF}bar: baz"));
+        $this->assertSame(['foo' => 1, "\u{FEFF}bar" => 2], $this->parser->parse("foo: 1\n\u{FEFF}bar: 2"));
+    }
+
     public function testParserIsStateless()
     {
         $yamlString = '# translations/messages.en.yaml

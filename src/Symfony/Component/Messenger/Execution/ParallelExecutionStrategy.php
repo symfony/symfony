@@ -74,6 +74,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     // unknown key runs alone: spreading its siblings across channels first would strand a
     // batch on a worker that can never complete it
     private ?int $pendingProbeRequestId = null;
+    private ?\WeakMap $completionCallbacks = null;
 
     public function __construct(
         private readonly string $console,
@@ -113,6 +114,8 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             }
 
             $this->pendingRequests[$channelId][$requestId] = new PendingParallelExecutionRequest($transportName, $envelope, $channelId, $affinityKey, $isProbe);
+            $this->completionCallbacks ??= new \WeakMap();
+            $this->completionCallbacks[$this->pendingRequests[$channelId][$requestId]] = $onHandled;
             $this->busyChannels[$channelId] = true;
 
             if ($isProbe) {
@@ -397,8 +400,6 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             }
         }
 
-        // rebuild the envelope around the original message object so that identity-keyed
-        // bookkeeping in the parent (e.g. Worker::$keepalives) keeps matching
         $handledEnvelope = Envelope::wrap($pendingRequest->envelope->getMessage(), array_merge(...array_values($stamps)));
 
         if (null !== $error = $response->error) {
@@ -406,8 +407,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             $error = ParallelExecutionFailureSanitizer::sanitizeError($error, $handledEnvelope);
         }
 
-        $acked = false;
-        $onHandled($handledEnvelope, $pendingRequest->transportName, $acked, $error);
+        $this->completeRequest($pendingRequest, $onHandled, $handledEnvelope, $error);
 
         return true;
     }
@@ -449,8 +449,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
                 $this->pendingProbeRequestId = null;
             }
 
-            $acked = false;
-            $onHandled($pendingRequest->envelope, $pendingRequest->transportName, $acked, new \RuntimeException('The parallel worker stopped before returning a result.', 0, $previous));
+            $this->completeRequest($pendingRequest, $onHandled, $pendingRequest->envelope, new \RuntimeException('The parallel worker stopped before returning a result.', 0, $previous));
             $handled = true;
         }
 
@@ -473,5 +472,16 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         }
 
         return new LogicException(\sprintf('Cannot send message "%s" to a parallel worker: it cannot be serialized.', get_debug_type($envelope->getMessage())), 0, $e);
+    }
+
+    private function completeRequest(PendingParallelExecutionRequest $request, callable $onHandled, Envelope $envelope, ?\Throwable $e): void
+    {
+        $completion = $this->completionCallbacks[$request] ?? null;
+        if ($onHandled instanceof MessageExecutionCallback && $completion instanceof MessageExecutionCallback) {
+            $onHandled = $completion;
+        }
+
+        $acked = false;
+        $onHandled($envelope, $request->transportName, $acked, $e);
     }
 }

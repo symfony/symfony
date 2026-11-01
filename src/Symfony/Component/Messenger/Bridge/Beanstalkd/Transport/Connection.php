@@ -181,15 +181,7 @@ class Connection
 
         $data = $job->getData();
 
-        try {
-            $beanstalkdEnvelope = json_decode($data, true, flags: \JSON_THROW_ON_ERROR);
-        } catch (\JsonException $exception) {
-            if (!$this->bodyOnly) {
-                throw new TransportException($exception->getMessage(), 0, $exception);
-            }
-
-            $beanstalkdEnvelope = null;
-        }
+        $beanstalkdEnvelope = json_decode($data, true);
 
         if ($this->bodyOnly) {
             $beanstalkdEnvelope = \is_array($beanstalkdEnvelope) && 2 === \count($beanstalkdEnvelope) && \is_string($beanstalkdEnvelope['body'] ?? null) && \is_array($beanstalkdEnvelope['symfony_headers'] ?? null)
@@ -199,8 +191,8 @@ class Connection
 
         return [
             'id' => $job->getId(),
-            'body' => $beanstalkdEnvelope['body'],
-            'headers' => $beanstalkdEnvelope['headers'],
+            'body' => \is_string($beanstalkdEnvelope['body'] ?? null) ? $beanstalkdEnvelope['body'] : null,
+            'headers' => \is_array($beanstalkdEnvelope['headers'] ?? null) ? $beanstalkdEnvelope['headers'] : null,
         ];
     }
 

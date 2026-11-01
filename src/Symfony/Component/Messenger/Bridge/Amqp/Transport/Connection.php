@@ -214,7 +214,7 @@ class Connection
      *     * verify: Enable or disable peer verification. If peer verification is enabled then the common name in the
      *       server certificate must match the server name. Peer verification is enabled by default.
      */
-    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], ?AmqpFactory $amqpFactory = null): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options = [], ?AmqpFactory $amqpFactory = null): self
     {
         if (false === $params = parse_url($dsn)) {
             // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
@@ -296,7 +296,7 @@ class Connection
         return new self($amqpOptions, $exchangeOptions, $queuesOptions, $amqpFactory);
     }
 
-    private static function validateOptions(array $options): void
+    private static function validateOptions(#[\SensitiveParameter] array $options): void
     {
         if ($invalidOptions = array_diff(array_keys($options), self::AVAILABLE_OPTIONS)) {
             throw new LogicException(\sprintf('Invalid option(s) "%s" passed to the AMQP Messenger transport.', implode('", "', $invalidOptions)));

@@ -81,7 +81,7 @@ class WorkflowAttributePassTest extends TestCase
         $this->assertSame(['new' => ['label' => 'New'], 'processing' => ['label' => 'Processing', 'bg_color' => '#eee']], $metadataStore->getArgument(1));
 
         $this->assertSame('state_machine.task', (string) $container->getAlias(WorkflowInterface::class.' $taskStateMachine'));
-        $this->assertSame(WorkflowInterface::class.' $taskStateMachine', (string) $container->getAlias('.'.WorkflowInterface::class.' $task'));
+        $this->assertSame('state_machine.task', (string) $container->getAlias('.'.WorkflowInterface::class.' $task'));
 
         $registryCalls = $container->getDefinition('workflow.registry')->getMethodCalls();
         $this->assertCount(1, $registryCalls);

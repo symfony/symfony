@@ -48,7 +48,7 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
     }
 
-    public static function createConnection(#[\SensitiveParameter] array|string $dsn, array $options = []): Bucket|Collection
+    public static function createConnection(#[\SensitiveParameter] array|string $dsn, #[\SensitiveParameter] array $options = []): Bucket|Collection
     {
         if (\is_string($dsn)) {
             $dsn = [$dsn];

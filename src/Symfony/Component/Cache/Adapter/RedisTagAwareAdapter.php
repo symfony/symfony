@@ -19,6 +19,7 @@ use Predis\Response\ErrorInterface;
 use Predis\Response\Status;
 use Relay\Relay;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
@@ -243,9 +244,10 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
             }
         });
 
+        $failed = false;
         foreach ($results as $id => $result) {
-            if ($result instanceof \RedisException || $result instanceof \Relay\Exception || $result instanceof ErrorInterface) {
-                CacheItem::log($this->logger, 'Failed to delete key "{key}": '.$result->getMessage(), ['key' => substr($id, \strlen($this->rootNamespace)), 'exception' => $result]);
+            if (false === $result || $result instanceof \RedisException || $result instanceof \Relay\Exception || $result instanceof ErrorInterface) {
+                $failed = true;
 
                 continue;
             }
@@ -255,6 +257,11 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
             } catch (\Exception) {
                 yield $id => [];
             }
+        }
+
+        if ($failed) {
+            // Make deleteItems() retry deleting the items one by one
+            throw new CacheException('Failed to delete some keys.');
         }
     }
 

@@ -30,14 +30,14 @@ class AmazonSqsTransportFactory implements TransportFactoryInterface
     ) {
     }
 
-    public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    public function createTransport(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options, SerializerInterface $serializer): TransportInterface
     {
         unset($options['transport_name']);
 
         return new AmazonSqsTransport(Connection::fromDsn($dsn, $options, $this->httpClient, $this->logger), $serializer, null, null, !($options['delete_on_rejection'] ?? false), $this->logger);
     }
 
-    public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
+    public function supports(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options): bool
     {
         return str_starts_with($dsn, 'sqs://') || preg_match('#^https://sqs\.[\w\-]+\.amazonaws\.(?:com(?:\.cn)?|eu)/.+#', $dsn);
     }

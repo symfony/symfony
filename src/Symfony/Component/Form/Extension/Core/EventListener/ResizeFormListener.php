@@ -17,6 +17,7 @@ use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Event\PreSetDataEvent;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -155,10 +156,10 @@ class ResizeFormListener implements EventSubscriberInterface
             $data = [];
         }
 
-        // Remove all empty rows
+        // Remove all rows missing from the submitted data
         if ($this->allowDelete) {
             foreach ($form as $name => $child) {
-                if (!isset($data[$name])) {
+                if (!\array_key_exists($name, $data)) {
                     $form->remove($name);
                 }
             }
@@ -168,7 +169,7 @@ class ResizeFormListener implements EventSubscriberInterface
         if ($this->allowAdd) {
             $usedKeys = null;
             foreach ($data as $name => $value) {
-                if ($form->has($name)) {
+                if ($form->has($name) || '' === $name || !FormConfigBuilder::isValidName((string) $name)) {
                     continue;
                 }
 
@@ -257,16 +258,22 @@ class ResizeFormListener implements EventSubscriberInterface
             foreach ($dataKeys as $key) {
                 unset($data[$key]);
             }
-            foreach ($form as $name => $child) {
-                $formReindex[] = $child;
-                $form->remove($name);
+            $index = 0;
+            foreach ($form as $child) {
+                // only the entries from the first misplaced entry are re-added, so that the previous entries stay submitted and validated
+                if ($formReindex || $this->keyOf($child) !== (string) $index) {
+                    $formReindex[$index] = $child;
+                }
+                $data[$index++] = $child->getData();
+            }
+            foreach ($formReindex as $child) {
+                $form->remove($child->getName());
             }
             foreach ($formReindex as $index => $child) {
                 $form->add(null === $this->entryName ? $index : $child->getName(), $this->forModelData($this->type, $child->getData()), array_replace(
                     $this->withPropertyPath($this->forModelData($this->options, $child->getData()), $index),
                     ['data' => $child->getData()],
                 ));
-                $data[$index] = $child->getData();
             }
         }
 

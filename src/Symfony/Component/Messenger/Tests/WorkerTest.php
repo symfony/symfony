@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\Messenger\Tests;
 
+use Amp\Cancellation;
+use Amp\DeferredFuture;
+use Amp\Sync\Channel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Revolt\EventLoop;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -45,6 +49,8 @@ use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
+use Symfony\Component\Messenger\Execution\Message\DeferredEnvelopeMessage;
+use Symfony\Component\Messenger\Execution\Message\HandledEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\MessageExecutionStrategyInterface;
 use Symfony\Component\Messenger\Execution\ParallelExecutionStrategy;
 use Symfony\Component\Messenger\Handler\Acknowledger;
@@ -2916,6 +2922,9 @@ class WorkerTest extends TestCase
         $unacks = new DeferredBatchMessageQueue();
         $unacks->add($dummyHandler, 'transport', $envelopeWithNoAutoAck, $acked, 0.0);
         (new \ReflectionProperty($worker, 'unacks'))->setValue($worker, $unacks);
+        $receipts = new \WeakMap();
+        $receipts[$dummyHandler] = new \stdClass();
+        (new \ReflectionProperty($worker, 'batchReceipts'))->setValue($worker, $receipts);
 
         $worker->run();
 
@@ -2990,6 +2999,292 @@ class WorkerTest extends TestCase
         $this->assertTrue($after < $before);
     }
 
+    public function testKeepaliveTracksEachDeliveryOfTheSameEnvelope()
+    {
+        $envelope = new Envelope(new DummyMessage('Hey'));
+        $receiver = new DummyKeepaliveReceiver([[$envelope, $envelope]]);
+        $handler = $this->createBatchHandler(static function (array $jobs) {
+            foreach ($jobs as [$message, $ack]) {
+                $ack->ack();
+            }
+        });
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]))]);
+        $dispatcher = new EventDispatcher();
+        $keepalives = [];
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($receiver, &$keepalives) {
+            $event->getWorker()->keepalive(2);
+            $keepalives[] = $receiver->keepaliveEnvelopes;
+            $receiver->keepaliveEnvelopes = [];
+
+            if (2 === \count($keepalives)) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+        $worker->keepalive(2);
+
+        $this->assertSame([[$envelope], [$envelope, $envelope]], $keepalives);
+        $this->assertSame([], $receiver->keepaliveEnvelopes);
+        $this->assertSame(2, $receiver->getAcknowledgeCount());
+    }
+
+    #[DataProvider('provideKeepaliveDeliveryOutcomes')]
+    public function testSettlingOneDeliveryKeepsAnotherDeliveryOfTheSameMessageAlive(?\Throwable $error, bool $retry)
+    {
+        $envelope = new Envelope(new DummyMessage('Hey'));
+        $receiver1 = new DummyKeepaliveReceiver([[$envelope]]);
+        $receiver2 = new DummyKeepaliveReceiver([[$envelope]]);
+        $handler = new class($error) implements BatchHandlerInterface {
+            private array $acks = [];
+
+            public function __construct(private ?\Throwable $error)
+            {
+            }
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null): int
+            {
+                $this->acks[] = $ack;
+                if (2 === \count($this->acks)) {
+                    $first = array_shift($this->acks);
+                    if (null === $this->error) {
+                        $first->ack();
+                    } else {
+                        $first->nack($this->error);
+                    }
+                }
+
+                return \count($this->acks);
+            }
+
+            public function flush(bool $force): void
+            {
+                foreach ($this->acks as $ack) {
+                    $ack->ack();
+                }
+                $this->acks = [];
+            }
+        };
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]))]);
+        $dispatcher = new EventDispatcher();
+        if ($retry) {
+            $sender = $this->createMock(SenderInterface::class);
+            $sender->expects($this->once())->method('send')->willReturnArgument(0);
+            $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['a' => static fn () => $sender]), new ServiceLocator(['a' => static fn () => new MultiplierRetryStrategy()])));
+        }
+        $keepalives = [];
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($receiver1, $receiver2, &$keepalives) {
+            $event->getWorker()->keepalive(2);
+            $keepalives[] = [$receiver1->keepaliveEnvelopes, $receiver2->keepaliveEnvelopes];
+            $receiver1->keepaliveEnvelopes = $receiver2->keepaliveEnvelopes = [];
+
+            if (2 === \count($keepalives)) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $worker = new Worker(['a' => $receiver1, 'b' => $receiver2], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+        $worker->keepalive(2);
+
+        $this->assertSame([[[$envelope], []], [[], [$envelope]]], $keepalives);
+        $this->assertSame([], $receiver1->keepaliveEnvelopes);
+        $this->assertSame([], $receiver2->keepaliveEnvelopes);
+        $this->assertSame(null === $error || $retry ? 1 : 0, $receiver1->getAcknowledgeCount());
+        $this->assertSame(null !== $error && !$retry ? 1 : 0, $receiver1->getRejectCount());
+        $this->assertSame(1, $receiver2->getAcknowledgeCount());
+    }
+
+    public static function provideKeepaliveDeliveryOutcomes(): iterable
+    {
+        yield 'handled' => [null, false];
+        yield 'failed' => [new \RuntimeException('Batch failed.'), false];
+        yield 'retried' => [new \RuntimeException('Retry the batch.'), true];
+    }
+
+    public function testKeepaliveIsRemovedWhenMiddlewareReplacesTheMessage()
+    {
+        $receiver = new DummyKeepaliveReceiver([[new Envelope(new DummyMessage('Hey'))]]);
+        $bus = new MessageBus([new class implements MiddlewareInterface {
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                return new Envelope(new DummyMessage('Changed'));
+            }
+        }]);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+        $worker->keepalive(2);
+
+        $this->assertSame([], $receiver->keepaliveEnvelopes);
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertSame('Changed', $receiver->getAcknowledgedEnvelopes()[0]->getMessage()->getMessage());
+    }
+
+    public function testRejectingRedeliveryKeepsAnotherDeliveryOfTheSameMessageAlive()
+    {
+        $envelope = new Envelope(new DummyMessage('Hey'));
+        $receiver = new DummyKeepaliveReceiver([[$envelope, $envelope]]);
+        $handler = $this->createBatchHandler(static function (array $jobs) {
+            foreach ($jobs as [$message, $ack]) {
+                $ack->ack();
+            }
+        });
+        $bus = new MessageBus([
+            new class implements MiddlewareInterface {
+                private int $calls = 0;
+
+                public function handle(Envelope $envelope, StackInterface $stack): Envelope
+                {
+                    if (2 === ++$this->calls) {
+                        throw new RejectRedeliveredMessageException('Redelivered.');
+                    }
+
+                    return $stack->next()->handle($envelope, $stack);
+                }
+            },
+            new HandleMessageMiddleware(new HandlersLocator([
+                DummyMessage::class => [new HandlerDescriptor($handler)],
+            ])),
+        ]);
+        $dispatcher = new EventDispatcher();
+        $keepalives = [];
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($receiver, &$keepalives) {
+            $event->getWorker()->keepalive(2);
+            $keepalives[] = $receiver->keepaliveEnvelopes;
+            $receiver->keepaliveEnvelopes = [];
+
+            if (2 === \count($keepalives)) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+        $worker->keepalive(2);
+
+        $this->assertSame([[$envelope], [$envelope]], $keepalives);
+        $this->assertSame([], $receiver->keepaliveEnvelopes);
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertSame(1, $receiver->getRejectCount());
+    }
+
+    public function testKeepaliveIsRemovedAfterFailedFlushWithoutAckStamp()
+    {
+        $receiver = new DummyKeepaliveReceiver([[new Envelope(new DummyMessage('Hey'))]]);
+        $bus = new MessageBus([new class(new HandlerDescriptor(new DummyBatchHandler())) implements MiddlewareInterface {
+            public function __construct(private HandlerDescriptor $batchHandler)
+            {
+            }
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                if ($envelope->last(FlushBatchHandlersStamp::class)) {
+                    throw new \RuntimeException('Flush failed.');
+                }
+
+                return new Envelope(new DummyMessage('Changed'), [new NoAutoAckStamp($this->batchHandler)]);
+            }
+        }]);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+        $worker->keepalive(2);
+
+        $this->assertSame([], $receiver->keepaliveEnvelopes);
+        $this->assertSame(1, $receiver->getRejectCount());
+        $this->assertSame('Changed', $receiver->getRejectedEnvelopes()[0]->getMessage()->getMessage());
+    }
+
+    public function testKeepaliveTracksEachParallelDeliveryWhileTheWorkerWaitsForAChannel()
+    {
+        $envelope = new Envelope(new DummyMessage('Hey'));
+        $receiver = new DummyKeepaliveReceiver([[$envelope, $envelope]]);
+        $channel = new class implements Channel {
+            private array $queue = [];
+            private ?DeferredFuture $waiter = null;
+
+            public function push(mixed $response): void
+            {
+                if ($waiter = $this->waiter) {
+                    $this->waiter = null;
+                    $waiter->complete($response);
+                } else {
+                    $this->queue[] = $response;
+                }
+            }
+
+            public function send(mixed $data): void
+            {
+            }
+
+            public function receive(?Cancellation $cancellation = null): mixed
+            {
+                if ($this->queue) {
+                    return array_shift($this->queue);
+                }
+
+                $keepAlive = EventLoop::repeat(60, static fn () => null);
+                $this->waiter = new DeferredFuture();
+
+                try {
+                    return $this->waiter->getFuture()->await($cancellation);
+                } finally {
+                    EventLoop::cancel($keepAlive);
+                }
+            }
+
+            public function close(): void
+            {
+            }
+
+            public function isClosed(): bool
+            {
+                return false;
+            }
+
+            public function onClose(\Closure $onClose): void
+            {
+            }
+        };
+        $strategy = new ParallelExecutionStrategy($this->console);
+        (new \ReflectionProperty($strategy, 'channels'))->setValue($strategy, [spl_object_id($channel) => $channel]);
+
+        $dispatcher = new EventDispatcher();
+        $keepalives = [];
+        $handled = 0;
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($receiver, $channel, $envelope, &$keepalives, &$handled) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->keepalive(2);
+                $keepalives[] = $receiver->keepaliveEnvelopes;
+                $receiver->keepaliveEnvelopes = [];
+                $channel->push(new HandledEnvelopeMessage(1, $envelope, null));
+                $event->getWorker()->stop();
+            } elseif (1 === ++$handled) {
+                $channel->push(new DeferredEnvelopeMessage(1));
+            } else {
+                // the delay lets the flush that follows the dispatch pass, so that the worker reads this result while it waits for a free channel
+                EventLoop::delay(0.05, static fn () => $channel->push(new HandledEnvelopeMessage(2, $envelope, null)));
+            }
+        });
+
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $strategy);
+        $worker->run();
+        $worker->keepalive(2);
+
+        $this->assertSame([[$envelope], []], [$keepalives[0], $receiver->keepaliveEnvelopes]);
+        $this->assertSame(2, $receiver->getAcknowledgeCount());
+    }
+
     #[RequiresPhpExtension('pcntl')]
     public function testKeepalive()
     {
@@ -3044,6 +3339,43 @@ class WorkerTest extends TestCase
         $worker->keepalive(2);
 
         $this->assertCount(0, $receiver->keepaliveEnvelopes);
+    }
+
+    public function testKeepaliveIsNotSentForAMessageThatIsNotHandled()
+    {
+        $receiver = new DummyKeepaliveReceiver([
+            [new Envelope(new DummyMessage('Hey')), new Envelope(new DummyMessage('Bob'))],
+        ]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->never())->method('dispatch');
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerMessageReceivedEvent::class, function (WorkerMessageReceivedEvent $event) use ($receiver, &$worker) {
+            $event->shouldHandle(false);
+
+            $worker->keepalive(2);
+            $this->assertSame([$event->getEnvelope()], $receiver->keepaliveEnvelopes);
+            $receiver->keepaliveEnvelopes = [];
+        });
+        $received = 0;
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver, &$received) {
+            $event->getWorker()->keepalive(2);
+            $this->assertSame([], $receiver->keepaliveEnvelopes);
+
+            if (2 === ++$received) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+
+        $worker->keepalive(2);
+
+        $this->assertSame([], $receiver->keepaliveEnvelopes);
+        $this->assertSame(0, $receiver->getAcknowledgeCount());
+        $this->assertSame(0, $receiver->getRejectCount());
     }
 
     #[RequiresPhpExtension('pcntl')]

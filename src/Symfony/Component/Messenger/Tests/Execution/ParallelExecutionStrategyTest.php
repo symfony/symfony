@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\Execution\Message\DeferredEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\DispatchEnvelopeMessage;
 use Symfony\Component\Messenger\Execution\Message\FlushBatchHandlersMessage;
 use Symfony\Component\Messenger\Execution\Message\HandledEnvelopeMessage;
+use Symfony\Component\Messenger\Execution\MessageExecutionCallback;
 use Symfony\Component\Messenger\Execution\ParallelExecutionStrategy;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -50,6 +51,48 @@ class ParallelExecutionStrategyTest extends TestCase
         foreach ($this->fakeChannels as $channel) {
             $this->assertNull($channel->get());
         }
+    }
+
+    public function testPublicPhaseCallbacksKeepTheirArity()
+    {
+        foreach (['wait', 'flush'] as $method) {
+            $envelope = new Envelope(new DummyMessage('Hello'));
+            $channel = $this->createFakeChannel([new DeferredEnvelopeMessage(1)]);
+            $strategy = $this->createStrategy($channel);
+            $initial = [];
+            $calls = [];
+
+            $strategy->execute($envelope, 'async', $this->createOnHandled($initial));
+            $channel->push(new HandledEnvelopeMessage(1, $envelope, null));
+            $strategy->$method(static function (Envelope $envelope, string $transportName, bool &$acked, ...$arguments) use (&$calls) {
+                $calls[] = [\func_num_args(), \count($arguments)];
+            });
+
+            $this->assertSame([], $initial);
+            $this->assertSame([[4, 1]], $calls);
+        }
+    }
+
+    public function testInternalCompletionsFollowOutOfOrderRequests()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $channel = $this->createFakeChannel([new DeferredEnvelopeMessage(1)]);
+        $strategy = $this->createStrategy($channel);
+        $first = $second = $phase = [];
+
+        $strategy->execute($envelope, 'async', new MessageExecutionCallback($this->createOnHandled($first), static function () {}));
+        $strategy->execute($envelope, 'async', new MessageExecutionCallback($this->createOnHandled($second), static function () {}));
+        $completion = new MessageExecutionCallback($this->createOnHandled($phase), static function () {});
+
+        $channel->push(new HandledEnvelopeMessage(2, $envelope, null));
+        $strategy->wait($completion);
+        $counts = [[\count($first), \count($second)]];
+
+        $channel->push(new HandledEnvelopeMessage(1, $envelope, null));
+        $strategy->wait($completion);
+        $counts[] = [\count($first), \count($second)];
+        $this->assertSame([[0, 1], [1, 1]], $counts);
+        $this->assertSame([], $phase);
     }
 
     public function testShouldPauseConsumptionWhileAProbeIsPending()

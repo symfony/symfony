@@ -57,22 +57,22 @@ class OidcTokenRefresherTest extends TestCase
     public function testRefreshIfNeededLeavesAValidAccessTokenAlone()
     {
         $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456']));
-        $token = $this->createToken(['oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() + 300]);
+        $token = $this->createToken(['oauth2_access_token_expires_at' => $this->clock->now()->getTimestamp() + 300]);
 
         $this->assertFalse($refresher->refreshIfNeeded($token));
-        $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('access-123', $token->getAttribute('oauth2_access_token'));
     }
 
     public function testRefreshIfNeededDoesNothingWithoutARefreshToken()
     {
         $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456']));
         $token = $this->createToken([
-            'oidc_refresh_token' => null,
-            'oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() - 1,
+            'oauth2_refresh_token' => null,
+            'oauth2_access_token_expires_at' => $this->clock->now()->getTimestamp() - 1,
         ]);
 
         $this->assertFalse($refresher->refreshIfNeeded($token));
-        $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('access-123', $token->getAttribute('oauth2_access_token'));
     }
 
     public function testRefreshIfNeededDoesNothingWithoutAKnownExpiry()
@@ -80,10 +80,10 @@ class OidcTokenRefresherTest extends TestCase
         // RFC 6749 Section 5.1 makes "expires_in" optional: nothing then says the access
         // token went stale, so renewing it on every request would be the only alternative
         $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456']));
-        $token = $this->createToken(['oidc_access_token_expires_at' => null]);
+        $token = $this->createToken(['oauth2_access_token_expires_at' => null]);
 
         $this->assertFalse($refresher->refreshIfNeeded($token));
-        $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
+        $this->assertSame('access-123', $token->getAttribute('oauth2_access_token'));
     }
 
     public function testRefreshIfNeededRenewsWithinTheLeeway()
@@ -91,11 +91,11 @@ class OidcTokenRefresherTest extends TestCase
         // the access token is handed to a downstream call, which must not receive one
         // expiring while it is in flight
         $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456', 'expires_in' => 300]), leeway: 30);
-        $token = $this->createToken(['oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() + 29]);
+        $token = $this->createToken(['oauth2_access_token_expires_at' => $this->clock->now()->getTimestamp() + 29]);
 
         $this->assertTrue($refresher->refreshIfNeeded($token));
-        $this->assertSame('access-456', $token->getAttribute('oidc_access_token'));
-        $this->assertSame($this->clock->now()->getTimestamp() + 300, $token->getAttribute('oidc_access_token_expires_at'));
+        $this->assertSame('access-456', $token->getAttribute('oauth2_access_token'));
+        $this->assertSame($this->clock->now()->getTimestamp() + 300, $token->getAttribute('oauth2_access_token_expires_at'));
     }
 
     #[Group('time-sensitive')]
@@ -104,10 +104,10 @@ class OidcTokenRefresherTest extends TestCase
         ClockMock::withClockMock($this->clock->now()->getTimestamp());
 
         $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456', 'expires_in' => 300]), withClock: false);
-        $token = $this->createToken(['oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() + 29]);
+        $token = $this->createToken(['oauth2_access_token_expires_at' => $this->clock->now()->getTimestamp() + 29]);
 
         $this->assertTrue($refresher->refreshIfNeeded($token));
-        $this->assertSame($this->clock->now()->getTimestamp() + 300, $token->getAttribute('oidc_access_token_expires_at'));
+        $this->assertSame($this->clock->now()->getTimestamp() + 300, $token->getAttribute('oauth2_access_token_expires_at'));
     }
 
     public function testRefreshStoresARotatedRefreshToken()
@@ -120,7 +120,7 @@ class OidcTokenRefresherTest extends TestCase
 
         parse_str($mockResponse->getRequestOptions()['body'], $body);
         $this->assertSame('refresh-123', $body['refresh_token']);
-        $this->assertSame('refresh-456', $token->getAttribute('oidc_refresh_token'));
+        $this->assertSame('refresh-456', $token->getAttribute('oauth2_refresh_token'));
     }
 
     public function testRefreshKeepsThePreviousRefreshTokenWhenTheProviderRotatesNone()
@@ -132,18 +132,18 @@ class OidcTokenRefresherTest extends TestCase
 
         $refresher->refresh($token);
 
-        $this->assertSame('refresh-123', $token->getAttribute('oidc_refresh_token'));
+        $this->assertSame('refresh-123', $token->getAttribute('oauth2_refresh_token'));
     }
 
     public function testRefreshClearsTheExpiryWhenTheProviderReportsNone()
     {
         $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456']));
-        $token = $this->createToken(['oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() - 1]);
+        $token = $this->createToken(['oauth2_access_token_expires_at' => $this->clock->now()->getTimestamp() - 1]);
 
         $refresher->refresh($token);
 
-        $this->assertSame('access-456', $token->getAttribute('oidc_access_token'));
-        $this->assertNull($token->getAttribute('oidc_access_token_expires_at'));
+        $this->assertSame('access-456', $token->getAttribute('oauth2_access_token'));
+        $this->assertNull($token->getAttribute('oauth2_access_token_expires_at'));
     }
 
     public function testRefreshStoresARefreshedIdToken()
@@ -249,8 +249,8 @@ class OidcTokenRefresherTest extends TestCase
         } catch (AuthenticationException) {
         }
 
-        $this->assertSame('access-123', $token->getAttribute('oidc_access_token'));
-        $this->assertSame('refresh-123', $token->getAttribute('oidc_refresh_token'));
+        $this->assertSame('access-123', $token->getAttribute('oauth2_access_token'));
+        $this->assertSame('refresh-123', $token->getAttribute('oauth2_refresh_token'));
     }
 
     public function testRefreshVerifiesTheSignatureOfARefreshedIdToken()
@@ -284,7 +284,7 @@ class OidcTokenRefresherTest extends TestCase
     public function testRefreshThrowsWithoutARefreshToken()
     {
         $refresher = $this->createRefresher(new JsonMockResponse(['access_token' => 'access-456']));
-        $token = $this->createToken(['oidc_refresh_token' => null]);
+        $token = $this->createToken(['oauth2_refresh_token' => null]);
 
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('carries no OIDC refresh token');
@@ -324,9 +324,9 @@ class OidcTokenRefresherTest extends TestCase
         $token = new PostAuthenticationToken(new InMemoryUser('user-42', null), 'main', ['ROLE_USER']);
         $token->setAttributes(array_merge([
             'oidc_id_token' => $this->buildIdToken(),
-            'oidc_access_token' => 'access-123',
-            'oidc_refresh_token' => 'refresh-123',
-            'oidc_access_token_expires_at' => $this->clock->now()->getTimestamp() - 1,
+            'oauth2_access_token' => 'access-123',
+            'oauth2_refresh_token' => 'refresh-123',
+            'oauth2_access_token_expires_at' => $this->clock->now()->getTimestamp() - 1,
         ], $attributes));
 
         return $token;

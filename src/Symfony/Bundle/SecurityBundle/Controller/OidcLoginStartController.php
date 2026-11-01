@@ -23,6 +23,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * firewall's "start_path".
  *
  * @author Mathieu Santostefano <msantostefano@proton.me>
+ *
+ * @internal
  */
 final class OidcLoginStartController
 {

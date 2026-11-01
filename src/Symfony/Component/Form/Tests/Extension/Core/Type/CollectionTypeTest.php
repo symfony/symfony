@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\Author;
@@ -701,5 +702,105 @@ class CollectionTypeTest extends BaseTypeTestCase
     {
         // resize form listener always set an empty array
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
+    }
+
+    public function testKeepAsListSubmitsTheEntriesOfAList()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['a', 'b'], [
+            'allow_add' => true,
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit(['x', 'y', 'z']);
+
+        $this->assertSame(['x', 'y', 'z'], $form->getData());
+        $this->assertTrue($form->get('0')->isSubmitted());
+        $this->assertTrue($form->get('1')->isSubmitted());
+        $this->assertTrue($form->get('2')->isSubmitted());
+    }
+
+    public function testKeepAsListKeepsTheTransformationErrorsOfTheEntries()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
+            'entry_type' => IntegerType::class,
+            'allow_add' => true,
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit(['5', 'not a number']);
+
+        $this->assertSame([5, null], $form->getData());
+        $this->assertTrue($form->get('1')->isSubmitted());
+        $this->assertFalse($form->get('1')->isSynchronized());
+        $this->assertSame('not a number', $form->get('1')->getViewData());
+    }
+
+    public function testKeepAsListRenumbersTheEntriesThatFollowAGap()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['a', 'b', 'c'], [
+            'allow_delete' => true,
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit([0 => 'x', 2 => 'z']);
+
+        $this->assertSame(['x', 'z'], $form->getData());
+        $this->assertTrue($form->get('0')->isSubmitted());
+        $this->assertFalse($form->has('2'));
+        $this->assertSame('z', $form->get('1')->getData());
+        $this->assertSame('[1]', (string) $form->get('1')->getPropertyPath());
+    }
+
+    public function testKeepAsListRenumbersAnEntryAddedUnderTheIndexOfAMovedOne()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [0 => 'a', 2 => 'c'], [
+            'allow_add' => true,
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit([0 => 'a', 2 => 'c', 1 => 'b', 3 => 'd']);
+
+        $this->assertSame(['a', 'c', 'b', 'd'], $form->getData());
+        $this->assertSame([0, 1, 2, 3], array_keys($form->all()));
+        $this->assertSame('c', $form->get('1')->getData());
+        $this->assertSame('b', $form->get('2')->getData());
+    }
+
+    public function testKeepAsListKeepsTheOptionsOfAnEntryThatKeepsItsIndex()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['a', 'b', 'c'], [
+            'keep_as_list' => true,
+        ]);
+        $form->add('1', TextTypeTest::TESTED_TYPE, ['disabled' => true]);
+
+        $form->submit(['x', 'attack', 'z']);
+
+        $this->assertSame(['x', 'b', 'z'], $form->getData());
+        $this->assertTrue($form->get('1')->isDisabled());
+    }
+
+    public function testKeepAsListDoesNotSubmitADisabledEntryThatIsRenumbered()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['a', 'b', 'c'], [
+            'allow_delete' => true,
+            'keep_as_list' => true,
+        ]);
+        $form->add('2', TextTypeTest::TESTED_TYPE, ['disabled' => true]);
+
+        $form->submit([0 => 'a', 2 => 'attack']);
+
+        $this->assertSame(['a', 'c'], $form->getData());
+    }
+
+    public function testKeepAsListKeepsTheExtraFieldsNamedLikeTheNewIndexOfAnEntry()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, [2 => 'old'], [
+            'keep_as_list' => true,
+        ]);
+
+        $form->submit([2 => 'new', 0 => 'extra']);
+
+        $this->assertSame(['new'], $form->getData());
+        $this->assertSame([0 => 'extra'], $form->getExtraData());
     }
 }

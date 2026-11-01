@@ -40,4 +40,23 @@ class AmqpTransportFactoryTest extends TestCase
 
         $this->assertEquals($expectedTransport, $factory->createTransport('amqp://localhost', ['host' => 'localhost'], $serializer));
     }
+
+    public function testOptionsAreNotExposedInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $factory = new AmqpTransportFactory();
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            $factory->createTransport('amqp://localhost', ['password' => 's3cr3t', 'foo' => 'bar'], $this->createStub(SerializerInterface::class));
+            $this->fail('An exception should have been thrown.');
+        } catch (\LogicException $e) {
+            $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
 }

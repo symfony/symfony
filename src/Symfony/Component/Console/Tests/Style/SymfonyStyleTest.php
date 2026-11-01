@@ -184,6 +184,21 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringNotContainsString("\e[", $display);
     }
 
+    public function testOutlineBlockKeepsTheBackslashThatEndsAFullLine()
+    {
+        $this->command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            (new SymfonyStyle($input, $output))->outlineError(str_repeat('a', 114).'\b');
+
+            return Command::SUCCESS;
+        });
+
+        $this->tester->execute([], ['interactive' => false, 'decorated' => true]);
+
+        $lines = explode("\n", $this->tester->getDisplay(true));
+
+        $this->assertSame("\e[31m │ \e[39m".str_repeat('a', 114)."\\\e[31m │\e[39m", $lines[3]);
+    }
+
     public function testErrorWithMalformedUtf8()
     {
         $message = "Cannot read the log file at /var/log/app/deep/path.log: \xB3 check the file permissions, then retry the command and report the result";

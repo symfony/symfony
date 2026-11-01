@@ -142,7 +142,7 @@ class DynamoDbStoreTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found in DSN: \[foo\]\. Allowed options are \[session_token, |');
 
-        new DynamoDbStore('dynamodb://default?foo=foo');
+        new DynamoDbStore('dynamodb://default?foo=s3cr3t');
     }
 
     public function testFromDsnWithInvalidOption()
@@ -150,7 +150,7 @@ class DynamoDbStoreTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found: \[bar\]\. Allowed options are \[session_token, |');
 
-        new DynamoDbStore('dynamodb://default', ['bar' => 'bar']);
+        new DynamoDbStore('dynamodb://default', ['bar' => 's3cr3t']);
     }
 
     public function testFromDsnWithInvalidQueryStringAndOption()
@@ -158,7 +158,7 @@ class DynamoDbStoreTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found: \[bar\]\. Allowed options are \[session_token, |');
 
-        new DynamoDbStore('dynamodb://default?foo=foo', ['bar' => 'bar']);
+        new DynamoDbStore('dynamodb://default?foo=s3cr3t', ['bar' => 's3cr3t']);
     }
 
     public function testDeleteIsScopedToTheOwnerToken()

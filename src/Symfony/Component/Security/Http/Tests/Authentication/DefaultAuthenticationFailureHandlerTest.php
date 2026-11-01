@@ -204,7 +204,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
     public function testFailurePathFromRequestWithoutHostIsIgnored()
     {
-        foreach (['http', 'httpx', 'https:', 'http:///some-path'] as $failurePath) {
+        foreach (['http', 'httpx', 'https:', 'http:///some-path', 'http:80', 'httpx:8080'] as $failurePath) {
             $this->request->attributes->set('_failure_path', $failurePath);
 
             $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), [], new NullLogger());

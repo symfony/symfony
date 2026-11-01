@@ -82,6 +82,10 @@ class ConnectionTest extends TestCase
         }
 
         $redis = new class extends \Redis {
+            public function __construct()
+            {
+            }
+
             public function connect($host, ...$args): bool
             {
                 return false;
@@ -90,11 +94,6 @@ class ConnectionTest extends TestCase
             public function isConnected(): bool
             {
                 return false;
-            }
-
-            public function getLastError(): ?string
-            {
-                return null;
             }
         };
 

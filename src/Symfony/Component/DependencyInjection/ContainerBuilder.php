@@ -1517,7 +1517,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($parsedName !== $target) {
-            $this->setAlias('.'.$type.' $'.$target, $type.' $'.$parsedName);
+            $this->setAlias('.'.$type.' $'.$target, $id);
         }
 
         return $this->setAlias($type.' $'.$parsedName, $id);

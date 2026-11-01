@@ -684,6 +684,51 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertFalse($child->createView()->vars['prototype']->vars['required'], '"Prototype" should not be required');
     }
 
+    public function testEntriesAreNotRequiredByDefaultWhenCollectionIsNotRequired()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['foo'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'required' => false,
+        ]);
+
+        $this->assertFalse($form->isRequired());
+        $this->assertFalse($form->get('0')->isRequired(), 'entry inherits the required state of the collection');
+    }
+
+    public function testEntriesKeepTheirRequiredStateWhenInheritRequiredIsFalse()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['foo'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_add' => true,
+            'required' => false,
+            'inherit_required' => false,
+        ]);
+
+        $view = $form->createView();
+
+        $this->assertFalse($form->isRequired(), 'collection is not required');
+        $this->assertTrue($form->get('0')->isRequired(), 'entry keeps its own required state');
+        $this->assertTrue($view->vars['prototype']->vars['required'], '"prototype" keeps its own required state');
+    }
+
+    public function testEntriesRespectEntryOptionsRequiredWhenInheritRequiredIsFalse()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['foo'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_add' => true,
+            'required' => false,
+            'inherit_required' => false,
+            'entry_options' => [
+                'required' => false,
+            ],
+        ]);
+
+        $view = $form->createView();
+
+        $this->assertFalse($form->get('0')->isRequired(), 'entry keeps the required state from the entry options');
+        $this->assertFalse($view->vars['prototype']->vars['required'], '"prototype" keeps the required state from the entry options');
+    }
+
     public function testPrototypeOptionsOverrideEntryOptions()
     {
         $form = $this->factory->create(static::TESTED_TYPE, [], [

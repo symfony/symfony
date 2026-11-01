@@ -27,10 +27,14 @@ class CollectionType extends AbstractType
         $resizePrototypeOptions = null;
         if ($options['allow_add'] && $options['prototype']) {
             $resizePrototypeOptions = array_replace($options['entry_options'], $options['prototype_options']);
-            $prototypeOptions = array_replace([
-                'required' => $options['required'],
+
+            $prototypeDefaults = [
                 'label' => $options['prototype_name'].'label__',
-            ], $resizePrototypeOptions);
+            ];
+            if ($options['inherit_required']) {
+                $prototypeDefaults['required'] = $options['required'];
+            }
+            $prototypeOptions = array_replace($prototypeDefaults, $resizePrototypeOptions);
 
             if (null !== $options['prototype_data']) {
                 $prototypeOptions['data'] = $options['prototype_data'];
@@ -116,6 +120,7 @@ class CollectionType extends AbstractType
             'delete_empty' => false,
             'invalid_message' => 'The collection is invalid.',
             'keep_as_list' => false,
+            'inherit_required' => true,
         ]);
 
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
@@ -124,6 +129,7 @@ class CollectionType extends AbstractType
         $resolver->setAllowedTypes('delete_empty', ['bool', 'callable']);
         $resolver->setAllowedTypes('prototype_options', 'array');
         $resolver->setAllowedTypes('keep_as_list', ['bool']);
+        $resolver->setAllowedTypes('inherit_required', ['bool']);
     }
 
     public function getBlockPrefix(): string

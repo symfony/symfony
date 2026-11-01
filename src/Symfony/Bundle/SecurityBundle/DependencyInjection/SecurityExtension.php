@@ -256,19 +256,19 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     private function createAuthorization(array $config, ContainerBuilder $container): void
     {
         foreach ($config['access_control'] as $access) {
+            $requestAttributes = $access['request_attributes'] ?: $access['attributes'];
+
             if (isset($access['request_matcher'])) {
-                if ($access['path'] || $access['host'] || $access['port'] || $access['ips'] || $access['methods'] || $access['attributes'] || $access['route']) {
+                if ($access['path'] || $access['host'] || $access['port'] || $access['ips'] || $access['methods'] || $requestAttributes || $access['route']) {
                     throw new InvalidConfigurationException('The "request_matcher" option should not be specified alongside other options. Consider integrating your constraints inside your RequestMatcher directly.');
                 }
                 $matcher = new Reference($access['request_matcher']);
             } else {
-                $attributes = $access['attributes'];
-
                 if ($access['route']) {
-                    if (\array_key_exists('_route', $attributes)) {
-                        throw new InvalidConfigurationException('The "route" option should not be specified alongside "attributes._route" option. Use just one of the options.');
+                    if (\array_key_exists('_route', $requestAttributes)) {
+                        throw new InvalidConfigurationException(\sprintf('The "route" option should not be specified alongside "%s._route" option. Use just one of the options.', $access['request_attributes'] ? 'request_attributes' : 'attributes'));
                     }
-                    $attributes['_route'] = $access['route'];
+                    $requestAttributes['_route'] = $access['route'];
                 }
 
                 $matcher = $this->createRequestMatcher(
@@ -278,13 +278,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     $access['port'],
                     $access['methods'],
                     $access['ips'],
-                    $attributes
+                    $requestAttributes
                 );
             }
 
-            $roles = $access['roles'];
+            $attributes = null !== $access['is_granted'] ? [$access['is_granted']] : $access['roles'];
             if ($access['allow_if']) {
-                $roles[] = $this->createExpression($container, $access['allow_if']);
+                $attributes[] = $this->createExpression($container, $access['allow_if']);
             }
 
             if (!array_filter($access)) {
@@ -292,7 +292,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             }
 
             $container->getDefinition('security.access_map')
-                      ->addMethodCall('add', [$matcher, $roles, $access['requires_channel']]);
+                      ->addMethodCall('add', [$matcher, $attributes, $access['requires_channel']]);
         }
 
         // compile the expressions of #[IsGranted] and of access_control rules when warming up the cache

@@ -23,8 +23,8 @@ security:
                 realm: 'My API'
 
     access_control:
-        - { path: ^/foo, roles: 'OAUTH2_SCOPE(openid profile:read)' }
-        - { path: ^/bar, roles: ROLE_ADMIN }
+        - { path: ^/foo, is_granted: 'OAUTH2_SCOPE(openid profile:read)' }
+        - { path: ^/bar, is_granted: ROLE_ADMIN }
 
 services:
     access_token.access_token_handler:

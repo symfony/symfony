@@ -93,10 +93,10 @@ $container->loadFromExtension('security', [
     ],
 
     'access_control' => [
-        ['path' => '/blog/524', 'role' => 'ROLE_USER', 'requires_channel' => 'https', 'methods' => ['get', 'POST'], 'port' => 8000],
-        ['path' => '/blog/.*', 'role' => 'IS_AUTHENTICATED_ANONYMOUSLY'],
+        ['path' => '/blog/524', 'is_granted' => 'ROLE_USER', 'requires_channel' => 'https', 'methods' => ['get', 'POST'], 'port' => 8000],
+        ['path' => '/blog/.*', 'is_granted' => 'IS_AUTHENTICATED_ANONYMOUSLY'],
         ['path' => '/blog/524', 'allow_if' => "token.getUserIdentifier() matches '/^admin/'"],
-        ['role' => 'ROLE_ADMIN', 'attributes' => ['_controller' => 'AdminController::index'], 'route' => 'admin'],
+        ['is_granted' => 'ROLE_ADMIN', 'request_attributes' => ['_controller' => 'AdminController::index'], 'route' => 'admin'],
     ],
 
     'role_hierarchy' => [

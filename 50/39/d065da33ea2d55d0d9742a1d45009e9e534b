@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T21:10:29Z
+
+Thanks @initd-it. I pushed one more assertion, with an escaped closing tag. On 8.2 the wrapper folds `\</b\>` into a placeholder, and the lookahead alone doesn't fix that case there. The merge-up note in the description now says how to resolve it.
+
+The stray `</>` in your SymfonyStyle test is a second bug, which I fixed in #67769.

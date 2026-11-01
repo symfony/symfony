@@ -101,12 +101,12 @@ key_management:
 Encryption
 ----------
 
-The server encrypts with AES-GCM and a 16-byte authentication tag. New
-ciphertexts use a 12-byte IV, as NIST SP 800-38D recommends; set `iv_length`
-(from 12 to 255 bytes) for a server that requires another length. Each
-ciphertext records the algorithm, the mode and the IV length it was produced
-with, so changing `iv_length` leaves earlier data readable as long as the
-server accepts their IV length.
+The server encrypts with AES-GCM, unless the `cipher` option selects another cipher (see below).
+All the ciphers use a 16-byte authentication tag.
+With AES-GCM, new ciphertexts use a 12-byte IV, as NIST SP 800-38D recommends.
+Set `iv_length` (from 12 to 255 bytes) for a server that requires another length.
+Each ciphertext records the algorithm, the mode and the IV length it was produced with.
+So changing `iv_length` leaves earlier data readable, as long as the server accepts their IV length.
 
 Encryption ciphers
 ------------------
@@ -131,6 +131,23 @@ ChaCha20-Poly1305 ciphertexts remain readable if the server and key support them
 Decryption accepts a vendor mode only when it matches the configured `mode`.
 Keep that option while ciphertexts using it remain stored.
 It can also be set with `cipher=aes-gcm`, `cipher=chacha20-poly1305` or with the default cipher to retain access to earlier AES-GCM-SIV ciphertexts while writing new ciphertexts with another cipher.
+
+Encryption limits
+-----------------
+
+The bridge draws a random IV for each encryption and sends it to the server.
+Because the IV is random, NIST SP 800-38D limits an AES-GCM key to 2^32 encryptions, even with a longer `iv_length`.
+ChaCha20-Poly1305 also uses random 96-bit nonces, so apply the same limit to its keys.
+The limit is per server key.
+It includes the encryptions of every application that uses that key.
+
+`EnvelopeEncrypter` wraps a new data key with the master key for each envelope.
+So each envelope counts as one encryption.
+`StoredEnvelopeEncrypter` uses one stored data key for many payloads, so it needs far fewer encryptions with the master key.
+
+AES-GCM-SIV resists nonce misuse.
+With AES-GCM-SIV, a repeated nonce only reveals that the same plaintext was encrypted twice with the same AAD.
+Your server may support it with a vendor mode, see the `mode` option above.
 
 Key rotation
 ------------

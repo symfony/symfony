@@ -579,6 +579,9 @@ class SigningSerializerTest extends TestCase
         yield 'unexpected algorithm' => [['body' => $body, 'headers' => ['type' => DummyMessage::class, 'Body-Sign' => 'tampered', 'Sign-Algo' => 'md5']], \sprintf('Expected "sha256" signature algorithm for message "%s", "md5" given.', DummyMessage::class)];
         yield 'invalid signature' => [['body' => $body, 'headers' => ['type' => DummyMessage::class, 'Body-Sign' => 'tampered', 'Sign-Algo' => 'sha256']], \sprintf('Invalid signature for message "%s".', DummyMessage::class)];
         yield 'undeterminable type' => [['body' => $body, 'headers' => []], 'The message could not be verified and its type could not be determined; refusing to decode it.'];
+        yield 'type that is not a string' => [['body' => $body, 'headers' => ['type' => [DummyMessage::class]]], 'The message could not be verified and its type could not be determined; refusing to decode it.'];
+        yield 'algorithm that is not a string' => [['body' => $body, 'headers' => ['type' => DummyMessage::class, 'Body-Sign' => 'tampered', 'Sign-Algo' => ['md5']]], \sprintf('Invalid signature for message "%s".', DummyMessage::class)];
+        yield 'body-only signature of a body that is not a string' => [['body' => ['foo'], 'headers' => ['type' => DummyMessage::class, 'Body-Sign' => 'tampered', 'Sign-Algo' => 'sha256']], \sprintf('Invalid signature for message "%s".', DummyMessage::class)];
     }
 
     public function testDecodeLetsTheDecodingFailuresOfTheInnerSerializerThrough()

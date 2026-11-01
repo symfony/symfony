@@ -64,7 +64,7 @@ final class SigningSerializer implements SerializerInterface
         $sign = \is_string($sign) ? $sign : null;
 
         try {
-            if ($sign) {
+            if ($sign && \is_string($encodedEnvelope['body'] ?? '')) {
                 // signatures written before the headers were covered carry no marker and authenticate the body alone
                 $bodyOnly = !str_starts_with($sign, self::SIGNATURE_MARKER);
                 $payload = $bodyOnly ? ($encodedEnvelope['body'] ?? '') : self::getSignedPayload($encodedEnvelope);
@@ -101,7 +101,7 @@ final class SigningSerializer implements SerializerInterface
                 throw new InvalidMessageSignatureException(\sprintf('Message "%s" requires a signature but none was found.', $type));
             }
 
-            if ($this->algorithm !== $algo = $headers['Sign-Algo'] ?? $this->algorithm) {
+            if (\is_string($algo = $headers['Sign-Algo'] ?? $this->algorithm) && $this->algorithm !== $algo) {
                 throw new InvalidMessageSignatureException(\sprintf('Expected "%s" signature algorithm for message "%s", "%s" given.', $this->algorithm, $type, $algo));
             }
 

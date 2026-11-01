@@ -122,7 +122,7 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
     public function getMessageType(array $encodedEnvelope): ?string
     {
-        return $encodedEnvelope['headers']['type'] ?? null;
+        return \is_string($type = $encodedEnvelope['headers']['type'] ?? null) ? $type : null;
     }
 
     public function encode(Envelope $envelope): array

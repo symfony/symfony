@@ -15,7 +15,7 @@ if (!function_exists('frankenphp_handle_request')) {
     function frankenphp_handle_request(callable $callable): bool
     {
         // FrankenPHP returns false without calling the handler when the worker stops
-        if (null !== FrankenPhpWorkerRunnerTest::$requests && 0 >= FrankenPhpWorkerRunnerTest::$requests--) {
+        if (0 >= FrankenPhpWorkerRunnerTest::$requests--) {
             return false;
         }
 
@@ -23,10 +23,17 @@ if (!function_exists('frankenphp_handle_request')) {
         try {
             $callable();
             ++FrankenPhpWorkerRunnerTest::$completedRequests;
+        } catch (Throwable $e) {
+            if (null === FrankenPhpWorkerRunnerTest::$reportedExceptions) {
+                throw $e;
+            }
+
+            // FrankenPHP reports an exception escaping the handler and keeps the worker running
+            FrankenPhpWorkerRunnerTest::$reportedExceptions[] = $e;
         } finally {
             FrankenPhpWorkerRunnerTest::$handlingRequest = false;
         }
 
-        return null !== FrankenPhpWorkerRunnerTest::$requests;
+        return true;
     }
 }

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T18:14:50Z
+
+Thank you for wiring this up. The BSL 1.1 grants non-production use, and this job already pulls `hashicorp/vault`, which has the same license. So I'm fine with running this image in CI.
+
+I pushed a small change so that the unknown key check runs under every supported version again, as it did for 1.4 before the split.

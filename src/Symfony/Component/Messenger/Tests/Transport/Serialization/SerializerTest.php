@@ -195,6 +195,7 @@ class SerializerTest extends TestCase
         $this->assertSame(DummyMessage::class, $serializer->getMessageType($serializer->encode(new Envelope(new DummyMessage('Hello')))));
         $this->assertNull($serializer->getMessageType(['body' => '{}']));
         $this->assertNull($serializer->getMessageType(['body' => '{}', 'headers' => []]));
+        $this->assertNull($serializer->getMessageType(['body' => '{}', 'headers' => ['type' => [DummyMessage::class]]]));
     }
 
     public function testUsesTheCustomFormatAndContext()

@@ -110,9 +110,16 @@ class NotifierBundleTest extends TestCase
     {
         $container = $this->load(self::TRANSPORTS, ['mailer', 'messenger']);
 
-        foreach (['notifier.channel.chat', 'notifier.channel.email', 'notifier.channel.sms'] as $channelId) {
+        foreach (['notifier.channel.chat', 'notifier.channel.sms'] as $channelId) {
             $this->assertNull($container->getDefinition($channelId)->getArgument(0), $channelId);
         }
+    }
+
+    public function testTheEmailChannelKeepsTheMailerTransportsWhenABusIsRegistered()
+    {
+        $container = $this->load(self::TRANSPORTS, ['mailer', 'messenger']);
+
+        $this->assertEquals(new Reference('mailer.transports'), $container->getDefinition('notifier.channel.email')->getArgument(0));
     }
 
     public function testTheChannelsKeepTheirTransportWithoutABus()

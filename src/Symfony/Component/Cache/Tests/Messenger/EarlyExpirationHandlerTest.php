@@ -14,12 +14,16 @@ namespace Symfony\Component\Cache\Tests\Messenger;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Messenger\EarlyExpirationDispatcher;
 use Symfony\Component\Cache\Messenger\EarlyExpirationHandler;
 use Symfony\Component\Cache\Messenger\EarlyExpirationMessage;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ReverseContainer;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Contracts\Cache\CallbackInterface;
 
 class EarlyExpirationHandlerTest extends TestCase
@@ -64,5 +68,40 @@ class EarlyExpirationHandlerTest extends TestCase
 
         $this->assertGreaterThan(25, $metadata['ctime']);
         $this->assertGreaterThan(time(), $metadata['expiry']);
+    }
+
+    public function testHandleReturnsValueWithoutSavingWhenCallbackDisablesSaving()
+    {
+        $pool = new FilesystemAdapter();
+        $item = $pool->getItem('bar');
+        $pool->save($item->set(234));
+
+        $computationService = new class implements CallbackInterface {
+            public bool $called = false;
+
+            public function __invoke(CacheItemInterface $item, bool &$save): mixed
+            {
+                $this->called = true;
+                $save = false;
+
+                return 123;
+            }
+        };
+
+        $container = new Container();
+        $container->set('computation_service', $computationService);
+        $container->set('cache_pool', $pool);
+
+        $reverseContainer = new ReverseContainer($container, new ServiceLocator([]));
+
+        $handler = new EarlyExpirationHandler($reverseContainer);
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([EarlyExpirationMessage::class => [$handler]]))]);
+        $pool->setCallbackWrapper(new EarlyExpirationDispatcher($bus, $reverseContainer));
+
+        $value = $pool->get('bar', $computationService, \INF);
+
+        $this->assertTrue($computationService->called);
+        $this->assertSame(234, $pool->getItem('bar')->get());
+        $this->assertSame(123, $value);
     }
 }

@@ -170,6 +170,68 @@ class AmazonSqsReceiverTest extends TestCase
         iterator_to_array($receiver->get());
     }
 
+    public function testAllIdentifiesTheMessagesByTheirSqsMessageId()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('findAll')->with(5)->willReturnCallback(fn () => yield $this->createListedSqsEnvelope());
+
+        $envelopes = iterator_to_array((new AmazonSqsReceiver($connection, $this->createSerializer()))->all(5), false);
+
+        $this->assertCount(1, $envelopes);
+        $this->assertEquals(new DummyMessage('Hi'), $envelopes[0]->getMessage());
+        $this->assertSame('message-id', $envelopes[0]->last(TransportMessageIdStamp::class)->getId());
+        $this->assertSame('receipt-handle', $envelopes[0]->last(AmazonSqsReceivedStamp::class)->getId());
+    }
+
+    public function testFindIdentifiesTheMessagesByTheirSqsMessageId()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('find')->with('message-id')->willReturn($this->createListedSqsEnvelope());
+
+        $envelope = (new AmazonSqsReceiver($connection, $this->createSerializer()))->find('message-id');
+
+        $this->assertEquals(new DummyMessage('Hi'), $envelope->getMessage());
+        $this->assertSame('message-id', $envelope->last(TransportMessageIdStamp::class)->getId());
+        $this->assertSame('receipt-handle', $envelope->last(AmazonSqsReceivedStamp::class)->getId());
+    }
+
+    public function testFindReturnsNullWhenTheMessageIsNotFound()
+    {
+        $connection = $this->createStub(Connection::class);
+        $connection->method('find')->willReturn(null);
+
+        $this->assertNull((new AmazonSqsReceiver($connection, $this->createSerializer()))->find('message-id'));
+    }
+
+    public function testItConvertsNetworkExceptionDuringAllIntoTransportException()
+    {
+        $connection = $this->createStub(Connection::class);
+        $connection->method('findAll')->willReturnCallback(static function () {
+            throw new NetworkException('Could not contact remote server.');
+            yield;
+        });
+
+        $receiver = new AmazonSqsReceiver($connection, $this->createSerializer());
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Could not contact remote server.');
+
+        iterator_to_array($receiver->all());
+    }
+
+    private function createListedSqsEnvelope(): array
+    {
+        return [
+            'id' => 'receipt-handle',
+            'message_id' => 'message-id',
+            'body' => '{"message": "Hi"}',
+            'headers' => [
+                'type' => DummyMessage::class,
+            ],
+            'system_attributes' => [],
+        ];
+    }
+
     public function testItConvertsNetworkExceptionDuringAckIntoTransportException()
     {
         $connection = $this->createStub(Connection::class);

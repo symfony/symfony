@@ -336,6 +336,44 @@ class AuthenticatedVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_DENIED, (new AuthenticatedVoter($legacyTrustResolver))->vote($token, null, ['IS_AUTHENTICATED_VERY_RECENTLY']));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testNoReAuthenticationIsRequestedWhenTheTrustResolverCannotTellRecency()
+    {
+        $legacyTrustResolver = new class implements AuthenticationTrustResolverInterface {
+            public function isAuthenticated(?TokenInterface $token = null): bool
+            {
+                return (bool) $token?->getUser();
+            }
+
+            public function isRememberMe(?TokenInterface $token = null): bool
+            {
+                return false;
+            }
+
+            public function isFullFledged(?TokenInterface $token = null): bool
+            {
+                return $this->isAuthenticated($token);
+            }
+        };
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, (new AuthenticatedVoter($legacyTrustResolver))->vote($this->getToken('fully'), null, ['IS_AUTHENTICATED_RECENTLY'], $vote = new Vote()));
+        $this->assertNull($vote->reAuthenticationAttribute);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testNoReAuthenticationIsRequestedWhenTheTokenCannotProveRecency()
+    {
+        $token = $this->createStub(TokenInterface::class);
+        $token->method('getUser')->willReturn(new InMemoryUser('wouter', '', ['ROLE_USER']));
+
+        $voter = new AuthenticatedVoter(new AuthenticationTrustResolver(900, 60));
+
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($token, null, ['IS_AUTHENTICATED_VERY_RECENTLY'], $vote = new Vote()));
+        $this->assertNull($vote->reAuthenticationAttribute);
+    }
+
     public function testACustomTrustResolverDecidesRecency()
     {
         // the token is stale by the default strategy, but this resolver trusts it anyway

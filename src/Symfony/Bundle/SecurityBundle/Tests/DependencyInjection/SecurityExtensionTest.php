@@ -302,6 +302,26 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('%security.very_recent_authentication_lifetime%', $container->getDefinition('security.authentication.trust_resolver')->getArgument(1));
     }
 
+    #[DataProvider('provideRecentAuthenticationLifetimeOptions')]
+    public function testRecentAuthenticationLifetimesMustBePositive(string $option)
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            $option => 0,
+            'providers' => ['default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]]],
+            'firewalls' => ['main' => ['form_login' => true]],
+        ]);
+        $container->compile();
+    }
+
+    public static function provideRecentAuthenticationLifetimeOptions(): iterable
+    {
+        yield ['recent_authentication_lifetime'];
+        yield ['very_recent_authentication_lifetime'];
+    }
+
     public function testReAuthenticationEntryPointIsRefusedOnAStatelessFirewall()
     {
         $container = $this->getRawContainer();

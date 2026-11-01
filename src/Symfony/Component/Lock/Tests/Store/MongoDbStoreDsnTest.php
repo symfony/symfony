@@ -64,4 +64,41 @@ class MongoDbStoreDsnTest extends TestCase
 
         new MongoDbStore('mongodb://localhost/?collection=locks');
     }
+
+    public function testInvalidUriIsNotExposedInExceptionMessage()
+    {
+        foreach (['mongo://user:s3cr3t@localhost/app?collection=locks', 'mongodb://user:s3cr3t@localhost:999999/app?collection=locks'] as $uri) {
+            try {
+                new MongoDbStore($uri);
+                $this->fail('An exception should have been thrown.');
+            } catch (InvalidArgumentException $e) {
+                $this->assertStringNotContainsString('s3cr3t', $e->getMessage());
+            }
+        }
+    }
+
+    public function testCredentialsAreNotExposedInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            foreach ([
+                ['mongodb://user:s3cr3t@localhost/?collection=locks', []],
+                ['mongodb://user:s3cr3t@localhost:999999/app?collection=locks', []],
+                ['mongodb://localhost/?collection=locks', ['uriOptions' => ['password' => 's3cr3t']]],
+            ] as [$uri, $options]) {
+                try {
+                    new MongoDbStore($uri, $options);
+                    $this->fail('An exception should have been thrown.');
+                } catch (InvalidArgumentException $e) {
+                    $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+                }
+            }
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
 }

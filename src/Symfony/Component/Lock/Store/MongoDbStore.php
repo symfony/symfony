@@ -96,7 +96,7 @@ class MongoDbStore implements PersistingStoreInterface
      * readPreference is primary for all read queries.
      * @see https://docs.mongodb.com/manual/applications/replication/
      */
-    public function __construct(Collection|Database|Client|Manager|string $mongo, array $options = [], float $initialTtl = 300.0)
+    public function __construct(#[\SensitiveParameter] Collection|Database|Client|Manager|string $mongo, #[\SensitiveParameter] array $options = [], float $initialTtl = 300.0)
     {
         if (isset($options['gcProbablity'])) {
             trigger_deprecation('symfony/lock', '6.3', 'The "gcProbablity" option (notice the typo in its name) is deprecated in "%s"; use the "gcProbability" option instead.', __CLASS__);
@@ -154,14 +154,14 @@ class MongoDbStore implements PersistingStoreInterface
      *
      * @see https://php.net/mongodb.connection-handling
      */
-    private function skimUri(string $uri): string
+    private function skimUri(#[\SensitiveParameter] string $uri): string
     {
         if (!str_starts_with($uri, 'mongodb://') && !str_starts_with($uri, 'mongodb+srv://')) {
-            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid. Expecting "mongodb://" or "mongodb+srv://".', $uri));
+            throw new InvalidArgumentException('The given MongoDB Connection URI is invalid. Expecting "mongodb://" or "mongodb+srv://".');
         }
 
         if (false === $params = parse_url($uri)) {
-            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
+            throw new InvalidArgumentException('The given MongoDB Connection URI is invalid.');
         }
         $pathDb = rawurldecode(ltrim($params['path'] ?? '', '/'));
         if ('' !== $pathDb) {

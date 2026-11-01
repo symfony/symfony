@@ -66,7 +66,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
      * @throws InvalidArgumentException When namespace contains invalid characters
      * @throws InvalidArgumentException When the initial ttl is not valid
      */
-    public function __construct(Connection|string $connOrUrl, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
+    public function __construct(#[\SensitiveParameter] Connection|string $connOrUrl, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
     {
         $this->init($options, $gcProbability, $initialTtl);
 

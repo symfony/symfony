@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `Table::setOptionalColumns()` and `setMaxWidth()` to hide optional columns when a table exceeds the available width
  * Add `CommandInvocation` and the `%command.invocation%` help placeholder to include the PHP executable or Symfony CLI launcher
  * Add `CompletionSuggestions::suggestPaths()`, `suggestDirectories()` and `getPathSuggestion()` to let the shell complete file system paths, as `InputFile` arguments and options now do
  * Pass the `CompletionSuggestions` to the `suggestedValues` closures of arguments and options

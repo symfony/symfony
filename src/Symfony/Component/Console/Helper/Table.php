@@ -19,6 +19,7 @@ use Symfony\Component\Console\Formatter\WrappableOutputFormatterInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Terminal;
 
 /**
  * Provides helpers to display a table.
@@ -52,6 +53,8 @@ class Table
     private array $columnWidths = [];
     private array $configuredColumnWidths = [];
     private array $columnMaxWidths = [];
+    private array $optionalColumns = [];
+    private ?int $maxWidth = null;
     private array $renderedLines = [];
     private array $tagStyles = [];
     private ?\WeakMap $rowspanLines = null;
@@ -175,6 +178,46 @@ class Table
         }
 
         $this->columnMaxWidths[$columnIndex] = $width;
+
+        return $this;
+    }
+
+    /**
+     * Sets the zero-based indices of columns that may be hidden to fit the table width.
+     *
+     * Columns are hidden from right to left. Required columns are never hidden.
+     *
+     * @param int[] $columns
+     *
+     * @return $this
+     */
+    public function setOptionalColumns(array $columns): static
+    {
+        foreach ($columns as $column) {
+            if (!\is_int($column) || $column < 0) {
+                throw new InvalidArgumentException('Optional column indices must be non-negative integers.');
+            }
+        }
+
+        $this->optionalColumns = array_fill_keys($columns, true);
+
+        return $this;
+    }
+
+    /**
+     * Sets the width above which optional columns are hidden, or null to use the terminal width.
+     *
+     * Required columns may exceed this width.
+     *
+     * @return $this
+     */
+    public function setMaxWidth(?int $width): static
+    {
+        if (null !== $width && $width < 1) {
+            throw new InvalidArgumentException('The maximum table width must be positive or null.');
+        }
+
+        $this->maxWidth = $width;
 
         return $this;
     }
@@ -342,6 +385,19 @@ class Table
      */
     public function render(): void
     {
+        if (!$this->optionalColumns) {
+            $this->doRender();
+
+            return;
+        }
+
+        $table = clone $this;
+        $table->doRender();
+        $this->renderedLines = $table->renderedLines;
+    }
+
+    private function doRender(): void
+    {
         if ($this->output instanceof ConsoleSectionOutput && $this->output->isDecorated()) {
             // remember the lines on screen, so that appendRow() can rewrite only the ones that change
             $lines = $this->renderLines();
@@ -432,6 +488,15 @@ class Table
 
         $rowGroups = $this->buildTableRows($rows);
         $this->calculateColumnsWidth($rowGroups);
+
+        if ($this->optionalColumns && $this->numberOfColumns) {
+            $rowGroups = $this->hideOptionalColumns($rowGroups);
+            if (!$rowGroups) {
+                $this->cleanup();
+
+                return;
+            }
+        }
 
         $isMarkdown = self::$styles['markdown'] === $this->style;
         // a markdown table must start with a header row, so one is added when the table has none
@@ -1095,6 +1160,84 @@ class Table
         $this->tagStyles = [];
         $this->rowspanLines = null;
         unset($this->numberOfColumns);
+    }
+
+    private function hideOptionalColumns(TableRows $groups): array
+    {
+        $groups = iterator_to_array($groups);
+        $columnCount = $this->numberOfColumns;
+        $columns = range(0, $columnCount - 1);
+        $optional = array_intersect_key($this->optionalColumns, array_flip($columns));
+        krsort($optional);
+        $maxWidth = $this->maxWidth ?? (new Terminal())->getWidth();
+        $columnConfiguration = [];
+        foreach (['columnStyles', 'columnWidths', 'configuredColumnWidths', 'columnMaxWidths'] as $property) {
+            $columnConfiguration[$property] = $this->$property;
+        }
+
+        $visibleGroups = $groups;
+        foreach ($optional as $column => $unused) {
+            $width = array_sum($this->effectiveColumnWidths)
+                + ($this->numberOfColumns - 1) * $this->getColumnSeparatorWidth()
+                + 2 * Helper::width(Helper::removeDecoration($this->output->getFormatter(), $this->renderColumnSeparator()));
+            if ($width <= $maxWidth) {
+                break;
+            }
+
+            unset($columns[$column]);
+            $this->numberOfColumns = \count($columns);
+            if (!$this->numberOfColumns) {
+                return [];
+            }
+
+            $visibleGroups = [];
+            foreach ($groups as $group) {
+                $visibleGroup = [];
+                foreach ($group as $row) {
+                    if ($row instanceof TableSeparator || !$row) {
+                        $visibleGroup[] = $row;
+
+                        continue;
+                    }
+
+                    $visibleRow = [];
+                    for ($index = 0; $index < $columnCount; ++$index) {
+                        $cell = $row[$index] ?? null;
+                        $colspan = $cell instanceof TableCell ? $cell->getColspan() : 1;
+                        $visibleSpan = \count(array_intersect_key($columns, array_flip(range($index, $index + $colspan - 1))));
+                        if ($visibleSpan) {
+                            if ($cell instanceof TableCell && $visibleSpan !== $colspan) {
+                                $visibleCell = new TableCell((string) $cell, ['colspan' => $visibleSpan, 'style' => $cell->getStyle()]);
+                                if (isset($this->rowspanLines[$cell])) {
+                                    $this->rowspanLines[$visibleCell] = true;
+                                }
+                                $cell = $visibleCell;
+                            }
+                            $visibleRow[] = $cell;
+                            for ($i = 1; $i < $visibleSpan; ++$i) {
+                                $visibleRow[] = '';
+                            }
+                        }
+                        $index += $colspan - 1;
+                    }
+                    $visibleGroup[] = $visibleRow;
+                }
+                $visibleGroups[] = $visibleGroup;
+            }
+
+            foreach ($columnConfiguration as $property => $values) {
+                $this->$property = [];
+                foreach (array_values($columns) as $index => $original) {
+                    if (isset($values[$original])) {
+                        $this->{$property}[$index] = $values[$original];
+                    }
+                }
+            }
+            $this->effectiveColumnWidths = [];
+            $this->calculateColumnsWidth($visibleGroups);
+        }
+
+        return $visibleGroups;
     }
 
     /**

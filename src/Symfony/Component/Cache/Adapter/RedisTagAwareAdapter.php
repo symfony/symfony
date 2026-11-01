@@ -421,10 +421,11 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
     private function pruneTagSet(string $setId): bool
     {
         // Skipping keys that are not Sets tells apart unrelated keys that happen to match the scanned pattern
+        // The script returns 0 for them, not false, because pipeline() turns false into the last error of the connection, even an old one
 
         $lua = <<<'EOLUA'
                         if 'set' ~= redis.call('TYPE', KEYS[1]).ok then
-                            return false
+                            return 0
                         end
 
                         return redis.call('SSCAN', KEYS[1], ARGV[1], 'COUNT', 1000)

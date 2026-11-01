@@ -96,6 +96,24 @@ trait RedisTagAwarePruneTestTrait
         $pool->deleteItem($key);
     }
 
+    public function testPruneSkipsKeysThatAreNotTagSetsAfterACommandFailed()
+    {
+        $pool = $this->createCachePool();
+
+        $key = "prune-err\1tags\1inside";
+        $pool->save($pool->getItem($key)->set('value'));
+
+        try {
+            self::$redis->sMembers($this->getPruneRawKey($key));
+        } catch (\Exception) {
+        }
+
+        $this->assertTrue($pool->prune());
+        $this->assertTrue($pool->getItem($key)->isHit());
+
+        $pool->deleteItem($key);
+    }
+
     private function getPruneRawKey(string $key): string
     {
         return str_replace('\\', '.', static::class).':'.$key;

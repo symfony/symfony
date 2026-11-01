@@ -42,11 +42,11 @@ class EarlyExpirationHandler
         if ($expiry && $ctime) {
             // skip duplicate or expired messages
 
-            $processingNonce = [$expiry, $ctime];
+            $processingNonce = (object) ['value' => [$expiry, $ctime]];
             $pool = $message->getPool();
             $key = $item->getKey();
 
-            if (($this->processedNonces[$pool][$key] ?? null) === $processingNonce) {
+            if (($this->processedNonces[$pool][$key]->value ?? null) === $processingNonce->value) {
                 return null;
             }
 
@@ -74,17 +74,28 @@ class EarlyExpirationHandler
             CacheItem::class
         );
 
-        $startTime = microtime(true);
-        $pool = $message->findPool($this->reverseContainer);
-        $callback = $message->findCallback($this->reverseContainer);
-        $save = true;
-        $item->set($callback($item, $save));
+        try {
+            $startTime = microtime(true);
+            $pool = $message->findPool($this->reverseContainer);
+            $callback = $message->findCallback($this->reverseContainer);
+            $save = true;
+            $item->set($callback($item, $save));
 
-        if ($save) {
-            $setMetadata($item, $startTime);
-            $pool->save($item);
+            if ($save) {
+                $setMetadata($item, $startTime);
+                $pool->save($item);
+            }
+
+            return new EarlyExpirationResult($item);
+        } catch (\Throwable $e) {
+            $pool = $message->getPool();
+            $key = $item->getKey();
+
+            if (isset($processingNonce) && ($this->processedNonces[$pool][$key] ?? null) === $processingNonce) {
+                unset($this->processedNonces[$pool][$key]);
+            }
+
+            throw $e;
         }
-
-        return new EarlyExpirationResult($item);
     }
 }

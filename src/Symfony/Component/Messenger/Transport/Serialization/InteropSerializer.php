@@ -117,7 +117,7 @@ final class InteropSerializer implements SerializerInterface, MessageTypeAwareSe
 
     private function withMessageType(array $encodedEnvelope, ?bool &$isTypeUnknown = null): array
     {
-        if (null === $this->messageType || !\is_array($encodedEnvelope['headers'] ?? []) || !empty($encodedEnvelope['headers']['type'])) {
+        if (null === $this->messageType || !\is_string($encodedEnvelope['body'] ?? null) || !\is_array($encodedEnvelope['headers'] ?? []) || '' !== ($encodedEnvelope['headers']['type'] ?? '')) {
             return $encodedEnvelope;
         }
 

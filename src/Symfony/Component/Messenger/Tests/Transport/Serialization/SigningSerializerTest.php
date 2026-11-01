@@ -1016,6 +1016,7 @@ class SigningSerializerTest extends TestCase
         yield 'with a tampered type' => [['headers' => ['type' => 'Unknown\Missing\OtherClass'] + $signed['headers']] + $signed, 'Invalid message signature.'];
         yield 'with a body-only signature' => [['headers' => ['Body-Sign' => hash_hmac('sha256', $message['body'], 'secret-key'), 'Sign-Algo' => 'sha256'] + $message['headers']] + $message, 'The signature of the message does not cover its headers.'];
         yield 'with another algorithm' => [['headers' => ['Sign-Algo' => 'md5'] + $signedWithAnotherKey['headers']] + $signedWithAnotherKey, 'Expected "sha256" signature algorithm, "md5" given.'];
+        yield 'with an algorithm that is not a string' => [['headers' => ['Sign-Algo' => ['md5']] + $signedWithAnotherKey['headers']] + $signedWithAnotherKey, 'Invalid message signature.'];
         yield 'signed as unverified' => [self::signWith($message, 'secret-key', false), 'The message is signed as unverified: only a failure transport accepts it.'];
     }
 

@@ -202,7 +202,7 @@ final class SigningSerializer implements SerializerInterface
                         $signed => 'The message is signed as unverified: only a failure transport accepts it.',
                         null === $sign => 'The message requires a signature but none was found.',
                         !str_starts_with($sign, self::SIGNATURE_MARKER) => 'The signature of the message does not cover its headers.',
-                        $this->algorithm !== $algo = $headers['Sign-Algo'] ?? $this->algorithm => \sprintf('Expected "%s" signature algorithm, "%s" given.', $this->algorithm, $algo),
+                        \is_string($algo = $headers['Sign-Algo'] ?? $this->algorithm) && $this->algorithm !== $algo => \sprintf('Expected "%s" signature algorithm, "%s" given.', $this->algorithm, $algo),
                         default => 'Invalid message signature.',
                     };
 

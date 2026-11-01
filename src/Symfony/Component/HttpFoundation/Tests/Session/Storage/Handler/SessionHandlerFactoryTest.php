@@ -98,4 +98,15 @@ class SessionHandlerFactoryTest extends TestCase
             ini_set('zend.exception_ignore_args', $previous);
         }
     }
+
+    public function testCreateHandlerWithUnsupportedDsnDoesNotLeakCredentials()
+    {
+        try {
+            SessionHandlerFactory::createHandler('unsupported://user:s3cr3t@localhost');
+            $this->fail('An exception should have been thrown.');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('No session handler supports the given DSN.', $e->getMessage());
+            $this->assertStringNotContainsString('s3cr3t', $e->getMessage());
+        }
+    }
 }

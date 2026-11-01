@@ -60,7 +60,7 @@ class DynamoDbStore implements PersistingStoreInterface
 
     public function __construct(
         #[\SensitiveParameter] DynamoDbClient|string $clientOrDsn,
-        array $options = [],
+        #[\SensitiveParameter] array $options = [],
         private readonly int $initialTtl = 300,
     ) {
         if ($clientOrDsn instanceof DynamoDbClient) {

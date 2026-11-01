@@ -161,6 +161,19 @@ class DynamoDbStoreTest extends TestCase
         new DynamoDbStore('dynamodb://default?foo=foo', ['bar' => 'bar']);
     }
 
+    public function testOptionsAreNotExposedInTrace()
+    {
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            new DynamoDbStore('dynamodb://default/lock_keys', ['session_token' => 's3cr3t', 'foo' => 'bar']);
+            $this->fail('An exception should have been thrown.');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
+
     public function testDeleteIsScopedToTheOwnerToken()
     {
         $requests = [];

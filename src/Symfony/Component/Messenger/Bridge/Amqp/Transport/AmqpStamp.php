@@ -48,7 +48,12 @@ final class AmqpStamp implements NonSendableStampInterface
         $attr = $previousStamp->attributes ?? [];
 
         // the broker also routes a message to the routing keys of its CC header, and keeps that header when delivering it
-        $attr['headers'] ??= array_diff_key($amqpEnvelope->getHeaders(), ['CC' => true]);
+        // stamps are encoded again by the serializer: copying them would bring back the ones removed from the envelope
+        $attr['headers'] ??= array_filter(
+            array_diff_key($amqpEnvelope->getHeaders(), ['CC' => true]),
+            static fn (string $name): bool => !str_starts_with($name, 'X-Message-Stamp-'),
+            \ARRAY_FILTER_USE_KEY
+        );
         $attr['content_type'] ??= $amqpEnvelope->getContentType();
         $attr['content_encoding'] ??= $amqpEnvelope->getContentEncoding();
         $attr['delivery_mode'] ??= $amqpEnvelope->getDeliveryMode();

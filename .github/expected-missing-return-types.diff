@@ -85,6 +85,16 @@ diff --git a/src/Symfony/Component/Cache/Adapter/DoctrineDbalAdapter.php b/src/S
 +    public function configureSchema(Schema $schema, Connection $forConnection, \Closure $isSameDatabase): Schema
      {
          if ($schema->hasTable($this->table)) {
+diff --git a/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php b/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php
+--- a/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php
++++ b/src/Symfony/Component/Cache/Messenger/EarlyExpirationHandler.php
+@@ -32,5 +32,5 @@ class EarlyExpirationHandler
+      * @return EarlyExpirationResult|null
+      */
+-    public function __invoke(EarlyExpirationMessage $message)
++    public function __invoke(EarlyExpirationMessage $message): ?EarlyExpirationResult
+     {
+         $item = $message->getItem();
 diff --git a/src/Symfony/Component/Console/Command/Command.php b/src/Symfony/Component/Console/Command/Command.php
 --- a/src/Symfony/Component/Console/Command/Command.php
 +++ b/src/Symfony/Component/Console/Command/Command.php

@@ -19,6 +19,102 @@ use Symfony\Component\BrowserKit\Response;
 
 class CookieJarTest extends TestCase
 {
+    public function testCookiesMatchEquivalentIpv6Hosts()
+    {
+        foreach ([
+            ['[0:0:0:0:0:0:0:1]', '[::1]'],
+            ['[2001:0DB8:0:0:0:0:0:1]', '[2001:db8::1]'],
+            ['[0:0:0:0:0:ffff:c000:280]', '[::ffff:192.0.2.128]'],
+        ] as [$firstHost, $secondHost]) {
+            $cookieJar = new CookieJar();
+            $cookieJar->updateFromSetCookie(['sid=old'], 'https://'.$firstHost.'/');
+
+            $this->assertSame(['sid' => 'old'], $cookieJar->allValues('https://'.$secondHost.'/'));
+            $this->assertSame('old', $cookieJar->get('sid', '/', $secondHost)->getValue());
+
+            $cookieJar->updateFromSetCookie(['sid=new'], 'https://'.$secondHost.'/');
+
+            $this->assertCount(1, $cookieJar->all());
+            $this->assertSame(['sid' => 'new'], $cookieJar->allValues('https://'.$firstHost.'/'));
+
+            $cookieJar->expire('sid', '/', $firstHost);
+
+            $this->assertSame([], $cookieJar->all());
+        }
+    }
+
+    public function testCookiesWithLeadingDotIpv6Domains()
+    {
+        foreach (['.', '..'] as $prefix) {
+            $cookieJar = new CookieJar();
+            $cookieJar->set($cookie = new Cookie('sid', 'old', null, '/', $prefix.'[0:0:0:0:0:0:0:1]'));
+
+            $this->assertSame($cookie, $cookieJar->get('sid', '/', '[0:0:0:0:0:0:0:1]'));
+            $this->assertSame(['sid' => 'old'], $cookieJar->allValues('https://[0:0:0:0:0:0:0:1]/'));
+            $this->assertSame(['sid' => 'old'], $cookieJar->allValues('https://[::1]/'));
+            $this->assertSame($prefix.'[0:0:0:0:0:0:0:1]', $cookie->getDomain());
+
+            $cookieJar->set(new Cookie('sid', 'new', null, '/', $prefix.'[::1]'));
+
+            $this->assertCount(1, $cookieJar->all());
+            $this->assertSame('new', $cookieJar->get('sid', '/', '[::1]')->getValue());
+
+            $cookieJar->expire('sid', '/', $prefix.'[0:0:0:0:0:0:0:1]');
+
+            $this->assertSame([], $cookieJar->all());
+        }
+    }
+
+    public function testCookieIpv6DomainPrefixesStaySeparate()
+    {
+        $cookieJar = new CookieJar();
+        foreach (['', '.', '..'] as $prefix) {
+            $cookieJar->set(new Cookie('sid', 'value', null, '/', $prefix.'[0:0:0:0:0:0:0:1]'));
+        }
+
+        $this->assertCount(3, $cookieJar->all());
+
+        $cookieJar->expire('sid', '/', '[::1]');
+        $this->assertCount(2, $cookieJar->all());
+
+        $cookieJar->expire('sid', '/', '.[::1]');
+        $this->assertCount(1, $cookieJar->all());
+        $this->assertSame('..[0:0:0:0:0:0:0:1]', $cookieJar->all()[0]->getDomain());
+    }
+
+    public function testManuallySetCookiesMatchEquivalentIpv6Domains()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set($cookie = new Cookie('sid', 'old', null, '/', '0:0:0:0:0:0:0:1'));
+
+        $this->assertSame($cookie, $cookieJar->get('sid', '/', '::1'));
+        $this->assertSame('0:0:0:0:0:0:0:1', $cookie->getDomain());
+
+        $cookieJar->set(new Cookie('sid', 'new', null, '/', '::1'));
+
+        $this->assertCount(1, $cookieJar->all());
+        $this->assertSame('new', $cookieJar->get('sid', '/', '0:0:0:0:0:0:0:1')->getValue());
+
+        $cookieJar->expire('sid', '/', '0:0:0:0:0:0:0:1');
+
+        $this->assertSame([], $cookieJar->all());
+    }
+
+    public function testCookieIpv6DomainsStaySeparate()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set(new Cookie('sid', 'bare', null, '/', '::1'));
+        $cookieJar->set(new Cookie('sid', 'bracketed', null, '/', '[::1]'));
+        $cookieJar->set(new Cookie('sid', 'other', null, '/', '[::2]'));
+        $cookieJar->set(new Cookie('sid', 'invalid', null, '/', '[invalid:address]'));
+
+        $this->assertCount(4, $cookieJar->all());
+        $this->assertSame('bare', $cookieJar->get('sid', '/', '::1')->getValue());
+        $this->assertSame(['sid' => 'bracketed'], $cookieJar->allValues('https://[::1]/'));
+        $this->assertSame(['sid' => 'other'], $cookieJar->allValues('https://[::2]/'));
+        $this->assertSame('invalid', $cookieJar->get('sid', '/', '[invalid:address]')->getValue());
+    }
+
     public function testSetGet()
     {
         $cookieJar = new CookieJar();
@@ -92,6 +188,16 @@ class CookieJarTest extends TestCase
 
         $this->assertSame(['baz' => 'qux'], $cookieJar->allValues('http://example.com/'));
         $this->assertNull($cookieJar->get('foo'));
+    }
+
+    public function testUpdateFromSetCookieDeletesCookiesAtTheUnixEpoch()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(['foo=bar'], 'https://example.com/');
+        $cookieJar->updateFromSetCookie(['foo=bar; Expires=Thu, 01 Jan 1970 00:00:00 GMT'], 'https://example.com/');
+
+        $this->assertNull($cookieJar->get('foo'));
+        $this->assertSame([], $cookieJar->allValues('https://example.com/'));
     }
 
     public function testUpdateFromSetCookieIgnoresAnEmptyDomainAttribute()

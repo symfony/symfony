@@ -319,8 +319,13 @@ class Connection implements ResetInterface
             // This may also work for other databases if their sequence name is suffixed with '_seq', '_id_seq' or similar.
             return str_starts_with($tableName, $this->configuration['table_name']); // MESSENGER_MESSAGES*
         });
-        $this->updateSchema();
-        $configuration->setSchemaAssetsFilter($assetFilter);
+
+        try {
+            $this->updateSchema();
+        } finally {
+            $configuration->setSchemaAssetsFilter($assetFilter);
+        }
+
         $this->autoSetup = false;
     }
 

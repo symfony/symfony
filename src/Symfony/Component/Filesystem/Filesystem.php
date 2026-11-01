@@ -171,35 +171,46 @@ class Filesystem
                     throw new IOException(\sprintf('Failed to remove symlink "%s": ', $file).self::$lastError);
                 }
             } elseif (is_dir($file)) {
-                if (!$isRecursive) {
-                    $tmpName = \dirname(realpath($file)).'/.!'.strrev(strtr(base64_encode(random_bytes(2)), '/=', '-!'));
+                $tmpDir = null;
+                $origFile = null;
 
-                    if (file_exists($tmpName)) {
-                        try {
-                            self::doRemove([$tmpName], true);
-                        } catch (IOException) {
+                try {
+                    if (!$isRecursive && \function_exists('mkdir')) {
+                        for ($i = 0; $i < 10; ++$i) {
+                            // Keep the temporary suffix within six characters to preserve room for descendant paths.
+                            $tmpName = \dirname(realpath($file)).'/.'.strtr(base64_encode(random_bytes(2)), ['/' => '-', '+' => '_', '=' => '']);
+
+                            if (!self::box('mkdir', $tmpName, 0o700)) {
+                                continue;
+                            }
+
+                            $tmpDir = $tmpName;
+
+                            if (self::box('rename', $file, $tmpDir.'/d')) {
+                                $origFile = $file;
+                                $file = $tmpDir.'/d';
+                            }
+
+                            break;
                         }
                     }
 
-                    if (!file_exists($tmpName) && self::box('rename', $file, $tmpName)) {
-                        $origFile = $file;
-                        $file = $tmpName;
-                    } else {
-                        $origFile = null;
+                    $filesystemIterator = new \FilesystemIterator($file, \FilesystemIterator::CURRENT_AS_PATHNAME | \FilesystemIterator::SKIP_DOTS);
+                    self::doRemove(iterator_to_array($filesystemIterator, true), true);
+
+                    if (!self::box('rmdir', $file) && file_exists($file) && !$isRecursive) {
+                        $lastError = self::$lastError;
+
+                        if (null !== $origFile && self::box('rename', $file, $origFile)) {
+                            $file = $origFile;
+                        }
+
+                        throw new IOException(\sprintf('Failed to remove directory "%s": ', $file).$lastError);
                     }
-                }
-
-                $filesystemIterator = new \FilesystemIterator($file, \FilesystemIterator::CURRENT_AS_PATHNAME | \FilesystemIterator::SKIP_DOTS);
-                self::doRemove(iterator_to_array($filesystemIterator, true), true);
-
-                if (!self::box('rmdir', $file) && file_exists($file) && !$isRecursive) {
-                    $lastError = self::$lastError;
-
-                    if (null !== $origFile && self::box('rename', $file, $origFile)) {
-                        $file = $origFile;
+                } finally {
+                    if (null !== $tmpDir) {
+                        self::box('rmdir', $tmpDir);
                     }
-
-                    throw new IOException(\sprintf('Failed to remove directory "%s": ', $file).$lastError);
                 }
             } elseif (!self::box('unlink', $file) && ((self::$lastError && str_contains(self::$lastError, 'Permission denied')) || file_exists($file))) {
                 throw new IOException(\sprintf('Failed to remove file "%s": ', $file).self::$lastError);

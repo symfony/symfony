@@ -141,7 +141,7 @@ class AuthenticatedVoter implements CacheableVoterInterface
             foreach ([self::IS_AUTHENTICATED_VERY_RECENTLY, self::IS_AUTHENTICATED_RECENTLY, self::IS_AUTHENTICATED_FULLY] as $attribute) {
                 if (null !== $vote && \in_array($attribute, $attributes, true)) {
                     // a remembered user only has to prove their credentials again, while anyone else has to log in
-                    if (self::IS_AUTHENTICATED_FULLY !== $attribute || $this->authenticationTrustResolver->isRememberMe($token)) {
+                    if (self::IS_AUTHENTICATED_FULLY === $attribute ? $this->authenticationTrustResolver->isRememberMe($token) : $this->canTellRecency($token, $attribute)) {
                         $vote->requestReAuthentication($attribute);
                     }
 
@@ -151,6 +151,16 @@ class AuthenticatedVoter implements CacheableVoterInterface
         }
 
         return $result;
+    }
+
+    /**
+     * A new authentication only cures the denial when its recency can be read: otherwise
+     * the user would be sent back to the login form after each authentication.
+     */
+    private function canTellRecency(TokenInterface $token, string $attribute): bool
+    {
+        return method_exists($this->authenticationTrustResolver, self::IS_AUTHENTICATED_RECENTLY === $attribute ? 'isAuthenticatedRecently' : 'isAuthenticatedVeryRecently')
+            && method_exists($token, 'getAuthenticationProofs');
     }
 
     private function isAuthenticatedRecently(TokenInterface $token, string $attribute): bool

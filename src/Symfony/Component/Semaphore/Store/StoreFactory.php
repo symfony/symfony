@@ -68,6 +68,6 @@ class StoreFactory
                 return new RedisStore($connection);
         }
 
-        throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection));
+        throw new InvalidArgumentException('No semaphore store supports the given DSN.');
     }
 }

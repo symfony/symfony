@@ -21,6 +21,7 @@ use AsyncAws\Sqs\Result\QueueExistsWaiter;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
 use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\Message;
+use AsyncAws\Sqs\ValueObject\MessageAttributeValue;
 use Composer\InstalledVersions;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -346,6 +347,37 @@ class ConnectionTest extends TestCase
         $connection = new Connection(['queue_name' => 'queue', 'account' => 123, 'auto_setup' => false, 'buffer_size' => 9], $client);
         $this->assertNotNull($connection->get(12));
         $this->assertNull($connection->get(12));
+    }
+
+    public function testGetIgnoresMessengerHeadersThatAreNotAJsonObject()
+    {
+        $client = $this->createMock(SqsClient::class);
+        $client->expects($this->exactly(3))->method('receiveMessage')->willReturnOnConsecutiveCalls(
+            ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
+                new Message(['MessageId' => 1, 'ReceiptHandle' => 'a', 'Body' => 'foo', 'MessageAttributes' => [
+                    'X-Symfony-Messenger' => new MessageAttributeValue(['DataType' => 'String', 'StringValue' => '"bar"']),
+                    'baz' => new MessageAttributeValue(['DataType' => 'String', 'StringValue' => 'qux']),
+                ]]),
+            ]]),
+            ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
+                new Message(['MessageId' => 2, 'ReceiptHandle' => 'b', 'Body' => 'foo', 'MessageAttributes' => [
+                    'X-Symfony-Messenger' => new MessageAttributeValue(['DataType' => 'String', 'StringValue' => '123']),
+                    'baz' => new MessageAttributeValue(['DataType' => 'String', 'StringValue' => 'qux']),
+                ]]),
+            ]]),
+            ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
+                new Message(['MessageId' => 3, 'ReceiptHandle' => 'c', 'Body' => 'foo', 'MessageAttributes' => [
+                    'X-Symfony-Messenger' => new MessageAttributeValue(['DataType' => 'String', 'StringValue' => '{"type":"bar"}']),
+                    'baz' => new MessageAttributeValue(['DataType' => 'String', 'StringValue' => 'qux']),
+                ]]),
+            ]]),
+        );
+
+        $connection = new Connection(['auto_setup' => false], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue');
+
+        $this->assertSame(['baz' => 'qux'], $connection->get()[0]['headers']);
+        $this->assertSame(['baz' => 'qux'], $connection->get()[0]['headers']);
+        $this->assertSame(['type' => 'bar', 'baz' => 'qux'], $connection->get()[0]['headers']);
     }
 
     public function testUnexpectedSqsError()

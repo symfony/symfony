@@ -44,7 +44,7 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
 
     public function decode(array $encodedEnvelope): Envelope
     {
-        if (empty($encodedEnvelope['body'])) {
+        if (!\is_string($encodedEnvelope['body'] ?? null) || '' === $encodedEnvelope['body']) {
             return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope should have at least a "body", or maybe you should implement your own serializer.');
         }
 

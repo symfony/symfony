@@ -219,6 +219,23 @@ class SymfonyStyleTest extends TestCase
         $this->assertCount(1, array_unique(array_map('strlen', $lines)), 'Every line of the block is padded to the same width.');
     }
 
+    public function testErrorKeepsAnEscapedTagThatIsWrappedAsText()
+    {
+        // the escaped "<" falls right where the block wraps the message
+        $message = str_repeat('a', 110).'<fg=red;x>y';
+        $this->command->setCode(static function (InputInterface $input, OutputInterface $output) use ($message) {
+            (new SymfonyStyle($input, $output))->error($message);
+
+            return Command::SUCCESS;
+        });
+
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+
+        $lines = array_filter(explode("\n", $this->tester->getDisplay(true)), static fn (string $line): bool => '' !== trim($line));
+
+        $this->assertSame($message, implode('', array_map(static fn (string $line): string => trim(substr($line, 9)), $lines)));
+    }
+
     public function testGetErrorStyle()
     {
         $input = $this->createStub(InputInterface::class);
@@ -401,6 +418,24 @@ class SymfonyStyleTest extends TestCase
         }
 
         $this->assertSame(0, memory_get_usage() - $start);
+    }
+
+    public function testBlockKeepsTheBackslashThatEndsAFullLine()
+    {
+        $this->command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            $io = new SymfonyStyle($input, $output);
+            $io->error(str_repeat('a', 110).'\b');
+            $io->writeln('after');
+
+            return Command::SUCCESS;
+        });
+
+        $this->tester->execute([], ['interactive' => false, 'decorated' => true]);
+
+        $lines = explode("\n", $this->tester->getDisplay(true));
+
+        $this->assertSame("\e[37;41m [ERROR] ".str_repeat('a', 110)."\\\e[39;49m", $lines[2]);
+        $this->assertSame('after', $lines[6]);
     }
 
     public function testAskAndClearExpectFullSectionCleared()

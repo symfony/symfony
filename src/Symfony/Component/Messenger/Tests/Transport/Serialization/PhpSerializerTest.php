@@ -67,6 +67,15 @@ class PhpSerializerTest extends TestCase
         $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
     }
 
+    public function testDecodingFailsWithABodyThatIsNotAString()
+    {
+        $serializer = $this->createPhpSerializer();
+
+        $envelope = $serializer->decode(['body' => ['foo']]);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+    }
+
     public function testDecodingFailsWithBadFormat()
     {
         $serializer = $this->createPhpSerializer();

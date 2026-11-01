@@ -548,7 +548,7 @@ class SymfonyStyle extends OutputStyle
                 : str_repeat(' ', $paddingLength);
 
             if ($style) {
-                $line = \sprintf('<%s>%s</>', $style, $line);
+                $line = \sprintf('<%s>%s</>', $style, OutputFormatter::escapeTrailingBackslash($line));
             }
         }
 

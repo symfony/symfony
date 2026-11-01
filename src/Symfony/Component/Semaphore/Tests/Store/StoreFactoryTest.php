@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
+use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 use Symfony\Component\Semaphore\Store\LockStore;
 use Symfony\Component\Semaphore\Store\RedisStore;
 use Symfony\Component\Semaphore\Store\StoreFactory;
@@ -52,6 +53,17 @@ class StoreFactoryTest extends TestCase
             yield ['redis://localhost?redis_cluster=1', RedisStore::class];
             yield ['redis://localhost?redis_cluster=1&lazy=1', RedisStore::class];
             yield ['redis:?host[localhost]&host[localhost:6379]&redis_cluster=1', RedisStore::class];
+        }
+    }
+
+    public function testCreateStoreWithUnsupportedDsnDoesNotLeakCredentials()
+    {
+        try {
+            StoreFactory::createStore('unsupported://user:s3cr3t@localhost');
+            $this->fail('An exception should have been thrown.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('No semaphore store supports the given DSN.', $e->getMessage());
+            $this->assertStringNotContainsString('s3cr3t', $e->getMessage());
         }
     }
 }

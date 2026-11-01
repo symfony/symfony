@@ -407,7 +407,7 @@ class Table
                                 $rows[] = [\sprintf(
                                     '<comment>%s%s</>: %s',
                                     str_repeat(' ', $maxHeaderLength - Helper::width(Helper::removeDecoration($formatter, $headers[$i] ?? ''))),
-                                    $headers[$i] ?? '',
+                                    OutputFormatter::escapeTrailingBackslash($headers[$i] ?? ''),
                                     $part
                                 )];
                             } else {
@@ -683,7 +683,7 @@ class Table
             $padType = $cell->getStyle()->getPadByAlign();
         }
 
-        return \sprintf($cellFormat, str_pad($content, $width, $style->getPaddingChar(), $padType));
+        return \sprintf($cellFormat, OutputFormatter::escapeTrailingBackslash(str_pad($content, $width, $style->getPaddingChar(), $padType)));
     }
 
     /**

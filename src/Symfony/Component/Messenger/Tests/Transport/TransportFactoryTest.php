@@ -53,10 +53,10 @@ class TransportFactoryTest extends TestCase
             'foobar://barfoo',
             null,
         ];
-        yield 'show dsn when no transport supports' => [
+        yield 'no transport supports dsn' => [
             [false],
             'foobar://barfoo',
-            'No transport supports Messenger DSN "foobar://barfoo".',
+            'No transport supports the given Messenger DSN.',
         ];
         yield 'empty dsn' => [
             [false],
@@ -66,37 +66,42 @@ class TransportFactoryTest extends TestCase
         yield 'dsn with no scheme' => [
             [false],
             'barfoo@bar',
-            'No transport supports Messenger DSN "barfoo@bar".',
+            'No transport supports the given Messenger DSN.',
         ];
         yield 'dsn with empty scheme ' => [
             [false],
             '://barfoo@bar',
-            'No transport supports Messenger DSN "://barfoo@bar".',
+            'No transport supports the given Messenger DSN.',
         ];
         yield 'https dsn' => [
             [false],
             'https://sqs.foobar.amazonaws.com',
-            'No transport supports Messenger DSN "https://sqs.foobar.amazonaws.com"',
+            'No transport supports the given Messenger DSN.',
         ];
         yield 'with package suggestion amqp://' => [
             [false],
             'amqp://foo:barfoo@bar',
-            'No transport supports Messenger DSN "amqp://foo:******@bar". Run "composer require symfony/amqp-messenger" to install AMQP transport.',
+            'No transport supports the given Messenger DSN. Run "composer require symfony/amqp-messenger" to install AMQP transport.',
         ];
-        yield 'replaces password with stars' => [
+        yield 'password' => [
             [false],
             'amqp://myuser:mypassword@broker:5672/vhost',
-            'No transport supports Messenger DSN "amqp://myuser:******@broker:5672/vhost". Run "composer require symfony/amqp-messenger" to install AMQP transport.',
+            'No transport supports the given Messenger DSN. Run "composer require symfony/amqp-messenger" to install AMQP transport.',
         ];
-        yield 'username only is blanked out (as this could be a secret token)' => [
+        yield 'username only' => [
             [false],
             'amqp://myuser@broker:5672/vhost',
-            'No transport supports Messenger DSN "amqp://******@broker:5672/vhost". Run "composer require symfony/amqp-messenger" to install AMQP transport.',
+            'No transport supports the given Messenger DSN. Run "composer require symfony/amqp-messenger" to install AMQP transport.',
         ];
         yield 'empty password' => [
             [false],
             'amqp://myuser:@broker:5672/vhost',
-            'No transport supports Messenger DSN "amqp://myuser:******@broker:5672/vhost". Run "composer require symfony/amqp-messenger" to install AMQP transport.',
+            'No transport supports the given Messenger DSN. Run "composer require symfony/amqp-messenger" to install AMQP transport.',
+        ];
+        yield 'password with a slash' => [
+            [false],
+            'amqp://myuser:12/34@broker:5672/vhost',
+            'No transport supports the given Messenger DSN. Run "composer require symfony/amqp-messenger" to install AMQP transport.',
         ];
     }
 

@@ -819,6 +819,31 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("\n")), $output, $question);
     }
 
+    public function testChoiceKeysWithATrailingBackslash()
+    {
+        $question = new ChoiceQuestion('Which drive?', ['C:\\' => 'first', 'D:\\' => 'second']);
+        (new QuestionHelper())->ask($this->createStreamableInputInterfaceMock($this->getInputStream("C:\\\n")), $output = $this->createOutputInterface(), $question);
+
+        rewind($output->getStream());
+        $this->assertStringStartsWith("Which drive?\n  [C:\\] first\n  [D:\\] second\n > ", str_replace(\PHP_EOL, "\n", stream_get_contents($output->getStream())));
+    }
+
+    public function testErrorWithATrailingBackslash()
+    {
+        $question = new Question('Which path?');
+        $question->setValidator(static function ($value) {
+            if ('/' !== $value) {
+                throw new \InvalidArgumentException('The path must not end with \\');
+            }
+
+            return $value;
+        });
+        (new QuestionHelper())->ask($this->createStreamableInputInterfaceMock($this->getInputStream("a\\\n/\n")), $output = $this->createOutputInterface(), $question);
+
+        rewind($output->getStream());
+        $this->assertSame("Which path?The path must not end with \\\nWhich path?", str_replace(\PHP_EOL, "\n", stream_get_contents($output->getStream())));
+    }
+
     public function testAskThrowsExceptionOnMissingInput()
     {
         $this->expectException(MissingInputException::class);

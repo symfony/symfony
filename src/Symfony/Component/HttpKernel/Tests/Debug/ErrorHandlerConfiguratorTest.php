@@ -61,6 +61,25 @@ class ErrorHandlerConfiguratorTest extends TestCase
         $this->assertSame('User Deprecated: Bar', $secondDeprecationLogger->cleanLogs()[0][1] ?? null);
     }
 
+    #[DataProvider('provideLogDeprecationsOnce')]
+    public function testConfigureLogsDeprecationsOnce(bool $logDeprecationsOnce, array $expectedLogs)
+    {
+        $handler = new ErrorHandler();
+        $logger = new BufferingLogger();
+        (new ErrorHandlerConfigurator($logger, \E_ALL, 0, false, false, null, $logDeprecationsOnce))->configure($handler);
+
+        $handler->handleError(\E_USER_DEPRECATED, 'Foo', __FILE__, __LINE__);
+        $handler->handleError(\E_USER_DEPRECATED, 'Foo', __FILE__, __LINE__);
+
+        $this->assertSame($expectedLogs, array_column($logger->cleanLogs(), 1));
+    }
+
+    public static function provideLogDeprecationsOnce(): iterable
+    {
+        yield 'once' => [true, ['User Deprecated: Foo']];
+        yield 'each time' => [false, ['User Deprecated: Foo', 'User Deprecated: Foo']];
+    }
+
     public function testConfigureKeepsTheLoggersSetOnTheHandler()
     {
         $appLogger = new NullLogger();

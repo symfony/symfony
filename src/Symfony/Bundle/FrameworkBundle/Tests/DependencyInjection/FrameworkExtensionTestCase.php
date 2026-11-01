@@ -774,6 +774,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
         }
     }
 
+    public function testDeprecationsAreLoggedOnceWithoutDebug()
+    {
+        foreach ([true, false] as $debug) {
+            $container = $this->createContainer(['kernel.debug' => $debug]);
+            (new FrameworkExtension())->load([], $container);
+
+            $this->assertSame(!$debug, $container->getDefinition('debug.error_handler_configurator')->getArgument(6));
+        }
+    }
+
     public function testNullPhpErrorsSettingsFollowDebug()
     {
         foreach ([true, false] as $debug) {

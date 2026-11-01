@@ -79,7 +79,7 @@ class Connection
     /** @var array<string, true> */
     private array $inflightIds = [];
 
-    public function __construct(array $options, \Redis|Relay|\RedisCluster|null $redis = null)
+    public function __construct(#[\SensitiveParameter] array $options, \Redis|Relay|\RedisCluster|null $redis = null)
     {
         if (version_compare(phpversion('redis'), '4.3.0', '<')) {
             throw new LogicException('The redis transport requires php-redis 4.3.0 or higher.');
@@ -195,7 +195,7 @@ class Connection
     /**
      * @param string|string[]|null $auth
      */
-    private static function initializeRedis(\Redis|Relay $redis, string $host, int $port, string|array|null $auth, array $params): \Redis|Relay
+    private static function initializeRedis(\Redis|Relay $redis, string $host, int $port, #[\SensitiveParameter] string|array|null $auth, #[\SensitiveParameter] array $params): \Redis|Relay
     {
         if ($redis->isConnected()) {
             return $redis;
@@ -234,7 +234,7 @@ class Connection
     /**
      * @param string|string[]|null $auth
      */
-    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, string|array|null $auth, array $params): \RedisCluster
+    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, #[\SensitiveParameter] string|array|null $auth, #[\SensitiveParameter] array $params): \RedisCluster
     {
         $redis ??= new \RedisCluster(null, $hosts, $params['timeout'], $params['read_timeout'], (bool) ($params['persistent'] ?? false), $auth, ...\defined('Redis::SCAN_PREFIX') ? [$params['ssl'] ?? null] : []);
         $redis->setOption(\Redis::OPT_SERIALIZER, $params['serializer']);
@@ -242,7 +242,7 @@ class Connection
         return $redis;
     }
 
-    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], \Redis|Relay|\RedisCluster|null $redis = null): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options = [], \Redis|Relay|\RedisCluster|null $redis = null): self
     {
         if (!str_contains($dsn, ',')) {
             $params = self::parseDsn($dsn, $options);
@@ -251,26 +251,27 @@ class Connection
                 $params['host'] = 'tls://'.$params['host'];
             }
         } else {
-            $dsns = explode(',', $dsn);
-            $paramss = array_map(static function ($dsn) use (&$options) {
-                return self::parseDsn($dsn, $options);
-            }, $dsns);
+            $allParams = [];
+            foreach (explode(',', $dsn) as $partialDsn) {
+                $allParams[] = self::parseDsn($partialDsn, $options);
+            }
 
             // Merge all the URLs, the last one overrides the previous ones
-            $params = array_merge(...$paramss);
+            $params = array_merge(...$allParams);
             $tls = 'rediss' === $params['scheme'];
 
             // Regroup all the hosts in an array interpretable by RedisCluster
-            $params['host'] = array_map(static function ($params) use ($tls) {
-                if (!isset($params['host'])) {
+            $params['host'] = [];
+            foreach ($allParams as $hostParams) {
+                if (!isset($hostParams['host'])) {
                     throw new InvalidArgumentException('Missing host in DSN, it must be defined when using Redis Cluster.');
                 }
                 if ($tls) {
-                    $params['host'] = 'tls://'.$params['host'];
+                    $hostParams['host'] = 'tls://'.$hostParams['host'];
                 }
 
-                return $params['host'].':'.($params['port'] ?? 6379);
-            }, $paramss, $dsns);
+                $params['host'][] = $hostParams['host'].':'.($hostParams['port'] ?? 6379);
+            }
         }
 
         if ($invalidOptions = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS), ['host', 'port'])) {
@@ -331,7 +332,7 @@ class Connection
         return new self($options, $redis);
     }
 
-    private static function parseDsn(string $dsn, array &$options): array
+    private static function parseDsn(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array &$options): array
     {
         $url = $dsn;
         $scheme = str_starts_with($dsn, 'rediss:') ? 'rediss' : 'redis';
@@ -343,10 +344,10 @@ class Connection
         $url = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', static function ($m) use (&$auth) {
             if (isset($m['password'])) {
                 if (!\in_array($m['user'], ['', 'default'], true)) {
-                    $auth['user'] = rawurldecode($m['user']);
+                    $auth['user'] = $m['user'];
                 }
 
-                $auth['pass'] = rawurldecode($m['password']);
+                $auth['pass'] = $m['password'];
             }
 
             return 'file:'.($m[1] ?? '');

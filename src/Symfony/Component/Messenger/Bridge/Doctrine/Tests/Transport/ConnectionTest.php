@@ -654,6 +654,29 @@ class ConnectionTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelope['headers']);
     }
 
+    /**
+     * @dataProvider provideInvalidIds
+     */
+    public function testFindReturnsNullForAnInvalidId(mixed $id)
+    {
+        $driverConnection = $this->getDBALConnection(true);
+        $driverConnection->expects($this->never())->method('executeQuery');
+
+        $connection = new Connection([], $driverConnection);
+        $this->assertNull($connection->find($id));
+    }
+
+    public static function provideInvalidIds(): iterable
+    {
+        yield 'trailing characters' => ['12abc'];
+        yield 'letters' => ['abc'];
+        yield 'empty string' => [''];
+        yield 'negative' => ['-1'];
+        yield 'decimal' => ['1.5'];
+        yield 'leading space' => [' 1'];
+        yield 'null' => [null];
+    }
+
     public function testFindAll()
     {
         $queryBuilder = $this->getQueryBuilderStub();

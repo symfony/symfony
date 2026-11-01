@@ -48,7 +48,8 @@ class FrankenPhpWorkerRunner implements RunnerInterface
         $resetKernel = $this->application instanceof HttpKernelInterface && filter_var($server['FRANKENPHP_RESET_KERNEL'] ?? false, \FILTER_VALIDATE_BOOL);
         $server['APP_RUNTIME_MODE'] = $resetKernel ? 'web=1&worker=2' : 'web=1&worker=1';
 
-        $handler = function () use ($server, &$sfRequest, &$sfResponse): void {
+        $terminationException = null;
+        $handler = function () use ($server, &$sfRequest, &$sfResponse, &$terminationException): void {
             // Connect to the Xdebug client if it's available
             if (\extension_loaded('xdebug') && \function_exists('xdebug_connect_to_client')) {
                 xdebug_connect_to_client();
@@ -64,15 +65,26 @@ class FrankenPhpWorkerRunner implements RunnerInterface
                 $sfResponse = $this->application;
             }
 
-            $sfResponse->send();
+            try {
+                $sfResponse->send();
+            } finally {
+                if ($this->application instanceof TerminableInterface) {
+                    try {
+                        $this->application->terminate($sfRequest, $sfResponse);
+                    } catch (\Throwable $e) {
+                        // FrankenPHP reports exceptions escaping the callback instead of propagating them
+                        $terminationException = $e;
+                    }
+                }
+            }
         };
 
         $loops = 0;
         do {
             $ret = frankenphp_handle_request($handler);
 
-            if ($this->application instanceof TerminableInterface && $sfRequest && $sfResponse) {
-                $this->application->terminate($sfRequest, $sfResponse);
+            if (null !== $terminationException) {
+                throw $terminationException;
             }
             if ($resetKernel) {
                 $this->application = clone $this->application;

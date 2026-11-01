@@ -24,6 +24,7 @@ use Doctrine\DBAL\Schema\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -340,6 +341,23 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $key = new Key(__METHOD__);
 
         $store->save($key);
+    }
+
+    public function testDsnIsNotExposedInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            new DoctrineDbalStore('pgsql://user:s3cr3t@localhost/db', [], 2.0);
+            $this->fail('An exception should have been thrown.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
     }
 
     public function testConfigureSchemaDifferentDatabase()

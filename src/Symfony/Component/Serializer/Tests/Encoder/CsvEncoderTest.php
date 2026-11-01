@@ -609,6 +609,43 @@ class CsvEncoderTest extends TestCase
         ));
     }
 
+    public function testDecodeSkipsEmptyLines()
+    {
+        $expected = [
+            ['a' => '1', 'b' => '2'],
+            ['a' => '3', 'b' => '4'],
+        ];
+
+        $this->assertSame($expected, $this->encoder->decode("a,b\n1,2\n\n3,4\n", 'csv'));
+        $this->assertSame($expected, $this->encoder->decode("a,b\n1,2\n\n\n3,4\n", 'csv'));
+        $this->assertSame([['a' => '1', 'b' => '2']], $this->encoder->decode("a,b\n1,2\n\n", 'csv'));
+    }
+
+    public function testDecodeSkipsEmptyLineBeforeHeader()
+    {
+        $this->assertSame([['a' => '1', 'b' => '2']], $this->encoder->decode("\na,b\n1,2\n", 'csv'));
+    }
+
+    public function testDecodeWithoutHeaderSkipsEmptyLines()
+    {
+        $this->assertSame([['1', '2'], ['3', '4']], $this->encoder->decode("1,2\n\n3,4\n", 'csv', [CsvEncoder::NO_HEADERS_KEY => true]));
+        $this->assertSame([['1', '2'], ['3', '4']], $this->encoder->decode("\n1,2\n\n3,4\n", 'csv', [CsvEncoder::NO_HEADERS_KEY => true]));
+    }
+
+    public function testDecodeKeepsEmptyLinesOfSingleColumnDocument()
+    {
+        $this->assertSame([['name' => 'alice'], ['name' => null], ['name' => 'bob'], ['name' => null]], $this->encoder->decode("name\nalice\n\nbob\n\n", 'csv'));
+        $this->assertSame([['name' => null]], $this->encoder->decode("name\n\n", 'csv'));
+        $this->assertSame([[null], ['x'], [null]], $this->encoder->decode("\nx\n\n", 'csv', [CsvEncoder::NO_HEADERS_KEY => true]));
+    }
+
+    public function testEncodeDecodeSingleColumnWithEmptyValues()
+    {
+        $data = [['name' => null], ['name' => 'alice'], ['name' => null]];
+
+        $this->assertSame($data, $this->encoder->decode($this->encoder->encode($data, 'csv'), 'csv'));
+    }
+
     public function testDecodeToManyRelation()
     {
         $expected = [

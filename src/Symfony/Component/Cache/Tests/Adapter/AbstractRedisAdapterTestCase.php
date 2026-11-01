@@ -16,6 +16,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Relay\Cluster as RelayCluster;
 use Relay\Relay;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 
 abstract class AbstractRedisAdapterTestCase extends AdapterTestCase
 {
@@ -54,5 +55,22 @@ abstract class AbstractRedisAdapterTestCase extends AdapterTestCase
 
         $cache->clear();
         $this->assertFalse($cache->hasItem('foo'));
+    }
+
+    public function testDeleteItemsWhenKeyHoldsAnotherType()
+    {
+        $cache = $this->createCachePool();
+
+        if (!$cache instanceof RedisAdapter && !$cache instanceof RedisTagAwareAdapter) {
+            $this->markTestSkipped('The Redis key of the item is not known.');
+        }
+
+        $cache->save($cache->getItem('foo')->set('foo'));
+        self::$redis->sAdd((new \ReflectionMethod($cache, 'getId'))->invoke($cache, 'bar'), 'bar');
+
+        $cache->deleteItems(['foo', 'bar']);
+
+        $this->assertFalse($cache->hasItem('foo'));
+        $this->assertFalse($cache->hasItem('bar'));
     }
 }

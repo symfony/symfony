@@ -67,19 +67,21 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
                 continue;
             }
 
-            if (!\is_array($redisEnvelope = json_decode($message['data']['message'] ?? '', true))) {
-                continue;
-            }
-
             $stamps = [
                 new RedisReceivedStamp($message['id']),
                 new TransportMessageIdStamp($message['id']),
             ];
 
+            if (!\is_array($redisEnvelope = json_decode($message['data']['message'] ?? '', true))) {
+                $envelopes[] = MessageDecodingFailedException::wrap($message['data'], 'Could not decode the Redis stream entry: its "message" field should contain a JSON object.')->with(...$stamps);
+
+                continue;
+            }
+
             try {
                 if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {
                     $envelope = $this->serializer->decode($redisEnvelope = [
-                        'body' => $redisEnvelope['body'],
+                        'body' => \is_string($redisEnvelope['body']) ? $redisEnvelope['body'] : null,
                         'headers' => $redisEnvelope['headers'],
                     ]);
                 } else {
@@ -154,7 +156,7 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
         try {
             if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {
                 $envelope = $this->serializer->decode([
-                    'body' => $redisEnvelope['body'],
+                    'body' => \is_string($redisEnvelope['body']) ? $redisEnvelope['body'] : null,
                     'headers' => $redisEnvelope['headers'],
                 ]);
             } else {

@@ -33,6 +33,10 @@ final class Rate
         if (TimeUtil::dateIntervalToSeconds($refillTime) < 1) {
             throw new InvalidIntervalException('The refill interval must be at least one second.');
         }
+
+        if ($refillAmount < 1) {
+            throw new \InvalidArgumentException(\sprintf('The refill amount must be a positive integer, "%d" given.', $refillAmount));
+        }
     }
 
     public static function perSecond(int $rate = 1): self

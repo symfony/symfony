@@ -22,6 +22,7 @@ use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 use Symfony\Component\Form\Tests\Fixtures\Organization;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -250,6 +251,70 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 
         // As result, root form contain errors
         $this->assertCount(1, $form->getErrors(false));
+    }
+
+    public function testCollectionTypeKeepAsListValidatesTheEntries()
+    {
+        $form = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->create(CollectionTypeTest::TESTED_TYPE, [], [
+                'entry_type' => TextTypeTest::TESTED_TYPE,
+                'entry_options' => ['constraints' => [new NotBlank()]],
+                'allow_add' => true,
+                'keep_as_list' => true,
+            ]);
+
+        $form->submit(['foo', '']);
+
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->getErrors(true));
+        $this->assertCount(0, $form->get('0')->getErrors());
+        $this->assertCount(1, $form->get('1')->getErrors());
+    }
+
+    public function testCollectionTypeKeepAsListValidatesTheEntriesBeforeAGap()
+    {
+        $form = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->create(CollectionTypeTest::TESTED_TYPE, ['a', 'b', 'c'], [
+                'entry_type' => TextTypeTest::TESTED_TYPE,
+                'entry_options' => ['constraints' => [new NotBlank()]],
+                'allow_delete' => true,
+                'keep_as_list' => true,
+                'constraints' => [new All([new Length(max: 1)])],
+            ]);
+
+        $form->submit([0 => '', 2 => 'zz']);
+
+        $this->assertSame([null, 'zz'], $form->getData());
+        $this->assertFalse($form->has('2'));
+        $this->assertCount(1, $form->get('0')->getErrors());
+        $this->assertSame('zz', $form->get('1')->getData());
+        $this->assertCount(1, $form->get('1')->getErrors());
+    }
+
+    public function testCollectionTypeKeepAsListMapsTheViolationsOfTheEntriesFollowingADeletedEmptyOne()
+    {
+        $form = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->create(CollectionTypeTest::TESTED_TYPE, [], [
+                'entry_type' => TextTypeTest::TESTED_TYPE,
+                'allow_add' => true,
+                'delete_empty' => true,
+                'keep_as_list' => true,
+                'constraints' => [new All([new Length(max: 1)])],
+            ]);
+
+        $form->submit([0 => 'a', 1 => '', 2 => 'b', 3 => 'cc']);
+
+        $this->assertSame(['a', 'b', 'cc'], $form->getData());
+        $this->assertFalse($form->has('3'));
+        $this->assertCount(0, $form->get('1')->getErrors());
+        $this->assertSame('cc', $form->get('2')->getData());
+        $this->assertCount(1, $form->get('2')->getErrors());
     }
 
     public function testCollectionTypeKeepAsListOptionTrue()

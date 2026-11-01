@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 
 class AmqpFactory
 {
-    public function createConnection(array $credentials): \AMQPConnection
+    public function createConnection(#[\SensitiveParameter] array $credentials): \AMQPConnection
     {
         return new \AMQPConnection($credentials);
     }

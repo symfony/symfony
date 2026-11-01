@@ -13,7 +13,9 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\Attributes\RequiresFunction;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
@@ -21,6 +23,7 @@ use Symfony\Component\HttpClient\Psr18NetworkException;
 use Symfony\Component\HttpClient\Psr18RequestException;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Tests\Fixtures\UnknownSizeStream;
+use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class Psr18ClientTest extends TestCase
@@ -42,6 +45,21 @@ class Psr18ClientTest extends TestCase
         $this->assertSame('application/json', $response->getHeaderLine('content-type'));
 
         $body = json_decode((string) $response->getBody(), true);
+
+        $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
+    }
+
+    #[RequiresPhpExtension('curl')]
+    public function testSendRequestWithTraceableClient()
+    {
+        $factory = new Psr17Factory();
+        $client = new Psr18Client(new TraceableHttpClient(new CurlHttpClient()), $factory, $factory);
+
+        $response = $client->sendRequest($factory->createRequest('GET', 'http://localhost:8057'));
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        $body = json_decode($response->getBody()->getContents(), true);
 
         $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
     }

@@ -324,6 +324,7 @@ class DumperTest extends TestCase
             'line-separator' => ["\xE2\x80\xA8", '"\\L"'],
             'paragraph-separator' => ["\xE2\x80\xA9", '"\\P"'],
             'colon' => [':', "':'"],
+            'byte-order-mark' => ["\u{FEFF}foo", "'\u{FEFF}foo'"],
         ];
     }
 

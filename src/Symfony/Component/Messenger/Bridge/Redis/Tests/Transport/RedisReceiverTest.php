@@ -152,28 +152,27 @@ class RedisReceiverTest extends TestCase
         $this->assertInstanceOf(MessageDecodingFailedException::class, $envelopes[0]->getMessage());
     }
 
-    public function testItIgnoresAMessageFieldThatDoesNotDecodeToAnArray()
+    public function testItRejectsAStreamEntryThatIsNotAMessengerEnvelope()
     {
         $connection = $this->createStub(Connection::class);
-        $connection->method('get')->willReturn([['id' => '1', 'data' => ['message' => '12345']]]);
+        $connection->method('get')->willReturn([
+            ['id' => '1', 'data' => ['message' => '12345']],
+            ['id' => '2', 'data' => ['message' => '"a string"']],
+            ['id' => '3', 'data' => ['message' => 'false']],
+            ['id' => '4', 'data' => ['message' => 'foo']],
+            ['id' => '5', 'data' => ['foo' => 'bar']],
+            ['id' => '6', 'data' => ['message' => '{"body":["foo"],"headers":{"type":"bar"}}']],
+        ]);
 
         $receiver = new RedisReceiver($connection, new PhpSerializer());
+        $envelopes = $receiver->get(6);
 
-        $this->assertSame([], $receiver->get());
+        $this->assertCount(6, $envelopes);
 
-        $connection = $this->createStub(Connection::class);
-        $connection->method('get')->willReturn([['id' => '2', 'data' => ['message' => '"a string"']]]);
-
-        $receiver = new RedisReceiver($connection, new PhpSerializer());
-
-        $this->assertSame([], $receiver->get());
-
-        $connection = $this->createStub(Connection::class);
-        $connection->method('get')->willReturn([['id' => '3', 'data' => ['message' => 'false']]]);
-
-        $receiver = new RedisReceiver($connection, new PhpSerializer());
-
-        $this->assertSame([], $receiver->get());
+        foreach ($envelopes as $i => $envelope) {
+            $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+            $this->assertSame((string) ($i + 1), $envelope->last(RedisReceivedStamp::class)->getId());
+        }
     }
 
     public static function redisEnvelopeProvider(): \Generator

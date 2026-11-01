@@ -1068,6 +1068,11 @@ class Parser
 
         $value = str_replace(["\r\n", "\r"], "\n", $value);
 
+        // remove the byte order mark (BOM) at the start of the stream, not at the start of a nested block
+        if (null === $this->totalNumberOfLines && str_starts_with($value, "\u{FEFF}")) {
+            $value = substr($value, 3);
+        }
+
         // remove the YAML header, and the comments and empty lines before the content
         $value = $this->removeLeadingLines('#^(?:[ \t]*+(?:\#[^\n]*+)?+\n)*+(?:%YAML[: ][\d.]++[^\n]*+\n(?:[ \t]*+(?:\#[^\n]*+)?+\n)*+)?+#', $value);
 

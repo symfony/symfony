@@ -91,6 +91,11 @@ class ConnectionTest extends TestCase
             {
                 return false;
             }
+
+            public function getLastError(): ?string
+            {
+                return null;
+            }
         };
 
         $previous = ini_set('zend.exception_ignore_args', '0');

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T07:33:28Z
+
+Fixed the checksum fixture for PHP on 32-bit systems. Rebased on 8.2 after the merge-up.

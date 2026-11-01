@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Allow configuring the answer regex and displayed labels of confirmation prompts in `SymfonyStyle::confirm()` and `ConfirmationQuestion`
  * Add `CommandInvocation` and the `%command.invocation%` help placeholder to include the PHP executable or Symfony CLI launcher
  * Add `CompletionSuggestions::suggestPaths()`, `suggestDirectories()` and `getPathSuggestion()` to let the shell complete file system paths, as `InputFile` arguments and options now do
  * Pass the `CompletionSuggestions` to the `suggestedValues` closures of arguments and options

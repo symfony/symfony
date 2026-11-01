@@ -291,6 +291,36 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame('children[field2].data', $violations[1]->getPropertyPath());
     }
 
+    public function testFieldConstraintsStayInTheirCollectionWithSharedPropertyPaths()
+    {
+        $this->assertFieldConstraintStaysInItsCollection(false, false);
+        $this->assertFieldConstraintStaysInItsCollection(true, false);
+    }
+
+    public function testFieldConstraintsStayInTheirCollectionWithSharedPropertyPathsAndErrorBubbling()
+    {
+        $this->assertFieldConstraintStaysInItsCollection(false, true);
+        $this->assertFieldConstraintStaysInItsCollection(true, true);
+    }
+
+    public function testTransformationErrorsStayOnTheirOriginatingFieldWithSharedPropertyPaths()
+    {
+        $form = $this->formFactory->create(FormType::class)
+            ->add('first', IntegerType::class, ['property_path' => '[value]'])
+            ->add('second', IntegerType::class, ['property_path' => '[value]']);
+
+        $form->submit(['first' => 'invalid', 'second' => '175']);
+
+        $this->assertFalse($form->isValid());
+        $this->assertFalse($form->get('first')->isSynchronized());
+        $this->assertTrue($form->get('second')->isSynchronized());
+        $this->assertTrue($form->get('second')->isValid());
+        $this->assertCount(1, $form->get('first')->getErrors());
+        $this->assertCount(0, $form->get('second')->getErrors());
+        $this->assertCount(1, $form->getErrors(true));
+        $this->assertSame($form->get('first'), $form->get('first')->getErrors()->current()->getOrigin());
+    }
+
     public function testCascadeValidationToChildFormsWithTwoValidConstraints()
     {
         $form = $this->formFactory->create(ReviewType::class);
@@ -480,6 +510,38 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertCount(0, $form->get('field1')->getErrors());
         $this->assertFalse($form->get('field2')->isValid());
         $this->assertCount(1, $form->get('field2')->getErrors());
+    }
+
+    private function assertFieldConstraintStaysInItsCollection(bool $reverseOrder, bool $errorBubbling): void
+    {
+        $builder = $this->formFactory->createBuilder(FormType::class, ['employees' => ['']]);
+        $names = $reverseOrder ? ['private', 'public'] : ['public', 'private'];
+
+        foreach ($names as $name) {
+            $builder->add($name, CollectionType::class, [
+                'property_path' => '[employees]',
+                'entry_type' => TextType::class,
+                'entry_options' => [
+                    'constraints' => 'public' === $name ? [new NotBlank()] : [],
+                    'error_bubbling' => $errorBubbling,
+                ],
+                'error_bubbling' => false,
+            ]);
+        }
+
+        $form = $builder->getForm();
+        $form->submit(['public' => [''], 'private' => ['175']]);
+
+        $this->assertFalse($form->isValid());
+        $this->assertFalse($form->get('public')->isValid());
+        $this->assertTrue($form->get('private')->isValid());
+        $this->assertCount(1, $form->get('public')->getErrors(true));
+        $this->assertCount(0, $form->get('private')->getErrors(true));
+        $error = $form->get('public')->getErrors(true)->current();
+        $this->assertSame($form->get('public')->get('0'), $error->getOrigin());
+        $this->assertSame('children[public].children[0].data', $error->getCause()->getPropertyPath());
+        $view = $form->createView();
+        $this->assertSame($error, ($errorBubbling ? $view['public'] : $view['public']['0'])->vars['errors']->current());
     }
 }
 

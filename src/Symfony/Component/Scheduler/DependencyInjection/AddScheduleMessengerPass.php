@@ -108,6 +108,17 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                     }
                 }
 
+                $isolated = $tagAttributes['isolated'] ?? false;
+                $timeout = $tagAttributes['timeout'] ?? null;
+
+                if (null !== $timeout && !$isolated) {
+                    throw new InvalidArgumentException(\sprintf('Invalid task service "%s": option "timeout" requires option "isolated" to be true, as a command cannot be interrupted while it runs in the worker consuming the schedule.', $serviceId));
+                }
+
+                if (null !== $timeout && $timeout <= 0) {
+                    throw new InvalidArgumentException(\sprintf('Invalid task service "%s": option "timeout" must be a positive number of seconds, or null to let the command run to completion.', $serviceId));
+                }
+
                 $serviceDefinition = $container->getDefinition($serviceId);
 
                 $commandTags = $serviceDefinition->getTag('console.command');
@@ -131,8 +142,19 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                     } else {
                         $input = $commandName.('' !== $arguments ? " $arguments" : '');
                     }
-                    $message = new Definition(RunCommandMessage::class, [$input]);
+                    $messageArguments = [$input];
+
+                    if ($isolated) {
+                        $messageArguments['$isolated'] = true;
+                        $messageArguments['$timeout'] = $timeout;
+                    }
+
+                    $message = new Definition(RunCommandMessage::class, $messageArguments);
                 } else {
+                    if ($isolated) {
+                        throw new InvalidArgumentException(\sprintf('Invalid task service "%s": option "isolated" is only supported on console commands, as a service call has no process of its own to run in.', $serviceId));
+                    }
+
                     $r = $container->getReflectionClass($serviceDefinition->getClass(), false);
 
                     if ($r && !$r->hasMethod($method) && !$r->hasMethod('__call')) {

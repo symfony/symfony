@@ -52,6 +52,12 @@ final class WorkflowServiceRegistrar
         $type = $workflow['type'];
         $workflowId = \sprintf('%s.%s', $type, $name);
 
+        foreach ([$workflowId, $workflowId.'.definition', $workflowId.'.metadata_store'] as $id) {
+            if ($container->has($id)) {
+                throw new LogicException(\sprintf('Cannot register workflow "%s": service ID "%s" already exists.', $name, $id));
+            }
+        }
+
         // Process Metadata (workflow + places (transition is done in the "create transition" block))
         $metadataStoreDefinition = new Definition(InMemoryMetadataStore::class, [[], [], null]);
         if ($workflow['metadata']) {

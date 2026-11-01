@@ -137,6 +137,23 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertOutputNotContains('[<comment>Add new tag</comment>, hello]', $output);
     }
 
+    public function testAskChoiceDefaultWithATrailingBackslash()
+    {
+        $question = new ChoiceQuestion('Which drive?', ['C:\\', 'D:\\'], 0);
+        (new SymfonyQuestionHelper())->ask($this->createStreamableInputInterfaceMock($this->getInputStream("\n")), $output = $this->createOutputInterface(), $question);
+
+        $this->assertOutputContains('Which drive? [C:\]:', $output);
+    }
+
+    public function testAskMultiselectChoiceDefaultWithATrailingBackslash()
+    {
+        $question = new ChoiceQuestion('Which drives?', ['C:\\', 'D:\\'], '0,1');
+        $question->setMultiselect(true);
+        (new SymfonyQuestionHelper())->ask($this->createStreamableInputInterfaceMock($this->getInputStream("\n")), $output = $this->createOutputInterface(), $question);
+
+        $this->assertOutputContains('Which drives? [C:\, D:\]:', $output);
+    }
+
     public function testAskReturnsNullIfValidatorAllowsIt()
     {
         $questionHelper = new SymfonyQuestionHelper();

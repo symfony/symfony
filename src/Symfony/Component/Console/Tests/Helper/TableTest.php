@@ -1210,6 +1210,27 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    public function testStyleWithoutPaddingAfterACellEndingWithABackslash()
+    {
+        $style = new TableStyle();
+        $style
+            ->setHorizontalBorderChars('')
+            ->setVerticalBorderChars('')
+            ->setDefaultCrossingChar('')
+            ->setCellRowContentFormat('%s')
+            ->setPadType(\STR_PAD_LEFT)
+        ;
+
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(['C:\\', 'D:\\'])
+            ->setRows([['abcd', 'ef']])
+            ->setStyle($style);
+        $table->render();
+
+        $this->assertSame(" C:\\D:\\\nabcd ef\n", $this->getOutputContent($output));
+    }
+
     public function testRowSeparator()
     {
         $table = new Table($output = $this->getOutputStream());
@@ -2918,6 +2939,18 @@ class TableTest extends TestCase
             'default',
             'Books',
             'Page 1/2',
+        ];
+
+        yield 'With a trailing backslash in a header' => [
+            <<<EOTXT
+                +-----------+
+                | Name: foo |
+                |  C:\\: bar |
+                +-----------+
+
+                EOTXT,
+            ['Name', 'C:\\'],
+            [['foo', 'bar']],
         ];
     }
 

@@ -66,6 +66,16 @@ class PhpSerializerTest extends TestCase
         $serializer->decode([]);
     }
 
+    public function testDecodingFailsWithABodyThatIsNotAString()
+    {
+        $serializer = $this->createPhpSerializer();
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage('Encoded envelope should have at least a "body", or maybe you should implement your own serializer');
+
+        $serializer->decode(['body' => ['foo']]);
+    }
+
     public function testDecodingFailsWithBadFormat()
     {
         $serializer = $this->createPhpSerializer();

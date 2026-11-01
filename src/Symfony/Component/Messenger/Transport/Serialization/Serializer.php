@@ -91,11 +91,11 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
     public function decode(array $encodedEnvelope): Envelope
     {
-        if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
+        if (!\is_string($encodedEnvelope['body'] ?? null) || '' === $encodedEnvelope['body'] || !($encodedEnvelope['headers'] ?? null)) {
             throw new MessageDecodingFailedException('Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.');
         }
 
-        if (empty($encodedEnvelope['headers']['type'])) {
+        if (!\is_string($encodedEnvelope['headers']['type'] ?? null) || '' === $encodedEnvelope['headers']['type']) {
             throw new MessageDecodingFailedException('Encoded envelope does not have a "type" header.');
         }
 

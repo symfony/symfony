@@ -273,6 +273,7 @@ class Connection
             $attributes = $message->getMessageAttributes();
             if (isset($attributes[self::MESSAGE_ATTRIBUTE_NAME]) && 'String' === $attributes[self::MESSAGE_ATTRIBUTE_NAME]->getDataType()) {
                 $headers = json_decode($attributes[self::MESSAGE_ATTRIBUTE_NAME]->getStringValue(), true);
+                $headers = \is_array($headers) ? $headers : [];
                 unset($attributes[self::MESSAGE_ATTRIBUTE_NAME]);
             }
             foreach ($attributes as $name => $attribute) {

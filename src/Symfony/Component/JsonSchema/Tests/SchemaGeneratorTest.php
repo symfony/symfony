@@ -195,6 +195,23 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSame(['BookWithAuthors', 'Author', 'SelfReferencingCategory'], array_keys($document->getDefinitions()));
     }
 
+    public function testDocumentKnowsTheClassOfEveryDefinition()
+    {
+        $generator = SchemaGenerator::create();
+        $document = new SchemaDocument();
+
+        $generator->generate(Type::object(BookWithAuthors::class), new Configuration(), $document);
+        $generator->generate(Type::object(Catalog\Product::class), new Configuration(), $document);
+        $generator->generate(Type::object(Inventory\Product::class), new Configuration(), $document);
+
+        $this->assertSame([
+            'BookWithAuthors' => BookWithAuthors::class,
+            'Author' => Author::class,
+            'Product' => Catalog\Product::class,
+            'Inventory.Product' => Inventory\Product::class,
+        ], $document->getDefinitionClasses());
+    }
+
     public function testGeneratorKeepsNoStateBetweenDocuments()
     {
         $generator = SchemaGenerator::create();

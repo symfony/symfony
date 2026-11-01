@@ -203,6 +203,12 @@ class Application implements ResetInterface
         $input ??= new ArgvInput();
         $output ??= new ConsoleOutput();
 
+        // allow phar/binary-distributed tools that cannot call setCatchExceptions()/setCatchErrors()
+        // to still defer to a previously registered PHP exception/error handler (e.g. set via
+        // auto_prepend_file) by setting SYMFONY_DISABLE_CATCH_EXCEPTIONS/SYMFONY_DISABLE_CATCH_ERRORS
+        $catchExceptions = $this->catchExceptions && !filter_var($_ENV['SYMFONY_DISABLE_CATCH_EXCEPTIONS'] ?? $_SERVER['SYMFONY_DISABLE_CATCH_EXCEPTIONS'] ?? getenv('SYMFONY_DISABLE_CATCH_EXCEPTIONS'), \FILTER_VALIDATE_BOOLEAN);
+        $catchErrors = $this->catchErrors && !filter_var($_ENV['SYMFONY_DISABLE_CATCH_ERRORS'] ?? $_SERVER['SYMFONY_DISABLE_CATCH_ERRORS'] ?? getenv('SYMFONY_DISABLE_CATCH_ERRORS'), \FILTER_VALIDATE_BOOLEAN);
+
         $renderException = function (\Throwable $e) use ($output) {
             if ($output instanceof ConsoleOutputInterface) {
                 $this->renderThrowable($e, $output->getErrorOutput());
@@ -227,10 +233,10 @@ class Application implements ResetInterface
 
             $exitCode = $this->doRun($input, $output);
         } catch (\Throwable $e) {
-            if ($e instanceof \Exception && !$this->catchExceptions) {
+            if ($e instanceof \Exception && !$catchExceptions) {
                 throw $e;
             }
-            if (!$e instanceof \Exception && !$this->catchErrors) {
+            if (!$e instanceof \Exception && !$catchErrors) {
                 throw $e;
             }
 

@@ -237,7 +237,7 @@ class ViolationMapper implements ViolationMapperInterface
      */
     private function matchChild(FormInterface $form, PropertyPathIteratorInterface $it, array $originForms): ?FormInterface
     {
-        $target = null;
+        $candidates = [];
         $chunk = '';
         $foundAtIndex = null;
 
@@ -282,11 +282,11 @@ class ViolationMapper implements ViolationMapperInterface
             foreach ($children as $i => $child) {
                 $childPath = (string) $child->getPropertyPath();
                 if ($childPath === $chunk) {
-                    $index = $it->key();
-                    if ($foundAtIndex !== $index || $target !== $origin) {
-                        $target = $child;
+                    if ($foundAtIndex !== $index = $it->key()) {
+                        $candidates = [];
                         $foundAtIndex = $index;
                     }
+                    $candidates[] = $child;
                 } elseif (str_starts_with($childPath, $chunk)) {
                     continue;
                 }
@@ -298,15 +298,15 @@ class ViolationMapper implements ViolationMapperInterface
         }
 
         // No child matched the violation path verbatim: retry with camelized paths.
-        if (null === $target && null !== $startIndex) {
-            return $this->matchCamelizedChild($allChildren, $it, $startIndex);
+        if (null === $foundAtIndex) {
+            return null !== $startIndex ? $this->matchCamelizedChild($allChildren, $it, $startIndex, $originForms) : null;
         }
 
-        if (null !== $foundAtIndex) {
-            $it->seek($foundAtIndex);
+        if (\in_array($origin, $candidates, true)) {
+            $candidates = [$origin];
         }
 
-        return $target;
+        return $this->selectCandidate($candidates, $it, $foundAtIndex, $originForms);
     }
 
     /**
@@ -317,11 +317,12 @@ class ViolationMapper implements ViolationMapperInterface
      * setters, which makes a child named "discount_price" read and write the
      * "discountPrice" property the violation points at.
      *
-     * @param list<FormInterface> $children
+     * @param list<FormInterface>       $children
+     * @param array<int, FormInterface> $originForms
      */
-    private function matchCamelizedChild(array $children, PropertyPathIteratorInterface $it, int $startIndex): ?FormInterface
+    private function matchCamelizedChild(array $children, PropertyPathIteratorInterface $it, int $startIndex, array $originForms): ?FormInterface
     {
-        $target = null;
+        $candidates = [];
         $chunk = '';
         $foundAtIndex = null;
         $childPaths = [];
@@ -339,8 +340,11 @@ class ViolationMapper implements ViolationMapperInterface
 
             foreach ($childPaths as $i => $childPath) {
                 if ($childPath === $chunk) {
-                    $target = $children[$i];
-                    $foundAtIndex = $it->key();
+                    if ($foundAtIndex !== $index = $it->key()) {
+                        $candidates = [];
+                        $foundAtIndex = $index;
+                    }
+                    $candidates[] = $children[$i];
                 } elseif (str_starts_with($childPath, $chunk)) {
                     continue;
                 }
@@ -349,11 +353,51 @@ class ViolationMapper implements ViolationMapperInterface
             }
         }
 
-        if (null !== $foundAtIndex) {
-            $it->seek($foundAtIndex);
+        return null !== $foundAtIndex ? $this->selectCandidate($candidates, $it, $foundAtIndex, $originForms) : null;
+    }
+
+    /**
+     * Selects the candidate through which the longest part of the property path can be matched, the last one on a tie.
+     *
+     * @param non-empty-list<FormInterface> $candidates  The children whose property path matches the path up to $foundAtIndex
+     * @param array<int, FormInterface>     $originForms
+     */
+    private function selectCandidate(array $candidates, PropertyPathIteratorInterface $it, int $foundAtIndex, array $originForms): FormInterface
+    {
+        $target = end($candidates);
+
+        if (1 < \count($candidates)) {
+            $deepestIndex = -1;
+
+            foreach ($candidates as $candidate) {
+                $it->seek($foundAtIndex);
+
+                if ($deepestIndex <= $index = $this->matchDescendants($candidate, $it, $originForms)) {
+                    $target = $candidate;
+                    $deepestIndex = $index;
+                }
+            }
         }
 
+        $it->seek($foundAtIndex);
+
         return $target;
+    }
+
+    /**
+     * Returns the index of the last element of the property path that the mapping can reach through the descendants of the form.
+     *
+     * @param array<int, FormInterface> $originForms
+     */
+    private function matchDescendants(FormInterface $form, PropertyPathIteratorInterface $it, array $originForms): int
+    {
+        $index = $it->key();
+
+        for ($it->next(); $this->acceptsErrors($form) && $it->valid() && null !== $form = $this->matchChild($form, $it, $originForms); $it->next()) {
+            $index = $it->key();
+        }
+
+        return $index;
     }
 
     /**

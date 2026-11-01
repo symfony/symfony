@@ -321,6 +321,35 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame($form->get('first'), $form->get('first')->getErrors()->current()->getOrigin());
     }
 
+    public function testDataConstraintsReachTheSubFormHavingTheFieldWithSharedPropertyPaths()
+    {
+        $this->assertDataConstraintReachesTheSubFormHavingTheField(false);
+        $this->assertDataConstraintReachesTheSubFormHavingTheField(true);
+    }
+
+    public function testEntityConstraintsReachTheSubFormHavingTheFieldWithSharedPropertyPaths()
+    {
+        $profile = new Profile();
+        $profile->person = new Person();
+        $form = $this->formFactory->create(FormType::class, $profile, ['data_class' => Profile::class]);
+
+        foreach (['pub' => 'name', 'home' => 'homeAddress', 'office' => 'officeAddress'] as $name => $field) {
+            $form->add($name, FormType::class, ['property_path' => 'person', 'data_class' => Person::class]);
+            $form->get($name)->add($field, TextType::class);
+        }
+
+        $form->submit(['pub' => ['name' => 'Jane'], 'home' => ['homeAddress' => ''], 'office' => ['officeAddress' => '']]);
+
+        $this->assertFalse($form->isValid());
+        $this->assertCount(2, $form->getErrors(true));
+        $this->assertCount(0, $form->getErrors());
+        $this->assertCount(0, $form->get('pub')->getErrors(true));
+        $this->assertCount(0, $form->get('home')->getErrors());
+        $this->assertCount(0, $form->get('office')->getErrors());
+        $this->assertSame('data.person.homeAddress', $form->get('home')->get('homeAddress')->getErrors()->current()->getCause()->getPropertyPath());
+        $this->assertSame('data.person.officeAddress', $form->get('office')->get('officeAddress')->getErrors()->current()->getCause()->getPropertyPath());
+    }
+
     public function testCascadeValidationToChildFormsWithTwoValidConstraints()
     {
         $form = $this->formFactory->create(ReviewType::class);
@@ -543,6 +572,28 @@ class FormValidatorFunctionalTest extends TestCase
         $view = $form->createView();
         $this->assertSame($error, ($errorBubbling ? $view['public'] : $view['public']['0'])->vars['errors']->current());
     }
+
+    private function assertDataConstraintReachesTheSubFormHavingTheField(bool $reverseOrder): void
+    {
+        $builder = $this->formFactory->createBuilder(FormType::class, ['address' => ['street' => '', 'zip' => '1']], [
+            'constraints' => [new Collection(['address' => new Collection(['street' => new NotBlank()], allowExtraFields: true)])],
+        ]);
+        $fields = ['withStreet' => 'street', 'withZip' => 'zip'];
+
+        foreach ($reverseOrder ? array_reverse($fields) : $fields as $name => $field) {
+            $builder->add($builder->create($name, FormType::class, ['property_path' => '[address]', 'error_bubbling' => false])->add($field, TextType::class));
+        }
+
+        $form = $builder->getForm();
+        $form->submit(['withStreet' => ['street' => ''], 'withZip' => ['zip' => '1']]);
+
+        $this->assertFalse($form->isValid());
+        $this->assertCount(1, $form->getErrors(true));
+        $this->assertCount(0, $form->getErrors());
+        $this->assertCount(0, $form->get('withStreet')->getErrors());
+        $this->assertCount(0, $form->get('withZip')->getErrors(true));
+        $this->assertSame('data[address][street]', $form->get('withStreet')->get('street')->getErrors()->current()->getCause()->getPropertyPath());
+    }
 }
 
 class Foo
@@ -630,5 +681,28 @@ class CustomerType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', Customer::class);
+    }
+}
+
+class Profile
+{
+    public $person;
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('person', new Valid());
+    }
+}
+
+class Person
+{
+    public $name;
+    public $homeAddress;
+    public $officeAddress;
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('homeAddress', new NotBlank());
+        $metadata->addPropertyConstraint('officeAddress', new NotBlank());
     }
 }

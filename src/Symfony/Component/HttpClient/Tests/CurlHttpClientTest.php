@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -207,6 +208,102 @@ class CurlHttpClientTest extends HttpClientTestCase
                 ],
             ],
         ]);
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testDigestAuthenticationUsingCurlOptions(bool $only)
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/custom?'.http_build_query([
+            'status' => 401,
+            'headers' => ['WWW-Authenticate: Digest realm="test", nonce="test-nonce", qop="auth"'],
+        ]), [
+            'extra' => ['curl' => [
+                \CURLOPT_HTTPAUTH => \CURLAUTH_DIGEST | ($only ? \CURLAUTH_ONLY : 0),
+                \CURLOPT_USERNAME => 'user',
+                \CURLOPT_PASSWORD => 'password',
+            ]],
+        ]);
+
+        $this->assertSame(401, $response->getStatusCode());
+        $this->assertStringStartsWith('Digest ', $response->toArray(false)['HTTP_AUTHORIZATION']);
+    }
+
+    public function testAwsAuthenticationUsingCurlOptions()
+    {
+        if (!\defined('CURLAUTH_AWS_SIGV4') || !\defined('CURLOPT_AWS_SIGV4')) {
+            $this->markTestSkipped('AWS signature authentication is not supported by this curl version.');
+        }
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/', [
+            'extra' => ['curl' => [
+                \CURLOPT_HTTPAUTH => \CURLAUTH_AWS_SIGV4,
+                \CURLOPT_AWS_SIGV4 => 'aws:amz:us-east-1:service',
+                \CURLOPT_USERNAME => 'access-key',
+                \CURLOPT_PASSWORD => 'secret-key',
+            ]],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringStartsWith('AWS4-HMAC-SHA256 ', $response->toArray()['HTTP_AUTHORIZATION']);
+    }
+
+    public function testNegotiateAuthenticationUsingCurlOptions()
+    {
+        if (!(curl_version()['features'] & \CURL_VERSION_SPNEGO)) {
+            $this->markTestSkipped('Negotiate authentication is not supported by this curl build.');
+        }
+        $response = $this->getHttpClient(__FUNCTION__)->request('GET', 'http://localhost:8057/', [
+            'extra' => ['curl' => [\CURLOPT_HTTPAUTH => \CURLAUTH_NEGOTIATE]],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[DataProvider('provideAuthenticationMethodsWithDedicatedOptions')]
+    public function testAuthenticationUsingCurlOptionsWithDedicatedOptionIsRejected(int $method, string $option)
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot set "CURLOPT_HTTPAUTH" with "extra.curl", use option "%s" instead.', $option));
+
+        $client->request('GET', 'http://localhost:8057/', ['extra' => ['curl' => [\CURLOPT_HTTPAUTH => $method]]]);
+    }
+
+    public static function provideAuthenticationMethodsWithDedicatedOptions(): iterable
+    {
+        if (!\extension_loaded('curl')) {
+            yield [0, 'auth_basic'];
+
+            return;
+        }
+
+        yield 'basic' => [\CURLAUTH_BASIC, 'auth_basic'];
+        yield 'basic and digest' => [\CURLAUTH_BASIC | \CURLAUTH_DIGEST, 'auth_basic'];
+        yield 'any' => [\CURLAUTH_ANY, 'auth_basic'];
+        yield 'ntlm' => [\CURLAUTH_NTLM, 'auth_ntlm'];
+        yield 'ntlm and negotiate' => [\CURLAUTH_NTLM | \CURLAUTH_NEGOTIATE, 'auth_ntlm'];
+        yield 'any safe' => [\CURLAUTH_ANYSAFE, 'auth_ntlm'];
+        if (\defined('CURLAUTH_NTLM_WB')) {
+            yield 'ntlm winbind' => [\CURLAUTH_NTLM_WB, 'auth_ntlm'];
+        }
+        if (\defined('CURLAUTH_BEARER')) {
+            yield 'bearer' => [\CURLAUTH_BEARER, 'auth_bearer'];
+            yield 'bearer and digest' => [\CURLAUTH_BEARER | \CURLAUTH_DIGEST, 'auth_bearer'];
+        }
+    }
+
+    #[TestWith(['4'])]
+    #[TestWith([4.0])]
+    #[TestWith([true])]
+    public function testAuthenticationUsingCurlOptionsRequiresInteger(mixed $method)
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "CURLOPT_HTTPAUTH" value in "extra.curl" must be an integer.');
+
+        $client->request('GET', 'http://localhost:8057/', ['extra' => ['curl' => [\CURLOPT_HTTPAUTH => $method]]]);
     }
 
     public function testOverridingMaxConnectDurationUsingCurlOptions()

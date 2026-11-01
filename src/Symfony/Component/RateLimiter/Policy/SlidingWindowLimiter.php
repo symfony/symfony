@@ -72,7 +72,7 @@ final class SlidingWindowLimiter implements LimiterInterface
                 $resetDuration = $window->calculateTimeForTokens($this->limit, 1);
                 $resetTime = \DateTimeImmutable::createFromTimestamp($availableTokens > 0 ? floor($now) : ceil($now + $resetDuration));
 
-                return new Reservation($now, new RateLimit($availableTokens, $resetTime, true, $this->limit, $this->resetAt($window, $now)));
+                return new Reservation($now, new RateLimit($availableTokens, $resetTime, true, $this->limit, $this->resetAt($window, $now), 0, null, $this->id));
             }
             if ($availableTokens >= $tokens) {
                 $window->add($tokens);
@@ -82,19 +82,19 @@ final class SlidingWindowLimiter implements LimiterInterface
                     $retryAfter += $window->calculateTimeForTokens($this->limit, 1);
                 }
 
-                $reservation = new Reservation($now, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromTimestamp($availableTokens === $tokens ? ceil($retryAfter) : floor($retryAfter)), true, $this->limit, $this->resetAt($window, $now)));
+                $reservation = new Reservation($now, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromTimestamp($availableTokens === $tokens ? ceil($retryAfter) : floor($retryAfter)), true, $this->limit, $this->resetAt($window, $now), max(0, $tokens), $tokens > 0 ? $now : null, $this->id));
             } else {
                 $waitDuration = $window->calculateTimeForTokens($this->limit, $tokens);
 
                 // the tokens are not available yet, even when the computed wait is 0 at the end of a window
                 if (null !== $maxTime && (0.0 === $maxTime || $waitDuration > $maxTime)) {
                     // process needs to wait longer than set interval
-                    throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->limit, $this->resetAt($window, $now)));
+                    throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->limit, $this->resetAt($window, $now), 0, null, $this->id));
                 }
 
                 $window->add($tokens);
 
-                $reservation = new Reservation($now + $waitDuration, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->limit, $this->resetAt($window, $now)));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->limit, $this->resetAt($window, $now), 0, null, $this->id));
             }
 
             if (0 !== $tokens) {
@@ -113,6 +113,66 @@ final class SlidingWindowLimiter implements LimiterInterface
             return $this->reserve($tokens, 0)->getRateLimit();
         } catch (MaxWaitDurationExceededException $e) {
             return $e->getRateLimit();
+        }
+    }
+
+    /**
+     * Gives back the tokens a consume() call took, when that call should not count.
+     *
+     * Hits fade out as the window slides, so refunding a hit whose weight has
+     * already been released has no effect: the tokens are back already.
+     */
+    public function refund(RateLimit $rateLimit): RateLimit
+    {
+        if (!$rateLimit->isAccepted() || 0 >= $rateLimit->getConsumedTokens() || null === $rateLimit->getHitTime() || $this->id !== $rateLimit->getLimiterId() || $rateLimit->isRefunded()) {
+            return $rateLimit;
+        }
+
+        $this->lock?->acquire(true);
+
+        try {
+            $window = $this->storage->fetch($this->id);
+
+            if (!$window instanceof SlidingWindow) {
+                return $rateLimit;
+            }
+
+            $now = microtime(true);
+            $hitTime = $rateLimit->getHitTime();
+            $windowEnd = $window->getSlidingWindowEndAt();
+            $currentWindowStart = $windowEnd - $this->interval;
+            $previousWindowStart = $currentWindowStart - $this->interval;
+
+            if ($hitTime >= $currentWindowStart && $hitTime < $windowEnd) {
+                if ($now >= $windowEnd + $this->interval) {
+                    return $rateLimit;
+                }
+
+                $window->add(-$rateLimit->getConsumedTokens());
+                $rateLimit->markRefunded();
+
+                if ($now >= $windowEnd) {
+                    // the window expired in the meantime, carry the remaining hits into the new one
+                    $window = SlidingWindow::createFromPreviousWindow($window, $this->interval);
+                }
+            } elseif ($hitTime >= $previousWindowStart && $hitTime < $currentWindowStart) {
+                if ($now >= $windowEnd) {
+                    return $rateLimit;
+                }
+
+                $window->addForLastWindow(-$rateLimit->getConsumedTokens());
+                $rateLimit->markRefunded();
+            } else {
+                return $rateLimit;
+            }
+
+            $this->storage->save($window);
+
+            $availableTokens = $this->getAvailableTokens($window->getHitCount());
+
+            return new RateLimit($availableTokens, \DateTimeImmutable::createFromTimestamp($availableTokens > 0 ? (int) floor($now) : (int) ceil($now + $window->calculateTimeForTokens($this->limit, 1))), true, $this->limit, $this->resetAt($window, $now), 0, null, $this->id);
+        } finally {
+            $this->lock?->release();
         }
     }
 

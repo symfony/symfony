@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T13:18:18Z
+
+Thanks for the PR. I pushed two changes. The BOM was also stripped at the start of nested blocks: `"foo:\n  \u{FEFF}bar: baz"` gave `['foo' => ['bar' => 'baz']]`. So this now strips the BOM at the start of the stream only. And `Yaml::dump("\u{FEFF}foo")` didn't parse back to the same string anymore, so the dumper now quotes strings that start with a BOM.

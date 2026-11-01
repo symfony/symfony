@@ -1581,6 +1581,146 @@ class ViolationMapperTest extends TestCase
         $this->assertEquals([$this->getFormError($violation3, $grandChild3)], iterator_to_array($grandChild3->getErrors()), $grandChild3->getName().' should have an error, but has none');
     }
 
+    public function testBacktrackIfSeveralSubFormsWithSamePropertyPathAndTheFirstOneHasTheChild()
+    {
+        $parent = $this->getForm('parent');
+        $child1 = $this->getForm('subform1', 'address');
+        $child2 = $this->getForm('subform2', 'address');
+        $grandChild = $this->getForm('street');
+
+        $parent->add($child2);
+        $parent->add($child1);
+        $child2->add($grandChild);
+
+        $parent->submit([]);
+
+        $violation = $this->getConstraintViolation('data.address[street]');
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
+        $this->assertCount(0, $child1->getErrors(), $child1->getName().' should not have an error, but has one');
+        $this->assertCount(0, $child2->getErrors(), $child2->getName().' should not have an error, but has one');
+        $this->assertEquals([$this->getFormError($violation, $grandChild)], iterator_to_array($grandChild->getErrors()), $grandChild->getName().' should have an error, but has none');
+    }
+
+    public function testBacktrackToTheSubFormHavingTheFieldWithSharedPropertyPath()
+    {
+        $parent = $this->getForm('parent');
+        $children = [];
+
+        foreach (['home' => 'homeAddress', 'office' => 'officeAddress', 'name' => 'name'] as $name => $field) {
+            $children[$name] = $this->getForm($name, 'person');
+            $children[$name.'.'.$field] = $this->getForm($field, $field);
+            $children[$name]->add($children[$name.'.'.$field]);
+            $parent->add($children[$name]);
+        }
+
+        $parent->submit([]);
+
+        foreach (['home.homeAddress', 'office.officeAddress', 'name.name'] as $expectedTarget) {
+            $violation = $this->getConstraintViolation('data.person.'.explode('.', $expectedTarget)[1]);
+            $this->mapper->mapViolation($violation, $parent);
+
+            $this->assertCount(0, $parent->getErrors());
+
+            foreach ($children as $name => $child) {
+                $this->assertCount($name === $expectedTarget ? 1 : 0, $child->getErrors(), $name);
+            }
+
+            $this->assertEquals([$this->getFormError($violation, $children[$expectedTarget])], iterator_to_array($children[$expectedTarget]->getErrors()));
+            $children[$expectedTarget]->clearErrors();
+        }
+    }
+
+    public function testBacktrackThroughNestedSubFormsWithSamePropertyPath()
+    {
+        $parent = $this->getForm('parent');
+        $first = $this->getForm('first', 'person');
+        $firstAddress = $this->getForm('address', 'address');
+        $street = $this->getForm('street', '[street]');
+        $second = $this->getForm('second', 'person');
+        $secondAddress = $this->getForm('address', 'address');
+        $firstAddress->add($street);
+        $first->add($firstAddress);
+        $second->add($secondAddress);
+        $parent->add($first);
+        $parent->add($second);
+        $parent->submit([]);
+        $violation = $this->getConstraintViolation('data.person.address[street]');
+
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(0, $parent->getErrors());
+        $this->assertCount(0, $first->getErrors());
+        $this->assertCount(0, $firstAddress->getErrors());
+        $this->assertCount(0, $second->getErrors());
+        $this->assertCount(0, $secondAddress->getErrors());
+        $this->assertEquals([$this->getFormError($violation, $street)], iterator_to_array($street->getErrors()));
+    }
+
+    public function testBacktrackToTheSubFormHavingTheCamelizedField()
+    {
+        $parent = $this->getForm('parent');
+        $first = $this->getForm('first', 'person_info');
+        $homeAddress = $this->getForm('home_address', 'home_address');
+        $second = $this->getForm('second', 'person_info');
+        $first->add($homeAddress);
+        $parent->add($first);
+        $parent->add($second);
+        $parent->submit([]);
+        $violation = $this->getConstraintViolation('data.personInfo.homeAddress');
+
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(0, $parent->getErrors());
+        $this->assertCount(0, $first->getErrors());
+        $this->assertCount(0, $second->getErrors());
+        $this->assertEquals([$this->getFormError($violation, $homeAddress)], iterator_to_array($homeAddress->getErrors()));
+    }
+
+    public function testBacktrackToTheSynchronizedSubFormWithSharedPropertyPath()
+    {
+        $parent = $this->getForm('parent');
+        $first = $this->getForm('first', 'address');
+        $firstStreet = $this->getForm('street', '[street]');
+        $second = $this->getForm('second', 'address', null, [], false, false);
+        $secondStreet = $this->getForm('street', '[street]');
+        $first->add($firstStreet);
+        $second->add($secondStreet);
+        $parent->add($first);
+        $parent->add($second);
+        $parent->submit(['first' => [], 'second' => 'invalid']);
+        $violation = $this->getConstraintViolation('data.address[street]');
+
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(0, $parent->getErrors());
+        $this->assertCount(0, $first->getErrors());
+        $this->assertCount(0, $second->getErrors());
+        $this->assertCount(0, $secondStreet->getErrors());
+        $this->assertEquals([$this->getFormError($violation, $firstStreet)], iterator_to_array($firstStreet->getErrors()));
+    }
+
+    public function testOriginatingChildTakesPrecedenceOverTheSubFormHavingTheField()
+    {
+        $parent = $this->getForm('parent');
+        $first = $this->getForm('first', 'address');
+        $second = $this->getForm('second', 'address');
+        $city = $this->getForm('city', '[city]');
+        $second->add($city);
+        $parent->add($first);
+        $parent->add($second);
+        $parent->submit([]);
+        $violation = $this->getConstraintViolation('children[first].data[city]');
+
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(0, $parent->getErrors());
+        $this->assertCount(0, $second->getErrors());
+        $this->assertCount(0, $city->getErrors());
+        $this->assertEquals([$this->getFormError($violation, $first)], iterator_to_array($first->getErrors()));
+    }
+
     public function testMapErrorToOriginatingChildWithSharedPropertyPath()
     {
         $this->assertErrorMappedWithSharedPropertyPath('children[first].data', 'address', 'first');
@@ -1596,6 +1736,7 @@ class ViolationMapperTest extends TestCase
     public function testMapDataErrorToLastChildWithSharedPropertyPath()
     {
         $this->assertErrorMappedWithSharedPropertyPath('data.address[street]', 'address', 'second.street');
+        $this->assertErrorMappedWithSharedPropertyPath('data.address[city]', 'address', 'second');
     }
 
     public function testErrorMappingTakesPrecedenceOverOriginatingChild()

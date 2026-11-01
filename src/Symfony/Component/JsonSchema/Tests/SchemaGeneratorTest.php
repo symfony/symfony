@@ -45,6 +45,8 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\DatedEvent;
 use Symfony\Component\JsonSchema\Tests\Fixtures\DocumentedArticle;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Drawing;
 use Symfony\Component\JsonSchema\Tests\Fixtures\EnumCollectionDefaults;
+use Symfony\Component\JsonSchema\Tests\Fixtures\FailingPropertySchemaProvider;
+use Symfony\Component\JsonSchema\Tests\Fixtures\FallbackClassSchemaResolver;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FixedPropertySchemaProvider;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FixedSchemaPropertySchemaEnricher;
 use Symfony\Component\JsonSchema\Tests\Fixtures\GroupedProduct;
@@ -273,6 +275,47 @@ class SchemaGeneratorTest extends TestCase
         $this->expectExceptionMessage('Types can only be described while a schema is generated in this document.');
 
         (new SchemaDocument())->describe(Type::int(), new Configuration());
+    }
+
+    public function testFailedGenerationLeavesTheDocumentAsItWas()
+    {
+        $generator = SchemaGenerator::create();
+        $document = new SchemaDocument();
+        $generator->generate(Type::object(SelfReferencingCategory::class), new Configuration(), $document);
+
+        try {
+            SchemaGenerator::create(null, [], [new FailingPropertySchemaProvider(Author::class)])->generate(Type::object(BookWithAuthors::class), new Configuration(), $document);
+            $this->fail('The generation should have failed.');
+        } catch (InvalidArgumentException) {
+        }
+
+        $this->assertSame(['SelfReferencingCategory' => SelfReferencingCategory::class], $document->getDefinitionClasses());
+        $this->assertSame(['SelfReferencingCategory'], array_keys($document->getDefinitions()));
+        $this->assertEquals($generator->generate(Type::object(BookWithAuthors::class)), $generator->generate(Type::object(BookWithAuthors::class), new Configuration(), $document));
+    }
+
+    public function testFailedGenerationDoesNotSetTheReferencePathOfTheDocument()
+    {
+        $document = new SchemaDocument();
+
+        try {
+            SchemaGenerator::create(null, [], [new FailingPropertySchemaProvider(Author::class)])->generate(Type::object(Author::class), new Configuration(Dialect::openApi31()), $document);
+            $this->fail('The generation should have failed.');
+        } catch (InvalidArgumentException) {
+        }
+
+        $this->assertSameSchema(['$ref' => '#/$defs/Author'], SchemaGenerator::create()->generate(Type::object(Author::class), new Configuration(), $document)->getRoot());
+    }
+
+    public function testFailedDescriptionLeavesNoDefinitionBehind()
+    {
+        $generator = new SchemaGenerator(self::createReflectionPropertyInfo(), new ShortNameDefinitionPolicy(), [new FallbackClassSchemaResolver(Shelf::class, Author::class)], [new FailingPropertySchemaProvider(Author::class)]);
+        $document = new SchemaDocument();
+
+        $schema = $generator->generate(Type::object(Library::class), new Configuration(), $document);
+
+        $this->assertSameSchema(['type' => 'object'], $schema->getDefinitions()['Library']['properties']['shelf']);
+        $this->assertSame(['Library' => Library::class], $document->getDefinitionClasses());
     }
 
     public function testCreateAddsTheGivenExtensions()

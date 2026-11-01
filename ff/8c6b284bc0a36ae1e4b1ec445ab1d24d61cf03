@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T18:47:24Z
+
+Thanks for the PR. In a single-column CSV, an empty line is a record with an empty value. `encode([['name' => null], ['name' => 'alice']])` gives `"name\n\nalice\n"`, which this PR decoded as `[['name' => 'alice']]`. I pushed a change so that empty lines are skipped only when the first non-empty line has several fields.

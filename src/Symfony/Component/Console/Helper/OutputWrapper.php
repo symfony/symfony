@@ -71,7 +71,9 @@ final class OutputWrapper
         // the u modifier counts characters instead of bytes, but preg_replace() returns null
         // on malformed UTF-8, which would empty the text
         $modifiers = preg_match('//u', $text) ? 'imux' : 'imx';
-        $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))|(%1$s))(?:\r?\n)?|(?:\r?\n|$))#%2$s', $rowPattern, $modifiers);
+        // a line cut inside a word never ends between a backslash and the "<" or ">" it escapes,
+        // or the escaped character would start the next line as a tag delimiter
+        $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))|(%1$s)(?!(?<=\\\\)[<>]))(?:\r?\n)?|(?:\r?\n|$))#%2$s', $rowPattern, $modifiers);
         $output = rtrim(preg_replace($pattern, '\\1'.$break, $text), $break);
 
         return str_replace(' '.$break, $break, $output);

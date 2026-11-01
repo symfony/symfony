@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PdoTagAwareAdapter;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 #[RequiresPhpExtension('pdo_sqlite')]
 #[Group('time-sensitive')]
@@ -112,6 +113,19 @@ class PdoTagAwareAdapterTest extends AbstractPdoAdapterTestCase
             $this->assertTrue($pool->invalidateTags(['foo']));
         } finally {
             @unlink($dbFile);
+        }
+    }
+
+    public function testOptionsAreNotExposedInTrace()
+    {
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            new PdoTagAwareAdapter('mysql://localhost/db', '', 0, ['db_password' => 's3cr3t']);
+            $this->fail('An exception should have been thrown.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
         }
     }
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-31T16:43:30Z
+
+Let me close as the placement outside the callback is deliberate ([original discussion](https://github.com/php-runtime/runtime/pull/124#discussion_r996299461)). Preserving trace context for background work belongs in Datadog's integration. Moving termination changes the PHP request lifecycle. Thanks for submitting!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-31T17:35:48Z
+
+Hum, I have a doubt, let me reopen. Please let me know if you have other elements.

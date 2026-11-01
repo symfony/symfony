@@ -654,27 +654,34 @@ class ConnectionTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelope['headers']);
     }
 
-    /**
-     * @dataProvider provideInvalidIds
-     */
-    public function testFindReturnsNullForAnInvalidId(mixed $id)
+    public function testFindAcceptsIntegerIds()
     {
-        $driverConnection = $this->getDBALConnection(true);
-        $driverConnection->expects($this->never())->method('executeQuery');
+        foreach ([1, \PHP_INT_MIN, \PHP_INT_MAX, '00012', '2147483648', '9223372036854775807', '-1', '-9223372036854775808'] as $id) {
+            $queryBuilder = $this->getQueryBuilderStub();
+            $driverConnection = $this->getDBALConnection(true);
+            $driverConnection->method('createQueryBuilder')->willReturn($queryBuilder);
+            $queryBuilder->method('getSQL')->willReturn('');
+            $driverConnection->expects($this->once())->method('executeQuery')->with('', [$id, 'default'])->willReturn($this->getResultMock([
+                'id' => $id,
+                'body' => 'message',
+                'headers' => '[]',
+            ]));
 
-        $connection = new Connection([], $driverConnection);
-        $this->assertNull($connection->find($id));
+            $message = (new Connection([], $driverConnection))->find($id);
+
+            $this->assertNotNull($message);
+            $this->assertSame($id, $message['id']);
+        }
     }
 
-    public static function provideInvalidIds(): iterable
+    public function testFindReturnsNullForAnInvalidId()
     {
-        yield 'trailing characters' => ['12abc'];
-        yield 'letters' => ['abc'];
-        yield 'empty string' => [''];
-        yield 'negative' => ['-1'];
-        yield 'decimal' => ['1.5'];
-        yield 'leading space' => [' 1'];
-        yield 'null' => [null];
+        foreach (['12abc', 'abc', '', '1.5', ' 1', null] as $id) {
+            $driverConnection = $this->getDBALConnection(true);
+            $driverConnection->expects($this->never())->method('executeQuery');
+
+            $this->assertNull((new Connection([], $driverConnection))->find($id));
+        }
     }
 
     public function testFindAll()

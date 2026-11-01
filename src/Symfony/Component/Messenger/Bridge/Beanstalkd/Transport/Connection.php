@@ -147,8 +147,8 @@ class Connection
 
         return [
             'id' => (string) $job->getId(),
-            'body' => $beanstalkdEnvelope['body'],
-            'headers' => $beanstalkdEnvelope['headers'],
+            'body' => \is_string($beanstalkdEnvelope['body'] ?? null) ? $beanstalkdEnvelope['body'] : null,
+            'headers' => \is_array($beanstalkdEnvelope['headers'] ?? null) ? $beanstalkdEnvelope['headers'] : null,
         ];
     }
 

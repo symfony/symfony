@@ -114,7 +114,7 @@ final class ConnectionTest extends TestCase
         $id = 1234;
         $beanstalkdEnvelope = [
             'body' => 'foo',
-            'headers' => 'bar',
+            'headers' => ['type' => 'bar'],
         ];
 
         $tube = 'baz';
@@ -147,6 +147,27 @@ final class ConnectionTest extends TestCase
         $connection = new Connection(['tube_name' => $tube, 'timeout' => $timeout], $client);
 
         $this->assertNull($connection->get());
+    }
+
+    public function testGetWhenTheJobIsNotAMessengerEnvelope()
+    {
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->method('watchOnly')->willReturn($client);
+        $client->expects($this->exactly(5))->method('reserveWithTimeout')->willReturnOnConsecutiveCalls(
+            new Job(1, 'foo'),
+            new Job(2, '"foo"'),
+            new Job(3, '{"foo":"bar"}'),
+            new Job(4, '{"body":["foo"],"headers":{"type":"bar"}}'),
+            new Job(5, '{"body":"foo","headers":"bar"}'),
+        );
+
+        $connection = new Connection([], $client);
+
+        $this->assertSame(['id' => '1', 'body' => null, 'headers' => null], $connection->get());
+        $this->assertSame(['id' => '2', 'body' => null, 'headers' => null], $connection->get());
+        $this->assertSame(['id' => '3', 'body' => null, 'headers' => null], $connection->get());
+        $this->assertSame(['id' => '4', 'body' => null, 'headers' => ['type' => 'bar']], $connection->get());
+        $this->assertSame(['id' => '5', 'body' => 'foo', 'headers' => null], $connection->get());
     }
 
     public function testGetWhenABeanstalkdExceptionOccurs()

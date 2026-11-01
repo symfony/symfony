@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Pipeline bulk reads per node when using Predis with Redis Cluster
+
 8.2
 ---
 

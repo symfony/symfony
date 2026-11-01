@@ -16,3 +16,5 @@ In Foo3Command.php line 21:
 
 foo3:bar
 
+Global options are available. Run the command with --help to list them.
+

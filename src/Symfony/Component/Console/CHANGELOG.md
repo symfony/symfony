@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `CommandInvocation` and the `%command.invocation%` help placeholder to include the PHP executable or Symfony CLI launcher
+ * Show a hint about global options after the command synopsis when rendering an error
  * Add `CompletionSuggestions::suggestPaths()`, `suggestDirectories()` and `getPathSuggestion()` to let the shell complete file system paths, as `InputFile` arguments and options now do
  * Pass the `CompletionSuggestions` to the `suggestedValues` closures of arguments and options
  * List the accepted values of `#[Argument]` and `#[Option]` inputs mapped to backed enums in their description, e.g. `[possible values: pending, paid]`

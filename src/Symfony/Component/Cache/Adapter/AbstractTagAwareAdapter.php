@@ -258,6 +258,8 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
         } catch (\Exception) {
         }
 
+        $ok = true;
+
         // When bulk-delete failed, retry each item individually
         foreach ($ids as $key => $id) {
             try {

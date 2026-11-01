@@ -444,6 +444,17 @@ PasswordHasher
    These hashers never need rehashing, so the hashers listed in `migrate_from` are never used.
    Use `auto` or a custom hasher whose `needsRehash()` method can return `true` instead
 
+PropertyInfo
+------------
+
+ * Deprecate not passing `true` for the `$resolveRefinements` argument of `PhpStanExtractor::__construct()`; PHPDoc refinements will always be resolved in 9.0.
+   `getType()` then returns `LiteralType` and `IntRangeType` instances for literals and integer ranges, see the TypeInfo section:
+
+   ```diff
+   -$extractor = new PhpStanExtractor();
+   +$extractor = new PhpStanExtractor(null, null, null, true, true);
+   ```
+
 RateLimiter
 -----------
 
@@ -628,6 +639,25 @@ TwigBundle
  * The cache warmer compiles only the form themes of `TwigBridge` that are listed in `twig.form_themes`, named in templates, or used or extended by those.
    A theme picked at runtime, through a variable in a `form_theme` tag or through `FormRenderer::setTheme()`, is compiled on first use.
    When the cache directory is read-only, name such a theme in one of your templates, e.g. in a comment, to have it warmed up
+
+TypeInfo
+--------
+
+ * Deprecate not passing `true` for the `$resolveRefinements` argument of `StringTypeResolver::__construct()` and `TypeResolver::create()`, and not setting the `type_info.resolve_refinements` option to `true`; PHPDoc refinements will always be resolved in 9.0.
+   Literals and integer ranges are then resolved as `LiteralType` and `IntRangeType`, which wrap a `BuiltinType`.
+   `non-zero-int` is resolved as the union `int<min, -1>|int<1, max>`, so unwrapping alone does not turn it back into an `int`.
+   Before enabling them, replace `instanceof BuiltinType` checks and `getTypeIdentifier()` calls with `isIdentifiedBy()`, or unwrap the `WrappingTypeInterface` types:
+
+   ```yaml
+   # config/packages/type_info.yaml
+   type_info:
+       resolve_refinements: true
+   ```
+
+   ```diff
+   -$resolver = TypeResolver::create();
+   +$resolver = TypeResolver::create(null, true);
+   ```
 
 Uid
 ---

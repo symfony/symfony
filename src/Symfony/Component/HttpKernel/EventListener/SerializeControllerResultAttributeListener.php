@@ -183,9 +183,9 @@ final class SerializeControllerResultAttributeListener implements EventSubscribe
     private function resolveReturnType(?\ReflectionFunctionAbstract $reflector): Type
     {
         try {
-            return (self::resolve($this->typeResolver) ?? $this->typeResolver = TypeResolver::create())->resolve($reflector);
+            return (self::resolve($this->typeResolver) ?? $this->typeResolver = TypeResolver::create(null, true))->resolve($reflector);
         } catch (UnsupportedException $e) {
-            throw new \LogicException(\sprintf('The "stream" option of the "#[%s]" attribute requires the "map" option or a return type on the controller: %s', Serialize::class, $e->getMessage()), 0, $e);
+            throw new \LogicException(\sprintf('The "stream" option of the "#[%s]" attribute requires the "map" option or a return type on the controller: "%s"', Serialize::class, $e->getMessage()), 0, $e);
         }
     }
 

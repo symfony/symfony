@@ -48,7 +48,7 @@ class TypeContextFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->typeContextFactory = new TypeContextFactory(new StringTypeResolver());
+        $this->typeContextFactory = new TypeContextFactory(new StringTypeResolver(null, null, [], true));
     }
 
     public function testCollectClassNames()
@@ -272,7 +272,7 @@ class TypeContextFactoryTest extends TestCase
 
     public function testCollectTypeAliasesWithExtraTypeAliases()
     {
-        $typeContextFactory = new TypeContextFactory(new StringTypeResolver(), [
+        $typeContextFactory = new TypeContextFactory(new StringTypeResolver(null, null, [], true), [
             'Custom' => Type::int(),
             'CustomArray' => Type::list(Type::bool()), // will be overridden by the resolved type alias
         ]);

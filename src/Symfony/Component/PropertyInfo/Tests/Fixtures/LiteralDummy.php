@@ -14,6 +14,11 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 class LiteralDummy
 {
     /**
+     * @var 'draft'|'published'
+     */
+    public $status;
+
+    /**
      * @var array{'quoted key': 'it\'s'}
      */
     public $shape;

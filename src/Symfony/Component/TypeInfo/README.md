@@ -18,8 +18,8 @@ use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
-// Instantiate a new resolver
-$typeResolver = TypeResolver::create();
+// Instantiate a new resolver, which also resolves PHPDoc refinements such as "positive-int"
+$typeResolver = TypeResolver::create(null, true);
 
 // Then resolve types for any subject
 $typeResolver->resolve(new \ReflectionProperty(Dummy::class, 'id')); // returns an "int" Type instance

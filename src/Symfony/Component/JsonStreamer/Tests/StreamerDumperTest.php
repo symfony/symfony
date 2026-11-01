@@ -95,7 +95,7 @@ class StreamerDumperTest extends TestCase
     {
         $path = $this->cacheDir.'/streamer.php';
 
-        $dumper = new StreamerDumper(new PropertyMetadataLoader(TypeResolver::create()), $this->cacheDir, new ConfigCacheFactory(true));
+        $dumper = new StreamerDumper(new PropertyMetadataLoader(TypeResolver::create(null, true)), $this->cacheDir, new ConfigCacheFactory(true));
         $dumper->dump($type, $path, static fn () => 'CONTENT');
 
         $resources = json_decode(file_get_contents($path.'.meta.json'), true)['resources'];

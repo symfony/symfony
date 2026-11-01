@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonStreamer\Tests\Write;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
@@ -74,14 +75,14 @@ class StreamWriterGeneratorTest extends TestCase
     {
         $propertyMetadataLoader ??= new GenericTypePropertyMetadataLoader(
             new AttributePropertyMetadataLoader(
-                new PropertyMetadataLoader(TypeResolver::create()),
+                new PropertyMetadataLoader(TypeResolver::create(null, true)),
                 new ServiceContainer([
                     DoubleIntAndCastToStringValueTransformer::class => new DoubleIntAndCastToStringValueTransformer(),
                     BooleanToStringValueTransformer::class => new BooleanToStringValueTransformer(),
                 ]),
-                TypeResolver::create(),
+                TypeResolver::create(null, true),
             ),
-            new TypeContextFactory(new StringTypeResolver()),
+            new TypeContextFactory(new StringTypeResolver(null, null, [], true)),
         );
 
         $generator = new StreamWriterGenerator($propertyMetadataLoader, new ServiceContainer([
@@ -153,7 +154,7 @@ class StreamWriterGeneratorTest extends TestCase
 
     public function testDoNotSupportIntersectionType()
     {
-        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamWritersDir);
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamWritersDir);
 
         $this->expectException(UnsupportedException::class);
         $this->expectExceptionMessage('Intersection types are not supported ("Stringable&Traversable").');
@@ -161,9 +162,22 @@ class StreamWriterGeneratorTest extends TestCase
         $generator->generate(Type::intersection(Type::object(\Traversable::class), Type::object(\Stringable::class)));
     }
 
+    #[RequiresMethod(Type::class, 'withoutRefinements')]
+    public function testGenerateRefinedTypesAsTheirBaseType()
+    {
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamWritersDir);
+
+        foreach ([
+            [Type::list(Type::nullable(Type::union(Type::literal('draft'), Type::literal('archived')))), Type::list(Type::nullable(Type::string()))],
+            [Type::array(Type::list(Type::bool()), Type::union(Type::intRange(null, -1), Type::intRange(1, null))), Type::array(Type::list(Type::bool()), Type::int())],
+        ] as [$type, $baseType]) {
+            $this->assertStringEqualsFile($generator->generate($baseType), file_get_contents($generator->generate($type)));
+        }
+    }
+
     public function testDoNotSupportEnumType()
     {
-        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamWritersDir);
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamWritersDir);
 
         $this->expectException(UnsupportedException::class);
         $this->expectExceptionMessage(\sprintf('"%s" type is not supported.', DummyEnum::class));
@@ -282,7 +296,7 @@ class StreamWriterGeneratorTest extends TestCase
 
     public function testFilenameIsStableWithoutCacheVariantOption()
     {
-        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamWritersDir);
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamWritersDir);
         $type = Type::object(ClassicDummy::class);
 
         $this->assertSame($generator->generate($type), $generator->generate($type, ['include_null_properties' => true]));
@@ -292,7 +306,7 @@ class StreamWriterGeneratorTest extends TestCase
     #[DataProvider('invalidCacheVariants')]
     public function testCacheVariantOptionRejectsInvalidValues(mixed $variant)
     {
-        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamWritersDir);
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create(null, true)), new ServiceContainer(), $this->streamWritersDir);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "cache_variant" option must match "[a-zA-Z0-9_-]+"');

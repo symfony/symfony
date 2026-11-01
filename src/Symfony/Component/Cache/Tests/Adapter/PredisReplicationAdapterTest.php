@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
+
 /**
  * @group integration
  */
@@ -36,5 +39,13 @@ class PredisReplicationAdapterTest extends AbstractRedisAdapterTestCase
         }
 
         self::$redis = new \Predis\Client($hostTable, ['replication' => 'predis', 'prefix' => 'prefix_']);
+    }
+
+    public function testDeleteItemsOnReadOnlyReplica()
+    {
+        $replica = new \Predis\Client(array_combine(['host', 'port'], explode(':', explode(' ', getenv('REDIS_REPLICATION_HOSTS'))[0])));
+
+        $this->assertFalse((new RedisAdapter($replica))->deleteItems(['foo', 'bar']));
+        $this->assertFalse((new RedisTagAwareAdapter($replica))->deleteItems(['foo', 'bar']));
     }
 }

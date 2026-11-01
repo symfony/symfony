@@ -78,6 +78,7 @@
         "resend-mailer": "src/Symfony/Component/Mailer/Bridge/Resend",
         "scaleway-mailer": "src/Symfony/Component/Mailer/Bridge/Scaleway",
         "sendgrid-mailer": "src/Symfony/Component/Mailer/Bridge/Sendgrid",
+        "sendpulse-mailer": "src/Symfony/Component/Mailer/Bridge/SendPulse",
         "sweego-mailer": "src/Symfony/Component/Mailer/Bridge/Sweego",
         "turbo-smtp-mailer": "src/Symfony/Component/Mailer/Bridge/TurboSmtp",
         "zoho-cpaas-mailer": "src/Symfony/Component/Mailer/Bridge/ZohoCpaas",

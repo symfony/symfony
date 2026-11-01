@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T07:33:54Z
+
+Added coverage for keepalive during the listener, repeated skips and cleanup before the next worker event.

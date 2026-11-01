@@ -149,6 +149,13 @@ class ConsoleLoggerTest extends TestCase
         $this->assertEquals($expected, $this->getLogs());
     }
 
+    public function testMessageWithATrailingBackslash()
+    {
+        $this->getLogger()->error('Cannot write to {dir}', ['dir' => 'C:\\']);
+
+        $this->assertSame(['error Cannot write to C:\\'], $this->getLogs());
+    }
+
     public function testObjectCastToString()
     {
         $this->getLogger()->warning(new DummyTest());

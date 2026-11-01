@@ -108,6 +108,7 @@ class InteropSerializerTest extends TestCase
 
         $this->assertEquals(new DummyMessage('Hello'), $serializer->decode(['body' => '{"message":"Hello"}'])->getMessage());
         $this->assertInstanceOf(MessageDecodingFailedException::class, $serializer->decode(['body' => '{"other":"Hello"}'])->getMessage());
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $serializer->decode(['body' => ['"message"']])->getMessage());
     }
 
     public function testDecodeFailsWithAClearMessageWhenTheGivenClosureCannotTellTheMessageType()
@@ -144,6 +145,7 @@ class InteropSerializerTest extends TestCase
         $serializer = new InteropSerializer(Serializer::create(), static fn (array $encodedEnvelope) => str_contains($encodedEnvelope['body'], '"message"') ? DummyMessage::class : null);
         $this->assertSame(DummyMessage::class, $serializer->getMessageType(['body' => '{"message":"Hello"}']));
         $this->assertNull($serializer->getMessageType(['body' => '{"other":"Hello"}']));
+        $this->assertNull($serializer->getMessageType(['body' => ['"message"']]));
 
         $serializer = new InteropSerializer(Serializer::create(), static fn () => throw new \LogicException('The type header must be used.'));
         $this->assertSame(DummyMessage::class, $serializer->getMessageType(['body' => '{"message":"Hello"}', 'headers' => ['type' => DummyMessage::class]]));

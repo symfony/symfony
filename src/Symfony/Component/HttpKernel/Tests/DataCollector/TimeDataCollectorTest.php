@@ -56,6 +56,19 @@ class TimeDataCollectorTest extends TestCase
         $this->assertSame(class_exists(Stopwatch::class, false), $c->isStopwatchInstalled());
     }
 
+    public function testCollectUsesTheRequestTimeOfVirtualRequests()
+    {
+        $kernel = $this->createMock(KernelInterface::class);
+        $kernel->expects($this->never())->method('getStartTime');
+
+        $c = new TimeDataCollector($kernel);
+        $request = new Request(attributes: ['_virtual_type' => 'command'], server: ['REQUEST_TIME_FLOAT' => 123.5]);
+
+        $c->collect($request, new Response());
+
+        $this->assertEquals(123500, $c->getStartTime());
+    }
+
     public function testReset()
     {
         $collector = new TimeDataCollector();

@@ -54,8 +54,12 @@ final class LoginLinkAuthenticator extends AbstractAuthenticator implements Inte
 
     public function authenticate(Request $request): Passport
     {
-        if (!$username = $request->get('user')) {
+        $username = $request->get('user');
+        if ('' === ($username ?? '')) {
             throw new InvalidLoginLinkAuthenticationException('Missing user from link.');
+        }
+        if (!\is_string($username)) {
+            throw new InvalidLoginLinkAuthenticationException('Invalid user from link.');
         }
 
         $userBadge = new UserBadge($username, function () use ($request) {

@@ -32,6 +32,6 @@ abstract class AbstractProviderFactory implements ProviderFactoryInterface
 
     protected function getPassword(Dsn $dsn): string
     {
-        return $dsn->getPassword() ?? throw new IncompleteDsnException('Password is not set.', $dsn->getOriginalDsn());
+        return $dsn->getPassword() ?? throw new IncompleteDsnException('Password is not set.', $dsn->getScheme().'://'.$dsn->getHost());
     }
 }

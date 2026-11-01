@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -127,7 +128,7 @@ class ProcessHelper extends Helper
 
     private function escapeString(string $str): string
     {
-        return str_replace('<', '\\<', $str);
+        return OutputFormatter::escapeTrailingBackslash(str_replace('<', '\\<', $str));
     }
 
     public function getName(): string

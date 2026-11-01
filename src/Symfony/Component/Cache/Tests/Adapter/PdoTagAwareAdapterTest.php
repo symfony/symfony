@@ -78,6 +78,18 @@ class PdoTagAwareAdapterTest extends AbstractPdoAdapterTestCase
         $this->assertTrue($pool->prune());
     }
 
+    public function testPruneWithoutTables()
+    {
+        $pool = new PdoTagAwareAdapter('sqlite:'.$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache'));
+
+        try {
+            $this->assertTrue($pool->prune());
+            $this->assertTrue($pool->prune());
+        } finally {
+            @unlink($dbFile);
+        }
+    }
+
     private function createConnectionWithMissingTagsTable(bool $prune): \PDO
     {
         $exception = new \PDOException('The tags table does not exist.');

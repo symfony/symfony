@@ -255,12 +255,15 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
      */
     private function pruneOrphanedTags(): bool
     {
-        $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->tagsTable WHERE $this->idCol NOT IN (SELECT $this->idCol FROM $this->table)", function () {
-            $this->createTagsTable();
-        });
-        $this->executeStatementWithFallback($stmt, function () {
-            $this->createTagsTable();
-        });
+        try {
+            $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->tagsTable WHERE $this->idCol NOT IN (SELECT $this->idCol FROM $this->table)", function () {
+                $this->createTagsTable();
+            });
+            $this->executeStatementWithFallback($stmt, function () {
+                $this->createTagsTable();
+            });
+        } catch (\PDOException) {
+        }
 
         return true;
     }

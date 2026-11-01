@@ -176,6 +176,8 @@ class Worker
         $envelope = $event->getEnvelope();
 
         if (!$event->shouldHandle()) {
+            unset($this->keepalives[$envelope->getMessage()]);
+
             return;
         }
 

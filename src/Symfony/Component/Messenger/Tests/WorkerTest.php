@@ -1694,6 +1694,43 @@ class WorkerTest extends TestCase
         $this->assertCount(0, $receiver->keepaliveEnvelopes);
     }
 
+    public function testKeepaliveIsNotSentForAMessageThatIsNotHandled()
+    {
+        $receiver = new DummyKeepaliveReceiver([
+            [new Envelope(new DummyMessage('Hey')), new Envelope(new DummyMessage('Bob'))],
+        ]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->never())->method('dispatch');
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerMessageReceivedEvent::class, function (WorkerMessageReceivedEvent $event) use ($receiver, &$worker) {
+            $event->shouldHandle(false);
+
+            $worker->keepalive(2);
+            $this->assertSame([$event->getEnvelope()], $receiver->keepaliveEnvelopes);
+            $receiver->keepaliveEnvelopes = [];
+        });
+        $received = 0;
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver, &$received) {
+            $event->getWorker()->keepalive(2);
+            $this->assertSame([], $receiver->keepaliveEnvelopes);
+
+            if (2 === ++$received) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run();
+
+        $worker->keepalive(2);
+
+        $this->assertSame([], $receiver->keepaliveEnvelopes);
+        $this->assertSame(0, $receiver->getAcknowledgeCount());
+        $this->assertSame(0, $receiver->getRejectCount());
+    }
+
     #[RequiresPhpExtension('pcntl')]
     #[RequiresPhpExtension('posix')]
     public function testAFailingKeepaliveDoesNotStopTheWorker()

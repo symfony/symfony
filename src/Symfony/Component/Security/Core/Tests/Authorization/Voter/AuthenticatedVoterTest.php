@@ -363,15 +363,53 @@ class AuthenticatedVoterTest extends TestCase
 
     #[Group('legacy')]
     #[IgnoreDeprecations]
-    public function testNoReAuthenticationIsRequestedWhenTheTokenCannotProveRecency()
+    public function testAReAuthenticationCanReplaceALegacyToken()
     {
         $token = $this->createStub(TokenInterface::class);
         $token->method('getUser')->willReturn(new InMemoryUser('wouter', '', ['ROLE_USER']));
-
+        $this->assertFalse(method_exists($token, 'getAuthenticationProofs'));
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver(900, 60));
+        $freshToken = $this->getToken('fully');
+        $freshToken->setAuthenticationProofs([AuthenticationMethod::PASSWORD => time()]);
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($token, null, ['IS_AUTHENTICATED_VERY_RECENTLY'], $vote = new Vote()));
-        $this->assertNull($vote->reAuthenticationAttribute);
+        foreach ([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY, AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY] as $attribute) {
+            $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($token, null, [$attribute], $denied = new Vote()));
+            $this->assertSame($attribute, $denied->reAuthenticationAttribute);
+            $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($freshToken, null, [$attribute], $granted = new Vote()));
+            $this->assertNull($granted->reAuthenticationAttribute);
+        }
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testACustomRecencyPolicyDoesNotRequireTokenProofMethods()
+    {
+        $token = $this->createStub(TokenInterface::class);
+        $token->method('getUser')->willReturn(new InMemoryUser('wouter', '', ['ROLE_USER']));
+        $trustResolver = new class extends AuthenticationTrustResolver {
+            public bool $recent = false;
+
+            public function isAuthenticatedRecently(?TokenInterface $token = null): bool
+            {
+                return $this->recent;
+            }
+
+            public function isAuthenticatedVeryRecently(?TokenInterface $token = null): bool
+            {
+                return $this->recent;
+            }
+        };
+        $voter = new AuthenticatedVoter($trustResolver);
+
+        foreach ([AuthenticatedVoter::IS_AUTHENTICATED_RECENTLY, AuthenticatedVoter::IS_AUTHENTICATED_VERY_RECENTLY] as $attribute) {
+            $trustResolver->recent = false;
+            $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($token, null, [$attribute], $denied = new Vote()));
+            $this->assertSame($attribute, $denied->reAuthenticationAttribute);
+
+            $trustResolver->recent = true;
+            $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($token, null, [$attribute], $granted = new Vote()));
+            $this->assertNull($granted->reAuthenticationAttribute);
+        }
     }
 
     public function testACustomTrustResolverDecidesRecency()

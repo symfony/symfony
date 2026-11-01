@@ -30,6 +30,44 @@ class FilesystemAdapterTest extends AdapterTestCase
         (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
+    public function testDeleteItemsWhenUnlinkFails()
+    {
+        $cache = $this->createCachePool();
+        $cache->save($cache->getItem('foo')->set('foo'));
+        $cache->save($cache->getItem('bar')->set('bar'));
+
+        $file = (new \ReflectionMethod($cache, 'getFile'))->invoke($cache, (new \ReflectionMethod($cache, 'getId'))->invoke($cache, 'foo'));
+
+        // Windows doesn't delete read-only files, other systems don't delete files in read-only directories
+        chmod($file, 0o444);
+        chmod(\dirname($file), 0o555);
+
+        try {
+            $this->assertFalse($cache->deleteItems(['foo', 'bar']));
+            $this->assertTrue($cache->hasItem('foo'));
+            $this->assertFalse($cache->hasItem('bar'));
+        } finally {
+            chmod(\dirname($file), 0o777);
+            chmod($file, 0o666);
+        }
+    }
+
+    public function testDeleteItemsWhenFileIsNotReadable()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Files cannot be made unreadable on Windows.');
+        }
+
+        $cache = $this->createCachePool();
+        $cache->save($cache->getItem('foo')->set('foo'));
+
+        $file = (new \ReflectionMethod($cache, 'getFile'))->invoke($cache, (new \ReflectionMethod($cache, 'getId'))->invoke($cache, 'foo'));
+        chmod($file, 0o000);
+
+        $this->assertTrue($cache->deleteItems(['foo']));
+        $this->assertFalse($cache->hasItem('foo'));
+    }
+
     protected function isPruned(CacheItemPoolInterface $cache, string $name): bool
     {
         $getFileMethod = (new \ReflectionObject($cache))->getMethod('getFile');

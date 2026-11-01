@@ -172,6 +172,33 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $handler->onAuthenticationSuccess($request, new NullToken());
     }
 
+    public function testTargetPathFromRequestWithoutHostIsIgnored()
+    {
+        foreach (['http', 'httpx', 'https:', 'http:///some-path'] as $targetPath) {
+            $request = Request::create('/');
+            $request->attributes->set('_target_path', $targetPath);
+
+            $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+            $urlGenerator->expects($this->never())->method('generate');
+
+            $handler = new DefaultAuthenticationSuccessHandler(new HttpUtils($urlGenerator));
+
+            $this->assertSame('http://localhost/', $handler->onAuthenticationSuccess($request, new NullToken())->getTargetUrl());
+        }
+    }
+
+    public function testTargetPathWithCustomHttpSchemeFromRequest()
+    {
+        foreach (['http+app://client/return', 'httpx://localhost/some-path', 'https+app://client/return'] as $targetPath) {
+            $request = Request::create('/');
+            $request->attributes->set('_target_path', $targetPath);
+
+            $handler = new DefaultAuthenticationSuccessHandler(new HttpUtils());
+
+            $this->assertSame($targetPath, $handler->onAuthenticationSuccess($request, new NullToken())->getTargetUrl());
+        }
+    }
+
     public function testTargetPathWithAbsoluteUrlFromRequest()
     {
         $options = ['target_path_parameter' => '_my_target_path'];

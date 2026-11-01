@@ -49,6 +49,16 @@ final class SchemaDocument
     }
 
     /**
+     * Returns the class each definition describes, for consumers that refer to definitions by class rather than by name.
+     *
+     * @return array<string, class-string> definition name => class
+     */
+    public function getDefinitionClasses(): array
+    {
+        return array_map(static fn (array $reservation): string => $reservation[0], $this->reservations);
+    }
+
+    /**
      * Generates the schema of a type in this document, for extensions that describe a value with other types.
      *
      * It is only available while a schema is generated in this document.

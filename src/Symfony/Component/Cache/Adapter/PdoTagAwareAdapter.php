@@ -236,16 +236,19 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
     protected function doInvalidate(array $tagIds): bool
     {
         $placeholders = implode(',', array_fill(0, \count($tagIds), '?'));
-        $stmt = $this->prepareStatementWithFallback("DELETE FROM $this->table WHERE $this->idCol IN (SELECT $this->idCol FROM $this->tagsTable WHERE $this->tagCol IN ($placeholders))", function () {
-            $this->createTagsTable();
-        });
 
-        foreach ($tagIds as $index => $value) {
-            $stmt->bindValue($index + 1, $value, \PDO::PARAM_STR);
+        try {
+            $stmt = $this->getConnection()->prepare("DELETE FROM $this->table WHERE $this->idCol IN (SELECT $this->idCol FROM $this->tagsTable WHERE $this->tagCol IN ($placeholders))");
+
+            foreach ($tagIds as $index => $value) {
+                $stmt->bindValue($index + 1, $value, \PDO::PARAM_STR);
+            }
+            $stmt->execute();
+        } catch (\PDOException $e) {
+            if (!$this->isTableMissing($e)) {
+                throw $e;
+            }
         }
-        $this->executeStatementWithFallback($stmt, function () {
-            $this->createTagsTable();
-        });
 
         return true;
     }

@@ -66,28 +66,33 @@ class RedisReceiverTest extends TestCase
         $receiver->get();
     }
 
-    public function testItIgnoresAMessageFieldThatDoesNotDecodeToAnArray()
+    public function testItRejectsAStreamEntryThatIsNotAMessengerEnvelope()
     {
-        $connection = $this->createStub(Connection::class);
-        $connection->method('get')->willReturn(['id' => '1', 'data' => ['message' => '12345']]);
+        $connection = $this->createMock(Connection::class);
+        $connection->method('get')->willReturnOnConsecutiveCalls(
+            ['id' => '1', 'data' => ['message' => '12345']],
+            ['id' => '2', 'data' => ['message' => '"a string"']],
+            ['id' => '3', 'data' => ['message' => 'false']],
+            ['id' => '4', 'data' => ['message' => 'foo']],
+            ['id' => '5', 'data' => ['foo' => 'bar']],
+            ['id' => '6', 'data' => ['message' => '{"body":["foo"],"headers":{"type":"bar"}}']],
+        );
+        $rejected = [];
+        $connection->expects($this->exactly(6))->method('reject')->willReturnCallback(static function (string $id) use (&$rejected) {
+            $rejected[] = $id;
+        });
 
         $receiver = new RedisReceiver($connection, new PhpSerializer());
 
-        $this->assertSame([], $receiver->get());
+        for ($i = 1; $i <= 6; ++$i) {
+            try {
+                $receiver->get();
+                $this->fail(\sprintf('Entry "%d" should be rejected.', $i));
+            } catch (MessageDecodingFailedException) {
+            }
+        }
 
-        $connection = $this->createStub(Connection::class);
-        $connection->method('get')->willReturn(['id' => '2', 'data' => ['message' => '"a string"']]);
-
-        $receiver = new RedisReceiver($connection, new PhpSerializer());
-
-        $this->assertSame([], $receiver->get());
-
-        $connection = $this->createStub(Connection::class);
-        $connection->method('get')->willReturn(['id' => '3', 'data' => ['message' => 'false']]);
-
-        $receiver = new RedisReceiver($connection, new PhpSerializer());
-
-        $this->assertSame([], $receiver->get());
+        $this->assertSame(['1', '2', '3', '4', '5', '6'], $rejected);
     }
 
     public static function redisEnvelopeProvider(): \Generator

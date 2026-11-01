@@ -59,13 +59,15 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
         $redisEnvelope = json_decode($message['data']['message'] ?? '', true);
 
         if (!\is_array($redisEnvelope)) {
-            return [];
+            $this->connection->reject($message['id']);
+
+            throw new MessageDecodingFailedException('Could not decode the Redis stream entry: its "message" field should contain a JSON object.');
         }
 
         try {
             if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {
                 $envelope = $this->serializer->decode([
-                    'body' => $redisEnvelope['body'],
+                    'body' => \is_string($redisEnvelope['body']) ? $redisEnvelope['body'] : null,
                     'headers' => $redisEnvelope['headers'],
                 ]);
             } else {

@@ -67,7 +67,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
      * @throws InvalidArgumentException When namespace contains invalid characters
      */
     public function __construct(
-        Connection|string $connOrDsn,
+        #[\SensitiveParameter] Connection|string $connOrDsn,
         private string $namespace = '',
         int $defaultLifetime = 0,
         array $options = [],

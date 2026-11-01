@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 #[RequiresPhpExtension('pdo_sqlite')]
 #[Group('time-sensitive')]
@@ -118,6 +119,23 @@ class PdoAdapterTest extends AdapterTestCase
         } finally {
             $pdo = new \PDO($dsn);
             $pdo->exec('DROP TABLE IF EXISTS cache_items');
+        }
+    }
+
+    public function testOptionsAreNotExposedInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            new PdoAdapter('mysql://localhost/db', '', 0, ['db_password' => 's3cr3t']);
+            $this->fail('An exception should have been thrown.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
         }
     }
 

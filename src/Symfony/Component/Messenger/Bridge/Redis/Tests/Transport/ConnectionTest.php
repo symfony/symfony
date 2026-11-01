@@ -56,6 +56,90 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testInvalidDsnDoesNotExposeCredentialsInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            foreach (['redis://user:s3cr3t@localhost:999999/queue', 'redis://user:s3cr3t@localhost:999999/queue,redis://localhost:6379', 'redis://user:s3cr3t@/tmp/redis.sock,redis://localhost:6379', 'redis://localhost:6379?auth=s3cr3t,redis://localhost:999999'] as $dsn) {
+                try {
+                    Connection::fromDsn($dsn, ['lazy' => true]);
+                    $this->fail('An exception should have been thrown.');
+                } catch (\InvalidArgumentException $e) {
+                    $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+                }
+            }
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
+
+    public function testConnectionFailureDoesNotExposeCredentialsInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $redis = new class extends \Redis {
+            public function connect($host, ...$args): bool
+            {
+                return false;
+            }
+
+            public function isConnected(): bool
+            {
+                return false;
+            }
+        };
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            foreach (['redis://s3cr3t@localhost/queue', 'redis://user:s3cr3t@localhost/queue', 'redis://localhost/queue?auth=s3cr3t'] as $dsn) {
+                try {
+                    Connection::fromDsn($dsn, [], $redis);
+                    $this->fail('An exception should have been thrown.');
+                } catch (\InvalidArgumentException $e) {
+                    $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+                }
+            }
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
+
+    public function testClusterFailureDoesNotExposeCredentialsInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $redis = new class extends \RedisCluster {
+            public function __construct()
+            {
+            }
+
+            public function setOption($option, $value): bool
+            {
+                throw new \RedisException('Connection failed.');
+            }
+        };
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            try {
+                Connection::fromDsn('redis://user:s3cr3t@localhost:6379,redis://localhost:6380', [], $redis);
+                $this->fail('An exception should have been thrown.');
+            } catch (\RedisException $e) {
+                $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+            }
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
+
     public function testFromDsnOnUnixSocket()
     {
         $this->assertEqualsConnection(
@@ -244,6 +328,16 @@ class ConnectionTest extends TestCase
         yield 'User and colon' => ['user', 'redis://user:@localhost/queue'];
         yield 'Colon and password' => ['password', 'redis://:password@localhost/queue'];
         yield 'Colon and falsy password' => ['0', 'redis://:0@localhost/queue'];
+    }
+
+    public function testAuthDecodesCredentialsOnce()
+    {
+        $redis = $this->createRedisMock();
+        $redis->expects($this->once())->method('auth')
+            ->with(['user%2Fname', 'pass%40word'])
+            ->willReturn(true);
+
+        Connection::fromDsn('redis://user%252Fname:pass%2540word@localhost/queue', [], $redis);
     }
 
     public function testAuthFromOptions()

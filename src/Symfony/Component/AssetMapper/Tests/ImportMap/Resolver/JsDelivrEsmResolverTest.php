@@ -191,6 +191,43 @@ class JsDelivrEsmResolverTest extends TestCase
             ],
         ];
 
+        yield 'require package that imports another with an encoded version constraint' => [
+            'packages' => [new PackageRequireOptions('prosemirror-model', '^1.25')],
+            'expectedRequests' => [
+                [
+                    'url' => '/v1/packages/npm/prosemirror-model/resolved?specifier=%5E1.25',
+                    'response' => ['body' => ['version' => '1.25.12']],
+                ],
+                [
+                    'url' => '/prosemirror-model@1.25.12/+esm',
+                    'response' => ['body' => 'import t from"/npm/orderedmap@%5E2.0.0/+esm";function e(){}'],
+                ],
+                [
+                    'url' => '/v1/packages/npm/prosemirror-model@1.25.12/entrypoints',
+                    'response' => ['body' => ['entrypoints' => []]],
+                ],
+                [
+                    'url' => '/v1/packages/npm/orderedmap/resolved?specifier=%5E2.0.0',
+                    'response' => ['body' => ['version' => '2.1.1']],
+                ],
+                [
+                    'url' => '/orderedmap@2.1.1/+esm',
+                ],
+                [
+                    'url' => '/v1/packages/npm/orderedmap@2.1.1/entrypoints',
+                    'response' => ['body' => ['entrypoints' => []]],
+                ],
+            ],
+            'expectedResolvedPackages' => [
+                'prosemirror-model' => [
+                    'version' => '1.25.12',
+                ],
+                'orderedmap' => [
+                    'version' => '2.1.1',
+                ],
+            ],
+        ];
+
         yield 'require single CSS package' => [
             'packages' => [new PackageRequireOptions('bootstrap/dist/css/bootstrap.min.css')],
             'expectedRequests' => [

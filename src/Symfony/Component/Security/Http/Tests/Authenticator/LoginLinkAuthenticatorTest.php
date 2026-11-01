@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -105,6 +106,30 @@ class LoginLinkAuthenticatorTest extends TestCase
         $this->expectException(InvalidLoginLinkAuthenticationException::class);
 
         (new LoginLinkAuthenticator($loginLinkHandler, new HttpUtils(), $this->successHandler, $this->failureHandler, []))->authenticate($request);
+    }
+
+    public function testArrayUser()
+    {
+        $request = Request::create('/login/link/check?user[]=alice');
+        $loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
+        $loginLinkHandler->expects($this->never())->method('consumeLoginLink');
+
+        $this->expectException(BadRequestException::class);
+
+        (new LoginLinkAuthenticator($loginLinkHandler, new HttpUtils(), $this->successHandler, $this->failureHandler, []))->authenticate($request);
+    }
+
+    public function testUserWithZeroIdentifier()
+    {
+        $request = Request::create('/login/link/check?user=0');
+        $user = new InMemoryUser('0', 'password');
+        $loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
+        $loginLinkHandler->expects($this->once())->method('consumeLoginLink')->with($request)->willReturn($user);
+
+        $passport = (new LoginLinkAuthenticator($loginLinkHandler, new HttpUtils(), $this->successHandler, $this->failureHandler, []))->authenticate($request);
+
+        $this->assertSame('0', $passport->getBadge(UserBadge::class)->getUserIdentifier());
+        $this->assertSame($user, $passport->getUser());
     }
 
     public function testPassportBadges()

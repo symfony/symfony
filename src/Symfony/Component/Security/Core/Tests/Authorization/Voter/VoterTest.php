@@ -86,6 +86,34 @@ class VoterTest extends TestCase
         $this->expectExceptionMessage('Should error');
         (new TypeErrorVoterTest_Voter())->vote($this->token, new \stdClass(), ['EDIT']);
     }
+
+    public function testVoteWithNonStringAttributeOnAnonymousVoter()
+    {
+        $voter = new class extends VoterTest_Voter {
+            protected function supports(string $attribute, $object): bool
+            {
+                return true;
+            }
+        };
+
+        $this->assertSame(VoterInterface::ACCESS_ABSTAIN, $voter->vote($this->token, new \stdClass(), [new \stdClass()]));
+    }
+
+    public function testVoteWithTypeErrorFromNestedSupportsCall()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('VoterTest_Voter::supports(): Argument #1 ($attribute) must be of type string, stdClass given');
+
+        (new NestedTypeErrorVoterTest_Voter())->vote($this->token, new \stdClass(), ['EDIT']);
+    }
+
+    public function testVoteWithTypeErrorFromNestedVote()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('VoterTest_Voter::voteOnAttribute(): Argument #1 ($attribute) must be of type string, stdClass given');
+
+        (new NestedVoteVoterTest_Voter())->vote($this->token, new \stdClass(), ['EDIT']);
+    }
 }
 
 class VoterTest_Voter extends Voter
@@ -132,5 +160,29 @@ class StringableAttribute
     public function __toString(): string
     {
         return 'EDIT';
+    }
+}
+
+class NestedTypeErrorVoterTest_Voter extends VoterTest_Voter
+{
+    protected function supports(string $attribute, $object): bool
+    {
+        return parent::supports($object, $attribute);
+    }
+}
+
+class NestedVoteVoterTest_Voter extends VoterTest_Voter
+{
+    protected function supports(string $attribute, $object): bool
+    {
+        return VoterInterface::ACCESS_GRANTED === (new WidenedSupportsVoterTest_Voter())->vote(new NullToken(), $object, [new \stdClass()]);
+    }
+}
+
+class WidenedSupportsVoterTest_Voter extends VoterTest_Voter
+{
+    protected function supports($attribute, $object): bool
+    {
+        return true;
     }
 }

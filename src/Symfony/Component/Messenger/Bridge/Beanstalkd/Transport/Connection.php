@@ -169,16 +169,12 @@ class Connection
 
         $data = $job->getData();
 
-        try {
-            $beanstalkdEnvelope = json_decode($data, true, flags: \JSON_THROW_ON_ERROR);
-        } catch (\JsonException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
-        }
+        $beanstalkdEnvelope = json_decode($data, true);
 
         return [
             'id' => $job->getId(),
-            'body' => $beanstalkdEnvelope['body'],
-            'headers' => $beanstalkdEnvelope['headers'],
+            'body' => \is_string($beanstalkdEnvelope['body'] ?? null) ? $beanstalkdEnvelope['body'] : null,
+            'headers' => \is_array($beanstalkdEnvelope['headers'] ?? null) ? $beanstalkdEnvelope['headers'] : null,
         ];
     }
 

@@ -90,7 +90,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 
         $targetUrl = ParameterBagUtils::getRequestParameterValue($request, $this->options['target_path_parameter']);
 
-        if (\is_string($targetUrl) && (str_starts_with($targetUrl, '/') || str_starts_with($targetUrl, 'http'))) {
+        if (\is_string($targetUrl) && (str_starts_with($targetUrl, '/') || (str_starts_with($targetUrl, 'http') && \is_string(parse_url($targetUrl, \PHP_URL_SCHEME)) && \is_string(parse_url($targetUrl, \PHP_URL_HOST))))) {
             return $targetUrl;
         }
 

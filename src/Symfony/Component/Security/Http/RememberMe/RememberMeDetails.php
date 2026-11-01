@@ -88,6 +88,9 @@ class RememberMeDetails
         if (false === $cookieParts[1] = base64_decode(strtr($cookieParts[1], '-_~', '+/='), true)) {
             throw new AuthenticationException('The user identifier contains a character from outside the base64 alphabet.');
         }
+        if (false === $cookieParts[2] = filter_var($cookieParts[2], \FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])) {
+            throw new AuthenticationException('The cookie contains invalid data.');
+        }
 
         return new static(...self::collectConstructorArguments(strtr($cookieParts[0], '.', '\\'), $cookieParts[1], $cookieParts[2], $cookieParts[3]));
     }

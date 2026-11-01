@@ -130,6 +130,33 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertEquals(['foo@foo.com'], $form->getData());
     }
 
+    public function testNotResizedIfSubmittedWithNullDataAndAllowDelete()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['foo@foo.com', 'bar@bar.com'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_delete' => true,
+        ]);
+        $form->submit(['foo@bar.com', null]);
+
+        $this->assertTrue($form->has('1'));
+        $this->assertSame(['foo@bar.com', null], $form->getData());
+        $this->assertSame([], $form->getExtraData());
+    }
+
+    public function testResizedDownIfSubmittedWithNullDataAndDeleteEmpty()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['foo@foo.com', 'bar@bar.com'], [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_delete' => true,
+            'delete_empty' => true,
+        ]);
+        $form->submit(['foo@foo.com', null]);
+
+        $this->assertFalse($form->has('1'));
+        $this->assertSame(['foo@foo.com'], $form->getData());
+        $this->assertSame([], $form->getExtraData());
+    }
+
     public function testDeleteEmptyPreservesUnsubmittedEntries()
     {
         $form = $this->factory->create(static::TESTED_TYPE, ['kept', '', 'original'], [
@@ -363,6 +390,33 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertEquals('foo@bar.com', $form[0]->getData());
         $this->assertEquals('bar@bar.com', $form[1]->getData());
         $this->assertEquals(['foo@bar.com', 'bar@bar.com'], $form->getData());
+    }
+
+    public function testIgnoresSubmittedEntriesWithInvalidNameWhenAllowAdd()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_add' => true,
+        ]);
+        $form->submit(['a.b' => 'x', 0 => 'y']);
+
+        $this->assertFalse($form->has('a.b'));
+        $this->assertTrue($form->has('0'));
+        $this->assertSame('y', $form[0]->getData());
+        $this->assertSame(['a.b' => 'x'], $form->getExtraData());
+    }
+
+    public function testIgnoresSubmittedEntriesWithEmptyNameWhenAllowAdd()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'entry_type' => TextTypeTest::TESTED_TYPE,
+            'allow_add' => true,
+        ]);
+        $form->submit(['' => 'x', 0 => 'y']);
+
+        $this->assertFalse($form->has(''));
+        $this->assertSame([0 => 'y'], $form->getData());
+        $this->assertSame(['' => 'x'], $form->getExtraData());
     }
 
     public function testAllowAddButNoPrototype()

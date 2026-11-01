@@ -198,6 +198,29 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
+    public function testFailurePathFromRequestWithoutHostIsIgnored()
+    {
+        foreach (['http', 'httpx', 'https:', 'http:///some-path', 'http:80', 'httpx:8080'] as $failurePath) {
+            $this->request->attributes->set('_failure_path', $failurePath);
+
+            $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), [], new NullLogger());
+            $result = $handler->onAuthenticationFailure($this->request, $this->exception);
+
+            $this->assertSame('https://localhost/login', $result->getTargetUrl());
+        }
+    }
+
+    public function testCustomHttpSchemeRedirectionFromRequest()
+    {
+        foreach (['http+app://client/return', 'httpx://localhost/some-path', 'https+app://client/return'] as $failurePath) {
+            $this->request->attributes->set('_failure_path', $failurePath);
+
+            $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils());
+
+            $this->assertSame($failurePath, $handler->onAuthenticationFailure($this->request, $this->exception)->getTargetUrl());
+        }
+    }
+
     public function testAbsoluteUrlRedirectionFromRequest()
     {
         $options = ['failure_path_parameter' => '_my_failure_path'];

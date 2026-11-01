@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -157,10 +158,10 @@ class ResizeFormListener implements EventSubscriberInterface
             $data = [];
         }
 
-        // Remove all empty rows
+        // Remove all rows missing from the submitted data
         if ($this->allowDelete) {
             foreach ($form as $name => $child) {
-                if (!isset($data[$name])) {
+                if (!\array_key_exists($name, $data)) {
                     $form->remove($name);
                 }
             }
@@ -169,7 +170,7 @@ class ResizeFormListener implements EventSubscriberInterface
         // Add all additional rows
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
-                if (!$form->has($name)) {
+                if (!$form->has($name) && '' !== $name && FormConfigBuilder::isValidName((string) $name)) {
                     $form->add($name, $this->type, array_replace([
                         'property_path' => '['.$name.']',
                     ], $this->prototypeOptions));

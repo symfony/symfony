@@ -201,6 +201,22 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertSame(98, $rateLimit->getRemainingTokens());
     }
 
+    public function testRejectLimitBelowOne()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set the limit of "Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter" to 0, as that would never accept any hit.');
+
+        new SlidingWindowLimiter('test', 0, new \DateInterval('PT12S'), $this->storage);
+    }
+
+    public function testRejectNegativeLimit()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set the limit of "Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter" to 0, as that would never accept any hit.');
+
+        new SlidingWindowLimiter('test', -1, new \DateInterval('PT12S'), $this->storage);
+    }
+
     private function createLimiter(): SlidingWindowLimiter
     {
         return new SlidingWindowLimiter('test', 10, new \DateInterval('PT12S'), $this->storage);

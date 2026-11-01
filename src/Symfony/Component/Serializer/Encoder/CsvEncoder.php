@@ -160,7 +160,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
         [$delimiter, $enclosure, $escapeChar, $keySeparator, , , , $asCollection] = $this->getCsvOptions($context);
 
-        while (false !== ($cols = fgetcsv($handle, 0, $delimiter, $enclosure, $escapeChar))) {
+        foreach ($this->readRows($handle, $delimiter, $enclosure, $escapeChar) as $cols) {
             $nbCols = \count($cols);
 
             if (null === $headers) {
@@ -307,5 +307,29 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
 
         return $headers;
+    }
+
+    /**
+     * @param resource $handle
+     */
+    private function readRows($handle, string $delimiter, string $enclosure, string $escapeChar): \Generator
+    {
+        $emptyLines = 0;
+        while ([null] === $cols = fgetcsv($handle, 0, $delimiter, $enclosure, $escapeChar)) {
+            ++$emptyLines;
+        }
+
+        // fgetcsv() returns [null] for an empty line: it is a record with an empty value in a single-column document, and carries no data otherwise
+        $skipEmptyLines = false !== $cols && 1 < \count($cols);
+
+        if (!$skipEmptyLines) {
+            yield from array_fill(0, $emptyLines, [null]);
+        }
+
+        for (; false !== $cols; $cols = fgetcsv($handle, 0, $delimiter, $enclosure, $escapeChar)) {
+            if (!$skipEmptyLines || [null] !== $cols) {
+                yield $cols;
+            }
+        }
     }
 }

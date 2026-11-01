@@ -37,4 +37,18 @@ class FilesystemTagAwareAdapterTest extends FilesystemAdapterTest
 
         $this->assertFalse($adapter->commit(), 'Commit should return false when tag save fails');
     }
+
+    public function testDeleteItemsWhenFetchingTagsFails()
+    {
+        $pool = new class extends FilesystemTagAwareAdapter {
+            protected function doDeleteYieldTags(array $ids): iterable
+            {
+                throw new \RuntimeException('Fetching tags failed.');
+            }
+        };
+        $pool->save($pool->getItem('foo')->set('bar'));
+
+        $this->assertTrue($pool->deleteItem('foo'));
+        $this->assertFalse($pool->hasItem('foo'));
+    }
 }

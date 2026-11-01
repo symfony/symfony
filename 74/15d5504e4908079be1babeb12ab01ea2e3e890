@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T07:33:40Z
+
+Added coverage for zero, negative and subsecond configuration values.

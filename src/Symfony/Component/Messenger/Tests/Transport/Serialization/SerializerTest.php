@@ -335,6 +335,11 @@ class SerializerTest extends TestCase
             'Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.',
         ];
 
+        yield 'body_not_a_string' => [
+            ['body' => ['foo'], 'headers' => ['type' => 'bar']],
+            'Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.',
+        ];
+
         yield 'no_headers' => [
             ['body' => '{}'],
             'Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.',
@@ -342,6 +347,11 @@ class SerializerTest extends TestCase
 
         yield 'no_headers_type' => [
             ['body' => '{}', 'headers' => ['foo' => 'bar']],
+            'Encoded envelope does not have a "type" header.',
+        ];
+
+        yield 'headers_type_not_a_string' => [
+            ['body' => '{}', 'headers' => ['type' => ['bar']]],
             'Encoded envelope does not have a "type" header.',
         ];
     }

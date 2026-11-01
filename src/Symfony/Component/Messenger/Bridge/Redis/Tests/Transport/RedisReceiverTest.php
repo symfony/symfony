@@ -84,7 +84,10 @@ class RedisReceiverTest extends TestCase
             $rejected[] = $id;
         });
 
-        $receiver = new RedisReceiver($connection, new PhpSerializer());
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())->method('decode')->with(['body' => null, 'headers' => ['type' => 'bar']])->willThrowException(new MessageDecodingFailedException());
+
+        $receiver = new RedisReceiver($connection, $serializer);
 
         for ($i = 1; $i <= 6; ++$i) {
             try {

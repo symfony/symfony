@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\HttpFoundation;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension;
 use Symfony\Component\Form\FormBuilder;
@@ -37,6 +38,33 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTestCase
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'), new \stdClass());
+    }
+
+    public function testPatchSkipsDeleteEmptyForUnsubmittedCollectionEntries()
+    {
+        $checked = [];
+        $form = Forms::createFormFactoryBuilder()
+            ->addTypeExtension(new FormTypeHttpFoundationExtension($this->requestHandler))
+            ->getFormFactory()
+            ->createNamed('collection', CollectionType::class, ['kept', '', 'original'], [
+                'method' => 'PATCH',
+                'allow_add' => true,
+                'delete_empty' => static function ($value) use (&$checked) {
+                    $checked[] = $value;
+
+                    return null === $value;
+                },
+            ]);
+
+        $form->handleRequest(Request::create('/', 'PATCH', ['collection' => [2 => 'updated', 3 => '']]));
+
+        $this->assertSame(['kept', '', 'updated'], $form->getData());
+        $this->assertSame(['updated', null], $checked);
+        $this->assertFalse($form->get('0')->isSubmitted());
+        $this->assertFalse($form->get('1')->isSubmitted());
+        $this->assertTrue($form->get('2')->isSubmitted());
+        $this->assertFalse($form->has('3'));
+        $this->assertTrue($form->isValid());
     }
 
     protected function setRequestData($method, $data, $files = [])

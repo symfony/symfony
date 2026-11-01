@@ -255,6 +255,41 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
+    public function testItDoesNotResendTheStampHeadersOfTheReceivedMessage()
+    {
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
+        $amqpEnvelope->method('getHeaders')->willReturn([
+            'type' => 'OldType',
+            'X-Message-Stamp-Foo' => '[{}]',
+            'x-custom' => 'bar',
+        ]);
+
+        $envelope = new Envelope(new DummyMessage('Oy'), [
+            new AmqpReceivedStamp($amqpEnvelope, 'original_queue'),
+            new RedeliveryStamp(1),
+        ]);
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->willReturn($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['original_queue']);
+        $connection->expects($this->once())->method('publish')
+            ->with($encoded['body'], $encoded['headers'], 0, $this->callback(function (AmqpStamp $stamp) use ($encoded) {
+                $headers = array_merge($stamp->getAttributes()['headers'], $encoded['headers']);
+
+                $this->assertArrayNotHasKey('X-Message-Stamp-Foo', $headers);
+                $this->assertSame('bar', $headers['x-custom']);
+                $this->assertSame(DummyMessage::class, $headers['type']);
+
+                return true;
+            }));
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
     public function testItKeepsTheReceivedRoutingKeyWhenSendingToTheTransportTheMessageWasReceivedFrom()
     {
         $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);

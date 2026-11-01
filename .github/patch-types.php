@@ -70,6 +70,11 @@ foreach ($loader->getClassMap() as $class => $file) {
 
     $refl = new \ReflectionClass($class);
     foreach ($refl->getMethods() as $method) {
+        // Keep existing void overrides compatible with the handler.
+        if (Symfony\Component\Cache\Messenger\EarlyExpirationHandler::class === $class && '__invoke' === $method->getName()) {
+            continue;
+        }
+
         if (
             $method->getReturnType()
             || (str_contains($method->getDocComment(), '@return') && str_contains($method->getDocComment(), 'resource'))

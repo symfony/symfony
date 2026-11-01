@@ -203,6 +203,28 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
 
+    public function testGetValueThrowsExceptionIfUninitializedPropertyOfAnonymousClassIsReadByReference()
+    {
+        $this->expectException(UninitializedPropertyException::class);
+        $this->expectExceptionMessage('The property "class@anonymous::$uninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
+
+        $object = new class {
+            public string $uninitialized;
+
+            public function __construct()
+            {
+                unset($this->uninitialized);
+            }
+
+            public function &__get($name)
+            {
+                return $this->$name;
+            }
+        };
+
+        $this->propertyAccessor->getValue($object, 'uninitialized');
+    }
+
     public function testGetValueThrowsExceptionIfUninitializedNotNullableOfParentClass()
     {
         $this->expectException(UninitializedPropertyException::class);

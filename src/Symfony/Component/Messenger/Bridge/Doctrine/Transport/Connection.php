@@ -343,8 +343,12 @@ class Connection implements ResetInterface
 
     public function find(mixed $id): ?array
     {
-        // Some platforms cast malformed IDs to existing integer IDs.
-        if (!\is_int($id) && (!\is_string($id) || !preg_match('/^-?[0-9]++$/D', $id))) {
+        // Some platforms cast malformed IDs to existing integer IDs, others fail on IDs that don't fit in a BIGINT.
+        if (\is_string($id) && preg_match('/^(-?)0*([0-9]{1,19})$/D', $id, $m)) {
+            if (19 === \strlen($m[2]) && 0 < strcmp($m[2], $m[1] ? '9223372036854775808' : '9223372036854775807')) {
+                return null;
+            }
+        } elseif (!\is_int($id)) {
             return null;
         }
 

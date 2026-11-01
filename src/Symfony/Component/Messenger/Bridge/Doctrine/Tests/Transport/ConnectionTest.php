@@ -656,7 +656,7 @@ class ConnectionTest extends TestCase
 
     public function testFindAcceptsIntegerIds()
     {
-        foreach ([1, \PHP_INT_MIN, \PHP_INT_MAX, '00012', '2147483648', '9223372036854775807', '-1', '-9223372036854775808'] as $id) {
+        foreach ([1, \PHP_INT_MIN, \PHP_INT_MAX, '00012', '2147483648', '9223372036854775807', '-1', '-9223372036854775808', '009223372036854775807', '-009223372036854775808'] as $id) {
             $queryBuilder = $this->getQueryBuilderStub();
             $driverConnection = $this->getDBALConnection(true);
             $driverConnection->method('createQueryBuilder')->willReturn($queryBuilder);
@@ -676,7 +676,7 @@ class ConnectionTest extends TestCase
 
     public function testFindReturnsNullForAnInvalidId()
     {
-        foreach (['12abc', 'abc', '', '1.5', ' 1', null] as $id) {
+        foreach (['12abc', 'abc', '', '1.5', ' 1', null, '9223372036854775808', '-9223372036854775809', '10000000000000000000', '-10000000000000000000'] as $id) {
             $driverConnection = $this->getDBALConnection(true);
             $driverConnection->expects($this->never())->method('executeQuery');
 

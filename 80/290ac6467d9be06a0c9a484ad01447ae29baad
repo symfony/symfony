@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T07:33:43Z
+
+Expanded the tests for malformed expiration values and valid remember-me cookies.

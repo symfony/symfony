@@ -324,7 +324,7 @@ class Connection
                 $tcpScheme = $tls ? 'tls' : 'tcp';
 
                 if (!\is_array($hosts = $query['host'])) {
-                    throw new InvalidArgumentException(\sprintf('Invalid Redis DSN: "%s".', $dsn));
+                    throw new InvalidArgumentException('Invalid Redis DSN: query parameter "host" must be an array.');
                 }
                 foreach ($hosts as $host => $parameters) {
                     if (\is_string($parameters)) {

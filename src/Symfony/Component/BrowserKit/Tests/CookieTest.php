@@ -171,6 +171,13 @@ class CookieTest extends TestCase
         $this->assertSame((string) \PHP_INT_MAX, Cookie::fromString('foo=bar; Max-Age=99999999999999999999')->getExpiresTime());
     }
 
+    public function testFromStringExpiresCookiesAtTheUnixEpoch()
+    {
+        $this->assertTrue(Cookie::fromString('foo=bar; Expires=Thu, 01 Jan 1970 00:00:00 GMT')->isExpired());
+        $this->assertFalse(Cookie::fromString('foo=bar; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=60')->isExpired());
+        $this->assertFalse((new Cookie('foo', 'bar', 0))->isExpired());
+    }
+
     public function testFromStringExpiresCookiesWithNonPositiveMaxAge()
     {
         $this->assertTrue(Cookie::fromString('foo=bar; Max-Age=0')->isExpired());

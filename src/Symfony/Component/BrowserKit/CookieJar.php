@@ -24,7 +24,7 @@ class CookieJar
 
     public function set(Cookie $cookie): void
     {
-        $this->cookieJar[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
+        $this->cookieJar[self::normalizeDomain($cookie->getDomain())][$cookie->getPath()][$cookie->getName()] = $cookie;
     }
 
     /**
@@ -41,6 +41,10 @@ class CookieJar
     {
         $this->flushExpiredCookies();
 
+        if (null !== $domain) {
+            $domain = self::normalizeDomain($domain);
+        }
+
         $match = null;
 
         foreach ($this->cookieJar as $cookieDomain => $pathCookies) {
@@ -55,7 +59,7 @@ class CookieJar
                 if (!self::pathMatches($cookiePath, $path) || !isset($namedCookies[$name])) {
                     continue;
                 }
-                if ($domain && $namedCookies[$name]->isHostOnly() && ltrim($domain, '.') !== $namedCookies[$name]->getDomain()) {
+                if ($domain && $namedCookies[$name]->isHostOnly() && ltrim($domain, '.') !== self::normalizeDomain($namedCookies[$name]->getDomain())) {
                     continue;
                 }
                 if (null === $match || self::isMoreSpecific($namedCookies[$name], $match)) {
@@ -83,7 +87,7 @@ class CookieJar
             // this should never happen but it allows for a better BC
             $domains = array_keys($this->cookieJar);
         } else {
-            $domains = [$domain];
+            $domains = [self::normalizeDomain($domain)];
         }
 
         foreach ($domains as $domain) {
@@ -179,6 +183,9 @@ class CookieJar
         $this->flushExpiredCookies();
 
         $parts = array_replace(['path' => '/'], parse_url($uri));
+        if (isset($parts['host'])) {
+            $parts['host'] = self::normalizeDomain($parts['host']);
+        }
         $cookies = [];
         foreach ($this->cookieJar as $domain => $pathCookies) {
             if ($domain) {
@@ -198,7 +205,7 @@ class CookieJar
                         continue;
                     }
 
-                    if ($cookie->isHostOnly() && $parts['host'] !== $cookie->getDomain()) {
+                    if ($cookie->isHostOnly() && $parts['host'] !== self::normalizeDomain($cookie->getDomain())) {
                         continue;
                     }
 
@@ -252,8 +259,8 @@ class CookieJar
 
     private static function domainMatches(string $host, string $cookieDomain): bool
     {
-        $host = strtolower($host);
-        $cookieDomain = strtolower(ltrim($cookieDomain, '.'));
+        $host = strtolower(self::normalizeDomain($host));
+        $cookieDomain = strtolower(ltrim(self::normalizeDomain($cookieDomain), '.'));
 
         return $host === $cookieDomain || (str_ends_with($host, '.'.$cookieDomain) && false === filter_var($host, \FILTER_VALIDATE_IP));
     }
@@ -265,5 +272,23 @@ class CookieJar
         }
 
         return str_starts_with($requestPath, $cookiePath) && (str_ends_with($cookiePath, '/') || '/' === $requestPath[\strlen($cookiePath)]);
+    }
+
+    private static function normalizeDomain(string $domain): string
+    {
+        if (!str_contains($domain, ':') || str_contains($domain, "\0")) {
+            return $domain;
+        }
+
+        $ip = ltrim($domain, '.');
+        $prefix = substr($domain, 0, \strlen($domain) - \strlen($ip));
+        $bracketed = str_starts_with($ip, '[') && str_ends_with($ip, ']');
+        if (false !== $address = @inet_pton($bracketed ? substr($ip, 1, -1) : $ip)) {
+            if (false !== $address = inet_ntop($address)) {
+                return $prefix.($bracketed ? '['.$address.']' : $address);
+            }
+        }
+
+        return $domain;
     }
 }

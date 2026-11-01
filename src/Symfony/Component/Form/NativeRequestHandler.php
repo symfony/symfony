@@ -121,7 +121,7 @@ class NativeRequestHandler implements RequestHandlerInterface
             if (\is_array($params) && \is_array($files)) {
                 $data = FormUtil::mergeParamsAndFiles($params, $files);
             } else {
-                $data = $params ?: $files;
+                $data = null === $params || '' === $params || [] === $params ? $files : $params;
             }
         }
 

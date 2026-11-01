@@ -208,6 +208,21 @@ class CollectionTypeTest extends BaseTypeTestCase
         $this->assertEquals(['foo@foo.com'], $form->getData());
     }
 
+    public function testDeleteEmptyPreservesUnsubmittedEntries()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, ['kept', '', 'original'], [
+            'delete_empty' => true,
+        ]);
+
+        $form->submit([2 => 'updated'], false);
+
+        $this->assertSame(['kept', '', 'updated'], $form->getData());
+        $this->assertFalse($form->get('0')->isSubmitted());
+        $this->assertFalse($form->get('1')->isSubmitted());
+        $this->assertTrue($form->get('2')->isSubmitted());
+        $this->assertTrue($form->isValid());
+    }
+
     public function testResizedDownIfSubmittedWithEmptyDataAndDeleteEmpty()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

@@ -18,6 +18,7 @@ use Symfony\Component\Cache\Traits\Relay\Relay30Trait;
 use Symfony\Component\Cache\Traits\Relay\Relay40Trait;
 use Symfony\Component\Cache\Traits\Relay\Relay50Trait;
 use Symfony\Component\Cache\Traits\Relay\Relay502Trait;
+use Symfony\Component\Cache\Traits\Relay\Relay61Trait;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -40,6 +41,7 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     use Relay40Trait;
     use Relay50Trait;
     use Relay502Trait;
+    use Relay61Trait;
 
     public function _compress($value): string
     {

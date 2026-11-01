@@ -214,7 +214,7 @@ class ResizeFormListener implements EventSubscriberInterface
             $initialKeys = $this->initialKeys[$form] ?? [];
             /** @var FormInterface $child */
             foreach ($form as $name => $child) {
-                if (!$child->isValid() || !$child->isSynchronized()) {
+                if (!$child->isSubmitted() || !$child->isValid() || !$child->isSynchronized()) {
                     continue;
                 }
 

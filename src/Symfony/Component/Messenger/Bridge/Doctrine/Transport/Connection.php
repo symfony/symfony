@@ -343,8 +343,8 @@ class Connection implements ResetInterface
 
     public function find(mixed $id): ?array
     {
-        // ids are auto-incremented integers: anything else would be cast by some platforms (e.g. "12abc" to 12 on MySQL)
-        if (!\is_int($id) && (!\is_string($id) || !ctype_digit($id))) {
+        // Some platforms cast malformed IDs to existing integer IDs.
+        if (!\is_int($id) && (!\is_string($id) || !preg_match('/^-?[0-9]++$/D', $id))) {
             return null;
         }
 

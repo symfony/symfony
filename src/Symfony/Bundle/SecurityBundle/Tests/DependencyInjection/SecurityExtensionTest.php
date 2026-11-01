@@ -77,6 +77,8 @@ use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\PrivateKeyJwt;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\SelfSignedTlsClientAuth;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\TlsClientAuth;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Component\Security\Http\PrivacyPass\PrivateTokenManager;
+use Symfony\Component\Security\Http\PrivacyPass\SessionPrivateTokenManager;
 
 class SecurityExtensionTest extends TestCase
 {
@@ -2469,6 +2471,203 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(0));
         $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(0));
         $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main')->getArgument(2));
+    }
+
+    public function testPrivateTokensAreNotWiredUnlessOneIsConfigured()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', ['firewalls' => ['main' => ['security' => false]]]);
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.private_token.attribute_listener'));
+    }
+
+    public function testPrivateTokenReadsTheKeysFromTheDirectoryOfTheIssuer()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'private_tokens' => ['contact' => ['issuer' => 'issuer.example']],
+        ]);
+        $container->compile();
+
+        $manager = $container->getDefinition('security.private_token.contact');
+        $this->assertArrayHasKey('security.private_token', $manager->getTags());
+        $this->assertSame([['name' => 'contact']], $manager->getTag('security.private_token'));
+        $this->assertSame('security.private_token.challenge_factory.contact', (string) $manager->getArgument(0));
+
+        $factory = $container->getDefinition('security.private_token.challenge_factory.contact');
+        $this->assertSame('issuer.example', $factory->getArgument(0));
+        $this->assertSame('security.private_token.issuer_directory.contact', (string) $factory->getArgument(2));
+
+        $directory = $container->getDefinition('security.private_token.issuer_directory.contact');
+        $this->assertSame('http_client', (string) $directory->getArgument(0));
+        $this->assertSame('cache.security.private_token', (string) $directory->getArgument(1));
+        $this->assertSame('issuer.example', $directory->getArgument(2));
+        $this->assertSame(3600, $directory->getArgument(4));
+    }
+
+    public function testPrivateTokenReadsTheKeysFromTheConfiguration()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'private_tokens' => ['contact' => [
+                'issuer' => 'issuer.example',
+                'token_keys' => ['MIIBUjA9BgkqhkiG9w0BAQow'],
+                'directory' => false,
+            ]],
+        ]);
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.private_token.issuer_directory.contact'));
+
+        $tokenKeys = $container->getDefinition('security.private_token.challenge_factory.contact')->getArgument(2);
+        $this->assertCount(1, $tokenKeys);
+        $this->assertSame(['MIIBUjA9BgkqhkiG9w0BAQow'], $tokenKeys[0]->getArguments());
+        $this->assertSame('createTokenKey', $tokenKeys[0]->getFactory()[1]);
+        $this->assertSame('security.private_token.token_type.blind_rsa', (string) $tokenKeys[0]->getFactory()[0]);
+    }
+
+    public function testPrivateTokenBindsItsTokensToATimeWindow()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'private_tokens' => ['contact' => [
+                'issuer' => 'issuer.example',
+                'redemption_context' => ['secret' => 's3cr3t', 'window' => 1800],
+            ]],
+        ]);
+        $container->compile();
+
+        $context = $container->getDefinition('security.private_token.redemption_context.contact');
+        $this->assertSame('s3cr3t', $context->getArgument(0));
+        $this->assertSame(1800, $context->getArgument(1));
+        $this->assertSame('security.private_token.redemption_context.contact', (string) $container->getDefinition('security.private_token.challenge_factory.contact')->getArgument(3));
+
+        // a token has to be remembered for as long as the challenge it answers is accepted
+        $this->assertSame(3600, $container->getDefinition('security.private_token.spent_tokens.contact')->getArgument(1));
+    }
+
+    public function testPrivateTokenAcceptsTokensBoundToNoContext()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'private_tokens' => ['contact' => ['issuer' => 'issuer.example']],
+        ]);
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.private_token.redemption_context.contact'));
+        $this->assertSame('security.private_token.redemption_context.empty', (string) $container->getDefinition('security.private_token.challenge_factory.contact')->getArgument(3));
+        $this->assertSame(7200, $container->getDefinition('security.private_token.spent_tokens.contact')->getArgument(1));
+    }
+
+    public function testPrivateTokenCanAcceptATokenAsManyTimesAsItIsPresented()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'private_tokens' => ['contact' => ['issuer' => 'issuer.example', 'spent_tokens' => false]],
+        ]);
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.private_token.spent_tokens.contact'));
+        $this->assertNull($container->getDefinition('security.private_token.contact')->getArgument(1));
+    }
+
+    public function testPrivateTokenPassesTheChallengeOptionsToItsFactory()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'private_tokens' => ['contact' => [
+                'issuer' => 'issuer.example',
+                'origins' => ['example.com'],
+                'max_age' => 300,
+                'grease_percentage' => 10,
+            ]],
+        ]);
+        $container->compile();
+
+        $factory = $container->getDefinition('security.private_token.challenge_factory.contact');
+        $this->assertSame(['example.com'], $factory->getArgument(4));
+        $this->assertSame(300, $factory->getArgument(5));
+        $this->assertSame(10, $factory->getArgument(6));
+    }
+
+    public function testPrivateTokenCanRememberAnAcceptedTokenInTheSession()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'private_tokens' => ['contact' => ['issuer' => 'issuer.example', 'remember' => ['lifetime' => 600]]],
+        ]);
+        $container->compile();
+
+        $manager = $container->getDefinition('security.private_token.contact');
+        $this->assertSame(SessionPrivateTokenManager::class, $manager->getClass());
+        $this->assertSame('security.private_token.contact.inner', (string) $manager->getArgument(0));
+        $this->assertSame(600, $manager->getArgument(1));
+        $this->assertSame('_security.private_token.contact', $manager->getArgument(2));
+        $this->assertSame([['name' => 'contact']], $manager->getTag('security.private_token'));
+        $this->assertSame(PrivateTokenManager::class, $container->getDefinition('security.private_token.contact.inner')->getClass());
+    }
+
+    public function testPrivateTokenRemembersNothingByDefault()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'private_tokens' => ['contact' => ['issuer' => 'issuer.example']],
+        ]);
+        $container->compile();
+
+        $this->assertSame(PrivateTokenManager::class, $container->getDefinition('security.private_token.contact')->getClass());
+        $this->assertFalse($container->hasDefinition('security.private_token.contact.inner'));
+    }
+
+    public function testPrivateTokenNeedsAtLeastOneKeySource()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'private_tokens' => ['contact' => ['issuer' => 'issuer.example', 'directory' => false]],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('You must set either "token_keys" or enable "directory".');
+
+        $container->compile();
+    }
+
+    public function testPrivateTokenRejectsBothKeySources()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'private_tokens' => ['contact' => ['issuer' => 'issuer.example', 'token_keys' => ['MIIBUjA9']]],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "token_keys" and "directory" options cannot be used together');
+
+        $container->compile();
+    }
+
+    public function testPrivateTokenRejectsOriginsThatAreNotAList()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => ['main' => ['security' => false]],
+            'private_tokens' => ['contact' => ['issuer' => 'issuer.example', 'origins' => 'example.com']],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "origins" option must be a list of hosts, or null.');
+
+        $container->compile();
     }
 
     protected function getRawContainer()

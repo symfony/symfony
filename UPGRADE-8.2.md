@@ -234,6 +234,7 @@ HttpClient
 HttpFoundation
 --------------
 
+ * [BC BREAK] `Cookie` rejects `__Http-` and `__Host-Http-` names when `HttpOnly` is disabled or `Secure` is explicitly disabled
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()`
  * Deprecate not passing an expiration to `UriSigner::sign()` when the signer has no default one; pass it, or set a default with the `$defaultExpiration` argument of `UriSigner::__construct()` or the `framework.uri_signer.expiration` option
  * Deprecate the `Request::$trustedHosts` property, it is never populated anymore since trusted hosts are

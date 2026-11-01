@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Degrade hexadecimal colors to the 4-bit color with the closest hue instead of rounding each RGB channel in `Ansi4` mode, and greys and nearly grey colors to black or white
  * Add `CommandInvocation` and the `%command.invocation%` help placeholder to include the PHP executable or Symfony CLI launcher
  * Add `CompletionSuggestions::suggestPaths()`, `suggestDirectories()` and `getPathSuggestion()` to let the shell complete file system paths, as `InputFile` arguments and options now do
  * Pass the `CompletionSuggestions` to the `suggestedValues` closures of arguments and options

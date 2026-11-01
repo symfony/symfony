@@ -1276,6 +1276,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return false;
         }
 
+        if (0 === $maxDepth) {
+            return true;
+        }
+
         $keyClass = $class;
         if ($this->classMetadataFactory) {
             while (false !== $parent = get_parent_class($keyClass)) {

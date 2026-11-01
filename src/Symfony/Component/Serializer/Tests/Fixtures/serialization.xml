@@ -121,4 +121,7 @@
         </attribute>
     </class>
 
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthZeroDummy">
+        <attribute name="child" max-depth="0" />
+    </class>
 </serializer>

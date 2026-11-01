@@ -19,7 +19,6 @@ BrowserKit
 
  * `CookieJar::updateFromSetCookie()` and `updateFromResponse()` ignore a cookie whose `Domain` attribute does not match the host of the response, as browsers do
  * `CookieJar` sends a cookie set without a `Domain` attribute only to the host that set it, not to its subdomains, as browsers do
- * `Cookie::__toString()` omits the `Domain` attribute for host-only cookies to preserve their scope
 
 Cache
 -----

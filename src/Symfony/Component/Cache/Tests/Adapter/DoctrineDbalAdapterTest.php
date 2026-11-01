@@ -22,6 +22,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Tests\Fixtures\DriverWrapper;
 
 /**
@@ -213,6 +214,23 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
         $this->expectException(\RuntimeException::class);
         $doSave->invoke($adapter, ['key' => 'value'], 0);
+    }
+
+    public function testDsnIsNotExposedInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            new DoctrineDbalAdapter('pgsql://user:s3cr3t@localhost/db', 'invalid:namespace');
+            $this->fail('An exception should have been thrown.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
     }
 
     protected function isPruned(DoctrineDbalAdapter $cache, string $name): bool

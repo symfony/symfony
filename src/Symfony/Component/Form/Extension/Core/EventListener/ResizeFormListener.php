@@ -102,10 +102,10 @@ class ResizeFormListener implements EventSubscriberInterface
             $data = [];
         }
 
-        // Remove all empty rows
+        // Remove all rows missing from the submitted data
         if ($this->allowDelete) {
             foreach ($form as $name => $child) {
-                if (!isset($data[$name])) {
+                if (!\array_key_exists($name, $data)) {
                     $form->remove($name);
                 }
             }

@@ -296,7 +296,7 @@ jobs:
           for attempt in {1..20}; do
             if timeout 15 env KMIP_TEST_HOST=127.0.0.1 KMIP_TEST_PORT=5696 KMIP_TEST_PEER_NAME=localhost \
               KMIP_TEST_CA="$fixture/certs/ca.crt" KMIP_TEST_CERT="$fixture/certs/client.crt" KMIP_TEST_KEY="$fixture/certs/client.key" \
-              KMIP_TEST_REQUIRED=1 \
+              KMIP_TEST_SERVER=pykmip KMIP_TEST_REQUIRED=1 \
               ./phpunit src/Symfony/Component/KeyManagement/Bridge/Kmip/Tests/KmipIntegrationTest.php \
               --filter testServerAdvertisesSupportedVersion --fail-on-empty-test-suite > "$RUNNER_TEMP/kmip-pykmip-readiness.log" 2>&1; then
               ready=1
@@ -322,6 +322,7 @@ jobs:
           echo "KMIP_TEST_NO_EKU_KEY=$fixture/certs/no-eku.key" >> "$GITHUB_ENV"
           echo "KMIP_TEST_ENCRYPTED_KEY=$fixture/certs/client-encrypted.key" >> "$GITHUB_ENV"
           echo "KMIP_TEST_KEY_PASSPHRASE=test-passphrase" >> "$GITHUB_ENV"
+          echo "KMIP_TEST_SERVER=pykmip" >> "$GITHUB_ENV"
           echo "KMIP_TEST_REQUIRED=1" >> "$GITHUB_ENV"
 
       - name: Provision Vault
@@ -358,8 +359,8 @@ jobs:
       - name: Run KMIP integration tests
         run: |
           tests=$(./phpunit --group kmip-integration --list-tests)
-          grep -Fq 'KmipIntegrationTest::testVersionedOperations"1.4"' <<< "$tests"
-          grep -Fq 'KmipIntegrationTest::testVersionedOperations"2.0"' <<< "$tests"
+          grep -Fq 'KmipIntegrationTest::testAuthenticatedEncryptionAndCrossVersionDecryption"1.4 aes-gcm"' <<< "$tests"
+          grep -Fq 'KmipIntegrationTest::testAuthenticatedEncryptionAndCrossVersionDecryption"2.0 aes-gcm"' <<< "$tests"
           ./phpunit --group kmip-integration --fail-on-empty-test-suite
 
       - name: Stop PyKMIP
@@ -371,3 +372,54 @@ jobs:
             docker exec kmip-server cat /tmp/server.log || true
           fi
           docker rm -f kmip-server || true
+
+      - name: Start Eviden KMS
+        run: |
+          fixture="$RUNNER_TEMP/eviden"
+          mkdir -p "$fixture/data"
+          docker run -d --name kmip-eviden -p 127.0.0.1:5696:5696 \
+            -v "$RUNNER_TEMP/pykmip/certs:/kmip/certs:ro" \
+            -v "$fixture/data:/kmip/data" \
+            ghcr.io/cosmian/kms:5.29.0@sha256:a5592576c17854868c8abe6536b0ab89c49f31eb978c2778d2ee471330e083c8 \
+            --database-type sqlite --sqlite-path /kmip/data \
+            --tls-cert-file /kmip/certs/server.crt --tls-key-file /kmip/certs/server.key \
+            --clients-ca-cert-file /kmip/certs/ca.crt --socket-server-start
+          ready=0
+          for ((attempt = 1; attempt <= 20; ++attempt)); do
+            if timeout 15 env KMIP_TEST_HOST=127.0.0.1 KMIP_TEST_PORT=5696 KMIP_TEST_PEER_NAME=localhost \
+              KMIP_TEST_CA="$RUNNER_TEMP/pykmip/certs/ca.crt" KMIP_TEST_CERT="$RUNNER_TEMP/pykmip/certs/client.crt" KMIP_TEST_KEY="$RUNNER_TEMP/pykmip/certs/client.key" \
+              KMIP_TEST_SERVER=eviden KMIP_TEST_REQUIRED=1 \
+              ./phpunit src/Symfony/Component/KeyManagement/Bridge/Kmip/Tests/KmipIntegrationTest.php \
+              --filter testServerAdvertisesSupportedVersion --fail-on-empty-test-suite > "$RUNNER_TEMP/kmip-eviden-readiness.log" 2>&1; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [[ "$ready" -ne 1 ]]; then
+            cat "$RUNNER_TEMP/kmip-eviden-readiness.log"
+            docker ps -a --filter name=kmip-eviden
+            docker logs kmip-eviden --tail 200 || true
+            exit 1
+          fi
+          echo "KMIP_TEST_SERVER=eviden" >> "$GITHUB_ENV"
+
+      - name: Run Eviden KMIP integration tests
+        run: |
+          tests=$(./phpunit --group kmip-integration --list-tests)
+          for version in 1.4 2.0 2.1; do
+            for cipher in aes-gcm chacha20-poly1305 aes-gcm-siv; do
+              grep -Fq "KmipIntegrationTest::testAuthenticatedEncryptionAndCrossVersionDecryption\"$version $cipher\"" <<< "$tests"
+            done
+          done
+          ./phpunit --group kmip-integration --fail-on-empty-test-suite
+
+      - name: Stop Eviden KMS
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          if [[ "$JOB_STATUS" != 'success' ]]; then
+            docker logs kmip-eviden --tail 200 || true
+          fi
+          docker rm -f kmip-eviden || true

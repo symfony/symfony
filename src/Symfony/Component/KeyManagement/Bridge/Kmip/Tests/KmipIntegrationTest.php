@@ -59,10 +59,13 @@ final class KmipIntegrationTest extends TestCase
     private const int STATUS_SUCCESS = 0;
     private const int REASON_PERMISSION_DENIED = 0x0C;
     private const int REASON_AUTHENTICATION_NOT_SUCCESSFUL = 3;
+    private const int REASON_INVALID_MESSAGE = 4;
     private const int REASON_GENERAL_FAILURE = 0x100;
     private const int DEFAULT_PORT = 5696;
     private const int TIMEOUT_SECONDS = 10;
     private const int AES_ALGORITHM = 3;
+    private const int CHACHA20_POLY1305_ALGORITHM = 0x1E;
+    private const string EVIDEN_GCM_SIV_MODE = '0x80000002';
     private const int AES_KEY_LENGTH_BITS = 256;
     private const int DEFAULT_IV_LENGTH_BYTES = 12;
     private const int LONG_IV_LENGTH_BYTES = 16;
@@ -71,13 +74,16 @@ final class KmipIntegrationTest extends TestCase
     private const int USAGE_ENCRYPT_AND_DECRYPT = 12;
     private const int REVOCATION_REASON_UNSPECIFIED = 1;
     private const int BULK_PAYLOAD_REPETITIONS = 8192;
-    private const int RAW_IV_LENGTH_OFFSET = 0;
     private const int RAW_IV_OFFSET = 1;
     private const int AUTHENTICATION_TAG_LENGTH = 16;
-    private const string CIPHERTEXT_HEADER = "\x01\x00\x00\x00\x03\x00\x00\x00\x09";
     private const int CIPHERTEXT_HEADER_LENGTH = 9;
 
-    public function testServerAdvertisesSupportedVersion()
+    private string $host;
+    private int $port;
+    private array $tlsOptions;
+    private array $keys = [];
+
+    protected function setUp(): void
     {
         $host = getenv('KMIP_TEST_HOST');
         if (!$host) {
@@ -86,31 +92,44 @@ final class KmipIntegrationTest extends TestCase
             }
             $this->markTestSkipped('KMIP fixture is not running.');
         }
-        $version = ProtocolVersion::Version20;
-        $clientCertificateFile = (string) getenv('KMIP_TEST_CERT');
-        $clientPrivateKeyFile = (string) getenv('KMIP_TEST_KEY');
-        $certificateAuthorityFile = (string) getenv('KMIP_TEST_CA');
-        $peerName = (string) getenv('KMIP_TEST_PEER_NAME');
-        $port = (int) (getenv('KMIP_TEST_PORT') ?: self::DEFAULT_PORT);
-        $protocol = new ProtocolClient(new StreamTransport($host, $port, $clientCertificateFile, $clientPrivateKeyFile, $certificateAuthorityFile, $peerName, null, self::TIMEOUT_SECONDS), $version, null, null);
+        if ('1' === getenv('KMIP_TEST_REQUIRED')) {
+            foreach (['KMIP_TEST_CERT', 'KMIP_TEST_KEY', 'KMIP_TEST_CA', 'KMIP_TEST_PEER_NAME'] as $name) {
+                $this->assertNotEmpty(getenv($name), $name.' is required.');
+            }
+        }
+        $this->host = $host;
+        $this->port = (int) (getenv('KMIP_TEST_PORT') ?: self::DEFAULT_PORT);
+        $this->tlsOptions = [
+            'cert' => (string) getenv('KMIP_TEST_CERT'),
+            'key' => (string) getenv('KMIP_TEST_KEY'),
+            'ca' => (string) getenv('KMIP_TEST_CA'),
+            'peer_name' => (string) getenv('KMIP_TEST_PEER_NAME'),
+        ];
+    }
 
-        $this->assertContains($version->value, self::discoverVersions($protocol, $version, $host, $port, $clientCertificateFile, $clientPrivateKeyFile, $certificateAuthorityFile, $peerName));
+    protected function tearDown(): void
+    {
+        foreach (array_reverse($this->keys, true) as $keyId => [$protocol, $active]) {
+            if ($active) {
+                $this->revokeKey($protocol, $keyId);
+            }
+            $protocol->request(self::OPERATION_DESTROY, Ttlv::text(ProtocolClient::UNIQUE_IDENTIFIER, $keyId));
+        }
+    }
+
+    public function testServerAdvertisesSupportedVersion()
+    {
+        $version = ProtocolVersion::Version20;
+        $versions = $this->discoverVersions($this->protocol($version), $version);
+
+        foreach ($this->supportedVersions() as $expected) {
+            $this->assertContains($expected->value, $versions);
+        }
     }
 
     public function testUntrustedServerCertificateFailureIdentifiesTheTlsProblem()
     {
-        $host = getenv('KMIP_TEST_HOST');
-        if (!$host) {
-            if ('1' === getenv('KMIP_TEST_REQUIRED')) {
-                $this->fail('KMIP_TEST_HOST is required.');
-            }
-            $this->markTestSkipped('KMIP fixture is not running.');
-        }
-        $clientCertificateFile = (string) getenv('KMIP_TEST_CERT');
-        $clientPrivateKeyFile = (string) getenv('KMIP_TEST_KEY');
-        $peerName = (string) getenv('KMIP_TEST_PEER_NAME');
-        $port = (int) (getenv('KMIP_TEST_PORT') ?: self::DEFAULT_PORT);
-        $transport = new StreamTransport($host, $port, $clientCertificateFile, $clientPrivateKeyFile, $clientCertificateFile, $peerName, null, self::TIMEOUT_SECONDS);
+        $transport = $this->transport(['ca' => $this->tlsOptions['cert']]);
 
         try {
             $transport->exchange('request');
@@ -122,184 +141,330 @@ final class KmipIntegrationTest extends TestCase
         }
     }
 
-    #[DataProvider('versions')]
-    public function testVersionedOperations(ProtocolVersion $version, int $ivLength = self::DEFAULT_IV_LENGTH_BYTES)
+    #[DataProvider('configurations')]
+    public function testAuthenticatedEncryptionAndCrossVersionDecryption(ProtocolVersion $version, string $cipher, int $ivLength)
     {
-        $host = getenv('KMIP_TEST_HOST');
-        if (!$host) {
-            if ('1' === getenv('KMIP_TEST_REQUIRED')) {
-                $this->fail('KMIP_TEST_HOST is required.');
-            }
-            $this->markTestSkipped('KMIP fixture is not running.');
-        }
-        if ('1' === getenv('KMIP_TEST_REQUIRED')) {
-            foreach (['KMIP_TEST_CERT', 'KMIP_TEST_KEY', 'KMIP_TEST_CA', 'KMIP_TEST_PEER_NAME', 'KMIP_TEST_OTHER_CERT', 'KMIP_TEST_OTHER_KEY', 'KMIP_TEST_NO_EKU_CERT', 'KMIP_TEST_NO_EKU_KEY', 'KMIP_TEST_ENCRYPTED_KEY', 'KMIP_TEST_KEY_PASSPHRASE'] as $name) {
-                $this->assertNotEmpty(getenv($name), $name.' is required.');
-            }
-        }
-        $clientCertificateFile = (string) getenv('KMIP_TEST_CERT');
-        $clientPrivateKeyFile = (string) getenv('KMIP_TEST_KEY');
-        $certificateAuthorityFile = (string) getenv('KMIP_TEST_CA');
-        $peerName = (string) getenv('KMIP_TEST_PEER_NAME');
-        $port = (int) (getenv('KMIP_TEST_PORT') ?: self::DEFAULT_PORT);
-        $protocol = new ProtocolClient(new StreamTransport($host, $port, $clientCertificateFile, $clientPrivateKeyFile, $certificateAuthorityFile, $peerName, null, self::TIMEOUT_SECONDS), $version, null, null);
-        $versions = self::discoverVersions($protocol, $version, $host, $port, $clientCertificateFile, $clientPrivateKeyFile, $certificateAuthorityFile, $peerName);
-        $this->assertContains(ProtocolVersion::Version14->value, $versions);
-        $this->assertContains(ProtocolVersion::Version20->value, $versions);
-        $this->assertContains($version->value, $versions);
-        $keyId = self::provisionKey($protocol, $version);
-        $options = ['cert' => $clientCertificateFile, 'key' => $clientPrivateKeyFile, 'ca' => $certificateAuthorityFile, 'peer_name' => $peerName];
-        $kms = self::kms($host, $port, $version, $options + ['iv_length' => $ivLength]);
+        [, $keyId, $kms] = $this->createKms($version, $cipher, $ivLength);
 
-        $ciphertext = $kms->encrypt($keyId, "hello\0world", "aad\0bytes");
-        $this->assertSame($keyId, $ciphertext->keyId);
-        $this->assertStringStartsWith(self::CIPHERTEXT_HEADER.\chr($ivLength), $ciphertext->blob);
-        $this->assertSame("hello\0world", $kms->decrypt($ciphertext, "aad\0bytes"));
-        $this->assertNotSame($ciphertext->blob, $kms->encrypt($keyId, "hello\0world", "aad\0bytes")->blob);
-        $otherIvLength = self::DEFAULT_IV_LENGTH_BYTES === $ivLength ? self::LONG_IV_LENGTH_BYTES : self::DEFAULT_IV_LENGTH_BYTES;
-        $otherIvKms = self::kms($host, $port, $version, $options + ['iv_length' => $otherIvLength]);
-        $otherIvCiphertext = $otherIvKms->encrypt($keyId, 'other IV', 'aad');
-        $this->assertSame('other IV', $kms->decrypt($otherIvCiphertext, 'aad'));
-        $this->assertSame('selected IV', $otherIvKms->decrypt($kms->encrypt($keyId, 'selected IV', 'aad'), 'aad'));
-        $this->assertStringStartsWith(self::CIPHERTEXT_HEADER.\chr($otherIvLength), $otherIvCiphertext->blob);
-        foreach (['', 'x', str_repeat("\0binary\xFF", self::BULK_PAYLOAD_REPETITIONS)] as $plaintext) {
+        foreach (['', 'x', "hello\0world", str_repeat("\0binary\xFF", self::BULK_PAYLOAD_REPETITIONS)] as $plaintext) {
+            $encrypted = $kms->encrypt($keyId, $plaintext, "aad\0bytes");
+
+            $this->assertSame($keyId, $encrypted->keyId);
+            $this->assertStringStartsWith(self::header($cipher, $ivLength), $encrypted->blob);
+            $this->assertSame($plaintext, $kms->decrypt($encrypted, "aad\0bytes"));
             $this->assertSame($plaintext, $kms->decrypt($kms->encrypt($keyId, $plaintext)));
-        }
-        $otherVersion = ProtocolVersion::Version14 === $version ? ProtocolVersion::Version20 : ProtocolVersion::Version14;
-        $otherVersionKms = self::kms($host, $port, $otherVersion, $options);
-        $this->assertSame("hello\0world", $otherVersionKms->decrypt($ciphertext, "aad\0bytes"));
-
-        $payloadOffset = self::CIPHERTEXT_HEADER_LENGTH;
-        $this->assertSame($ivLength, \ord($ciphertext->blob[$payloadOffset + self::RAW_IV_LENGTH_OFFSET]));
-        $authenticationTagOffset = self::RAW_IV_OFFSET + $ivLength;
-        $encryptedDataOffset = $authenticationTagOffset + self::AUTHENTICATION_TAG_LENGTH;
-        foreach ([self::RAW_IV_OFFSET, $authenticationTagOffset, $encryptedDataOffset] as $offset) {
-            $tampered = $ciphertext->blob;
-            $tampered[$payloadOffset + $offset] = \chr(\ord($tampered[$payloadOffset + $offset]) ^ 1);
-            $this->expectAuthenticationFailure(static fn () => $kms->decrypt(new Ciphertext($tampered, $keyId), "aad\0bytes"));
-        }
-        $tampered = $ciphertext->blob;
-        $tampered[$payloadOffset + self::RAW_IV_LENGTH_OFFSET] = "\0";
-        $this->expectDecryptionFailure(static fn () => $kms->decrypt(new Ciphertext($tampered, $keyId), "aad\0bytes"));
-        $tampered = $ciphertext->blob;
-        $tampered[$payloadOffset + self::RAW_IV_LENGTH_OFFSET] = \chr($otherIvLength);
-        $this->expectAuthenticationFailure(static fn () => $kms->decrypt(new Ciphertext($tampered, $keyId), "aad\0bytes"));
-        foreach ([0, 4, 8] as $headerOffset) {
-            $tampered = $ciphertext->blob;
-            $tampered[$headerOffset] = \chr(\ord($tampered[$headerOffset]) ^ 1);
-            $this->expectDecryptionFailure(static fn () => $kms->decrypt(new Ciphertext($tampered, $keyId), "aad\0bytes"));
-        }
-        $this->expectDecryptionFailure(static fn () => $kms->decrypt(new Ciphertext($ciphertext->blob, 'unknown-key'), "aad\0bytes"));
-        $alternateKeyId = self::provisionKey($protocol, $version);
-        $this->expectAuthenticationFailure(static fn () => $kms->decrypt(new Ciphertext($ciphertext->blob, $alternateKeyId), "aad\0bytes"));
-        try {
-            $kms->encrypt('unknown-key', 'data');
-            $this->fail('An unknown key must fail.');
-        } catch (KeyNotFoundException) {
-        }
-        try {
-            $kms->encrypt("missing\n\x1B[31m", 'data');
-            $this->fail('An unknown key must fail.');
-        } catch (KeyNotFoundException $e) {
-            $this->assertStringContainsString('\\x0A', $e->getMessage());
-            $this->assertStringContainsString('\\x1B', $e->getMessage());
-            $this->assertStringNotContainsString("\n", $e->getMessage());
+            $this->assertNotSame($encrypted->blob, $kms->encrypt($keyId, $plaintext, "aad\0bytes")->blob);
         }
 
-        $this->expectAuthenticationFailure(static fn () => $kms->decrypt($ciphertext, 'wrong aad'));
-        $this->expectAuthenticationFailure(static fn () => $kms->decrypt($ciphertext));
+        $encrypted = $kms->encrypt($keyId, 'cross-version plaintext', 'context');
+        foreach ($this->supportedVersions() as $otherVersion) {
+            $this->assertSame('cross-version plaintext', $this->kms($otherVersion, $cipher)->decrypt($encrypted, 'context'));
+        }
+    }
+
+    #[DataProvider('configurations')]
+    public function testStoredCipherAndIvLengthSurviveConfigurationChanges(ProtocolVersion $version, string $cipher, int $ivLength)
+    {
+        [$protocol, $keyId, $kms] = $this->createKms($version, $cipher, $ivLength);
+        $encrypted = $kms->encrypt($keyId, 'selected cipher', 'context');
+        $otherIvLength = self::DEFAULT_IV_LENGTH_BYTES === $ivLength ? self::LONG_IV_LENGTH_BYTES : self::DEFAULT_IV_LENGTH_BYTES;
+
+        $this->assertSame('selected cipher', $this->kms($version, 'aes-gcm', $otherIvLength)->decrypt($encrypted, 'context'));
+
+        $aesKeyId = $this->provisionKey($protocol, $version);
+        $earlier = $this->kms($version, 'aes-gcm', $otherIvLength)->encrypt($aesKeyId, 'earlier AES-GCM ciphertext', 'context');
+
+        $this->assertStringStartsWith(self::header('aes-gcm', $otherIvLength), $earlier->blob);
+        $this->assertSame('earlier AES-GCM ciphertext', $kms->decrypt($earlier, 'context'));
+    }
+
+    #[DataProvider('configurations')]
+    public function testTamperedCiphertextAndAssociatedDataAreRejected(ProtocolVersion $version, string $cipher, int $ivLength)
+    {
+        [$protocol, $keyId, $kms] = $this->createKms($version, $cipher, $ivLength);
+        $encrypted = $kms->encrypt($keyId, 'authenticated plaintext', 'context');
+        $ivOffset = self::CIPHERTEXT_HEADER_LENGTH + self::RAW_IV_OFFSET;
+        $tagOffset = $ivOffset + $ivLength;
+        $dataOffset = $tagOffset + self::AUTHENTICATION_TAG_LENGTH;
+
+        foreach (['IV' => $ivOffset, 'authentication tag' => $tagOffset, 'encrypted data' => $dataOffset] as $offset) {
+            $blob = $encrypted->blob;
+            $blob[$offset] = \chr(\ord($blob[$offset]) ^ 1);
+
+            $this->expectAuthenticationFailure(static fn () => $kms->decrypt(new Ciphertext($blob, $keyId), 'context'));
+        }
+        foreach (['format' => 0, 'algorithm' => 4, 'block cipher mode' => 8] as $offset) {
+            $blob = $encrypted->blob;
+            $blob[$offset] = \chr(\ord($blob[$offset]) ^ 1);
+
+            $this->expectDecryptionFailure(static fn () => $kms->decrypt(new Ciphertext($blob, $keyId), 'context'));
+        }
+        $blob = $encrypted->blob;
+        $blob[self::CIPHERTEXT_HEADER_LENGTH] = "\0";
+        $this->expectDecryptionFailure(static fn () => $kms->decrypt(new Ciphertext($blob, $keyId), 'context'));
+        if ('aes-gcm' === $cipher) {
+            $blob[self::CIPHERTEXT_HEADER_LENGTH] = \chr(self::DEFAULT_IV_LENGTH_BYTES === $ivLength ? self::LONG_IV_LENGTH_BYTES : self::DEFAULT_IV_LENGTH_BYTES);
+            $this->expectAuthenticationFailure(static fn () => $kms->decrypt(new Ciphertext($blob, $keyId), 'context'));
+        }
+
+        $alternateKeyId = $this->provisionKey($protocol, $version, self::USAGE_ENCRYPT_AND_DECRYPT, true, self::algorithm($cipher));
+        $this->expectAuthenticationFailure(static fn () => $kms->decrypt(new Ciphertext($encrypted->blob, $alternateKeyId), 'context'));
+        $this->expectDecryptionFailure(static fn () => $kms->decrypt(new Ciphertext($encrypted->blob, 'unknown-key'), 'context'));
+        $this->expectAuthenticationFailure(static fn () => $kms->decrypt($encrypted, 'wrong context'));
+        $this->expectAuthenticationFailure(static fn () => $kms->decrypt($encrypted));
         $this->expectAuthenticationFailure(static fn () => $kms->decrypt($kms->encrypt($keyId, 'without aad'), 'extra aad'));
+    }
+
+    #[DataProvider('configurations')]
+    public function testDataKeyGenerationWrappingAndUnwrapping(ProtocolVersion $version, string $cipher, int $ivLength)
+    {
+        [, $keyId, $kms] = $this->createKms($version, $cipher, $ivLength);
 
         foreach ([16, 32, 64] as $length) {
             foreach (['', 'wrapped aad'] as $aad) {
-                $dataKey = $kms->generateDataKey($keyId, $length, $aad);
-                $wrapped = $dataKey->wrapped;
-                $plaintext = $dataKey->use(static fn (string $bytes): string => $bytes);
+                $generated = $kms->generateDataKey($keyId, $length, $aad);
+                $plaintext = $generated->use(static fn (string $bytes): string => $bytes);
+
                 $this->assertSame($length, \strlen($plaintext));
+                $this->assertStringStartsWith(self::header($cipher, $ivLength), $generated->wrapped->blob);
+                $this->assertSame($plaintext, $kms->unwrapDataKey($generated->wrapped, $aad)->use(static fn (string $bytes): string => $bytes));
+                $wrapped = $kms->wrapDataKey($keyId, $plaintext, $aad);
                 $this->assertSame($plaintext, $kms->unwrapDataKey($wrapped, $aad)->use(static fn (string $bytes): string => $bytes));
+                $this->expectAuthenticationFailure(static fn () => $kms->unwrapDataKey($wrapped, 'wrong context'));
             }
         }
         $ordinaryWrapped = $kms->encrypt($keyId, random_bytes(32), 'rewrap');
         $this->assertSame($kms->decrypt($ordinaryWrapped, 'rewrap'), $kms->unwrapDataKey($ordinaryWrapped, 'rewrap')->use(static fn (string $bytes): string => $bytes));
-
-        $credentialed = (new KmipKmsFactory())->create(Dsn::fromString('kmip://user:password@'.$host.':'.$port.'?'.http_build_query($options + ['version' => $version->value, 'iv_length' => $ivLength])));
-        $credentialedCiphertext = $credentialed->encrypt($keyId, 'credentialed', 'aad');
-        $this->assertSame('credentialed', $credentialed->decrypt($credentialedCiphertext, 'aad'));
-        $this->assertSame($ivLength, \ord($credentialedCiphertext->blob[self::CIPHERTEXT_HEADER_LENGTH]));
-
-        $encryptedClientPrivateKeyFile = (string) getenv('KMIP_TEST_ENCRYPTED_KEY');
-        if ('' !== $encryptedClientPrivateKeyFile) {
-            $withPassphrase = self::kms($host, $port, $version, ['key' => $encryptedClientPrivateKeyFile, 'passphrase' => (string) getenv('KMIP_TEST_KEY_PASSPHRASE')] + $options);
-            $this->assertSame('encrypted key', $withPassphrase->decrypt($withPassphrase->encrypt($keyId, 'encrypted key')));
-            try {
-                self::kms($host, $port, $version, ['key' => $encryptedClientPrivateKeyFile, 'passphrase' => 'wrong-private-passphrase'] + $options)->encrypt($keyId, 'tls');
-                $this->fail('The wrong private-key passphrase must fail.');
-            } catch (RuntimeException $e) {
-                $this->assertStringNotContainsString('wrong-private-passphrase', $e->getMessage());
-            }
-        }
-
-        $otherClientCertificateFile = (string) getenv('KMIP_TEST_OTHER_CERT');
-        $otherClientPrivateKeyFile = (string) getenv('KMIP_TEST_OTHER_KEY');
-        if ('' !== $otherClientCertificateFile && '' !== $otherClientPrivateKeyFile) {
-            $otherOwner = self::kms($host, $port, $version, ['cert' => $otherClientCertificateFile, 'key' => $otherClientPrivateKeyFile] + $options);
-            try {
-                $otherOwner->decrypt($ciphertext, "aad\0bytes");
-                $this->fail('Another client identity must be denied.');
-            } catch (OperationFailed $e) {
-                $this->assertSame(self::REASON_PERMISSION_DENIED, $e->reason);
-            }
-        }
-
-        $encryptOnlyKeyId = self::provisionKey($protocol, $version, self::USAGE_ENCRYPT_ONLY);
-        $restrictedCiphertext = $kms->encrypt($encryptOnlyKeyId, 'restricted');
-        $this->expectOperationalFailure(static fn () => $kms->decrypt($restrictedCiphertext));
-        $preActiveKeyId = self::provisionKey($protocol, $version, self::USAGE_ENCRYPT_AND_DECRYPT, false);
-        $this->expectOperationalFailure(static fn () => $kms->encrypt($preActiveKeyId, 'inactive'));
-        $revokedKeyId = self::provisionKey($protocol, $version);
-        $revokedCiphertext = $kms->encrypt($revokedKeyId, 'revoked');
-        $protocol->request(self::OPERATION_REVOKE, Ttlv::text(ProtocolClient::UNIQUE_IDENTIFIER, $revokedKeyId).Ttlv::structure(self::TAG_REVOCATION_REASON, Ttlv::integer(self::TAG_REVOCATION_REASON_CODE, self::REVOCATION_REASON_UNSPECIFIED, Ttlv::ENUMERATION)));
-        $this->expectOperationalFailure(static fn () => $kms->encrypt($revokedKeyId, 'after revoke'));
-        $this->expectOperationalFailure(static fn () => $kms->decrypt($revokedCiphertext));
-
-        $this->expectOperationalFailure(static fn () => self::kms($host, $port, $version, ['peer_name' => 'wrong.example'] + $options)->encrypt($keyId, 'tls'));
-        $this->expectOperationalFailure(static fn () => self::kms($host, $port, $version, array_diff_key($options, ['peer_name' => true]))->encrypt($keyId, 'tls'));
-        $this->expectOperationalFailure(static fn () => self::kms($host, $port, $version, ['ca' => $clientCertificateFile] + $options)->encrypt($keyId, 'tls'));
-        $certificateWithoutExtendedKeyUsageFile = (string) getenv('KMIP_TEST_NO_EKU_CERT');
-        $matchingPrivateKeyFile = (string) getenv('KMIP_TEST_NO_EKU_KEY');
-        if ('' !== $certificateWithoutExtendedKeyUsageFile && '' !== $matchingPrivateKeyFile) {
-            try {
-                self::kms($host, $port, $version, ['cert' => $certificateWithoutExtendedKeyUsageFile, 'key' => $matchingPrivateKeyFile] + $options)->encrypt($keyId, 'tls');
-                $this->fail('A client without clientAuth EKU must be denied.');
-            } catch (OperationFailed $e) {
-                $this->assertSame(self::REASON_AUTHENTICATION_NOT_SUCCESSFUL, $e->reason);
-                $this->assertFalse($e->hasOperation);
-            }
-        }
-
-        $envelope = new EnvelopeEncrypter($kms);
-        $this->assertSame("bulk\0payload", $envelope->decrypt($envelope->encrypt($keyId, "bulk\0payload", 'context'), 'context'));
-
-        foreach ([$keyId, $alternateKeyId, $encryptOnlyKeyId] as $keyIdToDestroy) {
-            self::destroyKey($protocol, $keyIdToDestroy, true);
-        }
-        self::destroyKey($protocol, $preActiveKeyId, false);
-        self::destroyKey($protocol, $revokedKeyId, false);
     }
 
-    public static function versions(): iterable
+    #[DataProvider('configurations')]
+    public function testEnvelopeEncryption(ProtocolVersion $version, string $cipher, int $ivLength)
     {
-        yield '1.4' => [ProtocolVersion::Version14];
-        yield '2.0' => [ProtocolVersion::Version20];
-        yield '2.0 with a 16-byte IV' => [ProtocolVersion::Version20, self::LONG_IV_LENGTH_BYTES];
+        [, $keyId, $kms] = $this->createKms($version, $cipher, $ivLength);
+        $envelopes = new EnvelopeEncrypter($kms);
+        $plaintext = str_repeat("bulk\0payload\xFF", self::BULK_PAYLOAD_REPETITIONS);
+        $encrypted = $envelopes->encrypt($keyId, $plaintext, 'context');
+
+        $this->assertSame($plaintext, $envelopes->decrypt($encrypted, 'context'));
+        $this->expectDecryptionFailure(static fn () => $envelopes->decrypt($encrypted, 'wrong context'));
     }
 
-    private static function provisionKey(ProtocolClient $protocol, ProtocolVersion $version, int $usageMask = self::USAGE_ENCRYPT_AND_DECRYPT, bool $activate = true): string
+    #[DataProvider('configurations')]
+    public function testUsernameAndPasswordCredentials(ProtocolVersion $version, string $cipher, int $ivLength)
+    {
+        [, $keyId] = $this->createKms($version, $cipher, $ivLength);
+        $credentialed = $this->kms($version, $cipher, $ivLength, [], 'user:password@');
+        $encrypted = $credentialed->encrypt($keyId, 'credentialed', 'aad');
+
+        $this->assertSame('credentialed', $credentialed->decrypt($encrypted, 'aad'));
+        $this->assertStringStartsWith(self::header($cipher, $ivLength), $encrypted->blob);
+    }
+
+    public function testEncryptedClientPrivateKey()
+    {
+        $key = $this->fixtureOption('KMIP_TEST_ENCRYPTED_KEY');
+        $passphrase = $this->fixtureOption('KMIP_TEST_KEY_PASSPHRASE');
+        [, $keyId] = $this->createKms(ProtocolVersion::Version20, 'aes-gcm', self::DEFAULT_IV_LENGTH_BYTES);
+        $kms = $this->kms(ProtocolVersion::Version20, 'aes-gcm', self::DEFAULT_IV_LENGTH_BYTES, ['key' => $key, 'passphrase' => $passphrase]);
+
+        $this->assertSame('encrypted key', $kms->decrypt($kms->encrypt($keyId, 'encrypted key')));
+        try {
+            $this->kms(ProtocolVersion::Version20, 'aes-gcm', self::DEFAULT_IV_LENGTH_BYTES, ['key' => $key, 'passphrase' => 'wrong-private-passphrase'])->encrypt($keyId, 'tls');
+            $this->fail('The wrong private-key passphrase must fail.');
+        } catch (RuntimeException $e) {
+            $this->assertStringNotContainsString('wrong-private-passphrase', $e->getMessage());
+        }
+    }
+
+    #[DataProvider('configurations')]
+    public function testAnotherClientIdentityCannotDecrypt(ProtocolVersion $version, string $cipher, int $ivLength)
+    {
+        $options = ['cert' => $this->fixtureOption('KMIP_TEST_OTHER_CERT'), 'key' => $this->fixtureOption('KMIP_TEST_OTHER_KEY')];
+        [, $keyId, $kms] = $this->createKms($version, $cipher, $ivLength);
+        $encrypted = $kms->encrypt($keyId, 'private plaintext', 'context');
+        $otherOwner = $this->kms($version, $cipher, $ivLength, $options);
+
+        $this->assertSame('private plaintext', $kms->decrypt($encrypted, 'context'));
+        if (self::isEviden()) {
+            $this->expectDecryptionFailure(static fn () => $otherOwner->decrypt($encrypted, 'context'));
+
+            return;
+        }
+        try {
+            $otherOwner->decrypt($encrypted, 'context');
+            $this->fail('Another client identity must be denied.');
+        } catch (OperationFailed $e) {
+            $this->assertSame(self::REASON_PERMISSION_DENIED, $e->reason);
+        }
+    }
+
+    #[DataProvider('configurations')]
+    public function testKeyUsageAndLifecycle(ProtocolVersion $version, string $cipher, int $ivLength)
+    {
+        [$protocol, , $kms] = $this->createKms($version, $cipher, $ivLength);
+        $algorithm = self::algorithm($cipher);
+        $encryptOnlyKeyId = $this->provisionKey($protocol, $version, self::USAGE_ENCRYPT_ONLY, true, $algorithm);
+        $restrictedCiphertext = $kms->encrypt($encryptOnlyKeyId, 'restricted');
+        if (self::isEviden()) {
+            $this->expectDecryptionFailure(static fn () => $kms->decrypt($restrictedCiphertext));
+        } else {
+            $this->expectOperationalFailure(static fn () => $kms->decrypt($restrictedCiphertext));
+        }
+        $preActiveKeyId = $this->provisionKey($protocol, $version, self::USAGE_ENCRYPT_AND_DECRYPT, false, $algorithm);
+        $this->expectOperationalFailure(static fn () => $kms->encrypt($preActiveKeyId, 'inactive'));
+        $revokedKeyId = $this->provisionKey($protocol, $version, self::USAGE_ENCRYPT_AND_DECRYPT, true, $algorithm);
+        $revokedCiphertext = $kms->encrypt($revokedKeyId, 'revoked');
+        $this->revokeKey($protocol, $revokedKeyId);
+        $this->expectOperationalFailure(static fn () => $kms->encrypt($revokedKeyId, 'after revoke'));
+        if (self::isEviden()) {
+            $this->assertSame('revoked', $kms->decrypt($revokedCiphertext));
+        } else {
+            $this->expectOperationalFailure(static fn () => $kms->decrypt($revokedCiphertext));
+        }
+    }
+
+    public function testUnknownKeyIdentifiersAreEscaped()
+    {
+        foreach ($this->supportedVersions() as $version) {
+            try {
+                $this->kms($version)->encrypt("missing\n\x1B[31m", 'data');
+                $this->fail('An unknown key must fail.');
+            } catch (KeyNotFoundException $e) {
+                $this->assertStringContainsString('\\x0A', $e->getMessage());
+                $this->assertStringContainsString('\\x1B', $e->getMessage());
+                $this->assertStringNotContainsString("\n", $e->getMessage());
+            }
+        }
+    }
+
+    public function testClientWithoutExtendedKeyUsageCannotUseAnotherClientsKey()
+    {
+        [, $keyId, $owner] = $this->createKms(ProtocolVersion::Version20, 'aes-gcm', self::DEFAULT_IV_LENGTH_BYTES);
+        $kms = $this->kms(ProtocolVersion::Version20, 'aes-gcm', self::DEFAULT_IV_LENGTH_BYTES, [
+            'cert' => $this->fixtureOption('KMIP_TEST_NO_EKU_CERT'),
+            'key' => $this->fixtureOption('KMIP_TEST_NO_EKU_KEY'),
+        ]);
+
+        $this->assertSame('owner', $owner->decrypt($owner->encrypt($keyId, 'owner')));
+        if (self::isEviden()) {
+            $this->expectException(KeyNotFoundException::class);
+            $kms->encrypt($keyId, 'tls');
+
+            return;
+        }
+        try {
+            $kms->encrypt($keyId, 'tls');
+            $this->fail('A client without clientAuth EKU must be denied.');
+        } catch (OperationFailed $e) {
+            $this->assertSame(self::REASON_AUTHENTICATION_NOT_SUCCESSFUL, $e->reason);
+            $this->assertFalse($e->hasOperation);
+        }
+    }
+
+    #[DataProvider('invalidTlsOptions')]
+    public function testTlsVerificationCannotBeBypassed(array $options)
+    {
+        if (isset($options['ca'])) {
+            $options['ca'] = $this->tlsOptions['cert'];
+        }
+        $kms = $this->kms(ProtocolVersion::Version20, 'aes-gcm', self::DEFAULT_IV_LENGTH_BYTES, $options);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Could not establish a verified KMIP TLS connection');
+        $kms->encrypt('key', 'plaintext');
+    }
+
+    public static function invalidTlsOptions(): iterable
+    {
+        yield 'wrong peer name' => [['peer_name' => 'wrong.example']];
+        yield 'host does not match certificate' => [['peer_name' => null]];
+        yield 'untrusted certificate authority' => [['ca' => 'client certificate']];
+    }
+
+    public function testAnUnconfiguredVendorModeCannotDecryptStoredCiphertext()
+    {
+        [, $keyId, $kms] = $this->createKms(ProtocolVersion::Version20, 'aes-gcm-siv', self::DEFAULT_IV_LENGTH_BYTES);
+        $encrypted = $kms->encrypt($keyId, 'plaintext', 'context');
+
+        foreach ([null, '0x80001234'] as $mode) {
+            $reader = $this->kms(ProtocolVersion::Version20, 'aes-gcm', self::DEFAULT_IV_LENGTH_BYTES, ['mode' => $mode]);
+            $this->expectDecryptionFailure(static fn () => $reader->decrypt($encrypted, 'context'));
+        }
+    }
+
+    public function testVersion21IsRejectedWithoutAffectingVersion20()
+    {
+        if (self::isEviden()) {
+            $this->markTestSkipped('Only the PyKMIP fixture is expected to reject KMIP 2.1.');
+        }
+        [, $keyId, $version20Kms] = $this->createKms(ProtocolVersion::Version20, 'aes-gcm', self::DEFAULT_IV_LENGTH_BYTES);
+        $version21Kms = $this->kms(ProtocolVersion::Version21);
+
+        try {
+            $version21Kms->encrypt($keyId, 'unsupported');
+            $this->fail('PyKMIP must reject KMIP 2.1.');
+        } catch (OperationFailed $e) {
+            $this->assertSame(self::REASON_INVALID_MESSAGE, $e->reason);
+            $this->assertFalse($e->hasOperation);
+        }
+
+        $this->assertSame('working', $version20Kms->decrypt($version20Kms->encrypt($keyId, 'working')));
+    }
+
+    public static function configurations(): iterable
+    {
+        foreach (ProtocolVersion::cases() as $version) {
+            foreach (['aes-gcm', 'chacha20-poly1305', 'aes-gcm-siv'] as $cipher) {
+                yield $version->value.' '.$cipher => [$version, $cipher, self::DEFAULT_IV_LENGTH_BYTES];
+            }
+        }
+        yield '2.0 aes-gcm with a 16-byte IV' => [ProtocolVersion::Version20, 'aes-gcm', self::LONG_IV_LENGTH_BYTES];
+    }
+
+    private function createKms(ProtocolVersion $version, string $cipher, int $ivLength): array
+    {
+        if (!self::isEviden() && (ProtocolVersion::Version21 === $version || 'aes-gcm' !== $cipher)) {
+            $this->markTestSkipped('KMIP 2.1, ChaCha20-Poly1305 and AES-GCM-SIV require the Eviden fixture.');
+        }
+        $protocol = $this->protocol($version);
+        $keyId = $this->provisionKey($protocol, $version, self::USAGE_ENCRYPT_AND_DECRYPT, true, self::algorithm($cipher));
+
+        return [$protocol, $keyId, $this->kms($version, $cipher, $ivLength)];
+    }
+
+    private function protocol(ProtocolVersion $version): ProtocolClient
+    {
+        return new ProtocolClient($this->transport(), $version, null, null);
+    }
+
+    private function transport(array $options = []): StreamTransport
+    {
+        $options += $this->tlsOptions;
+
+        return new StreamTransport($this->host, $this->port, $options['cert'], $options['key'], $options['ca'], $options['peer_name'], null, self::TIMEOUT_SECONDS);
+    }
+
+    private function kms(ProtocolVersion $version, string $cipher = 'aes-gcm', int $ivLength = self::DEFAULT_IV_LENGTH_BYTES, array $options = [], string $credentials = ''): KmipKms
+    {
+        $options += ['cipher' => $cipher, 'version' => $version->value] + $this->tlsOptions;
+        if ('aes-gcm' === $cipher) {
+            $options += ['iv_length' => $ivLength];
+        }
+        if (self::isEviden()) {
+            $options += ['mode' => self::EVIDEN_GCM_SIV_MODE];
+        }
+        $options = array_filter($options, static fn ($value) => null !== $value);
+        $host = str_contains($this->host, ':') ? '['.$this->host.']' : $this->host;
+
+        return (new KmipKmsFactory())->create(Dsn::fromString('kmip://'.$credentials.$host.':'.$this->port.'?'.http_build_query($options)));
+    }
+
+    private function provisionKey(ProtocolClient $protocol, ProtocolVersion $version, int $usageMask = self::USAGE_ENCRYPT_AND_DECRYPT, bool $activate = true, int $algorithm = self::AES_ALGORITHM): string
     {
         if (ProtocolVersion::Version14 === $version) {
             $attributes = '';
             foreach ([
-                ['Cryptographic Algorithm', Ttlv::ENUMERATION, self::AES_ALGORITHM],
+                ['Cryptographic Algorithm', Ttlv::ENUMERATION, $algorithm],
                 ['Cryptographic Length', Ttlv::INTEGER, self::AES_KEY_LENGTH_BITS],
                 ['Cryptographic Usage Mask', Ttlv::INTEGER, $usageMask],
             ] as [$name, $type, $value]) {
@@ -308,23 +473,31 @@ final class KmipIntegrationTest extends TestCase
             $attributes = Ttlv::structure(self::TAG_TEMPLATE_ATTRIBUTE, $attributes);
         } else {
             $attributes = Ttlv::structure(self::TAG_ATTRIBUTES,
-                Ttlv::integer(self::TAG_CRYPTOGRAPHIC_ALGORITHM, self::AES_ALGORITHM, Ttlv::ENUMERATION)
+                Ttlv::integer(self::TAG_CRYPTOGRAPHIC_ALGORITHM, $algorithm, Ttlv::ENUMERATION)
                 .Ttlv::integer(self::TAG_CRYPTOGRAPHIC_LENGTH, self::AES_KEY_LENGTH_BITS)
                 .Ttlv::integer(self::TAG_CRYPTOGRAPHIC_USAGE_MASK, $usageMask)
             );
         }
         $created = $protocol->request(self::OPERATION_CREATE, Ttlv::integer(self::TAG_OBJECT_TYPE, self::OBJECT_TYPE_SYMMETRIC_KEY, Ttlv::ENUMERATION).$attributes);
         $keyId = Ttlv::requireType($created[ProtocolClient::UNIQUE_IDENTIFIER], ProtocolClient::UNIQUE_IDENTIFIER, Ttlv::TEXT);
+        $this->keys[$keyId] = [$protocol, false];
         if ($activate) {
             $protocol->request(self::OPERATION_ACTIVATE, Ttlv::text(ProtocolClient::UNIQUE_IDENTIFIER, $keyId));
+            $this->keys[$keyId][1] = true;
         }
 
         return $keyId;
     }
 
-    private static function discoverVersions(ProtocolClient $protocol, ProtocolVersion $version, string $host, int $port, string $clientCertificateFile, string $clientPrivateKeyFile, string $certificateAuthorityFile, string $peerName): array
+    private function revokeKey(ProtocolClient $protocol, string $keyId): void
     {
-        $frame = (new StreamTransport($host, $port, $clientCertificateFile, $clientPrivateKeyFile, $certificateAuthorityFile, $peerName, null, self::TIMEOUT_SECONDS))->exchange($protocol->buildRequest(self::OPERATION_DISCOVER_VERSIONS, ''));
+        $protocol->request(self::OPERATION_REVOKE, Ttlv::text(ProtocolClient::UNIQUE_IDENTIFIER, $keyId).Ttlv::structure(self::TAG_REVOCATION_REASON, Ttlv::integer(self::TAG_REVOCATION_REASON_CODE, self::REVOCATION_REASON_UNSPECIFIED, Ttlv::ENUMERATION)));
+        $this->keys[$keyId][1] = false;
+    }
+
+    private function discoverVersions(ProtocolClient $protocol, ProtocolVersion $version): array
+    {
+        $frame = $this->transport()->exchange($protocol->buildRequest(self::OPERATION_DISCOVER_VERSIONS, ''));
         $message = Ttlv::children(Ttlv::items($frame, $version)[0], self::TAG_RESPONSE_MESSAGE, $version);
         $batch = Ttlv::children($message[1], self::TAG_BATCH_ITEM, $version);
         $fields = [];
@@ -356,11 +529,14 @@ final class KmipIntegrationTest extends TestCase
 
     private function expectAuthenticationFailure(\Closure $call): void
     {
+        if (self::isEviden()) {
+            $this->expectDecryptionFailure($call);
+
+            return;
+        }
         try {
             $call();
             $this->fail('Expected authentication to fail.');
-        } catch (DecryptionFailedException) {
-            $this->assertTrue(true);
         } catch (OperationFailed $e) {
             // PyKMIP reports an invalid authentication tag as General Failure rather than Cryptographic Failure.
             $this->assertSame(self::REASON_GENERAL_FAILURE, $e->reason);
@@ -377,16 +553,40 @@ final class KmipIntegrationTest extends TestCase
         }
     }
 
-    private static function destroyKey(ProtocolClient $protocol, string $keyId, bool $active): void
+    private function fixtureOption(string $name): string
     {
-        if ($active) {
-            $protocol->request(self::OPERATION_REVOKE, Ttlv::text(ProtocolClient::UNIQUE_IDENTIFIER, $keyId).Ttlv::structure(self::TAG_REVOCATION_REASON, Ttlv::integer(self::TAG_REVOCATION_REASON_CODE, self::REVOCATION_REASON_UNSPECIFIED, Ttlv::ENUMERATION)));
+        $value = getenv($name);
+        if (false === $value || '' === $value) {
+            if ('1' === getenv('KMIP_TEST_REQUIRED')) {
+                $this->fail($name.' is required.');
+            }
+            $this->markTestSkipped($name.' is not configured.');
         }
-        $protocol->request(self::OPERATION_DESTROY, Ttlv::text(ProtocolClient::UNIQUE_IDENTIFIER, $keyId));
+
+        return $value;
     }
 
-    private static function kms(string $host, int $port, ProtocolVersion $version, array $options): KmipKms
+    private function supportedVersions(): array
     {
-        return (new KmipKmsFactory())->create(Dsn::fromString('kmip://'.$host.':'.$port.'?'.http_build_query($options + ['version' => $version->value])));
+        return self::isEviden() ? ProtocolVersion::cases() : [ProtocolVersion::Version14, ProtocolVersion::Version20];
+    }
+
+    private static function isEviden(): bool
+    {
+        return 'eviden' === getenv('KMIP_TEST_SERVER');
+    }
+
+    private static function algorithm(string $cipher): int
+    {
+        return 'chacha20-poly1305' === $cipher ? self::CHACHA20_POLY1305_ALGORITHM : self::AES_ALGORITHM;
+    }
+
+    private static function header(string $cipher, int $ivLength): string
+    {
+        return hex2bin(match ($cipher) {
+            'aes-gcm' => '010000000300000009',
+            'chacha20-poly1305' => '010000001e00000000',
+            'aes-gcm-siv' => '010000000380000002',
+        }).\chr($ivLength);
     }
 }

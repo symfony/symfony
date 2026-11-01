@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
+use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore;
 use Symfony\Component\Lock\Store\DoctrineDbalStore;
 use Symfony\Component\Lock\Store\FlockStore;
@@ -92,5 +93,16 @@ class StoreFactoryTest extends TestCase
 
         yield ['flock', FlockStore::class];
         yield ['flock://'.sys_get_temp_dir(), FlockStore::class];
+    }
+
+    public function testCreateStoreWithUnsupportedDsnDoesNotLeakCredentials()
+    {
+        try {
+            StoreFactory::createStore('unsupported://user:s3cr3t@localhost');
+            $this->fail('An exception should have been thrown.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('No lock store supports the given DSN.', $e->getMessage());
+            $this->assertStringNotContainsString('s3cr3t', $e->getMessage());
+        }
     }
 }

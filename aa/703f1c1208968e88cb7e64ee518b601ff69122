@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T17:45:20Z
+
+Thanks @HypeMC, I added a test for a redispatched failed message.
+
+Enabling `body_only` on a tube that still has jobs in the current format makes the worker handle them with wrong data, without error. I'd keep it that way and document it, see symfony/symfony-docs#23460.
+
+#67753 changes the same lines of `get()`.

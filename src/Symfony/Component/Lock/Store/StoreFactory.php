@@ -108,6 +108,6 @@ class StoreFactory
                 return new InMemoryStore();
         }
 
-        throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection));
+        throw new InvalidArgumentException('No lock store supports the given DSN.');
     }
 }

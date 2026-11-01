@@ -19,6 +19,7 @@ use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\HttpFoundation\Session\SessionUtils;
 
 /**
  * Session handler using a PDO connection to read and write data.
@@ -445,7 +446,7 @@ class PdoSessionHandler extends AbstractSessionHandler implements ClearableSessi
     public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         // PHP 8.6 calls updateTimestamp() instead of write() for a session that is still empty
-        if ('' === $data || (\function_exists('igbinary_serialize') && igbinary_serialize([]) === $data)) {
+        if (SessionUtils::isEmptySession($data)) {
             return $this->destroy($sessionId);
         }
 

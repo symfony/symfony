@@ -64,7 +64,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * gc_probability, "1"
      * lazy_write, "1"
      * name, "PHPSESSID"
-     * serialize_handler, "php"
+     * serialize_handler, "php" ("igbinary" is deprecated since Symfony 8.2)
      * use_strict_mode, "1"
      * use_cookies, "1"
      */
@@ -326,6 +326,9 @@ class NativeSessionStorage implements SessionStorageInterface
                 }
                 ini_set('session.'.$key, $value);
             }
+        }
+        if ('igbinary' === \ini_get('session.serialize_handler')) {
+            trigger_deprecation('symfony/http-foundation', '8.2', 'Using igbinary for session serialization is deprecated, use the "phpser" session serializer instead.');
         }
     }
 

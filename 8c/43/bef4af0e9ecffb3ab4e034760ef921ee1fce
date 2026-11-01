@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T07:56:47Z
+
+Rebased on 6.4, preserving the save flag handling from #67703.

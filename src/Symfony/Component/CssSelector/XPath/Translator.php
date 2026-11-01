@@ -57,7 +57,7 @@ class Translator implements TranslatorInterface
         $this
             ->registerExtension(new Extension\NodeExtension())
             ->registerExtension(new Extension\CombinationExtension())
-            ->registerExtension(new Extension\FunctionExtension())
+            ->registerExtension(new Extension\FunctionExtension($this))
             ->registerExtension(new Extension\PseudoClassExtension())
             ->registerExtension(new Extension\AttributeMatchingExtension())
             ->registerExtension(new Extension\RelationExtension())

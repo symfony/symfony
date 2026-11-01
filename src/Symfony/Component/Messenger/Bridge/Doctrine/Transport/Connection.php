@@ -343,6 +343,11 @@ class Connection implements ResetInterface
 
     public function find(mixed $id): ?array
     {
+        // ids are auto-incremented integers: anything else would be cast by some platforms (e.g. "12abc" to 12 on MySQL)
+        if (!\is_int($id) && (!\is_string($id) || !ctype_digit($id))) {
+            return null;
+        }
+
         $queryBuilder = $this->createQueryBuilder()
             ->where('m.id = ? and m.queue_name = ?');
 

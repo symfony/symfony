@@ -57,7 +57,7 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      * @throws InvalidArgumentException When namespace contains invalid characters
      */
-    public function __construct(#[\SensitiveParameter] \PDO|string $connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = [], ?MarshallerInterface $marshaller = null)
+    public function __construct(#[\SensitiveParameter] \PDO|string $connOrDsn, string $namespace = '', int $defaultLifetime = 0, #[\SensitiveParameter] array $options = [], ?MarshallerInterface $marshaller = null)
     {
         $this->tagsTable = $options['db_tags_table'] ?? $this->tagsTable;
         $this->tagCol = $options['db_tags_col'] ?? $this->tagCol;

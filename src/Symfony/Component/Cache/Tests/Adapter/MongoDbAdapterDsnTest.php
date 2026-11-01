@@ -363,6 +363,28 @@ class MongoDbAdapterDsnTest extends TestCase
         new MongoDbAdapter('redis://localhost');
     }
 
+    public function testOptionsAreNotExposedInTrace()
+    {
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            try {
+                new MongoDbAdapter('mongodb://localhost:999999', '', 0, ['driverOptions' => ['autoEncryption' => ['kmsProviders' => ['local' => ['key' => 's3cr3t']]]]]);
+                $this->fail('An exception should have been thrown.');
+            } catch (InvalidArgumentException $e) {
+                $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+            }
+
+            try {
+                MongoDbAdapter::createConnection('mongodb://localhost:999999', ['password' => 's3cr3t']);
+                $this->fail('An exception should have been thrown.');
+            } catch (InvalidArgumentException $e) {
+                $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+            }
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
+
     public function testClientUsesTheDefaultCollection()
     {
         $client = $this->createMock(Client::class);

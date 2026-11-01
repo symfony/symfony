@@ -60,7 +60,7 @@ trait MongoDbTrait
      *
      * @see https://www.mongodb.com/docs/php-library/current/reference/method/MongoDBCollection-withOptions/
      */
-    public function __construct(#[\SensitiveParameter] Collection|Client|Database|string $mongo, string $namespace = '', int $defaultLifetime = 0, array $options = [], ?MarshallerInterface $marshaller = null, ?ClockInterface $clock = null)
+    public function __construct(#[\SensitiveParameter] Collection|Client|Database|string $mongo, string $namespace = '', int $defaultLifetime = 0, #[\SensitiveParameter] array $options = [], ?MarshallerInterface $marshaller = null, ?ClockInterface $clock = null)
     {
         self::checkLibrary();
 
@@ -113,7 +113,7 @@ trait MongoDbTrait
      * This is the entry point used by AbstractAdapter::createConnection() so
      * that a "mongodb:" cache DSN produces a connection service.
      */
-    public static function createConnection(#[\SensitiveParameter] string $dsn, array $options = []): Collection
+    public static function createConnection(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options = []): Collection
     {
         self::checkLibrary();
 
@@ -246,7 +246,7 @@ trait MongoDbTrait
      *
      * @return array{0: array, 1: string}
      */
-    private static function parseDsn(#[\SensitiveParameter] string $dsn, array $options): array
+    private static function parseDsn(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options): array
     {
         if (!str_starts_with($dsn, 'mongodb://') && !str_starts_with($dsn, 'mongodb+srv://')) {
             throw new InvalidArgumentException('The given MongoDB DSN is invalid. Expecting "mongodb://" or "mongodb+srv://".');

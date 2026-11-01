@@ -20,6 +20,7 @@ use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass;
+use Symfony\Component\Cache\DependencyInjection\RemoveDefaultMarshallerSigningKeyPass;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Application;
@@ -57,6 +58,7 @@ class CacheBundle extends AbstractBundle
         $container->addCompilerPass(new CachePoolPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
         $container->addCompilerPass(new CachePoolClearerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new CachePoolPrunerPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new RemoveDefaultMarshallerSigningKeyPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
+use Symfony\Component\HttpFoundation\Session\SessionUtils;
 
 /**
  * @author Ahmed TAILOULOUTE <ahmed.tailouloute@gmail.com>
@@ -76,7 +77,7 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
     public function write(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         // empty data must reach the inner handler unchanged so that it destroys the session
-        if ('' === $data || (\function_exists('igbinary_serialize') && igbinary_serialize([]) === $data)) {
+        if (SessionUtils::isEmptySession($data)) {
             return $this->handler->write($sessionId, $data);
         }
 

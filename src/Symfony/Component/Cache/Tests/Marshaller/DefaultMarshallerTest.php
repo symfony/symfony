@@ -11,8 +11,13 @@
 
 namespace Symfony\Component\Cache\Tests\Marshaller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 
 class DefaultMarshallerTest extends TestCase
@@ -25,11 +30,170 @@ class DefaultMarshallerTest extends TestCase
             'b' => static function () {},
         ];
 
-        $expected = ['a' => serialize(123)];
+        $expected = ['a' => \extension_loaded('phpser') ? phpser_serialize(123) : serialize(123)];
         $this->assertSame($expected, $marshaller->marshall($values, $failed));
         $this->assertSame(['b'], $failed);
     }
 
+    public function testNativeSerialize()
+    {
+        $this->assertSame(['a' => serialize(123)], (new DefaultMarshaller(false))->marshall(['a' => 123], $failed));
+        $this->assertSame([], $failed);
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    #[DataProvider('providePhpSerValues')]
+    public function testPhpSerUnserialize(mixed $value)
+    {
+        $this->assertSame($value, (new DefaultMarshaller())->unmarshall(phpser_serialize($value)));
+    }
+
+    public static function providePhpSerValues(): iterable
+    {
+        yield [null];
+        yield [false];
+        yield [''];
+        yield [0];
+        yield ["\x01\x00\x00"];
+        yield [['a' => [true, 1.5, 'hello']]];
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    public function testPhpSerUnserializeWithColonInHeader()
+    {
+        $value = array_map(static fn ($i) => 'string'.$i, range(0, 57));
+        $value = [...$value, ...$value];
+        $this->assertSame($value, (new DefaultMarshaller())->unmarshall(phpser_serialize($value)));
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    public function testPhpSerObjects()
+    {
+        $value = new DefaultMarshallerPayload();
+
+        foreach ([null, str_repeat('k', 32)] as $key) {
+            $marshaller = new DefaultMarshaller(null, false, $key);
+            $serialized = $marshaller->marshall(['a' => [$value, $value]], $failed);
+            $this->assertSame([], $failed);
+            $this->assertSame(null === $key ? phpser_serialize([$value, $value]) : phpser_serialize_signed([$value, $value], $key), $serialized['a']);
+            $decoded = $marshaller->unmarshall($serialized['a']);
+            $this->assertEquals([$value, $value], $decoded);
+            $this->assertSame($decoded[0], $decoded[1]);
+        }
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    #[DataProvider('providePhpSerValues')]
+    public function testSignedPhpSer(mixed $value)
+    {
+        $key = str_repeat('k', 32);
+        $marshaller = new DefaultMarshaller(null, false, $key);
+        $serialized = $marshaller->marshall(['a' => $value], $failed);
+
+        $this->assertSame([], $failed);
+        $this->assertSame(phpser_serialize_signed($value, $key), $serialized['a']);
+        $this->assertSame($value, $marshaller->unmarshall($serialized['a']));
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    #[DataProvider('provideInvalidSignedValues')]
+    public function testSignedPhpSerRejectsInvalidValues(string $type)
+    {
+        $key = str_repeat('k', 32);
+        $value = match ($type) {
+            'native' => serialize(new DefaultMarshallerWakeup()),
+            'unsigned' => phpser_serialize(new DefaultMarshallerWakeup()),
+            'wrong key' => phpser_serialize_signed(new DefaultMarshallerWakeup(), str_repeat('x', 32)),
+            'tampered' => phpser_serialize_signed(new DefaultMarshallerWakeup(), $key),
+            'empty' => '',
+            'null' => 'N;',
+            'false' => 'b:0;',
+        };
+        if ('tampered' === $type) {
+            $value[-1] = ~$value[-1];
+        }
+
+        $this->expectException(\DomainException::class);
+        (new DefaultMarshaller(null, false, $key))->unmarshall($value);
+    }
+
+    public static function provideInvalidSignedValues(): iterable
+    {
+        foreach (['native', 'unsigned', 'wrong key', 'tampered', 'empty', 'null', 'false'] as $type) {
+            yield $type => [$type];
+        }
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    public function testPhpSerUnserializeInvalid()
+    {
+        $this->expectException(\DomainException::class);
+        (new DefaultMarshaller())->unmarshall("\x01\x00\xff");
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    public function testFuturePhpSerVersionIsNotUnserializedAsIgbinary()
+    {
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('Failed to unserialize phpser value.');
+        (new DefaultMarshaller())->unmarshall("\x1f\x00\x00");
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    public function testSigningKeyTooShort()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new DefaultMarshaller(null, false, str_repeat('k', 31));
+    }
+
+    public function testSigningKeyClosureIsCalledOnFirstUse()
+    {
+        $calls = 0;
+        $marshaller = new DefaultMarshaller(null, false, static function () use (&$calls) {
+            ++$calls;
+
+            return str_repeat('k', 32);
+        });
+        $this->assertSame(0, $calls);
+
+        $serialized = $marshaller->marshall(['a' => 123, 'b' => 456], $failed);
+        $this->assertSame(123, $marshaller->unmarshall($serialized['a']));
+
+        $usesPhpSer = \extension_loaded('phpser') && version_compare(phpversion('phpser'), '0.10.3', '>=');
+        $this->assertSame($usesPhpSer ? 1 : 0, $calls);
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    public function testSigningKeyClosureTooShort()
+    {
+        $marshaller = new DefaultMarshaller(null, false, static fn () => str_repeat('k', 31));
+
+        $this->expectException(InvalidArgumentException::class);
+        $marshaller->marshall(['a' => 123], $failed);
+    }
+
+    public function testSigningKeyIsIgnoredWithoutPhpSer()
+    {
+        if (\extension_loaded('phpser')) {
+            $this->markTestSkipped('The "phpser" extension is loaded.');
+        }
+
+        $marshaller = new DefaultMarshaller(null, false, str_repeat('k', 32));
+        $this->assertSame(['a' => serialize(123)], $marshaller->marshall(['a' => 123], $failed));
+        $this->assertSame(123, $marshaller->unmarshall(serialize(123)));
+    }
+
+    #[TestWith([false, 'native PHP'])]
+    #[TestWith([true, 'igbinary'])]
+    public function testSigningKeyRequiresAutomaticSerializer(bool $useIgbinarySerialize, string $serializer)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('A phpser signing key cannot be used with %s serialization.', $serializer));
+        new DefaultMarshaller($useIgbinarySerialize, false, str_repeat('k', 32));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     #[RequiresPhpExtension('igbinary')]
     public function testIgbinarySerialize()
     {
@@ -37,6 +201,7 @@ class DefaultMarshallerTest extends TestCase
             $this->markTestSkipped('igbinary needs to be v3.1.6 or higher.');
         }
 
+        $this->expectUserDeprecationMessage('Since symfony/cache 8.2: Using igbinary in "Symfony\Component\Cache\Marshaller\DefaultMarshaller" is deprecated, use the "phpser" extension instead.');
         $marshaller = new DefaultMarshaller(true);
         $values = [
             'a' => 123,
@@ -57,6 +222,8 @@ class DefaultMarshallerTest extends TestCase
         $this->assertSame(0, $marshaller->unmarshall(serialize(0)));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     #[RequiresPhpExtension('igbinary')]
     public function testIgbinaryUnserialize()
     {
@@ -71,6 +238,15 @@ class DefaultMarshallerTest extends TestCase
         $this->assertSame(0, $marshaller->unmarshall(igbinary_serialize(0)));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[RequiresPhpExtension('igbinary')]
+    public function testIgbinaryUnserializeIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/cache 8.2: Unmarshalling igbinary values in "Symfony\Component\Cache\Marshaller\DefaultMarshaller" is deprecated, use the "phpser" extension instead.');
+        $this->assertNull((new DefaultMarshaller())->unmarshall(igbinary_serialize(null)));
+    }
+
     public function testNativeUnserializeNotFoundClass()
     {
         $this->expectException(\DomainException::class);
@@ -78,6 +254,8 @@ class DefaultMarshallerTest extends TestCase
         (new DefaultMarshaller())->unmarshall('O:16:"NotExistingClass":0:{}');
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     #[RequiresPhpExtension('igbinary')]
     public function testIgbinaryUnserializeNotFoundClass()
     {
@@ -104,6 +282,8 @@ class DefaultMarshallerTest extends TestCase
         }
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     #[RequiresPhpExtension('igbinary')]
     public function testIgbinaryUnserializeInvalid()
     {
@@ -132,4 +312,17 @@ class DefaultMarshallerTest extends TestCase
         $this->expectException(\ValueError::class);
         $marshaller->marshall($values, $failed);
     }
+}
+
+class DefaultMarshallerWakeup
+{
+    public function __unserialize(array $data): void
+    {
+        throw new \LogicException('Unverified data must not be decoded.');
+    }
+}
+
+class DefaultMarshallerPayload
+{
+    public int $value = 123;
 }

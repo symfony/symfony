@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
@@ -65,6 +68,28 @@ class NativeSessionStorageTest extends TestCase
         $storage->registerBag(new AttributeBag());
 
         return $storage;
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[RequiresPhpExtension('igbinary')]
+    public function testIgbinarySerializationIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.2: Using igbinary for session serialization is deprecated, use the "phpser" session serializer instead.');
+        $this->getStorage(['serialize_handler' => 'igbinary']);
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    public function testPhpSerSession()
+    {
+        $storage = $this->getStorage(['serialize_handler' => 'phpser']);
+        $storage->start();
+        $storage->getBag('attributes')->set('foo', ['bar']);
+        $storage->save();
+
+        $storage = $this->getStorage(['serialize_handler' => 'phpser']);
+        $storage->start();
+        $this->assertSame(['bar'], $storage->getBag('attributes')->get('foo'));
     }
 
     public function testBag()

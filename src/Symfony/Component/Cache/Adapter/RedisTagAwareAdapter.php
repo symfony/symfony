@@ -181,9 +181,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
             return $failed;
         }
 
-        // While pipeline isn't supported on RedisCluster, other setups will at least benefit from doing this in one op
-        $results = $this->pipeline(static function () use ($serialized, $lifetime, $addTagData, $delTagData, $failed) {
-            // Store cache items, force a ttl if none is set, as there is no MSETEX we need to set each one
+        $saveItems = static function () use ($serialized, $lifetime) {
             foreach ($serialized as $id => $value) {
                 yield 'setEx' => [
                     $id,
@@ -191,8 +189,8 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
                     $value,
                 ];
             }
-
-            // Add and Remove Tags
+        };
+        $updateTags = static function () use ($addTagData, $delTagData, &$failed) {
             foreach ($addTagData as $tagId => $ids) {
                 if (!$failed || $ids = array_diff($ids, $failed)) {
                     yield 'sAdd' => array_merge([$tagId], $ids);
@@ -204,17 +202,35 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
                     yield 'sRem' => array_merge([$tagId], $ids);
                 }
             }
-        });
+        };
+        $results = function () use ($saveItems, $updateTags) {
+            if ($this->redis instanceof \RedisCluster && method_exists(\RedisCluster::class, 'pipeline')) {
+                // Per-node pipelines can register tags before another node has stored its items.
+                yield from $this->pipeline($saveItems);
+                yield from $this->pipeline($updateTags);
+            } else {
+                yield from $this->pipeline(static function () use ($saveItems, $updateTags) {
+                    yield from $saveItems();
+                    yield from $updateTags();
+                });
+            }
+        };
 
-        foreach ($results as $id => $result) {
-            // Skip results of SADD/SREM operations, they'll be 1 or 0 depending on if set value already existed or not
-            if (is_numeric($result)) {
-                continue;
+        try {
+            foreach ($results() as $id => $result) {
+                if (is_numeric($result)) {
+                    continue;
+                }
+                if (true !== $result && (!$result instanceof Status || Status::get('OK') !== $result)) {
+                    $failed[] = $id;
+                }
             }
-            // setEx results
-            if (true !== $result && (!$result instanceof Status || Status::get('OK') !== $result)) {
-                $failed[] = $id;
+        } catch (\RedisException|\RedisClusterException $e) {
+            if (!$this->redis instanceof \RedisCluster || !method_exists(\RedisCluster::class, 'pipeline')) {
+                throw $e;
             }
+
+            return array_keys($values);
         }
 
         return $failed;

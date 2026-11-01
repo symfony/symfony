@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T07:33:47Z
+
+Removed the handling for leading zeros and used `/D` for the end anchor.

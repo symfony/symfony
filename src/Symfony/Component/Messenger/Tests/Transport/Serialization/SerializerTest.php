@@ -306,6 +306,7 @@ class SerializerTest extends TestCase
         $this->assertSame(DummyMessage::class, $serializer->getMessageType($serializer->encode(new Envelope(new DummyMessage('Hello')))));
         $this->assertNull($serializer->getMessageType(['body' => '{}']));
         $this->assertNull($serializer->getMessageType(['body' => '{}', 'headers' => []]));
+        $this->assertNull($serializer->getMessageType(['body' => '{}', 'headers' => ['type' => [DummyMessage::class]]]));
     }
 
     #[Group('legacy')]
@@ -463,8 +464,10 @@ class SerializerTest extends TestCase
     public static function getMissingKeyTests(): iterable
     {
         yield 'no_body' => [['headers' => ['type' => 'bar']]];
+        yield 'body_not_a_string' => [['body' => ['foo'], 'headers' => ['type' => 'bar']]];
         yield 'no_headers' => [['body' => '{}']];
         yield 'no_headers_type' => [['body' => '{}', 'headers' => ['foo' => 'bar']]];
+        yield 'headers_type_not_a_string' => [['body' => '{}', 'headers' => ['type' => ['bar']]]];
     }
 
     public function testDecodingFailsWithBadClass()

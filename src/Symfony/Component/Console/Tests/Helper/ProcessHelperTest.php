@@ -115,6 +115,8 @@ class ProcessHelperTest extends TestCase
             [['  OUT  42'], true, Process::fromShellCommandline('php -r "echo 42;"'), StreamOutput::VERBOSITY_DEBUG, null],
             [['  OUT  42'], true, [new Process(['php', '-r', 'echo 42;'])], StreamOutput::VERBOSITY_DEBUG, null],
             [['  OUT  42'], true, [Process::fromShellCommandline('php -r '.$PHP), 'PHP' => 'echo 42;'], StreamOutput::VERBOSITY_DEBUG, null],
+            [[], true, 'php -r "echo 42;" C:\\\\', StreamOutput::VERBOSITY_VERY_VERBOSE, null],
+            [[], false, 'php -r "exit(252);"', StreamOutput::VERBOSITY_VERBOSE, 'Cannot write to C:\\'],
         ];
     }
 

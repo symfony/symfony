@@ -57,10 +57,6 @@ class TransportFactory implements TransportFactoryInterface
             $packageSuggestion = ' Run "composer require symfony/mongodb-messenger" to install MongoDB transport.';
         }
 
-        if ($dsn = $this->santitizeDsn($dsn)) {
-            throw new InvalidArgumentException(\sprintf('No transport supports Messenger DSN "%s".', $dsn).$packageSuggestion);
-        }
-
         throw new InvalidArgumentException('No transport supports the given Messenger DSN.'.$packageSuggestion);
     }
 
@@ -73,42 +69,5 @@ class TransportFactory implements TransportFactoryInterface
         }
 
         return false;
-    }
-
-    private function santitizeDsn(string $dsn): string
-    {
-        $parts = parse_url($dsn);
-        $dsn = '';
-
-        if (isset($parts['scheme'])) {
-            $dsn .= $parts['scheme'].'://';
-        }
-
-        if (isset($parts['user']) && !isset($parts['pass'])) {
-            $dsn .= '******';
-        } elseif (isset($parts['user'])) {
-            $dsn .= $parts['user'];
-        }
-
-        if (isset($parts['pass'])) {
-            $dsn .= ':******';
-        }
-
-        if (isset($parts['host'])) {
-            if (isset($parts['user'])) {
-                $dsn .= '@';
-            }
-            $dsn .= $parts['host'];
-        }
-
-        if (isset($parts['port'])) {
-            $dsn .= ':'.$parts['port'];
-        }
-
-        if (isset($parts['path'])) {
-            $dsn .= $parts['path'];
-        }
-
-        return $dsn;
     }
 }

@@ -94,7 +94,9 @@ final class OutputWrapper
 
         // 65535 is the highest value a quantifier accepts
         $rowPattern = '.{1,'.min($width, 65535).'}';
-        $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))|(%1$s))(?:\r?\n)?|(?:\r?\n|$))#imux', $rowPattern);
+        // a line cut inside a word never ends between a backslash and the "<" or ">" it escapes,
+        // or the escaped character would start the next line as a tag delimiter
+        $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))|(%1$s)(?!(?<=\\\\)[<>\x{F0000}-\x{10FFFF}]))(?:\r?\n)?|(?:\r?\n|$))#imux', $rowPattern);
         $output = rtrim(preg_replace($pattern, '\\1'.$break, $text), $break);
         $output = str_replace(' '.$break, $break, $output);
 

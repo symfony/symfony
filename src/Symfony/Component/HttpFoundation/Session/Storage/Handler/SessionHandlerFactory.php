@@ -93,6 +93,6 @@ class SessionHandlerFactory
                 return new PdoSessionHandler($connection, $options);
         }
 
-        throw new \InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection));
+        throw new \InvalidArgumentException('No session handler supports the given DSN.');
     }
 }

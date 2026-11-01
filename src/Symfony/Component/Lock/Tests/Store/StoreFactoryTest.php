@@ -220,4 +220,15 @@ class StoreFactoryTest extends TestCase
 
         yield ['null', NullStore::class];
     }
+
+    public function testCreateStoreWithUnsupportedDsnDoesNotLeakCredentials()
+    {
+        try {
+            StoreFactory::createStore('unsupported://user:s3cr3t@localhost');
+            $this->fail('An exception should have been thrown.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('No lock store supports the given DSN.', $e->getMessage());
+            $this->assertStringNotContainsString('s3cr3t', $e->getMessage());
+        }
+    }
 }

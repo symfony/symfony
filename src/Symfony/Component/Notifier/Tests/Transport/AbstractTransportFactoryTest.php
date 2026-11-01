@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Tests\Transport;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
@@ -36,6 +37,17 @@ class AbstractTransportFactoryTest extends TestCase
         yield '0' => ['dummy://host.test?ssl=0', false];
         yield 'empty' => ['dummy://host.test?ssl=', false];
     }
+
+    public function testMissingPasswordDoesNotLeakCredentials()
+    {
+        try {
+            (new DummyTransportFactory())->exposedPassword(new Dsn('dummy://s3cr3t@default?token=s3cr3t'));
+            $this->fail('An exception should have been thrown.');
+        } catch (IncompleteDsnException $e) {
+            $this->assertSame('Invalid "dummy://default" notifier DSN: Password is not set.', $e->getMessage());
+            $this->assertStringNotContainsString('s3cr3t', $e->getMessage());
+        }
+    }
 }
 
 class DummyTransportFactory extends AbstractTransportFactory
@@ -48,6 +60,11 @@ class DummyTransportFactory extends AbstractTransportFactory
     public function exposedSsl(Dsn $dsn): ?bool
     {
         return $this->getSsl($dsn);
+    }
+
+    public function exposedPassword(Dsn $dsn): string
+    {
+        return $this->getPassword($dsn);
     }
 
     protected function getSupportedSchemes(): array

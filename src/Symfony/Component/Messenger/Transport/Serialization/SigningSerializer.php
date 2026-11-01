@@ -260,7 +260,7 @@ final class SigningSerializer implements SerializerInterface
                 throw new InvalidMessageSignatureException(\sprintf('Message "%s" requires a signature but none was found.', $type));
             }
 
-            if ($this->algorithm !== $algo = $headers['Sign-Algo'] ?? $this->algorithm) {
+            if (\is_string($algo = $headers['Sign-Algo'] ?? $this->algorithm) && $this->algorithm !== $algo) {
                 throw new InvalidMessageSignatureException(\sprintf('Expected "%s" signature algorithm for message "%s", "%s" given.', $this->algorithm, $type, $algo));
             }
 

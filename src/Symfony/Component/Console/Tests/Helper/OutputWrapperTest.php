@@ -41,6 +41,16 @@ class OutputWrapperTest extends TestCase
         $this->assertSame($wrapper->wrap('Lorem X ipsum', 5), str_replace("\u{FFFD}", 'X', $wrapper->wrap("Lorem \xB3 ipsum", 5)));
     }
 
+    public function testWrapKeepsEscapedTagDelimitersWithTheirBackslash()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame("aaaa\n\\<b", $wrapper->wrap('aaaa\<b', 5));
+        $this->assertSame("aaaa\n\\>b", $wrapper->wrap('aaaa\>b', 5));
+        $this->assertSame("aaa\\<\nb", $wrapper->wrap('aaa\<b', 5));
+        $this->assertSame("aaaa\n\\</b\\>c", $wrapper->wrap('aaaa\</b\>c', 5));
+    }
+
     public function testWrapKeepsTheWholeMessageOfMalformedUtf8()
     {
         $text = "Cannot read the log file: \xB3 check the permissions";

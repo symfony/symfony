@@ -116,11 +116,11 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
             unset($encodedEnvelope['headers']['type']);
         }
 
-        if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
+        if (!\is_string($encodedEnvelope['body'] ?? null) || '' === $encodedEnvelope['body'] || !($encodedEnvelope['headers'] ?? null)) {
             return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.')->with(...$stamps);
         }
 
-        if (empty($encodedEnvelope['headers']['type'])) {
+        if (!\is_string($encodedEnvelope['headers']['type'] ?? null) || '' === $encodedEnvelope['headers']['type']) {
             return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope does not have a "type" header.')->with(...$stamps);
         }
 
@@ -162,7 +162,7 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
         $type = $encodedEnvelope['headers']['type'] ?? null;
 
-        return null === $type ? null : ($this->typeToClassMap[$type] ?? $type);
+        return \is_string($type) ? ($this->typeToClassMap[$type] ?? $type) : null;
     }
 
     public function encode(Envelope $envelope): array

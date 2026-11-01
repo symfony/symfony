@@ -174,7 +174,7 @@ class StoreFactory
                 return new NullStore();
         }
 
-        throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection));
+        throw new InvalidArgumentException('No lock store supports the given DSN.');
     }
 
     private static function requireBridgeClass(string $class, string $package): void

@@ -185,6 +185,21 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringNotContainsString("\e[", $display);
     }
 
+    public function testOutlineBlockKeepsTheBackslashThatEndsAFullLine()
+    {
+        $this->command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            (new SymfonyStyle($input, $output))->outlineError(str_repeat('a', 114).'\b');
+
+            return Command::SUCCESS;
+        });
+
+        $this->tester->execute([], ['interactive' => false, 'decorated' => true]);
+
+        $lines = explode("\n", $this->tester->getDisplay(true));
+
+        $this->assertSame("\e[31m │ \e[39m".str_repeat('a', 114)."\\\e[31m │\e[39m", $lines[3]);
+    }
+
     public function testErrorWithMalformedUtf8()
     {
         $message = "Cannot read the log file at /var/log/app/deep/path.log: \xB3 check the file permissions, then retry the command and report the result";
@@ -203,6 +218,23 @@ class SymfonyStyleTest extends TestCase
         $this->assertSame(str_replace([' ', "\xB3"], ['', "\u{FFFD}"], $message), str_replace(' ', '', implode('', array_map(static fn (string $line): string => substr($line, 9), $lines))));
         $this->assertGreaterThan(1, \count($lines), 'The message is wrapped over several lines.');
         $this->assertCount(1, array_unique(array_map(Helper::width(...), $lines)), 'Every line of the block is padded to the same width.');
+    }
+
+    public function testErrorKeepsAnEscapedTagThatIsWrappedAsText()
+    {
+        // the escaped "<" falls right where the block wraps the message
+        $message = str_repeat('a', 110).'<fg=red;x>y';
+        $this->command->setCode(static function (InputInterface $input, OutputInterface $output) use ($message) {
+            (new SymfonyStyle($input, $output))->error($message);
+
+            return Command::SUCCESS;
+        });
+
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+
+        $lines = array_filter(explode("\n", $this->tester->getDisplay(true)), static fn (string $line): bool => '' !== trim($line));
+
+        $this->assertSame($message, implode('', array_map(static fn (string $line): string => trim(substr($line, 9)), $lines)));
     }
 
     public function testGetErrorStyle()
@@ -387,6 +419,24 @@ class SymfonyStyleTest extends TestCase
         }
 
         $this->assertSame(0, memory_get_usage() - $start);
+    }
+
+    public function testBlockKeepsTheBackslashThatEndsAFullLine()
+    {
+        $this->command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            $io = new SymfonyStyle($input, $output);
+            $io->error(str_repeat('a', 110).'\b');
+            $io->writeln('after');
+
+            return Command::SUCCESS;
+        });
+
+        $this->tester->execute([], ['interactive' => false, 'decorated' => true]);
+
+        $lines = explode("\n", $this->tester->getDisplay(true));
+
+        $this->assertSame("\e[37;41m [ERROR] ".str_repeat('a', 110)."\\\e[39;49m", $lines[2]);
+        $this->assertSame('after', $lines[6]);
     }
 
     public function testAskAndClearExpectFullSectionCleared()

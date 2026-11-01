@@ -54,7 +54,6 @@ class ArrayNodeDefinitionTest extends TestCase
     public static function providePrototypeNodeSpecificCalls(): array
     {
         return [
-            ['defaultValue', [[]]],
             ['addDefaultChildrenIfNoneSet', []],
             ['requiresAtLeastOneElement', []],
             ['cannotBeEmpty', []],
@@ -71,6 +70,104 @@ class ArrayNodeDefinitionTest extends TestCase
             ->prototype('array')
         ;
         $node->getNode();
+    }
+
+    public function testConcreteNodeCannotHaveADefaultValueAndAddDefaultsIfNotSet()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->defaultValue([])
+            ->addDefaultsIfNotSet()
+        ;
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('->defaultValue() and ->addDefaultsIfNotSet() cannot be used together at path "root".');
+
+        $node->getNode();
+    }
+
+    public function testConcreteNodeDefaultValue()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->defaultValue(['class' => 'DefaultProvider'])
+            ->children()
+                ->scalarNode('class')->end()
+                ->scalarNode('service')->end()
+        ;
+
+        $tree = $node->getNode();
+        $this->assertTrue($tree->hasDefaultValue());
+        $this->assertSame(['class' => 'DefaultProvider'], $tree->getDefaultValue());
+    }
+
+    public function testConcreteNodeAllowsNullDefault()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->defaultNull()
+            ->children()
+                ->scalarNode('class')->end()
+        ;
+
+        $tree = $node->getNode();
+        $this->assertTrue($tree->hasDefaultValue());
+        $this->assertNull($tree->getDefaultValue());
+    }
+
+    public function testConcreteNodeRejectsNonArrayDefaultValue()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->defaultValue('not-an-array')
+            ->children()
+                ->scalarNode('class')->end()
+        ;
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('the default value of an array node has to be an array or null');
+        $node->getNode();
+    }
+
+    #[DataProvider('provideConcreteNodeDefaultValueConfigs')]
+    public function testConcreteNodeDefaultValueIsUsedOnlyWhenTheNodeIsNotConfigured(array $config, array $expected)
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->children()
+                ->arrayNode('provider')
+                    ->defaultValue(['class' => 'DefaultProvider'])
+                    ->children()
+                        ->scalarNode('class')->cannotBeEmpty()->end()
+                        ->scalarNode('service')->cannotBeEmpty()->end()
+                    ->end()
+                ->end()
+                ->arrayNode('wrapper')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('provider')
+                            ->defaultValue(['class' => 'DefaultProvider'])
+                            ->children()
+                                ->scalarNode('class')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+        ;
+
+        $this->assertSame($expected, (new Processor())->process($node->getNode(), [$config]));
+    }
+
+    public static function provideConcreteNodeDefaultValueConfigs(): iterable
+    {
+        yield 'not configured' => [
+            [],
+            ['provider' => ['class' => 'DefaultProvider'], 'wrapper' => ['provider' => ['class' => 'DefaultProvider']]],
+        ];
+        yield 'configured' => [
+            ['provider' => ['service' => 'my_provider']],
+            ['provider' => ['service' => 'my_provider'], 'wrapper' => ['provider' => ['class' => 'DefaultProvider']]],
+        ];
     }
 
     public function testPrototypeNodesCantHaveADefaultValueWhenUsingDefaultChildren()

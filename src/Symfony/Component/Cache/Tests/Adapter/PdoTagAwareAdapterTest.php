@@ -64,16 +64,29 @@ class PdoTagAwareAdapterTest extends AbstractPdoAdapterTestCase
         }
     }
 
-    public function testInvalidateTagsCreatesMissingTableWhenExecutionIsDeferred()
+    public function testInvalidateTagsWithMissingTableWhenExecutionIsDeferred()
     {
-        $pool = new PdoTagAwareAdapter($this->createConnectionWithMissingTagsTable(false));
+        $exception = new \PDOException('The tags table does not exist.');
+        $exception->errorInfo = ['42P01', 7, $exception->getMessage()];
+        $statement = $this->createMock(\PDOStatement::class);
+        $statement->expects($this->once())->method('execute')->willThrowException($exception);
+
+        $pdo = $this->createMock(\PDO::class);
+        $pdo->method('getAttribute')->willReturnMap([
+            [\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION],
+            [\PDO::ATTR_DRIVER_NAME, 'pgsql'],
+        ]);
+        $pdo->expects($this->once())->method('prepare')->willReturn($statement);
+        $pdo->expects($this->never())->method('exec');
+
+        $pool = new PdoTagAwareAdapter($pdo);
 
         $this->assertTrue($pool->invalidateTags(['unused']));
     }
 
     public function testPruneCreatesMissingTagsTableWhenExecutionIsDeferred()
     {
-        $pool = new PdoTagAwareAdapter($this->createConnectionWithMissingTagsTable(true));
+        $pool = new PdoTagAwareAdapter($this->createConnectionWithMissingTagsTable());
 
         $this->assertTrue($pool->prune());
     }
@@ -90,7 +103,19 @@ class PdoTagAwareAdapterTest extends AbstractPdoAdapterTestCase
         }
     }
 
-    private function createConnectionWithMissingTagsTable(bool $prune): \PDO
+    public function testInvalidateTagsWithoutTables()
+    {
+        $pool = new PdoTagAwareAdapter('sqlite:'.$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache'));
+
+        try {
+            $this->assertTrue($pool->invalidateTags(['foo']));
+            $this->assertTrue($pool->invalidateTags(['foo']));
+        } finally {
+            @unlink($dbFile);
+        }
+    }
+
+    private function createConnectionWithMissingTagsTable(): \PDO
     {
         $exception = new \PDOException('The tags table does not exist.');
         $exception->errorInfo = ['42P01', 7, $exception->getMessage()];
@@ -103,20 +128,15 @@ class PdoTagAwareAdapterTest extends AbstractPdoAdapterTestCase
 
             return true;
         });
-        $statements = [$statement];
-
-        if ($prune) {
-            $pruneItems = $this->createStub(\PDOStatement::class);
-            $pruneItems->method('execute')->willReturn(true);
-            array_unshift($statements, $pruneItems);
-        }
+        $pruneItems = $this->createStub(\PDOStatement::class);
+        $pruneItems->method('execute')->willReturn(true);
 
         $pdo = $this->createMock(\PDO::class);
         $pdo->method('getAttribute')->willReturnMap([
             [\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION],
             [\PDO::ATTR_DRIVER_NAME, 'pgsql'],
         ]);
-        $pdo->expects($this->exactly(\count($statements)))->method('prepare')->willReturnOnConsecutiveCalls(...$statements);
+        $pdo->expects($this->exactly(2))->method('prepare')->willReturnOnConsecutiveCalls($pruneItems, $statement);
         $pdo->expects($this->exactly(2))->method('exec')->willReturn(0);
 
         return $pdo;

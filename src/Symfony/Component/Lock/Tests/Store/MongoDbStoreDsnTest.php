@@ -65,6 +65,18 @@ class MongoDbStoreDsnTest extends TestCase
         new MongoDbStore('mongodb://localhost/?collection=locks');
     }
 
+    public function testInvalidUriIsNotExposedInExceptionMessage()
+    {
+        foreach (['mongo://user:s3cr3t@localhost/app?collection=locks', 'mongodb://user:s3cr3t@localhost:999999/app?collection=locks'] as $uri) {
+            try {
+                new MongoDbStore($uri);
+                $this->fail('An exception should have been thrown.');
+            } catch (InvalidArgumentException $e) {
+                $this->assertStringNotContainsString('s3cr3t', $e->getMessage());
+            }
+        }
+    }
+
     public function testCredentialsAreNotExposedInTrace()
     {
         if (!class_exists(\SensitiveParameterValue::class)) {

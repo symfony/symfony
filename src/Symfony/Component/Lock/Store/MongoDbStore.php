@@ -157,11 +157,11 @@ class MongoDbStore implements PersistingStoreInterface
     private function skimUri(#[\SensitiveParameter] string $uri): string
     {
         if (!str_starts_with($uri, 'mongodb://') && !str_starts_with($uri, 'mongodb+srv://')) {
-            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid. Expecting "mongodb://" or "mongodb+srv://".', $uri));
+            throw new InvalidArgumentException('The given MongoDB Connection URI is invalid. Expecting "mongodb://" or "mongodb+srv://".');
         }
 
         if (false === $params = parse_url($uri)) {
-            throw new InvalidArgumentException(\sprintf('The given MongoDB Connection URI "%s" is invalid.', $uri));
+            throw new InvalidArgumentException('The given MongoDB Connection URI is invalid.');
         }
         $pathDb = rawurldecode(ltrim($params['path'] ?? '', '/'));
         if ('' !== $pathDb) {

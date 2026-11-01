@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T07:33:51Z
+
+Kept valid custom schemes starting with `http` working. The host check now uses `PHP_URL_HOST`.

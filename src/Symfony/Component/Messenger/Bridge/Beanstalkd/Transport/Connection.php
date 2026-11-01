@@ -38,12 +38,14 @@ class Connection
         'timeout' => 0,
         'ttr' => 90,
         'bury_on_reject' => false,
+        'body_only' => false,
     ];
 
     private TubeName $tube;
     private int $timeout;
     private int $ttr;
     private bool $buryOnReject;
+    private bool $bodyOnly;
 
     private ?string $usedTube = null;
     private bool $watchingTube = false;
@@ -58,6 +60,7 @@ class Connection
      * * timeout: message reservation timeout (in seconds)
      * * ttr: the message time to run before it is put back in the ready queue (in seconds)
      * * bury_on_reject: bury rejected messages instead of deleting them
+     * * body_only: put only the body of the messages in the jobs and read the jobs as message bodies, retries keep their headers
      */
     public function __construct(
         private array $configuration,
@@ -68,6 +71,7 @@ class Connection
         $this->timeout = $this->configuration['timeout'];
         $this->ttr = $this->configuration['ttr'];
         $this->buryOnReject = $this->configuration['bury_on_reject'];
+        $this->bodyOnly = $this->configuration['body_only'];
     }
 
     public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = []): self
@@ -126,23 +130,28 @@ class Connection
     }
 
     /**
-     * @param int     $delay    The delay in milliseconds
-     * @param ?int    $priority The priority at which the message will be reserved
-     * @param ?string $tube     The tube to put the message in instead of the configured one
+     * @param int     $delay       The delay in milliseconds
+     * @param ?int    $priority    The priority at which the message will be reserved
+     * @param ?string $tube        The tube to put the message in instead of the configured one
+     * @param bool    $keepHeaders Whether to put the headers in the job even with the "body_only" option
      *
      * @return string The inserted id
      */
-    public function send(string $body, array $headers, int $delay = 0, ?int $priority = null, ?string $tube = null): string
+    public function send(string $body, array $headers, int $delay = 0, ?int $priority = null, ?string $tube = null, bool $keepHeaders = false): string
     {
         $tube = null !== $tube ? new TubeName($tube) : $this->tube;
 
-        try {
-            $message = json_encode([
-                'body' => $body,
-                'headers' => $headers,
-            ], \JSON_THROW_ON_ERROR);
-        } catch (\JsonException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
+        if ($this->bodyOnly && !$keepHeaders) {
+            $message = $body;
+        } else {
+            try {
+                $message = json_encode([
+                    'body' => $body,
+                    $this->bodyOnly ? 'symfony_headers' : 'headers' => $headers,
+                ], \JSON_THROW_ON_ERROR);
+            } catch (\JsonException $exception) {
+                throw new TransportException($exception->getMessage(), 0, $exception);
+            }
         }
 
         return $this->withReconnect(function () use ($message, $delay, $priority, $tube) {
@@ -175,7 +184,17 @@ class Connection
         try {
             $beanstalkdEnvelope = json_decode($data, true, flags: \JSON_THROW_ON_ERROR);
         } catch (\JsonException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
+            if (!$this->bodyOnly) {
+                throw new TransportException($exception->getMessage(), 0, $exception);
+            }
+
+            $beanstalkdEnvelope = null;
+        }
+
+        if ($this->bodyOnly) {
+            $beanstalkdEnvelope = \is_array($beanstalkdEnvelope) && 2 === \count($beanstalkdEnvelope) && \is_string($beanstalkdEnvelope['body'] ?? null) && \is_array($beanstalkdEnvelope['symfony_headers'] ?? null)
+                ? ['body' => $beanstalkdEnvelope['body'], 'headers' => $beanstalkdEnvelope['symfony_headers']]
+                : ['body' => $data, 'headers' => []];
         }
 
         return [

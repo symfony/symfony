@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `BeanstalkdTubeStamp` to put a message in another tube than the one of the transport
  * Implement the `CloseableTransportInterface` to allow closing the Beanstalkd connection
+ * Add the `body_only` option to send and receive jobs that hold only the body of the message, without its headers
 
 7.3
 ---

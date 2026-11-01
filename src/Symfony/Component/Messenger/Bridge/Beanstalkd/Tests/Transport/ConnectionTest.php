@@ -58,6 +58,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame(0, $configuration['timeout']);
         $this->assertSame(90, $configuration['ttr']);
         $this->assertFalse($configuration['bury_on_reject']);
+        $this->assertFalse($configuration['body_only']);
 
         $this->assertEquals(
             $connection = new Connection([], Pheanstalk::create('foobar', 15555)),
@@ -70,14 +71,15 @@ final class ConnectionTest extends TestCase
         $this->assertSame(0, $configuration['timeout']);
         $this->assertSame(90, $configuration['ttr']);
         $this->assertFalse($configuration['bury_on_reject']);
+        $this->assertFalse($configuration['body_only']);
         $this->assertSame('default', $connection->getTube());
     }
 
     public function testFromDsnWithOptions()
     {
         $this->assertEquals(
-            $connectionWithOptions = Connection::fromDsn('beanstalkd://localhost', ['tube_name' => 'foo', 'timeout' => 10, 'ttr' => 5000, 'bury_on_reject' => true]),
-            $connectionWithQuery = Connection::fromDsn('beanstalkd://localhost?tube_name=foo&timeout=10&ttr=5000&bury_on_reject=true')
+            $connectionWithOptions = Connection::fromDsn('beanstalkd://localhost', ['tube_name' => 'foo', 'timeout' => 10, 'ttr' => 5000, 'bury_on_reject' => true, 'body_only' => true]),
+            $connectionWithQuery = Connection::fromDsn('beanstalkd://localhost?tube_name=foo&timeout=10&ttr=5000&bury_on_reject=true&body_only=true')
         );
 
         $configuration = $connectionWithOptions->getConfiguration();
@@ -86,6 +88,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame(10, $configuration['timeout']);
         $this->assertSame(5000, $configuration['ttr']);
         $this->assertTrue($configuration['bury_on_reject']);
+        $this->assertTrue($configuration['body_only']);
         $this->assertSame('foo', $connectionWithOptions->getTube());
 
         $configuration = $connectionWithQuery->getConfiguration();
@@ -94,6 +97,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame(10, $configuration['timeout']);
         $this->assertSame(5000, $configuration['ttr']);
         $this->assertTrue($configuration['bury_on_reject']);
+        $this->assertTrue($configuration['body_only']);
         $this->assertSame('foo', $connectionWithOptions->getTube());
     }
 
@@ -104,11 +108,12 @@ final class ConnectionTest extends TestCase
             'timeout' => 20,
             'ttr' => 6000,
             'bury_on_reject' => false,
+            'body_only' => false,
         ];
 
         $this->assertEquals(
             $connection = new Connection($options, Pheanstalk::create('localhost', 11333)),
-            Connection::fromDsn('beanstalkd://localhost:11333?tube_name=foo&timeout=10&ttr=5000&bury_on_reject=true', $options)
+            Connection::fromDsn('beanstalkd://localhost:11333?tube_name=foo&timeout=10&ttr=5000&bury_on_reject=true&body_only=true', $options)
         );
 
         $configuration = $connection->getConfiguration();
@@ -117,6 +122,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame($options['timeout'], $configuration['timeout']);
         $this->assertSame($options['ttr'], $configuration['ttr']);
         $this->assertSame($options['bury_on_reject'], $configuration['bury_on_reject']);
+        $this->assertSame($options['body_only'], $configuration['body_only']);
         $this->assertSame($options['tube_name'], $connection->getTube());
     }
 
@@ -168,6 +174,37 @@ final class ConnectionTest extends TestCase
         $this->assertSame($id2, $envelope['id']);
         $this->assertSame($beanstalkdEnvelope['body'], $envelope['body']);
         $this->assertSame($beanstalkdEnvelope['headers'], $envelope['headers']);
+    }
+
+    #[TestWith(['foo'])]
+    #[TestWith(['"foo"'])]
+    #[TestWith(['{"name":"Ime"}'])]
+    #[TestWith(['{"body":"foo","headers":{"type":"bar"}}'])]
+    #[TestWith(['{"body":"foo"}'])]
+    #[TestWith(['{"body":"foo","symfony_headers":{},"name":"Ime"}'])]
+    #[TestWith(['{"body":{"name":"Ime"},"symfony_headers":{}}'])]
+    #[TestWith(['{"body":"foo","symfony_headers":"bar"}'])]
+    public function testGetWithBodyOnlyReturnsTheJobAsTheBodyOfTheMessage(string $data)
+    {
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('reserveWithTimeout')->willReturn(new Job(new JobId('1234'), $data));
+
+        $connection = new Connection(['body_only' => true], $client);
+
+        $this->assertSame(['id' => '1234', 'body' => $data, 'headers' => []], $connection->get());
+    }
+
+    #[TestWith(['{"body":"foo","symfony_headers":{"type":"bar"}}', ['type' => 'bar']])]
+    #[TestWith(['{"symfony_headers":{"type":"bar"},"body":"foo"}', ['type' => 'bar']])]
+    #[TestWith(['{"body":"foo","symfony_headers":[]}', []])]
+    public function testGetWithBodyOnlyReadsTheHeadersOfRetries(string $data, array $headers)
+    {
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('reserveWithTimeout')->willReturn(new Job(new JobId('1234'), $data));
+
+        $connection = new Connection(['body_only' => true], $client);
+
+        $this->assertSame(['id' => '1234', 'body' => 'foo', 'headers' => $headers], $connection->get());
     }
 
     public function testGetOnReconnect()
@@ -726,6 +763,26 @@ final class ConnectionTest extends TestCase
         $this->assertSame('110', $connection->send('foo', [], 0, null, 'abc'));
         $this->assertSame('111', $connection->send('foo', []));
         $this->assertSame(['abc', 'abc', 'xyz'], $usedTubes);
+    }
+
+    public function testSendWithBodyOnlyPutsOnlyTheBodyInTheJob()
+    {
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('put')->with('foo', 1024, 0, 90)->willReturn(new Job(new JobId('110'), 'foo'));
+
+        $connection = new Connection(['body_only' => true], $client);
+
+        $this->assertSame('110', $connection->send('foo', ['type' => 'bar']));
+    }
+
+    public function testSendWithBodyOnlyPutsTheHeadersInTheJobWhenAskedToKeepThem()
+    {
+        $client = $this->createMock(PheanstalkInterface::class);
+        $client->expects($this->once())->method('put')->with('{"body":"foo","symfony_headers":{"type":"bar"}}', 1024, 0, 90)->willReturn(new Job(new JobId('110'), 'foo'));
+
+        $connection = new Connection(['body_only' => true], $client);
+
+        $this->assertSame('110', $connection->send('foo', ['type' => 'bar'], 0, null, null, true));
     }
 
     public function testSendWhenABeanstalkdExceptionOccurs()

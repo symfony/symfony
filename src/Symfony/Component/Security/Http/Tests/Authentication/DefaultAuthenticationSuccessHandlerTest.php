@@ -174,7 +174,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
 
     public function testTargetPathFromRequestWithoutHostIsIgnored()
     {
-        foreach (['http', 'httpx', 'https:', 'http:///some-path'] as $targetPath) {
+        foreach (['http', 'httpx', 'https:', 'http:///some-path', 'http:80', 'httpx:8080'] as $targetPath) {
             $request = Request::create('/');
             $request->attributes->set('_target_path', $targetPath);
 

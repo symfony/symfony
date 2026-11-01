@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-01T13:17:55Z
+
+Thanks @BenMacha, I pushed a narrower fix. `onSubmit()` now keeps the entries that are already at their index, so these entries stay submitted and validated. Only the entries from the first misplaced entry are re-added, as before.
+
+Renumbering before the submission can't work. A form can't be renamed, so a new index means a new form. This new form loses the options that other code gave to the entry. For example, an entry replaced with `'disabled' => true` accepted the submitted value. Renumbering early can also hide an extra field, and `delete_empty` removes entries only after the submission anyway.
+
+The entries after a gap, for example after removing a row in the browser, are still not validated. Their data is correct and the violations of their data are mapped to the right entry.

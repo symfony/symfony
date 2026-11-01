@@ -14,11 +14,13 @@ namespace Symfony\Component\Cache\Adapter;
 use Predis\Connection\Aggregate\ClusterInterface;
 use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Connection\Aggregate\ReplicationInterface;
+use Predis\Connection\Cluster\ClusterInterface as Predis2ClusterInterface;
 use Predis\Connection\Replication\ReplicationInterface as Predis2ReplicationInterface;
 use Predis\Response\ErrorInterface;
 use Predis\Response\Status;
 use Relay\Relay;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
@@ -56,6 +58,8 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
      * preferred to be evicted over tag Sets, if eviction policy is configured according to requirements.
      */
     private const DEFAULT_CACHE_TTL = 8640000;
+    private const INVALIDATION_PREFIX = ":\1tags\1";
+    private const INVALIDATION_BATCH_SIZE = 500;
 
     /**
      * detected eviction policy used on Redis server.
@@ -161,7 +165,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
                     if ($prefixLen) {
                         $key = substr($key, $prefixLen);
                     }
-                    $ok = $this->pruneTagSet($key) && $ok;
+                    $ok = $this->pruneTagSet($key, $this->redis instanceof \RedisArray ? $host : null) && $ok;
                 }
             } while ($cursor);
         }
@@ -174,6 +178,14 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
         $eviction = $this->getRedisEvictionPolicy();
         if ('noeviction' !== $eviction && !str_starts_with($eviction, 'volatile-')) {
             throw new LogicException(\sprintf('Redis maxmemory-policy setting "%s" is *not* supported by RedisTagAwareAdapter, use "noeviction" or "volatile-*" eviction policies.', $eviction));
+        }
+
+        $addTagData = [];
+        $rootNamespace = '' === $this->namespace ? '' : $this->namespace.static::NS_SEPARATOR;
+        foreach ($values as $id => $value) {
+            foreach ($value['tags'] ?? [] as $tag) {
+                $addTagData[$this->getId(static::TAGS_PREFIX.$tag, $rootNamespace)][] = $id;
+            }
         }
 
         // serialize values
@@ -223,18 +235,18 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
     protected function doDeleteYieldTags(array $ids): iterable
     {
         $lua = <<<'EOLUA'
-                        local v = redis.call('GET', KEYS[1])
-                        local e = redis.pcall('UNLINK', KEYS[1])
+            local v = redis.call('GET', KEYS[1])
+            local e = redis.pcall('UNLINK', KEYS[1])
 
-                        if type(e) ~= 'number' then
-                            redis.call('DEL', KEYS[1])
-                        end
+            if type(e) ~= 'number' then
+                redis.call('DEL', KEYS[1])
+            end
 
-                        if not v or v:len() <= 13 or v:byte(1) ~= 0x9D or v:byte(6) ~= 0 or v:byte(10) ~= 0x5F then
-                            return ''
-                        end
+            if not v or v:len() <= 13 or v:byte(1) ~= 0x9D or v:byte(6) ~= 0 or v:byte(10) ~= 0x5F then
+                return ''
+            end
 
-                        return v:sub(14, 13 + v:byte(13) + v:byte(12) * 256 + v:byte(11) * 65536)
+            return v:sub(14, 13 + v:byte(13) + v:byte(12) * 256 + v:byte(11) * 65536)
             EOLUA;
 
         $results = $this->pipeline(function () use ($ids, $lua) {
@@ -275,101 +287,57 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
 
     protected function doInvalidate(array $tagIds): bool
     {
-        // This script scans the set of items linked to tag: it empties the set
-        // and removes the linked items. When the set is still not empty after
-        // the scan, it means we're in cluster mode and that the linked items
-        // are on other nodes: we move the links to a temporary set and we
-        // garbage collect that set from the client side.
-        // With Relay, the client deletes the linked items itself. When the script
-        // deletes them, Relay can keep serving them from memory for a short time.
-
+        $fast = $this->isSingleServer() && !$this->isPacked($this->redis);
+        $prefix = $fast ? $this->getRedisPrefix($this->redis) : '';
         $lua = <<<'EOLUA'
-                        redis.replicate_commands()
+            if '1' == ARGV[3] and 0 == redis.call('SCARD', KEYS[3]) and redis.call('SCARD', KEYS[1]) <= 500 then
+                for _, id in ipairs(redis.call('SMEMBERS', KEYS[1])) do
+                    redis.call('DEL', ARGV[2]..id)
+                end
+                redis.call('DEL', KEYS[1])
+                return 2
+            end
 
-                        local id = KEYS[1]
-                        if '1' == ARGV[2] then
-                            local cursor = '0'
-                            repeat
-                                local result = redis.call('SSCAN', id, cursor, 'COUNT', 5000);
-                                cursor = result[1];
-                                local rems = {}
+            if 1 == redis.call('EXISTS', KEYS[1]) then
+                redis.call('SADD', KEYS[3], ARGV[1])
+                redis.call('RENAME', KEYS[1], KEYS[2])
+            end
 
-                                for _, v in ipairs(result[2]) do
-                                    local ok, _ = pcall(redis.call, 'DEL', ARGV[1]..v)
-                                    if ok then
-                                        table.insert(rems, v)
-                                    end
-                                end
-                                if 0 < #rems then
-                                    redis.call('SREM', id, unpack(rems))
-                                end
-                            until '0' == cursor;
-                        end
-
-                        redis.call('SUNIONSTORE', '{'..id..'}'..id, id)
-                        redis.call('DEL', id)
-
-                        return redis.call('SSCAN', '{'..id..'}'..id, '0', 'COUNT', 5000)
+            return 1
             EOLUA;
 
-        $results = $this->pipeline(function () use ($tagIds, $lua) {
-            $isRelay = $this->redis instanceof Relay || $this->redis instanceof \Relay\Cluster;
-
-            if ($this->redis instanceof \Predis\ClientInterface) {
-                $prefix = $this->redis->getOptions()->prefix ? $this->redis->getOptions()->prefix->getPrefix() : '';
-            } elseif (\is_array($prefix = $this->redis->getOption($isRelay ? Relay::OPT_PREFIX : \Redis::OPT_PREFIX) ?? '')) {
-                $prefix = current($prefix);
-            }
-
+        $pending = [];
+        $results = $this->pipeline(function () use ($tagIds, $lua, $prefix, $fast, &$pending) {
             foreach ($tagIds as $id) {
-                yield 'eval' => $this->redis instanceof \Predis\ClientInterface ? [$lua, 1, $id, $prefix, '1'] : [$lua, [$id, $prefix, $isRelay ? '0' : '1'], 1];
+                $redis = $this->redis instanceof \RedisArray ? $this->redis->_instance($this->redis->_target($id)) : $this->redis;
+                $key = $this->getInvalidationKey($id, 'pending', $redis);
+                $snapshot = $this->getInvalidationKey($id, bin2hex(random_bytes(16)), $redis);
+                $pending[$id] = [$key, $redis];
+                $args = [$id, $snapshot, $key, $snapshot, $prefix, $fast ? '1' : '0'];
+
+                yield 'eval' => $this->redis instanceof \Predis\ClientInterface ? array_merge([$lua, 3], $args) : [$lua, $args, 3];
             }
         });
 
-        $lua = <<<'EOLUA'
-                        redis.replicate_commands()
-
-                        local id = KEYS[1]
-                        local cursor = table.remove(ARGV)
-                        redis.call('SREM', '{'..id..'}'..id, unpack(ARGV))
-
-                        return redis.call('SSCAN', '{'..id..'}'..id, cursor, 'COUNT', 5000)
-            EOLUA;
-
-        $success = true;
-        foreach ($results as $id => $values) {
-            if ($values instanceof \RedisException || $values instanceof \Relay\Exception || $values instanceof ErrorInterface) {
-                CacheItem::log($this->logger, 'Failed to invalidate key "{key}": '.$values->getMessage(), ['key' => substr($id, \strlen($this->namespace)), 'exception' => $values]);
-                $success = false;
-
+        $count = 0;
+        foreach ($results as $id => $result) {
+            ++$count;
+            if ($result instanceof \RedisException || $result instanceof \Relay\Exception || $result instanceof ErrorInterface) {
+                throw new CacheException($result->getMessage());
+            }
+            if (2 === $result && $fast) {
                 continue;
             }
-
-            [$cursor, $ids] = $values;
-
-            while ($ids || '0' !== $cursor) {
-                $this->doDelete($ids);
-
-                $evalArgs = [$id, $cursor];
-                array_splice($evalArgs, 1, 0, $ids);
-
-                if ($this->redis instanceof \Predis\ClientInterface) {
-                    array_unshift($evalArgs, $lua, 1);
-                } else {
-                    $evalArgs = [$lua, $evalArgs, 1];
-                }
-
-                $results = $this->pipeline(static function () use ($evalArgs) {
-                    yield 'eval' => $evalArgs;
-                });
-
-                foreach ($results as [$cursor, $ids]) {
-                    // no-op
-                }
+            if (1 !== $result) {
+                throw new CacheException('Failed to detach a tag set during invalidation.');
             }
+            $this->drainInvalidations($id, ...$pending[$id]);
+        }
+        if ($count !== \count($tagIds)) {
+            throw new CacheException('Failed to detach tag sets during invalidation.');
         }
 
-        return $success;
+        return true;
     }
 
     private function getRedisEvictionPolicy(): string
@@ -418,16 +386,42 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
         return $this->redisEvictionPolicy = '';
     }
 
-    private function pruneTagSet(string $setId): bool
+    private function pruneTagSet(string $setId, ?object $redis = null): bool
     {
+        $tagOffset = strpos($setId, static::TAGS_PREFIX);
+        if (false !== $tagOffset && false !== $offset = strpos($setId, self::INVALIDATION_PREFIX, $tagOffset + \strlen(static::TAGS_PREFIX))) {
+            $tagId = substr($setId, 0, $offset);
+
+            try {
+                $isSet = $this->executeScript("return redis.call('TYPE', KEYS[1]).ok == 'set' and 1 or 0", [$setId], [], $redis);
+                if (0 === $isSet) {
+                    return true;
+                }
+                if (1 !== $isSet) {
+                    throw new CacheException('Failed to check tag invalidation metadata.');
+                }
+                if (str_starts_with(substr($setId, $offset + \strlen(self::INVALIDATION_PREFIX)), 'pending')) {
+                    $this->drainInvalidations($tagId, $setId, $redis ?? $this->redis);
+                } else {
+                    $this->drainInvalidation($tagId, $setId, $redis ?? $this->redis);
+                }
+
+                return true;
+            } catch (\Exception $e) {
+                CacheItem::log($this->logger, 'Failed to prune tag set "{key}": '.$e->getMessage(), ['key' => $setId, 'exception' => $e]);
+
+                return false;
+            }
+        }
+
         // Skipping keys that are not Sets tells apart unrelated keys that happen to match the scanned pattern
 
         $lua = <<<'EOLUA'
-                        if 'set' ~= redis.call('TYPE', KEYS[1]).ok then
-                            return false
-                        end
+            if 'set' ~= redis.call('TYPE', KEYS[1]).ok then
+                return false
+            end
 
-                        return redis.call('SSCAN', KEYS[1], ARGV[1], 'COUNT', 1000)
+            return redis.call('SSCAN', KEYS[1], ARGV[1], 'COUNT', 1000)
             EOLUA;
 
         $cursor = '0';
@@ -494,5 +488,335 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableI
         } while ('0' !== $cursor);
 
         return true;
+    }
+
+    private function executeScript(string $lua, array $keys, array $args = [], ?object $redis = null): mixed
+    {
+        $redis ??= $this->redis;
+        $args = $redis instanceof \Predis\ClientInterface ? array_merge([$lua, \count($keys)], $keys, $args) : [$lua, array_merge($keys, $args), \count($keys)];
+
+        foreach ($this->pipeline(static function () use ($args) { yield 'eval' => $args; }, $redis) as $result) {
+            if ($result instanceof \RedisException || $result instanceof \Relay\Exception || $result instanceof ErrorInterface) {
+                throw new CacheException($result->getMessage(), 0, $result instanceof \Throwable ? $result : null);
+            }
+
+            return $result;
+        }
+
+        throw new CacheException('Failed to execute tag invalidation.');
+    }
+
+    private function drainInvalidations(string $tagId, string $pending, object $redis): void
+    {
+        while ($snapshots = $this->getInvalidationMembers($pending, $redis)) {
+            foreach ($snapshots as $snapshot) {
+                if (!str_starts_with($snapshot, $tagId.self::INVALIDATION_PREFIX)) {
+                    throw new CacheException('Invalid tag invalidation snapshot.');
+                }
+                $this->drainInvalidation($tagId, $snapshot, $redis);
+                $this->removeInvalidationMembers($pending, [$snapshot], $redis);
+            }
+        }
+    }
+
+    private function drainInvalidation(string $tagId, string $snapshot, object $redis): void
+    {
+        $tag = substr($tagId, strpos($tagId, static::TAGS_PREFIX) + \strlen(static::TAGS_PREFIX));
+        $serialized = $this->isPacked($redis);
+        $packedValues = $this->isPacked($this->redis);
+        $batch = !$packedValues && $this->isSingleServer();
+        $count = $batch ? 250 : ($packedValues ? 1 : self::INVALIDATION_BATCH_SIZE);
+        $readTags = <<<'EOLUA'
+            local function readTags(id)
+                local h = redis.call('GETRANGE', id, 0, 12)
+                if h:len() ~= 13 or h:byte(1) ~= 0x9D or h:byte(6) ~= 0 or h:byte(10) ~= 0x5F then
+                    return ''
+                end
+                local n = h:byte(13) + h:byte(12) * 256 + h:byte(11) * 65536
+                return redis.call('GETRANGE', id, 13, 12 + n)
+            end
+            EOLUA;
+        $delete = <<<'EOLUA'
+            local function deleteTagged(id, expected)
+                local h = redis.call('GETRANGE', id, 0, 12)
+                if h:len() ~= 13 or h:byte(1) ~= 0x9D or h:byte(6) ~= 0 or h:byte(10) ~= 0x5F then
+                    return 0
+                end
+                local n = h:byte(13) + h:byte(12) * 256 + h:byte(11) * 65536
+                if redis.call('GETRANGE', id, 13, 12 + n) ~= expected then
+                    return 0
+                end
+                local e = redis.pcall('UNLINK', id)
+                return type(e) == 'number' and e or redis.call('DEL', id)
+            end
+            EOLUA;
+        $deleteRaw = <<<'EOLUA'
+            if redis.call('GET', KEYS[1]) ~= ARGV[1] then
+                return 0
+            end
+            local e = redis.pcall('UNLINK', KEYS[1])
+            return type(e) == 'number' and e or redis.call('DEL', KEYS[1])
+            EOLUA;
+
+        while ($members = $this->getInvalidationMembers($snapshot, $redis)) {
+            foreach (array_chunk($members, $count) as $chunk) {
+                if ($batch) {
+                    $this->deleteTagBatch($tag, $chunk, $readTags, $delete);
+                    $this->removeInvalidationMembers($snapshot, $chunk, $redis);
+                    continue;
+                }
+                $ids = $packed = $clients = [];
+                foreach ($chunk as $member) {
+                    $id = $serialized ? $redis->_unpack($member) : $member;
+                    if (!\is_string($id)) {
+                        throw new CacheException('Invalid item identifier during tag invalidation.');
+                    }
+                    $ids[$member] = $id;
+                    $clients[$id] = $this->redis instanceof \RedisArray ? $this->redis->_instance($this->redis->_target($id)) : $this->redis;
+                    $packed[$id] = $this->redis instanceof \RedisArray ? $this->isPacked($clients[$id]) : $packedValues;
+                }
+                $results = $this->pipeline(function () use ($ids, $packed, $readTags) {
+                    foreach ($ids as $id) {
+                        $lua = $packed[$id] ? "return redis.call('GET', KEYS[1]) or ''" : $readTags."\nreturn readTags(KEYS[1])";
+                        yield 'eval' => $this->redis instanceof \Predis\ClientInterface ? [$lua, 1, $id] : [$lua, [$id], 1];
+                    }
+                });
+                $deletions = [];
+                $readCount = 0;
+                foreach ($results as $id => $value) {
+                    ++$readCount;
+                    if ($value instanceof \RedisException || $value instanceof \Relay\Exception || $value instanceof ErrorInterface) {
+                        throw new CacheException($value->getMessage());
+                    }
+                    if (!\is_string($value)) {
+                        throw new CacheException('Failed to read an item during tag invalidation.');
+                    }
+                    if ('' === $value) {
+                        continue;
+                    }
+                    $expected = $value;
+                    if ($packed[$id]) {
+                        $value = $clients[$id]->_unpack($value);
+                        if (!\is_string($value)) {
+                            throw new CacheException('Failed to decode an item during tag invalidation.');
+                        }
+                        if (13 >= \strlen($value) || "\x9D" !== $value[0] || "\0" !== $value[5] || "\x5F" !== $value[9]) {
+                            continue;
+                        }
+                        $length = unpack('N', substr($value, 9, 4))[1] & 0x00FFFFFF;
+                        $value = substr($value, 13, $length);
+                    }
+                    if ('' === $value) {
+                        continue;
+                    }
+                    $tags = $this->marshaller->unmarshall($value);
+                    if (\is_array($tags) && isset(array_fill_keys($tags, true)[$tag])) {
+                        $deletions[$id] = $packed[$id] ? $expected : $value;
+                    }
+                }
+                if ($readCount !== \count($ids)) {
+                    throw new CacheException('Failed to read items during tag invalidation.');
+                }
+                if ($deletions) {
+                    if ($this->redis instanceof Relay || $this->redis instanceof \Relay\Cluster) {
+                        foreach ($deletions as $id => $expected) {
+                            $lua = $packed[$id] ? "return redis.call('GET', KEYS[1]) or ''" : $readTags."\nreturn readTags(KEYS[1])";
+                            $this->deleteRelayItem($this->redis, $id, $expected, $lua);
+                        }
+                    } else {
+                        $deletedCount = 0;
+                        foreach ($this->pipeline(function () use ($deletions, $delete, $deleteRaw, $packed) {
+                            foreach ($deletions as $id => $expected) {
+                                $lua = $packed[$id] ? $deleteRaw : $delete."\nreturn deleteTagged(KEYS[1], ARGV[1])";
+                                yield 'eval' => $this->redis instanceof \Predis\ClientInterface ? [$lua, 1, $id, $expected] : [$lua, [$id, $expected], 1];
+                            }
+                        }) as $result) {
+                            ++$deletedCount;
+                            if ($result instanceof \RedisException || $result instanceof \Relay\Exception || $result instanceof ErrorInterface) {
+                                throw new CacheException($result->getMessage());
+                            }
+                            if (!\is_int($result) || 0 > $result || 1 < $result) {
+                                throw new CacheException('Failed to delete an item during tag invalidation.');
+                            }
+                        }
+                        if ($deletedCount !== \count($deletions)) {
+                            throw new CacheException('Failed to delete items during tag invalidation.');
+                        }
+                    }
+                }
+                $this->removeInvalidationMembers($snapshot, $chunk, $redis);
+            }
+        }
+    }
+
+    private function deleteRelayItem(Relay|\Relay\Cluster $redis, string $id, string $expected, string $lua): void
+    {
+        $watching = false;
+        try {
+            if (false === $redis->watch($id)) {
+                throw new CacheException('Failed to watch an item during tag invalidation.');
+            }
+            $watching = true;
+            $value = $redis->eval($lua, [$id], 1);
+            if (!\is_string($value)) {
+                throw new CacheException('Failed to read an item during tag invalidation.');
+            }
+            if ($value !== $expected) {
+                return;
+            }
+            if (false === $redis->multi(Relay::MULTI) || false === $redis->del($id)) {
+                throw new CacheException('Failed to queue item deletion during tag invalidation.');
+            }
+            $result = $redis->exec();
+            $watching = false;
+            if (!\is_array($result) || 1 !== \count($result) || !\is_int($result[0]) || 0 > $result[0] || 1 < $result[0]) {
+                throw new CacheException('Failed to delete a watched item during tag invalidation.');
+            }
+        } finally {
+            if (Relay::MULTI === $redis->getMode()) {
+                if (false === $redis->discard()) {
+                    throw new CacheException('Failed to discard tag invalidation.');
+                }
+            } elseif ($watching && false === $redis->unwatch()) {
+                throw new CacheException('Failed to unwatch an item during tag invalidation.');
+            }
+        }
+    }
+
+    private function deleteTagBatch(string $tag, array $ids, string $readTags, string $delete): void
+    {
+        $lua = $readTags."\nlocal values = {} for i, id in ipairs(KEYS) do values[i] = readTags(id) end return values";
+        $values = $this->executeScript($lua, $ids);
+        if (!\is_array($values) || \count($ids) !== \count($values)) {
+            throw new CacheException('Failed to read items during tag invalidation.');
+        }
+
+        $deletions = [];
+        foreach ($values as $i => $value) {
+            if (!\is_string($value)) {
+                throw new CacheException('Failed to read an item during tag invalidation.');
+            }
+            if ('' === $value) {
+                continue;
+            }
+            $tags = $this->marshaller->unmarshall($value);
+            if (\is_array($tags) && isset(array_fill_keys($tags, true)[$tag])) {
+                $deletions[$ids[$i]] = $value;
+            }
+        }
+        if (!$deletions) {
+            return;
+        }
+
+        $lua = $delete."\nlocal values = {} for i, id in ipairs(KEYS) do values[i] = deleteTagged(id, ARGV[i]) end return values";
+        $deleted = $this->executeScript($lua, array_keys($deletions), array_values($deletions));
+        if (!\is_array($deleted) || \count($deletions) !== \count($deleted)) {
+            throw new CacheException('Failed to delete items during tag invalidation.');
+        }
+        foreach ($deleted as $result) {
+            if (!\is_int($result) || 0 > $result || 1 < $result) {
+                throw new CacheException('Failed to delete an item during tag invalidation.');
+            }
+        }
+    }
+
+    private function getInvalidationMembers(string $key, object $redis): array
+    {
+        $members = $this->executeScript("return redis.call('SRANDMEMBER', KEYS[1], ".self::INVALIDATION_BATCH_SIZE.')', [$key], [], $redis);
+        if (!\is_array($members) || self::INVALIDATION_BATCH_SIZE < \count($members)) {
+            throw new CacheException('Failed to read tag invalidation members.');
+        }
+        foreach ($members as $member) {
+            if (!\is_string($member)) {
+                throw new CacheException('Invalid tag invalidation member.');
+            }
+        }
+
+        return $members;
+    }
+
+    private function removeInvalidationMembers(string $key, array $members, object $redis): void
+    {
+        $removed = $this->executeScript("return redis.call('SREM', KEYS[1], unpack(ARGV))", [$key], $members, $redis);
+        if (!\is_int($removed) || 0 > $removed || \count($members) < $removed) {
+            throw new CacheException('Failed to remove tag invalidation members.');
+        }
+    }
+
+    private function isSingleServer(): bool
+    {
+        if ($this->redis instanceof \Predis\ClientInterface) {
+            $connection = $this->redis->getConnection();
+            if ($connection instanceof ClusterInterface || $connection instanceof Predis2ClusterInterface) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return $this->redis instanceof \Redis;
+    }
+
+    private function isPacked(object $redis): bool
+    {
+        if ($redis instanceof \Predis\ClientInterface) {
+            return false;
+        }
+        $relay = $redis instanceof Relay || $redis instanceof \Relay\Cluster;
+
+        return array_filter((array) $redis->getOption($relay ? Relay::OPT_SERIALIZER : \Redis::OPT_SERIALIZER)) || array_filter((array) $redis->getOption($relay ? Relay::OPT_COMPRESSION : \Redis::OPT_COMPRESSION));
+    }
+
+    private function getRedisPrefix(object $redis): string
+    {
+        if ($redis instanceof \Predis\ClientInterface) {
+            return $redis->getOptions()->prefix ? $redis->getOptions()->prefix->getPrefix() : '';
+        }
+
+        return $redis->getOption($redis instanceof Relay || $redis instanceof \Relay\Cluster ? Relay::OPT_PREFIX : \Redis::OPT_PREFIX) ?? '';
+    }
+
+    private function getInvalidationKey(string $id, string $suffix, object $redis): string
+    {
+        $prefix = $this->getRedisPrefix($redis);
+        $key = $prefix.$id;
+        $suffix = self::INVALIDATION_PREFIX.$suffix;
+        if (false !== $start = strpos($key, '{')) {
+            if (false !== $end = strpos($key, '}', $start + 1)) {
+                if ($start + 1 !== $end) {
+                    return $id.$suffix;
+                }
+            }
+        }
+
+        // Append two correction bytes to keep RENAME keys in the same Redis Cluster slot.
+        // Redis uses CRC16/XMODEM, which isn't available through hash_algos().
+        $slot = self::crc16($key) & 0x3FFF;
+        $crc = self::crc16($key.$suffix);
+        for ($i = 0; $i < 4; ++$i) {
+            $value = $slot | ($i << 14);
+            for ($j = 0; $j < 16; ++$j) {
+                $value = ($value & 1) ? (($value ^ 0x1021) >> 1) | 0x8000 : $value >> 1;
+            }
+            $bytes = pack('n', $crc ^ $value);
+            if (!str_contains($bytes, '{') && !str_contains($bytes, '}')) {
+                return $id.$suffix.$bytes;
+            }
+        }
+
+        throw new \LogicException('Cannot compute a Redis tag invalidation key.');
+    }
+
+    private static function crc16(string $key): int
+    {
+        $crc = 0;
+        for ($i = 0, $length = \strlen($key); $i < $length; ++$i) {
+            $crc ^= \ord($key[$i]) << 8;
+            for ($j = 0; $j < 8; ++$j) {
+                $crc = (($crc << 1) ^ (($crc & 0x8000) ? 0x1021 : 0)) & 0xFFFF;
+            }
+        }
+
+        return $crc;
     }
 }

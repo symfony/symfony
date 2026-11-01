@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Process large `RedisTagAwareAdapter` tag sets in bounded batches
+
 8.2
 ---
 

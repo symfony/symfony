@@ -159,7 +159,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         $previousDescriber = $document->setDescriber(fn (Type $type, Configuration $config, ?DefinitionParent $parent): array => $this->buildTypeSchema($type, $config, $parent, $document));
 
         try {
-            return $build();
+            return $document->transactional($build);
         } finally {
             $document->setDescriber($previousDescriber);
         }

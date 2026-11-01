@@ -73,7 +73,7 @@ final class SchemaDocument
             throw new LogicException('Types can only be described while a schema is generated in this document.');
         }
 
-        return ($this->describer)($type, $config, $parent);
+        return $this->transactional(fn (): array => ($this->describer)($type, $config, $parent));
     }
 
     /**
@@ -89,6 +89,30 @@ final class SchemaDocument
         $this->describer = $describer;
 
         return $previous;
+    }
+
+    /**
+     * Runs a build in this document and puts the document back as it was when the build throws.
+     *
+     * Otherwise, the definitions reserved by the build would stay empty, and an empty definition accepts any value.
+     *
+     * @internal
+     *
+     * @param \Closure(): array<string, mixed> $build
+     *
+     * @return array<string, mixed>
+     */
+    public function transactional(\Closure $build): array
+    {
+        $state = [$this->dialect, $this->definitions, $this->reservations];
+
+        try {
+            return $build();
+        } catch (\Throwable $e) {
+            [$this->dialect, $this->definitions, $this->reservations] = $state;
+
+            throw $e;
+        }
     }
 
     /**

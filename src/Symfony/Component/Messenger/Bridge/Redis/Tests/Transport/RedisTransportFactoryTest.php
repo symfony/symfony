@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransport;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
@@ -71,6 +72,25 @@ class RedisTransportFactoryTest extends TestCase
                 'redis:?host['.str_replace(' ', ']&host[', getenv('REDIS_SENTINEL_HOSTS')).']',
                 ['sentinel_master' => getenv('REDIS_SENTINEL_SERVICE')],
             ];
+        }
+    }
+
+    public function testOptionsAreNotExposedInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $factory = new RedisTransportFactory();
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            $factory->createTransport('redis://localhost:999999/queue', ['auth' => 's3cr3t', 'lazy' => true], new PhpSerializer());
+            $this->fail('An exception should have been thrown.');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertStringNotContainsString('s3cr3t', json_encode($e->getTrace(), \JSON_THROW_ON_ERROR));
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
         }
     }
 

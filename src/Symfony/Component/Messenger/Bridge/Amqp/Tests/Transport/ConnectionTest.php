@@ -243,6 +243,28 @@ class ConnectionTest extends TestCase
         Connection::fromDsn($dsn, $options);
     }
 
+    public function testCredentialsAreNotExposedInTrace()
+    {
+        if (!class_exists(\SensitiveParameterValue::class)) {
+            $this->markTestSkipped('Sensitive parameter support requires PHP 8.2.');
+        }
+
+        $connection = Connection::fromDsn('amqp://user:s3cr3t@localhost', ['read_timeout' => -1]);
+
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            $connection->channel();
+            $this->fail('An exception should have been thrown.');
+        } catch (\AMQPConnectionException $e) {
+            // ext-amqp does not mark the arguments of its own constructor as sensitive
+            $trace = array_filter($e->getTrace(), static fn ($frame) => \AMQPConnection::class !== ($frame['class'] ?? null));
+
+            $this->assertStringNotContainsString('s3cr3t', json_encode($trace, \JSON_THROW_ON_ERROR));
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
+
     public function testItUsesANormalConnectionByDefault()
     {
         $factory = new TestAmqpFactory(

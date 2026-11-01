@@ -100,7 +100,7 @@ class Connection
     private int $inFlightMessages = 0;
     private int $publishSeqNo = 0;
 
-    public function __construct(array $connectionOptions, array $exchangeOptions, array $queuesOptions, ?AmqpFactory $amqpFactory = null)
+    public function __construct(#[\SensitiveParameter] array $connectionOptions, array $exchangeOptions, array $queuesOptions, ?AmqpFactory $amqpFactory = null)
     {
         if (!\extension_loaded('amqp')) {
             throw new LogicException(\sprintf('You cannot use the "%s" as the "amqp" extension is not installed.', __CLASS__));
@@ -173,7 +173,7 @@ class Connection
      *     * verify: Enable or disable peer verification. If peer verification is enabled then the common name in the
      *       server certificate must match the server name. Peer verification is enabled by default.
      */
-    public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], ?AmqpFactory $amqpFactory = null): self
+    public static function fromDsn(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options = [], ?AmqpFactory $amqpFactory = null): self
     {
         if (false === $params = parse_url($dsn)) {
             // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
@@ -246,7 +246,7 @@ class Connection
         return new self($amqpOptions, $exchangeOptions, $queuesOptions, $amqpFactory);
     }
 
-    private static function validateOptions(array $options): void
+    private static function validateOptions(#[\SensitiveParameter] array $options): void
     {
         if ($invalidOptions = array_diff(array_keys($options), self::AVAILABLE_OPTIONS)) {
             throw new LogicException(\sprintf('Invalid option(s) "%s" passed to the AMQP Messenger transport.', implode('", "', $invalidOptions)));

@@ -56,6 +56,7 @@ CHANGELOG
  * Add the `$limiterName` argument to `LoginThrottlingListener`, which dispatches `RateLimitExceededEvent` when login throttling rejects an attempt
  * Add `#[FirewallListenerOrder]` to declare the firewall listeners a listener runs before or after
  * Add argument `$clock` to `LoginLinkHandler::__construct()` and `SignatureRememberMeHandler::__construct()`, and make `LoginLinkNotification` use the global clock
+ * Add `UserNotFoundPasswordCheckListener`, which hashes the presented password when the user is not found, so that logins with an unknown username cost one password hash
 
 8.1
 ---

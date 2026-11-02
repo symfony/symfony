@@ -328,7 +328,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 continue;
             }
 
-            $extraFiles[] = Path::join(\dirname($sourceFilePath), $path);
+            $extraFiles[] = Path::join(\dirname('/'.$sourceFilePath), $path);
         }
 
         return preg_replace('{/\*# sourceMappingURL=[^ ]*+ \*/}', '', $content);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\ImportMap;
 
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Manages the local storage of remote/vendor importmap packages.
@@ -98,6 +99,6 @@ class RemotePackageStorage
 
     private function getExtraFileDownloadPath(ImportMapEntry $entry, string $extraFilename): string
     {
-        return $this->vendorDir.'/'.$entry->getPackageName().'/'.ltrim($extraFilename, '/');
+        return $this->vendorDir.'/'.$entry->getPackageName().'/'.ltrim(Path::canonicalize('/'.$extraFilename), '/');
     }
 }

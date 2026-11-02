@@ -576,6 +576,46 @@ class JsDelivrEsmResolverTest extends TestCase
         ]);
     }
 
+    public function testDownloadCssFileAtPackageRootWithUrlReferences()
+    {
+        $expectedRequests = [
+            [
+                'url' => '/npm/some-css-package@1.0.0',
+                'body' => '@font-face{src:url("fonts/a.woff2") format("woff2"),url("../b.woff2") format("woff2")}',
+            ],
+            [
+                'url' => '/npm/some-css-package@1.0.0/fonts/a.woff2',
+                'body' => 'a font contents',
+            ],
+            [
+                'url' => '/npm/some-css-package@1.0.0/b.woff2',
+                'body' => 'b font contents',
+            ],
+        ];
+        $responses = [];
+        foreach ($expectedRequests as $expectedRequest) {
+            $responses[] = function ($method, $url) use ($expectedRequest) {
+                $this->assertSame('GET', $method);
+                $this->assertStringEndsWith($expectedRequest['url'], $url);
+
+                return new MockResponse($expectedRequest['body']);
+            };
+        }
+
+        $httpClient = new MockHttpClient($responses);
+
+        $provider = new JsDelivrEsmResolver($httpClient);
+        $actualReturn = $provider->downloadPackages([
+            'some-css-package' => self::createRemoteEntry('some-css-package', version: '1.0.0', type: ImportMapType::CSS),
+        ]);
+        $this->assertSame(\count($responses), $httpClient->getRequestsCount());
+
+        $this->assertSame([
+            '/fonts/a.woff2' => 'a font contents',
+            '/b.woff2' => 'b font contents',
+        ], $actualReturn['some-css-package']['extraFiles']);
+    }
+
     public function testDownloadCssRecursivelyDownloadsUrlCss()
     {
         $expectedRequests = [

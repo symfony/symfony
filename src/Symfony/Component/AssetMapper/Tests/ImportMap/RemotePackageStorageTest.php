@@ -105,6 +105,17 @@ class RemotePackageStorageTest extends TestCase
         $this->assertEquals('any content', file_get_contents($targetPath));
     }
 
+    public function testSaveExtraFileKeepsItInThePackageDirectory()
+    {
+        $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
+        $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
+        $storage->saveExtraFile($entry, '../../extra-file.woff2', 'any content');
+        $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/extra-file.woff2';
+        $this->assertFileExists($targetPath);
+        $this->assertTrue($storage->isExtraFileDownloaded($entry, '../../extra-file.woff2'));
+        $this->assertFileDoesNotExist(self::$writableRoot.'/extra-file.woff2');
+    }
+
     /**
      * @dataProvider getDownloadPathTests
      */

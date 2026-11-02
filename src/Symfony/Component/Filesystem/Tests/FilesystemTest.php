@@ -13,6 +13,8 @@ namespace Symfony\Component\Filesystem\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
@@ -360,6 +362,255 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileDoesNotExist($basePath.'dir');
     }
 
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testRemoveDoesNotDeleteExistingTemporaryDirectories()
+    {
+        require __DIR__.'/Fixtures/remove_collision.php';
+
+        $directory = $this->workspace.'/directory';
+        mkdir($directory);
+        file_put_contents($directory.'/cache', 'cache');
+        $temporaryDirectories = [$this->workspace.'/.AAA'];
+
+        foreach ([2, 8] as $length) {
+            $temporaryDirectories[] = $this->workspace.'/.!'.strrev(strtr(base64_encode(str_repeat("\0", $length)), '/=', '-!'));
+        }
+
+        foreach ($temporaryDirectories as $temporaryDirectory) {
+            mkdir($temporaryDirectory);
+            file_put_contents($temporaryDirectory.'/foreign', 'foreign');
+        }
+
+        $attempts = 0;
+        $GLOBALS['filesystemRemoveCollision'] = static function (int $length) use (&$attempts): string {
+            ++$attempts;
+
+            return str_repeat("\0", $length);
+        };
+
+        try {
+            $this->filesystem->remove($directory);
+        } finally {
+            unset($GLOBALS['filesystemRemoveCollision']);
+        }
+
+        $this->assertDirectoryDoesNotExist($directory);
+        $this->assertSame(10, $attempts);
+
+        foreach ($temporaryDirectories as $temporaryDirectory) {
+            $this->assertStringEqualsFile($temporaryDirectory.'/foreign', 'foreign');
+        }
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testRemoveRetriesTemporaryDirectoryCollisions()
+    {
+        require __DIR__.'/Fixtures/remove_collision.php';
+
+        $directory = $this->workspace.'/directory';
+        $temporaryDirectory = $this->workspace.'/.AAA';
+        mkdir($directory);
+        mkdir($temporaryDirectory);
+        file_put_contents($directory.'/cache', 'cache');
+        file_put_contents($temporaryDirectory.'/foreign', 'foreign');
+        $attempts = 0;
+        $removedDirectory = null;
+        $GLOBALS['filesystemRemoveCollision'] = static function (int $length) use (&$attempts): string {
+            return str_repeat(\chr($attempts++), $length);
+        };
+        $GLOBALS['filesystemRemoveIterator'] = static function (\FilesystemIterator $iterator, bool $preserveKeys) use (&$removedDirectory): array {
+            $removedDirectory ??= $iterator->getPath();
+
+            return iterator_to_array($iterator, $preserveKeys);
+        };
+
+        try {
+            $this->filesystem->remove($directory);
+        } finally {
+            unset($GLOBALS['filesystemRemoveCollision'], $GLOBALS['filesystemRemoveIterator']);
+        }
+
+        $this->assertSame(2, $attempts);
+        $this->assertSame($this->workspace.'/.AQE/d', $removedDirectory);
+        $this->assertDirectoryDoesNotExist($directory);
+        $this->assertDirectoryDoesNotExist($this->workspace.'/.AQE');
+        $this->assertStringEqualsFile($temporaryDirectory.'/foreign', 'foreign');
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testRemoveDoesNotInterfereWithConcurrentRemoval()
+    {
+        require __DIR__.'/Fixtures/remove_collision.php';
+
+        $first = $this->workspace.'/first';
+        $second = $this->workspace.'/second';
+        mkdir($first);
+        mkdir($second);
+        file_put_contents($first.'/first-cache', 'first');
+        file_put_contents($second.'/second-cache', 'second');
+        $phase = 0;
+        $activeDirectory = null;
+        $filesystem = $this->filesystem;
+        $secondRemoval = new \Fiber(static fn () => $filesystem->remove($second));
+        $GLOBALS['filesystemRemoveCollision'] = static fn (int $length): string => str_repeat("\0", $length);
+        $GLOBALS['filesystemRemoveIterator'] = static function (\FilesystemIterator $iterator, bool $preserveKeys) use (&$phase, &$activeDirectory, $secondRemoval): array {
+            if (0 === $phase) {
+                $activeDirectory = $iterator->getPath();
+                $snapshot = iterator_to_array($iterator, $preserveKeys);
+                $phase = 1;
+                $secondRemoval->start();
+
+                return $snapshot;
+            }
+
+            if (1 === $phase && $iterator->getPath() === $activeDirectory && is_file($activeDirectory.'/second-cache')) {
+                $phase = 2;
+                \Fiber::suspend();
+            }
+
+            return iterator_to_array($iterator, $preserveKeys);
+        };
+
+        try {
+            $filesystem->remove($first);
+        } finally {
+            unset($GLOBALS['filesystemRemoveCollision'], $GLOBALS['filesystemRemoveIterator']);
+
+            if ($secondRemoval->isSuspended()) {
+                $secondRemoval->resume();
+            }
+        }
+
+        $this->assertTrue($secondRemoval->isTerminated());
+        $this->assertDirectoryDoesNotExist($first);
+        $this->assertDirectoryDoesNotExist($second);
+        $this->assertCount(0, new \FilesystemIterator($this->workspace));
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testRemoveRestoresDirectoryWhenConcurrentWritePreventsRemoval()
+    {
+        require __DIR__.'/Fixtures/remove_collision.php';
+
+        $directory = $this->workspace.'/directory';
+        mkdir($directory);
+        file_put_contents($directory.'/cache', 'cache');
+        $written = false;
+        $GLOBALS['filesystemRemoveIterator'] = static function (\FilesystemIterator $iterator, bool $preserveKeys) use (&$written): array {
+            $snapshot = iterator_to_array($iterator, $preserveKeys);
+
+            if (!$written) {
+                $written = true;
+                file_put_contents($iterator->getPath().'/concurrent', 'concurrent');
+            }
+
+            return $snapshot;
+        };
+
+        try {
+            $this->filesystem->remove($directory);
+            $this->fail('Expected removal to fail.');
+        } catch (IOException $e) {
+            $this->assertStringContainsString('Failed to remove directory "'.$directory.'": ', $e->getMessage());
+            $this->assertStringEqualsFile($directory.'/concurrent', 'concurrent');
+            $this->assertCount(1, new \FilesystemIterator($this->workspace));
+        } finally {
+            unset($GLOBALS['filesystemRemoveIterator']);
+        }
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testRemoveIgnoresDirectoryRemovedConcurrently()
+    {
+        require __DIR__.'/Fixtures/remove_collision.php';
+
+        $directory = $this->workspace.'/directory';
+        mkdir($directory);
+        $attempts = 0;
+        $GLOBALS['filesystemRemoveRealpath'] = static function (string $path): string|false {
+            if (is_dir($path)) {
+                rmdir($path);
+            }
+
+            return realpath($path);
+        };
+        $GLOBALS['filesystemRemoveCollision'] = static function (int $length) use (&$attempts): string {
+            ++$attempts;
+
+            return random_bytes($length);
+        };
+
+        try {
+            $this->filesystem->remove($directory);
+        } finally {
+            unset($GLOBALS['filesystemRemoveRealpath'], $GLOBALS['filesystemRemoveCollision']);
+        }
+
+        $this->assertSame(0, $attempts);
+        $this->assertCount(0, new \FilesystemIterator($this->workspace));
+    }
+
+    public function testRemoveWithRestrictiveUmask()
+    {
+        $directory = $this->workspace.'/directory';
+        mkdir($directory);
+        file_put_contents($directory.'/cache', 'cache');
+        $umask = umask(0o777);
+
+        try {
+            $this->filesystem->remove($directory);
+        } finally {
+            umask($umask);
+        }
+
+        $this->assertCount(0, new \FilesystemIterator($this->workspace));
+    }
+
+    public function testRemoveTreeWithPathsNearLengthLimit()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows path limits depend on long-path support.');
+        }
+
+        $directory = $this->workspace.'/d';
+        mkdir($directory);
+        $path = $directory;
+        $maxLength = \PHP_MAXPATHLEN - 8;
+
+        while (\strlen($path) < $maxLength - 1) {
+            $path .= '/'.str_repeat('x', min(200, $maxLength - \strlen($path) - 1));
+            mkdir($path);
+        }
+
+        file_put_contents($path.'/f', 'contents');
+        $this->assertGreaterThanOrEqual(\PHP_MAXPATHLEN - 7, \strlen($path.'/f'));
+
+        $this->filesystem->remove($directory);
+
+        $this->assertDirectoryDoesNotExist($directory);
+        $this->assertCount(0, new \FilesystemIterator($this->workspace));
+    }
+
+    public function testRemoveCleansReservationWhenRenameIsDisabled()
+    {
+        $directory = $this->workspace.'/directory';
+        mkdir($directory);
+        file_put_contents($directory.'/cache', 'cache');
+        $finder = new PhpExecutableFinder();
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-ddisable_functions=rename', __DIR__.'/Fixtures/remove_without_rename.php', $directory]));
+        $process->run();
+
+        $this->assertTrue($process->isSuccessful(), $process->getErrorOutput());
+        $this->assertSame('Unable to perform filesystem operation because the "rename()" function has been disabled.'.\PHP_EOL, $process->getOutput());
+        $this->assertStringEqualsFile($directory.'/cache', 'cache');
+        $this->assertCount(1, new \FilesystemIterator($this->workspace));
+    }
+
     public function testRemoveThrowsExceptionOnPermissionDenied()
     {
         $this->markAsSkippedIfChmodIsMissing();
@@ -379,6 +630,51 @@ class FilesystemTest extends FilesystemTestCase
         } finally {
             // Make sure we can clean up this file
             chmod($basePath, 0o777);
+        }
+    }
+
+    public function testRemoveRestoresDirectoryWhenNestedRemovalFails()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $directory = $this->workspace.'/directory';
+        $file = $directory.'/sub/file';
+        mkdir($directory.'/sub', 0o777, true);
+        touch($file);
+        chmod($directory.'/sub', 0o500);
+
+        try {
+            $this->filesystem->remove($directory);
+            $this->fail('Filesystem::remove() should throw an exception');
+        } catch (IOException $e) {
+            $this->assertStringStartsWith('Failed to remove file "'.$file.'": unlink(', $e->getMessage());
+            $this->assertStringEndsWith('): Permission denied', $e->getMessage());
+            $this->assertFileExists($file);
+            $this->assertCount(1, new \FilesystemIterator($this->workspace));
+        } finally {
+            chmod($directory.'/sub', 0o777);
+        }
+    }
+
+    public function testRemoveThrowsExceptionOnUnreadableDirectory()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $directory = $this->workspace.'/directory';
+        mkdir($directory);
+        touch($directory.'/file');
+        chmod($directory, 0o300);
+
+        try {
+            $this->filesystem->remove($directory);
+            $this->fail('Filesystem::remove() should throw an exception');
+        } catch (IOException $e) {
+            $this->assertStringStartsWith('Failed to remove directory "'.$directory.'": FilesystemIterator::__construct(', $e->getMessage());
+            $this->assertStringEndsWith('): Failed to open directory: Permission denied', $e->getMessage());
+            $this->assertFileExists($directory.'/file');
+            $this->assertCount(1, new \FilesystemIterator($this->workspace));
+        } finally {
+            chmod($directory, 0o777);
         }
     }
 

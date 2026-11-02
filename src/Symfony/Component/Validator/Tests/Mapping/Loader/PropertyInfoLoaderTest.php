@@ -347,4 +347,72 @@ class PropertyInfoLoaderTest extends TestCase
         $this->assertCount(2, $classMetadata->getPropertyMetadata('autoMappingExplicitlyEnabled')[0]->getConstraints());
         $this->assertSame(AutoMappingStrategy::ENABLED, $classMetadata->getPropertyMetadata('autoMappingExplicitlyEnabled')[0]->getAutoMappingStrategy());
     }
+
+    public function testTypesAreOnlyExtractedForAutoMappedProperties()
+    {
+        $propertyListExtractor = $this->createStub(PropertyListExtractorInterface::class);
+        $propertyListExtractor
+            ->method('getProperties')
+            ->willReturn(['string', 'autoMappingExplicitlyEnabled'])
+        ;
+
+        $propertyTypeExtractor = new class implements PropertyTypeExtractorInterface {
+            /** @var list<string> */
+            public array $extracted = [];
+
+            public function getType(string $class, string $property, array $context = []): ?Type
+            {
+                $this->extracted[] = $property;
+
+                return Type::string();
+            }
+
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                $this->extracted[] = $property;
+
+                return [new LegacyType('string')];
+            }
+        };
+
+        $propertyAccessExtractor = $this->createStub(PropertyAccessExtractorInterface::class);
+
+        $propertyInfoLoader = new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor);
+        $validator = Validation::createValidatorBuilder()
+            ->enableAttributeMapping()
+            ->addLoader($propertyInfoLoader)
+            ->getValidator()
+        ;
+
+        $validator->getMetadataFor(new PropertyInfoLoaderNoAutoMappingEntity());
+
+        $this->assertSame(['autoMappingExplicitlyEnabled'], $propertyTypeExtractor->extracted);
+    }
+
+    public function testTypeExtractorFailureDoesNotBreakLoadingWithoutAutoMapping()
+    {
+        $propertyListExtractor = $this->createStub(PropertyListExtractorInterface::class);
+        $propertyListExtractor
+            ->method('getProperties')
+            ->willReturn(['nullableString', 'string'])
+        ;
+
+        $propertyTypeExtractor = new class implements PropertyTypeExtractorInterface {
+            public function getType(string $class, string $property, array $context = []): ?Type
+            {
+                throw new \LogicException('The type cannot be extracted.');
+            }
+
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                throw new \LogicException('The type cannot be extracted.');
+            }
+        };
+
+        $propertyAccessExtractor = $this->createStub(PropertyAccessExtractorInterface::class);
+
+        $propertyInfoLoader = new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor);
+
+        $this->assertFalse($propertyInfoLoader->loadClassMetadata(new ClassMetadata(PropertyInfoLoaderEntity::class)));
+    }
 }

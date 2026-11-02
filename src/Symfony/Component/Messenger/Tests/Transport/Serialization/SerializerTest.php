@@ -175,6 +175,27 @@ class SerializerTest extends TestCase
         $this->assertEquals(new DummyMessage('Hello'), $xmlSerializer->decode($xmlSerializer->encode($envelope))->getMessage());
     }
 
+    public function testSerializedMessageStampIsNotUsedWhenTheMessageWasReplaced()
+    {
+        $serializer = new Serializer();
+
+        $envelope = $serializer->decode(['body' => '{"message": "Hello"}', 'headers' => ['type' => DummyMessage::class]]);
+        $stamps = array_merge(...array_values($envelope->all()));
+
+        $this->assertSame('{"message": "Hello"}', $serializer->encode($envelope->with(new ReceivedStamp('transport')))['body']);
+
+        $encoded = $serializer->encode(new Envelope(new DummySymfonySerializerUpcastedMessage('Hello', 'EUR'), $stamps));
+
+        $this->assertSame(DummySymfonySerializerUpcastedMessage::class, $encoded['headers']['type']);
+        $this->assertSame('{"message":"Hello","currency":"EUR"}', $encoded['body']);
+        $this->assertEquals(new DummySymfonySerializerUpcastedMessage('Hello', 'EUR'), $serializer->decode($encoded)->getMessage());
+
+        $encoded = $serializer->encode(new Envelope(new DummyMessage('Bye'), $stamps));
+
+        $this->assertSame('{"message":"Bye"}', $encoded['body']);
+        $this->assertEquals(new DummyMessage('Bye'), $serializer->decode($encoded)->getMessage());
+    }
+
     public function testEncodedIsHavingTheBodyAndTypeHeader()
     {
         $serializer = new Serializer();
@@ -519,6 +540,14 @@ class SerializerTest extends TestCase
 }
 class DummySymfonySerializerNonSendableStamp implements NonSendableStampInterface
 {
+}
+class DummySymfonySerializerUpcastedMessage
+{
+    public function __construct(
+        public string $message,
+        public string $currency,
+    ) {
+    }
 }
 class DummySymfonySerializerInvalidConstructor
 {

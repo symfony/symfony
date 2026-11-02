@@ -69,6 +69,11 @@ final class PhpDocTypeHelper
             $varType = $varType->getActualType();
         }
 
+        if ($this->isIntersection($varType)) {
+            // It's safer to fall back to other extractors here, as resolving intersection types correctly is not easy at the moment
+            return [];
+        }
+
         if ($varType instanceof LegacyScalar || $varType instanceof Scalar) {
             return [
                 new LegacyType(LegacyType::BUILTIN_TYPE_BOOL),
@@ -113,6 +118,10 @@ final class PhpDocTypeHelper
             if ($type instanceof Nullable) {
                 $nullable = true;
                 $type = $type->getActualType();
+            }
+
+            if ($this->isIntersection($type)) {
+                return [];
             }
 
             $varTypes[] = $type;

@@ -499,6 +499,20 @@ class PhpDocExtractorTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
+    public function testIntersectionTypesAreIgnoredLegacy()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
+        $this->assertNull($this->extractor->getTypes(DummyIntersectionType::class, 'objects'));
+        $this->assertNull($this->extractor->getTypes(DummyIntersectionType::class, 'arrayShapes'));
+        $this->assertNull($this->extractor->getTypes(DummyIntersectionType::class, 'nullable'));
+        $this->assertNull($this->extractor->getTypes(DummyIntersectionType::class, 'orNull'));
+        $this->assertNull($this->extractor->getTypes(DummyIntersectionType::class, 'orString'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true)], $this->extractor->getTypes(DummyIntersectionType::class, 'collection'));
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     #[DataProvider('legacyGenericsProvider')]
     public function testGenericsLegacy(string $class, string $property, array $expectedTypes)
     {

@@ -123,10 +123,6 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
             return MessageDecodingFailedException::wrap($encodedEnvelope, $stampFailure->getMessage(), (int) $stampFailure->getCode(), $stampFailure)->with(...$stamps);
         }
 
-        $stamps[] = $serializedMessageStamp = new SerializedMessageStamp($encodedEnvelope['body']);
-        self::$decoders ??= new \WeakMap();
-        self::$decoders[$serializedMessageStamp] = $this;
-
         $serializerStamp = $this->findFirstSerializerStamp($stamps);
 
         $context = $this->context;
@@ -142,6 +138,10 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         } catch (\Throwable $e) {
             return MessageDecodingFailedException::wrap($encodedEnvelope, 'Could not decode message: '.$e->getMessage(), (int) $e->getCode(), $e)->with(...$stamps);
         }
+
+        $stamps[] = $serializedMessageStamp = new SerializedMessageStamp($encodedEnvelope['body']);
+        self::$decoders ??= new \WeakMap();
+        self::$decoders[$serializedMessageStamp] = [$this, \WeakReference::create($message)];
 
         return new Envelope($message, $stamps);
     }
@@ -162,9 +162,13 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
         $serializedMessageStamp = $envelope->last(SerializedMessageStamp::class);
 
-        // the body can be reused only when it is what this serializer would produce
-        if ($serializedMessageStamp && ($decoder = self::$decoders[$serializedMessageStamp] ?? null) && [$decoder->serializer, $decoder->format, $decoder->context] !== [$this->serializer, $this->format, $this->context]) {
-            $serializedMessageStamp = null;
+        // the body can be reused only when it is what this serializer would produce for the decoded message
+        if ($serializedMessageStamp && ($decoded = self::$decoders[$serializedMessageStamp] ?? null)) {
+            [$decoder, $decodedMessage] = $decoded;
+
+            if ($decodedMessage->get() !== $envelope->getMessage() || [$decoder->serializer, $decoder->format, $decoder->context] !== [$this->serializer, $this->format, $this->context]) {
+                $serializedMessageStamp = null;
+            }
         }
 
         // A decode failure keeps the original encoded envelope: re-emit its body as-is

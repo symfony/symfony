@@ -14,10 +14,13 @@ namespace Symfony\Component\TypeInfo\Tests\TypeContext;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyInDifferentNs;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyWithTemplateAndParentInDifferentNs;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyImportingUnresolvableTypeAlias;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyReimportingUnresolvableTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithImportedOnlyTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAliasImport;
@@ -30,6 +33,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplateTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTypeAliasImportedFromInvalidClassName;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUnresolvableTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUses;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUsesWindowsLineEndings;
 use Symfony\Component\TypeInfo\Type;
@@ -236,6 +240,11 @@ class TypeContextFactoryTest extends TestCase
 
         yield [['CustomInt' => Type::int()], DummyWithImportedOnlyTypeAliases::class];
         yield [['AliasWithTemplate' => Type::template('T')], DummyWithTemplateTypeAlias::class];
+
+        // type aliases that cannot be resolved are left out
+        yield [['Name' => Type::string()], DummyWithUnresolvableTypeAlias::class];
+        yield [['Name' => Type::string()], DummyImportingUnresolvableTypeAlias::class];
+        yield [['Name' => Type::string()], DummyReimportingUnresolvableTypeAlias::class];
     }
 
     public function testCollectTypeAliasesWithExtraTypeAliases()
@@ -278,12 +287,15 @@ class TypeContextFactoryTest extends TestCase
         $this->typeContextFactory->createFromClassName(DummyWithInvalidTypeAliasImport::class);
     }
 
-    public function testThrowWhenCannotResolveTypeAlias()
+    public function testLeaveOutTypeAliasThatCannotBeResolved()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cannot resolve "Invalid" type alias.');
+        $typeContext = $this->typeContextFactory->createFromClassName(DummyWithInvalidTypeAlias::class);
 
-        $this->typeContextFactory->createFromClassName(DummyWithInvalidTypeAlias::class);
+        $this->assertSame([], $typeContext->typeAliases);
+
+        $this->expectException(UnsupportedException::class);
+
+        (new StringTypeResolver())->resolve('Invalid', $typeContext);
     }
 
     public function testThrowWhenTypeAliasNotImportedFromValidClassName()
@@ -294,12 +306,9 @@ class TypeContextFactoryTest extends TestCase
         $this->typeContextFactory->createFromClassName(DummyWithTypeAliasImportedFromInvalidClassName::class);
     }
 
-    public function testThrowWhenImportingRecursiveTypeAliases()
+    public function testLeaveOutRecursiveTypeAliases()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cannot resolve "Bar" type alias.');
-
-        $this->typeContextFactory->createFromClassName(DummyWithRecursiveTypeAliases::class)->typeAliases;
+        $this->assertSame([], $this->typeContextFactory->createFromClassName(DummyWithRecursiveTypeAliases::class)->typeAliases);
     }
 
     public function testThrowWhenImportingTypeAliasesCyclically()

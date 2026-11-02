@@ -221,9 +221,18 @@ class StringTypeResolverTest extends TestCase
         yield [Type::union(Type::int(), Type::string()), 'int|string'];
         yield [Type::mixed(), 'int|mixed'];
         yield [Type::mixed(), 'mixed|int'];
+        yield [Type::bool(), 'true|false'];
+        yield [Type::bool(), 'bool|true'];
+        yield [Type::nullable(Type::bool()), 'true|false|null'];
+        yield [Type::union(Type::bool(), Type::float(), Type::int(), Type::string()), 'scalar|false'];
+        yield [Type::object(), \sprintf('object|%s', \DateTime::class)];
+        yield [Type::nullable(Type::object()), \sprintf('%s|object|null', \DateTime::class)];
 
         // intersection
         yield [Type::intersection(Type::object(\DateTime::class), Type::object(\Stringable::class)), \DateTime::class.'&'.\Stringable::class];
+        yield [Type::arrayShape(['limit' => ['type' => Type::int(), 'optional' => true], 'offset' => ['type' => Type::int(), 'optional' => true], 'name' => ['type' => Type::string(), 'optional' => true]]), 'array{limit?: int, offset?: int}&array{name?: string}'];
+        yield [Type::arrayShape(['foo' => Type::int(), 'bar' => Type::string()]), 'array{foo?: int}&array{foo: int, bar: string}'];
+        yield [Type::arrayShape(['foo' => Type::int(), 'bar' => Type::string()], false), 'array{foo: int, ...}&array{bar: string, ...}'];
 
         // DNF
         yield [Type::union(Type::int(), Type::intersection(Type::object(\DateTime::class), Type::object(\Stringable::class))), \sprintf('int|(%s&%s)', \DateTime::class, \Stringable::class)];
@@ -472,6 +481,45 @@ class StringTypeResolverTest extends TestCase
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve('value-of<int>');
+    }
+
+    #[DataProvider('intersectionOfNonObjectTypesDataProvider')]
+    public function testCannotResolveIntersectionOfNonObjectTypes(string $type)
+    {
+        $this->expectException(UnsupportedException::class);
+        $this->resolver->resolve($type);
+    }
+
+    /**
+     * @return iterable<array{0: string}>
+     */
+    public static function intersectionOfNonObjectTypesDataProvider(): iterable
+    {
+        yield ['array{foo: int}&array{foo: string}'];
+        yield ['array{foo: int}&array{bar: string, ...}'];
+        yield ['array{foo: int, ...<string, int>}&array{bar: int, ...}'];
+        yield ['array{foo: int}&array<string, int>'];
+        yield ['int&string'];
+        yield [\sprintf('%s&array{foo: int}', \DateTime::class)];
+        yield [\sprintf('int|(%s&array{foo: int})', \DateTime::class)];
+    }
+
+    #[DataProvider('unionWithStandaloneTypeDataProvider')]
+    public function testCannotResolveUnionWithStandaloneType(string $type)
+    {
+        $this->expectException(UnsupportedException::class);
+        $this->resolver->resolve($type);
+    }
+
+    /**
+     * @return iterable<array{0: string}>
+     */
+    public static function unionWithStandaloneTypeDataProvider(): iterable
+    {
+        yield ['void|int'];
+        yield ['never|int'];
+        yield ['?void'];
+        yield ['?never'];
     }
 
     public function testCannotResolveListWithKeyType()

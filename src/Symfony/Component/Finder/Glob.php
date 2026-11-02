@@ -77,8 +77,8 @@ class Glob
 
             if ($delimiter === $car || '.' === $car || '(' === $car || ')' === $car || '|' === $car || '+' === $car || '^' === $car || '$' === $car) {
                 $regex .= "\\$car";
-            } elseif ('[' === $car && !$escaping && null !== $class = self::bracketExpressionToRegex($glob, $i, $delimiter, $bracketScanEnd)) {
-                $regex .= $class;
+            } elseif ('[' === $car && !$escaping) {
+                $regex .= self::bracketExpressionToRegex($glob, $i, $delimiter, $bracketScanEnd);
             } elseif ('*' === $car) {
                 if ($escaping || $strictWildcardSlash || !str_ends_with($regex, '.*')) {
                     // ".*.*" matches the same as ".*" but backtracks quadratically
@@ -135,16 +135,16 @@ class Glob
     }
 
     /**
-     * Returns null when a "/" comes before the closing "]", and "\[" when no "]" closes the "[" at position $i.
+     * Returns "\[" when no "]" closes the "[" at position $i, or when a "/" comes before the closing "]".
      *
      * $scanEnd is where the last scan stopped without finding a "]": every "[" before that position gets the same result.
      */
-    private static function bracketExpressionToRegex(string $glob, int &$i, string $delimiter, int &$scanEnd): ?string
+    private static function bracketExpressionToRegex(string $glob, int &$i, string $delimiter, int &$scanEnd): string
     {
         $sizeGlob = \strlen($glob);
 
         if ($i < $scanEnd) {
-            return $scanEnd < $sizeGlob ? null : '\\[';
+            return '\\[';
         }
 
         $class = '[';
@@ -159,9 +159,7 @@ class Glob
             }
 
             if ('/' === $car || ('\\' === $car && '/' === ($glob[$j + 1] ?? ''))) {
-                $scanEnd = $j;
-
-                return null;
+                break;
             }
 
             if ('[' === $car && preg_match('/\[:[a-z]++:\]/A', $glob, $m, 0, $j)) {
@@ -178,7 +176,7 @@ class Glob
                 $class .= $car;
             }
         }
-        $scanEnd = $sizeGlob;
+        $scanEnd = $j;
 
         return '\\[';
     }

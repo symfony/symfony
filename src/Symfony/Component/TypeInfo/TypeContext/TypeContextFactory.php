@@ -21,6 +21,7 @@ use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
 use PHPStan\PhpDocParser\ParserConfig;
+use Symfony\Component\TypeInfo\Exception\ExceptionInterface;
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Exception\RuntimeException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
@@ -56,6 +57,11 @@ final class TypeContextFactory
      * @var array<class-string, true>
      */
     private array $collectingTypeAliases = [];
+
+    /**
+     * @var array<class-string, array<string, true>>
+     */
+    private array $unresolvableTypeAliases = [];
 
     private ?Lexer $phpstanLexer = null;
     private ?PhpDocParser $phpstanParser = null;
@@ -309,6 +315,12 @@ final class TypeContextFactory
 
             $typeAlias = $importedFromContext->typeAliases[$tag->value->importedAlias] ?? null;
             if (!$typeAlias) {
+                if (isset($this->unresolvableTypeAliases[$importedFromContext->declaringClassName][$tag->value->importedAlias])) {
+                    $this->unresolvableTypeAliases[$typeContext->declaringClassName][$tag->value->importedAs ?? $tag->value->importedAlias] = true;
+
+                    continue;
+                }
+
                 throw new LogicException(\sprintf('Cannot find any "%s" type alias in "%s".', $tag->value->importedAlias, $importedFromType->getClassName()));
             }
 
@@ -348,23 +360,24 @@ final class TypeContextFactory
         );
 
         $succeeded = false;
-        $lastFailure = null;
-        $lastFailingAlias = null;
 
         foreach ($toResolve as $alias => $type) {
             try {
                 $resolved[$alias] = $this->stringTypeResolver->resolve($type, $typeContext);
                 unset($toResolve[$alias]);
                 $succeeded = true;
-            } catch (UnsupportedException $lastFailure) {
-                $lastFailingAlias = $alias;
+            } catch (ExceptionInterface) {
             }
         }
 
         // nothing has succeeded, the result won't be different from the
-        // previous one, we can stop here.
+        // previous one, so the remaining aliases are left out.
         if (!$succeeded) {
-            throw new LogicException(\sprintf('Cannot resolve "%s" type alias.', $lastFailingAlias), 0, $lastFailure);
+            foreach (array_keys($toResolve) as $alias) {
+                $this->unresolvableTypeAliases[$typeContext->declaringClassName][$alias] = true;
+            }
+
+            return $resolved;
         }
 
         if ($toResolve) {

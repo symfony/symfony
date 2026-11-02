@@ -134,6 +134,37 @@ class UrlHelperTest extends TestCase
         ];
     }
 
+    public function testGenerateAbsoluteUrlWithRequestContextAndBaseUrl()
+    {
+        if (!class_exists(RequestContext::class)) {
+            $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
+        }
+
+        $requestContext = new RequestContext('/app.php', 'GET', 'example.test', 'https', 80, 443, '/foo');
+        $requestContext->setQueryString('a=1');
+
+        $helper = new UrlHelper(new RequestStack(), $requestContext);
+
+        $this->assertSame('https://example.test/app.php/foo?b=2', $helper->getAbsoluteUrl('?b=2'));
+        $this->assertSame('https://example.test/app.php/foo?a=1#hash', $helper->getAbsoluteUrl('#hash'));
+
+        $requestContext->setPathInfo('foo');
+        $this->assertSame('https://example.test/app.php/foo?b=2', $helper->getAbsoluteUrl('?b=2'));
+    }
+
+    public function testGenerateAbsoluteUrlWithQueryAndScriptFileName()
+    {
+        $request = Request::create('http://localhost/index.php/foo?x=1');
+        $request->server->set('SCRIPT_NAME', '/index.php');
+        $request->server->set('SCRIPT_FILENAME', '/var/www/index.php');
+
+        $stack = new RequestStack();
+        $stack->push($request);
+        $helper = new UrlHelper($stack);
+
+        $this->assertSame('http://localhost/index.php/foo?b=2', $helper->getAbsoluteUrl('?b=2'));
+    }
+
     public function testGenerateAbsoluteUrlWithScriptFileName()
     {
         $request = Request::create('http://localhost/app/web/app_dev.php');

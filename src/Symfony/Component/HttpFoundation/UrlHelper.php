@@ -40,7 +40,7 @@ final class UrlHelper
         if ('#' === $path[0]) {
             $path = $request->getRequestUri().$path;
         } elseif ('?' === $path[0]) {
-            $path = $request->getPathInfo().$path;
+            $path = $request->getBaseUrl().$request->getPathInfo().$path;
         }
 
         if (!$path || '/' !== $path[0]) {
@@ -92,6 +92,8 @@ final class UrlHelper
             $port = ':'.$context->getHttpsPort();
         }
 
+        $isCurrentPathReference = str_starts_with($path, '#') || str_starts_with($path, '?');
+
         if ('#' === $path[0]) {
             $queryString = $context->getQueryString();
             $path = $context->getPathInfo().($queryString ? '?'.$queryString : '').$path;
@@ -101,6 +103,8 @@ final class UrlHelper
 
         if ('/' !== $path[0]) {
             $path = rtrim($context->getBaseUrl(), '/').'/'.$path;
+        } elseif ($isCurrentPathReference) {
+            $path = $context->getBaseUrl().$path;
         }
 
         return $scheme.'://'.$host.$port.$path;

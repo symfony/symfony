@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-02T08:09:07Z
+
+I pushed a small update: I removed the `\function_exists('mkdir')` check and its test. `box()` already throws an `IOException` when `mkdir()` is disabled, as it does for `rename()` in this method.

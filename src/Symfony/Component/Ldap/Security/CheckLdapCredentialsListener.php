@@ -16,8 +16,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 use Symfony\Component\Ldap\Exception\InvalidSearchCredentialsException;
 use Symfony\Component\Ldap\LdapInterface;
+use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\LogicException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
@@ -29,8 +33,17 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  */
 class CheckLdapCredentialsListener implements EventSubscriberInterface
 {
+    private PasswordHasherInterface|false $hasher;
+
+    /**
+     * @param PasswordHasherFactoryInterface|null $hasherFactory Hashes the presented password when an LDAP login fails and the LdapBadge uses $ldapUsersOnly,
+     *                                                           so that LDAP users take as long to reject as the users of other providers
+     * @param string                              $userClass     The class whose password hasher is used
+     */
     public function __construct(
         private ContainerInterface $ldapLocator,
+        private ?PasswordHasherFactoryInterface $hasherFactory = null,
+        private string $userClass = PasswordAuthenticatedUserInterface::class,
     ) {
     }
 
@@ -93,6 +106,8 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
                 $query = str_replace('{user_identifier}', $identifier, $ldapBadge->getQueryString());
                 $result = $ldap->query($ldapBadge->getDnString(), $query)->execute();
                 if (1 !== $result->count()) {
+                    $this->hashPassword($ldapBadge, $presentedPassword);
+
                     throw new BadCredentialsException('The presented user identifier is invalid.');
                 }
 
@@ -104,11 +119,38 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
 
             $ldap->bind($dn, $presentedPassword);
         } catch (InvalidCredentialsException) {
+            $this->hashPassword($ldapBadge, $presentedPassword);
+
             throw new BadCredentialsException('The presented password is invalid.');
         }
 
         $passwordCredentials->markResolved();
         $ldapBadge->markResolved();
+    }
+
+    private function hashPassword(LdapBadge $ldapBadge, #[\SensitiveParameter] string $password): void
+    {
+        if (!$ldapBadge->isLdapUsersOnly() || !$this->hasherFactory) {
+            return;
+        }
+
+        if (!isset($this->hasher)) {
+            try {
+                $this->hasher = $this->hasherFactory->getPasswordHasher($this->userClass);
+            } catch (\RuntimeException) {
+                $this->hasher = false;
+            }
+        }
+
+        if (!$this->hasher) {
+            return;
+        }
+
+        try {
+            $this->hasher->hash($password);
+        } catch (InvalidPasswordException) {
+            // the password is too long to be hashed, as when verify() rejects it
+        }
     }
 
     public static function getSubscribedEvents(): array

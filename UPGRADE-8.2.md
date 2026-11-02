@@ -584,6 +584,10 @@ SecurityBundle
        type: service
    ```
  * When `framework.test` is enabled, password hashers use the lowest `cost`, `time_cost` and `memory_cost` that bcrypt and argon2 accept, unless these options are set. Set them explicitly to keep the previous costs in tests
+ * A login with an unknown username now costs one password hash, like a login with a wrong password, unless
+   `expose_security_errors` is `all`. The same applies to a user that has no password. When `expose_security_errors`
+   is `none`, it also applies to a login that the user checker rejects. This hides which usernames exist, but these
+   failed logins now use as much CPU as the others. Use `login_throttling` to limit how many of them a client can send
 
 Serializer
 ----------

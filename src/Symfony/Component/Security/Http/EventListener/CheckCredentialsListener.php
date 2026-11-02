@@ -60,6 +60,13 @@ class CheckCredentialsListener implements EventSubscriberInterface
             }
 
             if (null === $user->getPassword()) {
+                // hash the presented password anyway, so that users without a password take as long to reject as the others
+                try {
+                    $this->hasherFactory->getPasswordHasher($user)->hash($presentedPassword);
+                } catch (\RuntimeException) {
+                    // no hasher is configured for the user, or the password is too long to be hashed
+                }
+
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 

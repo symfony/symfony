@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\Routing\SecurityRouteLoader;
 use Symfony\Bundle\SecurityBundle\Security\TestBrowserAccessTokenAuthenticator;
@@ -54,7 +55,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -68,6 +71,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\FallbackAuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\RedirectAuthenticationEntryPoint;
 use Symfony\Component\Security\Http\Event\CheckRefreshedUserEvent;
+use Symfony\Component\Security\Http\EventListener\UserNotFoundPasswordCheckListener;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretBasic;
 use Symfony\Component\Security\Http\OAuth2\ClientAuthentication\ClientSecretJwt;
@@ -1736,6 +1740,223 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
+    public function testUserNotFoundPasswordCheckListenerIsRegisteredPerFirewall()
+    {
+        $container = $this->getRawContainer();
+        $container->getExtension('security')->addUserProviderFactory(new TestEntityProviderFactory());
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'admins' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]],
+                'customers' => ['entity' => ['class' => 'App\Entity\Customer']],
+            ],
+            'firewalls' => [
+                'admin' => ['pattern' => '^/admin', 'provider' => 'admins', 'http_basic' => true],
+                'main' => ['provider' => 'customers', 'http_basic' => true],
+            ],
+        ]);
+
+        $container->compile();
+
+        foreach (['admin' => InMemoryUser::class, 'main' => 'App\Entity\Customer'] as $firewallName => $userClass) {
+            $listener = $container->getDefinition('security.listener.user_not_found_password_check.'.$firewallName);
+
+            $this->assertSame(UserNotFoundPasswordCheckListener::class, $listener->getClass());
+            $this->assertEquals(new Reference('security.password_hasher_factory'), $listener->getArgument(0));
+            $this->assertSame($userClass, $listener->getArgument(1));
+            $this->assertSame([['dispatcher' => 'security.event_dispatcher.'.$firewallName]], $listener->getTag('kernel.event_subscriber'));
+        }
+    }
+
+    #[DataProvider('provideUserClassesOfTheDefaultProvider')]
+    public function testUserNotFoundPasswordCheckListenerUsesTheUserClassOfTheDefaultProvider(array $providers, array $firewall, string $expectedUserClass)
+    {
+        $container = $this->getRawContainer();
+        $container->getExtension('security')->addUserProviderFactory(new TestEntityProviderFactory());
+
+        $container->loadFromExtension('security', [
+            'providers' => $providers,
+            'firewalls' => ['main' => $firewall],
+        ]);
+
+        $container->compile();
+
+        $this->assertSame($expectedUserClass, $container->getDefinition('security.listener.user_not_found_password_check.main')->getArgument(1));
+    }
+
+    public static function provideUserClassesOfTheDefaultProvider(): iterable
+    {
+        yield 'memory' => [
+            ['default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]]],
+            ['http_basic' => true],
+            InMemoryUser::class,
+        ];
+
+        yield 'entity' => [
+            ['default' => ['entity' => ['class' => 'App\Entity\Customer']]],
+            ['http_basic' => true],
+            'App\Entity\Customer',
+        ];
+
+        yield 'id' => [
+            ['default' => ['id' => 'app.user_provider']],
+            ['http_basic' => true],
+            PasswordAuthenticatedUserInterface::class,
+        ];
+
+        yield 'chain' => [
+            [
+                'default' => ['chain' => ['providers' => ['users', 'customers']]],
+                'users' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]],
+                'customers' => ['entity' => ['class' => 'App\Entity\Customer']],
+            ],
+            ['provider' => 'default', 'http_basic' => true],
+            InMemoryUser::class,
+        ];
+
+        yield 'chain starting with a provider of unknown class' => [
+            [
+                'default' => ['chain' => ['providers' => ['ids', 'customers']]],
+                'ids' => ['id' => 'app.user_provider'],
+                'customers' => ['entity' => ['class' => 'App\Entity\Customer']],
+            ],
+            ['provider' => 'default', 'http_basic' => true],
+            'App\Entity\Customer',
+        ];
+
+        yield 'chain of providers of unknown class' => [
+            [
+                'default' => ['chain' => ['providers' => ['ids']]],
+                'ids' => ['id' => 'app.user_provider'],
+            ],
+            ['provider' => 'default', 'http_basic' => true],
+            PasswordAuthenticatedUserInterface::class,
+        ];
+
+        yield 'no default provider' => [
+            [
+                'users' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]],
+                'customers' => ['entity' => ['class' => 'App\Entity\Customer']],
+            ],
+            ['http_basic' => ['provider' => 'users']],
+            PasswordAuthenticatedUserInterface::class,
+        ];
+    }
+
+    #[TestWith(['none', true])]
+    #[TestWith(['account_status', true])]
+    #[TestWith(['all', false])]
+    public function testUserNotFoundPasswordCheckListenerIsRegisteredUnlessAllSecurityErrorsAreExposed(string $exposeSecurityErrors, bool $registered)
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'expose_security_errors' => $exposeSecurityErrors,
+            'providers' => ['default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]]],
+            'firewalls' => ['main' => ['http_basic' => true]],
+        ]);
+
+        $container->compile();
+
+        $this->assertSame($registered, $container->hasDefinition('security.listener.user_not_found_password_check.main'));
+    }
+
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testLdapUsersOnlyHashesThePasswordOfLdapLogins(bool $ldapUsersOnly)
+    {
+        if (!property_exists(LdapAuthenticator::class, 'ldapUsersOnly')) {
+            $this->markTestSkipped('symfony/ldap 8.2 is required.');
+        }
+
+        $container = $this->getRawContainer();
+        $container->register('Symfony\\Component\\Ldap\\Ldap', Ldap::class)->addTag('ldap');
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'directory' => ['ldap' => ['service' => 'Symfony\\Component\\Ldap\\Ldap', 'base_dn' => 'dc=example,dc=com']],
+                'local' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]],
+                'chain' => ['chain' => ['providers' => ['directory', 'local']]],
+            ],
+            'firewalls' => [
+                'main' => [
+                    'provider' => 'chain',
+                    'form_login_ldap' => [
+                        'service' => 'Symfony\\Component\\Ldap\\Ldap',
+                        'ldap_users_only' => $ldapUsersOnly,
+                    ],
+                ],
+            ],
+        ]);
+        $container->compile();
+
+        $userNotFoundListener = $container->getDefinition('security.listener.user_not_found_password_check.main');
+        $this->assertSame(InMemoryUser::class, $userNotFoundListener->getArgument(1));
+        $this->assertSame($ldapUsersOnly, $userNotFoundListener->getArgument(2));
+        $this->assertSame($ldapUsersOnly, $container->getDefinition('security.listener.user_checker.main')->getArgument(2));
+
+        $ldapListener = $container->getDefinition('security.listener.form_login_ldap.main');
+        if ($ldapUsersOnly) {
+            $this->assertEquals([new Reference('security.ldap_locator'), new Reference('security.password_hasher_factory'), InMemoryUser::class], $ldapListener->getArguments());
+        } else {
+            $this->assertEquals([new Reference('security.ldap_locator')], $ldapListener->getArguments());
+        }
+    }
+
+    public function testLdapUsersOnlyHashesThePasswordInEveryLdapListenerOfTheFirewall()
+    {
+        if (!property_exists(LdapAuthenticator::class, 'ldapUsersOnly')) {
+            $this->markTestSkipped('symfony/ldap 8.2 is required.');
+        }
+
+        $container = $this->getRawContainer();
+        $container->register('Symfony\\Component\\Ldap\\Ldap', Ldap::class)->addTag('ldap');
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'directory' => ['ldap' => ['service' => 'Symfony\\Component\\Ldap\\Ldap', 'base_dn' => 'dc=example,dc=com']],
+                'local' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]],
+                'chain' => ['chain' => ['providers' => ['directory', 'local']]],
+            ],
+            'firewalls' => [
+                'main' => [
+                    'provider' => 'chain',
+                    'entry_point' => 'http_basic_ldap',
+                    'form_login_ldap' => [
+                        'service' => 'Symfony\\Component\\Ldap\\Ldap',
+                        'ldap_users_only' => true,
+                    ],
+                    'http_basic_ldap' => [
+                        'service' => 'Symfony\\Component\\Ldap\\Ldap',
+                    ],
+                ],
+            ],
+        ]);
+        $container->compile();
+
+        // the first LDAP listener of the firewall checks the passports of all its LDAP authenticators
+        $arguments = [new Reference('security.ldap_locator'), new Reference('security.password_hasher_factory'), InMemoryUser::class];
+        $this->assertEquals($arguments, $container->getDefinition('security.listener.form_login_ldap.main')->getArguments());
+        $this->assertEquals($arguments, $container->getDefinition('security.listener.http_basic_ldap.main')->getArguments());
+    }
+
+    #[TestWith(['none', true])]
+    #[TestWith(['account_status', false])]
+    #[TestWith(['all', false])]
+    public function testUserCheckerListenerHashesPasswordsUnlessAccountStatusErrorsAreExposed(string $exposeSecurityErrors, bool $hashes)
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'expose_security_errors' => $exposeSecurityErrors,
+            'providers' => ['default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]]],
+            'firewalls' => ['main' => ['http_basic' => true]],
+        ]);
+
+        $container->compile();
+
+        $hasherFactory = $hashes ? new Reference('security.password_hasher_factory') : null;
+        $this->assertEquals($hasherFactory, $container->getDefinition('security.listener.user_checker.main')->getArgument(1));
+    }
+
     /**
      * A stateful firewall stores the token in the session, so the cookie alone would stand for an
      * access token nobody has to sign for any more.
@@ -2834,5 +3055,27 @@ class TestFirewallListenerFactory implements AuthenticatorFactoryInterface, Fire
 
     public function addConfiguration(NodeDefinition $builder): void
     {
+    }
+}
+
+class TestEntityProviderFactory implements UserProviderFactoryInterface
+{
+    public function create(ContainerBuilder $container, string $id, array $config): void
+    {
+        $container->register($id, UserProviderInterface::class);
+    }
+
+    public function getKey(): string
+    {
+        return 'entity';
+    }
+
+    public function addConfiguration(NodeDefinition $builder): void
+    {
+        $builder
+            ->children()
+                ->scalarNode('class')->isRequired()->end()
+            ->end()
+        ;
     }
 }

@@ -216,6 +216,12 @@ class StringTypeResolverTest extends TestCase
         yield [Type::union(Type::int(), Type::string()), 'int|string'];
         yield [Type::mixed(), 'int|mixed'];
         yield [Type::mixed(), 'mixed|int'];
+        yield [Type::bool(), 'true|false'];
+        yield [Type::bool(), 'bool|true'];
+        yield [Type::nullable(Type::bool()), 'true|false|null'];
+        yield [Type::union(Type::bool(), Type::float(), Type::int(), Type::string()), 'scalar|false'];
+        yield [Type::object(), \sprintf('object|%s', \DateTime::class)];
+        yield [Type::nullable(Type::object()), \sprintf('%s|object|null', \DateTime::class)];
 
         // intersection
         yield [Type::intersection(Type::object(\DateTime::class), Type::object(\Stringable::class)), \DateTime::class.'&'.\Stringable::class];
@@ -485,6 +491,24 @@ class StringTypeResolverTest extends TestCase
         yield ['int&string'];
         yield [\sprintf('%s&array{foo: int}', \DateTime::class)];
         yield [\sprintf('int|(%s&array{foo: int})', \DateTime::class)];
+    }
+
+    #[DataProvider('unionWithStandaloneTypeDataProvider')]
+    public function testCannotResolveUnionWithStandaloneType(string $type)
+    {
+        $this->expectException(UnsupportedException::class);
+        $this->resolver->resolve($type);
+    }
+
+    /**
+     * @return iterable<array{0: string}>
+     */
+    public static function unionWithStandaloneTypeDataProvider(): iterable
+    {
+        yield ['void|int'];
+        yield ['never|int'];
+        yield ['?void'];
+        yield ['?never'];
     }
 
     public function testCannotResolveListWithKeyType()

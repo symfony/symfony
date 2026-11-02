@@ -45,6 +45,7 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -216,7 +217,13 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         if ($node instanceof NullableTypeNode) {
-            return Type::nullable($this->getTypeFromNode($node->type, $typeContext));
+            $type = $this->getTypeFromNode($node->type, $typeContext);
+
+            try {
+                return Type::nullable($type);
+            } catch (InvalidArgumentException $e) {
+                throw new \DomainException($e->getMessage(), previous: $e);
+            }
         }
 
         if ($node instanceof GenericTypeNode) {
@@ -298,6 +305,7 @@ final class StringTypeResolver implements TypeResolverInterface
 
         if ($node instanceof UnionTypeNode) {
             $types = [];
+            $identifiers = [];
 
             foreach ($node->types as $nodeType) {
                 $type = $this->getTypeFromNode($nodeType, $typeContext);
@@ -306,10 +314,29 @@ final class StringTypeResolver implements TypeResolverInterface
                     return Type::mixed();
                 }
 
-                $types[] = $type;
+                foreach ($type instanceof UnionType ? $type->getTypes() : [$type] as $t) {
+                    $types[] = $t;
+
+                    if ($t instanceof BuiltinType) {
+                        $identifiers[$t->getTypeIdentifier()->value] = true;
+                    }
+                }
             }
 
-            return Type::union(...$types);
+            // "true|false" and "bool|true" mean "bool", "object|Foo" means "object"
+            if (isset($identifiers['bool']) || isset($identifiers['true'], $identifiers['false'])) {
+                $types = [Type::bool(), ...array_filter($types, static fn (Type $t): bool => !$t instanceof BuiltinType || !$t->getTypeIdentifier()->isBool())];
+            }
+
+            if (isset($identifiers['object'])) {
+                $types = array_values(array_filter($types, static fn (Type $t): bool => !$t instanceof ObjectType));
+            }
+
+            try {
+                return 1 === \count($types) ? $types[0] : Type::union(...$types);
+            } catch (InvalidArgumentException $e) {
+                throw new \DomainException($e->getMessage(), previous: $e);
+            }
         }
 
         if ($node instanceof IntersectionTypeNode) {

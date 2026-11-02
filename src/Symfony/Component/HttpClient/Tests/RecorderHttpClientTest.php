@@ -344,11 +344,12 @@ class RecorderHttpClientTest extends TestCase
         $this->assertStringNotContainsString('tok', $authHeader['value']);
     }
 
-    public function testRedactsTokenEndpointResponseBodyOnRecord()
+    public function testRedactsTokenEndpointResponseBodyOnRecordAndReplaysIt()
     {
-        $inner = new MockHttpClient(new MockResponse('{"access_token":"tok","token_type":"Bearer"}', [
+        $body = '{"access_token":"a-long-secret-access-token-value","token_type":"Bearer"}';
+        $inner = new MockHttpClient(new MockResponse($body, [
             'http_code' => 200,
-            'response_headers' => ['content-type' => 'application/json'],
+            'response_headers' => ['content-type' => 'application/json', 'content-length' => (string) \strlen($body)],
         ]));
 
         $recorder = new RecorderHttpClient($inner, new RecorderConfiguration(RecorderMode::Record, $this->harFile));
@@ -362,6 +363,22 @@ class RecorderHttpClientTest extends TestCase
 
         $this->assertSame('[REDACTED]', $storedBody['access_token']);
         $this->assertSame('Bearer', $storedBody['token_type']);
+        $this->assertContains(['name' => 'content-length', 'value' => (string) \strlen($entry['response']['content']['text'])], $entry['response']['headers']);
+
+        $replay = new RecorderHttpClient(new MockHttpClient(), new RecorderConfiguration(RecorderMode::Replay, $this->harFile));
+
+        $this->assertSame($storedBody, $replay->request('POST', 'https://example.com/token')->toArray());
+    }
+
+    public function testReplayKeepsTheContentLengthOfAHeadResponse()
+    {
+        $inner = new MockHttpClient(new MockResponse('', ['response_headers' => ['content-length' => '1234']]));
+
+        (new RecorderHttpClient($inner, new RecorderConfiguration(RecorderMode::Record, $this->harFile)))->request('HEAD', 'https://example.com/file.zip')->getContent();
+
+        $replay = new RecorderHttpClient(new MockHttpClient(), new RecorderConfiguration(RecorderMode::Replay, $this->harFile));
+
+        $this->assertSame(['1234'], $replay->request('HEAD', 'https://example.com/file.zip')->getHeaders()['content-length']);
     }
 
     public function testReplayModeDoesNotRecordOnMiss()

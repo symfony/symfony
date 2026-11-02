@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyIntersectionType;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentWithPromotedSelfDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithConstructorOverride;
@@ -443,6 +444,16 @@ class PhpDocExtractorTest extends TestCase
     public function testGenericInterface()
     {
         $this->assertNull($this->extractor->getTypes(Dummy::class, 'genericInterface'));
+    }
+
+    public function testIntersectionTypesAreIgnored()
+    {
+        $this->assertNull($this->extractor->getTypes(DummyIntersectionType::class, 'objects'));
+        $this->assertNull($this->extractor->getTypes(DummyIntersectionType::class, 'arrayShapes'));
+        $this->assertNull($this->extractor->getTypes(DummyIntersectionType::class, 'nullable'));
+        $this->assertNull($this->extractor->getTypes(DummyIntersectionType::class, 'orNull'));
+        $this->assertNull($this->extractor->getTypes(DummyIntersectionType::class, 'orString'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)], $this->extractor->getTypes(DummyIntersectionType::class, 'collection'));
     }
 
     /**

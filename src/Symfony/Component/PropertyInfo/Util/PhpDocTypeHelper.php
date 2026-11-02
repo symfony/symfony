@@ -18,7 +18,9 @@ use phpDocumentor\Reflection\Type as DocType;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Collection;
 use phpDocumentor\Reflection\Types\Compound;
+use phpDocumentor\Reflection\Types\Expression;
 use phpDocumentor\Reflection\Types\Integer;
+use phpDocumentor\Reflection\Types\Intersection;
 use phpDocumentor\Reflection\Types\Mixed_;
 use phpDocumentor\Reflection\Types\Null_;
 use phpDocumentor\Reflection\Types\Nullable;
@@ -56,6 +58,11 @@ final class PhpDocTypeHelper
         if ($varType instanceof Nullable) {
             $nullable = true;
             $varType = $varType->getActualType();
+        }
+
+        if ($this->isIntersection($varType)) {
+            // It's safer to fall back to other extractors here, as resolving intersection types correctly is not easy at the moment
+            return [];
         }
 
         if ($varType instanceof Scalar) {
@@ -102,6 +109,10 @@ final class PhpDocTypeHelper
             if ($type instanceof Nullable) {
                 $nullable = true;
                 $type = $type->getActualType();
+            }
+
+            if ($this->isIntersection($type)) {
+                return [];
             }
 
             $varTypes[] = $type;
@@ -219,5 +230,10 @@ final class PhpDocTypeHelper
         }
 
         return ['object', ltrim($docType, '\\')];
+    }
+
+    private function isIntersection(DocType $type): bool
+    {
+        return $type instanceof Intersection || ($type instanceof Expression && $type->getValueType() instanceof Intersection);
     }
 }

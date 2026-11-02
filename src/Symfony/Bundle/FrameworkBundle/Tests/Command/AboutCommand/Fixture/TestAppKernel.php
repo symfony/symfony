@@ -18,6 +18,8 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class TestAppKernel extends Kernel
 {
+    private static ?string $projectDir = null;
+
     public function registerBundles(): iterable
     {
         return [
@@ -27,7 +29,7 @@ class TestAppKernel extends Kernel
 
     public function getProjectDir(): string
     {
-        return __DIR__.'/test';
+        return self::$projectDir ??= sys_get_temp_dir().'/sf_about_command_'.bin2hex(random_bytes(4));
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader): void

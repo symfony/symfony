@@ -64,11 +64,6 @@ final class PropertyInfoLoader implements LoaderInterface
                 continue;
             }
 
-            $type = $this->typeExtractor->getType($className, $property);
-            if (null === $type) {
-                continue;
-            }
-
             $enabledForProperty = $enabledForClass;
             $hasTypeConstraint = false;
             $hasNotNullConstraint = false;
@@ -98,6 +93,11 @@ final class PropertyInfoLoader implements LoaderInterface
             }
 
             if (!$enabledForProperty) {
+                continue;
+            }
+
+            $type = $this->typeExtractor->getType($className, $property);
+            if (null === $type) {
                 continue;
             }
 

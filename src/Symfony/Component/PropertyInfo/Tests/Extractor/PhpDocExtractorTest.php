@@ -27,6 +27,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyGeneric;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyIntersectionType;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentWithPromotedSelfDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithConstructorOverride;
@@ -506,6 +507,16 @@ class PhpDocExtractorTest extends TestCase
     public function testScalarPseudoType()
     {
         $this->assertEquals(Type::object('scalar'), $this->extractor->getType(PseudoTypeDummy::class, 'scalarPseudoType'));
+    }
+
+    public function testIntersectionTypesAreIgnored()
+    {
+        $this->assertNull($this->extractor->getType(DummyIntersectionType::class, 'objects'));
+        $this->assertNull($this->extractor->getType(DummyIntersectionType::class, 'arrayShapes'));
+        $this->assertNull($this->extractor->getType(DummyIntersectionType::class, 'nullable'));
+        $this->assertNull($this->extractor->getType(DummyIntersectionType::class, 'orNull'));
+        $this->assertNull($this->extractor->getType(DummyIntersectionType::class, 'orString'));
+        $this->assertEquals(Type::array(), $this->extractor->getType(DummyIntersectionType::class, 'collection'));
     }
 
     #[DataProvider('constructorTypesProvider')]

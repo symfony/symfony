@@ -207,6 +207,23 @@ class GlobTest extends TestCase
         $this->assertSame('#^(?=[^\.])[a[]$#', Glob::toRegex('[a[]'));
     }
 
+    public function testGlobToRegexBracketWithSlash()
+    {
+        $this->assertSame(1, preg_match(Glob::toRegex('a[/]b'), 'a[/]b'));
+        $this->assertSame(0, preg_match(Glob::toRegex('a[/]b'), 'a/b'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[/]'), '[/]'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[a/b]'), '[a/b]'));
+        $this->assertSame(1, preg_match(Glob::toRegex('x[y/z]w'), 'x[y/z]w'));
+        $this->assertSame(0, preg_match(Glob::toRegex('x[y/z]w'), 'xzw'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[a[/]'), '[a[/]'));
+
+        $this->assertSame(1, preg_match(Glob::toRegex('[a/b][c]'), '[a/b]c'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[a/b][c]'), '[a/b]d'));
+
+        $this->assertSame(1, preg_match(Glob::toRegex('[*/]x'), '[foo/]x'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[*/]x'), '[foo/bar/]x'));
+    }
+
     public function testGlobToRegexBracketsAfterAnUnclosedOne()
     {
         $this->assertSame('#^(?=[^\.])\[\[:alpha:]$#', Glob::toRegex('[[:alpha:]'));

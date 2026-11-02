@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-02T08:09:42Z
+
+Thanks for the PR! I moved the fix to record time, so the HAR file now stores the length of the redacted body. Dropping Content-Length on replay also removed it from every response of `HarFileResponseFactory`, including HEAD responses, where this header is the useful part.

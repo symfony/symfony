@@ -37,10 +37,20 @@ final class UrlHelper
             return $this->getAbsoluteUrlFromContext($path);
         }
 
-        if ('#' === $path[0]) {
-            $path = $request->getRequestUri().$path;
-        } elseif ('?' === $path[0]) {
-            $path = $request->getBaseUrl().$request->getPathInfo().$path;
+        if ('' === $path || '#' === $path[0] || '?' === $path[0]) {
+            [$requestPath, $queryString] = explode('?', $request->getRequestUri(), 2) + [1 => null];
+            $pathInfo = $request->getPathInfo();
+
+            // the path info of "/index.php" is "/", but the URL has no slash after the base URL
+            if (!str_ends_with($requestPath, $pathInfo)) {
+                $pathInfo = substr($pathInfo, 1);
+            }
+
+            if (null !== $queryString && !str_starts_with($path, '?')) {
+                $path = '?'.$queryString.$path;
+            }
+
+            $path = $request->getBaseUrl().$pathInfo.$path;
         }
 
         if (!$path || '/' !== $path[0]) {
@@ -92,9 +102,9 @@ final class UrlHelper
             $port = ':'.$context->getHttpsPort();
         }
 
-        $isCurrentPathReference = str_starts_with($path, '#') || str_starts_with($path, '?');
+        $isCurrentPathReference = '' === $path || str_starts_with($path, '#') || str_starts_with($path, '?');
 
-        if ('#' === $path[0]) {
+        if ('' === $path || '#' === $path[0]) {
             $queryString = $context->getQueryString();
             $path = $context->getPathInfo().($queryString ? '?'.$queryString : '').$path;
         } elseif ('?' === $path[0]) {

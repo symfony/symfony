@@ -31,11 +31,10 @@ interface SerializerInterface
      * - `body` (string) - the message body
      * - `headers` (string<string>) - a key/value pair of headers
      *
-     * On failure, implementations SHOULD return an Envelope wrapping a
-     * MessageDecodingFailedException instead of throwing, so that the worker
-     * can route the failure through the normal retry/DLQ path. Throwing a
-     * MessageDecodingFailedException is still supported for BC with custom
-     * serializers; transports will wrap the exception as a fallback.
+     * On failure, implementations SHOULD return an Envelope that wraps a MessageDecodingFailedException and contains the stamps they could decode.
+     * The worker needs these stamps to count the retries of the message.
+     * Throwing a MessageDecodingFailedException is still supported for BC, but the stamps of the message are then lost.
+     * In this case, the message is sent to the failure transport without being retried.
      *
      * @param array{body: string, headers?: array<string, string>} $encodedEnvelope
      *

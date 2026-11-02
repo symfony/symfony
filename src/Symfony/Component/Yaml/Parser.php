@@ -29,6 +29,9 @@ class Parser
     public const DEFAULT_MAX_NESTING_LEVEL = 128;
     public const DEFAULT_MAX_ALIASES_FOR_COLLECTIONS = 128;
 
+    // nested blocks that have a longer run of empty or comment lines are read in place instead of being copied at each nesting level
+    private const MAX_COPIED_EMPTY_LINES = 8;
+
     private ?string $filename = null;
     private int $offset = 0;
     private int $numberOfParsedLines = 0;
@@ -41,6 +44,12 @@ class Parser
     private array $locallySkippedLineNumbers = [];
     private array $refsBeingParsed = [];
     private ?ParserState $state = null;
+    private ?array $nextLineNumbers = null;
+    private int $linesOffset = 0;
+    private int $linesIndentation = 0;
+    private ?array $linesIndentations = null;
+    private array $replacedLines = [];
+    private array $commentIndentations = [];
 
     public function __construct(int $maxNestingLevel = self::DEFAULT_MAX_NESTING_LEVEL, int $maxAliasesForCollections = self::DEFAULT_MAX_ALIASES_FOR_COLLECTIONS)
     {
@@ -114,6 +123,7 @@ class Parser
             $this->skippedLineNumbers = [];
             $this->locallySkippedLineNumbers = [];
             $this->totalNumberOfLines = null;
+            $this->nextLineNumbers = null;
             $state->reset();
         }
 
@@ -125,13 +135,26 @@ class Parser
         return $this->state ??= new ParserState();
     }
 
-    private function doParse(string $value, int $flags): mixed
+    private function doParse(string|array $value, int $flags): mixed
     {
         $this->currentLineNb = -1;
         $this->currentLine = '';
-        $value = $this->cleanup($value, $hasContentOnStartMarkerLine);
-        $this->lines = explode("\n", $value);
-        $this->numberOfParsedLines = \count($this->lines);
+
+        if (\is_array($value)) {
+            $this->readBlock($value);
+            $hasContentOnStartMarkerLine = false;
+            $value = fn () => implode("\n", $this->getLines());
+        } else {
+            $value = $this->cleanup($value, $hasContentOnStartMarkerLine);
+            $this->lines = explode("\n", $value);
+            $this->numberOfParsedLines = \count($this->lines);
+
+            // copying the empty lines at each nesting level is cheap when there are few lines or few levels
+            if (null === $this->totalNumberOfLines && $this->numberOfParsedLines * $this->getState()->maxNestingLevel > self::MAX_COPIED_EMPTY_LINES * self::DEFAULT_MAX_NESTING_LEVEL ** 2) {
+                $this->indexLines();
+            }
+        }
+
         $this->locallySkippedLineNumbers = [];
         $this->totalNumberOfLines ??= $this->numberOfParsedLines;
 
@@ -206,7 +229,7 @@ class Parser
 
                     // keep trailing empty lines, they can be part of a block scalar
                     if ($currentLineNumber !== $this->getRealCurrentLineNb()) {
-                        $sequenceYaml .= "\n".$embedBlock;
+                        $sequenceYaml = $this->prependLine($sequenceYaml, $embedBlock);
                     }
 
                     $data[] = $this->parseBlock($currentLineNumber, $sequenceYaml, $flags);
@@ -224,14 +247,14 @@ class Parser
                         isset($values['leadspaces'])
                         && (
                             '!' === $values['value'][0]
-                            || self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->trimTag($values['value']), $matches)
+                            || self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[](?:[^ :]++| ++(?!:(?:\s|$))|:(?!\s|$))*+) *+\:(\s++(?P<value>(?:\s*+\S)++))?\s*+$#u', $this->trimTag($values['value']), $matches)
                         )
                     ) {
                         $currentLineNumber = $this->getRealCurrentLineNb();
 
                         $block = $values['value'];
                         if ($this->isNextLineIndented() || $this->isNextLineInBlockScalar($block)) {
-                            $block .= "\n".$this->getNextEmbedBlock($this->getCurrentLineIndentation() + \strlen($values['leadspaces']) + 1);
+                            $block = $this->prependLine($block, $this->getNextEmbedBlock($this->getCurrentLineIndentation() + \strlen($values['leadspaces']) + 1));
                         }
 
                         $data[] = $this->parseBlock($currentLineNumber, $block, $flags);
@@ -239,13 +262,13 @@ class Parser
                         $data[] = $this->parseValue($values['value'], $flags, $context);
                     }
                 }
-                if ($isRef) {
+                if (false !== $isRef) {
                     $this->refs[$isRef] = end($data);
                     array_pop($this->refsBeingParsed);
                 }
             } elseif (
                 // @todo in 7.0 remove legacy "(?:!?!php/const:)?"
-                self::preg_match('#^(?P<key>(?:![^\s]++\s++)?(?:'.Inline::REGEX_QUOTED_STRING.'|(?:!?!php/const:)?[^ \'"\[\{!].*?)|![^\s]++(?= +\:)) *\:(( |\t)++(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
+                self::preg_match('#^(?P<key>(?:![^\s]++\s++)?(?:'.Inline::REGEX_QUOTED_STRING.'|(?:!?!php/const:)?[^ \'"\[\{!](?:[^ :]++| ++(?!:(?:[ \t]|$))|:(?![ \t]|$))*+)|![^\s]++(?= +\:)) *+\:(( |\t)++(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
                 && (!str_contains($values['key'], ' #') || \in_array($values['key'][0], ['"', "'"]))
             ) {
                 if (str_starts_with($values['key'], '!php/const:')) {
@@ -297,7 +320,7 @@ class Parser
                         $refName = substr(rtrim($values['value']), 1);
 
                         // remove comments
-                        if (self::preg_match('/[ \t]+#/', $refName, $match, \PREG_OFFSET_CAPTURE)) {
+                        if (self::preg_match('/(?<![ \t])[ \t]++#/', $refName, $match, \PREG_OFFSET_CAPTURE)) {
                             $refName = substr($refName, 0, $match[0][1]);
                         }
 
@@ -332,6 +355,11 @@ class Parser
                         }
                         $parsed = $this->parseBlock($currentLineNumber + 1, $value, $flags);
 
+                        if (\is_array($value)) {
+                            $block = $value;
+                            $value = fn () => $this->getBlockText($block);
+                        }
+
                         if (Yaml::PARSE_OBJECT_FOR_MAP & $flags && $parsed instanceof \stdClass) {
                             $parsed = (array) $parsed;
                         }
@@ -340,7 +368,7 @@ class Parser
                             throw new ParseException('YAML merge keys used with a scalar value instead of an array.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
                         }
 
-                        if (self::preg_match('/^(?:[ \t]*+(?:#.*+)?\n)*+[ \t]*+(?:\[|-(?:\s|$))/', $value)) {
+                        if (self::preg_match('/^(?:[ \t]*+(?:#.*+)?\n)*+[ \t]*+(?:\[|-(?:\s|$))/', $value instanceof \Closure ? $this->getBlockText($block, true) : $value)) {
                             // If the value associated with the merge key is a sequence, then this sequence is expected to contain mapping nodes
                             // and each of these nodes is merged in turn according to its order in the sequence. Keys in mapping nodes earlier
                             // in the sequence override keys specified in later mapping nodes.
@@ -419,7 +447,7 @@ class Parser
                         throw new ParseException(\sprintf('Duplicate key "%s" detected.', $key), $this->getRealCurrentLineNb() + 1, $this->currentLine);
                     }
                 }
-                if ($isRef) {
+                if (false !== $isRef) {
                     $this->refs[$isRef] = $data[$key];
                     array_pop($this->refsBeingParsed);
                 }
@@ -483,10 +511,14 @@ class Parser
                     throw new ParseException('Complex mappings are not supported.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
                 }
 
+                if ($value instanceof \Closure) {
+                    $value = $value();
+                }
+
                 // 1-liner optionally followed by newline(s)
-                if (\is_string($value) && $this->lines[0] === trim($value)) {
+                if (\is_string($value) && $this->getLine(0) === trim($value)) {
                     try {
-                        $value = Inline::parse($this->lines[0], $flags, $this->refs, $this->state);
+                        $value = Inline::parse($this->getLine(0), $flags, $this->refs, $this->state);
                     } catch (ParseException $e) {
                         $e->setParsedLine($this->getRealCurrentLineNb() + 1);
                         $e->setSnippet($this->currentLine);
@@ -503,7 +535,7 @@ class Parser
                     $previousLineWasTerminatedWithBackslash = false;
                     $value = '';
 
-                    foreach ($this->lines as $line) {
+                    foreach ($this->getLines() as $line) {
                         $trimmedLine = trim($line);
                         if ('#' === ($trimmedLine[0] ?? '')) {
                             continue;
@@ -569,7 +601,7 @@ class Parser
         return empty($data) ? null : $data;
     }
 
-    private function parseBlock(int $offset, string $yaml, int $flags): mixed
+    private function parseBlock(int $offset, string|array $yaml, int $flags): mixed
     {
         $skippedLineNumbers = $this->skippedLineNumbers;
 
@@ -588,6 +620,11 @@ class Parser
         $parser->refs = &$this->refs;
         $parser->refsBeingParsed = $this->refsBeingParsed;
         $parser->state = $this->state;
+
+        if (\is_array($yaml)) {
+            $parser->lines = $this->lines;
+            $parser->nextLineNumbers = $this->nextLineNumbers;
+        }
 
         $this->getState()->enterNestingLevel($offset + 1, $this->currentLine, $this->filename);
 
@@ -630,18 +667,23 @@ class Parser
     /**
      * Returns the next embed block of YAML.
      *
+     * A block that contains many empty or comment lines is returned as an array
+     * that describes the lines to read in place.
+     *
      * @param int|null $indentation The indent level at which the block is to be read, or null for default
      * @param bool     $inSequence  True if the enclosing data structure is a sequence
      *
      * @throws ParseException When indentation problem are detected
      */
-    private function getNextEmbedBlock(?int $indentation = null, bool $inSequence = false): string
+    private function getNextEmbedBlock(?int $indentation = null, bool $inSequence = false): string|array
     {
         $oldLineIndentation = $this->getCurrentLineIndentation();
 
         if (!$this->moveToNextLine()) {
             return '';
         }
+
+        $nextContentLine = null;
 
         if (null === $indentation) {
             $newIndent = null;
@@ -659,6 +701,7 @@ class Parser
                     }
                 } else {
                     $newIndent = $this->getCurrentLineIndentation();
+                    $nextContentLine = substr($this->currentLine, $newIndent);
                 }
             } while (!$EOF && null === $newIndent);
 
@@ -687,7 +730,9 @@ class Parser
             return '';
         }
 
-        if ($inSequence && $oldLineIndentation === $newIndent && isset($data[0][0]) && '-' === $data[0][0]) {
+        $nextContentLine = $nextContentLine ?? $data[0];
+
+        if ($inSequence && $oldLineIndentation === $newIndent && isset($nextContentLine[0]) && '-' === $nextContentLine[0]) {
             // the previous line contained a dash but no item content, this line is a sequence item with the same indentation
             // and therefore no nested list or mapping
             $this->moveToPreviousLine();
@@ -697,11 +742,31 @@ class Parser
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
         $isItComment = $this->isCurrentLineComment();
+        $firstLineNumber = $this->currentLineNb;
+        $inPlace = false;
 
         while ($this->moveToNextLine()) {
             if ($isItComment && !$isItUnindentedCollection) {
                 $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
                 $isItComment = $this->isCurrentLineComment();
+            }
+
+            if (null !== $this->nextLineNumbers) {
+                $lineNumber = $this->nextLineNumbers[$this->linesOffset + $this->currentLineNb];
+
+                // when the block starts with comments, skip only them, so that the next line is checked above
+                if (!$isItComment) {
+                    $lineNumber = $this->nextLineNumbers[$lineNumber];
+                }
+
+                if (self::MAX_COPIED_EMPTY_LINES < ($lineNumber = min($lineNumber - $this->linesOffset, $this->numberOfParsedLines)) - $this->currentLineNb) {
+                    // skip a long run of empty and comment lines, the block will be read in place instead of copying them
+                    $inPlace = true;
+                    $this->currentLineNb = $lineNumber - 1;
+                    $this->currentLine = $this->getLine($this->currentLineNb);
+
+                    continue;
+                }
             }
 
             $indent = $this->getCurrentLineIndentation();
@@ -729,12 +794,253 @@ class Parser
             }
         }
 
+        if ($inPlace) {
+            return $this->createBlock($firstLineNumber, $this->currentLineNb, $newIndent ?? 0, $data[0]);
+        }
+
         return implode("\n", $data);
+    }
+
+    /**
+     * Returns a line of a nested block as getNextEmbedBlock() reads it.
+     */
+    private function getBlockLine(string $line, ?int $indentation): string
+    {
+        if ('' === trim($line, ' ') || \strlen($line) - \strlen(ltrim($line, ' ')) >= $indentation) {
+            return (string) substr($line, $indentation ?? 0);
+        }
+
+        // a comment line that is less indented than the block is kept as is
+        return $line;
+    }
+
+    /**
+     * Describes the lines of a nested block, so that they are read in place.
+     */
+    private function createBlock(int $firstLineNumber, int $lastLineNumber, int $indentation, string $firstLine): array
+    {
+        $lines = [$firstLine];
+
+        if ($firstLineNumber < $lastLineNumber && isset($this->replacedLines[$lastLineNumber])) {
+            $lines[$lastLineNumber - $firstLineNumber] = $this->getBlockLine($this->replacedLines[$lastLineNumber], $indentation);
+        }
+
+        return [
+            'offset' => $this->linesOffset + $firstLineNumber,
+            'count' => $lastLineNumber - $firstLineNumber + 1,
+            'indentation' => $this->linesIndentation + $indentation,
+            'indentations' => array_merge($this->linesIndentations ?? [], [$indentation]),
+            'lines' => $lines,
+        ];
+    }
+
+    private function prependLine(string $line, string|array $block): string|array
+    {
+        if (\is_string($block)) {
+            return $line."\n".$block;
+        }
+
+        $lines = [$line];
+
+        foreach ($block['lines'] as $lineNumber => $replacedLine) {
+            $lines[$lineNumber + 1] = $replacedLine;
+        }
+
+        --$block['offset'];
+        ++$block['count'];
+        $block['lines'] = $lines;
+
+        return $block;
+    }
+
+    private function useBlock(array $block): void
+    {
+        $this->linesOffset = $block['offset'];
+        $this->numberOfParsedLines = $block['count'];
+        $this->linesIndentation = $block['indentation'];
+        $this->linesIndentations = $block['indentations'];
+        $this->replacedLines = $block['lines'];
+    }
+
+    /**
+     * Reads a nested block in place, as cleanup() would have left it.
+     */
+    private function readBlock(array $block): void
+    {
+        $this->useBlock($block);
+
+        // remove the YAML header, and the comments and empty lines before the content
+        $hasYamlHeader = false;
+
+        for ($lineNumber = 0; $lineNumber < $this->numberOfParsedLines - 1; ++$lineNumber) {
+            if ($lineNumber < $nextLineNumber = min($this->getNextContentLineNumber($lineNumber), $this->numberOfParsedLines - 1)) {
+                $lineNumber = $nextLineNumber - 1;
+
+                continue;
+            }
+
+            $line = $this->getLine($lineNumber);
+
+            if (!self::preg_match('/^[ \t]*+(?:#.*+)?+$/', $line) && ($hasYamlHeader || !$hasYamlHeader = (bool) self::preg_match('#^%YAML[: ][\d.]++#', $line))) {
+                break;
+            }
+        }
+
+        $this->skipLines($lineNumber);
+    }
+
+    private function skipLines(int $count): void
+    {
+        if (0 === $count) {
+            return;
+        }
+
+        $this->offset += $count;
+        $this->linesOffset += $count;
+        $this->numberOfParsedLines -= $count;
+        $replacedLines = [];
+
+        foreach ($this->replacedLines as $lineNumber => $line) {
+            if ($lineNumber >= $count) {
+                $replacedLines[$lineNumber - $count] = $line;
+            }
+        }
+
+        $this->replacedLines = $replacedLines;
+    }
+
+    /**
+     * Returns the text of a nested block, or only its first line that is neither empty nor a comment.
+     */
+    private function getBlockText(array $block, bool $firstContentLineOnly = false): string
+    {
+        $parser = new self();
+        $parser->lines = $this->lines;
+        $parser->nextLineNumbers = $this->nextLineNumbers;
+        $parser->useBlock($block);
+
+        if (!$firstContentLineOnly) {
+            return implode("\n", $parser->getLines());
+        }
+
+        $lineNumber = 0;
+
+        while ($lineNumber < $parser->numberOfParsedLines - 1) {
+            $lineNumber = min($parser->getNextContentLineNumber($lineNumber), $parser->numberOfParsedLines - 1);
+
+            if ($lineNumber === $parser->numberOfParsedLines - 1 || !self::preg_match('/^[ \t]*+(?:#.*+)?$/', $parser->getLine($lineNumber))) {
+                break;
+            }
+
+            ++$lineNumber;
+        }
+
+        return $parser->getLine($lineNumber);
+    }
+
+    /**
+     * Indexes the blank and comment lines, so that nested blocks can skip them.
+     *
+     * A comment line points to the next line that is not a comment, any other line to the next content line.
+     */
+    private function indexLines(): void
+    {
+        $this->nextLineNumbers = array_fill(0, $this->numberOfParsedLines + 1, $this->numberOfParsedLines);
+        $nextContentLineNumber = $nextNonCommentLineNumber = $this->numberOfParsedLines;
+
+        for ($lineNumber = $this->numberOfParsedLines - 1; 0 <= $lineNumber; --$lineNumber) {
+            $line = ltrim($this->lines[$lineNumber], ' ');
+
+            if ('' === $line) {
+                $this->nextLineNumbers[$lineNumber] = $nextContentLineNumber;
+                $nextNonCommentLineNumber = $lineNumber;
+            } elseif ('#' === $line[0]) {
+                $this->nextLineNumbers[$lineNumber] = $nextNonCommentLineNumber;
+            } else {
+                $this->nextLineNumbers[$lineNumber] = $nextContentLineNumber = $nextNonCommentLineNumber = $lineNumber;
+            }
+        }
+    }
+
+    /**
+     * Returns the number of the first line from the given one that is neither empty nor a comment.
+     */
+    private function getNextContentLineNumber(int $lineNumber): int
+    {
+        while ($lineNumber < $this->numberOfParsedLines) {
+            if (null !== $this->nextLineNumbers && !isset($this->replacedLines[$lineNumber])) {
+                $lineNumber = $this->nextLineNumbers[$this->nextLineNumbers[$this->linesOffset + $lineNumber]] - $this->linesOffset;
+
+                if ($lineNumber >= $this->numberOfParsedLines) {
+                    break;
+                }
+            }
+
+            $line = ltrim($this->getLine($lineNumber), ' ');
+
+            if ('' !== $line && '#' !== $line[0]) {
+                return $lineNumber;
+            }
+
+            ++$lineNumber;
+        }
+
+        return $this->numberOfParsedLines;
+    }
+
+    private function getLine(int $lineNumber): string
+    {
+        if (null === $this->linesIndentations) {
+            return $this->lines[$lineNumber];
+        }
+
+        if (isset($this->replacedLines[$lineNumber])) {
+            return $this->replacedLines[$lineNumber];
+        }
+
+        $line = $this->lines[$this->linesOffset + $lineNumber];
+        $indentation = strspn($line, ' ');
+
+        if ($indentation >= $this->linesIndentation) {
+            return substr($line, $this->linesIndentation);
+        }
+
+        if (!isset($line[$indentation])) {
+            return '';
+        }
+
+        // a comment line that is less indented than a block is kept as is by that block
+        if (!isset($this->commentIndentations[$indentation])) {
+            $this->commentIndentations[$indentation] = 0;
+
+            foreach ($this->linesIndentations as $blockIndentation) {
+                if ($indentation - $this->commentIndentations[$indentation] >= $blockIndentation) {
+                    $this->commentIndentations[$indentation] += $blockIndentation;
+                }
+            }
+        }
+
+        return substr($line, $this->commentIndentations[$indentation]);
+    }
+
+    private function getLines(): array
+    {
+        if (null === $this->linesIndentations) {
+            return $this->lines;
+        }
+
+        $lines = [];
+
+        for ($lineNumber = 0; $lineNumber < $this->numberOfParsedLines; ++$lineNumber) {
+            $lines[] = $this->getLine($lineNumber);
+        }
+
+        return $lines;
     }
 
     private function hasMoreLines(): bool
     {
-        return (\count($this->lines) - 1) > $this->currentLineNb;
+        return $this->numberOfParsedLines - 1 > $this->currentLineNb;
     }
 
     /**
@@ -746,7 +1052,7 @@ class Parser
             return false;
         }
 
-        $this->currentLine = $this->lines[++$this->currentLineNb];
+        $this->currentLine = null === $this->linesIndentations ? $this->lines[++$this->currentLineNb] : $this->getLine(++$this->currentLineNb);
 
         return true;
     }
@@ -760,7 +1066,7 @@ class Parser
             return false;
         }
 
-        $this->currentLine = $this->lines[--$this->currentLineNb];
+        $this->currentLine = null === $this->linesIndentations ? $this->lines[--$this->currentLineNb] : $this->getLine(--$this->currentLineNb);
 
         return true;
     }
@@ -780,7 +1086,7 @@ class Parser
             $value = substr($value, 1);
 
             // remove comments
-            if (self::preg_match('/[ \t]+#/', $value, $match, \PREG_OFFSET_CAPTURE)) {
+            if (self::preg_match('/(?<![ \t])[ \t]++#/', $value, $match, \PREG_OFFSET_CAPTURE)) {
                 $value = substr($value, 0, $match[0][1]);
             }
 
@@ -997,10 +1303,10 @@ class Parser
         }
 
         // deal with trailing newlines
-        if ('' === $chomping) {
-            $text = preg_replace('/\n+$/', "\n", $text);
+        if ('' === $chomping && str_ends_with($text, "\n")) {
+            $text = rtrim($text, "\n")."\n";
         } elseif ('-' === $chomping) {
-            $text = preg_replace('/\n+$/', '', $text);
+            $text = rtrim($text, "\n");
         }
 
         return $text;
@@ -1104,11 +1410,11 @@ class Parser
      */
     private function isNextLineInBlockScalar(string $value): bool
     {
-        if (!isset($this->lines[$this->currentLineNb + 1]) || !self::preg_match('/:[ \t]+(?:'.self::TAG_PATTERN.'[ \t]+)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value)) {
+        if ($this->currentLineNb + 1 >= $this->numberOfParsedLines || !self::preg_match('/:[ \t]+(?:'.self::TAG_PATTERN.'[ \t]+)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value)) {
             return false;
         }
 
-        $nextLine = $this->lines[$this->currentLineNb + 1];
+        $nextLine = $this->getLine($this->currentLineNb + 1);
 
         return '' === trim($nextLine, ' ') || strspn($nextLine, ' ') > $this->getCurrentLineIndentation();
     }
@@ -1201,7 +1507,7 @@ class Parser
 
     private function getLineTag(string $value, int $flags, bool $nextLineCheck = true): ?string
     {
-        if ('' === $value || '!' !== $value[0] || 1 !== self::preg_match('/^'.self::TAG_PATTERN.' *( +#.*)?$/', $value, $matches)) {
+        if ('' === $value || '!' !== $value[0] || 1 !== self::preg_match('/^'.self::TAG_PATTERN.'(?: ++(?:#.*+)?+)?+$/', $value, $matches)) {
             return null;
         }
 

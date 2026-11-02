@@ -290,11 +290,11 @@ class Inline
             $output = self::parseQuotedScalar($scalar, $i);
 
             if (null !== $delimiters) {
-                $tmp = ltrim(substr($scalar, $i), " \n");
-                if ('' === $tmp) {
+                $j = $i + strspn($scalar, " \n", $i);
+                if (!isset($scalar[$j])) {
                     throw new ParseException(\sprintf('Unexpected end of line, expected one of "%s".', implode('', $delimiters)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                 }
-                if (!\in_array($tmp[0], $delimiters)) {
+                if (!\in_array($scalar[$j], $delimiters)) {
                     throw new ParseException(\sprintf('Unexpected characters (%s).', substr($scalar, $i)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                 }
             }
@@ -307,10 +307,20 @@ class Inline
                 $i += \strlen($output);
 
                 // remove comments
-                if (Parser::preg_match('/[ \t]+#/', $output, $match, \PREG_OFFSET_CAPTURE)) {
+                if (Parser::preg_match('/(?<![ \t])[ \t]++#/', $output, $match, \PREG_OFFSET_CAPTURE)) {
                     $output = substr($output, 0, $match[0][1]);
                 }
-            } elseif (Parser::preg_match('/^(.*?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
+            } elseif (\strlen($characters = implode('', $delimiters)) === \count($delimiters)) {
+                // the scalar ends at the first delimiter, which must come before any new line
+                $length = strcspn($scalar, $characters."\n", $i);
+
+                if (!isset($scalar[$i + $length]) || !str_contains($characters, $scalar[$i + $length])) {
+                    throw new ParseException(\sprintf('Malformed inline YAML string: "%s".', $scalar), self::$parsedLineNumber + 1, null, self::$parsedFilename);
+                }
+
+                $output = trim(substr($scalar, $i, $length));
+                $i += $length;
+            } elseif (Parser::preg_match('/(.*?)('.implode('|', $delimiters).')/A', $scalar, $match, 0, $i)) {
                 $output = $match[1];
                 $i += \strlen($output);
                 $output = trim($output);
@@ -339,7 +349,7 @@ class Inline
      */
     private static function parseQuotedScalar(string $scalar, int &$i = 0): string
     {
-        if (!Parser::preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
+        if (!Parser::preg_match('/'.self::REGEX_QUOTED_STRING.'/A', $scalar, $match, 0, $i)) {
             throw new ParseException(\sprintf('Malformed inline YAML string: "%s".', substr($scalar, $i)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
         }
 
@@ -421,40 +431,23 @@ class Inline
                         break;
                     default:
                         // a !php/const or !php/enum key of an embedded mapping is evaluated by parseMapping()
-                        $evaluate = null === $tag && !Parser::preg_match('/!php\/(?:const|enum) [^ ,\]]+?(?<!:): +[^ ,\]]/A', substr($sequence, $i));
+                        $evaluate = null === $tag && !Parser::preg_match('/!php\/(?:const|enum) [^ ,\]]+?(?<!:): +[^ ,\]]/A', substr($sequence, $i, strcspn($sequence, ',]', $i)));
+                        $offset = $i;
                         $value = self::parseScalar($sequence, $flags, [',', ']'], $i, $evaluate, $references, $isQuoted, $state);
 
                         // the value can be an array if a reference has been resolved to an array var
                         if (\is_string($value) && !$isQuoted && str_contains($value, ': ')) {
-                            // embedded mapping?
-                            $j = $i;
-                            $mappingValue = $value;
-                            $mappingException = null;
-                            do {
-                                try {
-                                    $pos = 0;
-                                    $value = self::parseMapping($state, '{'.$mappingValue.'}', $flags, $pos, $references);
-                                    $i = $j;
-                                    $mappingException = null;
-                                    break;
-                                } catch (ParseException $exception) {
-                                    $mappingException = $exception;
-                                    if ($j >= $len) {
-                                        break;
-                                    }
+                            // embedded mapping, whose value can be a collection that spans several scalars
+                            $value = '{'.$value;
 
-                                    $mappingValue .= $sequence[$j++];
-                                    if ($j >= $len) {
-                                        break;
-                                    }
-
-                                    $mappingValue .= self::parseScalar($sequence, $flags, [',', ']'], $j, null === $tag, $references);
-                                }
-                            } while ($j < $len);
-
-                            if ($mappingException) {
-                                throw $mappingException;
+                            if ($i < $end = self::findEmbeddedMappingEnd($sequence, $offset)) {
+                                $value .= substr($sequence, $i, $end - $i);
+                                $i = $end;
                             }
+
+                            $value .= '}';
+                            $pos = 0;
+                            $value = self::parseMapping($state, $value, $flags, $pos, $references);
                         }
 
                         --$i;
@@ -478,6 +471,86 @@ class Inline
         } finally {
             $state->leaveNestingLevel();
         }
+    }
+
+    /**
+     * Returns the offset of the "," or "]" that ends the embedded mapping starting at $i.
+     *
+     * Tokens are split the same way as in Parser::lexInlineStructure().
+     */
+    private static function findEmbeddedMappingEnd(string $sequence, int $i): int
+    {
+        $closingTags = [];
+        $len = \strlen($sequence);
+        $start = $i;
+
+        while ($i < $len) {
+            switch ($sequence[$i]) {
+                case '[':
+                    $closingTags[] = ']';
+                    $start = ++$i;
+                    break;
+                case '{':
+                    $closingTags[] = '}';
+                    $start = ++$i;
+                    break;
+                case ',':
+                    if (!$closingTags) {
+                        return $i;
+                    }
+                    $start = ++$i;
+                    break;
+                case ']':
+                case '}':
+                    if ($sequence[$i] !== array_pop($closingTags)) {
+                        return $i;
+                    }
+                    $start = ++$i;
+                    break;
+                case '"':
+                case "'":
+                case '&':
+                case '*':
+                    // a plain scalar can contain quotes, anchors and aliases, so the tokens are split again from $start, 100 per call to stay below pcre.backtrack_limit
+                    for ($end = $i, $i = $start; $i <= $end && $i < $len; $start = $i) {
+                        if (preg_match('/(?:[ \t:]++|"[^"\\\\]*+(?:\\\\.[^"\\\\]*+)*+"|\'[^\']*+\'|[&*][^ \t,\[\]{}]*+|[^ \t:"\'&*,\[\]{}][^:,\[\]{}]*+){1,100}+/As', $sequence, $match, 0, $i)) {
+                            $i += \strlen($match[0]);
+                            continue;
+                        }
+
+                        // an unterminated quoted string, or a PCRE error
+                        switch ($sequence[$i]) {
+                            case ' ':
+                            case "\t":
+                            case ':':
+                                ++$i;
+                                break;
+                            case '"':
+                            case "'":
+                                $quotation = $sequence[$i];
+                                while (++$i < $len && $quotation !== $sequence[$i]) {
+                                    if ('\\' === $sequence[$i] && '"' === $quotation) {
+                                        ++$i;
+                                    }
+                                }
+                                ++$i;
+                                break;
+                            case '&':
+                            case '*':
+                                $i += 1 + strcspn($sequence, " \t,[]{}", $i + 1);
+                                break;
+                            default:
+                                $i += strcspn($sequence, ',:[]{}', $i);
+                        }
+                    }
+                    break;
+                default:
+                    // spaces, colons and plain scalars
+                    $i += strcspn($sequence, ',[]{}"\'&*', $i);
+            }
+        }
+
+        return $len;
     }
 
     /**
@@ -698,7 +771,7 @@ class Inline
             $value = substr($scalar, 1);
 
             // remove comments
-            if (Parser::preg_match('/[ \t]+#/', $value, $match, \PREG_OFFSET_CAPTURE)) {
+            if (Parser::preg_match('/(?<![ \t])[ \t]++#/', $value, $match, \PREG_OFFSET_CAPTURE)) {
                 $value = substr($value, 0, $match[0][1]);
             }
 
@@ -894,7 +967,7 @@ class Inline
             return null;
         }
 
-        if (!Parser::preg_match('/^&(?P<ref>[^ \t,\[\]\{\}\n]++)\s*+/A', substr($value, $i), $matches)) {
+        if (!Parser::preg_match('/&(?P<ref>[^ \t,\[\]\{\}\n]++)\s*+/A', $value, $matches, 0, $i)) {
             return null;
         }
 

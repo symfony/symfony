@@ -531,6 +531,41 @@ class FilesystemTest extends FilesystemTestCase
         }
     }
 
+    /**
+     * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
+     */
+    public function testRemoveIgnoresDirectoryRemovedConcurrently()
+    {
+        require __DIR__.'/Fixtures/remove_collision.php';
+
+        $directory = $this->workspace.'/directory';
+        mkdir($directory);
+        $attempts = 0;
+        $GLOBALS['filesystemRemoveRealpath'] = static function (string $path): string|false {
+            if (is_dir($path)) {
+                rmdir($path);
+            }
+
+            return realpath($path);
+        };
+        $GLOBALS['filesystemRemoveCollision'] = static function (int $length) use (&$attempts): string {
+            ++$attempts;
+
+            return random_bytes($length);
+        };
+
+        try {
+            $this->filesystem->remove($directory);
+        } finally {
+            unset($GLOBALS['filesystemRemoveRealpath'], $GLOBALS['filesystemRemoveCollision']);
+        }
+
+        $this->assertSame(0, $attempts);
+        $this->assertCount(0, new \FilesystemIterator($this->workspace));
+    }
+
     public function testRemoveWithRestrictiveUmask()
     {
         $directory = $this->workspace.'/directory';
@@ -606,6 +641,49 @@ class FilesystemTest extends FilesystemTestCase
         } finally {
             // Make sure we can clean up this file
             chmod($basePath, 0o777);
+        }
+    }
+
+    public function testRemoveRestoresDirectoryWhenNestedRemovalFails()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $directory = $this->workspace.'/directory';
+        $file = $directory.'/sub/file';
+        mkdir($directory.'/sub', 0o777, true);
+        touch($file);
+        chmod($directory.'/sub', 0o500);
+
+        try {
+            $this->filesystem->remove($directory);
+            $this->fail('Filesystem::remove() should throw an exception');
+        } catch (IOException $e) {
+            $this->assertSame('Failed to remove file "'.$file.'": unlink('.$file.'): Permission denied', $e->getMessage());
+            $this->assertFileExists($file);
+            $this->assertCount(1, new \FilesystemIterator($this->workspace));
+        } finally {
+            chmod($directory.'/sub', 0o777);
+        }
+    }
+
+    public function testRemoveThrowsExceptionOnUnreadableDirectory()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $directory = $this->workspace.'/directory';
+        mkdir($directory);
+        touch($directory.'/file');
+        chmod($directory, 0o300);
+
+        try {
+            $this->filesystem->remove($directory);
+            $this->fail('Filesystem::remove() should throw an exception');
+        } catch (IOException $e) {
+            $this->assertSame('Failed to remove directory "'.$directory.'": FilesystemIterator::__construct('.$directory.'): Failed to open directory: Permission denied', $e->getMessage());
+            $this->assertFileExists($directory.'/file');
+            $this->assertCount(1, new \FilesystemIterator($this->workspace));
+        } finally {
+            chmod($directory, 0o777);
         }
     }
 

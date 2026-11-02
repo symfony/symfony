@@ -175,10 +175,10 @@ class Filesystem
                 $origFile = null;
 
                 try {
-                    if (!$isRecursive) {
+                    if (!$isRecursive && false !== $realPath = realpath($file)) {
                         for ($i = 0; $i < 10; ++$i) {
                             // Keep the temporary suffix within six characters to preserve room for descendant paths.
-                            $tmpName = \dirname(realpath($file)).'/.'.strtr(base64_encode(random_bytes(2)), ['/' => '-', '+' => '_', '=' => '']);
+                            $tmpName = \dirname($realPath).'/.'.strtr(base64_encode(random_bytes(2)), ['/' => '-', '+' => '_', '=' => '']);
 
                             if (!self::box('mkdir', $tmpName, 0o700)) {
                                 continue;
@@ -195,18 +195,27 @@ class Filesystem
                         }
                     }
 
-                    $filesystemIterator = new \FilesystemIterator($file, \FilesystemIterator::CURRENT_AS_PATHNAME | \FilesystemIterator::SKIP_DOTS);
+                    try {
+                        $filesystemIterator = new \FilesystemIterator($file, \FilesystemIterator::CURRENT_AS_PATHNAME | \FilesystemIterator::SKIP_DOTS);
+                    } catch (\UnexpectedValueException $e) {
+                        if (!file_exists($file)) {
+                            continue;
+                        }
+
+                        throw new IOException(\sprintf('Failed to remove directory "%s": ', $file).$e->getMessage(), 0, $e);
+                    }
+
                     self::doRemove(iterator_to_array($filesystemIterator, true), true);
 
                     if (!self::box('rmdir', $file) && file_exists($file) && !$isRecursive) {
-                        $lastError = self::$lastError;
-
-                        if (null !== $origFile && self::box('rename', $file, $origFile)) {
-                            $file = $origFile;
-                        }
-
-                        throw new IOException(\sprintf('Failed to remove directory "%s": ', $file).$lastError);
+                        throw new IOException(\sprintf('Failed to remove directory "%s": ', $file).self::$lastError);
                     }
+                } catch (IOException $e) {
+                    if (null === $origFile || !self::box('rename', $file, $origFile)) {
+                        throw $e;
+                    }
+
+                    throw new IOException(str_replace($file, $origFile, $e->getMessage()), 0, $e);
                 } finally {
                     if (null !== $tmpDir) {
                         self::box('rmdir', $tmpDir);

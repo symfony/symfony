@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ExceptionInterface;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -68,6 +69,8 @@ use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\CheckRefreshedUserEvent;
+use Symfony\Component\Security\Http\PrivacyPass\TokenKeyInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * SecurityExtension.
@@ -212,6 +215,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $this->createAuthorization($config, $container);
         $this->createRoleHierarchy($config, $container);
 
+        if ($config['private_tokens']) {
+            $loader->load('security_private_token.php');
+            $this->createPrivateTokens($config['private_tokens'], $container);
+        }
+
         if ($config['password_hashers']) {
             $this->createHashers($config['password_hashers'], $container);
         }
@@ -239,6 +247,84 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             MainConfiguration::STRATEGY_PRIORITY => new Definition(PriorityStrategy::class, [$allowIfAllAbstainDecisions]),
             default => throw new InvalidConfigurationException(\sprintf('The strategy "%s" is not supported.', $strategy)),
         };
+    }
+
+    private function createPrivateTokens(array $configs, ContainerBuilder $container): void
+    {
+        foreach ($configs as $name => $config) {
+            $context = $config['redemption_context'];
+
+            if (null !== $context['secret']) {
+                $contextId = 'security.private_token.redemption_context.'.$name;
+                $container->setDefinition($contextId, (new ChildDefinition('security.private_token.redemption_context.time_window'))
+                    ->replaceArgument(0, $context['secret'])
+                    ->replaceArgument(1, $context['window']));
+            } else {
+                $contextId = 'security.private_token.redemption_context.empty';
+            }
+
+            if ($config['token_keys']) {
+                $tokenKeys = [];
+                foreach ($config['token_keys'] as $tokenKey) {
+                    $tokenKeys[] = (new Definition(TokenKeyInterface::class))
+                        ->setFactory([new Reference('security.private_token.token_type.blind_rsa'), 'createTokenKey'])
+                        ->setArguments([$tokenKey]);
+                }
+            } else {
+                if (!ContainerBuilder::willBeAvailable('symfony/http-client', HttpClientInterface::class, ['symfony/security-bundle'])) {
+                    throw new LogicException('You cannot read the keys of a Privacy Pass issuer from its directory since the HttpClient component is not installed. Try running "composer require symfony/http-client".');
+                }
+
+                $directoryId = 'security.private_token.issuer_directory.'.$name;
+                $container->setDefinition($directoryId, (new ChildDefinition('security.private_token.issuer_directory'))
+                    ->replaceArgument(0, new Reference($config['directory']['http_client']))
+                    ->replaceArgument(1, new Reference($config['directory']['cache']))
+                    ->replaceArgument(2, $config['issuer'])
+                    ->replaceArgument(4, $config['directory']['ttl'])
+                    ->addTag('kernel.reset', ['method' => 'reset']));
+
+                $tokenKeys = new Reference($directoryId);
+            }
+
+            $factoryId = 'security.private_token.challenge_factory.'.$name;
+            $container->setDefinition($factoryId, (new ChildDefinition('security.private_token.challenge_factory'))
+                ->replaceArgument(0, $config['issuer'])
+                ->replaceArgument(2, $tokenKeys)
+                ->replaceArgument(3, new Reference($contextId))
+                ->replaceArgument(4, $config['origins'])
+                ->replaceArgument(5, $config['max_age'])
+                ->replaceArgument(6, $config['grease_percentage']));
+
+            $spentTokens = null;
+
+            if ($config['spent_tokens']['enabled']) {
+                $spentTokensId = 'security.private_token.spent_tokens.'.$name;
+                // a token has to be remembered for as long as the challenge it answers is accepted
+                $container->setDefinition($spentTokensId, (new ChildDefinition('security.private_token.spent_tokens'))
+                    ->replaceArgument(0, new Reference($config['spent_tokens']['cache']))
+                    ->replaceArgument(1, $config['spent_tokens']['lifetime'] ?? (null !== $context['secret'] ? 2 * $context['window'] : 7200)));
+
+                $spentTokens = new Reference($spentTokensId);
+            }
+
+            $managerId = 'security.private_token.'.$name;
+            $manager = (new ChildDefinition('security.private_token.manager'))
+                ->replaceArgument(0, new Reference($factoryId))
+                ->replaceArgument(1, $spentTokens)
+                ->addTag('monolog.logger', ['channel' => 'security']);
+
+            if ($config['remember']['enabled']) {
+                $container->setDefinition($managerId.'.inner', $manager);
+
+                // the key carries the name, so that two configurations never share what they remember
+                $manager = (new ChildDefinition('security.private_token.session_manager'))
+                    ->replaceArgument(0, new Reference($managerId.'.inner'))
+                    ->replaceArgument(1, $config['remember']['lifetime'])
+                    ->replaceArgument(2, '_security.private_token.'.$name);
+            }
+
+            $container->setDefinition($managerId, $manager->addTag('security.private_token', ['name' => $name]));
+        }
     }
 
     private function createRoleHierarchy(array $config, ContainerBuilder $container): void

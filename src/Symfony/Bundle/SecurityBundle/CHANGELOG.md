@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `private_tokens` option to accept Privacy Pass tokens
+
 8.2
 ---
 

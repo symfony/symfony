@@ -1,0 +1,26 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+security:
+    firewalls:
+        main:
+            security: false
+
+    private_tokens:
+        default:
+            issuer: issuer.example
+            token_keys: ['MIIBVjBBBgkqhkiG9w0BAQowNKAPMA0GCWCGSAFlAwQCAgUAoRwwGgYJKoZIhvcNAQEIMA0GCWCGSAFlAwQCAgUAogMCATADggEPADCCAQoCggEBALpxaaU8P8fGyWFlpDDOLToHuQxtbas00HVPVArGbV5-_zKE6z-MNhxPHSJNYcoAkrGtP2DV4uBHHTIxWu8eW4lFH6fgvjeiS-yGtadyPmt1kIEqD2oszXk_uQrbrlNmYMJ2RXaVtjp6Gp2Hwacxhq8xEbCZpWzrQLYwe0UQA6nApC0AN1zX7GGSfzbXKu8EvUVPX6Oac_tqyYKMPVboat_aSyQZ-zh48oKhXT0tZIhZjNrfbMlAf18MQwOHC0mN6wBpCXii5pKt6bozI55MXY1zIjWoXLlz18YP1caF68BJvUlqhMjTJ246ddY_ayuQXx6U1pP35vWf7sm4FAMSqjkCAwEAAQ==']
+            directory: false
+            redemption_context:
+                secret: '%kernel.secret%'
+                window: 1800
+        remembered:
+            issuer: issuer.example
+            token_keys: ['MIIBVjBBBgkqhkiG9w0BAQowNKAPMA0GCWCGSAFlAwQCAgUAoRwwGgYJKoZIhvcNAQEIMA0GCWCGSAFlAwQCAgUAogMCATADggEPADCCAQoCggEBALpxaaU8P8fGyWFlpDDOLToHuQxtbas00HVPVArGbV5-_zKE6z-MNhxPHSJNYcoAkrGtP2DV4uBHHTIxWu8eW4lFH6fgvjeiS-yGtadyPmt1kIEqD2oszXk_uQrbrlNmYMJ2RXaVtjp6Gp2Hwacxhq8xEbCZpWzrQLYwe0UQA6nApC0AN1zX7GGSfzbXKu8EvUVPX6Oac_tqyYKMPVboat_aSyQZ-zh48oKhXT0tZIhZjNrfbMlAf18MQwOHC0mN6wBpCXii5pKt6bozI55MXY1zIjWoXLlz18YP1caF68BJvUlqhMjTJ246ddY_ayuQXx6U1pP35vWf7sm4FAMSqjkCAwEAAQ==']
+            directory: false
+            remember: true
+        remembered_other:
+            issuer: issuer.example
+            token_keys: ['MIIBVjBBBgkqhkiG9w0BAQowNKAPMA0GCWCGSAFlAwQCAgUAoRwwGgYJKoZIhvcNAQEIMA0GCWCGSAFlAwQCAgUAogMCATADggEPADCCAQoCggEBALpxaaU8P8fGyWFlpDDOLToHuQxtbas00HVPVArGbV5-_zKE6z-MNhxPHSJNYcoAkrGtP2DV4uBHHTIxWu8eW4lFH6fgvjeiS-yGtadyPmt1kIEqD2oszXk_uQrbrlNmYMJ2RXaVtjp6Gp2Hwacxhq8xEbCZpWzrQLYwe0UQA6nApC0AN1zX7GGSfzbXKu8EvUVPX6Oac_tqyYKMPVboat_aSyQZ-zh48oKhXT0tZIhZjNrfbMlAf18MQwOHC0mN6wBpCXii5pKt6bozI55MXY1zIjWoXLlz18YP1caF68BJvUlqhMjTJ246ddY_ayuQXx6U1pP35vWf7sm4FAMSqjkCAwEAAQ==']
+            directory: false
+            remember: true

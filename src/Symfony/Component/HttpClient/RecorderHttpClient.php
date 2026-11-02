@@ -186,14 +186,22 @@ final class RecorderHttpClient implements HttpClientInterface
             }
 
             if ($chunk->isLast() && !$context->getInfo('canceled')) {
+                $headers = $this->redactor->redactHeaders($context->getHeaders());
+                $body = $this->redactor->redactBody($buffer);
+
+                // a length that described the received body must describe the redacted one
+                if ((string) \strlen($buffer) === ($headers['content-length'][0] ?? null)) {
+                    $headers['content-length'] = [(string) \strlen($body)];
+                }
+
                 $this->persist(HarFile::createEntry(
                     $method,
                     $recordedUrl,
                     '' !== $requestBody ? $requestBody : null,
                     $requestHeaders,
                     $context->getStatusCode(),
-                    $this->redactor->redactHeaders($context->getHeaders()),
-                    $this->redactor->redactBody($buffer),
+                    $headers,
+                    $body,
                 ), $rewrite);
             }
 

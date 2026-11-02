@@ -25,3 +25,8 @@ function iterator_to_array(\Traversable $iterator, bool $preserveKeys = true): a
 {
     return isset($GLOBALS['filesystemRemoveIterator']) ? ($GLOBALS['filesystemRemoveIterator'])($iterator, $preserveKeys) : \iterator_to_array($iterator, $preserveKeys);
 }
+
+function realpath(string $path): string|false
+{
+    return isset($GLOBALS['filesystemRemoveRealpath']) ? ($GLOBALS['filesystemRemoveRealpath'])($path) : \realpath($path);
+}

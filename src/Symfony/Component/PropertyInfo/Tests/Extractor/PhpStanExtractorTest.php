@@ -20,6 +20,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Clazz;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithoutDocBlock;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithUnsupportedType;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithVarTagsDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback;
@@ -932,6 +933,11 @@ class PhpStanExtractorTest extends TestCase
     public function testExtractConstructorTypesReturnNullOnEmptyDocBlock(string $property, ?Type $type)
     {
         $this->assertNull($this->extractor->getTypeFromConstructor(ConstructorDummyWithoutDocBlock::class, $property));
+    }
+
+    public function testExtractConstructorTypesReturnNullOnUnsupportedType()
+    {
+        $this->assertNull($this->extractor->getTypeFromConstructor(ConstructorDummyWithUnsupportedType::class, 'flags'));
     }
 
     /**

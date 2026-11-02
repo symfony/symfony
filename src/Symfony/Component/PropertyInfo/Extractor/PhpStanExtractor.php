@@ -235,7 +235,11 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
 
         $typeContext = $this->typeContextFactory->createFromClassName($class, $declaringClass);
 
-        return $this->stringTypeResolver->resolve((string) $tagDocNode->type, $typeContext);
+        try {
+            return $this->stringTypeResolver->resolve((string) $tagDocNode->type, $typeContext);
+        } catch (UnsupportedException) {
+            return null;
+        }
     }
 
     public function getShortDescription(string $class, string $property, array $context = []): ?string

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-02T09:13:47Z
+
+Good idea. A hash of `__DIR__` would also fix the tests that use a fixed name under the temp dir, since those collide between checkouts. I'd rather do that for all of them in a separate PR than start a third convention here.

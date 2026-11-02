@@ -246,7 +246,7 @@ final class LayoutEngine
         // for gap), only the first N that fit are rendered. Each child
         // needs at least 1 column, and each gap between children takes
         // $gap columns: maxChildren = floor((columns + gap) / (1 + gap)).
-        $maxChildren = (int) floor(($columns + $gap) / (1 + $gap));
+        $maxChildren = (int) floor(($columns + max(0, $gap)) / (1 + max(0, $gap)));
         if ($maxChildren < 1) {
             $maxChildren = 1;
         }

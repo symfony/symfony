@@ -13,16 +13,29 @@ namespace Symfony\Component\Tui\Tests\Render;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
+use Symfony\Component\Tui\Render\LayoutEngine;
+use Symfony\Component\Tui\Render\PositionTracker;
 use Symfony\Component\Tui\Render\Renderer;
 use Symfony\Component\Tui\Style\Border;
 use Symfony\Component\Tui\Style\Direction;
 use Symfony\Component\Tui\Style\Padding;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Widget\ContainerWidget;
+use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
 use Symfony\Component\Tui\Widget\TextWidget;
 
 class LayoutEngineTest extends TestCase
 {
+
+    public function testNegativeGapDoesNotCauseDivisionByZero()
+    {
+        $engine = new LayoutEngine(new Renderer(), new PositionTracker(), new FontRegistry());
+
+        $result = $engine->layout([new TextWidget('Hello'), new TextWidget('World')], 80, 24, -1, Direction::Horizontal);
+
+        $this->assertNotEmpty($result->toArray());
+    }
+
     public function testLayoutVerticalSingleChild()
     {
         $renderer = new Renderer();

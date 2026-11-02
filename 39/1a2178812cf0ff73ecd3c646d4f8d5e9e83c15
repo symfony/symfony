@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-02T08:09:12Z
+
+Looks good to me. A property that uses a left-out alias becomes unsupported, so the next extractor answers for it.
+
+/cc @mtarld since `TypeContextFactory` now skips the aliases it can't resolve instead of throwing.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-11-02T08:32:11Z
+
+Fair enough 👌

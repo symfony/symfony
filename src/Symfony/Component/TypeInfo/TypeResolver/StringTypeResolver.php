@@ -40,6 +40,7 @@ use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
@@ -341,6 +342,11 @@ final class StringTypeResolver implements TypeResolverInterface
 
         if ($node instanceof IntersectionTypeNode) {
             $types = array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->types);
+            $shapes = array_filter($types, static fn (Type $t): bool => $t instanceof ArrayShapeType);
+
+            if (\count($shapes) === \count($types)) {
+                return $this->mergeArrayShapes($types);
+            }
 
             try {
                 return Type::intersection(...$types);
@@ -470,5 +476,31 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         return $node;
+    }
+
+    /**
+     * @param list<ArrayShapeType> $types
+     */
+    private function mergeArrayShapes(array $types): ArrayShapeType
+    {
+        $shape = [];
+        $extraKeyType = $types[0]->getExtraKeyType();
+        $extraValueType = $types[0]->getExtraValueType();
+
+        foreach ($types as $type) {
+            if ((string) $extraKeyType !== (string) $type->getExtraKeyType() || (string) $extraValueType !== (string) $type->getExtraValueType()) {
+                throw new \DomainException(\sprintf('Cannot merge "%s" and "%s".', $types[0], $type));
+            }
+
+            foreach ($type->getShape() as $key => $item) {
+                if (isset($shape[$key]) && (string) $shape[$key]['type'] !== (string) $item['type']) {
+                    throw new \DomainException(\sprintf('Cannot merge array shapes that declare the "%s" key with different types.', $key));
+                }
+
+                $shape[$key] = ['type' => $item['type'], 'optional' => $item['optional'] && ($shape[$key]['optional'] ?? true)];
+            }
+        }
+
+        return new ArrayShapeType($shape, $extraKeyType, $extraValueType);
     }
 }

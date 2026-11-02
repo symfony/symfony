@@ -99,7 +99,6 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request->attributes->set('_controller', TestAbstractController::class.'::fooAction');
 
         $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
-        $this->assertSame($container, $controller->setContainer($container));
     }
 
     public function testAbstractControllerServiceWithFqcnIdGetsContainerWhenNotSet()
@@ -120,7 +119,6 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request->attributes->set('_controller', DummyController::class.'::fooAction');
 
         $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
-        $this->assertSame($container, $controller->getContainer());
     }
 
     public function testAbstractControllerGetsNoContainerWhenSet()

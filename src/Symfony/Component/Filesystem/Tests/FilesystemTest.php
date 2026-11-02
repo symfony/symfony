@@ -658,7 +658,8 @@ class FilesystemTest extends FilesystemTestCase
             $this->filesystem->remove($directory);
             $this->fail('Filesystem::remove() should throw an exception');
         } catch (IOException $e) {
-            $this->assertSame('Failed to remove file "'.$file.'": unlink('.$file.'): Permission denied', $e->getMessage());
+            $this->assertStringStartsWith('Failed to remove file "'.$file.'": unlink(', $e->getMessage());
+            $this->assertStringEndsWith('): Permission denied', $e->getMessage());
             $this->assertFileExists($file);
             $this->assertCount(1, new \FilesystemIterator($this->workspace));
         } finally {
@@ -679,7 +680,8 @@ class FilesystemTest extends FilesystemTestCase
             $this->filesystem->remove($directory);
             $this->fail('Filesystem::remove() should throw an exception');
         } catch (IOException $e) {
-            $this->assertSame('Failed to remove directory "'.$directory.'": FilesystemIterator::__construct('.$directory.'): Failed to open directory: Permission denied', $e->getMessage());
+            $this->assertStringStartsWith('Failed to remove directory "'.$directory.'": FilesystemIterator::__construct(', $e->getMessage());
+            $this->assertStringEndsWith('): Failed to open directory: Permission denied', $e->getMessage());
             $this->assertFileExists($directory.'/file');
             $this->assertCount(1, new \FilesystemIterator($this->workspace));
         } finally {

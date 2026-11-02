@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-02T08:09:14Z
+
+Thanks for the fix. I pushed a small rework: `bracketExpressionToRegex()` now returns `\[` itself when a `/` comes before the `]`. The caller has no null to handle anymore. I also added a case for a `[` nested in such a bracket (`[a[/]`).
+
+Treating the `[` as a literal is what POSIX asks for in pathname patterns: `a[b/c]d` only matches `a[b/c]d`. glob() on Linux, bash and Python do the same.

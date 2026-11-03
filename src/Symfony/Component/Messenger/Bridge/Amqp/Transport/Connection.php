@@ -798,19 +798,20 @@ class Connection
     {
         if (!isset($this->amqpChannel)) {
             $connectMethod = 'true' === ($this->connectionOptions['persistent'] ?? 'false') ? 'pconnect' : 'connect';
+            $hostIndex = 0;
             $hosts = \is_array($this->connectionOptions['host'] ?? null) ? $this->connectionOptions['host'] : [[]];
-
-            foreach ($hosts as $i => $host) {
-                $connection = $this->amqpFactory->createConnection($host + $this->connectionOptions);
+            do {
+                $connection = $this->amqpFactory->createConnection($hosts[$hostIndex] + $this->connectionOptions);
 
                 try {
                     $connection->{$connectMethod}();
-                    break;
-                } catch (\AMQPConnectionException $e) {
-                    if (!isset($hosts[$i + 1])) {
-                        throw new \AMQPException('Could not connect to the AMQP server. Please verify the provided DSN.', 0, $e);
-                    }
+                } catch (\AMQPConnectionException $amqpException) {
+                    $connection = null;
                 }
+            } while (++$hostIndex < \count($hosts) && !$connection);
+
+            if (!$connection) {
+                throw new \AMQPException('Could not connect to the AMQP server. Please verify the provided DSN.', 0, $amqpException);
             }
             $this->amqpChannel = $this->amqpFactory->createChannel($connection);
 

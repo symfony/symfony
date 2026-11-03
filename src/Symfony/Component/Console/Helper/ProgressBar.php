@@ -338,11 +338,11 @@ final class ProgressBar
         $this->step = $startAt;
         $this->startingStep = $startAt;
 
-        $startAt > 0 ? $this->setProgress($startAt) : $this->percent = 0.0;
-
         if (null !== $max) {
             $this->setMaxSteps($max);
         }
+
+        $startAt > 0 ? $this->setProgress($startAt) : $this->percent = 0.0;
 
         $this->display();
     }

@@ -231,6 +231,21 @@ class Connection
         parse_str($params['query'] ?? '', $parsedQuery);
         $port = $useAmqps ? 5671 : 5672;
 
+        if (isset($parsedQuery['host'])) {
+            if (!\is_array($hosts = $parsedQuery['host'])) {
+                throw new InvalidArgumentException('Invalid AMQP DSN: query parameter "host" must be an array.');
+            }
+            foreach (array_keys($hosts) as $host) {
+                if (false === $i = strrpos($host, ':')) {
+                    $hosts[$host] = ['host' => $host, 'port' => $params['port'] ?? $port];
+                } else {
+                    $hosts[$host] = ['host' => substr($host, 0, $i), 'port' => (int) substr($host, 1 + $i)];
+                }
+            }
+            array_unshift($hosts, ['host' => $params['host'] ?? 'localhost', 'port' => $params['port'] ?? $port]);
+            $parsedQuery['host'] = array_values($hosts);
+        }
+
         $amqpOptions = array_replace_recursive([
             'host' => $params['host'] ?? 'localhost',
             'port' => $params['port'] ?? $port,
@@ -779,13 +794,20 @@ class Connection
     public function channel(): \AMQPChannel
     {
         if (!isset($this->amqpChannel)) {
-            $connection = $this->amqpFactory->createConnection($this->connectionOptions);
             $connectMethod = 'true' === ($this->connectionOptions['persistent'] ?? 'false') ? 'pconnect' : 'connect';
+            $hosts = \is_array($this->connectionOptions['host'] ?? null) ? $this->connectionOptions['host'] : [[]];
 
-            try {
-                $connection->{$connectMethod}();
-            } catch (\AMQPConnectionException $e) {
-                throw new \AMQPException('Could not connect to the AMQP server. Please verify the provided DSN.', 0, $e);
+            foreach ($hosts as $i => $host) {
+                $connection = $this->amqpFactory->createConnection($host + $this->connectionOptions);
+
+                try {
+                    $connection->{$connectMethod}();
+                    break;
+                } catch (\AMQPConnectionException $e) {
+                    if (!isset($hosts[$i + 1])) {
+                        throw new \AMQPException('Could not connect to the AMQP server. Please verify the provided DSN.', 0, $e);
+                    }
+                }
             }
             $this->amqpChannel = $this->amqpFactory->createChannel($connection);
 

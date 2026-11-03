@@ -33,6 +33,7 @@ use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\Failure\FailedMessageRepository;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
@@ -50,6 +51,7 @@ use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\CorrelationStamp;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
@@ -64,6 +66,7 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\InteropSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -909,6 +912,55 @@ class FailureIntegrationTest extends TestCase
     {
         yield 'JSON' => [new Serializer()];
         yield 'PHP' => [new PhpSerializer()];
+    }
+
+    public function testVerifiedMessageWhoseSerializerThrowsIsSentToTheFailureTransportWithoutRetryAndReplayedWithItsSignedHeadersOnly()
+    {
+        $encryptingSerializer = new EncryptingFailureTestSerializer(new Serializer());
+        $serializer = new SigningSerializer(new InteropSerializer($encryptingSerializer), 'signing-key');
+        $failureSerializer = new SigningSerializer(new InteropSerializer(new Serializer()), 'signing-key', 'sha256', true);
+
+        $encodedEnvelope = $serializer->encode(new Envelope(new DummyMessage('API')));
+        $encodedEnvelope['headers']['correlation_id'] = 'added on the way';
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$encodedEnvelope]);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
+        $encryptingSerializer->decodingException = new \RuntimeException('Unknown encryption key.');
+
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer, 'failed' => static fn () => $failureSerializer])),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function () {}]])),
+        ]);
+
+        $failures = [];
+        $handled = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(3, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$failures) {
+            $failures[] = [RedeliveryStamp::getRetryCountFromEnvelope($event->getEnvelope()), $event->getThrowable()::class, $event->getThrowable()->getMessage()];
+        });
+        $dispatcher->addListener(WorkerMessageHandledEvent::class, static function (WorkerMessageHandledEvent $event) use (&$handled) {
+            $handled[] = $event->getEnvelope();
+        });
+
+        for ($i = 0; $i < 10 && $transport->getMessagesWaitingToBeReceived(); ++$i) {
+            (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        }
+
+        $this->assertSame([[0, UnrecoverableMessageHandlingException::class, 'Unknown encryption key.']], $failures);
+        $this->assertSame([], $handled);
+        $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
+        $this->assertArrayNotHasKey('Sign-Trust', $failureTransport->getMessagesWaitingToBeReceived()[0]['headers']);
+
+        $encryptingSerializer->decodingException = null;
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertCount(1, $handled);
+        $this->assertTrue(TrustStamp::isEnvelopeTrusted($handled[0]));
+        $this->assertNull($handled[0]->last(CorrelationStamp::class));
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
     }
 
     #[DataProvider('provideInnerSerializers')]
@@ -1814,5 +1866,36 @@ class HandlerArgumentsProviderDummyMessage extends DummyMessage implements Defau
     public function getDefaultStamps(): array
     {
         return [new HandlerArgumentsStamp(['default'])];
+    }
+}
+
+class EncryptingFailureTestSerializer implements SerializerInterface
+{
+    public ?\Throwable $decodingException = null;
+
+    public function __construct(
+        private SerializerInterface $serializer,
+    ) {
+    }
+
+    public function decode(array $encodedEnvelope): Envelope
+    {
+        if ($this->decodingException) {
+            throw $this->decodingException;
+        }
+
+        return $this->serializer->decode(['body' => base64_decode($encodedEnvelope['body'])] + $encodedEnvelope);
+    }
+
+    public function encode(Envelope $envelope): array
+    {
+        $encodedEnvelope = $this->serializer->encode($envelope);
+
+        // a decoding failure is sent again with its original body, which is encoded already
+        if (!$envelope->getMessage() instanceof MessageDecodingFailedException) {
+            $encodedEnvelope['body'] = base64_encode($encodedEnvelope['body']);
+        }
+
+        return $encodedEnvelope;
     }
 }

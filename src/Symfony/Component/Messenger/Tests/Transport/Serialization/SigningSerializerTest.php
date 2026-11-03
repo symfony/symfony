@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
@@ -688,6 +689,48 @@ class SigningSerializerTest extends TestCase
 
         $this->assertArrayNotHasKey('x-added', $reencoded['headers']);
         $this->assertTrue($serializer->decode($reencoded)->last(TrustStamp::class)?->isTrusted());
+    }
+
+    #[DataProvider('provideExceptionsThrownByTheInnerSerializer')]
+    public function testDecodeReturnsATrustedUnrecoverableFailureWhenTheInnerSerializerThrowsOnAVerifiedMessage(\Throwable $exception)
+    {
+        $encoded = (new SigningSerializer(self::createTenantSerializer(), 'secret-key'))->encode(new Envelope(new DummyMessage('hello')));
+        $signedEncoded = $encoded;
+        $encoded['headers']['x-added'] = 'added on the way';
+        $serializer = new SigningSerializer(self::createThrowingSerializer($exception), 'secret-key');
+
+        $envelope = $serializer->decode($encoded);
+        $failure = $envelope->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure);
+        $this->assertSame('Cannot fetch the key.', $failure->getMessage());
+        $this->assertSame(123, $failure->getCode());
+        $this->assertInstanceOf(UnrecoverableMessageHandlingException::class, $failure->getPrevious());
+        $this->assertSame($exception, $failure->getPrevious()->getPrevious());
+        $this->assertSame($signedEncoded, $failure->encodedEnvelope);
+        $this->assertTrue($envelope->last(TrustStamp::class)?->isTrusted());
+    }
+
+    public static function provideExceptionsThrownByTheInnerSerializer(): iterable
+    {
+        yield 'decoding failure' => [new MessageDecodingFailedException('Cannot fetch the key.', 123)];
+        yield 'other exception' => [new \RuntimeException('Cannot fetch the key.', 123)];
+    }
+
+    public function testDecodeReturnsAnUntrustedUnrecoverableFailureWhenTheInnerSerializerThrowsOnAMessageWithABodyOnlySignature()
+    {
+        $exception = new \RuntimeException('Cannot fetch the key.');
+        $encoded = self::signBodyOnly((new Serializer())->encode(new Envelope(new DummyMessage('hello'))));
+        $serializer = SigningSerializer::forMessageTypes(self::createThrowingSerializer($exception), 'secret-key', [DummyMessage::class]);
+
+        $envelope = $serializer->decode($encoded);
+        $failure = $envelope->getMessage();
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $failure);
+        $this->assertInstanceOf(UnrecoverableMessageHandlingException::class, $failure->getPrevious());
+        $this->assertSame($exception, $failure->getPrevious()->getPrevious());
+        $this->assertSame($encoded, $failure->encodedEnvelope);
+        $this->assertNull($envelope->last(TrustStamp::class));
     }
 
     #[DataProvider('provideEnumCasesCarriedBySignedMessages')]
@@ -1552,6 +1595,26 @@ class SigningSerializerTest extends TestCase
                 $encoded['headers'] += $this->headers;
 
                 return $encoded;
+            }
+        };
+    }
+
+    private static function createThrowingSerializer(\Throwable $exception): SerializerInterface
+    {
+        return new class($exception) implements SerializerInterface {
+            public function __construct(
+                private \Throwable $exception,
+            ) {
+            }
+
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                throw $this->exception;
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                throw new \BadMethodCallException();
             }
         };
     }

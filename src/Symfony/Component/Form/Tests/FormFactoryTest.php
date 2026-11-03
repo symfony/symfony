@@ -24,6 +24,7 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
+use Symfony\Component\Form\MinLengthTypeGuesserInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
 use Symfony\Component\Form\Tests\Fixtures\ConfigurableFormType;
@@ -123,6 +124,45 @@ class FormFactoryTest extends TestCase
         $this->assertSame('firstName', $builder->getName());
         $this->assertSame(['class' => 'foo', 'maxlength' => 11], $builder->getOption('attr'));
         $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
+    }
+
+    public function testCreateBuilderUsesMinLengthWithoutRedundantPattern()
+    {
+        $this->guesser1->configureMinLengthGuess(3, Guess::HIGH_CONFIDENCE);
+        $this->guesser2->configurePatternGuess('.{3,}', Guess::LOW_CONFIDENCE);
+
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+
+        $this->assertSame(['minlength' => 3], $builder->getOption('attr'));
+    }
+
+    public function testCreateBuilderUsesMinLengthAlongsideArabicPattern()
+    {
+        $this->guesser1->configureMinLengthGuess(3, Guess::HIGH_CONFIDENCE);
+        $this->guesser2->configurePatternGuess('[\p{Arabic}]+', Guess::HIGH_CONFIDENCE);
+
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+
+        $this->assertSame(['minlength' => 3, 'pattern' => '[\p{Arabic}]+'], $builder->getOption('attr'));
+    }
+
+    public function testCreateBuilderCanOverrideGuessedMinLength()
+    {
+        $this->guesser1->configureMinLengthGuess(3, Guess::HIGH_CONFIDENCE);
+
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, ['attr' => ['minlength' => 5]]);
+
+        $this->assertSame(['minlength' => 5], $builder->getOption('attr'));
+    }
+
+    public function testCreateBuilderIgnoresMinLengthForNonTextInputs()
+    {
+        $this->guesser1->configureTypeGuess(ChoiceType::class, [], Guess::HIGH_CONFIDENCE);
+        $this->guesser1->configureMinLengthGuess(3, Guess::HIGH_CONFIDENCE);
+
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+
+        $this->assertSame([], $builder->getOption('attr'));
     }
 
     public function testCreateBuilderUsesMaxLengthIfFound()
@@ -232,10 +272,11 @@ class FormFactoryTest extends TestCase
     }
 }
 
-class ConfigurableFormTypeGuesser implements FormTypeGuesserInterface
+class ConfigurableFormTypeGuesser implements MinLengthTypeGuesserInterface
 {
     private ?TypeGuess $typeGuess = null;
     private ?ValueGuess $requiredGuess = null;
+    private ?ValueGuess $minLengthGuess = null;
     private ?ValueGuess $maxLengthGuess = null;
     private ?ValueGuess $patternGuess = null;
 
@@ -247,6 +288,11 @@ class ConfigurableFormTypeGuesser implements FormTypeGuesserInterface
     public function guessRequired($class, $property): ?ValueGuess
     {
         return $this->requiredGuess;
+    }
+
+    public function guessMinLength($class, $property): ?ValueGuess
+    {
+        return $this->minLengthGuess;
     }
 
     public function guessMaxLength($class, $property): ?ValueGuess
@@ -267,6 +313,11 @@ class ConfigurableFormTypeGuesser implements FormTypeGuesserInterface
     public function configureRequiredGuess(bool $required, int $confidence): void
     {
         $this->requiredGuess = new ValueGuess($required, $confidence);
+    }
+
+    public function configureMinLengthGuess(int $minLength, int $confidence): void
+    {
+        $this->minLengthGuess = new ValueGuess($minLength, $confidence);
     }
 
     public function configureMaxLengthGuess(int $maxLength, int $confidence): void

@@ -18,9 +18,50 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
+use Symfony\Component\Form\MinLengthTypeGuesserInterface;
 
 class FormTypeGuesserChainTest extends TestCase
 {
+    public function testOptionalMinLengthGuesserUsesBestConfidenceAndCachesItsResult()
+    {
+        $guesser = new class implements MinLengthTypeGuesserInterface {
+            public int $calls = 0;
+
+            public function guessType(string $class, string $property): ?TypeGuess
+            {
+                return null;
+            }
+
+            public function guessRequired(string $class, string $property): ?ValueGuess
+            {
+                return null;
+            }
+
+            public function guessMinLength(string $class, string $property): ?ValueGuess
+            {
+                ++$this->calls;
+
+                return new ValueGuess(3, Guess::HIGH_CONFIDENCE);
+            }
+
+            public function guessMaxLength(string $class, string $property): ?ValueGuess
+            {
+                return null;
+            }
+
+            public function guessPattern(string $class, string $property): ?ValueGuess
+            {
+                return null;
+            }
+        };
+
+        $chain = new FormTypeGuesserChain([$guesser]);
+
+        $this->assertEquals(new ValueGuess(3, Guess::HIGH_CONFIDENCE), $chain->guessMinLength(\stdClass::class, 'name'));
+        $this->assertEquals(new ValueGuess(3, Guess::HIGH_CONFIDENCE), $chain->guessMinLength(\stdClass::class, 'name'));
+        $this->assertSame(1, $guesser->calls);
+    }
+
     public function testGuessesAreComputedOncePerClassAndProperty()
     {
         $guesser = new class implements FormTypeGuesserInterface {
@@ -66,6 +107,8 @@ class FormTypeGuesserChainTest extends TestCase
 
         $firstGuesses = $guess();
         $secondGuesses = $guess();
+        $this->assertNull($chain->guessMinLength(\stdClass::class, 'foo'));
+        $this->assertNull($chain->guessMinLength(\stdClass::class, 'foo'));
         $chain->guessType(\stdClass::class, 'bar');
         $chain->guessType(\ArrayObject::class, 'foo');
 

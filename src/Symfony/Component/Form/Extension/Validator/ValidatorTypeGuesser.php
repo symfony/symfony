@@ -26,7 +26,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
-use Symfony\Component\Form\FormTypeGuesserInterface;
+use Symfony\Component\Form\MinLengthTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
@@ -55,7 +55,7 @@ use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
-class ValidatorTypeGuesser implements FormTypeGuesserInterface
+class ValidatorTypeGuesser implements MinLengthTypeGuesserInterface
 {
     public function __construct(
         private MetadataFactoryInterface $metadataFactory,
@@ -72,6 +72,11 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
         // If we don't find any constraint telling otherwise, we can assume
         // that a field is not required (with LOW_CONFIDENCE)
         return $this->guess($class, $property, $this->guessRequiredForConstraint(...), false);
+    }
+
+    public function guessMinLength(string $class, string $property): ?ValueGuess
+    {
+        return $this->guess($class, $property, $this->guessMinLengthForConstraint(...));
     }
 
     public function guessMaxLength(string $class, string $property): ?ValueGuess
@@ -192,6 +197,18 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             IsTrue::class => new ValueGuess(true, Guess::HIGH_CONFIDENCE),
             default => null,
         };
+    }
+
+    /**
+     * Guesses a field's minimum length based on the given constraint.
+     */
+    public function guessMinLengthForConstraint(Constraint $constraint): ?ValueGuess
+    {
+        if ($constraint instanceof Length && is_numeric($constraint->min)) {
+            return new ValueGuess((int) $constraint->min, Guess::HIGH_CONFIDENCE);
+        }
+
+        return null;
     }
 
     /**

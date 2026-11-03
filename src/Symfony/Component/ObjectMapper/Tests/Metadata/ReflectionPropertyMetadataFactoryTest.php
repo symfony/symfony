@@ -32,6 +32,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\Lead;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\LeadDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\ToTypeDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\TypeDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteBySetter\Activity;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteBySetter\RenamedActivityInput;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ReflectionPropertyMetadataFactoryTest extends TestCase
@@ -149,6 +151,25 @@ class ReflectionPropertyMetadataFactoryTest extends TestCase
         $metadata = $factory->create(new MagicGetUser(), new MagicGetUserView(), 'id');
 
         $this->assertSame(PropertyReadability::ACCESSOR, $metadata['readability']);
+    }
+
+    public function testSetterIsReportedForAPropertyThatCannotBeAssigned()
+    {
+        $factory = $this->createFactory();
+
+        $this->assertSame('setName', $factory->create(new \stdClass(), new Activity(), 'name')['targetSetter']);
+        $this->assertSame('setName', $factory->create(new RenamedActivityInput(), new Activity(), 'title')['mappings'][0]['targetSetter']);
+        $this->assertNull($factory->create(new \stdClass(), new Activity(), 'id')['targetSetter']);
+        $this->assertNull($factory->create(new \stdClass(), new MagicGetUserView(), 'name')['targetSetter']);
+    }
+
+    public function testSetterIsNotReportedWhenAPropertyAccessorIsConfigured()
+    {
+        $metadataFactory = new ReflectionObjectMapperMetadataFactory();
+        $factory = new ReflectionPropertyMetadataFactory($metadataFactory, new ReflectionClassMetadataFactory($metadataFactory), PropertyAccess::createPropertyAccessor());
+
+        $this->assertNull($factory->create(new \stdClass(), new Activity(), 'name')['targetSetter']);
+        $this->assertNull($factory->create(new RenamedActivityInput(), new Activity(), 'title')['mappings'][0]['targetSetter']);
     }
 
     public function testMetadataIsCachedPerSourceAndTargetClass()

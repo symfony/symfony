@@ -26,6 +26,7 @@ namespace Symfony\Component\ObjectMapper\Metadata;
  *     sourceDeclared: bool,
  *     targetPropertyClass: ?string,
  *     targetWritable: bool,
+ *     targetSetter: ?string,
  * }
  * @phpstan-type PropertyMetadata array{
  *     name: string,
@@ -39,6 +40,7 @@ namespace Symfony\Component\ObjectMapper\Metadata;
  *     targetPropertyClass: ?string,
  *     targetWritable: bool,
  *     targetAccessorWritable: ?bool,
+ *     targetSetter: ?string,
  * }
  *
  * @internal

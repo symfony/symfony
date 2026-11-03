@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Stamp\UnverifiedDecodingFailureStamp;
 
@@ -176,12 +177,18 @@ final class SigningSerializer implements SerializerInterface
             }
 
             if ($signed && !isset($headers[self::UNVERIFIED_HEADER])) {
-                // A valid signature authenticates the message whatever its type: decode it without peeking.
-                $envelope = $this->inner->decode($signedEnvelope);
-                $failure = $envelope->getMessage();
-
                 // a body-only signature leaves the headers unverified
                 $trust = str_starts_with($sign, self::SIGNATURE_MARKER) ? [TrustStamp::trusted()] : [];
+
+                // A valid signature authenticates the message whatever its type: decode it without peeking.
+                try {
+                    $envelope = $this->inner->decode($signedEnvelope);
+                } catch (\Throwable $e) {
+                    // the stamps that count the retries are lost when the inner serializer throws, so the failure should not be retried
+                    return MessageDecodingFailedException::wrap($encodedEnvelope, $e->getMessage(), (int) $e->getCode(), new UnrecoverableMessageHandlingException($e->getMessage(), (int) $e->getCode(), $e))->with(...$trust);
+                }
+
+                $failure = $envelope->getMessage();
 
                 if (!$failure instanceof MessageDecodingFailedException || $this->hasValidSignature($failure->encodedEnvelope, !$signAll)) {
                     if (!$signAll && $this->shouldSign($failure::class)) {

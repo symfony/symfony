@@ -432,6 +432,7 @@ final class ProgressBar
 
         if (!$this->max) {
             $this->max = $this->step;
+            $this->percent = $this->max ? 1.0 : 0.0;
             $this->finishedWithoutMax = true;
         }
 

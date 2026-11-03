@@ -263,7 +263,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 continue;
             }
 
-            if (!$this->propertyIsMappable($targetRefl, $property)) {
+            if (!$this->propertyIsMappable($targetRefl, $mappedTarget, $property)) {
                 continue;
             }
 
@@ -593,9 +593,22 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         return null;
     }
 
-    private function propertyIsMappable(\ReflectionClass $targetRefl, int|string $property): bool
+    private function propertyIsMappable(\ReflectionClass $targetRefl, object $target, int|string $property): bool
     {
-        return $targetRefl->hasProperty($property) && $targetRefl->getProperty($property)->isPublic();
+        if (!$targetRefl->hasProperty($property) || !($reflProperty = $targetRefl->getProperty($property))->isPublic()) {
+            return false;
+        }
+
+        // readonly properties are also protected(set), unless declared public(set)
+        if ($reflProperty->isPrivateSet() || $reflProperty->isProtectedSet()) {
+            return false;
+        }
+
+        if ($reflProperty->isVirtual()) {
+            return $reflProperty->hasHook(\PropertyHookType::Set);
+        }
+
+        return !$reflProperty->isReadOnly() || !$reflProperty->isInitialized($target);
     }
 
     public function withObjectMapper(ObjectMapperInterface $objectMapper): static

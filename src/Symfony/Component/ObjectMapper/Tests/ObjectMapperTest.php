@@ -238,6 +238,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\Uninitialized\Post;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Uninitialized\PostView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Unreadable\Order;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Unreadable\OrderView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\UnwritableTargetProperty\AsymmetricVisibilityTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\UnwritableTargetProperty\ReadonlyPropertyTarget;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -1904,5 +1906,36 @@ final class ObjectMapperTest extends TestCase
 
         $this->assertSame('foo', $mapper->map(new CacheKeyCollisionFoo(), CacheKeyCollisionTarget::class)->name);
         $this->assertSame('foobar', $mapper->map(new CacheKeyCollisionFoobar())->name);
+    }
+
+    #[DataProvider('provideAccessor')]
+    public function testReadonlyTargetPropertiesAreSkipped(?PropertyAccessorInterface $accessor)
+    {
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor);
+        $source = (object) ['uninitialized' => 'source', 'initialized' => 'source', 'name' => 'source'];
+
+        $target = $mapper->map($source, ReadonlyPropertyTarget::class);
+
+        $this->assertFalse((new \ReflectionProperty($target, 'uninitialized'))->isInitialized($target));
+        $this->assertSame('target', $target->initialized);
+        $this->assertSame('source', $target->name);
+
+        $target = $mapper->map($source, new ReadonlyPropertyTarget());
+
+        $this->assertSame('target', $target->initialized);
+        $this->assertSame('source', $target->name);
+    }
+
+    public function testSetVisibilityOfTargetPropertiesIsHonored()
+    {
+        $source = (object) ['privateSet' => 'source', 'protectedSet' => 'source', 'uninitialized' => 'source', 'initialized' => 'source', 'virtual' => 'source'];
+
+        $target = (new ObjectMapper())->map($source, AsymmetricVisibilityTarget::class);
+
+        $this->assertSame('target', $target->privateSet);
+        $this->assertSame('target', $target->protectedSet);
+        $this->assertSame('source', $target->uninitialized);
+        $this->assertSame('target', $target->initialized);
+        $this->assertSame('target', $target->virtual);
     }
 }

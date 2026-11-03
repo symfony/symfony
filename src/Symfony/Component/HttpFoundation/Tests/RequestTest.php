@@ -1777,6 +1777,37 @@ class RequestTest extends TestCase
         $this->assertSame($expectedPathInfo, $request->getPathInfo(), 'pathInfo');
     }
 
+    public function testGetBaseUrlDoesNotStartWithTwoSlashes()
+    {
+        foreach (['//evil.example/public/index.php/admin', '/\\evil.example/public/index.php/admin'] as $requestUri) {
+            $request = new Request([], [], [], [], [], [
+                'REQUEST_URI' => $requestUri,
+                'SCRIPT_FILENAME' => '/var/www/public/index.php',
+                'SCRIPT_NAME' => '/public/index.php',
+                'PHP_SELF' => '/public/index.php',
+            ]);
+
+            $this->assertSame('', $request->getBaseUrl());
+            $this->assertSame('', $request->getBasePath());
+            $this->assertSame($requestUri, $request->getPathInfo());
+        }
+    }
+
+    public function testGetBaseUrlDoesNotStartWithTwoSlashesWhenTheScriptNameIsTheRequestPath()
+    {
+        foreach (['//evil.example/index.php', '/\\evil.example/index.php'] as $requestUri) {
+            $request = new Request([], [], [], [], [], [
+                'REQUEST_URI' => $requestUri,
+                'SCRIPT_FILENAME' => '/var/www/public/index.php',
+                'SCRIPT_NAME' => $requestUri,
+                'PHP_SELF' => $requestUri,
+            ]);
+
+            $this->assertSame('', $request->getBaseUrl());
+            $this->assertSame('', $request->getBasePath());
+        }
+    }
+
     public static function getBaseUrlData()
     {
         return [

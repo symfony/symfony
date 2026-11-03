@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Allow locale-specific route hosts to be configured through a container parameter holding a locale-to-host map
  * Add the `template`, `redirect_to_route` and `redirect_to` keys to route definitions; `template` is exposed as the `_template` route default
  * Add `RouteTrait::template()`, `RouteTrait::redirectToRoute()` and `RouteTrait::redirectTo()` to configure template and redirect routes in fluent PHP
  * Add `RouterBundle`, which provides the `router` configuration and the services previously provided by `FrameworkBundle` under `framework.router`

@@ -61,7 +61,7 @@ class FileType extends AbstractType
                         $data[] = $file;
 
                         if (method_exists($requestHandler, 'getUploadFileError') && null !== $errorCode = $requestHandler->getUploadFileError($file)) {
-                            $form->addError($this->getFileUploadError($errorCode));
+                            $form->addError($this->getFileUploadError($errorCode, $options));
                         }
                     }
                 }
@@ -75,7 +75,7 @@ class FileType extends AbstractType
 
                 $event->setData($data);
             } elseif ($requestHandler->isFileUpload($event->getData()) && method_exists($requestHandler, 'getUploadFileError') && null !== $errorCode = $requestHandler->getUploadFileError($event->getData())) {
-                $form->addError($this->getFileUploadError($errorCode));
+                $form->addError($this->getFileUploadError($errorCode, $options));
             } elseif (!($options['allow_array_submission'] && \is_array($event->getData())) && !$requestHandler->isFileUpload($event->getData())) {
                 $event->setData(null);
             }
@@ -116,6 +116,9 @@ class FileType extends AbstractType
             'multiple' => false,
             'allow_file_upload' => true,
             'invalid_message' => 'Please select a valid file.',
+            'upload_ini_size_message' => 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.',
+            'upload_form_size_message' => 'The file is too large.',
+            'upload_error_message' => 'The file could not be uploaded.',
         ]);
     }
 
@@ -124,21 +127,21 @@ class FileType extends AbstractType
         return 'file';
     }
 
-    private function getFileUploadError(int $errorCode): FileUploadError
+    private function getFileUploadError(int $errorCode, array $options): FileUploadError
     {
         $messageParameters = [];
 
         if (\UPLOAD_ERR_INI_SIZE === $errorCode) {
             [$limitAsString, $suffix] = $this->factorizeSizes(0, self::getMaxFilesize());
-            $messageTemplate = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
+            $messageTemplate = $options['upload_ini_size_message'];
             $messageParameters = [
                 '{{ limit }}' => $limitAsString,
                 '{{ suffix }}' => $suffix,
             ];
         } elseif (\UPLOAD_ERR_FORM_SIZE === $errorCode) {
-            $messageTemplate = 'The file is too large.';
+            $messageTemplate = $options['upload_form_size_message'];
         } else {
-            $messageTemplate = 'The file could not be uploaded.';
+            $messageTemplate = $options['upload_error_message'];
         }
 
         if (null !== $this->translator) {

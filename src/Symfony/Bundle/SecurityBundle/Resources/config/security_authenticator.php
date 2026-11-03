@@ -95,6 +95,7 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('user checker'),
+                null,
             ])
 
         ->set('security.listener.user_not_found_password_check', UserNotFoundPasswordCheckListener::class)

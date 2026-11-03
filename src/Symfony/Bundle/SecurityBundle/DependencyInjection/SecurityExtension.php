@@ -611,13 +611,19 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         // user checker listener
-        $container
+        $exposeSecurityErrors = $container->getParameter('.security.authentication.expose_security_errors');
+        $userCheckerListener = $container
             ->setDefinition('security.listener.user_checker.'.$id, new ChildDefinition('security.listener.user_checker'))
             ->replaceArgument(0, new Reference('security.user_checker.'.$id))
             ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
 
+        // when account status errors are exposed, the response already tells why the user was rejected
+        if (ExposeSecurityLevel::None === $exposeSecurityErrors) {
+            $userCheckerListener->replaceArgument(1, new Reference('security.password_hasher_factory'));
+        }
+
         // when all security errors are exposed, the response already tells whether the user exists
-        if (ExposeSecurityLevel::All !== $container->getParameter('.security.authentication.expose_security_errors')) {
+        if (ExposeSecurityLevel::All !== $exposeSecurityErrors) {
             $container
                 ->setDefinition('security.listener.user_not_found_password_check.'.$id, new ChildDefinition('security.listener.user_not_found_password_check'))
                 ->replaceArgument(1, $userClass)

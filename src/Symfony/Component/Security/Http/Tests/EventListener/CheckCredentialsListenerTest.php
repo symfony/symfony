@@ -65,6 +65,43 @@ class CheckCredentialsListenerTest extends TestCase
         yield ['Invalid', false, false];
     }
 
+    public function testUserWithoutPasswordHashesThePresentedPassword()
+    {
+        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasher->expects($this->once())->method('hash')->with('ThePa$$word');
+        $hasher->expects($this->never())->method('verify');
+
+        $hasherFactory = new PasswordHasherFactory([
+            InMemoryUser::class => $hasher,
+        ]);
+
+        $user = new InMemoryUser('wouter', null);
+        $event = $this->createEvent(new Passport(new UserBadge('wouter', static fn () => $user), new PasswordCredentials('ThePa$$word')));
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('The presented password is invalid.');
+
+        (new CheckCredentialsListener($hasherFactory))->checkPassport($event);
+    }
+
+    #[DataProvider('provideUnhashablePasswords')]
+    public function testUserWithoutPasswordAndUnhashablePassword(array $hashers, string $password)
+    {
+        $user = new InMemoryUser('wouter', null);
+        $event = $this->createEvent(new Passport(new UserBadge('wouter', static fn () => $user), new PasswordCredentials($password)));
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('The presented password is invalid.');
+
+        (new CheckCredentialsListener(new PasswordHasherFactory($hashers)))->checkPassport($event);
+    }
+
+    public static function provideUnhashablePasswords(): iterable
+    {
+        yield 'no hasher' => [[], 'ThePa$$word'];
+        yield 'too long' => [[InMemoryUser::class => ['algorithm' => 'plaintext']], str_repeat('a', 4097)];
+    }
+
     public function testEmptyPassword()
     {
         $hasherFactory = $this->createMock(PasswordHasherFactory::class);

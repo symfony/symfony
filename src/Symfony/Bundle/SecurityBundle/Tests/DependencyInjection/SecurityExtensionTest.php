@@ -1842,6 +1842,25 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame($registered, $container->hasDefinition('security.listener.user_not_found_password_check.main'));
     }
 
+    #[TestWith(['none', true])]
+    #[TestWith(['account_status', false])]
+    #[TestWith(['all', false])]
+    public function testUserCheckerListenerHashesPasswordsUnlessAccountStatusErrorsAreExposed(string $exposeSecurityErrors, bool $hashes)
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'expose_security_errors' => $exposeSecurityErrors,
+            'providers' => ['default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]]],
+            'firewalls' => ['main' => ['http_basic' => true]],
+        ]);
+
+        $container->compile();
+
+        $hasherFactory = $hashes ? new Reference('security.password_hasher_factory') : null;
+        $this->assertEquals($hasherFactory, $container->getDefinition('security.listener.user_checker.main')->getArgument(1));
+    }
+
     /**
      * A stateful firewall stores the token in the session, so the cookie alone would stand for an
      * access token nobody has to sign for any more.

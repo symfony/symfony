@@ -12,10 +12,16 @@
 namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Ldap\Security\LdapBadge;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
@@ -25,8 +31,13 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  */
 class UserCheckerListener implements EventSubscriberInterface
 {
+    /**
+     * @param PasswordHasherFactoryInterface|null $hasherFactory Hashes the presented password when the user checker rejects the user,
+     *                                                           so that such users take as long to reject as the others
+     */
     public function __construct(
         private UserCheckerInterface $userChecker,
+        private ?PasswordHasherFactoryInterface $hasherFactory = null,
     ) {
     }
 
@@ -37,7 +48,15 @@ class UserCheckerListener implements EventSubscriberInterface
             return;
         }
 
-        $this->userChecker->checkPreAuth($passport->getUser());
+        $user = $passport->getUser();
+
+        try {
+            $this->userChecker->checkPreAuth($user);
+        } catch (AuthenticationException $e) {
+            $this->hashPassword($passport, $user);
+
+            throw $e;
+        }
     }
 
     public function postCheckCredentials(AuthenticationSuccessEvent $event): void
@@ -48,6 +67,25 @@ class UserCheckerListener implements EventSubscriberInterface
         }
 
         $this->userChecker->checkPostAuth($user, $event->getAuthenticationToken());
+    }
+
+    private function hashPassword(Passport $passport, UserInterface $user): void
+    {
+        if (!$this->hasherFactory || !$user instanceof PasswordAuthenticatedUserInterface || $passport->hasBadge(LdapBadge::class) || !$passport->hasBadge(PasswordCredentials::class)) {
+            return;
+        }
+
+        /** @var PasswordCredentials $badge */
+        $badge = $passport->getBadge(PasswordCredentials::class);
+        if ($badge->isResolved() || '' === $password = $badge->getPassword()) {
+            return;
+        }
+
+        try {
+            $this->hasherFactory->getPasswordHasher($user)->hash($password);
+        } catch (\RuntimeException) {
+            // no hasher is configured for the user, or the password is too long to be hashed
+        }
     }
 
     public static function getSubscribedEvents(): array

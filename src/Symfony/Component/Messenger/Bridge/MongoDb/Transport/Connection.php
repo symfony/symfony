@@ -157,10 +157,18 @@ class Connection
             ],
         ];
 
+        // prevent signals raised during the MongoDB call from being lost when it throws
+        $asyncSignals = \function_exists('pcntl_async_signals') && \function_exists('pcntl_signal_dispatch') && pcntl_async_signals(false);
+
         try {
             $updatedDocument = $this->collection->findOneAndUpdate($this->createAvailableMessagesQuery($queueNames), $updateStatement, $options);
         } catch (MongoDriverException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
+        } finally {
+            if ($asyncSignals) {
+                pcntl_async_signals(true);
+                pcntl_signal_dispatch();
+            }
         }
 
         if (!$updatedDocument instanceof BSONDocument) {
@@ -293,6 +301,28 @@ class Connection
         }
 
         return $deleteResult->getDeletedCount() > 0;
+    }
+
+    /**
+     * @param int|null $seconds The minimum duration the message should be kept alive
+     *
+     * @throws TransportException
+     */
+    public function keepalive(string $id, ?int $seconds = null): void
+    {
+        if (null !== $seconds && $this->redeliverTimeout < $seconds) {
+            throw new TransportException(\sprintf('MongoDB redeliver_timeout (%ds) cannot be smaller than the keepalive interval (%ds).', $this->redeliverTimeout, $seconds));
+        }
+
+        try {
+            $this->collection->updateOne(
+                ['_id' => new ObjectId($id), 'deliveredTo' => $this->uniqueId],
+                ['$set' => ['deliveredAt' => new UTCDateTime($this->now())]],
+                $this->getWriteOptions(),
+            );
+        } catch (MongoDriverException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
     }
 
     /**

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Bridge\MongoDb\Tests\Transport;
 
+use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\UTCDateTime;
 use MongoDB\Client;
 use MongoDB\Driver\Monitoring\CommandFailedEvent;
 use MongoDB\Driver\Monitoring\CommandStartedEvent;
@@ -19,6 +21,8 @@ use MongoDB\Driver\Monitoring\CommandSucceededEvent;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Messenger\Bridge\MongoDb\Stamp\MongoDbReceivedStamp;
 use Symfony\Component\Messenger\Bridge\MongoDb\Stamp\MongoDbSessionStamp;
 use Symfony\Component\Messenger\Bridge\MongoDb\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\Connection;
@@ -122,6 +126,73 @@ class MongoDbTransportIntegrationTest extends TestCase
 
         usleep(2000);
         $this->assertSame(1, iterator_count($impatientTransport->get()));
+    }
+
+    public function testKeepaliveRenewsTheLease()
+    {
+        $clock = new MockClock();
+        $consumer = new MongoDbTransport($this->createConnection($clock), new PhpSerializer());
+        $otherConsumer = new MongoDbTransport($this->createConnection($clock), new PhpSerializer());
+
+        $consumer->send(new Envelope(new DummyMessage('Hi')));
+        $envelopes = iterator_to_array($consumer->get());
+        $this->assertCount(1, $envelopes);
+
+        $clock->sleep(4);
+        $consumer->keepalive($envelopes[0], 5);
+
+        $clock->sleep(4);
+        $this->assertSame(0, iterator_count($otherConsumer->get()));
+
+        $clock->sleep(2);
+        $this->assertSame(1, iterator_count($otherConsumer->get()));
+    }
+
+    public function testKeepaliveDoesNotRenewTheLeaseOfAMessageClaimedByAnotherConsumer()
+    {
+        $clock = new MockClock();
+        $consumer = new MongoDbTransport($this->createConnection($clock), new PhpSerializer());
+        $otherConnection = $this->createConnection($clock);
+
+        $consumer->send(new Envelope(new DummyMessage('Hi')));
+        $envelopes = iterator_to_array($consumer->get());
+        $this->assertCount(1, $envelopes);
+
+        $clock->sleep(6);
+        $this->assertNotNull($otherConnection->get());
+        $reclaimedAt = new UTCDateTime($clock->now());
+
+        $clock->sleep(1);
+        $consumer->keepalive($envelopes[0]);
+
+        $document = $this->client->getCollection(self::DATABASE, 'messenger_messages')->findOne(['_id' => new ObjectId($envelopes[0]->last(MongoDbReceivedStamp::class)->getId())]);
+        $this->assertSame($otherConnection->getUniqueId(), $document['deliveredTo']);
+        $this->assertEquals($reclaimedAt, $document['deliveredAt']);
+    }
+
+    public function testKeepaliveDoesNotRecreateAnAcknowledgedMessage()
+    {
+        $this->transport->send(new Envelope(new DummyMessage('Hi')));
+        $envelopes = iterator_to_array($this->transport->get());
+        $this->assertCount(1, $envelopes);
+        $this->transport->ack($envelopes[0]);
+
+        $this->transport->keepalive($envelopes[0]);
+
+        $this->assertNull($this->transport->find($envelopes[0]->last(MongoDbReceivedStamp::class)->getId()));
+    }
+
+    public function testKeepaliveThrowsWhenTheIntervalIsLongerThanTheRedeliverTimeout()
+    {
+        $consumer = new MongoDbTransport($this->createConnection(new MockClock()), new PhpSerializer());
+        $consumer->send(new Envelope(new DummyMessage('Hi')));
+        $envelopes = iterator_to_array($consumer->get());
+        $this->assertCount(1, $envelopes);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('MongoDB redeliver_timeout (5s) cannot be smaller than the keepalive interval (10s).');
+
+        $consumer->keepalive($envelopes[0], 10);
     }
 
     public function testAllAndFind()
@@ -307,6 +378,11 @@ class MongoDbTransportIntegrationTest extends TestCase
         }
 
         $this->assertContainsEquals(['availableAt' => 1, 'queueName' => 1, 'deliveredAt' => 1], $indexKeys);
+    }
+
+    private function createConnection(MockClock $clock): Connection
+    {
+        return Connection::fromDsn('mongodb://localhost/'.self::DATABASE, ['redeliver_timeout' => 5], $this->client, $clock);
     }
 
     private function countInserts(callable $callback): int

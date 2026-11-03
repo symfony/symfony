@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\MongoDb\Transport;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
@@ -23,7 +24,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * @author Alessandro Lai <alessandro.lai85@gmail.com>
  */
-class MongoDbTransport implements TransportInterface, BatchSenderInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface, QueueReceiverInterface
+class MongoDbTransport implements TransportInterface, BatchSenderInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface, QueueReceiverInterface, KeepaliveReceiverInterface
 {
     private MongoDbReceiver $receiver;
     private MongoDbSender $sender;
@@ -52,6 +53,11 @@ class MongoDbTransport implements TransportInterface, BatchSenderInterface, Setu
     public function reject(Envelope $envelope): void
     {
         $this->getReceiver()->reject($envelope);
+    }
+
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        $this->getReceiver()->keepalive($envelope, $seconds);
     }
 
     public function send(Envelope $envelope): Envelope

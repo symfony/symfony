@@ -94,6 +94,46 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testResumeWithNewMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+        $bar->start(200, 50);
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            '  50/200 [=======>--------------------]  25%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testResumeWithNewMaxAfterSmallerMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
+        $bar->start(100, 50);
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            '  50/100 [==============>-------------]  50%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testResumeBeyondNewMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+        $bar->start(10, 50);
+
+        rewind($output->getStream());
+
+        $this->assertSame(50, $bar->getMaxSteps());
+        $this->assertEquals(
+            ' 50/50 [============================] 100%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testRegularTimeEstimation()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 1_200, 0);

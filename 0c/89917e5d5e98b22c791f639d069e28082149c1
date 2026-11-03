@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by mattleads at 2026-11-03T10:37:01Z
+
+Thanks for the quick fix. I ran it against the reproducer from #67791 on 8.1.10: 'throw' mode now goes to the failure transport after 0 retries, 'return' mode is unchanged.
+
+One suggestion: #65122, #66460 and #66452 each added a test to FailureIntegrationTest. A worker-level test for a throwing serializer (0 retries, failure transport, replay) would be good here too. Happy to help turn the reproducer into one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-03T10:49:22Z
+
+Thanks @Ptraaah for the PR and @mattleads for testing it. I added the worker-level test you suggested, including the replay from the failure transport. SigningSerializer now throws when its inner serializer throws, so the fix also works for signed messages.

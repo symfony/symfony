@@ -58,7 +58,7 @@
 {%- endblock choice_widget -%}
 
 {%- block choice_widget_expanded -%}
-    {%- if empty_choices_message is not null -%}
+    {%- if empty_choices_message is defined and empty_choices_message is not null -%}
         {{- block('choice_widget_empty') -}}
     {%- else -%}
     <div {{ block('widget_container_attributes') }}>

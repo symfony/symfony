@@ -29,6 +29,8 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 {
     public function testExpandedEmptyChoicesMessageWithArabicText()
     {
+        $this->skipWhenEmptyChoicesMessageIsUnsupported();
+
         $form = $this->factory->createNamed('languages', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
             'choices' => [],
             'multiple' => true,
@@ -45,6 +47,8 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
     public function testExpandedEmptyChoicesMessageCanBeTranslated()
     {
+        $this->skipWhenEmptyChoicesMessageIsUnsupported();
+
         $form = $this->factory->createNamed('languages', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
             'choices' => [],
             'multiple' => true,
@@ -57,6 +61,8 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
     public function testExpandedEmptyChoicesMessageDoesNotReplaceAvailableOptions()
     {
+        $this->skipWhenEmptyChoicesMessageIsUnsupported();
+
         $form = $this->factory->createNamed('languages', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
             'choices' => ['العربية' => 'ar'],
             'multiple' => true,
@@ -68,6 +74,15 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
         $this->assertStringContainsString('<input', $html);
         $this->assertStringNotContainsString('لا توجد خيارات متاحة', $html);
+    }
+
+    private function skipWhenEmptyChoicesMessageIsUnsupported(): void
+    {
+        $form = $this->factory->create('Symfony\\Component\\Form\\Extension\\Core\\Type\\ChoiceType');
+
+        if (!\\array_key_exists('empty_choices_message', $form->getConfig()->getOptions())) {
+            $this->markTestSkipped('Requires the Form component with empty_choices_message support.');
+        }
     }
 
     public function testThemeBlockInheritanceUsingUse()

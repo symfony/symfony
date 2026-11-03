@@ -17,16 +17,16 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   choice_value                                         block_prefix                                          
   choices                                              by_reference                                          
   duplicate_preferred_choices                          data                                                  
-  expanded                                             disabled                                              
-  group_by                                             form_attr                                             
-  multiple                                             getter                                                
-  placeholder                                          help                                                  
-  placeholder_attr                                     help_attr                                             
-  preferred_choices                                    help_html                                             
-  separator                                            help_translation_parameters                           
-  separator_html                                       inherit_data                                          
-  sort_choices                                         invalid_message_parameters                            
-                                                       is_empty_callback                                     
+  empty_choices_message                                disabled                                              
+  expanded                                             form_attr                                             
+  group_by                                             getter                                                
+  multiple                                             help                                                  
+  placeholder                                          help_attr                                             
+  placeholder_attr                                     help_html                                             
+  preferred_choices                                    help_translation_parameters                           
+  separator                                            inherit_data                                          
+  separator_html                                       invalid_message_parameters                            
+  sort_choices                                         is_empty_callback                                     
                                                        label                                                 
                                                        label_attr                                            
                                                        label_format                                          

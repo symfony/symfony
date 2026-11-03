@@ -33,6 +33,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DefaultStampsProviderDummyMessage
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 
 class DecodeFailedMessageMiddlewareTest extends TestCase
 {
@@ -184,17 +185,69 @@ class DecodeFailedMessageMiddlewareTest extends TestCase
         $middleware->handle($envelope, new StackMiddleware());
     }
 
-    public function testItThrowsWhenDecodingStillFails()
+    public function testItThrowsAnUnrecoverableFailureWhenDecodingThrows()
     {
+        $thrown = new MessageDecodingFailedException('boom');
+
         $serializer = $this->createStub(SerializerInterface::class);
-        $serializer->method('decode')->willThrowException(new MessageDecodingFailedException('boom'));
+        $serializer->method('decode')->willThrowException($thrown);
 
         $middleware = new DecodeFailedMessageMiddleware(new InMemoryLocator(['transport' => $serializer]));
 
         $envelope = MessageDecodingFailedException::wrap(['body' => 'body', 'headers' => []], 'Could not decode.')
             ->with(new ReceivedStamp('transport'));
 
-        $this->expectException(MessageDecodingFailedException::class);
+        try {
+            $middleware->handle($envelope, new StackMiddleware());
+            $this->fail('An exception should have been thrown.');
+        } catch (UnrecoverableMessageHandlingException $e) {
+            $this->assertSame('boom', $e->getMessage());
+            $this->assertSame($thrown, $e->getPrevious());
+        }
+    }
+
+    public function testItThrowsTheUnrecoverableCauseWhenDecodingThrows()
+    {
+        $cause = new UnrecoverableMessageHandlingException('Invalid signature.');
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('decode')->willThrowException(new MessageDecodingFailedException('Invalid signature.', 0, $cause));
+
+        $middleware = new DecodeFailedMessageMiddleware(new InMemoryLocator(['transport' => $serializer]));
+
+        $envelope = MessageDecodingFailedException::wrap(['body' => 'body', 'headers' => []], 'Could not decode.')
+            ->with(new ReceivedStamp('transport'));
+
+        try {
+            $middleware->handle($envelope, new StackMiddleware());
+            $this->fail('An exception should have been thrown.');
+        } catch (UnrecoverableMessageHandlingException $e) {
+            $this->assertSame($cause, $e);
+        }
+    }
+
+    public function testItThrowsAnUnrecoverableFailureWhenTheInnerSerializerOfASigningSerializerThrows()
+    {
+        $inner = new class implements SerializerInterface {
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                throw new MessageDecodingFailedException('boom');
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                return ['body' => 'body'];
+            }
+        };
+        $serializer = new SigningSerializer($inner, 'secret-key', [DummyMessage::class]);
+
+        $middleware = new DecodeFailedMessageMiddleware(new InMemoryLocator(['transport' => $serializer]));
+
+        $envelope = MessageDecodingFailedException::wrap($serializer->encode(new Envelope(new DummyMessage('hello'))), 'boom')
+            ->with(new ReceivedStamp('transport'));
+
+        $this->expectException(UnrecoverableMessageHandlingException::class);
+        $this->expectExceptionMessage('boom');
         $middleware->handle($envelope, new StackMiddleware());
     }
 

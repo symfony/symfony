@@ -179,6 +179,40 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testRestartNoMaxAfterFinish()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+        $bar->start();
+        $bar->advance(3);
+        $bar->finish();
+        $bar->start();
+        $bar->advance(5);
+
+        rewind($output->getStream());
+
+        $this->assertSame(0, $bar->getMaxSteps());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    3 [--->------------------------]').
+            $this->generateOutput('    3 [============================]').
+            $this->generateOutput('    0 [>---------------------------]').
+            $this->generateOutput('    5 [----->----------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testRestartWithMaxSetAfterFinishWithoutMax()
+    {
+        $bar = new ProgressBar($this->getOutputStream(), 0, 0);
+        $bar->start();
+        $bar->advance(3);
+        $bar->finish();
+        $bar->setMaxSteps(10);
+        $bar->start();
+
+        $this->assertSame(10, $bar->getMaxSteps());
+    }
+
     public function testResumeAtNegativeStep()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
@@ -1189,6 +1223,43 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
 
         $bar->setMaxSteps(0);
         $this->assertSame(0.0, $bar->getProgressPercent());
+    }
+
+    public function testFinishAfterSettingMaxStepsBelowProgress()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 100, 0);
+        $bar->start();
+        $bar->setProgress(80);
+        $bar->setMaxSteps(50);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertSame(80, $bar->getProgress());
+        $this->assertEquals(
+            '   0/100 [>---------------------------]   0%'.
+            $this->generateOutput('  80/100 [======================>-----]  80%').
+            $this->generateOutput(' 80/80 [============================] 100%'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testFinishNonDecoratedOutputAfterDrawingMaxStepsBelowProgress()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 100, 0);
+        $bar->start();
+        $bar->setProgress(80);
+        $bar->setMaxSteps(50);
+        $bar->display();
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '   0/100 [>---------------------------]   0%'.\PHP_EOL.
+            '  80/100 [======================>-----]  80%'.\PHP_EOL.
+            ' 80/50 [============================] 100%'.\PHP_EOL.
+            ' 80/80 [============================] 100%',
+            stream_get_contents($output->getStream())
+        );
     }
 
     public function testWithSmallScreen()

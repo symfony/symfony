@@ -60,6 +60,7 @@ final class ProgressBar
     private ?string $previousMessage = null;
     private int $lastDrawnStep = 0;
     private int $lastDrawnMax = 0;
+    private bool $finishedWithoutMax = false;
     private Cursor $cursor;
     private array $placeholders = [];
 
@@ -343,6 +344,9 @@ final class ProgressBar
 
         if (null !== $max) {
             $this->setMaxSteps($max);
+        } elseif ($this->finishedWithoutMax) {
+            // drop the max that finish() set to draw a full bar
+            $this->setMaxSteps(0);
         }
 
         if ($this->max && $startAt > $this->max) {
@@ -408,6 +412,7 @@ final class ProgressBar
     public function setMaxSteps(int $max): void
     {
         $this->format = null;
+        $this->finishedWithoutMax = false;
         $this->max = max(0, $max);
         $this->stepWidth = $this->max ? Helper::width((string) $this->max) : 4;
         $this->percent = $this->max ? min(1, (float) $this->step / $this->max) : 0;
@@ -418,10 +423,16 @@ final class ProgressBar
      */
     public function finish(): void
     {
+        if ($this->max && $this->step > $this->max) {
+            // the max was lowered below the step with setMaxSteps(), raise it like setProgress() does
+            $this->max = $this->step;
+        }
+
         $max = $this->max;
 
         if (!$this->max) {
             $this->max = $this->step;
+            $this->finishedWithoutMax = true;
         }
 
         if ($this->step === $this->max && !$this->overwrite && $this->lastDrawnStep === $this->step && \in_array($this->lastDrawnMax, [$max, $this->max], true)) {

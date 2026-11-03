@@ -1938,8 +1938,8 @@ class Request
             $requestUri = '/'.$requestUri;
         }
 
-        if ($baseUrl && null !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) {
-            // full $baseUrl matches
+        if ($baseUrl && (null !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) && \in_array($requestUri[\strlen($prefix)] ?? '', ['', '/', '?'], true)) {
+            // full $baseUrl matches, and is not only the start of a longer path segment
             return $prefix;
         }
 
@@ -1964,6 +1964,11 @@ class Request
         // from PATH_INFO or QUERY_STRING
         if (\strlen($requestUri) >= \strlen($baseUrl) && (false !== $pos = strpos($requestUri, $baseUrl)) && 0 !== $pos) {
             $baseUrl = substr($requestUri, 0, $pos + \strlen($baseUrl));
+
+            if (!\in_array($requestUri[\strlen($baseUrl)] ?? '', ['', '/', '?'], true)) {
+                // the script filename is only the start of a longer path segment
+                return '';
+            }
         }
 
         return rtrim($baseUrl, '/'.\DIRECTORY_SEPARATOR);

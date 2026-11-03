@@ -41,4 +41,4 @@ security:
             provider: stateless
 
     access_control:
-        - { path: '^/main/user_profile$', roles: IS_AUTHENTICATED_FULLY }
+        - { path: '^/main/user_profile$', allow_if: "is_granted('IS_AUTHENTICATED_FULLY')" }

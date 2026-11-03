@@ -19,5 +19,5 @@ security:
             stateless: true
 
     access_control:
-        - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: .*, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/login$, is_granted: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: .*, is_granted: IS_AUTHENTICATED_FULLY }

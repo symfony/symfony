@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add the `$ldapUsersOnly` argument to `LdapAuthenticator` and `LdapBadge`, to bind only `LdapUser` instances against the LDAP server
+ * Add arguments `$hasherFactory` and `$userClass` to `CheckLdapCredentialsListener`, to hash the presented password when an LDAP login fails and the `LdapBadge` uses `$ldapUsersOnly`
  * Make `EntryManager::update()` send only the attributes that changed since the entry was fetched
 
 8.0

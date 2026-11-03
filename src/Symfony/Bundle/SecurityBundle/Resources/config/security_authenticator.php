@@ -28,6 +28,7 @@ use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
 use Symfony\Component\Security\Http\EventListener\RefreshedUserCheckerListener;
 use Symfony\Component\Security\Http\EventListener\SessionStrategyListener;
 use Symfony\Component\Security\Http\EventListener\UserCheckerListener;
+use Symfony\Component\Security\Http\EventListener\UserNotFoundPasswordCheckListener;
 use Symfony\Component\Security\Http\EventListener\UserProviderListener;
 use Symfony\Component\Security\Http\Firewall\AuthenticatorManagerListener;
 
@@ -94,6 +95,16 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('user checker'),
+                null,
+                false,
+            ])
+
+        ->set('security.listener.user_not_found_password_check', UserNotFoundPasswordCheckListener::class)
+            ->abstract()
+            ->args([
+                service('security.password_hasher_factory'),
+                abstract_arg('user class'),
+                false,
             ])
 
         ->set('security.listener.user_checker_on_refresh', RefreshedUserCheckerListener::class)

@@ -61,9 +61,12 @@ use Symfony\Component\Security\Core\Authorization\Strategy\UnanimousStrategy;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\ChainUserChecker;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
+use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Http\Authentication\ExposeSecurityLevel;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
@@ -316,6 +319,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $firewalls = $config['firewalls'];
         $providerIds = $this->createUserProviders($config, $container);
 
+        $userClasses = [];
+        foreach ($config['providers'] as $name => $provider) {
+            $userClasses[str_replace('-', '_', $name)] = self::getUserClass($config['providers'], $name);
+        }
+
         $container->setParameter('security.firewalls', array_keys($firewalls));
 
         // make the ContextListener aware of the configured user providers
@@ -353,7 +361,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
             $configId = 'security.firewall.map.config.'.$name;
 
-            [$matcher, $listeners, $exceptionListener, $logoutListener, $firewallAuthenticators] = $this->createFirewall($container, $name, $firewall, $providerIds, $configId);
+            [$matcher, $listeners, $exceptionListener, $logoutListener, $firewallAuthenticators] = $this->createFirewall($container, $name, $firewall, $providerIds, $userClasses, $configId);
 
             if (!$firewallAuthenticators) {
                 $authenticators[$name] = null;
@@ -396,7 +404,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    private function createFirewall(ContainerBuilder $container, string $id, array $firewall, array $providerIds, string $configId): array
+    private function createFirewall(ContainerBuilder $container, string $id, array $firewall, array $providerIds, array $userClasses, string $configId): array
     {
         $config = $container->setDefinition($configId, new ChildDefinition('security.firewall.config'));
         $config->replaceArgument(0, $id);
@@ -431,17 +439,20 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // Provider id (must be configured explicitly per firewall/authenticator if more than one provider is set)
         $defaultProvider = null;
+        $userClass = PasswordAuthenticatedUserInterface::class;
         if (isset($firewall['provider'])) {
             if (!isset($providerIds[$normalizedName = str_replace('-', '_', $firewall['provider'])])) {
                 throw new InvalidConfigurationException(\sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall['provider']));
             }
             $defaultProvider = $providerIds[$normalizedName];
+            $userClass = $userClasses[$normalizedName];
 
             $container->setDefinition('security.listener.'.$id.'.user_provider', new ChildDefinition('security.listener.user_provider.abstract'))
                 ->addTag('kernel.event_listener', ['dispatcher' => $firewallEventDispatcherId, 'event' => CheckPassportEvent::class, 'priority' => 2048, 'method' => 'checkPassport'])
                 ->replaceArgument(0, new Reference($defaultProvider));
         } elseif (1 === \count($providerIds)) {
             $defaultProvider = reset($providerIds);
+            $userClass = reset($userClasses);
         }
 
         $config->replaceArgument(5, $defaultProvider);
@@ -595,11 +606,48 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ;
         }
 
+        // with "ldap_users_only", the password hasher checks the users of the other providers,
+        // so LDAP logins have to hash the password too for all users to take as long to reject
+        $hashLdapPasswords = false;
+        $ldapListenerIds = [];
+        foreach ($this->getSortedFactories() as $factory) {
+            $key = str_replace('-', '_', $factory->getKey());
+
+            if (isset($firewall[$key]['ldap_users_only']) && $container->hasDefinition($ldapListenerId = 'security.listener.'.$key.'.'.$id)) {
+                $hashLdapPasswords = $hashLdapPasswords || $firewall[$key]['ldap_users_only'];
+                $ldapListenerIds[] = $ldapListenerId;
+            }
+        }
+
+        // any LDAP listener of the firewall can check the passports of all its LDAP authenticators
+        foreach ($hashLdapPasswords ? $ldapListenerIds : [] as $ldapListenerId) {
+            $container->getDefinition($ldapListenerId)
+                ->addArgument(new Reference('security.password_hasher_factory'))
+                ->addArgument($userClass);
+        }
+
         // user checker listener
-        $container
+        $exposeSecurityErrors = $container->getParameter('.security.authentication.expose_security_errors');
+        $userCheckerListener = $container
             ->setDefinition('security.listener.user_checker.'.$id, new ChildDefinition('security.listener.user_checker'))
             ->replaceArgument(0, new Reference('security.user_checker.'.$id))
             ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
+
+        // when account status errors are exposed, the response already tells why the user was rejected
+        if (ExposeSecurityLevel::None === $exposeSecurityErrors) {
+            $userCheckerListener
+                ->replaceArgument(1, new Reference('security.password_hasher_factory'))
+                ->replaceArgument(2, $hashLdapPasswords);
+        }
+
+        // when all security errors are exposed, the response already tells whether the user exists
+        if (ExposeSecurityLevel::All !== $exposeSecurityErrors) {
+            $container
+                ->setDefinition('security.listener.user_not_found_password_check.'.$id, new ChildDefinition('security.listener.user_not_found_password_check'))
+                ->replaceArgument(1, $userClass)
+                ->replaceArgument(2, $hashLdapPasswords)
+                ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
+        }
 
         if (($firewall['access_token']['dpop']['enabled'] ?? false) && !$firewall['stateless']) {
             throw new InvalidConfigurationException(\sprintf('The "dpop" option of the "access_token" authenticator requires the "%s" firewall to be stateless, as a stateful one stores the authenticated token in the session: the session cookie alone would then be accepted for an access token bound to a key, which is what the binding is there to prevent.', $id));
@@ -1220,6 +1268,31 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     /**
      * @return array<int, AuthenticatorFactoryInterface>
      */
+    /**
+     * Returns the class of the users of a provider, or of the first provider of a chain whose class is known.
+     */
+    private static function getUserClass(array $providers, string $name, array $visited = []): string
+    {
+        $provider = $providers[$name] ?? $providers[str_replace('-', '_', $name)] ?? [];
+
+        if (isset($provider['memory'])) {
+            return InMemoryUser::class;
+        }
+
+        if (isset($provider['entity']['class'])) {
+            return $provider['entity']['class'];
+        }
+
+        $visited[$name] = true;
+        foreach ($provider['chain']['providers'] ?? [] as $member) {
+            if (!isset($visited[$member]) && PasswordAuthenticatedUserInterface::class !== $class = self::getUserClass($providers, $member, $visited)) {
+                return $class;
+            }
+        }
+
+        return PasswordAuthenticatedUserInterface::class;
+    }
+
     private function getSortedFactories(): array
     {
         if (!$this->sortedFactories) {

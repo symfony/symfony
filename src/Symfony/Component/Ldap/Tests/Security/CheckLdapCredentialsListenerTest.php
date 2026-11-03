@@ -24,6 +24,8 @@ use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Ldap\Security\CheckLdapCredentialsListener;
 use Symfony\Component\Ldap\Security\LdapBadge;
 use Symfony\Component\Ldap\Security\LdapUser;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -256,13 +258,101 @@ class CheckLdapCredentialsListenerTest extends TestCase
         );
     }
 
-    private function createListener(?LdapInterface $ldap = null)
+    #[DataProvider('provideFailedLdapLogins')]
+    public function testLdapUsersOnlyHashesThePasswordWhenTheLdapLoginFails(LdapBadge $ldapBadge, CollectionInterface $queryResult, string $exceptionMessage)
+    {
+        $query = $this->createStub(QueryInterface::class);
+        $query->method('execute')->willReturn($queryResult);
+
+        $ldap = $this->createStub(LdapInterface::class);
+        $ldap->method('escape')->willReturnArgument(0);
+        $ldap->method('query')->willReturn($query);
+        $ldap->method('bind')->willReturnCallback(static function (string $dn, string $password) {
+            if ('s3cr3t' === $password) {
+                throw new InvalidCredentialsException();
+            }
+        });
+
+        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasher->expects($this->once())->method('hash')->with('s3cr3t');
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $this->createListener($ldap, $hasher)->onCheckPassport($this->createLdapUserEvent($ldapBadge));
+    }
+
+    public static function provideFailedLdapLogins(): iterable
+    {
+        $noEntry = new class([]) extends \ArrayObject implements CollectionInterface {
+            public function toArray(): array
+            {
+                return $this->getArrayCopy();
+            }
+        };
+        $oneEntry = new class([new Entry('cn=Wouter')]) extends \ArrayObject implements CollectionInterface {
+            public function toArray(): array
+            {
+                return $this->getArrayCopy();
+            }
+        };
+
+        yield 'wrong password' => [new LdapBadge('app.ldap', ldapUsersOnly: true), $noEntry, 'The presented password is invalid.'];
+        yield 'not found by the query' => [new LdapBadge('app.ldap', '{user_identifier}', 'elsa', 'test1234A$', '{user_identifier}_test', true), $noEntry, 'The presented user identifier is invalid.'];
+        yield 'wrong password after the query' => [new LdapBadge('app.ldap', '{user_identifier}', 'elsa', 'test1234A$', '{user_identifier}_test', true), $oneEntry, 'The presented password is invalid.'];
+    }
+
+    public function testLdapUsersOnlyHashesNoPasswordWhenTheLdapLoginSucceeds()
+    {
+        $ldap = $this->createStub(LdapInterface::class);
+        $ldap->method('escape')->willReturnArgument(0);
+
+        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasher->expects($this->never())->method('hash');
+
+        $event = $this->createLdapUserEvent(new LdapBadge('app.ldap', ldapUsersOnly: true));
+        $this->createListener($ldap, $hasher)->onCheckPassport($event);
+
+        $this->assertTrue($event->getPassport()->getBadge(PasswordCredentials::class)->isResolved());
+    }
+
+    public function testHashesNoPasswordWithoutLdapUsersOnly()
+    {
+        $ldap = $this->createStub(LdapInterface::class);
+        $ldap->method('escape')->willReturnArgument(0);
+        $ldap->method('bind')->willThrowException(new InvalidCredentialsException());
+
+        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasher->expects($this->never())->method('hash');
+
+        $this->expectException(BadCredentialsException::class);
+
+        $this->createListener($ldap, $hasher)->onCheckPassport($this->createLdapUserEvent(new LdapBadge('app.ldap')));
+    }
+
+    private function createLdapUserEvent(LdapBadge $ldapBadge): CheckPassportEvent
+    {
+        return new CheckPassportEvent(
+            new TestAuthenticator(),
+            new Passport(
+                new UserBadge('Wouter', static fn () => new LdapUser(new Entry('Wouter'), 'Wouter', null, ['ROLE_USER'])),
+                new PasswordCredentials('s3cr3t'),
+                [$ldapBadge]
+            )
+        );
+    }
+
+    private function createListener(?LdapInterface $ldap = null, ?PasswordHasherInterface $hasher = null)
     {
         $ldapLocator = new class(['app.ldap' => fn () => $ldap ?? $this->createStub(LdapInterface::class)]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
 
-        return new CheckLdapCredentialsListener($ldapLocator);
+        if (!$hasher) {
+            return new CheckLdapCredentialsListener($ldapLocator);
+        }
+
+        return new CheckLdapCredentialsListener($ldapLocator, new PasswordHasherFactory([InMemoryUser::class => $hasher]), InMemoryUser::class);
     }
 }
 

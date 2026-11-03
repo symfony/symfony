@@ -94,7 +94,7 @@ class RemotePackageStorage
             $filename .= '.'.$importMapType->value;
         }
 
-        return $this->vendorDir.'/'.$filename;
+        return $this->vendorDir.'/'.ltrim(Path::canonicalize('/'.$filename), '/');
     }
 
     private function getExtraFileDownloadPath(ImportMapEntry $entry, string $extraFilename): string

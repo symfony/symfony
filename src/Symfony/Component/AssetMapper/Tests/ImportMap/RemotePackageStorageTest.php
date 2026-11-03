@@ -150,5 +150,11 @@ class RemotePackageStorageTest extends TestCase
             'importMapType' => ImportMapType::CSS,
             'expectedPath' => '/assets/vendor/foo/bar.css',
         ];
+
+        yield 'javascript package with dot segments in its path' => [
+            'packageModuleSpecifier' => 'foo/../../../bar@1.0.0/bar.js',
+            'importMapType' => ImportMapType::JS,
+            'expectedPath' => '/assets/vendor/bar@1.0.0/bar.js',
+        ];
     }
 }

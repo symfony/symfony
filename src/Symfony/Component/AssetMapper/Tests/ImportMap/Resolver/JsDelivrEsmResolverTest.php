@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\Tests\ImportMap\Resolver;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
@@ -614,6 +615,38 @@ class JsDelivrEsmResolverTest extends TestCase
             '/fonts/a.woff2' => 'a font contents',
             '/b.woff2' => 'b font contents',
         ], $actualReturn['some-css-package']['extraFiles']);
+    }
+
+    public function testResolvePackagesRejectsDotSegmentsInImports()
+    {
+        $httpClient = new MockHttpClient(static fn ($method, $url) => match (true) {
+            str_contains($url, '/resolved') => new MockResponse(json_encode(['version' => '1.0.0'])),
+            str_contains($url, '/entrypoints') => new MockResponse(json_encode(['entrypoints' => []])),
+            default => new MockResponse('import "/npm/foo@1.0.0/../../bar@1.0.0/bar.js/+esm";'),
+        });
+
+        $provider = new JsDelivrEsmResolver($httpClient);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid import "foo/../../bar@1.0.0/bar.js": "." and ".." path segments are not allowed.');
+
+        $provider->resolvePackages([new PackageRequireOptions('foo')]);
+    }
+
+    public function testDownloadPackagesRejectsDotSegmentsInImports()
+    {
+        $httpClient = new MockHttpClient([
+            new MockResponse('import "/npm/foo@1.0.0/../../bar@1.0.0/bar.js/+esm";'),
+        ]);
+
+        $provider = new JsDelivrEsmResolver($httpClient);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid import "foo/../../bar@1.0.0/bar.js": "." and ".." path segments are not allowed.');
+
+        $provider->downloadPackages([
+            'foo' => self::createRemoteEntry('foo', version: '1.0.0'),
+        ]);
     }
 
     public function testDownloadCssRecursivelyDownloadsUrlCss()

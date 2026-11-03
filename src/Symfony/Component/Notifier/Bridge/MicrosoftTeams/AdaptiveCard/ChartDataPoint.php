@@ -11,6 +11,12 @@
 
 namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard;
 
+/**
+ * A data point of a chart.
+ *
+ * Pie, donut and stacked bar charts use legend/value points; bar, line and
+ * grouped bar charts use x/y points.
+ */
 final class ChartDataPoint
 {
     private array $options = [];
@@ -41,6 +47,26 @@ final class ChartDataPoint
     public function value(int|float $value): static
     {
         $this->options['value'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function x(string|int|float $x): static
+    {
+        $this->options['x'] = $x;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function y(int|float $y): static
+    {
+        $this->options['y'] = $y;
 
         return $this;
     }

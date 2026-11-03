@@ -22,6 +22,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\BlockElementHe
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Chart;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\ChartData;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\ChartDataPoint;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\ChartDisplayMode;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\ChartType;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Color;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Column;
@@ -32,6 +33,8 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Data\Query;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Fact;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\FactSet;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\FallbackOption;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\GaugeSegment;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\GaugeValueFormat;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Image;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Input\Choice;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Input\ChoiceSet;
@@ -207,6 +210,82 @@ final class AdaptiveCardTest extends TestCase
             'showLegend' => false,
             'data' => [
                 ['title' => 'Results', 'data' => [['legend' => 'Success', 'value' => 3, 'color' => 'good']]],
+            ],
+        ], $chart->toArray());
+    }
+
+    public function testBarChart()
+    {
+        $chart = (new Chart(ChartType::HorizontalBar))
+            ->displayMode(ChartDisplayMode::PartToWhole)
+            ->xAxisTitle('Fruit')
+            ->yAxisTitle('Sales')
+            ->data((new ChartDataPoint())->x('Pear')->y(59)->color('good'))
+            ->data((new ChartDataPoint())->x('Banana')->y(292));
+
+        $this->assertSame([
+            'type' => 'Chart.HorizontalBar',
+            'displayMode' => 'PartToWhole',
+            'xAxisTitle' => 'Fruit',
+            'yAxisTitle' => 'Sales',
+            'data' => [
+                ['x' => 'Pear', 'y' => 59, 'color' => 'good'],
+                ['x' => 'Banana', 'y' => 292],
+            ],
+        ], $chart->toArray());
+    }
+
+    public function testSeriesChart()
+    {
+        $chart = (new Chart(ChartType::VerticalBarGrouped))
+            ->stacked(true)
+            ->showBarValues(true)
+            ->colorSet('diverging')
+            ->data((new ChartData())
+                ->legend('Outlook')
+                ->color('categoricalBlue')
+                ->value((new ChartDataPoint())->x('2023-05-01')->y(24))
+                ->value((new ChartDataPoint())->x('2023-05-02')->y(48))
+            );
+
+        $this->assertSame([
+            'type' => 'Chart.VerticalBar.Grouped',
+            'stacked' => true,
+            'showBarValues' => true,
+            'colorSet' => 'diverging',
+            'data' => [
+                [
+                    'legend' => 'Outlook',
+                    'color' => 'categoricalBlue',
+                    'values' => [['x' => '2023-05-01', 'y' => 24], ['x' => '2023-05-02', 'y' => 48]],
+                ],
+            ],
+        ], $chart->toArray());
+    }
+
+    public function testGaugeChart()
+    {
+        $chart = (new Chart(ChartType::Gauge))
+            ->value(35)
+            ->min(0)
+            ->max(100)
+            ->subLabel('Used')
+            ->showMinMax(false)
+            ->valueFormat(GaugeValueFormat::Fraction)
+            ->segment((new GaugeSegment(35))->legend('Used')->color('good'))
+            ->segment((new GaugeSegment(65))->legend('Unused')->color('neutral'));
+
+        $this->assertSame([
+            'type' => 'Chart.Gauge',
+            'value' => 35,
+            'min' => 0,
+            'max' => 100,
+            'subLabel' => 'Used',
+            'showMinMax' => false,
+            'valueFormat' => 'Fraction',
+            'segments' => [
+                ['size' => 35, 'legend' => 'Used', 'color' => 'good'],
+                ['size' => 65, 'legend' => 'Unused', 'color' => 'neutral'],
             ],
         ], $chart->toArray());
     }

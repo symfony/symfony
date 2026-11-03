@@ -334,6 +334,7 @@ final class ProgressBar
      */
     public function start(?int $max = null, int $startAt = 0): void
     {
+        $startAt = max(0, $startAt);
         $this->startTime = time();
         $this->step = $startAt;
         $this->startingStep = $startAt;
@@ -403,6 +404,7 @@ final class ProgressBar
         $this->format = null;
         $this->max = max(0, $max);
         $this->stepWidth = $this->max ? Helper::width((string) $this->max) : 4;
+        $this->percent = $this->max ? min(1, (float) $this->step / $this->max) : 0;
     }
 
     /**

@@ -124,6 +124,17 @@ class ProgressBarTest extends TestCase
         $this->assertSame(0, $bar->getProgress());
     }
 
+    public function testStartAtNegativeStepClampsToZero()
+    {
+        $bar = new ProgressBarWidget(100);
+        $bar->start(null, -5);
+
+        $this->assertSame(0, $bar->getProgress());
+
+        $bar->advance();
+        $this->assertSame(1, $bar->getProgress());
+    }
+
     public function testBarWidth()
     {
         $bar = new ProgressBarWidget(100);
@@ -307,6 +318,40 @@ class ProgressBarTest extends TestCase
 
         $bar->setMaxSteps(0);
         $this->assertSame(0, $bar->getMaxSteps());
+    }
+
+    public function testNegativeMaxStepsMakesIndeterminate()
+    {
+        $bar = new ProgressBarWidget(-1);
+        $bar->start();
+        $bar->tick();
+        $this->assertSame(1, $bar->getProgress());
+
+        $bar = new ProgressBarWidget(100);
+        $bar->setMaxSteps(-1);
+        $bar->advance(3);
+        $this->assertSame(0, $bar->getMaxSteps());
+        $this->assertSame(0.0, $bar->getProgressPercent());
+    }
+
+    public function testSetMaxStepsUpdatesPercent()
+    {
+        $bar = new ProgressBarWidget(100);
+        $bar->setBarWidth(10);
+        $bar->setProgress(50);
+
+        $bar->setMaxSteps(200);
+        $this->assertSame(0.25, $bar->getProgressPercent());
+        $this->assertStringContainsString('50/200', $content = $bar->render(new RenderContext(80, 24))[0]);
+        $this->assertStringContainsString(' 25%', $content);
+
+        $bar->setMaxSteps(10);
+        $this->assertSame(10, $bar->getMaxSteps());
+        $this->assertSame(1.0, $bar->getProgressPercent());
+        $this->assertSame(10, $bar->getBarOffset());
+
+        $bar->setMaxSteps(0);
+        $this->assertSame(0.0, $bar->getProgressPercent());
     }
 
     public function testStepWidth()

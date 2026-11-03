@@ -58,6 +58,8 @@ final class ProgressBar
     private bool $overwrite = true;
     private Terminal $terminal;
     private ?string $previousMessage = null;
+    private int $lastDrawnStep = 0;
+    private int $lastDrawnMax = 0;
     private Cursor $cursor;
     private array $placeholders = [];
 
@@ -343,7 +345,11 @@ final class ProgressBar
             $this->setMaxSteps($max);
         }
 
-        $startAt > 0 ? $this->setProgress($startAt) : $this->percent = 0.0;
+        if ($this->max && $startAt > $this->max) {
+            $this->max = $startAt;
+        }
+
+        $this->percent = $this->max ? (float) $startAt / $this->max : 0.0;
 
         $this->display();
     }
@@ -412,12 +418,17 @@ final class ProgressBar
      */
     public function finish(): void
     {
+        $max = $this->max;
+
         if (!$this->max) {
             $this->max = $this->step;
         }
 
-        if ($this->step === $this->max && !$this->overwrite) {
-            // prevent double 100% output
+        if ($this->step === $this->max && !$this->overwrite && $this->lastDrawnStep === $this->step && \in_array($this->lastDrawnMax, [$max, $this->max], true)) {
+            // prevent double output when the last frame already shows this step, against the max it had before finishing or this one
+            // remember this max as drawn, so that calling finish() again does not draw the frame either
+            $this->lastDrawnMax = $this->max;
+
             return;
         }
 
@@ -438,6 +449,8 @@ final class ProgressBar
         }
 
         $this->overwrite($this->buildLine());
+        $this->lastDrawnStep = $this->step;
+        $this->lastDrawnMax = $this->max;
     }
 
     /**
@@ -509,7 +522,7 @@ final class ProgressBar
                     $this->cursor->clearLine();
                 }
             }
-        } elseif ($this->step > 0) {
+        } elseif (null !== $this->previousMessage) {
             $message = \PHP_EOL.$message;
         }
 

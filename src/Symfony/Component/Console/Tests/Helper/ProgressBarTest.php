@@ -134,6 +134,51 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testResumeWithNonDecoratedOutput()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 200, 0);
+        $bar->start(null, 50);
+        $bar->advance(20);
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            '  50/200 [=======>--------------------]  25%'.\PHP_EOL.
+            '  70/200 [=========>------------------]  35%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testResumeNoMaxWithNonDecoratedOutput()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 0, 0);
+        $bar->start(null, 15);
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            '   15 [>---------------------------]',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testRestartWithNonDecoratedOutput()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 2, 0);
+        $bar->start();
+        $bar->finish();
+        $bar->start();
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            ' 0/2 [>---------------------------]   0%'.\PHP_EOL.
+            ' 2/2 [============================] 100%'.\PHP_EOL.
+            ' 0/2 [>---------------------------]   0%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testResumeAtNegativeStep()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
@@ -895,6 +940,126 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals(
             '    0 [>---------------------------]'.\PHP_EOL.
             '    1 [->--------------------------]',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testFinishNonDecoratedOutputWithoutMaxWhenLastStepIsNotDrawnYet()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 0, 10);
+        $bar->start();
+        $bar->advance(15);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals('    0 [>---------------------------]'.\PHP_EOL.'   15 [============================]', stream_get_contents($output->getStream()));
+    }
+
+    public function testFinishNonDecoratedOutputWithoutMaxWhenLastStepIsAlreadyDrawn()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 0, 0);
+        $bar->start();
+        $bar->advance(15);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals('    0 [>---------------------------]'.\PHP_EOL.'   15 [->--------------------------]', stream_get_contents($output->getStream()));
+    }
+
+    public function testFinishTwiceNonDecoratedOutputWithoutMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 0, 0);
+        $bar->start();
+        $bar->advance(15);
+        $bar->finish();
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals('    0 [>---------------------------]'.\PHP_EOL.'   15 [->--------------------------]', stream_get_contents($output->getStream()));
+    }
+
+    public function testFinishEmptyNonDecoratedOutputWithoutMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 0, 0);
+        $bar->start();
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals('    0 [>---------------------------]', stream_get_contents($output->getStream()));
+    }
+
+    public function testFinishUnstartedNonDecoratedOutputWithoutMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 0, 0);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertSame('', stream_get_contents($output->getStream()));
+    }
+
+    public function testFinishNonDecoratedOutputAfterSettingMaxStepsToCurrentStep()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 100, 0);
+        $bar->start();
+        $bar->setProgress(50);
+        $bar->setMaxSteps(50);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '   0/100 [>---------------------------]   0%'.\PHP_EOL.
+            '  50/100 [==============>-------------]  50%'.\PHP_EOL.
+            ' 50/50 [============================] 100%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testFinishNonDecoratedOutputWithoutMaxAfterSettingMaxStepsToCurrentStep()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 0, 0);
+        $bar->start();
+        $bar->setProgress(15);
+        $bar->setMaxSteps(15);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.\PHP_EOL.
+            '   15 [->--------------------------]'.\PHP_EOL.
+            ' 15/15 [============================] 100%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testFinishNonDecoratedOutputAfterReachingMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 2, 0);
+        $bar->setFormat('verbose');
+        $bar->start();
+        $bar->advance(2);
+        sleep(1);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 0/2 [>---------------------------]   0% < 1 sec'.\PHP_EOL.
+            ' 2/2 [============================] 100% < 1 sec',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testFinishNonDecoratedOutputAgainAfterRemovingMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 10, 0);
+        $bar->start();
+        $bar->finish();
+        $bar->setMaxSteps(0);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '  0/10 [>---------------------------]   0%'.\PHP_EOL.
+            ' 10/10 [============================] 100%',
             stream_get_contents($output->getStream())
         );
     }

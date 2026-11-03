@@ -111,6 +111,7 @@ class ProgressBarWidget extends AbstractWidget
      */
     public function start(?int $max = null, int $startAt = 0): void
     {
+        $startAt = max(0, $startAt);
         $this->startTime = time();
         $this->step = $startAt;
         $this->startingStep = $startAt;
@@ -369,14 +370,15 @@ class ProgressBarWidget extends AbstractWidget
      */
     public function setMaxSteps(int $max): void
     {
-        if (0 === $max) {
+        if ($max <= 0) {
             $this->max = null;
             $this->stepWidth = 4;
         } else {
-            $this->max = max(0, $max);
-            $this->stepWidth = \strlen((string) $this->max);
+            $this->max = $max;
+            $this->stepWidth = \strlen((string) $max);
         }
 
+        $this->percent = $this->max ? min(1.0, (float) $this->step / $this->max) : 0.0;
         $this->invalidate();
     }
 

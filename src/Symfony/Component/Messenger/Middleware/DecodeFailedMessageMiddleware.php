@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Message\DefaultStampsProviderInterface;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
@@ -63,7 +64,12 @@ final class DecodeFailedMessageMiddleware implements MiddlewareInterface
             throw new LogicException(\sprintf('The serializer configured for the "%s" transport must implement "%s".', $transportName, SerializerInterface::class));
         }
 
-        $decodedEnvelope = $serializer->decode($message->encodedEnvelope);
+        try {
+            $decodedEnvelope = $serializer->decode($message->encodedEnvelope);
+        } catch (MessageDecodingFailedException $e) {
+            // the stamps of a thrown failure are lost and its retries cannot be counted, so it should not be retried
+            throw $e->getPrevious() instanceof UnrecoverableExceptionInterface ? $e->getPrevious() : new UnrecoverableMessageHandlingException($e->getMessage(), $e->getCode(), $e);
+        }
 
         if (($failure = $decodedEnvelope->getMessage()) instanceof MessageDecodingFailedException) {
             // retry listeners look at the thrown exception only: surface an unrecoverable cause so that the message skips retries

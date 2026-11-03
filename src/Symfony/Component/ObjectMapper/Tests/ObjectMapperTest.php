@@ -277,8 +277,11 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\Uninitialized\Post;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Uninitialized\PostView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Unreadable\Order;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Unreadable\OrderView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\UnwritableTargetProperty\AsymmetricVisibilityTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\UnwritableTargetProperty\ReadonlyPropertyTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteBySetter\Activity as WriteBySetterActivity;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteBySetter\ActivityInput as WriteBySetterActivityInput;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteBySetter\PrivateSetActivity as WriteBySetterPrivateSetActivity;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteBySetter\PromotedActivity as WriteBySetterPromotedActivity;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteBySetter\RenamedActivityInput as WriteBySetterRenamedActivityInput;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -2176,6 +2179,37 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame($profile, $profile->owner);
     }
 
+    #[DataProvider('provideAccessor')]
+    public function testReadonlyTargetPropertiesAreSkipped(?PropertyAccessorInterface $accessor)
+    {
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor);
+        $source = (object) ['uninitialized' => 'source', 'initialized' => 'source', 'name' => 'source'];
+
+        $target = $mapper->map($source, ReadonlyPropertyTarget::class);
+
+        $this->assertFalse((new \ReflectionProperty($target, 'uninitialized'))->isInitialized($target));
+        $this->assertSame('target', $target->initialized);
+        $this->assertSame('source', $target->name);
+
+        $target = $mapper->map($source, new ReadonlyPropertyTarget());
+
+        $this->assertSame('target', $target->initialized);
+        $this->assertSame('source', $target->name);
+    }
+
+    public function testSetVisibilityOfTargetPropertiesIsHonored()
+    {
+        $source = (object) ['privateSet' => 'source', 'protectedSet' => 'source', 'uninitialized' => 'source', 'initialized' => 'source', 'virtual' => 'source'];
+
+        $target = (new ObjectMapper())->map($source, AsymmetricVisibilityTarget::class);
+
+        $this->assertSame('target', $target->privateSet);
+        $this->assertSame('target', $target->protectedSet);
+        $this->assertSame('source', $target->uninitialized);
+        $this->assertSame('target', $target->initialized);
+        $this->assertSame('target', $target->virtual);
+    }
+
     #[DataProvider('providePropertyWrittenBySetter')]
     public function testPropertyWrittenBySetterRequiresAPropertyAccessor(object $source, object|string|null $target)
     {
@@ -2191,6 +2225,14 @@ final class ObjectMapperTest extends TestCase
         yield 'stdClass to an object' => [(object) ['name' => 'Keyboard'], new WriteBySetterActivity()];
         yield '#[Map] on the source class' => [new WriteBySetterActivityInput(), null];
         yield '#[Map] on the source property' => [new WriteBySetterRenamedActivityInput(), null];
+    }
+
+    public function testPrivateSetPropertyWrittenBySetterRequiresAPropertyAccessor()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf('The "%s::$name" property can only be written with "setName()", which requires a property accessor.', WriteBySetterPrivateSetActivity::class));
+
+        (new ObjectMapper())->map((object) ['name' => 'Keyboard'], WriteBySetterPrivateSetActivity::class);
     }
 
     #[RunInSeparateProcess]

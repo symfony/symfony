@@ -289,6 +289,11 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 continue;
             }
 
+            // a public(set) readonly property can be written only once
+            if (isset($classMetadata['readOnlyProperties'][$property]) && $targetRefl->getProperty($property)->isInitialized($mappedTarget)) {
+                continue;
+            }
+
             try {
                 $mappedTarget->{$property} = $value;
             } catch (\TypeError $e) {

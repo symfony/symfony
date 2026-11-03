@@ -58,6 +58,11 @@ final class ReflectionClassMetadataFactory implements ClassMetadataFactoryInterf
             ];
         }
 
+        $readOnlyProperties = [];
+        foreach ($targetRefl->getProperties(\ReflectionProperty::IS_READONLY) as $property) {
+            $readOnlyProperties[$property->name] = true;
+        }
+
         $classMappings = array_values($this->metadataFactory->create($source));
 
         return [
@@ -67,6 +72,7 @@ final class ReflectionClassMetadataFactory implements ClassMetadataFactoryInterf
             'hasConstructor' => null !== $constructor,
             'constructorParameters' => $parameters,
             'requiredConstructorParameters' => $constructor?->getNumberOfRequiredParameters() ?? 0,
+            'readOnlyProperties' => $readOnlyProperties,
         ];
     }
 

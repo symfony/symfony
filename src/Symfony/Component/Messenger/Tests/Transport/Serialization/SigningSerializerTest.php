@@ -875,6 +875,58 @@ class SigningSerializerTest extends TestCase
         $this->assertSame($encoded, $failure->encodedEnvelope);
     }
 
+    public function testDecodeFailureThrownByTheInnerSerializerOfAnUnverifiedMessageIsThrown()
+    {
+        $inner = new class implements SerializerInterface {
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                throw new MessageDecodingFailedException('Cannot decode.');
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                return ['body' => 'the-body'];
+            }
+        };
+        $serializer = new SigningSerializer($inner, 'secret-key', 'sha256', true);
+
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage('Cannot decode.');
+
+        $serializer->decode($serializer->encode(new Envelope(new DummyMessage('hello'), [new ReceivedStamp('async')])));
+    }
+
+    public function testExceptionThrownByTheInnerSerializerOfAnUnverifiedMessageIsThrownAsADecodingFailure()
+    {
+        $exception = new \RuntimeException('Cannot fetch the key.', 123);
+        $inner = new class($exception) implements SerializerInterface {
+            public function __construct(
+                private \Throwable $exception,
+            ) {
+            }
+
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                throw $this->exception;
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                return ['body' => 'the-body'];
+            }
+        };
+        $serializer = new SigningSerializer($inner, 'secret-key', 'sha256', true);
+
+        try {
+            $serializer->decode($serializer->encode(new Envelope(new DummyMessage('hello'), [new ReceivedStamp('async')])));
+            $this->fail('An exception should have been thrown.');
+        } catch (MessageDecodingFailedException $e) {
+            $this->assertSame('Cannot fetch the key.', $e->getMessage());
+            $this->assertSame(123, $e->getCode());
+            $this->assertSame($exception, $e->getPrevious());
+        }
+    }
+
     #[Group('legacy')]
     #[IgnoreDeprecations]
     public function testEncodeSignsTheDecodeFailureOfASignedMessage()

@@ -211,7 +211,16 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
             return $this->isWrittenDirectly($targetRefl, $property);
         }
 
-        return $targetRefl->hasProperty($property) && $targetRefl->getProperty($property)->isPublic();
+        if (!$targetRefl->hasProperty($property) || !($reflProperty = $targetRefl->getProperty($property))->isPublic()) {
+            return false;
+        }
+
+        // readonly properties are also protected(set), unless declared public(set)
+        if ($reflProperty->isPrivateSet() || $reflProperty->isProtectedSet()) {
+            return false;
+        }
+
+        return !$reflProperty->isVirtual() || $reflProperty->hasHook(\PropertyHookType::Set);
     }
 
     /**

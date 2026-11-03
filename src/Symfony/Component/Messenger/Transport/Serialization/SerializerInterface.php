@@ -37,11 +37,10 @@ interface SerializerInterface
      *   produced by encode() and does not survive a round trip, so implementations MUST
      *   treat it as optional and MUST NOT require it to decode.
      *
-     * On failure, implementations SHOULD return an Envelope wrapping a
-     * MessageDecodingFailedException instead of throwing, so that the worker
-     * can route the failure through the normal retry/DLQ path. Throwing a
-     * MessageDecodingFailedException is still supported for BC with custom
-     * serializers; transports will wrap the exception as a fallback.
+     * On failure, implementations SHOULD return an Envelope that wraps a MessageDecodingFailedException and contains the stamps they could decode.
+     * The worker needs these stamps to count the retries of the message.
+     * Throwing a MessageDecodingFailedException is still supported for BC, but the stamps of the message are then lost.
+     * In this case, the message is sent to the failure transport without being retried.
      *
      * @param array{body: string, headers?: array<string, string>, extra?: array<string, mixed>} $encodedEnvelope
      *

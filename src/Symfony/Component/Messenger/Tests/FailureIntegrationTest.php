@@ -1654,6 +1654,58 @@ class FailureIntegrationTest extends TestCase
         yield 'JSON' => ['App\JsonMessageWithDefaultStamps', Serializer::class];
     }
 
+    #[DataProvider('provideExceptionsThrownWhenDecoding')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testMessageWhoseSerializerThrowsIsSentToTheFailureTransportWithoutRetryAndReplayedOnceItDecodes(\Throwable $exception, bool $sign)
+    {
+        $encryptingSerializer = new EncryptingFailureTestSerializer(new Serializer());
+        $serializer = $sign ? new SigningSerializer($encryptingSerializer, 'signing-key', [DummyMessage::class]) : $encryptingSerializer;
+        $failureSerializer = $sign ? new SigningSerializer(new Serializer(), 'signing-key', [DummyMessage::class]) : new Serializer();
+
+        $transport = new SerializingFailureTestSenderAndReceiver($serializer, [$serializer->encode(new Envelope(new DummyMessage('API')))]);
+        $failureTransport = new SerializingFailureTestSenderAndReceiver($failureSerializer, []);
+        $encryptingSerializer->decodingException = $exception;
+
+        $calls = 0;
+        $bus = new MessageBus([
+            new DecodeFailedMessageMiddleware(new ServiceLocator(['transport' => static fn () => $serializer, 'failed' => static fn () => $failureSerializer])),
+            new FailedMessageProcessingMiddleware(),
+            new HandleMessageMiddleware(new HandlersLocator([DummyMessage::class => [static function () use (&$calls) { ++$calls; }]])),
+        ]);
+
+        $failures = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new SendFailedMessageForRetryListener(new ServiceLocator(['transport' => static fn () => $transport]), new ServiceLocator(['transport' => static fn () => new MultiplierRetryStrategy(3, 0)])));
+        $dispatcher->addSubscriber(new SendFailedMessageToFailureTransportListener(new ServiceLocator(['transport' => static fn () => $failureTransport])));
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$failures) {
+            $failures[] = [RedeliveryStamp::getRetryCountFromEnvelope($event->getEnvelope()), $event->getThrowable()::class, $event->getThrowable()->getMessage()];
+        });
+
+        for ($i = 0; $i < 10 && $transport->getMessagesWaitingToBeReceived(); ++$i) {
+            (new Worker(['transport' => $transport], $bus, $dispatcher))->run();
+        }
+
+        $this->assertSame([[0, UnrecoverableMessageHandlingException::class, 'Unknown encryption key.']], $failures);
+        $this->assertSame(0, $calls);
+        $this->assertSame([], $transport->getMessagesWaitingToBeReceived());
+        $this->assertCount(1, $failureTransport->getMessagesWaitingToBeReceived());
+
+        $encryptingSerializer->decodingException = null;
+        (new Worker(['failed' => $failureTransport], $bus, $dispatcher))->run();
+
+        $this->assertSame(1, $calls);
+        $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
+    }
+
+    public static function provideExceptionsThrownWhenDecoding(): iterable
+    {
+        yield 'decoding failure' => [new MessageDecodingFailedException('Unknown encryption key.'), false];
+        yield 'decoding failure, signed' => [new MessageDecodingFailedException('Unknown encryption key.'), true];
+        yield 'other exception, signed' => [new \RuntimeException('Unknown encryption key.'), true];
+    }
+
     public function testRetryThroughTransportSkipsTheHandlerWhoseResultCannotBeEncoded()
     {
         $transport = new InMemoryTransport(Serializer::create());
@@ -1806,9 +1858,15 @@ class SerializingFailureTestSenderAndReceiver implements ReceiverInterface, Send
 
     public function get(): iterable
     {
-        $encodedEnvelope = array_shift($this->encodedEnvelopes);
+        if (null === $encodedEnvelope = array_shift($this->encodedEnvelopes)) {
+            return [];
+        }
 
-        return null === $encodedEnvelope ? [] : [$this->serializer->decode($encodedEnvelope)];
+        try {
+            return [$this->serializer->decode($encodedEnvelope)];
+        } catch (MessageDecodingFailedException $e) {
+            return [MessageDecodingFailedException::wrap($encodedEnvelope, $e->getMessage(), $e->getCode(), $e)];
+        }
     }
 
     public function ack(Envelope $envelope): void

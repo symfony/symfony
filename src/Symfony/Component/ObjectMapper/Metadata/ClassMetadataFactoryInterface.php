@@ -26,6 +26,7 @@ namespace Symfony\Component\ObjectMapper\Metadata;
  *     hasConstructor: bool,
  *     constructorParameters: array<string, ConstructorParameterMetadata>,
  *     requiredConstructorParameters: int,
+ *     readOnlyProperties: array<string, true>,
  * }
  *
  * @internal

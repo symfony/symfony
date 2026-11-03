@@ -114,6 +114,17 @@ class RemotePackageStorageTest extends TestCase
         $this->assertEquals('any content', $this->filesystem->readFile($targetPath));
     }
 
+    public function testSaveExtraFileKeepsItInThePackageDirectory()
+    {
+        $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
+        $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
+        $storage->saveExtraFile($entry, '../../extra-file.woff2', 'any content');
+        $targetPath = self::$writableRoot.'/assets/vendor/module_specifier/extra-file.woff2';
+        $this->assertFileExists($targetPath);
+        $this->assertTrue($storage->isExtraFileDownloaded($entry, '../../extra-file.woff2'));
+        $this->assertFileDoesNotExist(self::$writableRoot.'/extra-file.woff2');
+    }
+
     #[DataProvider('getDownloadPathTests')]
     public function testGetDownloadedPath(string $packageModuleSpecifier, ImportMapType $importMapType, string $expectedPath)
     {
@@ -145,6 +156,12 @@ class RemotePackageStorageTest extends TestCase
             'packageModuleSpecifier' => 'foo/bar',
             'importMapType' => ImportMapType::CSS,
             'expectedPath' => '/assets/vendor/foo/bar.css',
+        ];
+
+        yield 'javascript package with dot segments in its path' => [
+            'packageModuleSpecifier' => 'foo/../../../bar@1.0.0/bar.js',
+            'importMapType' => ImportMapType::JS,
+            'expectedPath' => '/assets/vendor/bar@1.0.0/bar.js',
         ];
     }
 }

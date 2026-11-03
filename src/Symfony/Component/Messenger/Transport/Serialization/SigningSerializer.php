@@ -272,8 +272,11 @@ final class SigningSerializer implements SerializerInterface
             }
 
             throw new InvalidMessageSignatureException(\sprintf('Invalid signature for message "%s".', $type));
-        } catch (\Throwable $e) {
+        } catch (InvalidMessageSignatureException $e) {
             return MessageDecodingFailedException::wrap($encodedEnvelope, $e->getMessage(), (int) $e->getCode(), $e);
+        } catch (\Throwable $e) {
+            // returning what the inner serializer throws would lose the stamps that count its retries
+            throw $e instanceof MessageDecodingFailedException ? $e : new MessageDecodingFailedException($e->getMessage(), (int) $e->getCode(), $e);
         }
     }
 

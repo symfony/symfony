@@ -42,4 +42,16 @@ class LdapAuthenticatorTest extends TestCase
         $this->assertNotNull($badge);
         $this->assertSame('serviceId', $badge->getLdapServiceId());
     }
+
+    public function testAuthenticatePassesLdapUsersOnlyToTheBadge()
+    {
+        $decorated = $this->createStub(AuthenticatorInterface::class);
+        $decorated->method('authenticate')->willReturnCallback(static fn () => new Passport(new UserBadge('test'), new PasswordCredentials('s3cret')));
+
+        $passport = (new LdapAuthenticator($decorated, 'serviceId'))->authenticate(new Request());
+        $this->assertFalse($passport->getBadge(LdapBadge::class)->isLdapUsersOnly());
+
+        $passport = (new LdapAuthenticator($decorated, 'serviceId', ldapUsersOnly: true))->authenticate(new Request());
+        $this->assertTrue($passport->getBadge(LdapBadge::class)->isLdapUsersOnly());
+    }
 }

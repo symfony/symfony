@@ -46,7 +46,7 @@ use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Ldap\Ldap;
-use Symfony\Component\Ldap\Security\CheckLdapCredentialsListener;
+use Symfony\Component\Ldap\Security\LdapAuthenticator;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
@@ -169,9 +169,9 @@ class SecurityExtensionTest extends TestCase
         $this->assertEqualsCanonicalizing($expressionLanguage->variables, $tags[0]['variables']);
     }
 
-    public function testLdapUsersOnlyReachesTheCredentialsListener()
+    public function testLdapUsersOnlyReachesTheLdapAuthenticator()
     {
-        if (!property_exists(CheckLdapCredentialsListener::class, 'ldapUsersOnly')) {
+        if (!property_exists(LdapAuthenticator::class, 'ldapUsersOnly')) {
             $this->markTestSkipped('symfony/ldap 8.2 is required.');
         }
 
@@ -190,13 +190,41 @@ class SecurityExtensionTest extends TestCase
         ]);
         $container->compile();
 
-        $listener = $container->getDefinition('security.listener.form_login_ldap.main');
-        $this->assertTrue($listener->getArgument(1));
+        $this->assertTrue($this->getLdapUsersOnlyArgument($container, 'form_login_ldap'));
+    }
+
+    public function testLdapUsersOnlyIsSetPerAuthenticator()
+    {
+        if (!property_exists(LdapAuthenticator::class, 'ldapUsersOnly')) {
+            $this->markTestSkipped('symfony/ldap 8.2 is required.');
+        }
+
+        $container = $this->getRawContainer();
+        $container->register('Symfony\\Component\\Ldap\\Ldap', Ldap::class)->addTag('ldap');
+        $container->loadFromExtension('security', [
+            'providers' => ['default' => ['id' => 'foo']],
+            'firewalls' => [
+                'main' => [
+                    'entry_point' => 'http_basic_ldap',
+                    'form_login_ldap' => [
+                        'service' => 'Symfony\\Component\\Ldap\\Ldap',
+                        'ldap_users_only' => true,
+                    ],
+                    'http_basic_ldap' => [
+                        'service' => 'Symfony\\Component\\Ldap\\Ldap',
+                    ],
+                ],
+            ],
+        ]);
+        $container->compile();
+
+        $this->assertTrue($this->getLdapUsersOnlyArgument($container, 'form_login_ldap'));
+        $this->assertFalse($this->getLdapUsersOnlyArgument($container, 'http_basic_ldap'));
     }
 
     public function testLdapUsersOnlyIsRejectedWithoutAnLdapUserProvider()
     {
-        if (!property_exists(CheckLdapCredentialsListener::class, 'ldapUsersOnly')) {
+        if (!property_exists(LdapAuthenticator::class, 'ldapUsersOnly')) {
             $this->markTestSkipped('symfony/ldap 8.2 is required.');
         }
 
@@ -346,7 +374,7 @@ class SecurityExtensionTest extends TestCase
 
     public function testLdapUsersOnlyIsAcceptedWithAnLdapLegInAChainProvider()
     {
-        if (!property_exists(CheckLdapCredentialsListener::class, 'ldapUsersOnly')) {
+        if (!property_exists(LdapAuthenticator::class, 'ldapUsersOnly')) {
             $this->markTestSkipped('symfony/ldap 8.2 is required.');
         }
 
@@ -370,7 +398,7 @@ class SecurityExtensionTest extends TestCase
         ]);
         $container->compile();
 
-        $this->assertTrue($container->getDefinition('security.listener.form_login_ldap.main')->getArgument(1));
+        $this->assertTrue($this->getLdapUsersOnlyArgument($container, 'form_login_ldap'));
     }
 
     public function testLdapUsersOnlyDefaultsToCheckingEveryUser()
@@ -385,7 +413,7 @@ class SecurityExtensionTest extends TestCase
         ]);
         $container->compile();
 
-        $this->assertFalse($container->getDefinition('security.listener.form_login_ldap.main')->getArgument(1));
+        $this->assertFalse($this->getLdapUsersOnlyArgument($container, 'form_login_ldap'));
     }
 
     public function testAttributeExpressionLanguagesAreLazy()
@@ -2469,6 +2497,11 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(0));
         $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.client.main')->getArgument(0));
         $this->assertSame('oidc.http_client', (string) $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main')->getArgument(2));
+    }
+
+    private function getLdapUsersOnlyArgument(ContainerBuilder $container, string $key): bool
+    {
+        return $container->getDefinition('security.authenticator.'.$key.'.main')->getArguments()['$ldapUsersOnly'] ?? false;
     }
 
     protected function getRawContainer()

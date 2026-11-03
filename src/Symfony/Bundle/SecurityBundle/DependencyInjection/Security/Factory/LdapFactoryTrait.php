@@ -57,7 +57,7 @@ trait LdapFactoryTrait
         $authenticatorId = $decoratedId;
 
         if ($config['ldap_users_only']) {
-            if (!property_exists(CheckLdapCredentialsListener::class, 'ldapUsersOnly')) {
+            if (!property_exists(LdapAuthenticator::class, 'ldapUsersOnly')) {
                 throw new InvalidConfigurationException('Using "ldap_users_only" requires symfony/ldap 8.2 or higher, the installed version would ignore it.');
             }
 
@@ -69,7 +69,6 @@ trait LdapFactoryTrait
         $container->setDefinition('security.listener.'.$key.'.'.$firewallName, new Definition(CheckLdapCredentialsListener::class))
             ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$firewallName])
             ->addArgument(new Reference('security.ldap_locator'))
-            ->addArgument($config['ldap_users_only'])
         ;
 
         $ldapAuthenticatorId = 'security.authenticator.'.$key.'.'.$firewallName;
@@ -88,6 +87,10 @@ trait LdapFactoryTrait
             }
 
             $definition->addArgument($config['query_string']);
+        }
+
+        if ($config['ldap_users_only']) {
+            $definition->setArgument('$ldapUsersOnly', true);
         }
 
         return $ldapAuthenticatorId;

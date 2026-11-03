@@ -496,9 +496,13 @@ class Process implements \IteratorAggregate
             $this->readPipes($running, '\\' !== \DIRECTORY_SEPARATOR || !$running);
         } while ($running);
 
+        // Once its pipes are closed, the process is usually only a few microseconds away from exiting.
+        // Start polling with short sleeps so a short command does not wait a whole millisecond for nothing.
+        $sleep = 10;
         while ($this->isRunning()) {
             $this->checkTimeout();
-            usleep(1000);
+            usleep($sleep);
+            $sleep = min(2 * $sleep, 1000);
         }
 
         if ($this->processInformation['signaled'] && $this->processInformation['termsig'] !== $this->latestSignal) {

@@ -1012,6 +1012,26 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $this->assertEquals('    0 [>---------------------------]'.\PHP_EOL.'   15 [->--------------------------]', stream_get_contents($output->getStream()));
     }
 
+    public function testDisplayAfterFinishNonDecoratedOutputWithoutMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 0, 0);
+        $bar->start();
+        $bar->advance(15);
+        $bar->finish();
+
+        $this->assertSame(1.0, $bar->getProgressPercent());
+
+        $bar->display();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.\PHP_EOL.
+            '   15 [->--------------------------]'.\PHP_EOL.
+            '   15 [============================]',
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testFinishEmptyNonDecoratedOutputWithoutMax()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(false), 0, 0);

@@ -9,13 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DebugBundle\Tests\DependencyInjection;
+namespace Symfony\Bundle\DebugBundle\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\DebugBundle\DebugBundle;
 use Symfony\Bundle\DebugBundle\DependencyInjection\Compiler\DumpDataCollectorPass;
-use Symfony\Bundle\DebugBundle\DependencyInjection\DebugExtension;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -27,12 +26,12 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Server\Connection;
 use Symfony\Component\VarDumper\Server\DumpServer;
 
-class DebugExtensionTest extends TestCase
+class DebugBundleTest extends TestCase
 {
     public function testLoadWithoutConfiguration()
     {
         $container = $this->createContainer();
-        $container->registerExtension(new DebugExtension());
+        $container->registerExtension(new DebugBundle()->getContainerExtension());
         $container->loadFromExtension('debug', []);
         $this->compileContainer($container);
 
@@ -50,7 +49,7 @@ class DebugExtensionTest extends TestCase
     public function testUnsetClosureFileInfoShouldBeRegisteredInVarCloner()
     {
         $container = $this->createContainer();
-        $container->registerExtension(new DebugExtension());
+        $container->registerExtension(new DebugBundle()->getContainerExtension());
         $container->loadFromExtension('debug', []);
         $this->compileContainer($container);
 
@@ -89,7 +88,7 @@ class DebugExtensionTest extends TestCase
     public function testServicesUsingDumpDestinationCreation(?string $dumpDestination, string $expectedHost, ?string $expectedOutput)
     {
         $container = $this->createContainer();
-        $container->registerExtension(new DebugExtension());
+        $container->registerExtension(new DebugBundle()->getContainerExtension());
         $container->loadFromExtension('debug', ['dump_destination' => $dumpDestination]);
         $container->setAlias('dump_server_public', 'var_dumper.dump_server')->setPublic(true);
         $container->setAlias('server_conn_public', 'var_dumper.server_connection')->setPublic(true);
@@ -129,7 +128,7 @@ class DebugExtensionTest extends TestCase
         };
         $container = new ContainerBuilder();
         $container->getParameterBag()->add($kernel->getKernelParameters());
-        $container->registerExtension(new DebugExtension());
+        $container->registerExtension(new DebugBundle()->getContainerExtension());
         $container->loadFromExtension('debug', []);
         $container->addCompilerPass(new DumpDataCollectorPass());
         $this->compileContainer($container);
@@ -145,6 +144,7 @@ class DebugExtensionTest extends TestCase
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => true,
             'kernel.project_dir' => __DIR__,
+            'kernel.environment' => 'test',
             'kernel.bundles' => ['DebugBundle' => DebugBundle::class],
         ]));
 

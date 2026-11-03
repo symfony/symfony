@@ -2053,7 +2053,47 @@ b'])]
                     'SCRIPT_NAME' => '/api/index.php',
                     'PHP_SELF' => '/api/index.php',
                 ],
+                '/api',
+                '/index.phpfoo',
+            ],
+            [
+                '/index.phpfoo',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/index.php',
+                    'SCRIPT_NAME' => '/index.php',
+                    'PHP_SELF' => '/index.php',
+                ],
+                '',
+                '/index.phpfoo',
+            ],
+            [
+                '/api/index.php?foo=bar',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/api/index.php',
+                    'SCRIPT_NAME' => '/api/index.php',
+                    'PHP_SELF' => '/api/index.php',
+                ],
                 '/api/index.php',
+                '/',
+            ],
+            [
+                '/sub/api/index.phpfoo',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/api/index.php',
+                    'SCRIPT_NAME' => '/api/index.php',
+                    'PHP_SELF' => '/api/index.php',
+                ],
+                '',
+                '/sub/api/index.phpfoo',
+            ],
+            [
+                '/api%2Ffoo',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/api/index.php',
+                    'SCRIPT_NAME' => '/api/index.php',
+                    'PHP_SELF' => '/api/index.php',
+                ],
+                '/api%2F',
                 '/foo',
             ],
         ];

@@ -52,6 +52,9 @@ class UrlHelperTest extends TestCase
             ['http://localhost/foo/bar?baz=1#baz', '?baz=1#baz', '/foo/bar?foo=1'],
             ['http://localhost/foo/baz?baz=1#baz', 'baz?baz=1#baz', '/foo/bar?foo=1'],
 
+            ['http://localhost/foo/bar', '', '/foo/bar'],
+            ['http://localhost/foo/bar?foo=1', '', '/foo/bar?foo=1'],
+
             ['mailto:hello@example.localhost', 'mailto:hello@example.localhost', '/'],
             ['tel:123', 'tel:123', '/'],
         ];
@@ -125,6 +128,70 @@ class UrlHelperTest extends TestCase
             ['/foo.png', '/foo', 'localhost', 'http', 443, 80, 'http://localhost:443/foo.png'],
             ['/foo.png', '/foo', 'localhost', 'https', 443, 80, 'https://localhost:80/foo.png'],
         ];
+    }
+
+    public function testGenerateAbsoluteUrlWithRequestContextAndBaseUrl()
+    {
+        if (!class_exists(RequestContext::class)) {
+            $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
+        }
+
+        $requestContext = new RequestContext('/app.php', 'GET', 'example.test', 'https', 80, 443, '/foo');
+        $requestContext->setQueryString('a=1');
+
+        $helper = new UrlHelper(new RequestStack(), $requestContext);
+
+        $this->assertSame('https://example.test/app.php/foo?b=2', $helper->getAbsoluteUrl('?b=2'));
+        $this->assertSame('https://example.test/app.php/foo?a=1#hash', $helper->getAbsoluteUrl('#hash'));
+        $this->assertSame('https://example.test/app.php/foo?a=1', $helper->getAbsoluteUrl(''));
+
+        $requestContext->setPathInfo('foo');
+        $this->assertSame('https://example.test/app.php/foo?b=2', $helper->getAbsoluteUrl('?b=2'));
+    }
+
+    public function testGenerateAbsoluteUrlWithQueryAndScriptFileName()
+    {
+        $request = Request::create('http://localhost/index.php/foo?x=1');
+        $request->server->set('SCRIPT_NAME', '/index.php');
+        $request->server->set('SCRIPT_FILENAME', '/var/www/index.php');
+
+        $stack = new RequestStack();
+        $stack->push($request);
+        $helper = new UrlHelper($stack);
+
+        $this->assertSame('http://localhost/index.php/foo?b=2', $helper->getAbsoluteUrl('?b=2'));
+    }
+
+    public function testGenerateAbsoluteUrlWithTrustedPrefix()
+    {
+        Request::setTrustedProxies(['127.0.0.1'], Request::HEADER_X_FORWARDED_PREFIX);
+
+        try {
+            $stack = new RequestStack();
+            $stack->push(Request::create('http://localhost/foo?x=1', 'GET', [], [], [], ['HTTP_X_FORWARDED_PREFIX' => '/sub']));
+            $helper = new UrlHelper($stack);
+
+            $this->assertSame('http://localhost/sub/foo?x=1#h', $helper->getAbsoluteUrl('#h'));
+            $this->assertSame('http://localhost/sub/foo?b=2', $helper->getAbsoluteUrl('?b=2'));
+            $this->assertSame('http://localhost/sub/foo?x=1', $helper->getAbsoluteUrl(''));
+        } finally {
+            Request::setTrustedProxies([], -1);
+        }
+    }
+
+    public function testGenerateAbsoluteUrlWhenRequestingTheScriptName()
+    {
+        $request = Request::create('http://localhost/index.php?x=1');
+        $request->server->set('SCRIPT_NAME', '/index.php');
+        $request->server->set('SCRIPT_FILENAME', '/var/www/index.php');
+
+        $stack = new RequestStack();
+        $stack->push($request);
+        $helper = new UrlHelper($stack);
+
+        $this->assertSame('http://localhost/index.php?x=1#h', $helper->getAbsoluteUrl('#h'));
+        $this->assertSame('http://localhost/index.php?b=2', $helper->getAbsoluteUrl('?b=2'));
+        $this->assertSame('http://localhost/index.php?x=1', $helper->getAbsoluteUrl(''));
     }
 
     public function testGenerateAbsoluteUrlWithScriptFileName()

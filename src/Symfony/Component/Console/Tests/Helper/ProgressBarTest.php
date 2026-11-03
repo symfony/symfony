@@ -95,6 +95,62 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testResumeWithNewMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+        $bar->start(200, 50);
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            '  50/200 [=======>--------------------]  25%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testResumeWithNewMaxAfterSmallerMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
+        $bar->start(100, 50);
+
+        rewind($output->getStream());
+
+        $this->assertEquals(
+            '  50/100 [==============>-------------]  50%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testResumeBeyondNewMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+        $bar->start(10, 50);
+
+        rewind($output->getStream());
+
+        $this->assertSame(50, $bar->getMaxSteps());
+        $this->assertEquals(
+            ' 50/50 [============================] 100%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testResumeAtNegativeStep()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+        $bar->start(null, -5);
+        $bar->start(100, -5);
+
+        rewind($output->getStream());
+
+        $this->assertSame(0, $bar->getProgress());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('   0/100 [>---------------------------]   0%'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testRegularTimeEstimation()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 1_200, 0);
@@ -946,6 +1002,29 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             rtrim($this->generateOutput(' 100/100 [============================] 100%')),
             stream_get_contents($output->getStream())
         );
+    }
+
+    public function testSettingMaxStepsUpdatesPercent()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 100, 0);
+        $bar->start();
+        $bar->setProgress(50);
+        $bar->setMaxSteps(200);
+        $bar->display();
+        $bar->setMaxSteps(10);
+        $bar->display();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '   0/100 [>---------------------------]   0%'.
+            $this->generateOutput('  50/100 [==============>-------------]  50%').
+            $this->generateOutput('  50/200 [=======>--------------------]  25%').
+            $this->generateOutput(' 50/10 [============================] 100%'),
+            stream_get_contents($output->getStream())
+        );
+
+        $bar->setMaxSteps(0);
+        $this->assertSame(0.0, $bar->getProgressPercent());
     }
 
     public function testWithSmallScreen()

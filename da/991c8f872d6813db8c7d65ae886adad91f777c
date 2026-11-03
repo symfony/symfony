@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-03T21:32:29Z
+
+Thanks for the follow-up. I removed the PHP_SELF part. When SCRIPT_NAME doesn't end with the script filename, PHP_SELF is the request path itself, so the base URL would come from the client. This happens with nginx without `fastcgi_split_path_info`, or with `php -S` and a router outside the docroot, and that server config is what needs fixing.

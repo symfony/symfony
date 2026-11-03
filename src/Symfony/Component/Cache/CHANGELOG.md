@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Make `DeflateMarshaller` skip compression for small values and keep uncompressed values when compression does not reduce their size
+ * Add an optional `$compressionLevel` argument to `DeflateMarshaller`
+ * Deprecate nesting `DeflateMarshaller` decorators
+
 8.2
 ---
 

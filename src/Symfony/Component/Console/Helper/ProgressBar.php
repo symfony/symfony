@@ -60,7 +60,7 @@ final class ProgressBar
     private ?string $previousMessage = null;
     private int $lastDrawnStep = 0;
     private ?int $lastDrawnMax = null;
-    private bool $finishedWithoutMax = false;
+    private bool $maxInferred = false;
     private Cursor $cursor;
     private array $placeholders = [];
 
@@ -322,17 +322,20 @@ final class ProgressBar
             $max = null;
         }
 
+        $maxInferred = null === $max && is_countable($iterable);
         $max ??= is_countable($iterable) ? \count($iterable) : null;
 
         if (0 === $max) {
             $this->max = 0;
             $this->stepWidth = 2;
+            $this->maxInferred = true;
             $this->finish();
 
             return;
         }
 
         $this->start($max);
+        $this->maxInferred = $maxInferred;
 
         foreach ($iterable as $key => $value) {
             yield $key => $value;
@@ -358,9 +361,9 @@ final class ProgressBar
 
         if (null !== $max) {
             $this->setMaxSteps($max);
-        } elseif ($this->finishedWithoutMax) {
-            // drop the max that finish() set to draw a full bar
-            $this->setMaxSteps(0);
+        } elseif ($this->maxInferred) {
+            // drop the max that a previous iterate() or finish() inferred
+            $this->setMaxSteps(null);
         }
 
         if ($this->max && $startAt > $this->max) {
@@ -438,7 +441,7 @@ final class ProgressBar
         }
 
         $this->format = null;
-        $this->finishedWithoutMax = false;
+        $this->maxInferred = false;
         if (null === $max) {
             $this->max = null;
             $this->stepWidth = 4;
@@ -469,7 +472,7 @@ final class ProgressBar
         if (null === $this->max) {
             $this->max = $this->step;
             $this->percent = 1.0;
-            $this->finishedWithoutMax = true;
+            $this->maxInferred = true;
         }
 
         if ($this->step === $this->max && !$this->overwrite && $this->lastDrawnStep === $this->step && \in_array($this->lastDrawnMax, [$max, $this->max], true)) {

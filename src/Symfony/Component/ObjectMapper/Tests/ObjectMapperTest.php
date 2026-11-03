@@ -12,11 +12,14 @@
 namespace Symfony\Component\ObjectMapper\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\ObjectMapper\Condition\ClassRule;
 use Symfony\Component\ObjectMapper\Condition\ClassRuleList;
 use Symfony\Component\ObjectMapper\Exception\InvalidArgumentException;
+use Symfony\Component\ObjectMapper\Exception\LogicException;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
 use Symfony\Component\ObjectMapper\Exception\NoSuchCallableException;
@@ -274,7 +277,12 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\Uninitialized\Post;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Uninitialized\PostView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Unreadable\Order;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Unreadable\OrderView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteBySetter\Activity as WriteBySetterActivity;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteBySetter\ActivityInput as WriteBySetterActivityInput;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteBySetter\PromotedActivity as WriteBySetterPromotedActivity;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\WriteBySetter\RenamedActivityInput as WriteBySetterRenamedActivityInput;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class ObjectMapperTest extends TestCase
@@ -2166,5 +2174,49 @@ final class ObjectMapperTest extends TestCase
 
         $this->assertSame('Jane', $profile->name);
         $this->assertSame($profile, $profile->owner);
+    }
+
+    #[DataProvider('providePropertyWrittenBySetter')]
+    public function testPropertyWrittenBySetterRequiresAPropertyAccessor(object $source, object|string|null $target)
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf('The "%s::$name" property can only be written with "setName()", which requires a property accessor. Pass a property accessor to the object mapper, or enable "property_access" in your configuration.', WriteBySetterActivity::class));
+
+        (new ObjectMapper())->map($source, $target);
+    }
+
+    public static function providePropertyWrittenBySetter(): iterable
+    {
+        yield 'stdClass to a class' => [(object) ['name' => 'Keyboard'], WriteBySetterActivity::class];
+        yield 'stdClass to an object' => [(object) ['name' => 'Keyboard'], new WriteBySetterActivity()];
+        yield '#[Map] on the source class' => [new WriteBySetterActivityInput(), null];
+        yield '#[Map] on the source property' => [new WriteBySetterRenamedActivityInput(), null];
+    }
+
+    #[RunInSeparateProcess]
+    public function testPropertyWrittenBySetterSuggestsInstallingThePropertyAccessComponent()
+    {
+        ClassExistsMock::register(ObjectMapper::class);
+        ClassExistsMock::withMockedClasses([PropertyAccessor::class => false]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf('The "%s::$name" property can only be written with "setName()", which requires a property accessor. Try running "composer require symfony/property-access".', WriteBySetterActivity::class));
+
+        (new ObjectMapper())->map((object) ['name' => 'Keyboard'], WriteBySetterActivity::class);
+    }
+
+    #[DataProvider('provideAccessor')]
+    public function testPrivatePropertyWithoutSetterIsSkipped(?PropertyAccessorInterface $accessor)
+    {
+        $activity = (new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor))->map((object) ['id' => 42], WriteBySetterActivity::class);
+
+        $this->assertNull($activity->getId());
+    }
+
+    public function testPropertyWrittenBySetterIsPassedToTheConstructorWithoutPropertyAccessor()
+    {
+        $activity = (new ObjectMapper())->map((object) ['name' => 'Keyboard'], WriteBySetterPromotedActivity::class);
+
+        $this->assertSame('Keyboard', $activity->getName());
     }
 }

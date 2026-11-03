@@ -10,6 +10,7 @@ CHANGELOG
  * Add `PropertyTypeMappingMetadataFactory` to map a nested object to the class typing the property it is written into
  * Add `ObjectMapperCacheWarmer` to store the mapping metadata of every `#[Map]` class pair in a PHP file at cache warmup
  * Merge the objects that repeated `#[Map]` attributes map to the same property instead of keeping the last one
+ * Throw a `LogicException` when no property accessor is configured and a target property can only be written by its setter
 
 8.1
 ---

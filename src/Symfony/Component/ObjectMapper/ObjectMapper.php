@@ -13,6 +13,7 @@ namespace Symfony\Component\ObjectMapper;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\ObjectMapper\Condition\ClassRuleConditionCallableInterface;
+use Symfony\Component\ObjectMapper\Exception\LogicException;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
 use Symfony\Component\ObjectMapper\Exception\NoSuchCallableException;
@@ -30,6 +31,7 @@ use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactor
 use Symfony\Component\ObjectMapper\Metadata\ReflectionPropertyMetadataFactory;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionPropertyNameCollectionFactory;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException as PropertyAccessorNoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 
@@ -220,7 +222,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 // a later mapping of the same property must not write into an object copied as is from the source
                 $mergeTargets[$targetPropertyName] = \is_object($value) && $value !== $sourceValue ? $value : null;
                 $explicitTargets[$targetPropertyName] = true;
-                $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value, $writable);
+                $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value, $writable, $propertyMapping['targetSetter'], $targetName);
             }
 
             if ($propertyMetadata['mappings']) {
@@ -237,7 +239,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 }
 
                 $writable = $writeDirectly && $propertyMetadata['targetWritable'];
-                $implicitValues[$propertyName] = [$this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName, $propertyMetadata['sourceDeclared'], $propertyMetadata['readability']), $objectMap, $propertyMetadata['sameNameMapping'], $propertyMetadata['targetPropertyClass'], $declaredTarget, $propertyName, $ctorArguments, $writable), $writable];
+                $implicitValues[$propertyName] = [$this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName, $propertyMetadata['sourceDeclared'], $propertyMetadata['readability']), $objectMap, $propertyMetadata['sameNameMapping'], $propertyMetadata['targetPropertyClass'], $declaredTarget, $propertyName, $ctorArguments, $writable), $writable, $propertyMetadata['targetSetter']];
 
                 continue;
             }
@@ -259,9 +261,9 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             }
         }
 
-        foreach ($implicitValues as $propertyName => [$value, $writable]) {
+        foreach ($implicitValues as $propertyName => [$value, $writable, $setter]) {
             if (!isset($explicitTargets[$propertyName])) {
-                $this->storeValue($propertyName, $mapToProperties, $ctorArguments, $value, $writable);
+                $this->storeValue($propertyName, $mapToProperties, $ctorArguments, $value, $writable, $setter, $targetName);
             }
         }
 
@@ -422,11 +424,12 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
      * Store the value either the constructor arguments or as a property to be mapped.
      *
      * A property that cannot be written with an assignment is written by the PropertyAccessor, or dropped right away when there is none.
+     * Without a PropertyAccessor, a property that only a setter can write is an error.
      *
      * @param array<string, array{mixed, bool}> $mapToProperties
      * @param array<string, mixed>              $ctorArguments
      */
-    private function storeValue(string $propertyName, array &$mapToProperties, array &$ctorArguments, mixed $value, bool $writable): void
+    private function storeValue(string $propertyName, array &$mapToProperties, array &$ctorArguments, mixed $value, bool $writable, ?string $setter, string $targetClass): void
     {
         if (\array_key_exists($propertyName, $ctorArguments)) {
             $ctorArguments[$propertyName] = $value;
@@ -436,6 +439,8 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
         if ($writable || $this->propertyAccessor) {
             $mapToProperties[$propertyName] = [$value, $writable];
+        } elseif (null !== $setter) {
+            throw new LogicException(\sprintf('The "%s::$%s" property can only be written with "%s()", which requires a property accessor. ', $targetClass, $propertyName, $setter).(class_exists(PropertyAccessor::class) ? 'Pass a property accessor to the object mapper, or enable "property_access" in your configuration.' : 'Try running "composer require symfony/property-access".'));
         }
     }
 

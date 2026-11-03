@@ -21,7 +21,10 @@ use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ExtensionConfigTrees;
+use Symfony\Component\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Component\DependencyInjection\Compiler\ResettableServicePass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -70,6 +73,14 @@ class ServicesBundle extends AbstractBundle
             'kernel.reset',
         ]), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
         $container->addCompilerPass(new ResettableServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
+
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug') && $container->hasParameter('.kernel.config_dir') && $container->hasParameter('.kernel.bundles_definition')) {
+            $configTrees = new ExtensionConfigTrees($container->getParameter('.kernel.bundles_definition'));
+            $container->addCompilerPass(new PhpConfigReferenceDumpPass($container->getParameter('.kernel.config_dir').'/reference.php', $configTrees));
+            $container->addCompilerPass(new JsonSchemaConfigDumpPass($container->getParameter('.kernel.config_dir').'/schema.json', $configTrees));
+            // releases the trees once both passes used them
+            $container->addCompilerPass($configTrees);
+        }
     }
 
     public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void

@@ -9,11 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Definition\Dumper\JsonSchemaDumper;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Yaml;
 

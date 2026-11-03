@@ -9,26 +9,33 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ExtensionConfigTrees;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
+use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Compiler\ExtensionConfigTrees;
+use Symfony\Component\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Routing\Loader\Configurator\RoutesReference;
 
 class PhpConfigReferenceDumpPassTest extends TestCase
 {
     private string $readOnlyDir;
     private string $tempDir;
+
+    public static function setUpBeforeClass(): void
+    {
+        ClassExistsMock::register(PhpConfigReferenceDumpPass::class);
+    }
 
     protected function setUp(): void
     {
@@ -55,6 +62,8 @@ class PhpConfigReferenceDumpPassTest extends TestCase
             $fs = new Filesystem();
             $fs->remove($this->tempDir);
         }
+
+        ClassExistsMock::withMockedClasses([]);
     }
 
     public function testProcessWithConfigDir()
@@ -108,12 +117,30 @@ class PhpConfigReferenceDumpPassTest extends TestCase
         $pass->process($container);
 
         if ($_ENV['TEST_GENERATE_FIXTURES'] ?? false) {
-            copy($this->tempDir.'/reference.php', __DIR__.'/../../Fixtures/reference.php');
+            copy($this->tempDir.'/reference.php', __DIR__.'/../Fixtures/reference.php');
             self::markTestIncomplete('TEST_GENERATE_FIXTURES is set');
         }
 
-        $this->assertFileMatchesFormatFile(__DIR__.'/../../Fixtures/reference.php', $this->tempDir.'/reference.php');
+        $this->assertFileMatchesFormatFile(__DIR__.'/../Fixtures/reference.php', $this->tempDir.'/reference.php');
         $this->assertEquals([new FileResource(realpath($this->tempDir).'/reference.php')], $container->getResources());
+    }
+
+    public function testProcessWithoutRouting()
+    {
+        ClassExistsMock::withMockedClasses([RoutesReference::class => false]);
+
+        $container = new ContainerBuilder();
+        $container->setParameter('.container.known_envs', ['dev', 'prod', 'test']);
+
+        $pass = new PhpConfigReferenceDumpPass($this->tempDir.'/reference.php', new ExtensionConfigTrees([
+            TestBundle::class => ['all' => true],
+        ]));
+        $pass->process($container);
+
+        $content = file_get_contents($this->tempDir.'/reference.php');
+        $this->assertStringContainsString('final class App', $content);
+        $this->assertStringNotContainsString('namespace Symfony\\Component\\Routing', $content);
+        $this->assertStringNotContainsString('final class Routes', $content);
     }
 
     #[TestWith([self::class])]
@@ -133,7 +160,7 @@ class PhpConfigReferenceDumpPassTest extends TestCase
     }
 }
 
-class TestBundle extends Bundle
+class TestBundle extends AbstractBundle
 {
     public function getContainerExtension(): ?ExtensionInterface
     {
@@ -223,7 +250,7 @@ class AppConfiguration implements ConfigurationInterface
     }
 }
 
-class EmptyConfigBundle extends Bundle
+class EmptyConfigBundle extends AbstractBundle
 {
     public function getContainerExtension(): ?ExtensionInterface
     {

@@ -362,7 +362,6 @@ class RouterTest extends TestCase
         $router->getRouteCollection();
     }
 
-
     public function testLocalizedHostsFromContainerParameter()
     {
         $routes = new RouteCollection();

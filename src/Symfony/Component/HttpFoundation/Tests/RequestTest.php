@@ -2096,6 +2096,76 @@ b'])]
                 '/api%2F',
                 '/foo',
             ],
+            [
+                '/x/index.php/foo',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/api/index.php',
+                    'SCRIPT_NAME' => '/api/index.php',
+                    'PHP_SELF' => '/api/index.php',
+                ],
+                '',
+                '/x/index.php/foo',
+            ],
+            [
+                '/sub/index.php?next=/api/index.php',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/api/index.php',
+                    'SCRIPT_NAME' => '/api/index.php',
+                    'PHP_SELF' => '/api/index.php',
+                ],
+                '',
+                '/sub/index.php',
+            ],
+            [
+                '/sub/api/index.php?foo=bar',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/api/index.php',
+                    'SCRIPT_NAME' => '/api/index.php',
+                    'PHP_SELF' => '/api/index.php',
+                ],
+                '/sub/api/index.php',
+                '/',
+            ],
+            'Percent-encoded script name after a prefix' => [
+                '/sub/foo%20bar/app.php/home',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/foo bar/app.php',
+                    'SCRIPT_NAME' => '/foo bar/app.php',
+                    'PHP_SELF' => '/foo bar/app.php',
+                ],
+                '/sub/foo%20bar/app.php',
+                '/home',
+            ],
+            'Script name after a long prefix' => [
+                '/'.str_repeat('a', 2000).'/api/index.php/foo',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/api/index.php',
+                    'SCRIPT_NAME' => '/api/index.php',
+                    'PHP_SELF' => '/api/index.php',
+                ],
+                '/'.str_repeat('a', 2000).'/api/index.php',
+                '/foo',
+            ],
+            'Long script name' => [
+                '/'.str_repeat('a', 2000).'/index.php/foo',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/'.str_repeat('a', 2000).'/index.php',
+                    'SCRIPT_NAME' => '/'.str_repeat('a', 2000).'/index.php',
+                    'PHP_SELF' => '/'.str_repeat('a', 2000).'/index.php/foo',
+                ],
+                '/'.str_repeat('a', 2000).'/index.php',
+                '/foo',
+            ],
+            'Script name taken from the request path' => [
+                '/x/index.php/foo',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/app/index.php',
+                    'SCRIPT_NAME' => '/x/index.php/foo',
+                    'PHP_SELF' => '/x/index.php/foo',
+                ],
+                '',
+                '/x/index.php/foo',
+            ],
         ];
     }
 
@@ -2149,6 +2219,20 @@ b'])]
                 'UNENCODED_URL' => '/RoutingTest/foo/bar',
             ],
             '/RoutingTest',
+            '/foo/bar',
+        ];
+
+        yield 'Rewrite with case mismatch after a prefix' => [
+            [
+                'IIS_WasUrlRewritten' => '1',
+                'PATH_INFO' => '/foo/bar',
+                'PHP_SELF' => '/routingtest/index.php/foo/bar',
+                'REQUEST_URI' => '/Sub/RoutingTest/Index.php/foo/bar',
+                'SCRIPT_FILENAME' => 'C:/Users/derrabus/Projects/routing-test/public/index.php',
+                'SCRIPT_NAME' => '/routingtest/index.php',
+                'UNENCODED_URL' => '/Sub/RoutingTest/Index.php/foo/bar',
+            ],
+            '/Sub/RoutingTest/Index.php',
             '/foo/bar',
         ];
     }

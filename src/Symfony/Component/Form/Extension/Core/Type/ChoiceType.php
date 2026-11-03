@@ -252,6 +252,7 @@ class ChoiceType extends AbstractType
             'placeholder_attr' => [],
             'choice_translation_domain' => $choiceTranslationDomain,
             'choice_translation_parameters' => $options['choice_translation_parameters'],
+            'empty_choices_message' => $options['expanded'] && 0 === $form->count() ? $options['empty_choices_message'] : null,
         ]);
 
         // The decision, whether a choice is selected, is potentially done
@@ -420,6 +421,7 @@ class ChoiceType extends AbstractType
             // See https://github.com/symfony/symfony/pull/5582
             'data_class' => null,
             'choice_translation_domain' => true,
+            'empty_choices_message' => null,
             'trim' => false,
             'invalid_message' => 'The selected choice is invalid.',
         ]);
@@ -437,6 +439,7 @@ class ChoiceType extends AbstractType
 
         $resolver->setAllowedTypes('choices', ['null', 'array', \Traversable::class]);
         $resolver->setAllowedTypes('choice_translation_domain', ['null', 'bool', 'string']);
+        $resolver->setAllowedTypes('empty_choices_message', ['null', 'string']);
         $resolver->setAllowedTypes('choice_lazy', 'bool');
         $resolver->setAllowedTypes('choice_loader', ['null', ChoiceLoaderInterface::class, ChoiceLoader::class]);
         $resolver->setAllowedTypes('choice_filter', ['null', 'callable', 'string', PropertyPath::class, ChoiceFilter::class]);

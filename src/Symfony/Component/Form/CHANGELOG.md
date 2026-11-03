@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `empty_choices_message` option to `ChoiceType` to render a localized message when an expanded choice field has no options
  * Guess the `empty_data` option from the type of the mapped property when that type refuses `null`
  * Add `TypeInfoFormTypeGuesser` to guess the type of a field and whether it is required from the declared type of its property
  * Add `BoundsType` to render a lower and an upper bound of the same inner type

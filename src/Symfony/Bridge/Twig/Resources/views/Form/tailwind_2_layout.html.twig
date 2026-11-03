@@ -31,6 +31,9 @@
 {%- endblock form_errors -%}
 
 {%- block choice_widget_expanded -%}
+    {%- if empty_choices_message is not null -%}
+        {{- block('choice_widget_empty') -}}
+    {%- else -%}
     {%- set attr = attr|merge({class: attr.class|default('mt-2')}) -%}
     <div {{ block('widget_container_attributes') }}>
         {%- for child in form %}
@@ -42,6 +45,7 @@
             {{- form_help(child) -}}
         {% endfor -%}
     </div>
+    {%- endif -%}
 {%- endblock choice_widget_expanded -%}
 
 {%- block checkbox_row -%}

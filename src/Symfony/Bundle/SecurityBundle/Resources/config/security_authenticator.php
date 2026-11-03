@@ -96,6 +96,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('user checker'),
                 null,
+                false,
             ])
 
         ->set('security.listener.user_not_found_password_check', UserNotFoundPasswordCheckListener::class)
@@ -103,6 +104,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.password_hasher_factory'),
                 abstract_arg('user class'),
+                false,
             ])
 
         ->set('security.listener.user_checker_on_refresh', RefreshedUserCheckerListener::class)

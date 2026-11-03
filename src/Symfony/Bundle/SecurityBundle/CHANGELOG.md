@@ -52,6 +52,7 @@ CHANGELOG
  * Deprecate the `security.route_loader.logout` service, use `security.route_loader` instead
  * Make logins with an unknown username cost one password hash, like logins with a wrong password, unless `expose_security_errors` is `all`
  * Make logins rejected by the user checker cost one password hash when `expose_security_errors` is `none`
+ * Make LDAP logins cost one password hash on firewalls that use `ldap_users_only`, like the logins checked by the password hasher
 
 8.1
 ---

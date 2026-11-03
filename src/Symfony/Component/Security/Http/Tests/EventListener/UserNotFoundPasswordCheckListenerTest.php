@@ -201,6 +201,19 @@ class UserNotFoundPasswordCheckListenerTest extends TestCase
         (new UserNotFoundPasswordCheckListener($hasherFactory, InMemoryUser::class))->checkPassport($this->createEvent($passport));
     }
 
+    public function testHashesThePasswordOfAnLdapLoginWhenAskedTo()
+    {
+        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasher->expects($this->once())->method('hash')->with('ThePa$$word');
+
+        $passport = new Passport(new UserBadge('unknown', static fn () => null), new PasswordCredentials('ThePa$$word'));
+        $passport->addBadge($this->createStub(BadgeInterface::class), LdapBadge::class);
+
+        $this->expectException(UserNotFoundException::class);
+
+        (new UserNotFoundPasswordCheckListener(new PasswordHasherFactory([InMemoryUser::class => $hasher]), InMemoryUser::class, true))->checkPassport($this->createEvent($passport));
+    }
+
     private function createEvent(Passport $passport): CheckPassportEvent
     {
         return new CheckPassportEvent(new DummyAuthenticator(), $passport);

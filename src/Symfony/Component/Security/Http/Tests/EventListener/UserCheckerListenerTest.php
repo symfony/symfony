@@ -130,6 +130,22 @@ class UserCheckerListenerTest extends TestCase
         yield 'too long' => [new PasswordHasherFactory([InMemoryUser::class => ['algorithm' => 'plaintext']]), str_repeat('a', 4097)];
     }
 
+    public function testPreAuthFailureHashesThePasswordOfAnLdapLoginWhenAskedTo()
+    {
+        $this->userChecker->expects($this->once())->method('checkPreAuth')->willThrowException(new DisabledException());
+
+        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasher->expects($this->once())->method('hash')->with('ThePa$$word');
+        $listener = new UserCheckerListener($this->userChecker, new PasswordHasherFactory([InMemoryUser::class => $hasher]), true);
+
+        $passport = new Passport(new UserBadge('test', fn () => $this->user), new PasswordCredentials('ThePa$$word'));
+        $passport->addBadge($this->createStub(BadgeInterface::class), LdapBadge::class);
+
+        $this->expectException(DisabledException::class);
+
+        $listener->preCheckCredentials($this->createCheckPassportEvent($passport));
+    }
+
     public function testPreAuthSuccessDoesNotHashThePassword()
     {
         $this->userChecker->expects($this->once())->method('checkPreAuth')->with($this->user);

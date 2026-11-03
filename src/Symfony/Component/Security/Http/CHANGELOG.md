@@ -57,7 +57,7 @@ CHANGELOG
  * Add `#[FirewallListenerOrder]` to declare the firewall listeners a listener runs before or after
  * Add argument `$clock` to `LoginLinkHandler::__construct()` and `SignatureRememberMeHandler::__construct()`, and make `LoginLinkNotification` use the global clock
  * Add `UserNotFoundPasswordCheckListener`, which hashes the presented password when the user is not found, so that logins with an unknown username cost one password hash
- * Add argument `$hasherFactory` to `UserCheckerListener`, to hash the presented password when the user checker rejects the user
+ * Add arguments `$hasherFactory` and `$hashLdapPasswords` to `UserCheckerListener`, to hash the presented password when the user checker rejects the user
  * Hash the presented password in `CheckCredentialsListener` when the user has no password
 
 8.1

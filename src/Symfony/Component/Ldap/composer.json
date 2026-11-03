@@ -21,6 +21,7 @@
         "symfony/options-resolver": "^7.4|^8.0"
     },
     "require-dev": {
+        "symfony/password-hasher": "^7.4|^8.0",
         "symfony/security-core": "^8.0",
         "symfony/security-http": "^7.4|^8.0"
     },

@@ -32,12 +32,14 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 class UserCheckerListener implements EventSubscriberInterface
 {
     /**
-     * @param PasswordHasherFactoryInterface|null $hasherFactory Hashes the presented password when the user checker rejects the user,
-     *                                                           so that such users take as long to reject as the others
+     * @param PasswordHasherFactoryInterface|null $hasherFactory     Hashes the presented password when the user checker rejects the user,
+     *                                                               so that such users take as long to reject as the others
+     * @param bool                                $hashLdapPasswords Whether to also hash the password of LDAP logins, as needed when some users are not checked by the LDAP server
      */
     public function __construct(
         private UserCheckerInterface $userChecker,
         private ?PasswordHasherFactoryInterface $hasherFactory = null,
+        private bool $hashLdapPasswords = false,
     ) {
     }
 
@@ -71,7 +73,7 @@ class UserCheckerListener implements EventSubscriberInterface
 
     private function hashPassword(Passport $passport, UserInterface $user): void
     {
-        if (!$this->hasherFactory || !$user instanceof PasswordAuthenticatedUserInterface || $passport->hasBadge(LdapBadge::class) || !$passport->hasBadge(PasswordCredentials::class)) {
+        if (!$this->hasherFactory || !$user instanceof PasswordAuthenticatedUserInterface || (!$this->hashLdapPasswords && $passport->hasBadge(LdapBadge::class)) || !$passport->hasBadge(PasswordCredentials::class)) {
             return;
         }
 

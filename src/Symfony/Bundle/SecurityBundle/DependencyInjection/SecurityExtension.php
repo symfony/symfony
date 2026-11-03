@@ -321,11 +321,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $userClasses = [];
         foreach ($config['providers'] as $name => $provider) {
-            $userClasses[str_replace('-', '_', $name)] = match (true) {
-                isset($provider['memory']) => InMemoryUser::class,
-                isset($provider['entity']['class']) => $provider['entity']['class'],
-                default => PasswordAuthenticatedUserInterface::class,
-            };
+            $userClasses[str_replace('-', '_', $name)] = self::getUserClass($config['providers'], $name);
         }
 
         $container->setParameter('security.firewalls', array_keys($firewalls));
@@ -610,6 +606,26 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ;
         }
 
+        // with "ldap_users_only", the password hasher checks the users of the other providers,
+        // so LDAP logins have to hash the password too for all users to take as long to reject
+        $hashLdapPasswords = false;
+        $ldapListenerIds = [];
+        foreach ($this->getSortedFactories() as $factory) {
+            $key = str_replace('-', '_', $factory->getKey());
+
+            if (isset($firewall[$key]['ldap_users_only']) && $container->hasDefinition($ldapListenerId = 'security.listener.'.$key.'.'.$id)) {
+                $hashLdapPasswords = $hashLdapPasswords || $firewall[$key]['ldap_users_only'];
+                $ldapListenerIds[] = $ldapListenerId;
+            }
+        }
+
+        // any LDAP listener of the firewall can check the passports of all its LDAP authenticators
+        foreach ($hashLdapPasswords ? $ldapListenerIds : [] as $ldapListenerId) {
+            $container->getDefinition($ldapListenerId)
+                ->addArgument(new Reference('security.password_hasher_factory'))
+                ->addArgument($userClass);
+        }
+
         // user checker listener
         $exposeSecurityErrors = $container->getParameter('.security.authentication.expose_security_errors');
         $userCheckerListener = $container
@@ -619,7 +635,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // when account status errors are exposed, the response already tells why the user was rejected
         if (ExposeSecurityLevel::None === $exposeSecurityErrors) {
-            $userCheckerListener->replaceArgument(1, new Reference('security.password_hasher_factory'));
+            $userCheckerListener
+                ->replaceArgument(1, new Reference('security.password_hasher_factory'))
+                ->replaceArgument(2, $hashLdapPasswords);
         }
 
         // when all security errors are exposed, the response already tells whether the user exists
@@ -627,6 +645,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $container
                 ->setDefinition('security.listener.user_not_found_password_check.'.$id, new ChildDefinition('security.listener.user_not_found_password_check'))
                 ->replaceArgument(1, $userClass)
+                ->replaceArgument(2, $hashLdapPasswords)
                 ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
         }
 
@@ -1249,6 +1268,31 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     /**
      * @return array<int, AuthenticatorFactoryInterface>
      */
+    /**
+     * Returns the class of the users of a provider, or of the first provider of a chain whose class is known.
+     */
+    private static function getUserClass(array $providers, string $name, array $visited = []): string
+    {
+        $provider = $providers[$name] ?? $providers[str_replace('-', '_', $name)] ?? [];
+
+        if (isset($provider['memory'])) {
+            return InMemoryUser::class;
+        }
+
+        if (isset($provider['entity']['class'])) {
+            return $provider['entity']['class'];
+        }
+
+        $visited[$name] = true;
+        foreach ($provider['chain']['providers'] ?? [] as $member) {
+            if (!isset($visited[$member]) && PasswordAuthenticatedUserInterface::class !== $class = self::getUserClass($providers, $member, $visited)) {
+                return $class;
+            }
+        }
+
+        return PasswordAuthenticatedUserInterface::class;
+    }
+
     private function getSortedFactories(): array
     {
         if (!$this->sortedFactories) {

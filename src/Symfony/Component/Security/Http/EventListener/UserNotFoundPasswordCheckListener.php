@@ -31,16 +31,20 @@ final class UserNotFoundPasswordCheckListener implements EventSubscriberInterfac
 {
     private PasswordHasherInterface|false $hasher;
 
+    /**
+     * @param bool $hashLdapPasswords Whether to also hash the password of LDAP logins, as needed when some users are not checked by the LDAP server
+     */
     public function __construct(
         private PasswordHasherFactoryInterface $hasherFactory,
         private string $userClass,
+        private bool $hashLdapPasswords = false,
     ) {
     }
 
     public function checkPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();
-        if ($passport->hasBadge(LdapBadge::class) || !$passport->hasBadge(PasswordCredentials::class)) {
+        if ((!$this->hashLdapPasswords && $passport->hasBadge(LdapBadge::class)) || !$passport->hasBadge(PasswordCredentials::class)) {
             return;
         }
 

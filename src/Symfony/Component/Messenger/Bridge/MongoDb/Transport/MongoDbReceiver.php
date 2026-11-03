@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 /**
  * @author Alessandro Lai <alessandro.lai85@gmail.com>
  */
-class MongoDbReceiver implements MessageCountAwareInterface, ListableReceiverInterface, QueueReceiverInterface
+class MongoDbReceiver implements MessageCountAwareInterface, ListableReceiverInterface, QueueReceiverInterface, KeepaliveReceiverInterface
 {
     public function __construct(
         private Connection $connection,
@@ -70,6 +71,11 @@ class MongoDbReceiver implements MessageCountAwareInterface, ListableReceiverInt
     public function reject(Envelope $envelope): void
     {
         $this->connection->reject($this->findReceivedStamp($envelope)->getId());
+    }
+
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        $this->connection->keepalive($this->findReceivedStamp($envelope)->getId(), $seconds);
     }
 
     /**

@@ -32,6 +32,8 @@ use MongoDB\Model\BSONDocument;
 use MongoDB\Operation\FindOneAndUpdate;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\MockClock;
@@ -413,6 +415,46 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
+    #[RequiresPhpExtension('pcntl')]
+    #[RequiresPhpExtension('posix')]
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testGetDispatchesTheSignalsRaisedWhileWaitingOnTheServer(bool $fails)
+    {
+        $received = false;
+        $previousHandler = pcntl_signal_get_handler(\SIGUSR1);
+        $previousAsync = pcntl_async_signals(true);
+        pcntl_signal(\SIGUSR1, static function () use (&$received) { $received = true; });
+
+        try {
+            $collection = $this->createMock(Collection::class);
+            $collection->expects($this->once())->method('findOneAndUpdate')->willReturnCallback(function () use (&$received, $fails) {
+                posix_kill(posix_getpid(), \SIGUSR1);
+
+                $this->assertFalse($received);
+
+                if ($fails) {
+                    throw new RuntimeException('No suitable servers found.');
+                }
+
+                return null;
+            });
+
+            try {
+                $this->assertNull((new Connection($collection, 'default', 3_600))->get());
+                $this->assertFalse($fails);
+            } catch (TransportException $e) {
+                $this->assertTrue($fails, $e->getMessage());
+            }
+
+            $this->assertTrue($received);
+            $this->assertTrue(pcntl_async_signals());
+        } finally {
+            pcntl_signal(\SIGUSR1, $previousHandler);
+            pcntl_async_signals($previousAsync);
+        }
+    }
+
     public function testGetWithEmptyCollection()
     {
         $collection = $this->createMock(Collection::class);
@@ -788,6 +830,58 @@ class ConnectionTest extends TestCase
             ->willReturn($deleteResult);
 
         $this->assertSame($expectedResult, $connection->reject((string) $objectId));
+    }
+
+    #[DataProvider('keepaliveIntervalProvider')]
+    public function testKeepaliveRenewsTheLeaseOfTheMessagesItClaimed(?int $seconds)
+    {
+        $collection = $this->createMock(Collection::class);
+        $clock = new MockClock();
+        $connection = new Connection($collection, 'queueName', 100, $clock);
+        $objectId = new ObjectId();
+
+        $collection->expects($this->once())
+            ->method('updateOne')
+            ->with(
+                $this->equalTo(['_id' => $objectId, 'deliveredTo' => $connection->getUniqueId()]),
+                $this->equalTo(['$set' => ['deliveredAt' => new UTCDateTime($clock->now())]]),
+                $this->equalTo(['writeConcern' => new WriteConcern(WriteConcern::MAJORITY)])
+            );
+
+        $connection->keepalive((string) $objectId, $seconds);
+    }
+
+    public static function keepaliveIntervalProvider(): iterable
+    {
+        yield 'no interval' => [null];
+        yield 'interval equal to the redeliver timeout' => [100];
+    }
+
+    public function testKeepaliveThrowsWhenTheIntervalIsLongerThanTheRedeliverTimeout()
+    {
+        $collection = $this->createMock(Collection::class);
+        $collection->expects($this->never())->method('updateOne');
+
+        $connection = new Connection($collection, 'queueName', 100);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('MongoDB redeliver_timeout (100s) cannot be smaller than the keepalive interval (101s).');
+
+        $connection->keepalive((string) new ObjectId(), 101);
+    }
+
+    public function testKeepaliveWrapsMongoExceptions()
+    {
+        $collection = $this->createStub(Collection::class);
+        $collection->method('updateOne')
+            ->willThrowException(new RuntimeException('Foo bar baz'));
+
+        $connection = new Connection($collection, 'queueName', 100);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Foo bar baz');
+
+        $connection->keepalive((string) new ObjectId());
     }
 
     public function testGetMessageCount()

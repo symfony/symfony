@@ -293,6 +293,25 @@ class MongoDbReceiverTest extends TestCase
         $receiver->reject(new Envelope(new DummyMessage('Hi'), [new MongoDbReceivedStamp('some_id')]));
     }
 
+    public function testKeepalive()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('keepalive')->with('some_id', 30);
+
+        $receiver = new MongoDbReceiver($connection, $this->createStub(SerializerInterface::class));
+        $receiver->keepalive(new Envelope(new DummyMessage('Hi'), [new MongoDbReceivedStamp('some_id')]), 30);
+    }
+
+    public function testKeepaliveThrowsWithoutStamp()
+    {
+        $receiver = new MongoDbReceiver($this->createStub(Connection::class), $this->createStub(SerializerInterface::class));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('No MongoDbReceivedStamp found on the Envelope.');
+
+        $receiver->keepalive(new Envelope(new DummyMessage('Hi')));
+    }
+
     public function testAll()
     {
         $serializer = new PhpSerializer();

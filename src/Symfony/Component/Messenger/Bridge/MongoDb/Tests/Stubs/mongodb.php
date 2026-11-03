@@ -68,6 +68,10 @@ namespace MongoDB {
             public function insertOne($document, array $options = [])
             {
             }
+
+            public function updateOne($filter, $update, array $options = [])
+            {
+            }
         }
     }
 

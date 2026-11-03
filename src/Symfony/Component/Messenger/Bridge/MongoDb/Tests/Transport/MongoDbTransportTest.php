@@ -16,11 +16,13 @@ require_once __DIR__.'/../Stubs/mongodb.php';
 use MongoDB\BSON\ObjectId;
 use MongoDB\Model\BSONDocument;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Bridge\MongoDb\Stamp\MongoDbReceivedStamp;
 use Symfony\Component\Messenger\Bridge\MongoDb\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\BatchSenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -63,6 +65,18 @@ class MongoDbTransportTest extends TestCase
 
         $this->assertSame('5f0c7a2b9d1e4c3a2b1f0e9d', $envelopes[0]->last(TransportMessageIdStamp::class)?->getId());
         $this->assertSame('5f0c7a2b9d1e4c3a2b1f0e9e', $envelopes[1]->last(TransportMessageIdStamp::class)?->getId());
+    }
+
+    public function testKeepalive()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('keepalive')->with('some_id', 30);
+
+        $transport = new MongoDbTransport($connection, $this->createStub(SerializerInterface::class));
+
+        $this->assertInstanceOf(KeepaliveReceiverInterface::class, $transport);
+
+        $transport->keepalive(new Envelope(new DummyMessage('Hi'), [new MongoDbReceivedStamp('some_id')]), 30);
     }
 
     private function createDocument(): BSONDocument

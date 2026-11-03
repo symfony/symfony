@@ -235,11 +235,14 @@ class Connection
             if (!\is_array($hosts = $parsedQuery['host'])) {
                 throw new InvalidArgumentException('Invalid AMQP DSN: query parameter "host" must be an array.');
             }
-            foreach (array_keys($hosts) as $host) {
+            foreach ($hosts as $host => $parameters) {
+                if (\is_string($parameters)) {
+                    parse_str($parameters, $parameters);
+                }
                 if (false === $i = strrpos($host, ':')) {
-                    $hosts[$host] = ['host' => $host, 'port' => $params['port'] ?? $port];
+                    $hosts[$host] = ['host' => $host, 'port' => $params['port'] ?? $port] + $parameters;
                 } else {
-                    $hosts[$host] = ['host' => substr($host, 0, $i), 'port' => (int) substr($host, 1 + $i)];
+                    $hosts[$host] = ['host' => substr($host, 0, $i), 'port' => (int) substr($host, 1 + $i)] + $parameters;
                 }
             }
             array_unshift($hosts, ['host' => $params['host'] ?? 'localhost', 'port' => $params['port'] ?? $port]);

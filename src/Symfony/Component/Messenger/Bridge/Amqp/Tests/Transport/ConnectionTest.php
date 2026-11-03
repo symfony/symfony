@@ -107,8 +107,8 @@ class ConnectionTest extends TestCase
             new Connection([
                 'host' => [
                     ['host' => 'node1', 'port' => 1234],
-                    ['host' => 'node2', 'port' => 5673],
-                    ['host' => 'node3', 'port' => 1234],
+                    ['host' => 'node2', 'port' => 5673, 'connection_name' => 'node2'],
+                    ['host' => 'node3', 'port' => 1234, 'connection_name' => 'node3'],
                 ],
                 'port' => 1234,
                 'vhost' => '/',
@@ -117,7 +117,7 @@ class ConnectionTest extends TestCase
             ], [
                 self::DEFAULT_EXCHANGE_NAME => [],
             ]),
-            Connection::fromDsn('amqp://node1:1234?host[node2:5673]&host[node3]')
+            Connection::fromDsn('amqp://node1:1234?host[node2:5673][connection_name]=node2&host[node3][connection_name]=node3')
         );
 
         $this->assertEquals(

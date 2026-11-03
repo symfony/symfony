@@ -142,7 +142,7 @@ class FormFactoryTest extends TestCase
 
         $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
 
-        $this->assertSame(['minlength' => 3, 'pattern' => '[\p{Arabic}]+'], $builder->getOption('attr'));
+        $this->assertSame(['pattern' => '[\p{Arabic}]+', 'minlength' => 3], $builder->getOption('attr'));
     }
 
     public function testCreateBuilderCanOverrideGuessedMinLength()

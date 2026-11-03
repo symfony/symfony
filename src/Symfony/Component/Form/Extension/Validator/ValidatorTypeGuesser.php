@@ -76,7 +76,9 @@ class ValidatorTypeGuesser implements MinLengthTypeGuesserInterface
 
     public function guessMinLength(string $class, string $property): ?ValueGuess
     {
-        return $this->guess($class, $property, $this->guessMinLengthForConstraint(...));
+        $guess = $this->guess($class, $property, $this->guessMinLengthForConstraint(...));
+
+        return $guess instanceof ValueGuess ? $guess : null;
     }
 
     public function guessMaxLength(string $class, string $property): ?ValueGuess

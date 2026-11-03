@@ -1940,6 +1940,36 @@ class RequestTest extends TestCase
                 '/api%2F',
                 '/foo',
             ],
+            [
+                '/x/index.php/foo',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/api/index.php',
+                    'SCRIPT_NAME' => '/api/index.php',
+                    'PHP_SELF' => '/api/index.php',
+                ],
+                '',
+                '/x/index.php/foo',
+            ],
+            [
+                '/sub/index.php?next=/api/index.php',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/api/index.php',
+                    'SCRIPT_NAME' => '/api/index.php',
+                    'PHP_SELF' => '/api/index.php',
+                ],
+                '',
+                '/sub/index.php',
+            ],
+            [
+                '/sub/api/index.php?foo=bar',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/api/index.php',
+                    'SCRIPT_NAME' => '/api/index.php',
+                    'PHP_SELF' => '/api/index.php',
+                ],
+                '/sub/api/index.php',
+                '/',
+            ],
         ];
     }
 

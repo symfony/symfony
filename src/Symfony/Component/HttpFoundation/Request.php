@@ -1959,16 +1959,18 @@ class Request
             return '';
         }
 
-        // If using mod_rewrite or ISAPI_Rewrite strip the script filename
-        // out of baseUrl. $pos !== 0 makes sure it is not matching a value
-        // from PATH_INFO or QUERY_STRING
-        if (\strlen($requestUri) >= \strlen($baseUrl) && (false !== $pos = strpos($requestUri, $baseUrl)) && 0 !== $pos) {
-            $baseUrl = substr($requestUri, 0, $pos + \strlen($baseUrl));
+        // With mod_rewrite or ISAPI_Rewrite, the script filename can come after
+        // a prefix in the path: the base URL then ends with the script filename
+        if (!$pos = strpos($truncatedRequestUri, $baseUrl)) {
+            // the script filename isn't in the path, or only at its start, which is handled above
+            return '';
+        }
 
-            if (!\in_array($requestUri[\strlen($baseUrl)] ?? '', ['', '/', '?'], true)) {
-                // the script filename is only the start of a longer path segment
-                return '';
-            }
+        $baseUrl = substr($requestUri, 0, $pos + \strlen($baseUrl));
+
+        if (!\in_array($requestUri[\strlen($baseUrl)] ?? '', ['', '/', '?'], true)) {
+            // the script filename is only the start of a longer path segment
+            return '';
         }
 
         return rtrim($baseUrl, '/'.\DIRECTORY_SEPARATOR);

@@ -1,0 +1,10 @@
+imports:
+    - { resource: ./ldap_users_only.yml }
+
+security:
+    firewalls:
+        main:
+            entry_point: http_basic_ldap
+            http_basic_ldap:
+                service: Symfony\Component\Ldap\Ldap
+                dn_string: 'uid={user_identifier},dc=onfroy,dc=net'

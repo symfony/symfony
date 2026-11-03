@@ -186,8 +186,8 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $ldap = $this->createMock(LdapInterface::class);
         $ldap->expects($this->never())->method('bind');
 
-        $event = $this->createEvent();
-        $this->createListener($ldap, true)->onCheckPassport($event);
+        $event = $this->createEvent('s3cr3t', new LdapBadge('app.ldap', ldapUsersOnly: true));
+        $this->createListener($ldap)->onCheckPassport($event);
 
         $passport = $event->getPassport();
         // resolved, so a missing listener still fails closed, but the password is left to
@@ -207,11 +207,11 @@ class CheckLdapCredentialsListenerTest extends TestCase
             new Passport(
                 new UserBadge('Wouter', static fn () => new LdapUser(new Entry('Wouter'), 'Wouter', null, ['ROLE_USER'])),
                 new PasswordCredentials('s3cr3t'),
-                [new LdapBadge('app.ldap')]
+                [new LdapBadge('app.ldap', ldapUsersOnly: true)]
             )
         );
 
-        $this->createListener($ldap, true)->onCheckPassport($event);
+        $this->createListener($ldap)->onCheckPassport($event);
 
         $this->assertTrue($event->getPassport()->getBadge(PasswordCredentials::class)->isResolved());
     }
@@ -226,14 +226,26 @@ class CheckLdapCredentialsListenerTest extends TestCase
             new Passport(
                 new UserBadge('Wouter', static fn () => new LdapUser(new Entry('Wouter'), 'Wouter', null, ['ROLE_USER'])),
                 new PasswordCredentials(''),
-                [new LdapBadge('app.ldap')]
+                [new LdapBadge('app.ldap', ldapUsersOnly: true)]
             )
         );
 
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The presented password cannot be empty.');
 
-        $this->createListener($ldap, true)->onCheckPassport($event);
+        $this->createListener($ldap)->onCheckPassport($event);
+    }
+
+    public function testBindsAUserFromAnotherProviderWhenTheBadgeDoesNotRestrictToLdapUsers()
+    {
+        $ldap = $this->createMock(LdapInterface::class);
+        $ldap->method('escape')->willReturnArgument(0);
+        $ldap->expects($this->once())->method('bind')->with('Wouter', 's3cr3t');
+
+        $event = $this->createEvent();
+        $this->createListener($ldap)->onCheckPassport($event);
+
+        $this->assertTrue($event->getPassport()->getBadge(PasswordCredentials::class)->isResolved());
     }
 
     private function createEvent($password = 's3cr3t', $ldapBadge = null)
@@ -244,13 +256,13 @@ class CheckLdapCredentialsListenerTest extends TestCase
         );
     }
 
-    private function createListener(?LdapInterface $ldap = null, bool $ldapUsersOnly = false)
+    private function createListener(?LdapInterface $ldap = null)
     {
         $ldapLocator = new class(['app.ldap' => fn () => $ldap ?? $this->createStub(LdapInterface::class)]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
 
-        return new CheckLdapCredentialsListener($ldapLocator, $ldapUsersOnly);
+        return new CheckLdapCredentialsListener($ldapLocator);
     }
 }
 

@@ -21,7 +21,7 @@ use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
-use Symfony\Component\Ldap\Security\CheckLdapCredentialsListener;
+use Symfony\Component\Ldap\Security\LdapAuthenticator;
 
 class JsonLoginLdapTest extends AbstractWebTestCase
 {
@@ -73,7 +73,7 @@ class JsonLoginLdapTest extends AbstractWebTestCase
 
     public function testLdapUsersOnlyLeavesOtherProvidersToTheRegularPasswordChecker()
     {
-        if (!property_exists(CheckLdapCredentialsListener::class, 'ldapUsersOnly')) {
+        if (!property_exists(LdapAuthenticator::class, 'ldapUsersOnly')) {
             $this->markTestSkipped('symfony/ldap 8.2 is required.');
         }
 
@@ -88,7 +88,7 @@ class JsonLoginLdapTest extends AbstractWebTestCase
 
     public function testLdapUsersOnlyStillRejectsAWrongPasswordFromAnotherProvider()
     {
-        if (!property_exists(CheckLdapCredentialsListener::class, 'ldapUsersOnly')) {
+        if (!property_exists(LdapAuthenticator::class, 'ldapUsersOnly')) {
             $this->markTestSkipped('symfony/ldap 8.2 is required.');
         }
 
@@ -103,7 +103,7 @@ class JsonLoginLdapTest extends AbstractWebTestCase
 
     public function testLdapUsersOnlyStillBindsLdapUsers()
     {
-        if (!property_exists(CheckLdapCredentialsListener::class, 'ldapUsersOnly')) {
+        if (!property_exists(LdapAuthenticator::class, 'ldapUsersOnly')) {
             $this->markTestSkipped('symfony/ldap 8.2 is required.');
         }
 
@@ -114,6 +114,27 @@ class JsonLoginLdapTest extends AbstractWebTestCase
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
         $this->assertSame(['spomky'], $checked->getArrayCopy());
+    }
+
+    public function testLdapUsersOnlyAppliesToItsOwnAuthenticator()
+    {
+        if (!property_exists(LdapAuthenticator::class, 'ldapUsersOnly')) {
+            $this->markTestSkipped('symfony/ldap 8.2 is required.');
+        }
+
+        $client = $this->createClient(['test_case' => 'JsonLoginLdap', 'root_config' => 'ldap_users_only_mixed.yml', 'debug' => true]);
+        $client->disableReboot();
+        $checked = $this->mockLdapAdapter($client->getContainer());
+
+        $client->request('POST', '/login', [], [], ['CONTENT_TYPE' => 'application/json'], '{"user": {"login": "bob", "password": "db-pass"}}');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame([], $checked->getArrayCopy());
+
+        $client->request('GET', '/login', [], [], ['PHP_AUTH_USER' => 'bob', 'PHP_AUTH_PW' => 'db-pass']);
+
+        $this->assertSame(401, $client->getResponse()->getStatusCode());
+        $this->assertSame(['bob'], $checked->getArrayCopy());
     }
 
     /**

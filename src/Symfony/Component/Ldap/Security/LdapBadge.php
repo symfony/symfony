@@ -33,6 +33,7 @@ class LdapBadge implements BadgeInterface
         private string $searchDn = '',
         private string $searchPassword = '',
         ?string $queryString = null,
+        private bool $ldapUsersOnly = false,
     ) {
         $this->queryString = $queryString ?? '';
     }
@@ -60,6 +61,11 @@ class LdapBadge implements BadgeInterface
     public function getQueryString(): string
     {
         return $this->queryString;
+    }
+
+    public function isLdapUsersOnly(): bool
+    {
+        return $this->ldapUsersOnly;
     }
 
     public function markResolved(): void

@@ -108,7 +108,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver->setDefined($option = 'foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getAllowedTypes($option));
+        $debug->getAllowedTypes($option);
     }
 
     public function testGetAllowedTypesThrowsOnNotDefinedOption()
@@ -118,7 +118,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getAllowedTypes('foo'));
+        $debug->getAllowedTypes('foo');
     }
 
     public function testGetAllowedValues()
@@ -139,7 +139,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver->setDefined($option = 'foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getAllowedValues($option));
+        $debug->getAllowedValues($option);
     }
 
     public function testGetAllowedValuesThrowsOnNotDefinedOption()
@@ -149,7 +149,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getAllowedValues('foo'));
+        $debug->getAllowedValues('foo');
     }
 
     public function testGetNormalizer()
@@ -170,7 +170,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver->setDefined($option = 'foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getNormalizer($option));
+        $debug->getNormalizer($option);
     }
 
     public function testGetNormalizerThrowsOnNotDefinedOption()
@@ -180,7 +180,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getNormalizer('foo'));
+        $debug->getNormalizer('foo');
     }
 
     public function testGetNormalizers()

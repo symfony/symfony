@@ -74,15 +74,24 @@ class X509AuthenticatorTest extends TestCase
 
     public static function provideServerVarsNoUser()
     {
-        yield ['cert@example.com', 'CN=Sample certificate DN/emailAddress=cert@example.com'];
-        yield ['cert+something@example.com', 'CN=Sample certificate DN/emailAddress=cert+something@example.com'];
+        yield ['cert@example.com', '/CN=Sample certificate DN/emailAddress=cert@example.com'];
+        yield ['cert+something@example.com', '/CN=Sample certificate DN/emailAddress=cert+something@example.com'];
         yield ['cert@example.com', 'CN=Sample certificate DN,emailAddress=cert@example.com'];
         yield ['cert+something@example.com', 'CN=Sample certificate DN,emailAddress=cert+something@example.com'];
         yield ['cert+something@example.com', 'emailAddress=cert+something@example.com,CN=Sample certificate DN'];
         yield ['cert+something@example.com', 'emailAddress=cert+something@example.com'];
         yield ['firstname.lastname@mycompany.co.uk', 'emailAddress=firstname.lastname@mycompany.co.uk,CN=Firstname.Lastname,OU=london,OU=company design and engineering,OU=Issuer London,OU=Roaming,OU=Interactive,OU=Users,OU=Standard,OU=Business,DC=england,DC=core,DC=company,DC=co,DC=uk'];
         yield ['cert@example.com', '1.2.840.113549.1.9.1=cert@example.com,CN=Sample certificate DN'];
-        yield ['cert@example.com', 'CN=Sample certificate DN/1.2.840.113549.1.9.1=cert@example.com'];
+        yield ['cert@example.com', '/CN=Sample certificate DN/1.2.840.113549.1.9.1=cert@example.com'];
+
+        yield 'escaped separator in a preceding value' => ['cert@example.com', 'CN=Sample\, certificate DN,emailAddress=cert@example.com'];
+        yield 'genuine attribute wins over one embedded in a CN' => ['cert@example.com', 'CN=jdoe\,emailAddress=admin@target.example,emailAddress=cert@example.com'];
+        yield 'slash inside a RFC 2253 value' => ['cert@example.com', 'CN=Sample/certificate DN,emailAddress=cert@example.com'];
+        yield 'escaped separator in a preceding value, legacy format' => ['cert@example.com', '/CN=Sample\/certificate DN/emailAddress=cert@example.com'];
+        yield 'hex escape in a preceding value' => ['cert@example.com', 'CN=Sample\2C certificate DN,emailAddress=cert@example.com'];
+        yield 'backslash then escaped slash in a preceding legacy value' => ['cert@example.com', '/CN=jdoe\\\\/emailAddress=admin@target.example/emailAddress=cert@example.com'];
+        yield 'hex escape in a preceding legacy value' => ['cert@example.com', '/CN=Sample\\x2Fcertificate DN/emailAddress=cert@example.com'];
+        yield 'quoted preceding value' => ['cert@example.com', 'CN="Sample, certificate DN",emailAddress=cert@example.com'];
     }
 
     /**
@@ -101,11 +110,29 @@ class X509AuthenticatorTest extends TestCase
         yield ['CN=foo,OU=emailAddress=admin@target.example,O=Attacker'];
         yield ['CN=1.2.840.113549.1.9.1=admin@target.example,O=Attacker Corp'];
         yield ['CN=foo,OU=1.2.840.113549.1.9.1=admin@target.example,O=Attacker'];
+
+        yield 'escaped comma' => ['CN=jdoe\,emailAddress=admin@target.example'];
+        yield 'escaped comma, OID' => ['CN=jdoe\,1.2.840.113549.1.9.1=admin@target.example'];
+        yield 'escaped comma before a legitimate attribute' => ['CN=jdoe\,emailAddress=admin@target.example,O=Attacker'];
+        yield 'hex escaped comma' => ['CN=jdoe\2CemailAddress=admin@target.example'];
+        yield 'slash in a RFC 2253 value' => ['CN=jdoe/emailAddress=admin@target.example'];
+        yield 'escaped slash in a legacy value' => ['/CN=jdoe\/emailAddress=admin@target.example'];
+        yield 'comma in a legacy value' => ['/CN=jdoe,emailAddress=admin@target.example'];
+        yield 'backslash then escaped slash in a legacy value' => ['/CN=jdoe\\\\/emailAddress=admin@target.example'];
+        yield 'quoted value' => ['CN="jdoe,emailAddress=admin@target.example,x=",O=Attacker'];
+        yield 'quoted value, XN_FLAG_ONELINE' => ['O = Attacker, CN = "jdoe,emailAddress=admin@target.example,x="'];
     }
 
     public function testSupportNoData()
     {
         $request = $this->createRequest([]);
+
+        $this->assertFalse($this->authenticator->supports($request));
+    }
+
+    public function testSupportNonStringCredentials()
+    {
+        $request = $this->createRequest(['SSL_CLIENT_S_DN' => null]);
 
         $this->assertFalse($this->authenticator->supports($request));
     }
@@ -130,7 +157,7 @@ class X509AuthenticatorTest extends TestCase
         $authenticator = new X509Authenticator($this->userProvider, new TokenStorage(), 'main', 'SSL_CLIENT_S_DN_Email', 'TheCertKey');
 
         $request = $this->createRequest([
-            'TheCertKey' => 'CN=Sample certificate DN/emailAddress=cert@example.com',
+            'TheCertKey' => '/CN=Sample certificate DN/emailAddress=cert@example.com',
         ]);
         $this->assertTrue($authenticator->supports($request));
 

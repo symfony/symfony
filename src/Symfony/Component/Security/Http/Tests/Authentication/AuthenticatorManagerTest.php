@@ -21,9 +21,12 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\AuthenticationEvents;
+use Symfony\Component\Security\Core\Exception\AccountExpiredException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
@@ -34,6 +37,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Component\Security\Http\EventListener\UserCheckerListener;
 use Symfony\Component\Security\Http\Tests\Fixtures\DummySupportsAuthenticator;
 
 class AuthenticatorManagerTest extends TestCase
@@ -269,6 +273,28 @@ class AuthenticatorManagerTest extends TestCase
         $manager->authenticateUser($this->user, $authenticator, $this->request);
         $this->assertTrue($listenerCalled, 'The AuthenticationTokenCreatedEvent listener is not called');
         $this->assertSame($modifiedToken, $this->tokenStorage->getToken());
+    }
+
+    public function testAuthenticateUserRunsThePostAuthCheckOfTheUserChecker()
+    {
+        $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
+        $authenticator->method('createToken')->willReturn($this->token);
+        $authenticator->expects($this->never())->method('onAuthenticationSuccess');
+
+        $userChecker = $this->createMock(UserCheckerInterface::class);
+        $userChecker->expects($this->once())->method('checkPostAuth')->with($this->user)->willThrowException(new AccountExpiredException());
+        $this->eventDispatcher->addListener(AuthenticationEvents::AUTHENTICATION_SUCCESS, [new UserCheckerListener($userChecker), 'postCheckCredentials']);
+
+        $tokenStorage = new TokenStorage();
+        $manager = new AuthenticatorManager([$authenticator], $tokenStorage, $this->eventDispatcher, 'main');
+
+        try {
+            $manager->authenticateUser($this->user, $authenticator, $this->request);
+            $this->fail('The user checker should have rejected the user.');
+        } catch (AccountExpiredException $e) {
+        }
+
+        $this->assertNull($tokenStorage->getToken());
     }
 
     public function testInteractiveAuthenticator()

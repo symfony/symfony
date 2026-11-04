@@ -145,6 +145,11 @@ class RequestMatcher implements RequestMatcherInterface
     public function matchMethod(string|array|null $method)
     {
         $this->methods = null !== $method ? array_map('strtoupper', (array) $method) : [];
+
+        // HEAD requests are served by the GET handler, as the router does
+        if (\in_array('GET', $this->methods, true) && !\in_array('HEAD', $this->methods, true)) {
+            $this->methods[] = 'HEAD';
+        }
     }
 
     /**

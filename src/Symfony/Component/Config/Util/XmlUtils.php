@@ -52,7 +52,6 @@ class XmlUtils
         libxml_clear_errors();
 
         $dom = new \DOMDocument();
-        $dom->validateOnParse = true;
         if (!$dom->loadXML($content, \LIBXML_NONET | \LIBXML_COMPACT)) {
             throw new XmlParsingException(implode("\n", static::getXmlErrors($internalErrors)));
         }

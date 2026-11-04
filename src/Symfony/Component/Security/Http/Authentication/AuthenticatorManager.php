@@ -82,6 +82,8 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         // announce the authentication token
         $token = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($token, $passport))->getAuthenticatedToken();
 
+        $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($token), AuthenticationEvents::AUTHENTICATION_SUCCESS);
+
         // authenticate this in the system
         return $this->handleAuthenticationSuccess($token, $passport, $request, $authenticator, $this->tokenStorage->getToken());
     }

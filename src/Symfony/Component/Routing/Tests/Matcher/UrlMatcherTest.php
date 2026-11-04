@@ -939,6 +939,70 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals('b', $matcher->match('/bar/abc.123')['_route']);
     }
 
+    public function testHostVariableDoesNotMatchThePath()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/admin/report/{id}', [], [], [], 'app.{domain}'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'app.localhost'));
+        $this->assertEquals(['_route' => 'a', 'domain' => 'localhost', 'id' => '1'], $matcher->match('/admin/report/1'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'app'));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/x./admin/report/1');
+    }
+
+    public function testHostVariableWithPermissiveRequirementDoesNotMatchThePath()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/admin/report/{id}', [], ['domain' => '.+'], [], 'app.{domain}'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'app.example.com'));
+        $this->assertEquals(['_route' => 'a', 'domain' => 'example.com', 'id' => '1'], $matcher->match('/admin/report/1'));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/x./admin/report/1');
+    }
+
+    public function testHostVariableWithPermissiveRequirementMatchesTheHostOnly()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{path}', [], ['domain' => '.+', 'path' => '.+'], [], 'app.{domain}'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'app.example.com'));
+        $this->assertEquals(['_route' => 'a', 'domain' => 'example.com', 'path' => 'foo./bar'], $matcher->match('/foo./bar'));
+    }
+
+    public function testHostVariableWithNamedGroupInRequirementDoesNotMatchThePath()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/admin/report/{id}', [], ['domain' => '(?<name>.+)'], [], 'app.{domain}'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'app.example.com'));
+        $parameters = $matcher->match('/admin/report/1');
+        $this->assertSame('a', $parameters['_route']);
+        $this->assertSame('example.com', $parameters['domain']);
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/x./admin/report/1');
+    }
+
+    public function testStaticRouteWithHostVariableDoesNotMatchThePath()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/admin/report/{id}', [], [], [], 'app.{domain}', [], ['POST']));
+        $coll->add('b', new Route('/admin/report/latest', [], [], [], 'app.{domain}'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'app.localhost'));
+        $this->assertEquals(['_route' => 'b', 'domain' => 'localhost'], $matcher->match('/admin/report/latest'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'app'));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/x./admin/report/latest');
+    }
+
     public function testSlashVariant()
     {
         $coll = new RouteCollection();

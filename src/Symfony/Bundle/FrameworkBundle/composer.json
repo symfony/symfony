@@ -27,7 +27,7 @@
         "symfony/event-dispatcher": "^6.4|^7.0|^8.0",
         "symfony/filesystem": "^7.1|^8.0",
         "symfony/finder": "^6.4|^7.0|^8.0",
-        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4.23|^8.1.11",
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php85": "^1.32",

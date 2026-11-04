@@ -2955,7 +2955,30 @@ b'])]
     public function testTrustedProxiesPrivateSubnets(string $key)
     {
         Request::setTrustedProxies([$key], Request::HEADER_X_FORWARDED_FOR);
-        $this->assertSame(IpUtils::PRIVATE_SUBNETS, Request::getTrustedProxies());
+        $this->assertSame(IpUtils::PRIVATE_RANGES, Request::getTrustedProxies());
+    }
+
+    public function testPrivateRangesDoNotTrustAddressesEmbeddingARemoteIpv4()
+    {
+        Request::setTrustedProxies(['private_ranges'], Request::HEADER_X_FORWARDED_FOR);
+
+        foreach (['::ffff:8.8.8.8', '::8.8.8.8', '2002:808:808::1', '2001:0:4136:e378:8000:63bf:3fff:fdd2', '64:ff9b::8.8.8.8'] as $remoteAddr) {
+            $request = Request::create('/');
+            $request->server->set('REMOTE_ADDR', $remoteAddr);
+            $request->headers->set('X-Forwarded-For', '1.2.3.4');
+
+            $this->assertFalse($request->isFromTrustedProxy(), $remoteAddr);
+            $this->assertSame($remoteAddr, $request->getClientIp());
+        }
+
+        foreach (['10.0.0.5', '::ffff:10.0.0.5', '::ffff:127.0.0.1', 'fd00::1'] as $remoteAddr) {
+            $request = Request::create('/');
+            $request->server->set('REMOTE_ADDR', $remoteAddr);
+            $request->headers->set('X-Forwarded-For', '1.2.3.4');
+
+            $this->assertTrue($request->isFromTrustedProxy(), $remoteAddr);
+            $this->assertSame('1.2.3.4', $request->getClientIp());
+        }
     }
 
     public function testTrustedValuesCache()

@@ -174,7 +174,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
                     $filterContentHeaders = static function ($h) {
                         return 0 !== stripos($h, 'Content-Length:') && 0 !== stripos($h, 'Content-Type:') && 0 !== stripos($h, 'Transfer-Encoding:');
                     };
-                    $options['header'] = array_filter($options['header'], $filterContentHeaders);
+                    $options['headers'] = array_filter($options['headers'], $filterContentHeaders);
                     $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], $filterContentHeaders);
                     $redirectHeaders['with_auth'] = array_filter($redirectHeaders['with_auth'], $filterContentHeaders);
                 }

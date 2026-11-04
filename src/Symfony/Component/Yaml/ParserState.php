@@ -24,12 +24,20 @@ final class ParserState
     public $maxAliasesForCollections = Parser::DEFAULT_MAX_ALIASES_FOR_COLLECTIONS;
     public $collectionAliasCount = 0;
     public $aliasesEnabled = true;
+    public $maxAliasedNodeCount = \PHP_INT_MAX;
+    public $aliasedNodeCount = 0;
+    public $nodeCount = 0;
+    public $anchorNodeCounts = [];
 
     public function reset(): void
     {
         $this->currentNestingLevel = 0;
         $this->collectionAliasCount = 0;
         $this->aliasesEnabled = true;
+        $this->maxAliasedNodeCount = \PHP_INT_MAX;
+        $this->aliasedNodeCount = 0;
+        $this->nodeCount = 0;
+        $this->anchorNodeCounts = [];
     }
 
     public function enterNestingLevel(int $line, ?string $snippet, ?string $filename): void
@@ -51,7 +59,7 @@ final class ParserState
     /**
      * @param mixed $refValue
      */
-    public function countAlias($refValue, int $line, ?string $snippet, ?string $filename): void
+    public function countAlias(string $name, $refValue, int $line, ?string $snippet, ?string $filename): void
     {
         if (!$this->aliasesEnabled) {
             throw new ParseException('Aliases are disabled.', $line, $snippet, $filename);
@@ -67,6 +75,14 @@ final class ParserState
 
         if (++$this->collectionAliasCount > $this->maxAliasesForCollections) {
             throw new ParseException(sprintf('Maximum number of collection aliases (%d) exceeded. This limit can be increased via the Parser constructor.', $this->maxAliasesForCollections), $line, $snippet, $filename);
+        }
+
+        // an alias shares the nodes of its anchor, but the code that walks the parsed value visits them once per alias
+        $nodeCount = $this->anchorNodeCounts[$name] ?? 0;
+        $this->nodeCount += $nodeCount;
+
+        if (($this->aliasedNodeCount += $nodeCount) > $this->maxAliasedNodeCount) {
+            throw new ParseException(sprintf('Maximum number of nodes expanded by collection aliases (%d) exceeded. This limit can be increased via the Parser constructor.', $this->maxAliasedNodeCount), $line, $snippet, $filename);
         }
     }
 }

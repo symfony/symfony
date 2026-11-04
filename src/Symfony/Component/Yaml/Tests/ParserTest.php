@@ -3085,6 +3085,55 @@ YAML;
         $this->parser->parse($yaml, Yaml::PARSE_EXCEPTION_ON_ALIAS);
     }
 
+    /**
+     * @dataProvider provideChainedCollectionAliases
+     */
+    public function testParseRejectsCollectionAliasesThatExpandToTooManyNodes(string $yaml, int $flags = 0)
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Maximum number of nodes expanded by collection aliases');
+
+        $this->parser->parse($yaml, $flags);
+    }
+
+    public static function provideChainedCollectionAliases(): iterable
+    {
+        $flowSequences = "a0: &a0 [x]\n";
+        $blockSequences = "a0: &a0\n    - x\n";
+        $flowMappings = "a0: &a0 {x: 1}\n";
+        $mergeKeys = "a0: &a0 {x: 1}\n";
+        $taggedSequences = "a0: &a0 !t [x]\n";
+
+        for ($i = 1; $i <= 40; ++$i) {
+            $flowSequences .= "a$i: &a$i [*a".($i - 1).', *a'.($i - 1)."]\n";
+            $blockSequences .= "a$i: &a$i\n    - *a".($i - 1)."\n    - *a".($i - 1)."\n";
+            $flowMappings .= "a$i: &a$i {x: *a".($i - 1).', y: *a'.($i - 1)."}\n";
+            $mergeKeys .= "a$i: &a$i\n    <<: *a".($i - 1)."\n    k$i: *a".($i - 1)."\n";
+            $taggedSequences .= "a$i: &a$i !t [*a".($i - 1).', *a'.($i - 1)."]\n";
+        }
+
+        yield 'flow sequences' => [$flowSequences.'items: *a40'];
+        yield 'block sequences' => [$blockSequences.'items: *a40'];
+        yield 'flow mappings' => [$flowMappings.'items: *a40'];
+        yield 'flow mappings as objects' => [$flowMappings.'items: *a40', Yaml::PARSE_OBJECT_FOR_MAP];
+        yield 'merge keys' => [$mergeKeys.'items: *a40'];
+        yield 'tagged sequences' => [$taggedSequences.'items: *a40', Yaml::PARSE_CUSTOM_TAGS];
+    }
+
+    public function testParseAcceptsLargeCollectionAliasedManyTimes()
+    {
+        $items = implode(', ', array_map(function ($i) { return "item$i"; }, range(1, 500)));
+        $yaml = "defaults: &defaults [$items]\n";
+
+        for ($i = 0; $i < Parser::DEFAULT_MAX_ALIASES_FOR_COLLECTIONS; ++$i) {
+            $yaml .= "a$i: *defaults\n";
+        }
+
+        $result = $this->parser->parse($yaml);
+
+        $this->assertCount(500, $result['a'.(Parser::DEFAULT_MAX_ALIASES_FOR_COLLECTIONS - 1)]);
+    }
+
     public function testParseHandlesLargeYamlHeaders()
     {
         $yaml = "%YAML:".str_repeat('1', 100000)."\nfoo: bar\n";

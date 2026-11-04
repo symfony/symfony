@@ -151,6 +151,19 @@ class PhpEngineTest extends TestCase
         $this->assertEquals($foo, $engine->escape($foo), '->escape() does nothing on non strings');
     }
 
+    public function testEscapeCacheSizeLimit()
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertSame('&lt;'.$i.'&gt;', $engine->escape('<'.$i.'>'));
+        }
+
+        $escaperCache = \Closure::bind(function () { return self::$escaperCache; }, null, PhpEngine::class)();
+
+        $this->assertLessThanOrEqual(1001, \count($escaperCache['html']));
+    }
+
     public function testGetSetCharset()
     {
         $helper = new SlotsHelper();

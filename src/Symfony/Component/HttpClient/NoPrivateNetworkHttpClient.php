@@ -49,6 +49,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         '::1/128',
         'fc00::/7',
         'fe80::/10',
+        'fec0::/10',       // Site-Local Addresses, deprecated by RFC 3879
         '::ffff:0:0/96',
         '::/128',
         '::/96',

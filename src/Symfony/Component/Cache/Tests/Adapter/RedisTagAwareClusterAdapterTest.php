@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 
@@ -38,5 +39,17 @@ class RedisTagAwareClusterAdapterTest extends RedisClusterAdapterTest
         $adapter = new RedisTagAwareAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
 
         return $adapter;
+    }
+
+    public function testInvalidateTagsWithHashTagInPrefix()
+    {
+        $redis = RedisAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', getenv('REDIS_CLUSTER_HOSTS')).']', ['redis_cluster' => true]);
+        $redis->setOption(\Redis::OPT_PREFIX, '{app}:');
+        $pool = new RedisTagAwareAdapter($redis, str_replace('\\', '.', __CLASS__));
+
+        $pool->save($pool->getItem('foo')->set('bar')->tag('tag'));
+
+        $this->assertTrue($pool->invalidateTags(['tag']));
+        $this->assertFalse($pool->getItem('foo')->isHit());
     }
 }

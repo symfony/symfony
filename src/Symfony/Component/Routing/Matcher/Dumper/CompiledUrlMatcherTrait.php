@@ -56,7 +56,8 @@ trait CompiledUrlMatcherTrait
             $this->context->setScheme(key($allowSchemes));
             try {
                 if ($ret = $this->doMatch($pathinfo)) {
-                    return $this->redirect($pathinfo, $ret['_route'], $this->context->getScheme()) + $ret;
+                    // a leading "//" or "/\", even with tabs or newlines in between, would make the redirection point to another host
+                    return $this->redirect(preg_replace(['#^/[\t\n\r]*+\K/#', '#^/[\t\n\r]*+\K\\\\#'], ['%2F', '%5C'], $pathinfo), $ret['_route'], $this->context->getScheme()) + $ret;
                 }
             } finally {
                 $this->context->setScheme($scheme);
@@ -64,7 +65,7 @@ trait CompiledUrlMatcherTrait
         } elseif ('' !== $trimmedPathinfo = rtrim($pathinfo, '/')) {
             $pathinfo = $trimmedPathinfo === $pathinfo ? $pathinfo.'/' : $trimmedPathinfo;
             if ($ret = $this->doMatch($pathinfo, $allow, $allowSchemes)) {
-                return $this->redirect($pathinfo, $ret['_route']) + $ret;
+                return $this->redirect(preg_replace(['#^/[\t\n\r]*+\K/#', '#^/[\t\n\r]*+\K\\\\#'], ['%2F', '%5C'], $pathinfo), $ret['_route']) + $ret;
             }
             if ($allowSchemes) {
                 goto redirect_scheme;

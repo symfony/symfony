@@ -376,7 +376,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used
         // as the first segment of a relative-path reference, as it would be mistaken for a scheme name
         // (see http://tools.ietf.org/html/rfc3986#section-4.2).
-        return '' === $path || '/' === $path[0]
+        // A leading backslash, space or control character needs the prefix too,
+        // since browsers read a backslash as a slash and ignore leading spaces and control characters.
+        return '' === $path || '/' === $path[0] || '\\' === $path[0] || \ord($path[0]) <= 0x20
             || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos)
             ? "./$path" : $path;
     }

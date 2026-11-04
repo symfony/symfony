@@ -773,6 +773,10 @@ class RequestTest extends TestCase
             ['../baz/me.png', '/foo/bar/b', '/foo/baz/me.png'],
             ['../../fooz/baz/me.png', '/foo/bar/b', '/fooz/baz/me.png'],
             ['baz/me.png', '/foo/bar/b', 'baz/me.png'],
+            ['./\\\\example.com', '/foo/bar', '/foo/\\\\example.com'],
+            ['./\\/example.com', '/foo/bar', '/foo/\\/example.com'],
+            ['./ //example.com', '/foo/bar', '/foo/ //example.com'],
+            ["./\t//example.com", '/foo/bar', "/foo/\t//example.com"],
         ];
     }
 

@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -2877,6 +2878,29 @@ class RequestTest extends TestCase
         $_SERVER['REMOTE_ADDR'] = $serverRemoteAddr;
         Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_FOR);
         $this->assertSame($result, Request::getTrustedProxies());
+    }
+
+    public function testPrivateRangesDoNotTrustAddressesEmbeddingARemoteIpv4()
+    {
+        Request::setTrustedProxies(IpUtils::PRIVATE_RANGES, Request::HEADER_X_FORWARDED_FOR);
+
+        foreach (['::ffff:8.8.8.8', '::8.8.8.8', '2002:808:808::1', '2001:0:4136:e378:8000:63bf:3fff:fdd2', '64:ff9b::8.8.8.8'] as $remoteAddr) {
+            $request = Request::create('/');
+            $request->server->set('REMOTE_ADDR', $remoteAddr);
+            $request->headers->set('X-Forwarded-For', '1.2.3.4');
+
+            $this->assertFalse($request->isFromTrustedProxy(), $remoteAddr);
+            $this->assertSame($remoteAddr, $request->getClientIp());
+        }
+
+        foreach (['10.0.0.5', '::ffff:10.0.0.5', '::ffff:127.0.0.1', 'fd00::1'] as $remoteAddr) {
+            $request = Request::create('/');
+            $request->server->set('REMOTE_ADDR', $remoteAddr);
+            $request->headers->set('X-Forwarded-For', '1.2.3.4');
+
+            $this->assertTrue($request->isFromTrustedProxy(), $remoteAddr);
+            $this->assertSame('1.2.3.4', $request->getClientIp());
+        }
     }
 
     public function testTrustedValuesCache()

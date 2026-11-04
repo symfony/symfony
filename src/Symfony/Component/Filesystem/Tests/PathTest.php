@@ -1094,6 +1094,69 @@ class PathTest extends TestCase
         $this->assertSame('/path/to/test/subdir', Path::join('/path', 'to', '/test', 'subdir/'));
     }
 
+    public function testInvalidSchemeIsNotARoot()
+    {
+        $this->assertFalse(Path::isBasePath('/base', '/base/../../etc/x://../passwd'));
+        $this->assertFalse(Path::isBasePath('/base', '/base/x://../../etc/passwd'));
+        $this->assertSame('/etc/passwd', Path::canonicalize('/base/../../etc/x://../passwd'));
+        $this->assertSame('/etc/passwd', Path::join('/base', '../../etc/x://../passwd'));
+        $this->assertSame('/etc/passwd', Path::makeAbsolute('../../etc/x://../passwd', '/base'));
+        $this->assertSame('../etc/passwd', Path::makeRelative('/base/../../etc/x://../passwd', '/base'));
+
+        $this->assertSame('b:/c', Path::canonicalize('a/../b://c'));
+        $this->assertSame('x', Path::canonicalize('.://../x'));
+        $this->assertSame('x', Path::canonicalize('a_b://../x'));
+        $this->assertSame('x', Path::canonicalize('://../x'));
+        $this->assertSame('a/c', Path::canonicalize('a/b://../c'));
+        $this->assertSame('../b', Path::canonicalize('../a://../b'));
+    }
+
+    public function testIsAbsoluteAndGetRootIgnoreInvalidScheme()
+    {
+        $this->assertTrue(Path::isAbsolute('/etc/x://y'));
+        $this->assertFalse(Path::isAbsolute('a/b:///c'));
+        $this->assertFalse(Path::isAbsolute('a_b:///c'));
+        $this->assertFalse(Path::isAbsolute(':///c'));
+
+        $this->assertSame('/', Path::getRoot('/etc/x://y'));
+        $this->assertSame('', Path::getRoot('a/b:///c'));
+
+        $this->assertSame('/a/b:/x/c', Path::makeAbsolute('c', '/a/b://x'));
+    }
+
+    public function testIsLocalIgnoresInvalidScheme()
+    {
+        $this->assertTrue(Path::isLocal('/etc/x://y'));
+        $this->assertTrue(Path::isLocal('a/b://c'));
+    }
+
+    public function testSingleLetterBeforeDoubleSlashIsNotAScheme()
+    {
+        $this->assertSame(Path::canonicalize('x:/../y'), Path::canonicalize('x://../y'));
+        $this->assertSame(Path::getRoot('x:/y'), Path::getRoot('x://y'));
+        $this->assertTrue(Path::isLocal('x://y'));
+    }
+
+    public function testValidSchemeIsARoot()
+    {
+        $this->assertSame('phar:///style.css', Path::canonicalize('phar:///../style.css'));
+        $this->assertSame('PHAR:///style.css', Path::canonicalize('PHAR:///../style.css'));
+        $this->assertSame('file:///etc/passwd', Path::canonicalize('file:///../etc/passwd'));
+        $this->assertSame('vfs://root/file', Path::canonicalize('vfs://root/dir/../file'));
+        $this->assertSame('s3://file', Path::canonicalize('s3://../file'));
+        $this->assertSame('compress.zlib:///file.gz', Path::canonicalize('compress.zlib:///../file.gz'));
+        $this->assertSame('1a://x', Path::canonicalize('1a://../x'));
+        $this->assertSame('+a://x', Path::canonicalize('+a://../x'));
+
+        $this->assertTrue(Path::isAbsolute('PHAR:///c'));
+        $this->assertTrue(Path::isAbsolute('compress.zlib:///c'));
+        $this->assertTrue(Path::isAbsolute('1a:///c'));
+        $this->assertSame('compress.zlib:///', Path::getRoot('compress.zlib:///c'));
+        $this->assertFalse(Path::isLocal('compress.zlib:///c'));
+        $this->assertFalse(Path::isLocal('s3://bucket/c'));
+        $this->assertFalse(Path::isLocal('1a://x'));
+    }
+
     public function testGetHomeDirectoryFailsIfNotSupportedOperatingSystem()
     {
         $this->expectException(\RuntimeException::class);

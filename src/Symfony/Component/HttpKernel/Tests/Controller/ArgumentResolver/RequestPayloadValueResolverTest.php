@@ -36,8 +36,10 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Buz;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\BasicTypesController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ControllerAttributesController;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
@@ -746,7 +748,7 @@ class RequestPayloadValueResolverTest extends TestCase
     #[DataProvider('provideMatchedFormatContext')]
     public function testAcceptFormatPassed(mixed $acceptFormat, string $contentType, string $content)
     {
-        $encoders = ['json' => new JsonEncoder(), 'xml' => new XmlEncoder()];
+        $encoders = [new JsonEncoder(), new XmlEncoder(), new YamlEncoder(), new CsvEncoder([CsvEncoder::AS_COLLECTION_KEY => false])];
         $serializer = new Serializer([new ObjectNormalizer()], $encoders);
         $validator = (new ValidatorBuilder())->getValidator();
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
@@ -803,12 +805,25 @@ class RequestPayloadValueResolverTest extends TestCase
             'contentType' => 'application/xml',
             'content' => '<?xml version="1.0"?><request><price>50</price></request>',
         ];
+
+        yield 'configure with yaml, sends yaml' => [
+            'acceptFormat' => 'yaml',
+            'contentType' => 'application/x-yaml',
+            'content' => 'price: 50',
+        ];
+
+        yield 'configure with csv, sends csv' => [
+            'acceptFormat' => 'csv',
+            'contentType' => 'text/csv',
+            'content' => "price\n50",
+        ];
     }
 
     #[DataProvider('provideMismatchedFormatContext')]
     public function testAcceptFormatNotPassed(mixed $acceptFormat, string $contentType, string $content, string $expectedExceptionMessage)
     {
-        $serializer = new Serializer([new ObjectNormalizer()]);
+        $encoders = [new JsonEncoder(), new XmlEncoder(), new YamlEncoder(), new CsvEncoder([CsvEncoder::AS_COLLECTION_KEY => false])];
+        $serializer = new Serializer([new ObjectNormalizer()], $encoders);
         $validator = (new ValidatorBuilder())->getValidator();
         $resolver = new RequestPayloadValueResolver($serializer, $validator);
 
@@ -866,6 +881,27 @@ class RequestPayloadValueResolverTest extends TestCase
             'contentType' => 'application/ld+json',
             'content' => '{"@context": "https://schema.org", "@type": "FakeType", "price": 50}',
             'expectedExceptionMessage' => 'Unsupported format, expects "json", "xml", but "jsonld" given.',
+        ];
+
+        yield 'configure with no format, sends yaml' => [
+            'acceptFormat' => null,
+            'contentType' => 'application/x-yaml',
+            'content' => 'price: 50',
+            'expectedExceptionMessage' => 'Unsupported format, "yaml" must be explicitly listed in "acceptFormat".',
+        ];
+
+        yield 'configure with no format, sends a +yaml media type' => [
+            'acceptFormat' => null,
+            'contentType' => 'application/vnd.example+yaml',
+            'content' => 'price: 50',
+            'expectedExceptionMessage' => 'Unsupported format, "yaml" must be explicitly listed in "acceptFormat".',
+        ];
+
+        yield 'configure with no format, sends csv' => [
+            'acceptFormat' => null,
+            'contentType' => 'text/csv',
+            'content' => "price\n50",
+            'expectedExceptionMessage' => 'Unsupported format, "csv" must be explicitly listed in "acceptFormat".',
         ];
     }
 

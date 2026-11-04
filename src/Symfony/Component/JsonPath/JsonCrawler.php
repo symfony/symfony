@@ -33,9 +33,14 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 final class JsonCrawler implements JsonCrawlerInterface
 {
     private const REGEX_BACKTRACK_LIMIT = 10000;
+    private const REGEX_WORK_BUDGET = 300_000_000;
+    private const REGEX_WORK_PER_CALL = 1000;
+    private const REGEX_WORK_PER_BYTE = 16;
+    private const REGEX_WORK_ESCALATION = 8;
 
     private const MAX_FILTER_EXPRESSION_LENGTH = 10000;
     private const MAX_FILTER_EXPRESSION_DEPTH = 100;
+    private const MAX_PARSED_FILTER_EXPRESSIONS = 64;
 
     /**
      * Comparison operators and their corresponding lengths.
@@ -48,6 +53,36 @@ final class JsonCrawler implements JsonCrawlerInterface
         '>' => 1,
         '<' => 1,
     ];
+
+    private int $regexBudget = self::REGEX_WORK_BUDGET;
+
+    /**
+     * Filter expressions parsed so far, so that a filter applied to many nodes is parsed once.
+     *
+     * @var array<string, array{expression: array, validated: bool}>
+     */
+    private array $parsedFilterExpressions = [];
+
+    /**
+     * The whole input, decoded at most once per find() call and wrapped in a list to tell a null document apart.
+     *
+     * @var list<mixed>
+     */
+    private array $document = [];
+
+    /**
+     * The first node and the number of nodes each absolute query of a filter selects, or the error it raised,
+     * computed once per find() call since they do not depend on the node being filtered.
+     *
+     * @var array<string, array{mixed, int}|JsonCrawlerException>
+     */
+    private array $absoluteQueries = [];
+
+    /**
+     * How many more values the arrays kept in $absoluteQueries may hold, so that these copies never add up to more
+     * than one copy of the document. The budget is null until the values of the document are counted.
+     */
+    private ?int $absoluteQueriesBudget = null;
 
     /**
      * @param resource|string                                                                        $raw
@@ -66,61 +101,50 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     public function find(string|JsonPath $query): array
     {
-        return $this->evaluate(\is_string($query) ? new JsonPath($query) : $query);
+        $this->regexBudget = self::REGEX_WORK_BUDGET;
+
+        try {
+            return $this->evaluate(\is_string($query) ? new JsonPath($query) : $query);
+        } finally {
+            $this->document = $this->absoluteQueries = [];
+            $this->absoluteQueriesBudget = null;
+        }
     }
 
-    private function evaluate(JsonPath $query): array
+    /**
+     * @param bool $wholeDocument Whether to evaluate the query on the whole decoded document instead of reading
+     *                            the smallest part of a stream it needs
+     */
+    private function evaluate(JsonPath $query, bool $wholeDocument = false): array
     {
         try {
             if ($this->isComplexBracketExpression($query)) {
                 preg_match('/^\$\[([^\[\]]+)]$/', $query, $matches);
 
-                if (\is_resource($json = $this->raw)) {
-                    if (0 !== ftell($this->raw)) {
-                        rewind($this->raw);
-                    }
-
-                    if (false === $json = stream_get_contents($this->raw)) {
-                        throw new \RuntimeException('Failed to read from resource stream.');
-                    }
-                }
-
-                try {
-                    $data = json_decode($json, false, 512, \JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
-                    throw new InvalidJsonStringInputException($e->getMessage(), $e);
-                }
-
-                return $this->normalizeStorage($this->evaluateBracket($matches[1], $data));
+                return $this->normalizeStorage($this->evaluateBracket($matches[1], $this->getDocument()));
             }
 
             $tokens = JsonPathTokenizer::tokenize($query);
 
-            if (\is_resource($json = $this->raw)) {
-                if (!class_exists(Splitter::class)) {
-                    throw new \LogicException('The JsonStreamer package is required to evaluate a path against a resource. Try running "composer require symfony/json-streamer".');
+            if ($wholeDocument || !\is_resource($this->raw)) {
+                return $this->normalizeStorage($this->evaluateTokensOnDecodedData($tokens, $this->getDocument()));
+            }
+
+            if (!class_exists(Splitter::class)) {
+                throw new \LogicException('The JsonStreamer package is required to evaluate a path against a resource. Try running "composer require symfony/json-streamer".');
+            }
+
+            try {
+                $simplified = JsonPathUtils::findSmallestDeserializableStringAndPath($tokens, $this->raw);
+
+                $tokens = $simplified['tokens'];
+                $json = $simplified['json'];
+
+                if (!$json) {
+                    throw new \LogicException(); // fallback to reading the entire stream
                 }
-
-                try {
-                    $simplified = JsonPathUtils::findSmallestDeserializableStringAndPath($tokens, $this->raw);
-
-                    $tokens = $simplified['tokens'];
-                    $json = $simplified['json'];
-
-                    if (!$json) {
-                        throw new \LogicException(); // fallback to reading the entire stream
-                    }
-                } catch (\LogicException|UnexpectedValueException) {
-                    if (0 !== ftell($this->raw)) {
-                        rewind($this->raw);
-                    }
-
-                    if (false === $json = stream_get_contents($this->raw)) {
-                        throw new \RuntimeException('Failed to read from resource stream.');
-                    }
-
-                    $tokens = JsonPathTokenizer::tokenize($query);
-                }
+            } catch (\LogicException|UnexpectedValueException) {
+                return $this->normalizeStorage($this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize($query), $this->getDocument()));
             }
 
             try {
@@ -135,6 +159,78 @@ final class JsonCrawler implements JsonCrawlerInterface
         } catch (InvalidJsonPathException $e) {
             throw new JsonCrawlerException($query, $e->getMessage(), previous: $e);
         }
+    }
+
+    private function getDocument(): mixed
+    {
+        if ($this->document) {
+            return $this->document[0];
+        }
+
+        if (\is_resource($json = $this->raw)) {
+            if (0 !== ftell($this->raw)) {
+                rewind($this->raw);
+            }
+
+            if (false === $json = stream_get_contents($this->raw)) {
+                throw new \RuntimeException('Failed to read from resource stream.');
+            }
+        }
+
+        try {
+            $this->document = [json_decode($json, false, 512, \JSON_THROW_ON_ERROR)];
+        } catch (\JsonException $e) {
+            throw new InvalidJsonStringInputException($e->getMessage(), $e);
+        }
+
+        return $this->document[0];
+    }
+
+    /**
+     * @return array{mixed, int} The first node the query selects, or null, and the number of nodes it selects
+     */
+    private function evaluateAbsoluteQuery(string $expr): array
+    {
+        if (isset($this->absoluteQueries[$expr])) {
+            if ($this->absoluteQueries[$expr] instanceof JsonCrawlerException) {
+                throw $this->absoluteQueries[$expr];
+            }
+
+            return $this->absoluteQueries[$expr];
+        }
+
+        try {
+            $nodes = $this->evaluate(new JsonPath($expr), true);
+        } catch (JsonCrawlerException $e) {
+            throw $this->absoluteQueries[$expr] = $e;
+        }
+
+        $result = [$nodes[0] ?? null, \count($nodes)];
+
+        if (\is_array($result[0])) {
+            $this->absoluteQueriesBudget ??= $this->countNestedValues($this->getDocument());
+
+            // several spellings of a query can select the same large node: past the budget, such a query is evaluated again when read
+            if (0 > $this->absoluteQueriesBudget -= \count($result[0], \COUNT_RECURSIVE)) {
+                return $result;
+            }
+        }
+
+        return $this->absoluteQueries[$expr] = $result;
+    }
+
+    /**
+     * Counts the values in a decoded container and in its descendants, like count() does with COUNT_RECURSIVE.
+     */
+    private function countNestedValues(array|\stdClass $container): int
+    {
+        $count = 0;
+
+        foreach ($container as $value) {
+            $count += $this->isArrayOrObject($value) ? 1 + $this->countNestedValues($value) : 1;
+        }
+
+        return $count;
     }
 
     private function isComplexBracketExpression(JsonPath $query): bool
@@ -370,7 +466,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 $part = trim($part);
 
                 if (preg_match('/^\?(.*)$/', $part, $matches)) {
-                    $result = array_merge($result, $this->evaluateFilter(trim($matches[1]), $value));
+                    $result = array_merge($result, $this->evaluateFilter($this->getParsedFilterExpression(trim($matches[1])), $value));
 
                     continue;
                 }
@@ -401,9 +497,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 $filterExpr = "($filterExpr)";
             }
 
-            $this->validateFilterExpression($filterExpr);
-
-            return $this->evaluateFilter($filterExpr, $value);
+            return $this->evaluateFilter($this->getParsedFilterExpression($filterExpr, true), $value);
         }
 
         // comma-separated values, e.g. `['key1', 'key2', 123]` or `[0, 1, 'key']`
@@ -508,7 +602,10 @@ final class JsonCrawler implements JsonCrawlerInterface
         throw new InvalidJsonPathException(\sprintf('Unsupported bracket expression "%s".', $expr));
     }
 
-    private function evaluateFilter(string $expr, mixed $value): array
+    /**
+     * @param array $expr An expression parsed by self::parseFilterExpression()
+     */
+    private function evaluateFilter(array $expr, mixed $value): array
     {
         if (!$this->isArrayOrObject($value)) {
             return [];
@@ -524,32 +621,71 @@ final class JsonCrawler implements JsonCrawlerInterface
         return $result;
     }
 
-    private function evaluateFilterExpression(string $expr, mixed $context, int $depth = 0): bool
+    private function getParsedFilterExpression(string $expr, bool $validate = false): array
+    {
+        if (!isset($this->parsedFilterExpressions[$expr])) {
+            if (self::MAX_PARSED_FILTER_EXPRESSIONS <= \count($this->parsedFilterExpressions)) {
+                $this->parsedFilterExpressions = [];
+            }
+
+            $this->parsedFilterExpressions[$expr] = ['expression' => $this->parseFilterExpression($expr), 'validated' => false];
+        }
+
+        if ($validate && !$this->parsedFilterExpressions[$expr]['validated']) {
+            $this->validateFilterExpression($expr);
+            $this->parsedFilterExpressions[$expr]['validated'] = true;
+        }
+
+        return $this->parsedFilterExpressions[$expr]['expression'];
+    }
+
+    /**
+     * Splits a filter expression into a tree of logical operations, leaving the operands as they
+     * are. Everything this does depends on the expression only, never on the node being filtered.
+     */
+    private function parseFilterExpression(string $expr, int $depth = 0): array
     {
         $expr = JsonPathUtils::normalizeWhitespace($expr);
 
         if ($depth > self::MAX_FILTER_EXPRESSION_DEPTH || \strlen($expr) > self::MAX_FILTER_EXPRESSION_LENGTH) {
-            throw new JsonCrawlerException($expr, 'filter expression is too long or too deeply nested');
+            // reported when the node is reached, so that a branch that is never evaluated stays silent
+            return ['type' => 'too-complex', 'operand' => $expr];
         }
 
         $expr = $this->stripWrappingParentheses($expr);
 
         // logical operators bind less tightly than the negation
         if ($logicalOp = $this->findRightmostLogicalOperator($expr)) {
-            $left = trim(substr($expr, 0, $logicalOp['position']));
-            $right = trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator'])));
-
-            if ('||' === $logicalOp['operator']) {
-                return $this->evaluateFilterExpression($left, $context, $depth + 1) || $this->evaluateFilterExpression($right, $context, $depth + 1);
-            }
-
-            return $this->evaluateFilterExpression($left, $context, $depth + 1) && $this->evaluateFilterExpression($right, $context, $depth + 1);
+            return [
+                'type' => '||' === $logicalOp['operator'] ? 'or' : 'and',
+                'left' => $this->parseFilterExpression(trim(substr($expr, 0, $logicalOp['position'])), $depth + 1),
+                'right' => $this->parseFilterExpression(trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator']))), $depth + 1),
+            ];
         }
 
         if (str_starts_with($expr, '!')) {
-            return !$this->evaluateFilterExpression(trim(substr($expr, 1)), $context, $depth + 1);
+            return ['type' => 'not', 'operand' => $this->parseFilterExpression(trim(substr($expr, 1)), $depth + 1)];
         }
 
+        return ['type' => 'operand', 'operand' => $expr];
+    }
+
+    /**
+     * @param array $expr An expression parsed by self::parseFilterExpression()
+     */
+    private function evaluateFilterExpression(array $expr, mixed $context): bool
+    {
+        return match ($expr['type']) {
+            'and' => $this->evaluateFilterExpression($expr['left'], $context) && $this->evaluateFilterExpression($expr['right'], $context),
+            'or' => $this->evaluateFilterExpression($expr['left'], $context) || $this->evaluateFilterExpression($expr['right'], $context),
+            'not' => !$this->evaluateFilterExpression($expr['operand'], $context),
+            'too-complex' => throw new JsonCrawlerException($expr['operand'], 'filter expression is too long or too deeply nested'),
+            default => $this->evaluateFilterOperand($expr['operand'], $context),
+        };
+    }
+
+    private function evaluateFilterOperand(string $expr, mixed $context): bool
+    {
         foreach (self::COMPARISON_OPERATORS as $op => $len) {
             if (str_contains($expr, $op)) {
                 if (false === $opPos = $this->findOperatorPosition($expr, $op)) {
@@ -569,8 +705,12 @@ final class JsonCrawler implements JsonCrawlerInterface
 
         if (str_starts_with($expr, '$')) {
             try {
-                return (bool) $this->evaluate(new JsonPath($expr));
-            } catch (JsonCrawlerException) {
+                return 0 < $this->evaluateAbsoluteQuery($expr)[1];
+            } catch (JsonCrawlerException $e) {
+                if (0 > $this->regexBudget) {
+                    throw $e;
+                }
+
                 return false;
             }
         }
@@ -694,7 +834,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 throw new JsonCrawlerException($expr, 'non-singular query is not comparable');
             }
 
-            return $this->evaluate(new JsonPath($expr))[0] ?? null;
+            return $this->evaluateAbsoluteQuery($expr)[0];
         }
 
         // current node references
@@ -745,9 +885,7 @@ final class JsonCrawler implements JsonCrawlerInterface
         foreach ($argStrings as $arg) {
             $arg = trim($arg);
             if (str_starts_with($arg, '$')) { // special handling for absolute paths
-                $results = $this->evaluate(new JsonPath($arg));
-                $argList[] = $results[0] ?? null;
-                $nodelistSizes[] = \count($results);
+                [$argList[], $nodelistSizes[]] = $this->evaluateAbsoluteQuery($arg);
             } elseif (!str_starts_with($arg, '@')) { // special handling for @ to track nodelist size
                 $argList[] = $this->evaluateScalar($arg, $context);
                 $nodelistSizes[] = 1;
@@ -794,11 +932,11 @@ final class JsonCrawler implements JsonCrawlerInterface
             },
             'count' => $nodelistSize,
             'match' => match (true) {
-                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch(\sprintf('/\A(?:%s)\z/u', $this->transformJsonPathRegex($argList[1])), $value),
+                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch(\sprintf('/\A(?:%s)\z/u', $this->transformJsonPathRegex($argList[1])), $value, $argList[1]),
                 default => false,
             },
             'search' => match (true) {
-                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch("/{$this->transformJsonPathRegex($argList[1])}/u", $value),
+                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch("/{$this->transformJsonPathRegex($argList[1])}/u", $value, $argList[1]),
                 default => false,
             },
             'value' => 1 < $nodelistSize ? Nothing::Nothing : (1 === $nodelistSize ? (\is_array($value) ? ($value[0] ?? null) : $value) : $value),
@@ -1187,16 +1325,48 @@ final class JsonCrawler implements JsonCrawlerInterface
         throw new JsonCrawlerException($expr, \sprintf('the result of the custom JsonPath function "%s" (%s) cannot be used in test expressions', $functionName, $returnType->name.'Type'));
     }
 
-    private function safeRegexMatch(string $pattern, string $subject): bool
+    /**
+     * Matches a pattern taken from the query, spending a bounded amount of backtracking.
+     *
+     * PCRE gives up after "pcre.backtrack_limit" steps, but it restarts counting at every position it
+     * attempts a match from, so that setting bounds the cost of one position, not the cost of one call:
+     * a pattern that stays just under the limit still costs one full limit per byte of the subject. The
+     * limit is therefore derived from the work the call may do, that work is taken from a budget shared
+     * by every regex a single find() evaluates, and a pattern that needs more gets more while the budget
+     * can pay for it. Once it cannot, the budget is marked as spent and the crawl fails, even from inside
+     * an existence test. A match that could not be decided is not a "no match".
+     */
+    private function safeRegexMatch(string $pattern, string $subject, string $regex): bool
     {
-        $previousLimit = ini_set('pcre.backtrack_limit', self::REGEX_BACKTRACK_LIMIT);
-        try {
-            return @preg_match($pattern, $subject);
-        } finally {
-            if (false !== $previousLimit) {
-                ini_set('pcre.backtrack_limit', $previousLimit);
+        $startingPositions = 1 + \strlen($subject);
+        $limit = min(self::REGEX_BACKTRACK_LIMIT, intdiv(self::REGEX_WORK_PER_CALL + self::REGEX_WORK_PER_BYTE * \strlen($subject), $startingPositions));
+
+        while (($work = $limit * $startingPositions) <= $this->regexBudget) {
+            $this->regexBudget -= $work;
+            $previousLimit = ini_set('pcre.backtrack_limit', $limit);
+
+            try {
+                $result = @preg_match($pattern, $subject);
+            } finally {
+                if (false !== $previousLimit) {
+                    ini_set('pcre.backtrack_limit', $previousLimit);
+                }
             }
+
+            if (false !== $result || \PREG_BACKTRACK_LIMIT_ERROR !== preg_last_error()) {
+                return (bool) $result;
+            }
+
+            if (self::REGEX_BACKTRACK_LIMIT === $limit) {
+                break;
+            }
+
+            $limit = min(self::REGEX_BACKTRACK_LIMIT, $limit * self::REGEX_WORK_ESCALATION);
         }
+
+        $this->regexBudget = -1;
+
+        throw new JsonCrawlerException($regex, 'the regular expression needs more backtracking than allowed');
     }
 
     /**

@@ -25,6 +25,7 @@
     "require-dev": {
         "symfony/config": "^7.4|^8.0",
         "symfony/expression-language": "^7.4|^8.0",
+        "symfony/routing": "^8.2",
         "symfony/yaml": "^7.4|^8.0"
     },
     "conflict": {

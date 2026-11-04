@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ExtensionConfigTrees;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\JsonSchemaDumper;
+use Symfony\Component\DependencyInjection\Compiler\ExtensionConfigTrees;
+use Symfony\Component\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
+use Symfony\Component\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
@@ -69,7 +69,7 @@ class ExtensionConfigTreesTest extends TestCase
         $container->setParameter('.kernel.bundles_definition', []);
         $container->setParameter('.container.known_envs', ['dev']);
         $container->registerExtension(new CountingExtension());
-        (new FrameworkBundle())->build($container);
+        (new ServicesBundle())->build($container);
 
         $passes = $container->getCompilerPassConfig()->getBeforeOptimizationPasses();
         $i = array_key_first(array_filter($passes, static fn ($pass) => $pass instanceof PhpConfigReferenceDumpPass));

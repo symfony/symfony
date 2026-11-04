@@ -48,7 +48,6 @@ CHANGELOG
  * Resolve `debug:config` paths whose keys contain dots, e.g. `debug:config framework options.option.main`
  * Deprecate the `framework.fragments.hinclude_default_template` config option and the `fragment.renderer.hinclude.global_template` parameter; use ESI or inline rendering, or Symfony UX Turbo, instead
  * Add the `session:clear` command to remove all sessions from the configured handler
- * Generate JSON schema for YAML configuration of bundles
  * Add `framework.profiler.excluded_paths` and `framework.profiler.excluded_http_codes` to skip profiling requests matching a path or answered with a given HTTP status code
  * Instantiate on the console only the bundles that override the deprecated `Bundle::registerCommands()` method
  * Add `MessengerAssertionsTrait` to `KernelTestCase` to assert on and consume the messages of in-memory Messenger transports

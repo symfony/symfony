@@ -9,12 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Definition\ArrayShapeGenerator;
 use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\AppReference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -46,6 +45,10 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
                 return $config;
             }
         }
+
+        PHP;
+
+    private const ROUTES_TEMPLATE = <<<'PHP'
 
         namespace Symfony\Component\Routing\Loader\Configurator;
 
@@ -143,18 +146,26 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
         }
         $appParam = $r->getMethod('config')->getDocComment();
 
-        $r = new \ReflectionClass(RoutesReference::class);
+        $routesReference = '';
+        if (class_exists(RoutesReference::class)) {
+            $r = new \ReflectionClass(RoutesReference::class);
 
-        if (false === $i = strpos($phpdoc = $r->getDocComment(), "\n * @psalm-type RoutesConfig = ")) {
-            throw new \LogicException(\sprintf('Cannot insert config shape in "%s".', RoutesReference::class));
-        }
-        $routesTypes = '';
-        foreach ($knownEnvs as $env) {
-            $routesTypes .= strtr(self::WHEN_ENV_ROUTES_TEMPLATE, ['{ENV}' => $env]);
-        }
-        if ('' !== $routesTypes) {
-            $routesTypes = strtr(self::ROUTES_TYPES_TEMPLATE, ['{SHAPE}' => $routesTypes]);
-            $routesTypes = substr_replace($phpdoc, $routesTypes, $i);
+            if (false === $i = strpos($phpdoc = $r->getDocComment(), "\n * @psalm-type RoutesConfig = ")) {
+                throw new \LogicException(\sprintf('Cannot insert config shape in "%s".', RoutesReference::class));
+            }
+            $routesTypes = '';
+            foreach ($knownEnvs as $env) {
+                $routesTypes .= strtr(self::WHEN_ENV_ROUTES_TEMPLATE, ['{ENV}' => $env]);
+            }
+            if ('' !== $routesTypes) {
+                $routesTypes = strtr(self::ROUTES_TYPES_TEMPLATE, ['{SHAPE}' => $routesTypes]);
+                $routesTypes = substr_replace($phpdoc, $routesTypes, $i);
+            }
+
+            $routesReference = strtr(self::ROUTES_TEMPLATE, [
+                '{ROUTES_TYPES}' => $routesTypes,
+                '{ROUTES_PARAM}' => $r->getMethod('config')->getDocComment(),
+            ]);
         }
 
         $appTypes = str_replace('\\'.ParamConfigurator::class, 'Param', $appTypes);
@@ -166,9 +177,7 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
         $configReference = strtr(self::REFERENCE_TEMPLATE, [
             '{APP_TYPES}' => $appTypes,
             '{APP_PARAM}' => $appParam,
-            '{ROUTES_TYPES}' => $routesTypes,
-            '{ROUTES_PARAM}' => $r->getMethod('config')->getDocComment(),
-        ]);
+        ]).$routesReference;
 
         $dir = \dirname($this->referenceFile);
         if (is_dir($dir) && is_writable($dir)) {

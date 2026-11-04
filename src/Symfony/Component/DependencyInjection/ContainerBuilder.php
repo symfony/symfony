@@ -1685,7 +1685,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                             // an empty value can leave another placeholder alone in the string, which is then replaced by its raw value
                             $value = str_ireplace($placeholder, $resolved, $value);
                         } else {
-                            $replacements[strtolower($placeholder)] = $resolved;
+                            $replacements[strtolower($placeholder)] = (string) $resolved;
                         }
                     }
                     $usedEnvs[$env] = $env;
@@ -1699,7 +1699,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($replacements) {
-            $value = preg_replace_callback('/'.implode('|', array_keys($replacements)).'/i', static fn ($m) => $replacements[strtolower($m[0])], $value);
+            $value = preg_replace_callback('/env_[a-f0-9]{16}_\w+_[a-f0-9]{32}/Ui', static fn ($m) => $replacements[strtolower($m[0])] ?? $m[0], $value);
         }
 
         return $value;

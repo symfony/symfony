@@ -1144,6 +1144,29 @@ class ContainerBuilderTest extends TestCase
         unset($_ENV['DUMMY_ENV_VAR'], $_SERVER['DUMMY_SERVER_VAR'], $_SERVER['HTTP_DUMMY_VAR']);
     }
 
+    public function testResolveEnvPlaceholdersWithManyEnvVars()
+    {
+        $container = new ContainerBuilder();
+        $bag = $container->getParameterBag();
+
+        $placeholders = $expected = [];
+        for ($i = 0; $i < 1000; ++$i) {
+            $placeholders[] = $bag->get('env(VAR_'.$i.')');
+            $expected[] = '%env(VAR_'.$i.')%';
+        }
+
+        $this->assertSame(implode(' - ', $expected), $container->resolveEnvPlaceholders(implode(' - ', $placeholders)));
+    }
+
+    public function testResolveEnvPlaceholdersLeavesUnknownPlaceholdersUntouched()
+    {
+        $container = new ContainerBuilder();
+        $placeholder = $container->getParameterBag()->get('env(FOO)');
+        $unknown = 'env_0123456789abcdef_BAR_0123456789abcdef0123456789abcdef';
+
+        $this->assertSame('%env(FOO)% '.$unknown, $container->resolveEnvPlaceholders($placeholder.' '.$unknown));
+    }
+
     public function testResolveEnvValuesWithArray()
     {
         $_ENV['ANOTHER_DUMMY_ENV_VAR'] = 'dummy';

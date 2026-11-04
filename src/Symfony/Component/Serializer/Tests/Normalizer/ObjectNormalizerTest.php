@@ -828,6 +828,15 @@ class ObjectNormalizerTest extends TestCase
         }]));
     }
 
+    public function testIsWritableCacheSizeLimit()
+    {
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->normalizer->denormalize(['unknown'.$i => 'value'], ObjectDummy::class);
+        }
+
+        $this->assertLessThanOrEqual(1001, \count((new \ReflectionProperty(ObjectNormalizer::class, 'isWritableCache'))->getValue()));
+    }
+
     public function testThrowUnexpectedValueException()
     {
         $this->expectException(UnexpectedValueException::class);

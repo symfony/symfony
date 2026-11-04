@@ -48,6 +48,11 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         }
 
         if (!\array_key_exists($class, $this->normalizeCache) || !\array_key_exists($propertyName, $this->normalizeCache[$class])) {
+            if (1000 < \count($this->normalizeCache[$class] ?? [])) {
+                // stop memory leak if there are many keys
+                $this->normalizeCache[$class] = \array_slice($this->normalizeCache[$class], 500, null, true);
+            }
+
             $this->normalizeCache[$class][$propertyName] = $this->getCacheValueForNormalization($propertyName, $class);
         }
 

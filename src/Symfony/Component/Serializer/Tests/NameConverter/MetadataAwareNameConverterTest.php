@@ -200,6 +200,20 @@ final class MetadataAwareNameConverterTest extends TestCase
         $nameConverter->normalize('foo', NestedPathAndName::class);
     }
 
+    public function testNormalizeCacheSizeLimit()
+    {
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader()));
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertSame('unknown'.$i, $nameConverter->normalize('unknown'.$i, OtherSerializedNameDummy::class));
+        }
+        $this->assertSame('quux', $nameConverter->normalize('qux', OtherSerializedNameDummy::class));
+
+        $normalizeCache = (new \ReflectionProperty(MetadataAwareNameConverter::class, 'normalizeCache'))->getValue($nameConverter);
+
+        $this->assertLessThanOrEqual(1001, \count($normalizeCache[OtherSerializedNameDummy::class]));
+    }
+
     public function testNormalizeAndDenormalizeAfterAConverterWithoutMapping()
     {
         $attributes = new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader()));

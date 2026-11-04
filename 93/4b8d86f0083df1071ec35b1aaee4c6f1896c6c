@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-03T19:21:36Z
+
+Thanks @dtokos! We're taking this as a minor improvement for 8.2, so I retargeted it and moved the schema.json passes into this PR too. I also pushed a fix for apps without symfony/routing, where the moved pass threw a ReflectionException.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-03T21:14:35Z
+
+Thanks! Could you move `JsonSchemaConfigDumpPassTest` back to FrameworkBundle, as it was before your last push? Most of its cases check the schemas of FrameworkBundle and of other component bundles, which DependencyInjection doesn't depend on. The Fabbot failures can be ignored.
+
+---------------------------------------------------------------------------
+
+by dtokos at 2026-11-03T21:53:25Z
+
+@nicolas-grekas All done. Let me know if you need me to do something before review. Thanks a lot!

@@ -461,16 +461,16 @@ class JavaScriptImportPathCompilerTest extends TestCase
         if ('\\' !== \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Must be on windows where dirname() understands backslashes');
         }
-        $inputAsset = new MappedAsset('app.js', 'C:\\\\project\\assets\\app.js', publicPathWithoutDigest: '/assets/app.js');
+        $inputAsset = new MappedAsset('app.js', 'C:\\project\\assets\\app.js', publicPathWithoutDigest: '/assets/app.js');
 
         $assetMapper = $this->createStub(AssetMapperInterface::class);
         $assetMapper
             ->method('getAssetFromSourcePath')
             ->willReturnCallback(static function ($path) {
                 return match ($path) {
-                    'C://project/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
-                    'C://project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
-                    'C://project/root_asset.js' => new MappedAsset('root_asset.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/root_asset.js'),
+                    'C:/project/assets/other.js' => new MappedAsset('other.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/other.js'),
+                    'C:/project/assets/subdir/foo.js' => new MappedAsset('subdir/foo.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/subdir/foo.js'),
+                    'C:/project/root_asset.js' => new MappedAsset('root_asset.js', '/can/be/anything.js', publicPathWithoutDigest: '/assets/root_asset.js'),
                     default => throw new \RuntimeException(\sprintf('Unexpected source path "%s"', $path)),
                 };
             });

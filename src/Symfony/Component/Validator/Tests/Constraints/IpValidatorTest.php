@@ -182,13 +182,13 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ['8.8.8.8'],
             ['1.1.1.1'],
             ['123.45.67.178'],
-            ['224.0.0.1'],
             // just outside the non-public subnets
             ['100.63.255.255'],
             ['100.128.0.1'],
             ['172.32.0.1'],
             ['198.17.255.255'],
             ['198.20.0.1'],
+            ['223.255.255.255'],
         ];
     }
 
@@ -237,6 +237,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ['fe7f:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
             ['fec0::1'],
             ['::1:0:0:0'],
+            ['100:0:0:1::'],
             ['2001:1::1'],
             ['2001:1:ffff:ffff:ffff:ffff:ffff:ffff'],
             ['2001:2:1::1'],
@@ -372,9 +373,15 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             // 172.16.0.0/12 private use
             ['172.16.0.0'],
             ['172.31.255.254'],
+            // 192.0.0.0/24 IETF protocol assignments
+            ['192.0.0.1'],
+            ['192.0.0.254'],
             // 192.0.2.0/24 documentation TEST-NET-1
             ['192.0.2.1'],
             ['192.0.2.254'],
+            // 192.88.99.0/24 6to4 relay anycast, deprecated
+            ['192.88.99.1'],
+            ['192.88.99.254'],
             // 192.168.0.0/16 private use
             ['192.168.1.0'],
             ['192.168.255.254'],
@@ -387,6 +394,10 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             // 203.0.113.0/24 documentation TEST-NET-3
             ['203.0.113.1'],
             ['203.0.113.254'],
+            // 224.0.0.0/4 multicast, both edges included
+            ['224.0.0.0'],
+            ['224.0.0.1'],
+            ['239.255.255.255'],
             // 240.0.0.0/4 reserved, including the broadcast address
             ['240.0.0.1'],
             ['255.255.255.255'],
@@ -571,6 +582,10 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ['::8.8.8.8'],
             ['::0808:0808'],
             ['::ffff:ffff'],
+            // 100::/64 discard-only
+            ['100::'],
+            ['100::1'],
+            ['100::ffff:ffff:ffff:ffff'],
             // 2002::/16 6to4
             ['2002::'],
             ['2002:7f00:1::'],
@@ -598,6 +613,12 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ['64:ff9b:1::1'],
             ['64:ff9b:1:1234::1'],
             ['64:ff9b:1:ffff:ffff:ffff:ffff:ffff'],
+            // ff00::/8 multicast
+            ['ff00::'],
+            ['ff02::1'],
+            ['ff05::1'],
+            ['ff0e::1'],
+            ['ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
         ];
     }
 

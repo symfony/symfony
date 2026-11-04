@@ -57,7 +57,14 @@ class X509Authenticator extends AbstractPreAuthenticatedAuthenticator
 
     private function extractUsernameFromDn(string $dn): ?string
     {
-        foreach (self::splitDn($dn) as $rdn) {
+        $rdns = self::splitDn($dn);
+
+        // In the legacy format, some servers don't escape slashes inside values, so a DN that contains the attribute twice can't be trusted
+        if (str_starts_with($dn, '/') && 1 < preg_match_all('#(?:emailAddress|1\.2\.840\.113549\.1\.9\.1)=#', implode(',', $rdns))) {
+            return null;
+        }
+
+        foreach ($rdns as $rdn) {
             if (preg_match('#^\s*(?:emailAddress|1\.2\.840\.113549\.1\.9\.1)=([^,/@]++@[^,/]++)$#D', $rdn, $matches)) {
                 return $matches[1];
             }

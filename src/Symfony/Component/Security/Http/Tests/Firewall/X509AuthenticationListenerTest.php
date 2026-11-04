@@ -93,10 +93,9 @@ class X509AuthenticationListenerTest extends TestCase
         yield ['cert@example.com', '/CN=Sample certificate DN/1.2.840.113549.1.9.1=cert@example.com'];
 
         yield 'genuine attribute wins over one embedded in a CN' => ['cert@example.com', 'CN=jdoe\\,emailAddress=admin@target.example,emailAddress=cert@example.com'];
-        yield 'genuine attribute wins over one embedded in a CN, legacy format' => ['cert@example.com', '/CN=jdoe,emailAddress=admin@target.example/emailAddress=cert@example.com'];
+        yield 'two genuine attributes' => ['first@example.com', 'emailAddress=first@example.com,emailAddress=second@example.com,CN=Sample certificate DN'];
         yield 'slash inside a RFC 2253 value' => ['cert@example.com', 'CN=Sample/certificate DN,emailAddress=cert@example.com'];
         yield 'escaped slash in a preceding legacy value' => ['cert@example.com', '/CN=Sample\\/certificate DN/emailAddress=cert@example.com'];
-        yield 'backslash then escaped slash in a preceding legacy value' => ['cert@example.com', '/CN=jdoe\\\\/emailAddress=admin@target.example/emailAddress=cert@example.com'];
         yield 'quoted preceding value' => ['cert@example.com', 'CN="Sample, certificate DN",emailAddress=cert@example.com'];
     }
 
@@ -132,6 +131,15 @@ class X509AuthenticationListenerTest extends TestCase
         yield 'slash-separated without a leading slash' => ['CN=jdoe/emailAddress=admin@target.example,O=Attacker'];
         yield 'quoted value' => ['CN="jdoe,emailAddress=admin@target.example,x=",O=Attacker'];
         yield 'quoted value, XN_FLAG_ONELINE' => ['O = Attacker, CN = "jdoe,emailAddress=admin@target.example,x="'];
+
+        yield 'attribute embedded in a legacy CN before the genuine one' => ['/CN=jdoe,emailAddress=admin@target.example/emailAddress=cert@example.com'];
+        yield 'backslash then escaped slash in a legacy value before the genuine attribute' => ['/CN=jdoe\\\\/emailAddress=admin@target.example/emailAddress=cert@example.com'];
+
+        // OpenSSL before 3.0 and HAProxy leave slashes inside values unescaped
+        yield 'bare slash in a legacy value' => ['/C=FR/O=Acme/CN=jdoe/emailAddress=admin@target.example/emailAddress=cert@example.com'];
+        yield 'bare slash in a legacy value, OID' => ['/CN=jdoe/1.2.840.113549.1.9.1=admin@target.example/emailAddress=cert@example.com'];
+        yield 'bare slash in a legacy value ending with a backslash' => ['/CN=jdoe/emailAddress=admin@target.example/x=\\/emailAddress=cert@example.com'];
+        yield 'bare slash in a legacy value, hex escaped attribute' => ['/CN=jdoe/\\x65mailAddress=admin@target.example/emailAddress=cert@example.com'];
     }
 
     public function testGetPreAuthenticatedDataWithNonStringCredentials()

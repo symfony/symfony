@@ -13,6 +13,7 @@ namespace Symfony\Component\HtmlSanitizer\TextSanitizer;
 
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\UriString;
+use Uri\Rfc3986\Uri;
 
 /**
  * @internal
@@ -52,7 +53,7 @@ final class UrlSanitizer
             return null;
         }
 
-        if (false !== strpbrk($input, '\\') || preg_match('~^(?:https?|ftp|wss?):(/[^/]|///)~i', $input)) {
+        if (preg_match('~^(?:https?|ftp|wss?):(/[^/]|///)~i', $input)) {
             return null;
         }
 
@@ -103,11 +104,8 @@ final class UrlSanitizer
             $url['scheme'] = 'https';
         }
 
-        // In absence of a scheme and of an authority, RFC 3986 forbids a colon in the
-        // first path segment, which would otherwise be read as a scheme. league/uri
-        // enforces this in UriString::build(), but only since version 7.
-        if (!$url['scheme'] && null === $url['host'] && preg_match('#^[^/:]*+:#', $url['path'])) {
-            return null;
+        if (\PHP_VERSION_ID >= 80500) {
+            return self::build($url);
         }
 
         try {
@@ -133,7 +131,7 @@ final class UrlSanitizer
      */
     public static function parse(string $url): ?array
     {
-        if (!$url) {
+        if (!$url || str_contains($url, '\\')) {
             return null;
         }
 
@@ -174,12 +172,51 @@ final class UrlSanitizer
                 return null;
             }
 
-            $parsedUrl = UriString::parse($url);
+            // RFC 3986 allows neither non-ASCII characters nor some ASCII ones that browsers accept.
+            // Percent-encode them, as browsers do for most of them, so that a strict parser accepts the URL.
+            // In the authority, only non-ASCII characters are encoded, to support internationalized domain names.
+            $url = self::encodeNonAscii($url);
+            $i = preg_match('#^(?:[a-z][a-z0-9+.\-]*:)?//[^/?\#]*+#i', $url, $m) ? \strlen($m[0]) : 0;
+            $tail = preg_replace_callback('/["<>\[\]^`{|}]|%(?![0-9A-Fa-f]{2})/', static fn ($m) => rawurlencode($m[0]), substr($url, $i));
+
+            if (false !== $j = strpos($tail, '#')) {
+                $tail = substr($tail, 0, ++$j).str_replace('#', '%23', substr($tail, $j));
+            }
+
+            $url = substr($url, 0, $i).$tail;
+
+            if (\PHP_VERSION_ID < 80500) {
+                $parsedUrl = UriString::parse($url);
+            } elseif (!$uri = Uri::parse($url)) {
+                return null;
+            } else {
+                $userInfo = $uri->getRawUserInfo();
+                [$user, $pass] = null !== $userInfo ? explode(':', $userInfo, 2) + [1 => null] : [null, null];
+
+                $parsedUrl = [
+                    'scheme' => $uri->getRawScheme(),
+                    'user' => $user,
+                    'pass' => $pass,
+                    'host' => $uri->getRawHost(),
+                    'port' => $uri->getPort(),
+                    'path' => $uri->getRawPath(),
+                    'query' => $uri->getRawQuery(),
+                    'fragment' => $uri->getRawFragment(),
+                ];
+            }
+
             if (isset($parsedUrl['scheme'])) {
                 $parsedUrl['scheme'] = strtolower($parsedUrl['scheme']);
             }
 
-            if (isset($parsedUrl['host']) && self::decodeUnreservedCharacters($parsedUrl['host']) !== $parsedUrl['host']) {
+            // In absence of a scheme and of an authority, RFC 3986 forbids a colon in the first path segment, which would otherwise be read as a scheme.
+            // league/uri does not enforce this when parsing.
+            if (null === $parsedUrl['scheme'] && null === $parsedUrl['host'] && preg_match('#^[^/:]*+:#', $parsedUrl['path'])) {
+                return null;
+            }
+
+            // Percent-encoded ASCII characters have no use in a host and could change how the host is matched
+            if (isset($parsedUrl['host']) && preg_match('/%[0-7]/', $parsedUrl['host'])) {
                 return null;
             }
 
@@ -225,7 +262,7 @@ final class UrlSanitizer
         $parts = array_reverse(explode('.', strtolower($host)));
 
         foreach ($allowedHosts as $allowedHost) {
-            if (self::matchAllowedHostParts($parts, array_reverse(explode('.', strtolower($allowedHost))))) {
+            if (self::matchAllowedHostParts($parts, array_reverse(explode('.', strtolower(self::encodeNonAscii($allowedHost)))))) {
                 return true;
             }
         }
@@ -245,15 +282,38 @@ final class UrlSanitizer
         return true;
     }
 
-    /**
-     * Implementation borrowed from League\Uri\Encoder::decodeUnreservedCharacters().
-     */
-    private static function decodeUnreservedCharacters(string $host): string
+    private static function encodeNonAscii(string $value): string
     {
-        return preg_replace_callback(
-            ',%(2[1-9A-Fa-f]|[3-7][0-9A-Fa-f]|61|62|64|65|66|7[AB]|5F),',
-            static fn (array $matches): string => rawurldecode($matches[0]),
-            $host
-        );
+        return preg_replace_callback('/[\x80-\xFF]/', static fn ($m) => rawurlencode($m[0]), $value);
+    }
+
+    /**
+     * Recomposes a URL from its components, as described in RFC 3986, section 5.3.
+     */
+    private static function build(array $url): string
+    {
+        $uri = null !== $url['scheme'] ? $url['scheme'].':' : '';
+
+        if (null !== $url['host']) {
+            $uri .= '//';
+
+            if (null !== $url['user']) {
+                $uri .= $url['user'].(null !== $url['pass'] ? ':'.$url['pass'] : '').'@';
+            }
+
+            $uri .= $url['host'].(null !== $url['port'] ? ':'.$url['port'] : '');
+        }
+
+        $uri .= $url['path'];
+
+        if (null !== $url['query']) {
+            $uri .= '?'.$url['query'];
+        }
+
+        if (null !== $url['fragment']) {
+            $uri .= '#'.$url['fragment'];
+        }
+
+        return $uri;
     }
 }

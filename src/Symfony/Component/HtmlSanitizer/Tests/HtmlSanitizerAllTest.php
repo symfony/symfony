@@ -171,7 +171,7 @@ class HtmlSanitizerAllTest extends TestCase
             ],
             [
                 '<img src= onmouseover="alert(\'XSS\');" />',
-                '<img src="onmouseover&#61;&#34;alert(&#039;XSS&#039;);&#34;" />',
+                '<img src="onmouseover&#61;%22alert(&#039;XSS&#039;);%22" />',
             ],
             [
                 '<<img src="javascript:evil"/>iframe src="javascript:evil"/>',

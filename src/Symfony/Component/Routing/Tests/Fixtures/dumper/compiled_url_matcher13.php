@@ -11,17 +11,17 @@ return [
     ],
     [ // $regexpList
         0 => '{^(?'
-            .'|(?i:([^\\.]++)\\.exampple\\.com)\\.(?'
+            .'|(?=(?i:(?:[^\\.]++)\\.exampple\\.com)\\.)(?=[^/]*+(.*+))(?i:([^\\.]++)\\.exampple\\.com)\\.(?=\\1)(?'
                 .'|/abc([^/]++)(?'
-                    .'|(*:56)'
+                    .'|(*:114)'
                 .')'
             .')'
             .')/?$}sD',
     ],
     [ // $dynamicRoutes
-        56 => [
-            [['_route' => 'r1'], ['foo', 'foo'], null, null, false, true, null],
-            [['_route' => 'r2'], ['foo', 'foo'], null, null, false, true, null],
+        114 => [
+            [['_route' => 'r1'], ['foo', 'foo', 'foo'], null, null, false, true, null],
+            [['_route' => 'r2'], ['foo', 'foo', 'foo'], null, null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],
     ],

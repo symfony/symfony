@@ -57,7 +57,6 @@ class XmlUtils
         libxml_clear_errors();
 
         $dom = new \DOMDocument();
-        $dom->validateOnParse = true;
         if (!$dom->loadXML($content, \LIBXML_NONET | (\defined('LIBXML_COMPACT') ? \LIBXML_COMPACT : 0))) {
             if (\LIBXML_VERSION < 20900) {
                 libxml_disable_entity_loader($disableEntities);

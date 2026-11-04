@@ -172,6 +172,56 @@ class LegacyCachingHttpClientTest extends TestCase
         self::assertSame('hello', $second);
     }
 
+    public function testWithOptions()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/http-client 7.4: Passing a "Symfony\Component\HttpKernel\HttpCache\StoreInterface" as constructor\'s 2nd argument of "Symfony\Component\HttpClient\CachingHttpClient" is deprecated, "Symfony\Contracts\Cache\TagAwareCacheInterface" expected.');
+
+        $mockClient = new MockHttpClient(static fn (string $method, string $url, array $options) => new MockResponse(
+            $options['normalized_headers']['authorization'][0] ?? 'anonymous',
+            ['response_headers' => ['Cache-Control' => 'max-age=60']],
+        ));
+
+        $cacheDir = sys_get_temp_dir().'/sf_http_cache_'.uniqid('', true);
+        $client = new CachingHttpClient($mockClient, new Store($cacheDir));
+
+        try {
+            $alice = $client->withOptions(['auth_bearer' => 'alice'])->request('GET', 'https://example.com/foo')->getContent();
+            $bob = $client->withOptions(['auth_bearer' => 'bob'])->request('GET', 'https://example.com/foo')->getContent();
+            $anonymous = $client->request('GET', 'https://example.com/foo')->getContent();
+        } finally {
+            $this->removeDir($cacheDir);
+        }
+
+        self::assertSame('authorization: Bearer alice', $alice);
+        self::assertSame('authorization: Bearer bob', $bob);
+        self::assertSame('anonymous', $anonymous);
+    }
+
+    public function testWithNtlmCredentials()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/http-client 7.4: Passing a "Symfony\Component\HttpKernel\HttpCache\StoreInterface" as constructor\'s 2nd argument of "Symfony\Component\HttpClient\CachingHttpClient" is deprecated, "Symfony\Contracts\Cache\TagAwareCacheInterface" expected.');
+
+        $mockClient = new MockHttpClient(static fn (string $method, string $url, array $options) => new MockResponse(
+            $options['auth_ntlm'] ?? 'anonymous',
+            ['response_headers' => ['Cache-Control' => 'max-age=60']],
+        ));
+
+        $cacheDir = sys_get_temp_dir().'/sf_http_cache_'.uniqid('', true);
+        $client = new CachingHttpClient($mockClient, new Store($cacheDir));
+
+        try {
+            $alice = $client->withOptions(['auth_ntlm' => 'alice:secret'])->request('GET', 'https://example.com/foo')->getContent();
+            $bob = $client->withOptions(['auth_ntlm' => 'bob:secret'])->request('GET', 'https://example.com/foo')->getContent();
+            $anonymous = $client->request('GET', 'https://example.com/foo')->getContent();
+        } finally {
+            $this->removeDir($cacheDir);
+        }
+
+        self::assertSame('alice:secret', $alice);
+        self::assertSame('bob:secret', $bob);
+        self::assertSame('anonymous', $anonymous);
+    }
+
     private function runRequest(MockResponse $mockResponse): ResponseInterface
     {
         $mockClient = new MockHttpClient($mockResponse);

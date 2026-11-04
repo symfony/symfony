@@ -41,6 +41,10 @@ final class JsonCrawler implements JsonCrawlerInterface
     private const SINGULAR_ARGUMENT_FUNCTIONS = ['length', 'match', 'search'];
 
     private const REGEX_BACKTRACK_LIMIT = 10000;
+    private const REGEX_WORK_BUDGET = 300_000_000;
+    private const REGEX_WORK_PER_CALL = 1000;
+    private const REGEX_WORK_PER_BYTE = 16;
+    private const REGEX_WORK_ESCALATION = 8;
 
     private const MAX_FILTER_EXPRESSION_LENGTH = 10000;
     private const MAX_FILTER_EXPRESSION_DEPTH = 100;
@@ -57,6 +61,8 @@ final class JsonCrawler implements JsonCrawlerInterface
         '<' => 1,
     ];
 
+    private int $regexBudget = self::REGEX_WORK_BUDGET;
+
     /**
      * @param resource|string $raw
      */
@@ -70,6 +76,8 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     public function find(string|JsonPath $query): array
     {
+        $this->regexBudget = self::REGEX_WORK_BUDGET;
+
         return $this->evaluate(\is_string($query) ? new JsonPath($query) : $query);
     }
 
@@ -574,7 +582,11 @@ final class JsonCrawler implements JsonCrawlerInterface
         if (str_starts_with($expr, '$')) {
             try {
                 return (bool) $this->evaluate(new JsonPath($expr));
-            } catch (JsonCrawlerException) {
+            } catch (JsonCrawlerException $e) {
+                if (0 > $this->regexBudget) {
+                    throw $e;
+                }
+
                 return false;
             }
         }
@@ -782,11 +794,11 @@ final class JsonCrawler implements JsonCrawlerInterface
             },
             'count' => $nodelistSize,
             'match' => match (true) {
-                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch(\sprintf('/\A(?:%s)\z/u', $this->transformJsonPathRegex($argList[1])), $value),
+                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch(\sprintf('/\A(?:%s)\z/u', $this->transformJsonPathRegex($argList[1])), $value, $argList[1]),
                 default => false,
             },
             'search' => match (true) {
-                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch("/{$this->transformJsonPathRegex($argList[1])}/u", $value),
+                \is_string($value) && \is_string($argList[1] ?? null) => $this->safeRegexMatch("/{$this->transformJsonPathRegex($argList[1])}/u", $value, $argList[1]),
                 default => false,
             },
             'value' => 1 < $nodelistSize ? Nothing::Nothing : (1 === $nodelistSize ? (\is_array($value) ? ($value[0] ?? null) : $value) : $value),
@@ -1161,16 +1173,48 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
     }
 
-    private function safeRegexMatch(string $pattern, string $subject): bool
+    /**
+     * Matches a pattern taken from the query, spending a bounded amount of backtracking.
+     *
+     * PCRE gives up after "pcre.backtrack_limit" steps, but it restarts counting at every position it
+     * attempts a match from, so that setting bounds the cost of one position, not the cost of one call:
+     * a pattern that stays just under the limit still costs one full limit per byte of the subject. The
+     * limit is therefore derived from the work the call may do, that work is taken from a budget shared
+     * by every regex a single find() evaluates, and a pattern that needs more gets more while the budget
+     * can pay for it. Once it cannot, the budget is marked as spent and the crawl fails, even from inside
+     * an existence test. A match that could not be decided is not a "no match".
+     */
+    private function safeRegexMatch(string $pattern, string $subject, string $regex): bool
     {
-        $previousLimit = ini_set('pcre.backtrack_limit', self::REGEX_BACKTRACK_LIMIT);
-        try {
-            return @preg_match($pattern, $subject);
-        } finally {
-            if (false !== $previousLimit) {
-                ini_set('pcre.backtrack_limit', $previousLimit);
+        $startingPositions = 1 + \strlen($subject);
+        $limit = min(self::REGEX_BACKTRACK_LIMIT, intdiv(self::REGEX_WORK_PER_CALL + self::REGEX_WORK_PER_BYTE * \strlen($subject), $startingPositions));
+
+        while (($work = $limit * $startingPositions) <= $this->regexBudget) {
+            $this->regexBudget -= $work;
+            $previousLimit = ini_set('pcre.backtrack_limit', $limit);
+
+            try {
+                $result = @preg_match($pattern, $subject);
+            } finally {
+                if (false !== $previousLimit) {
+                    ini_set('pcre.backtrack_limit', $previousLimit);
+                }
             }
+
+            if (false !== $result || \PREG_BACKTRACK_LIMIT_ERROR !== preg_last_error()) {
+                return (bool) $result;
+            }
+
+            if (self::REGEX_BACKTRACK_LIMIT === $limit) {
+                break;
+            }
+
+            $limit = min(self::REGEX_BACKTRACK_LIMIT, $limit * self::REGEX_WORK_ESCALATION);
         }
+
+        $this->regexBudget = -1;
+
+        throw new JsonCrawlerException($regex, 'the regular expression needs more backtracking than allowed');
     }
 
     /**

@@ -557,16 +557,54 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sayings of the Century', $result[0]['title']);
     }
 
-    public function testSearchFunctionDoesNotHangOnPathologicalRegex()
+    public function testSearchFunctionFailsClosedOnPathologicalRegex()
     {
         $crawler = new JsonCrawler(json_encode(['items' => [str_repeat('a', 40).'!']]));
 
-        $start = microtime(true);
-        $result = $crawler->find('$.items[?search(@, "(a+)+$")]');
-        $elapsed = microtime(true) - $start;
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('Error while crawling JSON with JSON path "(a+)+$": the regular expression needs more backtracking than allowed.');
 
-        $this->assertSame([], $result);
-        $this->assertLessThan(1.0, $elapsed, 'ReDoS pattern must not stall preg_match');
+        $crawler->find('$.items[?search(@, "(a+)+$")]');
+    }
+
+    public function testSearchFunctionIsBoundedOnLongStrings()
+    {
+        // this pattern stays under the backtracking limit at every starting position, but PCRE
+        // restarts its counter at each of them, so the cost is paid once per character
+        $crawler = new JsonCrawler(json_encode(['items' => [str_repeat('a', 100000)]]));
+
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the regular expression needs more backtracking than allowed');
+
+        $crawler->find('$.items[?search(@, "(a?){11}[^a]")]');
+    }
+
+    public function testSearchFunctionAcceptsLongStrings()
+    {
+        $crawler = new JsonCrawler(json_encode(['items' => [str_repeat('lorem ipsum ', 600000)]]));
+
+        $this->assertSame([], $crawler->find('$.items[?search(@, "foo")]'));
+    }
+
+    public function testRegexBudgetIsSharedByAllTheCallsOfOneQuery()
+    {
+        $crawler = new JsonCrawler(json_encode(['items' => array_fill(0, 100, str_repeat('lorem ipsum ', 2520))]));
+        $query = '$.items[?'.implode(' || ', array_fill(0, 10, 'search(@, "zz")')).']';
+
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the regular expression needs more backtracking than allowed');
+
+        $crawler->find($query);
+    }
+
+    public function testExistenceTestFailsClosedOnPathologicalRegex()
+    {
+        $crawler = new JsonCrawler(json_encode(['items' => [1, 2], 'data' => [str_repeat('a', 40).'!']]));
+
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the regular expression needs more backtracking than allowed');
+
+        $crawler->find('$.items[?$.data[?search(@, "(a+)+$")]]');
     }
 
     public function testDeeplyNestedFilterExpressionIsRejected()

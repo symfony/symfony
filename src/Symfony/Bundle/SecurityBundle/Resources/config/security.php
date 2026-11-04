@@ -17,6 +17,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Ldap\Security\LdapUserProvider;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -132,6 +133,8 @@ return static function (ContainerConfigurator $container) {
             ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" service is deprecated, use "'.UserPasswordHasherInterface::class.'" instead.')
 
         ->set('security.user_checker', InMemoryUserChecker::class)
+        ->set('security.user_checker_locator', ServiceLocator::class)
+            ->args([[]])
 
         ->set('security.expression_language', ExpressionLanguage::class)
             ->args([service('cache.security_expression_language')->nullOnInvalid()])

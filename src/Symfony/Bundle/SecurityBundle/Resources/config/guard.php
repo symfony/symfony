@@ -22,6 +22,7 @@ return static function (ContainerConfigurator $container) {
                 service('security.token_storage'),
                 service('event_dispatcher')->nullOnInvalid(),
                 abstract_arg('stateless firewall keys'),
+                service('security.user_checker_locator'),
             ])
             ->call('setSessionAuthenticationStrategy', [service('security.authentication.session_strategy')])
             ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')

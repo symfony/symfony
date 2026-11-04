@@ -28,7 +28,7 @@
         "symfony/polyfill-php80": "^1.16",
         "symfony/security-core": "^5.4|^6.0",
         "symfony/security-csrf": "^4.4|^5.0|^6.0",
-        "symfony/security-guard": "^5.3",
+        "symfony/security-guard": "^5.4.57",
         "symfony/security-http": "^5.4.30|^6.3.6",
         "symfony/service-contracts": "^1.10|^2|^3"
     },

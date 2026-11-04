@@ -176,6 +176,51 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame(['stateless_firewall'], $definition->getArgument(2));
     }
 
+    /**
+     * @group legacy
+     *
+     * @testWith [true]
+     *           [false]
+     */
+    public function testGuardHandlerIsPassedTheUserCheckersOfTheFirewalls(bool $authenticatorManagerEnabled)
+    {
+        $container = $this->getRawContainer();
+        $container->register('app.user_checker', TestUserChecker::class);
+
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => $authenticatorManagerEnabled,
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+
+            'firewalls' => [
+                'no_security' => [
+                    'pattern' => '^/public',
+                    'security' => false,
+                ],
+                'some_firewall' => [
+                    'pattern' => '^/admin',
+                    'http_basic' => null,
+                    'user_checker' => 'app.user_checker',
+                ],
+                'stateless_firewall' => [
+                    'pattern' => '/.*',
+                    'stateless' => true,
+                    'http_basic' => null,
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $locator = $container->getDefinition('security.authentication.guard_handler')->getArgument(3);
+        $userCheckers = $container->getDefinition((string) $locator)->getArgument(0);
+
+        $this->assertSame(['some_firewall', 'stateless_firewall'], array_keys($userCheckers));
+        $this->assertSame(TestUserChecker::class, $container->findDefinition((string) $userCheckers['some_firewall']->getValues()[0])->getClass());
+        $this->assertSame(InMemoryUserChecker::class, $container->findDefinition((string) $userCheckers['stateless_firewall']->getValues()[0])->getClass());
+    }
+
     public function testSwitchUserNotStatelessOnStatelessFirewall()
     {
         $container = $this->getRawContainer();

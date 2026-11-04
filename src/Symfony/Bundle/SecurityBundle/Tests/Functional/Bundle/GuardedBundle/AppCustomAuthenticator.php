@@ -23,7 +23,7 @@ class AppCustomAuthenticator extends AbstractGuardAuthenticator
 {
     public function supports(Request $request): bool
     {
-        return '/manual_login' !== $request->getPathInfo() && '/profile' !== $request->getPathInfo();
+        return !\in_array($request->getPathInfo(), ['/manual_login', '/manual_login_with_authenticator', '/profile'], true);
     }
 
     public function getCredentials(Request $request)
@@ -46,6 +46,7 @@ class AppCustomAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
+        return null;
     }
 
     public function start(Request $request, ?AuthenticationException $authException = null): Response

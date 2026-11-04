@@ -130,6 +130,56 @@ class HtmlSanitizerCustomTest extends TestCase
         }
     }
 
+    public function testSanitizeWithSafeElementsDropsAttributesThatActOnThePage()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame(
+            '<img src="https://example.com/x.png" />',
+            $this->sanitize($config, '<img name="cookie" src="https://example.com/x.png">')
+        );
+
+        $this->assertSame(
+            '<details open><summary>Hello</summary>world</details>',
+            $this->sanitize($config, '<details name="faq" open><summary>Hello</summary>world</details>')
+        );
+
+        $this->assertSame('<label>Hello</label>', $this->sanitize($config, '<label for="delete-account">Hello</label>'));
+        $this->assertSame('<p>Hello</p>', $this->sanitize($config, '<p is="page-widget">Hello</p>'));
+        $this->assertSame('<span>Hello</span>', $this->sanitize($config, '<span slot="header">Hello</span>'));
+
+        $this->assertSame(
+            '<a href="https://example.com/">Hello</a>',
+            $this->sanitize($config, '<a href="https://example.com/" accesskey="s" tabindex="1" download="invoice.pdf">Hello</a>')
+        );
+    }
+
+    public function testSanitizeWithSafeElementsDropsElementsThatActOnThePage()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame('Hello', $this->sanitize($config, 'Hello<button type="reset">world</button>'));
+        $this->assertSame('Hello', $this->sanitize($config, 'Hello<dialog open>world</dialog>'));
+        $this->assertSame('Hello', $this->sanitize($config, 'Hello<datalist id="emails"><option>world</option></datalist>'));
+    }
+
+    public function testSanitizeWithSafeElementsKeepsIds()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+            ->allowRelativeLinks()
+        ;
+
+        $this->assertSame(
+            '<a href="#intro">Hello</a><h2 id="intro">world</h2>',
+            $this->sanitize($config, '<a href="#intro">Hello</a><h2 id="intro">world</h2>')
+        );
+    }
+
     public function testSanitizeForTextarea()
     {
         $config = (new HtmlSanitizerConfig())

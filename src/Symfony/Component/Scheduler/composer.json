@@ -37,7 +37,7 @@
     },
     "conflict": {
         "symfony/cache": "<8.2",
-        "symfony/cache-contracts": "<3.8",
+        "symfony/cache-contracts": "<3.8.1",
         "symfony/console": "<8.2",
         "symfony/dependency-injection": "<8.1",
         "symfony/messenger": "<8.2"

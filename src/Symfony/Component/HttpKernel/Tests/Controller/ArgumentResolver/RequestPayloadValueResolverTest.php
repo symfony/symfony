@@ -1082,7 +1082,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $request = Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/vnd.api+json'], '{"price": 50}');
 
         $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
-            MapRequestPayload::class => new MapRequestPayload(),
+            MapRequestPayload::class => new MapRequestPayload(acceptFormat: 'jsonapi'),
         ]);
 
         $kernel = $this->createStub(HttpKernelInterface::class);

@@ -3846,6 +3846,141 @@ class ParserTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $this->parser->parse($yaml));
     }
 
+    /**
+     * @dataProvider provideLinesWithLongRunsOfSpaces
+     */
+    public function testParseLinesWithLongRunsOfSpaces($expected, string $yaml)
+    {
+        // patterns that scan a run of spaces once per character of the run exceed a low limit
+        $backtrackLimit = ini_set('pcre.backtrack_limit', '1000');
+
+        try {
+            $this->assertSame($expected, $this->parser->parse($yaml));
+        } finally {
+            ini_set('pcre.backtrack_limit', $backtrackLimit);
+        }
+    }
+
+    /**
+     * @dataProvider provideBlockScalarsWithManyBlankLines
+     */
+    public function testParseBlockScalarsWithManyBlankLines(string $expected, string $yaml)
+    {
+        // a pattern that scans the run of newlines once per newline exceeds a low limit
+        $backtrackLimit = ini_set('pcre.backtrack_limit', '1000');
+
+        try {
+            $this->assertSame(['k' => $expected], $this->parser->parse($yaml));
+        } finally {
+            ini_set('pcre.backtrack_limit', $backtrackLimit);
+        }
+    }
+
+    public static function provideBlockScalarsWithManyBlankLines(): iterable
+    {
+        $newlines = str_repeat("\n", 20000);
+
+        yield 'literal' => ["a\n".$newlines."b\n", "k: |\n  a\n".$newlines."  b\n"];
+        yield 'literal at the end of the document' => ["a\n".$newlines.'b', "k: |\n  a\n".$newlines.'  b'];
+        yield 'literal with strip chomping' => ["a\n".$newlines.'b', "k: |-\n  a\n".$newlines."  b\n"];
+        yield 'folded' => ['a'.$newlines."b\n", "k: >\n  a\n".$newlines."  b\n"];
+        yield 'folded with strip chomping' => ['a'.$newlines.'b', "k: >-\n  a\n".$newlines."  b\n"];
+    }
+
+    /**
+     * @dataProvider provideEmptySequenceItemsFollowedByBlankOrCommentLines
+     */
+    public function testParseEmptySequenceItemsFollowedByBlankOrCommentLines(array $expected, string $yaml)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public static function provideEmptySequenceItemsFollowedByBlankOrCommentLines(): iterable
+    {
+        yield 'blank line' => [[null, 'x'], "-\n\n- x"];
+        yield 'comment line' => [[null, 'x'], "-\n# comment\n- x"];
+        yield 'line of spaces' => [[null, 'x'], "- \n  \n- x"];
+        yield 'anchor' => [[null, 'x'], "- &a\n\n- x"];
+        yield 'nested sequence' => [[[null, 'x']], "-\n  -\n\n  - x"];
+        yield 'indented sequence is nested' => [[['x']], "-\n\n  - x"];
+        yield 'many items' => [array_merge(array_fill(0, 300, null), ['x']), str_repeat("-\n\n", 300).'- x'];
+    }
+
+    public static function provideLinesWithLongRunsOfSpaces(): iterable
+    {
+        $spaces = str_repeat(' ', 20000);
+
+        yield 'mapping key' => [['a'.$spaces.'b' => 'c'], 'a'.$spaces.'b: c'];
+        yield 'mapping key followed by a tab' => [['a' => 'c'], 'a'.$spaces."\t: c"];
+        yield 'mapping key in a sequence' => [[['a'.$spaces.'b' => 'c']], '- a'.$spaces.'b: c'];
+        yield 'mapping value in a sequence' => [[['a' => 'b'.$spaces.'c']], '- a: b'.$spaces.'c'];
+        yield 'tagged scalar' => [substr($spaces, 1).'x', '!!str'.$spaces.'x'];
+        yield 'tagged mapping value' => [['a' => substr($spaces, 1).'x'], 'a: !!str'.$spaces.'x'];
+    }
+
+    public function testParseAnchorsNamedZero()
+    {
+        $this->assertSame(['a', 'a'], $this->parser->parse("- &0 a\n- *0"));
+        $this->assertSame(['k' => 'a', 'l' => 'a'], $this->parser->parse("k: &0 a\nl: *0"));
+    }
+
+    public function testParseNestedBlocksWithManyEmptyLines()
+    {
+        $yaml = '';
+        for ($i = 0; $i < 100; ++$i) {
+            $yaml .= str_repeat(' ', $i)."k:\n";
+        }
+        $yaml .= str_repeat(' ', 100)."a: 1\n".str_repeat("\n#", 10000)."\n";
+        $yaml .= str_repeat(' ', 100).'b: !php/object '.serialize(new MemoryUsageRecorder());
+
+        $memoryUsage = memory_get_usage();
+        $data = $this->parser->parse($yaml, Yaml::PARSE_OBJECT);
+
+        for ($i = 0; $i < 100; ++$i) {
+            $data = $data['k'];
+        }
+
+        $this->assertSame(1, $data['a']);
+        $this->assertInstanceOf(MemoryUsageRecorder::class, $data['b']);
+
+        // the empty and comment lines used to be copied by each nesting level
+        $this->assertLessThan(10 * 1024 * 1024, MemoryUsageRecorder::$memoryUsage - $memoryUsage);
+    }
+
+    public function testParseNestedSequencesOnOneLineWithManyCommentLines()
+    {
+        $yaml = str_repeat('- ', 100).'!php/object '.serialize(new MemoryUsageRecorder()).str_repeat("\n#", 10000);
+
+        $memoryUsage = memory_get_usage();
+        $data = $this->parser->parse($yaml, Yaml::PARSE_OBJECT);
+
+        for ($i = 0; $i < 100; ++$i) {
+            $data = $data[0];
+        }
+
+        $this->assertInstanceOf(MemoryUsageRecorder::class, $data);
+
+        // the comment lines that start a nested block used to be copied by each nesting level
+        $this->assertLessThan(10 * 1024 * 1024, MemoryUsageRecorder::$memoryUsage - $memoryUsage);
+    }
+
+    public function testParseNestedBlocksWithHigherMaxNestingLevel()
+    {
+        $yaml = str_repeat('- ', 255).'!php/object '.serialize(new MemoryUsageRecorder()).str_repeat("\n#".str_repeat('-', 200), 1000);
+
+        $memoryUsage = memory_get_usage();
+        $data = (new Parser(256))->parse($yaml, Yaml::PARSE_OBJECT);
+
+        for ($i = 0; $i < 255; ++$i) {
+            $data = $data[0];
+        }
+
+        $this->assertInstanceOf(MemoryUsageRecorder::class, $data);
+
+        // with a higher limit, the lines of smaller documents used to be copied by each nesting level
+        $this->assertLessThan(20 * 1024 * 1024, MemoryUsageRecorder::$memoryUsage - $memoryUsage);
+    }
+
     public function testParseHandlesTrailingNewlinesAfterDocumentEndMarker()
     {
         $yaml = "---\nfoo: bar\n...\n\n";
@@ -3946,6 +4081,16 @@ class ParserTest extends TestCase
             var_export($expected, true),
             var_export($actual, true)
         );
+    }
+}
+
+class MemoryUsageRecorder
+{
+    public static int $memoryUsage;
+
+    public function __wakeup(): void
+    {
+        self::$memoryUsage = memory_get_usage();
     }
 }
 

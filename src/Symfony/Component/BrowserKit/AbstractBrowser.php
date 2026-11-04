@@ -601,6 +601,16 @@ abstract class AbstractBrowser
         $server = $request->getServer();
         $server = $this->updateServerFromUri($server, $this->redirect);
 
+        // Authorization and Cookie headers MUST NOT follow redirects to another scheme or authority
+        $uri = $this->getAbsoluteUri($this->redirect);
+        if (parse_url($uri, \PHP_URL_SCHEME) !== parse_url($request->getUri(), \PHP_URL_SCHEME) || $this->extractHost($uri) !== $this->extractHost($request->getUri())) {
+            foreach ($server as $key => $value) {
+                if (\in_array(strtolower(str_replace('_', '-', $key)), ['http-authorization', 'http-cookie'], true)) {
+                    unset($server[$key]);
+                }
+            }
+        }
+
         $this->isMainRequest = false;
 
         $response = $this->request($method, $this->redirect, $parameters, $files, $server, $content);

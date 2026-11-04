@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -42,6 +43,7 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
 class RouterListener implements EventSubscriberInterface
 {
     private RequestContext $context;
+    private array $parentContexts = [];
 
     /**
      * @param RequestContext|null $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
@@ -78,14 +80,43 @@ class RouterListener implements EventSubscriberInterface
      * After a sub-request is done, we need to reset the routing context to the parent request so that the URL generator
      * operates on the correct context again.
      */
-    public function onKernelFinishRequest(): void
+    public function onKernelFinishRequest(?FinishRequestEvent $event = null): void
     {
-        $this->setCurrentRequest($this->requestStack->getParentRequest());
+        if (null === $event) {
+            $this->setCurrentRequest($this->requestStack->getParentRequest());
+
+            return;
+        }
+
+        $id = spl_object_id($event->getRequest());
+
+        if (!isset($this->parentContexts[$id])) {
+            return;
+        }
+
+        // The context of the parent is restored instead of being computed again:
+        // while a sub-request runs, its trusted proxies also apply to the parent request
+        $parentContext = $this->parentContexts[$id];
+        unset($this->parentContexts[$id]);
+
+        $this->context
+            ->setBaseUrl($parentContext->getBaseUrl())
+            ->setPathInfo($parentContext->getPathInfo())
+            ->setMethod($parentContext->getMethod())
+            ->setHost($parentContext->getHost())
+            ->setScheme($parentContext->getScheme())
+            ->setHttpPort($parentContext->getHttpPort())
+            ->setHttpsPort($parentContext->getHttpsPort())
+            ->setQueryString($parentContext->getQueryString());
     }
 
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
+
+        if (null !== $this->requestStack->getParentRequest()) {
+            $this->parentContexts[spl_object_id($request)] = clone $this->context;
+        }
 
         $this->setCurrentRequest($request);
 

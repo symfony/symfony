@@ -343,7 +343,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
                 foreach ($supportedTypes as $supportedType => $isCacheable) {
                     if (\in_array($supportedType, ['*', 'object'], true)
-                        || $class !== $supportedType && ('object' !== $genericType || !is_subclass_of($class, $supportedType))
+                        || $class !== $supportedType && ('object' !== $genericType || !is_a($class, $supportedType, true))
                         && !($doesClassRepresentCollection && str_ends_with($supportedType, '[]') && is_subclass_of(strstr($class, '[]', true), strstr($supportedType, '[]', true)))
                     ) {
                         continue;

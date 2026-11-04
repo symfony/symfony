@@ -1973,6 +1973,11 @@ class Request
             $requestUri = '/'.$requestUri;
         }
 
+        if (str_starts_with($requestUri, '//') || str_starts_with($requestUri, '/\\')) {
+            // the URI starts with a host that the client chose: URLs built on it would point there
+            return '';
+        }
+
         if ($baseUrl && (null !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) && \in_array($requestUri[\strlen($prefix)] ?? '', ['', '/', '?'], true)) {
             // full $baseUrl matches, and is not only the start of a longer path segment
             return $prefix;

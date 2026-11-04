@@ -359,6 +359,32 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
+    public function testAllowLinksRelativeDoesNotAllowSchemeRelativeHosts()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('a', ['href'])
+            ->allowLinkHosts(['trusted.com'])
+            ->allowRelativeLinks()
+        ;
+
+        foreach (['https:untrusted.com', 'https:untrusted.com/login', 'http:untrusted.com', 'https:/untrusted.com', 'https:///untrusted.com', '///untrusted.com', '//untrusted.com', 'https://://untrusted.com/', 'https://:/untrusted.com/', '//:/untrusted.com/'] as $href) {
+            $this->assertSame(
+                '<a>Hello world</a>',
+                $this->sanitize($config, \sprintf('<a href="%s">Hello world</a>', $href))
+            );
+        }
+
+        $this->assertSame(
+            '<a href="/index.php">Hello world</a>',
+            $this->sanitize($config, '<a href="/index.php">Hello world</a>')
+        );
+
+        $this->assertSame(
+            '<a href="https://trusted.com/index.php">Hello world</a>',
+            $this->sanitize($config, '<a href="https://trusted.com/index.php">Hello world</a>')
+        );
+    }
+
     public function testAllowMediaSchemes()
     {
         $config = (new HtmlSanitizerConfig())
@@ -421,6 +447,48 @@ class HtmlSanitizerCustomTest extends TestCase
             '<img src="https://trusted.com" />',
             $this->sanitize($config, '<img src="https://trusted.com" />')
         );
+    }
+
+    public function testAllowMediasRelativeDoesNotAllowSchemeRelativeHosts()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('img', ['src'])
+            ->allowMediaHosts(['trusted.com'])
+            ->allowRelativeMedias()
+        ;
+
+        foreach (['https:untrusted.com/image.png', 'https:/untrusted.com/image.png', 'https:///untrusted.com/image.png', '///untrusted.com/image.png', '//untrusted.com/image.png', 'https://://untrusted.com/image.png', '//:/untrusted.com/image.png'] as $src) {
+            $this->assertSame(
+                '<img />',
+                $this->sanitize($config, \sprintf('<img src="%s" />', $src))
+            );
+        }
+
+        $this->assertSame(
+            '<img src="/image.png" />',
+            $this->sanitize($config, '<img src="/image.png" />')
+        );
+
+        $this->assertSame(
+            '<img src="//trusted.com/image.png" />',
+            $this->sanitize($config, '<img src="//trusted.com/image.png" />')
+        );
+    }
+
+    public function testAllowedHostsApplyToHostZero()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('a', ['href'])
+            ->allowElement('img', ['src'])
+            ->allowLinkHosts(['trusted.com'])
+            ->allowRelativeLinks()
+            ->allowMediaHosts(['trusted.com'])
+            ->allowRelativeMedias()
+        ;
+
+        $this->assertSame('<a>Hello world</a>', $this->sanitize($config, '<a href="https://0/">Hello world</a>'));
+        $this->assertSame('<a>Hello world</a>', $this->sanitize($config, '<a href="//0/login">Hello world</a>'));
+        $this->assertSame('<img />', $this->sanitize($config, '<img src="https://0/image.png" />'));
     }
 
     public function testActionAttributeIsSanitized()

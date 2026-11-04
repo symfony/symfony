@@ -47,7 +47,7 @@
         "psr/http-message": "^1.0|^2.0",
         "psr/link": "^1.1|^2.0",
         "psr/log": "^1|^2|^3",
-        "symfony/contracts": "^3.7",
+        "symfony/contracts": "^3.8.1",
         "symfony/polyfill-ctype": "^1.8",
         "symfony/polyfill-deepclone": "^1.43.1",
         "symfony/polyfill-intl-grapheme": "^1.33",

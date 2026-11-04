@@ -45,8 +45,8 @@ final class W3CReference
      */
     public const HEAD_ELEMENTS = [
         'head' => true,
-        'link' => true,
-        'meta' => true,
+        'link' => false,
+        'meta' => false,
         'style' => false,
         'title' => true,
     ];
@@ -136,7 +136,7 @@ final class W3CReference
         'output' => true,
         'p' => true,
         'picture' => true,
-        'plaintext' => true,
+        'plaintext' => false,
         'popup' => true,
         'portal' => true,
         'pre' => true,
@@ -339,7 +339,7 @@ final class W3CReference
         'preload' => true,
         'pseudo' => true,
         'readonly' => true,
-        'referrerpolicy' => true,
+        'referrerpolicy' => false,
         'rel' => true,
         'reportingorigin' => true,
         'required' => true,

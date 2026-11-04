@@ -201,7 +201,23 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                         return '';
                     }
 
-                    $url = $token[1].$mergedParams[$varName].$url;
+                    // browsers resolve "." and ".." path segments even when they are percent-encoded
+                    $value = (string) $mergedParams[$varName];
+                    if (false !== strpbrk($value, './') && preg_match('#(?:^|/)\.\.?(?:/|$)#D', $token[1].$value.explode('/', $url, 2)[0])) {
+                        $message = 'Parameter "{parameter}" for route "{route}" must not add "." or ".." segments to the path ("{given}" given) to generate a corresponding URL.';
+
+                        if ($this->strictRequirements) {
+                            throw new InvalidParameterException(strtr($message, ['{parameter}' => $varName, '{route}' => $name, '{given}' => $mergedParams[$varName]]));
+                        }
+
+                        if ($this->logger) {
+                            $this->logger->error($message, ['parameter' => $varName, 'route' => $name, 'given' => $mergedParams[$varName]]);
+                        }
+
+                        return '';
+                    }
+
+                    $url = $token[1].$value.$url;
                     $optional = false;
                 }
             } else {
@@ -293,6 +309,11 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             $url = self::getRelativePath($this->context->getPathInfo(), $url);
         } else {
             $url = $schemeAuthority.$this->context->getBaseUrl().$url;
+
+            // without scheme and host, a URL that starts with "//" would point to another host
+            if ('' === $schemeAuthority && str_starts_with($url, '//')) {
+                $url = '/%2F'.substr($url, 2);
+            }
         }
 
         // add a query string if needed

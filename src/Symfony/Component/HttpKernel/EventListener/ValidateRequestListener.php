@@ -34,7 +34,7 @@ class ValidateRequestListener implements EventSubscriberInterface
         }
         $request = $event->getRequest();
 
-        if ($request::getTrustedProxies()) {
+        if ($request->isFromTrustedProxy()) {
             $request->getClientIps();
         }
 

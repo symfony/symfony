@@ -1429,10 +1429,10 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('GET', '/', ['REMOTE_ADDR' => '10.0.0.1']);
         $this->assertSame($existing, Request::getTrustedProxies());
 
-        $existing = array_unique(array_merge($existing, ['127.0.0.1']));
         $this->kernel->assert(function ($backendRequest) use ($existing) {
             $this->assertSame($existing, Request::getTrustedProxies());
-            $this->assertsame('10.0.0.1', $backendRequest->getClientIp());
+            $this->assertTrue($backendRequest->isFromTrustedProxy());
+            $this->assertSame('10.0.0.1', $backendRequest->getClientIp());
         });
 
         Request::setTrustedProxies([], -1);

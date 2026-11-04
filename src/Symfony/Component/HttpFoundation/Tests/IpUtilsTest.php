@@ -34,6 +34,18 @@ class IpUtilsTest extends TestCase
         $this->assertTrue(IpUtils::checkIp6($ip, $subnet));
     }
 
+    public function testCacheSizeLimit()
+    {
+        for ($i = 0; $i < 2000; ++$i) {
+            IpUtils::checkIp4(long2ip(0x0A000000 + $i), '127.0.0.1');
+        }
+
+        $checkedIps = new \ReflectionProperty(IpUtils::class, 'checkedIps');
+        $checkedIps->setAccessible(true);
+
+        $this->assertLessThanOrEqual(1001, \count($checkedIps->getValue()));
+    }
+
     /**
      * @dataProvider getIpv4Data
      */

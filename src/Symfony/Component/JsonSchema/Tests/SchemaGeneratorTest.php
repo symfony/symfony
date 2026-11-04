@@ -92,6 +92,26 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 
 class SchemaGeneratorTest extends TestCase
 {
+    public function testGenericSpecializationDependsOnTypeInfoMappingSupport()
+    {
+        $generator = SchemaGenerator::create();
+        $raw = Type::object(Fixtures\Generic\Envelope::class);
+        $type = Type::generic($raw, Type::string());
+        $document = new SchemaDocument();
+        $schema = $generator->generate($type, new Configuration(), $document);
+        $supported = method_exists(Type::class, 'map');
+        $name = $supported ? 'Envelope-of.string' : 'Envelope';
+
+        $this->assertSame(['$ref' => '#/$defs/'.$name], $schema->getRoot());
+        $this->assertEquals($supported ? ['type' => 'string'] : new \ArrayObject(), $schema->getDefinitions()[$name]['properties']['data']);
+        $this->assertEquals([$name => $supported ? $type : $raw], $document->getDefinitionTypes());
+
+        $schema = $generator->generate(Type::object(Fixtures\Generic\Inbox::class));
+        $properties = $schema->getDefinitions()['Inbox']['properties'];
+        $this->assertSame(['$ref' => '#/$defs/'.($supported ? 'Envelope-of.string' : 'Envelope')], $properties['message']);
+        $this->assertSame(['$ref' => '#/$defs/'.($supported ? 'Envelope-of.Customer' : 'Envelope')], $properties['customer']);
+    }
+
     #[DataProvider('provideFixtureClasses')]
     public function testGeneratesTheExpectedSchema(string $class)
     {
@@ -166,7 +186,7 @@ class SchemaGeneratorTest extends TestCase
     public function testDifferentShapesNamedAlikeThrow()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Definition "Shape" already describes class "'.BookWithAuthors::class.'" with a different configuration, it cannot also describe class "'.Author::class.'", "'.ConstantNameDefinitionPolicy::class.'" must return distinct names for distinct shapes.');
+        $this->expectExceptionMessage('Definition "Shape" already describes class "'.BookWithAuthors::class.'" with a different type or configuration, it cannot also describe class "'.Author::class.'", "'.ConstantNameDefinitionPolicy::class.'" must return distinct names for distinct shapes.');
 
         (new SchemaGenerator(self::createReflectionPropertyInfo(), new ConstantNameDefinitionPolicy('Shape')))->generate(Type::object(BookWithAuthors::class));
     }
@@ -233,7 +253,7 @@ class SchemaGeneratorTest extends TestCase
         $generator->generate(Type::object(Author::class), new Configuration(attributes: ['first_name']), $document);
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Definition "Author-first_name" already describes class "'.Author::class.'" with a different configuration');
+        $this->expectExceptionMessage('Definition "Author-first_name" already describes class "'.Author::class.'" with a different type or configuration');
 
         $generator->generate(Type::object(Author::class), new Configuration(attributes: ['first', 'name']), $document);
     }
@@ -771,9 +791,9 @@ class SchemaGeneratorTest extends TestCase
         (new SchemaGenerator(self::createReflectionPropertyInfo(), $policy))->generate(Type::object(BookWithAuthors::class));
 
         $this->assertEquals([
-            [BookWithAuthors::class, null],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'author', new Configuration())],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'coAuthor', new Configuration())],
+            [Type::object(BookWithAuthors::class), null],
+            [Type::object(Author::class), new DefinitionParent(BookWithAuthors::class, 'author', new Configuration())],
+            [Type::object(Author::class), new DefinitionParent(BookWithAuthors::class, 'coAuthor', new Configuration())],
         ], $policy->calls);
     }
 
@@ -785,7 +805,7 @@ class SchemaGeneratorTest extends TestCase
 
         [$authorClass, $authorParent] = $policy->calls[2];
 
-        $this->assertSame(Author::class, $authorClass);
+        $this->assertEquals(Type::object(Author::class), $authorClass);
         $this->assertSame(Shelf::class, $authorParent->class);
         $this->assertSame('topAuthor', $authorParent->property);
         $this->assertSame(Library::class, $authorParent->parent->class);
@@ -813,9 +833,9 @@ class SchemaGeneratorTest extends TestCase
         (new SchemaGenerator(self::createReflectionPropertyInfo(), definitionProcessors: [$processor]))->generate(Type::object(Library::class));
 
         $this->assertEquals([
-            [Author::class, new DefinitionParent(Shelf::class, 'topAuthor', new Configuration(), new DefinitionParent(Library::class, 'shelf', new Configuration()))],
-            [Shelf::class, new DefinitionParent(Library::class, 'shelf', new Configuration())],
-            [Library::class, null],
+            [Type::object(Author::class), new DefinitionParent(Shelf::class, 'topAuthor', new Configuration(), new DefinitionParent(Library::class, 'shelf', new Configuration()))],
+            [Type::object(Shelf::class), new DefinitionParent(Library::class, 'shelf', new Configuration())],
+            [Type::object(Library::class), null],
         ], $processor->calls);
     }
 
@@ -859,11 +879,11 @@ class SchemaGeneratorTest extends TestCase
         (new SchemaGenerator(self::createPhpDocPropertyInfo(), classSchemaResolvers: [$resolver]))->generate(Type::object(BookWithAuthors::class));
 
         $this->assertEquals([
-            [BookWithAuthors::class, null],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'author', new Configuration())],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'coAuthor', new Configuration())],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'reviewers', new Configuration())],
-            [Author::class, new DefinitionParent(BookWithAuthors::class, 'authorsByRole', new Configuration())],
+            [Type::object(BookWithAuthors::class), null],
+            [Type::object(Author::class), new DefinitionParent(BookWithAuthors::class, 'author', new Configuration())],
+            [Type::object(Author::class), new DefinitionParent(BookWithAuthors::class, 'coAuthor', new Configuration())],
+            [Type::object(Author::class), new DefinitionParent(BookWithAuthors::class, 'reviewers', new Configuration())],
+            [Type::object(Author::class), new DefinitionParent(BookWithAuthors::class, 'authorsByRole', new Configuration())],
         ], $resolver->calls);
     }
 
@@ -876,7 +896,7 @@ class SchemaGeneratorTest extends TestCase
 
         [$authorClass, $authorParent] = $resolver->calls[1];
 
-        $this->assertSame(Author::class, $authorClass);
+        $this->assertEquals(Type::object(Author::class), $authorClass);
         $this->assertSame(['name'], $resolver->configs[1]->attributes);
         $this->assertSame($config, $authorParent->config);
     }
@@ -890,7 +910,7 @@ class SchemaGeneratorTest extends TestCase
 
         [$authorClass, $authorParent] = $resolver->calls[2];
 
-        $this->assertSame(Author::class, $authorClass);
+        $this->assertEquals(Type::object(Author::class), $authorClass);
         $this->assertSame(['name'], $resolver->configs[2]->attributes);
         $this->assertSame(['topAuthor' => ['name']], $authorParent->config->attributes);
         $this->assertSame($config, $authorParent->parent->config);
@@ -903,7 +923,7 @@ class SchemaGeneratorTest extends TestCase
 
         (new SchemaGenerator(self::createReflectionPropertyInfo(), new ShortNameDefinitionPolicy(), [$resolver]))->generate(Type::object(Library::class), $config);
 
-        $this->assertSame(Author::class, $resolver->calls[2][0]);
+        $this->assertEquals(Type::object(Author::class), $resolver->calls[2][0]);
         $this->assertNotSame($config, $resolver->configs[2]);
         $this->assertSame(['operation' => 'get_library'], $resolver->configs[2]->context);
     }
@@ -951,7 +971,7 @@ class SchemaGeneratorTest extends TestCase
         $schema = $generator->generate(Type::object(Library::class));
 
         $this->assertSame(['Library'], array_keys($schema->getDefinitions()));
-        $this->assertEquals([[Library::class, null]], $resolver->calls);
+        $this->assertEquals([[Type::object(Library::class), null]], $resolver->calls);
     }
 
     public function testEnrichersRunOnTheProvidedPropertySchema()

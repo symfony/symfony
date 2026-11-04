@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonSchema\ClassSchemaResolver\NativeClassSchemaResolver;
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\SchemaDocument;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
@@ -24,7 +25,7 @@ class NativeClassSchemaResolverTest extends TestCase
     #[DataProvider('provideDefaultContexts')]
     public function testDefaultContextSelectsTheFormat(array $defaultContext, string $class, array $expected)
     {
-        $this->assertSame($expected, (new NativeClassSchemaResolver($defaultContext))->resolve($class, new Configuration(), new SchemaDocument()));
+        $this->assertSame($expected, (new NativeClassSchemaResolver($defaultContext))->resolve(Type::object($class), new Configuration(), new SchemaDocument()));
     }
 
     public static function provideDefaultContexts(): iterable

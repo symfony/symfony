@@ -15,6 +15,8 @@ use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionPolicyInterface;
 use Symfony\Component\JsonSchema\SchemaDocument;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 
 class ConstantNameDefinitionPolicy implements DefinitionPolicyInterface
 {
@@ -22,7 +24,7 @@ class ConstantNameDefinitionPolicy implements DefinitionPolicyInterface
     {
     }
 
-    public function nameFor(string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): string
+    public function nameFor(ObjectType|GenericType $type, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): string
     {
         return $this->name;
     }

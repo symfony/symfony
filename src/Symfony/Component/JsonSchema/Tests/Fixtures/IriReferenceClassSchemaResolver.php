@@ -15,6 +15,8 @@ use Symfony\Component\JsonSchema\ClassSchemaResolver\ClassSchemaResolverInterfac
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\SchemaDocument;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 
 class IriReferenceClassSchemaResolver implements ClassSchemaResolverInterface
 {
@@ -26,8 +28,14 @@ class IriReferenceClassSchemaResolver implements ClassSchemaResolverInterface
     ) {
     }
 
-    public function resolve(string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): ?array
+    /**
+     * @param ObjectType|GenericType<ObjectType> $type
+     *
+     * @return array<string, mixed>|null
+     */
+    public function resolve(ObjectType|GenericType $type, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): ?array
     {
+        $class = ($type instanceof GenericType ? $type->getWrappedType() : $type)->getClassName();
         if (null === $parent || $class !== $this->class) {
             return null;
         }

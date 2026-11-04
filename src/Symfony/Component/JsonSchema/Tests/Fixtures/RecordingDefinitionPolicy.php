@@ -16,11 +16,13 @@ use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionPolicy\DefinitionPolicyInterface;
 use Symfony\Component\JsonSchema\DefinitionPolicy\ShortNameDefinitionPolicy;
 use Symfony\Component\JsonSchema\SchemaDocument;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 
 class RecordingDefinitionPolicy implements DefinitionPolicyInterface
 {
     /**
-     * @var list<array{string, ?DefinitionParent}>
+     * @var list<array{ObjectType|GenericType<ObjectType>, ?DefinitionParent}>
      */
     public array $calls = [];
 
@@ -31,10 +33,10 @@ class RecordingDefinitionPolicy implements DefinitionPolicyInterface
         $this->decorated = new ShortNameDefinitionPolicy();
     }
 
-    public function nameFor(string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): string
+    public function nameFor(ObjectType|GenericType $type, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): string
     {
-        $this->calls[] = [$class, $parent];
+        $this->calls[] = [$type, $parent];
 
-        return $this->decorated->nameFor($class, $config, $document, $parent);
+        return $this->decorated->nameFor($type, $config, $document, $parent);
     }
 }

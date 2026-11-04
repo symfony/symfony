@@ -14,6 +14,8 @@ namespace Symfony\Component\JsonSchema\DefinitionProcessor;
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\SchemaDocument;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 
 /**
  * Post-processes every object definition once its properties are assembled.
@@ -31,11 +33,11 @@ use Symfony\Component\JsonSchema\SchemaDocument;
 interface DefinitionProcessorInterface
 {
     /**
-     * @param array<string, mixed> $definition
-     * @param class-string         $class
-     * @param ?DefinitionParent    $parent     null for the root definition
+     * @param array<string, mixed>               $definition
+     * @param ObjectType|GenericType<ObjectType> $type
+     * @param DefinitionParent|null              $parent     null for the root definition
      *
      * @return array<string, mixed>
      */
-    public function process(array $definition, string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array;
+    public function process(array $definition, ObjectType|GenericType $type, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array;
 }

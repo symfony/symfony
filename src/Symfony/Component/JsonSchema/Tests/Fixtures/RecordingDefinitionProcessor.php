@@ -15,11 +15,13 @@ use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionProcessor\DefinitionProcessorInterface;
 use Symfony\Component\JsonSchema\SchemaDocument;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 
 class RecordingDefinitionProcessor implements DefinitionProcessorInterface
 {
     /**
-     * @var list<array{string, ?DefinitionParent}>
+     * @var list<array{ObjectType|GenericType<ObjectType>, ?DefinitionParent}>
      */
     public array $calls = [];
 
@@ -28,9 +30,15 @@ class RecordingDefinitionProcessor implements DefinitionProcessorInterface
     ) {
     }
 
-    public function process(array $definition, string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array
+    /**
+     * @param ObjectType|GenericType<ObjectType> $type
+     * @param array<string, mixed> $definition
+     *
+     * @return array<string, mixed>
+     */
+    public function process(array $definition, ObjectType|GenericType $type, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array
     {
-        $this->calls[] = [$class, $parent];
+        $this->calls[] = [$type, $parent];
         $definition['x-processors'][] = $this->marker;
 
         return $definition;

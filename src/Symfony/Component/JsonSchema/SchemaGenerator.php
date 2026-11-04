@@ -45,6 +45,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException as TypeInfoInvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ArrayShapeType;
@@ -56,7 +57,9 @@ use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
+use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 use Symfony\Component\Validator\Validation;
@@ -66,12 +69,22 @@ use Symfony\Component\Validator\Validation;
  */
 final class SchemaGenerator implements SchemaGeneratorInterface
 {
+    private const MAX_GENERIC_DEPTH = 64;
+    private const MAX_GENERIC_SIZE = 1024;
+
     /**
      * @var array<class-string, list<string>>
      */
     private array $mandatoryConstructorArguments = [];
 
     private readonly ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver;
+
+    /**
+     * @var array<class-string, list<string>>
+     */
+    private array $templateNames = [];
+
+    private ?TypeContextFactory $typeContextFactory = null;
 
     /**
      * @param iterable<ClassSchemaResolverInterface>    $classSchemaResolvers
@@ -232,8 +245,9 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             $type instanceof ArrayShapeType => $this->buildArrayShapeSchema($type, $config, $parent, $document),
             $type instanceof CollectionType => $this->buildCollectionSchema($type, $config, $parent, $document),
             $type instanceof ObjectShapeType => $this->buildShapeSchema($type->getShape(), $config, $parent, $document),
-            $type instanceof GenericType, $type instanceof TemplateType => $this->buildTypeSchema($type->getWrappedType(), $config, $parent, $document),
-            $type instanceof ObjectType => $this->buildObjectSchema($type->getClassName(), $config, $parent, $document),
+            $type instanceof GenericType => $this->buildGenericSchema($type, $config, $parent, $document),
+            $type instanceof TemplateType => $this->buildTypeSchema($type->getWrappedType(), $config, $parent, $document),
+            $type instanceof ObjectType => $this->buildObjectSchema($type, $config, $parent, $document),
             $type instanceof BuiltinType => $this->buildBuiltinSchema($type, $config->dialect),
             default => throw new InvalidArgumentException(\sprintf('Cannot generate a JSON Schema for type "%s".', $type)),
         };
@@ -424,35 +438,40 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
-     * @param class-string $class
+     * @param ObjectType|GenericType<ObjectType> $type
      *
      * @return array<string, mixed>
      */
-    private function buildObjectSchema(string $class, Configuration $config, ?DefinitionParent $parent, SchemaDocument $document, bool $resolveDiscriminator = true): array
+    private function buildObjectSchema(ObjectType|GenericType $type, Configuration $config, ?DefinitionParent $parent, SchemaDocument $document, bool $resolveDiscriminator = true): array
     {
+        $class = ($type instanceof GenericType ? $type->getWrappedType() : $type)->getClassName();
+
         foreach ($this->classSchemaResolvers as $resolver) {
-            if (null !== $schema = $resolver->resolve($class, $config, $document, $parent)) {
+            if (null !== $schema = $resolver->resolve($type, $config, $document, $parent)) {
                 return $schema;
             }
         }
 
         if ($resolveDiscriminator && null !== $mapping = $this->classDiscriminatorResolver?->getMappingForClass($class)) {
-            return $this->buildDiscriminatedSchema($class, $mapping, $config, $parent, $document);
+            return $this->buildDiscriminatedSchema($type, $mapping, $config, $parent, $document);
         }
 
-        $name = $this->definitionPolicy->nameFor($class, $config, $document, $parent);
-        $fingerprint = serialize([$class, $config->groups, $config->attributes, $config->ignoredAttributes, $config->allowExtraAttributes, $config->getValidationGroupNames(), $config->format, $config->direction]);
+        $name = $this->definitionPolicy->nameFor($type, $config, $document, $parent);
+        $fingerprint = serialize([(string) $type, $config->groups, $config->attributes, $config->ignoredAttributes, $config->allowExtraAttributes, $config->getValidationGroupNames(), $config->format, $config->direction]);
 
-        if (null === $reservation = $document->reserve($name, $class, $fingerprint, $config->dialect)) {
-            $definition = $this->buildDefinition($class, $config, $parent, $document);
+        if (null === $reservation = $document->reserve($name, $type, $fingerprint, $config->dialect)) {
+            $definition = $this->buildDefinition($type, $config, $parent, $document);
 
             foreach ($this->definitionProcessors as $processor) {
-                $definition = $processor->process($definition, $class, $config, $document, $parent);
+                $definition = $processor->process($definition, $type, $config, $document, $parent);
             }
 
             $document->define($name, $definition);
         } elseif ($reservation[1] !== $fingerprint) {
-            throw new LogicException(\sprintf('Definition "%s" already describes class "%s" with a different configuration, it cannot also describe class "%s", "%s" must return distinct names for distinct shapes.', $name, $reservation[0], $class, $this->definitionPolicy::class));
+            $reservedType = $reservation[0];
+            $reservedClass = ($reservedType instanceof GenericType ? $reservedType->getWrappedType() : $reservedType)->getClassName();
+
+            throw new LogicException(\sprintf('Definition "%s" already describes class "%s" with a different type or configuration, it cannot also describe class "%s", "%s" must return distinct names for distinct shapes.', $name, $reservedClass, $class, $this->definitionPolicy::class));
         }
 
         return ['$ref' => $config->dialect->refPath.$name];
@@ -461,22 +480,23 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     /**
      * Describes a class that declares a discriminator map: the value is one of the mapped classes, and the type property tells which one.
      *
-     * @param class-string $class
+     * @param ObjectType|GenericType<ObjectType> $type
      *
      * @return array<string, mixed>
      */
-    private function buildDiscriminatedSchema(string $class, ClassDiscriminatorMapping $mapping, Configuration $config, ?DefinitionParent $parent, SchemaDocument $document): array
+    private function buildDiscriminatedSchema(ObjectType|GenericType $type, ClassDiscriminatorMapping $mapping, Configuration $config, ?DefinitionParent $parent, SchemaDocument $document): array
     {
+        $class = ($type instanceof GenericType ? $type->getWrappedType() : $type)->getClassName();
         $typeProperty = $this->getSerializedName($mapping->getTypeProperty(), $class, $config);
         $typesByClass = [];
 
-        foreach ($mapping->getTypesMapping() as $type => $mappedClass) {
-            $typesByClass[$mappedClass][] = (string) $type;
+        foreach ($mapping->getTypesMapping() as $discriminatorType => $mappedClass) {
+            $typesByClass[$mappedClass][] = (string) $discriminatorType;
         }
 
         $schemas = [];
         foreach ($typesByClass as $mappedClass => $types) {
-            $schema = $this->buildObjectSchema($mappedClass, $config, $parent, $document, $mappedClass !== $class);
+            $schema = $this->buildObjectSchema($mappedClass === $class ? $type : Type::object($mappedClass), $config, $parent, $document, $mappedClass !== $class);
 
             if (Direction::Output === $config->direction || !\in_array($mapping->getDefaultType(), $types, true)) {
                 $schema = self::wrapReferenceSiblings([...$schema, 'required' => [...$schema['required'] ?? [], $typeProperty]], $config->dialect);
@@ -489,12 +509,21 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
-     * @param class-string $class
+     * @param ObjectType|GenericType<ObjectType> $objectType
      *
      * @return array<string, mixed>
      */
-    private function buildDefinition(string $class, Configuration $config, ?DefinitionParent $parent, SchemaDocument $document): array
+    private function buildDefinition(ObjectType|GenericType $objectType, Configuration $config, ?DefinitionParent $parent, SchemaDocument $document): array
     {
+        $class = ($objectType instanceof GenericType ? $objectType->getWrappedType() : $objectType)->getClassName();
+        $bindings = [];
+        if ($objectType instanceof GenericType) {
+            foreach ($this->getTemplateNames($class) as $position => $name) {
+                if (isset($objectType->getVariableTypes()[$position])) {
+                    $bindings[$name] = $objectType->getVariableTypes()[$position];
+                }
+            }
+        }
         $context = [...$config->context, 'serializer_groups' => $config->groups ?: null];
 
         $definition = ['type' => 'object'];
@@ -513,6 +542,13 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             }
 
             $type = $this->propertyInfoExtractor->getType($class, $property, $context);
+            if (null !== $type && $bindings) {
+                try {
+                    $type = $type->map(static fn (Type $type): Type => $type instanceof TemplateType ? ($bindings[$type->getName()] ?? $type) : $type);
+                } catch (TypeInfoInvalidArgumentException $e) {
+                    throw new InvalidArgumentException(\sprintf('Cannot substitute template arguments for "%s::$%s": %s', $class, $property, $e->getMessage()), 0, $e);
+                }
+            }
             $schema = $this->provideSchema($class, $property, $config, $document);
 
             if (null === $schema) {
@@ -802,6 +838,122 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         }
 
         return $descriptions;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildGenericSchema(GenericType $type, Configuration $config, ?DefinitionParent $parent, SchemaDocument $document): array
+    {
+        $wrapped = $type->getWrappedType();
+        if (!$wrapped instanceof ObjectType) {
+            return $this->buildTypeSchema($wrapped, $config, $parent, $document);
+        }
+
+        // Remove this check when symfony/type-info >= 8.2 is required.
+        if (!\is_callable([$type, 'map']) || !$type->getVariableTypes() || self::requiresRawDefinition($type)) {
+            return $this->buildObjectSchema($wrapped, $config, $parent, $document);
+        }
+
+        $size = 0;
+        /** @var \WeakMap<Type, int> $sizes */
+        $sizes = new \WeakMap();
+        foreach ($type->getVariableTypes() as $argument) {
+            $size += self::getTypeSize($argument, $sizes);
+            if ($size > self::MAX_GENERIC_SIZE) {
+                return $this->buildObjectSchema($wrapped, $config, $parent, $document);
+            }
+        }
+
+        return $this->buildObjectSchema(new GenericType($wrapped, ...$type->getVariableTypes()), $config, $parent, $document);
+    }
+
+    /**
+     * @param class-string $class
+     *
+     * @return list<string>
+     */
+    private function getTemplateNames(string $class): array
+    {
+        if (isset($this->templateNames[$class])) {
+            return $this->templateNames[$class];
+        }
+        if (!class_exists(PhpDocParser::class) || (!class_exists($class) && !interface_exists($class))) {
+            return $this->templateNames[$class] = [];
+        }
+
+        $this->typeContextFactory ??= new TypeContextFactory(new StringTypeResolver());
+
+        return $this->templateNames[$class] = array_keys($this->typeContextFactory->createFromClassName($class)->templates);
+    }
+
+    /**
+     * Detects arguments that require the raw class because they contain templates or exceed the nesting limit.
+     */
+    private static function requiresRawDefinition(Type $type): bool
+    {
+        $pending = [[$type, 0]];
+        /** @var \WeakMap<Type, int> $visited */
+        $visited = new \WeakMap();
+        while ($pending) {
+            [$type, $depth] = array_pop($pending);
+            if ($depth > self::MAX_GENERIC_DEPTH) {
+                return true;
+            }
+            if (($visited[$type] ?? -1) >= $depth) {
+                continue;
+            }
+            $visited[$type] = $depth;
+            if ($type instanceof TemplateType) {
+                return true;
+            }
+            foreach (self::getTypeChildren($type) as $child) {
+                $pending[] = [$child, $depth + 1];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Counts each occurrence of shared argument types without expanding their exponentially growing string forms.
+     *
+     * @param \WeakMap<Type, int> $sizes
+     */
+    private static function getTypeSize(Type $type, \WeakMap $sizes): int
+    {
+        if (null !== $cached = $sizes[$type] ?? null) {
+            return $cached;
+        }
+        $size = 1;
+        foreach (self::getTypeChildren($type) as $child) {
+            $size += self::getTypeSize($child, $sizes);
+            if ($size > self::MAX_GENERIC_SIZE) {
+                break;
+            }
+        }
+
+        return $sizes[$type] = $size;
+    }
+
+    /**
+     * @return list<Type>
+     */
+    private static function getTypeChildren(Type $type): array
+    {
+        if ($type instanceof ArrayShapeType || $type instanceof ObjectShapeType) {
+            $children = array_column($type->getShape(), 'type');
+            if ($type instanceof ArrayShapeType) {
+                array_push($children, ...array_filter([$type->getExtraKeyType(), $type->getExtraValueType()]));
+            }
+
+            return $children;
+        }
+        if ($type instanceof GenericType) {
+            return [$type->getWrappedType(), ...$type->getVariableTypes()];
+        }
+
+        return array_values(array_filter(iterator_to_array($type->traverse()), static fn (Type $child): bool => $child !== $type));
     }
 
     /**

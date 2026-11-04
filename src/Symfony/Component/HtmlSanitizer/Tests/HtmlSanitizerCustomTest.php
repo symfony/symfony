@@ -491,6 +491,201 @@ class HtmlSanitizerCustomTest extends TestCase
         $this->assertSame('<img />', $this->sanitize($config, '<img src="https://0/image.png" />'));
     }
 
+    public function testAllowMediasHostsInSrcset()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('img', ['src', 'srcset'])
+            ->allowMediaHosts(['trusted.com'])
+        ;
+
+        $this->assertSame(
+            '<img srcset="https://trusted.com/b.png 2x" />',
+            $this->sanitize($config, '<img srcset="https://untrusted.com/a.png 1x, https://trusted.com/b.png 2x" />')
+        );
+
+        $this->assertSame(
+            '<img />',
+            $this->sanitize($config, '<img srcset="https://untrusted.com/a.png 1x" />')
+        );
+
+        $this->assertSame(
+            '<img />',
+            $this->sanitize($config, '<img src="https://untrusted.com/a.png" />')
+        );
+    }
+
+    public function testAllowMediasSchemesInSrcset()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('picture')
+            ->allowElement('source', ['srcset'])
+            ->allowElement('img', ['src'])
+            ->allowMediaSchemes(['https'])
+        ;
+
+        $this->assertSame(
+            '<picture><source /><img /></picture>',
+            $this->sanitize($config, '<picture><source srcset="http://trusted.com/a.png 1x"><img src="http://trusted.com/a.png"></picture>')
+        );
+
+        $this->assertSame(
+            '<picture><source srcset="https://trusted.com/a.png 1x" /></picture>',
+            $this->sanitize($config, '<picture><source srcset="https://trusted.com/a.png 1x, ftp://trusted.com/b.png 2x"></picture>')
+        );
+    }
+
+    public function testAllowMediasHostsInImageSrcset()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('link', ['rel', 'as', 'href', 'imagesrcset'])
+            ->allowMediaHosts(['trusted.com'])
+            ->allowLinkHosts(['trusted.com'])
+        ;
+
+        $this->assertSame(
+            '<link rel="preload" as="image" imagesrcset="https://trusted.com/b.png 2x" href="https://trusted.com/fallback.png" />',
+            (new HtmlSanitizer($config))->sanitizeFor('head', '<link rel="preload" as="image" imagesrcset="https://untrusted.com/a.png 1x, https://trusted.com/b.png 2x" href="https://trusted.com/fallback.png">')
+        );
+
+        $this->assertSame(
+            '<link rel="preload" as="image" href="https://trusted.com/fallback.png" />',
+            (new HtmlSanitizer($config))->sanitizeFor('head', '<link rel="preload" as="image" imagesrcset="https://untrusted.com/a.png 1x" href="https://trusted.com/fallback.png">')
+        );
+    }
+
+    public function testAllowedSrcsetIsPreservedWithItsDescriptors()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('img', ['src', 'srcset'])
+            ->allowMediaHosts(['trusted.com'])
+        ;
+
+        $this->assertSame(
+            '<img srcset="https://trusted.com/a.png 1x, https://trusted.com/b.png 2x, https://trusted.com/c.png 640w, https://trusted.com/d.png" />',
+            $this->sanitize($config, '<img srcset="https://trusted.com/a.png 1x, https://trusted.com/b.png 2x, https://trusted.com/c.png 640w, https://trusted.com/d.png" />')
+        );
+    }
+
+    public function testSrcsetCommasInsideUrlsAreNotCandidateSeparators()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('img', ['srcset'])
+            ->allowMediaHosts(['trusted.com'])
+        ;
+
+        $this->assertSame(
+            '<img srcset="https://trusted.com/a,b.png 1x, https://trusted.com/c,d.png 2x" />',
+            $this->sanitize($config, '<img srcset="https://trusted.com/a,b.png 1x,https://trusted.com/c,d.png 2x" />')
+        );
+
+        $this->assertSame(
+            '<img srcset="https://trusted.com/a.png, https://trusted.com/b.png 2x" />',
+            $this->sanitize($config, '<img srcset="https://trusted.com/a.png,,, https://trusted.com/b.png 2x" />')
+        );
+    }
+
+    public function testSrcsetCommasInsideDescriptorParenthesesAreNotCandidateSeparators()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('img', ['srcset'])
+            ->allowMediaHosts(['trusted.com'])
+        ;
+
+        $this->assertSame(
+            '<img srcset="https://trusted.com/a.png (a,b)" />',
+            $this->sanitize($config, '<img srcset="https://trusted.com/a.png (a,b) , https://evil.com/x.png 1x" />')
+        );
+
+        $this->assertSame(
+            '<img srcset="https://trusted.com/a.png (a,b), https://trusted.com/c.png 1x" />',
+            $this->sanitize($config, '<img srcset="https://trusted.com/a.png (a,b), https://trusted.com/c.png 1x" />')
+        );
+
+        $this->assertSame(
+            '<img srcset="https://trusted.com/a.png 1x" />',
+            $this->sanitize($config, '<img srcset="https://evil.com/x.png (a,b) , https://trusted.com/a.png 1x" />')
+        );
+
+        // An unterminated parenthesis swallows the rest of the value, as the specification requires
+        $this->assertSame(
+            '<img srcset="https://trusted.com/a.png (a,b" />',
+            $this->sanitize($config, '<img srcset="https://trusted.com/a.png (a,b" />')
+        );
+
+        // Parentheses do not nest, so the first one closes the run and the next comma separates
+        $this->assertSame(
+            '<img srcset="https://trusted.com/a.png (a(b)" />',
+            $this->sanitize($config, '<img srcset="https://trusted.com/a.png (a(b),c) 2x, https://evil.com/x.png 1x" />')
+        );
+    }
+
+    public function testSrcsetDescriptorWhitespaceIsNormalized()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('img', ['srcset'])
+            ->allowMediaHosts(['trusted.com'])
+        ;
+
+        $this->assertSame(
+            '<img srcset="https://trusted.com/a.png 100w 2x, https://trusted.com/b.png 1x" />',
+            $this->sanitize($config, "<img srcset=\"https://trusted.com/a.png \t 100w\n\n2x ,\t https://trusted.com/b.png   1x\" />")
+        );
+    }
+
+    public function testForceHttpsUrlsInSrcset()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('img', ['srcset'])
+            ->forceHttpsUrls()
+        ;
+
+        $this->assertSame(
+            '<img srcset="https://trusted.com/a.png 1x" />',
+            $this->sanitize($config, '<img srcset="http://trusted.com/a.png 1x" />')
+        );
+    }
+
+    public function testAllowRelativeMediasInSrcset()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('img', ['srcset'])
+        ;
+
+        $this->assertSame(
+            '<img />',
+            $this->sanitize($config, '<img srcset="/a.png 1x" />')
+        );
+
+        $this->assertSame(
+            '<img srcset="/a.png 1x" />',
+            $this->sanitize($config->allowRelativeMedias(), '<img srcset="/a.png 1x" />')
+        );
+    }
+
+    public function testAllowRelativeMediasInSrcsetDoesNotAllowSchemeRelativeHosts()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('img', ['srcset'])
+            ->allowMediaHosts(['trusted.com'])
+            ->allowRelativeMedias()
+        ;
+
+        $this->assertSame(
+            '<img srcset="/b.png 2x" />',
+            $this->sanitize($config, '<img srcset="https:untrusted.com/a.png 1x, /b.png 2x" />')
+        );
+
+        $this->assertSame(
+            '<img srcset="https://trusted.com/c.png 3x" />',
+            $this->sanitize($config, '<img srcset="https:/untrusted.com/a.png 1x, ///untrusted.com/b.png 2x, https://trusted.com/c.png 3x" />')
+        );
+
+        $this->assertSame(
+            '<img />',
+            $this->sanitize($config, '<img srcset="https:untrusted.com/a.png 1x" />')
+        );
+    }
+
     public function testActionAttributeIsSanitized()
     {
         $config = (new HtmlSanitizerConfig())

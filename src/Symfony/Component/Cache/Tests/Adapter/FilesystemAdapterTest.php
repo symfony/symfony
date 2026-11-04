@@ -12,8 +12,10 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('time-sensitive')]
@@ -27,6 +29,22 @@ class FilesystemAdapterTest extends AdapterTestCase
     public static function tearDownAfterClass(): void
     {
         (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    public function testPhpSerSignatures()
+    {
+        $directory = sys_get_temp_dir().'/symfony-cache/'.__FUNCTION__;
+        $cache = new FilesystemAdapter('', 0, $directory, new DefaultMarshaller(false));
+        $this->assertTrue($cache->save($cache->getItem('foo')->set('unsigned')));
+
+        $cache = new FilesystemAdapter('', 0, $directory, new DefaultMarshaller(null, false, str_repeat('k', 32)));
+        $this->assertFalse($cache->getItem('foo')->isHit());
+        $this->assertTrue($cache->save($cache->getItem('foo')->set('signed')));
+        $this->assertSame('signed', $cache->getItem('foo')->get());
+
+        $cache = new FilesystemAdapter('', 0, $directory, new DefaultMarshaller(null, false, str_repeat('x', 32)));
+        $this->assertFalse($cache->getItem('foo')->isHit());
     }
 
     public function testConstructorCreatesTheDirectory()

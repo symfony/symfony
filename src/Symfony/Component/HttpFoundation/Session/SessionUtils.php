@@ -21,6 +21,24 @@ namespace Symfony\Component\HttpFoundation\Session;
  */
 final class SessionUtils
 {
+    public static function isEmptySession(string $data): bool
+    {
+        if ('' === $data) {
+            return true;
+        }
+        static $igbinaryEmptyData, $phpserEmptyData;
+        if ($data === ($igbinaryEmptyData ??= \function_exists('igbinary_serialize') ? igbinary_serialize([]) : '')) {
+            trigger_deprecation('symfony/http-foundation', '8.2', 'Using igbinary for session serialization is deprecated, use the "phpser" session serializer instead.');
+
+            return true;
+        }
+
+        $phpserEmptyData ??= \function_exists('phpser_serialize') ? phpser_serialize([]) : '';
+
+        // with "phpser.session_key", the data is followed by a 32-byte HMAC
+        return '' !== $phpserEmptyData && str_starts_with($data, $phpserEmptyData) && \in_array(\strlen($data), [\strlen($phpserEmptyData), 32 + \strlen($phpserEmptyData)], true);
+    }
+
     /**
      * Finds the session header amongst the headers that are to be sent, removes it, and returns
      * it so the caller can process it further.

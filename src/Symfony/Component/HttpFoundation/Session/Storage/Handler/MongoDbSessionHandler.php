@@ -17,6 +17,7 @@ use MongoDB\Client;
 use MongoDB\Driver\BulkWrite;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\Query;
+use Symfony\Component\HttpFoundation\Session\SessionUtils;
 
 /**
  * Session handler using the MongoDB driver extension.
@@ -141,7 +142,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler implements ClearableS
     public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         // PHP 8.6 calls updateTimestamp() instead of write() for a session that is still empty
-        if ('' === $data || (\function_exists('igbinary_serialize') && igbinary_serialize([]) === $data)) {
+        if (SessionUtils::isEmptySession($data)) {
             return $this->destroy($sessionId);
         }
 

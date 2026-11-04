@@ -12,6 +12,9 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
@@ -165,6 +168,8 @@ class MarshallingSessionHandlerTest extends TestCase
         $this->assertTrue($marshallingSessionHandler->write('session_id', ''));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testWriteDoesNotMarshallIgbinaryEmptyData()
     {
         if (!\function_exists('igbinary_serialize')) {
@@ -181,6 +186,18 @@ class MarshallingSessionHandlerTest extends TestCase
             ->willReturn(true);
 
         $this->assertTrue($marshallingSessionHandler->write('session_id', igbinary_serialize([])));
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    public function testWriteDoesNotMarshallPhpSerEmptyData()
+    {
+        $marshaller = $this->createMock(MarshallerInterface::class);
+        $marshaller->expects($this->never())->method('marshall');
+        $this->handler->expects($this->once())->method('write')
+            ->with('session_id', phpser_serialize([]))
+            ->willReturn(true);
+
+        $this->assertTrue((new MarshallingSessionHandler($this->handler, $marshaller))->write('session_id', phpser_serialize([])));
     }
 
     public function testValidateId()

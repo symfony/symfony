@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 use Predis\Response\ErrorInterface;
 use Relay\Relay;
+use Symfony\Component\HttpFoundation\Session\SessionUtils;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -100,7 +101,7 @@ class RedisSessionHandler extends AbstractSessionHandler implements ClearableSes
     public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         // PHP 8.6 calls updateTimestamp() instead of write() for a session that is still empty
-        if ('' === $data || (\function_exists('igbinary_serialize') && igbinary_serialize([]) === $data)) {
+        if (SessionUtils::isEmptySession($data)) {
             return $this->destroy($sessionId);
         }
 

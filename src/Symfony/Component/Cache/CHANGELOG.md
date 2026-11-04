@@ -4,6 +4,9 @@ CHANGELOG
 8.2
 ---
 
+ * Use the phpser extension in `DefaultMarshaller` when available and add its `$signingKey` argument for HMAC signing
+ * Sign values with `cache.default_marshaller` when phpser is installed and `kernel.secret` is defined, using a key derived from that secret
+ * Deprecate igbinary serialization in `DefaultMarshaller` and `MemcachedAdapter`
  * Add `CacheBundle`, which provides the `cache` configuration and the services previously provided by `FrameworkBundle` under `framework.cache`
  * Add the `cache:pool:clear`, `cache:pool:delete`, `cache:pool:invalidate-tags`, `cache:pool:list` and `cache:pool:prune` commands, `CacheWarmer\AbstractPhpFileCacheWarmer` and `CacheWarmer\CachePoolClearerCacheWarmer`, which `FrameworkBundle` used to provide
  * Add the `cache.default_provider` option to configure `cache.app` with a DSN

@@ -12,7 +12,9 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 
 class AbstractSessionHandlerTest extends TestCase
 {
@@ -37,6 +39,36 @@ class AbstractSessionHandlerTest extends TestCase
             proc_terminate(self::$server);
             proc_close(self::$server);
         }
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    #[DataProvider('provideEmptySessionMethods')]
+    public function testPhpSerEmptySession(string $method, bool $signed)
+    {
+        $handler = $this->createPartialMock(AbstractSessionHandler::class, ['doRead', 'doWrite', 'doDestroy', 'close', 'gc']);
+        $handler->expects($this->never())->method('doWrite');
+        $handler->expects($this->once())->method('doDestroy')->with('session_id')->willReturn(true);
+
+        // with "phpser.session_key", PHP appends a 32-byte HMAC to the data
+        $this->assertTrue($handler->$method('session_id', phpser_serialize([]).($signed ? random_bytes(32) : '')));
+    }
+
+    public static function provideEmptySessionMethods(): iterable
+    {
+        yield ['write', false];
+        yield ['updateTimestamp', false];
+        yield ['write', true];
+        yield ['updateTimestamp', true];
+    }
+
+    #[RequiresPhpExtension('phpser')]
+    public function testPhpSerNonEmptySessionIsWritten()
+    {
+        $handler = $this->createPartialMock(AbstractSessionHandler::class, ['doRead', 'doWrite', 'doDestroy', 'close', 'gc']);
+        $handler->expects($this->never())->method('doDestroy');
+        $handler->expects($this->once())->method('doWrite')->willReturn(true);
+
+        $this->assertTrue($handler->write('session_id', phpser_serialize(['foo' => 'bar']).random_bytes(32)));
     }
 
     #[DataProvider('provideSession')]

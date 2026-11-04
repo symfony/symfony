@@ -28,7 +28,6 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
     private ?\Throwable $prefetchError = null;
     private ?string $newSessionId = null;
     private ?string $readSessionId = null;
-    private string $igbinaryEmptyData;
 
     public function __serialize(): array
     {
@@ -105,8 +104,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
 
     public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
-        $this->igbinaryEmptyData ??= \function_exists('igbinary_serialize') ? igbinary_serialize([]) : '';
-        if ('' === $data || $this->igbinaryEmptyData === $data) {
+        if (SessionUtils::isEmptySession($data)) {
             return $this->destroy($sessionId);
         }
 
@@ -115,9 +113,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
 
     public function write(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
-        // see https://github.com/igbinary/igbinary/issues/146
-        $this->igbinaryEmptyData ??= \function_exists('igbinary_serialize') ? igbinary_serialize([]) : '';
-        if ('' === $data || $this->igbinaryEmptyData === $data) {
+        if (SessionUtils::isEmptySession($data)) {
             return $this->destroy($sessionId);
         }
         $this->newSessionId = null;

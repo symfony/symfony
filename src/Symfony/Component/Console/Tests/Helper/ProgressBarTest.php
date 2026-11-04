@@ -1540,6 +1540,84 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         );
     }
 
+    public function testIterateUncountableAfterCountable()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+
+        $this->assertEquals([1, 2], iterator_to_array($bar->iterate([1, 2])));
+        $this->assertEquals([1, 2, 3], iterator_to_array($bar->iterate((static function () {
+            yield 1;
+            yield 2;
+            yield 3;
+        })())));
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 0/2 [>---------------------------]   0%'.
+            $this->generateOutput(' 1/2 [==============>-------------]  50%').
+            $this->generateOutput(' 2/2 [============================] 100%').
+            $this->generateOutput('    0 [>---------------------------]').
+            $this->generateOutput('    1 [->--------------------------]').
+            $this->generateOutput('    2 [-->-------------------------]').
+            $this->generateOutput('    3 [--->------------------------]').
+            $this->generateOutput('    3 [============================]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testIterateUncountableAfterEmpty()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
+
+        $this->assertEquals([], iterator_to_array($bar->iterate([])));
+        $this->assertEquals([1, 2], iterator_to_array($bar->iterate((static function () {
+            yield 1;
+            yield 2;
+        })())));
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '  0 [============================]'.
+            $this->generateOutput('    0 [>---------------------------]').
+            $this->generateOutput('    1 [->--------------------------]').
+            $this->generateOutput('    2 [-->-------------------------]').
+            $this->generateOutput('    2 [============================]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testIterateUncountableKeepsMaxSetByUser()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
+        $generator = static function () {
+            yield 1;
+            yield 2;
+        };
+
+        $this->assertEquals([1, 2], iterator_to_array($bar->iterate($generator())));
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '  0/10 [>---------------------------]   0%'.
+            $this->generateOutput('  1/10 [==>-------------------------]  10%').
+            $this->generateOutput('  2/10 [=====>----------------------]  20%').
+            $this->generateOutput(' 10/10 [============================] 100%'),
+            stream_get_contents($output->getStream())
+        );
+
+        iterator_to_array($bar->iterate($generator()));
+        $this->assertSame(10, $bar->getMaxSteps());
+
+        iterator_to_array($bar->iterate([1, 2]));
+        $bar->setMaxSteps(5);
+        iterator_to_array($bar->iterate($generator()));
+        $this->assertSame(5, $bar->getMaxSteps());
+
+        iterator_to_array($bar->iterate([1, 2], 3));
+        iterator_to_array($bar->iterate($generator()));
+        $this->assertSame(3, $bar->getMaxSteps());
+    }
+
     public function testEmptyInputWithDebugFormat()
     {
         $bar = new ProgressBar($output = $this->getOutputStream());

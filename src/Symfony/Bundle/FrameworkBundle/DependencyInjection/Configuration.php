@@ -1682,7 +1682,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->children()
                                     ->scalarNode('scope')
-                                        ->info('The regular expression that the request URL must match before adding the other options. When none is provided, the base URI is used instead.')
+                                        ->info('The regular expression that the request URL must match before adding the other options. When none is provided, the base URI is used instead. The regular expression should end with a "/", for example "https://api\.github\.com/", so that it doesn\'t match other hosts.')
                                         ->cannotBeEmpty()
                                     ->end()
                                     ->scalarNode('base_uri')

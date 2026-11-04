@@ -688,6 +688,24 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertCount(1, $nameConverter->cacheKeys);
     }
 
+    public function testTypesCacheSizeLimit()
+    {
+        $object = new class() {
+            public function __set(string $name, $value): void
+            {
+            }
+        };
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $normalizer->denormalize(['attribute'.$i => 'value'], \get_class($object), null, ['object_to_populate' => $object]);
+        }
+
+        $typesCache = \Closure::bind(function () { return $this->typesCache; }, $normalizer, AbstractObjectNormalizer::class)();
+
+        $this->assertLessThanOrEqual(1001, \count($typesCache));
+    }
+
     public function testDenormalizeXmlScalar()
     {
         $normalizer = new class() extends AbstractObjectNormalizer {

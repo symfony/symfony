@@ -164,6 +164,18 @@ class PhpEngineTest extends TestCase
         $this->assertLessThanOrEqual(1001, \count($escaperCache['html']));
     }
 
+    public function testEscapeDoesNotCacheLongValues()
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+        $value = str_repeat('<', 1000);
+
+        $this->assertSame(str_repeat('&lt;', 1000), $engine->escape($value));
+
+        $escaperCache = \Closure::bind(function () { return self::$escaperCache; }, null, PhpEngine::class)();
+
+        $this->assertArrayNotHasKey($value, $escaperCache['html'] ?? []);
+    }
+
     public function testGetSetCharset()
     {
         $helper = new SlotsHelper();

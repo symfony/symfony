@@ -13,10 +13,18 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -121,6 +129,121 @@ class DataUriNormalizerTest extends TestCase
         $this->normalizer->denormalize('/etc/shadow', 'SplFileObject');
     }
 
+    public function testDenormalizeArray()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The provided "data:" URI is not valid.');
+        $this->normalizer->denormalize(['path' => '/etc/shadow'], File::class);
+    }
+
+    public function testSupportsDenormalizationOfSubclasses()
+    {
+        $this->assertTrue($this->normalizer->supportsDenormalization([], UploadedFile::class));
+        $this->assertTrue($this->normalizer->supportsDenormalization([], FileChild::class));
+        $this->assertTrue($this->normalizer->supportsDenormalization([], SplFileInfoChild::class));
+        $this->assertTrue($this->normalizer->supportsDenormalization([], \SplTempFileObject::class));
+        $this->assertFalse($this->normalizer->supportsDenormalization([], \stdClass::class));
+    }
+
+    /**
+     * @dataProvider provideInstancesOfType
+     */
+    public function testDenormalizeInstanceOfType(\SplFileInfo $file, string $type)
+    {
+        $this->assertSame($file, $this->normalizer->denormalize($file, $type));
+    }
+
+    public static function provideInstancesOfType(): iterable
+    {
+        $uploadedFile = new UploadedFile(__DIR__.'/../Fixtures/test.gif', 'test.gif', null, null, true);
+
+        yield [$uploadedFile, UploadedFile::class];
+        yield [$uploadedFile, File::class];
+        yield [$uploadedFile, \SplFileInfo::class];
+        yield [new FileChild(__DIR__.'/../Fixtures/test.gif'), FileChild::class];
+        yield [new SplFileInfoChild(__DIR__.'/../Fixtures/test.gif'), SplFileInfoChild::class];
+        yield [new \SplFileObject(__DIR__.'/../Fixtures/test.txt'), \SplFileObject::class];
+    }
+
+    /**
+     * @dataProvider provideDataForSubclasses
+     */
+    public function testDenormalizeSubclassFromData($data, string $type)
+    {
+        try {
+            $this->normalizer->denormalize($data, $type, null, ['deserialization_path' => 'file']);
+            $this->fail('The data must not be denormalized.');
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame([$type], $e->getExpectedTypes());
+            $this->assertSame('file', $e->getPath());
+            $this->assertTrue($e->canUseMessageForUser());
+        }
+    }
+
+    public static function provideDataForSubclasses(): iterable
+    {
+        yield [['path' => __FILE__, 'originalName' => 'test.gif', 'test' => true], UploadedFile::class];
+        yield [['path' => __FILE__, 'originalName' => 'test.gif'], UploadedFile::class];
+        yield [__FILE__, UploadedFile::class];
+        yield [self::TEST_GIF_DATA, UploadedFile::class];
+        yield [null, UploadedFile::class];
+        yield [new File(__FILE__), UploadedFile::class];
+        yield [['path' => __FILE__], FileChild::class];
+        yield [['filename' => __FILE__], SplFileInfoChild::class];
+        yield [self::TEST_GIF_DATA, SplFileInfoChild::class];
+    }
+
+    /**
+     * @dataProvider provideOtherSpellingsOfSupportedTypes
+     */
+    public function testDeserializeFromDataWithOtherSpellingOfType(string $type)
+    {
+        $serializer = new Serializer([$this->normalizer, new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage(sprintf('Data expected to be an instance of "%s" ("array" given).', $type));
+
+        $serializer->deserialize(json_encode(['filename' => __FILE__, 'path' => __FILE__]), $type, 'json');
+    }
+
+    public static function provideOtherSpellingsOfSupportedTypes(): iterable
+    {
+        yield ['\SplFileInfo'];
+        yield ['splfileinfo'];
+        yield ['\SplFileObject'];
+        yield ['\\'.File::class];
+    }
+
+    public function testDeserializeUploadedFileFromData()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), $this->normalizer, new ObjectNormalizer(null, null, null, new PhpDocExtractor())], ['json' => new JsonEncoder()]);
+        $file = ['path' => __FILE__, 'originalName' => 'test.gif', 'test' => true];
+
+        try {
+            $serializer->deserialize(json_encode(['file' => $file, 'files' => [$file]]), UploadedFileDummy::class, 'json', [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+            $this->fail('An UploadedFile must not be built from data.');
+        } catch (PartialDenormalizationException $e) {
+            $this->assertNull($e->getData()->file);
+            $this->assertSame([], $e->getData()->files);
+            $this->assertSame(['file', 'files[0]'], array_map(static function (NotNormalizableValueException $error) {
+                return $error->getPath();
+            }, $e->getErrors()));
+        }
+    }
+
+    public function testDenormalizeUploadedFileInstances()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), $this->normalizer, new ObjectNormalizer(null, null, null, new PhpDocExtractor())]);
+        $file = new UploadedFile(__DIR__.'/../Fixtures/test.gif', 'test.gif', null, null, true);
+
+        $dummy = $serializer->denormalize(['file' => $file, 'files' => [$file]], UploadedFileDummy::class, 'json');
+
+        $this->assertSame($file, $dummy->file);
+        $this->assertSame([$file], $dummy->files);
+    }
+
     /**
      * @dataProvider invalidUriProvider
      */
@@ -182,4 +305,25 @@ class DataUriNormalizerTest extends TestCase
 
         return $buffer;
     }
+}
+
+class UploadedFileDummy
+{
+    /**
+     * @var UploadedFile|null
+     */
+    public $file;
+
+    /**
+     * @var UploadedFile[]
+     */
+    public $files = [];
+}
+
+class FileChild extends File
+{
+}
+
+class SplFileInfoChild extends \SplFileInfo
+{
 }

@@ -7,6 +7,250 @@ in 7.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v7.4.0...v7.4.1
 
+## 7.4.23 (2026-11-04)
+
+### AssetMapper
+
+ * bug #67802 [AssetMapper] Fix the resolution of relative paths in downloaded packages (nicolas-grekas)
+ * bug #67750 [AssetMapper] Decode the version of a jsDelivr import before resolving it (mathieudz)
+ * bug #67621 [AssetMapper] Fix `importmap:remove` deleting the files of local entries (nicolas-grekas)
+
+### BrowserKit
+
+ * bug #67685 [BrowserKit] Match cookies across equivalent IPv6 addresses (X-Coder264)
+ * bug #67684 [BrowserKit] Expire cookies dated at the Unix epoch (X-Coder264)
+
+### Cache
+
+ * bug #67759 [Cache] Fix FilesystemTagAwareAdapter::deleteItems() returning true when some items could not be deleted (nicolas-grekas)
+ * bug #67741 [Cache] Fix Redis deleteItems() returning true when some items could not be deleted (nicolas-grekas)
+ * bug #67736 [Cache] Fix tag-aware deleteItems() returning false when the per-item retry succeeds (nicolas-grekas)
+ * bug #67720 [Cache] Retry failed early expiration callbacks (nicolas-grekas)
+ * bug #67703 [Cache] Honor the $save flag set by the callback in EarlyExpirationHandler (BenMacha)
+ * bug #67714 [Cache] Preserve null results from synchronous early recomputation (nicolas-grekas)
+ * bug #67681 [Cache] Add support for relay 0.61 (nicolas-grekas)
+ * minor #67744 [Cache] Mark connection options as #[\SensitiveParameter] (nicolas-grekas)
+
+### Config
+
+ * security #ghsa-5jff-8h8q-r5qx [Config] Do not validate XML documents on parse (nicolas-grekas)
+
+### Console
+
+ * bug #67832 [Console] Fix ProgressBar::iterate() keeping the max of a previous iterable for a non-countable one (nicolas-grekas)
+ * bug #67831 [Console] Fix ProgressBar's percent after finish() on undecorated output without a max (nicolas-grekas)
+ * bug #67830 [Console] Fix ProgressBar::finish() with a lowered max and restarting a finished bar without a max (jack-worman)
+ * bug #67823 [Console] Fix ProgressBar frames on undecorated output when resuming, restarting or finishing (jack-worman)
+ * bug #67811 [Console] Fix ProgressBar::setMaxSteps() not updating the percentage (nicolas-grekas)
+ * bug #67805 [Console] Fix ProgressBar::start() computing the percentage against the previous max (jack-worman)
+ * bug #67769 [Console] Fix text ending with a backslash escaping the closing tag that follows it (nicolas-grekas)
+ * bug #67762 [Console] Keep an escaped tag delimiter with its backslash when wrapping text (initd-it)
+ * bug #67634 [Console] Fix `setRow()`, `setColumnMaxWidth()` and consecutive rowspans in `Table` (nicolas-grekas)
+ * bug #67633 [Console] Fix `Table` cells that span rows when they follow a cell that spans columns (ybai08)
+
+### DependencyInjection
+
+ * bug #67757 [DependencyInjection] Fix `#[Target]` resolution when two names give the same camelCase alias (nicolas-grekas)
+
+### Filesystem
+
+ * security #ghsa-6prc-h956-hxjq [Filesystem] Only treat a valid URI scheme as the root of a path (nicolas-grekas)
+ * bug #67786 [Filesystem] Fix failure handling in remove() (nicolas-grekas)
+ * bug #67778 [Filesystem] Reserve temporary removal directories atomically (X-Coder264)
+
+### Finder
+
+ * bug #67785 [Finder] Fix Glob::toRegex() producing an invalid regex for bracket expressions containing a slash (0xABCD01)
+
+### Form
+
+ * bug #67776 [Form] Map data validation errors to the sibling form that has the field (nicolas-grekas)
+ * bug #67772 [Form] Keep validation errors on their originating form (X-Coder264)
+ * bug #67699 [Form] Validate the collection entries that keep_as_list doesn't need to renumber (BenMacha)
+ * bug #67731 [Form] Fix `allow_delete` removing collection entries submitted as null (nicolas-grekas)
+ * bug #67700 [Form] Ignore collection entries with invalid names when allow_add is enabled (BenMacha)
+ * bug #67702 [Form] Fix submitting "0" to a non-compound root form (BenMacha)
+ * bug #67713 [Form] Skip unsubmitted collection entries with `delete_empty` (nicolas-grekas)
+ * bug #67701 [Form] Fix the post_max_size check when it is set to a negative value (BenMacha)
+ * bug #67650 [Form] Preserve the Unix epoch in date string transformation (ahbaqdadi)
+ * minor #67795 [Form] Review Greek translations (sogav21)
+ * minor #67773 [Form] Review Croatian translations (HypeMC)
+ * minor #67674 [Form] Review Polish translations (lukaszkrakowiak)
+ * minor #67660 [Form] Review Japanese translations (OTA-EITA)
+ * minor #67623 [Form][Validator] Review Slovak (sk) translations (tito10047)
+ * minor #67642 [Form][Validator] Review and improve Chinese (zh_CN) translations (siganushka)
+ * minor #67635 [Form][Validator] Review and fix Luxembourgish (lb) translations (mweimerskirch)
+ * minor #67632 [Form] Fix Dutch translations for validators (mdalikadar)
+ * minor #67631 [Form] Fix Italian translations for validators (mdalikadar)
+ * minor #67626 [Form][Security][Validator] Review Vietnamese translations (HongTin2104)
+ * minor #67622 [Form][Validator] review translations for Ukrainian (uk) (qconer)
+ * minor #67627 [Form][Validator] Review translations for Chinese (zh_TW) (HsukqiLee)
+ * minor #67447 [Form] Review Turkish (tr) validator translations (erenbati)
+ * minor #67617 [Form][Validator] Review German translations (Rommmoa)
+
+### HtmlSanitizer
+
+ * security #ghsa-q8jq-xrf4-v5j8 [HtmlSanitizer] Apply the URL policy to srcset and imagesrcset (nicolas-grekas)
+ * security #cve-2026-118517 [HtmlSanitizer] Require special schemes and scheme-relative URLs to carry a non-empty authority (nicolas-grekas)
+ * security #ghsa-wm2w-4mgj-vw33 [HtmlSanitizer] Fix meta refresh URL sanitization bypass (nicolas-grekas)
+
+### HttpClient
+
+ * security #ghsa-c7hm-wqwp-f9v8 [HttpClient] Pin the IP of cached hosts in NoPrivateNetworkHttpClient (nicolas-grekas)
+ * security #ghsa-gq53-v8w2-gjhj [HttpClient] Don't send the options of the default scope to other origins in ScopingHttpClient (nicolas-grekas)
+ * bug #67619 [HttpClient] Let PHP destruct the response decorated by TraceableResponse (nicolas-grekas)
+ * bug #67612 [HttpClient] Fix AsyncResponse throwing a LogicException when it is canceled while streaming (nicolas-grekas)
+ * bug #67610 [HttpClient] Fix getContent() returning a truncated body when the response is canceled while it reads it (nicolas-grekas)
+ * bug #67599 [HttpClient] Fix reading a traced CurlResponse as a stream after its decorator is destructed (PhilETaylor)
+ * bug #67609 [HttpClient] Fix CurlHttpClient writing the body of a response to stdout when it is canceled during stream() (nicolas-grekas)
+ * bug #67605 [HttpClient] Fix clearing the DNS cache of pending requests when a traced response is destructed (nicolas-grekas)
+
+### HttpFoundation
+
+ * security #ghsa-xg2q-4rrq-657q [HttpFoundation] Split the private ranges usable as trusted proxies from the deny list of private subnets (nicolas-grekas)
+ * security #ghsa-xg2q-4rrq-657q [HttpFoundation] Add the list of private ranges usable as trusted proxies (nicolas-grekas)
+ * security #cve-2026-118514 [HttpFoundation] Match HEAD requests when GET is listed in a MethodRequestMatcher (nicolas-grekas)
+ * security #cve-2026-118514 [HttpFoundation] Match HEAD requests when GET is listed in a RequestMatcher (nicolas-grekas)
+ * security #ghsa-5mx8-mwrp-5693 [HttpFoundation] Don't let Request::getBaseUrl() start with a host chosen by the client (nicolas-grekas)
+ * security #ghsa-3h27-hjv7-fqjx [HttpFoundation] Don't match the script name in Request::getBaseUrl() when it's only the start of a path segment (jack-worman)
+ * bug #67829 [HttpFoundation] Fix Request::getBaseUrl() for a percent-encoded or wrong-case script name after a prefix, and behind an alias (jack-worman)
+ * bug #67826 [HttpFoundation] Don't use the script name as Request::getBaseUrl() when it's not in the URI path (jack-worman)
+ * bug #67804 [HttpFoundation] Don't match the script name in Request::getBaseUrl() when it's only the start of a path segment (jack-worman)
+ * bug #67814 [HttpFoundation] Fix UrlHelper for fragments behind a trusted X-Forwarded-Prefix and for an empty path (nicolas-grekas)
+ * bug #67800 [HttpFoundation] Preserve the base URL for query and fragment references (ahbaqdadi)
+ * minor #67760 [HttpFoundation][Lock][Semaphore] Do not expose the DSN in the exception thrown for unsupported connections (nicolas-grekas)
+ * minor #67746 [HttpFoundation] Mark the DSN and options of SessionHandlerFactory as #[\SensitiveParameter] (nicolas-grekas)
+
+### HttpKernel
+
+ * security #ghsa-hwfg-qwvh-2wfx [HttpKernel] Don't decode CSV and YAML payloads unless `acceptFormat` lists them (nicolas-grekas)
+ * security #ghsa-wg5q-m2ww-f3c9 [HttpKernel] Restore the router context of the parent request after a sub-request (nicolas-grekas)
+ * bug #67834 [HttpKernel] Accept only form, JSON and XML payloads in `#[MapRequestPayload]` unless `acceptFormat` lists other formats (nicolas-grekas)
+ * bug #67683 [HttpKernel] Compute #[Cache] durations without daylight saving time (nicolas-grekas)
+ * bug #67607 [HttpKernel] Fix searching profiles by status code 0 (chr-hertel)
+
+### JsonPath
+
+ * security #ghsa-cpww-5vpx-72x7 [JsonPath] Evaluate absolute queries in filters once per query instead of once per node (nicolas-grekas)
+ * security #ghsa-cpww-5vpx-72x7 [JsonPath] Parse filter expressions once per query instead of once per node (nicolas-grekas)
+ * security #ghsa-cpww-5vpx-72x7 [JsonPath] Bound the regex work of one find() call (nicolas-grekas)
+ * bug #67601 [JsonPath] Fix negative-step slices and reject invalid slices on objects (nicolas-grekas)
+ * bug #67595 [JsonPath] Fix open-ended slices in the path builder (shuvroroy)
+
+### Lock
+
+ * bug #67748 [Lock] Fix DynamoDbStore listing the values of unknown options instead of their names (nicolas-grekas)
+ * minor #67747 [Lock] Mark the options of DynamoDbStore as #[\SensitiveParameter] (nicolas-grekas)
+ * minor #67745 [Lock] Mark the DSNs and options of the DBAL and MongoDB stores as #[\SensitiveParameter] (nicolas-grekas)
+
+### Messenger
+
+ * bug #67792 [Messenger] Don't reuse a serialized body after replacing the message (dalerazimov)
+ * bug #67767 [Messenger] Fix the Redis transport throwing "Redis server went away" when connecting fails (nicolas-grekas)
+ * bug #67753 [Messenger] Treat Beanstalkd jobs that aren't Messenger envelopes as decoding failures (nicolas-grekas)
+ * bug #67719 [Messenger] Track keepalives independently for each received envelope (nicolas-grekas)
+ * bug #67712 [Messenger] Stop keeping alive the messages that a listener prevents the worker from handling (BenMacha)
+ * bug #67724 [Messenger] Fix Redis DSN credential decoding and exception traces (nicolas-grekas)
+ * bug #67711 [Messenger] Do not resend the stamp headers of a received AMQP message (BenMacha)
+ * bug #67709 [Messenger] Restore the schema assets filter when the Doctrine transport setup fails (BenMacha)
+ * bug #67710 [Messenger] Do not expose the Redis DSN in the invalid host query parameter exception (BenMacha)
+ * bug #67654 [Messenger] Wait for all batch handlers before acknowledging a message (andreybolonin)
+ * bug #67655 [Messenger] Retry the messages whose batch was flushed during a failed dispatch (nicolas-grekas)
+ * bug #67651 [Messenger] Let the worker flush the batches that contain a failed message (nicolas-grekas)
+ * bug #67647 [Messenger] Don't hide handler failures when a batch handler acks the same message (nicolas-grekas)
+ * bug #67643 [Messenger] Preserve handled stamps when a batch handler nacks (dalerazimov)
+ * minor #67771 [Messenger] Do not expose the DSN in the exception thrown when no transport supports it (nicolas-grekas)
+ * minor #67763 [Messenger] Treat encoded envelopes whose body or type isn't a string as decoding failures (nicolas-grekas)
+ * minor #67766 [Messenger] Ignore the "X-Symfony-Messenger" attribute of an SQS message when it isn't a JSON object (nicolas-grekas)
+ * minor #67764 [Messenger] Treat a body or header that isn't a string as a decoding failure in SigningSerializer (nicolas-grekas)
+ * minor #67754 [Messenger] Treat Redis stream entries that aren't Messenger envelopes as decoding failures (nicolas-grekas)
+ * minor #67739 [Messenger] Mark transport options as #[\SensitiveParameter] (nicolas-grekas)
+ * minor #67722 [Messenger] Ignore ids that are not integers when finding a message of the Doctrine transport (BenMacha)
+
+### Notifier
+
+ * minor #67761 [Notifier][Translation] Do not expose the DSN in the exception thrown when its password is missing (nicolas-grekas)
+
+### ObjectMapper
+
+ * bug #67820 [ObjectMapper] Skip readonly and asymmetric visibility target properties without a property accessor (nicolas-grekas)
+
+### PropertyAccess
+
+ * bug #67733 [PropertyAccess] Fix parsing type errors thrown by anonymous classes (nicolas-grekas)
+ * bug #67682 [PropertyAccess] Handle uninitialized properties of anonymous classes on PHP 8.6 (nicolas-grekas)
+
+### PropertyInfo
+
+ * bug #67788 [PropertyInfo] Don't turn intersection types into class names in PhpDocExtractor (nicolas-grekas)
+ * bug #67789 [PropertyInfo] Return `null` for docblock types the extractors can't resolve (nicolas-grekas)
+
+### RateLimiter
+
+ * bug #67705 [RateLimiter] Validate the refill amount, the fixed window interval and the sliding window limit (BenMacha)
+
+### Routing
+
+ * security #cve-2026-118516 [Routing] Prevent host placeholders from matching the path in compiled matchers (nicolas-grekas)
+
+### Runtime
+
+ * bug #67679 [Runtime] Terminate the kernel within the FrankenPHP request callback (pokorny344)
+
+### Security
+
+ * security #cve-2026-118513 [Security] Parse the DN into RDNs before extracting the user identifier (nicolas-grekas)
+ * security #ghsa-8f57-m8wj-x65w [Security] Run checkPostAuth() of user checkers on programmatic logins (nicolas-grekas)
+ * minor #67738 [Security] Fix `Voter` with anonymous classes and nested `supports()` calls (nicolas-grekas)
+ * minor #67707 [Security] Reject login links with an out of range "expires" parameter (BenMacha)
+ * minor #67708 [Security] Ignore target and failure paths that are neither paths nor absolute URLs (BenMacha)
+ * minor #67716 [Security] Reject malformed login link user identifiers (nicolas-grekas)
+ * minor #67706 [Security] Reject remember-me cookies with an invalid expiration time (BenMacha)
+
+### Serializer
+
+ * security #ghsa-hqp2-7rr8-hf26 [Serializer] Ignore undeclared property paths when denormalizing (nicolas-grekas)
+ * security #cve-2026-118515 [Serializer] Don't build UploadedFile and other file objects from denormalized data (nicolas-grekas)
+ * security #ghsa-pxj9-jh84-vhm5 [Serializer] Lowercase the scheme of data URIs before opening them (nicolas-grekas)
+ * bug #67752 [Serializer] Skip empty lines when decoding multi-column CSV documents (0xABCD01)
+ * bug #67665 [Serializer] Fix denormalizing a data URI ending with slashes to a File (ahmed-bhs)
+
+### Translation
+
+ * bug #67669 [Translation] Don't read provider responses as file paths (nicolas-grekas)
+ * minor #67625 [Translation] Reviewed the Danish translation in issue #65554 (mcardle)
+
+### TypeInfo
+
+ * bug #67793 [TypeInfo] Fix resolving unions and intersections that PHPStan accepts (paulferrett, nicolas-grekas)
+ * bug #67782 [TypeInfo] Leave out type aliases that cannot be resolved (paulferrett)
+
+### Validator
+
+ * security #ghsa-4qpf-57w4-m3wc [Validator] Reject non-public IP addresses in the no-priv, no-res and only-public modes (nicolas-grekas)
+ * bug #67787 [Validator] Only extract property types when auto-mapping applies (paulferrett)
+ * minor #67644 [Validator] Show the count in the word count messages of locales with a single plural form (nicolas-grekas)
+
+### WebProfilerBundle
+
+ * bug #67618 [WebProfilerBundle] Reset the CSP handler between requests (norkunas)
+ * bug #67620 [WebProfilerBundle] Reset the profiler Twig extension between requests (nicolas-grekas)
+ * bug #67606 [WebProfilerBundle] Return a 404 when opening the profiler file viewer without a file (kevinsleegerslameco, nicolas-grekas)
+
+### Yaml
+
+ * security #ghsa-hwfg-qwvh-2wfx [Yaml] Fix exponential and quadratic parse times (nicolas-grekas)
+ * security #ghsa-hwfg-qwvh-2wfx [Yaml] Fix quadratic parse times (nicolas-grekas)
+ * bug #67735 [Yaml] Strip the byte order mark at the start of a stream (0xABCD01)
+
+### Other
+
+ * bug #67614 Reject trailing newlines in Content-Disposition fallbacks (ahbaqdadi)
+ * minor #67675 translation: checked proposed serbian translations (Trysha-rbrn)
+ * minor #67676 review(translation): [#64516] reviewed and updated the translation (mikocevar)
+ * minor #67695 Allow symfony/mercure-bundle ^0.5 (DavidPrevot)
+ * minor #67649 Review translations for Estonian (et) (erkia)
+
 ## 7.4.22 (2026-10-28)
 
 ### AssetMapper

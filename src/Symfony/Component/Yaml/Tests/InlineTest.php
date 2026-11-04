@@ -166,6 +166,26 @@ class InlineTest extends TestCase
         Inline::parse('[foo] bar');
     }
 
+    public function testParseLargeCollections()
+    {
+        $this->assertSame(array_fill(0, 50000, 'a'), Inline::parse('['.str_repeat('"a", ', 49999).'"a"]'));
+        $this->assertSame(array_fill(0, 50000, 'a'), Inline::parse('['.str_repeat('a, ', 49999).'a]'));
+
+        $mapping = [];
+        for ($i = 0; $i < 50000; ++$i) {
+            $mapping['k'.$i] = 'v';
+        }
+        $this->assertSame($mapping, Inline::parse(json_encode($mapping)));
+    }
+
+    public function testQuotedScalarFollowedByUnexpectedCharactersInSequence()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unexpected characters ( b]) at line 1 (near "[\'a\' b]").');
+
+        Inline::parse("['a' b]");
+    }
+
     public function testParseInvalidSequenceShouldThrowException()
     {
         $this->expectException(ParseException::class);

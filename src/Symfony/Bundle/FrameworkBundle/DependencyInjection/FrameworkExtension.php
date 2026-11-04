@@ -2995,7 +2995,8 @@ class FrameworkExtension extends Extension
             }
 
             if ($this->readConfigEnabled('http_client.scoped_clients.'.$name.'.caching', $container, $cachingOptions)) {
-                $this->registerCachingHttpClient($cachingOptions, $scopeConfig, $name, $container);
+                // ScopingHttpClient applies the options of the scope, and only to the URLs in the scope
+                $this->registerCachingHttpClient($cachingOptions, [], $name, $container);
             }
 
             if (null !== $rateLimiter) {

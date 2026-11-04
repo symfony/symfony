@@ -576,6 +576,82 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider provideMetaRefreshContent
+     */
+    public function testMetaRefreshContentGrammar(string $content, string $expected)
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowStaticElements()
+            ->allowLinkHosts(['trusted.example'])
+        ;
+
+        $this->assertSame(
+            $expected,
+            (new HtmlSanitizer($config))->sanitizeFor('head', '<meta http-equiv="refresh" content="'.$content.'">')
+        );
+    }
+
+    public static function provideMetaRefreshContent(): iterable
+    {
+        yield 'canonical' => ['0;url=https://evil.example/', '<meta http-equiv="refresh" />'];
+        yield 'whitespace separator' => ['0 url=https://evil.example/', '<meta http-equiv="refresh" />'];
+        yield 'no url keyword' => ['0;https://evil.example/', '<meta http-equiv="refresh" />'];
+        yield 'whitespace around comma' => ['9 , https://evil.example/', '<meta http-equiv="refresh" />'];
+        yield 'comma separator' => ['0,https://evil.example/', '<meta http-equiv="refresh" />'];
+        yield 'fractional time' => ['.5;url=https://evil.example/', '<meta http-equiv="refresh" />'];
+        yield 'incomplete url keyword' => ['0;uhttps://evil.example/', '<meta http-equiv="refresh" />'];
+        yield 'quoted url' => ['0;url=&#039;https://evil.example/&#039;', '<meta http-equiv="refresh" />'];
+        yield 'unparsable directive' => ['0:https://evil.example/', '<meta http-equiv="refresh" />'];
+        yield 'vertical tab in the url keyword' => ["0;url\x0B=https://trusted.example/x", '<meta http-equiv="refresh" />'];
+        yield 'vertical tab as separator' => ["0\x0Bhttps://trusted.example/x", '<meta http-equiv="refresh" />'];
+
+        yield 'allowed host' => [
+            '0;url=https://trusted.example/x',
+            '<meta http-equiv="refresh" content="0;url&#61;https://trusted.example/x" />',
+        ];
+        yield 'allowed host without url keyword' => [
+            '9 , https://trusted.example/x',
+            '<meta http-equiv="refresh" content="9 , https://trusted.example/x" />',
+        ];
+        yield 'long trailing whitespace' => [
+            '0;url=https://trusted.example/x'.str_repeat(' ', 2000).'y',
+            '<meta http-equiv="refresh" content="0;url&#61;https://trusted.example/x'.str_repeat('%20', 2000).'y" />',
+        ];
+        yield 'reload' => ['5', '<meta http-equiv="refresh" content="5" />'];
+        yield 'reload with an empty url' => ['0;url&#61;', '<meta http-equiv="refresh" content="0;url&#61;" />'];
+        yield 'reload with an empty quoted url' => [
+            '0;url&#61;&#039;&#039;',
+            '<meta http-equiv="refresh" content="0;url&#61;&#039;&#039;" />',
+        ];
+        yield 'not a refresh directive' => ['some text', '<meta http-equiv="refresh" content="some text" />'];
+    }
+
+    /**
+     * An incomplete "url=" keyword is part of the URL rather than a keyword, so the
+     * browser navigates to a relative URL that allowRelativeLinks() opts into.
+     */
+    public function testMetaRefreshIncompleteUrlKeyword()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowStaticElements()
+            ->allowLinkHosts(['trusted.example'])
+            ->allowRelativeLinks()
+        ;
+
+        foreach (['0;u//evil.example/', '0;ur//evil.example/', '0;url//evil.example/'] as $content) {
+            $this->assertSame(
+                '<meta http-equiv="refresh" content="'.$content.'" />',
+                (new HtmlSanitizer($config))->sanitizeFor('head', '<meta http-equiv="refresh" content="'.$content.'">')
+            );
+        }
+
+        $this->assertSame(
+            '<meta http-equiv="refresh" />',
+            (new HtmlSanitizer($config))->sanitizeFor('head', '<meta http-equiv="refresh" content="0;url=https://evil.example/">')
+        );
+    }
+
     public function testCustomAttributeSanitizer()
     {
         $config = (new HtmlSanitizerConfig())

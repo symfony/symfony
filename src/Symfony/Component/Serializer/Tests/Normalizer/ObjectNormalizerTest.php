@@ -946,6 +946,50 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $obj);
     }
+
+    public function testDenormalizeWithPropertyPathAndWithoutGroups()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping-without-groups.yaml'));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $dummy = new ObjectOuter();
+        $dummy->setInner(new ObjectInner());
+
+        $obj = $normalizer->denormalize(['inner_foo' => 'foo'], ObjectOuter::class, 'json', [
+            'object_to_populate' => $dummy,
+        ]);
+
+        $this->assertSame('foo', $obj->getInner()->foo);
+    }
+
+    public function testDenormalizeIgnoresUndeclaredPropertyPath()
+    {
+        $normalizer = new ObjectNormalizer();
+
+        $dummy = new ObjectOuter();
+        $dummy->setInner(new ObjectInner());
+
+        $obj = $normalizer->denormalize(['inner.foo' => 'foo'], ObjectOuter::class, 'json', [
+            'object_to_populate' => $dummy,
+        ]);
+
+        $this->assertNull($obj->getInner()->foo);
+    }
+
+    public function testDenormalizeIgnoresUndeclaredPropertyPathWithClassMetadata()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping.yaml'));
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+
+        $dummy = new ObjectOuter();
+        $dummy->setInner(new ObjectInner());
+
+        $obj = $normalizer->denormalize(['inner.bar' => 'bar'], ObjectOuter::class, 'json', [
+            'object_to_populate' => $dummy,
+        ]);
+
+        $this->assertNull($obj->getInner()->bar);
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy

@@ -220,7 +220,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
         }
 
-        if (!$attribute->acceptFormat && \in_array($format, ['csv', 'yaml'], true)) {
+        if (!$attribute->acceptFormat && !\in_array($format, ['form', 'json', 'xml'], true)) {
             throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, "%s" must be explicitly listed in "acceptFormat".', $format));
         }
 

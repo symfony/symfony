@@ -52,7 +52,13 @@ final class UrlSanitizer
             return null;
         }
 
-        if (false !== strpbrk($input, '\\') || preg_match('~^(?:https?|ftp|wss?):(/[^/]|///)~i', $input)) {
+        // Schemes that browsers parse per WHATWG, where the authority is optional
+        // and the number of slashes is not significant, must carry exactly the two
+        // slashes RFC 3986 requires; otherwise the host seen by the browser is not
+        // the host this sanitizer checks against the allowed hosts. The same holds
+        // for scheme-relative URLs: "///host" is a path for RFC 3986 but an
+        // authority for browsers.
+        if (false !== strpbrk($input, '\\') || preg_match('~^(?:https?|ftp|wss?):(?!//[^/])|^///~i', $input)) {
             return null;
         }
 
@@ -87,13 +93,20 @@ final class UrlSanitizer
 
         // If the scheme used is not supposed to have a host, do not check the host
         if (!self::isHostlessScheme($url['scheme'])) {
-            // No host and relative not allowed
-            if (!$allowRelative && !$url['host']) {
+            // An empty authority is never a valid destination, and rebuilding the URL
+            // around it changes the number of slashes in front of the path, which
+            // browsers would then read as an authority
+            if ('' === $url['host']) {
+                return null;
+            }
+
+            // No host and relative not allowed; "0" is a host, not a missing one
+            if (!$allowRelative && null === $url['host']) {
                 return null;
             }
 
             // Forbidden host
-            if ($url['host'] && null !== $allowedHosts && !self::isAllowedHost($url['host'], $allowedHosts)) {
+            if (null !== $url['host'] && null !== $allowedHosts && !self::isAllowedHost($url['host'], $allowedHosts)) {
                 return null;
             }
         }

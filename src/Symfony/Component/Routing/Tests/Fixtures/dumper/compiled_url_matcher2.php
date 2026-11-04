@@ -57,20 +57,20 @@ return [
                     .'|(*:287)'
                 .')'
                 .'|/aba/([^/]++)(*:309)'
-            .')|(?i:([^\\.]++)\\.example\\.com)\\.(?'
+            .')|(?=(?i:(?:[^\\.]++)\\.example\\.com)\\.)(?=[^/]*+(.*+))(?i:([^\\.]++)\\.example\\.com)\\.(?=\\1)(?'
                 .'|/route1(?'
-                    .'|3/([^/]++)(*:371)'
-                    .'|4/([^/]++)(*:389)'
+                    .'|3/([^/]++)(*:428)'
+                    .'|4/([^/]++)(*:446)'
                 .')'
             .')|(?i:c\\.example\\.com)\\.(?'
-                .'|/route15/([^/]++)(*:441)'
+                .'|/route15/([^/]++)(*:498)'
             .')|(?:(?:[^./]*+\\.)++)(?'
-                .'|/route16/([^/]++)(*:489)'
+                .'|/route16/([^/]++)(*:546)'
                 .'|/a/(?'
-                    .'|a\\.\\.\\.(*:510)'
+                    .'|a\\.\\.\\.(*:567)'
                     .'|b/(?'
-                        .'|([^/]++)(*:531)'
-                        .'|c/([^/]++)(*:549)'
+                        .'|([^/]++)(*:588)'
+                        .'|c/([^/]++)(*:606)'
                     .')'
                 .')'
             .')'
@@ -95,13 +95,13 @@ return [
         279 => [[['_route' => 'foo3'], ['_locale', 'foo'], null, null, false, true, null]],
         287 => [[['_route' => 'bar3'], ['_locale', 'bar'], null, null, false, true, null]],
         309 => [[['_route' => 'foo4'], ['foo'], null, null, false, true, null]],
-        371 => [[['_route' => 'route13'], ['var1', 'name'], null, null, false, true, null]],
-        389 => [[['_route' => 'route14', 'var1' => 'val'], ['var1', 'name'], null, null, false, true, null]],
-        441 => [[['_route' => 'route15'], ['name'], null, null, false, true, null]],
-        489 => [[['_route' => 'route16', 'var1' => 'val'], ['name'], null, null, false, true, null]],
-        510 => [[['_route' => 'a'], [], null, null, false, false, null]],
-        531 => [[['_route' => 'b'], ['var'], null, null, false, true, null]],
-        549 => [
+        428 => [[['_route' => 'route13'], ['var1', 'var1', 'name'], null, null, false, true, null]],
+        446 => [[['_route' => 'route14', 'var1' => 'val'], ['var1', 'var1', 'name'], null, null, false, true, null]],
+        498 => [[['_route' => 'route15'], ['name'], null, null, false, true, null]],
+        546 => [[['_route' => 'route16', 'var1' => 'val'], ['name'], null, null, false, true, null]],
+        567 => [[['_route' => 'a'], [], null, null, false, false, null]],
+        588 => [[['_route' => 'b'], ['var'], null, null, false, true, null]],
+        606 => [
             [['_route' => 'c'], ['var'], null, null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],

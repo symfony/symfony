@@ -331,6 +331,29 @@ class RouterListenerTest extends TestCase
         $this->assertStringContainsString('Welcome', $response->getContent());
     }
 
+    public function testRoutingContextOfTheParentIsRestoredAfterNestedMainRequest()
+    {
+        $context = new RequestContext();
+        $matcher = $this->createStub(UrlMatcherInterface::class);
+        $matcher->method('getContext')->willReturn($context);
+
+        $requestStack = new RequestStack();
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new RouterListener($matcher, $requestStack, $context));
+        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
+
+        $request = Request::create('http://example.com/');
+        $request->attributes->set('_controller', function () use ($kernel, $context) {
+            $nestedRequest = Request::create('https://example.org/');
+            $nestedRequest->attributes->set('_controller', function () { return new Response(); });
+            $kernel->handle($nestedRequest);
+
+            return new Response($context->getScheme().'://'.$context->getHost());
+        });
+
+        $this->assertSame('http://example.com', $kernel->handle($request)->getContent());
+    }
+
     public function testRequestWithBadHost()
     {
         $kernel = $this->createStub(HttpKernelInterface::class);

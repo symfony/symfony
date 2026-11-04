@@ -22,6 +22,7 @@ use Symfony\Component\JsonPath\JsonCrawlerInterface;
 use Symfony\Component\JsonPath\JsonPath;
 use Symfony\Component\JsonPath\JsonPathCrawler;
 use Symfony\Component\JsonPath\JsonPathCrawlerInterface;
+use Symfony\Component\JsonPath\Tests\Fixtures\CountingStream;
 
 class JsonCrawlerTest extends TestCase
 {
@@ -603,16 +604,54 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sayings of the Century', $result[0]['title']);
     }
 
-    public function testSearchFunctionDoesNotHangOnPathologicalRegex()
+    public function testSearchFunctionFailsClosedOnPathologicalRegex()
     {
         $crawler = new JsonCrawler(json_encode(['items' => [str_repeat('a', 40).'!']]));
 
-        $start = microtime(true);
-        $result = $crawler->find('$.items[?search(@, "(a+)+$")]');
-        $elapsed = microtime(true) - $start;
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('Error while crawling JSON with JSON path "(a+)+$": the regular expression needs more backtracking than allowed.');
 
-        $this->assertSame([], $result);
-        $this->assertLessThan(1.0, $elapsed, 'ReDoS pattern must not stall preg_match');
+        $crawler->find('$.items[?search(@, "(a+)+$")]');
+    }
+
+    public function testSearchFunctionIsBoundedOnLongStrings()
+    {
+        // this pattern stays under the backtracking limit at every starting position, but PCRE
+        // restarts its counter at each of them, so the cost is paid once per character
+        $crawler = new JsonCrawler(json_encode(['items' => [str_repeat('a', 100000)]]));
+
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the regular expression needs more backtracking than allowed');
+
+        $crawler->find('$.items[?search(@, "(a?){11}[^a]")]');
+    }
+
+    public function testSearchFunctionAcceptsLongStrings()
+    {
+        $crawler = new JsonCrawler(json_encode(['items' => [str_repeat('lorem ipsum ', 600000)]]));
+
+        $this->assertSame([], $crawler->find('$.items[?search(@, "foo")]'));
+    }
+
+    public function testRegexBudgetIsSharedByAllTheCallsOfOneQuery()
+    {
+        $crawler = new JsonCrawler(json_encode(['items' => array_fill(0, 100, str_repeat('lorem ipsum ', 2520))]));
+        $query = '$.items[?'.implode(' || ', array_fill(0, 10, 'search(@, "zz")')).']';
+
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the regular expression needs more backtracking than allowed');
+
+        $crawler->find($query);
+    }
+
+    public function testExistenceTestFailsClosedOnPathologicalRegex()
+    {
+        $crawler = new JsonCrawler(json_encode(['items' => [1, 2], 'data' => [str_repeat('a', 40).'!']]));
+
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the regular expression needs more backtracking than allowed');
+
+        $crawler->find('$.items[?$.data[?search(@, "(a+)+$")]]');
     }
 
     public function testDeeplyNestedFilterExpressionIsRejected()
@@ -623,6 +662,25 @@ class JsonCrawlerTest extends TestCase
         $this->expectExceptionMessage('filter expression is too long or too deeply nested');
 
         (new JsonCrawler('[1]'))->find('$[?'.str_repeat('!', 1000).'@.a]');
+    }
+
+    #[DataProvider('provideLongFilterExpressions')]
+    public function testLongFilterExpressionsAreEvaluatedCorrectly(string $path, array $expected)
+    {
+        $crawler = new JsonCrawler('{"items": [{"x": 1}, {"x": 2}, {"x": 3}]}');
+
+        $this->assertSame($expected, $crawler->find($path));
+    }
+
+    public static function provideLongFilterExpressions(): iterable
+    {
+        $chain = static fn (string $clause, string $operator) => implode($operator, array_fill(0, 100, $clause));
+
+        yield 'conjunction' => ['$.items[?'.$chain('@.x == 1', ' && ').']', [['x' => 1]]];
+        yield 'disjunction' => ['$.items[?'.$chain('@.x == 1', ' || ').']', [['x' => 1]]];
+        yield 'negated conjunction' => ['$.items[?'.$chain('!(@.x == 1)', ' && ').']', [['x' => 2], ['x' => 3]]];
+        yield 'parenthesized conjunction' => ['$.items[?'.$chain('(@.x < 3)', ' && ').']', [['x' => 1], ['x' => 2]]];
+        yield 'function calls' => ['$.items[?'.$chain('length(@) == 1', ' && ').']', [['x' => 1], ['x' => 2], ['x' => 3]]];
     }
 
     public function testDeepExpressionInFilter()
@@ -812,6 +870,92 @@ class JsonCrawlerTest extends TestCase
 
         $this->assertSame([['a' => 1, 'b' => ['a' => 1]]], $crawler->find('$[?count(@..a) == 2]'));
         $this->assertSame([['a' => 1, 'b' => ['a' => 1]]], $crawler->find('$[?(count(@[*]) == 2)]'));
+    }
+
+    #[DataProvider('provideAbsoluteQueriesInFilters')]
+    public function testAbsoluteQueryInFilter(string $path, array $expected)
+    {
+        // longer than the chunks a stream is read by, with most members queried in the first one
+        $json = json_encode([
+            'target' => 250,
+            'max' => 3,
+            'tag' => 't12',
+            'items' => array_map(static fn (int $i) => ['id' => $i, 'tag' => 't'.$i], range(0, 499)),
+            'total' => 500,
+        ]);
+
+        $this->assertSame($expected, (new JsonCrawler($json))->find($path));
+        $this->assertSame($expected, (new JsonCrawler(self::createStream($json)))->find($path));
+    }
+
+    public static function provideAbsoluteQueriesInFilters(): iterable
+    {
+        yield 'no filter' => ['$.target', [250]];
+        yield 'comparison' => ['$.items[?@.id == $.target].tag', ['t250']];
+        yield 'comparison with the absolute query first' => ['$.items[?$.max > @.id].id', [0, 1, 2]];
+        yield 'existence' => ['$.items[?$.max && @.id < 2].id', [0, 1]];
+        yield 'existence of nothing' => ['$.items[?$.missing].id', []];
+        yield 'existence of an invalid selector' => ['$.items[?$.items[01]].id', []];
+        yield 'existence of a non-singular query' => ['$.items[?$..id && @.id < 2].id', [0, 1]];
+        yield 'match()' => ['$.items[?match(@.tag, $.tag)].id', [12]];
+        yield 'search()' => ['$.items[?search(@.tag, $.tag)].id', [12, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129]];
+        yield 'length()' => ['$.items[?length($.items) == $.total && @.id < 2].id', [0, 1]];
+        yield 'two spellings of the same large node' => ['$.items[?@.id < 2 && length($.items) == $.total && length($["items"]) == $.total].id', [0, 1]];
+        yield 'count() of a non-singular query' => ['$.items[?count($..tag) == 501 && @.id < 2].id', [0, 1]];
+        yield 'value()' => ['$.items[?value($.target) == @.id].id', [250]];
+        yield 'nested filter' => ['$.items[?$.items[?@.id == $.target] && @.id < 2].id', [0, 1]];
+    }
+
+    public function testNonSingularAbsoluteQueryInComparisonThrows()
+    {
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('Error while crawling JSON with JSON path "$..id": non-singular query is not comparable.');
+
+        (new JsonCrawler('{"items": [{"id": 1}, {"id": 2}]}'))->find('$.items[?@.id == $..id, 0]');
+    }
+
+    public function testAbsoluteQueryInFilterIsEvaluatedByEachFind()
+    {
+        $resource = self::createStream('{"target": 1, "items": [{"id": 1}, {"id": 2}]}');
+        $crawler = new JsonCrawler($resource);
+
+        $this->assertSame([['id' => 1]], $crawler->find('$.items[?@.id == $.target]'));
+
+        rewind($resource);
+        fwrite($resource, '{"target": 2, "items": [{"id": 1}, {"id": 2}]}');
+
+        $this->assertSame([['id' => 2]], $crawler->find('$.items[?@.id == $.target]'));
+    }
+
+    public function testAbsoluteQueryInFilterDoesNotReadTheStreamForEachNode()
+    {
+        CountingStream::$data = $json = json_encode(['target' => 1, 'items' => array_fill(0, 100, ['id' => 1])]);
+        CountingStream::$bytesRead = 0;
+
+        stream_wrapper_register('jsonpath-counting', CountingStream::class);
+        try {
+            $result = (new JsonCrawler(fopen('jsonpath-counting://', 'r')))->find('$.items[?@.id == $.target]');
+        } finally {
+            stream_wrapper_unregister('jsonpath-counting');
+        }
+
+        $this->assertCount(100, $result);
+        // one scan to locate the items, one read of them, one read of the whole document for $.target,
+        // and one more scan with the JsonStreamer of 8.2
+        $this->assertLessThanOrEqual(5 * \strlen($json), CountingStream::$bytesRead);
+    }
+
+    public function testAbsoluteQueriesInFilterKeepAtMostAsManyValuesAsTheDocument()
+    {
+        // commas inside a string are not values
+        $crawler = new JsonCrawler(json_encode(['pad' => str_repeat(',', 200000), 'items' => array_fill(0, 1000, ['a' => 1]), 'x' => [1]]));
+        $query = '$.x[?'.implode(' && ', array_map(static fn (int $i) => 'length($['.str_repeat(' ', $i).'"items"]) == 1000', range(0, 49))).']';
+
+        memory_reset_peak_usage();
+        $memory = memory_get_usage();
+
+        $this->assertSame([1], $crawler->find($query));
+        $this->assertLessThan(8 * 1024 * 1024, memory_get_peak_usage() - $memory);
     }
 
     public function testAcceptsJsonPath()
@@ -1131,5 +1275,17 @@ class JsonCrawlerTest extends TestCase
         ];
 
         return new JsonCrawler(json_encode($json));
+    }
+
+    /**
+     * @return resource
+     */
+    private static function createStream(string $json): mixed
+    {
+        $resource = fopen('php://memory', 'r+');
+        fwrite($resource, $json);
+        rewind($resource);
+
+        return $resource;
     }
 }

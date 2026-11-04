@@ -88,6 +88,7 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface
                 throw $e;
             }
 
+            $requestOptions = $options;
             $defaultOptions = $this->defaultOptionsByRegexp[$this->defaultRegexp];
             $options = self::mergeDefaultOptions($options, $defaultOptions, true);
             if (\is_string($options['base_uri'] ?? null)) {
@@ -95,6 +96,13 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface
                 $resolved = true;
             }
             $url = implode('', self::resolveUrl($url, $options['base_uri'] ?? null, $defaultOptions['query'] ?? []));
+
+            // A network-path reference can point outside of the base URI's authority: the options of the default scope must not follow it
+            $resolvedUrl = self::parseUrl($url);
+            if ($resolvedUrl['scheme'].$resolvedUrl['authority'] !== $options['base_uri']['scheme'].$options['base_uri']['authority']) {
+                $options = $requestOptions;
+                $e = null;
+            }
         }
 
         if ($resolved) {

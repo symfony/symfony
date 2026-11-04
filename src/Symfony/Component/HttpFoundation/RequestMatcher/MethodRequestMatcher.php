@@ -33,6 +33,11 @@ class MethodRequestMatcher implements RequestMatcherInterface
     public function __construct(array|string $methods)
     {
         $this->methods = array_reduce(array_map('strtoupper', (array) $methods), static fn (array $methods, string $method) => array_merge($methods, preg_split('/\s*,\s*/', $method)), []);
+
+        // HEAD requests are served by the GET handler, as the router does
+        if (\in_array('GET', $this->methods, true) && !\in_array('HEAD', $this->methods, true)) {
+            $this->methods[] = 'HEAD';
+        }
     }
 
     public function matches(Request $request): bool

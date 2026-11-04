@@ -183,4 +183,97 @@ class ScopingHttpClientTest extends TestCase
 
         $this->assertSame([[]], $inner->resets);
     }
+
+    #[DataProvider('provideUrlsOnTheBaseUriOrigin')]
+    public function testForBaseUriAppliesOptionsOnTheBaseUriOrigin(string $url, string $expectedUrl)
+    {
+        $client = ScopingHttpClient::forBaseUri(new MockHttpClient(null, null), 'https://safe.example/api/', [
+            'auth_bearer' => 'scope-secret',
+            'headers' => ['X-Api-Key' => 'scope-secret'],
+            'local_cert' => '/scope/client.pem',
+        ]);
+
+        $response = $client->request('GET', $url);
+        $requestOptions = $response->getRequestOptions();
+
+        $this->assertSame($expectedUrl, $response->getInfo('url'));
+        $this->assertContains('Authorization: Bearer scope-secret', $requestOptions['headers']);
+        $this->assertContains('X-Api-Key: scope-secret', $requestOptions['headers']);
+        $this->assertSame('/scope/client.pem', $requestOptions['local_cert']);
+    }
+
+    public static function provideUrlsOnTheBaseUriOrigin(): iterable
+    {
+        yield 'relative path' => ['users/1', 'https://safe.example/api/users/1'];
+        yield 'absolute path outside the base path' => ['/outside-scope', 'https://safe.example/outside-scope'];
+        yield 'dot segments outside the base path' => ['../escape', 'https://safe.example/escape'];
+        yield 'network-path reference' => ['//safe.example/api/users/1', 'https://safe.example/api/users/1'];
+        yield 'network-path reference with the default port' => ['//safe.example:443/api/users/1', 'https://safe.example/api/users/1'];
+        yield 'network-path reference with an uppercase host' => ['//SAFE.Example/api/users/1', 'https://safe.example/api/users/1'];
+        yield 'absolute URL' => ['https://safe.example/api/users/1', 'https://safe.example/api/users/1'];
+    }
+
+    #[DataProvider('provideUrlsOutsideTheBaseUriOrigin')]
+    public function testForBaseUriDoesNotApplyOptionsOutsideTheBaseUriOrigin(string $url, string $expectedUrl)
+    {
+        $client = ScopingHttpClient::forBaseUri(new MockHttpClient(null, null), 'https://safe.example/api/', [
+            'auth_bearer' => 'scope-secret',
+            'headers' => ['X-Api-Key' => 'scope-secret'],
+            'local_cert' => '/scope/client.pem',
+        ]);
+
+        $response = $client->request('GET', $url);
+        $requestOptions = $response->getRequestOptions();
+
+        $this->assertSame($expectedUrl, $response->getInfo('url'));
+        $this->assertNotContains('Authorization: Bearer scope-secret', $requestOptions['headers']);
+        $this->assertNotContains('X-Api-Key: scope-secret', $requestOptions['headers']);
+        $this->assertNull($requestOptions['local_cert'] ?? null);
+    }
+
+    public static function provideUrlsOutsideTheBaseUriOrigin(): iterable
+    {
+        yield 'absolute URL' => ['https://evil.example/steal', 'https://evil.example/steal'];
+        yield 'network-path reference' => ['//evil.example/steal', 'https://evil.example/steal'];
+        yield 'network-path reference with userinfo naming the base host' => ['//safe.example@evil.example/steal', 'https://safe.example@evil.example/steal'];
+        yield 'network-path reference with another port' => ['//safe.example:8443/api/users/1', 'https://safe.example:8443/api/users/1'];
+        yield 'network-path reference with the default port of another scheme' => ['//safe.example:80/api/users/1', 'https://safe.example:80/api/users/1'];
+        yield 'network-path reference with userinfo' => ['//user@safe.example/api/users/1', 'https://user@safe.example/api/users/1'];
+    }
+
+    public function testNetworkPathReferenceGetsTheOptionsOfTheScopeItResolvesTo()
+    {
+        $client = new ScopingHttpClient(new MockHttpClient(), [
+            'https://safe\.example/' => [
+                'base_uri' => 'https://safe.example/api/',
+                'auth_bearer' => 'safe-secret',
+                'headers' => ['X-Api-Key' => 'safe-secret'],
+            ],
+            'https://other\.example/' => [
+                'auth_bearer' => 'other-secret',
+            ],
+        ], 'https://safe\.example/');
+
+        $response = $client->request('GET', '//other.example/users/1');
+        $requestOptions = $response->getRequestOptions();
+
+        $this->assertSame('https://other.example/users/1', $response->getInfo('url'));
+        $this->assertContains('Authorization: Bearer other-secret', $requestOptions['headers']);
+        $this->assertNotContains('X-Api-Key: safe-secret', $requestOptions['headers']);
+    }
+
+    public function testNetworkPathReferenceGetsTheDefaultOptionsWhenTheDefaultRegexpMatches()
+    {
+        $client = new ScopingHttpClient(new MockHttpClient(), [
+            'https://(safe|mirror)\.example/' => [
+                'base_uri' => 'https://safe.example/api/',
+                'auth_bearer' => 'safe-secret',
+            ],
+        ], 'https://(safe|mirror)\.example/');
+
+        $response = $client->request('GET', '//mirror.example/api/users/1');
+
+        $this->assertSame('https://mirror.example/api/users/1', $response->getInfo('url'));
+        $this->assertContains('Authorization: Bearer safe-secret', $response->getRequestOptions()['headers']);
+    }
 }

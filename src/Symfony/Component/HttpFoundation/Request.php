@@ -674,7 +674,7 @@ class Request
      *
      * You should only list the reverse proxies that you manage directly.
      *
-     * @param array                          $proxies          A list of trusted proxies, the string 'REMOTE_ADDR' will be replaced with $_SERVER['REMOTE_ADDR'] and 'PRIVATE_SUBNETS' by IpUtils::PRIVATE_SUBNETS
+     * @param array                          $proxies          A list of trusted proxies, the string 'REMOTE_ADDR' will be replaced with $_SERVER['REMOTE_ADDR'], and 'private_ranges' or 'PRIVATE_SUBNETS' by IpUtils::PRIVATE_RANGES
      * @param int-mask-of<Request::HEADER_*> $trustedHeaderSet A bit field to set which headers to trust from your proxies
      */
     public static function setTrustedProxies(array $proxies, int $trustedHeaderSet): void
@@ -690,7 +690,7 @@ class Request
 
         if (false !== ($i = array_search('PRIVATE_SUBNETS', $proxies, true)) || false !== ($i = array_search('private_ranges', $proxies, true))) {
             unset($proxies[$i]);
-            $proxies = array_merge($proxies, IpUtils::PRIVATE_SUBNETS);
+            $proxies = array_merge($proxies, IpUtils::PRIVATE_RANGES);
         }
 
         self::$trustedProxies = $proxies;
@@ -2026,6 +2026,11 @@ class Request
         $requestUri = $this->getRequestUri();
         if ('' !== $requestUri && '/' !== $requestUri[0]) {
             $requestUri = '/'.$requestUri;
+        }
+
+        if (str_starts_with($requestUri, '//') || str_starts_with($requestUri, '/\\')) {
+            // the URI starts with a host that the client chose: URLs built on it would point there
+            return '';
         }
 
         if ($baseUrl && (null !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) && \in_array($requestUri[\strlen($prefix)] ?? '', ['', '/', '?'], true)) {

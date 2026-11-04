@@ -85,9 +85,20 @@ final class DataUriNormalizer implements NormalizerInterface, DenormalizerInterf
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): \SplFileInfo
     {
-        if (null === $data || !preg_match('/^data:([a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}\/[a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}(;[a-z0-9\-]+\=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9\!\$\&\\\'\,\(\)\*\+\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
+        if ($data instanceof \SplFileInfo && $data instanceof $type) {
+            return $data;
+        }
+
+        if (!isset(self::SUPPORTED_TYPES[$type]) && is_a($type, \SplFileInfo::class, true)) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Data expected to be an instance of "%s" ("%s" given).', $type, get_debug_type($data)), $data, [$type], $context['deserialization_path'] ?? null, true);
+        }
+
+        if (!\is_string($data) || !preg_match('/^data:([a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}\/[a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}(;[a-z0-9\-]+\=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9\!\$\&\\\'\,\(\)\*\+\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
             throw NotNormalizableValueException::createForUnexpectedDataType('The provided "data:" URI is not valid.', $data, ['string'], $context['deserialization_path'] ?? null, true);
         }
+
+        // PHP opens a "data:" URI as a local path when its scheme is not lowercase
+        $data = 'data:'.substr($data, 5);
 
         try {
             switch ($type) {
@@ -117,7 +128,7 @@ final class DataUriNormalizer implements NormalizerInterface, DenormalizerInterf
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return isset(self::SUPPORTED_TYPES[$type]);
+        return isset(self::SUPPORTED_TYPES[$type]) || is_a($type, \SplFileInfo::class, true);
     }
 
     /**

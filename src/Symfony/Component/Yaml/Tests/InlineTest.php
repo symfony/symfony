@@ -78,6 +78,7 @@ class InlineTest extends TestCase
             ['{ !php/const PHP_INT_MAX: foo }', [\PHP_INT_MAX => 'foo']],
             ['!php/const NULL', null],
             ['{ !php/const Symfony\Component\Yaml\Yaml::PARSE_CONSTANT: foo }', [Yaml::PARSE_CONSTANT => 'foo']],
+            ['[ foo: [ bar: baz, !php/const PHP_INT_MAX: qux ] ]', [['foo' => [['bar' => 'baz'], [\PHP_INT_MAX => 'qux']]]]],
         ];
     }
 
@@ -223,6 +224,18 @@ class InlineTest extends TestCase
         Inline::parse('[foo] bar');
     }
 
+    public function testParseLargeCollections()
+    {
+        $this->assertSame(array_fill(0, 50000, 'a'), Inline::parse('['.str_repeat('"a", ', 49999).'"a"]'));
+        $this->assertSame(array_fill(0, 50000, 'a'), Inline::parse('['.str_repeat('a, ', 49999).'a]'));
+
+        $mapping = [];
+        for ($i = 0; $i < 50000; ++$i) {
+            $mapping['k'.$i] = 'v';
+        }
+        $this->assertSame($mapping, Inline::parse(json_encode($mapping)));
+    }
+
     public function testParseInvalidSequenceShouldThrowException()
     {
         $this->expectException(ParseException::class);
@@ -235,6 +248,23 @@ class InlineTest extends TestCase
         $this->expectExceptionMessageMatches('/Duplicate key "bar" detected/');
 
         Inline::parse('[ foo: { bar: 1, bar: 2 } ]');
+    }
+
+    public function testParseDeeplyNestedEmbeddedMappings()
+    {
+        $expected = [['a' => 'x'], 'x'];
+        for ($i = 1; $i < 30; ++$i) {
+            $expected = [['a' => $expected]];
+        }
+
+        $this->assertSame($expected, Inline::parse(str_repeat('[a: ', 30).'x, x'.str_repeat(']', 30)));
+    }
+
+    public function testParseInvalidDeeplyNestedEmbeddedMappingsShouldThrowException()
+    {
+        $this->expectException(ParseException::class);
+
+        Inline::parse('![a'.str_repeat(':[a: {]', 30).str_repeat(']', 60));
     }
 
     public function testParseInvalidTaggedSequenceShouldThrowException()
@@ -266,6 +296,7 @@ class InlineTest extends TestCase
             'list-in-list' => ['[[ *var ]]', [['var-value']]],
             'map-in-list' => ['[ { key: *var } ]', [['key' => 'var-value']]],
             'embedded-mapping-in-list' => ['[ key: *var ]', [['key' => 'var-value']]],
+            'nested-embedded-mapping-in-list' => ['[ key: [ key: *var ] ]', [['key' => [['key' => 'var-value']]]]],
             'map' => ['{ key: *var }', ['key' => 'var-value']],
             'list-in-map' => ['{ key: [*var] }', ['key' => ['var-value']]],
             'map-in-map' => ['{ foo: { bar: *var } }', ['foo' => ['bar' => 'var-value']]],
@@ -431,6 +462,13 @@ class InlineTest extends TestCase
             ['[ foo: { bar: [ \'foobar\', 12 ] } ]', [['foo' => ['bar' => ['foobar', 12]]]]],
             ['[ foo: { bar: \'foobar\', baz: false } ]', [['foo' => ['bar' => 'foobar', 'baz' => false]]]],
             ['[ foo: { bar: [ \'foobar\', 12 ], baz: true } ]', [['foo' => ['bar' => ['foobar', 12], 'baz' => true]]]],
+            ['[ foo: [ bar, \'baz, qux\' ], baz: ~ ]', [['foo' => ['bar', 'baz, qux']], ['baz' => null]]],
+            ['[ foo: [ bar, ~ ] ]', [['foo' => ['bar', null]]]],
+            ['[ foo: { bar: "baz, ]" }, qux ]', [['foo' => ['bar' => 'baz, ]']], 'qux']],
+            ['[ foo: [ "bar, ]", \'baz, ]\', qux"quux\'s ] ]', [['foo' => ['bar, ]', 'baz, ]', 'qux"quux\'s']]]],
+            ['[ foo: [ \'bar\'\'s, baz\', "qux\\", quux" ] ]', [['foo' => ["bar's, baz", 'qux", quux']]]],
+            ['[ foo: [ bar: &anchor baz ], qux: *anchor ]', [['foo' => [['bar' => 'baz']]], ['qux' => 'baz']]],
+            ['[ foo: [ '.str_repeat('bar:', 150).'baz"qux ] ]', [['foo' => [str_repeat('bar:', 150).'baz"qux']]]],
 
             // Binary string not utf8-compliant but starting with and utf8-equivalent "&" character
             ['{ uid: !!binary Ju0Yh+uqSXOagJZFTlUt8g== }', ['uid' => hex2bin('26ed1887ebaa49739a8096454e552df2')]],

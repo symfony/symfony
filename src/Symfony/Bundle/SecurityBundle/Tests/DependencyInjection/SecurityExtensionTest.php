@@ -42,6 +42,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -1052,6 +1053,53 @@ class SecurityExtensionTest extends TestCase
         $this->expectExceptionMessage('The "route" option should not be specified alongside "attributes._route" option. Use just one of the options.');
 
         $container->compile();
+    }
+
+    public function testAccessControlRuleRestrictedToGetAppliesToHeadRequests()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'main' => ['pattern' => '^/', 'http_basic' => []],
+            ],
+            'access_control' => [
+                ['path' => '^/admin', 'roles' => 'ROLE_ADMIN', 'methods' => ['GET']],
+                ['path' => '^/upload', 'roles' => 'ROLE_USER', 'methods' => ['POST']],
+            ],
+        ]);
+        $container->compile();
+
+        [$adminRule, $uploadRule] = $container->getDefinition('security.access_map')->getMethodCalls();
+
+        $matcher = $this->createRequestMatcher($container, $adminRule[1][0]);
+        $this->assertTrue($matcher->matches(Request::create('/admin', 'GET')));
+        $this->assertTrue($matcher->matches(Request::create('/admin', 'HEAD')));
+
+        $matcher = $this->createRequestMatcher($container, $uploadRule[1][0]);
+        $this->assertFalse($matcher->matches(Request::create('/upload', 'HEAD')));
+        $this->assertTrue($matcher->matches(Request::create('/upload', 'POST')));
+    }
+
+    private function createRequestMatcher(ContainerBuilder $container, $reference): RequestMatcherInterface
+    {
+        $definition = $container->getDefinition((string) $reference);
+        $class = $definition->getClass();
+        $arguments = [];
+
+        foreach ($definition->getArguments() as $argument) {
+            if (\is_array($argument)) {
+                $argument = array_map(fn ($child) => $child instanceof Reference ? $this->createRequestMatcher($container, $child) : $child, $argument);
+            } elseif ($argument instanceof Reference) {
+                $argument = $this->createRequestMatcher($container, $argument);
+            }
+
+            $arguments[] = $argument;
+        }
+
+        return new $class(...$arguments);
     }
 
     public function testRegisterTheUserProviderAlias()

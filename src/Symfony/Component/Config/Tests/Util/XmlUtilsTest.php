@@ -14,6 +14,7 @@ namespace Symfony\Component\Config\Tests\Util;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Util\Exception\InvalidXmlException;
+use Symfony\Component\Config\Util\Exception\XmlParsingException;
 use Symfony\Component\Config\Util\XmlUtils;
 
 class XmlUtilsTest extends TestCase
@@ -222,6 +223,31 @@ class XmlUtilsTest extends TestCase
 
         // should not throw an exception
         XmlUtils::loadFile(__DIR__.'/../Fixtures/Util/valid.xml', __DIR__.'/../Fixtures/Util/schema.xsd');
+    }
+
+    public function testParseDoesNotResolveExternalEntities()
+    {
+        // the target is not well-formed on its own, so expanding it would abort the parsing
+        $target = __DIR__.'/../Fixtures/Util/invalid.xml';
+        $parts = explode('/', ltrim(str_replace('\\', '/', $target), '/'));
+        $drive = '\\' === \DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
+        $uri = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
+        $content = '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "'.$uri.'">]><root>&xxe;</root>';
+
+        $internalErrors = libxml_use_internal_errors(true);
+
+        try {
+            XmlUtils::parse($content);
+            $this->fail('An exception should have been raised.');
+        } catch (XmlParsingException $e) {
+            // the document is rejected for carrying a doctype, not for failing DTD validation,
+            // which means the doctype was never processed and the entity was never resolved
+            $this->assertSame('Document types are not allowed.', $e->getMessage());
+            $this->assertTrue(!libxml_get_errors(), 'The external entity should not have been resolved.');
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($internalErrors);
+        }
     }
 }
 

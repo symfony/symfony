@@ -172,6 +172,11 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
             }
         }
 
+        if ($this->isPropertyPath($attribute)) {
+            // a property path is writable only when the class metadata declares it as an attribute
+            return $this->classMetadataFactory && isset($this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata()[$attribute]);
+        }
+
         $context = array_intersect_key($context, ['enable_getter_setter_extraction' => true, 'enable_magic_methods_extraction' => true, 'enable_constructor_extraction' => true, 'enable_adder_remover_extraction' => true]);
         $cacheKey = $class.'::'.$attribute.hash('xxh128', serialize($context));
 
@@ -180,8 +185,8 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
         }
 
         // constructor parameters can be set when instantiating, even when property info reports them as not writable
-        if ($this->isPropertyPath($attribute)
-            || (($context['enable_constructor_extraction'] ?? true) && $this->isConstructorParameter($class, $attribute))
+        if (
+            (($context['enable_constructor_extraction'] ?? true) && $this->isConstructorParameter($class, $attribute))
             || $this->propertyInfoExtractor->isWritable($class, $attribute, $context)
         ) {
             return self::$isWritableCache[$cacheKey] = true;

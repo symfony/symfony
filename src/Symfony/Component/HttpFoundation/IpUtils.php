@@ -18,6 +18,13 @@ namespace Symfony\Component\HttpFoundation;
  */
 class IpUtils
 {
+    /**
+     * Ranges that a server must not connect to: the private networks, plus the documentation, benchmarking
+     * and other special-purpose ranges listed below. This is a deny list for outgoing requests, so it also
+     * covers the IPv6 prefixes that embed an IPv4 address (IPv4-mapped, IPv4-compatible, 6to4, Teredo,
+     * NAT64). A remote client can present such an address as its own, so this list must not serve as an
+     * allow list of trusted proxies: use PRIVATE_RANGES for that.
+     */
     public const PRIVATE_SUBNETS = [
         '127.0.0.0/8',     // RFC1700 (Loopback)
         '10.0.0.0/8',      // RFC1918
@@ -50,6 +57,25 @@ class IpUtils
         'ff00::/8',        // RFC4291 (IPv6 multicast)
     ];
 
+    /**
+     * Ranges reserved for private networks, which a reverse proxy in front of the application can live in.
+     *
+     * Unlike PRIVATE_SUBNETS, this list holds no prefix that a remote client can present as its own address,
+     * so it can serve as an allow list, as Request::setTrustedProxies() does for "private_ranges".
+     * An IPv4-mapped IPv6 address is matched as the IPv4 host it embeds.
+     */
+    public const PRIVATE_RANGES = [
+        '127.0.0.0/8',    // RFC1700 (Loopback)
+        '10.0.0.0/8',     // RFC1918
+        '172.16.0.0/12',  // RFC1918
+        '192.168.0.0/16', // RFC1918
+        '169.254.0.0/16', // RFC3927
+        '100.64.0.0/10',  // RFC6598
+        '::1/128',        // Loopback
+        'fc00::/7',       // Unique Local Address
+        'fe80::/10',      // Link Local Address
+    ];
+
     private static array $checkedIps = [];
 
     /**
@@ -71,9 +97,19 @@ class IpUtils
         }
 
         $method = substr_count($requestIp, ':') > 1 ? 'checkIp6' : 'checkIp4';
+        $embeddedIp4 = null;
+
+        // An IPv4-mapped IPv6 address is the address of an IPv4 host, so it is also checked against IPv4 subnets as that host
+        if ('checkIp6' === $method && filter_var($requestIp, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6) && false !== ($packed = @inet_pton($requestIp)) && 16 === \strlen($packed) && "\0\0\0\0\0\0\0\0\0\0\xFF\xFF" === substr($packed, 0, 12)) {
+            $embeddedIp4 = inet_ntop(substr($packed, 12));
+        }
 
         foreach ($ips as $ip) {
             if (self::$method($requestIp, $ip)) {
+                return true;
+            }
+
+            if (null !== $embeddedIp4 && !str_contains($ip, ':') && self::checkIp4($embeddedIp4, $ip)) {
                 return true;
             }
         }

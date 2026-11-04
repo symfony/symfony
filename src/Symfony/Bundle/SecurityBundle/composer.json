@@ -25,7 +25,7 @@
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/event-dispatcher": "^8.2",
         "symfony/http-kernel": "^7.4|^8.0",
-        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4.23|^8.1.11",
         "symfony/password-hasher": "^7.4|^8.0",
         "symfony/security-core": "^8.2",
         "symfony/security-csrf": "^8.2",

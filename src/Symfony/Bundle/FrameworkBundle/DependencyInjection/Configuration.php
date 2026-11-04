@@ -105,7 +105,7 @@ class Configuration implements ConfigurationInterface
                 ->variableNode('trusted_proxies')
                     ->beforeNormalization()
                         ->ifTrue(static fn ($v) => 'private_ranges' === $v || 'PRIVATE_SUBNETS' === $v)
-                        ->then(static fn () => IpUtils::PRIVATE_SUBNETS)
+                        ->then(static fn () => IpUtils::PRIVATE_RANGES)
                     ->end()
                     ->defaultValue(['%env(default::SYMFONY_TRUSTED_PROXIES)%'])
                 ->end()

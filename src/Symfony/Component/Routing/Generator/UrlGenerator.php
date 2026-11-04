@@ -277,6 +277,23 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                         return '';
                     }
 
+                    // characters that are forbidden in a host, or that IDNA maps to ".", can change which host the URL points to
+                    // only IPv6 literals like "[::1]" can contain some of them
+                    $value = $mergedParams[$token[3]] ?? '';
+                    if (preg_match('/[\x00-\x20#%\/:<>?@\[\\\\\]^|\x7F]|\xE3\x80\x82|\xEF\xBC\x8E|\xEF\xBD\xA1/', $value) && !(str_starts_with($value, '[') && str_ends_with($value, ']') && filter_var(substr($value, 1, -1), \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6))) {
+                        $message = 'Parameter "{parameter}" for route "{route}" must not contain characters that are forbidden in a host ("{given}" given) to generate a corresponding URL.';
+
+                        if ($this->strictRequirements) {
+                            throw new InvalidParameterException(strtr($message, ['{parameter}' => $token[3], '{route}' => $name, '{given}' => $mergedParams[$token[3]]]));
+                        }
+
+                        if ($this->logger) {
+                            $this->logger->error($message, ['parameter' => $token[3], 'route' => $name, 'given' => $mergedParams[$token[3]]]);
+                        }
+
+                        return '';
+                    }
+
                     $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;
                 } else {
                     $routeHost = $token[1].$routeHost;

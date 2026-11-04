@@ -617,6 +617,25 @@ class JsonCrawlerTest extends TestCase
         (new JsonCrawler('[1]'))->find('$[?'.str_repeat('!', 1000).'@.a]');
     }
 
+    #[DataProvider('provideLongFilterExpressions')]
+    public function testLongFilterExpressionsAreEvaluatedCorrectly(string $path, array $expected)
+    {
+        $crawler = new JsonCrawler('{"items": [{"x": 1}, {"x": 2}, {"x": 3}]}');
+
+        $this->assertSame($expected, $crawler->find($path));
+    }
+
+    public static function provideLongFilterExpressions(): iterable
+    {
+        $chain = static fn (string $clause, string $operator) => implode($operator, array_fill(0, 100, $clause));
+
+        yield 'conjunction' => ['$.items[?'.$chain('@.x == 1', ' && ').']', [['x' => 1]]];
+        yield 'disjunction' => ['$.items[?'.$chain('@.x == 1', ' || ').']', [['x' => 1]]];
+        yield 'negated conjunction' => ['$.items[?'.$chain('!(@.x == 1)', ' && ').']', [['x' => 2], ['x' => 3]]];
+        yield 'parenthesized conjunction' => ['$.items[?'.$chain('(@.x < 3)', ' && ').']', [['x' => 1], ['x' => 2]]];
+        yield 'function calls' => ['$.items[?'.$chain('length(@) == 1', ' && ').']', [['x' => 1], ['x' => 2], ['x' => 3]]];
+    }
+
     public function testDeepExpressionInFilter()
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?(@.publisher.address.city == "Springfield")]');

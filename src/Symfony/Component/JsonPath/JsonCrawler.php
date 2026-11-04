@@ -48,6 +48,7 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private const MAX_FILTER_EXPRESSION_LENGTH = 10000;
     private const MAX_FILTER_EXPRESSION_DEPTH = 100;
+    private const MAX_PARSED_FILTER_EXPRESSIONS = 64;
 
     /**
      * Comparison operators and their corresponding lengths.
@@ -62,6 +63,13 @@ final class JsonCrawler implements JsonCrawlerInterface
     ];
 
     private int $regexBudget = self::REGEX_WORK_BUDGET;
+
+    /**
+     * Filter expressions parsed so far, so that a filter applied to many nodes is parsed once.
+     *
+     * @var array<string, array{expression: array, validated: bool}>
+     */
+    private array $parsedFilterExpressions = [];
 
     /**
      * @param resource|string $raw
@@ -382,7 +390,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 $part = trim($part);
 
                 if (preg_match('/^\?(.*)$/', $part, $matches)) {
-                    $result = array_merge($result, $this->evaluateFilter(trim($matches[1]), $value));
+                    $result = array_merge($result, $this->evaluateFilter($this->getParsedFilterExpression(trim($matches[1])), $value));
 
                     continue;
                 }
@@ -413,9 +421,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 $filterExpr = "($filterExpr)";
             }
 
-            $this->validateFilterExpression($filterExpr);
-
-            return $this->evaluateFilter($filterExpr, $value);
+            return $this->evaluateFilter($this->getParsedFilterExpression($filterExpr, true), $value);
         }
 
         // comma-separated values, e.g. `['key1', 'key2', 123]` or `[0, 1, 'key']`
@@ -520,7 +526,10 @@ final class JsonCrawler implements JsonCrawlerInterface
         throw new InvalidJsonPathException(\sprintf('Unsupported bracket expression "%s".', $expr));
     }
 
-    private function evaluateFilter(string $expr, mixed $value): array
+    /**
+     * @param array $expr An expression parsed by self::parseFilterExpression()
+     */
+    private function evaluateFilter(array $expr, mixed $value): array
     {
         if (!$this->isArrayOrObject($value)) {
             return [];
@@ -536,32 +545,71 @@ final class JsonCrawler implements JsonCrawlerInterface
         return $result;
     }
 
-    private function evaluateFilterExpression(string $expr, mixed $context, int $depth = 0): bool
+    private function getParsedFilterExpression(string $expr, bool $validate = false): array
+    {
+        if (!isset($this->parsedFilterExpressions[$expr])) {
+            if (self::MAX_PARSED_FILTER_EXPRESSIONS <= \count($this->parsedFilterExpressions)) {
+                $this->parsedFilterExpressions = [];
+            }
+
+            $this->parsedFilterExpressions[$expr] = ['expression' => $this->parseFilterExpression($expr), 'validated' => false];
+        }
+
+        if ($validate && !$this->parsedFilterExpressions[$expr]['validated']) {
+            $this->validateFilterExpression($expr);
+            $this->parsedFilterExpressions[$expr]['validated'] = true;
+        }
+
+        return $this->parsedFilterExpressions[$expr]['expression'];
+    }
+
+    /**
+     * Splits a filter expression into a tree of logical operations, leaving the operands as they
+     * are. Everything this does depends on the expression only, never on the node being filtered.
+     */
+    private function parseFilterExpression(string $expr, int $depth = 0): array
     {
         $expr = JsonPathUtils::normalizeWhitespace($expr);
 
         if ($depth > self::MAX_FILTER_EXPRESSION_DEPTH || \strlen($expr) > self::MAX_FILTER_EXPRESSION_LENGTH) {
-            throw new JsonCrawlerException($expr, 'filter expression is too long or too deeply nested');
+            // reported when the node is reached, so that a branch that is never evaluated stays silent
+            return ['type' => 'too-complex', 'operand' => $expr];
         }
 
         $expr = $this->stripWrappingParentheses($expr);
 
         // logical operators bind less tightly than the negation
         if ($logicalOp = $this->findRightmostLogicalOperator($expr)) {
-            $left = trim(substr($expr, 0, $logicalOp['position']));
-            $right = trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator'])));
-
-            if ('||' === $logicalOp['operator']) {
-                return $this->evaluateFilterExpression($left, $context, $depth + 1) || $this->evaluateFilterExpression($right, $context, $depth + 1);
-            }
-
-            return $this->evaluateFilterExpression($left, $context, $depth + 1) && $this->evaluateFilterExpression($right, $context, $depth + 1);
+            return [
+                'type' => '||' === $logicalOp['operator'] ? 'or' : 'and',
+                'left' => $this->parseFilterExpression(trim(substr($expr, 0, $logicalOp['position'])), $depth + 1),
+                'right' => $this->parseFilterExpression(trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator']))), $depth + 1),
+            ];
         }
 
         if (str_starts_with($expr, '!')) {
-            return !$this->evaluateFilterExpression(trim(substr($expr, 1)), $context, $depth + 1);
+            return ['type' => 'not', 'operand' => $this->parseFilterExpression(trim(substr($expr, 1)), $depth + 1)];
         }
 
+        return ['type' => 'operand', 'operand' => $expr];
+    }
+
+    /**
+     * @param array $expr An expression parsed by self::parseFilterExpression()
+     */
+    private function evaluateFilterExpression(array $expr, mixed $context): bool
+    {
+        return match ($expr['type']) {
+            'and' => $this->evaluateFilterExpression($expr['left'], $context) && $this->evaluateFilterExpression($expr['right'], $context),
+            'or' => $this->evaluateFilterExpression($expr['left'], $context) || $this->evaluateFilterExpression($expr['right'], $context),
+            'not' => !$this->evaluateFilterExpression($expr['operand'], $context),
+            'too-complex' => throw new JsonCrawlerException($expr['operand'], 'filter expression is too long or too deeply nested'),
+            default => $this->evaluateFilterOperand($expr['operand'], $context),
+        };
+    }
+
+    private function evaluateFilterOperand(string $expr, mixed $context): bool
+    {
         foreach (self::COMPARISON_OPERATORS as $op => $len) {
             if (str_contains($expr, $op)) {
                 if (false === $opPos = $this->findOperatorPosition($expr, $op)) {

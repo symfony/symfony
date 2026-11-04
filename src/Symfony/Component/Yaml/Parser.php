@@ -29,7 +29,8 @@ class Parser
     public const DEFAULT_MAX_NESTING_LEVEL = 128;
     public const DEFAULT_MAX_ALIASES_FOR_COLLECTIONS = 128;
 
-    // nested blocks that have a longer run of empty or comment lines are read in place instead of being copied at each nesting level
+    // nested blocks that have more bytes, or a longer run of empty or comment lines, are read in place instead of being copied at each nesting level
+    private const MAX_COPIED_BYTES = 8192;
     private const MAX_COPIED_EMPTY_LINES = 8;
 
     private $filename;
@@ -655,8 +656,8 @@ class Parser
     /**
      * Returns the next embed block of YAML.
      *
-     * A block that contains many empty or comment lines is returned as an array
-     * that describes the lines to read in place.
+     * A long block, or a block that contains many empty or comment lines, is
+     * returned as an array that describes the lines to read in place.
      *
      * @param int|null $indentation The indent level at which the block is to be read, or null for default
      * @param bool     $inSequence  True if the enclosing data structure is a sequence
@@ -784,11 +785,13 @@ class Parser
             }
         }
 
-        if ($inPlace) {
+        $block = implode("\n", $data);
+
+        if ($inPlace || self::MAX_COPIED_BYTES < \strlen($block)) {
             return $this->createBlock($firstLineNumber, $this->currentLineNb, $newIndent ?? 0, $data[0]);
         }
 
-        return implode("\n", $data);
+        return $block;
     }
 
     /**

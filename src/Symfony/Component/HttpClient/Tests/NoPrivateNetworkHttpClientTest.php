@@ -157,6 +157,29 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         }
     }
 
+    /**
+     * @group dns-sensitive
+     */
+    public function testCachedHostIsResolvedToTheCheckedIp()
+    {
+        DnsMock::withMockedHosts(['example.com' => [['type' => 'A', 'ip' => '104.26.14.6']]]);
+
+        $resolved = [];
+        $client = new NoPrivateNetworkHttpClient(new MockHttpClient(function (string $method, string $url, array $options) use (&$resolved) {
+            $resolved[] = $options['resolve'] ?? [];
+
+            return new MockResponse('foo', ['primary_ip' => '104.26.14.6']);
+        }));
+
+        $client->request('GET', 'http://example.com/')->getContent();
+
+        DnsMock::withMockedHosts(['example.com' => [['type' => 'A', 'ip' => '127.0.0.1']]]);
+
+        $client->request('GET', 'http://example.com/')->getContent();
+
+        $this->assertSame([['example.com' => '104.26.14.6'], ['example.com' => '104.26.14.6']], $resolved);
+    }
+
     public function testCustomOnProgressCallback()
     {
         $ipAddr = '104.26.14.6';

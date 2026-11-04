@@ -16,14 +16,20 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -226,6 +232,56 @@ class InlineFragmentRendererTest extends TestCase
         $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest));
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_IF_MODIFIED_SINCE' => 'Fri, 01 Jan 2016 00:00:00 GMT', 'HTTP_IF_NONE_MATCH' => '*']);
         $strategy->render('/', $request);
+    }
+
+    public function testRoutingContextOfTheParentIgnoresUntrustedHeadersAfterSubRequest()
+    {
+        $context = new RequestContext();
+        $matcher = $this->createStub(UrlMatcherInterface::class);
+        $matcher->method('getContext')->willReturn($context);
+        $matcher->method('match')->willReturn(['_controller' => function () { return new Response('fragment'); }]);
+
+        $requestStack = new RequestStack();
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new RouterListener($matcher, $requestStack, $context));
+        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
+        $renderer = new InlineFragmentRenderer($kernel);
+
+        $request = Request::create('http://example.com/', 'GET', [], [], [], ['REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_HOST' => 'evil.example', 'HTTP_X_FORWARDED_PROTO' => 'https']);
+        $request->attributes->set('_controller', function () use ($renderer, $request, $context) {
+            $renderer->render('/fragment', $request);
+
+            return new Response($context->getScheme().'://'.$context->getHost());
+        });
+
+        $this->assertSame('http://example.com', $kernel->handle($request)->getContent());
+    }
+
+    public function testRoutingContextOfTheParentIgnoresUntrustedHeadersAfterSubRequestAnsweredBeforeRouting()
+    {
+        $context = new RequestContext();
+        $matcher = $this->createStub(UrlMatcherInterface::class);
+        $matcher->method('getContext')->willReturn($context);
+
+        $requestStack = new RequestStack();
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new RouterListener($matcher, $requestStack, $context));
+        $dispatcher->addListener(KernelEvents::REQUEST, function (RequestEvent $event) {
+            if (!$event->isMainRequest()) {
+                $event->setResponse(new Response('fragment'));
+            }
+        }, 64);
+        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
+        $renderer = new InlineFragmentRenderer($kernel);
+
+        $request = Request::create('http://example.com/', 'GET', [], [], [], ['REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_HOST' => 'evil.example', 'HTTP_X_FORWARDED_PROTO' => 'https']);
+        $request->attributes->set('_controller', function () use ($renderer, $request, $context) {
+            $renderer->render('/fragment', $request);
+
+            return new Response($context->getScheme().'://'.$context->getHost());
+        });
+
+        $this->assertSame('http://example.com', $kernel->handle($request)->getContent());
     }
 
     public function testFirstTrustedProxyIsSetAsRemote()

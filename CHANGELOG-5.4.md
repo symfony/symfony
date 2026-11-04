@@ -7,6 +7,60 @@ in 5.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.4.0...v5.4.1
 
+## 5.4.56 (2026-11-04)
+
+### Config
+
+ * security #ghsa-5jff-8h8q-r5qx [Config] Do not validate XML documents on parse (nicolas-grekas)
+
+### Filesystem
+
+ * security #ghsa-6prc-h956-hxjq [Filesystem] Only treat a valid URI scheme as the root of a path (nicolas-grekas)
+
+### HttpClient
+
+ * security #ghsa-c7hm-wqwp-f9v8 [HttpClient] Pin the IP of cached hosts in NoPrivateNetworkHttpClient (nicolas-grekas)
+ * security #ghsa-gq53-v8w2-gjhj [HttpClient] Don't send the options of the default scope to other origins in ScopingHttpClient (nicolas-grekas)
+
+### HttpFoundation
+
+ * security #cve-2026-118514 [HttpFoundation] Match HEAD requests when GET is listed in a RequestMatcher (nicolas-grekas)
+ * security #ghsa-5mx8-mwrp-5693 [HttpFoundation] Don't let Request::getBaseUrl() start with a host chosen by the client (nicolas-grekas)
+ * security #ghsa-3h27-hjv7-fqjx [HttpFoundation] Don't match the script name in Request::getBaseUrl() when it's only the start of a path segment (jack-worman)
+ * bug #67826 [HttpFoundation] Don't use the script name as Request::getBaseUrl() when it's not in the URI path (jack-worman)
+ * bug #67804 [HttpFoundation] Don't match the script name in Request::getBaseUrl() when it's only the start of a path segment (jack-worman)
+
+### HttpKernel
+
+ * security #ghsa-wg5q-m2ww-f3c9 [HttpKernel] Restore the router context of the parent request after a sub-request (nicolas-grekas)
+
+### Routing
+
+ * security #cve-2026-118516 [Routing] Prevent host placeholders from matching the path in compiled matchers (nicolas-grekas)
+
+### Security
+
+ * security #ghsa-8f57-m8wj-x65w [Security] Run checkPostAuth() of user checkers on programmatic logins (nicolas-grekas)
+ * security #cve-2026-118513 [Security] Parse the DN into RDNs before extracting the user identifier (nicolas-grekas)
+
+### Serializer
+
+ * security #ghsa-hqp2-7rr8-hf26 [Serializer] Ignore undeclared property paths when denormalizing (nicolas-grekas)
+ * security #ghsa-pxj9-jh84-vhm5 [Serializer] Lowercase the scheme of data URIs before opening them (nicolas-grekas)
+ * security #cve-2026-118515 [Serializer] Don't build UploadedFile and other file objects from denormalized data (nicolas-grekas)
+
+### Translation
+
+ * bug #67669 [Translation] Don't read provider responses as file paths (nicolas-grekas)
+
+### Validator
+
+ * security #ghsa-4qpf-57w4-m3wc [Validator] Reject non-public IP addresses in the no-priv, no-res and only-public modes (nicolas-grekas)
+
+### Yaml
+
+ * security #ghsa-hwfg-qwvh-2wfx [Yaml] Fix quadratic parse times (nicolas-grekas)
+
 ## 5.4.55 (2026-10-28)
 
 ### Console

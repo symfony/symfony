@@ -89,6 +89,7 @@ class IpUtilsTest extends TestCase
             [false, '}__test|O:21:&quot;JDatabaseDriverMysqli&quot;:3:{s:2', '::1'],
             [false, '2a01:198:603:0:396e:4789:8e99:890f', 'unknown'],
             [false, '', '::1'],
+            [false, "::1\0", '::1/128'],
             [false, '127.0.0.1', '::1'],
             [false, '0.0.0.0/8', '::1'],
             [false,  '::1', '127.0.0.1'],
@@ -194,6 +195,29 @@ class IpUtilsTest extends TestCase
             [true, '1.2.3.4', '0.0.0.0/0'],
             [true, '1.2.3.4', '192.168.1.0/0'],
             [false, '1.2.3.4', '256.256.256/0'], // invalid CIDR notation
+        ];
+    }
+
+    /**
+     * @dataProvider getIpv4MappedData
+     */
+    public function testIpv4MappedAddressesAreCheckedAsTheIpv4HostTheyEmbed(bool $matches, string $remoteAddr, string $cidr)
+    {
+        $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
+    }
+
+    public static function getIpv4MappedData(): array
+    {
+        return [
+            [true, '::ffff:10.0.0.5', '10.0.0.0/8'],
+            [true, '::ffff:a00:5', '10.0.0.0/8'],
+            [true, '::ffff:127.0.0.1', '127.0.0.1'],
+            [true, '::ffff:10.0.0.5', '::ffff:10.0.0.0/104'],
+            [false, '::ffff:8.8.8.8', '10.0.0.0/8'],
+            [false, '::10.0.0.5', '10.0.0.0/8'],
+            [false, '2002:a00:5::', '10.0.0.0/8'],
+            [false, '10.0.0.5', '::ffff:10.0.0.0/104'],
+            [false, "::ffff:10.0.0.5\0", '10.0.0.0/8'],
         ];
     }
 }

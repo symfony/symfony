@@ -95,6 +95,12 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
 
         $this->client = $client;
         $this->subnets = null !== $subnets ? (array) $subnets : null;
+
+        if (\FILTER_FLAG_IPV6 === $ipFlags) {
+            // Block IPv4-mapped addresses too, since they reach IPv4 hosts
+            $this->subnets[] = '::ffff:0:0/96';
+        }
+
         $this->ipFlags = $ipFlags;
         $this->dnsCache = new \ArrayObject();
     }

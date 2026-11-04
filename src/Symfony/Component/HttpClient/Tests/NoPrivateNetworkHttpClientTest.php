@@ -55,9 +55,12 @@ class NoPrivateNetworkHttpClientTest extends TestCase
             ['10.0.0.1',    '10.0.0.1',    true],
             ['fc00::1',     'fc00::1/120', true],
             ['fc00::1',     'fc00::1',     true],
+            ['::ffff:127.0.0.1', ['127.0.0.0/8', '::1/128'], true],
+            ['::ffff:7f00:1',    ['127.0.0.0/8', '::1/128'], true],
 
             ['172.16.0.1',  ['10.0.0.0/8', '192.168.0.0/16'], false],
             ['fc00::1',     ['fe80::/10', '::ffff:0:0/96'],   false],
+            ['::ffff:172.16.0.1', ['127.0.0.0/8', '::1/128'], false],
 
             // public
             ['104.26.14.6',            null,                false],
@@ -81,6 +84,8 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         // weird scenarios (e.g.: when trying to match ipv4 address on ipv6 subnet)
         yield ['10.0.0.1', 'fc00::/7',   true];
         yield ['fc00::1',  '10.0.0.0/8', true];
+        yield ['::ffff:10.0.0.1',    'fc00::/7',              true];
+        yield ['::ffff:104.26.14.6', ['fc00::/7', '::1/128'], true];
     }
 
     /**
@@ -178,6 +183,29 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $client->request('GET', 'http://example.com/')->getContent();
 
         $this->assertSame([['example.com' => '104.26.14.6'], ['example.com' => '104.26.14.6']], $resolved);
+    }
+
+    /**
+     * @dataProvider getIpv4MappedRequestData
+     */
+    public function testIpv4MappedAddressIsCheckedAgainstCustomIpv4Subnets(string $url, array $options, string $message)
+    {
+        $client = new NoPrivateNetworkHttpClient(new MockHttpClient([
+            new MockResponse('', ['http_code' => 302, 'redirect_url' => 'http://[::ffff:127.0.0.1]/']),
+            new MockResponse('internal'),
+        ]), ['10.0.0.0/8', '127.0.0.0/8', 'fc00::/7', '::1/128']);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage($message);
+
+        $client->request('GET', $url, $options)->getContent();
+    }
+
+    public static function getIpv4MappedRequestData(): iterable
+    {
+        yield 'url' => ['http://[::ffff:127.0.0.1]/', [], 'Host "[::ffff:127.0.0.1]" is blocked for "http://[::ffff:127.0.0.1]/".'];
+        yield 'resolve option' => ['http://example.com/', ['resolve' => ['example.com' => '::ffff:127.0.0.1']], 'Host "example.com" is blocked for "http://example.com/".'];
+        yield 'redirect' => ['http://104.26.14.6/', [], 'Host "[::ffff:127.0.0.1]" is blocked for "http://[::ffff:127.0.0.1]/".'];
     }
 
     public function testCustomOnProgressCallback()

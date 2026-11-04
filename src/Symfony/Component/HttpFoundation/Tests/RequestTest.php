@@ -1083,6 +1083,10 @@ class RequestTest extends TestCase
             [['88.88.88.88'],              '127.0.0.1',                '88.88.88.88',               ['127.0.0.1', '88.88.88.88']],
             // forwarded for with remote IPv4 range trusted
             [['88.88.88.88'],              '123.45.67.89',             '88.88.88.88',               ['123.45.67.0/24']],
+            // forwarded for with remote IPv4-mapped addr in a trusted IPv4 range
+            [['88.88.88.88'],              '::ffff:123.45.67.89',      '88.88.88.88',               ['123.45.67.0/24']],
+            // forwarded for with remote IPv4-mapped addr out of the trusted IPv4 range
+            [['::ffff:123.45.68.89'],      '::ffff:123.45.68.89',      '88.88.88.88',               ['123.45.67.0/24']],
 
             // forwarded for with remote IPv6 addr not trusted
             [['1620:0:1cfe:face:b00c::3'], '1620:0:1cfe:face:b00c::3', '2620:0:1cfe:face:b00c::3',  null],

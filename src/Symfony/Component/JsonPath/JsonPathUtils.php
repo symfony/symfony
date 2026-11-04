@@ -82,7 +82,7 @@ final class JsonPathUtils
         }
 
         return [
-            'json' => stream_get_contents($json, $currentLength, $currentOffset ?: -1),
+            'json' => stream_get_contents($json, $currentLength, $currentOffset),
             'tokens' => $remainingTokens,
         ];
     }

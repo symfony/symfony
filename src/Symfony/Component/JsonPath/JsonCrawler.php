@@ -72,6 +72,27 @@ final class JsonCrawler implements JsonCrawlerInterface
     private array $parsedFilterExpressions = [];
 
     /**
+     * The whole input, decoded at most once per find() call and wrapped in a list to tell a null document apart.
+     *
+     * @var list<mixed>
+     */
+    private array $document = [];
+
+    /**
+     * The first node and the number of nodes each absolute query of a filter selects, or the error it raised,
+     * computed once per find() call since they do not depend on the node being filtered.
+     *
+     * @var array<string, array{mixed, int}|JsonCrawlerException>
+     */
+    private array $absoluteQueries = [];
+
+    /**
+     * How many more values the arrays kept in $absoluteQueries may hold, so that these copies never add up to more
+     * than one copy of the document. The budget is null until the values of the document are counted.
+     */
+    private ?int $absoluteQueriesBudget = null;
+
+    /**
      * @param resource|string $raw
      */
     public function __construct(
@@ -86,61 +107,48 @@ final class JsonCrawler implements JsonCrawlerInterface
     {
         $this->regexBudget = self::REGEX_WORK_BUDGET;
 
-        return $this->evaluate(\is_string($query) ? new JsonPath($query) : $query);
+        try {
+            return $this->evaluate(\is_string($query) ? new JsonPath($query) : $query);
+        } finally {
+            $this->document = $this->absoluteQueries = [];
+            $this->absoluteQueriesBudget = null;
+        }
     }
 
-    private function evaluate(JsonPath $query): array
+    /**
+     * @param bool $wholeDocument Whether to evaluate the query on the whole decoded document instead of reading
+     *                            the smallest part of a stream it needs
+     */
+    private function evaluate(JsonPath $query, bool $wholeDocument = false): array
     {
         try {
             if ($this->isComplexBracketExpression($query)) {
                 preg_match('/^\$\[([^\[\]]+)]$/', $query, $matches);
 
-                if (\is_resource($json = $this->raw)) {
-                    if (0 !== ftell($this->raw)) {
-                        rewind($this->raw);
-                    }
-
-                    if (false === $json = stream_get_contents($this->raw)) {
-                        throw new \RuntimeException('Failed to read from resource stream.');
-                    }
-                }
-
-                try {
-                    $data = json_decode($json, false, 512, \JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
-                    throw new InvalidJsonStringInputException($e->getMessage(), $e);
-                }
-
-                return $this->normalizeStorage($this->evaluateBracket($matches[1], $data));
+                return $this->normalizeStorage($this->evaluateBracket($matches[1], $this->getDocument()));
             }
 
             $tokens = JsonPathTokenizer::tokenize($query);
 
-            if (\is_resource($json = $this->raw)) {
-                if (!class_exists(Splitter::class)) {
-                    throw new \LogicException('The JsonStreamer package is required to evaluate a path against a resource. Try running "composer require symfony/json-streamer".');
+            if ($wholeDocument || !\is_resource($this->raw)) {
+                return $this->normalizeStorage($this->evaluateTokensOnDecodedData($tokens, $this->getDocument()));
+            }
+
+            if (!class_exists(Splitter::class)) {
+                throw new \LogicException('The JsonStreamer package is required to evaluate a path against a resource. Try running "composer require symfony/json-streamer".');
+            }
+
+            try {
+                $simplified = JsonPathUtils::findSmallestDeserializableStringAndPath($tokens, $this->raw);
+
+                $tokens = $simplified['tokens'];
+                $json = $simplified['json'];
+
+                if (!$json) {
+                    throw new \LogicException(); // fallback to reading the entire stream
                 }
-
-                try {
-                    $simplified = JsonPathUtils::findSmallestDeserializableStringAndPath($tokens, $this->raw);
-
-                    $tokens = $simplified['tokens'];
-                    $json = $simplified['json'];
-
-                    if (!$json) {
-                        throw new \LogicException(); // fallback to reading the entire stream
-                    }
-                } catch (\LogicException|UnexpectedValueException) {
-                    if (0 !== ftell($this->raw)) {
-                        rewind($this->raw);
-                    }
-
-                    if (false === $json = stream_get_contents($this->raw)) {
-                        throw new \RuntimeException('Failed to read from resource stream.');
-                    }
-
-                    $tokens = JsonPathTokenizer::tokenize($query);
-                }
+            } catch (\LogicException|UnexpectedValueException) {
+                return $this->normalizeStorage($this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize($query), $this->getDocument()));
             }
 
             try {
@@ -155,6 +163,78 @@ final class JsonCrawler implements JsonCrawlerInterface
         } catch (InvalidJsonPathException $e) {
             throw new JsonCrawlerException($query, $e->getMessage(), previous: $e);
         }
+    }
+
+    private function getDocument(): mixed
+    {
+        if ($this->document) {
+            return $this->document[0];
+        }
+
+        if (\is_resource($json = $this->raw)) {
+            if (0 !== ftell($this->raw)) {
+                rewind($this->raw);
+            }
+
+            if (false === $json = stream_get_contents($this->raw)) {
+                throw new \RuntimeException('Failed to read from resource stream.');
+            }
+        }
+
+        try {
+            $this->document = [json_decode($json, false, 512, \JSON_THROW_ON_ERROR)];
+        } catch (\JsonException $e) {
+            throw new InvalidJsonStringInputException($e->getMessage(), $e);
+        }
+
+        return $this->document[0];
+    }
+
+    /**
+     * @return array{mixed, int} The first node the query selects, or null, and the number of nodes it selects
+     */
+    private function evaluateAbsoluteQuery(string $expr): array
+    {
+        if (isset($this->absoluteQueries[$expr])) {
+            if ($this->absoluteQueries[$expr] instanceof JsonCrawlerException) {
+                throw $this->absoluteQueries[$expr];
+            }
+
+            return $this->absoluteQueries[$expr];
+        }
+
+        try {
+            $nodes = $this->evaluate(new JsonPath($expr), true);
+        } catch (JsonCrawlerException $e) {
+            throw $this->absoluteQueries[$expr] = $e;
+        }
+
+        $result = [$nodes[0] ?? null, \count($nodes)];
+
+        if (\is_array($result[0])) {
+            $this->absoluteQueriesBudget ??= $this->countNestedValues($this->getDocument());
+
+            // several spellings of a query can select the same large node: past the budget, such a query is evaluated again when read
+            if (0 > $this->absoluteQueriesBudget -= \count($result[0], \COUNT_RECURSIVE)) {
+                return $result;
+            }
+        }
+
+        return $this->absoluteQueries[$expr] = $result;
+    }
+
+    /**
+     * Counts the values in a decoded container and in its descendants, like count() does with COUNT_RECURSIVE.
+     */
+    private function countNestedValues(array|\stdClass $container): int
+    {
+        $count = 0;
+
+        foreach ($container as $value) {
+            $count += $this->isArrayOrObject($value) ? 1 + $this->countNestedValues($value) : 1;
+        }
+
+        return $count;
     }
 
     private function isComplexBracketExpression(JsonPath $query): bool
@@ -629,7 +709,7 @@ final class JsonCrawler implements JsonCrawlerInterface
 
         if (str_starts_with($expr, '$')) {
             try {
-                return (bool) $this->evaluate(new JsonPath($expr));
+                return 0 < $this->evaluateAbsoluteQuery($expr)[1];
             } catch (JsonCrawlerException $e) {
                 if (0 > $this->regexBudget) {
                     throw $e;
@@ -756,7 +836,7 @@ final class JsonCrawler implements JsonCrawlerInterface
                 throw new JsonCrawlerException($expr, 'non-singular query is not comparable');
             }
 
-            return $this->evaluate(new JsonPath($expr))[0] ?? null;
+            return $this->evaluateAbsoluteQuery($expr)[0];
         }
 
         // current node references
@@ -800,9 +880,7 @@ final class JsonCrawler implements JsonCrawlerInterface
             foreach ($args as $arg) {
                 $arg = trim($arg);
                 if (str_starts_with($arg, '$')) { // special handling for absolute paths
-                    $results = $this->evaluate(new JsonPath($arg));
-                    $argList[] = $results[0] ?? null;
-                    $nodelistSizes[] = \count($results);
+                    [$argList[], $nodelistSizes[]] = $this->evaluateAbsoluteQuery($arg);
                 } elseif (!str_starts_with($arg, '@')) { // special handling for @ to track nodelist size
                     $argList[] = $this->evaluateScalar($arg, $context);
                     $nodelistSizes[] = 1;

@@ -264,7 +264,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             $format = Request::getStructuredSuffixFormat($request->headers->get('CONTENT_TYPE')) ?? $format;
         }
 
-        if (!$attribute->acceptFormat && \in_array($format, ['csv', 'yaml'], true)) {
+        if (!$attribute->acceptFormat && !\in_array($format, ['form', 'json', 'xml'], true)) {
             throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, "%s" must be explicitly listed in "acceptFormat".', $format));
         }
 

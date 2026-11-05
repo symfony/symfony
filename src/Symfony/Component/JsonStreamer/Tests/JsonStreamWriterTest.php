@@ -20,6 +20,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithArray;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithConcreteInheritedGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDollarNamedProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
@@ -257,6 +258,19 @@ class JsonStreamWriterTest extends TestCase
         $dummy->dummies = [$nestedDummy];
 
         $this->assertWritten('{"dummies":[{"id":10,"name":"dummy name"}]}', $dummy, Type::generic(Type::object(DummyWithGenerics::class), Type::object(ClassicDummy::class)));
+    }
+
+    public function testWriteObjectWithConcreteInheritedGenerics()
+    {
+        $nestedDummy = new DummyWithNameAttributes();
+        $nestedDummy->id = 10;
+        $nestedDummy->name = 'dummy name';
+
+        $dummy = new DummyWithConcreteInheritedGenerics();
+        $dummy->extra = 1;
+        $dummy->dummies = [$nestedDummy];
+
+        $this->assertWritten('{"extra":1,"dummies":[{"id":10,"name":"dummy name"}]}', $dummy, Type::object(DummyWithConcreteInheritedGenerics::class));
     }
 
     public function testWriteObjectWithStreamedName()

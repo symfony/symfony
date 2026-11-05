@@ -990,6 +990,24 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertNull($obj->getInner()->bar);
     }
+
+    public function testDenormalizeIgnoresUndeclaredPropertyPathIndexWithMagicSetter()
+    {
+        $object = new class() {
+            public $values = [];
+
+            public function __set($name, $value)
+            {
+            }
+        };
+
+        (new ObjectNormalizer())->denormalize(['values[first]' => 'foo'], \get_class($object), 'json', [
+            'object_to_populate' => $object,
+            'ignored_attributes' => ['values'],
+        ]);
+
+        $this->assertSame([], $object->values);
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy

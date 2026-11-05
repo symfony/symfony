@@ -197,7 +197,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             return (\is_object($classOrObject) && $this->propertyAccessor->isReadable($classOrObject, $attribute)) || $this->propertyInfoExtractor->isReadable($class, $attribute) || $this->hasAttributeAccessorMethod($class, $attribute);
         }
 
-        if (str_contains($attribute, '.')) {
+        if (str_contains($attribute, '.') || str_contains($attribute, '[')) {
             // a property path is writable only when the class metadata declares it as an attribute
             return $this->classMetadataFactory && isset($this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata()[$attribute]);
         }

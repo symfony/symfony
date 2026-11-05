@@ -463,7 +463,7 @@ class TypeContextFactoryTest extends TestCase
 
         $this->expectException(UnsupportedException::class);
 
-        (new StringTypeResolver())->resolve('Invalid', $typeContext);
+        (new StringTypeResolver(null, null, [], true))->resolve('Invalid', $typeContext);
     }
 
     public function testThrowWhenTypeAliasNotImportedFromValidClassName()

@@ -12,7 +12,9 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\StrictKeysRedis;
 use Symfony\Component\Cache\Traits\RedisProxy;
 
 /**
@@ -38,5 +40,19 @@ class RedisTagAwareAdapterTest extends RedisAdapterTest
         $adapter = new RedisTagAwareAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
 
         return $adapter;
+    }
+
+    public function testInvalidateTagsOnlyAccessesDeclaredKeys()
+    {
+        $redis = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'), ['class' => StrictKeysRedis::class]);
+        $redis->setOption(\Redis::OPT_PREFIX, 'strict_');
+        $pool = new RedisTagAwareAdapter($redis, str_replace('\\', '.', __CLASS__));
+        $pool->clear();
+
+        $item = $pool->getItem('foo');
+        $pool->save($item->set('bar')->tag('tag'));
+
+        $this->assertTrue($pool->invalidateTags(['tag']));
+        $this->assertFalse($pool->getItem('foo')->isHit());
     }
 }

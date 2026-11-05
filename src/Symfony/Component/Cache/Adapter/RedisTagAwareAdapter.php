@@ -226,23 +226,25 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
                             until '0' == cursor;
                         end
 
-                        redis.call('SUNIONSTORE', '{'..id..'}'..id, id)
+                        redis.call('SUNIONSTORE', KEYS[2], id)
                         redis.call('DEL', id)
 
-                        return redis.call('SSCAN', '{'..id..'}'..id, '0', 'COUNT', 5000)
+                        return redis.call('SSCAN', KEYS[2], '0', 'COUNT', 5000)
             EOLUA;
 
-        $results = $this->pipeline(function () use ($tagIds, $lua) {
-            $isRelay = $this->redis instanceof Relay;
+        $isRelay = $this->redis instanceof Relay;
 
-            if ($this->redis instanceof \Predis\ClientInterface) {
-                $prefix = $this->redis->getOptions()->prefix ? $this->redis->getOptions()->prefix->getPrefix() : '';
-            } elseif (\is_array($prefix = $this->redis->getOption($isRelay ? Relay::OPT_PREFIX : \Redis::OPT_PREFIX) ?? '')) {
-                $prefix = current($prefix);
-            }
+        if ($this->redis instanceof \Predis\ClientInterface) {
+            $prefix = $this->redis->getOptions()->prefix ? $this->redis->getOptions()->prefix->getPrefix() : '';
+        } elseif (\is_array($prefix = $this->redis->getOption($isRelay ? Relay::OPT_PREFIX : \Redis::OPT_PREFIX) ?? '')) {
+            $prefix = current($prefix);
+        }
 
+        $results = $this->pipeline(function () use ($tagIds, $lua, $prefix, $isRelay) {
             foreach ($tagIds as $id) {
-                yield 'eval' => $this->redis instanceof \Predis\ClientInterface ? [$lua, 1, $id, $prefix, '1'] : [$lua, [$id, $prefix, $isRelay ? '0' : '1'], 1];
+                // declared so that servers enforcing KEYS (e.g. Dragonfly) accept the script; same hash slot as $id
+                $tmpId = '{'.$prefix.$id.'}'.$id;
+                yield 'eval' => $this->redis instanceof \Predis\ClientInterface ? [$lua, 2, $id, $tmpId, $prefix, '1'] : [$lua, [$id, $tmpId, $prefix, $isRelay ? '0' : '1'], 2];
             }
         });
 
@@ -251,9 +253,9 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
 
                         local id = KEYS[1]
                         local cursor = table.remove(ARGV)
-                        redis.call('SREM', '{'..id..'}'..id, unpack(ARGV))
+                        redis.call('SREM', KEYS[2], unpack(ARGV))
 
-                        return redis.call('SSCAN', '{'..id..'}'..id, cursor, 'COUNT', 5000)
+                        return redis.call('SSCAN', KEYS[2], cursor, 'COUNT', 5000)
             EOLUA;
 
         $success = true;
@@ -270,13 +272,13 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
             while ($ids || '0' !== $cursor) {
                 $this->doDelete($ids);
 
-                $evalArgs = [$id, $cursor];
-                array_splice($evalArgs, 1, 0, $ids);
+                $evalArgs = [$id, '{'.$prefix.$id.'}'.$id, $cursor];
+                array_splice($evalArgs, 2, 0, $ids);
 
                 if ($this->redis instanceof \Predis\ClientInterface) {
-                    array_unshift($evalArgs, $lua, 1);
+                    array_unshift($evalArgs, $lua, 2);
                 } else {
-                    $evalArgs = [$lua, $evalArgs, 1];
+                    $evalArgs = [$lua, $evalArgs, 2];
                 }
 
                 $results = $this->pipeline(static function () use ($evalArgs) {

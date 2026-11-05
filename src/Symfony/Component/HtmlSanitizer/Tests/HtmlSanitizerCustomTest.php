@@ -72,6 +72,64 @@ class HtmlSanitizerCustomTest extends TestCase
         $this->assertSame('Hello', $this->sanitize($config, 'Hello<plaintext>the rest of the page'));
     }
 
+    public function testSanitizeWithSafeElementsBlocksHtmlAndBody()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame('<p>Hello</p>', $this->sanitize($config, '<body inert><p>Hello</p></body>'));
+        $this->assertSame('<p>Hello</p>', $this->sanitize($config, '<html dir="rtl"><p>Hello</p></html>'));
+        $this->assertSame('<div>Hello</div>', $this->sanitize($config, '<div><body inert>Hello</body></div>'));
+
+        $document = '<html dir="rtl"><head><title>Hello</title></head><body inert><p>world</p></body></html>';
+        $this->assertSame('<p>world</p>', $this->sanitize($config, $document));
+        $this->assertSame('<p>world</p>', (new HtmlSanitizer($config))->sanitizeFor('html', $document));
+    }
+
+    public function testSanitizeWithSafeElementsDropsTheOpenerLinkType()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame(
+            '<a href="https://example.com/" target="_blank">Hello</a>',
+            $this->sanitize($config, '<a href="https://example.com/" target="_blank" rel="opener">Hello</a>')
+        );
+
+        $this->assertSame(
+            '<a href="https://example.com/" target="_blank" rel="nofollow noreferrer">Hello</a>',
+            $this->sanitize($config, '<a href="https://example.com/" target="_blank" rel="nofollow OPENER noreferrer">Hello</a>')
+        );
+
+        $this->assertSame(
+            '<area href="https://example.com/" target="_blank" />',
+            $this->sanitize($config, '<area href="https://example.com/" target="_blank" rel="opener">')
+        );
+    }
+
+    public function testSanitizeWithSafeElementsTurnsNamedTargetsIntoBlank()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        foreach (['foo', '_new', ' _blank'] as $target) {
+            $this->assertSame(
+                '<a href="https://example.com/" target="_blank">Hello</a>',
+                $this->sanitize($config, \sprintf('<a href="https://example.com/" target="%s">Hello</a>', $target))
+            );
+        }
+
+        foreach (['_blank', '_BLANK', '_self', '_parent', '_top'] as $target) {
+            $this->assertSame(
+                \sprintf('<a href="https://example.com/" target="%s" rel="noopener">Hello</a>', $target),
+                $this->sanitize($config, \sprintf('<a href="https://example.com/" target="%s" rel="noopener">Hello</a>', $target))
+            );
+        }
+    }
+
     public function testSanitizeForTextarea()
     {
         $config = (new HtmlSanitizerConfig())

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-05T17:10:25Z
+
+Thank you @X-Coder264. I pushed one change: I removed the early return on an empty member schema in `buildUnionSchema()`. With a shared `SchemaDocument`, `Author|T` left the `Author` definition in the document with nothing referencing it. The mixed check in `buildArrayShapeSchema()` already covers list shapes, so other unions keep their current output.

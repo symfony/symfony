@@ -3290,6 +3290,62 @@ YAML;
         $this->assertLessThan(20 * 1024 * 1024, MemoryUsageRecorder::$memoryUsage - $memoryUsage);
     }
 
+    /**
+     * @dataProvider provideNestedBlocksWithManyBytes
+     */
+    public function testParseNestedBlocksWithManyBytes(int $lines, int $length)
+    {
+        $yaml = '';
+        for ($i = 0; $i < 100; ++$i) {
+            $yaml .= str_repeat(' ', $i)."k:\n";
+        }
+        for ($i = 0; $i < $lines; ++$i) {
+            $yaml .= str_repeat(' ', 100)."a$i: ".str_repeat('x', $length)."\n";
+        }
+        $yaml .= str_repeat(' ', 100).'b: !php/object '.serialize(new MemoryUsageRecorder());
+
+        $memoryUsage = memory_get_usage();
+        $data = $this->parser->parse($yaml, Yaml::PARSE_OBJECT);
+
+        for ($i = 0; $i < 100; ++$i) {
+            $data = $data['k'];
+        }
+
+        $this->assertSame(str_repeat('x', $length), $data['a'.($lines - 1)]);
+        $this->assertInstanceOf(MemoryUsageRecorder::class, $data['b']);
+
+        // the lines used to be copied by each nesting level
+        $this->assertLessThan(10 * 1024 * 1024, MemoryUsageRecorder::$memoryUsage - $memoryUsage);
+    }
+
+    public static function provideNestedBlocksWithManyBytes(): iterable
+    {
+        yield 'many lines' => [10000, 1];
+        yield 'long lines' => [2, 500000];
+    }
+
+    public function testParseNestedSequencesOnOneLineWithManyLines()
+    {
+        $yaml = str_repeat('- ', 100)."a0: 0\n";
+        for ($i = 1; $i < 10000; ++$i) {
+            $yaml .= str_repeat(' ', 200)."a$i: $i\n";
+        }
+        $yaml .= str_repeat(' ', 200).'b: !php/object '.serialize(new MemoryUsageRecorder());
+
+        $memoryUsage = memory_get_usage();
+        $data = $this->parser->parse($yaml, Yaml::PARSE_OBJECT);
+
+        for ($i = 0; $i < 100; ++$i) {
+            $data = $data[0];
+        }
+
+        $this->assertSame(9999, $data['a9999']);
+        $this->assertInstanceOf(MemoryUsageRecorder::class, $data['b']);
+
+        // the lines used to be copied by each nesting level
+        $this->assertLessThan(10 * 1024 * 1024, MemoryUsageRecorder::$memoryUsage - $memoryUsage);
+    }
+
     public function testParseHandlesTrailingNewlinesAfterDocumentEndMarker()
     {
         $yaml = "---\nfoo: bar\n...\n\n";

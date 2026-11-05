@@ -39,6 +39,24 @@ class SMimeSignerTest extends SMimeTestCase
         $this->assertMessageSignatureIsValid($signedMessage, $message);
     }
 
+    public function testSignedMessageDoesNotSplitCrlfAcrossChunks()
+    {
+        // The signed output is read back in 16372-byte chunks.
+        // Shifting the body by up to one line length makes a CRLF straddle a chunk boundary for at least one shift.
+        for ($shift = 0; $shift < 62; ++$shift) {
+            $lines = [str_repeat('x', $shift)];
+            for ($i = 0; $i < 1000; ++$i) {
+                $lines[] = str_pad("Line $i", 60, '.');
+            }
+
+            $message = new Message((new Headers())->addMailboxListHeader('From', ['fabien@symfony.com']), new TextPart(implode("\r\n", $lines)));
+
+            $signer = new SMimeSigner($this->samplesDir.'sign.crt', $this->samplesDir.'sign.key');
+
+            $this->assertStringNotContainsString("\r\r\n", $signer->sign($message)->toString(), "shift $shift");
+        }
+    }
+
     public function testSignEncryptedMessage()
     {
         $message = (new Email())

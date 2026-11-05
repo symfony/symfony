@@ -60,15 +60,17 @@ final class OutputWrapper
             return $text;
         }
 
-        $tagPattern = \sprintf('<(?:(?:%s)|/(?:%s)?)>', self::TAG_OPEN_REGEX_SEGMENT, self::TAG_CLOSE_REGEX_SEGMENT);
-        $limitPattern = "{1,$width}";
-        $patternBlocks = [$tagPattern];
+        // tags print nothing, so they take no column and stay with the characters next to them
+        $tagPattern = \sprintf('(?:<(?:(?:%s)|/(?:%s)?)>)', self::TAG_OPEN_REGEX_SEGMENT, self::TAG_CLOSE_REGEX_SEGMENT);
+        $charPattern = '.';
+        $urlPattern = '';
         if (!$this->allowCutUrls) {
-            $patternBlocks[] = self::URL_PATTERN;
+            // URLs are never cut. A URL longer than the width gets a line of its own, together with the start of its word when that fits
+            $charPattern = '(?!'.self::URL_PATTERN.').';
+            $urlPattern = "|$tagPattern*+[^\\s<]{0,$width}?$tagPattern*+".self::URL_PATTERN.'[^\S\r\n]?';
         }
-        $patternBlocks[] = '.';
-        $blocks = implode('|', $patternBlocks);
-        $rowPattern = "(?:$blocks)$limitPattern";
+        $rowPattern = "(?:(?:$tagPattern*+.){1,$width}$tagPattern*+|$tagPattern++)";
+        $cutPattern = "(?:(?:$tagPattern*+$charPattern){1,$width}|$tagPattern++)";
         // the u modifier counts characters instead of bytes, but preg_replace() returns null
         // on malformed UTF-8, which would empty the text
         $modifiers = preg_match('//u', $text) ? 'imux' : 'imx';
@@ -84,10 +86,11 @@ final class OutputWrapper
         if ($wideChars) {
             $text = strtr($text, $wideChars);
             $rowPattern .= '(?!'.self::WIDE_CHAR_FILLER.')';
+            $cutPattern .= '(?!'.self::WIDE_CHAR_FILLER.')';
         }
         // a line cut inside a word never ends between a backslash and the "<" or ">" it escapes,
         // or the escaped character would start the next line as a tag delimiter
-        $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))|(%1$s)(?!(?<=\\\\)[<>]))(?:\r?\n)?|(?:\r?\n|$))#%2$s', $rowPattern, $modifiers);
+        $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))%3$s|(%2$s)(?!(?<=\\\\)[<>]))(?:\r?\n)?|(?:\r?\n|$))#%4$s', $rowPattern, $cutPattern, $urlPattern, $modifiers);
         $output = rtrim(preg_replace($pattern, '\\1'.$break, $text), $break);
 
         $output = str_replace(' '.$break, $break, $output);

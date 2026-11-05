@@ -32,7 +32,7 @@ class OutputWrapperTest extends TestCase
 
         $this->assertSame("Lorem\n\xB3\nipsum", $wrapper->wrap("Lorem \xB3 ipsum", 5));
         $this->assertSame("Lorem\n\xF0\x9F", $wrapper->wrap("Lorem \xF0\x9F", 5));
-        $this->assertSame("<info>Lore\nm \xB3</info>\nhttps://example.com/\nipsum ", $wrapper->wrap("<info>Lorem \xB3</info> https://example.com/\nipsum \n", 5));
+        $this->assertSame("<info>Lorem\n\xB3</info>\nhttps://example.com/\nipsum ", $wrapper->wrap("<info>Lorem \xB3</info> https://example.com/\nipsum \n", 5));
     }
 
     public function testWrapBreaksMalformedUtf8LikeValidText()
@@ -73,6 +73,31 @@ class OutputWrapperTest extends TestCase
         $this->assertSame("aaaa\n\\</b\\>c", $wrapper->wrap('aaaa\</b\>c', 5));
     }
 
+    public function testWrapDoesNotCountTagsInTheWidth()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame('aaaa <info>bbbb</info> cccc', $wrapper->wrap('aaaa <info>bbbb</info> cccc', 14));
+        $this->assertSame("aaaa <info>bbbb</info>\ncccc", $wrapper->wrap('aaaa <info>bbbb</info> cccc', 9));
+        $this->assertSame("<href=https://symfony.com>aaaa</>\nbbbb", $wrapper->wrap('<href=https://symfony.com>aaaa</> bbbb', 4));
+        $this->assertSame("aaaa\n</>\n<info>", $wrapper->wrap("aaaa\n</>\n<info>", 4));
+        $this->assertSame("<info>\n\\<b>c", $wrapper->wrap('<info>\<b>c', 1));
+    }
+
+    public function testWrapCountsUrlsWithTheirWidthWithoutCuttingThem()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame("aaaa\nhttp://a.b", $wrapper->wrap('aaaa http://a.b', 12));
+        $this->assertSame("See\nhttps://symfony.com/doc/current/console.html\nfor more", $wrapper->wrap('See https://symfony.com/doc/current/console.html for more', 10));
+        $this->assertSame("See\n<href=https://symfony.com>https://symfony.com/doc</>\nfor more", $wrapper->wrap('See <href=https://symfony.com>https://symfony.com/doc</> for more', 10));
+        $this->assertSame("See\n(https://symfony.com/doc/current/console.html)\nfor more", $wrapper->wrap('See (https://symfony.com/doc/current/console.html) for more', 10));
+        $this->assertSame("aaaaaaaaaa\naaahttps://symfony.com/doc", $wrapper->wrap('aaaaaaaaaaaaahttps://symfony.com/doc', 10));
+        $this->assertSame('<info>aaa</info>https://symfony.com/doc', $wrapper->wrap('<info>aaa</info>https://symfony.com/doc', 5));
+        $this->assertSame("a<info>b\n</info>https://symfony.com/doc", $wrapper->wrap('a<info>b</info>https://symfony.com/doc', 5));
+        $this->assertSame("See\nhttps://symfony.com/doc\n\nfor more", $wrapper->wrap("See https://symfony.com/doc\n\nfor more", 10));
+    }
+
     public function testWrapDoesNotDropBytesOfMalformedUtf8()
     {
         $text = "Cannot read the log file: \xB3 check the permissions";
@@ -93,8 +118,10 @@ class OutputWrapperTest extends TestCase
             false,
             <<<'EOS'
                 Árvíztűrőtükörfúrógé
-                p https://github.com/symfony/symfony Lorem ipsum
-                <comment>dolor</comment> sit amet,
+                p
+                https://github.com/symfony/symfony
+                Lorem ipsum <comment>dolor</comment>
+                sit amet,
                 consectetur
                 adipiscing elit.
                 Praesent vestibulum

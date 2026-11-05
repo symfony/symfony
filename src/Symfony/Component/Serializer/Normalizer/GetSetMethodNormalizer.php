@@ -164,7 +164,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     protected function setAttributeValue(object $object, string $attribute, $value, ?string $format = null, array $context = [])
     {
         $setter = 'set'.$attribute;
-        $key = \get_class($object).':'.$setter;
+        $key = \get_class($object).':'.strtolower($setter);
 
         if (!isset(self::$setterAccessibleCache[$key])) {
             self::$setterAccessibleCache[$key] = method_exists($object, $setter) && \is_callable([$object, $setter]) && !(new \ReflectionMethod($object, $setter))->isStatic();

@@ -211,7 +211,8 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        if ($this->propertyInfoExtractor->isWritable($class, $attribute)) {
+        // asking PropertyInfo about attributes that the class doesn't have would fill its cache with each unknown key
+        if ((property_exists($class, $attribute) || method_exists($class, 'set'.$attribute)) && $this->propertyInfoExtractor->isWritable($class, $attribute)) {
             return true;
         }
 

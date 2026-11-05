@@ -30,6 +30,48 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider provideSanitizeForHeadWithSafeElements
+     */
+    public function testSanitizeForHeadWithSafeElements(string $input, string $expected)
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame($expected, (new HtmlSanitizer($config))->sanitizeFor('head', $input));
+    }
+
+    public static function provideSanitizeForHeadWithSafeElements(): iterable
+    {
+        yield 'stylesheet' => ['<link rel="stylesheet" href="https://evil.example/x.css">', ''];
+        yield 'data stylesheet' => ['<link rel="stylesheet" href="data:text/css,body{background:url(https://evil.example/leak)}">', ''];
+        yield 'import' => ['<link rel="import" href="https://evil.example/x.html">', ''];
+        yield 'referrer policy' => ['<meta name="referrer" content="unsafe-url">', ''];
+        yield 'title' => ['<title>Hello</title>', '<title>Hello</title>'];
+    }
+
+    public function testSanitizeWithSafeElementsDropsReferrerPolicy()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame(
+            '<a href="https://evil.example/">Hello</a><img src="https://evil.example/pixel" />',
+            $this->sanitize($config, '<a href="https://evil.example/" referrerpolicy="unsafe-url">Hello</a><img src="https://evil.example/pixel" referrerpolicy="unsafe-url">')
+        );
+    }
+
+    public function testSanitizeWithSafeElementsDropsPlaintext()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame('Hello', $this->sanitize($config, 'Hello<plaintext>the rest of the page'));
+    }
+
     public function testSanitizeForTextarea()
     {
         $config = (new HtmlSanitizerConfig())

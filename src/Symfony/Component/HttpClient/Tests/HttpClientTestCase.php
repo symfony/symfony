@@ -619,6 +619,10 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $response = $client->request('GET', 'http://localhost:8057/302/two-locations', ['max_redirects' => 0]);
 
+        if (!isset($response->getHeaders(false)['location'])) {
+            $this->markTestSkipped('The test server of symfony/http-client-contracts has no "/302/two-locations" route.');
+        }
+
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('http://localhost:8057/', $response->getInfo('redirect_url'));
 

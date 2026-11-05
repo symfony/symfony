@@ -619,6 +619,10 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $response = $client->request('GET', 'http://localhost:8057/302/two-locations', ['max_redirects' => 0]);
 
+        if (!$response->getContent(false)) {
+            $this->markTestSkipped('Legacy symfony/http-client-contracts in use');
+        }
+
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('http://localhost:8057/', $response->getInfo('redirect_url'));
 

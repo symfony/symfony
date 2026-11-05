@@ -225,6 +225,37 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertArrayNotHasKey('variables', $tags[1]);
     }
 
+    public function testControllerExpressionLanguageListsEveryExpressionPropertyOfHttpKernelAttributes()
+    {
+        $container = $this->createContainerFromFile('default_config');
+
+        $listed = [];
+        foreach ($container->getDefinition('controller.expression_language')->getTag('expression_language.compiled') as $tag) {
+            foreach ([$tag['attributes'] ?? [], $tag['string_expressions'] ?? []] as $attributes) {
+                foreach ($attributes as $class => $properties) {
+                    foreach ($properties as $property) {
+                        $listed[] = $class.'::$'.$property;
+                    }
+                }
+            }
+        }
+
+        $expressionProperties = [];
+        $r = new \ReflectionClass(Lock::class);
+        foreach (glob(\dirname($r->getFileName()).'/*.php') as $file) {
+            $class = $r->getNamespaceName().'\\'.basename($file, '.php');
+
+            foreach ((new \ReflectionClass($class))->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+                if (\in_array(Expression::class, preg_split('/[?|]/', (string) $property->getType()), true)) {
+                    $expressionProperties[] = $class.'::$'.$property->name;
+                }
+            }
+        }
+
+        $this->assertNotSame([], $expressionProperties);
+        $this->assertSame([], array_values(array_diff($expressionProperties, $listed)));
+    }
+
     public function testCsrfProtectionNeedsSessionToBeEnabled()
     {
         $this->expectException(\LogicException::class);

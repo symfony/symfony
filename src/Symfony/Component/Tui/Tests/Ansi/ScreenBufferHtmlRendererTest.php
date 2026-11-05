@@ -53,6 +53,7 @@ class ScreenBufferHtmlRendererTest extends TestCase
         yield 'truecolor background white' => ["\x1b[48;2;255;255;255mX\x1b[0m", ['background-color: #ffffff']];
         yield 'truecolor fg + bg' => ["\x1b[38;2;255;0;0;48;2;0;0;255mX\x1b[0m", ['color: #ff0000', 'background-color: #0000ff']];
         yield 'truecolor with bold' => ["\x1b[1;38;2;128;64;32mX\x1b[0m", ['font-weight: bold', 'color: #804020']];
+        yield 'curly underline with bold and color' => ["\x1b[1;31;4:3mX\x1b[0m", ['font-weight: bold', 'color: #cd0000', 'text-decoration: underline']];
     }
 
     #[DataProvider('colorCodeMappingProvider')]

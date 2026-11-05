@@ -65,6 +65,36 @@ class AnsiCodeTrackerTest extends TestCase
         $this->assertFalse($this->tracker->hasActiveCodes());
     }
 
+    public function testStyledUnderlinesAreKeptAcrossLines()
+    {
+        $this->tracker->process("\x1b[4m");
+        $this->tracker->process("\x1b[4:3m");
+        $this->assertSame("\x1b[4:3m", $this->tracker->getActiveCodes(), 'The curly underline, not a plain one.');
+
+        $this->tracker->process("\x1b[4:0m");
+        $this->assertSame('', $this->tracker->getActiveCodes());
+
+        $this->tracker->process("\x1b[21m");
+        $this->tracker->process("\x1b[4:3m");
+        $this->assertSame("\x1b[4:3m", $this->tracker->getActiveCodes(), 'The curly underline replaces the double one.');
+
+        $this->tracker->process("\x1b[0m");
+        $this->assertSame('', $this->tracker->getActiveCodes());
+
+        $this->tracker->process("\x1b[4:4;58;5;1m");
+        $this->tracker->process("\x1b[4m");
+        $this->assertSame("\x1b[4;58;5;1m", $this->tracker->getActiveCodes(), 'A plain underline replaces the dotted one.');
+
+        $this->tracker->processText("x\x1b[4:5my");
+        $this->assertSame("\x1b[4:5;58;5;1m", $this->tracker->getActiveCodes(), 'Also when scanning text.');
+
+        $this->tracker->processText("\x1b[38:2::255:0:0;5m");
+        $this->assertSame("\x1b[4:5;5;58;5;1m", $this->tracker->getActiveCodes(), 'Other colon forms are skipped, not the parameters after them.');
+
+        $this->tracker->process("\x1b[24m");
+        $this->assertSame("\x1b[5;58;5;1m", $this->tracker->getActiveCodes());
+    }
+
     public function testSgr21SetsDoubleUnderline()
     {
         $this->tracker->process("\x1b[21m");

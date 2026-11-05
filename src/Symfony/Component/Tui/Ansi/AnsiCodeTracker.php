@@ -34,6 +34,8 @@ final class AnsiCodeTracker
     private ?string $fgColor = null;
     private ?string $bgColor = null;
     private ?string $underlineColor = null;
+    /** A styled underline, like 4:3 (curly): kept as is */
+    private ?string $underlineVariant = null;
 
     /**
      * Process an ANSI escape code and update tracking state.
@@ -72,6 +74,7 @@ final class AnsiCodeTracker
         $this->fgColor = null;
         $this->bgColor = null;
         $this->underlineColor = null;
+        $this->underlineVariant = null;
     }
 
     /**
@@ -90,7 +93,9 @@ final class AnsiCodeTracker
         if ($this->italic) {
             $codes .= '3;';
         }
-        if ($this->underline) {
+        if (null !== $this->underlineVariant) {
+            $codes .= $this->underlineVariant.';';
+        } elseif ($this->underline) {
             $codes .= '4;';
         }
         if ($this->doubleUnderline) {
@@ -169,7 +174,7 @@ final class AnsiCodeTracker
         }
 
         // Use preg_match_all to find all SGR sequences at once (C-level scan)
-        if (!preg_match_all('/\x1b\[([\d;]*)m/', $text, $matches)) {
+        if (!preg_match_all('/\x1b\[([\d;:]*)m/', $text, $matches)) {
             return;
         }
         foreach ($matches[1] as $params) {
@@ -191,6 +196,20 @@ final class AnsiCodeTracker
         $count = \count($parts);
 
         while ($i < $count) {
+            // A styled underline: 4:0 is none, 4:1 to 4:5 a shape
+            if (str_starts_with($parts[$i], '4:')) {
+                $this->underline = '4:0' !== $parts[$i];
+                $this->doubleUnderline = false;
+                $this->underlineVariant = $this->underline ? $parts[$i] : null;
+                ++$i;
+                continue;
+            }
+            if (str_contains($parts[$i], ':')) {
+                // Other colon forms, like 38:2::R:G:B colors, are not tracked
+                ++$i;
+                continue;
+            }
+
             $code = (int) $parts[$i];
 
             // Handle 256-color and RGB codes which consume multiple parameters
@@ -226,7 +245,7 @@ final class AnsiCodeTracker
                 1 => $this->bold = true,
                 2 => $this->dim = true,
                 3 => $this->italic = true,
-                4 => $this->underline = true,
+                4 => [$this->underline, $this->underlineVariant] = [true, null],
                 5 => $this->blink = true,
                 7 => $this->inverse = true,
                 8 => $this->hidden = true,
@@ -234,7 +253,7 @@ final class AnsiCodeTracker
                 21 => $this->doubleUnderline = true,
                 22 => $this->bold = $this->dim = false,
                 23 => $this->italic = false,
-                24 => $this->underline = $this->doubleUnderline = false,
+                24 => [$this->underline, $this->doubleUnderline, $this->underlineVariant] = [false, false, null],
                 25 => $this->blink = false,
                 27 => $this->inverse = false,
                 28 => $this->hidden = false,

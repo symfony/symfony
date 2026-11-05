@@ -18,6 +18,16 @@ use Symfony\Component\Tui\Ansi\TextWrapper;
 
 class TextWrapperTest extends TestCase
 {
+    public function testAStyledUnderlineContinuesOnTheWrappedLines()
+    {
+        $lines = TextWrapper::wrapTextWithAnsi("\x1b[4:3mcurly underline that wraps\x1b[4:0m", 10);
+
+        $this->assertCount(3, $lines);
+        foreach ($lines as $line) {
+            $this->assertStringStartsWith("\x1b[4:3m", $line);
+        }
+    }
+
     /**
      * @param string[] $expected
      */

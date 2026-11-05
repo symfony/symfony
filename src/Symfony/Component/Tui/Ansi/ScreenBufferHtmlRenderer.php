@@ -140,11 +140,21 @@ final class ScreenBufferHtmlRenderer
     {
         // Parse SGR parameters from the style string
         // Style is stored as the full escape sequence, e.g., "\x1b[1;32m"
-        if (!preg_match('/\x1b\[([0-9;]*)m/', $ansi, $matches)) {
+        if (!preg_match('/\x1b\[([0-9;:]*)m/', $ansi, $matches)) {
             return '';
         }
 
-        $params = '' !== $matches[1] ? array_map('intval', explode(';', $matches[1])) : [0];
+        $params = [];
+        foreach ('' !== $matches[1] ? explode(';', $matches[1]) : ['0'] as $param) {
+            // A styled underline, like 4:3 (curly), is drawn as a plain one, other colon forms are skipped
+            if (str_contains($param, ':')) {
+                if (str_starts_with($param, '4:') && '4:0' !== $param) {
+                    $params[] = 4;
+                }
+                continue;
+            }
+            $params[] = (int) $param;
+        }
         $css = [];
 
         $i = -1;

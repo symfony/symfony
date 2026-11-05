@@ -14,11 +14,17 @@ namespace Symfony\Component\JsonStreamer\Tests\Mapping;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
+use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDeeplyInheritedGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithInheritedGenerics;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUndeclaredInheritedGenerics;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
 class GenericTypePropertyMetadataLoaderTest extends TestCase
 {
@@ -69,6 +75,31 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
         $this->assertEquals([
             'nullable' => new PropertyMetadata('nullable', Type::mixed()),
             'union' => new PropertyMetadata('union', Type::mixed()),
+        ], $metadata);
+    }
+
+    public function testReplaceGenericsOfParentClasses()
+    {
+        $loader = new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new TypeContextFactory(new StringTypeResolver()));
+
+        $metadata = $loader->load(DummyWithInheritedGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithInheritedGenerics::class), Type::int(), Type::object(ClassicDummy::class))]);
+
+        $this->assertEquals([
+            'extra' => new PropertyMetadata('extra', Type::int()),
+            'dummies' => new PropertyMetadata('dummies', Type::list(Type::object(ClassicDummy::class))),
+        ], $metadata);
+
+        $metadata = $loader->load(DummyWithDeeplyInheritedGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithDeeplyInheritedGenerics::class), Type::object(ClassicDummy::class))]);
+
+        $this->assertEquals([
+            'extra' => new PropertyMetadata('extra', Type::int()),
+            'dummies' => new PropertyMetadata('dummies', Type::list(Type::object(ClassicDummy::class))),
+        ], $metadata);
+
+        $metadata = $loader->load(DummyWithUndeclaredInheritedGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithUndeclaredInheritedGenerics::class), Type::object(ClassicDummy::class))]);
+
+        $this->assertEquals([
+            'dummies' => new PropertyMetadata('dummies', Type::list(Type::object(ClassicDummy::class))),
         ], $metadata);
     }
 

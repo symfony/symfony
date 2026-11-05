@@ -19,6 +19,8 @@ use Symfony\Component\Tui\Terminal\ScreenBuffer;
 use Symfony\Component\Tui\Terminal\VirtualTerminal;
 use Symfony\Component\Tui\Tui;
 use Symfony\Component\Tui\Widget\AbstractWidget;
+use Symfony\Component\Tui\Widget\ContainerWidget;
+use Symfony\Component\Tui\Widget\ProgressBarWidget;
 
 final class SubElementStyleTest extends TestCase
 {
@@ -41,6 +43,76 @@ final class SubElementStyleTest extends TestCase
         $line = explode("\n", $screen->getStyledScreen())[0];
         $this->assertStringContainsString("\e[34mK", $line);
         $this->assertStringContainsString("\e[31m] rest", $line);
+    }
+
+    public function testTheTextAfterASubElementKeepsTheStyleOfTheContainer()
+    {
+        $terminal = new VirtualTerminal(20, 3);
+        $tui = new Tui(terminal: $terminal);
+        $tui->addStyleSheet(new StyleSheet([
+            '.box' => new Style(color: 'red'),
+            SubElementWidget::class.'::key' => new Style(color: 'blue'),
+        ]));
+        $box = new ContainerWidget();
+        $box->addStyleClass('box');
+        $box->add(new SubElementWidget());
+        $tui->add($box);
+        $tui->start();
+        $tui->processRender();
+
+        $screen = new ScreenBuffer(20, 3);
+        $screen->write($terminal->getOutput());
+
+        $line = explode("\n", $screen->getStyledScreen())[0];
+        $this->assertStringContainsString("\e[34mK", $line);
+        $this->assertStringContainsString("\e[31m] rest", $line);
+    }
+
+    public function testTheTextAfterASubElementThatCancelsTheBackgroundKeepsTheBackgroundOfTheContainer()
+    {
+        $terminal = new VirtualTerminal(20, 3);
+        $tui = new Tui(terminal: $terminal);
+        $tui->addStyleSheet(new StyleSheet([
+            '.box' => new Style(background: 'blue'),
+            SubElementWidget::class.'::key' => new Style(color: 'yellow', background: 'default'),
+        ]));
+        $box = new ContainerWidget();
+        $box->addStyleClass('box');
+        $box->add(new SubElementWidget());
+        $tui->add($box);
+        $tui->start();
+        $tui->processRender();
+
+        $screen = new ScreenBuffer(20, 3);
+        $screen->write($terminal->getOutput());
+
+        $line = explode("\n", $screen->getStyledScreen())[0];
+        $this->assertStringContainsString("\e[33mK", $line);
+        $this->assertStringContainsString("\e[44m] rest", $line);
+    }
+
+    public function testTheTextAfterANestedSubElementKeepsTheStyleOfTheOuterOne()
+    {
+        $terminal = new VirtualTerminal(20, 3);
+        $tui = new Tui(terminal: $terminal);
+        $tui->addStyleSheet(new StyleSheet([
+            ProgressBarWidget::class => new Style(color: 'red'),
+            ProgressBarWidget::class.'::text' => new Style(color: 'yellow'),
+            ProgressBarWidget::class.'::bar-fill' => new Style(color: 'green'),
+            ProgressBarWidget::class.'::bar-empty' => new Style(color: 'blue'),
+        ]));
+        $progressBar = new ProgressBarWidget(10, '[%bar%] done');
+        $progressBar->setBarWidth(4);
+        $progressBar->setProgress(5);
+        $tui->add($progressBar);
+        $tui->start();
+        $tui->processRender();
+
+        $screen = new ScreenBuffer(20, 3);
+        $screen->write($terminal->getOutput());
+
+        $line = explode("\n", $screen->getStyledScreen())[0];
+        $this->assertStringContainsString("\e[33m] done", $line);
     }
 }
 

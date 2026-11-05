@@ -137,14 +137,4 @@ final class WidgetContext
     {
         return $this->focusManager;
     }
-
-    /**
-     * Returns the resolved style of a widget for the current frame.
-     *
-     * @internal
-     */
-    public function resolveStyle(AbstractWidget $widget): Style
-    {
-        return $this->renderer->resolveStyle($widget);
-    }
 }

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-05T20:06:25Z
+
+Thank you @dylanpulver. I moved `expectException()` and `expectExceptionMessage()` right before the call that throws, here and in the tests of #67852. Please do the same in your next PRs on this topic, so that an exception thrown by the setup can't pass for the expected one.

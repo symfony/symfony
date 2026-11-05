@@ -104,13 +104,25 @@ abstract class Helper implements HelperInterface
      */
     public static function substrToWidth(?string $string, int $width): string
     {
-        $length = $width;
+        $substring = self::substr($string, 0, $width);
 
-        do {
-            $substring = self::substr($string, 0, $length);
-        } while ($length-- > 0 && self::width($substring) > $width);
+        if ($width <= 0 || self::width($substring) <= $width) {
+            return $substring;
+        }
 
-        return $substring;
+        // the width grows with the length: search the longest beginning that fits
+        $min = 0;
+        $max = $width - 1;
+        while ($min < $max) {
+            $length = ($min + $max + 1) >> 1;
+            if (self::width(self::substr($string, 0, $length)) <= $width) {
+                $min = $length;
+            } else {
+                $max = $length - 1;
+            }
+        }
+
+        return self::substr($string, 0, $min);
     }
 
     /**

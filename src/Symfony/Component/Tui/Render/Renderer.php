@@ -178,6 +178,7 @@ final class Renderer implements WidgetRendererInterface
         }
 
         $widget->setRenderCache($lines, $cacheColumns, $cacheRows);
+        $this->positionTracker->markRendered($widget);
 
         return $lines;
     }

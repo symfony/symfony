@@ -38,9 +38,31 @@ final class PositionTracker
      */
     private array $positionStack = [];
 
+    /**
+     * The widgets whose last render was not tracked, like the measuring pass of a layout.
+     *
+     * @var \WeakMap<AbstractWidget, true>
+     */
+    private \WeakMap $untracked;
+
     public function __construct()
     {
         $this->widgetPositions = new \WeakMap();
+        $this->untracked = new \WeakMap();
+    }
+
+    /**
+     * Record whether a widget was just rendered with its positions tracked.
+     *
+     * After a render without tracking, the rects of the descendants still come from an earlier frame, so moveSubtree() must not reuse them.
+     */
+    public function markRendered(AbstractWidget $widget): void
+    {
+        if ($this->isActive()) {
+            unset($this->untracked[$widget]);
+        } else {
+            $this->untracked[$widget] = true;
+        }
     }
 
     /**
@@ -77,7 +99,7 @@ final class PositionTracker
      */
     public function moveSubtree(AbstractWidget $widget, WidgetRect $rect): bool
     {
-        if (!isset($this->widgetPositions[$widget])) {
+        if (!isset($this->widgetPositions[$widget]) || isset($this->untracked[$widget])) {
             return false;
         }
 

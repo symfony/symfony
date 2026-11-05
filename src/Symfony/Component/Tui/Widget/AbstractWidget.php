@@ -436,7 +436,8 @@ abstract class AbstractWidget
     /**
      * Apply a sub-element style to text.
      *
-     * Shorthand for `$this->resolveElement($element)->apply($text)`.
+     * The styled text ends with codes that reset its attributes to the terminal defaults.
+     * The widget's own style is applied again after it, so that the rest of the line keeps that style.
      */
     final protected function applyElement(string $element, string $text): string
     {
@@ -444,7 +445,10 @@ abstract class AbstractWidget
             return $text;
         }
 
-        return $this->resolveElement($element)->apply($text);
+        $styled = $this->resolveElement($element)->apply($text);
+        $restore = $this->context?->resolveStyle($this)->getAnsiRestore() ?? '';
+
+        return '' === $restore || $styled === $text ? $styled : $styled.$restore;
     }
 
     /**

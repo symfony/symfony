@@ -364,6 +364,8 @@ class Inline
             $lastToken = null;
             while ($i < $len) {
                 if (']' === $sequence[$i]) {
+                    $state->nodeCount += \count($output);
+
                     return $output;
                 }
                 if (',' === $sequence[$i] || ' ' === $sequence[$i]) {
@@ -452,6 +454,8 @@ class Inline
                         ++$i;
                         continue 2;
                     case '}':
+                        $state->nodeCount += \count($output);
+
                         if (self::$objectForMap) {
                             return (object) $output;
                         }
@@ -606,7 +610,7 @@ class Inline
                 throw new ParseException(sprintf('Reference "%s" does not exist.', $value), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
             }
 
-            $state->countAlias($references[$value], self::$parsedLineNumber + 1, null, self::$parsedFilename);
+            $state->countAlias($value, $references[$value], self::$parsedLineNumber + 1, null, self::$parsedFilename);
 
             return $references[$value];
         }

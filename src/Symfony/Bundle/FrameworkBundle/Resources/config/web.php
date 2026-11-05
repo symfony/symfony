@@ -218,7 +218,7 @@ return static function (ContainerConfigurator $container) {
                 'attributes' => [
                     MapQueryString::class => ['validationGroups'],
                     MapRequestPayload::class => ['validationGroups'],
-                    RateLimit::class => ['key'],
+                    RateLimit::class => ['key', 'if'],
                     Lock::class => ['key'],
                 ],
                 'variables' => ['request', 'args', 'this'],

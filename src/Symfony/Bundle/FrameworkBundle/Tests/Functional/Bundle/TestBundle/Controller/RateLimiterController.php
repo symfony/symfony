@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
 
@@ -24,6 +25,12 @@ class RateLimiterController
 
     #[RateLimit('own_pool')]
     public function ownPool(): Response
+    {
+        return new Response('ticket');
+    }
+
+    #[RateLimit('tickets', if: new Expression('request.isMethod("POST")'))]
+    public function conditional(): Response
     {
         return new Response('ticket');
     }

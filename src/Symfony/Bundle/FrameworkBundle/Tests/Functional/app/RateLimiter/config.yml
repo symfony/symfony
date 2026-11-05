@@ -19,3 +19,4 @@ framework:
 services:
     Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\RateLimiterController:
         public: true
+        tags: [controller.service_arguments]

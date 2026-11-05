@@ -49,6 +49,15 @@ class RateLimiterTest extends AbstractWebTestCase
         self::assertResponseStatusCodeSame(429);
     }
 
+    public function testWarmUpCompilesTheConditionOfRateLimit()
+    {
+        $kernel = self::bootKernel(['test_case' => 'RateLimiter']);
+
+        self::getContainer()->get('expression_language.cache_warmer')->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());
+
+        self::assertSame(['request.isMethod("POST")'], array_keys(require $kernel->getBuildDir().'/expression_language/controller.expression_language.php'));
+    }
+
     private function consumeAllTokens(KernelBrowser $client, string $uri): void
     {
         for ($i = 0; $i < 5; ++$i) {

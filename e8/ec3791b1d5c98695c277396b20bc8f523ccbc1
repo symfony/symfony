@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-05T17:25:09Z
+
+I moved the tests to `RendererTest`, next to the other tests about cached positions. The second test duplicated `testCachedDescendantPositionsMoveWithTheirParent`, so I replaced it with a column inside a row. That case goes through the `moveSubtree()` call of the horizontal layout, and it also fails without your fix.

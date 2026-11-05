@@ -98,6 +98,22 @@ abstract class Helper implements HelperInterface
     }
 
     /**
+     * Returns the beginning of a string that fits in the given number of columns.
+     *
+     * @internal
+     */
+    public static function substrToWidth(?string $string, int $width): string
+    {
+        $length = $width;
+
+        do {
+            $substring = self::substr($string, 0, $length);
+        } while ($length-- > 0 && self::width($substring) > $width);
+
+        return $substring;
+    }
+
+    /**
      * @return string
      */
     public static function formatTime(int|float $secs, int $precision = 1)

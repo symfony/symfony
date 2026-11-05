@@ -42,6 +42,27 @@ class OutputWrapperTest extends TestCase
         $this->assertSame($wrapper->wrap('Lorem X ipsum', 5), str_replace("\xB3", 'X', $wrapper->wrap("Lorem \xB3 ipsum", 5)));
     }
 
+    public function testWrapCountsWideCharactersAsTwoColumns()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame("日本語\nテキス\nト", $wrapper->wrap('日本語テキスト', 6));
+        $this->assertSame("日本\n語テ\nキス\nト", $wrapper->wrap('日本語テキスト', 5));
+        $this->assertSame("日\n本", $wrapper->wrap('日本', 1));
+        $this->assertSame("abc\n日本語\ndef", $wrapper->wrap('abc 日本語 def', 6));
+        $this->assertSame("a日本\nb", $wrapper->wrap('a日本b', 5));
+        $this->assertSame("<info>日本\n語</info>", $wrapper->wrap('<info>日本語</info>', 5));
+        $this->assertSame("日本\nhttps://日本語.example.com/", $wrapper->wrap('日本 https://日本語.example.com/', 5));
+    }
+
+    public function testWrapKeepsNoncharactersOfTheText()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame("aaaa\n\u{FDD0}bbb\nb", $wrapper->wrap("aaaa\u{FDD0}bbbb", 4));
+        $this->assertSame("\u{FDD0}日本", $wrapper->wrap("\u{FDD0}日本", 5));
+    }
+
     public function testWrapKeepsEscapedTagDelimitersWithTheirBackslash()
     {
         $wrapper = new OutputWrapper();

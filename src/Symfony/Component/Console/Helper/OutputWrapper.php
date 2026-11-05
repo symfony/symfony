@@ -47,6 +47,7 @@ final class OutputWrapper
     private const TAG_OPEN_REGEX_SEGMENT = '[a-z](?:[^\\\\<>]*+ | \\\\.)*';
     private const TAG_CLOSE_REGEX_SEGMENT = '[a-z][^<>]*+';
     private const URL_PATTERN = 'https?://\S+';
+    private const WIDE_CHAR_FILLER = "\u{FDD0}";
 
     public function __construct(
         private bool $allowCutUrls = false,
@@ -71,11 +72,26 @@ final class OutputWrapper
         // the u modifier counts characters instead of bytes, but preg_replace() returns null
         // on malformed UTF-8, which would empty the text
         $modifiers = preg_match('//u', $text) ? 'imux' : 'imx';
+        // a wide character uses two columns: a filler that follows it makes the pattern count both of them, and a line can't end between the two
+        $wideChars = [];
+        if ('imux' === $modifiers && !str_contains($text, self::WIDE_CHAR_FILLER) && preg_match_all('/[^\x00-\x{10FF}]/u', $text, $chars)) {
+            foreach (array_unique($chars[0]) as $char) {
+                if (2 === Helper::width($char)) {
+                    $wideChars[$char] = $char.self::WIDE_CHAR_FILLER;
+                }
+            }
+        }
+        if ($wideChars) {
+            $text = strtr($text, $wideChars);
+            $rowPattern .= '(?!'.self::WIDE_CHAR_FILLER.')';
+        }
         // a line cut inside a word never ends between a backslash and the "<" or ">" it escapes,
         // or the escaped character would start the next line as a tag delimiter
         $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))|(%1$s)(?!(?<=\\\\)[<>]))(?:\r?\n)?|(?:\r?\n|$))#%2$s', $rowPattern, $modifiers);
         $output = rtrim(preg_replace($pattern, '\\1'.$break, $text), $break);
 
-        return str_replace(' '.$break, $break, $output);
+        $output = str_replace(' '.$break, $break, $output);
+
+        return $wideChars ? str_replace(self::WIDE_CHAR_FILLER, '', $output) : $output;
     }
 }

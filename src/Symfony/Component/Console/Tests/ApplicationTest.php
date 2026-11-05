@@ -480,6 +480,20 @@ class ApplicationTest extends TestCase
         ];
     }
 
+    public function testFindWithAmbiguousAbbreviationsAlignsAndTruncatesByColumns()
+    {
+        putenv('COLUMNS=40');
+        $this->expectException(CommandNotFoundException::class);
+        $this->expectExceptionMessage("Command \"foo:\" is ambiguous.\nDid you mean one of these?\n    foo:bar  日本語日本語日本語...\n    foo:é    c\n    foo:日本 b");
+
+        $application = new Application();
+        $application->add((new Command('foo:bar'))->setDescription(str_repeat('日本語', 10)));
+        $application->add((new Command('foo:é'))->setDescription('c'));
+        $application->add((new Command('foo:日本'))->setDescription('b'));
+
+        $application->find('foo:');
+    }
+
     public function testFindWithAmbiguousAbbreviationsFindsCommandIfAlternativesAreHidden()
     {
         $application = new Application();

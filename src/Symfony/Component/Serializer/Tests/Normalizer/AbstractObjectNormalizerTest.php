@@ -32,8 +32,10 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -660,6 +662,30 @@ class AbstractObjectNormalizerTest extends TestCase
         $serializer->normalize($foobar, null, ['cache_key' => false]);
 
         $this->assertFalse($normalizer->childContextCacheKey);
+    }
+
+    public function testCollectionItemsShareTheSameCacheKey()
+    {
+        $nameConverter = new class() implements NameConverterInterface {
+            public $cacheKeys = [];
+
+            public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
+            {
+                return $propertyName;
+            }
+
+            public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
+            {
+                $this->cacheKeys[$context['cache_key']] = true;
+
+                return $propertyName;
+            }
+        };
+
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer(null, $nameConverter)]);
+        $serializer->denormalize(['first' => ['foo' => 'a'], 'second' => ['foo' => 'b'], 'third' => ['foo' => 'c']], Dummy::class.'[]');
+
+        $this->assertCount(1, $nameConverter->cacheKeys);
     }
 
     public function testDenormalizeXmlScalar()

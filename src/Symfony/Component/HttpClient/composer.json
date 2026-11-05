@@ -44,7 +44,7 @@
         "symfony/stopwatch": "^7.4|^8.0"
     },
     "conflict": {
-        "amphp/amp": "<3",
+        "amphp/amp": "<3.0.1",
         "php-http/discovery": "<1.15"
     },
     "autoload": {

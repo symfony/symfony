@@ -318,6 +318,15 @@ class SchemaGeneratorTest extends TestCase
         $this->assertSame(['Library' => Library::class], $document->getDefinitionClasses());
     }
 
+    public function testUnionWithAnUnconstrainedMemberLeavesNoDefinitionBehind()
+    {
+        $document = new SchemaDocument();
+
+        $schema = SchemaGenerator::create()->generate(Type::union(Type::object(Author::class), Type::template('T')), new Configuration(), $document);
+
+        $this->assertSame(array_keys($document->getDefinitions()), array_keys($schema->getDefinitions()));
+    }
+
     public function testCreateAddsTheGivenExtensions()
     {
         $generator = SchemaGenerator::create(new ConstantNameDefinitionPolicy('Shape'), [new IriReferenceClassSchemaResolver(Author::class)], [new FixedPropertySchemaProvider(BookWithAuthors::class, 'title', ['type' => 'string', 'format' => 'isbn'])], [new MarkingPropertySchemaEnricher()], [new RecordingDefinitionProcessor('custom')]);
@@ -511,6 +520,98 @@ class SchemaGeneratorTest extends TestCase
             'items' => ['anyOf' => [['type' => 'boolean'], ['type' => 'integer']]],
             'minItems' => 1,
         ], $schema->getRoot());
+    }
+
+    #[DataProvider('provideListShapedArrayShapesWithDistinctSerializedTypes')]
+    public function testListShapedArrayShapePreservesSerializedItemTypes(Type $type, array $items, int $minItems, ?int $maxItems)
+    {
+        $schema = SchemaGenerator::create()->generate($type);
+        $expected = ['type' => 'array', 'items' => $items];
+
+        if ($minItems) {
+            $expected['minItems'] = $minItems;
+        }
+
+        if (null !== $maxItems) {
+            $expected['maxItems'] = $maxItems;
+        }
+
+        $this->assertSameSchema($expected, $schema->getRoot());
+    }
+
+    public static function provideListShapedArrayShapesWithDistinctSerializedTypes(): iterable
+    {
+        $collection = Type::collection(Type::object(\ArrayIterator::class), Type::int());
+        $items = ['anyOf' => [['type' => 'array', 'items' => ['type' => 'integer']], ['type' => 'object']]];
+
+        yield 'collection and object' => [Type::arrayShape([Type::object(), $collection]), $items, 2, 2];
+        yield 'optional collection and object' => [Type::arrayShape([['type' => $collection, 'optional' => true], Type::object()]), $items, 1, 2];
+        yield 'extra collection' => [Type::arrayShape([Type::object()], false, Type::int(), $collection), $items, 1, null];
+        yield 'extra object' => [Type::arrayShape([$collection], false, Type::int(), Type::object()), $items, 1, null];
+        yield 'date and object' => [Type::arrayShape([Type::object(), Type::object(\DateTimeImmutable::class)]), ['anyOf' => [['type' => 'string', 'format' => 'date-time'], ['type' => 'object']]], 2, 2];
+        yield 'object and collection with the same string representation' => [Type::arrayShape([Type::object(\ArrayIterator::class), Type::collection(Type::object(\ArrayIterator::class))]), ['anyOf' => [['$ref' => '#/$defs/ArrayIterator'], ['type' => 'array', 'items' => new \ArrayObject()]]], 2, 2];
+        yield 'only extra items' => [Type::arrayShape([], false, Type::int(), Type::string()), ['type' => 'string'], 0, null];
+    }
+
+    #[DataProvider('provideListShapedArrayShapeItemUnions')]
+    public function testListShapedArrayShapeCombinesItemSchemas(array $types, array $items)
+    {
+        $schema = SchemaGenerator::create()->generate(Type::arrayShape($types));
+
+        $this->assertSameSchema(['type' => 'array', 'items' => $items ?: new \ArrayObject(), 'minItems' => \count($types), 'maxItems' => \count($types)], $schema->getRoot());
+    }
+
+    public static function provideListShapedArrayShapeItemUnions(): iterable
+    {
+        yield 'duplicate types' => [[Type::int(), Type::int()], ['type' => 'integer']];
+        yield 'classes with the same schema' => [[Type::object(\DateTime::class), Type::object(\DateTimeImmutable::class)], ['type' => 'string', 'format' => 'date-time']];
+        yield 'mixed' => [[Type::int(), Type::mixed()], []];
+        yield 'mixed and unrepresentable type' => [[Type::mixed(), Type::builtin(TypeIdentifier::CALLABLE)], []];
+        yield 'unrepresentable type' => [[Type::int(), Type::builtin(TypeIdentifier::CALLABLE)], ['type' => 'integer']];
+        yield 'null only' => [[Type::null()], ['type' => 'null']];
+        yield 'nullable scalar' => [[Type::int(), Type::null()], ['type' => ['integer', 'null']]];
+    }
+
+    #[DataProvider('provideNullableListShapedArrayShapeDialects')]
+    public function testListShapedArrayShapePreservesNullableCollectionItems(Dialect $dialect, array $items)
+    {
+        $type = Type::arrayShape([Type::object(), Type::collection(Type::object(\ArrayIterator::class), Type::int()), Type::null()]);
+        $schema = SchemaGenerator::create()->generate($type, new Configuration($dialect));
+
+        $this->assertSameSchema($items, $schema->getRoot()['items']);
+    }
+
+    public static function provideNullableListShapedArrayShapeDialects(): iterable
+    {
+        $schemas = [['type' => 'array', 'items' => ['type' => 'integer']], ['type' => 'object']];
+
+        yield 'JSON Schema' => [Dialect::jsonSchema202012(), ['anyOf' => [...$schemas, ['type' => 'null']]]];
+        yield 'OpenAPI 3.0' => [Dialect::openApi30(), ['anyOf' => $schemas, 'nullable' => true]];
+        yield 'OpenAPI 3.1' => [Dialect::openApi31(), ['anyOf' => [...$schemas, ['type' => 'null']]]];
+    }
+
+    #[DataProvider('provideListShapedArrayShapeNullableUnionItems')]
+    public function testListShapedArrayShapePreservesNullableUnionItems(Type $type, Dialect $dialect, array $items)
+    {
+        $schema = SchemaGenerator::create()->generate($type, new Configuration($dialect));
+
+        $this->assertSameSchema($items, $schema->getRoot()['items']);
+    }
+
+    public static function provideListShapedArrayShapeNullableUnionItems(): iterable
+    {
+        foreach (['callable' => TypeIdentifier::CALLABLE, 'resource' => TypeIdentifier::RESOURCE] as $unsupported => $identifier) {
+            $type = Type::builtin($identifier);
+
+            foreach (['JSON Schema' => Dialect::jsonSchema202012(), 'OpenAPI 3.0' => Dialect::openApi30(), 'OpenAPI 3.1' => Dialect::openApi31()] as $name => $dialect) {
+                $items = NullSyntax::NullableFlag === $dialect->nullSyntax ? ['type' => 'integer', 'nullable' => true] : ['type' => ['integer', 'null']];
+
+                yield "$name nullable $unsupported entry" => [Type::arrayShape([Type::nullable($type), Type::int()]), $dialect, $items];
+                yield "$name nullable integer entry and $unsupported" => [Type::arrayShape([Type::nullable(Type::int()), $type]), $dialect, $items];
+                yield "$name nullable $unsupported extra items" => [Type::arrayShape([Type::int()], false, Type::int(), Type::nullable($type)), $dialect, $items];
+                yield "$name nullable integer entry and extra $unsupported" => [Type::arrayShape([Type::nullable(Type::int())], false, Type::int(), $type), $dialect, $items];
+            }
+        }
     }
 
     public function testEmptyArrayShapeBecomesAnEmptyArray()

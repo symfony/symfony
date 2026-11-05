@@ -109,6 +109,11 @@ switch (parse_url($vars['REQUEST_URI'], \PHP_URL_PATH)) {
         header('Location: ..', true, 302);
         break;
 
+    case '/302/two-locations':
+        header('Location: http://localhost:8057/', true, 302);
+        header('Location: http://localhost:8057/404', false);
+        break;
+
     case '/304':
         header('Content-Length: 10', true, 304);
         echo '12345';

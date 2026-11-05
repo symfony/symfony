@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-05T17:25:11Z
+
+I added a fix to ScreenBufferHtmlRenderer. With this PR, ScreenBuffer stores `4:3` in the style of a cell, and the renderer only parsed `[0-9;]`. So these cells lost all their CSS, bold and colors included. They're now drawn with a plain underline, as before.

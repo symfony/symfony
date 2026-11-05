@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-11-05T00:58:36Z
+
+Thanks! Symfony's own limiters never return a retryAfter far enough in the past to push this below 0, so I didn't add the clamp.

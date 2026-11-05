@@ -30,7 +30,7 @@ use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
  */
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
 #[RecoverableAttribute(RateLimitExceededException::class)]
-final class RateLimit
+class RateLimit
 {
     /** @var string[] */
     public readonly array $methods;
@@ -52,7 +52,7 @@ final class RateLimit
         public readonly bool|Expression|\Closure $if = true,
     ) {
         if ($this->tokens < 1) {
-            throw new \InvalidArgumentException(\sprintf('The "$tokens" argument of "%s" must be greater than 0, "%d" given.', self::class, $this->tokens));
+            throw new \InvalidArgumentException(\sprintf('The "$tokens" argument of "%s" must be greater than 0, "%d" given.', static::class, $this->tokens));
         }
 
         if (\in_array('GET', $methods = array_map('strtoupper', (array) $methods), true)) {

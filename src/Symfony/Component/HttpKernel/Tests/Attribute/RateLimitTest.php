@@ -33,9 +33,25 @@ class RateLimitTest extends TestCase
         new RateLimit('api', tokens: 0);
     }
 
+    public function testInvalidTokensErrorNamesTheExtendingAttribute()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageIs('The "$tokens" argument of "Symfony\\Component\\HttpKernel\\Tests\\Attribute\\ExtendedRateLimit" must be greater than 0, "0" given.');
+
+        new ExtendedRateLimit(0);
+    }
+
     public function testMethodsAreNormalized()
     {
         $rl = new RateLimit('api', methods: ['get', 'post']);
         $this->assertSame(['GET', 'POST', 'HEAD'], $rl->methods);
+    }
+}
+
+class ExtendedRateLimit extends RateLimit
+{
+    public function __construct(int $tokens)
+    {
+        parent::__construct('api', null, $tokens);
     }
 }

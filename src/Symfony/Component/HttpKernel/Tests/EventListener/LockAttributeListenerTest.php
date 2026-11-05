@@ -349,6 +349,22 @@ class LockAttributeListenerTest extends TestCase
         $this->assertFalse($this->isLocked('foo'));
     }
 
+    public function testKernelAcquiresAndReleasesTheLockOfAnAttributeExtendingLock()
+    {
+        $lockedInController = null;
+        $request = Request::create('/');
+        $request->attributes->set('_controller', #[ExtendedLock('import')] function () use (&$lockedInController) {
+            $lockedInController = $this->isLocked('import');
+
+            return new Response();
+        });
+
+        $this->makeKernel()->handle($request);
+
+        $this->assertTrue($lockedInController);
+        $this->assertFalse($this->isLocked('import'));
+    }
+
     public function testRejectsAConcurrentRequestWith409()
     {
         $listener = $this->makeListener();
@@ -783,6 +799,14 @@ class LockAttributeListenerTest extends TestCase
         $this->makeListener()->onKernelControllerAttribute($this->makeEvent(new Lock(static fn () => 4.2), Request::create('/')));
     }
 
+    public function testInvalidKeyErrorNamesTheExtendingAttribute()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessageIs('The value of the "$key" option of the "Symfony\\Component\\HttpKernel\\Tests\\EventListener\\ExtendedLock" attribute must evaluate to a string, an integer or a "Stringable" object, "float" given.');
+
+        $this->makeListener()->onKernelControllerAttribute($this->makeEvent(new ExtendedLock(static fn () => 4.2), Request::create('/')));
+    }
+
     #[DataProvider('provideKeysWithPlaceholders')]
     public function testKeyPlaceholdersAreReplacedByRequestAttributes(string $key, string $expectedKey)
     {
@@ -973,6 +997,15 @@ class LockAttributeListenerTest extends TestCase
         $factory->expects($this->never())->method('createLock');
 
         $this->makeListener(['default' => $factory])->onKernelControllerAttribute($this->makeEvent(new Lock('foo', methods: ['POST']), Request::create('/', 'GET')));
+    }
+}
+
+#[\Attribute(\Attribute::TARGET_FUNCTION)]
+class ExtendedLock extends Lock
+{
+    public function __construct(string|Expression|\Closure $key)
+    {
+        parent::__construct($key);
     }
 }
 

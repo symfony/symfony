@@ -446,6 +446,16 @@ class RateLimitAttributeListenerTest extends TestCase
         }
     }
 
+    public function testAttributeExtendingRateLimitIsAppliedThroughARealKernel()
+    {
+        $kernel = $this->makeRealKernel(['policy' => 'fixed_window', 'limit' => 5, 'interval' => '1 minute']);
+
+        $response = $this->handleThrough($kernel, new ExtendedRateLimitController());
+
+        $this->assertSame('5', $response->headers->get('X-RateLimit-Limit'));
+        $this->assertSame('4', $response->headers->get('X-RateLimit-Remaining'));
+    }
+
     #[DataProvider('policyProvider')]
     public function testSharedCacheDoesNotServeOneClientsQuotaToAnother(array $config)
     {
@@ -718,6 +728,17 @@ class RateLimitAttributeListenerTest extends TestCase
 
         $this->makeListener()->onKernelControllerAttribute($this->makeEvent(
             new RateLimit('api', key: static fn () => 42),
+            Request::create('/'),
+        ));
+    }
+
+    public function testNonStringKeyErrorNamesTheExtendingAttribute()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessageIs('The value of the "$key" option of the "Symfony\\Component\\HttpKernel\\Tests\\EventListener\\RateLimitExposingHeaders" attribute must evaluate to a string, "int" given.');
+
+        $this->makeListener()->onKernelControllerAttribute($this->makeEvent(
+            new RateLimitExposingHeaders('api', static fn () => 42),
             Request::create('/'),
         ));
     }
@@ -1009,6 +1030,17 @@ class RateLimitAttributeListenerTest extends TestCase
         ));
     }
 
+    public function testNonBooleanIfErrorNamesTheExtendingAttribute()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessageIs('The value of the "$if" option of the "Symfony\\Component\\HttpKernel\\Tests\\EventListener\\RateLimitExposingHeaders" attribute must evaluate to a boolean, "int" given.');
+
+        $this->makeListener()->onKernelControllerAttribute($this->makeEvent(
+            new RateLimitExposingHeaders('api', null, static fn () => 42),
+            Request::create('/'),
+        ));
+    }
+
     #[DataProvider('provideConditionsReadingArguments')]
     public function testConditionReadingArgumentsIsConsumedOnceTheArgumentsAreResolved(Expression|\Closure $if)
     {
@@ -1080,6 +1112,24 @@ class RateLimitAttributeListenerTest extends TestCase
 class RateLimitedController
 {
     #[RateLimit('api', exposeHeaders: true)]
+    public function __invoke(): Response
+    {
+        return new Response('ok');
+    }
+}
+
+#[\Attribute(\Attribute::TARGET_METHOD)]
+class RateLimitExposingHeaders extends RateLimit
+{
+    public function __construct(string $limiter, string|Expression|\Closure|null $key = null, bool|Expression|\Closure $if = true)
+    {
+        parent::__construct($limiter, $key, 1, [], true, $if);
+    }
+}
+
+class ExtendedRateLimitController
+{
+    #[RateLimitExposingHeaders('api')]
     public function __invoke(): Response
     {
         return new Response('ok');

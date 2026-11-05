@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-05T18:40:57Z
+
+Thank you @b84330808. I pushed a few changes. The wrapper now measures each distinct wide character once, so wrapping 1KB of CJK text takes 0.1ms instead of 1.8ms. A text that already contains U+FDD0 now keeps that character. I also adjusted the new tests so that they merge up to 8.x unchanged.
+
+---------------------------------------------------------------------------
+
+by phcorp at 2026-11-05T18:48:54Z
+
+Thanks for the update. I measured 333af0f against its 6.4 base (Console suite green on PHP 8.5 and on 8.1 with symfony/string 6.4; the 6 behaviour tests fail on the base as expected).
+
+The wrapper change holds up: 1KB of CJK wraps in 36µs instead of 507µs here, and texts containing U+FDD0 wrap exactly as on 6.4. Text made of distinct characters gets no benefit (10KB of distinct ideographs: 51µs on 6.4, 5.0ms now), which looks acceptable for console messages.
+
+`Helper::substrToWidth()` is still quadratic though: it drops one character per iteration and measures the whole prefix each time, and `FormatterHelper::truncate()` accepts any length.
+
+| `truncate()` on 10KB of CJK | 6.4 | this PR | binary search |
+|---|---|---|---|
+| length 120 | 2.8ms | 8.3ms | 3.3ms |
+| length 2000 | 2.8ms | 1111ms | 13ms |
+
+The width only grows with the length, so a binary search returns the same result. It gave identical output on 36,001 random cases (ASCII, CJK, emoji, ZWJ sequences, combining marks, control characters, newlines, U+FDD0, widths from -7 to 100), and the Console suite passes with it:
+
+```php
+    public static function substrToWidth(?string $string, int $width): string
+    {
+        $substring = self::substr($string, 0, $width);
+
+        if ($width <= 0 || self::width($substring) <= $width) {
+            return $substring;
+        }
+
+        // the width grows with the length: search the longest beginning that fits
+        $min = 0;
+        $max = $width - 1;
+        while ($min < $max) {
+            $length = ($min + $max + 1) >> 1;
+            if (self::width(self::substr($string, 0, $length)) <= $width) {
+                $min = $length;
+            } else {
+                $max = $length - 1;
+            }
+        }
+
+        return self::substr($string, 0, $min);
+    }
+```

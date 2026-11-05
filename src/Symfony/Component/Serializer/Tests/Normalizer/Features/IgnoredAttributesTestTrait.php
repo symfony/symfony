@@ -74,6 +74,17 @@ trait IgnoredAttributesTestTrait
             ], ObjectOuter::class, null, $context));
     }
 
+    public function testIgnoredAttributesContextDenormalizeCaseVariants()
+    {
+        $normalizer = $this->getDenormalizerForIgnoredAttributes();
+
+        $objectOuter = new ObjectOuter();
+        $objectOuter->bar = 'bar';
+
+        $context = ['ignored_attributes' => ['foo']];
+        $this->assertEquals($objectOuter, $normalizer->denormalize(['FOO' => 'foo', 'Foo' => 'foo', 'bar' => 'bar'], ObjectOuter::class, null, $context));
+    }
+
     public function testIgnoredAttributesContextDenormalizeInherit()
     {
         $normalizer = $this->getDenormalizerForIgnoredAttributes();

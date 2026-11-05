@@ -202,6 +202,15 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             return $this->classMetadataFactory && isset($this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata()[$attribute]);
         }
 
+        if ($ignoredAttributes = $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES]) {
+            $foldedAttribute = strtolower(str_replace(['_', ' '], '', $attribute));
+            foreach ($ignoredAttributes as $ignoredAttribute) {
+                if ($foldedAttribute === strtolower(str_replace(['_', ' '], '', $ignoredAttribute)) && $this->isWrittenByMethod($class, $attribute)) {
+                    return false;
+                }
+            }
+        }
+
         if ($this->propertyInfoExtractor->isWritable($class, $attribute)) {
             return true;
         }
@@ -211,6 +220,19 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         }
 
         return false;
+    }
+
+    private function isWrittenByMethod(string $class, string $attribute): bool
+    {
+        if (!$writeInfo = $this->writeInfoExtractor->getWriteInfo($class, $attribute, ['enable_constructor_extraction' => false])) {
+            return false;
+        }
+
+        if (PropertyWriteInfo::TYPE_METHOD === $writeInfo->getType()) {
+            return method_exists($class, $writeInfo->getName());
+        }
+
+        return PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $writeInfo->getType();
     }
 
     private function hasAttributeAccessorMethod(string $class, string $attribute): bool

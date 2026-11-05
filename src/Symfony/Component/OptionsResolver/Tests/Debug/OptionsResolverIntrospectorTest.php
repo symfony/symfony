@@ -102,22 +102,22 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetAllowedTypesThrowsOnNoConfiguredValue()
     {
-        $this->expectException(NoConfigurationException::class);
-        $this->expectExceptionMessage('No allowed types were set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
+        $this->expectException(NoConfigurationException::class);
+        $this->expectExceptionMessage('No allowed types were set for the "foo" option.');
         $debug->getAllowedTypes($option);
     }
 
     public function testGetAllowedTypesThrowsOnNotDefinedOption()
     {
-        $this->expectException(UndefinedOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
+        $this->expectException(UndefinedOptionsException::class);
+        $this->expectExceptionMessage('The option "foo" does not exist.');
         $debug->getAllowedTypes('foo');
     }
 
@@ -133,22 +133,22 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetAllowedValuesThrowsOnNoConfiguredValue()
     {
-        $this->expectException(NoConfigurationException::class);
-        $this->expectExceptionMessage('No allowed values were set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
+        $this->expectException(NoConfigurationException::class);
+        $this->expectExceptionMessage('No allowed values were set for the "foo" option.');
         $debug->getAllowedValues($option);
     }
 
     public function testGetAllowedValuesThrowsOnNotDefinedOption()
     {
-        $this->expectException(UndefinedOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
+        $this->expectException(UndefinedOptionsException::class);
+        $this->expectExceptionMessage('The option "foo" does not exist.');
         $debug->getAllowedValues('foo');
     }
 
@@ -164,22 +164,22 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetNormalizerThrowsOnNoConfiguredValue()
     {
-        $this->expectException(NoConfigurationException::class);
-        $this->expectExceptionMessage('No normalizer was set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
+        $this->expectException(NoConfigurationException::class);
+        $this->expectExceptionMessage('No normalizer was set for the "foo" option.');
         $debug->getNormalizer($option);
     }
 
     public function testGetNormalizerThrowsOnNotDefinedOption()
     {
-        $this->expectException(UndefinedOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
+        $this->expectException(UndefinedOptionsException::class);
+        $this->expectExceptionMessage('The option "foo" does not exist.');
         $debug->getNormalizer('foo');
     }
 

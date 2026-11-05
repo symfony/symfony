@@ -188,15 +188,11 @@ class RouteCompilerTest extends TestCase
      */
     public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens, $deprecationType)
     {
-        $this->expectException(\LogicException::class);
         $r = new \ReflectionClass(Route::class);
         $route = $r->newInstanceArgs($arguments);
 
-        $compiled = $route->compile();
-        $this->assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
-        $this->assertEquals($regex, $compiled->getRegex(), $name.' (regex)');
-        $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
-        $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
+        $this->expectException(\LogicException::class);
+        $route->compile();
     }
 
     public static function provideCompileImplicitUtf8Data()

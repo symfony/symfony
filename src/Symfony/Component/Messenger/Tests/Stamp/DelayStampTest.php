@@ -32,12 +32,15 @@ class DelayStampTest extends TestCase
         $this->assertSame(-5000, $stamp->getDelay());
     }
 
+    /**
+     * @group time-sensitive
+     */
     public function testDelayUntil()
     {
-        $stamp = DelayStamp::delayUntil(new \DateTimeImmutable('+30 seconds'));
+        $stamp = DelayStamp::delayUntil(new \DateTimeImmutable('@'.(time() + 30)));
         $this->assertSame(30000, $stamp->getDelay());
 
-        $stamp = DelayStamp::delayUntil(new \DateTimeImmutable('-5 seconds'));
+        $stamp = DelayStamp::delayUntil(new \DateTimeImmutable('@'.(time() - 5)));
         $this->assertSame(-5000, $stamp->getDelay());
     }
 }

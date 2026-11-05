@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by srebb at 2026-11-05T19:28:25Z
+
+Thanks @nicolas-grekas , added it as `testInvalidateTagsWithHashTagInPrefix()` in `RedisTagAwareClusterAdapterTest`, pretty much as you wrote it.
+
+And yeah, it catches exactly that case. With the prefix set to `{app}:` the old temporary key landed in a different slot than the tag set, so `SUNIONSTORE` went cross-slot and `invalidateTags()` quietly returned `false`. Pinning the temp key to the same slot with `{prefix+id}id` is what makes it pass now.

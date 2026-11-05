@@ -44,6 +44,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
             ['fe80::1',     null,          true],
             ['fc00::1',     null,          true],
             ['fd00::1',     null,          true],
+            ['fec0::1',     null,          true],
             ['::7f00:1',          null,    true],
             ['2002:7f00:1::',     null,    true],
             ['2001::1',           null,    true],

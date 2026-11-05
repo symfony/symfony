@@ -227,7 +227,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     private function buildTypeSchema(Type $type, Configuration $config, ?DefinitionParent $parent, SchemaDocument $document): array
     {
         return match (true) {
-            $type instanceof UnionType => $this->buildUnionSchema($type, $config, $parent, $document),
+            $type instanceof UnionType => $this->buildUnionSchema($type->getTypes(), $config, $parent, $document),
             $type instanceof IntersectionType => $this->buildIntersectionSchema($type, $config, $parent, $document),
             $type instanceof ArrayShapeType => $this->buildArrayShapeSchema($type, $config, $parent, $document),
             $type instanceof CollectionType => $this->buildCollectionSchema($type, $config, $parent, $document),
@@ -254,15 +254,17 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     }
 
     /**
+     * @param list<Type> $types
+     *
      * @return array<string, mixed>
      */
-    private function buildUnionSchema(UnionType $type, Configuration $config, ?DefinitionParent $parent, SchemaDocument $document): array
+    private function buildUnionSchema(array $types, Configuration $config, ?DefinitionParent $parent, SchemaDocument $document): array
     {
         $nullable = false;
         $schemas = [];
-        $dropUnrepresentable = self::isRepresentable($type);
+        $dropUnrepresentable = array_any($types, static fn (Type $t): bool => !$t->isIdentifiedBy(TypeIdentifier::NULL) && self::isRepresentable($t));
 
-        foreach ($type->getTypes() as $t) {
+        foreach ($types as $t) {
             if ($t instanceof BuiltinType && TypeIdentifier::NULL === $t->getTypeIdentifier()) {
                 $nullable = true;
 
@@ -273,7 +275,15 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 continue;
             }
 
-            $schemas[] = $this->buildTypeSchema($t, $config, $parent, $document);
+            $schema = $this->buildTypeSchema($t, $config, $parent, $document);
+
+            if (!\in_array($schema, $schemas, true)) {
+                $schemas[] = $schema;
+            }
+        }
+
+        if (!$schemas && $nullable) {
+            return $this->buildBuiltinSchema(Type::null(), $config->dialect);
         }
 
         $schema = 1 === \count($schemas) ? $schemas[0] : ['anyOf' => $schemas];
@@ -342,8 +352,25 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             return $this->buildShapeSchema($shape, $config, $parent, $document) + ['additionalProperties' => null === $extraValueType ? false : $this->buildTypeSchema($extraValueType, $config, $parent, $document)];
         }
 
-        $valueType = null === $extraValueType ? $type->getCollectionValueType() : CollectionType::mergeCollectionValueTypes([$type->getCollectionValueType(), $extraValueType]);
-        $schema = ['type' => 'array', 'items' => $this->buildTypeSchema($valueType, $config, $parent, $document)];
+        // Merging PHP types can discard classes that serialize to arrays or scalars instead of objects.
+        $itemTypes = array_column($shape, 'type');
+
+        if (null !== $extraValueType) {
+            $itemTypes[] = $extraValueType;
+        }
+
+        $valueTypes = [];
+
+        foreach ($itemTypes as $itemType) {
+            array_push($valueTypes, ...($itemType instanceof UnionType ? $itemType->getTypes() : [$itemType]));
+        }
+
+        if (array_any($valueTypes, static fn (Type $t): bool => $t->isIdentifiedBy(TypeIdentifier::MIXED))) {
+            $valueTypes = [];
+        }
+
+        usort($valueTypes, static fn (Type $a, Type $b): int => strcmp((string) $a, (string) $b));
+        $schema = ['type' => 'array', 'items' => $this->buildUnionSchema($valueTypes ?: [Type::mixed()], $config, $parent, $document)];
 
         if ($minItems = \count(array_filter($shape, static fn (array $element): bool => !$element['optional']))) {
             $schema['minItems'] = $minItems;

@@ -187,6 +187,30 @@ class TypeTest extends TestCase
         Type::union(Type::template('T'), Type::int())->map(self::replaceTemplate(Type::void()));
     }
 
+    #[DataProvider('withoutRefinementsDataProvider')]
+    public function testWithoutRefinements(Type $type, Type $expected)
+    {
+        $this->assertEquals($expected, $type->withoutRefinements());
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: Type}>
+     */
+    public static function withoutRefinementsDataProvider(): iterable
+    {
+        $nonZeroInt = Type::union(Type::intRange(null, -1), Type::intRange(1, null));
+
+        yield [Type::string(), Type::string()];
+        yield [Type::literal('a'), Type::string()];
+        yield [Type::intRange(1, null), Type::int()];
+        yield [$nonZeroInt, Type::int()];
+        yield [Type::nullable($nonZeroInt), Type::nullable(Type::int())];
+        yield [Type::union(Type::literal('a'), Type::literal('b')), Type::string()];
+        yield [Type::union(Type::literal('a'), Type::string()), Type::string()];
+        yield [Type::union(Type::literal(1), Type::literal('one')), Type::union(Type::int(), Type::string())];
+        yield [Type::array(Type::literal(1.5), $nonZeroInt), Type::array(Type::float(), Type::int())];
+    }
+
     #[DataProvider('provideGetMismatches')]
     public function testGetMismatches(Type $type, mixed $value, array $expectedMismatches)
     {

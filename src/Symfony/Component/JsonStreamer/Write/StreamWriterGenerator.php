@@ -102,6 +102,11 @@ final class StreamWriterGenerator
             throw new UnsupportedException(\sprintf('Intersection types are not supported ("%s").', (string) $type));
         }
 
+        // the lowest symfony/type-info has no refinements to remove
+        if (method_exists($type, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+            $type = $type->withoutRefinements();
+        }
+
         if ($type instanceof UnionType) {
             $nodes = [];
             foreach ($type->getTypes() as $t) {

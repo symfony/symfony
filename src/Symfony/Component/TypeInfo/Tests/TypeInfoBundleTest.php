@@ -86,6 +86,7 @@ class TestTypeInfoKernel extends AbstractKernel
             'aliases' => [
                 'CustomAlias' => 'int',
             ],
+            'resolve_refinements' => true,
         ]);
         $container->services()->alias('test.type_info.resolver', 'type_info.resolver')->public();
     }

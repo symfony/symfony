@@ -985,6 +985,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $collectionValueType = $collectionValueType instanceof NullableType ? $collectionValueType->getWrappedType() : $collectionValueType->getCollectionValueType();
             }
 
+            // the lowest symfony/type-info has no refinements to remove
+            if (method_exists($collectionValueType, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+                $collectionValueType = $collectionValueType->withoutRefinements();
+            }
+
             $collectionValueBaseType = $collectionValueType;
         }
 
@@ -1174,7 +1179,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return [];
         }
 
-        $this->typeContextFactory ??= new TypeContextFactory(new StringTypeResolver());
+        $this->typeContextFactory ??= new TypeContextFactory(new StringTypeResolver(null, null, [], true));
         $templateTypes = [];
 
         // the templates of the generic class are the ones the variable types are given for, not those of a mapped child class

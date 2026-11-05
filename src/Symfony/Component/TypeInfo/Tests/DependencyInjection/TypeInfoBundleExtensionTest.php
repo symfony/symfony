@@ -56,6 +56,30 @@ class TypeInfoBundleExtensionTest extends TestCase
         $this->assertSame(['CustomAlias' => 'int'], $container->getDefinition('type_info.resolver.string')->getArgument(2));
     }
 
+    public function testResolveRefinementsIsPassedToTheStringResolver()
+    {
+        if (!class_exists(PhpDocParser::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" dependency is required.');
+        }
+
+        $container = $this->createContainerFromFile('type_info');
+        $this->assertTrue($container->getDefinition('type_info.resolver.string')->getArgument(3));
+        $this->assertTrue($container->getParameter('.type_info.resolve_refinements'));
+
+        $container = $this->createContainerFromFile('type_info_default_config');
+        $this->assertNull($container->getDefinition('type_info.resolver.string')->getArgument(3));
+        $this->assertNull($container->getParameter('.type_info.resolve_refinements'));
+    }
+
+    public function testResolveRefinementsParameterIsDefinedWhenTypeInfoIsDisabled()
+    {
+        $container = $this->createContainer();
+        $container->loadFromExtension('type_info', ['enabled' => false, 'resolve_refinements' => true]);
+        $container->compile();
+
+        $this->assertTrue($container->getParameter('.type_info.resolve_refinements'));
+    }
+
     private function createContainerFromFile(string $file): ContainerBuilder
     {
         $container = $this->createContainer();

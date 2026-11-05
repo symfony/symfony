@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Kernel\BundleInterface;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\JsonSchema\JsonSchemaBundle;
+use Symfony\Component\TypeInfo\Type;
 
 class JsonSchemaBundleTestKernel extends AbstractKernel
 {
@@ -59,6 +60,11 @@ class JsonSchemaBundleTestKernel extends AbstractKernel
 
     private function configureContainer(ContainerConfigurator $container): void
     {
+        // the option exists only where refinements do
+        if (method_exists(Type::class, 'literal')) {
+            $container->extension('type_info', ['resolve_refinements' => true]);
+        }
+
         foreach ($this->extensionConfigs as $name => $config) {
             $container->extension($name, $config);
         }

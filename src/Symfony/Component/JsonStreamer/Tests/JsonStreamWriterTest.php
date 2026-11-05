@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonStreamer\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -800,6 +801,23 @@ class JsonStreamWriterTest extends TestCase
         );
 
         $this->assertWritten('true', true, Type::bool());
+    }
+
+    #[RequiresMethod(Type::class, 'literal')]
+    public function testWriteRefinedTypesAsTheirBaseType()
+    {
+        $writer = JsonStreamWriter::create([], $this->streamWritersDir);
+
+        foreach ([
+            ['draft', Type::literal('draft'), Type::string()],
+            ['b', Type::union(Type::literal('a'), Type::literal('b')), Type::string()],
+            [['a"b$c*/'], Type::list(Type::literal('a"b$c*/')), Type::list(Type::string())],
+            [1, Type::nullable(Type::intRange(1, null)), Type::nullable(Type::int())],
+            [[true, false], Type::array(Type::bool(), Type::intRange(0, null)), Type::array(Type::bool(), Type::int())],
+            [[1 => true, 2 => false], Type::array(Type::bool(), Type::intRange(1, null)), Type::array(Type::bool(), Type::int())],
+        ] as [$data, $type, $baseType]) {
+            $this->assertSame((string) $writer->write($data, $baseType), (string) $writer->write($data, $type));
+        }
     }
 
     /**

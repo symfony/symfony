@@ -22,6 +22,7 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\TypeInfo\Exception\ExceptionInterface;
+use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
@@ -103,7 +104,7 @@ final class TypeInfoFormTypeGuesser implements FormTypeGuesserInterface
             while (!$reflector->hasProperty($property) && $reflector->getParentClass()) {
                 $reflector = $reflector->getParentClass();
             }
-            $type = ($this->typeResolver ??= TypeResolver::create())->resolve($reflector->getProperty($property));
+            $type = ($this->typeResolver ??= TypeResolver::create(null, true))->resolve($reflector->getProperty($property));
         } catch (\ReflectionException|ExceptionInterface) {
             return [null, [], null];
         }
@@ -117,6 +118,11 @@ final class TypeInfoFormTypeGuesser implements FormTypeGuesserInterface
 
         if ($type instanceof NullableType) {
             $type = $type->getWrappedType();
+        }
+
+        // the lowest symfony/type-info has no refinements to remove
+        if (method_exists($type, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+            $type = $type->withoutRefinements();
         }
 
         if ($type instanceof BuiltinType) {

@@ -46,12 +46,18 @@ class TypeInfoBundle extends AbstractBundle
                     ->useAttributeAsKey('name')
                     ->scalarPrototype()->end()
                 ->end()
+                ->booleanNode('resolve_refinements')
+                    ->info('Whether to resolve PHPDoc refinements, such as literals and integer ranges. Not setting it to true is deprecated since Symfony 8.2, refinements will always be resolved as of 9.0.')
+                    ->defaultNull()
+                ->end()
             ->end()
         ;
     }
 
     public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void
     {
+        $container->setParameter('.type_info.resolve_refinements', $config['resolve_refinements']);
+
         if (!$config['enabled']) {
             return;
         }
@@ -60,7 +66,7 @@ class TypeInfoBundle extends AbstractBundle
 
         if (ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/type-info'])) {
             $container->register('type_info.resolver.string', StringTypeResolver::class)
-                ->setArguments([null, null, $config['aliases']]);
+                ->setArguments([null, null, $config['aliases'], $config['resolve_refinements']]);
 
             $container->register('type_info.resolver.reflection_parameter.phpdoc_aware', PhpDocAwareReflectionTypeResolver::class)
                 ->setArguments([new Reference('type_info.resolver.reflection_parameter'), new Reference('type_info.resolver.string'), new Reference('type_info.type_context_factory')]);

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-05T17:10:23Z
+
+Thank you @alexisLefebvre. As @phcorp suggested, I pushed a test where the `?self` property comes from a trait. The other tests pass on PHP 8.5 even without the fix. I also added the `getParentClass()` fallback, with a test.

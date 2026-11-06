@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-06T09:27:58Z
+
+Thank you @dylanpulver. I moved #67907 here and put `expectException()` right before the call that throws in each test. Please add the next ones you find to a single PR like this one.

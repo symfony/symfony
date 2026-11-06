@@ -19,13 +19,6 @@ parameters:
     ignoreErrors:
         # Added in PHP 8.4
         - '#^Class BcMath\\Number not found\.$#'
-        # Composer needs the unreachable declarations to index these deprecated class aliases. Remove this ignore with the shims in 9.0.
-        -
-            identifier: if.alwaysFalse
-            paths:
-                - src/Symfony/Component/HttpKernel/Config/FileLocator.php
-                - src/Symfony/Component/HttpKernel/DependencyInjection/ServicesResetter.php
-                - src/Symfony/Component/HttpKernel/DependencyInjection/ServicesResetterInterface.php
         # DeferredBatchMessage::$acked aliases a bool that batch handlers flip during dispatch()
         -
             message: '#^If condition is always false\.$#'

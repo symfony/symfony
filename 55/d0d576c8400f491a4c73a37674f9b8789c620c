@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-06T13:25:38Z
+
+Thanks for the fix. I pushed one more change, so that a float node with a min or a max now rejects NAN. Once NAN was no longer seen as a placeholder, `->min(0)->max(1)` accepted it silently, because `NAN < 0` and `NAN > 1` are both false.

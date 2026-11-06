@@ -28,7 +28,18 @@ final class ReflectionTypeResolver implements TypeResolverInterface
     public function resolve(mixed $subject, ?TypeContext $typeContext = null): Type
     {
         if ($subject instanceof \ReflectionUnionType) {
-            return Type::union(...array_map(fn (mixed $t): Type => $this->resolve($t, $typeContext), $subject->getTypes()));
+            $types = [];
+
+            foreach ($subject->getTypes() as $reflectionType) {
+                $type = $this->resolve($reflectionType, $typeContext);
+
+                // "self|static" means "self" when the called class is the declaring class
+                if (!\in_array($type, $types)) {
+                    $types[] = $type;
+                }
+            }
+
+            return 1 === \count($types) ? $types[0] : Type::union(...$types);
         }
 
         if ($subject instanceof \ReflectionIntersectionType) {

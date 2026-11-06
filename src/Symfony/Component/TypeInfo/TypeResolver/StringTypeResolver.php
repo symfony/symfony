@@ -316,6 +316,11 @@ final class StringTypeResolver implements TypeResolverInterface
                 }
 
                 foreach ($type instanceof UnionType ? $type->getTypes() : [$type] as $t) {
+                    // "int|positive-int" and "'a'|'b'" mean "int" and "string"
+                    if (\in_array($t, $types)) {
+                        continue;
+                    }
+
                     $types[] = $t;
 
                     if ($t instanceof BuiltinType) {
@@ -341,7 +346,20 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         if ($node instanceof IntersectionTypeNode) {
-            $types = array_map(fn (TypeNode $t): Type => $this->getTypeFromNode($t, $typeContext), $node->types);
+            $types = [];
+
+            foreach ($node->types as $nodeType) {
+                $type = $this->getTypeFromNode($nodeType, $typeContext);
+
+                if (!\in_array($type, $types)) {
+                    $types[] = $type;
+                }
+            }
+
+            if (1 === \count($types)) {
+                return $types[0];
+            }
+
             $shapes = array_filter($types, static fn (Type $t): bool => $t instanceof ArrayShapeType);
 
             if (\count($shapes) === \count($types)) {

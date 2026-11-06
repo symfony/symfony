@@ -61,6 +61,8 @@ class ReflectionTypeResolverTest extends TestCase
         yield [Type::nullable(Type::object(ReflectionExtractableDummy::class)), $reflection->getProperty('nullableSelf')->getType(), $typeContext];
         yield [Type::object(ReflectionExtractableDummy::class), $reflection->getMethod('getStatic')->getReturnType(), $typeContext];
         yield [Type::nullable(Type::object(ReflectionExtractableDummy::class)), $reflection->getMethod('getNullableStatic')->getReturnType(), $typeContext];
+        yield [Type::object(ReflectionExtractableDummy::class), $reflection->getMethod('getSelfOrStatic')->getReturnType(), $typeContext];
+        yield [Type::nullable(Type::object(ReflectionExtractableDummy::class)), $reflection->getMethod('getNullableSelfOrStatic')->getReturnType(), $typeContext];
         yield [Type::object(AbstractDummy::class), $reflection->getProperty('parent')->getType(), $typeContext];
         yield [Type::nullable(Type::object(AbstractDummy::class)), $reflection->getProperty('nullableParent')->getType(), $typeContext];
         yield [Type::enum(DummyEnum::class), $reflection->getProperty('enum')->getType()];

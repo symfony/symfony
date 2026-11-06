@@ -135,12 +135,12 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
 
     public function getTypesFromConstructor(string $class, string $property): ?array
     {
-        if (![$tagDocNode, $declaringClass] = $this->getDocBlockFromConstructor($class, $property)) {
+        if (![$tagDocNode, $declaringClass, $declaringTrait] = $this->getDocBlockFromConstructor($class, $property)) {
             return $this->getTypes($class, $property);
         }
 
         $types = [];
-        foreach ($this->phpStanTypeHelper->getTypes($tagDocNode, $this->nameScopeFactory->create($class, $declaringClass)) as $type) {
+        foreach ($this->phpStanTypeHelper->getTypes($tagDocNode, $this->nameScopeFactory->create($class, $declaringTrait ?? $declaringClass, $declaringClass)) as $type) {
             $types[] = $type;
         }
 
@@ -152,7 +152,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
     }
 
     /**
-     * @return array{ParamTagValueNode, string}|null
+     * @return array{ParamTagValueNode, string, string|null}|null
      */
     private function getDocBlockFromConstructor(string $class, string $property): ?array
     {
@@ -174,7 +174,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
             return null;
         }
 
-        return [$tagDocNode, $reflectionConstructor->class];
+        return [$tagDocNode, $reflectionConstructor->class, $this->getDeclaringTrait($reflectionConstructor)?->name];
     }
 
     private function filterDocBlockParams(PhpDocNode $docNode, string $allowedParam): ?ParamTagValueNode
@@ -203,10 +203,10 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
 
         if ([$docBlock, $source, $declaringClass, $selfClass] = $this->getDocBlockFromProperty($class, $property)) {
             $data = [$docBlock, $source, null, $declaringClass, $selfClass];
-        } elseif ([$docBlock, $_, $declaringClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR)) {
-            $data = [$docBlock, self::ACCESSOR, null, $declaringClass, $declaringClass];
-        } elseif ([$docBlock, $prefix, $declaringClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR)) {
-            $data = [$docBlock, self::MUTATOR, $prefix, $declaringClass, $declaringClass];
+        } elseif ([$docBlock, $_, $declaringClass, $selfClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR)) {
+            $data = [$docBlock, self::ACCESSOR, null, $declaringClass, $selfClass];
+        } elseif ([$docBlock, $prefix, $declaringClass, $selfClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR)) {
+            $data = [$docBlock, self::MUTATOR, $prefix, $declaringClass, $selfClass];
         } else {
             $data = [null, null, null, null, null];
         }
@@ -259,7 +259,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
     }
 
     /**
-     * @return array{PhpDocNode, string, string}|null
+     * @return array{PhpDocNode, string, string, string}|null
      */
     private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type): ?array
     {
@@ -307,7 +307,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
 
         $phpDocNode = $this->getPhpDocNode($rawDocNode);
 
-        return [$phpDocNode, $prefix, $method->class];
+        return [$phpDocNode, $prefix, $this->getDeclaringTrait($method)->name ?? $method->class, $method->class];
     }
 
     private function getPhpDocNode(string $rawDocNode): PhpDocNode
@@ -317,5 +317,23 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         $tokens->consumeTokenType(Lexer::TOKEN_END);
 
         return $phpDocNode;
+    }
+
+    /**
+     * Finds the trait where a method is written, since reflection gives the class using the trait as its declaring class.
+     */
+    private function getDeclaringTrait(\ReflectionMethod $method, ?\ReflectionClass $class = null): ?\ReflectionClass
+    {
+        foreach (($class ?? $method->getDeclaringClass())->getTraits() as $trait) {
+            if ($declaringTrait = $this->getDeclaringTrait($method, $trait)) {
+                return $declaringTrait;
+            }
+
+            if ($trait->getFileName() === $method->getFileName() && $trait->getStartLine() <= $method->getStartLine() && $method->getEndLine() <= $trait->getEndLine()) {
+                return $trait;
+            }
+        }
+
+        return null;
     }
 }

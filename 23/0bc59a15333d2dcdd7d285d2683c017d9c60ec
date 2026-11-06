@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by DerManoMann at 2026-11-05T01:30:14Z
+
+Hi there,
+
+Thanks for picking this up. A lot more involved than what I was expecting (or planning :)
+
+`SchemaDocument::getDefinitionClasses()` still maps each definition name to a class only, so `Envelope-of.string` reads back as `Envelope` and its arguments are lost. In my case [openapi-json-schema](https://github.com/DerManoMann/openapi-json-schema) maps definitions to swagger-php components by class, and needs the arguments to reference the right one.
+
+Would it make sense to also expose the type behind each definition? For example a `getDefinitionTypes()` that, like `getDefinitionClasses()`, maps each definition name to its `ObjectType|GenericType`.
+
+Other than that the changes all make sense to me.
+
+Cheers,
+mano
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-11-05T02:31:57Z
+
+Thanks, that makes sense. I’ve pushed a new commit adding `SchemaDocument::getDefinitionTypes()`. It maps each definition name to its complete `ObjectType` or `GenericType`, preserving generic arguments for integrations such as yours. `getDefinitionClasses()` continues to return base class names.
+
+I’ve also updated the documentation PR with an example.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-11-05T12:12:08Z
+
+I’ve pushed a new commit adding recursive readable labels, including `Envelope-of.Envelope_Customer` for `Envelope<Envelope<Customer>>` and `Envelope-of.list_Customer` for `Envelope<list<Customer>>`. The 128-byte limit on readable argument labels, hash fallback and collision handling remain covered by tests.
+
+The default property builder doesn’t bind extra arguments, but custom resolvers and processors can use them to produce different schemas, and `getDefinitionTypes()` exposes them to integrations. Because those arguments can affect extension output, I’ve kept them in specialization identity and definition names. I also added a regression case verifying that extra arguments survive inside nested generics.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-11-05T22:53:45Z
+
+I’ve pushed a rework using `TypeContextFactory` and `Type::map()`, with a fallback for TypeInfo 7.4/8.1. `TypeSubstitutor` and the custom `proc_open()` scripts are gone.
+
+I kept `TypeIdentity` because a `GenericType` representing `array<string, int>` and a `CollectionType` wrapping it stringify identically but generate different schemas.
+
+The fallback also reuses TypeInfo’s collection union normalization for substitutions that `Type::map()` currently cannot rebuild, such as `T|string` with `T=never` and `T|false` with `T=true`.
+
+I kept narrower limits on concrete generic arguments: 64 nesting levels and 1,024 expanded type nodes per specialization. Starting from `Node<int>`, a property like `Node<list<T>>` creates endless specializations. A `Node<Pair<T,T>>|null` property doubles the expanded argument tree at each step. Without the size limit, TypeInfo can exhaust memory while stringifying rebuilt union members before reaching the depth limit. Property declarations themselves no longer have expansion budgets.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-11-06T01:22:20Z
+
+I opened #67904 to fix a TypeInfo bug found while implementing this PR. Union and intersection members are deduplicated by their string representations, which can discard distinct types, such as a generic DTO and its collection wrapper. During template substitution here, that can lose schema alternatives or constraints.
+
+The plan is to:
+
+1. Wait for #67904, which targets 7.4, to be merged up to 8.2.
+2. Check that the matching fixes to `UnionType::map()` and `IntersectionType::map()` are included during the merge-up. If they aren’t, I can send a separate PR for them.
+3. Then update this PR’s fallback intersection mapper for TypeInfo 7.4/8.1, add regression coverage, and review the minimum dependency versions and documented limitations.
+
+#67904 provides the underlying fix, but the mapping paths need those additional changes before this PR can fully benefit from it.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-11-06T17:22:33Z
+
+I’ve rebased on current 8.2 and pushed the simpler implementation. Specialization now uses `TypeContextFactory` and native `Type::map()` with TypeInfo 8.2 or later. Generic objects use their raw class definitions with older TypeInfo versions.
+
+The ownership guard, template-name regexp and compatibility mapper are gone. I’ve updated the regression tests and [documentation PR](https://github.com/symfony/symfony-docs/pull/23469) to match.
+
+[Fabbot’s remaining failure](https://github.com/symfony/symfony/actions/runs/42259629556/job/128035844997) is its exception-message check asking to restore quotes around the previous exception’s message. I’ve kept that sentence unquoted, as requested in [your review comment](https://github.com/symfony/symfony/pull/67853#discussion_r4493023589). PHP-CS-Fixer and all other Fabbot steps pass.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-11-06T18:18:16Z
+
+I opened #67943 to fix a PropertyInfo regression affecting the current 7.4 and 8.1 branch code when used with TypeInfo 8.2. Rebuilding the context for trait properties drops inherited template mappings, which can lose collection shapes declared through `@use` or lead to incorrect substitution here when class and trait templates share a name.
+
+The fix preserves those mappings while retaining compatibility with older TypeInfo versions. PropertyInfo 8.2 already handles this correctly, so this issue does not block this PR.

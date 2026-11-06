@@ -52,8 +52,9 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
 
         // The legacy ServicesResetterInterface alias is deprecated; running the
         // command must not autoload its file (which would trigger a deprecation).
-        $this->assertFalse(
-            interface_exists('Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface', false),
+        $this->assertNotContains(
+            realpath(\dirname((new \ReflectionClass(HttpKernelInterface::class))->getFileName()).'/DependencyInjection/ServicesResetterInterface.php'),
+            get_included_files(),
             'debug:autowiring should not autoload deprecated alias classes.'
         );
         $this->assertStringContainsString('[deprecated]', $tester->getDisplay());

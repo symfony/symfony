@@ -54,7 +54,7 @@
         "psr/log-implementation": "1.0|2.0|3.0"
     },
     "conflict": {
-        "symfony/dependency-injection": "<8.1",
+        "symfony/dependency-injection": "<8.1.12",
         "symfony/flex": "<2.10",
         "symfony/http-client-contracts": "<2.5",
         "symfony/serializer": "<7.4.15|>=8.0,<8.0.15|>=8.1,<8.1.2",

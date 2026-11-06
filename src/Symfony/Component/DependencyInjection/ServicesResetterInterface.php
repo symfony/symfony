@@ -19,3 +19,7 @@ use Symfony\Contracts\Service\ResetInterface;
 interface ServicesResetterInterface extends ResetInterface
 {
 }
+
+if (!interface_exists('Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface', false)) {
+    class_alias(ServicesResetterInterface::class, 'Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface');
+}

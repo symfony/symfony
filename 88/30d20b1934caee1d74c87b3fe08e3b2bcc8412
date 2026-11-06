@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-11-06T14:55:59Z
+
+> The canary is declared after $response, so when the TraceableResponse is freed, the decorated response is released first and the event still includes the time spent in its destructor (testStopwatchDestruct still passes).
+
+Is this actually guaranteed ? Or does it rely on the order of object ids ?
+
+---------------------------------------------------------------------------
+
+by lazerg at 2026-11-06T15:35:45Z
+
+When the TraceableResponse is freed normally (refcount or GC), properties are released in declaration order, so that part doesn't depend on object ids. It does at shutdown though: for objects still alive then, PHP calls destructors in object id order, and since ids get reused the canary can end up first, so the event would stop a bit early there. The response stays usable either way, which is the actual fix, so I didn't think the timing at shutdown was worth more code, but let me know if you see it differently.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-11-06T16:14:02Z
+
+@nicolas-grekas could you double check this please ?

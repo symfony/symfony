@@ -170,7 +170,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             }
 
             try {
-                $this->constructorDocBlocks[$class] = $reflectionConstructor ? [$this->docBlockFactory->create($reflectionConstructor, $this->createFromReflector($reflectionConstructor->getDeclaringClass())), $reflectionConstructor->class] : false;
+                $this->constructorDocBlocks[$class] = $reflectionConstructor ? [$this->docBlockFactory->create($reflectionConstructor, $this->createFromReflector($this->getDeclaringTrait($reflectionConstructor) ?? $reflectionConstructor->getDeclaringClass())), $reflectionConstructor->class] : false;
             } catch (\InvalidArgumentException) {
                 $this->constructorDocBlocks[$class] = false;
             }
@@ -358,6 +358,24 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $cacheKey = $reflector->getNamespaceName().':'.$reflector->getFileName();
 
         return $this->contexts[$cacheKey] ??= $this->contextFactory->createFromReflector($reflector);
+    }
+
+    /**
+     * Finds the trait where a method is written, since reflection gives the class using the trait as its declaring class.
+     */
+    private function getDeclaringTrait(\ReflectionMethod $method, ?\ReflectionClass $class = null): ?\ReflectionClass
+    {
+        foreach (($class ?? $method->getDeclaringClass())->getTraits() as $trait) {
+            if ($declaringTrait = $this->getDeclaringTrait($method, $trait)) {
+                return $declaringTrait;
+            }
+
+            if ($trait->getFileName() === $method->getFileName() && $trait->getStartLine() <= $method->getStartLine() && $method->getEndLine() <= $trait->getEndLine()) {
+                return $trait;
+            }
+        }
+
+        return null;
     }
 
     /**

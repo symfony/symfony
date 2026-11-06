@@ -39,6 +39,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\InheritedTemplates\ChildEnvelo
 use Symfony\Component\PropertyInfo\Tests\Fixtures\InheritedTemplates\DummyEnvelope;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\InheritedTemplates\DummyGrandChildEnvelope;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\InheritedTemplates\DummyItemUser;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\InheritedTemplates\ItemUser;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\LiteralDummy;
@@ -51,6 +52,9 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\RejectedCandidateDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\AnotherNamespace\DummyInAnotherNamespace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingConcreteGenericTrait;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingGenericTrait;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingGenericTraitWithSameTemplate;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VoidNeverReturnTypeDummy;
 use Symfony\Component\TypeInfo\Exception\LogicException;
@@ -287,6 +291,67 @@ class PhpStanExtractorTest extends TestCase
         yield ['dummyInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
     }
 
+    #[DataProvider('methodsDefinedByTraitsProvider')]
+    public function testMethodsDefinedByTraits(string $property, ?Type $type)
+    {
+        $this->assertEquals($type, $this->extractor->getType(DummyUsingTrait::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: ?Type}>
+     */
+    public static function methodsDefinedByTraitsProvider(): iterable
+    {
+        yield ['methodInTraitPrimitiveType', Type::string()];
+        yield ['methodInTraitObjectSameNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['methodInTraitObjectDifferentNamespace', Type::object(Dummy::class)];
+        yield ['methodInExternalTraitPrimitiveType', Type::string()];
+        yield ['methodInExternalTraitObjectSameNamespace', Type::object(Dummy::class)];
+        yield ['methodInExternalTraitObjectDifferentNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['methodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['aliasedMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['overriddenMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['templateInTraitInAnotherNamespace', Type::list(Type::template('T'))];
+    }
+
+    public function testConstructorDefinedByTrait()
+    {
+        $this->assertEquals(Type::object(DummyInAnotherNamespace::class), $this->extractor->getTypeFromConstructor(DummyUsingTrait::class, 'dummyInConstructor'));
+        $this->assertEquals(Type::list(Type::template('T')), $this->extractor->getTypeFromConstructor(DummyUsingTrait::class, 'templateInConstructor'));
+    }
+
+    #[DataProvider('provideGenericTraitProperties')]
+    public function testGenericTraitPropertiesKeepInheritedTemplateTypes(string $class, Type $expected)
+    {
+        if (!property_exists(TypeContext::class, 'inheritedTemplateTypes')) {
+            $this->markTestSkipped('Inherited template types require symfony/type-info 8.2 or higher.');
+        }
+
+        $this->assertEquals($expected, $this->extractor->getType($class, 'item'));
+        $this->assertEquals(Type::arrayShape(['value' => $expected, 'owner' => Type::object($class)]), $this->extractor->getType($class, 'details'));
+    }
+
+    #[DataProvider('provideGenericTraitProperties')]
+    public function testGenericTraitMethodsKeepInheritedTemplateTypes(string $class, Type $expected)
+    {
+        if (!property_exists(TypeContext::class, 'inheritedTemplateTypes')) {
+            $this->markTestSkipped('Inherited template types require symfony/type-info 8.2 or higher.');
+        }
+
+        $this->assertEquals($expected, $this->extractor->getType($class, 'value'));
+        $this->assertEquals($expected, $this->extractor->getTypeFromConstructor($class, 'value'));
+    }
+
+    /**
+     * @return iterable<array{class-string, Type}>
+     */
+    public static function provideGenericTraitProperties(): iterable
+    {
+        yield 'concrete argument' => [DummyUsingConcreteGenericTrait::class, Type::string()];
+        yield 'renamed template' => [DummyUsingGenericTrait::class, Type::list(Type::template('U'))];
+        yield 'same template name' => [DummyUsingGenericTraitWithSameTemplate::class, Type::list(Type::template('T'))];
+    }
+
     #[DataProvider('propertiesStaticTypeProvider')]
     public function testPropertiesStaticType(string $class, string $property, ?Type $type)
     {
@@ -408,6 +473,9 @@ class PhpStanExtractorTest extends TestCase
         yield [ChildEnvelope::class, 'data', Type::template('U')];
         yield [DummyGrandChildEnvelope::class, 'data', Type::list(Type::object(Dummy::class))];
         yield [DummyItemUser::class, 'item', Type::object(Dummy::class)];
+        yield [DummyItemUser::class, 'itemValue', Type::object(Dummy::class)];
+        yield [ItemUser::class, 'item', Type::template('U')];
+        yield [ItemUser::class, 'itemValue', Type::template('U')];
     }
 
     public function testExtractInheritedTemplateTypeFromConstructor()

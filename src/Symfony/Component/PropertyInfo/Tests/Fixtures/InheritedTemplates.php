@@ -78,10 +78,28 @@ trait HasItem
 {
     /** @var T */
     public mixed $item = null;
+
+    /**
+     * @return T
+     */
+    public function getItemValue(): mixed
+    {
+        return $this->item;
+    }
 }
 
 class DummyItemUser
 {
     /** @use HasItem<Dummy> */
+    use HasItem;
+}
+
+/**
+ * @template T
+ * @template U
+ */
+class ItemUser
+{
+    /** @use HasItem<U> */
     use HasItem;
 }

@@ -53,4 +53,23 @@ trait ClassHierarchyTrait
 
         return null;
     }
+
+    /**
+     * Gets the class a property is typed with, resolving self and parent against the class that declares the property.
+     */
+    private function getPropertyClass(\ReflectionClass $refl, string $propertyName): ?string
+    {
+        $property = $this->getPropertyFromHierarchy($refl, $propertyName);
+        $type = $property?->getType();
+
+        if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
+            return null;
+        }
+
+        return match (strtolower($type->getName())) {
+            'self' => $property->getDeclaringClass()->getName(),
+            'parent' => ($parent = $property->getDeclaringClass()->getParentClass()) ? $parent->getName() : $type->getName(),
+            default => $type->getName(),
+        };
+    }
 }

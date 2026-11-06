@@ -58,20 +58,12 @@ final class PropertyTypeMappingMetadataFactory implements ObjectMapperMetadataFa
     private function createFromPropertyType(object $object, string $targetClass, string $targetProperty): array
     {
         try {
-            $property = $this->getPropertyFromHierarchy(new \ReflectionClass($targetClass), $targetProperty);
+            $propertyClass = $this->getPropertyClass(new \ReflectionClass($targetClass), $targetProperty);
         } catch (\ReflectionException $e) {
             throw new MappingException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $type = $property?->getType();
-
-        if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
-            return [];
-        }
-
-        $propertyClass = $type->getName();
-
-        if ($object instanceof $propertyClass || !class_exists($propertyClass) && !interface_exists($propertyClass)) {
+        if (null === $propertyClass || $object instanceof $propertyClass || !class_exists($propertyClass) && !interface_exists($propertyClass)) {
             return [];
         }
 

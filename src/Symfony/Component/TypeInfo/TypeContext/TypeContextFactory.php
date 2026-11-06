@@ -269,7 +269,7 @@ final class TypeContextFactory
             $traitUses[] = $this->collectUses($traitReflection);
         }
 
-        return array_merge($uses, ...$traitUses);
+        return $uses + array_merge(...$traitUses);
     }
 
     /**

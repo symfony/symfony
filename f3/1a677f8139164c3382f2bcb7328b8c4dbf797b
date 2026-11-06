@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-06T19:37:50Z
+
+I pushed the same line as on 8.2. PHP ignores the extra constructor argument when the installed TypeInfo has no `inheritedTemplateTypes`, so we don't need the `get_object_vars()` guard. This also makes the merge-up to 8.2 conflict-free. PHPStan complains about it on 7.4, but we prefer not polluting the code with such SA concerns.

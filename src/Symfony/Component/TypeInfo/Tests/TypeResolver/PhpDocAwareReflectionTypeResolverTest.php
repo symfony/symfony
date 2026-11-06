@@ -17,6 +17,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyInDifferentNs;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyUsingTraitInDifferentNs;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyUsingTraitWithUses;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpDoc;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
@@ -60,6 +61,11 @@ class PhpDocAwareReflectionTypeResolverTest extends TestCase
         yield [Type::object(AbstractDummy::class), $reflection->getProperty('parent')];
         yield [Type::object(DummyInDifferentNs::class), $reflection->getMethod('getNextDummy')];
         yield [Type::object(DummyInDifferentNs::class), $reflection->getMethod('getNextDummy')->getParameters()[0]];
+
+        $reflection = new \ReflectionClass(DummyUsingTraitWithUses::class);
+
+        yield [Type::object(DummyInDifferentNs::class), $reflection->getProperty('dummy')];
+        yield [Type::object(Dummy::class), $reflection->getProperty('dummyFromTrait')];
     }
 
     public function testFallbackWhenNoPhpDoc()

@@ -320,6 +320,18 @@ class StoreTest extends TestCase
         $this->assertFalse($this->store->isLocked($req));
     }
 
+    public function testWriteKeepsTheLockHeldByAnotherStore()
+    {
+        $holder = new Store(sys_get_temp_dir().'/http_cache');
+        $this->assertTrue($holder->lock($this->request));
+
+        $this->store->write($this->request, new Response('v1'));
+        $this->assertTrue((new Store(sys_get_temp_dir().'/http_cache'))->isLocked($this->request));
+
+        $holder->write($this->request, new Response('v2'));
+        $this->assertSame($this->getStorePath('en'.hash('xxh128', 'v2')), $this->store->lookup($this->request)->headers->get('X-Body-File'));
+    }
+
     public function testPurgeHttps()
     {
         $request = Request::create('https://example.com/foo');

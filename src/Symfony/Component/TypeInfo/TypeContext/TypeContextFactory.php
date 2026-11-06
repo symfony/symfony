@@ -278,7 +278,7 @@ final class TypeContextFactory
             $traitUses[] = $this->collectUses($traitReflection);
         }
 
-        return $this->usesCache[$reflection->getName()] = array_merge($uses, ...$traitUses);
+        return $this->usesCache[$reflection->getName()] = $uses + array_merge(...$traitUses);
     }
 
     /**

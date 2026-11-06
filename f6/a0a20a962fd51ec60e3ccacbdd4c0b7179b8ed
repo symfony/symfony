@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-05T20:36:28Z
+
+Thank you @dylanpulver. Could you add all your other similar findings to this PR, instead of opening one PR per component? That'll be easier to review and merge in one go.

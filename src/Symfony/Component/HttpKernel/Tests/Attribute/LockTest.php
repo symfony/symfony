@@ -52,4 +52,9 @@ class LockTest extends TestCase
     {
         $this->assertSame(['POST'], new Lock('import', methods: 'post')->methods);
     }
+
+    public function testCommaSeparatedMethods()
+    {
+        $this->assertSame(['GET', 'POST', 'HEAD'], new Lock('import', methods: 'get, POST')->methods);
+    }
 }

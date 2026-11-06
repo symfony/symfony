@@ -240,6 +240,13 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\ThreeSourcesTarget
 use Symfony\Component\ObjectMapper\Tests\Fixtures\RepeatedMap\TransformTarget as RepeatedMapTransformTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfReferencing\Category;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfReferencing\CategoryDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfTypedProperty\ChildSource as SelfTypedPropertyChildSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfTypedProperty\ChildTarget as SelfTypedPropertyChildTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfTypedProperty\ParentlessTarget as SelfTypedPropertyParentlessTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfTypedProperty\ParentTarget as SelfTypedPropertyParentTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfTypedProperty\RelatedSource as SelfTypedPropertyRelatedSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfTypedProperty\Source as SelfTypedPropertySource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfTypedProperty\Target as SelfTypedPropertyTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLoadedValue\LoadedValueService;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLoadedValue\ServiceLoadedValueTransformer;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLoadedValue\ValueToMap;
@@ -1597,6 +1604,46 @@ final class ObjectMapperTest extends TestCase
 
         $this->assertSame('alice', $mapped->name);
         $this->assertSame($mapped, $mapped->friend);
+    }
+
+    public function testNestedPropertyTypedWithSelfIsMappedToTheDeclaringClass()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new SelfTypedPropertySource('copy', new SelfTypedPropertySource('original')), SelfTypedPropertyTarget::class);
+
+        $this->assertInstanceOf(SelfTypedPropertyTarget::class, $target->derivedFrom);
+        $this->assertSame('original', $target->derivedFrom->name);
+    }
+
+    public function testNestedPropertyTypedWithParentIsMappedToTheParentClass()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new SelfTypedPropertyChildSource('child', new SelfTypedPropertyRelatedSource('related')), SelfTypedPropertyChildTarget::class);
+
+        $this->assertInstanceOf(SelfTypedPropertyParentTarget::class, $target->related);
+        $this->assertSame('related', $target->related->name);
+    }
+
+    public function testInheritedNestedPropertyTypedWithSelfIsMappedToTheDeclaringClass()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new SelfTypedPropertyChildSource('child', null, new SelfTypedPropertyRelatedSource('original')), SelfTypedPropertyChildTarget::class);
+
+        $this->assertInstanceOf(SelfTypedPropertyParentTarget::class, $target->derivedFrom);
+        $this->assertSame('original', $target->derivedFrom->name);
+    }
+
+    public function testNestedPropertyTypedWithParentInAClassWithoutParentIsWrittenAsIs()
+    {
+        $mapper = new ObjectMapper();
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('of type ?parent');
+
+        $mapper->map(new SelfTypedPropertyChildSource('child', new SelfTypedPropertyRelatedSource('related')), SelfTypedPropertyParentlessTarget::class);
     }
 
     public function testExplicitMappingTakesPriorityOverImplicitSameNameProperty()

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Tui\Style;
 
-use Symfony\Component\Tui\Ansi\AnsiUtils;
-
 /**
  * Represents styling options for widgets including padding, borders, background, and text formatting.
  *
@@ -59,11 +57,26 @@ use Symfony\Component\Tui\Ansi\AnsiUtils;
  */
 final class Style
 {
+    /**
+     * The SGR code that resets the attribute set by each SGR code.
+     */
+    private const RESET_CODES = [
+        '1' => 22, '2' => 22, '3' => 23, '4' => 24, '4:1' => 24, '4:2' => 24, '4:3' => 24, '4:4' => 24, '4:5' => 24, '21' => 24, '7' => 27, '9' => 29,
+        '30' => 39, '31' => 39, '32' => 39, '33' => 39, '34' => 39, '35' => 39, '36' => 39, '37' => 39, '38' => 39,
+        '90' => 39, '91' => 39, '92' => 39, '93' => 39, '94' => 39, '95' => 39, '96' => 39, '97' => 39,
+        '40' => 49, '41' => 49, '42' => 49, '43' => 49, '44' => 49, '45' => 49, '46' => 49, '47' => 49, '48' => 49,
+        '100' => 49, '101' => 49, '102' => 49, '103' => 49, '104' => 49, '105' => 49, '106' => 49, '107' => 49,
+        '58' => 59,
+    ];
+
     private ?Color $backgroundColor;
     private ?Color $foregroundColor;
     private ?string $ansiPrefix = null;
     private ?string $ansiSuffix = null;
-    private ?string $bgCode = null;
+    /** @var array<int|string, string> The codes of each attribute, keyed by the SGR code that resets it */
+    private array $restoreCodes = [];
+    /** Matches the SGR sequences that set or reset an attribute of this style */
+    private ?string $restorePattern = null;
 
     /**
      * @param Padding|null          $padding       Padding specification (null = not set, see Padding::from())
@@ -119,7 +132,8 @@ final class Style
     {
         $this->ansiPrefix = null;
         $this->ansiSuffix = null;
-        $this->bgCode = null;
+        $this->restoreCodes = [];
+        $this->restorePattern = null;
     }
 
     /**
@@ -743,6 +757,9 @@ final class Style
      *
      * When a boolean property is explicitly false (not null), it emits a reset
      * code to cancel any inherited styling from parent containers.
+     *
+     * When a styled span in the text resets an attribute, this style applies
+     * its own code for that attribute again after the span.
      */
     public function apply(string $text): string
     {
@@ -750,12 +767,11 @@ final class Style
             $this->computeAnsiCodes();
         }
 
-        $processedText = $text;
-        if (null !== $this->bgCode) {
-            $processedText = AnsiUtils::reapplyBackgroundAfterResets($text, $this->bgCode);
+        if (null !== $this->restorePattern && str_contains($text, "\x1b[")) {
+            $text = $this->restoreAfterResets($text, $this->restorePattern);
         }
 
-        return $this->ansiPrefix.$processedText.$this->ansiSuffix;
+        return $this->ansiPrefix.$text.$this->ansiSuffix;
     }
 
     /**
@@ -768,56 +784,112 @@ final class Style
         $suffix = '';
 
         if (null !== $this->foregroundColor) {
-            $prefix .= $this->foregroundColor->toForegroundCode();
+            $prefix .= $this->restoreCodes[39] = $this->foregroundColor->toForegroundCode();
             $suffix = Color::resetForeground().$suffix;
         }
         if (null !== $this->backgroundColor) {
-            $prefix .= $this->backgroundColor->toBackgroundCode();
+            $prefix .= $this->restoreCodes[49] = $this->backgroundColor->toBackgroundCode();
             $suffix = Color::resetBackground().$suffix;
-            $this->bgCode = $this->backgroundColor->toBackgroundCode();
         }
         // Bold (SGR 1) and dim (SGR 2) share the same reset code (SGR 22),
         // so they must be handled together. Emit the reset first, then
         // re-enable whichever attributes should be active.
-        $needsBoldDimReset = false === $this->bold || false === $this->dim;
-        if ($needsBoldDimReset) {
-            $prefix .= "\x1b[22m";
-        }
+        $intensity = false === $this->bold || false === $this->dim ? "\x1b[22m" : '';
         if (true === $this->bold) {
-            $prefix .= "\x1b[1m";
+            $intensity .= "\x1b[1m";
         }
         if (true === $this->dim) {
-            $prefix .= "\x1b[2m";
+            $intensity .= "\x1b[2m";
+        }
+        if ('' !== $intensity) {
+            $prefix .= $this->restoreCodes[22] = $intensity;
         }
         if (true === $this->bold || true === $this->dim) {
             $suffix = "\x1b[22m".$suffix;
         }
         if (true === $this->italic) {
-            $prefix .= "\x1b[3m";
+            $prefix .= $this->restoreCodes[23] = "\x1b[3m";
             $suffix = "\x1b[23m".$suffix;
         } elseif (false === $this->italic) {
-            $prefix .= "\x1b[23m";
+            $prefix .= $this->restoreCodes[23] = "\x1b[23m";
         }
         if (true === $this->strikethrough) {
-            $prefix .= "\x1b[9m";
+            $prefix .= $this->restoreCodes[29] = "\x1b[9m";
             $suffix = "\x1b[29m".$suffix;
         } elseif (false === $this->strikethrough) {
-            $prefix .= "\x1b[29m";
+            $prefix .= $this->restoreCodes[29] = "\x1b[29m";
         }
         if (true === $this->underline) {
-            $prefix .= "\x1b[4m";
+            $prefix .= $this->restoreCodes[24] = "\x1b[4m";
             $suffix = "\x1b[24m".$suffix;
         } elseif (false === $this->underline) {
-            $prefix .= "\x1b[24m";
+            $prefix .= $this->restoreCodes[24] = "\x1b[24m";
         }
         if (true === $this->reverse) {
-            $prefix .= "\x1b[7m";
+            $prefix .= $this->restoreCodes[27] = "\x1b[7m";
             $suffix = "\x1b[27m".$suffix;
         } elseif (false === $this->reverse) {
-            $prefix .= "\x1b[27m";
+            $prefix .= $this->restoreCodes[27] = "\x1b[27m";
         }
 
         $this->ansiPrefix = $prefix;
         $this->ansiSuffix = $suffix;
+
+        if ($this->restoreCodes) {
+            $codes = [...array_keys($this->restoreCodes), '4:0'];
+            foreach (self::RESET_CODES as $code => $reset) {
+                if (isset($this->restoreCodes[$reset])) {
+                    $codes[] = $code;
+                }
+            }
+            $this->restorePattern = '/\x1b\[((?:[\d:]*;)*(?:0?|'.implode('|', $codes).')(?:;[\d;:]*)?)m/';
+        }
+    }
+
+    /**
+     * A reset counts when it resets everything or when it ends a span opened in
+     * the text. A reset that comes first cancels an inherited attribute on purpose,
+     * like a nested style with bold set to false.
+     */
+    private function restoreAfterResets(string $text, string $pattern): string
+    {
+        $opened = [];
+
+        return preg_replace_callback($pattern, function (array $m) use (&$opened): string {
+            $restore = [];
+            $params = explode(';', $m[1]);
+
+            for ($i = 0, $count = \count($params); $i < $count; ++$i) {
+                $param = '4:0' === $params[$i] ? '24' : $params[$i];
+
+                if ('' === $param || '0' === $param) {
+                    $opened = [];
+                    $restore = $this->restoreCodes;
+                } elseif (isset($this->restoreCodes[$param])) {
+                    if (isset($opened[$param])) {
+                        unset($opened[$param]);
+                        $restore[$param] = $this->restoreCodes[$param];
+                    } else {
+                        $opened[$param] = true;
+                    }
+                } elseif (null !== $reset = self::RESET_CODES[$param] ?? null) {
+                    if (isset($this->restoreCodes[$reset])) {
+                        $opened[$reset] = true;
+                        unset($restore[$reset]);
+                    }
+
+                    // Skip the arguments of 256 and true colors, like 38;5;N or 48;2;R;G;B
+                    if ('38' === $param || '48' === $param || '58' === $param) {
+                        $i += match ($params[$i + 1] ?? '') {
+                            '5' => 2,
+                            '2' => 4,
+                            default => 0,
+                        };
+                    }
+                }
+            }
+
+            return $m[0].implode('', $restore);
+        }, $text) ?? $text;
     }
 }

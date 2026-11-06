@@ -57,11 +57,22 @@ final class MetadataAwareNameConverter implements NameConverterInterface
 
     public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
-        if (null === $class) {
+        // stdClass has no metadata and its properties can have any name
+        if (null === $class || \stdClass::class === $class) {
             return $this->normalizeFallback($propertyName, $class, $format, $context);
         }
 
         $cacheKey = $this->getCacheKey($class, $context);
+
+        if (1000 < \count($this->normalizeCache[$cacheKey] ?? [])) {
+            // stop memory leak if there are many keys
+            $this->normalizeCache[$cacheKey] = \array_slice($this->normalizeCache[$cacheKey], 500, null, true);
+        }
+
+        if (null !== $this->sharedCacheKey && 1000 < \count(self::$sharedNormalizeCache[$this->sharedCacheKey][$cacheKey] ?? [])) {
+            self::$sharedNormalizeCache[$this->sharedCacheKey][$cacheKey] = \array_slice(self::$sharedNormalizeCache[$this->sharedCacheKey][$cacheKey], 500, null, true);
+        }
+
         $name = $this->normalizeCache[$cacheKey][$propertyName] ??= null === $this->sharedCacheKey
             ? $this->getCacheValueForNormalization($propertyName, $class, $context) ?? false
             : self::$sharedNormalizeCache[$this->sharedCacheKey][$cacheKey][$propertyName] ??= $this->getCacheValueForNormalization($propertyName, $class, $context) ?? false;
@@ -76,8 +87,8 @@ final class MetadataAwareNameConverter implements NameConverterInterface
         }
 
         $cacheKey = $this->getCacheKey($class, $context);
-        if (!\array_key_exists($cacheKey, $this->denormalizeCache) || !\array_key_exists($propertyName, $this->denormalizeCache[$cacheKey])) {
-            $this->denormalizeCache[$cacheKey][$propertyName] = $this->getCacheValueForDenormalization($propertyName, $class, $context);
+        if (!isset($this->denormalizeCache[$cacheKey][$propertyName]) && null !== $name = $this->getCacheValueForDenormalization($propertyName, $class, $context)) {
+            $this->denormalizeCache[$cacheKey][$propertyName] = $name;
         }
 
         return $this->denormalizeCache[$cacheKey][$propertyName] ?? $this->denormalizeFallback($propertyName, $class, $format, $context);

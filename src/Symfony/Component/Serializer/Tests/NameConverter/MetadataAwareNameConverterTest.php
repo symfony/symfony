@@ -412,6 +412,24 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertSame('eleven', $nameConverter->normalize('baz', NestedPathAndNameDifferentGroups::class, null, ['groups' => 'a']));
     }
 
+    public function testNormalizeCacheSizeLimit()
+    {
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader()), null, __METHOD__);
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertSame('unknown'.$i, $nameConverter->normalize('unknown'.$i, OtherSerializedNameDummy::class));
+        }
+        $this->assertSame('quux', $nameConverter->normalize('qux', OtherSerializedNameDummy::class));
+
+        $normalizeCache = (new \ReflectionProperty(MetadataAwareNameConverter::class, 'normalizeCache'))->getValue($nameConverter);
+        $sharedNormalizeCache = (new \ReflectionProperty(MetadataAwareNameConverter::class, 'sharedNormalizeCache'))->getValue()[__METHOD__];
+
+        foreach ([$normalizeCache, $sharedNormalizeCache] as $cache) {
+            $this->assertCount(1, $cache);
+            $this->assertLessThanOrEqual(1001, \count(current($cache)));
+        }
+    }
+
     public function testNormalizeAndDenormalizeAfterAConverterWithoutMapping()
     {
         $attributes = new MetadataAwareNameConverter(new ClassMetadataFactory(new AttributeLoader()));
@@ -480,6 +498,34 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertSame('foo', $clone->denormalize('yaml_foo', ScalarDummy::class));
         $this->assertSame('yaml_foo', $nameConverter->normalize('foo', ScalarDummy::class));
         $this->assertSame('foo', $nameConverter->denormalize('yaml_foo', ScalarDummy::class));
+    }
+
+    public function testDenormalizeDoesNotCacheUnknownNames()
+    {
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/serialized-name-mapping.yml')));
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertSame('unknown'.$i, $nameConverter->denormalize('unknown'.$i, Dummy::class));
+        }
+        $this->assertSame('foo', $nameConverter->denormalize('yaml_foo', Dummy::class));
+        $this->assertSame('foo', $nameConverter->denormalize('yaml_foo', Dummy::class));
+
+        $denormalizeCache = \Closure::bind(fn () => $this->denormalizeCache, $nameConverter, MetadataAwareNameConverter::class)();
+
+        $this->assertSame(1, array_sum(array_map('count', $denormalizeCache)));
+    }
+
+    public function testNormalizeDoesNotCacheStdClassProperties()
+    {
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/serialized-name-mapping.yml')));
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertSame('property'.$i, $nameConverter->normalize('property'.$i, \stdClass::class));
+        }
+
+        $normalizeCache = \Closure::bind(fn () => $this->normalizeCache, $nameConverter, MetadataAwareNameConverter::class)();
+
+        $this->assertSame([], $normalizeCache);
     }
 
     private function createYamlMetadataFactory(): ClassMetadataFactory

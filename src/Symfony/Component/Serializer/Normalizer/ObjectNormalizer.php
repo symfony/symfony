@@ -184,10 +184,16 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
             return self::$isWritableCache[$cacheKey];
         }
 
+        if (1000 < \count(self::$isWritableCache)) {
+            // stop memory leak if there are many keys
+            self::$isWritableCache = \array_slice(self::$isWritableCache, 500, null, true);
+        }
+
         // constructor parameters can be set when instantiating, even when property info reports them as not writable
+        // asking PropertyInfo about attributes that the class doesn't have would fill its cache with each unknown key
         if (
             (($context['enable_constructor_extraction'] ?? true) && $this->isConstructorParameter($class, $attribute))
-            || $this->propertyInfoExtractor->isWritable($class, $attribute, $context)
+            || ((property_exists($class, $attribute) || method_exists($class, 'set'.$attribute)) && $this->propertyInfoExtractor->isWritable($class, $attribute, $context))
         ) {
             return self::$isWritableCache[$cacheKey] = true;
         }

@@ -493,11 +493,12 @@ class PropertyAccessorTest extends TestCase
 
     public function testIsReadableCachesPropertyPath()
     {
-        $cache = new ArrayAdapter(0, false);
-        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH, $cache);
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
 
         $this->assertTrue($propertyAccessor->isReadable(['foo' => ['bar' => 'baz']], '[foo][bar]'));
-        $this->assertEquals([new PropertyPath('[foo][bar]')], array_values($cache->getValues()));
+
+        $propertyPathCache = \Closure::bind(fn () => $this->propertyPathCache, $propertyAccessor, PropertyAccessor::class)();
+        $this->assertEquals(['[foo][bar]' => new PropertyPath('[foo][bar]')], $propertyPathCache);
     }
 
     public function testIsReadableThrowsOnInvalidPropertyPath()
@@ -810,6 +811,76 @@ class PropertyAccessorTest extends TestCase
         $this->expectException(NoSuchPropertyException::class);
 
         $this->propertyAccessor->getValue($object, 'property?.lastName');
+    }
+
+    public function testCachePoolIgnoresUndeclaredNames()
+    {
+        $object = new class {
+            public $name;
+            public $values = [];
+            private $fullName;
+
+            public function getFullName()
+            {
+                return $this->fullName;
+            }
+
+            public function setFullName($fullName)
+            {
+                $this->fullName = $fullName;
+            }
+
+            public function __get($name)
+            {
+                return $this->values[$name] ?? null;
+            }
+
+            public function __set($name, $value)
+            {
+                $this->values[$name] = $value;
+            }
+        };
+        $cache = new ArrayAdapter();
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET, PropertyAccessor::DO_NOT_THROW, $cache);
+
+        foreach (['name', 'fullName', 'full_name', 'FullName'] as $property) {
+            $propertyAccessor->setValue($object, $property, $property);
+            $this->assertSame($property, $propertyAccessor->getValue($object, $property));
+        }
+
+        $cachedKeys = array_keys(array_filter($cache->getValues()));
+        $this->assertCount(8, $cachedKeys);
+
+        foreach (['FULLNAME', 'fullname', 'full__name', '_full_name', 'full_name_', 'full name'] as $property) {
+            $propertyAccessor->setValue($object, $property, $property);
+            $this->assertSame($property, $propertyAccessor->getValue($object, $property));
+        }
+
+        $propertyAccessor->setValue($object, 'magic', 'value');
+        $this->assertSame('value', $propertyAccessor->getValue($object, 'magic'));
+        $this->assertSame(['magic' => 'value'], $object->values);
+        $this->assertNull($propertyAccessor->getValue(new \stdClass(), 'unknown'));
+        $this->assertSame('value', $propertyAccessor->getValue(['key' => 'value'], '[key]'));
+
+        $this->assertSame($cachedKeys, array_keys(array_filter($cache->getValues())));
+    }
+
+    public function testCacheSizeLimit()
+    {
+        $object = new TestClassMagicGet('foo');
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET, PropertyAccessor::DO_NOT_THROW);
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $propertyAccessor->setValue($object, 'property'.$i, $i);
+            $propertyAccessor->getValue($object, 'property'.$i);
+            $propertyAccessor->getValue([], '[property'.$i.']');
+        }
+
+        $caches = \Closure::bind(fn () => [$this->propertyPathCache, $this->readPropertyCache[TestClassMagicGet::class], $this->writePropertyCache], $propertyAccessor, PropertyAccessor::class)();
+
+        foreach ($caches as $cache) {
+            $this->assertLessThanOrEqual(1001, \count($cache));
+        }
     }
 
     public function testAttributeWithSpecialChars()

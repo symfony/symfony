@@ -39,7 +39,9 @@ final class IsSignatureValid
     public function __construct(
         array|string $methods = [],
     ) {
-        if (\in_array('GET', $methods = array_map('strtoupper', (array) $methods), true)) {
+        $methods = array_reduce(array_map('strtoupper', (array) $methods), static fn (array $methods, string $method) => array_merge($methods, preg_split('/\s*,\s*/', $method)), []);
+
+        if (\in_array('GET', $methods, true)) {
             $methods[] = 'HEAD';
         }
         $this->methods = $methods;

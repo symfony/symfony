@@ -293,4 +293,16 @@ class MemcachedAdapterTest extends AdapterTestCase
 
         $this->assertSame('bar', $cache->getItem('foo')->get());
     }
+
+    public function testLongKeyWithSlashInHashedId()
+    {
+        $pool = $this->createCachePool();
+        $key = str_repeat('a', 300);
+
+        self::assertTrue($pool->save($pool->getItem($key)->set('foobar')));
+
+        $item = $pool->getItems([$key])->current();
+        self::assertTrue($item->isHit());
+        self::assertSame('foobar', $item->get());
+    }
 }

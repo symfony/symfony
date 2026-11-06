@@ -40,6 +40,27 @@ class RemoteUserAuthenticatorTest extends TestCase
         $this->assertFalse($authenticator->supports($this->createRequest(['REMOTE_USER' => ''])));
     }
 
+    public function testSupportNoUserClearsToken()
+    {
+        $tokenStorage = new TokenStorage();
+        $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), $tokenStorage, 'main');
+
+        $tokenStorage->setToken(new PreAuthenticatedToken(new InMemoryUser('username', null), 'main'));
+        $this->assertFalse($authenticator->supports($this->createRequest([])));
+        $this->assertNull($tokenStorage->getToken());
+
+        $tokenStorage->setToken(new PreAuthenticatedToken(new InMemoryUser('username', null), 'main'));
+        $this->assertFalse($authenticator->supports($this->createRequest(['REMOTE_USER' => ''])));
+        $this->assertNull($tokenStorage->getToken());
+    }
+
+    public function testSupportUserNamedZero()
+    {
+        $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), new TokenStorage(), 'main');
+
+        $this->assertTrue($authenticator->supports($this->createRequest(['REMOTE_USER' => '0'])));
+    }
+
     public function testSupportTokenStorageWithToken()
     {
         $tokenStorage = new TokenStorage();
@@ -88,7 +109,7 @@ class RemoteUserAuthenticatorTest extends TestCase
         $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
 
         $this->assertFalse($authenticator->supports($request));
-        $this->assertSame(['no user identifier was found in the request'], $reasons->all());
+        $this->assertSame(['User key is empty: "REMOTE_USER".'], $reasons->all());
 
         $tokenStorage->setToken(new PreAuthenticatedToken(new InMemoryUser('username', null), 'main'));
         $request = $this->createRequest(['REMOTE_USER' => 'username']);

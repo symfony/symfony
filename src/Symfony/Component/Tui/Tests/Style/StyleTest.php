@@ -237,6 +237,31 @@ class StyleTest extends TestCase
         $this->assertStringContainsString("\x1b[36m", $result);
     }
 
+    /**
+     * @return iterable<string, array{Style, string, string}>
+     */
+    public static function applyAroundStyledTextProvider(): iterable
+    {
+        yield 'color after a colored span' => [new Style(color: 'red'), "a\x1b[34mb\x1b[39mc", "\x1b[31ma\x1b[34mb\x1b[39m\x1b[31mc\x1b[39m"];
+        yield 'dim after a bold span' => [new Style(dim: true), "a\x1b[1mb\x1b[22mc", "\x1b[2ma\x1b[1mb\x1b[22m\x1b[2mc\x1b[22m"];
+        yield 'italic after an italic span' => [new Style(italic: true), "a\x1b[3mb\x1b[23mc", "\x1b[3ma\x1b[3mb\x1b[23m\x1b[3mc\x1b[23m"];
+        yield 'background after a background span' => [new Style(background: 'blue'), "a\x1b[42mb\x1b[49mc", "\x1b[44ma\x1b[42mb\x1b[49m\x1b[44mc\x1b[49m"];
+        yield 'only the attributes reset by the text' => [new Style(color: 'red', bold: true), "a\x1b[1;34mb\x1b[22mc\x1b[39md", "\x1b[31m\x1b[1ma\x1b[1;34mb\x1b[22m\x1b[1mc\x1b[39m\x1b[31md\x1b[22m\x1b[39m"];
+        yield 'everything after a full reset' => [new Style(color: 'red', bold: true), "\x1b[32mOK\x1b[0m rest", "\x1b[31m\x1b[1m\x1b[32mOK\x1b[0m\x1b[31m\x1b[1m rest\x1b[22m\x1b[39m"];
+        yield 'not after a code set after the reset' => [new Style(background: 'blue'), "a\x1b[0;42mb", "\x1b[44ma\x1b[0;42mb\x1b[49m"];
+        yield 'an explicit false after a span' => [new Style(bold: false), "a\x1b[1mb\x1b[22mc", "\x1b[22ma\x1b[1mb\x1b[22m\x1b[22mc"];
+        yield 'not after a reset that cancels the attribute' => [new Style(bold: true), "\x1b[22ma", "\x1b[1m\x1b[22ma\x1b[22m"];
+        yield 'not after a reset that cancels the color' => [new Style(color: 'red'), "\x1b[39ma", "\x1b[31m\x1b[39ma\x1b[39m"];
+        yield 'after a basic color followed by an attribute' => [new Style(bold: true), "a\x1b[34;2mb\x1b[22mc", "\x1b[1ma\x1b[34;2mb\x1b[22m\x1b[1mc\x1b[22m"];
+        yield 'not after a true color with a zero component' => [new Style(background: 'blue'), "\x1b[48;2;255;0;0ma", "\x1b[44m\x1b[48;2;255;0;0ma\x1b[49m"];
+    }
+
+    #[DataProvider('applyAroundStyledTextProvider')]
+    public function testApplyRestoresItsAttributesAfterTheTextResetsThem(Style $style, string $text, string $expected)
+    {
+        $this->assertSame($expected, $style->apply($text));
+    }
+
     public function testWithoutLayoutPropertiesStripsAllLayoutProperties()
     {
         $style = new Style()

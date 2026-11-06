@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RateLimiter\PeekableRequestRateLimiterInterface;
 use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
@@ -40,6 +42,8 @@ class LoginThrottlingListenerTest extends TestCase
 
     protected function setUp(): void
     {
+        ClockMock::register(LoginThrottlingListener::class);
+
         $this->requestStack = new RequestStack();
         $this->listener = new LoginThrottlingListener($this->requestStack, $this->createLimiter());
     }
@@ -58,6 +62,26 @@ class LoginThrottlingListenerTest extends TestCase
 
         $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
         $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+    }
+
+    #[Group('time-sensitive')]
+    public function testThresholdDoesNotCountTheRoundingOfTheRetryInstant()
+    {
+        ClockMock::withClockMock(1729990780.75);
+
+        $this->requestStack->push($this->createRequest());
+
+        $limiter = $this->createMock(RequestRateLimiterInterface::class);
+        $limiter->expects($this->once())->method('consume')->willReturn(new RateLimit(0, \DateTimeImmutable::createFromFormat('U', '1729990841'), false, 3));
+
+        $listener = new LoginThrottlingListener($this->requestStack, $limiter);
+
+        try {
+            $listener->checkPassport($this->createCheckPassportEvent($this->createPassport('wouter')));
+            $this->fail(TooManyLoginAttemptsAuthenticationException::class.' was not thrown.');
+        } catch (TooManyLoginAttemptsAuthenticationException $e) {
+            $this->assertSame(1, $e->getMessageData()['%minutes%']);
+        }
     }
 
     public function testPreventsLoginWithMultipleCase()

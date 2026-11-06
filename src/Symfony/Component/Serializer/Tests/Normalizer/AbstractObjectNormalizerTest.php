@@ -45,6 +45,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -1709,6 +1710,48 @@ class AbstractObjectNormalizerTest extends TestCase
         $serializer->normalize($foobar, null, ['cache_key' => false]);
 
         $this->assertFalse($normalizer->childContextCacheKey);
+    }
+
+    public function testCollectionItemsShareTheSameCacheKey()
+    {
+        $nameConverter = new class implements NameConverterInterface {
+            public $cacheKeys = [];
+
+            public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
+            {
+                return $propertyName;
+            }
+
+            public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
+            {
+                $this->cacheKeys[$context['cache_key']] = true;
+
+                return $propertyName;
+            }
+        };
+
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer(null, $nameConverter)]);
+        $serializer->denormalize(['first' => ['foo' => 'a'], 'second' => ['foo' => 'b'], 'third' => ['foo' => 'c']], Dummy::class.'[]');
+
+        $this->assertCount(1, $nameConverter->cacheKeys);
+    }
+
+    public function testTypesCacheSizeLimit()
+    {
+        $object = new class {
+            public function __set(string $name, $value): void
+            {
+            }
+        };
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $normalizer->denormalize(['attribute'.$i => 'value'], $object::class, null, ['object_to_populate' => $object]);
+        }
+
+        $typeCache = \Closure::bind(fn () => $this->typeCache, $normalizer, AbstractObjectNormalizer::class)();
+
+        $this->assertLessThanOrEqual(1001, \count($typeCache));
     }
 
     public function testDenormalizeXmlScalar()

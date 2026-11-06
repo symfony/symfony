@@ -51,7 +51,9 @@ final class Lock
             throw new \InvalidArgumentException(\sprintf('The "$ttl" argument of "%s" must be greater than 0 or null, "%s" given.', self::class, $this->ttl));
         }
 
-        if (\in_array('GET', $methods = array_map('strtoupper', (array) $methods), true)) {
+        $methods = array_reduce(array_map('strtoupper', (array) $methods), static fn (array $methods, string $method) => array_merge($methods, preg_split('/\s*,\s*/', $method)), []);
+
+        if (\in_array('GET', $methods, true)) {
             $methods[] = 'HEAD';
         }
         $this->methods = $methods;

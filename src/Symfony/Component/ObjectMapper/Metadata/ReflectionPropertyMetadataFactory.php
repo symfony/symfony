@@ -197,9 +197,18 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
 
     private function getPropertyClass(\ReflectionClass $targetRefl, string $property): ?string
     {
-        $type = $this->getPropertyFromHierarchy($targetRefl, $property)?->getType();
+        $property = $this->getPropertyFromHierarchy($targetRefl, $property);
+        $type = $property?->getType();
 
-        return $type instanceof \ReflectionNamedType && !$type->isBuiltin() ? $type->getName() : null;
+        if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
+            return null;
+        }
+
+        return match (strtolower($type->getName())) {
+            'self' => $property->getDeclaringClass()->getName(),
+            'parent' => ($parent = $property->getDeclaringClass()->getParentClass()) ? $parent->getName() : $type->getName(),
+            default => $type->getName(),
+        };
     }
 
     /**

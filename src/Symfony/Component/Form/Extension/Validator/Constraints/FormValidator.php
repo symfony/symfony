@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class FormValidator extends ConstraintValidator
 {
     /**
-     * @var \SplObjectStorage<FormInterface, array<int, string|string[]|GroupSequence>>
+     * @var \SplObjectStorage<FormInterface, array<int, string|string[]|GroupSequence>|false>
      */
     private \SplObjectStorage $resolvedGroups;
 
@@ -53,7 +53,10 @@ class FormValidator extends ConstraintValidator
             // Validate the form data only if transformation succeeded
             $groups = $this->getValidationGroups($form);
 
-            if (!$groups) {
+            // A "validation_groups" callable returning false only skips the constraints:
+            // unlike the false option value, transformation failures of the children and
+            // extra fields are still reported
+            if (!$groups && false !== $groups) {
                 return;
             }
 
@@ -66,7 +69,7 @@ class FormValidator extends ConstraintValidator
 
             // Validate the data against the constraints defined in the form
             /** @var Constraint[] $constraints */
-            $constraints = $config->getOption('constraints', []);
+            $constraints = false === $groups ? [] : $config->getOption('constraints', []);
 
             $hasChildren = $form->count() > 0;
 
@@ -260,9 +263,9 @@ class FormValidator extends ConstraintValidator
     /**
      * Returns the validation groups of the given form.
      *
-     * @return string|GroupSequence|array<string|GroupSequence>
+     * @return string|GroupSequence|array<string|GroupSequence>|false
      */
-    private function getValidationGroups(FormInterface $form): string|GroupSequence|array
+    private function getValidationGroups(FormInterface $form): string|GroupSequence|array|false
     {
         // Determine the clicked button of the complete form tree
         $clickedButton = null;
@@ -303,12 +306,17 @@ class FormValidator extends ConstraintValidator
      *
      * @param-immediately-invoked-callable $groups
      *
-     * @return GroupSequence|array<string|GroupSequence>
+     * @return GroupSequence|array<string|GroupSequence>|false
      */
-    private static function resolveValidationGroups(string|GroupSequence|array|callable $groups, FormInterface $form): GroupSequence|array
+    private static function resolveValidationGroups(string|GroupSequence|array|callable $groups, FormInterface $form): GroupSequence|array|false
     {
         if (!\is_string($groups) && \is_callable($groups)) {
             $groups = $groups($form);
+        }
+
+        // A callable may return false to skip the constraints
+        if (false === $groups) {
+            return false;
         }
 
         if ($groups instanceof GroupSequence) {

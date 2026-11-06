@@ -220,6 +220,22 @@ class SymfonyStyleTest extends TestCase
         $this->assertCount(1, array_unique(array_map(Helper::width(...), $lines)), 'Every line of the block is padded to the same width.');
     }
 
+    public function testBlockWithWideCharactersFitsInTheLineLength()
+    {
+        $this->command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            (new SymfonyStyle($input, $output))->error(str_repeat('日本語のエラーメッセージ', 30));
+
+            return Command::SUCCESS;
+        });
+
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+
+        $lines = array_filter(explode("\n", $this->tester->getDisplay(true)), static fn (string $line): bool => '' !== trim($line));
+
+        $this->assertGreaterThan(1, \count($lines), 'The message is wrapped over several lines.');
+        $this->assertSame([120], array_values(array_unique(array_map(Helper::width(...), $lines))), 'Every line of the block uses the line length.');
+    }
+
     public function testErrorKeepsAnEscapedTagThatIsWrappedAsText()
     {
         // the escaped "<" falls right where the block wraps the message

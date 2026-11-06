@@ -167,6 +167,7 @@ final class Renderer implements WidgetRendererInterface
 
         $this->validateLines($widget, $lines, $context->getColumns());
         $widget->setRenderCache($lines, $cacheColumns, $cacheRows);
+        $this->positionTracker->markRendered($widget);
 
         return $lines;
     }

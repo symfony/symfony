@@ -1194,6 +1194,47 @@ class RendererTest extends TestCase
         $this->assertSame(2, $renderer->getWidgetRect($leaf)->row);
     }
 
+    public function testPositionsFollowAChangeInANestedRow()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $outer = new ContainerWidget();
+        $row = new ContainerWidget()->setStyle(new Style(direction: Direction::Horizontal, gap: 1));
+        $row->add($a = new TextWidget('a')->setStyle(new Style(flex: 0)));
+        $row->add($b = new TextWidget('b')->setStyle(new Style(flex: 0)));
+        $outer->add($row);
+        $root->add($outer);
+
+        $renderer->renderFrame($root, 40, 10);
+        $this->assertSame(2, $renderer->getWidgetRect($b)->col);
+
+        $a->setText('a longer text');
+        $renderer->renderFrame($root, 40, 10);
+
+        $this->assertSame(14, $renderer->getWidgetRect($b)->col);
+        $this->assertSame(13, $renderer->getWidgetRect($a)->columns);
+    }
+
+    public function testPositionsFollowAChangeInAColumnOfARow()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $row = new ContainerWidget()->setStyle(new Style(direction: Direction::Horizontal));
+        $column = new ContainerWidget();
+        $column->add($first = new TextWidget('first'));
+        $column->add($second = new TextWidget('second'));
+        $row->add($column);
+        $root->add($row);
+
+        $renderer->renderFrame($root, 40, 10);
+        $this->assertSame(1, $renderer->getWidgetRect($second)->row);
+
+        $first->setText("first\nnow on two rows");
+        $renderer->renderFrame($root, 40, 10);
+
+        $this->assertSame(2, $renderer->getWidgetRect($second)->row);
+    }
+
     public function testAlignedPositionsAreShiftedOnEveryFrame()
     {
         $renderer = new Renderer();

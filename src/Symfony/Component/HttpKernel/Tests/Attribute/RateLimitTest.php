@@ -38,4 +38,9 @@ class RateLimitTest extends TestCase
         $rl = new RateLimit('api', methods: ['get', 'post']);
         $this->assertSame(['GET', 'POST', 'HEAD'], $rl->methods);
     }
+
+    public function testCommaSeparatedMethods()
+    {
+        $this->assertSame(['GET', 'POST', 'HEAD'], (new RateLimit('api', methods: 'get, POST'))->methods);
+    }
 }

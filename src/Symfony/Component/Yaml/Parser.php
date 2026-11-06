@@ -29,7 +29,8 @@ class Parser
     public const DEFAULT_MAX_NESTING_LEVEL = 128;
     public const DEFAULT_MAX_ALIASES_FOR_COLLECTIONS = 128;
 
-    // nested blocks that have a longer run of empty or comment lines are read in place instead of being copied at each nesting level
+    // nested blocks that have more bytes, or a longer run of empty or comment lines, are read in place instead of being copied at each nesting level
+    private const MAX_COPIED_BYTES = 8192;
     private const MAX_COPIED_EMPTY_LINES = 8;
 
     private ?string $filename = null;
@@ -110,6 +111,7 @@ class Parser
         $state = $this->getState();
         $state->reset();
         $state->aliasesEnabled = 0 === (Yaml::PARSE_EXCEPTION_ON_ALIAS & $flags);
+        $state->maxAliasedNodeCount = min(\PHP_INT_MAX, $state->maxAliasesForCollections * \strlen($value));
 
         try {
             $data = $this->doParse($value, $flags);
@@ -200,6 +202,7 @@ class Parser
             Inline::initialize($flags, $this->getRealCurrentLineNb(), $this->filename);
 
             $isRef = $mergeNode = false;
+            $nodeCount = $this->getState()->nodeCount;
             if ('-' === $this->currentLine[0] && self::preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+))?$#', rtrim($this->currentLine), $values)) {
                 if ($context && 'mapping' == $context) {
                     throw new ParseException('You cannot define a sequence item when in a mapping.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
@@ -270,6 +273,7 @@ class Parser
                 }
                 if (false !== $isRef) {
                     $this->refs[$isRef] = end($data);
+                    $this->getState()->anchorNodeCounts[$isRef] = $this->getState()->nodeCount - $nodeCount;
                     array_pop($this->refsBeingParsed);
                 }
             } elseif (
@@ -335,7 +339,7 @@ class Parser
 
                         $refValue = $this->refs[$refName];
 
-                        $this->getState()->countAlias($refValue, $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+                        $this->getState()->countAlias($refName, $refValue, $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
 
                         if (Yaml::PARSE_OBJECT_FOR_MAP & $flags && $refValue instanceof \stdClass) {
                             $refValue = (array) $refValue;
@@ -424,6 +428,7 @@ class Parser
                         $value = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(), $flags);
                         if ($isMergeKey) {
                             $this->refs[$refMatches['ref']] = $value;
+                            $this->getState()->anchorNodeCounts[$refMatches['ref']] = $this->getState()->nodeCount - $nodeCount;
 
                             if (Yaml::PARSE_OBJECT_FOR_MAP & $flags && $value instanceof \stdClass) {
                                 $value = (array) $value;
@@ -462,6 +467,7 @@ class Parser
                 }
                 if (false !== $isRef) {
                     $this->refs[$isRef] = $data[$key];
+                    $this->getState()->anchorNodeCounts[$isRef] = $this->getState()->nodeCount - $nodeCount;
                     array_pop($this->refsBeingParsed);
                 }
             } elseif ('"' === $this->currentLine[0] || "'" === $this->currentLine[0]) {
@@ -597,6 +603,8 @@ class Parser
             }
         } while ($this->moveToNextLine());
 
+        $this->getState()->nodeCount += \count($data);
+
         if (null !== $tag) {
             $data = new TaggedValue($tag, $data);
         }
@@ -676,8 +684,8 @@ class Parser
     /**
      * Returns the next embed block of YAML.
      *
-     * A block that contains many empty or comment lines is returned as an array
-     * that describes the lines to read in place.
+     * A long block, or a block that contains many empty or comment lines, is
+     * returned as an array that describes the lines to read in place.
      *
      * @param int|null $indentation The indent level at which the block is to be read, or null for default
      * @param bool     $inSequence  True if the enclosing data structure is a sequence
@@ -790,11 +798,13 @@ class Parser
 
         $this->currentLine = $this->getLine($this->currentLineNb);
 
-        if ($inPlace) {
+        $block = implode("\n", $data);
+
+        if ($inPlace || self::MAX_COPIED_BYTES < \strlen($block)) {
             return $this->createBlock($firstLineNumber, $this->currentLineNb, $newIndent ?? 0, $data[0]);
         }
 
-        return implode("\n", $data);
+        return $block;
     }
 
     /**
@@ -1094,7 +1104,7 @@ class Parser
                 throw new ParseException(\sprintf('Reference "%s" does not exist.', $value), $this->currentLineNb + 1, $this->currentLine, $this->filename);
             }
 
-            $this->getState()->countAlias($this->refs[$value], $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+            $this->getState()->countAlias($value, $this->refs[$value], $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
 
             return $this->refs[$value];
         }

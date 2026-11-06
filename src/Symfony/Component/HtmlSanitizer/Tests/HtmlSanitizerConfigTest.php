@@ -107,7 +107,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $safeElements = array_keys(array_filter(W3CReference::HEAD_ELEMENTS + W3CReference::BODY_ELEMENTS));
 
         $this->assertSame(array_fill_keys($safeElements, $safeAttributes), $config->getAllowedElements());
-        $this->assertSame([], $config->getBlockedElements());
+        $this->assertSame(['html' => true, 'body' => true], $config->getBlockedElements());
     }
 
     public function testAllowStaticElements()

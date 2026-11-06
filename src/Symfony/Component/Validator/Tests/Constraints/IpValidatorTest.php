@@ -235,7 +235,6 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ['fbff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
             ['fe00::1'],
             ['fe7f:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
-            ['fec0::1'],
             ['::1:0:0:0'],
             ['100:0:0:1::'],
             ['2001:1::1'],
@@ -561,6 +560,10 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             ['febf::1'],
             ['febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
             ['fe80:0000:0000:0000:0202:b3ff:fe1e:8329'],
+            // fec0::/10 deprecated site local address, both edges included
+            ['fec0::'],
+            ['fec0::1'],
+            ['feff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'],
             // ::ffff:0:0/96 IPv4-mapped
             ['::ffff:127.0.0.1'],
             ['::ffff:7f00:1'],

@@ -55,7 +55,7 @@ class AmpResolver implements DnsResolver
             $recordType = DnsRecord::AAAA;
         }
 
-        if (null !== $ip || $recordType !== $type) {
+        if (null === $ip || $recordType !== $type) {
             return Dns\resolve($name, $type, $cancellation);
         }
 

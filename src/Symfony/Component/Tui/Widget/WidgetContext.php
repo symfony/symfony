@@ -89,14 +89,6 @@ final class WidgetContext
     }
 
     /**
-     * @internal
-     */
-    public function getFocusManager(): FocusManager
-    {
-        return $this->focusManager;
-    }
-
-    /**
      * @return string[]
      */
     public function renderWidget(AbstractWidget $widget, RenderContext $context): array
@@ -136,5 +128,13 @@ final class WidgetContext
     public function detachChild(AbstractWidget $child): void
     {
         $this->widgetTree->detach($child);
+    }
+
+    /**
+     * @internal
+     */
+    public function getFocusManager(): FocusManager
+    {
+        return $this->focusManager;
     }
 }

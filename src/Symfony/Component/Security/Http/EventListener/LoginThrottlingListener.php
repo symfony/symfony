@@ -70,7 +70,7 @@ final class LoginThrottlingListener implements EventSubscriberInterface
             $dispatcher->dispatch(new RateLimitExceededEvent($rejectedLimit, $this->limiterName));
         }
 
-        throw new TooManyLoginAttemptsAuthenticationException(ceil(($limit->getRetryAfter()->getTimestamp() - time()) / 60));
+        throw new TooManyLoginAttemptsAuthenticationException($this->getThreshold($limit));
     }
 
     public function onSuccessfulLogin(LoginSuccessEvent $event): void
@@ -96,5 +96,11 @@ final class LoginThrottlingListener implements EventSubscriberInterface
             LoginFailureEvent::class => 'onFailedLogin',
             LoginSuccessEvent::class => 'onSuccessfulLogin',
         ];
+    }
+
+    private function getThreshold(RateLimit $limit): int
+    {
+        // getRetryAfter() is rounded up to the second and time() is rounded down, so one second of the difference is only rounding.
+        return (int) ceil(($limit->getRetryAfter()->getTimestamp() - time() - 1) / 60);
     }
 }

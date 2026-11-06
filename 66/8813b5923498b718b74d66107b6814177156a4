@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-06T13:25:45Z
+
+Thank you @KalimeroMK. I pushed one change to keep the scan linear. Skipping `$scanEnd` after a POSIX class made `str_repeat('[', 8000).':alpha:]'` take 12s instead of 7ms. Now only a `[` that starts a POSIX class is scanned again.
+
+I'm fine with `(?!)`. glob() drops only the reversed range, so `[a[-?]` matches `a`. But POSIX leaves this undefined, and matching nothing is better than an invalid regex.

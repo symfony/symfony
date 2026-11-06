@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\DataModel\Write;
 
+use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 
 /**
@@ -23,17 +24,18 @@ use Symfony\Component\TypeInfo\Type\ObjectType;
 final class ObjectNode implements DataModelNodeInterface
 {
     /**
+     * @param ObjectType|GenericType<ObjectType>    $type
      * @param array<string, DataModelNodeInterface> $properties
      */
     public function __construct(
         private string $accessor,
-        private ObjectType $type,
+        private ObjectType|GenericType $type,
         private array $properties,
         private bool $mock = false,
     ) {
     }
 
-    public static function createMock(string $accessor, ObjectType $type): self
+    public static function createMock(string $accessor, ObjectType|GenericType $type): self
     {
         return new self($accessor, $type, [], true);
     }
@@ -50,7 +52,7 @@ final class ObjectNode implements DataModelNodeInterface
 
     public function getIdentifier(): string
     {
-        return (string) $this->getType();
+        return (string) $this->type;
     }
 
     public function getAccessor(): string
@@ -60,7 +62,7 @@ final class ObjectNode implements DataModelNodeInterface
 
     public function getType(): ObjectType
     {
-        return $this->type;
+        return $this->type instanceof GenericType ? $this->type->getWrappedType() : $this->type;
     }
 
     /**

@@ -60,7 +60,11 @@ final class CompositeNode implements DataModelNodeInterface
 
     public function getIdentifier(): string
     {
-        return (string) $this->getType();
+        // unlike their types, the identifiers of object nodes include the variable types of generics
+        $identifiers = array_map(static fn (DataModelNodeInterface $n): string => $n->getIdentifier(), $this->nodes);
+        sort($identifiers);
+
+        return implode('|', $identifiers);
     }
 
     public function getType(): UnionType

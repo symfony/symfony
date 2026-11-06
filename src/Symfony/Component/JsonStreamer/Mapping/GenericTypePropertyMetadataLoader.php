@@ -263,6 +263,7 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
                 array_map(fn (array $item): array => ['type' => $this->replaceVariableTypes($item['type'], $variableTypes)] + $item, $type->getShape()),
                 $type->getExtraKeyType() ? $this->replaceVariableTypes($type->getExtraKeyType(), $variableTypes) : null,
                 $type->getExtraValueType() ? $this->replaceVariableTypes($type->getExtraValueType(), $variableTypes) : null,
+                $type->isList(),
             );
         }
 

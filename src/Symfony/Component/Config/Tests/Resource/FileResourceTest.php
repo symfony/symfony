@@ -60,7 +60,7 @@ class FileResourceTest extends TestCase
 
     public function testIsFresh()
     {
-        $this->assertTrue($this->resource->isFresh($this->time), '->isFresh() returns true if the resource has not changed in same second');
+        $this->assertFalse($this->resource->isFresh($this->time), '->isFresh() returns false if the resource was modified in the same second as the timestamp: filemtime() has a one-second resolution, so the resource may have changed after it was read but before the cache file was written');
         $this->assertTrue($this->resource->isFresh($this->time + 10), '->isFresh() returns true if the resource has not changed');
         $this->assertFalse($this->resource->isFresh($this->time - 86400), '->isFresh() returns false if the resource has been updated');
     }

@@ -55,6 +55,10 @@ class FileResource implements SelfCheckingResourceInterface
 
     public function isFresh(int $timestamp): bool
     {
-        return false !== ($filemtime = @filemtime($this->resource)) && $filemtime <= $timestamp;
+        // A resource modified in the same second as the timestamp was taken
+        // counts as stale: filemtime() has a one-second resolution, so the
+        // resource may have changed after it was read but before the cache
+        // file was written (see #67939).
+        return false !== ($filemtime = @filemtime($this->resource)) && $filemtime < $timestamp;
     }
 }

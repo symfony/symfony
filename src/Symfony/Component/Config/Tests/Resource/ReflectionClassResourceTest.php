@@ -175,6 +175,24 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertTrue($res->isFresh(0));
     }
 
+    public function testIsFreshWhenSignatureChangesInSameSecond()
+    {
+        $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
+        $ser = unserialize(serialize($res));
+        $mtime = filemtime(__FILE__);
+
+        $this->assertTrue($ser->isFresh($mtime), '->isFresh() returns true if the resource has not changed in same second');
+
+        $original = TestEventSubscriber::$subscribedEvents;
+        TestEventSubscriber::$subscribedEvents = [123] === $original ? [456] : [123];
+
+        try {
+            $this->assertFalse($ser->isFresh($mtime), '->isFresh() returns false if the resource changed in the same second as the timestamp');
+        } finally {
+            TestEventSubscriber::$subscribedEvents = $original;
+        }
+    }
+
     /**
      * @group legacy
      */

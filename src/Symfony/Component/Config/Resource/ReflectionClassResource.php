@@ -48,7 +48,12 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                 return false;
             }
 
-            if ($filemtime > $timestamp) {
+            // A file modified in the same second as the timestamp was taken
+            // counts as changed: filemtime() has a one-second resolution, so
+            // the file may have changed after it was read but before the
+            // cache file was written (see #67939). The hash comparison then
+            // decides whether the content actually changed.
+            if ($filemtime >= $timestamp) {
                 return $this->hash === $this->computeHash();
             }
         }

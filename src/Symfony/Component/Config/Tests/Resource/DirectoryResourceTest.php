@@ -77,6 +77,16 @@ class DirectoryResourceTest extends TestCase
         $this->assertFalse($resource->isFresh(time() - 86400), '->isFresh() returns false if the resource has been updated');
     }
 
+    public function testIsFreshWhenFileChangesInSameSecond()
+    {
+        $resource = new DirectoryResource($this->directory);
+        $time = time();
+        touch($this->directory.'/tmp.xml', $time);
+        touch($this->directory, $time);
+
+        $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if a file was modified in the same second as the timestamp');
+    }
+
     public function testIsFreshForDeletedResources()
     {
         $resource = new DirectoryResource($this->directory);

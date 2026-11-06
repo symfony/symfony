@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
@@ -94,6 +95,35 @@ class ConfigCacheTest extends TestCase
         $cache->write('', [$staleResource]);
 
         $this->assertFalse($cache->isFresh());
+    }
+
+    public function testIsNotFreshWhenResourceChangesWhileCacheIsBeingBuilt()
+    {
+        $p = (new \ReflectionClass(SelfCheckingResourceChecker::class))->getProperty('cache');
+        $p->setValue(null, []);
+
+        $resourceFile = tempnam(sys_get_temp_dir(), 'resource_');
+        file_put_contents($resourceFile, 'v1');
+
+        $cache = new ConfigCache($this->cacheFile, true);
+
+        $content = file_get_contents($resourceFile); // the build reads the resource
+        file_put_contents($resourceFile, 'v2'); // an editor saves the file while the build still runs
+        clearstatcache();
+
+        $cache->write('<?php return '.var_export($content, true).';', [new FileResource($resourceFile)]);
+
+        // The resource and the cache file were written in the same second;
+        // force that condition so the test does not depend on wall-clock timing.
+        touch($this->cacheFile, filemtime($resourceFile));
+        clearstatcache();
+
+        try {
+            $this->assertSame('v1', require $cache->getPath());
+            $this->assertFalse($cache->isFresh(), '->isFresh() returns false when a resource changed while the cache was being built');
+        } finally {
+            @unlink($resourceFile);
+        }
     }
 
     public static function debugModes(): array

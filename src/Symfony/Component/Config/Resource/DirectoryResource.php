@@ -62,7 +62,7 @@ class DirectoryResource implements SelfCheckingResourceInterface
             return false;
         }
 
-        if ($timestamp < filemtime($this->resource)) {
+        if ($timestamp <= filemtime($this->resource)) {
             return false;
         }
 
@@ -85,8 +85,11 @@ class DirectoryResource implements SelfCheckingResourceInterface
                 continue;
             }
 
-            // early return if a file's mtime exceeds the passed timestamp
-            if ($timestamp < $fileMTime) {
+            // early return if a file's mtime is not older than the passed
+            // timestamp (see #67939: filemtime() has a one-second resolution,
+            // so a file modified in the same second may have changed after
+            // it was read but before the cache file was written)
+            if ($timestamp <= $fileMTime) {
                 return false;
             }
         }

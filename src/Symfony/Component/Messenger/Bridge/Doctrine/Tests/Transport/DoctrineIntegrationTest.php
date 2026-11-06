@@ -203,6 +203,39 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertEquals('the body', $envelope['body']);
     }
 
+    public function testSetupReplacesTheIndexesOfATableCreatedBeforeTheCompositeIndex()
+    {
+        $this->connection->setup();
+        $compositeIndex = $this->listIndexNames();
+        $this->assertCount(1, $compositeIndex);
+
+        // bring the table back to the single-column indexes of older versions
+        $platform = $this->driverConnection->getDatabasePlatform();
+        $this->driverConnection->executeStatement($platform->getDropIndexSQL($compositeIndex[0], 'messenger_messages'));
+
+        foreach (['queue_name', 'available_at', 'delivered_at'] as $column) {
+            $this->driverConnection->executeStatement(\sprintf('CREATE INDEX idx_%s ON messenger_messages (%s)', $column, $column));
+        }
+
+        $this->assertSame(['idx_available_at', 'idx_delivered_at', 'idx_queue_name'], $this->listIndexNames());
+
+        $this->connection->setup();
+
+        $this->assertSame($compositeIndex, $this->listIndexNames());
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function listIndexNames(): array
+    {
+        $names = array_keys($this->createSchemaManager()->listTableIndexes('messenger_messages'));
+        $names = array_filter($names, static fn ($name) => 'primary' !== $name);
+        sort($names);
+
+        return $names;
+    }
+
     private function formatDateTime(\DateTimeImmutable $dateTime): string
     {
         return $dateTime->format($this->driverConnection->getDatabasePlatform()->getDateTimeFormatString());

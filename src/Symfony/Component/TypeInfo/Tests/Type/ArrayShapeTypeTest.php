@@ -59,6 +59,9 @@ class ArrayShapeTypeTest extends TestCase
             'foo' => ['type' => Type::bool(), 'optional' => false],
         ]);
         $this->assertEquals(Type::arrayKey(), $type->getCollectionKeyType());
+
+        $type = new ArrayShapeType([], Type::int(), Type::string(), true);
+        $this->assertEquals(Type::int(), $type->getCollectionKeyType());
     }
 
     public function testGetCollectionValueType()
@@ -127,6 +130,19 @@ class ArrayShapeTypeTest extends TestCase
         $this->assertTrue($type->accepts(['other' => 'string', 'foo' => true]));
         $this->assertFalse($type->accepts(['other' => 1, 'foo' => true]));
         $this->assertFalse($type->accepts(['other' => 'string', 'foo' => 'foo']));
+
+        $type = new ArrayShapeType([['type' => Type::int(), 'optional' => false]], Type::int(), Type::string(), true);
+
+        $this->assertTrue($type->accepts([1]));
+        $this->assertTrue($type->accepts([1, 'string', 'string']));
+        $this->assertFalse($type->accepts([1, 'key' => 'string']));
+        $this->assertFalse($type->accepts([1 => 'string', 0 => 1]));
+    }
+
+    public function testIsList()
+    {
+        $this->assertFalse((new ArrayShapeType([['type' => Type::int(), 'optional' => false]]))->isList());
+        $this->assertTrue((new ArrayShapeType([['type' => Type::int(), 'optional' => false]], null, null, true))->isList());
     }
 
     public function testToString()
@@ -165,5 +181,14 @@ class ArrayShapeTypeTest extends TestCase
             extraValueType: Type::string(),
         );
         $this->assertSame("array{'foo': bool, ...<int, string>}", (string) $type);
+
+        $type = new ArrayShapeType([['type' => Type::int(), 'optional' => false]], null, null, true);
+        $this->assertSame('list{0: int}', (string) $type);
+
+        $type = new ArrayShapeType([['type' => Type::int(), 'optional' => false]], Type::int(), Type::string(), true);
+        $this->assertSame('list{0: int, ...<string>}', (string) $type);
+
+        $type = new ArrayShapeType([], Type::int(), Type::mixed(), true);
+        $this->assertSame('list{...}', (string) $type);
     }
 }

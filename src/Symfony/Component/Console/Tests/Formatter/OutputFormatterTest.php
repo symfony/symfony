@@ -243,6 +243,15 @@ class OutputFormatterTest extends TestCase
         $this->assertEquals("\033[37;41msome error\033[39;49m".$long, $formatter->format('<error>some error</error>'.$long));
     }
 
+    public function testFormatLongRunsOfEscapedTagDelimiters()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $text = str_repeat('array<int> ', 10000);
+        $this->assertSame($text."\033[32mfoo\033[39m", $formatter->format(OutputFormatter::escape($text).'<info>foo</info>'));
+        $this->assertSame('<a'.str_repeat(' <b>', 10000)."\033[32mfoo\033[39m", $formatter->format('<a'.str_repeat(' \<b\>', 10000).'<info>foo</info>'));
+    }
+
     public function testFormatToStringObject()
     {
         $formatter = new OutputFormatter(false);

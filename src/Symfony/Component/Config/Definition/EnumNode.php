@@ -90,7 +90,7 @@ class EnumNode extends ScalarNode
 
         return implode($separator, array_unique(array_map(static function ($value) use ($trim) {
             if (!$value instanceof \UnitEnum) {
-                return json_encode($value, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_PRESERVE_ZERO_FRACTION);
+                return self::formatValue($value);
             }
 
             return $trim ? ltrim(var_export($value, true), '\\') : var_export($value, true);
@@ -164,5 +164,11 @@ class EnumNode extends ScalarNode
         $e->setPath($this->getPath());
 
         return $e;
+    }
+
+    private static function formatValue(mixed $value): string
+    {
+        // json_encode() fails on INF, NAN and enums without a backing value
+        return json_encode($value, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_PRESERVE_ZERO_FRACTION) ?: ltrim(var_export($value, true), '\\');
     }
 }

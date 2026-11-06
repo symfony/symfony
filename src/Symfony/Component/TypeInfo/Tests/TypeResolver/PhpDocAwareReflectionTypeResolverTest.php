@@ -13,7 +13,10 @@ namespace Symfony\Component\TypeInfo\Tests\TypeResolver;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
+use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyInDifferentNs;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyUsingTraitInDifferentNs;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpDoc;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
@@ -48,6 +51,15 @@ class PhpDocAwareReflectionTypeResolverTest extends TestCase
         yield [Type::arrayShape(["it's" => Type::int(), 'quoted key' => Type::int()]), $reflection->getProperty('arrayShapeWithQuotedKeys')];
         yield [Type::arrayShape(["it's" => Type::int(), 'quoted key' => Type::int()]), $reflection->getProperty('aliasedArrayShapeWithQuotedKeys')];
         yield [Type::string(), $reflection->getProperty('literal')];
+
+        $reflection = new \ReflectionClass(DummyUsingTraitInDifferentNs::class);
+
+        yield [Type::list(Type::template('T')), $reflection->getProperty('items')];
+        yield [Type::list(Type::object(DummyInDifferentNs::class)), $reflection->getProperty('dummies')];
+        yield [Type::object(DummyUsingTraitInDifferentNs::class), $reflection->getProperty('self')];
+        yield [Type::object(AbstractDummy::class), $reflection->getProperty('parent')];
+        yield [Type::object(DummyInDifferentNs::class), $reflection->getMethod('getNextDummy')];
+        yield [Type::object(DummyInDifferentNs::class), $reflection->getMethod('getNextDummy')->getParameters()[0]];
     }
 
     public function testFallbackWhenNoPhpDoc()

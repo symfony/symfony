@@ -42,6 +42,8 @@ use Symfony\Component\TypeInfo\Type\UnionType;
  */
 final class StreamReaderGenerator
 {
+    private const MAX_GENERIC_DEPTH = 512;
+
     private StreamerDumper $dumper;
     private ?PhpGenerator $phpGenerator = null;
 
@@ -102,22 +104,34 @@ final class StreamReaderGenerator
             return new BackedEnumNode($type);
         }
 
+        $genericType = null;
+
         if ($type instanceof GenericType) {
+            $genericType = $type;
             $type = $type->getWrappedType();
         }
 
         if ($type instanceof ObjectType && !$type instanceof EnumType) {
-            $typeString = (string) $type;
+            $typeString = (string) ($genericType ?? $type);
             $className = $type->getClassName();
 
             if ($context['generated_classes'][$typeString] ??= false) {
-                return ObjectNode::createMock($type);
+                return ObjectNode::createMock($genericType ?? $type);
             }
 
             $propertiesNodes = [];
             $context['generated_classes'][$typeString] = true;
 
-            $propertiesMetadata = $this->propertyMetadataLoader->load($className, $options, $context);
+            $propertiesMetadata = $this->propertyMetadataLoader->load($className, $options, $genericType ? ['original_type' => $genericType] + $context : $context);
+
+            if ($genericType) {
+                $context['generic_depths'][$className] ??= 0;
+
+                // a class that contains itself with growing generic types would be expanded forever
+                if (++$context['generic_depths'][$className] > self::MAX_GENERIC_DEPTH) {
+                    throw new UnsupportedException(\sprintf('"%s" contains itself with generic types that keep growing, which is not supported.', $className));
+                }
+            }
 
             foreach ($propertiesMetadata as $streamedName => $propertyMetadata) {
                 if (!$propertyMetadata->getName()) {
@@ -158,7 +172,11 @@ final class StreamReaderGenerator
                 ];
             }
 
-            return new ObjectNode($type, $propertiesNodes);
+            if ($genericType) {
+                --$context['generic_depths'][$className];
+            }
+
+            return new ObjectNode($genericType ?? $type, $propertiesNodes);
         }
 
         if ($type instanceof CollectionType) {

@@ -1082,10 +1082,8 @@ class ParserTest extends TestCase
                 child: duplicate
                 child: duplicate
             EOD;
-
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Duplicate key "child" detected');
-
         Yaml::parse($input);
     }
 
@@ -1095,10 +1093,8 @@ class ParserTest extends TestCase
             parent: { child: first, child: duplicate }
             parent: { child: duplicate, child: duplicate }
             EOD;
-
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Duplicate key "child" detected');
-
         Yaml::parse($input);
     }
 

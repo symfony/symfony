@@ -93,13 +93,13 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     public function getType(string $class, string $property, array $context = []): ?Type
     {
         /** @var PhpDocNode|null $docNode */
-        [$docNode, $source, $prefix, $declaringClass] = $this->getDocBlock($class, $property);
+        [$docNode, $source, $prefix, $declaringClass, $selfClass] = $this->getDocBlock($class, $property);
 
         if (null === $docNode) {
             return null;
         }
 
-        $typeContext = $this->typeContextFactory->createFromClassName($class, $declaringClass);
+        $typeContext = $this->contexts[$class.'/'.$declaringClass.'/'.$selfClass] ??= $this->createTypeContext($class, $declaringClass, $selfClass);
 
         $tag = match ($source) {
             self::PROPERTY => '@var',

@@ -753,7 +753,7 @@ class PropertyAccessorTest extends TestCase
                 return $this->values[$name] ?? null;
             }
 
-            public function __set($name, $value)
+            public function __set($name, $value): void
             {
                 $this->values[$name] = $value;
             }

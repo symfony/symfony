@@ -811,7 +811,7 @@ class ObjectNormalizerTest extends TestCase
             public $data = [];
             public $loggedOut = false;
 
-            public function __set($name, $value)
+            public function __set($name, $value): void
             {
                 $this->data[$name] = $value;
             }
@@ -2070,7 +2070,7 @@ class ObjectNormalizerTest extends TestCase
         $object = new class {
             public $values = [];
 
-            public function __set($name, $value)
+            public function __set($name, $value): void
             {
             }
         };
@@ -2109,7 +2109,7 @@ class ObjectNormalizerTest extends TestCase
             public $data = [];
             public $deleted = false;
 
-            public function __set($name, $value)
+            public function __set($name, $value): void
             {
                 $this->data[$name] = $value;
             }

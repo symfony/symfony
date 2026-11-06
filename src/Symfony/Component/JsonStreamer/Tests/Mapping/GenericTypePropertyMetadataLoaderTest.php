@@ -24,6 +24,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithInheritedGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUndeclaredInheritedGenerics;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
@@ -64,6 +65,9 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
 
         $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::intersection(Type::object(\stdClass::class), Type::generic(Type::object(DummyWithGenerics::class), Type::int()))]);
         $this->assertEquals(['foo' => new PropertyMetadata('foo', Type::int())], $metadata);
+
+        $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::generic(Type::object(DummyWithGenerics::class), Type::int()))]);
+        $this->assertEquals(['foo' => new PropertyMetadata('foo', Type::generic(Type::object(DummyWithGenerics::class), Type::int()))], $metadata);
     }
 
     public function testReplaceGenericsInArrayShape()
@@ -79,6 +83,19 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
         ], $metadata);
     }
 
+    public function testReplaceGenericsInListShape()
+    {
+        $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
+            'foo' => new PropertyMetadata('foo', new ArrayShapeType([['type' => Type::template('T'), 'optional' => false]], Type::int(), Type::template('T'), true)),
+        ]), new TypeContextFactory(new StringTypeResolver()));
+
+        $metadata = $loader->load(DummyWithGenerics::class, context: ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::bool())]);
+
+        $this->assertEquals([
+            'foo' => new PropertyMetadata('foo', new ArrayShapeType([['type' => Type::bool(), 'optional' => false]], Type::int(), Type::bool(), true)),
+        ], $metadata);
+    }
+
     public function testReplaceGenericsWithMixedInUnion()
     {
         $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
@@ -91,6 +108,28 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
         $this->assertEquals([
             'nullable' => new PropertyMetadata('nullable', Type::mixed()),
             'union' => new PropertyMetadata('union', Type::mixed()),
+        ], $metadata);
+    }
+
+    public function testReplaceGenericsWithTheSameTypeInUnion()
+    {
+        $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
+            'union' => new PropertyMetadata('union', Type::union(Type::template('T'), Type::int())),
+            'nullableUnion' => new PropertyMetadata('nullableUnion', Type::union(Type::template('T'), Type::int(), Type::null())),
+        ]), new TypeContextFactory(new StringTypeResolver()));
+
+        $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::int())]);
+
+        $this->assertEquals([
+            'union' => new PropertyMetadata('union', Type::int()),
+            'nullableUnion' => new PropertyMetadata('nullableUnion', Type::nullable(Type::int())),
+        ], $metadata);
+
+        $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::nullable(Type::int()))]);
+
+        $this->assertEquals([
+            'union' => new PropertyMetadata('union', Type::nullable(Type::int())),
+            'nullableUnion' => new PropertyMetadata('nullableUnion', Type::nullable(Type::int())),
         ], $metadata);
     }
 

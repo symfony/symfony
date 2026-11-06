@@ -96,19 +96,18 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
 
             while ($type instanceof WrappingTypeInterface) {
                 $baseType = $type;
-
-                if ($type instanceof GenericType) {
-                    foreach ($type->getVariableTypes() as $t) {
-                        if (null !== $classType = $findTypeWithClassName($className, $t)) {
-                            return $classType;
-                        }
-                    }
-                }
-
                 $type = $type->getWrappedType();
 
                 if ($type instanceof ObjectType && $type->getClassName() === $className) {
                     return $baseType;
+                }
+
+                if ($baseType instanceof GenericType) {
+                    foreach ($baseType->getVariableTypes() as $t) {
+                        if (null !== $classType = $findTypeWithClassName($className, $t)) {
+                            return $classType;
+                        }
+                    }
                 }
             }
 
@@ -243,16 +242,25 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
         }
 
         if ($type instanceof UnionType) {
-            $types = array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getTypes());
+            $types = [];
 
-            foreach ($types as $t) {
+            foreach ($type->getTypes() as $t) {
+                $t = $this->replaceVariableTypes($t, $variableTypes);
+
                 // a union with "mixed" is "mixed", and creating such a union is not allowed
                 if ($t instanceof BuiltinType && TypeIdentifier::MIXED === $t->getTypeIdentifier()) {
                     return $t;
                 }
+
+                // "T|int" is "int" when T is "int", and "?int" when T is "?int"
+                foreach ($t instanceof UnionType ? $t->getTypes() : [$t] as $member) {
+                    if (!\in_array($member, $types)) {
+                        $types[] = $member;
+                    }
+                }
             }
 
-            return Type::union(...$types);
+            return 1 === \count($types) ? $types[0] : Type::union(...$types);
         }
 
         if ($type instanceof IntersectionType) {
@@ -264,6 +272,7 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
                 array_map(fn (array $item): array => ['type' => $this->replaceVariableTypes($item['type'], $variableTypes)] + $item, $type->getShape()),
                 $type->getExtraKeyType() ? $this->replaceVariableTypes($type->getExtraKeyType(), $variableTypes) : null,
                 $type->getExtraValueType() ? $this->replaceVariableTypes($type->getExtraValueType(), $variableTypes) : null,
+                $type->isList(),
             );
         }
 

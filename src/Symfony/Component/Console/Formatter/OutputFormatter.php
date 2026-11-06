@@ -129,18 +129,14 @@ class OutputFormatter implements WrappableOutputFormatterInterface
 
         $offset = 0;
         $output = '';
-        $openTagRegex = '[a-z](?:[^\\\\<>]*+ | \\\\.)*';
+        $openTagRegex = '[a-z](?:[^\\\\<>]++ | \\\\.)*+';
         $closeTagRegex = '[a-z][^<>]*+';
         $currentLineLength = 0;
         $lineBreak = false;
-        preg_match_all("#<(($openTagRegex) | /($closeTagRegex)?)>#ix", $message, $matches, \PREG_OFFSET_CAPTURE);
+        preg_match_all("#(?<!\\\\)<(($openTagRegex) | /($closeTagRegex)?)>#ix", $message, $matches, \PREG_OFFSET_CAPTURE);
         foreach ($matches[0] as $i => $match) {
             $pos = $match[1];
             $text = $match[0];
-
-            if (0 != $pos && '\\' == $message[$pos - 1]) {
-                continue;
-            }
 
             // tags are delimited by "<" and ">", which are ASCII, so a tag offset can never
             // fall inside a multibyte sequence: slicing by bytes is safe here

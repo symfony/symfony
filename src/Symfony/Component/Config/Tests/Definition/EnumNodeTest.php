@@ -199,6 +199,26 @@ class EnumNodeTest extends TestCase
         $node->finalize('custom');
     }
 
+    public function testFinalizeWithNonFiniteFloats()
+    {
+        $node = new EnumNode('foo', null, [1.5, \INF, -\INF]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The value of type "float" is not allowed for path "foo". Permissible values: 1.5, INF, -INF.');
+
+        $node->finalize(\NAN);
+    }
+
+    public function testFinalizeWithEnumCaseOfAnotherEnum()
+    {
+        $node = new EnumNode('foo', null, ['foo', TestEnum::Foo]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The value of type "Symfony\Component\Config\Tests\Fixtures\TestEnum2" is not allowed for path "foo". Permissible values: "foo", Symfony\Component\Config\Tests\Fixtures\TestEnum::Foo.');
+
+        $node->finalize(TestEnum2::Foo);
+    }
+
     public function testSameStringCoercedValuesAreDifferent()
     {
         $node = new EnumNode('ccc', null, ['', false, null]);

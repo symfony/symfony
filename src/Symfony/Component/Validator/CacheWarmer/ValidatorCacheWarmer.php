@@ -94,3 +94,7 @@ final class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
         return $supportedLoaders;
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer', false)) {
+    class_alias(ValidatorCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer');
+}

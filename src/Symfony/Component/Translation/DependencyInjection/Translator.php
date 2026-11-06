@@ -202,3 +202,7 @@ final class Translator extends BaseTranslator implements WarmableInterface
         return null;
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\Translation\Translator', false)) {
+    class_alias(Translator::class, 'Symfony\Bundle\FrameworkBundle\Translation\Translator');
+}

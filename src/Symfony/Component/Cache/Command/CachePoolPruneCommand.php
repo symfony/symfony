@@ -68,3 +68,7 @@ final class CachePoolPruneCommand extends Command
         return $exitCode;
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand', false)) {
+    class_alias(CachePoolPruneCommand::class, 'Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand');
+}

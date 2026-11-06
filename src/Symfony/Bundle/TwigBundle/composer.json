@@ -29,7 +29,7 @@
         "symfony/console": "^8.2",
         "symfony/stopwatch": "^7.4|^8.0",
         "symfony/expression-language": "^7.4|^8.0",
-        "symfony/framework-bundle": "^7.4|^8.0",
+        "symfony/framework-bundle": "^8.2",
         "symfony/finder": "^7.4|^8.0",
         "symfony/form": "^7.4|^8.0",
         "symfony/property-info": "^7.4|^8.0",
@@ -40,7 +40,8 @@
         "symfony/web-link": "^7.4|^8.0"
     },
     "conflict": {
-        "symfony/console": "<8.2"
+        "symfony/console": "<8.2",
+        "symfony/framework-bundle": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\TwigBundle\\": "" },

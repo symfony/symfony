@@ -88,3 +88,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
      */
     abstract protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, ?string $buildDir = null): bool;
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\CacheWarmer\AbstractPhpFileCacheWarmer', false)) {
+    class_alias(AbstractPhpFileCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\AbstractPhpFileCacheWarmer');
+}

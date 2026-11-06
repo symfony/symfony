@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\CacheWarmer\SerializerCacheWarmer as BaseSerial
 
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer', BaseSerializerCacheWarmer::class);
 
-class_alias(BaseSerializerCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer');
+class_exists(BaseSerializerCacheWarmer::class);
 
 if (false) {
     /**

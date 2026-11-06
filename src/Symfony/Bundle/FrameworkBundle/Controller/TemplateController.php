@@ -15,7 +15,7 @@ use Symfony\Bundle\TwigBundle\Controller\TemplateController as BaseTemplateContr
 
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use the "template" routing option instead.', 'Symfony\Bundle\FrameworkBundle\Controller\TemplateController');
 
-class_alias(BaseTemplateController::class, 'Symfony\Bundle\FrameworkBundle\Controller\TemplateController');
+class_exists(BaseTemplateController::class);
 
 if (false) {
     /**

@@ -15,7 +15,7 @@ use Symfony\Component\Cache\CacheWarmer\AbstractPhpFileCacheWarmer as BaseAbstra
 
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\CacheWarmer\AbstractPhpFileCacheWarmer', BaseAbstractPhpFileCacheWarmer::class);
 
-class_alias(BaseAbstractPhpFileCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\AbstractPhpFileCacheWarmer');
+class_exists(BaseAbstractPhpFileCacheWarmer::class);
 
 if (false) {
     /**

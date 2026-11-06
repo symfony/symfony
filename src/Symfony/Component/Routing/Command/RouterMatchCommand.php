@@ -115,3 +115,7 @@ class RouterMatchCommand extends Command
         return 0;
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand', false)) {
+    class_alias(RouterMatchCommand::class, 'Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand');
+}

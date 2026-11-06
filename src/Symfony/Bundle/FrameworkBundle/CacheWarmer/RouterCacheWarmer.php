@@ -15,7 +15,7 @@ use Symfony\Component\Routing\CacheWarmer\RouterCacheWarmer as BaseRouterCacheWa
 
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer', BaseRouterCacheWarmer::class);
 
-class_alias(BaseRouterCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer');
+class_exists(BaseRouterCacheWarmer::class);
 
 if (false) {
     /**

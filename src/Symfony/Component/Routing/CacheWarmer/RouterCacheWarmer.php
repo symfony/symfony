@@ -61,3 +61,7 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
         ];
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer', false)) {
+    class_alias(RouterCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer');
+}

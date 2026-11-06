@@ -78,3 +78,7 @@ class TemplateController
         return $this->templateAction($template, $maxAge, $sharedAge, $private, $context, $statusCode, $headers);
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\Controller\TemplateController', false)) {
+    class_alias(TemplateController::class, 'Symfony\Bundle\FrameworkBundle\Controller\TemplateController');
+}

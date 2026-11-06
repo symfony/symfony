@@ -48,3 +48,7 @@ class AttributeRouteControllerLoader extends AttributeClassLoader
         return str_replace('__', '_', $name);
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\Routing\AttributeRouteControllerLoader', false)) {
+    class_alias(AttributeRouteControllerLoader::class, 'Symfony\Bundle\FrameworkBundle\Routing\AttributeRouteControllerLoader');
+}

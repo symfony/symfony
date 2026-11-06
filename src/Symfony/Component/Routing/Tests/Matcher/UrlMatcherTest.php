@@ -1021,6 +1021,29 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/x./admin/report/latest');
     }
 
+    public function testHostVariableNamedRouteDoesNotMatchThePath()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/admin/report/{id}', [], [], [], 'app.{_route}'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'app.localhost'));
+        $this->assertEquals(['_route' => 'a', 'id' => '1'], $matcher->match('/admin/report/1'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'app'));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/x./admin/report/1');
+    }
+
+    public function testRouteVariableDoesNotReplaceTheRouteName()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/foo/{_route}/{bar}'));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(['_route' => 'a', 'bar' => 'baz'], $matcher->match('/foo/abc/baz'));
+    }
+
     public function testSlashVariant()
     {
         $coll = new RouteCollection();

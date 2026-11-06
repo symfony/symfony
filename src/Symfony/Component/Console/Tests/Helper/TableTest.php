@@ -3423,6 +3423,15 @@ class TableTest extends TestCase
         $table->render();
     }
 
+    public function testStyleOpenedAfterLongRunsOfEscapedTagDelimitersIsClosed()
+    {
+        $table = new Table($output = $this->getOutputStream(true));
+        $table->setRows([[OutputFormatter::escape(str_repeat('array<int> ', 10000)).'<info>foo', 'bar']]);
+        $table->render();
+
+        $this->assertStringContainsString("\033[32mfoo\033[39m | bar |\n", $this->getOutputContent($output));
+    }
+
     public function testWithHyperlinkAndMaxWidth()
     {
         $table = new Table($output = $this->getOutputStream(true));

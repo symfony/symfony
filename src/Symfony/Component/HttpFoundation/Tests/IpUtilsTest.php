@@ -263,10 +263,24 @@ class IpUtilsTest extends TestCase
             ['2001:0002::1',       true],
             ['64:ff9b::7f00:1',    true],
             ['64:ff9b:1::7f00:1',  true],
+            // addresses embedding a private IPv4 address
+            ['::ffff:10.0.0.1',                       true],
+            ['2002:a00:1::',                          true],
+            ['2001:0:4136:e378:8000:63bf:f5ff:fffe',  true],
+            ['64:ff9b::a00:1',                        true],
+            // where the IPv4 address sits is unknown, or no host presents such an address
+            ['64:ff9b:1::681a:e06',                   true],
+            ['::104.26.14.6',                         true],
 
             // public
             ['104.26.14.6',             false],
             ['2606:4700:20::681a:e06',  false],
+            // addresses embedding the public IPv4 address 104.26.14.6
+            ['::ffff:104.26.14.6',                    false],
+            ['::ffff:681a:e06',                       false],
+            ['2002:681a:e06::1',                      false],
+            ['2001:0:4136:e378:8000:63bf:97e5:f1f9',  false],
+            ['64:ff9b::681a:e06',                     false],
             // just past the boundary of the ranges above, which pins their prefix lengths
             ['100.128.0.1',             false],
             ['198.20.0.1',              false],
@@ -340,7 +354,7 @@ class IpUtilsTest extends TestCase
     public function testPrivateRangesDoNotCoverAddressesARemoteClientCanPresent(string $ip)
     {
         $this->assertFalse(IpUtils::checkIp($ip, IpUtils::PRIVATE_RANGES));
-        $this->assertTrue(IpUtils::isPrivateIp($ip));
+        $this->assertTrue(IpUtils::checkIp($ip, IpUtils::PRIVATE_SUBNETS));
     }
 
     public static function getAddressesARemoteClientCanPresent(): array

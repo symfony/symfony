@@ -1735,7 +1735,6 @@ class ApplicationTest extends TestCase
         $this->expectExceptionMessage('error');
 
         $tester->run(['command' => 'dym']);
-        $this->assertStringContainsString('before.dym.error.after.', $tester->getDisplay(), 'The PHP error did not dispatch events');
     }
 
     public function testRunDispatchesAllEventsWithError()

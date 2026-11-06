@@ -151,7 +151,7 @@ trait CompiledUrlMatcherTrait
                     }
 
                     foreach ($vars as $i => $v) {
-                        if (isset($matches[1 + $i])) {
+                        if (isset($matches[1 + $i]) && '_route' !== $v) {
                             $ret[$v] = $matches[1 + $i];
                         }
                     }

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AttributeRouteControllerLoaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultCachePoolsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DefaultMessageBusPass;
@@ -228,6 +229,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RegisterCompiledExpressionLanguagesPass());
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RoutingResolverPass());
+        $container->addCompilerPass(new AttributeRouteControllerLoaderPass());
         $this->addCompilerPassIfExists($container, RoutingControllerPass::class);
         $container->addCompilerPass(new ProfilerPass());
         $this->addCompilerPassIfExists($container, ControllerAttributesListenerPass::class, PassConfig::TYPE_BEFORE_REMOVING);

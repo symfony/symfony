@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
+use Symfony\Component\HttpKernel\Tests\Fixtures\WakingPayload;
 
 class StoreTest extends TestCase
 {
@@ -569,6 +570,21 @@ class StoreTest extends TestCase
 
         $responseLook = $this->store->lookup($req1);
         $this->assertSame($content, $responseLook->getContent());
+    }
+
+    public function testMetadataIsReadWithoutInstantiatingObjects()
+    {
+        WakingPayload::reset();
+
+        $key = $this->store->write($this->request, $this->response);
+
+        // the metadata file holds scalars and plain arrays; an attacker who can write to the cache directory must not be able to have an object built out of it
+        file_put_contents($this->getStorePath($key), serialize([[['payload' => new WakingPayload()], []]]));
+
+        $metadata = $this->getStoreMetadata($key);
+
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $metadata[0][0]['payload']);
+        $this->assertFalse(WakingPayload::$awoken);
     }
 
     protected function storeSimpleEntry($path = null, $headers = [])

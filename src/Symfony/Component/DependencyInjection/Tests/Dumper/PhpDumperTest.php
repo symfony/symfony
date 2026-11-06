@@ -563,15 +563,13 @@ class PhpDumperTest extends TestCase
 
     public function testOverrideServiceWhenUsingADumpedContainer()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "decorator_service" service is already initialized, you cannot replace it.');
         require_once self::$fixturesPath.'/php/services9_compiled.php';
 
         $container = new \ProjectServiceContainer();
         $container->get('decorator_service');
-        $container->set('decorator_service', $decorator = new \stdClass());
-
-        $this->assertSame($decorator, $container->get('decorator_service'), '->set() overrides an already defined service');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "decorator_service" service is already initialized, you cannot replace it.');
+        $container->set('decorator_service', new \stdClass());
     }
 
     public function testDumpAutowireData()

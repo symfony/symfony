@@ -752,6 +752,48 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
     }
 
+    #[RequiresPhpExtension('pcntl')]
+    public function testRunStopsWhenSignalWasReceivedBeforeTheWorkerWasCreated()
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->method('find')->willReturn(new Envelope(new \stdClass()));
+        $receiver->expects($this->never())->method('ack');
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->never())->method('dispatch');
+
+        $command = new FailedMessagesRetryCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]), $bus, new EventDispatcher());
+
+        $this->assertFalse($command->handleSignal(\SIGTERM));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['id' => [10, 12], '--force' => true]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringNotContainsString('[OK]', $tester->getDisplay());
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testRunIgnoresKeepaliveSignalReceivedBeforeTheWorkerWasCreated()
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->method('find')->willReturn(new Envelope(new \stdClass()));
+        $receiver->expects($this->once())->method('ack');
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch')->willReturn(new Envelope(new \stdClass()));
+
+        $command = new FailedMessagesRetryCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]), $bus, new EventDispatcher());
+
+        $this->assertFalse($command->handleSignal(\SIGALRM));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['id' => [10], '--force' => true]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
     private function createFailedEnvelope(int $id, string $failedAt): Envelope
     {
         return new Envelope(new \stdClass(), [

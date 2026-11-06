@@ -811,6 +811,70 @@ class ObjectNormalizerTest extends TestCase
         return $normalizer;
     }
 
+    public function testDeepObjectToPopulateDoesNotCallMethodNamedAfterUntypedAttribute()
+    {
+        $object = new class {
+            public $data = [];
+            public $loggedOut = false;
+
+            public function __set($name, $value)
+            {
+                $this->data[$name] = $value;
+            }
+
+            public function logout()
+            {
+                $this->loggedOut = true;
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        new Serializer([$normalizer]);
+        $normalizer->denormalize(['logout' => ['foo' => 'bar']], $object::class, null, [
+            'object_to_populate' => $object,
+            'deep_object_to_populate' => true,
+        ]);
+
+        $this->assertFalse($object->loggedOut);
+        $this->assertSame(['logout' => ['foo' => 'bar']], $object->data);
+    }
+
+    public function testDeepObjectToPopulateReadsThroughMethodNamedAfterTypedAttribute()
+    {
+        $inner = new ObjectInner();
+        $inner->bar = 'bar';
+
+        $object = new class($inner) {
+            private $inner;
+
+            public function __construct(ObjectInner $inner)
+            {
+                $this->inner = $inner;
+            }
+
+            public function inner(): ObjectInner
+            {
+                return $this->inner;
+            }
+
+            public function setInner(ObjectInner $inner): void
+            {
+                $this->inner = $inner;
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        new Serializer([$normalizer]);
+        $normalizer->denormalize(['inner' => ['foo' => 'foo']], $object::class, null, [
+            'object_to_populate' => $object,
+            'deep_object_to_populate' => true,
+        ]);
+
+        $this->assertSame($inner, $object->inner());
+        $this->assertSame('foo', $inner->foo);
+        $this->assertSame('bar', $inner->bar);
+    }
+
     // skip null
 
     protected function getNormalizerForSkipNullValues(): ObjectNormalizer
@@ -2297,6 +2361,122 @@ class ObjectNormalizerTest extends TestCase
         ]);
 
         $this->assertSame([], $object->values);
+    }
+
+    public function testDenormalizeWritesPublicPropertyRatherThanMethodOfSameName()
+    {
+        $object = new class {
+            public $refund = false;
+            public $refunded = false;
+
+            public function refund($notify)
+            {
+                $this->refunded = true;
+            }
+        };
+
+        (new ObjectNormalizer())->denormalize(['refund' => true], $object::class, 'json', [
+            'object_to_populate' => $object,
+        ]);
+
+        $this->assertTrue($object->refund);
+        $this->assertFalse($object->refunded);
+    }
+
+    public function testDenormalizeWritesMagicPropertyRatherThanMethodOfSameName()
+    {
+        $object = new class {
+            public $data = [];
+            public $deleted = false;
+
+            public function __set($name, $value)
+            {
+                $this->data[$name] = $value;
+            }
+
+            public function delete($confirm)
+            {
+                $this->deleted = true;
+            }
+        };
+
+        (new ObjectNormalizer())->denormalize(['delete' => true], $object::class, 'json', [
+            'object_to_populate' => $object,
+        ]);
+
+        $this->assertSame(['delete' => true], $object->data);
+        $this->assertFalse($object->deleted);
+    }
+
+    public function testDenormalizeDoesNotCallMethodNamedAfterConstructorArgument()
+    {
+        $object = new class(1) {
+            public $calls = 0;
+            private $amount;
+
+            public function __construct($amount)
+            {
+                $this->amount = $amount;
+            }
+
+            public function amount($multiplier)
+            {
+                ++$this->calls;
+            }
+        };
+
+        (new ObjectNormalizer())->denormalize(['amount' => 2], $object::class, 'json', [
+            'object_to_populate' => $object,
+        ]);
+
+        $this->assertSame(0, $object->calls);
+    }
+
+    public function testDenormalizeDoesNotCallMethodNamedAfterAdder()
+    {
+        $object = new class {
+            public $calls = [];
+
+            public function addRefund($refund)
+            {
+                $this->calls[] = 'addRefund';
+            }
+
+            public function removeRefund($refund)
+            {
+                $this->calls[] = 'removeRefund';
+            }
+
+            public function refund($amount)
+            {
+                $this->calls[] = 'refund';
+            }
+        };
+
+        (new ObjectNormalizer())->denormalize(['refund' => 5], $object::class, 'json', [
+            'object_to_populate' => $object,
+        ]);
+
+        $this->assertSame([], $object->calls);
+    }
+
+    public function testDenormalizeCallsMethodOfSameNameWhenGetterSetterExtractionIsEnabled()
+    {
+        $object = new class {
+            public $calls = [];
+
+            public function refund($amount)
+            {
+                $this->calls[] = $amount;
+            }
+        };
+
+        (new ObjectNormalizer())->denormalize(['refund' => 5], $object::class, 'json', [
+            'object_to_populate' => $object,
+            'enable_getter_setter_extraction' => true,
+        ]);
+
+        $this->assertSame([5], $object->calls);
     }
 }
 

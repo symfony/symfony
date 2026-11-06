@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\HttpKernel\Tests\Fixtures\WakingPayload;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
@@ -92,6 +93,42 @@ class LoggerDataCollectorTest extends TestCase
         $this->assertInstanceOf(Data::class, $processedLogs[0]['context']);
 
         @unlink($path);
+    }
+
+    public function testDeprecationsLogIsReadWithoutInstantiatingObjects()
+    {
+        WakingPayload::reset();
+
+        $containerPathPrefix = __DIR__.'/';
+        $path = $containerPathPrefix.'Deprecations.log';
+        file_put_contents($path, serialize([[
+            'type' => 16384,
+            'message' => 'The "Foo" class is deprecated.',
+            'file' => '/app/src/Controller/DefaultController.php',
+            'line' => 9,
+            'trace' => [['file' => '/app/src/Kernel.php', 'line' => 9, 'args' => [new WakingPayload()]]],
+            'count' => 1,
+        ]]));
+
+        $logger = $this
+            ->getMockBuilder(DebugLoggerInterface::class)
+            ->onlyMethods(['countErrors', 'getLogs', 'clear'])
+            ->getMock();
+
+        $logger->expects($this->once())->method('countErrors')->willReturn(0);
+        $logger->expects($this->exactly(2))->method('getLogs')->willReturn([]);
+
+        $c = new LoggerDataCollector($logger, $containerPathPrefix);
+
+        try {
+            $c->lateCollect();
+
+            // the log file holds scalars and plain arrays; an attacker who can write to the cache directory must not be able to have an object built out of it
+            $this->assertCount(1, $c->getProcessedLogs());
+            $this->assertFalse(WakingPayload::$awoken);
+        } finally {
+            @unlink($path);
+        }
     }
 
     public function testWithMainRequest()

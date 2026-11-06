@@ -372,6 +372,9 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
         }
 
         $this->worker = new Worker($receivers, $bus, $eventDispatcher, $this->logger, $rateLimiters, new Clock(), $messageExecutionStrategy, $cooldownStrategies);
+        if ($this->shouldStop) {
+            $this->worker->stop();
+        }
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
             'time_limit' => null !== $timeLimit ? (int) $timeLimit : null,
@@ -390,6 +393,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             $this->worker->run($options);
         } finally {
             $this->worker = null;
+            $this->shouldStop = false;
             $messageExecutionStrategy?->shutdown();
         }
 
@@ -421,6 +425,10 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         if (!$this->worker) {
+            if (\SIGALRM !== $signal) {
+                $this->shouldStop = true;
+            }
+
             return false;
         }
 

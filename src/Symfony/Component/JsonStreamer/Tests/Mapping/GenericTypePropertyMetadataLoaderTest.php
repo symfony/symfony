@@ -18,6 +18,7 @@ use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithConcreteInheritedGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDeeplyInheritedGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithInheritedGenerics;
@@ -114,6 +115,25 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
         $metadata = $loader->load(DummyWithUndeclaredInheritedGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithUndeclaredInheritedGenerics::class), Type::object(ClassicDummy::class))]);
 
         $this->assertEquals([
+            'dummies' => new PropertyMetadata('dummies', Type::list(Type::object(ClassicDummy::class))),
+        ], $metadata);
+    }
+
+    public function testReplaceGenericsOfParentClassesOfNonGenericClass()
+    {
+        $loader = new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new TypeContextFactory(new StringTypeResolver()));
+
+        $metadata = $loader->load(DummyWithConcreteInheritedGenerics::class, [], ['original_type' => Type::object(DummyWithConcreteInheritedGenerics::class)]);
+
+        $this->assertEquals([
+            'extra' => new PropertyMetadata('extra', Type::int()),
+            'dummies' => new PropertyMetadata('dummies', Type::list(Type::object(ClassicDummy::class))),
+        ], $metadata);
+
+        $metadata = $loader->load(DummyWithConcreteInheritedGenerics::class, [], ['original_type' => Type::list(Type::object(DummyWithConcreteInheritedGenerics::class))]);
+
+        $this->assertEquals([
+            'extra' => new PropertyMetadata('extra', Type::int()),
             'dummies' => new PropertyMetadata('dummies', Type::list(Type::object(ClassicDummy::class))),
         ], $metadata);
     }

@@ -152,6 +152,14 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      */
     protected function setAttributeValue(object $object, string $attribute, $value, ?string $format = null, array $context = [])
     {
+        if ($writeInfo = $this->getWriteInfoInsteadOfGetterSetter($object, $attribute, $value)) {
+            if (PropertyWriteInfo::TYPE_PROPERTY === $writeInfo->getType()) {
+                $object->{$writeInfo->getName()} = $value;
+            }
+
+            return;
+        }
+
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);
         } catch (NoSuchPropertyException $exception) {
@@ -253,5 +261,32 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         return !$method->isStatic()
             && (\PHP_VERSION_ID < 80000 || !$method->getAttributes(Ignore::class))
             && !$method->getNumberOfRequiredParameters();
+    }
+
+    /**
+     * Returns how to write the attribute when PropertyAccessor would call a method named after it, like name($value), that isAllowedAttribute() doesn't account for.
+     */
+    private function getWriteInfoInsteadOfGetterSetter(object $object, string $attribute, $value): ?PropertyWriteInfo
+    {
+        $method = str_replace(['_', ' '], '', $attribute);
+
+        if (!method_exists($object, $method) || !(new \ReflectionMethod($object, $method))->getNumberOfParameters()) {
+            return null;
+        }
+
+        $context = ['enable_constructor_extraction' => false, 'enable_adder_remover_extraction' => is_iterable($value)];
+        $writeInfo = $this->writeInfoExtractor->getWriteInfo(\get_class($object), $attribute, ['enable_getter_setter_extraction' => true] + $context);
+
+        if (PropertyWriteInfo::TYPE_METHOD !== $writeInfo->getType()) {
+            return null;
+        }
+
+        $writeInfoWithoutGetterSetter = $this->writeInfoExtractor->getWriteInfo(\get_class($object), $attribute, $context);
+
+        if (PropertyWriteInfo::TYPE_METHOD === $writeInfoWithoutGetterSetter->getType() && $writeInfo->getName() === $writeInfoWithoutGetterSetter->getName()) {
+            return null;
+        }
+
+        return $writeInfoWithoutGetterSetter;
     }
 }

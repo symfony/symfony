@@ -1176,6 +1176,103 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertSame([], $object->values);
     }
+
+    public function testDenormalizeWritesPublicPropertyRatherThanMethodOfSameName()
+    {
+        $object = new class() {
+            public $refund = false;
+            public $refunded = false;
+
+            public function refund($notify)
+            {
+                $this->refunded = true;
+            }
+        };
+
+        (new ObjectNormalizer())->denormalize(['refund' => true], \get_class($object), 'json', [
+            'object_to_populate' => $object,
+        ]);
+
+        $this->assertTrue($object->refund);
+        $this->assertFalse($object->refunded);
+    }
+
+    public function testDenormalizeWritesMagicPropertyRatherThanMethodOfSameName()
+    {
+        $object = new class() {
+            public $data = [];
+            public $deleted = false;
+
+            public function __set($name, $value)
+            {
+                $this->data[$name] = $value;
+            }
+
+            public function delete($confirm)
+            {
+                $this->deleted = true;
+            }
+        };
+
+        (new ObjectNormalizer())->denormalize(['delete' => true], \get_class($object), 'json', [
+            'object_to_populate' => $object,
+        ]);
+
+        $this->assertSame(['delete' => true], $object->data);
+        $this->assertFalse($object->deleted);
+    }
+
+    public function testDenormalizeDoesNotCallMethodNamedAfterConstructorArgument()
+    {
+        $object = new class(1) {
+            public $calls = 0;
+            private $amount;
+
+            public function __construct($amount)
+            {
+                $this->amount = $amount;
+            }
+
+            public function amount($multiplier)
+            {
+                ++$this->calls;
+            }
+        };
+
+        (new ObjectNormalizer())->denormalize(['amount' => 2], \get_class($object), 'json', [
+            'object_to_populate' => $object,
+        ]);
+
+        $this->assertSame(0, $object->calls);
+    }
+
+    public function testDenormalizeDoesNotCallMethodNamedAfterAdder()
+    {
+        $object = new class() {
+            public $calls = [];
+
+            public function addRefund($refund)
+            {
+                $this->calls[] = 'addRefund';
+            }
+
+            public function removeRefund($refund)
+            {
+                $this->calls[] = 'removeRefund';
+            }
+
+            public function refund($amount)
+            {
+                $this->calls[] = 'refund';
+            }
+        };
+
+        (new ObjectNormalizer())->denormalize(['refund' => 5], \get_class($object), 'json', [
+            'object_to_populate' => $object,
+        ]);
+
+        $this->assertSame([], $object->calls);
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy

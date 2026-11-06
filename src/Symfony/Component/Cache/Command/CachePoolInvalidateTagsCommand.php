@@ -106,3 +106,7 @@ final class CachePoolInvalidateTagsCommand extends Command
         }
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\Command\CachePoolInvalidateTagsCommand', false)) {
+    class_alias(CachePoolInvalidateTagsCommand::class, 'Symfony\Bundle\FrameworkBundle\Command\CachePoolInvalidateTagsCommand');
+}

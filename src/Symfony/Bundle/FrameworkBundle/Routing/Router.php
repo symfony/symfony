@@ -15,7 +15,7 @@ use Symfony\Component\Routing\DependencyInjection\Router as BaseRouter;
 
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Routing\Router', BaseRouter::class);
 
-class_alias(BaseRouter::class, 'Symfony\Bundle\FrameworkBundle\Routing\Router');
+class_exists(BaseRouter::class);
 
 if (false) {
     /**

@@ -15,7 +15,7 @@ use Symfony\Component\Validator\CacheWarmer\ValidatorCacheWarmer as BaseValidato
 
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer', BaseValidatorCacheWarmer::class);
 
-class_alias(BaseValidatorCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer');
+class_exists(BaseValidatorCacheWarmer::class);
 
 if (false) {
     /**

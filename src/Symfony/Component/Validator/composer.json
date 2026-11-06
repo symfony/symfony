@@ -51,7 +51,8 @@
         "symfony/console": "<8.2",
         "symfony/dependency-injection": "<8.2",
         "symfony/doctrine-bridge": "<7.4",
-        "symfony/expression-language": "<7.4"
+        "symfony/expression-language": "<7.4",
+        "symfony/framework-bundle": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Validator\\": "" },

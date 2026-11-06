@@ -53,3 +53,7 @@ final class CachePoolListCommand extends Command
         return 0;
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand', false)) {
+    class_alias(CachePoolListCommand::class, 'Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand');
+}

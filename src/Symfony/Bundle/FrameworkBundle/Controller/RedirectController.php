@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Controller\RedirectController as BaseRedirectContr
 
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use the "redirect_to_route" or "redirect_to" routing option instead.', 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController');
 
-class_alias(BaseRedirectController::class, 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController');
+class_exists(BaseRedirectController::class);
 
 if (false) {
     /**

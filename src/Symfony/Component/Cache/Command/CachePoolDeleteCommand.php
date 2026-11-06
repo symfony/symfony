@@ -84,3 +84,7 @@ final class CachePoolDeleteCommand extends Command
         }
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand', false)) {
+    class_alias(CachePoolDeleteCommand::class, 'Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand');
+}

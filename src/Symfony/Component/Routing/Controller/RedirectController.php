@@ -185,3 +185,7 @@ class RedirectController
         throw new \RuntimeException(\sprintf('The parameter "path" or "route" is required to configure the redirect action in "%s" routing configuration.', $request->attributes->get('_route')));
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\Controller\RedirectController', false)) {
+    class_alias(RedirectController::class, 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController');
+}

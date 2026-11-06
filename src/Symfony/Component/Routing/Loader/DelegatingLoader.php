@@ -78,3 +78,7 @@ class DelegatingLoader extends BaseDelegatingLoader
         return $collection;
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader', false)) {
+    class_alias(DelegatingLoader::class, 'Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader');
+}

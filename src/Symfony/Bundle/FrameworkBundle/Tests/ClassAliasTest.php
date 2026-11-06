@@ -15,10 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 class ClassAliasTest extends TestCase
 {
-    /**
-     * Composer indexes declared classes only, so a file that just aliases one
-     * is missing from an authoritative class map.
-     */
     public function testAliasedClassesAreDeclared()
     {
         $root = \dirname(__DIR__);
@@ -34,8 +30,9 @@ class ClassAliasTest extends TestCase
 
             $code = file_get_contents($path);
             $name = $file->getBasename('.php');
+            $isAlias = str_contains($code, 'class_alias(') || preg_match('{^class_exists\([^\n]+::class\);$}m', $code);
 
-            if (str_contains($code, 'class_alias(') && !preg_match('{\b(?:class|interface|trait|enum)\s+'.preg_quote($name, '{}').'\b}', $code)) {
+            if ($isAlias && !preg_match('{\b(?:class|interface|trait|enum)\s+'.preg_quote($name, '{}').'\b}', $code)) {
                 $missing[] = substr($path, 1 + \strlen($root));
             }
         }

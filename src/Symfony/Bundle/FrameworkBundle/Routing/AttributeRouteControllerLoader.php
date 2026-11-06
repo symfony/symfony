@@ -13,11 +13,15 @@ namespace Symfony\Bundle\FrameworkBundle\Routing;
 
 use Symfony\Component\Routing\Loader\AttributeRouteControllerLoader as BaseAttributeRouteControllerLoader;
 
-trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', AttributeRouteControllerLoader::class, BaseAttributeRouteControllerLoader::class);
+trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Routing\AttributeRouteControllerLoader', BaseAttributeRouteControllerLoader::class);
 
-/**
- * @deprecated since Symfony 8.2, use Symfony\Component\Routing\Loader\AttributeRouteControllerLoader instead
- */
-class AttributeRouteControllerLoader extends BaseAttributeRouteControllerLoader
-{
+class_exists(BaseAttributeRouteControllerLoader::class);
+
+if (false) {
+    /**
+     * @deprecated since Symfony 8.2, use Symfony\Component\Routing\Loader\AttributeRouteControllerLoader instead
+     */
+    class AttributeRouteControllerLoader extends BaseAttributeRouteControllerLoader
+    {
+    }
 }

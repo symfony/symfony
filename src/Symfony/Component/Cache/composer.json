@@ -47,7 +47,8 @@
         "ext-redis": "<6.1",
         "ext-relay": "<0.12.1",
         "symfony/console": "<8.2",
-        "symfony/dependency-injection": "<8.1"
+        "symfony/dependency-injection": "<8.1",
+        "symfony/framework-bundle": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Cache\\": "" },

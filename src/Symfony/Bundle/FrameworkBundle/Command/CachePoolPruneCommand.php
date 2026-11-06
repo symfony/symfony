@@ -15,7 +15,7 @@ use Symfony\Component\Cache\Command\CachePoolPruneCommand as BaseCachePoolPruneC
 
 trigger_deprecation('symfony/framework-bundle', '8.2', 'The "%s" class is deprecated, use "%s" instead.', 'Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand', BaseCachePoolPruneCommand::class);
 
-class_alias(BaseCachePoolPruneCommand::class, 'Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand');
+class_exists(BaseCachePoolPruneCommand::class);
 
 if (false) {
     /**

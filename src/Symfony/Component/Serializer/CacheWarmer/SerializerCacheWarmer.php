@@ -83,3 +83,7 @@ final class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
         return $supportedLoaders;
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer', false)) {
+    class_alias(SerializerCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer');
+}

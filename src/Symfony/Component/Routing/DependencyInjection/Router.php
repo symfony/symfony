@@ -215,3 +215,7 @@ final class Router extends BaseRouter implements WarmableInterface, ServiceSubsc
         ];
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\Routing\Router', false)) {
+    class_alias(Router::class, 'Symfony\Bundle\FrameworkBundle\Routing\Router');
+}

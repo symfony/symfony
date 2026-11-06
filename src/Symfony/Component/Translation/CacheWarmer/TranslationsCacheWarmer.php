@@ -57,3 +57,7 @@ final class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubs
         ];
     }
 }
+
+if (!class_exists('Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer', false)) {
+    class_alias(TranslationsCacheWarmer::class, 'Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer');
+}

@@ -1159,7 +1159,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return false === $this->typeCache[$key] ? null : $this->typeCache[$key];
         }
 
-        if (null !== $type = $this->getPropertyType($currentClass, $attribute)) {
+        if (1000 < \count($this->typeCache)) {
+            // stop memory leak if there are many keys
+            $this->typeCache = \array_slice($this->typeCache, 500, null, true);
+        }
+
+        // asking PropertyInfo about attributes that the class doesn't have would fill its cache with each unknown key
+        if ($this->isDeclaredAttribute($currentClass, $attribute) && null !== $type = $this->getPropertyType($currentClass, $attribute)) {
             return $this->typeCache[$key] = $type;
         }
 
@@ -1169,7 +1175,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {
-                if (null !== $type = $this->getPropertyType($mappedClass, $attribute)) {
+                if ($this->isDeclaredAttribute($mappedClass, $attribute) && null !== $type = $this->getPropertyType($mappedClass, $attribute)) {
                     return $this->typeCache[$key] = $type;
                 }
             }
@@ -1193,6 +1199,26 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         return $this->propertyTypeExtractor->getTypes($className, $property);
+    }
+
+    /**
+     * Tells whether the class has a property, a getter, a setter or a constructor argument named after the attribute.
+     */
+    private function isDeclaredAttribute(string $class, string $attribute): bool
+    {
+        if (property_exists($class, $attribute) || method_exists($class, 'get'.$attribute) || method_exists($class, 'set'.$attribute)) {
+            return true;
+        }
+
+        if (method_exists($class, '__construct')) {
+            foreach ((new \ReflectionMethod($class, '__construct'))->getParameters() as $parameter) {
+                if ($attribute === $parameter->name) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1374,6 +1400,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         unset($context['cache_key']); // avoid artificially different keys
         unset($context['not_normalizable_value_exceptions']); // grows with every collected error
         unset($context['debug_trace_id']); // unique per call when the serializer is traced
+        unset($context['deserialization_path']); // differs for each item of a collection
 
         try {
             return hash('xxh128', $format.serialize([

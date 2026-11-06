@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
@@ -24,6 +25,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -965,6 +967,45 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame(42, $obj->params['param2']);
     }
 
+    public function testDenormalizeDoesNotLookUpUnknownAttributes()
+    {
+        $cache = new ArrayAdapter();
+        $propertyInfo = new PropertyInfoCacheExtractor(new PropertyInfoExtractor([], [new ReflectionExtractor()], [], [new ReflectionExtractor()]), $cache);
+        $normalizer = new ObjectNormalizer(null, null, null, $propertyInfo, null, null, [], $propertyInfo);
+
+        $normalizer->denormalize(['foo' => 'foo'], ObjectDummy::class);
+        $cachedValues = $cache->getValues();
+
+        $obj = $normalizer->denormalize(['foo' => 'foo', 'foo_' => 'bar', 'unknown1' => 1, 'unknown2' => 2], ObjectDummy::class);
+
+        $this->assertSame('bar', $obj->getFoo());
+        $this->assertSame($cachedValues, $cache->getValues());
+    }
+
+    public function testDenormalizeDoesNotLookUpMagicAttributes()
+    {
+        $object = new class {
+            public $foo;
+            public $values = [];
+
+            public function __set(string $name, $value): void
+            {
+                $this->values[$name] = $value;
+            }
+        };
+        $cache = new ArrayAdapter();
+        $propertyInfo = new PropertyInfoCacheExtractor(new PropertyInfoExtractor([], [new ReflectionExtractor()], [], [new ReflectionExtractor()]), $cache);
+        $normalizer = new ObjectNormalizer(null, null, null, $propertyInfo, null, null, [], $propertyInfo);
+
+        $normalizer->denormalize(['foo' => 'foo'], $object::class, null, ['object_to_populate' => $object]);
+        $cachedValues = $cache->getValues();
+
+        $normalizer->denormalize(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'], $object::class, null, ['object_to_populate' => $object]);
+
+        $this->assertSame(['bar' => 'bar', 'baz' => 'baz'], $object->values);
+        $this->assertSame($cachedValues, $cache->getValues());
+    }
+
     public function testNoTraversableSupport()
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
@@ -1002,6 +1043,15 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $this->normalizer->normalize($objectDummy, null, ['not_serializable' => static function () {
         }]));
+    }
+
+    public function testIsWritableCacheSizeLimit()
+    {
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->normalizer->denormalize(['unknown'.$i => 'value'], ObjectDummy::class);
+        }
+
+        $this->assertLessThanOrEqual(1001, \count((new \ReflectionProperty(ObjectNormalizer::class, 'isWritableCache'))->getValue()));
     }
 
     public function testThrowUnexpectedValueException()
@@ -2021,6 +2071,24 @@ class ObjectNormalizerTest extends TestCase
         $this->assertInstanceOf(DiscriminatorWithIgnoredAttribute::class, $denormalized);
         $this->assertSame('FOO', $denormalized->foo);
         $this->assertSame('hidden', $denormalized->hidden);
+    }
+
+    public function testDenormalizeIgnoresUndeclaredPropertyPathIndexWithMagicSetter()
+    {
+        $object = new class {
+            public $values = [];
+
+            public function __set($name, $value)
+            {
+            }
+        };
+
+        (new ObjectNormalizer())->denormalize(['values[first]' => 'foo'], $object::class, 'json', [
+            'object_to_populate' => $object,
+            'ignored_attributes' => ['values'],
+        ]);
+
+        $this->assertSame([], $object->values);
     }
 }
 

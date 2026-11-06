@@ -106,6 +106,7 @@ class HtmlSanitizerConfig
         $this->attributeSanitizers = [
             new Visitor\AttributeSanitizer\UrlAttributeSanitizer(),
             new Visitor\AttributeSanitizer\MetaRefreshAttributeSanitizer(),
+            new Visitor\AttributeSanitizer\LinkTargetAttributeSanitizer(),
         ];
     }
 
@@ -171,7 +172,8 @@ class HtmlSanitizerConfig
             }
         }
 
-        return $clone;
+        // Browsers merge the attributes of html and body into the elements of the page, so only their content is kept
+        return $clone->blockElement('html')->blockElement('body');
     }
 
     /**

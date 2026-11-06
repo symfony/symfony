@@ -6,4 +6,5 @@
 # "ser" is the $ser variable of Config's ResourceCheckerConfigCache
 # "atleast" is PHPUnit's TestCase::atLeast()
 # "grigorian" is the name of an author of Console's Table helper
-ignore-words-list = smove,hastable,signall,caf,ser,atleast,grigorian
+# "truncat" is the expected output of FormatterHelper::truncate() in Console's FormatterHelperTest
+ignore-words-list = smove,hastable,signall,caf,ser,atleast,grigorian,truncat

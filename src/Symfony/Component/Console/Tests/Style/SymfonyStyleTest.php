@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\TreeHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\Input;
@@ -131,6 +132,22 @@ class SymfonyStyleTest extends TestCase
         $this->assertSame(str_replace(' ', '', $message), str_replace(' ', '', implode('', array_map(static fn (string $line): string => substr($line, 9), $lines))));
         $this->assertGreaterThan(1, \count($lines), 'The message is wrapped over several lines.');
         $this->assertCount(1, array_unique(array_map('strlen', $lines)), 'Every line of the block is padded to the same width.');
+    }
+
+    public function testBlockWithWideCharactersFitsInTheLineLength()
+    {
+        $this->command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            (new SymfonyStyle($input, $output))->error(str_repeat('日本語のエラーメッセージ', 30));
+
+            return Command::SUCCESS;
+        });
+
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+
+        $lines = array_filter(explode("\n", $this->tester->getDisplay(true)), static fn (string $line): bool => '' !== trim($line));
+
+        $this->assertGreaterThan(1, \count($lines), 'The message is wrapped over several lines.');
+        $this->assertSame([120], array_values(array_unique(array_map(Helper::width(...), $lines))), 'Every line of the block uses the line length.');
     }
 
     public function testErrorKeepsAnEscapedTagThatIsWrappedAsText()

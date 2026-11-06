@@ -59,6 +59,7 @@ class IpValidator extends ConstraintValidator
         '::1/128',        // loopback
         'fc00::/7',       // unique local address
         'fe80::/10',      // link local address
+        'fec0::/10',      // site local address, deprecated by RFC 3879
         '::ffff:0:0/96',  // IPv4-mapped
         '::/96',          // IPv4-compatible, including the unspecified address
         '2002::/16',      // 6to4

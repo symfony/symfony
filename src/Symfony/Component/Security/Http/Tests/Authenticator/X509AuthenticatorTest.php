@@ -83,10 +83,10 @@ class X509AuthenticatorTest extends TestCase
 
         yield 'escaped separator in a preceding value' => ['cert@example.com', 'CN=Sample\, certificate DN,emailAddress=cert@example.com'];
         yield 'genuine attribute wins over one embedded in a CN' => ['cert@example.com', 'CN=jdoe\,emailAddress=admin@target.example,emailAddress=cert@example.com'];
+        yield 'two genuine attributes' => ['first@example.com', 'emailAddress=first@example.com,emailAddress=second@example.com,CN=Sample certificate DN'];
         yield 'slash inside a RFC 2253 value' => ['cert@example.com', 'CN=Sample/certificate DN,emailAddress=cert@example.com'];
         yield 'escaped separator in a preceding value, legacy format' => ['cert@example.com', '/CN=Sample\/certificate DN/emailAddress=cert@example.com'];
         yield 'hex escape in a preceding value' => ['cert@example.com', 'CN=Sample\2C certificate DN,emailAddress=cert@example.com'];
-        yield 'backslash then escaped slash in a preceding legacy value' => ['cert@example.com', '/CN=jdoe\\\\/emailAddress=admin@target.example/emailAddress=cert@example.com'];
         yield 'hex escape in a preceding legacy value' => ['cert@example.com', '/CN=Sample\\x2Fcertificate DN/emailAddress=cert@example.com'];
         yield 'quoted preceding value' => ['cert@example.com', 'CN="Sample, certificate DN",emailAddress=cert@example.com'];
     }
@@ -116,6 +116,14 @@ class X509AuthenticatorTest extends TestCase
         yield 'backslash then escaped slash in a legacy value' => ['/CN=jdoe\\\\/emailAddress=admin@target.example'];
         yield 'quoted value' => ['CN="jdoe,emailAddress=admin@target.example,x=",O=Attacker'];
         yield 'quoted value, XN_FLAG_ONELINE' => ['O = Attacker, CN = "jdoe,emailAddress=admin@target.example,x="'];
+
+        yield 'backslash then escaped slash in a legacy value before the genuine attribute' => ['/CN=jdoe\\\\/emailAddress=admin@target.example/emailAddress=cert@example.com'];
+
+        // OpenSSL before 3.0 and HAProxy leave slashes inside values unescaped
+        yield 'bare slash in a legacy value' => ['/C=FR/O=Acme/CN=jdoe/emailAddress=admin@target.example/emailAddress=cert@example.com'];
+        yield 'bare slash in a legacy value, OID' => ['/CN=jdoe/1.2.840.113549.1.9.1=admin@target.example/emailAddress=cert@example.com'];
+        yield 'bare slash in a legacy value ending with a backslash' => ['/CN=jdoe/emailAddress=admin@target.example/x=\\/emailAddress=cert@example.com'];
+        yield 'bare slash in a legacy value, hex escaped attribute' => ['/CN=jdoe/\\x65mailAddress=admin@target.example/emailAddress=cert@example.com'];
     }
 
     public function testSupportNoData()
@@ -187,6 +195,7 @@ class X509AuthenticatorTest extends TestCase
         yield ['Sample certificate DN', 'emailAddress=cert+something@example.com,CN=Sample certificate DN'];
         yield ['Firstname.Lastname', 'emailAddress=firstname.lastname@mycompany.co.uk,CN=Firstname.Lastname,OU=london,OU=company design and engineering,OU=Issuer London,OU=Roaming,OU=Interactive,OU=Users,OU=Standard,OU=Business,DC=england,DC=core,DC=company,DC=co,DC=uk'];
         yield ['user1', 'C=FR, O=My Organization, CN=user1, emailAddress=user1@myorg.fr'];
+        yield ['jdoe', 'CN=jdoe,CN=Users,DC=example,DC=com'];
     }
 
     #[DataProvider('provideDnsForCustomUserIdentifier')]
@@ -222,6 +231,10 @@ class X509AuthenticatorTest extends TestCase
         yield 'genuine attribute, legacy format' => ['jdoe', '/C=US/O=Ex/UID=jdoe/CN=John Doe'];
         yield 'genuine attribute wins over one embedded in an O' => ['jdoe', 'C=US,O=Evil Co\,UID=admin,UID=jdoe'];
         yield 'surrounding spaces are trimmed' => ['jdoe', 'C=US, UID=jdoe , CN=John Doe'];
+
+        // OpenSSL before 3.0 and HAProxy leave slashes inside values unescaped
+        yield 'bare slash in a legacy O' => [null, '/C=US/O=Evil Co/UID=admin/UID=jdoe/CN=John Doe'];
+        yield 'bare slash in a legacy O, hex escaped attribute' => [null, '/C=US/O=Evil Co/\\x55ID=admin/UID=jdoe/CN=John Doe'];
     }
 
     #[DataProvider('provideDns')]

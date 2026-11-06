@@ -100,6 +100,8 @@ class FormatterHelperTest extends TestCase
         $this->assertSame('testing truncat...', $formatter->truncate($message, 15));
         $this->assertSame('testing truncate...', $formatter->truncate($message, 16));
         $this->assertSame('zażółć gęślą...', $formatter->truncate('zażółć gęślą jaźń', 12));
+        $this->assertSame('日本...', $formatter->truncate('日本語テキスト', 4));
+        $this->assertSame('日本...', $formatter->truncate('日本語テキスト', 5));
     }
 
     public function testTruncatingMessageWithCustomSuffix()

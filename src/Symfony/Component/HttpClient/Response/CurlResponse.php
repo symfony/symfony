@@ -426,7 +426,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
             self::addResponseHeaders([substr($data, 0, -2)], $info, $headers);
 
             if (!str_starts_with($data, 'HTTP/')) {
-                if (0 === stripos($data, 'Location:')) {
+                if (null === $location && 0 === stripos($data, 'Location:')) {
                     $location = trim(substr($data, 9, -2));
                 }
 

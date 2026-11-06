@@ -64,8 +64,18 @@ abstract class SMime
 
     protected function getStreamIterator($stream): iterable
     {
+        $carry = '';
         while (!feof($stream)) {
-            yield str_replace("\n", "\r\n", str_replace("\r\n", "\n", fread($stream, 16372)));
+            $chunk = $carry.fread($stream, 16372);
+            $carry = '';
+
+            // Don't split a CRLF across two chunks, or normalizing each chunk turns it into "\r\r\n"
+            if (str_ends_with($chunk, "\r") && !feof($stream)) {
+                $chunk = substr($chunk, 0, -1);
+                $carry = "\r";
+            }
+
+            yield str_replace("\n", "\r\n", str_replace("\r\n", "\n", $chunk));
         }
     }
 

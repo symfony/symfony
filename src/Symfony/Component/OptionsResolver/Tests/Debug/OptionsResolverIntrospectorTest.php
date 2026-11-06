@@ -102,23 +102,23 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetAllowedTypesThrowsOnNoConfiguredValue()
     {
-        $this->expectException(NoConfigurationException::class);
-        $this->expectExceptionMessage('No allowed types were set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getAllowedTypes($option));
+        $this->expectException(NoConfigurationException::class);
+        $this->expectExceptionMessage('No allowed types were set for the "foo" option.');
+        $debug->getAllowedTypes($option);
     }
 
     public function testGetAllowedTypesThrowsOnNotDefinedOption()
     {
-        $this->expectException(UndefinedOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getAllowedTypes('foo'));
+        $this->expectException(UndefinedOptionsException::class);
+        $this->expectExceptionMessage('The option "foo" does not exist.');
+        $debug->getAllowedTypes('foo');
     }
 
     public function testGetAllowedValues()
@@ -133,23 +133,23 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetAllowedValuesThrowsOnNoConfiguredValue()
     {
-        $this->expectException(NoConfigurationException::class);
-        $this->expectExceptionMessage('No allowed values were set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getAllowedValues($option));
+        $this->expectException(NoConfigurationException::class);
+        $this->expectExceptionMessage('No allowed values were set for the "foo" option.');
+        $debug->getAllowedValues($option);
     }
 
     public function testGetAllowedValuesThrowsOnNotDefinedOption()
     {
-        $this->expectException(UndefinedOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getAllowedValues('foo'));
+        $this->expectException(UndefinedOptionsException::class);
+        $this->expectExceptionMessage('The option "foo" does not exist.');
+        $debug->getAllowedValues('foo');
     }
 
     public function testGetNormalizer()
@@ -164,23 +164,23 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetNormalizerThrowsOnNoConfiguredValue()
     {
-        $this->expectException(NoConfigurationException::class);
-        $this->expectExceptionMessage('No normalizer was set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getNormalizer($option));
+        $this->expectException(NoConfigurationException::class);
+        $this->expectExceptionMessage('No normalizer was set for the "foo" option.');
+        $debug->getNormalizer($option);
     }
 
     public function testGetNormalizerThrowsOnNotDefinedOption()
     {
-        $this->expectException(UndefinedOptionsException::class);
-        $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getNormalizer('foo'));
+        $this->expectException(UndefinedOptionsException::class);
+        $this->expectExceptionMessage('The option "foo" does not exist.');
+        $debug->getNormalizer('foo');
     }
 
     public function testGetNormalizers()

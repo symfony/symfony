@@ -33,6 +33,20 @@ class NullableTypeTest extends TestCase
         $this->assertEquals([Type::int(), Type::null(), Type::string()], $type->getTypes());
     }
 
+    public function testPreservesTypesWithTheSameStringRepresentation()
+    {
+        $collection = Type::array(Type::string(), Type::int());
+        $generic = $collection->getWrappedType();
+
+        foreach ([[$generic, $collection], [$collection, $generic]] as $types) {
+            $type = Type::nullable(Type::union(...$types));
+
+            $this->assertCount(3, $type->getTypes());
+            $this->assertTrue($type->accepts(null));
+            $this->assertTrue($type->accepts([123]));
+        }
+    }
+
     public function testWrappedTypeIsSatisfiedBy()
     {
         $type = new NullableType(Type::int());

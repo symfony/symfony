@@ -21,9 +21,38 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\KeywordsGrandParent;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\KeywordsParent;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\OtherNamespace\KeywordsChild as KeywordsChildInOtherNamespace;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 class ClassKeywordsResolutionTest extends TestCase
 {
+    public function testSelfStaticAndParentAreResolvedTheSameWayByAllExtractors()
+    {
+        $expected = [];
+        $actual = [];
+
+        foreach ([new PhpDocExtractor(), new PhpStanExtractor()] as $extractor) {
+            foreach ([KeywordsParent::class, KeywordsChild::class, KeywordsChildInOtherNamespace::class] as $class) {
+                $type = $this->createExpectedType(KeywordsParent::class, $class, KeywordsGrandParent::class);
+
+                foreach (['prop', 'promoted', 'accessor', 'mutator', 'traitProp', 'traitAccessor', 'traitMutator'] as $property) {
+                    $key = \sprintf('%s::getType() for %s::$%s', $extractor::class, $class, $property);
+                    $expected[$key] = $type;
+                    $actual[$key] = $extractor->getType($class, $property);
+                }
+
+                foreach (['promoted', 'argument'] as $property) {
+                    $key = \sprintf('%s::getTypeFromConstructor() for %s::$%s', $extractor::class, $class, $property);
+                    $expected[$key] = $type;
+                    $actual[$key] = $extractor->getTypeFromConstructor($class, $property);
+                }
+            }
+        }
+
+        $mismatches = array_keys(array_filter($actual, static fn ($type, $key) => $type != $expected[$key], \ARRAY_FILTER_USE_BOTH));
+
+        $this->assertEquals($expected, $actual, "Unexpected types:\n".implode("\n", $mismatches));
+    }
+
     #[IgnoreDeprecations]
     #[Group('legacy')]
     public function testSelfStaticAndParentAreResolvedTheSameWayByAllExtractorsLegacy()
@@ -52,6 +81,22 @@ class ClassKeywordsResolutionTest extends TestCase
         $mismatches = array_keys(array_filter($actual, static fn ($types, $key) => $types != $expected[$key], \ARRAY_FILTER_USE_BOTH));
 
         $this->assertEquals($expected, $actual, "Unexpected types:\n".implode("\n", $mismatches));
+    }
+
+    private function createExpectedType(string $self, string $static, string $parent): Type
+    {
+        $self = Type::object($self);
+        $static = Type::object($static);
+        $parent = Type::object($parent);
+
+        return Type::union(
+            $self,
+            $static,
+            $parent,
+            Type::list(Type::union($self, $static, $parent)),
+            Type::array(Type::nullable($static), Type::string()),
+            Type::collection(Type::object(\ArrayObject::class), $parent, Type::int()),
+        );
     }
 
     private function createExpectedLegacyTypes(string $self, string $static, string $parent): array

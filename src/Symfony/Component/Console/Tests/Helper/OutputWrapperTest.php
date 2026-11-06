@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\OutputWrapper;
 
 class OutputWrapperTest extends TestCase
@@ -70,7 +71,19 @@ class OutputWrapperTest extends TestCase
         $this->assertSame("aaaa\n\\<b", $wrapper->wrap('aaaa\<b', 5));
         $this->assertSame("aaaa\n\\>b", $wrapper->wrap('aaaa\>b', 5));
         $this->assertSame("aaa\\<\nb", $wrapper->wrap('aaa\<b', 5));
-        $this->assertSame("aaaa\n\\</b\\>c", $wrapper->wrap('aaaa\</b\>c', 5));
+        $this->assertSame("aaaa\n\\</b\n\\>c", $wrapper->wrap('aaaa\</b\>c', 5));
+    }
+
+    public function testWrapCountsEscapedTagsAsText()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame("Expected\narray\\<int>\nhere", $wrapper->wrap('Expected array\<int> here', 12));
+        $this->assertSame("Unexpected\n\\</foo\\> tag", $wrapper->wrap('Unexpected \</foo\> tag', 12));
+        $this->assertSame("aaaa\n\\<b><info>c</info> d", $wrapper->wrap('aaaa \<b><info>c</info> d', 8));
+
+        $text = OutputFormatter::escape(str_repeat('array<int> ', 10000));
+        $this->assertSame($text, str_replace("\n", ' ', $wrapper->wrap($text, 120)));
     }
 
     public function testWrapDoesNotCountTagsInTheWidth()
@@ -81,7 +94,8 @@ class OutputWrapperTest extends TestCase
         $this->assertSame("aaaa <info>bbbb</info>\ncccc", $wrapper->wrap('aaaa <info>bbbb</info> cccc', 9));
         $this->assertSame("<href=https://symfony.com>aaaa</>\nbbbb", $wrapper->wrap('<href=https://symfony.com>aaaa</> bbbb', 4));
         $this->assertSame("aaaa\n</>\n<info>", $wrapper->wrap("aaaa\n</>\n<info>", 4));
-        $this->assertSame("<info>\n\\<b>c", $wrapper->wrap('<info>\<b>c', 1));
+        $this->assertSame("<info>\n\\<\nb\n>\nc", $wrapper->wrap('<info>\<b>c', 1));
+        $this->assertSame("<href=https://example.com>abcdefghij\nklmnopqrst\nuvwxyz</> end", $wrapper->wrap('<href=https://example.com>abcdefghijklmnopqrstuvwxyz</> end', 10));
     }
 
     public function testWrapCountsUrlsWithTheirWidthWithoutCuttingThem()
@@ -151,6 +165,33 @@ class OutputWrapperTest extends TestCase
                 Donec ullamcorper
                 risus at <error>libero
                 ornare</error> efficitur.
+                EOS,
+        ];
+
+        yield 'Width above the PCRE compiled-size limit' => [
+            $baseTextWithUtf8AndUrl,
+            150,
+            false,
+            <<<'EOS'
+                Árvíztűrőtükörfúrógép https://github.com/symfony/symfony Lorem ipsum <comment>dolor</comment> sit amet, consectetur adipiscing elit. Praesent vestibulum nulla quis urna
+                maximus porttitor. Donec ullamcorper risus at <error>libero ornare</error> efficitur.
+                EOS,
+        ];
+
+        yield 'Width above the quantifier limit' => [
+            $baseTextWithUtf8AndUrl,
+            100000,
+            false,
+            $baseTextWithUtf8AndUrl,
+        ];
+
+        yield 'Width above the PCRE compiled-size limit with URL cut' => [
+            $baseTextWithUtf8AndUrl,
+            150,
+            true,
+            <<<'EOS'
+                Árvíztűrőtükörfúrógép https://github.com/symfony/symfony Lorem ipsum <comment>dolor</comment> sit amet, consectetur adipiscing elit. Praesent vestibulum nulla quis urna
+                maximus porttitor. Donec ullamcorper risus at <error>libero ornare</error> efficitur.
                 EOS,
         ];
     }

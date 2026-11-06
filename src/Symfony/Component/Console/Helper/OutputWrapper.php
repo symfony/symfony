@@ -60,17 +60,6 @@ final class OutputWrapper
             return $text;
         }
 
-        // tags print nothing, so they take no column and stay with the characters next to them
-        $tagPattern = \sprintf('(?:<(?:(?:%s)|/(?:%s)?)>)', self::TAG_OPEN_REGEX_SEGMENT, self::TAG_CLOSE_REGEX_SEGMENT);
-        $charPattern = '.';
-        $urlPattern = '';
-        if (!$this->allowCutUrls) {
-            // URLs are never cut. A URL longer than the width gets a line of its own, together with the start of its word when that fits
-            $charPattern = '(?!'.self::URL_PATTERN.').';
-            $urlPattern = "|$tagPattern*+[^\\s<]{0,$width}?$tagPattern*+".self::URL_PATTERN.'[^\S\r\n]?';
-        }
-        $rowPattern = "(?:(?:$tagPattern*+.){1,$width}$tagPattern*+|$tagPattern++)";
-        $cutPattern = "(?:(?:$tagPattern*+$charPattern){1,$width}|$tagPattern++)";
         // the u modifier counts characters instead of bytes, but preg_replace() returns null
         // on malformed UTF-8, which would empty the text
         $modifiers = preg_match('//u', $text) ? 'imux' : 'imx';
@@ -85,12 +74,36 @@ final class OutputWrapper
         }
         if ($wideChars) {
             $text = strtr($text, $wideChars);
+        }
+
+        // an escaped "<" never starts a tag, as in OutputFormatter
+        $tagPattern = \sprintf('(?<!\\\\<)(?:(?:%s)|/(?:%s)?)>', self::TAG_OPEN_REGEX_SEGMENT, self::TAG_CLOSE_REGEX_SEGMENT);
+        $hasTags = str_contains($text, '<') && preg_match("#<$tagPattern#$modifiers", $text);
+        $hasUrls = !$this->allowCutUrls && preg_match('#'.self::URL_PATTERN.'#i', $text);
+        // PCRE compiles a bounded repetition of a group by copying the group, so tags and URLs are subroutine calls that keep each copy small
+        // with them, the pattern still gets too large at about 1000 columns, and 65535 is the highest value a quantifier accepts
+        $width = min($width, $hasTags || $hasUrls ? 900 : 65535);
+        $charPattern = $hasUrls ? '(?!(?&url)).' : '.';
+        if ($hasTags) {
+            // tags print nothing, so they take no column and stay with the characters next to them
+            $tag = '(?:<(?&tag))';
+            $rowPattern = "(?:(?:$tag*+.){1,$width}$tag*+|$tag++)";
+            $cutPattern = "(?:(?:$tag*+$charPattern){1,$width}|$tag++)";
+            $wordStartPattern = "$tag*+[^\\s<]{0,$width}?$tag*+";
+        } else {
+            $rowPattern = ".{1,$width}";
+            $cutPattern = $hasUrls ? "(?:$charPattern){1,$width}" : $rowPattern;
+            $wordStartPattern = "[^\\s<]{0,$width}?";
+        }
+        // URLs are never cut. A URL longer than the width gets a line of its own, together with the start of its word when that fits
+        $urlPattern = $hasUrls ? "|$wordStartPattern(?&url)[^\\S\\r\\n]?" : '';
+        if ($wideChars) {
             $rowPattern .= '(?!'.self::WIDE_CHAR_FILLER.')';
             $cutPattern .= '(?!'.self::WIDE_CHAR_FILLER.')';
         }
         // a line cut inside a word never ends between a backslash and the "<" or ">" it escapes,
         // or the escaped character would start the next line as a tag delimiter
-        $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))%3$s|(%2$s)(?!(?<=\\\\)[<>]))(?:\r?\n)?|(?:\r?\n|$))#%4$s', $rowPattern, $cutPattern, $urlPattern, $modifiers);
+        $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))%3$s|(%2$s)(?!(?<=\\\\)[<>]))(?:\r?\n)?|(?:\r?\n|$))(?(DEFINE)(?<tag>%5$s)(?<url>%6$s))#%4$s', $rowPattern, $cutPattern, $urlPattern, $modifiers, $tagPattern, self::URL_PATTERN);
         $output = rtrim(preg_replace($pattern, '\\1'.$break, $text), $break);
 
         $output = str_replace(' '.$break, $break, $output);

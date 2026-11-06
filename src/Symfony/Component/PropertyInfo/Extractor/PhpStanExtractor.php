@@ -587,6 +587,6 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             return $typeContext;
         }
 
-        return new TypeContext($typeContext->calledClassName, $selfClass, $typeContext->namespace, $typeContext->uses, $typeContext->templates, $typeContext->typeAliases);
+        return new TypeContext($typeContext->calledClassName, $selfClass, $typeContext->namespace, $typeContext->uses, $typeContext->templates, $typeContext->typeAliases, $typeContext->inheritedTemplateTypes ?? []);
     }
 }

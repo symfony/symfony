@@ -122,6 +122,17 @@ class DirectoryResourceTest extends TestCase
         $this->assertFalse($resource->isFresh(time()), '->isFresh() returns false if the whole resource is removed');
     }
 
+    public function testIsFreshIgnoresTheParentDirectory()
+    {
+        $subdirectory = $this->directory.'/subdirectory';
+        mkdir($subdirectory);
+        touch($subdirectory.'/file.xml');
+        touch($this->directory, time() + 20);
+
+        $resource = new DirectoryResource($subdirectory);
+        $this->assertTrue($resource->isFresh(time() + 10), '->isFresh() returns true if only the parent directory is modified');
+    }
+
     public function testIsFreshCreateFileInSubdirectory()
     {
         $subdirectory = $this->directory.'/subdirectory';

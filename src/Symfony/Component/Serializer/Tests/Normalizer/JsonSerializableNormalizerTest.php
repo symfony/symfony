@@ -73,7 +73,7 @@ class JsonSerializableNormalizerTest extends TestCase
         ;
         $normalizer->setSerializer($serializer);
 
-        $this->assertEquals('string_object', $normalizer->normalize(new JsonSerializableDummy()));
+        $normalizer->normalize(new JsonSerializableDummy());
     }
 
     protected function getNormalizerForCircularReference(array $defaultContext): JsonSerializableNormalizer

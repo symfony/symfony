@@ -124,7 +124,7 @@ class SerializerTest extends TestCase
     {
         $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([new TestDenormalizer()], []);
-        $this->assertTrue($serializer->normalize(new \stdClass(), 'json'));
+        $serializer->normalize(new \stdClass(), 'json');
     }
 
     public function testDenormalizeNoMatch()
@@ -147,7 +147,7 @@ class SerializerTest extends TestCase
         $this->expectException(UnexpectedValueException::class);
         $serializer = new Serializer([new TestNormalizer()], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
-        $this->assertTrue($serializer->denormalize(json_encode($data), 'stdClass', 'json'));
+        $serializer->denormalize(json_encode($data), 'stdClass', 'json');
     }
 
     public function testCustomNormalizerCanNormalizeCollectionsAndScalar()

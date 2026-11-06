@@ -39,7 +39,7 @@ final class ExpirationMiddleware implements MiddlewareInterface
         // Dropping a message without a word is worse than keeping it, so say which one went and when it was due.
         $this->logger?->warning('Discarding message {class} expired on {expiration}', [
             'class' => $envelope->getMessage()::class,
-            'expiration' => $stamp->getExpiresAt()->format(\DateTimeInterface::RFC3339_EXTENDED),
+            'expiration' => \DateTimeImmutable::createFromTimestamp($stamp->getTimestamp())->format(\DateTimeInterface::RFC3339_EXTENDED),
         ]);
 
         return $envelope;

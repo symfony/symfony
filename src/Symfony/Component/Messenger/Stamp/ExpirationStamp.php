@@ -18,23 +18,26 @@ namespace Symfony\Component\Messenger\Stamp;
  */
 final class ExpirationStamp implements StampInterface
 {
-    /**
-     * @var float The deadline as a Unix timestamp, so that it survives every transport serializer
-     */
-    private float $expiresAt;
+    private float $timestamp;
 
-    public function __construct(\DateTimeInterface $expiresAt)
+    /**
+     * @param \DateTimeInterface|float $timestamp The deadline, as a date or as a Unix timestamp
+     */
+    public function __construct(\DateTimeInterface|float $timestamp)
     {
-        $this->expiresAt = (float) $expiresAt->format('U.u');
+        $this->timestamp = $timestamp instanceof \DateTimeInterface ? (float) $timestamp->format('U.u') : $timestamp;
     }
 
-    public function getExpiresAt(): \DateTimeImmutable
+    /**
+     * The deadline as a Unix timestamp, which is how it goes through every transport serializer too.
+     */
+    public function getTimestamp(): float
     {
-        return \DateTimeImmutable::createFromTimestamp($this->expiresAt);
+        return $this->timestamp;
     }
 
     public function isExpired(\DateTimeImmutable $now): bool
     {
-        return $this->expiresAt <= (float) $now->format('U.u');
+        return $this->timestamp <= (float) $now->format('U.u');
     }
 }

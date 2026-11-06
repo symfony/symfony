@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Lock\LockFactory;
@@ -26,6 +27,9 @@ use Symfony\Component\Messenger\Stamp\ExpirationStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 final class ExpirationMiddlewareTest extends MiddlewareTestCase
 {
@@ -112,6 +116,23 @@ final class ExpirationMiddlewareTest extends MiddlewareTestCase
     {
         $stamp = new ExpirationStamp($expiresAt = new \DateTimeImmutable('2026-10-20 11:59:59.123456', new \DateTimeZone('UTC')));
 
-        $this->assertEquals($expiresAt, unserialize(serialize($stamp))->getExpiresAt());
+        $this->assertSame((float) $expiresAt->format('U.u'), unserialize(serialize($stamp))->getTimestamp());
+    }
+
+    #[DataProvider('transportSerializers')]
+    public function testTheDeadlineKeepsItsMicrosecondsThroughTheTransport(SerializerInterface $serializer)
+    {
+        $expiresAt = new \DateTimeImmutable('2026-10-20 12:59:59.123456', new \DateTimeZone('+01:00'));
+        $envelope = new Envelope(new DummyMessage('Hello'), [new ExpirationStamp($expiresAt)]);
+
+        $stamp = $serializer->decode($serializer->encode($envelope))->last(ExpirationStamp::class);
+
+        $this->assertSame((float) $expiresAt->format('U.u'), $stamp->getTimestamp());
+    }
+
+    public static function transportSerializers(): iterable
+    {
+        yield 'php' => [new PhpSerializer()];
+        yield 'symfony' => [Serializer::create()];
     }
 }

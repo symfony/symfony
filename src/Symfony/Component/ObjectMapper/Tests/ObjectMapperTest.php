@@ -115,7 +115,11 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\Abstr
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\AbstractTagHolder;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\AmbiguousTagHolder;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\AmbiguousTagHolderWithPrivateProperty;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\ChildFriendDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\ChildNameAndFriendDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\FriendDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\InterfaceTagHolder;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\NameDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\Person;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\PersonDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InferredFromPropertyType\PropertyOnlyMetadataFactory;
@@ -1604,6 +1608,28 @@ final class ObjectMapperTest extends TestCase
 
         $this->assertSame('alice', $mapped->name);
         $this->assertSame($mapped, $mapped->friend);
+    }
+
+    public function testDestinationPropertyTypedWithSelfInfersItsDeclaringClass()
+    {
+        $person = new Person();
+        $person->friend = new Person('bob');
+
+        $mapped = (new ObjectMapper())->map($person, ChildFriendDto::class);
+
+        $this->assertInstanceOf(FriendDto::class, $mapped->friend);
+        $this->assertSame('bob', $mapped->friend->name);
+    }
+
+    public function testDestinationPropertyTypedWithParentInfersTheParentOfItsDeclaringClass()
+    {
+        $person = new Person();
+        $person->friend = new Person('bob');
+
+        $mapped = (new ObjectMapper())->map($person, ChildNameAndFriendDto::class);
+
+        $this->assertInstanceOf(NameDto::class, $mapped->friend);
+        $this->assertSame('bob', $mapped->friend->name);
     }
 
     public function testNestedPropertyTypedWithSelfIsMappedToTheDeclaringClass()

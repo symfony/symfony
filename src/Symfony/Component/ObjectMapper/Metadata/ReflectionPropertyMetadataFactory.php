@@ -195,22 +195,6 @@ final class ReflectionPropertyMetadataFactory implements PropertyMetadataFactory
         };
     }
 
-    private function getPropertyClass(\ReflectionClass $targetRefl, string $property): ?string
-    {
-        $property = $this->getPropertyFromHierarchy($targetRefl, $property);
-        $type = $property?->getType();
-
-        if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
-            return null;
-        }
-
-        return match (strtolower($type->getName())) {
-            'self' => $property->getDeclaringClass()->getName(),
-            'parent' => ($parent = $property->getDeclaringClass()->getParentClass()) ? $parent->getName() : $type->getName(),
-            default => $type->getName(),
-        };
-    }
-
     /**
      * Tells whether the mapper can write the property with an assignment instead of using the property accessor.
      */

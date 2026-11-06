@@ -373,7 +373,12 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if (!$this->isFreshEnough($request, $entry)) {
             $this->record($request, 'stale');
 
-            return $this->validate($request, $entry, $catch);
+            try {
+                return $this->validate($request, $entry, $catch);
+            } finally {
+                // release the lock taken by isFreshEnough(), even when nothing was stored
+                $this->store->unlock($request);
+            }
         }
 
         if ($entry->headers->hasCacheControlDirective('no-cache')) {

@@ -60,8 +60,6 @@ class JsonSerializableNormalizerTest extends TestCase
     {
         $normalizer = new JsonSerializableNormalizer(null, null, [JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
 
-        $this->expectException(CircularReferenceException::class);
-
         $serializer = $this->createMock(JsonSerializerNormalizer::class);
         $serializer
             ->expects($this->once())
@@ -74,7 +72,8 @@ class JsonSerializableNormalizerTest extends TestCase
         ;
         $normalizer->setSerializer($serializer);
 
-        $this->assertEquals('string_object', $normalizer->normalize(new JsonSerializableDummy()));
+        $this->expectException(CircularReferenceException::class);
+        $normalizer->normalize(new JsonSerializableDummy());
     }
 
     protected function getNormalizerForCircularReference(array $defaultContext): JsonSerializableNormalizer

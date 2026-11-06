@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\FloatNode;
 use Symfony\Component\Config\Definition\NumericNode;
@@ -71,6 +72,43 @@ class FloatNodeTest extends TestCase
             [['foo' => 'bar']],
             [new \stdClass()],
         ];
+    }
+
+    public function testNanIsNotTreatedAsPlaceholder()
+    {
+        $node = new FloatNode('test');
+        $node->setFinalValidationClosures([static function (float $value): float {
+            throw new InvalidConfigurationException(is_nan($value) ? 'NAN reached the validation closure.' : 'Unexpected value.');
+        }]);
+
+        $this->assertNan($node->normalize(\NAN));
+        $this->assertSame(1.5, $node->merge(\NAN, 1.5));
+        $this->assertNan($node->merge(1.5, \NAN));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('NAN reached the validation closure.');
+
+        $node->finalize(\NAN);
+    }
+
+    public function testFinalizeRejectsNanWithMin()
+    {
+        $node = new FloatNode('ratio', null, 0);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The value NAN is not allowed for path "ratio". Should be a number');
+
+        $node->finalize(\NAN);
+    }
+
+    public function testFinalizeRejectsNanWithMax()
+    {
+        $node = new FloatNode('ratio', null, null, 1);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The value NAN is not allowed for path "ratio". Should be a number');
+
+        $node->finalize(\NAN);
     }
 
     public function testFinalizeAcceptsEnvPlaceholderBelowMin()

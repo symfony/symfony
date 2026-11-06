@@ -11,9 +11,13 @@
 
 namespace Symfony\Component\TypeInfo\Tests\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnum;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyEnum;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
@@ -61,6 +65,57 @@ class IntersectionTypeTest extends TestCase
     {
         $type = new IntersectionType(Type::object(\DateTime::class), Type::object(\Iterator::class), Type::object(\Stringable::class));
         $this->assertEquals([Type::object(\DateTime::class), Type::object(\Iterator::class), Type::object(\Stringable::class)], $type->getTypes());
+    }
+
+    #[DataProvider('provideTypesWithTheSameStringRepresentation')]
+    public function testPreservesTypesWithTheSameStringRepresentation(Type $first, Type $second)
+    {
+        $this->assertSame((string) $first, (string) $second);
+
+        foreach ([[$first, $second], [$second, $first]] as $types) {
+            $this->assertSame($types, (new IntersectionType(...$types))->getTypes());
+            $this->assertSame($types, (new IntersectionType(...[...$types, clone $first, clone $second]))->getTypes());
+            $this->assertSame($first.'&'.$second, (string) new IntersectionType(...$types));
+        }
+    }
+
+    public static function provideTypesWithTheSameStringRepresentation(): iterable
+    {
+        $generic = Type::generic(Type::object(\ArrayObject::class), Type::int(), Type::string());
+        yield 'generic object and collection' => [$generic, new CollectionType($generic)];
+
+        yield 'template bounds' => [Type::template('T', Type::object(\Countable::class)), Type::template('T', Type::object(\Traversable::class))];
+        yield 'nested generic arguments' => [Type::generic(Type::object(\ArrayObject::class), Type::template('T', Type::int())), Type::generic(Type::object(\ArrayObject::class), Type::template('T', Type::string()))];
+        yield 'nested collection arguments' => [Type::collection(Type::object(\ArrayObject::class), Type::template('T', Type::int())), Type::collection(Type::object(\ArrayObject::class), Type::template('T', Type::string()))];
+        yield 'enum and object' => [Type::enum(DummyEnum::class), Type::object(DummyEnum::class)];
+        yield 'backed enum and object' => [Type::enum(DummyBackedEnum::class), Type::object(DummyBackedEnum::class)];
+    }
+
+    public function testRemovesEquivalentTypes()
+    {
+        $generic = Type::generic(Type::object(\ArrayObject::class), Type::int(), Type::string());
+        $equivalent = Type::generic(Type::object(\ArrayObject::class), Type::int(), Type::string());
+        $type = new IntersectionType(Type::object(\Stringable::class), $generic, Type::object(\Countable::class), $equivalent, clone $generic, Type::object(\Countable::class));
+
+        $this->assertEquals([$generic, Type::object(\Countable::class), Type::object(\Stringable::class)], $type->getTypes());
+    }
+
+    public function testAcceptsEveryTypeWithTheSameStringRepresentation()
+    {
+        $generic = Type::generic(Type::object(\ArrayObject::class), Type::int(), Type::string());
+        $collection = new CollectionType($generic);
+        $integers = new \ArrayObject([123]);
+        $strings = new \ArrayObject(['value']);
+
+        $this->assertTrue($generic->accepts($integers));
+        $this->assertFalse($collection->accepts($integers));
+
+        foreach ([[$generic, $collection], [$collection, $generic]] as $types) {
+            $type = new IntersectionType(...$types);
+
+            $this->assertFalse($type->accepts($integers));
+            $this->assertTrue($type->accepts($strings));
+        }
     }
 
     public function testComposedTypesAreSatisfiedBy()

@@ -402,7 +402,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            if ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false) {
+            $type = $this->getType($resolvedClass, $attribute);
+
+            // the current value is used only to denormalize typed attributes
+            if (null !== $type && ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false)) {
                 $discriminatorMapping = $this->classDiscriminatorResolver?->getMappingForMappedObject($object);
 
                 try {
@@ -417,7 +420,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
             }
 
-            if (null !== $type = $this->getType($resolvedClass, $attribute)) {
+            if (null !== $type) {
                 try {
                     $value = $this->validateAndDenormalize($type, $resolvedClass, $attribute, $value, $format, $attributeContext);
                 } catch (NotNormalizableValueException $exception) {
@@ -734,7 +737,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     TypeIdentifier::ITERABLE => is_iterable($data),
                     TypeIdentifier::MIXED => true,
                     TypeIdentifier::NULL => null === $data,
-                    TypeIdentifier::OBJECT => \is_object($data),
+                    TypeIdentifier::OBJECT => \is_object($data) && !$t->isIdentifiedBy(TypeIdentifier::ARRAY),
                     TypeIdentifier::RESOURCE => \is_resource($data),
                     TypeIdentifier::STRING => \is_string($data),
                     TypeIdentifier::TRUE => true === $data,

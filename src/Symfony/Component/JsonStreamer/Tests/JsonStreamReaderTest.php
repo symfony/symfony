@@ -21,6 +21,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithBackedEnumValueTransformer;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithConcreteInheritedGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateIntervals;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimeZones;
@@ -177,6 +178,19 @@ class JsonStreamReaderTest extends TestCase
             $this->assertSame(10, $read->dummies[0]->id);
             $this->assertSame('dummy name', $read->dummies[0]->name);
         }, '{"dummies":[{"id":10,"name":"dummy name"}]}', Type::generic(Type::object(DummyWithGenerics::class), Type::object(ClassicDummy::class)));
+    }
+
+    public function testReadObjectWithConcreteInheritedGenerics()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithConcreteInheritedGenerics::class, $read);
+            $this->assertSame(1, $read->extra);
+            $this->assertInstanceOf(ClassicDummy::class, $read->dummies[0]);
+            $this->assertSame(10, $read->dummies[0]->id);
+            $this->assertSame('dummy name', $read->dummies[0]->name);
+        }, '{"extra":1,"dummies":[{"id":10,"name":"dummy name"}]}', Type::object(DummyWithConcreteInheritedGenerics::class));
     }
 
     public function testReadObjectWithStreamedName()

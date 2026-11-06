@@ -193,8 +193,35 @@ class GlobTest extends TestCase
 
     public function testGlobToRegexBracketsAfterAnUnclosedOne()
     {
-        $this->assertSame('#^(?=[^\.])\[\[:alpha:]$#', Glob::toRegex('[[:alpha:]'));
-        $this->assertSame(1, preg_match(Glob::toRegex('[[:alpha:]'), '[[:alpha:]'));
+        $this->assertSame('#^(?=[^\.])\[[\:alpha\:]$#', Glob::toRegex('[[:alpha:]'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[[:alpha:]'), '[:'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[[:alpha:]'), '[a'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[[:alpha:]'), '[z'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[[:alpha:]'), '[[:alpha:]'));
+
+        $this->assertSame('#^(?=[^\.])\[[\:alpha\:]/(?=[^\.])]$#', Glob::toRegex('[[:alpha:]/]'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[[:alpha:]/]'), '[a/]'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[[:alpha:]/]'), '[z/]'));
+    }
+
+    public function testGlobToRegexColonsAreNotAPosixClass()
+    {
+        $this->assertSame('#^(?=[^\.])[\:alpha\:]$#', Glob::toRegex('[:alpha:]'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[:alpha:]'), ':'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[:alpha:]'), 'a'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[:alpha:]'), 'z'));
+
+        $this->assertSame('#^(?=[^\.])[[:alpha:]]$#', Glob::toRegex('[[:alpha:]]'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[[:alpha:]]'), 'z'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[[:alpha:]]'), ':'));
+    }
+
+    public function testGlobToRegexBracketExpressionPcreRejects()
+    {
+        $this->assertSame('#^(?=[^\.])(?!)$#', Glob::toRegex('[[-?]'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[[-?]'), '['));
+        $this->assertSame(0, preg_match(Glob::toRegex('[[-?]'), '?'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[[-?]'), '[[-?]'));
     }
 
     public function testGlobToRegexUnclosedCurlies()

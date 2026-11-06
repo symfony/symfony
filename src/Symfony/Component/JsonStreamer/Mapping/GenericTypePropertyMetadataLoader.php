@@ -47,6 +47,7 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
     private ?Lexer $phpDocLexer = null;
     private ?PhpDocParser $phpDocParser = null;
     private ?StringTypeResolver $stringTypeResolver = null;
+    private array $inheritedClassVariableTypes = [];
 
     public function __construct(
         private PropertyMetadataLoaderInterface $decorated,
@@ -115,7 +116,8 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
         };
 
         if (null === $classType = $findTypeWithClassName($className, $type)) {
-            return [];
+            // the parents of a non-generic class still get the variable types given by its "@extends" and "@implements" tags
+            return $this->inheritedClassVariableTypes[$className] ??= array_filter($this->resolveParentClassVariableTypes((new \ReflectionClass($className))->name, []));
         }
 
         $variableTypes = $classType instanceof GenericType ? $classType->getVariableTypes() : [];
@@ -185,6 +187,10 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
     private function getParentVariableTypes(string $className): array
     {
         if (!class_exists(PhpDocParser::class) || false === $docComment = (new \ReflectionClass($className))->getDocComment()) {
+            return [];
+        }
+
+        if (!str_contains($docComment, 'extends') && !str_contains($docComment, 'implements')) {
             return [];
         }
 

@@ -92,9 +92,17 @@ class CollectionType extends Type implements WrappingTypeInterface
         $normalizedTypes = [];
         $boolTypes = [];
         $objectTypes = [];
+        $seenTypes = [];
 
         foreach ($types as $type) {
             foreach (($type instanceof UnionType ? $type->getTypes() : [$type]) as $t) {
+                $key = (string) $t;
+                // Compare objects structurally so equal instances are deduplicated.
+                if (\in_array($t, $seenTypes[$key] ?? [])) {
+                    continue;
+                }
+                $seenTypes[$key][] = $t;
+
                 // cannot create an union with a standalone type
                 if ($t->isIdentifiedBy(TypeIdentifier::MIXED)) {
                     return Type::mixed();
@@ -116,9 +124,6 @@ class CollectionType extends Type implements WrappingTypeInterface
             }
         }
 
-        $boolTypes = array_unique($boolTypes);
-        $objectTypes = array_unique($objectTypes);
-
         // cannot create an union with either "true" and "false", "bool" must be used instead
         if ($boolTypes) {
             $normalizedTypes[] = \count($boolTypes) > 1 ? Type::bool() : $boolTypes[0];
@@ -129,8 +134,6 @@ class CollectionType extends Type implements WrappingTypeInterface
             $hasBuiltinObjectType = array_filter($objectTypes, static fn (Type $t): bool => $t->isSatisfiedBy(static fn (Type $t): bool => $t instanceof BuiltinType));
             $normalizedTypes = [...$normalizedTypes, ...($hasBuiltinObjectType ? [Type::object()] : $objectTypes)];
         }
-
-        $normalizedTypes = array_values(array_unique($normalizedTypes));
 
         return \count($normalizedTypes) > 1 ? self::union(...$normalizedTypes) : $normalizedTypes[0];
     }

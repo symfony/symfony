@@ -11,11 +11,15 @@
 
 namespace Symfony\Component\TypeInfo\Tests\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnum;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyEnum;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class CollectionTypeTest extends TestCase
@@ -154,5 +158,62 @@ class CollectionTypeTest extends TestCase
         $this->expectExceptionMessage('The $types cannot be empty.');
 
         CollectionType::mergeCollectionValueTypes([]);
+    }
+
+    #[DataProvider('provideValueTypesWithTheSameStringRepresentation')]
+    public function testMergeCollectionValueTypesPreservesTypesWithTheSameStringRepresentation(Type $first, Type $second)
+    {
+        $this->assertSame((string) $first, (string) $second);
+
+        foreach ([[$first, $second], [$second, $first]] as $types) {
+            $merged = CollectionType::mergeCollectionValueTypes($types);
+
+            $this->assertInstanceOf(UnionType::class, $merged);
+            $this->assertSame($types, $merged->getTypes());
+
+            $merged = CollectionType::mergeCollectionValueTypes([...$types, clone $first, clone $second]);
+
+            $this->assertInstanceOf(UnionType::class, $merged);
+            $this->assertSame($types, $merged->getTypes());
+        }
+    }
+
+    public static function provideValueTypesWithTheSameStringRepresentation(): iterable
+    {
+        $generic = Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::string());
+        yield 'generic array and collection' => [$generic, new CollectionType($generic)];
+
+        $generic = Type::generic(Type::object(\ArrayObject::class), Type::int(), Type::string());
+        yield 'generic object and collection' => [$generic, new CollectionType($generic)];
+
+        yield 'template bounds' => [Type::template('T', Type::int()), Type::template('T', Type::string())];
+        yield 'nested generic arguments' => [Type::generic(Type::object(\ArrayObject::class), Type::template('T', Type::int())), Type::generic(Type::object(\ArrayObject::class), Type::template('T', Type::string()))];
+        yield 'nested collection arguments' => [Type::array(Type::template('T', Type::int())), Type::array(Type::template('T', Type::string()))];
+        yield 'enum and object' => [Type::enum(DummyEnum::class), Type::object(DummyEnum::class)];
+        yield 'backed enum and object' => [Type::enum(DummyBackedEnum::class), Type::object(DummyBackedEnum::class)];
+    }
+
+    public function testMergeCollectionValueTypesPreservesNestedUnionMembers()
+    {
+        $generic = Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::string());
+        $collection = new CollectionType($generic);
+        $type = CollectionType::mergeCollectionValueTypes([$generic, Type::union($collection, Type::int())]);
+
+        $this->assertInstanceOf(UnionType::class, $type);
+        $this->assertEquals([$generic, $collection, Type::int()], $type->getTypes());
+        $this->assertTrue($type->accepts([123]));
+    }
+
+    public function testMergeCollectionValueTypesRemovesEquivalentTypes()
+    {
+        $generic = Type::generic(Type::object(\ArrayObject::class), Type::int(), Type::string());
+        $equivalent = Type::generic(Type::object(\ArrayObject::class), Type::int(), Type::string());
+
+        $this->assertSame($generic, CollectionType::mergeCollectionValueTypes([$generic, $equivalent, clone $generic]));
+
+        $type = CollectionType::mergeCollectionValueTypes([Type::bool(), $generic, Type::string(), $equivalent, Type::int(), clone $generic, Type::bool(), Type::int()]);
+
+        $this->assertInstanceOf(UnionType::class, $type);
+        $this->assertEquals([$generic, Type::bool(), Type::int(), Type::string()], $type->getTypes());
     }
 }

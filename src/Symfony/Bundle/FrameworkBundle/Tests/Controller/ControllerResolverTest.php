@@ -83,9 +83,6 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
     public function testAbstractControllerGetsContainerWhenNotSet()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\TestAbstractController" has no container set, did you forget to define it as a service subscriber?');
-
         class_exists(AbstractControllerTest::class);
 
         $controller = new TestAbstractController(false);
@@ -98,14 +95,13 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', TestAbstractController::class.'::fooAction');
 
-        $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\TestAbstractController" has no container set, did you forget to define it as a service subscriber?');
+        $resolver->getController($request);
     }
 
     public function testAbstractControllerServiceWithFqcnIdGetsContainerWhenNotSet()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\DummyController" has no container set, did you forget to define it as a service subscriber?');
-
         class_exists(AbstractControllerTest::class);
 
         $controller = new DummyController();
@@ -118,7 +114,9 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', DummyController::class.'::fooAction');
 
-        $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\DummyController" has no container set, did you forget to define it as a service subscriber?');
+        $resolver->getController($request);
     }
 
     public function testAbstractControllerGetsNoContainerWhenSet()

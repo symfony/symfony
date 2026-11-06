@@ -83,17 +83,14 @@ class FailedMessagesRemoveCommandTest extends TestCase
     {
         $failureReceiverName = 'failure_receiver';
 
-        $this->expectException(InvalidArgumentException::class);
         $command = new FailedMessagesRemoveCommand(
             $failureReceiverName,
             new ServiceLocator([])
         );
 
         $tester = new CommandTester($command);
+        $this->expectException(InvalidArgumentException::class);
         $tester->execute(['id' => [20], '--transport' => $failureReceiverName, '--force' => true]);
-
-        $this->assertStringContainsString('Failed Message Details', $tester->getDisplay());
-        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
     public function testRemoveMultipleMessagesWithServiceLocator()

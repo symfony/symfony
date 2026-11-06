@@ -1058,8 +1058,6 @@ class ParserTest extends TestCase
      */
     public function testMappingDuplicateKeyBlock()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Duplicate key "child" detected');
         $input = <<<'EOD'
             parent:
                 child: first
@@ -1068,28 +1066,20 @@ class ParserTest extends TestCase
                 child: duplicate
                 child: duplicate
             EOD;
-        $expected = [
-            'parent' => [
-                'child' => 'first',
-            ],
-        ];
-        $this->assertSame($expected, Yaml::parse($input));
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Duplicate key "child" detected');
+        Yaml::parse($input);
     }
 
     public function testMappingDuplicateKeyFlow()
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Duplicate key "child" detected');
         $input = <<<'EOD'
             parent: { child: first, child: duplicate }
             parent: { child: duplicate, child: duplicate }
             EOD;
-        $expected = [
-            'parent' => [
-                'child' => 'first',
-            ],
-        ];
-        $this->assertSame($expected, Yaml::parse($input));
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Duplicate key "child" detected');
+        Yaml::parse($input);
     }
 
     /**

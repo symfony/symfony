@@ -15,6 +15,7 @@ use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\RedirectionException;
 use Symfony\Component\HttpClient\Exception\ServerException;
+use Symfony\Component\HttpClient\Internal\Canary;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -35,6 +36,8 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
     private ResponseInterface $response;
     private mixed $content;
     private ?StopwatchEvent $event;
+    // Declared after $response so that the event includes the time spent destructing it
+    private Canary $canary;
 
     public function __construct(HttpClientInterface $client, ResponseInterface $response, &$content, ?StopwatchEvent $event = null)
     {
@@ -42,6 +45,11 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
         $this->response = $response;
         $this->content = &$content;
         $this->event = $event;
+        $this->canary = new Canary(static function () use ($event) {
+            if ($event?->isStarted()) {
+                $event->stop();
+            }
+        });
     }
 
     public function __serialize(): array
@@ -52,17 +60,6 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
     public function __unserialize(array $data): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-    }
-
-    public function __destruct()
-    {
-        try {
-            unset($this->response);
-        } finally {
-            if ($this->event?->isStarted()) {
-                $this->event->stop();
-            }
-        }
     }
 
     public function getStatusCode(): int

@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\TypeInfo\TypeContext;
 
+use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ImplementsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TemplateTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasImportTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\UsesTagValueNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -26,7 +29,10 @@ use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Exception\RuntimeException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 /**
@@ -67,6 +73,21 @@ final class TypeContextFactory
      * @var array<class-string, array<string, true>>
      */
     private array $unresolvableTypeAliases = [];
+
+    /**
+     * @var array<class-string, PhpDocNode|null>
+     */
+    private array $classDocNodeCache = [];
+
+    /**
+     * @var array<class-string, array<class-string, list<Type>>>
+     */
+    private array $parentVariableTypesCache = [];
+
+    /**
+     * @var array<class-string, array<class-string, list<Type>>>
+     */
+    private array $traitVariableTypesCache = [];
 
     private ?Lexer $phpstanLexer = null;
     private ?PhpDocParser $phpstanParser = null;
@@ -139,12 +160,22 @@ final class TypeContextFactory
         $declaringClassDocNode = $this->getPhpDocNode($declaringClassReflection);
         $calledClassDocNode = $calledClassName === $declaringClassName ? $declaringClassDocNode : $this->getPhpDocNode($calledClassNameReflection);
 
+        $templates = $this->collectTemplates($calledClassDocNode, $calledClassTypeContext);
+        $inheritedTemplateTypes = [];
+
+        if ($calledClassNameReflection->name !== $declaringClassReflection->name && $declaringClassTemplates = $this->collectTemplates($declaringClassDocNode, $typeContext)) {
+            $inheritedTemplateTypes = $this->collectInheritedTemplateTypes($calledClassNameReflection, $declaringClassReflection, $templates, array_keys($declaringClassTemplates));
+            $templates += $declaringClassTemplates;
+        }
+
         $typeContext = new TypeContext(
             $typeContext->calledClassName,
             $typeContext->declaringClassName,
             $typeContext->namespace,
             $typeContext->uses,
-            $this->collectTemplates($calledClassDocNode, $calledClassTypeContext) + $this->collectTemplates($declaringClassDocNode, $typeContext),
+            $templates,
+            [],
+            $inheritedTemplateTypes,
         );
 
         return new TypeContext(
@@ -154,6 +185,7 @@ final class TypeContextFactory
             $typeContext->uses,
             $typeContext->templates,
             $this->collectTypeAliases($declaringClassDocNode, $typeContext),
+            $typeContext->inheritedTemplateTypes,
         );
     }
 
@@ -294,6 +326,190 @@ final class TypeContextFactory
     }
 
     /**
+     * Resolves the types that the called class gives to the templates of the declaring class.
+     *
+     * The types come from the "@extends", "@implements" and "@use" tags of the classes in between. A parent that gets no types from such a tag gets the types of the templates that have the same name. The result is empty when no tag is involved. In that case, the templates of the called class already have precedence.
+     *
+     * @param array<string, Type> $calledClassTemplates
+     * @param list<string>        $declaringClassTemplates
+     *
+     * @return array<string, Type>
+     */
+    private function collectInheritedTemplateTypes(\ReflectionClass $calledClassReflection, \ReflectionClass $declaringClassReflection, array $calledClassTemplates, array $declaringClassTemplates): array
+    {
+        $templateTypes = [$calledClassReflection->name => []];
+        foreach ($calledClassTemplates as $template => $bound) {
+            $templateTypes[$calledClassReflection->name][$template] = Type::template($template, $bound);
+        }
+
+        $isTagged = [$calledClassReflection->name => false];
+        $classNames = [$calledClassReflection->name];
+
+        while (null !== $className = array_shift($classNames)) {
+            $classTemplateTypes = $templateTypes[$className];
+
+            foreach ($this->getParents($className, $declaringClassReflection) as $parentClassName => $variableTypes) {
+                if (isset($templateTypes[$parentClassName])) {
+                    continue;
+                }
+
+                $templateTypes[$parentClassName] = [];
+                $isTagged[$parentClassName] = $isTagged[$className] || null !== $variableTypes;
+
+                $parentTemplates = $parentClassName === $declaringClassReflection->name ? $declaringClassTemplates : array_keys($this->createFromClassName($parentClassName)->templates);
+
+                foreach ($parentTemplates as $i => $template) {
+                    if (null === $variableTypes) {
+                        if (isset($classTemplateTypes[$template])) {
+                            $templateTypes[$parentClassName][$template] = $classTemplateTypes[$template];
+                        }
+                    } elseif (isset($variableTypes[$i])) {
+                        $templateTypes[$parentClassName][$template] = $variableTypes[$i]->map(static fn (Type $t): Type => $t instanceof TemplateType ? $classTemplateTypes[$t->getName()] ?? $t : $t);
+                    }
+                }
+
+                if ($parentClassName === $declaringClassReflection->name) {
+                    return $isTagged[$parentClassName] ? $templateTypes[$parentClassName] : [];
+                }
+
+                $classNames[] = $parentClassName;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Returns the parent class, interfaces and traits of a class that can lead to the declaring class.
+     *
+     * Each parent comes with the variable types from the matching tag of the class, or with null when there is no such tag.
+     *
+     * @return array<class-string, list<Type>|null>
+     */
+    private function getParents(string $className, \ReflectionClass $declaringClassReflection): array
+    {
+        $reflection = self::$reflectionClassCache[$className] ??= new \ReflectionClass($className);
+        $parents = $this->parentVariableTypesCache[$className] ??= $this->collectParentVariableTypes($reflection, $this->getPhpDocNode($reflection));
+        $parentClassName = get_parent_class($className);
+
+        if ($declaringClassReflection->isTrait()) {
+            $parents = ($this->traitVariableTypesCache[$className] ??= $this->collectTraitVariableTypes($reflection)) + $parents;
+            $untaggedParents = $reflection->getTraitNames();
+        } elseif ($declaringClassReflection->isInterface()) {
+            $untaggedParents = class_implements($className);
+
+            // the walk reaches the interfaces of the parent class and of other interfaces from there
+            if (false !== $parentClassName) {
+                $untaggedParents = array_diff_key($untaggedParents, class_implements($parentClassName));
+            }
+            foreach ($untaggedParents as $interface) {
+                $untaggedParents = array_diff_key($untaggedParents, class_implements($interface));
+            }
+        } else {
+            $untaggedParents = [];
+        }
+
+        if (false !== $parentClassName) {
+            $parents += [$parentClassName => null];
+        }
+        foreach ($untaggedParents as $untaggedParent) {
+            $parents += [$untaggedParent => null];
+        }
+
+        foreach (array_keys($parents) as $parent) {
+            if ($declaringClassReflection->isTrait() ? interface_exists($parent) : !is_a($parent, $declaringClassReflection->name, true)) {
+                unset($parents[$parent]);
+            }
+        }
+
+        return $parents;
+    }
+
+    /**
+     * Returns the variable types that a class gives to its parent class, interfaces and traits in "@extends", "@implements" and "@use" tags.
+     *
+     * Like PHPStan does, "@phpstan-" tags have precedence over "@template-" tags, which have precedence over unprefixed tags.
+     *
+     * @return array<class-string, list<Type>>
+     */
+    private function collectParentVariableTypes(\ReflectionClass $reflection, ?PhpDocNode $docNode): array
+    {
+        if (!$docNode) {
+            return [];
+        }
+
+        $typeContext = null;
+        $parentVariableTypes = [];
+        $priorities = [];
+
+        foreach ($docNode->getTags() as $tag) {
+            if (!$tag->value instanceof ExtendsTagValueNode && !$tag->value instanceof ImplementsTagValueNode && !$tag->value instanceof UsesTagValueNode) {
+                continue;
+            }
+
+            try {
+                $type = $this->stringTypeResolver->resolve((string) $tag->value->type, $typeContext ??= $this->createFromClassName($reflection->name));
+            } catch (ExceptionInterface) {
+                continue;
+            }
+
+            if ($type instanceof CollectionType) {
+                $type = $type->getWrappedType();
+            }
+
+            if (!$type instanceof GenericType || !($parentType = $type->getWrappedType()) instanceof ObjectType) {
+                continue;
+            }
+
+            $parentClassName = (self::$reflectionClassCache[$parentType->getClassName()] ??= new \ReflectionClass($parentType->getClassName()))->name;
+            $priority = str_starts_with($tag->name, '@phpstan-') ? 2 : (str_starts_with($tag->name, '@template-') ? 1 : 0);
+
+            if ($priority > ($priorities[$parentClassName] ?? -1) && (is_subclass_of($reflection->name, $parentClassName) || \in_array($parentClassName, $reflection->getTraitNames(), true))) {
+                $parentVariableTypes[$parentClassName] = $type->getVariableTypes();
+                $priorities[$parentClassName] = $priority;
+            }
+        }
+
+        return $parentVariableTypes;
+    }
+
+    /**
+     * Returns the variable types that a class gives to its traits in the "@use" tags of its "use" statements.
+     *
+     * @return array<class-string, list<Type>>
+     */
+    private function collectTraitVariableTypes(\ReflectionClass $reflection): array
+    {
+        if (!$reflection->getTraitNames() || !\is_string($fileName = $reflection->getFileName()) || false === $code = @file_get_contents($fileName)) {
+            return [];
+        }
+
+        $traitVariableTypes = [];
+        $docComment = null;
+        $depth = 0;
+
+        foreach (\PhpToken::tokenize($code) as $token) {
+            if ($token->line < $reflection->getStartLine() || $token->is([\T_WHITESPACE, \T_COMMENT])) {
+                continue;
+            }
+
+            if (1 === $depth && null !== $docComment && $token->is(\T_USE)) {
+                $traitVariableTypes += $this->collectParentVariableTypes($reflection, $this->parsePhpDoc($docComment));
+            }
+
+            $docComment = 1 === $depth && $token->is(\T_DOC_COMMENT) ? $token->text : null;
+
+            if ($token->is(['{', \T_CURLY_OPEN, \T_DOLLAR_OPEN_CURLY_BRACES])) {
+                ++$depth;
+            } elseif ($token->is('}') && 0 === --$depth) {
+                break;
+            }
+        }
+
+        return $traitVariableTypes;
+    }
+
+    /**
      * @return array<string, Type>
      */
     private function collectTypeAliases(?PhpDocNode $docNode, TypeContext $typeContext): array
@@ -377,6 +593,7 @@ final class TypeContextFactory
             $typeContext->uses,
             $typeContext->templates,
             $typeContext->typeAliases + $resolved,
+            $typeContext->inheritedTemplateTypes,
         );
 
         $succeeded = false;
@@ -409,10 +626,24 @@ final class TypeContextFactory
 
     private function getPhpDocNode(\ReflectionClass|\ReflectionFunctionAbstract $reflection): ?PhpDocNode
     {
-        if (!$this->stringTypeResolver || !class_exists(PhpDocParser::class) || !$rawDocNode = $reflection->getDocComment()) {
-            return null;
+        if ($reflection instanceof \ReflectionClass && \array_key_exists($reflection->name, $this->classDocNodeCache)) {
+            return $this->classDocNodeCache[$reflection->name];
         }
 
+        $docNode = null;
+        if ($this->stringTypeResolver && class_exists(PhpDocParser::class) && $rawDocNode = $reflection->getDocComment()) {
+            $docNode = $this->parsePhpDoc($rawDocNode);
+        }
+
+        if ($reflection instanceof \ReflectionClass) {
+            $this->classDocNodeCache[$reflection->name] = $docNode;
+        }
+
+        return $docNode;
+    }
+
+    private function parsePhpDoc(string $rawDocNode): PhpDocNode
+    {
         if (class_exists(ParserConfig::class)) {
             $this->phpstanLexer ??= new Lexer($config = new ParserConfig([]));
             $this->phpstanParser ??= new PhpDocParser($config, new TypeParser($config, new ConstExprParser($config)), new ConstExprParser($config));

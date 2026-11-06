@@ -273,6 +273,7 @@ class StringTypeResolverTest extends TestCase
         yield [Type::object(Dummy::class), 'Self', $typeContextFactory->createFromClassName(Dummy::class)];
         yield [Type::object(Dummy::class), 'Number', new TypeContext(Dummy::class, Dummy::class, null, ['Number' => Dummy::class])];
         yield [Type::template('Number', Type::bool()), 'Number', new TypeContext(Dummy::class, Dummy::class, null, [], ['Number' => Type::bool()])];
+        yield [Type::list(Type::int()), 'list<Number>', new TypeContext(Dummy::class, AbstractDummy::class, null, [], ['Number' => Type::bool()], [], ['Number' => Type::int()])];
         yield [Type::string(), 'Number', new TypeContext(Dummy::class, Dummy::class, null, [], [], ['Number' => Type::string()])];
 
         // type aliases

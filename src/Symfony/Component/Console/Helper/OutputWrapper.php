@@ -44,7 +44,7 @@ namespace Symfony\Component\Console\Helper;
  */
 final class OutputWrapper
 {
-    private const TAG_OPEN_REGEX_SEGMENT = '[a-z](?:[^\\\\<>]*+ | \\\\.)*';
+    private const TAG_OPEN_REGEX_SEGMENT = '[a-z](?:[^\\\\<>]++ | \\\\.)*+';
     private const TAG_CLOSE_REGEX_SEGMENT = '[a-z][^<>]*+';
     private const URL_PATTERN = 'https?://\S+';
     private const WIDE_CHAR_FILLER = "\u{FDD0}";
@@ -79,19 +79,23 @@ final class OutputWrapper
         // an escaped "<" never starts a tag, as in OutputFormatter
         $tagPattern = \sprintf('(?<!\\\\<)(?:(?:%s)|/(?:%s)?)>', self::TAG_OPEN_REGEX_SEGMENT, self::TAG_CLOSE_REGEX_SEGMENT);
         $hasTags = str_contains($text, '<') && preg_match("#<$tagPattern#$modifiers", $text);
+        $hasEscapes = str_contains($text, '\\<') || str_contains($text, '\\>');
         $hasUrls = !$this->allowCutUrls && preg_match('#'.self::URL_PATTERN.'#i', $text);
-        // PCRE compiles a bounded repetition of a group by copying the group, so tags and URLs are subroutine calls that keep each copy small
+        // PCRE compiles a bounded repetition of a group by copying the group, so tags, escapes and URLs are subroutine calls that keep each copy small
         // with them, the pattern still gets too large at about 1000 columns, and 65535 is the highest value a quantifier accepts
-        $width = min($width, $hasTags || $hasUrls ? 900 : 65535);
-        $charPattern = $hasUrls ? '(?!(?&url)).' : '.';
+        $width = min($width, $hasTags || $hasEscapes || $hasUrls ? 900 : 65535);
+        // an escaped "<" or ">" prints one character, so the backslash and the escaped character take one column together
+        // a line never ends between the two, or the next line would start with a tag delimiter
+        $char = $hasEscapes ? '(?&char)' : '.';
+        $charPattern = $hasUrls ? "(?!(?&url))$char" : $char;
         if ($hasTags) {
             // tags print nothing, so they take no column and stay with the characters next to them
             $tag = '(?:<(?&tag))';
-            $rowPattern = "(?:(?:$tag*+.){1,$width}$tag*+|$tag++)";
+            $rowPattern = "(?:(?:$tag*+$char){1,$width}$tag*+|$tag++)";
             $cutPattern = "(?:(?:$tag*+$charPattern){1,$width}|$tag++)";
             $wordStartPattern = "$tag*+[^\\s<]{0,$width}?$tag*+";
         } else {
-            $rowPattern = ".{1,$width}";
+            $rowPattern = "$char{1,$width}";
             $cutPattern = $hasUrls ? "(?:$charPattern){1,$width}" : $rowPattern;
             $wordStartPattern = "[^\\s<]{0,$width}?";
         }
@@ -101,9 +105,7 @@ final class OutputWrapper
             $rowPattern .= '(?!'.self::WIDE_CHAR_FILLER.')';
             $cutPattern .= '(?!'.self::WIDE_CHAR_FILLER.')';
         }
-        // a line cut inside a word never ends between a backslash and the "<" or ">" it escapes,
-        // or the escaped character would start the next line as a tag delimiter
-        $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))%3$s|(%2$s)(?!(?<=\\\\)[<>]))(?:\r?\n)?|(?:\r?\n|$))(?(DEFINE)(?<tag>%5$s)(?<url>%6$s))#%4$s', $rowPattern, $cutPattern, $urlPattern, $modifiers, $tagPattern, self::URL_PATTERN);
+        $pattern = \sprintf('#(?:((?>(%1$s)((?<=[^\S\r\n])[^\S\r\n]?|(?=\r?\n)|$|[^\S\r\n]))%3$s|(%2$s))(?:\r?\n)?|(?:\r?\n|$))(?(DEFINE)(?<tag>%5$s)(?<url>%6$s)(?<char>(?>\\\\[<>]|.)))#%4$s', $rowPattern, $cutPattern, $urlPattern, $modifiers, $tagPattern, self::URL_PATTERN);
         $output = rtrim(preg_replace($pattern, '\\1'.$break, $text), $break);
 
         $output = str_replace(' '.$break, $break, $output);

@@ -891,13 +891,9 @@ class Table
         $openTags = [[]];
         foreach ($lines as $i => $line) {
             $tags = $openTags[$i];
-            preg_match_all('#<(?:[a-z](?:[^\\\\<>]*+|\\\\.)*|/(?:[a-z][^<>]*+)?)>#i', $line, $matches, \PREG_OFFSET_CAPTURE);
+            preg_match_all('#(?<!\\\\)<(?:[a-z](?:[^\\\\<>]++|\\\\.)*+|/(?:[a-z][^<>]*+)?)>#i', $line, $matches);
 
-            foreach ($matches[0] as [$tag, $offset]) {
-                if ($offset && '\\' === $line[$offset - 1]) {
-                    continue;
-                }
-
+            foreach ($matches[0] as $tag) {
                 if ('</>' !== $tag) {
                     // the formatter pushes the style of a style tag, and prints any other tag as is
                     $name = ltrim(substr($tag, 1), '/');

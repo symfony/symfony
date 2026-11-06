@@ -123,6 +123,7 @@ return static function (ContainerConfigurator $container) {
                 service('routing.resolver'),
                 [], // Default options
                 [], // Default requirements
+                [], // Processors
             ])
 
         ->set('router.default', Router::class)

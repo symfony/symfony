@@ -27,10 +27,14 @@ class DelegatingLoader extends BaseDelegatingLoader
 {
     private bool $loading = false;
 
+    /**
+     * @param iterable<callable(RouteCollection): void> $processors Called with the loaded routes, after the default options and requirements are added
+     */
     public function __construct(
         LoaderResolverInterface $resolver,
         private array $defaultOptions = [],
         private array $defaultRequirements = [],
+        private iterable $processors = [],
     ) {
         parent::__construct($resolver);
     }
@@ -73,6 +77,10 @@ class DelegatingLoader extends BaseDelegatingLoader
                     $route->setRequirements($route->getRequirements() + $this->defaultRequirements);
                 }
             }
+        }
+
+        foreach ($this->processors as $processor) {
+            $processor($collection);
         }
 
         return $collection;

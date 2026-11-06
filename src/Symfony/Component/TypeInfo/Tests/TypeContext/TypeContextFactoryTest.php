@@ -183,7 +183,7 @@ class TypeContextFactoryTest extends TestCase
 
     public function testCollectTemplatesInDeclarationOrder()
     {
-        $this->assertSame(['T', 'U', 'V', 'W'], array_keys($this->typeContextFactory->createFromClassName(DummyWithMixedTemplates::class)->templates));
+        $this->assertSame(['S', 'T', 'U', 'V', 'W', 'X', 'Y'], array_keys($this->typeContextFactory->createFromClassName(DummyWithMixedTemplates::class)->templates));
     }
 
     public function testCollectTemplatesWithParent()

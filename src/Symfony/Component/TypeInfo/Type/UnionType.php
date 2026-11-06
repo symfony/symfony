@@ -162,6 +162,22 @@ class UnionType extends Type implements CompositeTypeInterface
             }
         }
 
+        // "never" adds nothing to a union, "bool" includes "true" and "false", and "object" includes all classes
+        $identifiers = array_map(static fn (Type $t): ?TypeIdentifier => $t instanceof BuiltinType ? $t->getTypeIdentifier() : null, $types);
+        $hasBool = \in_array(TypeIdentifier::BOOL, $identifiers, true) || (\in_array(TypeIdentifier::TRUE, $identifiers, true) && \in_array(TypeIdentifier::FALSE, $identifiers, true));
+        $hasObject = \in_array(TypeIdentifier::OBJECT, $identifiers, true);
+
+        $types = array_values(array_filter($types, static fn (Type $t): bool => match (true) {
+            $t instanceof ObjectType => !$hasObject,
+            !$t instanceof BuiltinType => true,
+            TypeIdentifier::NEVER === $t->getTypeIdentifier() => 1 === \count($types),
+            default => !$hasBool || !$t->getTypeIdentifier()->isBool(),
+        }));
+
+        if ($hasBool) {
+            $types[] = Type::bool();
+        }
+
         return $mapper(1 === \count($types) ? $types[0] : Type::union(...$types));
     }
 

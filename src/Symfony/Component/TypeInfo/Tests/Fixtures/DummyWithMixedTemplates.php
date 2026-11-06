@@ -12,6 +12,8 @@
 namespace Symfony\Component\TypeInfo\Tests\Fixtures;
 
 /**
+ * @template-contravariant S
+ *
  * @template-covariant T
  *
  * @template U
@@ -19,6 +21,10 @@ namespace Symfony\Component\TypeInfo\Tests\Fixtures;
  * @phpstan-template V
  *
  * @psalm-template W
+ *
+ * @phpstan-template-contravariant X
+ *
+ * @psalm-template-contravariant Y
  */
 final class DummyWithMixedTemplates
 {

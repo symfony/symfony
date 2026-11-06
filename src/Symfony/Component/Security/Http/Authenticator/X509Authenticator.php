@@ -59,12 +59,23 @@ class X509Authenticator extends AbstractPreAuthenticatedAuthenticator
 
     private function extractUsernameFromDn(string $dn): ?string
     {
-        $pattern = 'emailAddress' === $this->credentialUserIdentifier
-            ? '#^\s*(?:emailAddress|1\.2\.840\.113549\.1\.9\.1)=([^,/@]++@[^,/]++)$#D'
-            : '#^\s*'.preg_quote($this->credentialUserIdentifier, '#').'=([^,/]++)$#D';
+        if ('emailAddress' === $this->credentialUserIdentifier) {
+            $attribute = '(?:emailAddress|1\.2\.840\.113549\.1\.9\.1)';
+            $value = '[^,/@]++@[^,/]++';
+        } else {
+            $attribute = preg_quote($this->credentialUserIdentifier, '#');
+            $value = '[^,/]++';
+        }
 
-        foreach (self::splitDn($dn) as $rdn) {
-            if (preg_match($pattern, $rdn, $matches)) {
+        $rdns = self::splitDn($dn);
+
+        // In the legacy format, some servers don't escape slashes inside values, so a DN that contains the attribute twice can't be trusted
+        if (str_starts_with($dn, '/') && 1 < preg_match_all('#'.$attribute.'=#', implode(',', $rdns))) {
+            return null;
+        }
+
+        foreach ($rdns as $rdn) {
+            if (preg_match('#^\s*'.$attribute.'=('.$value.')$#D', $rdn, $matches)) {
                 return trim($matches[1]);
             }
         }

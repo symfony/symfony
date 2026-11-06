@@ -385,6 +385,8 @@ class Inline
             $lastToken = null;
             while ($i < $len) {
                 if (']' === $sequence[$i]) {
+                    $state->nodeCount += \count($output);
+
                     return $output;
                 }
                 if (',' === $sequence[$i] || ' ' === $sequence[$i]) {
@@ -408,6 +410,7 @@ class Inline
                 if (null !== $anchorRef && (!isset($sequence[$i]) || ',' === $sequence[$i] || ']' === $sequence[$i])) {
                     $value = null;
                     $references[$anchorRef] = $value;
+                    $state->anchorNodeCounts[$anchorRef] = 0;
                     if (null !== $tag && '' !== $tag) {
                         $value = new TaggedValue($tag, $value);
                     }
@@ -419,6 +422,8 @@ class Inline
                 if (!isset($sequence[$i])) {
                     break;
                 }
+
+                $nodeCount = $state->nodeCount;
 
                 switch ($sequence[$i]) {
                     case '[':
@@ -455,6 +460,7 @@ class Inline
 
                 if (null !== $anchorRef) {
                     $references[$anchorRef] = $value;
+                    $state->anchorNodeCounts[$anchorRef] = $state->nodeCount - $nodeCount;
                 }
 
                 if (null !== $tag && '' !== $tag) {
@@ -577,6 +583,8 @@ class Inline
                         ++$i;
                         continue 2;
                     case '}':
+                        $state->nodeCount += \count($output);
+
                         if (self::$objectForMap) {
                             return (object) $output;
                         }
@@ -646,6 +654,7 @@ class Inline
                     if (null !== $anchorRef && (!isset($mapping[$i]) || \in_array($mapping[$i], [',', '}', "\n"], true))) {
                         $value = null;
                         $references[$anchorRef] = $value;
+                        $state->anchorNodeCounts[$anchorRef] = 0;
                         if (!$isMergeKey) {
                             if ($allowOverwrite || !isset($output[$key])) {
                                 $output[$key] = null !== $tag ? new TaggedValue($tag, $value) : $value;
@@ -660,12 +669,15 @@ class Inline
                         break;
                     }
 
+                    $nodeCount = $state->nodeCount;
+
                     switch ($mapping[$i]) {
                         case '[':
                             // nested sequence
                             $value = self::parseSequence($state, $mapping, $flags, $i, $references);
                             if (null !== $anchorRef) {
                                 $references[$anchorRef] = $value;
+                                $state->anchorNodeCounts[$anchorRef] = $state->nodeCount - $nodeCount;
                             }
                             // Spec: Keys MUST be unique; first one wins.
                             // Parser cannot abort this mapping earlier, since lines
@@ -698,6 +710,7 @@ class Inline
                             $value = self::parseMapping($state, $mapping, $flags, $i, $references);
                             if (null !== $anchorRef) {
                                 $references[$anchorRef] = $value;
+                                $state->anchorNodeCounts[$anchorRef] = $state->nodeCount - $nodeCount;
                             }
                             // Spec: Keys MUST be unique; first one wins.
                             // Parser cannot abort this mapping earlier, since lines
@@ -719,6 +732,7 @@ class Inline
                             $value = self::parseScalar($mapping, $flags, [',', '}', "\n"], $i, null === $tag, $references, $isValueQuoted, $state);
                             if (null !== $anchorRef) {
                                 $references[$anchorRef] = $value;
+                                $state->anchorNodeCounts[$anchorRef] = $state->nodeCount - $nodeCount;
                             }
                             // Spec: Keys MUST be unique; first one wins.
                             // Parser cannot abort this mapping earlier, since lines
@@ -784,7 +798,7 @@ class Inline
                 throw new ParseException(\sprintf('Reference "%s" does not exist.', $value), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
             }
 
-            $state->countAlias($references[$value], self::$parsedLineNumber + 1, null, self::$parsedFilename);
+            $state->countAlias($value, $references[$value], self::$parsedLineNumber + 1, null, self::$parsedFilename);
 
             return $references[$value];
         }

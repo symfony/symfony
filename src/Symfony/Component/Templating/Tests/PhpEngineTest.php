@@ -13,6 +13,7 @@ namespace Symfony\Component\Templating\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\Helper\SlotsHelper;
+use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateEngine;
 use Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateEngineLoader;
@@ -143,6 +144,31 @@ class PhpEngineTest extends TestCase
         $this->assertEquals('&lt;br /&gt;', $engine->escape('<br />'), '->escape() escapes strings');
         $foo = new \stdClass();
         $this->assertEquals($foo, $engine->escape($foo), '->escape() does nothing on non strings');
+    }
+
+    public function testEscapeCacheSizeLimit()
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertSame('&lt;'.$i.'&gt;', $engine->escape('<'.$i.'>'));
+        }
+
+        $escaperCache = \Closure::bind(static fn () => self::$escaperCache, null, PhpEngine::class)();
+
+        $this->assertLessThanOrEqual(1001, \count($escaperCache['html']));
+    }
+
+    public function testEscapeDoesNotCacheLongValues()
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+        $value = str_repeat('<', 1000);
+
+        $this->assertSame(str_repeat('&lt;', 1000), $engine->escape($value));
+
+        $escaperCache = \Closure::bind(static fn () => self::$escaperCache, null, PhpEngine::class)();
+
+        $this->assertArrayNotHasKey($value, $escaperCache['html'] ?? []);
     }
 
     public function testGetSetCharset()

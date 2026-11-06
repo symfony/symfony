@@ -237,6 +237,34 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertSame('foo', $attributes->normalize('foo', ScalarDummy::class));
         $this->assertSame('yaml_foo', $attributes->denormalize('yaml_foo', ScalarDummy::class));
     }
+
+    public function testDenormalizeDoesNotCacheUnknownNames()
+    {
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/serialized-name-mapping.yml')));
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertSame('unknown'.$i, $nameConverter->denormalize('unknown'.$i, Dummy::class));
+        }
+        $this->assertSame('foo', $nameConverter->denormalize('yaml_foo', Dummy::class));
+        $this->assertSame('foo', $nameConverter->denormalize('yaml_foo', Dummy::class));
+
+        $denormalizeCache = \Closure::bind(fn () => $this->denormalizeCache, $nameConverter, MetadataAwareNameConverter::class)();
+
+        $this->assertSame(1, array_sum(array_map('count', $denormalizeCache)));
+    }
+
+    public function testNormalizeDoesNotCacheStdClassProperties()
+    {
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/serialized-name-mapping.yml')));
+
+        for ($i = 0; $i < 2000; ++$i) {
+            $this->assertSame('property'.$i, $nameConverter->normalize('property'.$i, \stdClass::class));
+        }
+
+        $normalizeCache = \Closure::bind(fn () => $this->normalizeCache, $nameConverter, MetadataAwareNameConverter::class)();
+
+        $this->assertSame([], $normalizeCache);
+    }
 }
 
 class NestedPathAndName

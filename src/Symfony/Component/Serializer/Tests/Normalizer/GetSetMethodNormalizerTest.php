@@ -469,6 +469,18 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->getFoo());
     }
 
+    public function testSetterCacheIgnoresCase()
+    {
+        foreach (['foo', 'Foo', 'FOO', 'fOo'] as $attribute) {
+            $this->assertSame('bar', $this->normalizer->denormalize([$attribute => 'bar'], GetSetDummy::class)->getFoo());
+        }
+
+        $setterAccessibleCache = \Closure::bind(static fn () => self::$setterAccessibleCache, null, GetSetMethodNormalizer::class)();
+        $keys = array_filter(array_keys($setterAccessibleCache), static fn ($key) => 0 === strcasecmp($key, GetSetDummy::class.':setFoo'));
+
+        $this->assertCount(1, $keys);
+    }
+
     public function testHasGetterDenormalize()
     {
         $obj = $this->normalizer->denormalize(['foo' => true], ObjectWithHasGetterDummy::class);

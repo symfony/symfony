@@ -61,7 +61,7 @@ class EnumNode extends ScalarNode
     {
         return implode($separator, array_unique(array_map(static function (mixed $value): string {
             if (!$value instanceof \UnitEnum) {
-                return json_encode($value);
+                return self::formatValue($value);
             }
 
             return ltrim(var_export($value, true), '\\');
@@ -85,12 +85,18 @@ class EnumNode extends ScalarNode
         $value = parent::finalizeValue($value);
 
         if (!\in_array($value, $this->values, true)) {
-            $ex = new InvalidConfigurationException(\sprintf('The value %s is not allowed for path "%s". Permissible values: %s', json_encode($value), $this->getPath(), $this->getPermissibleValues(', ')));
+            $ex = new InvalidConfigurationException(\sprintf('The value %s is not allowed for path "%s". Permissible values: %s', self::formatValue($value), $this->getPath(), $this->getPermissibleValues(', ')));
             $ex->setPath($this->getPath());
 
             throw $ex;
         }
 
         return $value;
+    }
+
+    private static function formatValue(mixed $value): string
+    {
+        // json_encode() fails on INF, NAN and enums without a backing value
+        return json_encode($value) ?: ltrim(var_export($value, true), '\\');
     }
 }

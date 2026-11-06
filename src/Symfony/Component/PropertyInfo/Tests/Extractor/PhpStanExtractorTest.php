@@ -50,12 +50,16 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\RejectedCandidateDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\AnotherNamespace\DummyInAnotherNamespace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingConcreteGenericTrait;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingGenericTrait;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingGenericTraitWithSameTemplate;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VoidNeverReturnTypeDummy;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
+use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 
 require_once __DIR__.'/../Fixtures/Extractor/DummyNamespace.php';
 
@@ -894,6 +898,27 @@ class PhpStanExtractorTest extends TestCase
         yield ['propertyInTraitObjectSameNamespace', Type::object(DummyUsedInTrait::class)];
         yield ['propertyInTraitObjectDifferentNamespace', Type::object(Dummy::class)];
         yield ['dummyInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+    }
+
+    #[DataProvider('provideGenericTraitProperties')]
+    public function testGenericTraitPropertiesKeepInheritedTemplateTypes(string $class, Type $expected)
+    {
+        if (!property_exists(TypeContext::class, 'inheritedTemplateTypes')) {
+            $this->markTestSkipped('Inherited template types require symfony/type-info 8.2 or higher.');
+        }
+
+        $this->assertEquals($expected, $this->extractor->getType($class, 'item'));
+        $this->assertEquals(Type::arrayShape(['value' => $expected, 'owner' => Type::object($class)]), $this->extractor->getType($class, 'details'));
+    }
+
+    /**
+     * @return iterable<array{class-string, Type}>
+     */
+    public static function provideGenericTraitProperties(): iterable
+    {
+        yield 'concrete argument' => [DummyUsingConcreteGenericTrait::class, Type::string()];
+        yield 'renamed template' => [DummyUsingGenericTrait::class, Type::list(Type::template('U'))];
+        yield 'same template name' => [DummyUsingGenericTraitWithSameTemplate::class, Type::list(Type::template('T'))];
     }
 
     #[DataProvider('propertiesStaticTypeProvider')]

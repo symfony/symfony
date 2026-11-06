@@ -31,6 +31,154 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
+    #[DataProvider('provideSanitizeForHeadWithSafeElements')]
+    public function testSanitizeForHeadWithSafeElements(string $input, string $expected)
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame($expected, (new HtmlSanitizer($config))->sanitizeFor('head', $input));
+    }
+
+    public static function provideSanitizeForHeadWithSafeElements(): iterable
+    {
+        yield 'stylesheet' => ['<link rel="stylesheet" href="https://evil.example/x.css">', ''];
+        yield 'data stylesheet' => ['<link rel="stylesheet" href="data:text/css,body{background:url(https://evil.example/leak)}">', ''];
+        yield 'import' => ['<link rel="import" href="https://evil.example/x.html">', ''];
+        yield 'referrer policy' => ['<meta name="referrer" content="unsafe-url">', ''];
+        yield 'title' => ['<title>Hello</title>', '<title>Hello</title>'];
+    }
+
+    public function testSanitizeWithSafeElementsDropsReferrerPolicy()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame(
+            '<a href="https://evil.example/">Hello</a><img src="https://evil.example/pixel" />',
+            $this->sanitize($config, '<a href="https://evil.example/" referrerpolicy="unsafe-url">Hello</a><img src="https://evil.example/pixel" referrerpolicy="unsafe-url">')
+        );
+    }
+
+    public function testSanitizeWithSafeElementsDropsPlaintext()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame('Hello', $this->sanitize($config, 'Hello<plaintext>the rest of the page'));
+    }
+
+    public function testSanitizeWithSafeElementsBlocksHtmlAndBody()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame('<p>Hello</p>', $this->sanitize($config, '<body inert><p>Hello</p></body>'));
+        $this->assertSame('<p>Hello</p>', $this->sanitize($config, '<html dir="rtl"><p>Hello</p></html>'));
+        $this->assertSame('<div>Hello</div>', $this->sanitize($config, '<div><body inert>Hello</body></div>'));
+
+        $document = '<html dir="rtl"><head><title>Hello</title></head><body inert><p>world</p></body></html>';
+        $this->assertSame('<p>world</p>', $this->sanitize($config, $document));
+        $this->assertSame('<p>world</p>', (new HtmlSanitizer($config))->sanitizeFor('html', $document));
+    }
+
+    public function testSanitizeWithSafeElementsDropsTheOpenerLinkType()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame(
+            '<a href="https://example.com/" target="_blank">Hello</a>',
+            $this->sanitize($config, '<a href="https://example.com/" target="_blank" rel="opener">Hello</a>')
+        );
+
+        $this->assertSame(
+            '<a href="https://example.com/" target="_blank" rel="nofollow noreferrer">Hello</a>',
+            $this->sanitize($config, '<a href="https://example.com/" target="_blank" rel="nofollow OPENER noreferrer">Hello</a>')
+        );
+
+        $this->assertSame(
+            '<area href="https://example.com/" target="_blank" />',
+            $this->sanitize($config, '<area href="https://example.com/" target="_blank" rel="opener">')
+        );
+    }
+
+    public function testSanitizeWithSafeElementsTurnsNamedTargetsIntoBlank()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        foreach (['foo', '_new', ' _blank'] as $target) {
+            $this->assertSame(
+                '<a href="https://example.com/" target="_blank">Hello</a>',
+                $this->sanitize($config, \sprintf('<a href="https://example.com/" target="%s">Hello</a>', $target))
+            );
+        }
+
+        foreach (['_blank', '_BLANK', '_self', '_parent', '_top'] as $target) {
+            $this->assertSame(
+                \sprintf('<a href="https://example.com/" target="%s" rel="noopener">Hello</a>', $target),
+                $this->sanitize($config, \sprintf('<a href="https://example.com/" target="%s" rel="noopener">Hello</a>', $target))
+            );
+        }
+    }
+
+    public function testSanitizeWithSafeElementsDropsAttributesThatActOnThePage()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame(
+            '<img src="https://example.com/x.png" />',
+            $this->sanitize($config, '<img name="cookie" src="https://example.com/x.png">')
+        );
+
+        $this->assertSame(
+            '<details open><summary>Hello</summary>world</details>',
+            $this->sanitize($config, '<details name="faq" open><summary>Hello</summary>world</details>')
+        );
+
+        $this->assertSame('<label>Hello</label>', $this->sanitize($config, '<label for="delete-account">Hello</label>'));
+        $this->assertSame('<p>Hello</p>', $this->sanitize($config, '<p is="page-widget">Hello</p>'));
+        $this->assertSame('<span>Hello</span>', $this->sanitize($config, '<span slot="header">Hello</span>'));
+
+        $this->assertSame(
+            '<a href="https://example.com/">Hello</a>',
+            $this->sanitize($config, '<a href="https://example.com/" accesskey="s" tabindex="1" download="invoice.pdf">Hello</a>')
+        );
+    }
+
+    public function testSanitizeWithSafeElementsDropsElementsThatActOnThePage()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+        ;
+
+        $this->assertSame('Hello', $this->sanitize($config, 'Hello<button type="reset">world</button>'));
+        $this->assertSame('Hello', $this->sanitize($config, 'Hello<dialog open>world</dialog>'));
+        $this->assertSame('Hello', $this->sanitize($config, 'Hello<datalist id="emails"><option>world</option></datalist>'));
+    }
+
+    public function testSanitizeWithSafeElementsKeepsIds()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+            ->allowRelativeLinks()
+        ;
+
+        $this->assertSame(
+            '<a href="#intro">Hello</a><h2 id="intro">world</h2>',
+            $this->sanitize($config, '<a href="#intro">Hello</a><h2 id="intro">world</h2>')
+        );
+    }
+
     public function testSanitizeForTextarea()
     {
         $config = (new HtmlSanitizerConfig())

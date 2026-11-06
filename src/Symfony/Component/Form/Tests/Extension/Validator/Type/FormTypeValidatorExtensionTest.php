@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Validator\Constraints\Form as FormConstraint;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Forms;
@@ -96,6 +98,25 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 
         $this->assertCount(1, $errors);
         $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
+    }
+
+    public function testValidationGroupsCallbackReturningFalseKeepsTransformationFailures()
+    {
+        $form = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->create(FormTypeTest::TESTED_TYPE, null, ['validation_groups' => static fn () => false])
+            ->add('number', IntegerType::class)
+            ->add('name', TextType::class, ['constraints' => [new NotBlank()]])
+        ;
+
+        $form->submit(['number' => 'abc', 'name' => '']);
+
+        $errors = $form->getErrors(true);
+
+        $this->assertCount(1, $errors);
+        $this->assertSame('number', $errors[0]->getOrigin()->getName());
+        $this->assertSame(FormConstraint::NOT_SYNCHRONIZED_ERROR, $errors[0]->getCause()->getCode());
     }
 
     public function testManyFieldsGroupSequenceWithConstraintsOption()

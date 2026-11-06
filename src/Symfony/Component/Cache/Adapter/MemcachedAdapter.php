@@ -253,12 +253,13 @@ class MemcachedAdapter extends AbstractAdapter
     {
         try {
             $encodedIds = array_map([__CLASS__, 'encodeKey'], $ids);
+            $ids = array_combine($encodedIds, $ids);
 
             $encodedResult = $this->checkResultCode($this->getClient()->getMulti($encodedIds));
 
             $result = [];
             foreach ($encodedResult as $key => $value) {
-                $result[self::decodeKey($key)] = $this->marshaller->unmarshall($value);
+                $result[$ids[$key]] = $this->marshaller->unmarshall($value);
             }
 
             return $result;
@@ -321,10 +322,5 @@ class MemcachedAdapter extends AbstractAdapter
     private static function encodeKey(string $key): string
     {
         return strtr($key, self::RESERVED_MEMCACHED, self::RESERVED_PSR6);
-    }
-
-    private static function decodeKey(string $key): string
-    {
-        return strtr($key, self::RESERVED_PSR6, self::RESERVED_MEMCACHED);
     }
 }

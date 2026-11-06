@@ -255,6 +255,7 @@ class IpUtilsTest extends TestCase
             ['fe80::1',         true],
             ['::ffff:0:1',      true],
             ['fd00::1',         true],
+            ['fec0::1',         true],
             ['::7f00:1',           true],
             ['2002:7f00:1::',      true],
             ['2001::1',            true],

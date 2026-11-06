@@ -549,6 +549,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_CERTINFO => 'capture_peer_cert_chain',
             \CURLOPT_USERAGENT => 'normalized_headers',
             \CURLOPT_REFERER => 'headers',
+            \CURLOPT_COOKIE => 'headers',
             // options used in CurlResponse
             \CURLOPT_NOPROGRESS => 'on_progress',
             \CURLOPT_PROGRESSFUNCTION => 'on_progress',
@@ -578,6 +579,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_PROTOCOLS,
             \CURLOPT_REDIR_PROTOCOLS,
             \CURLOPT_COOKIEFILE,
+            \CURLOPT_UNRESTRICTED_AUTH,
             \CURLINFO_REDIRECT_COUNT,
         ];
 

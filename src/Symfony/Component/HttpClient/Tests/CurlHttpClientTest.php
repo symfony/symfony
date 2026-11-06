@@ -150,6 +150,36 @@ class CurlHttpClientTest extends HttpClientTestCase
         ]);
     }
 
+    public function testOverridingCookieUsingCurlOptions()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set "CURLOPT_COOKIE" with "extra.curl", use option "headers" instead.');
+
+        $httpClient->request('GET', 'http://localhost:8057/', [
+            'extra' => [
+                'curl' => [
+                    \CURLOPT_COOKIE => 'foo=bar',
+                ],
+            ],
+        ]);
+    }
+
+    public function testSendingCredentialsToOtherHostsUsingCurlOptions()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set "CURLOPT_UNRESTRICTED_AUTH" with "extra.curl".');
+
+        $httpClient->request('GET', 'http://localhost:8057/', [
+            'extra' => [
+                'curl' => [
+                    \CURLOPT_UNRESTRICTED_AUTH => true,
+                ],
+            ],
+        ]);
+    }
+
     public function testOverridingHttpMethodUsingCurlOptions()
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);

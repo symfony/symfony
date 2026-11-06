@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RateLimiter\PeekableRequestRateLimiterInterface;
 use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
@@ -51,7 +52,7 @@ final class LoginThrottlingListener implements EventSubscriberInterface
             // be accepted even if there are 0 tokens remaining to be consumed. We check both
             // anyway for safety in case third party implementations behave unexpectedly.
             if (!$limit->isAccepted() || 0 === $limit->getRemainingTokens()) {
-                throw new TooManyLoginAttemptsAuthenticationException(ceil(($limit->getRetryAfter()->getTimestamp() - time()) / 60));
+                throw new TooManyLoginAttemptsAuthenticationException($this->getThreshold($limit));
             }
 
             // Remember an untouched window, a successful login then has nothing to reset.
@@ -59,7 +60,7 @@ final class LoginThrottlingListener implements EventSubscriberInterface
         } else {
             $limit = $this->limiter->consume($request);
             if (!$limit->isAccepted()) {
-                throw new TooManyLoginAttemptsAuthenticationException(ceil(($limit->getRetryAfter()->getTimestamp() - time()) / 60));
+                throw new TooManyLoginAttemptsAuthenticationException($this->getThreshold($limit));
             }
         }
     }
@@ -87,5 +88,11 @@ final class LoginThrottlingListener implements EventSubscriberInterface
             LoginFailureEvent::class => 'onFailedLogin',
             LoginSuccessEvent::class => 'onSuccessfulLogin',
         ];
+    }
+
+    private function getThreshold(RateLimit $limit): int
+    {
+        // getRetryAfter() is rounded up to the second and time() is rounded down, so one second of the difference is only rounding.
+        return (int) ceil(($limit->getRetryAfter()->getTimestamp() - time() - 1) / 60);
     }
 }

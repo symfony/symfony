@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\OutputWrapper;
 
 class OutputWrapperTest extends TestCase
@@ -31,7 +32,7 @@ class OutputWrapperTest extends TestCase
 
         $this->assertSame("Lorem\n\xB3\nipsum", $wrapper->wrap("Lorem \xB3 ipsum", 5));
         $this->assertSame("Lorem\n\xF0\x9F", $wrapper->wrap("Lorem \xF0\x9F", 5));
-        $this->assertSame("<info>Lore\nm \xB3</info>\nhttps://example.com/\nipsum ", $wrapper->wrap("<info>Lorem \xB3</info> https://example.com/\nipsum \n", 5));
+        $this->assertSame("<info>Lorem\n\xB3</info>\nhttps://example.com/\nipsum ", $wrapper->wrap("<info>Lorem \xB3</info> https://example.com/\nipsum \n", 5));
     }
 
     public function testWrapBreaksMalformedUtf8LikeValidText()
@@ -41,6 +42,27 @@ class OutputWrapperTest extends TestCase
         $this->assertSame($wrapper->wrap('Lorem X ipsum', 5), str_replace("\xB3", 'X', $wrapper->wrap("Lorem \xB3 ipsum", 5)));
     }
 
+    public function testWrapCountsWideCharactersAsTwoColumns()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame("日本語\nテキス\nト", $wrapper->wrap('日本語テキスト', 6));
+        $this->assertSame("日本\n語テ\nキス\nト", $wrapper->wrap('日本語テキスト', 5));
+        $this->assertSame("日\n本", $wrapper->wrap('日本', 1));
+        $this->assertSame("abc\n日本語\ndef", $wrapper->wrap('abc 日本語 def', 6));
+        $this->assertSame("a日本\nb", $wrapper->wrap('a日本b', 5));
+        $this->assertSame("<info>日本\n語</info>", $wrapper->wrap('<info>日本語</info>', 5));
+        $this->assertSame("日本\nhttps://日本語.example.com/", $wrapper->wrap('日本 https://日本語.example.com/', 5));
+    }
+
+    public function testWrapKeepsNoncharactersOfTheText()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame("aaaa\n\u{FDD0}bbb\nb", $wrapper->wrap("aaaa\u{FDD0}bbbb", 4));
+        $this->assertSame("\u{FDD0}日本", $wrapper->wrap("\u{FDD0}日本", 5));
+    }
+
     public function testWrapKeepsEscapedTagDelimitersWithTheirBackslash()
     {
         $wrapper = new OutputWrapper();
@@ -48,7 +70,45 @@ class OutputWrapperTest extends TestCase
         $this->assertSame("aaaa\n\\<b", $wrapper->wrap('aaaa\<b', 5));
         $this->assertSame("aaaa\n\\>b", $wrapper->wrap('aaaa\>b', 5));
         $this->assertSame("aaa\\<\nb", $wrapper->wrap('aaa\<b', 5));
-        $this->assertSame("aaaa\n\\</b\\>c", $wrapper->wrap('aaaa\</b\>c', 5));
+        $this->assertSame("aaaa\n\\</b\n\\>c", $wrapper->wrap('aaaa\</b\>c', 5));
+    }
+
+    public function testWrapCountsEscapedTagsAsText()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame("Expected\narray\\<int>\nhere", $wrapper->wrap('Expected array\<int> here', 12));
+        $this->assertSame("Unexpected\n\\</foo\\> tag", $wrapper->wrap('Unexpected \</foo\> tag', 12));
+        $this->assertSame("aaaa\n\\<b><info>c</info> d", $wrapper->wrap('aaaa \<b><info>c</info> d', 8));
+
+        $text = OutputFormatter::escape(str_repeat('array<int> ', 10000));
+        $this->assertSame($text, str_replace("\n", ' ', $wrapper->wrap($text, 120)));
+    }
+
+    public function testWrapDoesNotCountTagsInTheWidth()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame('aaaa <info>bbbb</info> cccc', $wrapper->wrap('aaaa <info>bbbb</info> cccc', 14));
+        $this->assertSame("aaaa <info>bbbb</info>\ncccc", $wrapper->wrap('aaaa <info>bbbb</info> cccc', 9));
+        $this->assertSame("<href=https://symfony.com>aaaa</>\nbbbb", $wrapper->wrap('<href=https://symfony.com>aaaa</> bbbb', 4));
+        $this->assertSame("aaaa\n</>\n<info>", $wrapper->wrap("aaaa\n</>\n<info>", 4));
+        $this->assertSame("<info>\n\\<\nb\n>\nc", $wrapper->wrap('<info>\<b>c', 1));
+        $this->assertSame("<href=https://example.com>abcdefghij\nklmnopqrst\nuvwxyz</> end", $wrapper->wrap('<href=https://example.com>abcdefghijklmnopqrstuvwxyz</> end', 10));
+    }
+
+    public function testWrapCountsUrlsWithTheirWidthWithoutCuttingThem()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame("aaaa\nhttp://a.b", $wrapper->wrap('aaaa http://a.b', 12));
+        $this->assertSame("See\nhttps://symfony.com/doc/current/console.html\nfor more", $wrapper->wrap('See https://symfony.com/doc/current/console.html for more', 10));
+        $this->assertSame("See\n<href=https://symfony.com>https://symfony.com/doc</>\nfor more", $wrapper->wrap('See <href=https://symfony.com>https://symfony.com/doc</> for more', 10));
+        $this->assertSame("See\n(https://symfony.com/doc/current/console.html)\nfor more", $wrapper->wrap('See (https://symfony.com/doc/current/console.html) for more', 10));
+        $this->assertSame("aaaaaaaaaa\naaahttps://symfony.com/doc", $wrapper->wrap('aaaaaaaaaaaaahttps://symfony.com/doc', 10));
+        $this->assertSame('<info>aaa</info>https://symfony.com/doc', $wrapper->wrap('<info>aaa</info>https://symfony.com/doc', 5));
+        $this->assertSame("a<info>b\n</info>https://symfony.com/doc", $wrapper->wrap('a<info>b</info>https://symfony.com/doc', 5));
+        $this->assertSame("See\nhttps://symfony.com/doc\n\nfor more", $wrapper->wrap("See https://symfony.com/doc\n\nfor more", 10));
     }
 
     public function testWrapDoesNotDropBytesOfMalformedUtf8()
@@ -71,8 +131,10 @@ class OutputWrapperTest extends TestCase
             false,
             <<<'EOS'
                 Árvíztűrőtükörfúrógé
-                p https://github.com/symfony/symfony Lorem ipsum
-                <comment>dolor</comment> sit amet,
+                p
+                https://github.com/symfony/symfony
+                Lorem ipsum <comment>dolor</comment>
+                sit amet,
                 consectetur
                 adipiscing elit.
                 Praesent vestibulum
@@ -102,6 +164,33 @@ class OutputWrapperTest extends TestCase
                 Donec ullamcorper
                 risus at <error>libero
                 ornare</error> efficitur.
+                EOS,
+        ];
+
+        yield 'Width above the PCRE compiled-size limit' => [
+            $baseTextWithUtf8AndUrl,
+            150,
+            false,
+            <<<'EOS'
+                Árvíztűrőtükörfúrógép https://github.com/symfony/symfony Lorem ipsum <comment>dolor</comment> sit amet, consectetur adipiscing elit. Praesent vestibulum nulla quis urna
+                maximus porttitor. Donec ullamcorper risus at <error>libero ornare</error> efficitur.
+                EOS,
+        ];
+
+        yield 'Width above the quantifier limit' => [
+            $baseTextWithUtf8AndUrl,
+            100000,
+            false,
+            $baseTextWithUtf8AndUrl,
+        ];
+
+        yield 'Width above the PCRE compiled-size limit with URL cut' => [
+            $baseTextWithUtf8AndUrl,
+            150,
+            true,
+            <<<'EOS'
+                Árvíztűrőtükörfúrógép https://github.com/symfony/symfony Lorem ipsum <comment>dolor</comment> sit amet, consectetur adipiscing elit. Praesent vestibulum nulla quis urna
+                maximus porttitor. Donec ullamcorper risus at <error>libero ornare</error> efficitur.
                 EOS,
         ];
     }

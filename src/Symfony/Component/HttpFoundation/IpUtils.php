@@ -41,6 +41,7 @@ class IpUtils
         '::1/128',         // Loopback
         'fc00::/7',        // Unique Local Address
         'fe80::/10',       // Link Local Address
+        'fec0::/10',       // Site-Local Addresses, deprecated by RFC 3879
         '::ffff:0:0/96',   // IPv4-mapped IPv6 addresses (RFC 4291 section 2.5.5.2)
         '::/128',          // Unspecified address
         '::/96',           // IPv4-compatible IPv6 addresses (RFC 4291 section 2.5.5.1)

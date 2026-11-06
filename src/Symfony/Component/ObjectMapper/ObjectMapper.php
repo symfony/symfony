@@ -503,7 +503,11 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             return $metadata;
         }
 
-        $propertyClass = $type->getName();
+        $propertyClass = match (strtolower($type->getName())) {
+            'self' => $property->getDeclaringClass()->getName(),
+            'parent' => ($parent = $property->getDeclaringClass()->getParentClass()) ? $parent->getName() : $type->getName(),
+            default => $type->getName(),
+        };
         $filtered = array_values(array_filter($metadata, static fn (Mapping $m): bool => $m->transform || (\is_string($m->target)
             && class_exists($m->target)
             && is_a($m->target, $propertyClass, true))

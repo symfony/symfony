@@ -43,11 +43,17 @@ final class MetadataAwareNameConverter implements NameConverterInterface
 
     public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
-        if (null === $class) {
+        // stdClass has no metadata and its properties can have any name
+        if (null === $class || \stdClass::class === $class) {
             return $this->normalizeFallback($propertyName, $class, $format, $context);
         }
 
         if (!\array_key_exists($class, $this->normalizeCache) || !\array_key_exists($propertyName, $this->normalizeCache[$class])) {
+            if (1000 < \count($this->normalizeCache[$class] ?? [])) {
+                // stop memory leak if there are many keys
+                $this->normalizeCache[$class] = \array_slice($this->normalizeCache[$class], 500, null, true);
+            }
+
             $this->normalizeCache[$class][$propertyName] = $this->getCacheValueForNormalization($propertyName, $class);
         }
 
@@ -61,8 +67,8 @@ final class MetadataAwareNameConverter implements NameConverterInterface
         }
 
         $cacheKey = $this->getCacheKey($class, $context);
-        if (!\array_key_exists($cacheKey, $this->denormalizeCache) || !\array_key_exists($propertyName, $this->denormalizeCache[$cacheKey])) {
-            $this->denormalizeCache[$cacheKey][$propertyName] = $this->getCacheValueForDenormalization($propertyName, $class, $context);
+        if (!isset($this->denormalizeCache[$cacheKey][$propertyName]) && null !== $name = $this->getCacheValueForDenormalization($propertyName, $class, $context)) {
+            $this->denormalizeCache[$cacheKey][$propertyName] = $name;
         }
 
         return $this->denormalizeCache[$cacheKey][$propertyName] ?? $this->denormalizeFallback($propertyName, $class, $format, $context);

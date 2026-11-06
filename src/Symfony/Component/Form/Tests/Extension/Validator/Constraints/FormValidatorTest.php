@@ -455,6 +455,48 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testDontValidateConstraintsIfValidationGroupsCallbackReturnsFalse()
+    {
+        $object = new \stdClass();
+        $options = [
+            'validation_groups' => static fn (FormInterface $form) => false,
+            'constraints' => [new NotBlank()],
+        ];
+        $form = $this->getCompoundForm($object, $options);
+        $form->submit([]);
+
+        $this->expectNoValidate();
+
+        $this->validator->validate($form, new Form());
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidateChildrenAndExtraFieldsIfValidationGroupsCallbackReturnsFalse()
+    {
+        $form = $this->getBuilder('parent', null, [
+            'validation_groups' => static fn (FormInterface $form) => false,
+            'extra_fields_message' => 'Extra!|Extras!',
+        ])
+            ->setCompound(true)
+            ->setDataMapper(new DataMapper())
+            ->add($this->getBuilder('child'))
+            ->getForm();
+
+        $form->submit(['foo' => 'bar']);
+
+        $this->expectValidateValueAt(0, 'children[child]', $form->get('child'), new Form());
+
+        $this->validator->validate($form, new Form());
+
+        $this->buildViolation('Extra!|Extras!')
+            ->setParameter('{{ extra_fields }}', '"foo"')
+            ->setInvalidValue(['foo' => 'bar'])
+            ->setPlural(1)
+            ->setCode(Form::NO_SUCH_FIELD_ERROR)
+            ->assertRaised();
+    }
+
     public function testUseValidationGroupOfClickedButton()
     {
         $object = new \stdClass();

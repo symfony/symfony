@@ -595,9 +595,9 @@ class Table
             $titleLength = Helper::width(Helper::removeDecoration($formatter = $this->output->getFormatter(), $formattedTitle = \sprintf($titleFormat, $title)));
             $markupLength = Helper::width($markup);
             if ($titleLength > $limit = $markupLength - 4) {
-                $titleLength = $limit;
                 $formatLength = Helper::width(Helper::removeDecoration($formatter, \sprintf($titleFormat, '')));
-                $formattedTitle = \sprintf($titleFormat, Helper::substr($title, 0, $limit - $formatLength - 3).'...');
+                $formattedTitle = \sprintf($titleFormat, Helper::substrToWidth($title, $limit - $formatLength - 3).'...');
+                $titleLength = Helper::width(Helper::removeDecoration($formatter, $formattedTitle));
             }
 
             $titleStart = intdiv($markupLength - $titleLength, 2);

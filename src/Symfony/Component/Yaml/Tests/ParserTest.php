@@ -3829,6 +3829,59 @@ class ParserTest extends TestCase
         $this->parser->parse($yaml, Yaml::PARSE_EXCEPTION_ON_ALIAS);
     }
 
+    #[DataProvider('provideChainedCollectionAliases')]
+    public function testParseRejectsCollectionAliasesThatExpandToTooManyNodes(string $yaml, int $flags = 0)
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Maximum number of nodes expanded by collection aliases');
+
+        $this->parser->parse($yaml, $flags);
+    }
+
+    public static function provideChainedCollectionAliases(): iterable
+    {
+        $flowSequences = "a0: &a0 [x]\n";
+        $blockSequences = "a0: &a0\n    - x\n";
+        $flowMappings = "a0: &a0 {x: 1}\n";
+        $mergeKeys = "a0: &a0 {x: 1}\n";
+        $taggedSequences = "a0: &a0 !t [x]\n";
+        $inlineMapping = 'root: {a0: &a0 [x]';
+        $inlineSequence = 'root: [&a0 [x]';
+
+        for ($i = 1; $i <= 40; ++$i) {
+            $flowSequences .= "a$i: &a$i [*a".($i - 1).', *a'.($i - 1)."]\n";
+            $blockSequences .= "a$i: &a$i\n    - *a".($i - 1)."\n    - *a".($i - 1)."\n";
+            $flowMappings .= "a$i: &a$i {x: *a".($i - 1).', y: *a'.($i - 1)."}\n";
+            $mergeKeys .= "a$i: &a$i\n    <<: *a".($i - 1)."\n    k$i: *a".($i - 1)."\n";
+            $taggedSequences .= "a$i: &a$i !t [*a".($i - 1).', *a'.($i - 1)."]\n";
+            $inlineMapping .= ", a$i: &a$i [*a".($i - 1).', *a'.($i - 1).']';
+            $inlineSequence .= ", &a$i [*a".($i - 1).', *a'.($i - 1).']';
+        }
+
+        yield 'flow sequences' => [$flowSequences.'items: *a40'];
+        yield 'block sequences' => [$blockSequences.'items: *a40'];
+        yield 'flow mappings' => [$flowMappings.'items: *a40'];
+        yield 'flow mappings as objects' => [$flowMappings.'items: *a40', Yaml::PARSE_OBJECT_FOR_MAP];
+        yield 'merge keys' => [$mergeKeys.'items: *a40'];
+        yield 'tagged sequences' => [$taggedSequences.'items: *a40', Yaml::PARSE_CUSTOM_TAGS];
+        yield 'anchors inside a flow mapping' => [$inlineMapping.', items: *a40}'];
+        yield 'anchors inside a flow sequence' => [$inlineSequence.', *a40]'];
+    }
+
+    public function testParseAcceptsLargeCollectionAliasedManyTimes()
+    {
+        $items = implode(', ', array_map(static fn ($i) => "item$i", range(1, 500)));
+        $yaml = "defaults: &defaults [$items]\n";
+
+        for ($i = 0; $i < Parser::DEFAULT_MAX_ALIASES_FOR_COLLECTIONS; ++$i) {
+            $yaml .= "a$i: *defaults\n";
+        }
+
+        $result = $this->parser->parse($yaml);
+
+        $this->assertCount(500, $result['a'.(Parser::DEFAULT_MAX_ALIASES_FOR_COLLECTIONS - 1)]);
+    }
+
     public function testParseHandlesLargeYamlHeaders()
     {
         $yaml = '%YAML:'.str_repeat('1', 100000)."\nfoo: bar\n";
@@ -3977,6 +4030,60 @@ class ParserTest extends TestCase
 
         // with a higher limit, the lines of smaller documents used to be copied by each nesting level
         $this->assertLessThan(20 * 1024 * 1024, MemoryUsageRecorder::$memoryUsage - $memoryUsage);
+    }
+
+    #[DataProvider('provideNestedBlocksWithManyBytes')]
+    public function testParseNestedBlocksWithManyBytes(int $lines, int $length)
+    {
+        $yaml = '';
+        for ($i = 0; $i < 100; ++$i) {
+            $yaml .= str_repeat(' ', $i)."k:\n";
+        }
+        for ($i = 0; $i < $lines; ++$i) {
+            $yaml .= str_repeat(' ', 100)."a$i: ".str_repeat('x', $length)."\n";
+        }
+        $yaml .= str_repeat(' ', 100).'b: !php/object '.serialize(new MemoryUsageRecorder());
+
+        $memoryUsage = memory_get_usage();
+        $data = $this->parser->parse($yaml, Yaml::PARSE_OBJECT);
+
+        for ($i = 0; $i < 100; ++$i) {
+            $data = $data['k'];
+        }
+
+        $this->assertSame(str_repeat('x', $length), $data['a'.($lines - 1)]);
+        $this->assertInstanceOf(MemoryUsageRecorder::class, $data['b']);
+
+        // the lines used to be copied by each nesting level
+        $this->assertLessThan(10 * 1024 * 1024, MemoryUsageRecorder::$memoryUsage - $memoryUsage);
+    }
+
+    public static function provideNestedBlocksWithManyBytes(): iterable
+    {
+        yield 'many lines' => [10000, 1];
+        yield 'long lines' => [2, 500000];
+    }
+
+    public function testParseNestedSequencesOnOneLineWithManyLines()
+    {
+        $yaml = str_repeat('- ', 100)."a0: 0\n";
+        for ($i = 1; $i < 10000; ++$i) {
+            $yaml .= str_repeat(' ', 200)."a$i: $i\n";
+        }
+        $yaml .= str_repeat(' ', 200).'b: !php/object '.serialize(new MemoryUsageRecorder());
+
+        $memoryUsage = memory_get_usage();
+        $data = $this->parser->parse($yaml, Yaml::PARSE_OBJECT);
+
+        for ($i = 0; $i < 100; ++$i) {
+            $data = $data[0];
+        }
+
+        $this->assertSame(9999, $data['a9999']);
+        $this->assertInstanceOf(MemoryUsageRecorder::class, $data['b']);
+
+        // the lines used to be copied by each nesting level
+        $this->assertLessThan(10 * 1024 * 1024, MemoryUsageRecorder::$memoryUsage - $memoryUsage);
     }
 
     public function testParseHandlesTrailingNewlinesAfterDocumentEndMarker()

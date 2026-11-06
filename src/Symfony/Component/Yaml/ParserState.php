@@ -24,12 +24,20 @@ final class ParserState
     public int $maxAliasesForCollections = Parser::DEFAULT_MAX_ALIASES_FOR_COLLECTIONS;
     public int $collectionAliasCount = 0;
     public bool $aliasesEnabled = true;
+    public int $maxAliasedNodeCount = \PHP_INT_MAX;
+    public int $aliasedNodeCount = 0;
+    public int $nodeCount = 0;
+    public array $anchorNodeCounts = [];
 
     public function reset(): void
     {
         $this->currentNestingLevel = 0;
         $this->collectionAliasCount = 0;
         $this->aliasesEnabled = true;
+        $this->maxAliasedNodeCount = \PHP_INT_MAX;
+        $this->aliasedNodeCount = 0;
+        $this->nodeCount = 0;
+        $this->anchorNodeCounts = [];
     }
 
     public function enterNestingLevel(int $line, ?string $snippet, ?string $filename): void
@@ -48,7 +56,7 @@ final class ParserState
         }
     }
 
-    public function countAlias(mixed $refValue, int $line, ?string $snippet, ?string $filename): void
+    public function countAlias(string $name, mixed $refValue, int $line, ?string $snippet, ?string $filename): void
     {
         if (!$this->aliasesEnabled) {
             throw new ParseException('Aliases are disabled.', $line, $snippet, $filename);
@@ -64,6 +72,14 @@ final class ParserState
 
         if (++$this->collectionAliasCount > $this->maxAliasesForCollections) {
             throw new ParseException(\sprintf('Maximum number of collection aliases (%d) exceeded. This limit can be increased via the Parser constructor.', $this->maxAliasesForCollections), $line, $snippet, $filename);
+        }
+
+        // an alias shares the nodes of its anchor, but the code that walks the parsed value visits them once per alias
+        $nodeCount = $this->anchorNodeCounts[$name] ?? 0;
+        $this->nodeCount += $nodeCount;
+
+        if (($this->aliasedNodeCount += $nodeCount) > $this->maxAliasedNodeCount) {
+            throw new ParseException(\sprintf('Maximum number of nodes expanded by collection aliases (%d) exceeded. This limit can be increased via the Parser constructor.', $this->maxAliasedNodeCount), $line, $snippet, $filename);
         }
     }
 }

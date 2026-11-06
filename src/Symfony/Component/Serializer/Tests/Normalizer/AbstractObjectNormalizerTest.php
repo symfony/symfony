@@ -1038,6 +1038,39 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('plain', $actual->children);
     }
 
+    public function testDenormalizeObjectIntoListOfObjects()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+
+        try {
+            $serializer->denormalize(['children' => new \DateTimeImmutable()], DummyWithListOfChildren::class);
+            $this->fail('A NotNormalizableValueException should have been thrown.');
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame(\sprintf('The type of the "children" attribute for class "%s" must be one of "%s[]" ("DateTimeImmutable" given).', DummyWithListOfChildren::class, DummyChildWithConstructor::class), $e->getMessage());
+        }
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage(\sprintf('The type of the "children" attribute for class "%s" must be one of "%s[]" ("stdClass" given).', DummyWithListOfChildren::class, DummyChildWithConstructor::class));
+
+        $serializer->denormalize(['children' => (object) ['bar' => 'first']], DummyWithListOfChildren::class);
+    }
+
+    public function testDenormalizeObjectIntoObjectCollectionOfObjects()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $children = new \ArrayObject([new DummyChildWithConstructor('first')]);
+
+        $this->assertSame($children, $serializer->denormalize(['children' => $children], DummyWithArrayObjectOfChildren::class)->children);
+    }
+
+    public function testDenormalizeArrayIntoListOfObjects()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]))]);
+        $actual = $serializer->denormalize(['children' => [['bar' => 'first']]], DummyWithListOfChildren::class);
+
+        $this->assertEquals([new DummyChildWithConstructor('first')], $actual->children);
+    }
+
     /**
      * @dataProvider provideScalarsForUnionWithObjectAndScalarTypes
      */
@@ -1682,6 +1715,26 @@ class DummyWithChildrenOrString
 {
     /** @var DummyChildWithConstructor[]|string */
     public array|string $children = [];
+}
+
+class DummyWithListOfChildren
+{
+    /**
+     * @param list<DummyChildWithConstructor> $children
+     */
+    public function __construct(public array $children)
+    {
+    }
+}
+
+class DummyWithArrayObjectOfChildren
+{
+    /**
+     * @param \ArrayObject<int, DummyChildWithConstructor> $children
+     */
+    public function __construct(public \ArrayObject $children)
+    {
+    }
 }
 
 class XmlScalarDummy

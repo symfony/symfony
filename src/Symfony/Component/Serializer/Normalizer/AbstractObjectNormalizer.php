@@ -635,7 +635,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     case Type::BUILTIN_TYPE_OBJECT:
                     case Type::BUILTIN_TYPE_RESOURCE:
                     case Type::BUILTIN_TYPE_STRING:
-                        if (('is_'.$builtinType)($data)) {
+                        // an object can be a collection of objects, but not one declared as an array
+                        if (('is_'.$builtinType)($data) && (Type::BUILTIN_TYPE_OBJECT !== $builtinType || Type::BUILTIN_TYPE_ARRAY !== $type->getBuiltinType())) {
                             return $data;
                         }
 

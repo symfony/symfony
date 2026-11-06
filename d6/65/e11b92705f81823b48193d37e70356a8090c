@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-06T13:25:43Z
+
+Thanks for the fix. I pushed a change that narrows the check, so that an object is refused only when the collection is declared as an array. With the `[]` check, a `Collection<int, Item>` property given an `ArrayCollection` was refused too. The same happened to an `\ArrayObject<int, Item>` given an `ArrayObject`. Both work on all branches today.

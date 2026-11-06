@@ -12,9 +12,11 @@
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
+use Symfony\Bundle\TwigBundle\Routing\TemplateRouteProcessor;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Twig\Loader\FilesystemLoader;
 
@@ -51,6 +53,11 @@ class ExtensionPass implements CompilerPassInterface
 
         if ($container->has('router')) {
             $container->getDefinition('twig.extension.routing')->addTag('twig.extension');
+        }
+
+        if ($container->hasDefinition('routing.loader')) {
+            $routingLoader = $container->getDefinition('routing.loader');
+            $routingLoader->replaceArgument(3, [...$routingLoader->getArgument(3), new Definition(TemplateRouteProcessor::class)]);
         }
 
         if ($container->has('html_sanitizer')) {

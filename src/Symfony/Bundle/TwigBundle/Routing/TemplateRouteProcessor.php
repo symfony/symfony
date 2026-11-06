@@ -12,8 +12,6 @@
 namespace Symfony\Bundle\TwigBundle\Routing;
 
 use Symfony\Bundle\TwigBundle\Controller\TemplateController;
-use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -21,21 +19,10 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @internal
  */
-final class TemplateRouteLoader implements LoaderInterface
+final class TemplateRouteProcessor
 {
-    public function __construct(
-        private LoaderInterface $loader,
-    ) {
-    }
-
-    public function load(mixed $resource, ?string $type = null): mixed
+    public function __invoke(RouteCollection $routes): void
     {
-        $routes = $this->loader->load($resource, $type);
-
-        if (!$routes instanceof RouteCollection) {
-            return $routes;
-        }
-
         foreach ($routes->all() as $name => $route) {
             // a controller set by an import wins, the same way it wins over the "controller" key of the route
             if (null === ($template = $route->getDefault('_template')) || $route->hasDefault('_controller')) {
@@ -54,22 +41,5 @@ final class TemplateRouteLoader implements LoaderInterface
             unset($defaults['_template']);
             $route->setDefaults(['_controller' => TemplateController::class.'::templateAction', 'template' => $template] + $defaults);
         }
-
-        return $routes;
-    }
-
-    public function supports(mixed $resource, ?string $type = null): bool
-    {
-        return $this->loader->supports($resource, $type);
-    }
-
-    public function getResolver(): LoaderResolverInterface
-    {
-        return $this->loader->getResolver();
-    }
-
-    public function setResolver(LoaderResolverInterface $resolver): void
-    {
-        $this->loader->setResolver($resolver);
     }
 }

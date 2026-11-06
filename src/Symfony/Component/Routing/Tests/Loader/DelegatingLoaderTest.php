@@ -66,4 +66,27 @@ class DelegatingLoaderTest extends TestCase
         $this->assertSame($expected, $routeCollection->get('bar')->getOptions());
         $this->assertSame(['_locale' => 'de'], $routeCollection->get('bar')->getRequirements());
     }
+
+    public function testProcessorsGetTheRoutesAfterTheDefaultOptionsAndRequirements()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('foo', new Route('/'));
+
+        $loader = $this->createStub(LoaderInterface::class);
+        $loader->method('supports')->willReturn(true);
+        $loader->method('load')->willReturn($routeCollection);
+
+        $calls = [];
+        $delegatingLoader = new DelegatingLoader(new LoaderResolver([$loader]), ['utf8' => true], ['_locale' => 'fr|en'], [
+            static function (RouteCollection $routes) use (&$calls) {
+                $calls[] = ['first', $routes->get('foo')->getOption('utf8'), $routes->get('foo')->getRequirement('_locale')];
+            },
+            static function (RouteCollection $routes) use (&$calls) {
+                $calls[] = ['second', $routes->get('foo')->getOption('utf8'), $routes->get('foo')->getRequirement('_locale')];
+            },
+        ]);
+
+        $this->assertSame($routeCollection, $delegatingLoader->load('routes.yaml'));
+        $this->assertSame([['first', true, 'fr|en'], ['second', true, 'fr|en']], $calls);
+    }
 }

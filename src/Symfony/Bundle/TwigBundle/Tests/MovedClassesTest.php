@@ -47,14 +47,20 @@ class MovedClassesTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testAnAppGetsTheTemplateControllerAsAnInstanceOfTheLegacyType()
+    public function testAnAppGetsTheMovedServicesAsInstancesOfTheirLegacyTypes()
     {
         $kernel = new MovedClassesKernel(sys_get_temp_dir().'/'.uniqid('sf_twig_moved_classes_', true));
 
         try {
             $kernel->boot();
 
-            $this->assertTrue(is_a($kernel->getContainer()->get(TemplateController::class), self::LEGACY_TEMPLATE_CONTROLLER));
+            foreach ([
+                [TemplateController::class, self::LEGACY_TEMPLATE_CONTROLLER],
+                ['routing.loader', 'Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader'],
+            ] as [$id, $legacyClass]) {
+                $service = $kernel->getContainer()->get($id);
+                $this->assertTrue(is_a($service, $legacyClass), \sprintf('The "%s" service is a "%s", not a "%s".', $id, get_debug_type($service), $legacyClass));
+            }
         } finally {
             (new Filesystem())->remove($kernel->getCacheDir());
         }
@@ -79,6 +85,7 @@ class MovedClassesKernel extends Kernel
             $container->loadFromExtension('framework', [
                 'secret' => '$ecret',
                 'form' => ['enabled' => false],
+                'router' => ['resource' => __DIR__.'/Functional/Resources/config/template_routing.yml'],
             ]);
         });
     }

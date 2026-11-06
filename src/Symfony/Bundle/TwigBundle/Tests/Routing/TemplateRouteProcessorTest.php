@@ -13,16 +13,15 @@ namespace Symfony\Bundle\TwigBundle\Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\TwigBundle\Controller\TemplateController;
-use Symfony\Bundle\TwigBundle\Routing\TemplateRouteLoader;
-use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Bundle\TwigBundle\Routing\TemplateRouteProcessor;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class TemplateRouteLoaderTest extends TestCase
+class TemplateRouteProcessorTest extends TestCase
 {
     public function testTemplateDefaultIsRenderedByTemplateController()
     {
-        $routes = $this->load([
+        $routes = $this->process([
             'faq' => new Route('/faq.html', ['_template' => 'pages/faq.html.twig', 'maxAge' => 300]),
             'blog' => new Route('/blog', ['_controller' => 'App\Controller\BlogController::index']),
         ]);
@@ -37,7 +36,7 @@ class TemplateRouteLoaderTest extends TestCase
 
     public function testControllerWinsOverTemplateDefault()
     {
-        $routes = $this->load([
+        $routes = $this->process([
             'faq' => new Route('/faq.html', ['_template' => 'pages/faq.html.twig', '_controller' => 'App\Controller\PageController::faq']),
         ]);
 
@@ -49,7 +48,7 @@ class TemplateRouteLoaderTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The route "faq" must not define both the "_template" default and the "template" default.');
 
-        $this->load([
+        $this->process([
             'faq' => new Route('/faq.html', ['_template' => 'pages/faq.html.twig', 'template' => 'pages/other.html.twig']),
         ]);
     }
@@ -59,7 +58,7 @@ class TemplateRouteLoaderTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The route "page" must not define both the "_template" default and a "{template}" placeholder.');
 
-        $this->load([
+        $this->process([
             'page' => new Route('/pages/{template}', ['_template' => 'pages/faq.html.twig']),
         ]);
     }
@@ -67,16 +66,15 @@ class TemplateRouteLoaderTest extends TestCase
     /**
      * @param array<string, Route> $routes
      */
-    private function load(array $routes): RouteCollection
+    private function process(array $routes): RouteCollection
     {
         $collection = new RouteCollection();
         foreach ($routes as $name => $route) {
             $collection->add($name, $route);
         }
 
-        $loader = $this->createStub(LoaderInterface::class);
-        $loader->method('load')->willReturn($collection);
+        (new TemplateRouteProcessor())($collection);
 
-        return (new TemplateRouteLoader($loader))->load('routes.yaml');
+        return $collection;
     }
 }

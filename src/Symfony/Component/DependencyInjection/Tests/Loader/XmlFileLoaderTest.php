@@ -942,14 +942,12 @@ class XmlFileLoaderTest extends TestCase
 
     public function testAliasDefinitionContainsUnsupportedElements()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid attribute "class" defined for alias "bar" in');
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
 
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid attribute "class" defined for alias "bar" in');
         $loader->load('invalid_alias_definition.xml');
-
-        $this->assertTrue($container->has('bar'));
     }
 
     public function testArgumentWithKeyOutsideCollection()

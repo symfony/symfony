@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
@@ -287,6 +288,56 @@ class ConsumeMessagesCommandTest extends TestCase
 
         $this->assertSame(0, $tester->getStatusCode());
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testRunStopsWhenSignalWasReceivedBeforeTheWorkerWasCreated()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $getCalls = 0;
+        $receiver = $this->createStub(ReceiverInterface::class);
+        $receiver->method('get')->willReturnCallback(static function () use ($envelope, &$getCalls) {
+            ++$getCalls;
+
+            return [$envelope];
+        });
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', $receiver);
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', new MessageBus());
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
+        $tester = new CommandTester($application->get('messenger:consume'));
+
+        $this->assertFalse($command->handleSignal(\SIGTERM));
+
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--limit' => 1,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame(0, $getCalls);
+
+        $this->assertFalse($command->handleSignal(\SIGALRM));
+
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--limit' => 1,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame(1, $getCalls);
     }
 
     public function testRunWithMemoryLimit()

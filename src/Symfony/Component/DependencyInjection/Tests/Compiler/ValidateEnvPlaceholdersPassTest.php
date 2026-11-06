@@ -105,17 +105,15 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testEnvsAreValidatedInConfigWithInvalidPlaceholder()
     {
-        $this->expectException(InvalidTypeException::class);
-        $this->expectExceptionMessage('Invalid type for path "env_extension.bool_node". Expected "bool", but got one of "bool", "int", "float", "string", "array".');
         $container = new ContainerBuilder();
-        $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', $expected = [
+        $container->registerExtension(new EnvExtension());
+        $container->prependExtensionConfig('env_extension', [
             'bool_node' => '%env(const:BAZ)%',
         ]);
 
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessage('Invalid type for path "env_extension.bool_node". Expected "bool", but got one of "bool", "int", "float", "string", "array".');
         $this->doProcess($container);
-
-        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
     public function testInvalidEnvInConfig()

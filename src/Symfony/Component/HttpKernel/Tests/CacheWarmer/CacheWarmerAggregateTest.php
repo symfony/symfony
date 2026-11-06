@@ -174,6 +174,48 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp(__DIR__, null, $io);
     }
 
+    public function testWarmupReadsTheDeprecationLogWithoutInstantiatingObjects()
+    {
+        $logFile = tempnam(sys_get_temp_dir(), 'sf_deprecations_');
+        // the log file holds scalars and plain arrays; an attacker who can write to the cache directory must not be able to have an object built out of it
+        file_put_contents($logFile, 'a:1:{i:1;O:18:"DeprecationPayload":0:{}}');
+
+        // collecting deprecations is disabled when PHPUNIT_COMPOSER_INSTALL is defined, hence the child process
+        $srcDir = \dirname((new \ReflectionClass(CacheWarmerAggregate::class))->getFileName());
+        $bootCode = <<<'EOPHP'
+            <?php
+            [, $srcDir, $logFile] = $argv;
+            require $srcDir.'/WarmableInterface.php';
+            require $srcDir.'/CacheWarmerInterface.php';
+            require $srcDir.'/CacheWarmerAggregate.php';
+
+            class DeprecationPayload
+            {
+                public function __wakeup(): void
+                {
+                    echo 'WOKE';
+                }
+            }
+
+            (new \Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate([], true, $logFile))->warmUp(sys_get_temp_dir());
+
+            echo 'OK';
+            EOPHP;
+
+        $process = new Process([\PHP_BINARY, '--', $srcDir, $logFile]);
+        $process->setInput($bootCode);
+        $process->run();
+
+        try {
+            $this->assertSame('OK', $process->getOutput(), $process->getErrorOutput());
+            $this->assertSame(0, $process->getExitCode());
+            // the log is written back as a list, so the renumbered entry proves it was read
+            $this->assertSame('a:1:{i:0;O:18:"DeprecationPayload":0:{}}', file_get_contents($logFile));
+        } finally {
+            @unlink($logFile);
+        }
+    }
+
     public function testWarmupRecoversFromCorruptedDeprecationLog()
     {
         $logFile = tempnam(sys_get_temp_dir(), 'sf_deprecations_');

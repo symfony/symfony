@@ -315,7 +315,7 @@ abstract class BaseNode implements NodeInterface
             throw new ForbiddenOverwriteException(\sprintf('Configuration path "%s" cannot be overwritten. You have to define all options for this path, and any of its sub-paths in one configuration section.', $this->getPath()));
         }
 
-        if ($leftSide !== $leftPlaceholders = self::resolvePlaceholderValue($leftSide)) {
+        if (\is_string($leftSide) && $leftSide !== $leftPlaceholders = self::resolvePlaceholderValue($leftSide)) {
             foreach ($leftPlaceholders as $leftPlaceholder) {
                 $this->handlingPlaceholder = $leftSide;
                 try {
@@ -328,7 +328,7 @@ abstract class BaseNode implements NodeInterface
             return $rightSide;
         }
 
-        if ($rightSide !== $rightPlaceholders = self::resolvePlaceholderValue($rightSide)) {
+        if (\is_string($rightSide) && $rightSide !== $rightPlaceholders = self::resolvePlaceholderValue($rightSide)) {
             foreach ($rightPlaceholders as $rightPlaceholder) {
                 $this->handlingPlaceholder = $rightSide;
                 try {
@@ -357,7 +357,7 @@ abstract class BaseNode implements NodeInterface
         }
 
         // resolve placeholder value
-        if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
+        if (\is_string($value) && $value !== $placeholders = self::resolvePlaceholderValue($value)) {
             foreach ($placeholders as $placeholder) {
                 $this->handlingPlaceholder = $value;
                 try {
@@ -402,7 +402,7 @@ abstract class BaseNode implements NodeInterface
 
     final public function finalize(mixed $value): mixed
     {
-        if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
+        if (\is_string($value) && $value !== $placeholders = self::resolvePlaceholderValue($value)) {
             foreach ($placeholders as $placeholder) {
                 $this->handlingPlaceholder = $value;
                 try {

@@ -150,6 +150,10 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         if (!$this->worker) {
+            if (\SIGALRM !== $signal) {
+                $this->shouldStop = true;
+            }
+
             return false;
         }
 
@@ -249,6 +253,9 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
             $this->eventDispatcher,
             $this->logger
         );
+        if ($this->shouldStop) {
+            $this->worker->stop();
+        }
 
         try {
             $this->worker->run();

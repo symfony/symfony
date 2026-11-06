@@ -170,8 +170,6 @@ class ContainerTest extends TestCase
 
     public function testSetWithNullOnInitializedPredefinedService()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "bar" service is already initialized, you cannot replace it.');
         $sc = new Container();
         $sc->set('foo', new \stdClass());
         $sc->set('foo', null);
@@ -179,8 +177,9 @@ class ContainerTest extends TestCase
 
         $sc = new ProjectServiceContainer();
         $sc->get('bar');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "bar" service is already initialized, you cannot replace it.');
         $sc->set('bar', null);
-        $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
     }
 
     public function testSetWithNullOnUninitializedPredefinedService()

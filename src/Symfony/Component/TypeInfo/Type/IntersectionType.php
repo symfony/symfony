@@ -54,19 +54,9 @@ final class IntersectionType extends Type implements CompositeTypeInterface
             }
         }
 
-        $uniqueTypes = [];
-        $seenTypes = [];
-        foreach ($types as $type) {
-            $key = (string) $type;
-            // Compare objects structurally so equal instances are deduplicated.
-            if (!\in_array($type, $seenTypes[$key] ?? [])) {
-                $seenTypes[$key][] = $type;
-                $uniqueTypes[] = $type;
-            }
-        }
-
-        usort($uniqueTypes, static fn (Type $a, Type $b): int => (string) $a <=> (string) $b);
-        $this->types = $uniqueTypes;
+        $types = self::removeDuplicates($types);
+        usort($types, static fn (Type $a, Type $b): int => (string) $a <=> (string) $b);
+        $this->types = $types;
     }
 
     /**
@@ -113,7 +103,7 @@ final class IntersectionType extends Type implements CompositeTypeInterface
             return $mapper($this);
         }
 
-        $types = array_values(array_unique($types));
+        $types = self::removeDuplicates($types);
 
         return $mapper(1 === \count($types) ? $types[0] : Type::intersection(...$types));
     }
@@ -129,5 +119,28 @@ final class IntersectionType extends Type implements CompositeTypeInterface
         }
 
         return $string;
+    }
+
+    /**
+     * @template U of Type
+     *
+     * @param array<U> $types
+     *
+     * @return list<U>
+     */
+    private static function removeDuplicates(array $types): array
+    {
+        $uniqueTypes = [];
+        $seenTypes = [];
+        foreach ($types as $type) {
+            $key = (string) $type;
+            // Compare objects structurally so equal instances are deduplicated.
+            if (!\in_array($type, $seenTypes[$key] ?? [])) {
+                $seenTypes[$key][] = $type;
+                $uniqueTypes[] = $type;
+            }
+        }
+
+        return $uniqueTypes;
     }
 }

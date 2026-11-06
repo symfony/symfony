@@ -17,6 +17,7 @@ use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
@@ -184,6 +185,21 @@ class TypeTest extends TestCase
             Type::object(\Iterator::class),
             Type::intersection(Type::object(\Iterator::class), Type::object(\Stringable::class))->map(static fn (Type $t): Type => 'Stringable' === (string) $t ? Type::object(\Iterator::class) : $t),
         );
+    }
+
+    public function testMapPreservesTypesWithTheSameStringRepresentation()
+    {
+        $generic = Type::generic(Type::object(\ArrayIterator::class), Type::int(), Type::string());
+        $collection = Type::collection($generic);
+        $t = Type::template('T', Type::object(\ArrayIterator::class));
+
+        $union = Type::union($t, $collection)->map(self::replaceTemplate($generic));
+        $this->assertInstanceOf(UnionType::class, $union);
+        $this->assertCount(2, $union->getTypes());
+
+        $intersection = Type::intersection($t, $collection)->map(self::replaceTemplate($generic));
+        $this->assertInstanceOf(IntersectionType::class, $intersection);
+        $this->assertCount(2, $intersection->getTypes());
     }
 
     public function testMapThrowsOnInvalidComposedType()

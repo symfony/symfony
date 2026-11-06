@@ -51,6 +51,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\PhpStanPseudoTypesDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RejectedCandidateDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\AnotherNamespace\DummyInAnotherNamespace;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyImportingDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingConcreteGenericTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingGenericTrait;
@@ -312,6 +313,7 @@ class PhpStanExtractorTest extends TestCase
         yield ['aliasedMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
         yield ['overriddenMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
         yield ['templateInTraitInAnotherNamespace', Type::list(Type::template('T'))];
+        yield ['mutatorInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
     }
 
     public function testConstructorDefinedByTrait()
@@ -583,6 +585,13 @@ class PhpStanExtractorTest extends TestCase
 
         $this->assertEquals('A\Property', $phpStanType->getClassName());
         $this->assertEquals($phpDocType->getClassName(), $phpStanType->getClassName());
+    }
+
+    public function testClassImportsWinOverTraitAndParentImports()
+    {
+        $this->assertEquals(Type::object(Dummy::class), $this->extractor->getType(DummyImportingDummy::class, 'dummy'));
+        $this->assertEquals(Type::object(DummyInAnotherNamespace::class), $this->extractor->getType(DummyImportingDummy::class, 'dummyFromTrait'));
+        $this->assertEquals(Type::object(DummyUsedInTrait::class), $this->extractor->getType(DummyImportingDummy::class, 'dummyFromParent'));
     }
 
     #[DataProvider('intRangeTypeProvider')]

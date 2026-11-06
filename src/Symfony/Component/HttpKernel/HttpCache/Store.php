@@ -80,7 +80,7 @@ class Store implements StoreInterface
         $key = $this->getCacheKey($request);
 
         if (!isset($this->locks[$key])) {
-            $path = $this->getPath($key);
+            $path = $this->getPath($key).'.lck';
             if (!is_dir(\dirname($path)) && !@mkdir(\dirname($path), 0o777, true) && !is_dir(\dirname($path))) {
                 return $path;
             }
@@ -129,7 +129,7 @@ class Store implements StoreInterface
             return true; // shortcut if lock held by this process
         }
 
-        if (!is_file($path = $this->getPath($key))) {
+        if (!is_file($path = $this->getPath($key).'.lck')) {
             return false;
         }
 
@@ -399,49 +399,35 @@ class Store implements StoreInterface
      */
     private function save(string $key, string $data, bool $overwrite = true): bool
     {
-        $this->resetLocksAfterFork();
-
         $path = $this->getPath($key);
 
         if (!$overwrite && file_exists($path)) {
             return true;
         }
 
-        if (isset($this->locks[$key])) {
-            $fp = $this->locks[$key];
-            @ftruncate($fp, 0);
-            @fseek($fp, 0);
-            $len = @fwrite($fp, $data);
-            if (\strlen($data) !== $len) {
-                @ftruncate($fp, 0);
+        if (!is_dir(\dirname($path)) && !@mkdir(\dirname($path), 0o777, true) && !is_dir(\dirname($path))) {
+            return false;
+        }
 
-                return false;
-            }
-        } else {
-            if (!is_dir(\dirname($path)) && !@mkdir(\dirname($path), 0o777, true) && !is_dir(\dirname($path))) {
-                return false;
-            }
+        $tmpFile = tempnam(\dirname($path), basename($path));
+        if (false === $fp = @fopen($tmpFile, 'w')) {
+            @unlink($tmpFile);
 
-            $tmpFile = tempnam(\dirname($path), basename($path));
-            if (false === $fp = @fopen($tmpFile, 'w')) {
-                @unlink($tmpFile);
+            return false;
+        }
+        @fwrite($fp, $data);
+        @fclose($fp);
 
-                return false;
-            }
-            @fwrite($fp, $data);
-            @fclose($fp);
+        if ($data != file_get_contents($tmpFile)) {
+            @unlink($tmpFile);
 
-            if ($data != file_get_contents($tmpFile)) {
-                @unlink($tmpFile);
+            return false;
+        }
 
-                return false;
-            }
+        if (!@rename($tmpFile, $path)) {
+            @unlink($tmpFile);
 
-            if (!@rename($tmpFile, $path)) {
-                @unlink($tmpFile);
-
-                return false;
-            }
+            return false;
         }
 
         @chmod($path, 0o666 & ~umask());

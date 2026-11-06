@@ -924,6 +924,35 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Old response', $this->response->getContent());
     }
 
+    public function testDoesNotServeStaleWhileRevalidatingResponsesThatMustBeRevalidated()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Skips on windows to avoid permissions issues.');
+        }
+
+        $this->cacheConfig['stale_while_revalidate'] = 60;
+
+        $this->setNextResponse(200, ['Cache-Control' => 'public, max-age=5, must-revalidate']);
+        $this->request('GET', '/must-revalidate');
+        $this->setNextResponse(200, ['Cache-Control' => 'public, max-age=5, proxy-revalidate']);
+        $this->request('GET', '/proxy-revalidate');
+
+        $this->store->lock(Request::create('/must-revalidate'));
+        $this->store->lock(Request::create('/proxy-revalidate'));
+
+        sleep(10);
+
+        $this->store = $this->createStore(); // create another store instance that does not hold the current locks
+
+        $this->request('GET', '/must-revalidate');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertSame(503, $this->response->getStatusCode());
+
+        $this->request('GET', '/proxy-revalidate');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertSame(503, $this->response->getStatusCode());
+    }
+
     public function testDegradationWhenCacheLockedWithEsi()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
@@ -965,6 +994,32 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertSame(503, $this->response->getStatusCode());
         $this->assertSame('10', $this->response->headers->get('Retry-After'));
         $this->assertSame('Old response with fragment', $this->response->getContent());
+    }
+
+    public function testRevalidatesResponsesWithNoCacheDirectiveWhenCacheLocked()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Skips on windows to avoid permissions issues.');
+        }
+
+        $this->cacheConfig['stale_while_revalidate'] = 0;
+
+        $this->setNextResponse(200, ['Cache-Control' => 'public, max-age=5, no-cache', 'ETag' => '"v1"'], 'Old response');
+        $this->request('GET', '/');
+
+        $this->store->lock(Request::create('/', 'GET'));
+
+        sleep(10);
+
+        $this->setNextResponse(304, ['Cache-Control' => 'public, max-age=5, no-cache', 'ETag' => '"v1"']);
+        $this->store = $this->createStore(); // create another store instance that does not hold the current lock
+        $this->request('GET', '/');
+
+        $this->assertHttpKernelIsCalled();
+        $this->assertTraceContains('valid');
+        $this->assertSame(200, $this->response->getStatusCode());
+        $this->assertFalse($this->response->headers->has('Retry-After'));
+        $this->assertSame('Old response', $this->response->getContent());
     }
 
     public function testHitBackendOnlyOnceWhenCacheWasLocked()

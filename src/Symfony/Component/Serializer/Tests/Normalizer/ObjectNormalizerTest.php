@@ -721,6 +721,70 @@ class ObjectNormalizerTest extends TestCase
         return $normalizer;
     }
 
+    public function testDeepObjectToPopulateDoesNotCallMethodNamedAfterUntypedAttribute()
+    {
+        $object = new class() {
+            public $data = [];
+            public $loggedOut = false;
+
+            public function __set($name, $value)
+            {
+                $this->data[$name] = $value;
+            }
+
+            public function logout()
+            {
+                $this->loggedOut = true;
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        new Serializer([$normalizer]);
+        $normalizer->denormalize(['logout' => ['foo' => 'bar']], \get_class($object), null, [
+            'object_to_populate' => $object,
+            'deep_object_to_populate' => true,
+        ]);
+
+        $this->assertFalse($object->loggedOut);
+        $this->assertSame(['logout' => ['foo' => 'bar']], $object->data);
+    }
+
+    public function testDeepObjectToPopulateReadsThroughMethodNamedAfterTypedAttribute()
+    {
+        $inner = new ObjectInner();
+        $inner->bar = 'bar';
+
+        $object = new class($inner) {
+            private $inner;
+
+            public function __construct(ObjectInner $inner)
+            {
+                $this->inner = $inner;
+            }
+
+            public function inner(): ObjectInner
+            {
+                return $this->inner;
+            }
+
+            public function setInner(ObjectInner $inner): void
+            {
+                $this->inner = $inner;
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        new Serializer([$normalizer]);
+        $normalizer->denormalize(['inner' => ['foo' => 'foo']], \get_class($object), null, [
+            'object_to_populate' => $object,
+            'deep_object_to_populate' => true,
+        ]);
+
+        $this->assertSame($inner, $object->inner());
+        $this->assertSame('foo', $inner->foo);
+        $this->assertSame('bar', $inner->bar);
+    }
+
     // skip null
 
     protected function getNormalizerForSkipNullValues(): ObjectNormalizer

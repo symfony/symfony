@@ -902,6 +902,52 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Hello World', $this->response->getContent());
     }
 
+    public function testReleasesTheLockWhenTheRevalidatedResponseIsNotStored()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Skips on windows to avoid permissions issues.');
+        }
+
+        // Last-Modified makes the response validateable, so it is stored although it is already stale
+        $this->setNextResponse(200, ['Cache-Control' => 'public, max-age=0, must-revalidate', 'Last-Modified' => 'some while ago'], 'Old response');
+        $this->request('GET', '/');
+        $this->assertTraceContains('store');
+
+        $this->setNextResponse(200, ['Cache-Control' => 'private'], 'New response');
+        $this->request('GET', '/');
+        $this->assertTraceContains('invalid');
+        $this->assertTraceNotContains('store');
+
+        $this->assertFalse($this->store->isLocked(Request::create('/', 'GET')));
+        $this->assertFalse($this->createStore()->isLocked(Request::create('/', 'GET')));
+    }
+
+    public function testReleasesTheLockWhenTheRevalidationThrows()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Skips on windows to avoid permissions issues.');
+        }
+
+        $this->setNextResponse(200, ['Cache-Control' => 'public, max-age=0, must-revalidate', 'Last-Modified' => 'some while ago'], 'Old response');
+        $this->request('GET', '/');
+        $this->assertTraceContains('store');
+
+        $this->setNextResponse(200, [], 'New response', static function () {
+            throw new \RuntimeException('Backend failure.');
+        });
+
+        try {
+            $this->request('GET', '/');
+            $this->fail('The backend error should be thrown.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Backend failure.', $e->getMessage());
+        }
+
+        $this->assertTraceContains('stale');
+        $this->assertFalse($this->store->isLocked(Request::create('/', 'GET')));
+        $this->assertFalse($this->createStore()->isLocked(Request::create('/', 'GET')));
+    }
+
     public function testDegradationWhenCacheLocked()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {

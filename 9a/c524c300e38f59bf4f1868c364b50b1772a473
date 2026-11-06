@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-06T13:25:41Z
+
+Thanks for the fix. I pushed one more change, so that `messenger:consume` resets the stop request after its worker has run. Without it, a command instance that got the signal early stopped every later run too.

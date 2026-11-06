@@ -58,19 +58,9 @@ class UnionType extends Type implements CompositeTypeInterface
             }
         }
 
-        $uniqueTypes = [];
-        $seenTypes = [];
-        foreach ($types as $type) {
-            $key = (string) $type;
-            // Compare objects structurally so equal instances are deduplicated.
-            if (!\in_array($type, $seenTypes[$key] ?? [])) {
-                $seenTypes[$key][] = $type;
-                $uniqueTypes[] = $type;
-            }
-        }
-
-        usort($uniqueTypes, static fn (Type $a, Type $b): int => (string) $a <=> (string) $b);
-        $this->types = $uniqueTypes;
+        $types = self::removeDuplicates($types);
+        usort($types, static fn (Type $a, Type $b): int => (string) $a <=> (string) $b);
+        $this->types = $types;
 
         $builtinTypesIdentifiers = array_map(
             static fn (BuiltinType $t): TypeIdentifier => $t->getTypeIdentifier(),
@@ -153,8 +143,7 @@ class UnionType extends Type implements CompositeTypeInterface
         }
 
         // flatten mapped unions first, so that duplicates inside them are removed as well (e.g. "?int|int" must become "?int")
-        $types = array_merge(...array_map(static fn (Type $t): array => $t instanceof self ? $t->getTypes() : [$t], $types));
-        $types = array_values(array_unique($types));
+        $types = self::removeDuplicates(array_merge(...array_map(static fn (Type $t): array => $t instanceof self ? $t->getTypes() : [$t], $types)));
 
         foreach ($types as $type) {
             if ($type instanceof BuiltinType && TypeIdentifier::MIXED === $type->getTypeIdentifier()) {
@@ -176,5 +165,28 @@ class UnionType extends Type implements CompositeTypeInterface
         }
 
         return $string;
+    }
+
+    /**
+     * @template U of Type
+     *
+     * @param array<U> $types
+     *
+     * @return list<U>
+     */
+    private static function removeDuplicates(array $types): array
+    {
+        $uniqueTypes = [];
+        $seenTypes = [];
+        foreach ($types as $type) {
+            $key = (string) $type;
+            // Compare objects structurally so equal instances are deduplicated.
+            if (!\in_array($type, $seenTypes[$key] ?? [])) {
+                $seenTypes[$key][] = $type;
+                $uniqueTypes[] = $type;
+            }
+        }
+
+        return $uniqueTypes;
     }
 }

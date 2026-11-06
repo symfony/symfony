@@ -782,6 +782,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     private function mayServeStaleWhileRevalidate(Response $entry): bool
     {
+        if ($entry->mustRevalidate()) {
+            return false;
+        }
+
         $timeout = $entry->headers->getCacheControlDirective('stale-while-revalidate');
         $timeout ??= $this->options['stale_while_revalidate'];
 

@@ -989,6 +989,35 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Old response', $this->response->getContent());
     }
 
+    public function testDoesNotServeStaleWhileRevalidatingResponsesThatMustBeRevalidated()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Skips on windows to avoid permissions issues.');
+        }
+
+        $this->cacheConfig['stale_while_revalidate'] = 60;
+
+        $this->setNextResponse(200, ['Cache-Control' => 'public, max-age=5, must-revalidate']);
+        $this->request('GET', '/must-revalidate');
+        $this->setNextResponse(200, ['Cache-Control' => 'public, max-age=5, proxy-revalidate']);
+        $this->request('GET', '/proxy-revalidate');
+
+        $this->store->lock(Request::create('/must-revalidate'));
+        $this->store->lock(Request::create('/proxy-revalidate'));
+
+        sleep(10);
+
+        $this->store = $this->createStore(); // create another store instance that does not hold the current locks
+
+        $this->request('GET', '/must-revalidate');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertSame(503, $this->response->getStatusCode());
+
+        $this->request('GET', '/proxy-revalidate');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertSame(503, $this->response->getStatusCode());
+    }
+
     public function testDegradationWhenCacheLockedWithEsi()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {

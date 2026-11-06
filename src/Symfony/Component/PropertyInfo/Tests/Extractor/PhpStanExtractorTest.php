@@ -900,6 +900,35 @@ class PhpStanExtractorTest extends TestCase
         yield ['dummyInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
     }
 
+    #[DataProvider('methodsDefinedByTraitsProvider')]
+    public function testMethodsDefinedByTraits(string $property, ?Type $type)
+    {
+        $this->assertEquals($type, $this->extractor->getType(DummyUsingTrait::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: ?Type}>
+     */
+    public static function methodsDefinedByTraitsProvider(): iterable
+    {
+        yield ['methodInTraitPrimitiveType', Type::string()];
+        yield ['methodInTraitObjectSameNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['methodInTraitObjectDifferentNamespace', Type::object(Dummy::class)];
+        yield ['methodInExternalTraitPrimitiveType', Type::string()];
+        yield ['methodInExternalTraitObjectSameNamespace', Type::object(Dummy::class)];
+        yield ['methodInExternalTraitObjectDifferentNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['methodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['aliasedMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['overriddenMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['templateInTraitInAnotherNamespace', Type::list(Type::template('T'))];
+    }
+
+    public function testConstructorDefinedByTrait()
+    {
+        $this->assertEquals(Type::object(DummyInAnotherNamespace::class), $this->extractor->getTypeFromConstructor(DummyUsingTrait::class, 'dummyInConstructor'));
+        $this->assertEquals(Type::list(Type::template('T')), $this->extractor->getTypeFromConstructor(DummyUsingTrait::class, 'templateInConstructor'));
+    }
+
     #[DataProvider('provideGenericTraitProperties')]
     public function testGenericTraitPropertiesKeepInheritedTemplateTypes(string $class, Type $expected)
     {
@@ -909,6 +938,17 @@ class PhpStanExtractorTest extends TestCase
 
         $this->assertEquals($expected, $this->extractor->getType($class, 'item'));
         $this->assertEquals(Type::arrayShape(['value' => $expected, 'owner' => Type::object($class)]), $this->extractor->getType($class, 'details'));
+    }
+
+    #[DataProvider('provideGenericTraitProperties')]
+    public function testGenericTraitMethodsKeepInheritedTemplateTypes(string $class, Type $expected)
+    {
+        if (!property_exists(TypeContext::class, 'inheritedTemplateTypes')) {
+            $this->markTestSkipped('Inherited template types require symfony/type-info 8.2 or higher.');
+        }
+
+        $this->assertEquals($expected, $this->extractor->getType($class, 'value'));
+        $this->assertEquals($expected, $this->extractor->getTypeFromConstructor($class, 'value'));
     }
 
     /**

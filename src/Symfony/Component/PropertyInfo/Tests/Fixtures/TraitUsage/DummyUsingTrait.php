@@ -16,5 +16,15 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\AnotherNamespace\Du
 class DummyUsingTrait
 {
     use DummyTrait;
-    use DummyTraitInAnotherNamespace;
+    use DummyTraitInAnotherNamespace {
+        getMethodInTraitInAnotherNamespace as getAliasedMethodInTraitInAnotherNamespace;
+    }
+
+    /**
+     * @return DummyUsedInTrait
+     */
+    public function getOverriddenMethodInTraitInAnotherNamespace()
+    {
+        return new DummyUsedInTrait();
+    }
 }

@@ -21,4 +21,19 @@ trait GenericTrait
 
     /** @var array{value: T, owner: self} */
     public array $details;
+
+    /**
+     * @param T $value
+     */
+    public function __construct(mixed $value = null)
+    {
+    }
+
+    /**
+     * @return T
+     */
+    public function getValue(): mixed
+    {
+        return null;
+    }
 }

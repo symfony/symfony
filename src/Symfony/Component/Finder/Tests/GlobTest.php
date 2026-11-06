@@ -174,6 +174,20 @@ class GlobTest extends TestCase
         $this->assertSame('#^(?=[^\.])[a[]$#', Glob::toRegex('[a[]'));
     }
 
+    public function testGlobToRegexBracketsContainingASlash()
+    {
+        // a "/" is never matched by a bracket expression, so the "[" is a literal character
+        $this->assertSame('#^(?=[^\.])\[/(?=[^\.])b$#', Glob::toRegex('[/b'));
+        $this->assertSame('#^(?=[^\.])a\[/(?=[^\.])b$#', Glob::toRegex('a[/b'));
+        $this->assertSame('#^(?=[^\.])\[/(?=[^\.])]$#', Glob::toRegex('[/]'));
+        $this->assertSame('#^(?=[^\.])\[\[/(?=[^\.])]$#', Glob::toRegex('[[/]'));
+        $this->assertSame('#^(?=[^\.])\[a/(?=[^\.])b]c$#', Glob::toRegex('[a/b]c'));
+
+        $this->assertSame(1, preg_match(Glob::toRegex('[/b'), '[/b'));
+        $this->assertSame(1, preg_match(Glob::toRegex('[/]'), '[/]'));
+        $this->assertSame(0, preg_match(Glob::toRegex('[/]'), '/'));
+    }
+
     public function testGlobToRegexBracketsAfterAnUnclosedOne()
     {
         $this->assertSame('#^(?=[^\.])\[\[:alpha:]$#', Glob::toRegex('[[:alpha:]'));

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-06T13:25:36Z
+
+Thank you @KalimeroMK. I pushed a small change to the warmer test. The log file was byte-identical when the warmer never read it, so the last assertion also passed with deprecation collection turned off. The entry now uses key 1, and the test checks that it is written back as key 0.

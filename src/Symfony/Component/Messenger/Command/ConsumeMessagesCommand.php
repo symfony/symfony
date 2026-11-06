@@ -51,6 +51,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
     private ?ContainerInterface $rateLimiterLocator;
     private ?array $signals;
     private ?Worker $worker = null;
+    private bool $shouldStop = false;
 
     public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, ?LoggerInterface $logger = null, array $receiverNames = [], ?ResetServicesListener $resetServicesListener = null, array $busIds = [], ?ContainerInterface $rateLimiterLocator = null, ?array $signals = null)
     {
@@ -233,6 +234,9 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
         $this->worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
+        if ($this->shouldStop) {
+            $this->worker->stop();
+        }
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
             'time_limit' => null !== $timeLimit ? (int) $timeLimit : null,
@@ -249,6 +253,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             $this->worker->run($options);
         } finally {
             $this->worker = null;
+            $this->shouldStop = false;
 
             foreach ($subscribers as $subscriber) {
                 $this->eventDispatcher->removeSubscriber($subscriber);
@@ -279,6 +284,8 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         if (!$this->worker) {
+            $this->shouldStop = true;
+
             return false;
         }
 

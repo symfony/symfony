@@ -272,6 +272,52 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
+    /**
+     * @requires extension pcntl
+     */
+    public function testRunStopsWhenSignalWasReceivedBeforeTheWorkerWasCreated()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $getCalls = 0;
+        $receiver = $this->createStub(ReceiverInterface::class);
+        $receiver->method('get')->willReturnCallback(static function () use ($envelope, &$getCalls) {
+            ++$getCalls;
+
+            return [$envelope];
+        });
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', $receiver);
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', new MessageBus());
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+
+        $this->assertFalse($command->handleSignal(\SIGTERM));
+
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--limit' => 1,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame(0, $getCalls);
+
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--limit' => 1,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame(1, $getCalls);
+    }
+
     public function testRunWithMemoryLimit()
     {
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);

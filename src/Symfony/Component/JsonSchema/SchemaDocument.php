@@ -13,6 +13,8 @@ namespace Symfony\Component\JsonSchema;
 
 use Symfony\Component\JsonSchema\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 
 /**
  * Collects the definitions of the schemas generated for one document, for example an OpenAPI document.
@@ -32,9 +34,9 @@ final class SchemaDocument
     private array $definitions = [];
 
     /**
-     * Definition name => class and shape fingerprint it was reserved for.
+     * Definition name => object type and shape fingerprint it was reserved for.
      *
-     * @var array<string, array{class-string, string}>
+     * @var array<string, array{ObjectType|GenericType<ObjectType>, string}>
      */
     private array $reservations = [];
 
@@ -51,11 +53,26 @@ final class SchemaDocument
     /**
      * Returns the class each definition describes, for consumers that refer to definitions by class rather than by name.
      *
+     * Values are not unique: arguments or configurations can produce several definitions for one class.
+     *
      * @return array<string, class-string> definition name => class
      */
     public function getDefinitionClasses(): array
     {
-        return array_map(static fn (array $reservation): string => $reservation[0], $this->reservations);
+        return array_map(static fn (ObjectType|GenericType $type): string => ($type instanceof GenericType ? $type->getWrappedType() : $type)->getClassName(), $this->getDefinitionTypes());
+    }
+
+    /**
+     * Returns the complete object type each definition describes, including its generic arguments.
+     *
+     * Values are not unique: configurations can produce several definitions for one type.
+     * The first reserved type is returned when equivalent types share a definition.
+     *
+     * @return array<string, ObjectType|GenericType<ObjectType>> definition name => type
+     */
+    public function getDefinitionTypes(): array
+    {
+        return array_map(static fn (array $reservation): ObjectType|GenericType => $reservation[0], $this->reservations);
     }
 
     /**
@@ -120,11 +137,11 @@ final class SchemaDocument
      *
      * @internal
      *
-     * @param class-string $class
+     * @param ObjectType|GenericType<ObjectType> $type
      *
-     * @return array{class-string, string}|null null when the name was free, the class and fingerprint it is reserved for otherwise
+     * @return array{ObjectType|GenericType<ObjectType>, string}|null null when the name was free, the type and fingerprint it is reserved for otherwise
      */
-    public function reserve(string $name, string $class, string $fingerprint, Dialect $dialect): ?array
+    public function reserve(string $name, ObjectType|GenericType $type, string $fingerprint, Dialect $dialect): ?array
     {
         $this->dialect ??= $dialect;
 
@@ -136,7 +153,7 @@ final class SchemaDocument
             return $this->reservations[$name];
         }
 
-        $this->reservations[$name] = [$class, $fingerprint];
+        $this->reservations[$name] = [$type, $fingerprint];
         $this->definitions[$name] = [];
 
         return null;

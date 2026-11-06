@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonSchema\Tests;
 
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -28,6 +29,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\Author;
 use Symfony\Component\JsonSchema\Tests\Fixtures\BookWithAuthors;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Drawing;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FixedPropertySchemaProvider;
+use Symfony\Component\JsonSchema\Tests\Fixtures\Generic\Inbox;
 use Symfony\Component\JsonSchema\Tests\Fixtures\IdentifierDefinitionProcessor;
 use Symfony\Component\JsonSchema\Tests\Fixtures\IriReferenceClassSchemaResolver;
 use Symfony\Component\JsonSchema\Tests\Fixtures\JsonSchemaBundleTestAppBundle;
@@ -80,6 +82,16 @@ class JsonSchemaBundleTest extends TestCase
         $generator = $this->bootKernel('describe')->getContainer()->get('test.json_schema.generator');
 
         $this->assertSame(['type' => 'object', 'properties' => ['name' => ['type' => 'string']]], $generator->generate(Type::object(Author::class))->getDefinitions()['Author']);
+    }
+
+    #[RequiresMethod(Type::class, 'map')]
+    public function testGenericPropertiesAreExtracted()
+    {
+        $generator = $this->bootKernel('generics')->getContainer()->get('test.json_schema.generator');
+        $definitions = $generator->generate(Type::object(Inbox::class))->getDefinitions();
+
+        $this->assertSame(['type' => 'string'], $definitions['Envelope-of.string']['properties']['data']);
+        $this->assertSame(['$ref' => '#/$defs/Customer'], $definitions['Envelope-of.Customer']['properties']['data']);
     }
 
     public function testExtensionsAreAutoconfigured()

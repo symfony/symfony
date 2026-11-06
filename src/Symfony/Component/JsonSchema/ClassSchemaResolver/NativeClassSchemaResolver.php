@@ -17,6 +17,8 @@ use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\Direction;
 use Symfony\Component\JsonSchema\SchemaDocument;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -40,8 +42,15 @@ final class NativeClassSchemaResolver implements ClassSchemaResolverInterface
     ) {
     }
 
-    public function resolve(string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): ?array
+    /**
+     * @param ObjectType|GenericType<ObjectType> $type
+     *
+     * @return array<string, mixed>|null
+     */
+    public function resolve(ObjectType|GenericType $type, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): ?array
     {
+        $class = ($type instanceof GenericType ? $type->getWrappedType() : $type)->getClassName();
+
         return match (true) {
             is_a($class, \DateTimeInterface::class, true) => ['type' => 'string', ...match ($this->getContext($config, $parent)['datetime_format'] ?? \DateTimeInterface::RFC3339) {
                 \DateTimeInterface::RFC3339, \DateTimeInterface::RFC3339_EXTENDED => ['format' => 'date-time'],

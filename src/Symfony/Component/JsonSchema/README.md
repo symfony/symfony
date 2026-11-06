@@ -29,6 +29,9 @@ $generator = SchemaGenerator::create();
 // {"$schema": "...", "$ref": "#/$defs/Book", "$defs": {"Book": {...}, "Author": {...}}}
 $schema = $generator->generate(Type::object(Book::class));
 
+// specialize the @template T properties of a generic DTO (requires TypeInfo 8.2+)
+$schema = $generator->generate(Type::generic(Type::object(Envelope::class), Type::object(Book::class)));
+
 // an OpenAPI 3.1 request body, restricted to the "book:write" serialization group
 $schema = $generator->generate(Type::object(Book::class), new Configuration(
     dialect: Dialect::openApi31(),
@@ -55,6 +58,7 @@ echo json_encode($schema);
 Resources
 ---------
 
+ * [Documentation](https://symfony.com/doc/current/components/json_schema.html)
  * [Contributing](https://symfony.com/doc/current/contributing/index.html)
  * [Report issues](https://github.com/symfony/symfony/issues) and
    [send Pull Requests](https://github.com/symfony/symfony/pulls)

@@ -15,10 +15,18 @@ use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\DefinitionProcessor\DefinitionProcessorInterface;
 use Symfony\Component\JsonSchema\SchemaDocument;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 
 class IdentifierDefinitionProcessor implements DefinitionProcessorInterface
 {
-    public function process(array $definition, string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array
+    /**
+     * @param ObjectType|GenericType<ObjectType> $type
+     * @param array<string, mixed> $definition
+     *
+     * @return array<string, mixed>
+     */
+    public function process(array $definition, ObjectType|GenericType $type, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent): array
     {
         $definition['properties'] = ['@id' => ['type' => 'string'], ...$definition['properties'] ?? []];
 

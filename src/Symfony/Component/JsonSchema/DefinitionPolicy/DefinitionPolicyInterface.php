@@ -14,6 +14,8 @@ namespace Symfony\Component\JsonSchema\DefinitionPolicy;
 use Symfony\Component\JsonSchema\Configuration;
 use Symfony\Component\JsonSchema\DefinitionParent;
 use Symfony\Component\JsonSchema\SchemaDocument;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 
 /**
  * Names the definition describing a class under a given configuration.
@@ -22,7 +24,7 @@ use Symfony\Component\JsonSchema\SchemaDocument;
  * and a definition is only built for the first occurrence of a name, with that occurrence's
  * parent. Anything that changes the shape of the definition (groups, attributes, a format,
  * the owning property...) must therefore be part of the name. The generator throws when two different
- * shapes (class or shape-relevant configuration) get the same name in a document; a difference coming only
+ * shapes (type arguments, class or shape-relevant configuration) get the same name in a document; a difference coming only
  * from the parent cannot be detected and the first occurrence wins.
  *
  * A policy that needs state for a document, for example to give a name to the first class asking for it,
@@ -33,8 +35,8 @@ use Symfony\Component\JsonSchema\SchemaDocument;
 interface DefinitionPolicyInterface
 {
     /**
-     * @param class-string      $class
-     * @param ?DefinitionParent $parent null for the root definition
+     * @param ObjectType|GenericType<ObjectType> $type
+     * @param DefinitionParent|null              $parent null for the root definition
      */
-    public function nameFor(string $class, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): string;
+    public function nameFor(ObjectType|GenericType $type, Configuration $config, SchemaDocument $document, ?DefinitionParent $parent = null): string;
 }

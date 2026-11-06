@@ -49,6 +49,9 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
 
         $metadata = $loader->load(DummyWithGenerics::class, context: ['original_type' => Type::intersection(Type::object(\stdClass::class), Type::generic(Type::object(DummyWithGenerics::class), Type::int()))]);
         $this->assertEquals(['foo' => new PropertyMetadata('foo', Type::int())], $metadata);
+
+        $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::generic(Type::object(DummyWithGenerics::class), Type::int()))]);
+        $this->assertEquals(['foo' => new PropertyMetadata('foo', Type::generic(Type::object(DummyWithGenerics::class), Type::int()))], $metadata);
     }
 
     public function testReplaceGenericsInArrayShape()

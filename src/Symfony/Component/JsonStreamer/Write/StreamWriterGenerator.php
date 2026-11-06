@@ -41,6 +41,8 @@ use Symfony\Component\TypeInfo\Type\UnionType;
  */
 final class StreamWriterGenerator
 {
+    private const MAX_GENERIC_DEPTH = 512;
+
     private StreamerDumper $dumper;
     private ?PhpGenerator $phpGenerator = null;
 
@@ -97,7 +99,10 @@ final class StreamWriterGenerator
             return new BackedEnumNode($accessor, $type);
         }
 
+        $genericType = null;
+
         if ($type instanceof GenericType) {
+            $genericType = $type;
             $type = $type->getWrappedType();
         }
 
@@ -106,15 +111,24 @@ final class StreamWriterGenerator
         }
 
         if ($type instanceof ObjectType && !$type instanceof EnumType) {
-            $typeString = (string) $type;
+            $typeString = (string) ($genericType ?? $type);
             $className = $type->getClassName();
 
             if ($context['generated_classes'][$typeString] ??= false) {
-                return ObjectNode::createMock($accessor, $type);
+                return ObjectNode::createMock($accessor, $genericType ?? $type);
             }
 
             $context['generated_classes'][$typeString] = true;
-            $propertiesMetadata = $this->propertyMetadataLoader->load($className, $options, $context);
+            $propertiesMetadata = $this->propertyMetadataLoader->load($className, $options, $genericType ? ['original_type' => $genericType] + $context : $context);
+
+            if ($genericType) {
+                $context['generic_depths'][$className] ??= 0;
+
+                // a class that contains itself with growing generic types would be expanded forever
+                if (++$context['generic_depths'][$className] > self::MAX_GENERIC_DEPTH) {
+                    throw new UnsupportedException(\sprintf('"%s" contains itself with generic types that keep growing, which is not supported.', $className));
+                }
+            }
 
             try {
                 $classReflection = new \ReflectionClass($className);
@@ -152,7 +166,11 @@ final class StreamWriterGenerator
                 $propertiesNodes[$streamedName] = $this->createDataModel($propertyMetadata->getType(), $propertyAccessor, $options, $context);
             }
 
-            return new ObjectNode($accessor, $type, $propertiesNodes);
+            if ($genericType) {
+                --$context['generic_depths'][$className];
+            }
+
+            return new ObjectNode($accessor, $genericType ?? $type, $propertiesNodes);
         }
 
         if ($type instanceof CollectionType) {

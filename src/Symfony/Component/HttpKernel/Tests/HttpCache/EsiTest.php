@@ -161,12 +161,12 @@ class EsiTest extends TestCase
 
     public function testProcessWhenNoSrcInAnEsi()
     {
-        $this->expectException(\RuntimeException::class);
         $esi = new Esi();
 
         $request = Request::create('/');
         $response = new Response('foo <esi:include />');
-        $this->assertSame($response, $esi->process($request, $response));
+        $this->expectException(\RuntimeException::class);
+        $esi->process($request, $response);
     }
 
     public function testProcessRemoveSurrogateControlHeader()

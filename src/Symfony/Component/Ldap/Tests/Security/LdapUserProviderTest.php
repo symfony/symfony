@@ -108,8 +108,6 @@ class LdapUserProviderTest extends TestCase
 
     public function testLoadUserByIdentifierFailsIfMoreThanOneLdapPasswordsInEntry()
     {
-        $this->expectException(InvalidArgumentException::class);
-
         $result = $this->createMock(CollectionInterface::class);
         $query = $this->createMock(QueryInterface::class);
         $query
@@ -144,7 +142,8 @@ class LdapUserProviderTest extends TestCase
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={user_identifier})', 'userpassword');
-        $this->assertInstanceOf(LdapUser::class, $provider->loadUserByIdentifier('foo'));
+        $this->expectException(InvalidArgumentException::class);
+        $provider->loadUserByIdentifier('foo');
     }
 
     public function testLoadUserByIdentifierShouldNotFailIfEntryHasNoUidKeyAttribute()
@@ -185,8 +184,6 @@ class LdapUserProviderTest extends TestCase
 
     public function testLoadUserByIdentifierFailsIfEntryHasNoPasswordAttribute()
     {
-        $this->expectException(InvalidArgumentException::class);
-
         $result = $this->createMock(CollectionInterface::class);
         $query = $this->createMock(QueryInterface::class);
         $query
@@ -218,7 +215,8 @@ class LdapUserProviderTest extends TestCase
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={user_identifier})', 'userpassword');
-        $this->assertInstanceOf(LdapUser::class, $provider->loadUserByIdentifier('foo'));
+        $this->expectException(InvalidArgumentException::class);
+        $provider->loadUserByIdentifier('foo');
     }
 
     public function testLoadUserByIdentifierIsSuccessfulWithoutPasswordAttribute()

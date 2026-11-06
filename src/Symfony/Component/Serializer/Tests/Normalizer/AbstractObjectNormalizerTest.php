@@ -2419,6 +2419,138 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame(['kind' => 'circle'], $drawing->mappedBox->wrapping);
     }
 
+    public function testDenormalizeGenericTypeWithDiscriminatorMapToGenericClass()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['mappedBox' => ['type' => 'bag', 'item' => ['kind' => 'circle', 'radius' => 1.0], 'spares' => [['kind' => 'circle', 'radius' => 2.0]]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericGiftBag::class, $drawing->mappedBox);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->mappedBox->item);
+        $this->assertContainsOnlyInstancesOf(GenericCircle::class, $drawing->mappedBox->spares);
+        $this->assertSame(2.0, $drawing->mappedBox->spares[0]->radius);
+    }
+
+    public function testDenormalizeGenericTypeWithDiscriminatorMapToSeveralClasses()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['mappedBoxes' => [
+            ['type' => 'gift', 'item' => ['kind' => 'circle', 'radius' => 1.0]],
+            ['type' => 'bag', 'item' => ['kind' => 'circle', 'radius' => 2.0], 'spares' => [['kind' => 'circle', 'radius' => 3.0]]],
+        ]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericGiftBox::class, $drawing->mappedBoxes[0]);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->mappedBoxes[0]->item);
+        $this->assertInstanceOf(GenericGiftBag::class, $drawing->mappedBoxes[1]);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->mappedBoxes[1]->item);
+        $this->assertContainsOnlyInstancesOf(GenericCircle::class, $drawing->mappedBoxes[1]->spares);
+        $this->assertSame(3.0, $drawing->mappedBoxes[1]->spares[0]->radius);
+    }
+
+    public function testDenormalizeGenericTypeOfParentClasses()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize([
+            'envelope' => ['extra' => 1, 'data' => ['kind' => 'circle', 'radius' => 2.0]],
+            'deepEnvelope' => ['extra' => 3, 'data' => ['kind' => 'circle', 'radius' => 4.0]],
+        ], GenericDrawing::class);
+
+        $this->assertSame(1, $drawing->envelope->extra);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->envelope->data);
+        $this->assertSame(2.0, $drawing->envelope->data->radius);
+        $this->assertSame(3, $drawing->deepEnvelope->extra);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->deepEnvelope->data);
+        $this->assertSame(4.0, $drawing->deepEnvelope->data->radius);
+    }
+
+    public function testDenormalizeGenericTypeOfParentClassesOfNonGenericClass()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $envelope = $serializer->denormalize(['data' => ['kind' => 'circle', 'radius' => 2.0]], GenericCircleEnvelope::class);
+
+        $this->assertInstanceOf(GenericCircle::class, $envelope->data);
+        $this->assertSame(2.0, $envelope->data->radius);
+
+        $drawing = $serializer->denormalize(['circleEnvelopes' => [['data' => ['kind' => 'circle', 'radius' => 3.0]]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericCircle::class, $drawing->circleEnvelopes[0]->data);
+        $this->assertSame(3.0, $drawing->circleEnvelopes[0]->data->radius);
+    }
+
+    public function testDenormalizeGenericTypeOfParentClassesWithoutExtendsTag()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['sameNameEnvelope' => ['data' => ['kind' => 'circle', 'radius' => 2.0]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericCircle::class, $drawing->sameNameEnvelope->data);
+        $this->assertSame(2.0, $drawing->sameNameEnvelope->data->radius);
+    }
+
+    public function testDenormalizeGenericTypeOfParentAccessors()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['accessorEnvelope' => ['extra' => 1, 'data' => ['kind' => 'circle', 'radius' => 2.0]]], GenericDrawing::class);
+
+        $this->assertSame(1, $drawing->accessorEnvelope->extra);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->accessorEnvelope->getData());
+        $this->assertSame(2.0, $drawing->accessorEnvelope->getData()->radius);
+    }
+
+    public function testDenormalizeGenericTypeOfParentConstructor()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['constructedEnvelope' => ['extra' => 1, 'data' => ['kind' => 'circle', 'radius' => 2.0]]], GenericDrawing::class);
+
+        $this->assertSame(1, $drawing->constructedEnvelope->extra);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->constructedEnvelope->data);
+        $this->assertSame(2.0, $drawing->constructedEnvelope->data->radius);
+    }
+
+    public function testDenormalizeGenericTypeWithDiscriminatorMapOnInterface()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['shapeHolder' => ['type' => 'holder', 'shape' => ['kind' => 'circle', 'radius' => 2.0]]], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericShapeHolder::class, $drawing->shapeHolder);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->shapeHolder->shape);
+        $this->assertSame(2.0, $drawing->shapeHolder->shape->radius);
+    }
+
+    public function testDenormalizeGenericTypeWithDiscriminatorMapOnInterfaceWithoutImplementsTag()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize([
+            'shapeHolder' => ['type' => 'untagged', 'shape' => ['kind' => 'circle', 'radius' => 2.0]],
+            'otherShapeHolder' => ['type' => 'untagged_child', 'shape' => ['kind' => 'circle', 'radius' => 3.0]],
+        ], GenericDrawing::class);
+
+        $this->assertInstanceOf(GenericUntaggedShapeHolder::class, $drawing->shapeHolder);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->shapeHolder->shape);
+        $this->assertSame(2.0, $drawing->shapeHolder->shape->radius);
+        $this->assertInstanceOf(GenericUntaggedChildShapeHolder::class, $drawing->otherShapeHolder);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->otherShapeHolder->shape);
+        $this->assertSame(3.0, $drawing->otherShapeHolder->shape->radius);
+    }
+
+    public function testDenormalizeGenericTypeOfTraitProperties()
+    {
+        $serializer = self::createGenericTypeSerializer();
+
+        $drawing = $serializer->denormalize(['traitUser' => ['extra' => 1, 'item' => ['kind' => 'circle', 'radius' => 2.0]]], GenericDrawing::class);
+
+        $this->assertSame(1, $drawing->traitUser->extra);
+        $this->assertInstanceOf(GenericCircle::class, $drawing->traitUser->item);
+        $this->assertSame(2.0, $drawing->traitUser->item->radius);
+    }
+
     public function testDenormalizeGenericTypeDoesNotLeakToNestedObjects()
     {
         $serializer = self::createGenericTypeSerializer();
@@ -3562,7 +3694,7 @@ class GenericPair
 /**
  * @template T of GenericShape
  */
-#[DiscriminatorMap('type', ['gift' => GenericGiftBox::class])]
+#[DiscriminatorMap('type', ['gift' => GenericGiftBox::class, 'bag' => GenericGiftBag::class])]
 abstract class AbstractGenericBox
 {
     /** @var T */
@@ -3576,6 +3708,182 @@ class GenericGiftBox extends AbstractGenericBox
 {
     /** @var U */
     public mixed $wrapping = null;
+}
+
+/**
+ * @template V of GenericShape
+ *
+ * @extends AbstractGenericBox<V>
+ */
+class GenericGiftBag extends AbstractGenericBox
+{
+    /** @var list<V> */
+    public array $spares = [];
+}
+
+/**
+ * @template T
+ */
+class GenericEnvelope
+{
+    /** @var T */
+    public mixed $data = null;
+}
+
+/**
+ * @template T
+ * @template U of GenericShape
+ *
+ * @extends GenericEnvelope<U>
+ */
+class GenericChildEnvelope extends GenericEnvelope
+{
+    /** @var T */
+    public mixed $extra = null;
+}
+
+/**
+ * @template T of GenericShape
+ *
+ * @extends GenericChildEnvelope<int, T>
+ */
+class GenericGrandChildEnvelope extends GenericChildEnvelope
+{
+}
+
+/**
+ * @template T of GenericShape
+ */
+class GenericSameNameEnvelope extends GenericEnvelope
+{
+}
+
+/**
+ * @extends GenericEnvelope<GenericCircle>
+ */
+class GenericCircleEnvelope extends GenericEnvelope
+{
+}
+
+/**
+ * @template T
+ */
+class GenericAccessorEnvelope
+{
+    private mixed $data = null;
+
+    /**
+     * @return T
+     */
+    public function getData(): mixed
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param T $data
+     */
+    public function setData(mixed $data): void
+    {
+        $this->data = $data;
+    }
+}
+
+/**
+ * @template T
+ * @template U of GenericShape
+ *
+ * @extends GenericAccessorEnvelope<U>
+ */
+class GenericChildAccessorEnvelope extends GenericAccessorEnvelope
+{
+    /** @var T */
+    public mixed $extra = null;
+}
+
+/**
+ * @template T
+ */
+class GenericConstructedEnvelope
+{
+    /**
+     * @param T $data
+     */
+    public function __construct(
+        public mixed $data = null,
+    ) {
+    }
+}
+
+/**
+ * @template T
+ * @template U of GenericShape
+ *
+ * @extends GenericConstructedEnvelope<U>
+ */
+class GenericChildConstructedEnvelope extends GenericConstructedEnvelope
+{
+    /** @var T */
+    public mixed $extra = null;
+}
+
+/**
+ * @template T of GenericShape
+ */
+#[DiscriminatorMap('type', ['holder' => GenericShapeHolder::class, 'untagged' => GenericUntaggedShapeHolder::class, 'untagged_child' => GenericUntaggedChildShapeHolder::class])]
+interface GenericShapeHolderInterface
+{
+}
+
+/**
+ * @template V of GenericShape
+ *
+ * @implements GenericShapeHolderInterface<V>
+ */
+class GenericShapeHolder implements GenericShapeHolderInterface
+{
+    /** @var V */
+    public mixed $shape = null;
+}
+
+/**
+ * @template T of GenericShape
+ */
+class GenericUntaggedShapeHolder implements GenericShapeHolderInterface
+{
+    /** @var T */
+    public mixed $shape = null;
+}
+
+/**
+ * @template V of GenericShape
+ *
+ * @extends GenericUntaggedShapeHolder<V>
+ */
+class GenericUntaggedChildShapeHolder extends GenericUntaggedShapeHolder
+{
+}
+
+/**
+ * @template T
+ */
+trait GenericItemTrait
+{
+    /** @var T */
+    public mixed $item = null;
+}
+
+/**
+ * @template T
+ * @template U of GenericShape
+ */
+class GenericTraitUser
+{
+    /** @use GenericItemTrait<U> */
+    use GenericItemTrait;
+
+    /** @var T */
+    public mixed $extra = null;
 }
 
 class GenericDrawing
@@ -3612,6 +3920,36 @@ class GenericDrawing
 
     /** @var AbstractGenericBox<GenericCircle> */
     public AbstractGenericBox $mappedBox;
+
+    /** @var list<AbstractGenericBox<GenericCircle>> */
+    public array $mappedBoxes = [];
+
+    /** @var GenericChildEnvelope<int, GenericCircle> */
+    public GenericChildEnvelope $envelope;
+
+    /** @var GenericGrandChildEnvelope<GenericCircle> */
+    public GenericGrandChildEnvelope $deepEnvelope;
+
+    /** @var GenericSameNameEnvelope<GenericCircle> */
+    public GenericSameNameEnvelope $sameNameEnvelope;
+
+    /** @var list<GenericCircleEnvelope> */
+    public array $circleEnvelopes = [];
+
+    /** @var GenericChildAccessorEnvelope<int, GenericCircle> */
+    public GenericChildAccessorEnvelope $accessorEnvelope;
+
+    /** @var GenericChildConstructedEnvelope<int, GenericCircle> */
+    public GenericChildConstructedEnvelope $constructedEnvelope;
+
+    /** @var GenericShapeHolderInterface<GenericCircle> */
+    public GenericShapeHolderInterface $shapeHolder;
+
+    /** @var GenericShapeHolderInterface<GenericCircle> */
+    public GenericShapeHolderInterface $otherShapeHolder;
+
+    /** @var GenericTraitUser<int, GenericCircle> */
+    public GenericTraitUser $traitUser;
 
     public GenericBox $plainBox;
 }

@@ -1160,7 +1160,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * Pairs the variable types of a generic type with the templates declared by the generic class.
+     * Pairs the variable types of a generic type with the templates of the mapped class.
+     *
+     * The variable types are given for the templates of the generic class. A mapped child class can give them other names in its "@extends" and "@implements" tags.
      *
      * Templates that have no variable type are left as is, so that they fall back to their bound.
      *
@@ -1178,12 +1180,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         $this->typeContextFactory ??= new TypeContextFactory(new StringTypeResolver());
+        $inheritedTemplateTypes = $this->typeContextFactory->createFromClassName($mappedClass, $genericClass->getClassName())->inheritedTemplateTypes;
         $templateTypes = [];
 
-        // the templates of the generic class are the ones the variable types are given for, not those of a mapped child class
         foreach (array_keys($this->typeContextFactory->createFromClassName($genericClass->getClassName())->templates) as $i => $template) {
-            if (isset($variableTypes[$i])) {
-                $templateTypes[$template] = $variableTypes[$i];
+            $mappedTemplate = $inheritedTemplateTypes[$template] ?? Type::template($template);
+
+            if (isset($variableTypes[$i]) && $mappedTemplate instanceof TemplateType) {
+                $templateTypes[$mappedTemplate->getName()] ??= $variableTypes[$i];
             }
         }
 

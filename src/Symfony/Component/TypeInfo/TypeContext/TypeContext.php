@@ -34,6 +34,7 @@ final class TypeContext
      * @param array<string, string> $uses
      * @param array<string, Type>   $templates
      * @param array<string, Type>   $typeAliases
+     * @param array<string, Type>   $inheritedTemplateTypes The types that the called class gives to the templates of the declaring class through "@extends", "@implements" and "@use" tags
      */
     public function __construct(
         public readonly string $calledClassName,
@@ -42,6 +43,7 @@ final class TypeContext
         public readonly array $uses = [],
         public readonly array $templates = [],
         public readonly array $typeAliases = [],
+        public readonly array $inheritedTemplateTypes = [],
     ) {
     }
 

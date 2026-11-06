@@ -434,6 +434,10 @@ final class StringTypeResolver implements TypeResolverInterface
             return Type::object($className);
         }
 
+        if (null !== $type = $typeContext?->inheritedTemplateTypes[$identifier] ?? null) {
+            return $type;
+        }
+
         if (isset($typeContext?->templates[$identifier])) {
             return Type::template($identifier, $typeContext->templates[$identifier]);
         }

@@ -35,6 +35,10 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyWithStaticGette
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyWithTemplateAndParentInDifferentNs;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\PromotedPropertiesWithDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IFace;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\InheritedTemplates\ChildEnvelope;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\InheritedTemplates\DummyEnvelope;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\InheritedTemplates\DummyGrandChildEnvelope;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\InheritedTemplates\DummyItemUser;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\LiteralDummy;
@@ -51,8 +55,10 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VoidNeverReturnTypeDummy;
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 
 require_once __DIR__.'/../Fixtures/Extractor/DummyNamespace.php';
+require_once __DIR__.'/../Fixtures/InheritedTemplates.php';
 
 /**
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
@@ -382,6 +388,36 @@ class PhpStanExtractorTest extends TestCase
         yield [Dummy::class, 'rootDummyItem', Type::nullable(Type::object(RootDummyItem::class))];
         yield [DummyWithTemplateAndParent::class, 'items', Type::list(Type::template('T', Type::object(DummyInDifferentNs::class)))];
         yield [DummyWithTemplateAndParentInDifferentNs::class, 'items', Type::list(Type::template('T', Type::object(DummyInDifferentNs::class)))];
+    }
+
+    #[DataProvider('inheritedTemplateTypesProvider')]
+    public function testExtractInheritedTemplateTypes(string $class, string $property, Type $type)
+    {
+        if (!property_exists(TypeContext::class, 'inheritedTemplateTypes')) {
+            $this->markTestSkipped('symfony/type-info 8.2 or higher is required.');
+        }
+
+        $this->assertEquals($type, $this->extractor->getType($class, $property));
+    }
+
+    public static function inheritedTemplateTypesProvider(): iterable
+    {
+        yield [DummyEnvelope::class, 'data', Type::object(Dummy::class)];
+        yield [DummyEnvelope::class, 'value', Type::object(Dummy::class)];
+        yield [DummyEnvelope::class, 'payload', Type::object(Dummy::class)];
+        yield [ChildEnvelope::class, 'data', Type::template('U')];
+        yield [DummyGrandChildEnvelope::class, 'data', Type::list(Type::object(Dummy::class))];
+        yield [DummyItemUser::class, 'item', Type::object(Dummy::class)];
+    }
+
+    public function testExtractInheritedTemplateTypeFromConstructor()
+    {
+        if (!property_exists(TypeContext::class, 'inheritedTemplateTypes')) {
+            $this->markTestSkipped('symfony/type-info 8.2 or higher is required.');
+        }
+
+        $this->assertEquals(Type::object(Dummy::class), $this->extractor->getTypeFromConstructor(DummyEnvelope::class, 'payload'));
+        $this->assertEquals(Type::list(Type::object(Dummy::class)), $this->extractor->getTypeFromConstructor(DummyGrandChildEnvelope::class, 'payload'));
     }
 
     public function testExtractConstructorTypesOfSeveralClassesWithOneExtractor()

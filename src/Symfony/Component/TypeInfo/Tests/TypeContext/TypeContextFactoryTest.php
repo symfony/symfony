@@ -41,10 +41,35 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTypeAliasImportedFromInva
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUnresolvableTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUses;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUsesWindowsLineEndings;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\AbstractHolder;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\ChildEnvelope;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\DummyEnvelope;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\DummyGrandChildEnvelope;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\DummyHolder;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\DummyItemUser;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\DummyUntaggedHolder;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\Envelope;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\GrandChildEnvelope;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\HasItem;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\Holder;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\IntListHolder;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\IntListItemUser;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\IntSameNameEnvelope;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\ListEnvelope;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\ListItemUser;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\MissingTypePair;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\NestedPair;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\Pair;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\PhpStanPrefixedEnvelope;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\SameNameEnvelope;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\SwappedPair;
+use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\TooManyTypesEnvelope;
 use Symfony\Component\TypeInfo\Tests\Fixtures\ParentDummyWithTemplate;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
+
+require_once __DIR__.'/../Fixtures/InheritedTemplates.php';
 
 class TypeContextFactoryTest extends TestCase
 {
@@ -203,6 +228,55 @@ class TypeContextFactoryTest extends TestCase
 
         $this->assertEquals(['T' => Type::object(DummyInDifferentNs::class)], $typeContext->templates);
         $this->assertEquals(['ParentInt' => Type::int()], $typeContext->typeAliases);
+    }
+
+    /**
+     * @param array<string, Type> $expectedTypes
+     * @param class-string        $calledClassName
+     * @param class-string        $declaringClassName
+     */
+    #[DataProvider('collectInheritedTemplateTypesDataProvider')]
+    public function testCollectInheritedTemplateTypes(array $expectedTypes, string $calledClassName, string $declaringClassName)
+    {
+        $this->assertEquals($expectedTypes, $this->typeContextFactory->createFromClassName($calledClassName, $declaringClassName)->inheritedTemplateTypes);
+    }
+
+    /**
+     * @return iterable<array{0: array<string, Type>, 1: class-string, 2: class-string}>
+     */
+    public static function collectInheritedTemplateTypesDataProvider(): iterable
+    {
+        yield 'concrete type' => [['T' => Type::object(Dummy::class)], DummyEnvelope::class, Envelope::class];
+        yield 'renamed template' => [['T' => Type::template('U', Type::object(Dummy::class))], ChildEnvelope::class, Envelope::class];
+        yield 'two levels' => [['T' => Type::template('V', Type::object(Dummy::class))], GrandChildEnvelope::class, Envelope::class];
+        yield 'three levels' => [['T' => Type::object(Dummy::class)], DummyGrandChildEnvelope::class, Envelope::class];
+        yield 'intermediate class' => [['T' => Type::int(), 'U' => Type::object(Dummy::class)], DummyGrandChildEnvelope::class, ChildEnvelope::class];
+        yield 'nested template' => [['T' => Type::list(Type::template('V'))], ListEnvelope::class, Envelope::class];
+        yield 'nested generic' => [['K' => Type::int(), 'V' => Type::generic(Type::object(Pair::class), Type::template('T'), Type::string())], NestedPair::class, Pair::class];
+        yield 'swapped templates' => [['K' => Type::template('B'), 'V' => Type::template('A')], SwappedPair::class, Pair::class];
+        yield 'no tag' => [[], SameNameEnvelope::class, Envelope::class];
+        yield 'same name without tag' => [['T' => Type::int()], IntSameNameEnvelope::class, Envelope::class];
+        yield 'too many types' => [['T' => Type::int()], TooManyTypesEnvelope::class, Envelope::class];
+        yield 'missing type' => [['K' => Type::int()], MissingTypePair::class, Pair::class];
+        yield 'phpstan prefix' => [['T' => Type::string()], PhpStanPrefixedEnvelope::class, Envelope::class];
+        yield 'interface' => [['T' => Type::template('U')], AbstractHolder::class, Holder::class];
+        yield 'interface of parent' => [['T' => Type::object(Dummy::class)], DummyHolder::class, Holder::class];
+        yield 'interface without tag' => [['T' => Type::object(Dummy::class)], DummyUntaggedHolder::class, Holder::class];
+        yield 'parent interface' => [['T' => Type::list(Type::int())], IntListHolder::class, Holder::class];
+        yield 'trait' => [['T' => Type::object(Dummy::class)], DummyItemUser::class, HasItem::class];
+        yield 'nested template of trait' => [['T' => Type::list(Type::template('U'))], ListItemUser::class, HasItem::class];
+        yield 'trait of parent' => [['T' => Type::list(Type::int())], IntListItemUser::class, HasItem::class];
+        yield 'declaring class without template' => [[], Dummy::class, AbstractDummy::class];
+    }
+
+    public function testResolveInheritedTemplateTypes()
+    {
+        $stringTypeResolver = new StringTypeResolver();
+        $typeContextFactory = new TypeContextFactory($stringTypeResolver);
+
+        $this->assertEquals(Type::object(Dummy::class), $stringTypeResolver->resolve('T', $typeContextFactory->createFromClassName(DummyGrandChildEnvelope::class, Envelope::class)));
+        $this->assertEquals(Type::list(Type::int()), $stringTypeResolver->resolve('T', $typeContextFactory->createFromClassName(IntListItemUser::class, HasItem::class)));
+        $this->assertEquals(Type::template('T'), $stringTypeResolver->resolve('T', $typeContextFactory->createFromClassName(SameNameEnvelope::class, Envelope::class)));
     }
 
     public function testDoNotCollectTemplatesWhenToStringTypeResolver()

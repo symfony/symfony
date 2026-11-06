@@ -17,10 +17,13 @@ use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyInDifferentNs;
+use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyTraitWithUses;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyWithTemplateAndParentInDifferentNs;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnum;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyImportingUnresolvableTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyReimportingUnresolvableTypeAlias;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyUsingTraitWithUses;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithImportedOnlyTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAliasImport;
@@ -126,6 +129,19 @@ class TypeContextFactoryTest extends TestCase
         $this->assertEquals($uses, $this->typeContextFactory->createFromReflection(new \ReflectionProperty(DummyWithUsesWindowsLineEndings::class, 'createdAt'))->uses);
         $this->assertEquals($uses, $this->typeContextFactory->createFromReflection(new \ReflectionMethod(DummyWithUsesWindowsLineEndings::class, 'setCreatedAt'))->uses);
         $this->assertEquals($uses, $this->typeContextFactory->createFromReflection(new \ReflectionParameter([DummyWithUsesWindowsLineEndings::class, 'setCreatedAt'], 'createdAt'))->uses);
+    }
+
+    public function testClassUsesWinOverTraitUses()
+    {
+        $uses = [
+            'Dummy' => DummyInDifferentNs::class,
+            'DummyTraitWithUses' => DummyTraitWithUses::class,
+            'DummyBackedEnum' => DummyBackedEnum::class,
+        ];
+
+        $this->assertSame($uses, $this->typeContextFactory->createFromClassName(DummyUsingTraitWithUses::class)->uses);
+        $this->assertEquals($uses, $this->typeContextFactory->createFromReflection(new \ReflectionProperty(DummyUsingTraitWithUses::class, 'dummy'))->uses);
+        $this->assertEquals(['Dummy' => Dummy::class, 'DummyBackedEnum' => DummyBackedEnum::class], $this->typeContextFactory->createFromReflection(new \ReflectionProperty(DummyUsingTraitWithUses::class, 'dummyFromTrait'))->uses);
     }
 
     /**

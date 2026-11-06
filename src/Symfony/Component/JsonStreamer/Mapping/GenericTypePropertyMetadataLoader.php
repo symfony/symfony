@@ -75,19 +75,18 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
 
             while ($type instanceof WrappingTypeInterface) {
                 $baseType = $type;
-
-                if ($type instanceof GenericType) {
-                    foreach ($type->getVariableTypes() as $t) {
-                        if (null !== $classType = $findTypeWithClassName($className, $t)) {
-                            return $classType;
-                        }
-                    }
-                }
-
                 $type = $type->getWrappedType();
 
                 if ($type instanceof ObjectType && $type->getClassName() === $className) {
                     return $baseType;
+                }
+
+                if ($baseType instanceof GenericType) {
+                    foreach ($baseType->getVariableTypes() as $t) {
+                        if (null !== $classType = $findTypeWithClassName($className, $t)) {
+                            return $classType;
+                        }
+                    }
                 }
             }
 

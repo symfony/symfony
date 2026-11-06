@@ -22,7 +22,16 @@ class GlobTest extends TestCase
         $this->assertEquals('#^(?=[^\.])\#$#', Glob::toRegex('#'));
         $this->assertEquals('#^\.[^/]*$#', Glob::toRegex('.*'));
         $this->assertEquals('^\.[^/]*$', Glob::toRegex('.*', true, true, ''));
-        $this->assertEquals('/^\.[^/]*$/', Glob::toRegex('.*', true, true, '/'));
+        $this->assertEquals('/^\.[^\/]*$/', Glob::toRegex('.*', true, true, '/'));
+
+        foreach (['/', '#', '~'] as $delimiter) {
+            $this->assertSame(1, preg_match(Glob::toRegex('*.php', true, true, $delimiter), 'a.php'));
+            $this->assertSame(0, preg_match(Glob::toRegex('*.php', true, true, $delimiter), 'a/b.php'));
+            $this->assertSame(1, preg_match(Glob::toRegex('?.php', true, true, $delimiter), 'a.php'));
+            $this->assertSame(0, preg_match(Glob::toRegex('?.php', true, true, $delimiter), '/.php'));
+            $this->assertSame(1, preg_match(Glob::toRegex('**/*.php', true, true, $delimiter), 'a/b.php'));
+            $this->assertSame(1, preg_match(Glob::toRegex('a'.$delimiter.'[bc]', true, true, $delimiter), 'a'.$delimiter.'c'));
+        }
     }
 
     public function testGlobToRegexBracketExpressions()

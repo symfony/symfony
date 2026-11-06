@@ -35,6 +35,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithMixedNullablePr
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedArray;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedDictDummies;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedListDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
@@ -288,6 +289,25 @@ class JsonStreamWriterTest extends TestCase
         $dummy->dummies = [$nestedDummy];
 
         $this->assertWritten('{"extra":1,"dummies":[{"id":10,"name":"dummy name"}]}', $dummy, Type::object(DummyWithConcreteInheritedGenerics::class));
+    }
+
+    public function testWriteObjectWithNestedGenerics()
+    {
+        $generic = static function (object ...$dummies): DummyWithGenerics {
+            $dummy = new DummyWithGenerics();
+            $dummy->dummies = $dummies;
+
+            return $dummy;
+        };
+
+        $dummy = new DummyWithNestedGenerics();
+        $dummy->dummies = $generic(new ClassicDummy());
+        $dummy->dummiesList = [$generic(new ClassicDummy())];
+        $dummy->nullableDummies = $generic(new ClassicDummy());
+        $dummy->nestedDummies = $generic($generic(new ClassicDummy()));
+        $dummy->namedDummies = $generic(new DummyWithNameAttributes());
+
+        $this->assertWritten('{"dummies":{"dummies":[{"id":1,"name":"dummy"}]},"dummiesList":[{"dummies":[{"id":1,"name":"dummy"}]}],"nullableDummies":{"dummies":[{"id":1,"name":"dummy"}]},"nestedDummies":{"dummies":[{"dummies":[{"id":1,"name":"dummy"}]}]},"namedDummies":{"dummies":[{"@id":1,"name":"dummy"}]}}', $dummy, Type::object(DummyWithNestedGenerics::class));
     }
 
     public function testWriteObjectWithStreamedName()

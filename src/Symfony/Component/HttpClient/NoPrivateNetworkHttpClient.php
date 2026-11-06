@@ -61,10 +61,6 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, ShutdownI
             }
         }
 
-        foreach ((array) $allowList as $allowed) {
-            $ipFlags |= str_contains($allowed, ':') ? \FILTER_FLAG_IPV6 : \FILTER_FLAG_IPV4;
-        }
-
         if (!\defined('STREAM_PF_INET6')) {
             $ipFlags &= ~\FILTER_FLAG_IPV6;
         }

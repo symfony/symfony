@@ -45,6 +45,7 @@ class Glob
         $curlies = [];
         $bracketScanEnd = 0;
         $regex = '';
+        $notSlash = '/' === $delimiter ? '[^\/]' : '[^/]';
         if ($unanchored = str_starts_with($glob, '**/')) {
             $glob = '/'.$glob;
         }
@@ -82,10 +83,10 @@ class Glob
             } elseif ('*' === $car) {
                 if ($escaping || $strictWildcardSlash || !str_ends_with($regex, '.*')) {
                     // ".*.*" matches the same as ".*" but backtracks quadratically
-                    $regex .= $escaping ? '\\*' : ($strictWildcardSlash ? '[^/]*' : '.*');
+                    $regex .= $escaping ? '\\*' : ($strictWildcardSlash ? $notSlash.'*' : '.*');
                 }
             } elseif ('?' === $car) {
-                $regex .= $escaping ? '\\?' : ($strictWildcardSlash ? '[^/]' : '.');
+                $regex .= $escaping ? '\\?' : ($strictWildcardSlash ? $notSlash : '.');
             } elseif ('{' === $car) {
                 if (!$escaping) {
                     $curlies[] = [\strlen($regex)];

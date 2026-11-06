@@ -360,10 +360,10 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
     public function testReverseTransformWithNonExistingDate()
     {
-        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::SHORT);
 
-        $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('31.04.10 04:05'));
+        $this->expectException(TransformationFailedException::class);
+        $transformer->reverseTransform('31.04.10 04:05');
     }
 
     public function testReverseTransformOutOfTimestampRange()

@@ -142,21 +142,10 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
     public function getTypeFromConstructor(string $class, string $property): ?Type
     {
-        $types = [];
-
-        if ([$docBlock] = $this->getDocBlockFromConstructor($class, $property)) {
-            /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
-            foreach ($docBlock->getTagsByName('param') as $tag) {
-                if ($tag instanceof InvalidTag || !$tagType = $tag->getType()) {
-                    continue;
-                }
-
-                $types[] = $this->phpDocTypeHelper->getType($tagType);
+        if ([$docBlock, $declaringClass] = $this->getDocBlockFromConstructor($class, $property)) {
+            if (null !== $type = $this->getTypeFromDocBlock($docBlock, self::MUTATOR, $class, $declaringClass, null)) {
+                return $type;
             }
-        }
-
-        if (null !== $type = $types[0] ?? null) {
-            return $type;
         }
 
         // the doc block of a promoted property describes the constructor argument, the one of a plain property does not
@@ -441,7 +430,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         try {
             return match ($type->getClassName()) {
                 'self' => Type::object($typeContext->getDeclaringClass()),
-                'static' => Type::object($typeContext->getCalledClass()),
+                'static', '$this' => Type::object($typeContext->getCalledClass()),
                 'parent' => Type::object($typeContext->getParentClass()),
                 default => $type,
             };

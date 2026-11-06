@@ -15,14 +15,18 @@ use Symfony\Component\DependencyInjection\ServicesResetter as BaseServicesResett
 
 trigger_deprecation('symfony/http-kernel', '8.1', 'The "%s" class is deprecated, use "%s" from the DependencyInjection component instead.', ServicesResetter::class, BaseServicesResetter::class);
 
-/**
- * Resets provided services.
- *
- * @author Alexander M. Turek <me@derrabus.de>
- * @author Nicolas Grekas <p@tchwork.com>
- *
- * @deprecated since Symfony 8.1, use ServicesResetter from the DependencyInjection component instead
- */
-final class ServicesResetter extends BaseServicesResetter implements ServicesResetterInterface
-{
+class_exists(BaseServicesResetter::class);
+
+if (false) {
+    /**
+     * Resets provided services.
+     *
+     * @author Alexander M. Turek <me@derrabus.de>
+     * @author Nicolas Grekas <p@tchwork.com>
+     *
+     * @deprecated since Symfony 8.1, use ServicesResetter from the DependencyInjection component instead
+     */
+    final class ServicesResetter extends BaseServicesResetter implements ServicesResetterInterface
+    {
+    }
 }

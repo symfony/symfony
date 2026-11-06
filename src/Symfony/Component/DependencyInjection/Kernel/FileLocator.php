@@ -37,3 +37,7 @@ class FileLocator extends BaseFileLocator
         return parent::locate($file, $currentPath, $first);
     }
 }
+
+if (!class_exists('Symfony\Component\HttpKernel\Config\FileLocator', false)) {
+    class_alias(FileLocator::class, 'Symfony\Component\HttpKernel\Config\FileLocator');
+}

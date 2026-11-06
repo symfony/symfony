@@ -38,6 +38,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGmpNumber;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithIterable;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNonNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullablePropertiesAndDefaults;
@@ -268,6 +269,26 @@ class JsonStreamReaderTest extends TestCase
             $this->assertSame(10, $read->dummies[0]->id);
             $this->assertSame('dummy name', $read->dummies[0]->name);
         }, '{"extra":1,"dummies":[{"id":10,"name":"dummy name"}]}', Type::object(DummyWithConcreteInheritedGenerics::class));
+    }
+
+    public function testReadObjectWithNestedGenerics()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithNestedGenerics::class, $read);
+            $this->assertInstanceOf(ClassicDummy::class, $read->dummies->dummies[0]);
+            $this->assertSame(1, $read->dummies->dummies[0]->id);
+            $this->assertInstanceOf(ClassicDummy::class, $read->dummiesList[0]->dummies[0]);
+            $this->assertSame(2, $read->dummiesList[0]->dummies[0]->id);
+            $this->assertInstanceOf(ClassicDummy::class, $read->nullableDummies->dummies[0]);
+            $this->assertSame(3, $read->nullableDummies->dummies[0]->id);
+            $this->assertInstanceOf(DummyWithGenerics::class, $read->nestedDummies->dummies[0]);
+            $this->assertInstanceOf(ClassicDummy::class, $read->nestedDummies->dummies[0]->dummies[0]);
+            $this->assertSame(4, $read->nestedDummies->dummies[0]->dummies[0]->id);
+            $this->assertInstanceOf(DummyWithNameAttributes::class, $read->namedDummies->dummies[0]);
+            $this->assertSame(5, $read->namedDummies->dummies[0]->id);
+        }, '{"dummies":{"dummies":[{"id":1}]},"dummiesList":[{"dummies":[{"id":2}]}],"nullableDummies":{"dummies":[{"id":3}]},"nestedDummies":{"dummies":[{"dummies":[{"id":4}]}]},"namedDummies":{"dummies":[{"@id":5}]}}', Type::object(DummyWithNestedGenerics::class));
     }
 
     public function testReadObjectWithStreamedName()

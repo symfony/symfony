@@ -37,6 +37,7 @@ final class ArrayShapeType extends CollectionType
         array $shape,
         private readonly ?Type $extraKeyType = null,
         private readonly ?Type $extraValueType = null,
+        bool $isList = false,
     ) {
         $keyTypes = [];
         $valueTypes = [];
@@ -50,12 +51,12 @@ final class ArrayShapeType extends CollectionType
             $keyTypes = array_values(array_unique($keyTypes));
             $keyType = \count($keyTypes) > 1 ? self::union(...$keyTypes) : $keyTypes[0];
         } else {
-            $keyType = Type::arrayKey();
+            $keyType = $isList ? Type::int() : Type::arrayKey();
         }
 
         $valueType = $valueTypes ? CollectionType::mergeCollectionValueTypes($valueTypes) : Type::mixed();
 
-        parent::__construct(self::generic(self::builtin(TypeIdentifier::ARRAY), $keyType, $valueType));
+        parent::__construct(self::generic(self::builtin(TypeIdentifier::ARRAY), $keyType, $valueType), $isList);
 
         $sortedShape = $shape;
         ksort($sortedShape);
@@ -96,7 +97,7 @@ final class ArrayShapeType extends CollectionType
 
     public function accepts(mixed $value): bool
     {
-        if (!\is_array($value)) {
+        if (!\is_array($value) || ($this->isList() && !array_is_list($value))) {
             return false;
         }
 
@@ -123,7 +124,7 @@ final class ArrayShapeType extends CollectionType
 
     public function getMismatches(mixed $value): array
     {
-        if (!\is_array($value)) {
+        if (!\is_array($value) || ($this->isList() && !array_is_list($value))) {
             return [new TypeMismatch('', $this, get_debug_type($value))];
         }
 
@@ -171,7 +172,7 @@ final class ArrayShapeType extends CollectionType
             return $mapper($this);
         }
 
-        return $mapper(new self($shape, $extraKeyType, $extraValueType));
+        return $mapper(new self($shape, $extraKeyType, $extraValueType, $this->isList()));
     }
 
     public function __toString(): string
@@ -187,12 +188,14 @@ final class ArrayShapeType extends CollectionType
             $items[] = \sprintf('%s: %s', $itemKey, $value['type']);
         }
 
-        if (!$this->isSealed()) {
+        if (!$this->isSealed() && $this->isList()) {
+            $items[] = $this->extraValueType->isIdentifiedBy(TypeIdentifier::MIXED) ? '...' : \sprintf('...<%s>', $this->extraValueType);
+        } elseif (!$this->isSealed()) {
             $items[] = $this->extraKeyType->isIdentifiedBy(TypeIdentifier::INT) && $this->extraKeyType->isIdentifiedBy(TypeIdentifier::STRING) && $this->extraValueType->isIdentifiedBy(TypeIdentifier::MIXED)
                 ? '...'
                 : \sprintf('...<%s, %s>', $this->extraKeyType, $this->extraValueType);
         }
 
-        return \sprintf('array{%s}', implode(', ', $items));
+        return \sprintf('%s{%s}', $this->isList() ? 'list' : 'array', implode(', ', $items));
     }
 }

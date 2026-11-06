@@ -19,3 +19,7 @@ use Symfony\Contracts\Service\ShutdownInterface;
 interface ServicesResetterInterface extends ShutdownInterface
 {
 }
+
+if (!interface_exists('Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface', false)) {
+    class_alias(ServicesResetterInterface::class, 'Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface');
+}

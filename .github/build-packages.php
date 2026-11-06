@@ -48,6 +48,9 @@ foreach ($dirs as $k => $dir) {
     if (!str_contains($json, "\n    \"repositories\": [\n")) {
         $json = rtrim(json_encode(['repositories' => $package->repositories], $flags), "\n}").','.substr($json, 1);
         file_put_contents($dir.'/composer.json', $json);
+    } elseif (!str_contains($json, $package->repositories[0]['url'])) {
+        $json = str_replace("\n    \"repositories\": [\n", "\n    \"repositories\": [\n        ".json_encode($package->repositories[0], $flags & ~JSON_PRETTY_PRINT).",\n", $json);
+        file_put_contents($dir.'/composer.json', $json);
     }
 
     if (isset($preferredInstall[$package->name]) && 'source' === $preferredInstall[$package->name]) {

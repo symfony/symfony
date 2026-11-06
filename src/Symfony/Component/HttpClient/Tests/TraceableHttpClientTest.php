@@ -145,6 +145,19 @@ class TraceableHttpClientTest extends TestCase
         $this->assertSame(0, $response->destructCount);
     }
 
+    public function testResponseIsUsableAfterShutdownDestructors()
+    {
+        $sut = new TraceableHttpClient(new MockHttpClient(new MockResponse('OK')));
+        $response = $sut->request('GET', 'https://example.com/');
+
+        // At shutdown, PHP calls the destructors of the remaining objects in no particular order, so another destructor can still use the response afterwards
+        if (method_exists($response, '__destruct')) {
+            $response->__destruct();
+        }
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     public function testToArrayChecksStatusCodeBeforeDecoding()
     {
         $this->expectException(ClientExceptionInterface::class);
@@ -241,6 +254,29 @@ class TraceableHttpClientTest extends TestCase
         $this->assertArrayHasKey('GET http://localhost:8057', $events);
         $this->assertCount(1, $events['GET http://localhost:8057']->getPeriods());
         $this->assertGreaterThan(0.0, $events['GET http://localhost:8057']->getDuration());
+    }
+
+    public function testStopwatchIncludesTheDestructorOfTheWrappedResponse()
+    {
+        $event = (new Stopwatch(true))->start('GET https://example.com/');
+        $eventWasStarted = null;
+        $response = new class extends MockResponse {
+            public \Closure $onDestruct;
+
+            public function __destruct()
+            {
+                ($this->onDestruct)();
+            }
+        };
+        $response->onDestruct = static function () use ($event, &$eventWasStarted) {
+            $eventWasStarted = $event->isStarted();
+        };
+        $content = false;
+        $traceableResponse = new TraceableResponse(new MockHttpClient(), $response, $content, $event);
+        unset($response, $traceableResponse);
+
+        $this->assertTrue($eventWasStarted);
+        $this->assertFalse($event->isStarted());
     }
 
     public function testWithOptions()

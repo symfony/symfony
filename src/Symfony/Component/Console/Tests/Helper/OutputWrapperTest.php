@@ -67,10 +67,10 @@ class OutputWrapperTest extends TestCase
     {
         $wrapper = new OutputWrapper();
 
-        $this->assertSame("aaaa\n\\<b", $wrapper->wrap('aaaa\<b', 5));
-        $this->assertSame("aaaa\n\\>b", $wrapper->wrap('aaaa\>b', 5));
-        $this->assertSame("aaa\\<\nb", $wrapper->wrap('aaa\<b', 5));
-        $this->assertSame("aaaa\n\\</b\n\\>c", $wrapper->wrap('aaaa\</b\>c', 5));
+        $this->assertSame("aaaa\\<\nb", $wrapper->wrap('aaaa\<b', 5));
+        $this->assertSame("aaaa\\>\nb", $wrapper->wrap('aaaa\>b', 5));
+        $this->assertSame('aaa\<b', $wrapper->wrap('aaa\<b', 5));
+        $this->assertSame("aaaa\\<\n/b\\>c", $wrapper->wrap('aaaa\</b\>c', 5));
     }
 
     public function testWrapCountsEscapedTagsAsText()
@@ -83,6 +83,22 @@ class OutputWrapperTest extends TestCase
 
         $text = OutputFormatter::escape(str_repeat('array<int> ', 10000));
         $this->assertSame($text, str_replace("\n", ' ', $wrapper->wrap($text, 120)));
+
+        $text = '<info>foo</info> <a'.str_repeat(' \<b\>', 10000);
+        $this->assertSame($text, str_replace("\n", ' ', $wrapper->wrap($text, 120)));
+    }
+
+    public function testWrapCountsEscapedTagDelimitersAsOneColumn()
+    {
+        $wrapper = new OutputWrapper();
+
+        $this->assertSame("Expected array\\<int\\>\nhere", $wrapper->wrap('Expected array\<int\> here', 19));
+        $this->assertSame("\\<b\\>\\<b\\>\n\\<b\\>", $wrapper->wrap('\<b\>\<b\>\<b\>', 6));
+        $this->assertSame("a\\\\<b\nc", $wrapper->wrap('a\\\<b c', 4));
+        $this->assertSame("<info>a\\<b</info>\nc", $wrapper->wrap('<info>a\<b</info> c', 3));
+        $this->assertSame("日本\\<\nb", $wrapper->wrap('日本\<b', 5));
+        $this->assertSame("\u{FFFD}\\<\nb", $wrapper->wrap("\xB3\\<b", 2));
+        $this->assertSame('Expected array\<int\> here', $wrapper->wrap('Expected array\<int\> here', 5000));
     }
 
     public function testWrapDoesNotCountTagsInTheWidth()
@@ -93,7 +109,7 @@ class OutputWrapperTest extends TestCase
         $this->assertSame("aaaa <info>bbbb</info>\ncccc", $wrapper->wrap('aaaa <info>bbbb</info> cccc', 9));
         $this->assertSame("<href=https://symfony.com>aaaa</>\nbbbb", $wrapper->wrap('<href=https://symfony.com>aaaa</> bbbb', 4));
         $this->assertSame("aaaa\n</>\n<info>", $wrapper->wrap("aaaa\n</>\n<info>", 4));
-        $this->assertSame("<info>\n\\<\nb\n>\nc", $wrapper->wrap('<info>\<b>c', 1));
+        $this->assertSame("<info>\\<\nb\n>\nc", $wrapper->wrap('<info>\<b>c', 1));
         $this->assertSame("<href=https://example.com>abcdefghij\nklmnopqrst\nuvwxyz</> end", $wrapper->wrap('<href=https://example.com>abcdefghijklmnopqrstuvwxyz</> end', 10));
     }
 

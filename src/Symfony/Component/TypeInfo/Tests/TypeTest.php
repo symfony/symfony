@@ -123,6 +123,7 @@ class TypeTest extends TestCase
             Type::objectShape(['a' => $t, 'b' => ['type' => Type::string(), 'optional' => true]]),
             Type::objectShape(['a' => Type::int(), 'b' => ['type' => Type::string(), 'optional' => true]]),
         ];
+        yield [new ArrayShapeType([['type' => $t, 'optional' => false]], Type::int(), $t, true), new ArrayShapeType([['type' => Type::int(), 'optional' => false]], Type::int(), Type::int(), true)];
         yield [$shape = new ArrayShapeType(['a' => ['optional' => false, 'type' => Type::int()]]), $shape];
         yield [$shape = new ObjectShapeType(['a' => ['optional' => false, 'type' => Type::int()]]), $shape];
     }
@@ -240,6 +241,10 @@ class TypeTest extends TestCase
         $unsealedShape = Type::arrayShape(['foo' => Type::bool()], false, Type::string(), Type::int());
         yield 'unsealed array shape extra value' => [$unsealedShape, ['foo' => true, 'baz' => '1'], [new TypeMismatch('[baz]', Type::int(), 'string')]];
         yield 'unsealed array shape extra key' => [$unsealedShape, ['foo' => true, 1 => 1], [new TypeMismatch('[1]', Type::never(), 'int')]];
+
+        $listShape = new ArrayShapeType([['type' => Type::int(), 'optional' => false]], Type::int(), Type::string(), true);
+        yield 'list shape extra value' => [$listShape, [1, 2], [new TypeMismatch('[1]', Type::string(), 'int')]];
+        yield 'list shape not a list' => [$listShape, [1, 'key' => 'value'], [new TypeMismatch('', $listShape, 'array')]];
 
         $objectShape = Type::objectShape(['foo' => Type::bool(), 'bar' => ['type' => Type::objectShape(['baz' => Type::int()]), 'optional' => true]]);
         yield 'object shape' => [$objectShape, [], [new TypeMismatch('', $objectShape, 'array')]];

@@ -297,6 +297,9 @@ class IpUtils
     /**
      * Checks if an IPv4 or IPv6 address is contained in the list of private IP subnets.
      *
+     * An IPv4-mapped, 6to4, Teredo or NAT64 address is checked as the IPv4 address it embeds:
+     * connecting to it reaches that IPv4 address, and a client can present it only when that IPv4 address is its own.
+     *
      * @throws \ValueError When $requestIp is not a valid IP address
      */
     public static function isPrivateIp(string $requestIp): bool
@@ -305,7 +308,26 @@ class IpUtils
             throw new \ValueError(\sprintf('"%s" is not a valid IP address.', $requestIp));
         }
 
-        return self::checkIp($requestIp, self::PRIVATE_SUBNETS);
+        return self::checkIp(self::getEmbeddedIp4($requestIp) ?? $requestIp, self::PRIVATE_SUBNETS);
+    }
+
+    private static function getEmbeddedIp4(string $ip): ?string
+    {
+        if (!str_contains($ip, ':') || false === $packed = @inet_pton($ip)) {
+            return null;
+        }
+
+        return match (true) {
+            // IPv4-mapped (::ffff:0:0/96): the last 32 bits
+            "\0\0\0\0\0\0\0\0\0\0\xFF\xFF" === substr($packed, 0, 12) => inet_ntop(substr($packed, 12)),
+            // NAT64 with the well-known prefix (64:ff9b::/96): the last 32 bits
+            "\0\x64\xFF\x9B\0\0\0\0\0\0\0\0" === substr($packed, 0, 12) => inet_ntop(substr($packed, 12)),
+            // 6to4 (2002::/16): the 32 bits after the prefix
+            "\x20\x02" === substr($packed, 0, 2) => inet_ntop(substr($packed, 2, 4)),
+            // Teredo (2001::/32): the public address of the client, inverted in the last 32 bits
+            "\x20\x01\0\0" === substr($packed, 0, 4) => inet_ntop(~substr($packed, 12)),
+            default => null,
+        } ?: null;
     }
 
     private static function getCacheResult(string $cacheKey): ?bool

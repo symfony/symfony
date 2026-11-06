@@ -83,7 +83,6 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testRenderExceptionNoIgnoreErrors()
     {
-        $this->expectException(\RuntimeException::class);
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->never())->method('dispatch');
         $logger = $this->createMock(LoggerInterface::class);
@@ -91,7 +90,8 @@ class InlineFragmentRendererTest extends TestCase
 
         $strategy = new InlineFragmentRenderer($this->getKernel(new \RuntimeException('foo')), $dispatcher, $logger);
 
-        $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
+        $this->expectException(\RuntimeException::class);
+        $strategy->render('/', Request::create('/'));
     }
 
     public function testRenderExceptionIgnoreErrors()
@@ -326,7 +326,7 @@ class InlineFragmentRendererTest extends TestCase
         $context = new RequestContext();
         $matcher = $this->createStub(UrlMatcherInterface::class);
         $matcher->method('getContext')->willReturn($context);
-        $matcher->method('match')->willReturn(['_controller' => function () { return new Response('fragment'); }]);
+        $matcher->method('match')->willReturn(['_controller' => static fn () => new Response('fragment')]);
 
         $requestStack = new RequestStack();
         $dispatcher = new EventDispatcher();
@@ -335,7 +335,7 @@ class InlineFragmentRendererTest extends TestCase
         $renderer = new InlineFragmentRenderer($kernel);
 
         $request = Request::create('http://example.com/', 'GET', [], [], [], ['REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_HOST' => 'evil.example', 'HTTP_X_FORWARDED_PROTO' => 'https']);
-        $request->attributes->set('_controller', function () use ($renderer, $request, $context) {
+        $request->attributes->set('_controller', static function () use ($renderer, $request, $context) {
             $renderer->render('/fragment', $request);
 
             return new Response($context->getScheme().'://'.$context->getHost());
@@ -353,7 +353,7 @@ class InlineFragmentRendererTest extends TestCase
         $requestStack = new RequestStack();
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new RouterListener($matcher, $requestStack, $context));
-        $dispatcher->addListener(KernelEvents::REQUEST, function (RequestEvent $event) {
+        $dispatcher->addListener(KernelEvents::REQUEST, static function (RequestEvent $event) {
             if (!$event->isMainRequest()) {
                 $event->setResponse(new Response('fragment'));
             }
@@ -362,7 +362,7 @@ class InlineFragmentRendererTest extends TestCase
         $renderer = new InlineFragmentRenderer($kernel);
 
         $request = Request::create('http://example.com/', 'GET', [], [], [], ['REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_HOST' => 'evil.example', 'HTTP_X_FORWARDED_PROTO' => 'https']);
-        $request->attributes->set('_controller', function () use ($renderer, $request, $context) {
+        $request->attributes->set('_controller', static function () use ($renderer, $request, $context) {
             $renderer->render('/fragment', $request);
 
             return new Response($context->getScheme().'://'.$context->getHost());

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\DataModel\Read;
 
+use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 
@@ -24,16 +25,17 @@ use Symfony\Component\TypeInfo\Type\UnionType;
 final class ObjectNode implements DataModelNodeInterface
 {
     /**
+     * @param ObjectType|GenericType<ObjectType>                                                                    $type
      * @param array<string, array{name: string, value: DataModelNodeInterface, accessor: callable(string): string}> $properties
      */
     public function __construct(
-        private ObjectType $type,
+        private ObjectType|GenericType $type,
         private array $properties,
         private bool $mock = false,
     ) {
     }
 
-    public static function createMock(ObjectType|UnionType $type): self
+    public static function createMock(ObjectType|GenericType|UnionType $type): self
     {
         return new self($type, [], true);
     }
@@ -45,7 +47,7 @@ final class ObjectNode implements DataModelNodeInterface
 
     public function getType(): ObjectType
     {
-        return $this->type;
+        return $this->type instanceof GenericType ? $this->type->getWrappedType() : $this->type;
     }
 
     /**

@@ -129,3 +129,7 @@ class ServicesResetter implements ServicesResetterInterface
         return (self::$reflectors[$service::class] ??= new \ReflectionClass($service))->isUninitializedLazyObject($service);
     }
 }
+
+if (!class_exists('Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter', false)) {
+    class_alias(ServicesResetter::class, 'Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter');
+}

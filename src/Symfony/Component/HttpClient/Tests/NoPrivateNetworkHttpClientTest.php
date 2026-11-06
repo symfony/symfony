@@ -159,6 +159,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         // allow-list combined with a custom $subnets list
         yield 'private IPv4 allowed via allow-list against custom subnets' => ['10.0.0.1', '10.0.0.0/8',          '10.0.0.1',         false];
         yield 'public IPv4 keeps being allowed regardless of allow-list' => ['104.26.14.6', null,               '10.0.0.0/8',       false];
+        yield 'IPv6 still blocked by IPv4 subnets despite an IPv6 allow-list entry' => ['::1',      '10.0.0.0/8',          'fd00::1',          true];
     }
 
     #[DataProvider('getAllowListData')]
@@ -194,6 +195,31 @@ class NoPrivateNetworkHttpClientTest extends TestCase
             $this->assertEquals($content, $response->getContent());
             $this->assertEquals(200, $response->getStatusCode());
         }
+    }
+
+    public static function getAllowListAddressFamilyData(): iterable
+    {
+        yield ['fd00::1', '10.0.0.0/8', 'fd00::1', false];
+        yield ['::1', '10.0.0.0/8', 'fd00::1', true];
+        yield ['2606:4700:20::681a:e06', '10.0.0.0/8', 'fd00::1', true];
+        yield ['10.0.0.1', 'fc00::/7', '10.0.0.1', false];
+        yield ['127.0.0.1', 'fc00::/7', '10.0.0.1', true];
+    }
+
+    #[DataProvider('getAllowListAddressFamilyData')]
+    public function testAllowListDoesNotLetItsAddressFamilyThrough(string $ipAddr, string $subnets, string $allowList, bool $mustThrow)
+    {
+        $host = str_contains($ipAddr, ':') ? '['.$ipAddr.']' : $ipAddr;
+        $url = \sprintf('http://%s/', $host);
+
+        if ($mustThrow) {
+            $this->expectException(TransportException::class);
+            $this->expectExceptionMessage(\sprintf('Host "%s" is blocked for "%s".', $host, $url));
+        }
+
+        $client = new NoPrivateNetworkHttpClient(new MockHttpClient(), $subnets, $allowList);
+
+        $this->assertSame(200, $client->request('GET', $url)->getStatusCode());
     }
 
     #[Group('dns-sensitive')]

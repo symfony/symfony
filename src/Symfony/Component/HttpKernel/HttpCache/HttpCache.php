@@ -611,6 +611,12 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if ($this->waitForLock($request)) {
             throw new CacheWasLockedException(); // unwind back to handle(), try again
         }
+
+        // a no-cache entry must be validated anyway, call the backend
+        if ($entry->headers->hasCacheControlDirective('no-cache')) {
+            return false;
+        }
+
         // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
         $entry->setStatusCode(503);
         if (!$entry->headers->has('X-Body-File') && !$entry->headers->has('X-Body-Eval')) {

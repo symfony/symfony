@@ -1032,6 +1032,32 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertSame('Old response with fragment', $this->response->getContent());
     }
 
+    public function testRevalidatesResponsesWithNoCacheDirectiveWhenCacheLocked()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Skips on windows to avoid permissions issues.');
+        }
+
+        $this->cacheConfig['stale_while_revalidate'] = 0;
+
+        $this->setNextResponse(200, ['Cache-Control' => 'public, max-age=5, no-cache', 'ETag' => '"v1"'], 'Old response');
+        $this->request('GET', '/');
+
+        $this->store->lock(Request::create('/', 'GET'));
+
+        sleep(10);
+
+        $this->setNextResponse(304, ['Cache-Control' => 'public, max-age=5, no-cache', 'ETag' => '"v1"']);
+        $this->store = $this->createStore(); // create another store instance that does not hold the current lock
+        $this->request('GET', '/');
+
+        $this->assertHttpKernelIsCalled();
+        $this->assertTraceContains('valid');
+        $this->assertSame(200, $this->response->getStatusCode());
+        $this->assertFalse($this->response->headers->has('Retry-After'));
+        $this->assertSame('Old response', $this->response->getContent());
+    }
+
     public function testHitBackendOnlyOnceWhenCacheWasLocked()
     {
         // Disable stale-while-revalidate, it circumvents waiting for the lock

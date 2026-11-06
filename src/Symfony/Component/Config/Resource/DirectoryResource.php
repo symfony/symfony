@@ -66,15 +66,10 @@ class DirectoryResource implements SelfCheckingResourceInterface
             return false;
         }
 
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
+        // SELF_FIRST yields directories too, so deleted files are detected through their parent's mtime.
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
             // if regex filtering is enabled only check matching files
             if ($this->pattern && $file->isFile() && !preg_match($this->pattern, $file->getBasename())) {
-                continue;
-            }
-
-            // always monitor directories for changes, except the .. entries
-            // (otherwise deleted files wouldn't get detected)
-            if ($file->isDir() && str_ends_with($file, '/..')) {
                 continue;
             }
 

@@ -439,6 +439,15 @@ class PhpDocExtractorTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
+    public function testConstructorDefinedByTraitLegacy()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypesFromConstructor()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypeFromConstructor()" instead.');
+
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypesFromConstructor(DummyUsingTrait::class, 'dummyInConstructor'));
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     #[DataProvider('provideLegacyPropertiesStaticType')]
     public function testPropertiesStaticTypeLegacy(string $class, string $property, LegacyType $type)
     {

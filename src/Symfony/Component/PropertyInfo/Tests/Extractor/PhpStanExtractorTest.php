@@ -49,6 +49,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\PhpStanPseudoTypesDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RejectedCandidateDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\AnotherNamespace\DummyInAnotherNamespace;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyImportingDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingConcreteGenericTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingGenericTrait;
@@ -376,6 +377,33 @@ class PhpStanExtractorTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
+    public function testMethodsDefinedByTraitsLegacy()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInTraitPrimitiveType'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInTraitObjectSameNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInTraitObjectDifferentNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInExternalTraitPrimitiveType'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInExternalTraitObjectSameNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInExternalTraitObjectDifferentNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInTraitInAnotherNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'aliasedMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'overriddenMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'mutatorInTraitInAnotherNamespace'));
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testConstructorDefinedByTraitLegacy()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypesFromConstructor()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypeFromConstructor()" instead.');
+
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypesFromConstructor(DummyUsingTrait::class, 'dummyInConstructor'));
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     #[DataProvider('provideLegacyPropertiesStaticType')]
     public function testPropertiesStaticTypeLegacy(string $class, string $property, LegacyType $type)
     {
@@ -559,6 +587,17 @@ class PhpStanExtractorTest extends TestCase
 
         $this->assertEquals('A\Property', $phpStanTypes[0]->getClassName());
         $this->assertEquals($phpDocTypes[0]->getClassName(), $phpStanTypes[0]->getClassName());
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testClassImportsWinOverTraitAndParentImportsLegacy()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(DummyImportingDummy::class, 'dummy'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyImportingDummy::class, 'dummyFromTrait'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyImportingDummy::class, 'dummyFromParent'));
     }
 
     #[IgnoreDeprecations]
@@ -921,6 +960,7 @@ class PhpStanExtractorTest extends TestCase
         yield ['aliasedMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
         yield ['overriddenMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
         yield ['templateInTraitInAnotherNamespace', Type::list(Type::template('T'))];
+        yield ['mutatorInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
     }
 
     public function testConstructorDefinedByTrait()
@@ -1131,6 +1171,13 @@ class PhpStanExtractorTest extends TestCase
 
         $this->assertEquals('A\Property', $phpStanType->getClassName());
         $this->assertEquals($phpDocType->getClassName(), $phpStanType->getClassName());
+    }
+
+    public function testClassImportsWinOverTraitAndParentImports()
+    {
+        $this->assertEquals(Type::object(Dummy::class), $this->extractor->getType(DummyImportingDummy::class, 'dummy'));
+        $this->assertEquals(Type::object(DummyInAnotherNamespace::class), $this->extractor->getType(DummyImportingDummy::class, 'dummyFromTrait'));
+        $this->assertEquals(Type::object(DummyUsedInTrait::class), $this->extractor->getType(DummyImportingDummy::class, 'dummyFromParent'));
     }
 
     #[DataProvider('intRangeTypeProvider')]

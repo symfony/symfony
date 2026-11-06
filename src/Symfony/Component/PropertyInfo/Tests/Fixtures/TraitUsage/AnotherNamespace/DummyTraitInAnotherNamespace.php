@@ -42,4 +42,11 @@ trait DummyTraitInAnotherNamespace
     public function setTemplateInTraitInAnotherNamespace($value)
     {
     }
+
+    /**
+     * @param DummyInAnotherNamespace $value
+     */
+    public function setMutatorInTraitInAnotherNamespace($value)
+    {
+    }
 }

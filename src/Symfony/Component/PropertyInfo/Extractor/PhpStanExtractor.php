@@ -164,12 +164,12 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
         trigger_deprecation('symfony/property-info', '7.3', 'The "%s()" method is deprecated, use "%s::getTypeFromConstructor()" instead.', __METHOD__, self::class);
 
         $declaringClass = $class;
-        if (null === $tagDocNode = $this->getDocBlockFromConstructor($declaringClass, $property)) {
+        if (null === $tagDocNode = $this->getDocBlockFromConstructor($declaringClass, $property, $declaringTrait)) {
             return $this->getTypes($class, $property);
         }
 
         $types = [];
-        foreach ($this->phpStanTypeHelper->getTypes($tagDocNode, $this->typeContextFactory->createFromClassName($class, $declaringClass)) as $type) {
+        foreach ($this->phpStanTypeHelper->getTypes($tagDocNode, $this->createTypeContext($class, $declaringTrait ?? $declaringClass, $declaringClass)) as $type) {
             $types[] = $type;
         }
 

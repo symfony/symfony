@@ -26,7 +26,7 @@
         "php": ">=8.2",
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/string": "^6.4|^7.0|^8.0",
-        "symfony/type-info": "^7.4.7|^8.0.7"
+        "symfony/type-info": "^7.4.24|^8.1.12"
     },
     "require-dev": {
         "symfony/serializer": "^6.4|^7.0|^8.0",

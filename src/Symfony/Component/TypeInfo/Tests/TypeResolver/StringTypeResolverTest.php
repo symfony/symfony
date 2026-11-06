@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\TypeInfo\Tests\TypeResolver;
 
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
@@ -28,6 +29,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplateTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTypeAliases;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
@@ -108,6 +110,13 @@ class StringTypeResolverTest extends TestCase
         yield [Type::arrayShape([0 => Type::int()]), "array{'0': int}"];
         yield [Type::arrayShape([Type::int(), Type::string()]), 'array{int, string}'];
         yield [Type::arrayShape(["it's" => Type::int()]), "array{'it\\'s': int}"];
+        yield [new ArrayShapeType([['type' => Type::int(), 'optional' => false], ['type' => Type::string(), 'optional' => false]], null, null, true), 'list{int, string}'];
+        yield [new ArrayShapeType([['type' => Type::int(), 'optional' => false]], Type::int(), Type::string(), true), 'list{int, ...<string>}'];
+        yield [new ArrayShapeType([], Type::int(), Type::mixed(), true), 'list{...}'];
+
+        if (\defined(ArrayShapeNode::class.'::KIND_NON_EMPTY_LIST')) {
+            yield [new ArrayShapeType([['type' => Type::int(), 'optional' => false]], null, null, true), 'non-empty-list{int}'];
+        }
 
         // object shape
         yield [Type::object(), 'object{foo: true, bar: false}'];
@@ -232,6 +241,7 @@ class StringTypeResolverTest extends TestCase
         yield [Type::arrayShape(['limit' => ['type' => Type::int(), 'optional' => true], 'offset' => ['type' => Type::int(), 'optional' => true], 'name' => ['type' => Type::string(), 'optional' => true]]), 'array{limit?: int, offset?: int}&array{name?: string}'];
         yield [Type::arrayShape(['foo' => Type::int(), 'bar' => Type::string()]), 'array{foo?: int}&array{foo: int, bar: string}'];
         yield [Type::arrayShape(['foo' => Type::int(), 'bar' => Type::string()], false), 'array{foo: int, ...}&array{bar: string, ...}'];
+        yield [new ArrayShapeType([['type' => Type::int(), 'optional' => false]], null, null, true), 'list{0?: int}&array{0: int}'];
 
         // DNF
         yield [Type::union(Type::int(), Type::intersection(Type::object(\DateTime::class), Type::object(\Stringable::class))), \sprintf('int|(%s&%s)', \DateTime::class, \Stringable::class)];
@@ -525,6 +535,12 @@ class StringTypeResolverTest extends TestCase
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve('list<int, string>');
+    }
+
+    public function testCannotResolveListShapeWithStringKey()
+    {
+        $this->expectException(UnsupportedException::class);
+        $this->resolver->resolve('list{foo: int}');
     }
 
     public function testCannotResolveInvalidNonEmptyListWithKeyType()

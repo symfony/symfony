@@ -400,7 +400,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            if ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false) {
+            $types = $this->getTypes($resolvedClass, $attribute);
+
+            // the current value is used only to denormalize typed attributes
+            if (null !== $types && ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false)) {
                 $discriminatorMapping = $this->classDiscriminatorResolver?->getMappingForMappedObject($object);
 
                 try {
@@ -414,8 +417,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     }
                 }
             }
-
-            $types = $this->getTypes($resolvedClass, $attribute);
 
             if (null !== $types) {
                 try {

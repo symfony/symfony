@@ -134,6 +134,14 @@ class ObjectNormalizer extends AbstractObjectNormalizer
      */
     protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = [])
     {
+        if ($writeInfo = $this->getWriteInfoInsteadOfGetterSetter($object, $attribute, $value, $context)) {
+            if (PropertyWriteInfo::TYPE_PROPERTY === $writeInfo->getType()) {
+                $object->{$writeInfo->getName()} = $value;
+            }
+
+            return;
+        }
+
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);
         } catch (NoSuchPropertyException) {
@@ -229,5 +237,32 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     private function isPropertyPath(string $attribute): bool
     {
         return str_contains($attribute, '.') || str_contains($attribute, '[');
+    }
+
+    /**
+     * Returns how to write the attribute when PropertyAccessor would call a method named after it, like name($value), that isAllowedAttribute() doesn't account for.
+     */
+    private function getWriteInfoInsteadOfGetterSetter(object $object, string $attribute, mixed $value, array $context): ?PropertyWriteInfo
+    {
+        $method = str_replace(['_', ' '], '', $attribute);
+
+        if (!method_exists($object, $method) || !(new \ReflectionMethod($object, $method))->getNumberOfParameters()) {
+            return null;
+        }
+
+        $context = ['enable_constructor_extraction' => false, 'enable_adder_remover_extraction' => is_iterable($value)] + array_intersect_key($context, ['enable_getter_setter_extraction' => true, 'enable_magic_methods_extraction' => true]);
+        $writeInfo = $this->writeInfoExtractor->getWriteInfo($object::class, $attribute, ['enable_getter_setter_extraction' => true] + $context);
+
+        if (PropertyWriteInfo::TYPE_METHOD !== $writeInfo->getType()) {
+            return null;
+        }
+
+        $writeInfoWithoutGetterSetter = $this->writeInfoExtractor->getWriteInfo($object::class, $attribute, $context);
+
+        if (PropertyWriteInfo::TYPE_METHOD === $writeInfoWithoutGetterSetter->getType() && $writeInfo->getName() === $writeInfoWithoutGetterSetter->getName()) {
+            return null;
+        }
+
+        return $writeInfoWithoutGetterSetter;
     }
 }

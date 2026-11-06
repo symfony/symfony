@@ -242,16 +242,25 @@ final class GenericTypePropertyMetadataLoader implements PropertyMetadataLoaderI
         }
 
         if ($type instanceof UnionType) {
-            $types = array_map(fn (Type $t): Type => $this->replaceVariableTypes($t, $variableTypes), $type->getTypes());
+            $types = [];
 
-            foreach ($types as $t) {
+            foreach ($type->getTypes() as $t) {
+                $t = $this->replaceVariableTypes($t, $variableTypes);
+
                 // a union with "mixed" is "mixed", and creating such a union is not allowed
                 if ($t instanceof BuiltinType && TypeIdentifier::MIXED === $t->getTypeIdentifier()) {
                     return $t;
                 }
+
+                // "T|int" is "int" when T is "int", and "?int" when T is "?int"
+                foreach ($t instanceof UnionType ? $t->getTypes() : [$t] as $member) {
+                    if (!\in_array($member, $types)) {
+                        $types[] = $member;
+                    }
+                }
             }
 
-            return Type::union(...$types);
+            return 1 === \count($types) ? $types[0] : Type::union(...$types);
         }
 
         if ($type instanceof IntersectionType) {

@@ -79,6 +79,28 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
         ], $metadata);
     }
 
+    public function testReplaceGenericsWithTheSameTypeInUnion()
+    {
+        $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
+            'union' => new PropertyMetadata('union', Type::union(Type::template('T'), Type::int())),
+            'nullableUnion' => new PropertyMetadata('nullableUnion', Type::union(Type::template('T'), Type::int(), Type::null())),
+        ]), new TypeContextFactory(new StringTypeResolver()));
+
+        $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::int())]);
+
+        $this->assertEquals([
+            'union' => new PropertyMetadata('union', Type::int()),
+            'nullableUnion' => new PropertyMetadata('nullableUnion', Type::nullable(Type::int())),
+        ], $metadata);
+
+        $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::nullable(Type::int()))]);
+
+        $this->assertEquals([
+            'union' => new PropertyMetadata('union', Type::nullable(Type::int())),
+            'nullableUnion' => new PropertyMetadata('nullableUnion', Type::nullable(Type::int())),
+        ], $metadata);
+    }
+
     public function testReplaceGenericsOfParentClasses()
     {
         $loader = new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new TypeContextFactory(new StringTypeResolver()));

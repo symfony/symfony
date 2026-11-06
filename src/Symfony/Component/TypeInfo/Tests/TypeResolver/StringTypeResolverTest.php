@@ -222,9 +222,13 @@ class StringTypeResolverTest extends TestCase
         yield [Type::union(Type::bool(), Type::float(), Type::int(), Type::string()), 'scalar|false'];
         yield [Type::object(), \sprintf('object|%s', \DateTime::class)];
         yield [Type::nullable(Type::object()), \sprintf('%s|object|null', \DateTime::class)];
+        yield [Type::int(), 'int|int'];
+        yield [Type::string(), "'asc'|'desc'"];
+        yield [Type::nullable(Type::int()), 'positive-int|0|null'];
 
         // intersection
         yield [Type::intersection(Type::object(\DateTime::class), Type::object(\Stringable::class)), \DateTime::class.'&'.\Stringable::class];
+        yield [Type::object(\DateTime::class), \DateTime::class.'&'.\DateTime::class];
         yield [Type::arrayShape(['limit' => ['type' => Type::int(), 'optional' => true], 'offset' => ['type' => Type::int(), 'optional' => true], 'name' => ['type' => Type::string(), 'optional' => true]]), 'array{limit?: int, offset?: int}&array{name?: string}'];
         yield [Type::arrayShape(['foo' => Type::int(), 'bar' => Type::string()]), 'array{foo?: int}&array{foo: int, bar: string}'];
         yield [Type::arrayShape(['foo' => Type::int(), 'bar' => Type::string()], false), 'array{foo: int, ...}&array{bar: string, ...}'];

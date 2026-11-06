@@ -64,6 +64,16 @@ final class ReflectionExtractableDummy extends AbstractDummy
         return null;
     }
 
+    public function getSelfOrStatic(): self|static
+    {
+        return $this;
+    }
+
+    public function getNullableSelfOrStatic(): self|static|null
+    {
+        return null;
+    }
+
     public function getNothing()
     {
         return $this->nothing;

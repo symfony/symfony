@@ -39,6 +39,9 @@ class NumericNode extends ScalarNode
         }
 
         $errorMsg = null;
+        if ((isset($this->min) || isset($this->max)) && \is_float($value) && is_nan($value)) {
+            $errorMsg = \sprintf('The value NAN is not allowed for path "%s". Should be a number', $this->getPath());
+        }
         if (isset($this->min) && $value < $this->min) {
             $errorMsg = \sprintf('The value %s is too small for path "%s". Should be greater than or equal to %s', $value, $this->getPath(), $this->min);
         }

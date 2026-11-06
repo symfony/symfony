@@ -189,7 +189,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         try {
-            $docBlock = $this->docBlockFactory->create($reflectionConstructor, $this->contextFactory->createFromReflector($reflectionConstructor));
+            $docBlock = $this->docBlockFactory->create($reflectionConstructor, $this->createFromReflector($this->getDeclaringTrait($reflectionConstructor) ?? $reflectionConstructor->getDeclaringClass()));
 
             return [$this->filterDocBlockParams($docBlock, $property), $reflectionConstructor->class];
         } catch (\InvalidArgumentException) {
@@ -354,6 +354,24 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $this->contexts[$cacheKey] = $this->contextFactory->createFromReflector($reflector);
 
         return $this->contexts[$cacheKey];
+    }
+
+    /**
+     * Finds the trait where a method is written, since reflection gives the class using the trait as its declaring class.
+     */
+    private function getDeclaringTrait(\ReflectionMethod $method, ?\ReflectionClass $class = null): ?\ReflectionClass
+    {
+        foreach (($class ?? $method->getDeclaringClass())->getTraits() as $trait) {
+            if ($declaringTrait = $this->getDeclaringTrait($method, $trait)) {
+                return $declaringTrait;
+            }
+
+            if ($trait->getFileName() === $method->getFileName() && $trait->getStartLine() <= $method->getStartLine() && $method->getEndLine() <= $trait->getEndLine()) {
+                return $trait;
+            }
+        }
+
+        return null;
     }
 
     private function resolveClassKeywords(Type $type, string $class, ?string $declaringClass): Type

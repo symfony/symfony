@@ -30,6 +30,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RejectedCandidateDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\AnotherNamespace\DummyInAnotherNamespace;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyImportingDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VoidNeverReturnTypeDummy;
@@ -332,6 +333,25 @@ class PhpStanExtractorTest extends TestCase
         ];
     }
 
+    public function testMethodsDefinedByTraits()
+    {
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_STRING)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInTraitPrimitiveType'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInTraitObjectSameNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInTraitObjectDifferentNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_STRING)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInExternalTraitPrimitiveType'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInExternalTraitObjectSameNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInExternalTraitObjectDifferentNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInTraitInAnotherNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'aliasedMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'overriddenMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'mutatorInTraitInAnotherNamespace'));
+    }
+
+    public function testConstructorDefinedByTrait()
+    {
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypesFromConstructor(DummyUsingTrait::class, 'dummyInConstructor'));
+    }
+
     /**
      * @dataProvider propertiesStaticTypeProvider
      */
@@ -490,6 +510,13 @@ class PhpStanExtractorTest extends TestCase
 
         $this->assertEquals('A\Property', $phpStanTypes[0]->getClassName());
         $this->assertEquals($phpDocTypes[0]->getClassName(), $phpStanTypes[0]->getClassName());
+    }
+
+    public function testClassImportsWinOverTraitAndParentImports()
+    {
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(DummyImportingDummy::class, 'dummy'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyImportingDummy::class, 'dummyFromTrait'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyImportingDummy::class, 'dummyFromParent'));
     }
 
     /**

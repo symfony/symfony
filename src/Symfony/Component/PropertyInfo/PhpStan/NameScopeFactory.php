@@ -26,7 +26,7 @@ final class NameScopeFactory
 
         $declaringReflection = new \ReflectionClass($declaringClassName);
         [$declaringNamespace, $declaringUses] = $this->extractFromFullClassName($declaringReflection);
-        $declaringUses = array_merge($declaringUses, $this->collectUses($declaringReflection));
+        $declaringUses += $this->collectUses($declaringReflection);
 
         return new NameScope($calledClassName, $declaringNamespace, $declaringUses, $selfClassName ?? $declaringClassName);
     }

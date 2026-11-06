@@ -262,10 +262,13 @@ final class TypeContextFactory
         $templateTags = [
             '@template',
             '@template-covariant',
+            '@template-contravariant',
             '@psalm-template',
             '@psalm-template-covariant',
+            '@psalm-template-contravariant',
             '@phpstan-template',
             '@phpstan-template-covariant',
+            '@phpstan-template-contravariant',
         ];
 
         $templates = [];

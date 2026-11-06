@@ -173,6 +173,12 @@ class TypeTest extends TestCase
         $this->assertEquals(Type::int(), Type::union($t, Type::int())->map(self::replaceTemplate(Type::int())));
         $this->assertEquals(Type::nullable(Type::int()), Type::union($t, Type::int())->map(self::replaceTemplate(Type::nullable(Type::int()))));
         $this->assertEquals(Type::mixed(), Type::union($t, Type::int())->map(self::replaceTemplate(Type::mixed())));
+        $this->assertEquals(Type::int(), Type::union($t, Type::int())->map(self::replaceTemplate(Type::never())));
+        $this->assertEquals(Type::null(), Type::nullable($t)->map(self::replaceTemplate(Type::never())));
+        $this->assertEquals(Type::bool(), Type::union($t, Type::false())->map(self::replaceTemplate(Type::true())));
+        $this->assertEquals(Type::union(Type::bool(), Type::int()), Type::union($t, Type::bool(), Type::int())->map(self::replaceTemplate(Type::false())));
+        $this->assertEquals(Type::object(), Type::union($t, Type::object(\Iterator::class))->map(self::replaceTemplate(Type::object())));
+        $this->assertEquals(Type::nullable(Type::object()), Type::union($t, Type::object())->map(self::replaceTemplate(Type::nullable(Type::object(\Iterator::class)))));
 
         $this->assertEquals(
             Type::object(\Iterator::class),

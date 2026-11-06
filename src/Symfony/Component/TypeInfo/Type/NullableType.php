@@ -75,6 +75,10 @@ final class NullableType extends UnionType implements WrappingTypeInterface
     {
         $type = $this->type->map($mapper);
 
-        return $mapper($type === $this->type ? $this : Type::nullable($type));
+        return $mapper(match (true) {
+            $type === $this->type => $this,
+            $type instanceof BuiltinType && TypeIdentifier::NEVER === $type->getTypeIdentifier() => Type::null(),
+            default => Type::nullable($type),
+        });
     }
 }

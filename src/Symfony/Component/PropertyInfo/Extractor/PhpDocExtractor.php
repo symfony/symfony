@@ -204,21 +204,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
     public function getTypeFromConstructor(string $class, string $property): ?Type
     {
-        if (![$docBlock] = $this->getDocBlockFromConstructor($class, $property)) {
+        if (![$docBlock, $declaringClass] = $this->getDocBlockFromConstructor($class, $property)) {
             return null;
         }
 
-        $types = [];
-        /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
-        foreach ($docBlock->getTagsByName('param') as $tag) {
-            if ($tag instanceof InvalidTag || !$tagType = $tag->getType()) {
-                continue;
-            }
-
-            $types[] = $this->phpDocTypeHelper->getType($tagType);
-        }
-
-        return $types[0] ?? null;
+        return $this->getTypeFromDocBlock($docBlock, self::MUTATOR, $class, $declaringClass, null);
     }
 
     public function getDocBlock(string $class, string $property): ?DocBlock
@@ -494,7 +484,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         try {
             return match ($type->getClassName()) {
                 'self' => Type::object($typeContext->getDeclaringClass()),
-                'static' => Type::object($typeContext->getCalledClass()),
+                'static', '$this' => Type::object($typeContext->getCalledClass()),
                 'parent' => Type::object($typeContext->getParentClass()),
                 default => $type,
             };

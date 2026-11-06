@@ -97,6 +97,26 @@ final class TypeContextFactory
             return null;
         }
 
+        // a trait member is read in the scope of the trait, but "self" and "parent" refer to the class using the trait
+        if ($traitReflection = $this->getDeclaringTrait($reflection, $declaringClassReflection)) {
+            $typeContext = $this->createFromClassName($declaringClassReflection->getName(), $traitReflection->getName());
+
+            $templates = match (true) {
+                $reflection instanceof \ReflectionFunctionAbstract => $this->collectTemplates($reflection, $typeContext),
+                $reflection instanceof \ReflectionParameter => $this->collectTemplates($reflection->getDeclaringFunction(), $typeContext),
+                default => [],
+            };
+
+            return new TypeContext(
+                $typeContext->calledClassName,
+                $declaringClassReflection->getName(),
+                $typeContext->namespace,
+                $typeContext->uses,
+                $templates + $typeContext->templates,
+                $typeContext->typeAliases,
+            );
+        }
+
         $typeContext = $this->createIntermediateTypeContext($declaringClassReflection->getName(), $declaringClassReflection);
 
         $templates = match (true) {
@@ -159,6 +179,37 @@ final class TypeContextFactory
             trim($declaringClassReflection->getNamespaceName(), '\\'),
             $this->collectUses($declaringClassReflection),
         );
+    }
+
+    /**
+     * Finds the trait where a property, a method or a parameter is written, since reflection gives the class using the trait as their declaring class.
+     */
+    private function getDeclaringTrait(\Reflector $reflection, \ReflectionClass $classReflection): ?\ReflectionClass
+    {
+        if ($reflection instanceof \ReflectionParameter) {
+            $reflection = $reflection->getDeclaringFunction();
+        }
+
+        if (!$reflection instanceof \ReflectionProperty && !$reflection instanceof \ReflectionFunctionAbstract) {
+            return null;
+        }
+
+        foreach ($classReflection->getTraits() as $traitReflection) {
+            if ($declaringTraitReflection = $this->getDeclaringTrait($reflection, $traitReflection)) {
+                return $declaringTraitReflection;
+            }
+
+            if ($reflection instanceof \ReflectionProperty) {
+                // a class can declare a property of its traits again, with another doc comment
+                if ($traitReflection->hasProperty($reflection->name) && $traitReflection->getProperty($reflection->name)->getDocComment() === $reflection->getDocComment()) {
+                    return $traitReflection;
+                }
+            } elseif ($traitReflection->getFileName() === $reflection->getFileName() && $traitReflection->getStartLine() <= $reflection->getStartLine() && $reflection->getEndLine() <= $traitReflection->getEndLine()) {
+                return $traitReflection;
+            }
+        }
+
+        return null;
     }
 
     /**

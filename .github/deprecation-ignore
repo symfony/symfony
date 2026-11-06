@@ -17,3 +17,7 @@
 # PHP 8.6 deprecates "is" as a class name. guzzlehttp/promises declares an "Is"
 # class that HttplugClient reaches through the Guzzle promise API.
 %^Using "is" as a class name is deprecated%
+
+# The routing loader service uses the deprecated FrameworkBundle loader class
+# for BC (see #67909); instantiating it triggers the class deprecation by design.
+%The "Symfony\\Bundle\\FrameworkBundle\\Routing\\AttributeRouteControllerLoader" class is deprecated%

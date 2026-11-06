@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Bundle\FrameworkBundle\Routing\AttributeRouteControllerLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Routing\Loader\AttributeRouteControllerLoader as BaseAttributeRouteControllerLoader;
@@ -40,6 +39,8 @@ class AttributeRouteControllerLoaderPass implements CompilerPassInterface
             return;
         }
 
-        $definition->setClass(AttributeRouteControllerLoader::class);
+        // The class is referenced by its FQCN string because it is deprecated:
+        // using ::class on it is flagged by PHPStan's deprecation rules.
+        $definition->setClass('Symfony\\Bundle\\FrameworkBundle\\Routing\\AttributeRouteControllerLoader');
     }
 }

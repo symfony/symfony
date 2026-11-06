@@ -264,10 +264,6 @@ EOF;
             'vars' => [],
         ];
         $state->getVars = static function ($m) use ($state) {
-            if ('_route' === $m[1]) {
-                return '?:';
-            }
-
             $state->vars[] = $m[1];
 
             return '';

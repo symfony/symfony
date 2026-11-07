@@ -97,6 +97,15 @@ class GlobResourceTest extends TestCase
         $this->assertArrayNotHasKey($file, $paths);
     }
 
+    public function testToStringDependsOnExcludedPrefixes()
+    {
+        $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
+        $resource = new GlobResource($dir, '/*Exclude*', true, false, [$dir.'/Exclude' => true]);
+        $otherResource = new GlobResource($dir, '/*Exclude*', true, false, [$dir.'/Resource' => true]);
+
+        $this->assertNotSame((string) $resource, (string) $otherResource);
+    }
+
     public function testIsFreshNonRecursiveDetectsNewFile()
     {
         $dir = \dirname(__DIR__).'/Fixtures';

@@ -24,7 +24,7 @@
     },
     "require-dev": {
         "symfony/yaml": "^5.4|^6.0|^7.0",
-        "symfony/config": "^6.1|^7.0",
+        "symfony/config": "^6.4.51|^7.4.24",
         "symfony/expression-language": "^5.4|^6.0|^7.0"
     },
     "conflict": {

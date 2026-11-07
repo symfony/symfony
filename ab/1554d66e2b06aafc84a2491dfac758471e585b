@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-11-07T13:53:21Z
+
+Agreed, I switched to a depth limit of 512 that throws in f52b64d, and added tests for your build() case, a key that yields itself and the shared iterator.

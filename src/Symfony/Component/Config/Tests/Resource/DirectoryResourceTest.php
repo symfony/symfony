@@ -95,6 +95,7 @@ class DirectoryResourceTest extends TestCase
     public function testIsFreshUpdateFileInSameSecond()
     {
         $resource = new DirectoryResource($this->directory);
+        file_put_contents($this->directory.'/tmp.xml', 'changed');
         touch($this->directory.'/tmp.xml', $time = time() + 20);
         $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if an existing file is modified in the same second');
         $this->assertTrue($resource->isFresh($time + 1), '->isFresh() returns true if no file is modified since the previous second');
@@ -103,11 +104,44 @@ class DirectoryResourceTest extends TestCase
     public function testIsFreshModifyDirectoryInSameSecond()
     {
         $resource = new DirectoryResource($this->directory);
+        touch($this->directory.'/new.xml');
         touch($this->directory, $time = time() + 20);
         // touch() clears the stat cache only as of PHP 8.4.5
         clearstatcache();
         $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if the directory is modified in the same second');
         $this->assertTrue($resource->isFresh($time + 1), '->isFresh() returns true if the directory is not modified since the previous second');
+    }
+
+    public function testIsFreshComparesContentWhenModifiedInSameSecondAsLoaded()
+    {
+        file_put_contents($this->directory.'/tmp.xml', 'v1');
+        touch($this->directory.'/tmp.xml', $time = time() + 20);
+        clearstatcache();
+        $resource = unserialize(serialize(new DirectoryResource($this->directory)));
+
+        $this->assertTrue($resource->isFresh($time), '->isFresh() returns true if no file has changed since the resource was loaded');
+
+        file_put_contents($this->directory.'/tmp.xml', 'v2');
+        touch($this->directory.'/tmp.xml', $time);
+        clearstatcache();
+
+        $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if a file has changed in the same second');
+    }
+
+    public function testIsFreshComparesEntriesWhenModifiedInSameSecondAsLoaded()
+    {
+        touch($this->directory.'/new.xml');
+        touch($this->directory, $time = time() + 20);
+        clearstatcache();
+        $resource = unserialize(serialize(new DirectoryResource($this->directory)));
+
+        $this->assertTrue($resource->isFresh($time), '->isFresh() returns true if no entry has been added or removed since the resource was loaded');
+
+        unlink($this->directory.'/new.xml');
+        touch($this->directory, $time);
+        clearstatcache();
+
+        $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if an entry has been removed in the same second');
     }
 
     public function testIsFreshNewFile()
@@ -198,6 +232,37 @@ class DirectoryResourceTest extends TestCase
 
         $this->assertSame(realpath($this->directory), $resource->getResource());
         $this->assertSame('/\.(foo|xml)$/', $resource->getPattern());
+    }
+
+    public function testSerializedFormDoesNotDependOnModificationTimeWhenSourceDateEpochIsSet()
+    {
+        $_SERVER['SOURCE_DATE_EPOCH'] = '1700000000';
+
+        try {
+            $serialized = serialize(new DirectoryResource($this->directory));
+            touch($this->directory.'/tmp.xml', time() - 10);
+            clearstatcache();
+
+            $this->assertSame($serialized, serialize(new DirectoryResource($this->directory)));
+        } finally {
+            unset($_SERVER['SOURCE_DATE_EPOCH']);
+        }
+    }
+
+    public function testUnreadableSubdirectoryDoesNotPreventLoading()
+    {
+        mkdir($subdirectory = $this->directory.'/subdirectory');
+        chmod($subdirectory, 0);
+
+        try {
+            if (is_readable($subdirectory)) {
+                $this->markTestSkipped('This process can read directories without the read permission.');
+            }
+
+            $this->assertSame(realpath($this->directory), (new DirectoryResource($this->directory))->getResource());
+        } finally {
+            chmod($subdirectory, 0o755);
+        }
     }
 
     public function testResourcesWithDifferentPatternsAreDifferent()

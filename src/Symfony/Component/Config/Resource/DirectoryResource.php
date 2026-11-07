@@ -21,6 +21,7 @@ namespace Symfony\Component\Config\Resource;
 class DirectoryResource implements SelfCheckingResourceInterface
 {
     private string $resource;
+    private ?string $hash = null;
 
     /**
      * @param string      $resource The file path to the resource
@@ -39,6 +40,18 @@ class DirectoryResource implements SelfCheckingResourceInterface
         }
 
         $this->resource = $resolvedResource;
+
+        // mtimes have a one-second resolution: remember the content of the most recently modified entries to tell if they change again in the same second
+        // Reproducible builds skip this: which entries are the most recent depends on the checkout
+        if (!isset($_SERVER['SOURCE_DATE_EPOCH']) && (!$this->pattern || false !== @preg_match($this->pattern, ''))) {
+            try {
+                $mtimes = iterator_to_array($this->getMTimes());
+            } catch (\UnexpectedValueException) {
+                return;
+            }
+
+            $this->hash = $this->hashEntries(array_keys($mtimes, max($mtimes), true));
+        }
     }
 
     public function __toString(): string
@@ -62,9 +75,42 @@ class DirectoryResource implements SelfCheckingResourceInterface
             return false;
         }
 
-        if ($timestamp <= filemtime($this->resource)) {
-            return false;
+        $paths = [];
+        foreach ($this->getMTimes() as $path => $mtime) {
+            // early return if an entry was modified after the passed timestamp
+            if ($timestamp < $mtime) {
+                return false;
+            }
+
+            if ($timestamp === $mtime) {
+                $paths[] = $path;
+            }
         }
+
+        // mtimes have a one-second resolution: entries modified in the same second as $timestamp may have changed after being loaded
+        return !$paths || (null !== $this->hash && $this->hash === $this->hashEntries($paths));
+    }
+
+    public function __serialize(): array
+    {
+        $data = [
+            'resource' => $this->resource,
+            'pattern' => $this->pattern,
+        ];
+
+        if (null !== $this->hash) {
+            $data['hash'] = $this->hash;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return \Generator<string, int>
+     */
+    private function getMTimes(): \Generator
+    {
+        yield $this->resource => filemtime($this->resource);
 
         // SELF_FIRST yields directories too, so deleted files are detected through their parent's mtime.
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
@@ -75,25 +121,33 @@ class DirectoryResource implements SelfCheckingResourceInterface
 
             // for broken links
             try {
-                $fileMTime = $file->getMTime();
+                $mtime = $file->getMTime();
             } catch (\RuntimeException) {
                 continue;
             }
 
-            // early return if a file was modified in the same second as the passed timestamp or later
-            if ($timestamp <= $fileMTime) {
-                return false;
-            }
+            yield $file->getPathname() => $mtime;
         }
-
-        return true;
     }
 
-    public function __serialize(): array
+    /**
+     * Hashes the names of the entries of directories and the content of files.
+     *
+     * @param list<string> $paths
+     */
+    private function hashEntries(array $paths): ?string
     {
-        return [
-            'resource' => $this->resource,
-            'pattern' => $this->pattern,
-        ];
+        sort($paths);
+        $hash = hash_init('xxh128');
+
+        foreach ($paths as $path) {
+            if (false === $content = is_dir($path) ? @scandir($path) : @hash_file('xxh128', $path)) {
+                return null;
+            }
+
+            hash_update($hash, $path."\0".(\is_array($content) ? implode("\0", $content) : $content)."\0");
+        }
+
+        return hash_final($hash);
     }
 }

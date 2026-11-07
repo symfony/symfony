@@ -39,6 +39,8 @@ class QtFileLoader implements LoaderInterface
             throw new NotFoundResourceException(\sprintf('File "%s" not found.', $resource));
         }
 
+        $fileResource = class_exists(FileResource::class) ? new FileResource($resource) : null;
+
         try {
             $dom = XmlUtils::loadFile($resource);
         } catch (\InvalidArgumentException $e) {
@@ -66,8 +68,8 @@ class QtFileLoader implements LoaderInterface
                 }
             }
 
-            if (class_exists(FileResource::class)) {
-                $catalogue->addResource(new FileResource($resource));
+            if (null !== $fileResource) {
+                $catalogue->addResource($fileResource);
             }
         }
 

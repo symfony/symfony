@@ -18,6 +18,7 @@ use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
@@ -528,5 +529,41 @@ class PhpFileLoaderTest extends TestCase
         $route = $loader->load('class-attributes.php')->get('my_route');
         $this->assertSame('/my-prefix/my/route', $route->getPath());
         $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
+    }
+
+    public function testPhpIsCapturedBeforeTheConfiguratorExecutes()
+    {
+        $directory = sys_get_temp_dir().'/sf-route-capture-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        try {
+            $path = $directory.'/routes.php';
+            file_put_contents($path, <<<'PHP'
+                <?php
+                use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+                return static function (RoutingConfigurator $routes) {
+                    $routes->add('test', '/v1');
+                    file_put_contents(__FILE__, str_replace('/v1', '/v2', file_get_contents(__FILE__)));
+                };
+                PHP);
+            $collection = (new PhpFileLoader(new FileLocator()))->load($path);
+
+            self::assertSame('/v1', $collection->get('test')->getPath());
+            self::assertFalse($this->fileResource($collection, $path)->isFresh(time() + 10));
+        } finally {
+            (new Filesystem())->remove($directory);
+        }
+    }
+
+    /**
+     * Finds the source resource retained by the real route loader.
+     */
+    private function fileResource(RouteCollection $collection, string $path): FileResource
+    {
+        foreach ($collection->getResources() as $resource) {
+            if ($resource instanceof FileResource && $resource->getResource() === realpath($path)) {
+                return $resource;
+            }
+        }
+        self::fail('The route collection must track its source file.');
     }
 }

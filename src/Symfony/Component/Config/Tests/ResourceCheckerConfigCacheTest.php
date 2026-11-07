@@ -134,7 +134,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
             $this->assertFalse($cache->isFresh());
 
             touch($this->cacheFile, $time + 1);
-            $this->assertTrue($cache->isFresh());
+            $this->assertFalse($cache->isFresh());
         } finally {
             unlink($resourceFile);
         }
@@ -250,6 +250,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
                 [
                     '@type' => FileResource::class,
                     'resource' => __FILE__,
+                    'mtime' => filemtime(__FILE__),
                 ],
             ],
         ], \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE));

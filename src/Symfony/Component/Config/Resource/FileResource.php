@@ -24,6 +24,7 @@ class FileResource implements SelfCheckingResourceInterface
 {
     private string $resource;
     private ?string $hash = null;
+    private ?int $mtime = null;
 
     /**
      * @param string $resource The file path to the resource
@@ -42,8 +43,12 @@ class FileResource implements SelfCheckingResourceInterface
 
         // mtimes have a one-second resolution: remember the content of recently modified files to tell if they change again in the same second
         // Reproducible builds skip this: whether a file is recent depends on when the build runs
-        if (!isset($_SERVER['SOURCE_DATE_EPOCH']) && time() - 1 <= @filemtime($resolvedResource)) {
-            $this->hash = @hash_file('xxh128', $resolvedResource) ?: null;
+        if (!isset($_SERVER['SOURCE_DATE_EPOCH'])) {
+            $mtime = @filemtime($resolvedResource);
+            $this->mtime = false === $mtime ? null : $mtime;
+            if (null !== $this->mtime && time() - 1 <= $this->mtime) {
+                $this->hash = is_file($resolvedResource) ? (@hash_file('xxh128', $resolvedResource) ?: '') : '';
+            }
         }
     }
 
@@ -66,20 +71,38 @@ class FileResource implements SelfCheckingResourceInterface
             return false;
         }
 
-        if ($filemtime !== $timestamp) {
+        if (null !== $this->mtime) {
+            if ($timestamp < $filemtime) {
+                return false;
+            }
+
+            if (null === $this->hash) {
+                return $this->mtime === $filemtime && $filemtime < $timestamp;
+            }
+
+            if ('' === $this->hash || !is_file($this->resource)) {
+                return false;
+            }
+        } elseif ($filemtime !== $timestamp) {
             return $filemtime < $timestamp;
         }
 
-        // mtimes have a one-second resolution: a file modified in the same second as $timestamp may have changed after being loaded
+        // A recent input can change within its capture second, even when the cache is written later.
         return null !== $this->hash && $this->hash === @hash_file('xxh128', $this->resource);
     }
 
+    /**
+     * @return array{resource: string, hash?: string, mtime?: int}
+     */
     public function __serialize(): array
     {
         $data = ['resource' => $this->resource];
 
         if (null !== $this->hash) {
             $data['hash'] = $this->hash;
+        }
+        if (null !== $this->mtime) {
+            $data['mtime'] = $this->mtime;
         }
 
         return $data;

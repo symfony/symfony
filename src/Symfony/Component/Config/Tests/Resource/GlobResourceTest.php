@@ -530,6 +530,156 @@ class GlobResourceTest extends TestCase
         $this->assertFalse($resource->isFresh(0));
     }
 
+    public function testGlobFreezesCompletedDiscoveryBeforeSerialization()
+    {
+        $directory = $this->createCaptureDirectory();
+        file_put_contents($directory.'/a.php', '<?php');
+        $resource = new GlobResource($directory, '/*.php', false);
+        self::assertCount(1, iterator_to_array($resource));
+        file_put_contents($directory.'/b.php', '<?php');
+        clearstatcache();
+
+        self::assertFalse(unserialize(serialize($resource))->isFresh(time() + 10));
+        $before = serialize($resource);
+        self::assertSame($before, serialize($resource));
+        self::assertCount(2, iterator_to_array($resource));
+        self::assertFalse($resource->isFresh(time() + 10));
+    }
+
+    public function testGlobPartialIterationDoesNotFreezeAPrefix()
+    {
+        $directory = $this->createCaptureDirectory();
+        file_put_contents($directory.'/a.php', '<?php');
+        file_put_contents($directory.'/b.php', '<?php');
+        $resource = new GlobResource($directory, '/*.php', false);
+        foreach ($resource as $path => $file) {
+            break;
+        }
+        self::assertTrue(unserialize(serialize($resource))->isFresh(time()));
+    }
+
+    public function testGlobAdditionDuringIterationIsNotPartOfTheBaseline()
+    {
+        $directory = $this->createCaptureDirectory();
+        file_put_contents($directory.'/a.php', '<?php');
+        file_put_contents($directory.'/b.php', '<?php');
+        $resource = new GlobResource($directory, '/*.php', false);
+        $paths = [];
+        foreach ($resource as $path => $file) {
+            $paths[] = $path;
+            file_put_contents($directory.'/c.php', '<?php');
+        }
+        self::assertCount(2, $paths);
+        self::assertFalse(unserialize(serialize($resource))->isFresh(time()));
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testDirectoryShortcutMatchesThePathsObservedDuringDiscovery(bool $oldDirectory)
+    {
+        $directory = $this->createCaptureDirectory();
+        file_put_contents($directory.'/a.php', '<?php');
+        file_put_contents($directory.'/b.php', '<?php');
+        touch($directory, time() - ($oldDirectory ? 100 : 0));
+        clearstatcache();
+        $resource = new GlobResource($directory, '/*.php', false);
+        $paths = [];
+        foreach ($resource as $path => $file) {
+            $paths[] = $path;
+            unlink($directory.'/b.php');
+        }
+        self::assertSame([$directory.'/a.php'], $paths);
+        file_put_contents($directory.'/b.php', '<?php');
+        clearstatcache();
+
+        self::assertFalse($resource->isFresh(time()));
+        self::assertFalse(unserialize(serialize($resource))->isFresh(time()));
+    }
+
+    public function testThrowingGlobIterationDoesNotFreezeAPrefix()
+    {
+        $directory = $this->createCaptureDirectory();
+        file_put_contents($directory.'/a.php', '<?php');
+        file_put_contents($directory.'/b.php', '<?php');
+        $resource = new GlobResource($directory, '/*.php', false);
+        $iterator = $resource->getIterator();
+        $iterator->rewind();
+        try {
+            $iterator->throw(new \RuntimeException('Interrupted discovery.'));
+            self::fail('The iteration must propagate its exception.');
+        } catch (\RuntimeException $e) {
+            self::assertSame('Interrupted discovery.', $e->getMessage());
+        }
+        self::assertTrue(unserialize(serialize($resource))->isFresh(time()));
+    }
+
+    public function testCompletedDiscoveryKeepsTheShortcutForRecentDirectories()
+    {
+        $directory = $this->createTree(time());
+        $resource = new GlobResource($directory, '', true);
+        self::assertCount(4, iterator_to_array($resource));
+        $data = $resource->__serialize();
+
+        self::assertNotNull($data['directories']);
+        self::assertNull($data['directories'][''][0]);
+        self::assertTrue(unserialize(serialize($resource))->isFresh(time()));
+        unlink($directory.'/Foo/B.php');
+        clearstatcache();
+        self::assertFalse($resource->isFresh(time()));
+        self::assertFalse(unserialize(serialize($resource))->isFresh(time()));
+    }
+
+    public function testRestoringDirectoryNamesDuringDiscoveryCannotHideAMissingPath()
+    {
+        $directory = $this->createCaptureDirectory();
+        foreach (['a', 'b', 'c'] as $name) {
+            file_put_contents($directory.'/'.$name.'.php', '<?php');
+        }
+        $resource = new GlobResource($directory, '/*.php', false);
+        $paths = [];
+        foreach ($resource as $path => $file) {
+            $paths[] = $path;
+            if ($path === $directory.'/a.php') {
+                unlink($directory.'/b.php');
+            } elseif ($path === $directory.'/c.php') {
+                file_put_contents($directory.'/b.php', '<?php');
+            }
+            clearstatcache();
+        }
+
+        self::assertSame([$directory.'/a.php', $directory.'/c.php'], $paths);
+        self::assertFalse($resource->isFresh(time()));
+        self::assertFalse(unserialize(serialize($resource))->isFresh(time()));
+    }
+
+    public function testFrozenDiscoveryPreservesExcludedDirectories()
+    {
+        $directory = $this->createTree(time());
+        $resource = new GlobResource($directory, '', true, false, [$directory.'/Excluded' => true]);
+        self::assertCount(3, iterator_to_array($resource));
+        file_put_contents($directory.'/Excluded/New.php', '<?php');
+        clearstatcache();
+        self::assertTrue(unserialize(serialize($resource))->isFresh(time()));
+        unlink($directory.'/Foo/B.php');
+        clearstatcache();
+        self::assertFalse(unserialize(serialize($resource))->isFresh(time()));
+    }
+
+    public function testFrozenDiscoveryTracksSymlinkTargets()
+    {
+        $directory = $this->createTree(time());
+        if (!@symlink($directory.'/Foo', $directory.'/Linked')) {
+            self::markTestSkipped('Symlinks are not supported.');
+        }
+        $resource = new GlobResource($directory, '', true);
+        self::assertNotEmpty(iterator_to_array($resource));
+        self::assertNull($resource->__serialize()['directories']);
+        file_put_contents($directory.'/Foo/Added.php', '<?php');
+        clearstatcache();
+        self::assertFalse($resource->isFresh(time()));
+        self::assertFalse(unserialize(serialize($resource))->isFresh(time()));
+    }
+
     private function createTree(int $mtime): string
     {
         $dir = $this->tmpDir = sys_get_temp_dir().'/sf_glob_resource_'.bin2hex(random_bytes(4));
@@ -551,5 +701,17 @@ class GlobResourceTest extends TestCase
     private function unserializedResource(string $dir, string $pattern = '', bool $recursive = true, array $excludedPrefixes = []): GlobResource
     {
         return unserialize(serialize(new GlobResource($dir, $pattern, $recursive, false, $excludedPrefixes)));
+    }
+
+    /**
+     * Creates an empty discovery tree that the existing test cleanup owns.
+     */
+    private function createCaptureDirectory(): string
+    {
+        $this->tmpDir = sys_get_temp_dir().'/sf-glob-capture-'.bin2hex(random_bytes(6));
+        mkdir($this->tmpDir);
+        $this->tmpDir = realpath($this->tmpDir);
+
+        return $this->tmpDir;
     }
 }

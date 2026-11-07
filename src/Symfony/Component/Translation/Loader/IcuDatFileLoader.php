@@ -33,6 +33,8 @@ class IcuDatFileLoader extends IcuResFileLoader
             throw new NotFoundResourceException(\sprintf('File "%s" not found.', $resource));
         }
 
+        $fileResource = class_exists(FileResource::class) ? new FileResource($resource.'.dat') : null;
+
         try {
             $rb = new \ResourceBundle($locale, $resource);
         } catch (\Exception) {
@@ -49,8 +51,8 @@ class IcuDatFileLoader extends IcuResFileLoader
         $catalogue = new MessageCatalogue($locale);
         $catalogue->add($messages, $domain);
 
-        if (class_exists(FileResource::class)) {
-            $catalogue->addResource(new FileResource($resource.'.dat'));
+        if (null !== $fileResource) {
+            $catalogue->addResource($fileResource);
         }
 
         return $catalogue;

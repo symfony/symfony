@@ -36,7 +36,7 @@ abstract class ObjectLoader extends Loader
     public function load(mixed $resource, ?string $type = null): RouteCollection
     {
         if (!preg_match('/^[^\:]+(?:::(?:[^\:]+))?$/', $resource)) {
-            throw new \InvalidArgumentException(\sprintf('Invalid resource "%s" passed to the %s route loader: use the format "object_id::method" or "object_id" if your object class has an "__invoke" method.', $resource, \is_string($type) ? '"'.$type.'"' : 'object'));
+            throw new \InvalidArgumentException(\sprintf('Invalid resource "%s" passed to the "%s" route loader: use the format "object_id::method" or "object_id" if your object class has an "__invoke" method.', $resource, $type ?? 'object'));
         }
 
         $parts = explode('::', $resource);
@@ -48,6 +48,8 @@ abstract class ObjectLoader extends Loader
             throw new \BadMethodCallException(\sprintf('Method "%s" not found on "%s" when importing routing resource "%s".', $method, get_debug_type($loaderObject), $resource));
         }
 
+        $resources = new RouteCollection();
+        $this->addClassResource(new \ReflectionClass($loaderObject), $resources);
         $routeCollection = $loaderObject->$method($this, $this->env);
 
         if (!$routeCollection instanceof RouteCollection) {
@@ -57,7 +59,9 @@ abstract class ObjectLoader extends Loader
         }
 
         // make the object file tracked so that if it changes, the cache rebuilds
-        $this->addClassResource(new \ReflectionClass($loaderObject), $routeCollection);
+        foreach ($resources->getResources() as $resource) {
+            $routeCollection->addResource($resource);
+        }
 
         return $routeCollection;
     }

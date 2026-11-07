@@ -18,6 +18,8 @@ use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Resource\ComposerResource;
+use Symfony\Component\Config\Resource\GlobResource;
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
@@ -94,6 +96,124 @@ class TranslationBundleTest extends TestCase
         $files = array_map(static fn ($file) => str_replace('\\', '/', $file), $options['resource_files']['en']);
         $this->assertContains(str_replace('\\', '/', __DIR__).'/Fixtures/translations/messages.en.yaml', $files);
         $this->assertContains(__DIR__.'/Fixtures/translations', $options['scanned_directories']);
+    }
+
+    public function testTranslationDiscoveryIsCapturedBeforeContainerMetadataIsWritten()
+    {
+        $projectDir = $this->createProjectDir();
+        try {
+            $container = $this->load(['default_path' => '%kernel.project_dir%/translations'], projectDir: $projectDir);
+            $resources = array_values(array_filter($container->getResources(), static fn ($resource) => $resource instanceof GlobResource && $resource->getPrefix() === realpath($projectDir.'/translations')));
+            self::assertCount(1, $resources);
+            file_put_contents($projectDir.'/translations/added.fr.yaml', 'key: v2');
+            touch($projectDir.'/translations/added.fr.yaml', time() - 1);
+            touch($projectDir.'/translations', time() - 1);
+            clearstatcache();
+            $cache = new ConfigCache($projectDir.'/var/discovery.php', true);
+            $cache->write('<?php return null;', $resources);
+
+            self::assertFalse($cache->isFresh());
+        } finally {
+            (new Filesystem())->remove($projectDir);
+        }
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testDiscardedTranslationDirectoryResourcesAreNotEnumerated(bool $vendor)
+    {
+        $projectDir = $this->createProjectDir();
+        $container = new class extends ContainerBuilder {
+            public ?GlobResource $directoryResource = null;
+
+            /**
+             * Records the glob passed for registration, including those discarded by the parent.
+             */
+            public function addResource(ResourceInterface $resource): static
+            {
+                if ($resource instanceof GlobResource) {
+                    $this->directoryResource = $resource;
+                }
+
+                return parent::addResource($resource);
+            }
+        };
+        if ($vendor) {
+            (new Filesystem())->dumpFile($projectDir.'/composer/installed.json', '[]');
+            (new \ReflectionProperty(ContainerBuilder::class, 'vendors'))->setValue($container, [realpath($projectDir)]);
+        } else {
+            $container->setResourceTracking(false);
+        }
+        try {
+            self::assertTrue((new \ReflectionMethod(TranslationBundle::class, 'hasTranslationDir'))->invoke(null, $container, $projectDir.'/translations'));
+            self::assertCount($vendor ? 1 : 0, $container->getResources());
+            self::assertNotNull($container->directoryResource);
+            self::assertFalse((new \ReflectionProperty(GlobResource::class, 'hash'))->isInitialized($container->directoryResource));
+        } finally {
+            (new Filesystem())->remove($projectDir);
+        }
+    }
+
+    public function testReplacingATranslationDirectoryResourceStillCapturesDiscovery()
+    {
+        $projectDir = $this->createProjectDir();
+        $container = new ContainerBuilder();
+        $container->addResource($previous = new GlobResource($projectDir.'/translations', '', true));
+        try {
+            self::assertTrue((new \ReflectionMethod(TranslationBundle::class, 'hasTranslationDir'))->invoke(null, $container, $projectDir.'/translations'));
+            self::assertCount(1, $resources = $container->getResources());
+            self::assertNotSame($previous, $resources[0]);
+            file_put_contents($projectDir.'/translations/added.fr.yaml', 'key: v2');
+            touch($projectDir.'/translations/added.fr.yaml', time() - 1);
+            touch($projectDir.'/translations', time() - 1);
+            clearstatcache();
+            $cache = new ConfigCache($projectDir.'/var/discovery.php', true);
+            $cache->write('<?php return null;', $resources);
+
+            self::assertFalse($cache->isFresh());
+        } finally {
+            (new Filesystem())->remove($projectDir);
+        }
+    }
+
+    public function testCatalogueCacheVariesWithDiscoveredFilesAndIgnoresCheckoutPaths()
+    {
+        $projectDir = $this->createProjectDir();
+        try {
+            $config = ['default_path' => '%kernel.project_dir%/translations'];
+            $before = $this->load($config, projectDir: $projectDir)->getDefinition('translator.default')->getArgument(4)['cache_vary'];
+            file_put_contents($projectDir.'/translations/added.fr.yaml', 'key: v2');
+            $after = $this->load($config, projectDir: $projectDir)->getDefinition('translator.default')->getArgument(4)['cache_vary'];
+
+            self::assertNotSame($before, $after);
+            self::assertIsString($after['resource_files']);
+            self::assertMatchesRegularExpression('/^[a-f0-9]{32}$/', $after['resource_files']);
+            self::assertStringNotContainsString($projectDir, serialize($after['resource_files']));
+
+            unlink($projectDir.'/translations/added.fr.yaml');
+            file_put_contents($projectDir.'/translations/messages.en.yaml', 'hello: Changed');
+            $settled = $this->load($config, projectDir: $projectDir)->getDefinition('translator.default')->getArgument(4)['cache_vary'];
+            self::assertSame($before, $settled);
+        } finally {
+            (new Filesystem())->remove($projectDir);
+        }
+    }
+
+    #[TestWith(['some%missing%.en.yaml', 'some%missing%'])]
+    #[TestWith(['directory%missing%/messages.en.yaml', 'messages'])]
+    public function testDiscoveredResourceNamesCanContainLiteralPercentSigns(string $file, string $domain)
+    {
+        $projectDir = $this->createProjectDir();
+        try {
+            (new Filesystem())->dumpFile($projectDir.'/translations/'.$file, 'key: Literal');
+            $container = $this->load(['cache_dir' => $projectDir.'/var/translations', 'default_path' => '%kernel.project_dir%/translations'], merge: false, projectDir: $projectDir);
+            $container->register('config_cache_factory', ConfigCacheFactory::class)->setArguments([true]);
+            $container->compile();
+
+            self::assertSame('Literal', $container->get('translator')->trans('key', [], $domain));
+        } finally {
+            (new Filesystem())->remove($projectDir);
+        }
     }
 
     public function testTheTranslationsOfTheValidatorAreRegisteredOnceWhenItsBundleIsEnabled()

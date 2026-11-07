@@ -13,11 +13,15 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use Opis\JsonSchema\Errors\ErrorFormatter;
 use Opis\JsonSchema\Validator;
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RequiresMethod;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocator;
@@ -54,6 +58,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
 
@@ -1607,6 +1612,202 @@ class YamlFileLoaderTest extends TestCase
         $this->assertTrue($container->hasAlias('bar'));
 
         $this->assertStringContainsString('.decorator.foo.', (string) $container->getAlias('foo'));
+    }
+
+    #[BackupGlobals(true)]
+    #[DataProvider('provideNestedLoads')]
+    public function testWrappingHooksKeepTheirOwnSnapshot(bool $nested)
+    {
+        unset($_SERVER['SOURCE_DATE_EPOCH']);
+        $directory = sys_get_temp_dir().'/sf-yaml-capture-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        file_put_contents($directory.'/outer.yml', 'parameters: { outer: v1 }');
+        file_put_contents($directory.'/inner.yml', 'parameters: { inner: v1 }');
+        $container = new ContainerBuilder();
+        $loader = new class($container, new FileLocator()) extends YamlFileLoader {
+            public bool $nested;
+
+            /**
+             * @return array{parameters: array<string, string>}|null
+             */
+            protected function loadFile(string $file): ?array
+            {
+                $content = parent::loadFile($file);
+                file_put_contents($file, str_replace('v1', 'v2', file_get_contents($file)));
+                if ($this->nested && 'outer.yml' === basename($file)) {
+                    $this->load(\dirname($file).'/inner.yml');
+                }
+
+                return $content;
+            }
+        };
+        $loader->nested = $nested;
+
+        try {
+            $loader->load($directory.'/outer.yml');
+            self::assertSame('v1', $container->getParameter('outer'));
+            $files = array_values(array_filter($container->getResources(), static fn ($r) => $r instanceof FileResource));
+            self::assertCount($nested ? 2 : 1, $files);
+            foreach ($files as $file) {
+                self::assertFalse($file->isFresh(time() + 10));
+            }
+        } finally {
+            (new Filesystem())->remove($directory);
+        }
+    }
+
+    public static function provideNestedLoads(): iterable
+    {
+        yield [false];
+        yield [true];
+    }
+
+    #[BackupGlobals(true)]
+    public function testEmptyInputKeepsItsSnapshotWithoutLeakingIntoTheNextLoad()
+    {
+        unset($_SERVER['SOURCE_DATE_EPOCH']);
+        $directory = sys_get_temp_dir().'/sf-yaml-empty-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        file_put_contents($directory.'/empty.yml', '');
+        file_put_contents($directory.'/valid.yml', 'parameters: { value: valid }');
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator());
+        try {
+            $loader->load($directory.'/empty.yml');
+            $empty = $container->getResources()[0];
+            file_put_contents($directory.'/empty.yml', 'parameters: { value: changed }');
+            $loader->load($directory.'/valid.yml');
+
+            self::assertSame('valid', $container->getParameter('value'));
+            self::assertCount(2, $container->getResources());
+            self::assertFalse($empty->isFresh(time() + 10));
+            self::assertSame(realpath($directory.'/valid.yml'), (string) $container->getResources()[1]);
+            self::assertTrue($container->getResources()[1]->isFresh(time() + 10));
+        } finally {
+            (new Filesystem())->remove($directory);
+        }
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testMissingYamlSupportDoesNotLeakIntoTheNextLoad()
+    {
+        ClassExistsMock::register(YamlFileLoader::class);
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Fixtures/yaml'));
+        ClassExistsMock::withMockedClasses([YamlParser::class => false]);
+        try {
+            try {
+                $loader->load('services1.yml');
+                self::fail('Missing YAML support must be reported.');
+            } catch (RuntimeException $e) {
+                self::assertStringContainsString('Yaml Component is not installed', $e->getMessage());
+                self::assertSame([], $container->getResources());
+            }
+        } finally {
+            ClassExistsMock::withMockedClasses([]);
+        }
+
+        $loader->load('services1.yml');
+        self::assertSame(realpath(__DIR__.'/../Fixtures/yaml/services1.yml'), (string) $container->getResources()[0]);
+    }
+
+    #[BackupGlobals(true)]
+    #[DataProvider('provideReplacingHooks')]
+    public function testReplacingHooksRetainTheRegistrationFallback(bool $alternatePath)
+    {
+        unset($_SERVER['SOURCE_DATE_EPOCH']);
+        $directory = sys_get_temp_dir().'/sf-yaml-replacement-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        file_put_contents($directory.'/outer.yml', 'parameters: { value: original }');
+        file_put_contents($directory.'/alternate.yml', 'parameters: { value: alternate }');
+        $container = new ContainerBuilder();
+        $loader = new class($container, new FileLocator()) extends YamlFileLoader {
+            public bool $alternatePath;
+
+            /**
+             * @return array{parameters: array<string, string>}|null
+             */
+            protected function loadFile(string $file): ?array
+            {
+                return $this->alternatePath ? parent::loadFile(\dirname($file).'/alternate.yml') : ['parameters' => ['value' => 'replacement']];
+            }
+        };
+        $loader->alternatePath = $alternatePath;
+        try {
+            $loader->load($directory.'/outer.yml');
+            self::assertSame($alternatePath ? 'alternate' : 'replacement', $container->getParameter('value'));
+            $resources = $container->getResources();
+            self::assertCount(1, $resources);
+            self::assertSame(realpath($directory.'/outer.yml'), (string) $resources[0]);
+        } finally {
+            (new Filesystem())->remove($directory);
+        }
+    }
+
+    public static function provideReplacingHooks(): iterable
+    {
+        yield [false];
+        yield [true];
+    }
+
+    #[BackupGlobals(true)]
+    public function testFailedHookDoesNotLeakItsSnapshotIntoTheNextLoad()
+    {
+        unset($_SERVER['SOURCE_DATE_EPOCH']);
+        $directory = sys_get_temp_dir().'/sf-yaml-failure-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        file_put_contents($directory.'/failed.yml', 'parameters: { value: failed }');
+        file_put_contents($directory.'/valid.yml', 'parameters: { value: valid }');
+        $container = new ContainerBuilder();
+        $loader = new class($container, new FileLocator()) extends YamlFileLoader {
+            /**
+             * @return array{parameters: array<string, string>}|null
+             */
+            protected function loadFile(string $file): ?array
+            {
+                $content = parent::loadFile($file);
+                if ('failed.yml' === basename($file)) {
+                    throw new \RuntimeException('The wrapping hook failed.');
+                }
+                $content = parent::loadFile($file);
+
+                return $content;
+            }
+        };
+        try {
+            try {
+                $loader->load($directory.'/failed.yml');
+                self::fail('The hook exception must propagate.');
+            } catch (\RuntimeException $e) {
+                self::assertSame('The wrapping hook failed.', $e->getMessage());
+            }
+            self::assertSame([], $container->getResources());
+            $loader->load($directory.'/valid.yml');
+            self::assertSame('valid', $container->getParameter('value'));
+            self::assertCount(1, $container->getResources());
+            self::assertSame(realpath($directory.'/valid.yml'), (string) $container->getResources()[0]);
+        } finally {
+            (new Filesystem())->remove($directory);
+        }
+    }
+
+    #[BackupGlobals(true)]
+    public function testDisabledTrackingKeepsWrappingHooksFunctional()
+    {
+        unset($_SERVER['SOURCE_DATE_EPOCH']);
+        $directory = sys_get_temp_dir().'/sf-yaml-untracked-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        file_put_contents($directory.'/services.yml', 'parameters: { value: v1 }');
+        $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
+        try {
+            (new YamlFileLoader($container, new FileLocator()))->load($directory.'/services.yml');
+            self::assertSame('v1', $container->getParameter('value'));
+            self::assertSame([], $container->getResources());
+        } finally {
+            (new Filesystem())->remove($directory);
+        }
     }
 
     private static function toJsonData(mixed $value): mixed

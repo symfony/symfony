@@ -33,6 +33,8 @@ class IcuResFileLoader implements LoaderInterface
             throw new NotFoundResourceException(\sprintf('File "%s" not found.', $resource));
         }
 
+        $directoryResource = class_exists(DirectoryResource::class) ? new DirectoryResource($resource) : null;
+
         try {
             $rb = new \ResourceBundle($locale, $resource);
         } catch (\Exception) {
@@ -49,8 +51,8 @@ class IcuResFileLoader implements LoaderInterface
         $catalogue = new MessageCatalogue($locale);
         $catalogue->add($messages, $domain);
 
-        if (class_exists(DirectoryResource::class)) {
-            $catalogue->addResource(new DirectoryResource($resource));
+        if (null !== $directoryResource) {
+            $catalogue->addResource($directoryResource);
         }
 
         return $catalogue;

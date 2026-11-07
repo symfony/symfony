@@ -18,6 +18,7 @@ use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\MessageCatalogueInterface;
+use Symfony\Component\Translation\Tests\Fixtures\MutatingResourceStream;
 
 class XliffFileLoaderTest extends TestCase
 {
@@ -722,5 +723,26 @@ class XliffFileLoaderTest extends TestCase
             '{audience, select, formal {Bonjour!}}',
             $catalogue->get('greeting', $intlDomain)
         );
+    }
+
+    public function testXmlInputIsCapturedBeforeItIsRead()
+    {
+        $contents = '<?xml version="1.0"?><xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2"><file source-language="en" datatype="plaintext" original="messages"><body><trans-unit id="key"><source>key</source><target>v1</target></trans-unit></body></file></xliff>';
+        $path = tempnam(sys_get_temp_dir(), 'sf-translation-capture-');
+        file_put_contents($path, $contents);
+        MutatingResourceStream::$path = $path;
+        MutatingResourceStream::$mutated = false;
+        stream_wrapper_register('translationcapture', MutatingResourceStream::class);
+        try {
+            $catalogue = (new XliffFileLoader())->load('translationcapture://messages', 'en');
+            self::assertTrue(MutatingResourceStream::$mutated);
+            self::assertSame('v1', $catalogue->get('key'));
+            self::assertStringContainsString('v2', file_get_contents($path));
+            self::assertCount(1, $catalogue->getResources());
+            self::assertFalse($catalogue->getResources()[0]->isFresh(time() + 10));
+        } finally {
+            stream_wrapper_unregister('translationcapture');
+            unlink($path);
+        }
     }
 }

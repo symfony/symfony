@@ -50,6 +50,7 @@ class YamlFileLoader extends FileLoader
         }
 
         $this->yamlParser ??= new YamlParser();
+        $fileResource = new FileResource($path);
 
         try {
             $parsedConfig = $this->yamlParser->parseFile($path, Yaml::PARSE_CONSTANT);
@@ -58,7 +59,7 @@ class YamlFileLoader extends FileLoader
         }
 
         $collection = new RouteCollection();
-        $collection->addResource(new FileResource($path));
+        $collection->addResource($fileResource);
 
         // empty file
         if (null === $parsedConfig) {

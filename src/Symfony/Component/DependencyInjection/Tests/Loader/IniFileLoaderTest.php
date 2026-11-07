@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
@@ -33,6 +34,26 @@ class IniFileLoaderTest extends TestCase
     {
         $this->loader->load('parameters.ini');
         $this->assertEquals(['foo' => 'bar', 'bar' => '%foo%'], $this->container->getParameterBag()->all(), '->load() takes a single file name as its first argument');
+    }
+
+    public function testResourceIsCapturedBeforeParsingErrors()
+    {
+        $resources = null;
+        set_error_handler(function () use (&$resources): bool {
+            $resources = $this->container->getResources();
+
+            return true;
+        }, \E_WARNING);
+        try {
+            $this->loader->load('nonvalid.ini');
+            self::fail('Invalid INI input must be rejected.');
+        } catch (InvalidArgumentException) {
+            self::assertCount(1, $resources);
+            self::assertInstanceOf(FileResource::class, $resources[0]);
+            self::assertSame(realpath(__DIR__.'/../Fixtures/ini/nonvalid.ini'), $resources[0]->getResource());
+        } finally {
+            restore_error_handler();
+        }
     }
 
     #[DataProvider('getTypeConversions')]

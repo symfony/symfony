@@ -161,6 +161,9 @@ final class CacheItem implements ItemInterface
                     $replace['{'.$k.'}'] = $v;
                 }
             }
+            if (isset($replace['{cache-adapter}']) && !str_contains($message, '{cache-adapter}')) {
+                $message .= ' (from "{cache-adapter}")';
+            }
             @trigger_error(strtr($message, $replace), \E_USER_WARNING);
         }
     }

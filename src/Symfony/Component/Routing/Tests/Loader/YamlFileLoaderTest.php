@@ -16,6 +16,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
@@ -209,6 +210,18 @@ class YamlFileLoaderTest extends TestCase
 
         $route = $routeCollection->get('baz_route');
         $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
+
+        $this->assertContainsEquals(new GlobResource(__DIR__.'/../Fixtures/glob', '/ba?.yml', false), $routeCollection->getResources());
+    }
+
+    public function testImportGlobMatchingNoFilesTracksTheGlob()
+    {
+        $loader = new YamlFileLoader(new FileLocator());
+        $routeCollection = $loader->import(__DIR__.'/../Fixtures/glob/*.missing');
+
+        $this->assertInstanceOf(RouteCollection::class, $routeCollection);
+        $this->assertCount(0, $routeCollection);
+        $this->assertEquals([new GlobResource(__DIR__.'/../Fixtures/glob', '/*.missing', false)], $routeCollection->getResources());
     }
 
     public function testImportRouteWithNamePrefix()

@@ -88,6 +88,18 @@ abstract class FileLoader extends BaseFileLoader
     }
 
     /**
+     * @internal
+     */
+    protected function trackGlobResource(GlobResource|array $resource, mixed $imported): mixed
+    {
+        foreach (\is_array($resource) ? $resource : [$resource] as $r) {
+            $this->container->addResource($r);
+        }
+
+        return $imported;
+    }
+
+    /**
      * Registers a set of classes as services using PSR-4 for discovery.
      *
      * @param Definition           $prototype A definition to use as template

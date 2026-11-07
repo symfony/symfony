@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Loader;
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Routing\Loader\Configurator\Traits\GlobResourceTrait;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -27,6 +28,8 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class PhpFileLoader extends FileLoader
 {
+    use GlobResourceTrait;
+
     /**
      * Loads a PHP file.
      */

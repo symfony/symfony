@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -92,6 +93,17 @@ class FileLoaderTest extends TestCase
         ];
 
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
+        $this->assertContainsEquals(new GlobResource(self::$fixturesPath, '/{F}ixtures/{xml,yaml}/services2.{yml,xml}', false), $container->getResources());
+    }
+
+    public function testImportGlobMatchingNoFilesTracksTheGlob()
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath));
+
+        $loader->import(self::$fixturesPath.'/Fixtures/yaml/*.missing');
+
+        $this->assertEquals([new GlobResource(self::$fixturesPath.'/Fixtures/yaml', '/*.missing', false)], $container->getResources());
     }
 
     public function testRegisterClasses()

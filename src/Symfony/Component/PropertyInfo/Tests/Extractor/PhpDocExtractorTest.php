@@ -37,6 +37,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\RejectedCandidateDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\AnotherNamespace\DummyInAnotherNamespace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTraitWithUseDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VoidNeverReturnTypeDummy;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -400,6 +401,7 @@ class PhpDocExtractorTest extends TestCase
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'aliasedMethodInTraitInAnotherNamespace'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'overriddenMethodInTraitInAnotherNamespace'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'abstractMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTraitWithUseDocBlock::class, 'abstractMethodInTraitInAnotherNamespace'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'overriddenAbstractMethodInTraitInAnotherNamespace'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'mutatorInTraitInAnotherNamespace'));
     }

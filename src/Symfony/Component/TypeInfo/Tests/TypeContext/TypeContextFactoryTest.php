@@ -36,6 +36,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpstanTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPsalmCovariantTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPsalmTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithRecursiveTypeAliases;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithSameTemplateNameAndUntaggedParent;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplateAndParent;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplateTypeAlias;
@@ -67,6 +68,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\PhpStanPrefixed
 use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\SameNameEnvelope;
 use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\SwappedPair;
 use Symfony\Component\TypeInfo\Tests\Fixtures\InheritedTemplates\TooManyTypesEnvelope;
+use Symfony\Component\TypeInfo\Tests\Fixtures\ParentDummyWithIntTemplate;
 use Symfony\Component\TypeInfo\Tests\Fixtures\ParentDummyWithTemplate;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
@@ -242,8 +244,17 @@ class TypeContextFactoryTest extends TestCase
     {
         $typeContext = $this->typeContextFactory->createFromClassName(DummyWithTemplateAndParent::class, ParentDummyWithTemplate::class);
 
-        $this->assertEquals(['T' => Type::object(DummyInDifferentNs::class)], $typeContext->templates);
+        $this->assertEquals(['T' => Type::object()], $typeContext->templates);
+        $this->assertEquals(['T' => Type::template('T', Type::object(DummyInDifferentNs::class))], $typeContext->inheritedTemplateTypes);
         $this->assertEquals(['ParentInt' => Type::int()], $typeContext->typeAliases);
+    }
+
+    public function testTemplatesOfTheDeclaringClassWinOverTheSameNamedTemplatesOfAnUntaggedChild()
+    {
+        $typeContext = $this->typeContextFactory->createFromClassName(DummyWithSameTemplateNameAndUntaggedParent::class, ParentDummyWithIntTemplate::class);
+
+        $this->assertEquals(['T' => Type::int()], $typeContext->templates);
+        $this->assertSame([], $typeContext->inheritedTemplateTypes);
     }
 
     /**

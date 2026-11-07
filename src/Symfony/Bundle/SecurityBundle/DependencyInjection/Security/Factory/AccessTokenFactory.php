@@ -72,6 +72,12 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
     {
         parent::addConfiguration($node);
 
+        $node
+            ->validate()
+                ->always(self::finalizeTokenHandler(...))
+            ->end()
+        ;
+
         $builder = $node->children();
         $builder
             ->scalarNode('realm')->defaultNull()->end()
@@ -402,5 +408,27 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         }
 
         return $id;
+    }
+
+    private static function finalizeTokenHandler(array $config): array
+    {
+        $resource = $config['resource_metadata']['resource'] ?? null;
+        $defaultAudience = null !== $resource && !str_starts_with($resource, '/') ? [$resource] : [];
+
+        if (isset($config['token_handler']['oidc'])) {
+            $config['token_handler']['oidc']['audience'] = $config['token_handler']['oidc']['audience'] ?: $defaultAudience;
+
+            if (!$config['token_handler']['oidc']['audience']) {
+                throw new \InvalidArgumentException('You must set the "audience" of the "oidc" token handler when the "resource" of "resource_metadata" is not a URL.');
+            }
+        } elseif (isset($config['token_handler']['oauth2'])) {
+            $config['token_handler']['oauth2']['audience'] = $config['token_handler']['oauth2']['audience'] ?: $defaultAudience;
+
+            if ($config['token_handler']['oauth2']['response_signature']['enabled'] && (null === $config['token_handler']['oauth2']['issuer'] || !$config['token_handler']['oauth2']['audience'])) {
+                throw new \InvalidArgumentException('The "issuer" and "audience" options of the "oauth2" token handler are required when "response_signature" is enabled: RFC 9701 §5 makes "iss" and "aud" mandatory claims of the response.');
+            }
+        }
+
+        return $config;
     }
 }

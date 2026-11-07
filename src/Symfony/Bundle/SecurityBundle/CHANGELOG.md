@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Default the `audience` of the `oidc` and `oauth2` token handlers to the `resource` of `resource_metadata` when it is a URL; with `oauth2`, `aud` then becomes a mandatory claim of the introspection response
  * Add the `entry_point_path` firewall option, redirecting anonymous users to a path or a route when they need to authenticate
  * Retain the referer after failed authentication when `use_referer` is enabled
  * Default the `cost`, `time_cost` and `memory_cost` options of password hashers to the lowest values bcrypt and argon2 accept when `framework.test` is enabled

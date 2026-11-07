@@ -363,6 +363,7 @@ class PhpDocExtractorTest extends TestCase
         yield ['propertyInExternalTraitPrimitiveType', Type::string()];
         yield ['propertyInExternalTraitObjectSameNamespace', Type::object(Dummy::class)];
         yield ['propertyInExternalTraitObjectDifferentNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['redeclaredPropertyInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
     }
 
     #[DataProvider('methodsDefinedByTraitsProvider')]
@@ -382,6 +383,12 @@ class PhpDocExtractorTest extends TestCase
         yield ['methodInExternalTraitPrimitiveType', Type::string()];
         yield ['methodInExternalTraitObjectSameNamespace', Type::object(Dummy::class)];
         yield ['methodInExternalTraitObjectDifferentNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['methodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['aliasedMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['overriddenMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['abstractMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['overriddenAbstractMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['mutatorInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
     }
 
     public function testConstructorDefinedByTrait()

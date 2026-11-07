@@ -131,6 +131,56 @@ bar';
         self::assertSame([], json_decode(trim($tester->getDisplay()), true));
     }
 
+    public function testLintCorrectFileWithJunitFormat()
+    {
+        $filename = $this->createFile('foo: bar');
+        $tester = $this->createCommandTester();
+
+        $tester->execute(['filename' => $filename, '--format' => 'junit'], ['decorated' => false]);
+
+        self::assertSame(0, $tester->getStatusCode());
+        $xml = simplexml_load_string($tester->getDisplay());
+        self::assertNotFalse($xml);
+        self::assertSame('1', (string) $xml->testsuite['tests']);
+        self::assertSame('0', (string) $xml->testsuite['failures']);
+        self::assertSame($filename, (string) $xml->testsuite->testcase['file']);
+        self::assertCount(0, $xml->testsuite->testcase->failure);
+    }
+
+    public function testLintIncorrectFilesWithJunitFormat()
+    {
+        $valid = $this->createFile('foo: bar');
+        $invalid = $this->createFile("foo:\nbar");
+        $tester = $this->createCommandTester();
+
+        $tester->execute(['filename' => [$valid, $invalid], '--format' => 'junit'], ['decorated' => false]);
+
+        self::assertSame(1, $tester->getStatusCode());
+        $xml = simplexml_load_string($tester->getDisplay());
+        self::assertNotFalse($xml);
+        self::assertSame('2', (string) $xml->testsuite['tests']);
+        self::assertSame('1', (string) $xml->testsuite['failures']);
+        self::assertSame($valid, (string) $xml->testsuite->testcase[0]['file']);
+        self::assertSame($invalid, (string) $xml->testsuite->testcase[1]['file']);
+        self::assertCount(0, $xml->testsuite->testcase[0]->failure);
+        self::assertSame('error', (string) $xml->testsuite->testcase[1]->failure['type']);
+        self::assertStringContainsString('Unable to parse at line 2', (string) $xml->testsuite->testcase[1]->failure);
+    }
+
+    public function testLintJunitFormatEscapesXmlSpecialCharacters()
+    {
+        $filename = $this->createFile('foo: "unclosed <node>&');
+        $tester = $this->createCommandTester();
+
+        $tester->execute(['filename' => $filename, '--format' => 'junit'], ['decorated' => false]);
+
+        self::assertSame(1, $tester->getStatusCode());
+        $xml = simplexml_load_string($tester->getDisplay());
+        self::assertNotFalse($xml);
+        self::assertSame('1', (string) $xml->testsuite['failures']);
+        self::assertCount(1, $xml->testsuite->testcase->failure);
+    }
+
     public function testLintAutodetectsGithubActionEnvironment()
     {
         $prev = getenv('GITHUB_ACTIONS');
@@ -568,7 +618,7 @@ bar';
     {
         $tester = new CommandCompletionTester($this->createCommand());
 
-        $expectedSuggestions = ['txt', 'json', 'github'];
+        $expectedSuggestions = ['txt', 'json', 'github', 'junit'];
         if (class_exists(GitlabCiReporter::class)) {
             $expectedSuggestions[] = 'gitlab';
         }

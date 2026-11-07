@@ -112,7 +112,7 @@ final class LockAttributeListener implements EventSubscriberInterface, ResetInte
         } elseif (\is_string($key = $event->evaluate($key)) || \is_int($key) || $key instanceof \Stringable) {
             $key = (string) $key;
         } else {
-            throw new \TypeError(\sprintf('The value of the "$key" option of the "%s" attribute must evaluate to a string, an integer or a "Stringable" object, "%s" given.', Lock::class, get_debug_type($key)));
+            throw new \TypeError(\sprintf('The value of the "$key" option of the "%s" attribute must evaluate to a string, an integer or a "Stringable" object, "%s" given.', $attribute::class, get_debug_type($key)));
         }
 
         $mainRequest = $this->requestStack->getMainRequest() ?? $request;

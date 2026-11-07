@@ -82,7 +82,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         }
 
         if (!\is_bool($if = $event->evaluate($attribute->if))) {
-            throw new \TypeError(\sprintf('The value of the "$if" option of the "%s" attribute must evaluate to a boolean, "%s" given.', RateLimit::class, get_debug_type($if)));
+            throw new \TypeError(\sprintf('The value of the "$if" option of the "%s" attribute must evaluate to a boolean, "%s" given.', $attribute::class, get_debug_type($if)));
         }
 
         if (!$if) {
@@ -98,7 +98,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         } elseif (\is_string($key = $attribute->key) && str_contains($key, '{')) {
             $key = KeyPlaceholderResolver::resolve($key, $event);
         } elseif (!\is_string($key = $event->evaluate($key))) {
-            throw new \TypeError(\sprintf('The value of the "$key" option of the "%s" attribute must evaluate to a string, "%s" given.', RateLimit::class, get_debug_type($key)));
+            throw new \TypeError(\sprintf('The value of the "$key" option of the "%s" attribute must evaluate to a string, "%s" given.', $attribute::class, get_debug_type($key)));
         }
 
         $rateLimit = $this->limiters->get($attribute->limiter)->create($key)->consume($attribute->tokens);

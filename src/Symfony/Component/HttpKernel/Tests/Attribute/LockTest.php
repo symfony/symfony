@@ -36,6 +36,14 @@ class LockTest extends TestCase
         new Lock('import', ttl: 0);
     }
 
+    public function testInvalidTtlErrorNamesTheExtendingAttribute()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageIs('The "$ttl" argument of "Symfony\\Component\\HttpKernel\\Tests\\Attribute\\ExtendedLock" must be greater than 0 or null, "0" given.');
+
+        new ExtendedLock(0);
+    }
+
     public function testNullTtlMeansNoExpiration()
     {
         $this->assertNull(new Lock('import', ttl: null)->ttl);
@@ -56,5 +64,13 @@ class LockTest extends TestCase
     public function testCommaSeparatedMethods()
     {
         $this->assertSame(['GET', 'POST', 'HEAD'], new Lock('import', methods: 'get, POST')->methods);
+    }
+}
+
+class ExtendedLock extends Lock
+{
+    public function __construct(?float $ttl)
+    {
+        parent::__construct('import', 'default', $ttl);
     }
 }

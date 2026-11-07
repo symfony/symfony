@@ -26,7 +26,7 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
  */
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
 #[RecoverableAttribute(LockConflictedException::class)]
-final class Lock
+class Lock
 {
     /** @var string[] */
     public readonly array $methods;
@@ -48,7 +48,7 @@ final class Lock
         public readonly bool $read = false,
     ) {
         if (null !== $this->ttl && $this->ttl <= 0) {
-            throw new \InvalidArgumentException(\sprintf('The "$ttl" argument of "%s" must be greater than 0 or null, "%s" given.', self::class, $this->ttl));
+            throw new \InvalidArgumentException(\sprintf('The "$ttl" argument of "%s" must be greater than 0 or null, "%s" given.', static::class, $this->ttl));
         }
 
         $methods = array_reduce(array_map('strtoupper', (array) $methods), static fn (array $methods, string $method) => array_merge($methods, preg_split('/\s*,\s*/', $method)), []);

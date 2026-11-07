@@ -13,7 +13,6 @@ namespace Symfony\Component\Yaml\Schema;
 
 use Opis\JsonSchema\Errors\ErrorFormatter;
 use Opis\JsonSchema\Parsers\SchemaParser;
-use Opis\JsonSchema\Resolvers\SchemaResolver;
 use Opis\JsonSchema\SchemaLoader;
 use Opis\JsonSchema\Validator;
 use Symfony\Component\Yaml\Exception\LogicException;
@@ -63,7 +62,7 @@ final class SchemaValidator implements SchemaValidatorInterface
         // Disable default value application: a linter validates the actual content and must
         // not inject (then check) schema defaults, which may be null on non-nullable nodes.
         // Keep validating after the first violation, so one run reports them all.
-        $validator = $this->validator ??= new Validator(new SchemaLoader(new SchemaParser([], ['allowDefaults' => false]), new SchemaResolver(), true), 100, false);
+        $validator = $this->validator ??= new Validator(new SchemaLoader(new SchemaParser([], ['allowDefaults' => false]), new FileSchemaResolver(), true), 100, false);
 
         if (is_file($schema)) {
             // Register the file so relative and internal "$ref" resolve against its location.
@@ -107,11 +106,20 @@ final class SchemaValidator implements SchemaValidatorInterface
     }
 
     /**
-     * Builds a "file://" URI from a filesystem path, using forward slashes so Windows paths stay valid URIs.
+     * Builds a "file://" URI from a filesystem path, using forward slashes and percent-encoding
+     * the path segments.
      */
     private static function toFileUri(string $path): string
     {
         $path = str_replace('\\', '/', $path);
+        $drive = '';
+
+        if ('\\' === \DIRECTORY_SEPARATOR && preg_match('{^[a-zA-Z]:/}', $path, $m)) {
+            $drive = $m[0];
+            $path = substr($path, 3);
+        }
+
+        $path = $drive.implode('/', array_map('rawurlencode', explode('/', $path)));
 
         // Windows paths ("C:/...") need an extra leading slash to form "file:///C:/...".
         return 'file://'.(str_starts_with($path, '/') ? '' : '/').$path;

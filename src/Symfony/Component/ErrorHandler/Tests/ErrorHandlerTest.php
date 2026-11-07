@@ -945,6 +945,75 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
+    #[DataProvider('provideLogDeprecationsOnce')]
+    public function testLogDeprecationsOnce(bool $once, array $expectedLogs)
+    {
+        $handler = new ErrorHandler();
+        $handler->setDefaultLogger($logger = new BufferingLogger());
+        $handler->logDeprecationsOnce($once);
+        $errorReporting = error_reporting(\E_ALL);
+
+        try {
+            $this->assertTrue($handler->handleError(\E_USER_DEPRECATED, 'foo', __FILE__, __LINE__));
+            $this->assertTrue($handler->handleError(\E_USER_DEPRECATED, 'foo', __FILE__, __LINE__));
+            $this->assertTrue($handler->handleError(\E_USER_DEPRECATED, 'bar', __FILE__, __LINE__));
+            $this->assertTrue($handler->handleError(\E_DEPRECATED, 'foo', __FILE__, __LINE__));
+            $this->assertTrue($handler->handleError(\E_DEPRECATED, 'foo', __FILE__, __LINE__));
+        } finally {
+            error_reporting($errorReporting);
+        }
+
+        $this->assertSame($expectedLogs, array_column($logger->cleanLogs(), 1));
+    }
+
+    public static function provideLogDeprecationsOnce(): iterable
+    {
+        yield 'once' => [true, ['User Deprecated: foo', 'User Deprecated: bar', 'Deprecated: foo']];
+        yield 'each time' => [false, ['User Deprecated: foo', 'User Deprecated: foo', 'User Deprecated: bar', 'Deprecated: foo', 'Deprecated: foo']];
+    }
+
+    public function testLogDeprecationsOnceForgetsLoggedDeprecationsAfter100Messages()
+    {
+        $handler = new ErrorHandler();
+        $handler->setDefaultLogger($logger = new BufferingLogger());
+        $handler->logDeprecationsOnce(true);
+
+        for ($i = 0; $i <= 100; ++$i) {
+            $handler->handleError(\E_USER_DEPRECATED, 'foo '.$i, __FILE__, __LINE__);
+        }
+        $handler->handleError(\E_USER_DEPRECATED, 'foo 100', __FILE__, __LINE__);
+        $handler->handleError(\E_USER_DEPRECATED, 'foo 0', __FILE__, __LINE__);
+
+        $this->assertCount(102, $logs = $logger->cleanLogs());
+        $this->assertSame('User Deprecated: foo 0', $logs[101][1]);
+    }
+
+    public function testLogDeprecationsOnceIgnoresDeprecationsTriggeredWhileLogging()
+    {
+        $handler = new ErrorHandler();
+        $logger = new class($handler) extends BufferingLogger {
+            public function __construct(
+                private ErrorHandler $handler,
+            ) {
+            }
+
+            public function log($level, $message, array $context = []): void
+            {
+                if ('User Deprecated: foo' === $message) {
+                    $this->handler->handleError(\E_USER_DEPRECATED, 'bar', __FILE__, __LINE__);
+                }
+                parent::log($level, $message, $context);
+            }
+        };
+        $handler->setDefaultLogger($logger);
+        $handler->logDeprecationsOnce(true);
+
+        $handler->handleError(\E_USER_DEPRECATED, 'foo', __FILE__, __LINE__);
+        $handler->handleError(\E_USER_DEPRECATED, 'bar', __FILE__, __LINE__);
+
+        $this->assertSame(['User Deprecated: foo', 'User Deprecated: bar'], array_column($logger->cleanLogs(), 1));
+    }
+
     public function testRenderExceptionLogsTheParentOfAnonymousClasses()
     {
         $handler = new ErrorHandler();

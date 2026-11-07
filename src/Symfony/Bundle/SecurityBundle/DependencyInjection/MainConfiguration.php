@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AccessTokenFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -114,11 +115,24 @@ class MainConfiguration implements ConfigurationInterface
 
         $this->addPasswordHashersSection($rootNode);
         $this->addProvidersSection($rootNode);
+        $this->addTokenHandlersSection($rootNode, $this->factories);
         $this->addFirewallsSection($rootNode, $this->factories);
         $this->addAccessControlSection($rootNode);
         $this->addRoleHierarchySection($rootNode);
 
         return $tb;
+    }
+
+    /**
+     * @param array<AuthenticatorFactoryInterface> $factories
+     */
+    private function addTokenHandlersSection(ArrayNodeDefinition $rootNode, array $factories): void
+    {
+        foreach ($factories as $factory) {
+            if ($factory instanceof AccessTokenFactory) {
+                $factory->addTokenHandlersConfiguration($rootNode);
+            }
+        }
     }
 
     private function addRoleHierarchySection(ArrayNodeDefinition $rootNode): void

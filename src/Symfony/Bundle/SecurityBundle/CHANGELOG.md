@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `token_handlers` section to declare reusable token handlers, and default the `audience` of the `oidc` and `oauth2` token handlers to the `resource` of `resource_metadata`
  * Add the `entry_point_path` firewall option, redirecting anonymous users to a path or a route when they need to authenticate
  * Retain the referer after failed authentication when `use_referer` is enabled
  * Default the `cost`, `time_cost` and `memory_cost` options of password hashers to the lowest values bcrypt and argon2 accept when `framework.test` is enabled

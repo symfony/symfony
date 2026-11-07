@@ -1372,6 +1372,105 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertSame(['https://login.example.com'], $metadata['authorization_servers']);
     }
 
+    #[DataProvider('provideTokenHandlersDefaultingAudienceToResource')]
+    public function testAudienceDefaultsToTheResourceOfResourceMetadata(array $tokenHandler)
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig([
+            'token_handler' => $tokenHandler,
+            'resource_metadata' => ['resource' => 'https://api.example.com/v1'],
+        ], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $this->assertSame('https://api.example.com/v1', $container->getDefinition('security.access_token_handler.firewall1')->getArgument(2));
+    }
+
+    public static function provideTokenHandlersDefaultingAudienceToResource(): iterable
+    {
+        yield 'oidc' => [['oidc' => ['enforce_at_jwt_type' => true, 'keyset' => 'keyset', 'issuers' => ['https://accounts.example.com']]]];
+        yield 'oauth2' => [['oauth2' => true]];
+        yield 'oauth2 with signed response' => [['oauth2' => ['issuer' => 'https://accounts.example.com', 'response_signature' => ['enabled' => true, 'keyset' => '{"keys":[]}']]]];
+    }
+
+    #[DataProvider('provideTokenHandlersWithConfiguredAudience')]
+    public function testConfiguredAudienceWinsOverTheResourceOfResourceMetadata(array $tokenHandler)
+    {
+        $container = $this->createContainerBuilder();
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $config = $this->processConfig([
+            'token_handler' => $tokenHandler,
+            'resource_metadata' => ['resource' => 'https://api.example.com/v1'],
+        ], $factory);
+
+        $factory->createAuthenticator($container, 'firewall1', $config, 'userprovider');
+
+        $this->assertSame('showcase-api', $container->getDefinition('security.access_token_handler.firewall1')->getArgument(2));
+    }
+
+    public static function provideTokenHandlersWithConfiguredAudience(): iterable
+    {
+        yield 'oidc' => [['oidc' => ['enforce_at_jwt_type' => true, 'keyset' => 'keyset', 'issuers' => ['https://accounts.example.com'], 'audience' => 'showcase-api']]];
+        yield 'oauth2' => [['oauth2' => ['audience' => 'showcase-api']]];
+    }
+
+    #[DataProvider('provideConfigsWithoutAResourceUrl')]
+    public function testOidcAudienceIsRequiredWhenResourceMetadataHasNoResourceUrl(array $extraConfig)
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('You must set the "audience" of the "oidc" token handler when the "resource" of "resource_metadata" is not a URL.');
+
+        $this->processConfig([
+            'token_handler' => [
+                'oidc' => [
+                    'enforce_at_jwt_type' => true,
+                    'keyset' => 'keyset',
+                    'issuers' => ['https://accounts.example.com'],
+                ],
+            ],
+        ] + $extraConfig, new AccessTokenFactory($this->createTokenHandlerFactories()));
+    }
+
+    #[DataProvider('provideConfigsWithoutAResourceUrl')]
+    public function testOAuth2SignedResponseRequiresAudienceWhenResourceMetadataHasNoResourceUrl(array $extraConfig)
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "issuer" and "audience" options of the "oauth2" token handler are required when "response_signature" is enabled: RFC 9701 §5 makes "iss" and "aud" mandatory claims of the response.');
+
+        $this->processConfig([
+            'token_handler' => [
+                'oauth2' => [
+                    'issuer' => 'https://accounts.example.com',
+                    'response_signature' => [
+                        'enabled' => true,
+                        'keyset' => '{"keys":[]}',
+                    ],
+                ],
+            ],
+        ] + $extraConfig, new AccessTokenFactory($this->createTokenHandlerFactories()));
+    }
+
+    public static function provideConfigsWithoutAResourceUrl(): iterable
+    {
+        yield 'no resource_metadata' => [[]];
+        yield 'resource_metadata without a resource' => [['resource_metadata' => []]];
+        yield 'resource_metadata with a path' => [['resource_metadata' => ['resource' => '/v1']]];
+    }
+
+    public function testAudienceOnTokenHandlerRequiresId()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "audience" option of "token_handler" can only be used when referencing a token handler with "id"; set it on the "oidc" or "oauth2" token handler instead.');
+
+        $this->processConfig([
+            'token_handler' => [
+                'cas' => ['validation_url' => 'https://www.example.com/cas/validate'],
+                'audience' => 'showcase-api',
+            ],
+        ], new AccessTokenFactory($this->createTokenHandlerFactories()));
+    }
+
     public function testEachFirewallGetsItsOwnMetadata()
     {
         $container = $this->createContainerBuilder();

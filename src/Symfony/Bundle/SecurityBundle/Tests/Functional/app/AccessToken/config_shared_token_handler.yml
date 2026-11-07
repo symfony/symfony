@@ -1,0 +1,47 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+framework:
+    serializer: ~
+
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    dunglas: { password: foo, roles: [ROLE_USER] }
+
+    token_handlers:
+        oidc:
+            oidc:
+                claim: 'username'
+                issuers: ['https://www.example.com']
+                algorithms: ['ES256']
+                keyset: '{"keys":[{"kty":"EC","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo"}]}'
+                enforce_at_jwt_type: true
+
+    firewalls:
+        foo:
+            pattern: ^/foo
+            stateless: true
+            access_token:
+                token_handler:
+                    id: oidc
+                    audience: showcase-api
+                resource_metadata:
+                    scopes_supported: ['proposals:write']
+        bar:
+            pattern: ^/bar
+            stateless: true
+            access_token:
+                token_handler: oidc
+                resource_metadata:
+                    resource: 'http://localhost/bar'
+                    scopes_supported: ['proposals:write', 'proposals:review']
+
+    access_control:
+        - { path: ^/foo, roles: ROLE_USER }
+        - { path: ^/bar, roles: ROLE_USER }

@@ -117,6 +117,17 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertEquals(new ValueGuess(false, Guess::LOW_CONFIDENCE), $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
+    public function testGuessMinLengthFromLengthConstraint()
+    {
+        $constraint = new Length(min: '3');
+
+        $this->assertEquals(new ValueGuess(3, Guess::HIGH_CONFIDENCE), $this->guesser->guessMinLengthForConstraint($constraint));
+        $this->assertNull($this->guesser->guessMinLengthForConstraint(new Length(max: 10)));
+
+        $this->metadata->addPropertyConstraint(self::TEST_PROPERTY, $constraint);
+        $this->assertEquals(new ValueGuess(3, Guess::HIGH_CONFIDENCE), $this->guesser->guessMinLength(self::TEST_CLASS, self::TEST_PROPERTY));
+    }
+
     public function testGuessMaxLengthForConstraintWithMaxValue()
     {
         $constraint = new Length(max: '2');

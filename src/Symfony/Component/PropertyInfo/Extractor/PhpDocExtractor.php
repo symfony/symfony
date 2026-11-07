@@ -296,7 +296,8 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $reflector = $reflectionProperty->getDeclaringClass();
 
         foreach ($reflector->getTraits() as $trait) {
-            if ($trait->hasProperty($property)) {
+            // a class can declare a property of its traits again, with another doc comment
+            if ($trait->hasProperty($property) && $trait->getProperty($property)->getDocComment() === $reflectionProperty->getDocComment()) {
                 return $this->getDocBlockFromProperty($trait->getName(), $property, $reflector->isTrait() ? $originalClass : $reflector->getName());
             }
         }
@@ -322,9 +323,8 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     /**
      * @return array{DocBlock, int, ?string, string}|null
      */
-    private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type, ?string $originalClass = null): ?array
+    private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type): ?array
     {
-        $originalClass ??= $class;
         $prefixes = self::ACCESSOR === $type ? $this->accessorPrefixes : $this->mutatorPrefixes;
         $prefix = null;
         $method = null;
@@ -363,27 +363,29 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return null;
         }
 
-        $reflector = $method->getDeclaringClass();
+        $declaringClass = $method->class;
 
-        foreach ($reflector->getTraits() as $trait) {
-            if ($trait->hasMethod($methodName)) {
-                return $this->getDocBlockFromMethod($trait->getName(), $ucFirstProperty, $type, $reflector->isTrait() ? $originalClass : $reflector->getName());
+        // a method without docblock that implements an abstract method of a trait uses the docblock of the trait
+        if (false === $method->getDocComment()) {
+            foreach ($method->getDeclaringClass()->getTraits() as $trait) {
+                if ($trait->hasMethod($method->name) && $trait->getMethod($method->name)->isAbstract()) {
+                    $method = $trait->getMethod($method->name);
+                    break;
+                }
             }
         }
 
-        $context = $this->createFromReflector($reflector);
+        $context = $this->createFromReflector($this->getDeclaringTrait($method) ?? $method->getDeclaringClass());
         $prefix = self::ACCESSOR === $type ? null : $prefix;
 
         try {
-            $declaringClass = $reflector->isTrait() ? $originalClass : $reflector->getName();
-
             return [$this->docBlockFactory->create($method, $context), $type, $prefix, $declaringClass];
         } catch (\InvalidArgumentException) {
             return null;
         } catch (\RuntimeException) {
             // Workaround for phpdocumentor/reflection-docblock < 6 not supporting ?Type<...> syntax
             if (($rawDoc = $method->getDocComment()) && $docBlock = $this->getNullableGenericDocBlock($rawDoc, $context)) {
-                return [$docBlock, $type, $prefix, $declaringClass ?? ($reflector->isTrait() ? $originalClass : $reflector->getName())];
+                return [$docBlock, $type, $prefix, $declaringClass];
             }
 
             return null;

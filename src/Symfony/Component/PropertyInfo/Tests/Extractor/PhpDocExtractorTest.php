@@ -412,6 +412,7 @@ class PhpDocExtractorTest extends TestCase
             ['propertyInExternalTraitPrimitiveType', new LegacyType(LegacyType::BUILTIN_TYPE_STRING)],
             ['propertyInExternalTraitObjectSameNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
             ['propertyInExternalTraitObjectDifferentNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
+            ['redeclaredPropertyInTraitInAnotherNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
         ];
     }
 
@@ -435,6 +436,20 @@ class PhpDocExtractorTest extends TestCase
             ['methodInExternalTraitObjectSameNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
             ['methodInExternalTraitObjectDifferentNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
         ];
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testMethodsDefinedByTraitInAnotherNamespaceLegacy()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor::getType()" instead.');
+
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInTraitInAnotherNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'aliasedMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'overriddenMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'abstractMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'overriddenAbstractMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'mutatorInTraitInAnotherNamespace'));
     }
 
     #[IgnoreDeprecations]
@@ -930,6 +945,7 @@ class PhpDocExtractorTest extends TestCase
         yield ['propertyInExternalTraitPrimitiveType', Type::string()];
         yield ['propertyInExternalTraitObjectSameNamespace', Type::object(Dummy::class)];
         yield ['propertyInExternalTraitObjectDifferentNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['redeclaredPropertyInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
     }
 
     #[DataProvider('methodsDefinedByTraitsProvider')]
@@ -949,6 +965,12 @@ class PhpDocExtractorTest extends TestCase
         yield ['methodInExternalTraitPrimitiveType', Type::string()];
         yield ['methodInExternalTraitObjectSameNamespace', Type::object(Dummy::class)];
         yield ['methodInExternalTraitObjectDifferentNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['methodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['aliasedMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['overriddenMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['abstractMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['overriddenAbstractMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['mutatorInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
     }
 
     public function testConstructorDefinedByTrait()

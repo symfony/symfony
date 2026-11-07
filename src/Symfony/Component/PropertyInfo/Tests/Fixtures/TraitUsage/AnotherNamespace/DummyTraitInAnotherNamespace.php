@@ -13,6 +13,11 @@ trait DummyTraitInAnotherNamespace
     public $dummyInAnotherNamespace;
 
     /**
+     * @var DummyInAnotherNamespace
+     */
+    public $redeclaredPropertyInTraitInAnotherNamespace;
+
+    /**
      * @param DummyInAnotherNamespace $dummyInConstructor
      * @param list<T>                 $templateInConstructor
      */
@@ -35,6 +40,16 @@ trait DummyTraitInAnotherNamespace
     {
         return new DummyInAnotherNamespace();
     }
+
+    /**
+     * @return DummyInAnotherNamespace
+     */
+    abstract public function getAbstractMethodInTraitInAnotherNamespace();
+
+    /**
+     * @return DummyInAnotherNamespace
+     */
+    abstract public function getOverriddenAbstractMethodInTraitInAnotherNamespace();
 
     /**
      * @param list<T> $value

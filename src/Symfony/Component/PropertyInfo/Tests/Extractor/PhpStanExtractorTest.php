@@ -31,10 +31,13 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyPropertyAndGetterWithDifferentTypes;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyUnionType;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithTemplateAndParent;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithConstructorOverride;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithoutConstructorOverride;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithSelfDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyInDifferentNs;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyWithStaticGetterInDifferentNs;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyWithTemplateAndParentInDifferentNs;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ParentWithPromotedPropertyDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ParentWithSelfDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\PromotedPropertiesWithDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IFace;
@@ -372,6 +375,7 @@ class PhpStanExtractorTest extends TestCase
             ['propertyInTraitObjectSameNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
             ['propertyInTraitObjectDifferentNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
             ['dummyInAnotherNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)],
+            ['redeclaredPropertyInTraitInAnotherNamespace', new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
         ];
     }
 
@@ -390,6 +394,8 @@ class PhpStanExtractorTest extends TestCase
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInTraitInAnotherNamespace'));
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'aliasedMethodInTraitInAnotherNamespace'));
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'overriddenMethodInTraitInAnotherNamespace'));
+        $this->assertNull($this->extractor->getTypes(DummyUsingTrait::class, 'abstractMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'overriddenAbstractMethodInTraitInAnotherNamespace'));
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'mutatorInTraitInAnotherNamespace'));
     }
 
@@ -639,6 +645,19 @@ class PhpStanExtractorTest extends TestCase
             [Php80Dummy::class, 'collection', [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_STRING))]],
             [Php80PromotedDummy::class, 'promoted', null],
         ];
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testInheritedPromotedPropertyWithConstructorOverrideLegacy()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::getType()" instead.');
+
+        $expectedTypes = [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_STRING), new LegacyType(LegacyType::BUILTIN_TYPE_INT))];
+
+        $this->assertEquals($expectedTypes, $this->extractor->getTypes(ParentWithPromotedPropertyDocBlock::class, 'items'));
+        $this->assertEquals($expectedTypes, $this->extractor->getTypes(ChildWithoutConstructorOverride::class, 'items'));
+        $this->assertEquals($expectedTypes, $this->extractor->getTypes(ChildWithConstructorOverride::class, 'items'));
     }
 
     #[IgnoreDeprecations]
@@ -937,6 +956,7 @@ class PhpStanExtractorTest extends TestCase
         yield ['propertyInTraitObjectSameNamespace', Type::object(DummyUsedInTrait::class)];
         yield ['propertyInTraitObjectDifferentNamespace', Type::object(Dummy::class)];
         yield ['dummyInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['redeclaredPropertyInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
     }
 
     #[DataProvider('methodsDefinedByTraitsProvider')]
@@ -959,6 +979,8 @@ class PhpStanExtractorTest extends TestCase
         yield ['methodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
         yield ['aliasedMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
         yield ['overriddenMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['abstractMethodInTraitInAnotherNamespace', null];
+        yield ['overriddenAbstractMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
         yield ['templateInTraitInAnotherNamespace', Type::list(Type::template('T'))];
         yield ['mutatorInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
     }
@@ -1216,6 +1238,15 @@ class PhpStanExtractorTest extends TestCase
         yield [Php80Dummy::class, 'promoted', null];
         yield [Php80Dummy::class, 'collection', Type::array(Type::string())];
         yield [Php80PromotedDummy::class, 'promoted', null];
+    }
+
+    public function testInheritedPromotedPropertyWithConstructorOverride()
+    {
+        $expectedType = Type::dict(Type::int(), Type::string());
+
+        $this->assertEquals($expectedType, $this->extractor->getType(ParentWithPromotedPropertyDocBlock::class, 'items'));
+        $this->assertEquals($expectedType, $this->extractor->getType(ChildWithoutConstructorOverride::class, 'items'));
+        $this->assertEquals($expectedType, $this->extractor->getType(ChildWithConstructorOverride::class, 'items'));
     }
 
     #[DataProvider('allowPrivateAccessProvider')]

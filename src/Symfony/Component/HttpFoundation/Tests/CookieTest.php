@@ -229,7 +229,7 @@ class CookieTest extends TestCase
 
     public function testInstantiationThrowsExceptionIfPrefixedNameIsExplicitlyInsecure()
     {
-        foreach (['__Secure-foo', '__Host-foo'] as $name) {
+        foreach (['__Secure-foo', '__Host-foo', '__Http-foo', '__Host-Http-foo'] as $name) {
             try {
                 Cookie::create($name, 'bar', 0, '/', null, false);
                 $this->fail(\sprintf('Expected an exception for "%s".', $name));
@@ -241,7 +241,7 @@ class CookieTest extends TestCase
 
     public function testWithSecureThrowsExceptionIfPrefixedNameIsMadeInsecure()
     {
-        foreach (['__Secure-foo', '__Host-foo'] as $name) {
+        foreach (['__Secure-foo', '__Host-foo', '__Http-foo', '__Host-Http-foo'] as $name) {
             try {
                 Cookie::create($name, 'bar', 0, '/', null, true)->withSecure(false);
                 $this->fail(\sprintf('Expected an exception for "%s".', $name));
@@ -253,7 +253,7 @@ class CookieTest extends TestCase
 
     public function testPrefixedNameWithNullSecureIsAccepted()
     {
-        foreach (['__Secure-foo', '__Host-foo'] as $name) {
+        foreach (['__Secure-foo', '__Host-foo', '__Http-foo', '__Host-Http-foo'] as $name) {
             $cookie = Cookie::create($name, 'bar', 0, '/', null, null);
 
             $this->assertFalse($cookie->isSecure());
@@ -271,6 +271,48 @@ class CookieTest extends TestCase
         $this->assertSame('__Host-foo', $cookie->getName());
         $this->assertNull($cookie->getDomain());
         $this->assertSame('/', $cookie->getPath());
+    }
+
+    #[DataProvider('httpPrefixedNames')]
+    public function testInstantiationThrowsExceptionIfHttpPrefixedNameIsNotHttpOnly(string $name)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The cookie name "%s" uses a reserved prefix, which requires the "httpOnly" flag to be enabled.', $name));
+
+        Cookie::create($name, 'bar', 0, '/', null, true, false);
+    }
+
+    #[DataProvider('httpPrefixedNames')]
+    public function testWithHttpOnlyThrowsExceptionIfHttpPrefixedNameIsMadeAccessibleToScripts(string $name)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The cookie name "%s" uses a reserved prefix, which requires the "httpOnly" flag to be enabled.', $name));
+
+        Cookie::create($name, 'bar')->withHttpOnly(false);
+    }
+
+    #[DataProvider('httpPrefixedNames')]
+    public function testHttpPrefixedNameIsParsedFromAValidHeader(string $name)
+    {
+        $cookie = Cookie::fromString($name.'=bar; path=/; secure; httponly');
+
+        $this->assertSame($name, $cookie->getName());
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+    }
+
+    public static function httpPrefixedNames(): array
+    {
+        return [['__Http-foo'], ['__Host-Http-foo']];
+    }
+
+    public function testHttpPrefixMatchingIsCaseSensitive()
+    {
+        foreach (['__http-foo', '__host-http-foo'] as $name) {
+            $cookie = Cookie::create($name, 'bar', 0, '/admin', 'example.com', false, false);
+
+            $this->assertSame($name, $cookie->getName());
+        }
     }
 
     public function testParsingAHeaderWithoutSecureDefersInsteadOfFailing()

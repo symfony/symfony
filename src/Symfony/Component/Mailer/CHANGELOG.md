@@ -24,6 +24,7 @@ CHANGELOG
  * Use the global clock of symfony/clock, when installed, for the throttling of `AbstractTransport::setMaxPerSecond()` and the retry period of `RoundRobinTransport` and `FailoverTransport`
  * Add `Transports::close()`, `RoundRobinTransport::stop()` and `SendmailTransport::stop()`
  * Stop the SMTP transports when the kernel shuts down
+ * Declare the message size in the `MAIL FROM` command when the SMTP server supports the `SIZE` extension (RFC 1870)
 
 8.0
 ---

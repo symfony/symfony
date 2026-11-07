@@ -21,7 +21,10 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyTraitWithUse
 use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyWithTemplateAndParentInDifferentNs;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnum;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyExtendingParentDummyWithTemplate;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyImplementingInterfaceWithTemplate;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyImportingUnresolvableTypeAlias;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyInterfaceWithTemplate;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyReimportingUnresolvableTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyUsingTraitWithUses;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithImportedOnlyTypeAliases;
@@ -39,6 +42,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTypeAliasImportedFromInva
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUnresolvableTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUses;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUsesWindowsLineEndings;
+use Symfony\Component\TypeInfo\Tests\Fixtures\ParentDummyWithTemplate;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
@@ -204,6 +208,27 @@ class TypeContextFactoryTest extends TestCase
         $typeContextFactory = new TypeContextFactory();
 
         $this->assertEquals([], $typeContextFactory->createFromClassName(DummyWithTemplates::class)->templates);
+    }
+
+    /**
+     * @param class-string $calledClassName
+     * @param class-string $declaringClassName
+     */
+    #[DataProvider('resolveTemplateOfUntaggedParentDataProvider')]
+    public function testResolveTemplateOfUntaggedParent(string $calledClassName, string $declaringClassName)
+    {
+        $typeContext = $this->typeContextFactory->createFromClassName($calledClassName, $declaringClassName);
+
+        $this->assertEquals(Type::template('T', Type::object()), (new StringTypeResolver())->resolve('T', $typeContext));
+    }
+
+    /**
+     * @return iterable<array{0: class-string, 1: class-string}>
+     */
+    public static function resolveTemplateOfUntaggedParentDataProvider(): iterable
+    {
+        yield 'class' => [DummyExtendingParentDummyWithTemplate::class, ParentDummyWithTemplate::class];
+        yield 'interface' => [DummyImplementingInterfaceWithTemplate::class, DummyInterfaceWithTemplate::class];
     }
 
     /**

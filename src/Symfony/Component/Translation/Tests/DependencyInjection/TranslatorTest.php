@@ -124,6 +124,27 @@ class TranslatorTest extends TestCase
         $this->assertSame('en', $translator->getLocale());
     }
 
+    public function testScannedDirectoriesAreCapturedBeforeCatalogueLoading()
+    {
+        mkdir($this->tmpDir);
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects($this->once())->method('load')->willReturnCallback(function (): MessageCatalogue {
+            file_put_contents($this->tmpDir.'/added.en.yml', 'key: v2');
+
+            return new MessageCatalogue('en', ['messages' => ['key' => 'v1']]);
+        });
+        $container = new Container();
+        $container->set('loader', $loader);
+        $translator = new Translator($container, new MessageFormatter(), 'en', ['loader' => ['test']], ['scanned_directories' => [$this->tmpDir]]);
+        $translator->addResource('test', 'input', 'en');
+
+        self::assertSame('v1', $translator->trans('key'));
+        $resources = $translator->getCatalogue('en')->getResources();
+        self::assertCount(1, $resources);
+        self::assertInstanceOf(DirectoryResource::class, $resources[0]);
+        self::assertFalse($resources[0]->isFresh(time() + 10));
+    }
+
     public function testInvalidOptions()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -200,7 +221,9 @@ class TranslatorTest extends TestCase
 
         $resources = $catalogue->getResources();
 
-        $this->assertEquals(new DirectoryResource(__DIR__), $resources[1]);
+        $this->assertInstanceOf(DirectoryResource::class, $resources[1]);
+        $this->assertSame(__DIR__, $resources[1]->getResource());
+        $this->assertNull($resources[1]->getPattern());
         $this->assertEquals(new FileExistenceResource('/tmp/I/sure/hope/this/does/not/exist'), $resources[2]);
     }
 
@@ -260,11 +283,13 @@ class TranslatorTest extends TestCase
 
         $resources = $translator->getCatalogue('fr')->getResources();
 
+        $this->assertInstanceOf(DirectoryResource::class, $resources[1]);
+        $this->assertSame(__DIR__, $resources[1]->getResource());
+        $this->assertNull($resources[1]->getPattern());
         $this->assertEquals([
-            new DirectoryResource(__DIR__),
             new FileResource($vendorDir.'/composer/installed.json'),
             new FileExistenceResource('/tmp/I/sure/hope/this/does/not/exist'),
-        ], \array_slice($resources, 1));
+        ], \array_slice($resources, 2));
     }
 
     public function testUpdatingAPackageRefreshesTheCachedCatalogue()

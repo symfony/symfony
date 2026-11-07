@@ -331,11 +331,18 @@ class TranslationBundle extends AbstractBundle
         return [array_values(array_unique($dirs)), array_values(array_unique($transPaths)), array_values(array_unique($nonExistingDirs))];
     }
 
+    /**
+     * @param list<string> $dirs
+     * @param list<string> $nonExistingDirs
+     *
+     * @return array{resource_files: array<string, list<string>>, scanned_directories: list<string>, cache_vary: array{scanned_directories: list<string>, resource_files: string}}
+     */
     private function buildResourceOptions(array $dirs, array $nonExistingDirs, ContainerBuilder $container): array
     {
         $files = [];
+        $resourceNames = [];
 
-        foreach ($dirs as $dir) {
+        foreach ($dirs as $directoryIndex => $dir) {
             $finder = Finder::create()
                 ->followLinks()
                 ->files()
@@ -347,6 +354,7 @@ class TranslationBundle extends AbstractBundle
                 $fileNameParts = explode('.', basename($file));
                 $locale = $fileNameParts[\count($fileNameParts) - 2];
                 $files[$locale][] = (string) $file;
+                $resourceNames[$locale][] = $directoryIndex.'/'.substr((string) $file, \strlen($dir) + 1);
             }
         }
 
@@ -359,6 +367,7 @@ class TranslationBundle extends AbstractBundle
             'scanned_directories' => $parameterBag->escapeValue($scannedDirectories),
             'cache_vary' => [
                 'scanned_directories' => $parameterBag->escapeValue(array_map(static fn ($dir) => str_starts_with($dir, $projectDir.'/') ? substr($dir, 1 + \strlen($projectDir)) : $dir, $scannedDirectories)),
+                'resource_files' => hash('xxh128', serialize($resourceNames)),
             ],
         ];
     }
@@ -372,7 +381,12 @@ class TranslationBundle extends AbstractBundle
             return $container->fileExists($dir);
         }
 
-        $container->addResource(new GlobResource($dir, '', true));
+        $container->addResource($resource = new GlobResource($dir, '', true));
+        if (\in_array($resource, $container->getResources(), true)) {
+            foreach ($resource as $_) {
+                // Complete discovery now so a later edit cannot enter its baseline.
+            }
+        }
 
         return true;
     }

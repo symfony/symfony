@@ -121,6 +121,30 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 
     public function getIterator(): \Traversable
     {
+        if (isset($this->hash)) {
+            yield from $this->listPaths();
+
+            return;
+        }
+
+        $directories = isset($_SERVER['SOURCE_DATE_EPOCH']) ? null : $this->snapshotDirectories();
+        $hash = hash_init('xxh128');
+        foreach ($this->listPaths() as $path => $info) {
+            hash_update($hash, $path."\n");
+            yield $path => $info;
+        }
+
+        if (!isset($this->hash)) {
+            $this->hash = hash_final($hash);
+            $this->directories = null !== $directories && $this->discoveryMatchesDirectories($directories, $this->hash) ? $directories : null;
+        }
+    }
+
+    /**
+     * @return \Traversable<string, \SplFileInfo>
+     */
+    private function listPaths(): \Traversable
+    {
         if ((!$this->recursive && '' === $this->pattern) || !file_exists($this->prefix)) {
             return;
         }
@@ -234,7 +258,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
     {
         $hash = hash_init('xxh128');
 
-        foreach ($this->getIterator() as $path => $info) {
+        foreach ($this->listPaths() as $path => $info) {
             hash_update($hash, $path."\n");
         }
 
@@ -365,6 +389,36 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         foreach ($this->directories as $dir => [$mtime, $inode, $hash]) {
             if ((null === $mtime || @filemtime($this->prefix.$dir) !== $mtime || fileinode($this->prefix.$dir) !== $inode) && self::hashDirectory($this->prefix.$dir) !== $hash) {
                 return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Confirms that the directory snapshots still describe the discovered paths, including recent directories.
+     *
+     * @param array<string, array{int|null, int, string}> $directories
+     */
+    private function discoveryMatchesDirectories(array $directories, string $hash): bool
+    {
+        $recent = false;
+        foreach ($directories as $dir => [$mtime, $inode]) {
+            if (null === $mtime) {
+                $recent = true;
+            } elseif (@filemtime($this->prefix.$dir) !== $mtime || @fileinode($this->prefix.$dir) !== $inode) {
+                return false;
+            }
+        }
+
+        if ($recent) {
+            if ($hash !== $this->computeHash()) {
+                return false;
+            }
+            foreach ($directories as $dir => [, , $entriesHash]) {
+                if (self::hashDirectory($this->prefix.$dir) !== $entriesHash) {
+                    return false;
+                }
             }
         }
 

@@ -13,6 +13,8 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Routing\Loader\ObjectLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -97,6 +99,62 @@ class ObjectLoaderTest extends TestCase
         $this->expectException(\LogicException::class);
 
         $loader->load('my_service::loadRoutes');
+    }
+
+    public function testObjectIsCapturedBeforeItsCallbackExecutes()
+    {
+        $directory = sys_get_temp_dir().'/sf-route-capture-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        try {
+            $path = $directory.'/object.php';
+            file_put_contents($path, <<<'PHP'
+                <?php
+                return new class {
+                    public function __invoke() {
+                        $collection = new Symfony\Component\Routing\RouteCollection();
+                        $collection->add('test', new Symfony\Component\Routing\Route('/v1'));
+                        file_put_contents(__FILE__, str_replace('/v1', '/v2', file_get_contents(__FILE__)));
+                        return $collection;
+                    }
+                };
+                PHP);
+            $object = require $path;
+            $loader = new class($object) extends ObjectLoader {
+                public function __construct(private object $object)
+                {
+                    parent::__construct();
+                }
+
+                protected function getObject(string $id): object
+                {
+                    return $this->object;
+                }
+
+                public function supports(mixed $resource, ?string $type = null): bool
+                {
+                    return true;
+                }
+            };
+            $collection = $loader->load('test');
+
+            self::assertSame('/v1', $collection->get('test')->getPath());
+            self::assertFalse($this->fileResource($collection, $path)->isFresh(time() + 10));
+        } finally {
+            (new Filesystem())->remove($directory);
+        }
+    }
+
+    /**
+     * Finds the source resource retained by the real route loader.
+     */
+    private function fileResource(RouteCollection $collection, string $path): FileResource
+    {
+        foreach ($collection->getResources() as $resource) {
+            if ($resource instanceof FileResource && $resource->getResource() === realpath($path)) {
+                return $resource;
+            }
+        }
+        self::fail('The route collection must track its source file.');
     }
 }
 

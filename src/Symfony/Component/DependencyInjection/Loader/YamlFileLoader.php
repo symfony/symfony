@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -30,14 +31,23 @@ class YamlFileLoader extends FileLoader
     protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
     private YamlParser $yamlParser;
+    private ?FileResource $fileResource = null;
 
     public function load(mixed $resource, ?string $type = null): mixed
     {
         $path = $this->locator->locate($resource);
 
-        $content = $this->loadFile($path);
-
-        $this->container->fileExists($path);
+        $previousResource = $this->fileResource;
+        try {
+            $content = $this->loadFile($path);
+            if ($previousResource !== $this->fileResource && null !== $this->fileResource && $this->fileResource->getResource() === (realpath($path) ?: $path)) {
+                $this->container->addResource($this->fileResource);
+            } else {
+                $this->container->fileExists($path);
+            }
+        } finally {
+            $this->fileResource = $previousResource;
+        }
 
         // empty file
         if (null === $content) {
@@ -97,6 +107,10 @@ class YamlFileLoader extends FileLoader
         }
 
         $this->yamlParser ??= new YamlParser();
+
+        if ($this->container->isTrackingResources()) {
+            $this->fileResource = new FileResource($file);
+        }
 
         try {
             $configuration = $this->yamlParser->parseFile($file, Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS);

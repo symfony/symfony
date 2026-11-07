@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\JsonStreamer\Tests;
 
+use Composer\Autoload\ClassLoader;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
@@ -55,6 +57,53 @@ class StreamerDumperTest extends TestCase
         $this->assertFileExists($path.'.meta.json');
 
         $this->assertStringEqualsFile($path, 'CONTENT');
+    }
+
+    public function testSourceEditedDuringGenerationIsRejectedInTheNextProcess()
+    {
+        $directory = sys_get_temp_dir().'/sf-streamer-capture-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        $class = 'StreamerCapturedClass'.bin2hex(random_bytes(6));
+        $source = $directory.'/model.php';
+        $path = $directory.'/streamer.php';
+        $server = $_SERVER;
+        unset($_SERVER['SOURCE_DATE_EPOCH']);
+        $_SERVER['REQUEST_TIME'] = time() - 10;
+        file_put_contents($source, '<?php class '.$class.' { public string $value = "v1"; }');
+        touch($source, time() - 100);
+        require $source;
+        $metadataLoader = $this->createStub(PropertyMetadataLoaderInterface::class);
+        $metadataLoader->method('load')->willReturn([]);
+        $dumper = new StreamerDumper($metadataLoader, $directory, new ConfigCacheFactory(true));
+        try {
+            $dumper->dump(Type::object($class), $path, static function () use ($source, $class): string {
+                file_put_contents($source, str_replace('v1', 'v2', file_get_contents($source)));
+                touch($source, time() - 1);
+                clearstatcache();
+
+                return (new $class())->value;
+            });
+            self::assertStringEqualsFile($path, 'v1');
+            foreach (ClassLoader::getRegisteredLoaders() as $vendor => $loader) {
+                if ($loader->findFile(ConfigCache::class)) {
+                    $autoload = $vendor.'/autoload.php';
+                    break;
+                }
+            }
+            $process = proc_open([\PHP_BINARY, '-r', 'require $argv[1]; require $argv[2]; echo (new Symfony\Component\Config\ConfigCache($argv[3], true))->isFresh() ? "fresh" : "stale";', $autoload, $source, $path], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+            $output = stream_get_contents($pipes[1]);
+            $error = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            self::assertSame(0, proc_close($process), $error);
+            self::assertSame('stale', $output);
+        } finally {
+            $_SERVER = $server;
+            foreach (glob($directory.'/*') as $file) {
+                unlink($file);
+            }
+            rmdir($directory);
+        }
     }
 
     public function testDumpWithoutConfigCache()

@@ -11,18 +11,25 @@
 
 namespace Symfony\Component\Config\Tests\Resource;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Tests\Fixtures\LegacyResource;
+use Symfony\Component\Filesystem\Filesystem;
 
 class FileResourceTest extends TestCase
 {
+    private string $directory;
+
     protected FileResource $resource;
     protected string $file;
     protected int $time;
 
     protected function setUp(): void
     {
+        $this->directory = sys_get_temp_dir().'/sf-file-resource-'.bin2hex(random_bytes(6));
+        mkdir($this->directory);
         $this->file = sys_get_temp_dir().'/tmp.xml';
         $this->time = time();
         touch($this->file, $this->time);
@@ -31,6 +38,7 @@ class FileResourceTest extends TestCase
 
     protected function tearDown(): void
     {
+        (new Filesystem())->remove($this->directory);
         if (file_exists($this->file)) {
             @unlink($this->file);
         }
@@ -74,7 +82,7 @@ class FileResourceTest extends TestCase
         $this->touch($time = $this->time + 20);
 
         $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if the resource has been updated in the same second');
-        $this->assertTrue($resource->isFresh($time + 1), '->isFresh() returns true if the resource has not changed since the previous second');
+        $this->assertFalse($resource->isFresh($time + 1), 'A later cache write does not replace the captured input.');
     }
 
     public function testIsFreshComparesContentWhenModifiedInSameSecondAsLoaded()
@@ -116,6 +124,96 @@ class FileResourceTest extends TestCase
             $this->assertSame($serialized, serialize(new FileResource($this->file)));
         } finally {
             unset($_SERVER['SOURCE_DATE_EPOCH']);
+        }
+    }
+
+    #[DataProvider('provideFileChanges')]
+    public function testFileRemembersConsumedInput(int $age, int $editAge, string $contents, bool $fresh)
+    {
+        $now = time();
+        $path = $this->directory.'/é space.bin';
+        file_put_contents($path, "v1\0");
+        touch($path, $now - $age);
+        clearstatcache();
+        $resource = new FileResource($path);
+        $serialized = serialize($resource);
+
+        file_put_contents($path, $contents);
+        touch($path, $now - $editAge);
+        clearstatcache();
+
+        self::assertSame($fresh, $resource->isFresh($now + 10));
+        self::assertSame($fresh, unserialize($serialized)->isFresh($now + 10));
+        self::assertSame($serialized, serialize($resource));
+    }
+
+    public static function provideFileChanges(): iterable
+    {
+        yield 'old input edited before cache write' => [100, 1, "v2\0", false];
+        yield 'recent input rewritten in its capture second' => [0, 0, "v2\0", false];
+        yield 'recent input unchanged' => [0, 0, "v1\0", true];
+        yield 'hashed identical rewrite' => [0, -1, "v1\0", true];
+        yield 'unhashed identical rewrite' => [100, 1, "v1\0", false];
+        yield 'mtime moves backwards' => [100, 200, "v2\0", false];
+        yield 'empty replacement' => [0, 0, '', false];
+        yield 'large replacement' => [0, 0, str_repeat('x', 1024 * 1024), false];
+    }
+
+    public function testAtomicReplacementAndMultipleEditsKeepTheOriginalFileBaseline()
+    {
+        file_put_contents($path = $this->directory.'/a', 'v1');
+        $mtime = filemtime($path);
+        $resource = new FileResource($path);
+        file_put_contents($this->directory.'/replacement', 'v2');
+        rename($this->directory.'/replacement', $path);
+        touch($path, $mtime);
+        clearstatcache();
+        self::assertFalse($resource->isFresh(time() + 10));
+        file_put_contents($path, 'v3');
+        touch($path, $mtime);
+        clearstatcache();
+        self::assertFalse(unserialize(serialize($resource))->isFresh(time() + 10));
+        unlink($path);
+        self::assertFalse($resource->isFresh(time() + 10));
+    }
+
+    public function testFileResourceStillAcceptsDirectories()
+    {
+        $now = time();
+        touch($this->directory, $now);
+        clearstatcache();
+        $resource = new FileResource($this->directory);
+        self::assertSame(realpath($this->directory), $resource->getResource());
+        self::assertFalse($resource->isFresh($now + 10));
+        touch($this->directory, $now - 100);
+        clearstatcache();
+        self::assertTrue((new FileResource($this->directory))->isFresh($now + 10));
+    }
+
+    public function testLegacyMetadataRemainsReadable()
+    {
+        $resource = LegacyResource::create(FileResource::class, ['resource' => $this->file]);
+        self::assertTrue($resource->isFresh(time() + 10));
+    }
+
+    public function testFailedRecentHashCannotCertifyFreshnessAfterReadAccessReturns()
+    {
+        file_put_contents($this->file, 'v1');
+        chmod($this->file, 0);
+        clearstatcache();
+        if (is_readable($this->file)) {
+            chmod($this->file, 0o600);
+            self::markTestSkipped('This process can read files without read permission.');
+        }
+        try {
+            $resource = new FileResource($this->file);
+            self::assertFalse($resource->isFresh(time() + 10));
+            chmod($this->file, 0o600);
+            clearstatcache();
+            self::assertFalse($resource->isFresh(time() + 10));
+            self::assertTrue((new FileResource($this->file))->isFresh(time() + 10));
+        } finally {
+            chmod($this->file, 0o600);
         }
     }
 

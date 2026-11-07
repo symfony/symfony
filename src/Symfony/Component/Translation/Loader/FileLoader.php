@@ -31,6 +31,7 @@ abstract class FileLoader extends ArrayLoader
             throw new NotFoundResourceException(\sprintf('File "%s" not found.', $resource));
         }
 
+        $fileResource = class_exists(FileResource::class) ? new FileResource($resource) : null;
         $messages = $this->loadResource($resource);
 
         // empty resource
@@ -43,8 +44,8 @@ abstract class FileLoader extends ArrayLoader
 
         $catalogue = parent::load($messages, $locale, $domain);
 
-        if (class_exists(FileResource::class)) {
-            $catalogue->addResource(new FileResource($resource));
+        if (null !== $fileResource) {
+            $catalogue->addResource($fileResource);
         }
 
         return $catalogue;

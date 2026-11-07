@@ -14,9 +14,11 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 require_once __DIR__.'/../Fixtures/includes/AcmeExtension.php';
 require_once __DIR__.'/../Fixtures/includes/fixture_app_services.php';
 
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -35,6 +37,35 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class PhpFileLoaderTest extends TestCase
 {
+    #[BackupGlobals(true)]
+    public function testResourceIsCapturedBeforeExecutingConfiguration()
+    {
+        unset($_SERVER['SOURCE_DATE_EPOCH']);
+        $path = tempnam(sys_get_temp_dir(), 'sf-php-capture-');
+        file_put_contents($path, <<<'PHP'
+            <?php
+            use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+            return static function (ContainerConfigurator $container): void {
+                $container->parameters()->set('value', 'v1');
+                file_put_contents(__FILE__, str_replace('v1', 'v2', file_get_contents(__FILE__)));
+                touch(__FILE__, time() - 1);
+                clearstatcache();
+            };
+            PHP);
+        touch($path, time() - 100);
+        $container = new ContainerBuilder();
+
+        try {
+            (new PhpFileLoader($container, new FileLocator()))->load($path);
+            self::assertSame('v1', $container->getParameter('value'));
+            $resources = array_values(array_filter($container->getResources(), static fn ($resource) => $resource instanceof FileResource && $resource->getResource() === $path));
+            self::assertCount(1, $resources);
+            self::assertFalse($resources[0]->isFresh(time() + 10));
+        } finally {
+            unlink($path);
+        }
+    }
+
     public function testSupports()
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());

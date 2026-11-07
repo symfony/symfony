@@ -16,6 +16,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\QtFileLoader;
+use Symfony\Component\Translation\Tests\Fixtures\MutatingResourceStream;
 
 class QtFileLoaderTest extends TestCase
 {
@@ -63,5 +64,26 @@ class QtFileLoaderTest extends TestCase
         $this->expectExceptionMessage(\sprintf('Unable to load "%s".', $resource));
 
         (new QtFileLoader())->load($resource, 'en', 'domain1');
+    }
+
+    public function testXmlInputIsCapturedBeforeItIsRead()
+    {
+        $contents = '<?xml version="1.0"?><TS><context><name>messages</name><message><source>key</source><translation>v1</translation></message></context></TS>';
+        $path = tempnam(sys_get_temp_dir(), 'sf-translation-capture-');
+        file_put_contents($path, $contents);
+        MutatingResourceStream::$path = $path;
+        MutatingResourceStream::$mutated = false;
+        stream_wrapper_register('translationcapture', MutatingResourceStream::class);
+        try {
+            $catalogue = (new QtFileLoader())->load('translationcapture://messages', 'en');
+            self::assertTrue(MutatingResourceStream::$mutated);
+            self::assertSame('v1', $catalogue->get('key'));
+            self::assertStringContainsString('v2', file_get_contents($path));
+            self::assertCount(1, $catalogue->getResources());
+            self::assertFalse($catalogue->getResources()[0]->isFresh(time() + 10));
+        } finally {
+            stream_wrapper_unregister('translationcapture');
+            unlink($path);
+        }
     }
 }

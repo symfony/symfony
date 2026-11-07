@@ -20,6 +20,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\DirectoryLoader;
@@ -30,6 +31,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\MyController;
 use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
+use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
 
@@ -681,6 +683,33 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse((new Validator())->validate($data, $schema)->isValid());
     }
 
+    public function testYamlIsCapturedBeforeParsing()
+    {
+        $directory = sys_get_temp_dir().'/sf-route-capture-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        try {
+            $path = $directory.'/routes.yml';
+            file_put_contents($path, 'test: { path: /v1 }');
+            $loader = new YamlFileLoader(new FileLocator());
+            $parser = new class extends Parser {
+                public function parseFile(string $filename, int $flags = 0): mixed
+                {
+                    $result = parent::parseFile($filename, $flags);
+                    file_put_contents($filename, 'test: { path: /v2 }');
+
+                    return $result;
+                }
+            };
+            (new \ReflectionProperty($loader, 'yamlParser'))->setValue($loader, $parser);
+            $collection = $loader->load($path);
+
+            self::assertSame('/v1', $collection->get('test')->getPath());
+            self::assertFalse($this->fileResource($collection, $path)->isFresh(time() + 10));
+        } finally {
+            (new Filesystem())->remove($directory);
+        }
+    }
+
     private static function toJsonData(mixed $value): mixed
     {
         return match (true) {
@@ -690,5 +719,18 @@ class YamlFileLoaderTest extends TestCase
             \is_array($value) => array_map(self::toJsonData(...), $value),
             default => $value,
         };
+    }
+
+    /**
+     * Finds the source resource retained by the real route loader.
+     */
+    private function fileResource(RouteCollection $collection, string $path): FileResource
+    {
+        foreach ($collection->getResources() as $resource) {
+            if ($resource instanceof FileResource && $resource->getResource() === realpath($path)) {
+                return $resource;
+            }
+        }
+        self::fail('The route collection must track its source file.');
     }
 }

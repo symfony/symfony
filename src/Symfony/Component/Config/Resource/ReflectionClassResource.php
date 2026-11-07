@@ -26,6 +26,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
     private string $className;
     private array $excludedVendors = [];
     private string $hash;
+    private ?int $loadedAt = null;
 
     public function __construct(
         private \ReflectionClass $classReflector,
@@ -33,10 +34,18 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
     ) {
         $this->className = $classReflector->name;
         $this->excludedVendors = $excludedVendors;
+        if (!isset($_SERVER['SOURCE_DATE_EPOCH'])) {
+            $now = time();
+            $requestTime = $_SERVER['REQUEST_TIME'] ?? null;
+            $this->loadedAt = \is_int($requestTime) && 0 < $requestTime ? min($requestTime, $now) : $now;
+        }
     }
 
     public function isFresh(int $timestamp): bool
     {
+        if (null !== $this->loadedAt) {
+            $timestamp = min($timestamp, $this->loadedAt);
+        }
         if (!isset($this->hash)) {
             $this->hash = $this->computeHash();
             $this->loadFiles($this->classReflector);
@@ -60,6 +69,9 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         return 'reflection.'.$this->className;
     }
 
+    /**
+     * @return array{files: array<string, null>, className: string, excludedVendors: array<array-key, string>, hash: string, loadedAt?: int}
+     */
     public function __serialize(): array
     {
         if (!isset($this->hash)) {
@@ -67,12 +79,17 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             $this->loadFiles($this->classReflector);
         }
 
-        return [
+        $data = [
             'files' => $this->files,
             'className' => $this->className,
             'excludedVendors' => $this->excludedVendors,
             'hash' => $this->hash,
         ];
+        if (null !== $this->loadedAt) {
+            $data['loadedAt'] = $this->loadedAt;
+        }
+
+        return $data;
     }
 
     private function loadFiles(\ReflectionClass $class): void

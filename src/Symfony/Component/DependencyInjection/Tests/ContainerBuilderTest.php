@@ -17,6 +17,7 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Bridge\PhpUnit\Attribute\TimeSensitive;
@@ -77,6 +78,8 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class ContainerBuilderTest extends TestCase
 {
@@ -1640,6 +1643,51 @@ class ContainerBuilderTest extends TestCase
         $this->assertNull($container->getReflectionClass('callable'));
         $this->assertNull($container->getReflectionClass('iterable'));
         $this->assertNull($container->getReflectionClass('mixed'));
+    }
+
+    public function testRegisteringAReflectionResourceDoesNotCallServiceSubscribers()
+    {
+        $subscriber = new class implements ServiceSubscriberInterface {
+            public static int $calls = 0;
+
+            /** @return array{} */
+            public static function getSubscribedServices(): array
+            {
+                ++self::$calls;
+
+                return [];
+            }
+        };
+        $container = new ContainerBuilder();
+        $container->register('subscriber', $subscriber::class);
+        $container->getReflectionClass($subscriber::class);
+
+        self::assertSame(0, $subscriber::$calls);
+        serialize($container->getResources());
+        self::assertSame(1, $subscriber::$calls);
+    }
+
+    #[RequiresClass(AbstractTypeExtension::class)]
+    public function testRegisteringAReflectionResourceDoesNotCallFormExtensions()
+    {
+        $extension = new class extends AbstractTypeExtension {
+            public static int $calls = 0;
+
+            /** @return iterable<string> */
+            public static function getExtendedTypes(): iterable
+            {
+                ++self::$calls;
+
+                yield 'fixture.type';
+            }
+        };
+        $container = new ContainerBuilder();
+        $container->register('extension', $extension::class);
+        $container->getReflectionClass($extension::class);
+
+        self::assertSame(0, $extension::$calls);
+        serialize($container->getResources());
+        self::assertSame(1, $extension::$calls);
     }
 
     public function testCompilesClassDefinitionsOfLazyServices()

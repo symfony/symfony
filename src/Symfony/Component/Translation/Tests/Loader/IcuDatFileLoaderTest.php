@@ -58,4 +58,49 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
 
         (new IcuDatFileLoader())->load(__DIR__.'/../Fixtures/non-existing.txt', 'en', 'domain1');
     }
+
+    public function testIcuCapturesBeforeFlattening()
+    {
+        if (!class_exists(\ResourceBundle::class)) {
+            self::markTestSkipped('The intl extension is required.');
+        }
+        $directory = sys_get_temp_dir().'/sf-icu-capture-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        copy(__DIR__.'/../Fixtures/resourcebundle/dat/resources.dat', $directory.'/resources.dat');
+        $loader = new class extends IcuDatFileLoader {
+            public string $path;
+
+            /**
+             * Changes the bundle bytes while its previous messages are being flattened.
+             *
+             * @param array<string, string> $messages
+             *
+             * @return array<string, string>
+             */
+            protected function flatten(\ResourceBundle $rb, array &$messages = [], ?string $path = null): array
+            {
+                $this->changeInput();
+
+                return parent::flatten($rb, $messages, $path);
+            }
+
+            private function changeInput(): void
+            {
+                file_put_contents($this->path, str_replace("g\0r\0e\0a\0t\0", "s\0u\0p\0e\0r\0", file_get_contents($this->path)));
+                clearstatcache();
+            }
+        };
+        $resource = $directory.'/resources';
+        $loader->path = $resource.'.dat';
+        try {
+            $catalogue = $loader->load($resource, 'en');
+            self::assertNotEmpty($catalogue->all());
+            self::assertFalse($catalogue->getResources()[0]->isFresh(time() + 10));
+        } finally {
+            foreach (glob($directory.'/*') as $file) {
+                unlink($file);
+            }
+            rmdir($directory);
+        }
+    }
 }

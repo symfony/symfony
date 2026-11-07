@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Config\Tests\Resource;
 
+use Composer\Autoload\ClassLoader;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Config\Tests\Fixtures\FakeVendor\Base;
+use Symfony\Component\Config\Tests\Fixtures\LegacyResource;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -69,6 +71,8 @@ class ReflectionClassResourceTest extends TestCase
         touch($tmp, $mtime = time() - 10);
         require $tmp;
 
+        $requestTime = $_SERVER['REQUEST_TIME'] ?? null;
+        $_SERVER['REQUEST_TIME'] = time();
         $res = unserialize(serialize(new ReflectionClassResource(new \ReflectionClass(\ReflectionClassResourceSameSecondTestClass::class))));
         // simulates a signature that changed after the resource was created
         (new \ReflectionProperty(ReflectionClassResource::class, 'hash'))->setValue($res, 'outdated');
@@ -78,6 +82,11 @@ class ReflectionClassResourceTest extends TestCase
             $this->assertFalse($res->isFresh($mtime), '->isFresh() returns false if the signature changed in the same second');
         } finally {
             unlink($tmp);
+            if (null === $requestTime) {
+                unset($_SERVER['REQUEST_TIME']);
+            } else {
+                $_SERVER['REQUEST_TIME'] = $requestTime;
+            }
         }
     }
 
@@ -242,6 +251,166 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertStringContainsString('TestAttribute', $actual);
         $this->assertStringContainsString('Beta', $actual);
         $this->assertStringContainsString('beta', $actual);
+    }
+
+    #[DataProvider('provideRequestTimes')]
+    public function testRequestBoundaryIsCapturedWithoutExecutingCallbacks(mixed $requestTime, int $offset)
+    {
+        $server = $_SERVER;
+        unset($_SERVER['SOURCE_DATE_EPOCH'], $_SERVER['REQUEST_TIME']);
+        if (null !== $requestTime) {
+            $_SERVER['REQUEST_TIME'] = \is_int($requestTime) && 0 < $requestTime ? time() + $requestTime : $requestTime;
+        }
+        $subscriber = new class implements ServiceSubscriberInterface {
+            public static int $calls = 0;
+
+            /**
+             * Counts lazy signature callbacks while returning no subscribed services.
+             *
+             * @return array{}
+             */
+            public static function getSubscribedServices(): array
+            {
+                ++self::$calls;
+
+                return [];
+            }
+        };
+        $subscriber::$calls = 0;
+        $now = time();
+        try {
+            $resource = new ReflectionClassResource(new \ReflectionClass($subscriber));
+            self::assertSame(0, $subscriber::$calls);
+            $serialized = $resource->__serialize();
+            self::assertSame(1, $subscriber::$calls);
+            self::assertGreaterThanOrEqual($now + $offset, $serialized['loadedAt']);
+            self::assertLessThanOrEqual(time(), $serialized['loadedAt']);
+            self::assertSame(serialize($resource), serialize(unserialize(serialize($resource))));
+        } finally {
+            $_SERVER = $server;
+        }
+    }
+
+    public static function provideRequestTimes(): iterable
+    {
+        yield 'missing' => [null, 0];
+        yield 'string' => ['invalid', 0];
+        yield 'numeric string' => ['1700000000', 0];
+        yield 'zero' => [0, 0];
+        yield 'negative' => [-1, 0];
+        yield 'future is clamped' => [100, 0];
+    }
+
+    #[DataProvider('provideLoadBoundaryExpectations')]
+    public function testSourceEditedAfterClassLoadingBeforeResourceConstruction(bool $requestStartAvailable, bool $stale)
+    {
+        $directory = sys_get_temp_dir().'/sf-reflection-capture-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        $class = 'CapturedClass'.bin2hex(random_bytes(6));
+        $path = $directory.'/class.php';
+        $metadata = $directory.'/resource';
+        $server = $_SERVER;
+        unset($_SERVER['SOURCE_DATE_EPOCH']);
+        if ($requestStartAvailable) {
+            $_SERVER['REQUEST_TIME'] = time() - 10;
+        } else {
+            unset($_SERVER['REQUEST_TIME']);
+        }
+        file_put_contents($path, '<?php class '.$class.' { public function __construct(public string $value = "v1") {} }');
+        touch($path, time() - 100);
+        require $path;
+        file_put_contents($path, str_replace('v1', 'v2', file_get_contents($path)));
+        touch($path, time() - 1);
+        clearstatcache();
+        $resource = new ReflectionClassResource(new \ReflectionClass($class));
+        file_put_contents($metadata, serialize($resource));
+
+        foreach (ClassLoader::getRegisteredLoaders() as $vendor => $loader) {
+            if ($loader->findFile(ReflectionClassResource::class)) {
+                $autoload = $vendor.'/autoload.php';
+                break;
+            }
+        }
+        try {
+            $process = proc_open([\PHP_BINARY, '-r', 'require $argv[1]; require $argv[2]; echo unserialize(file_get_contents($argv[3]))->isFresh(time() + 10) ? "fresh" : "stale";', $autoload, $path, $metadata], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+            $output = stream_get_contents($pipes[1]);
+            $error = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            self::assertSame(0, proc_close($process), $error);
+            self::assertSame($stale ? 'stale' : 'fresh', $output);
+        } finally {
+            $_SERVER = $server;
+            unlink($path);
+            unlink($metadata);
+            rmdir($directory);
+        }
+    }
+
+    public static function provideLoadBoundaryExpectations(): iterable
+    {
+        yield 'ordinary request detects the edit' => [true, true];
+        yield 'missing request start retains the pre-capture limit' => [false, false];
+    }
+
+    public function testLongRunningRequestRechecksCallbacksButMissingBoundaryUsesConstructionTime()
+    {
+        $directory = sys_get_temp_dir().'/sf-reflection-callbacks-'.bin2hex(random_bytes(6));
+        mkdir($directory);
+        $class = 'ReflectionCallbackCost'.bin2hex(random_bytes(6));
+        $counter = 'reflection_callback_'.bin2hex(random_bytes(6));
+        $path = $directory.'/class.php';
+        file_put_contents($path, '<?php class '.$class.' implements Symfony\Contracts\Service\ServiceSubscriberInterface { public static function getSubscribedServices(): array { ++$GLOBALS['.var_export($counter, true).']; return []; } }');
+        touch($path, time() - 10);
+        require $path;
+        $server = $_SERVER;
+        unset($_SERVER['SOURCE_DATE_EPOCH']);
+        $GLOBALS[$counter] = 0;
+        $_SERVER['REQUEST_TIME'] = time() - 100;
+        try {
+            $resource = new ReflectionClassResource(new \ReflectionClass($class));
+            self::assertSame(0, $GLOBALS[$counter]);
+            serialize($resource);
+            self::assertSame(1, $GLOBALS[$counter]);
+            self::assertTrue($resource->isFresh(time() + 10));
+            self::assertTrue($resource->isFresh(time() + 10));
+            self::assertSame(3, $GLOBALS[$counter]);
+
+            unset($_SERVER['REQUEST_TIME']);
+            $resource = new ReflectionClassResource(new \ReflectionClass($class));
+            serialize($resource);
+            self::assertSame(4, $GLOBALS[$counter]);
+            self::assertTrue($resource->isFresh(time() + 10));
+            self::assertTrue($resource->isFresh(time() + 10));
+            self::assertSame(4, $GLOBALS[$counter]);
+        } finally {
+            $_SERVER = $server;
+            unset($GLOBALS[$counter]);
+            unlink($path);
+            rmdir($directory);
+        }
+    }
+
+    public function testLegacyMetadataRemainsReadable()
+    {
+        $data = (new ReflectionClassResource(new \ReflectionClass(self::class)))->__serialize();
+        unset($data['loadedAt']);
+        $resource = LegacyResource::create(ReflectionClassResource::class, $data);
+        self::assertTrue($resource->isFresh(time() + 10));
+    }
+
+    public function testSerializedFormIgnoresRequestTimeWithSourceDateEpoch()
+    {
+        $server = $_SERVER;
+        $_SERVER['SOURCE_DATE_EPOCH'] = '1700000000';
+        try {
+            $_SERVER['REQUEST_TIME'] = time();
+            $before = serialize(new ReflectionClassResource(new \ReflectionClass(self::class)));
+            $_SERVER['REQUEST_TIME'] -= 100000;
+            self::assertSame($before, serialize(new ReflectionClassResource(new \ReflectionClass(self::class))));
+        } finally {
+            $_SERVER = $server;
+        }
     }
 }
 

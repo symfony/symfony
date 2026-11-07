@@ -32,7 +32,10 @@ class GlobFileLoaderTest extends TestCase
         $loader = new GlobFileLoaderWithoutImport(new FileLocator());
         $collection = $loader->load(__DIR__.'/../Fixtures/directory/*.yml');
 
-        $this->assertEquals(new GlobResource(__DIR__.'/../Fixtures/directory', '/*.yml', false), $collection->getResources()[0]);
+        $expected = new GlobResource(__DIR__.'/../Fixtures/directory', '/*.yml', false);
+        $actual = $collection->getResources()[0];
+        $this->assertSame((string) $expected, (string) $actual);
+        $this->assertSame(array_keys(iterator_to_array($expected)), array_keys(iterator_to_array($actual)));
     }
 }
 

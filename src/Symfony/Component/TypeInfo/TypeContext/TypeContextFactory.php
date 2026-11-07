@@ -186,7 +186,7 @@ final class TypeContextFactory
 
         if ($calledClassNameReflection->name !== $declaringClassReflection->name && $declaringClassTemplates = $this->collectTemplates($declaringClassDocNode, $typeContext)) {
             $inheritedTemplateTypes = $this->collectInheritedTemplateTypes($calledClassNameReflection, $declaringClassReflection, $templates, array_keys($declaringClassTemplates));
-            $templates += $declaringClassTemplates;
+            $templates = $declaringClassTemplates + $templates;
         }
 
         $typeContext = new TypeContext(

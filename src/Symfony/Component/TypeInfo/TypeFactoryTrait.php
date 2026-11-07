@@ -32,6 +32,8 @@ use Symfony\Component\TypeInfo\Type\UnionType;
  */
 trait TypeFactoryTrait
 {
+    private static int $fromValueDepth = 0;
+
     /**
      * @template T of TypeIdentifier
      * @template U value-of<T>
@@ -430,9 +432,17 @@ trait TypeFactoryTrait
             /** @var list<Type> $valueTypes */
             $valueTypes = [];
 
-            foreach ($value as $k => $v) {
-                $keyTypes[] = self::fromValue($k);
-                $valueTypes[] = self::fromValue($v);
+            try {
+                if (++self::$fromValueDepth > 512) {
+                    throw new InvalidArgumentException('Cannot create a type from a value nested more than 512 levels deep, it may contain a reference cycle.');
+                }
+
+                foreach ($value as $k => $v) {
+                    $keyTypes[] = self::fromValue($k);
+                    $valueTypes[] = self::fromValue($v);
+                }
+            } finally {
+                --self::$fromValueDepth;
             }
 
             if ($keyTypes) {

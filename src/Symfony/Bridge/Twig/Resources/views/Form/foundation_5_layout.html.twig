@@ -177,6 +177,9 @@
 {%- endblock choice_widget_collapsed %}
 
 {% block choice_widget_expanded -%}
+    {%- if empty_choices_message is defined and empty_choices_message is not null -%}
+        {{- block('choice_widget_empty') -}}
+    {%- else -%}
     {% if '-inline' in label_attr.class|default('') %}
         <ul class="inline-list">
             {% for child in form %}
@@ -199,6 +202,7 @@
             {% endfor %}
         </div>
     {% endif %}
+    {%- endif -%}
 {%- endblock choice_widget_expanded %}
 
 {% block checkbox_widget -%}

@@ -763,11 +763,16 @@ trait RedisTrait
         $ids = [];
         $redis ??= $this->redis;
 
-        if ($redis instanceof \RedisCluster || $redis instanceof RelayCluster || ($redis instanceof \Predis\ClientInterface && ($redis->getConnection() instanceof RedisCluster || $redis->getConnection() instanceof Predis2RedisCluster))) {
-            // phpredis & predis don't support pipelining with RedisCluster
+        if ($redis instanceof \Predis\ClientInterface && ($redis->getConnection() instanceof RedisCluster || $redis->getConnection() instanceof Predis2RedisCluster)) {
+            yield from $this->pipelinePredisCluster($generator, $redis);
+
+            return;
+        }
+
+        if ($redis instanceof \RedisCluster || $redis instanceof RelayCluster) {
+            // phpredis doesn't support pipelining with RedisCluster
             // \Relay\Cluster does not support multi with pipeline mode
-            // see https://github.com/phpredis/phpredis/blob/develop/cluster.markdown#pipelining
-            // see https://github.com/nrk/predis/issues/267#issuecomment-123781423
+            // see https://github.com/phpredis/phpredis/blob/develop/cluster.md#pipelining
             $results = [];
             foreach ($generator() as $command => $args) {
                 $results[] = $redis->{$command}(...$args);
@@ -857,5 +862,64 @@ trait RedisTrait
         }
 
         return $options;
+    }
+
+    private function pipelinePredisCluster(\Closure $generator, \Predis\ClientInterface $redis): \Generator
+    {
+        $commands = $ids = $seen = $results = [];
+        $pipeline = true;
+
+        foreach ($generator() as $command => $args) {
+            $ids[] = 'eval' === $command ? $args[2] : $args[0];
+            $commands[] = $prepared = $redis->createCommand($command, $args);
+            $key = $prepared->getArgument(0);
+            $pipeline = $pipeline && 'GET' === $prepared->getId() && !isset($seen[$key]);
+            $seen[$key] = true;
+        }
+
+        if (!$pipeline || 2 > \count($commands)) {
+            foreach ($commands as $i => $command) {
+                $results[$i] = $redis->executeCommand($command);
+            }
+        } else {
+            try {
+                $pipelines = $positions = [];
+                $cluster = $redis->getConnection();
+                foreach ($commands as $i => $command) {
+                    $node = $cluster instanceof Predis2RedisCluster ? $cluster->getConnectionByCommand($command) : $cluster->getConnection($command);
+                    $nodeId = spl_object_id($node);
+                    $pipelines[$nodeId] ??= (new \Predis\Client($node, $redis->getOptions()))->pipeline();
+                    $pipelines[$nodeId]->executeCommand($command);
+                    $positions[$nodeId][] = $i;
+                }
+
+                // Drain every node before retrying commands through the cluster connection.
+                foreach ($pipelines as $nodeId => $nodePipeline) {
+                    foreach ($nodePipeline->execute() as $i => $result) {
+                        $results[$positions[$nodeId][$i]] = $result;
+                    }
+                }
+            } catch (\Throwable $e) {
+                $redis->disconnect();
+
+                if (!$e instanceof \Predis\CommunicationException) {
+                    throw $e;
+                }
+
+                foreach ($commands as $i => $command) {
+                    $results[$i] = $redis->executeCommand($command);
+                }
+            }
+
+            foreach ($commands as $i => $command) {
+                if ($results[$i] instanceof ErrorInterface && \in_array($results[$i]->getErrorType(), ['MOVED', 'ASK', 'CLUSTERDOWN'], true)) {
+                    $results[$i] = $redis->executeCommand($command);
+                }
+            }
+        }
+
+        foreach ($ids as $i => $id) {
+            yield $id => $results[$i];
+        }
     }
 }

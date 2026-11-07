@@ -33,6 +33,7 @@ use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
+use PHPStan\PhpDocParser\Parser\ParserException;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
 use PHPStan\PhpDocParser\ParserConfig;
@@ -98,7 +99,7 @@ final class StringTypeResolver implements TypeResolverInterface
 
         try {
             return $this->getTypeFromNode($this->parse($subject), $typeContext);
-        } catch (\DomainException $e) {
+        } catch (\DomainException|ParserException $e) {
             throw new UnsupportedException(\sprintf('Cannot resolve "%s".', $subject), $subject, previous: $e);
         }
     }

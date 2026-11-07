@@ -353,6 +353,22 @@ class StringTypeResolverTest extends TestCase
         yield ['String|Array{KEY: String}', 'Array'];
     }
 
+    #[DataProvider('malformedTypeDataProvider')]
+    public function testCannotResolveMalformedType(string $subject)
+    {
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot resolve "%s".', $subject));
+
+        $this->resolver->resolve($subject);
+    }
+
+    public static function malformedTypeDataProvider(): iterable
+    {
+        yield ['array<int,'];
+        yield ['array{a: int'];
+        yield ['int|'];
+    }
+
     public function testUnknownIdentifierIsReportedAsWritten()
     {
         $this->expectException(UnsupportedException::class);

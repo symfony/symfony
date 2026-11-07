@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Channel;
 
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -23,6 +24,7 @@ use Symfony\Component\Notifier\Notification\EmailNotificationInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -36,6 +38,7 @@ class EmailChannel implements ChannelInterface
         private ?MessageBusInterface $bus = null,
         ?string $from = null,
         private ?Envelope $envelope = null,
+        private ?EventDispatcherInterface $dispatcher = null,
     ) {
         if (null === $transport && null === $bus) {
             throw new LogicException(\sprintf('"%s" needs a Transport or a Bus but both cannot be "null".', static::class));
@@ -80,9 +83,25 @@ class EmailChannel implements ChannelInterface
 
         if (null === $this->bus) {
             $this->transport->send($message->getMessage(), $message->getEnvelope());
-        } else {
-            $this->bus->dispatch(new SendEmailMessage($message->getMessage(), $message->getEnvelope()));
+
+            return;
         }
+
+        $stamps = [];
+        if (null !== $this->dispatcher) {
+            // same as Mailer::send(): listeners get a clone, as they run again on the original message when the queued email is sent
+            $clonedMessage = clone $message->getMessage();
+            $clonedEnvelope = null !== $message->getEnvelope() ? clone $message->getEnvelope() : Envelope::create($clonedMessage);
+            $event = new MessageEvent($clonedMessage, $clonedEnvelope, (string) $this->transport, true);
+            $this->dispatcher->dispatch($event);
+            $stamps = $event->getStamps();
+
+            if ($event->isRejected()) {
+                return;
+            }
+        }
+
+        $this->bus->dispatch(new SendEmailMessage($message->getMessage(), $message->getEnvelope()), $stamps);
     }
 
     public function supports(Notification $notification, RecipientInterface $recipient): bool

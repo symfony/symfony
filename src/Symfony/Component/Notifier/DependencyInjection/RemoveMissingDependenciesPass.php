@@ -39,8 +39,8 @@ class RemoveMissingDependenciesPass implements CompilerPassInterface
                 $container->getDefinition('notifier.failed_message_listener')->addTag('kernel.event_subscriber');
             }
 
-            // as we have a bus, the channels don't need the transports
-            foreach (['notifier.channel.chat', 'notifier.channel.email', 'notifier.channel.sms', 'notifier.channel.push', 'notifier.channel.desktop'] as $channelId) {
+            // as we have a bus, the channels don't need the transports; the email channel keeps them to name them in the queued mailer event
+            foreach (['notifier.channel.chat', 'notifier.channel.sms', 'notifier.channel.push', 'notifier.channel.desktop'] as $channelId) {
                 if ($container->hasDefinition($channelId)) {
                     $container->getDefinition($channelId)->setArgument(0, null);
                 }

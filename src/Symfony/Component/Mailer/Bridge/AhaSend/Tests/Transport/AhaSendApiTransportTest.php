@@ -181,6 +181,31 @@ class AhaSendApiTransportTest extends TestCase
         $this->assertSame('3f8e2b1a-7c4d-4e2a-9b1e-2f3a4b5c6d7e', $sentMessage->getMessageId());
     }
 
+    public static function provideSendResponses(): iterable
+    {
+        yield 'Message-ID in message_id_header' => [[
+            ['object' => 'message', 'id' => '0199f1c2-7c4d-4e2a-9b1e-2f3a4b5c6d7e', 'message_id_header' => '<0199f1c2-7c4d-4e2a-9b1e-2f3a4b5c6d7e@example.com>', 'recipient' => ['email' => 'bar@example.com'], 'status' => 'queued', 'error' => null],
+        ], '0199f1c2-7c4d-4e2a-9b1e-2f3a4b5c6d7e@example.com'];
+        yield 'Message-ID in id, before message_id_header was added' => [[
+            ['object' => 'message', 'id' => '<0199f1c2-7c4d-4e2a-9b1e-2f3a4b5c6d7e@example.com>', 'recipient' => ['email' => 'bar@example.com'], 'status' => 'queued', 'error' => null],
+        ], '0199f1c2-7c4d-4e2a-9b1e-2f3a4b5c6d7e@example.com'];
+        yield 'the first recipient was rejected' => [[
+            ['object' => 'message', 'id' => null, 'message_id_header' => null, 'recipient' => ['email' => 'someone@gmil.com'], 'status' => 'error', 'error' => 'someone@gmil.com: Invalid recipient'],
+            ['object' => 'message', 'id' => '0199f1c2-7c4d-4e2a-9b1e-2f3a4b5c6d7e', 'message_id_header' => '<0199f1c2-7c4d-4e2a-9b1e-2f3a4b5c6d7e@example.com>', 'recipient' => ['email' => 'bar@example.com'], 'status' => 'queued', 'error' => null],
+        ], '0199f1c2-7c4d-4e2a-9b1e-2f3a4b5c6d7e@example.com'];
+    }
+
+    #[DataProvider('provideSendResponses')]
+    public function testTheMessageIdIsTheMessageIdHeaderWithoutAngleBracketsV2(array $data, string $expectedMessageId)
+    {
+        $client = new MockHttpClient(new JsonMockResponse(['object' => 'list', 'data' => $data], ['http_code' => 202]));
+        $email = (new Email())->from('foo@example.com')->to('bar@example.com')->subject('An email')->text('Test email body');
+
+        $sentMessage = (new AhaSendApiTransport('aha-sk-foo', $client, null, null, 'SAMPLE-ACCOUNT-ID'))->send($email);
+
+        $this->assertSame($expectedMessageId, $sentMessage->getMessageId());
+    }
+
     #[Group('legacy')]
     #[IgnoreDeprecations]
     public function testSendDeliveryEventIsDispatchedV1()

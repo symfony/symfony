@@ -30,11 +30,12 @@ the DSN instead.
 
 > [!NOTE]
 > Since Symfony 8.2, the ID of the [remote events][webhook] received from
-> AhaSend is the `Message-ID` of the message, which the v2 API returns when
-> sending it, so those events can be matched with the messages you sent. This
-> applies to all AhaSend webhooks, whatever the transport used to send the
-> messages; it used to be the internal ID of the event, which is still available
-> in the payload under `data.id`.
+> AhaSend is the `Message-ID` header of the message, without angle brackets.
+> For a message sent through the v2 API or over SMTP, it is the ID that
+> `SentMessage::getMessageId()` returns. This lets you match the events with the
+> messages you sent. Before Symfony 8.2, the ID was the `data.id` field of the
+> payload. This field is now AhaSend's own ID for the message, the `id` that the
+> v2 API returns when sending it.
 
 Sponsor
 -------

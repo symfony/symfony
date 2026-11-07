@@ -25,8 +25,12 @@ final class AhaSendPayloadConverter implements PayloadConverterInterface
             throw new ParseException('The payload is malformed.');
         }
 
-        // "data.id" is AhaSend's internal event id; "data.message_id_header" carries the
-        // Message-ID that the v2 send API returned, so it is what matches sent emails
+        // Without its angle brackets, the Message-ID header is the ID of the SentMessage, whether the email was sent through the v2 API or over SMTP.
+        // "data.id" is AhaSend's own ID for the message, the "id" of the v2 send response.
+        $id = $payload['data']['message_id_header'];
+        if (str_starts_with($id, '<') && str_ends_with($id, '>')) {
+            $id = substr($id, 1, -1);
+        }
 
         if (\in_array($payload['type'], ['message.clicked', 'message.opened'], true)) {
             $name = match ($payload['type']) {
@@ -34,7 +38,7 @@ final class AhaSendPayloadConverter implements PayloadConverterInterface
                 'message.opened' => MailerEngagementEvent::OPEN,
                 default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['type'])),
             };
-            $event = new MailerEngagementEvent($name, $payload['data']['message_id_header'], $payload);
+            $event = new MailerEngagementEvent($name, $id, $payload);
         } elseif (str_starts_with($payload['type'], 'message.')) {
             $name = match ($payload['type']) {
                 'message.reception' => MailerDeliveryEvent::RECEIVED,
@@ -44,7 +48,7 @@ final class AhaSendPayloadConverter implements PayloadConverterInterface
                 'message.suppressed' => MailerDeliveryEvent::DROPPED,
                 default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['type'])),
             };
-            $event = new MailerDeliveryEvent($name, $payload['data']['message_id_header'], $payload);
+            $event = new MailerDeliveryEvent($name, $id, $payload);
         } else {
             // suppressions and domain DNS problem webhooks. Ignore them for now.
             throw new ParseException(\sprintf('Unsupported event "%s".', $payload['type']));

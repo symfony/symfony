@@ -30,9 +30,12 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyNamespace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyPropertyAndGetterWithDifferentTypes;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyUnionType;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithTemplateAndParent;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithConstructorOverride;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithoutConstructorOverride;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyInDifferentNs;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyWithStaticGetterInDifferentNs;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyWithTemplateAndParentInDifferentNs;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ParentWithPromotedPropertyDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\PromotedPropertiesWithDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IFace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy;
@@ -284,6 +287,7 @@ class PhpStanExtractorTest extends TestCase
         yield ['propertyInTraitObjectSameNamespace', Type::object(DummyUsedInTrait::class)];
         yield ['propertyInTraitObjectDifferentNamespace', Type::object(Dummy::class)];
         yield ['dummyInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+        yield ['redeclaredPropertyInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
     }
 
     #[DataProvider('methodsDefinedByTraitsProvider')]
@@ -306,6 +310,8 @@ class PhpStanExtractorTest extends TestCase
         yield ['methodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
         yield ['aliasedMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
         yield ['overriddenMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
+        yield ['abstractMethodInTraitInAnotherNamespace', null];
+        yield ['overriddenAbstractMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
         yield ['templateInTraitInAnotherNamespace', Type::list(Type::template('T'))];
         yield ['mutatorInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
     }
@@ -571,6 +577,15 @@ class PhpStanExtractorTest extends TestCase
         yield [Php80Dummy::class, 'promoted', null];
         yield [Php80Dummy::class, 'collection', Type::array(Type::string())];
         yield [Php80PromotedDummy::class, 'promoted', null];
+    }
+
+    public function testInheritedPromotedPropertyWithConstructorOverride()
+    {
+        $expectedType = Type::dict(Type::int(), Type::string());
+
+        $this->assertEquals($expectedType, $this->extractor->getType(ParentWithPromotedPropertyDocBlock::class, 'items'));
+        $this->assertEquals($expectedType, $this->extractor->getType(ChildWithoutConstructorOverride::class, 'items'));
+        $this->assertEquals($expectedType, $this->extractor->getType(ChildWithConstructorOverride::class, 'items'));
     }
 
     #[DataProvider('allowPrivateAccessProvider')]

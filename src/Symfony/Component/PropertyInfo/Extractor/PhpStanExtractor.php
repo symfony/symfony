@@ -393,7 +393,8 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
         $reflector = $reflectionProperty->getDeclaringClass();
 
         foreach ($reflector->getTraits() as $trait) {
-            if ($trait->hasProperty($property)) {
+            // a class can declare a property of its traits again, with another doc comment
+            if ($trait->hasProperty($property) && $trait->getProperty($property)->getDocComment() === $reflectionProperty->getDocComment()) {
                 return $this->getDocBlockFromProperty($trait->getName(), $property, $reflector->isTrait() ? $selfClass : $reflector->getName());
             }
         }
@@ -403,7 +404,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
 
         $constructorPhpDocNode = null;
         if ($reflectionProperty->isPromoted()) {
-            $constructorRawDocNode = (new \ReflectionMethod($class, '__construct'))->getDocComment();
+            $constructorRawDocNode = (new \ReflectionMethod($reflectionProperty->class, '__construct'))->getDocComment();
             $constructorPhpDocNode = $constructorRawDocNode ? $this->getPhpDocNode($constructorRawDocNode) : null;
         }
 

@@ -107,11 +107,19 @@ final class SchemaValidator implements SchemaValidatorInterface
     }
 
     /**
-     * Builds a "file://" URI from a filesystem path, using forward slashes so Windows paths stay valid URIs.
+     * Builds a "file://" URI from a filesystem path, using forward slashes and percent-encoding the path segments.
      */
     private static function toFileUri(string $path): string
     {
         $path = str_replace('\\', '/', $path);
+        $drive = '';
+
+        if ('\\' === \DIRECTORY_SEPARATOR && preg_match('{^[a-zA-Z]:/}', $path, $m)) {
+            $drive = $m[0];
+            $path = substr($path, 3);
+        }
+
+        $path = $drive.implode('/', array_map('rawurlencode', explode('/', $path)));
 
         // Windows paths ("C:/...") need an extra leading slash to form "file:///C:/...".
         return 'file://'.(str_starts_with($path, '/') ? '' : '/').$path;

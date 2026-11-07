@@ -65,6 +65,61 @@ class SchemaValidatorTest extends TestCase
         $this->assertSame(0, $errors[0]['line']);
     }
 
+    public function testSchemaPathWithSpaceIsEncodedAsFileUri()
+    {
+        $dir = sys_get_temp_dir().'/sf-schema-'.bin2hex(random_bytes(4)).' with space';
+        $schema = $dir.'/schema.json';
+
+        mkdir($dir);
+        file_put_contents($schema, json_encode([
+            'type' => 'object',
+            'properties' => ['version' => ['type' => 'integer']],
+        ]));
+
+        try {
+            $content = 'version: not-an-integer';
+            $errors = (new SchemaValidator())->validate(Yaml::parse($content), $schema, $content);
+
+            $this->assertCount(1, $errors);
+            $this->assertSame(1, $errors[0]['line']);
+        } finally {
+            @unlink($schema);
+            @rmdir($dir);
+        }
+    }
+
+    public function testRelativeRefInSchemaPathWithSpaceIsResolved()
+    {
+        $dir = sys_get_temp_dir().'/sf-schema-'.bin2hex(random_bytes(4)).' with space';
+        $schema = $dir.'/schema.json';
+        $defs = $dir.'/defs.json';
+
+        mkdir($dir);
+        file_put_contents($defs, json_encode([
+            '$defs' => ['positive' => ['type' => 'integer', 'minimum' => 1]],
+        ]));
+        file_put_contents($schema, json_encode([
+            'type' => 'object',
+            'properties' => ['count' => ['$ref' => 'defs.json#/$defs/positive']],
+        ]));
+
+        try {
+            $validator = new SchemaValidator();
+
+            $content = 'count: 2';
+            $this->assertSame([], $validator->validate(Yaml::parse($content), $schema, $content));
+
+            $content = 'count: 0';
+            $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+            $this->assertCount(1, $errors);
+            $this->assertSame(1, $errors[0]['line']);
+        } finally {
+            @unlink($schema);
+            @unlink($defs);
+            @rmdir($dir);
+        }
+    }
+
     public function testErrorLineIsResolvedFromNestedKey()
     {
         $schema = $this->createFile(json_encode([

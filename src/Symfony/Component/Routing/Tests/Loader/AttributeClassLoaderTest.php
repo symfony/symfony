@@ -321,6 +321,18 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('/nl/suffix', $routes->get('action.nl')->getPath());
     }
 
+    public function testLocalizedPrefixWithExplicitNonLocalizedRoute()
+    {
+        $routes = $this->loader->load(\Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\LocalizedPrefixWithUnlocalizedActionController::class);
+
+        $this->assertCount(3, $routes);
+        $this->assertSame('/en/translated', $routes->get('translated.en')->getPath());
+        $this->assertSame('/fr/translated', $routes->get('translated.fr')->getPath());
+        $this->assertSame('/.well-known/jwks.json', $routes->get('public_jwks')->getPath());
+        $this->assertNull($routes->get('public_jwks')->getDefault('_locale'));
+        $this->assertNull($routes->get('public_jwks.en'));
+    }
+
     public function testLoadingRouteWithPrefix()
     {
         $routes = $this->loader->load(RouteWithPrefixController::class);

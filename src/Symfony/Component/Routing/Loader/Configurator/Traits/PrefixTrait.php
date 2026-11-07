@@ -49,6 +49,8 @@ trait PrefixTrait
                             $routes->addAlias($aliasName.'.'.$locale, $name.'.'.$locale);
                         }
                     }
+                } elseif (false === $locale) {
+                    $route->setDefault('_locale', null);
                 } elseif (!isset($prefix[$locale])) {
                     throw new \InvalidArgumentException(\sprintf('Route "%s" with locale "%s" is missing a corresponding prefix in its parent collection.', $name, $locale));
                 } else {

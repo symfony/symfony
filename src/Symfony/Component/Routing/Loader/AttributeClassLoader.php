@@ -189,6 +189,9 @@ abstract class AttributeClassLoader implements LoaderInterface
                     $paths[$locale] = $prefix[$locale].$localePath;
                 }
             }
+        } elseif (false === ($defaults['_locale'] ?? null) && \is_array($prefix)) {
+            $paths[] = $path;
+            unset($defaults['_locale']);
         } elseif (\is_array($prefix)) {
             foreach ($prefix as $locale => $localePrefix) {
                 $paths[$locale] = $localePrefix.$path;

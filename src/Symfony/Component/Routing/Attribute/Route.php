@@ -43,7 +43,7 @@ class Route
      * @param string|string[]                                   $schemes      The list of schemes allowed by this route (i.e. "https")
      * @param string|null                                       $condition    An expression that must evaluate to true for the route to be matched, @see https://symfony.com/doc/current/routing.html#matching-expressions
      * @param int|null                                          $priority     The priority of the route if multiple ones are defined for the same path
-     * @param string|null                                       $locale       The locale accepted by the route
+     * @param string|false|null                                 $locale       The locale accepted by the route, or false to disable localized prefixes
      * @param string|null                                       $format       The format returned by the route (i.e. "json", "xml")
      * @param bool|null                                         $utf8         Whether the route accepts UTF-8 in its parameters
      * @param bool|null                                         $stateless    Whether the route is defined as stateless or stateful, @see https://symfony.com/doc/current/routing.html#stateless-routes
@@ -62,7 +62,7 @@ class Route
         array|string $schemes = [],
         public ?string $condition = null,
         public ?int $priority = null,
-        ?string $locale = null,
+        string|false|null $locale = null,
         ?string $format = null,
         ?bool $utf8 = null,
         ?bool $stateless = null,

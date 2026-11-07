@@ -18,6 +18,32 @@ use Symfony\Component\Routing\RouteCollection;
 
 class PrefixTraitTest extends TestCase
 {
+    public function testExplicitNonLocalizedRouteRetainsPathAndAlias()
+    {
+        $collection = new RouteCollection();
+        $collection->add('public_jwks', new Route('/.well-known/jwks.json', ['_locale' => false]));
+        $collection->addAlias('jwks_alias', 'public_jwks');
+        $collection->add('translated', new Route('/translated'));
+
+        $trait = new class {
+            use PrefixTrait;
+
+            public function add(RouteCollection $routes, array $prefixes): void
+            {
+                $this->addPrefix($routes, $prefixes, false);
+            }
+        };
+
+        $trait->add($collection, ['ar' => '/ar', 'fr' => '/fr']);
+
+        $this->assertSame('/.well-known/jwks.json', $collection->get('public_jwks')->getPath());
+        $this->assertNull($collection->get('public_jwks')->getDefault('_locale'));
+        $this->assertSame('public_jwks', $collection->getAlias('jwks_alias')->getId());
+        $this->assertNull($collection->get('public_jwks.ar'));
+        $this->assertSame('/ar/translated', $collection->get('translated.ar')->getPath());
+        $this->assertSame('/fr/translated', $collection->get('translated.fr')->getPath());
+    }
+
     public function testAddLocalizedPrefixUpdatesAliases()
     {
         $collection = new RouteCollection();

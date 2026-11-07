@@ -93,7 +93,7 @@ abstract class FileLoader extends Loader
                 $ret = [];
                 $i = strcspn($resource, '*?{[');
                 $isSubpath = 0 !== $i && str_contains(substr($resource, 0, $i), '/');
-                foreach ($this->glob($resource, false, $_, $ignoreErrors || !$isSubpath, false, $excluded) as $path => $info) {
+                foreach ($this->glob($resource, false, $globResource, $ignoreErrors || !$isSubpath, false, $excluded) as $path => $info) {
                     if (null !== $res = $this->doImport($path, 'glob' === $type ? null : $type, $ignoreErrors, $sourceResource)) {
                         $ret[] = $res;
                     }
@@ -101,7 +101,7 @@ abstract class FileLoader extends Loader
                 }
 
                 if ($isSubpath) {
-                    return isset($ret[1]) ? $ret : ($ret[0] ?? null);
+                    return $this->trackGlobResource($globResource, isset($ret[1]) ? $ret : ($ret[0] ?? null));
                 }
             }
         } elseif (\is_array($resource) && $excluded) {
@@ -109,6 +109,18 @@ abstract class FileLoader extends Loader
         }
 
         return $this->doImport($resource, $type, $ignoreErrors, $sourceResource);
+    }
+
+    /**
+     * Lets loaders track the resource of a glob import, so that files added later are detected.
+     *
+     * @param GlobResource|FileExistenceResource[] $resource
+     *
+     * @internal
+     */
+    protected function trackGlobResource(GlobResource|array $resource, mixed $imported): mixed
+    {
+        return $imported;
     }
 
     /**

@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Translation\Command\TranslationExtractCommand;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
+use Symfony\Component\Translation\Extractor\PhpAstExtractor;
+use Symfony\Component\Translation\Extractor\Visitor\TransMethodVisitor;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\Reader\TranslationReader;
@@ -252,6 +254,45 @@ class TranslationExtractCommandTest extends TestCase
         ];
     }
 
+    #[DataProvider('provideBundleTemplateDirectories')]
+    public function testExtractPhpMessagesFromBundle(?string $templateDirectory)
+    {
+        $bundlePath = $this->translationDir.'/bundle';
+        $this->fs->dumpFile($bundlePath.'/Service.php', '<?php $translator->trans("bundle.root");');
+        $this->fs->dumpFile($bundlePath.'/src/Service.php', '<?php $translator->trans("bundle.src");');
+        $this->fs->dumpFile($this->translationDir.'/templates/page.php', '<?php $translator->trans("application.template");');
+        $this->fs->dumpFile($this->translationDir.'/src/Service.php', '<?php $translator->trans("application.source");');
+        $this->fs->dumpFile($this->translationDir.'/other-bundle/Service.php', '<?php $translator->trans("other.bundle");');
+        if (null !== $templateDirectory) {
+            $this->fs->dumpFile($bundlePath.'/'.$templateDirectory.'/page.php', '<?php $translator->trans("bundle.template");');
+        }
+        $kernel = $this->createStub(KernelInterface::class);
+        $kernel->method('getBundle')->willReturn($this->getBundle($bundlePath));
+        $kernel->method('getProjectDir')->willReturn($this->translationDir);
+        $tester = $this->createCommandTester([], [], $kernel, [], [], null, new PhpAstExtractor([new TransMethodVisitor()]));
+
+        $this->assertSame(0, $tester->execute(['locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true]));
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('bundle.root', $display);
+        $this->assertStringContainsString('bundle.src', $display);
+        $this->assertStringContainsString('application.template', $display);
+        $this->assertStringNotContainsString('application.source', $display);
+        $this->assertStringNotContainsString('other.bundle', $display);
+        if (null !== $templateDirectory) {
+            $this->assertStringContainsString('bundle.template', $display);
+            $this->assertStringContainsString('4 messages were successfully extracted', $display);
+        } else {
+            $this->assertStringContainsString('3 messages were successfully extracted', $display);
+        }
+    }
+
+    public static function provideBundleTemplateDirectories(): iterable
+    {
+        yield 'modern bundle' => ['templates'];
+        yield 'legacy bundle' => ['Resources/views'];
+        yield 'bundle without templates' => [null];
+    }
+
     protected function setUp(): void
     {
         $this->fs = new Filesystem();
@@ -266,21 +307,23 @@ class TranslationExtractCommandTest extends TestCase
         $this->fs->remove($this->translationDir);
     }
 
-    private function createCommandTester($extractedMessages = [], $loadedMessages = [], ?KernelInterface $kernel = null, array $transPaths = [], array $codePaths = [], ?array $writerMessages = null): CommandTester
+    private function createCommandTester($extractedMessages = [], $loadedMessages = [], ?KernelInterface $kernel = null, array $transPaths = [], array $codePaths = [], ?array $writerMessages = null, ?ExtractorInterface $extractor = null): CommandTester
     {
         $translator = new Translator('fr');
         $translator->setFallbackLocales(['en']);
 
-        $extractor = $this->createStub(ExtractorInterface::class);
-        $extractor
-            ->method('extract')
-            ->willReturnCallback(
-                static function ($path, $catalogue) use ($extractedMessages) {
-                    foreach ($extractedMessages as $domain => $messages) {
-                        $catalogue->add($messages, $domain);
+        if (null === $extractor) {
+            $extractor = $this->createStub(ExtractorInterface::class);
+            $extractor
+                ->method('extract')
+                ->willReturnCallback(
+                    static function ($path, $catalogue) use ($extractedMessages) {
+                        foreach ($extractedMessages as $domain => $messages) {
+                            $catalogue->add($messages, $domain);
+                        }
                     }
-                }
-            );
+                );
+        }
 
         $loader = $this->createStub(TranslationReader::class);
         $loader

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Extract translation messages from PHP code as well as templates when passing a bundle to `translation:extract`
  * Add the `cache.translation.providers` cache pool, which the Phrase provider uses instead of `cache.app`
  * Add `CacheWarmer\TranslationsCacheWarmer`, `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand`, `DependencyInjection\TranslationLintCommandPass`, `DependencyInjection\TranslationUpdateCommandPass` and `DependencyInjection\Translator`, which `FrameworkBundle` used to provide
  * Add `TranslationBundle`, which provides the `translation` configuration and the services previously provided by `FrameworkBundle` under `framework.translator`

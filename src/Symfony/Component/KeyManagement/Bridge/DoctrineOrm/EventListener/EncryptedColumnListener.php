@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener;
 
+use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\TypeRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedTypes;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\Encrypted;
 use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
@@ -198,8 +201,26 @@ final class EncryptedColumnListener
      */
     private function registerAutomaticTypes(array $types, EntityManagerInterface $manager): void
     {
-        if ($types) {
-            (new EncryptedTypes($this->automaticEnvelopes, $types))->register($manager->getConnection());
+        if (!$types) {
+            return;
+        }
+
+        if (null === $this->automaticEnvelopes) {
+            throw new \LogicException('The encrypted columns that omit their key need a data key store: configure "key_management.store", or set an explicit key.');
+        }
+
+        $configuration = $manager->getConnection()->getConfiguration();
+        $parents = method_exists($configuration, 'getTypeProvider') ? $configuration->getTypeProvider() : Type::getTypeRegistry();
+        $registry = $parents instanceof TypeRegistry ? $parents : (method_exists(Configuration::class, 'getTypeProvider') ? (new Configuration())->getTypeProvider() : $parents);
+
+        if (!$registry instanceof TypeRegistry) {
+            throw new \LogicException('The encrypted columns that omit their key require a writable Doctrine type registry.');
+        }
+
+        foreach ($types as $name => $type) {
+            $encrypted = new EncryptedType($parents->get($type['type']), $this->automaticEnvelopes, $type['key'], $type['type']);
+
+            $registry->has($name) ? $registry->override($name, $encrypted) : $registry->register($name, $encrypted);
         }
     }
 }

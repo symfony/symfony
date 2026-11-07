@@ -175,7 +175,7 @@ class ProxyHelperTest extends TestCase
         $expected = <<<'EOPHP'
              implements \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface1, \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2, \Symfony\Component\VarExporter\LazyObjectInterface
             {
-                use \Symfony\Component\VarExporter\Internal\LazyDecoratorTrait;
+                use \Symfony\Component\VarExporter\Internal\LazyInterfaceProxyTrait;
 
                 private const LAZY_OBJECT_PROPERTY_SCOPES = [];
 

@@ -16,3 +16,5 @@
 
 [32mfoo3:bar[39m
 
+Global options are available. Run the command with --help to list them.
+

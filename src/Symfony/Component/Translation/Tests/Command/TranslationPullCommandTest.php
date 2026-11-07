@@ -26,6 +26,7 @@ use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Component\Translation\Writer\TranslationWriter;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
@@ -343,6 +344,46 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
         );
     }
 
+    #[DataProvider('providePullSynchronizationOptions')]
+    public function testPullSynchronizationOptions(bool $force, bool $deleteMissing, array $expectedMessages)
+    {
+        $file = $this->createYamlFile([
+            'shared' => 'Local',
+            'local_only' => 'Keep me',
+        ]);
+        $providerBag = new TranslatorBag();
+        $providerBag->addCatalogue((new ArrayLoader())->load([
+            'shared' => 'Remote',
+            'remote_only' => 'New',
+        ], 'en'));
+
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('read')
+            ->with(['messages'], ['en'])
+            ->willReturn($providerBag);
+        $provider->method('__toString')->willReturn('null://default');
+
+        $tester = $this->createCommandTester($provider);
+        $tester->execute([
+            '--locales' => ['en'],
+            '--domains' => ['messages'],
+            '--format' => 'yml',
+            '--force' => $force,
+            '--delete-missing' => $deleteMissing,
+        ]);
+
+        $this->assertEqualsCanonicalizing($expectedMessages, Yaml::parseFile($file));
+    }
+
+    public static function providePullSynchronizationOptions(): iterable
+    {
+        yield 'append only' => [false, false, ['shared' => 'Local', 'local_only' => 'Keep me', 'remote_only' => 'New']];
+        yield 'overwrite without deletion' => [true, false, ['shared' => 'Remote', 'local_only' => 'Keep me', 'remote_only' => 'New']];
+        yield 'delete without overwriting' => [false, true, ['shared' => 'Local', 'remote_only' => 'New']];
+        yield 'overwrite and delete' => [true, true, ['shared' => 'Remote', 'remote_only' => 'New']];
+    }
+
     public function testPullForceMessages()
     {
         $arrayLoader = new ArrayLoader();
@@ -367,7 +408,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
             'bar.error' => 'Bar error',
         ], 'en', 'validators'));
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load([
-            'foo.error' => 'Valeur invalide',
+            'foo.error' => 'Valeur incorrecte',
             'bar.error' => 'Bar erreur',
         ], 'fr', 'validators'));
 
@@ -462,7 +503,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
                     <body>
                         <trans-unit id="nYScnTy" resname="foo.error">
                             <source>foo.error</source>
-                            <target>Valeur invalide</target>
+                            <target>Valeur incorrecte</target>
                         </trans-unit>
                         <trans-unit id="fe0ouWC" resname="bar.error">
                             <source>bar.error</source>

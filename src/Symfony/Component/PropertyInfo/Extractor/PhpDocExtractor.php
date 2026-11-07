@@ -301,8 +301,8 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         $declaringClass = $method->class;
 
-        // a method without docblock that implements an abstract method of a trait uses the docblock of the trait
-        if (false === $method->getDocComment()) {
+        // a method that implements an abstract trait method uses the docblock of the trait when its own docblock has no tag for the type, for example when PHP gives it the docblock of a "use" statement
+        if (!str_contains((string) $method->getDocComment(), self::ACCESSOR === $type ? '@return' : '@param')) {
             foreach ($method->getDeclaringClass()->getTraits() as $trait) {
                 if ($trait->hasMethod($method->name) && $trait->getMethod($method->name)->isAbstract()) {
                     $method = $trait->getMethod($method->name);

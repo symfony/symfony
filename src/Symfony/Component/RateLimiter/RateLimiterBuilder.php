@@ -19,7 +19,7 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class RateLimiterBuilder
+final class RateLimiterBuilder implements RateLimiterBuilderInterface
 {
     public function __construct(
         private StorageInterface $storage,
@@ -27,13 +27,6 @@ final class RateLimiterBuilder
     ) {
     }
 
-    /**
-     * @param string               $id       Unique identifier for the rate limiter
-     * @param int                  $limit    Maximum allowed hits for the passed interval
-     * @param \DateInterval|string $interval If string, must be a number followed by "second",
-     *                                       "minute", "hour", "day", "week" or "month" (or their
-     *                                       plural equivalent)
-     */
     public function slidingWindow(string $id, int $limit, \DateInterval|string $interval): RateLimiterFactoryInterface
     {
         return $this->factory([
@@ -44,16 +37,6 @@ final class RateLimiterBuilder
         ]);
     }
 
-    /**
-     * @param string                         $id       Unique identifier for the rate limiter
-     * @param int                            $limit    Maximum allowed hits for the passed interval
-     * @param \DateInterval|string           $interval If string, must be a number followed by "second",
-     *                                                 "minute", "hour", "day", "week" or "month" (or their
-     *                                                 plural equivalent)
-     * @param \DateTimeInterface|string|null $anchorAt Align the window to a calendar starting at this datetime
-     *                                                 instead of the first hit; requires an "$interval" of at
-     *                                                 least one month. Timezone-less strings are parsed as UTC.
-     */
     public function fixedWindow(string $id, int $limit, \DateInterval|string $interval, \DateTimeInterface|string|null $anchorAt = null): RateLimiterFactoryInterface
     {
         return $this->factory([
@@ -65,12 +48,6 @@ final class RateLimiterBuilder
         ]);
     }
 
-    /**
-     * @param string               $id       Unique identifier for the rate limiter
-     * @param int                  $limit    Maximum allowed hits in a burst
-     * @param \DateInterval|string $interval Interval at which "$amount" tokens are added back
-     * @param int                  $amount   Number of tokens added back per "$interval"
-     */
     public function tokenBucket(string $id, int $limit, \DateInterval|string $interval, int $amount = 1): RateLimiterFactoryInterface
     {
         return $this->factory([

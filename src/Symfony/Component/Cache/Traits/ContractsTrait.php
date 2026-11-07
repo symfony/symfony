@@ -59,7 +59,7 @@ trait ContractsTrait
         return $previousWrapper;
     }
 
-    private function doGet(AdapterInterface $pool, string $key, callable $callback, ?float $beta, ?array &$metadata = null): mixed
+    private function doGet(AdapterInterface $pool, string $key, callable $callback, ?float $beta, ?array &$metadata = null, ?\Closure $beforeCompute = null, ?\Closure $beforeSave = null): mixed
     {
         if (0 > $beta ??= 1.0) {
             throw new InvalidArgumentException(\sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', static::class, $beta));
@@ -102,9 +102,11 @@ trait ContractsTrait
         }
 
         try {
-            $value = ($this->callbackWrapper)($callback, $item, $save, $pool, static function (CacheItem $item, ?bool $saved = null) use ($setMetadata, $startTime, &$metadata) {
+            $beforeCompute?->__invoke($item);
+            $value = ($this->callbackWrapper)($callback, $item, $save, $pool, static function (CacheItem $item, ?bool $saved = null) use ($setMetadata, $startTime, &$metadata, $beforeSave) {
                 if (null === $saved) {
                     $setMetadata($item, $startTime, $metadata);
+                    $beforeSave?->__invoke($item);
                 } elseif (!$saved) {
                     $metadata[CacheItem::METADATA_SAVE_FAILED] = true;
                 }
@@ -116,8 +118,11 @@ trait ContractsTrait
 
         $item->set($value);
 
-        if ($save && !$pool->save($item)) {
-            $metadata[CacheItem::METADATA_SAVE_FAILED] = true;
+        if ($save) {
+            $beforeSave?->__invoke($item);
+            if (!$pool->save($item)) {
+                $metadata[CacheItem::METADATA_SAVE_FAILED] = true;
+            }
         }
 
         return $item->get();

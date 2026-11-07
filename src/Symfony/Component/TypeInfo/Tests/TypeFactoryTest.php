@@ -329,8 +329,11 @@ class TypeFactoryTest extends TestCase
         yield [Type::dict(Type::bool()), ['a' => true, 'b' => false]];
         yield [Type::array(Type::string()), [1 => 'foo', 'bar' => 'baz']];
         yield [Type::array(Type::nullable(Type::bool()), Type::int()), [1 => true, 2 => null, 3 => false]];
+        yield [Type::dict(Type::int()), ['count' => 5]];
         yield [Type::collection(Type::object(\ArrayIterator::class), Type::mixed(), Type::arrayKey()), new \ArrayIterator()];
+        yield [Type::collection(Type::object(\ArrayIterator::class), Type::int(), Type::string()), new \ArrayIterator(['count' => 5])];
         yield [Type::collection(Type::object(\Generator::class), Type::string(), Type::int()), (static fn (): iterable => yield 'string')()];
+        yield [Type::collection(Type::object(\Generator::class), Type::int(), Type::object(\DateTimeImmutable::class)), (static function (): iterable { yield new \DateTimeImmutable() => 1; })()];
         yield [Type::collection(Type::object($arrayAccess::class)), $arrayAccess];
     }
 

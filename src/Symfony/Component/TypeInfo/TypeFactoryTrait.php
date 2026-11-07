@@ -438,7 +438,7 @@ trait TypeFactoryTrait
                 }
 
                 foreach ($value as $k => $v) {
-                    $keyTypes[] = self::fromValue($k);
+                    $keyTypes[] = \is_string($k) ? self::string() : self::fromValue($k);
                     $valueTypes[] = self::fromValue($v);
                 }
             } finally {

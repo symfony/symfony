@@ -20,14 +20,17 @@ use phpDocumentor\Reflection\Types\ContextFactory;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDocBlockExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\PropertyInfo\Util\PhpDocInheritance;
 use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 
@@ -45,7 +48,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     public const MUTATOR = 2;
 
     /**
-     * @var array<string, array{DocBlock|null, int|null, string|null, string|null}>
+     * @var array<string, array{DocBlock|null, int|null, string|null, string|null, bool}>
      */
     private array $docBlocks = [];
 
@@ -132,18 +135,18 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             }
         }
 
-        [$docBlock, $source, $prefix, $declaringClass] = $this->findDocBlock($class, $property);
+        [$docBlock, $source, $prefix, $declaringClass, $inherited] = $this->findDocBlock($class, $property, true);
         if (!$docBlock) {
             return null;
         }
 
-        return $this->getTypeFromDocBlock($docBlock, $source, $class, $declaringClass, $prefix);
+        return $this->getTypeFromDocBlock($docBlock, $source, $class, $declaringClass, $prefix, $inherited);
     }
 
     public function getTypeFromConstructor(string $class, string $property): ?Type
     {
-        if ([$docBlock, $declaringClass] = $this->getDocBlockFromConstructor($class, $property)) {
-            if (null !== $type = $this->getTypeFromDocBlock($docBlock, self::MUTATOR, $class, $declaringClass, null)) {
+        if ([$docBlock, $declaringClass, $inherited] = $this->getDocBlockFromConstructor($class, $property, true)) {
+            if (null !== $type = $this->getTypeFromDocBlock($docBlock, self::MUTATOR, $class, $declaringClass, null, $inherited)) {
                 return $type;
             }
         }
@@ -158,9 +161,9 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     }
 
     /**
-     * @return array{DocBlock, string}|null
+     * @return array{DocBlock, string, bool}|null
      */
-    private function getDocBlockFromConstructor(string $class, string $property): ?array
+    private function getDocBlockFromConstructor(string $class, string $property, bool $inherit = false): ?array
     {
         if (!isset($this->constructorDocBlocks[$class])) {
             try {
@@ -170,19 +173,27 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             }
 
             try {
-                $this->constructorDocBlocks[$class] = $reflectionConstructor ? [$this->docBlockFactory->create($reflectionConstructor, $this->createFromReflector($this->getDeclaringTrait($reflectionConstructor) ?? $reflectionConstructor->getDeclaringClass())), $reflectionConstructor->class] : false;
+                $this->constructorDocBlocks[$class] = $reflectionConstructor ? [$this->docBlockFactory->create($reflectionConstructor, $this->createFromReflector(PhpDocInheritance::getDeclaringTrait($reflectionConstructor) ?? $reflectionConstructor->getDeclaringClass())), $reflectionConstructor->class] : false;
             } catch (\InvalidArgumentException) {
                 $this->constructorDocBlocks[$class] = false;
             }
         }
 
-        if (!$this->constructorDocBlocks[$class]) {
-            return null;
+        $data = null;
+        if ($this->constructorDocBlocks[$class]) {
+            [$docBlock, $declaringClass] = $this->constructorDocBlocks[$class];
+            $data = [$this->filterDocBlockParams($docBlock, $property), $declaringClass, false];
         }
 
-        [$docBlock, $declaringClass] = $this->constructorDocBlocks[$class];
+        if (!$inherit || ($data[0] ?? null)?->hasTag('param') || !$parameter = PhpDocInheritance::getConstructorParameter((new \ReflectionClass($class))->getConstructor(), $property)) {
+            return $data;
+        }
 
-        return [$this->filterDocBlockParams($docBlock, $property), $declaringClass];
+        if ($inheritedDocBlock = $this->getInheritedDocBlock($parameter)) {
+            return [$inheritedDocBlock[0], $inheritedDocBlock[2], true];
+        }
+
+        return $data;
     }
 
     private function filterDocBlockParams(DocBlock $docBlock, string $allowedParam): DocBlock
@@ -194,11 +205,13 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     }
 
     /**
-     * @return array{DocBlock|null, int|null, string|null, string|null}
+     * @param bool $inherit Whether a member without a type tag of its own inherits the docblock of the member that it overrides
+     *
+     * @return array{DocBlock|null, int|null, string|null, string|null, bool}
      */
-    private function findDocBlock(string $class, string $property): array
+    private function findDocBlock(string $class, string $property, bool $inherit = false): array
     {
-        $propertyHash = \sprintf('%s::%s', $class, $property);
+        $propertyHash = \sprintf('%s::%s', $class, $property).($inherit ? ':inherit' : '');
 
         if (isset($this->docBlocks[$propertyHash])) {
             return $this->docBlocks[$propertyHash];
@@ -212,14 +225,16 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         $ucFirstProperty = ucfirst($property);
 
-        if ($reflectionProperty?->isPromoted() && [$docBlock, $declaringClass] = $this->getDocBlockFromConstructor($reflectionProperty->class, $property)) {
-            $data = [$docBlock, self::MUTATOR, null, $declaringClass];
+        if ($reflectionProperty?->isPromoted() && [$docBlock, $declaringClass, $inherited] = $this->getDocBlockFromConstructor($reflectionProperty->class, $property, $inherit)) {
+            $data = [$docBlock, self::MUTATOR, null, $declaringClass, $inherited];
+        } elseif ($inherit && $reflectionProperty && !$reflectionProperty->isPromoted() && !str_contains((string) $reflectionProperty->getDocComment(), '@var') && [$docBlock, $source, $declaringClass] = $this->getInheritedDocBlock($reflectionProperty)) {
+            $data = [$docBlock, $source, null, $declaringClass, true];
         } elseif ([$docBlock, $declaringClass] = $this->getDocBlockFromProperty($class, $property)) {
-            $data = [$docBlock, self::PROPERTY, null, $declaringClass];
+            $data = [$docBlock, self::PROPERTY, null, $declaringClass, false];
         } else {
-            $data = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR)
-                ?? $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR)
-                ?? [null, null, null, null];
+            $data = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR, $inherit)
+                ?? $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR, $inherit)
+                ?? [null, null, null, null, false];
         }
 
         return $this->docBlocks[$propertyHash] = $data;
@@ -267,9 +282,9 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     }
 
     /**
-     * @return array{DocBlock, int, ?string, string}|null
+     * @return array{DocBlock, int, ?string, string, bool}|null
      */
-    private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type): ?array
+    private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type, bool $inherit = false): ?array
     {
         $prefixes = self::ACCESSOR === $type ? $this->accessorPrefixes : $this->mutatorPrefixes;
         $prefix = null;
@@ -310,32 +325,70 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         $declaringClass = $method->class;
+        $prefix = self::ACCESSOR === $type ? null : $prefix;
 
-        // a method that implements an abstract trait method uses the docblock of the trait when its own docblock has no tag for the type, for example when PHP gives it the docblock of a "use" statement
         if (!str_contains((string) $method->getDocComment(), self::ACCESSOR === $type ? '@return' : '@param')) {
-            foreach ($method->getDeclaringClass()->getTraits() as $trait) {
-                if ($trait->hasMethod($method->name) && $trait->getMethod($method->name)->isAbstract()) {
-                    $method = $trait->getMethod($method->name);
-                    break;
+            if ($inherit) {
+                if ($inheritedDocBlock = $this->getInheritedDocBlock(self::ACCESSOR === $type ? $method : $method->getParameters()[0])) {
+                    return [$inheritedDocBlock[0], $type, $prefix, $inheritedDocBlock[2], true];
+                }
+            } else {
+                // a method that implements an abstract trait method uses the docblock of the trait when its own docblock has no tag for the type, for example when PHP gives it the docblock of a "use" statement
+                foreach ($method->getDeclaringClass()->getTraits() as $trait) {
+                    if ($trait->hasMethod($method->name) && $trait->getMethod($method->name)->isAbstract()) {
+                        $method = $trait->getMethod($method->name);
+                        break;
+                    }
                 }
             }
         }
 
-        $context = $this->createFromReflector($this->getDeclaringTrait($method) ?? $method->getDeclaringClass());
-        $prefix = self::ACCESSOR === $type ? null : $prefix;
+        $context = $this->createFromReflector(PhpDocInheritance::getDeclaringTrait($method) ?? $method->getDeclaringClass());
 
         try {
-            return [$this->docBlockFactory->create($method, $context), $type, $prefix, $declaringClass];
+            return [$this->docBlockFactory->create($method, $context), $type, $prefix, $declaringClass, false];
         } catch (\InvalidArgumentException) {
             return null;
         } catch (\RuntimeException) {
             // Workaround for phpdocumentor/reflection-docblock < 6 not supporting ?Type<...> syntax
             if (($rawDoc = $method->getDocComment()) && $docBlock = $this->getNullableGenericDocBlock($rawDoc, $context)) {
-                return [$docBlock, $type, $prefix, $declaringClass];
+                return [$docBlock, $type, $prefix, $declaringClass, false];
             }
 
             return null;
         }
+    }
+
+    /**
+     * Returns the docblock that a member without a type tag of its own inherits, with the tag to read and the class that "self" refers to in it.
+     *
+     * @return array{DocBlock, int, string}|null
+     */
+    private function getInheritedDocBlock(\ReflectionMethod|\ReflectionParameter|\ReflectionProperty $member): ?array
+    {
+        foreach (PhpDocInheritance::getOverriddenMembers($member) as [$overriddenMember, $docClass, $selfClass]) {
+            try {
+                $docBlock = $this->docBlockFactory->create($overriddenMember instanceof \ReflectionParameter ? $overriddenMember->getDeclaringFunction() : $overriddenMember, $this->createFromReflector($docClass));
+            } catch (\InvalidArgumentException|\RuntimeException) {
+                continue;
+            }
+
+            [$tag, $source] = match (true) {
+                $overriddenMember instanceof \ReflectionMethod => ['return', self::ACCESSOR],
+                $overriddenMember instanceof \ReflectionParameter => ['param', self::MUTATOR],
+                default => ['var', self::PROPERTY],
+            };
+
+            if ($overriddenMember instanceof \ReflectionParameter) {
+                $docBlock = $this->filterDocBlockParams($docBlock, $overriddenMember->name);
+            }
+
+            if ($docBlock->hasTag($tag)) {
+                return PhpDocInheritance::hasSameNativeType($member, $overriddenMember, $selfClass) ? [$docBlock, $source, $selfClass] : null;
+            }
+        }
+
+        return null;
     }
 
     private function getNullableGenericDocBlock(string $rawDoc, Context $context): ?DocBlock
@@ -360,24 +413,6 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $cacheKey = $reflector->getNamespaceName().':'.$reflector->getFileName();
 
         return $this->contexts[$cacheKey] ??= $this->contextFactory->createFromReflector($reflector);
-    }
-
-    /**
-     * Finds the trait where a method is written, since reflection gives the class using the trait as its declaring class.
-     */
-    private function getDeclaringTrait(\ReflectionMethod $method, ?\ReflectionClass $class = null): ?\ReflectionClass
-    {
-        foreach (($class ?? $method->getDeclaringClass())->getTraits() as $trait) {
-            if ($declaringTrait = $this->getDeclaringTrait($method, $trait)) {
-                return $declaringTrait;
-            }
-
-            if ($trait->getFileName() === $method->getFileName() && $trait->getStartLine() <= $method->getStartLine() && $method->getEndLine() <= $trait->getEndLine()) {
-                return $trait;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -460,7 +495,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
     }
 
-    private function getTypeFromDocBlock(DocBlock $docBlock, int $source, string $class, ?string $declaringClass, ?string $prefix): ?Type
+    private function getTypeFromDocBlock(DocBlock $docBlock, int $source, string $class, ?string $declaringClass, ?string $prefix, bool $inherited = false): ?Type
     {
         $tag = match ($source) {
             self::PROPERTY => 'var',
@@ -482,6 +517,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         if (!$type = $types[0] ?? null) {
+            return null;
+        }
+
+        // templates and type aliases are read as class names, so an inherited type that names a class that doesn't exist is ignored
+        if ($inherited && self::hasUnknownClass($type)) {
             return null;
         }
 
@@ -524,5 +564,16 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         } catch (\ReflectionException) {
             return false;
         }
+    }
+
+    private static function hasUnknownClass(Type $type): bool
+    {
+        return match (true) {
+            $type instanceof ObjectType => !class_exists($type->getClassName()) && !interface_exists($type->getClassName()),
+            $type instanceof GenericType => self::hasUnknownClass($type->getWrappedType()) || array_any($type->getVariableTypes(), self::hasUnknownClass(...)),
+            $type instanceof WrappingTypeInterface => self::hasUnknownClass($type->getWrappedType()),
+            $type instanceof CompositeTypeInterface => array_any($type->getTypes(), self::hasUnknownClass(...)),
+            default => false,
+        };
     }
 }

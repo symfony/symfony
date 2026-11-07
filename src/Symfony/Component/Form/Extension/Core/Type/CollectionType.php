@@ -70,6 +70,11 @@ class CollectionType extends AbstractType
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
+        $entryPrefixes = array_map(static fn (string $prefix): string => $prefix.'_entry', \array_slice($view->vars['block_prefixes'], 1, -1));
+        if (!\in_array('collection_entry', $entryPrefixes, true)) {
+            array_unshift($entryPrefixes, 'collection_entry');
+        }
+
         $prefixOffset = -2;
         // check if the entry type also defines a block prefix
         /** @var FormInterface $entry */
@@ -82,7 +87,7 @@ class CollectionType extends AbstractType
         }
 
         foreach ($view as $entryView) {
-            array_splice($entryView->vars['block_prefixes'], $prefixOffset, 0, 'collection_entry');
+            array_splice($entryView->vars['block_prefixes'], $prefixOffset, 0, $entryPrefixes);
         }
 
         /** @var FormInterface $prototype */
@@ -91,7 +96,7 @@ class CollectionType extends AbstractType
                 $view->vars['multipart'] = true;
             }
 
-            array_splice($view->vars['prototype']->vars['block_prefixes'], $prototype->getConfig()->getOption('block_prefix') ? -3 : -2, 0, 'collection_entry');
+            array_splice($view->vars['prototype']->vars['block_prefixes'], $prototype->getConfig()->getOption('block_prefix') ? -3 : -2, 0, $entryPrefixes);
         }
     }
 

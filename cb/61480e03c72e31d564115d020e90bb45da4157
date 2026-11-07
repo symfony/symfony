@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-07T07:26:52Z
+
+Same as #67953: I'd drop the rows with matching names. `ParentClass` declares `T of int`, and the test expects a string for `data` because the child also declares a `T`. PHPStan and Psalm both say `int`. We still bind by name when there's no tag, for BC, but I wouldn't promise it in a new component. I'd also remove the paragraph about it from symfony-docs#23469.
+
+(and please move the other rows to `GenericSchemaGeneratorTest`, with one fixture class per file like the others)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-07T07:50:05Z
+
+I moved the rows with different names to `GenericSchemaGeneratorTest`. The new fixtures reuse `Envelope`, `PayloadInterface` and `PayloadTrait` as parents, one class per file.

@@ -101,6 +101,93 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testItGetsMultipleHostsFromTheDsn()
+    {
+        $this->assertEquals(
+            new Connection([
+                'host' => [
+                    ['host' => 'node1', 'port' => 1234],
+                    ['host' => 'node2', 'port' => 5673, 'connection_name' => 'node2'],
+                    ['host' => 'node3', 'port' => 1234, 'connection_name' => 'node3'],
+                ],
+                'port' => 1234,
+                'vhost' => '/',
+            ], [
+                'name' => self::DEFAULT_EXCHANGE_NAME,
+            ], [
+                self::DEFAULT_EXCHANGE_NAME => [],
+            ]),
+            Connection::fromDsn('amqp://node1:1234?host[node2:5673][connection_name]=node2&host[node3][connection_name]=node3')
+        );
+
+        $this->assertEquals(
+            new Connection([
+                'host' => [
+                    ['host' => 'node1', 'port' => 5671],
+                    ['host' => 'node2', 'port' => 5671],
+                ],
+                'port' => 5671,
+                'vhost' => '/',
+                'cacert' => '/etc/ssl/certs',
+            ], [
+                'name' => self::DEFAULT_EXCHANGE_NAME,
+            ], [
+                self::DEFAULT_EXCHANGE_NAME => [],
+            ]),
+            Connection::fromDsn('amqps://node1?host[node2]&cacert=/etc/ssl/certs')
+        );
+    }
+
+    public function testFromDsnWithNonArrayHostQueryParameterDoesNotLeakCredentials()
+    {
+        try {
+            Connection::fromDsn('amqp://user:s3cr3t@localhost?host=foo');
+            $this->fail('An exception should have been thrown.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('Invalid AMQP DSN: query parameter "host" must be an array.', $e->getMessage());
+            $this->assertStringNotContainsString('s3cr3t', $e->getMessage());
+        }
+    }
+
+    public function testItConnectsToTheNextHostWhenAHostIsUnreachable()
+    {
+        $factory = new class($amqpConnection = $this->createStub(\AMQPConnection::class), $this->createStub(\AMQPChannel::class), $this->createStub(\AMQPQueue::class), $this->createStub(\AMQPExchange::class)) extends TestAmqpFactory {
+            public array $hosts = [];
+
+            public function createConnection(array $credentials): \AMQPConnection
+            {
+                $this->hosts[] = $credentials['host'].':'.$credentials['port'];
+
+                return parent::createConnection($credentials);
+            }
+        };
+
+        $amqpConnection->method('connect')->willReturnOnConsecutiveCalls($this->throwException(new \AMQPConnectionException('Oups.')), null);
+
+        Connection::fromDsn('amqp://node1?host[node2:5673]', [], $factory)->channel();
+
+        $this->assertSame(['node1:5672', 'node2:5673'], $factory->hosts);
+    }
+
+    public function testItThrowsWhenNoHostIsReachable()
+    {
+        $this->expectException(\AMQPException::class);
+        $this->expectExceptionMessage('Could not connect to the AMQP server. Please verify the provided DSN.');
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createStub(\AMQPConnection::class),
+            $this->createStub(\AMQPChannel::class),
+            $this->createStub(\AMQPQueue::class),
+            $this->createStub(\AMQPExchange::class)
+        );
+
+        $amqpConnection->method('connect')->willThrowException(
+            new \AMQPConnectionException('Oups.')
+        );
+
+        $connection = Connection::fromDsn('amqp://node1?host[node2]', [], $factory);
+        $connection->channel();
+    }
+
     public function testOverrideOptionsViaQueryParameters()
     {
         $this->assertEquals(

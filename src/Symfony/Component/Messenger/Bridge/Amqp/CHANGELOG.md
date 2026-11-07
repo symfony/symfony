@@ -12,6 +12,7 @@ CHANGELOG
  * Make `AmqpSender` and `AmqpTransport` implement `BatchSenderInterface`, waiting once for the publisher confirms of a batch when `confirm_timeout` is set
  * Make `AmqpStamp` implement `SenderStampInterface` so that an outbox keeps it
  * Set the native `message_id` and `correlation_id` properties of sent messages from `MessageIdStamp` and `CorrelationStamp`
+ * Add support for multiple AMQP hosts in the DSN using `host[hostname:port]` query parameters
 
 8.1
 ---

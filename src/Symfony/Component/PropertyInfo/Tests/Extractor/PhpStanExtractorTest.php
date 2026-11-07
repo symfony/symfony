@@ -50,6 +50,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80PromotedDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\PhpDocInheritance;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\PhpStanPseudoTypesDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RejectedCandidateDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
@@ -67,6 +68,7 @@ use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 
 require_once __DIR__.'/../Fixtures/Extractor/DummyNamespace.php';
 require_once __DIR__.'/../Fixtures/InheritedTemplates.php';
+require_once __DIR__.'/../Fixtures/PhpDocInheritance.php';
 
 /**
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
@@ -316,7 +318,7 @@ class PhpStanExtractorTest extends TestCase
         yield ['methodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
         yield ['aliasedMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
         yield ['overriddenMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
-        yield ['abstractMethodInTraitInAnotherNamespace', null];
+        yield ['abstractMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
         yield ['overriddenAbstractMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
         yield ['templateInTraitInAnotherNamespace', Type::list(Type::template('T'))];
         yield ['mutatorInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
@@ -746,6 +748,139 @@ class PhpStanExtractorTest extends TestCase
         yield 'description and type from inline @var' => [PromotedPropertiesWithDocBlock::class, 'baz', 'A baz property', null, Type::string()];
         yield 'inline @var wins over constructor @param' => [PromotedPropertiesWithDocBlock::class, 'qux', 'An overridden qux property', null, Type::int()];
         yield 'long description from inline docblock' => [PromotedPropertiesWithDocBlock::class, 'corge', 'A corge property.', 'A detailed explanation of corge.', null];
+    }
+
+    /**
+     * @param class-string $class
+     */
+    #[DataProvider('inheritedTypesProvider')]
+    public function testInheritedTypes(string $class, string $property, ?Type $type)
+    {
+        $this->assertEquals($type, $this->extractor->getType($class, $property));
+    }
+
+    /**
+     * @return iterable<string, array{class-string, string, ?Type}>
+     */
+    public static function inheritedTypesProvider(): iterable
+    {
+        $items = Type::list(Type::object(PhpDocInheritance\Item::class));
+
+        yield 'parent method' => [PhpDocInheritance\ChildDummy::class, 'items', $items];
+        yield 'parent method without native types' => [PhpDocInheritance\ChildDummy::class, 'untyped', $items];
+        yield 'native type added by the override' => [PhpDocInheritance\ChildDummy::class, 'addedNative', $items];
+        yield 'docblock with a description only' => [PhpDocInheritance\ChildDummy::class, 'described', $items];
+        yield 'docblock with another tag' => [PhpDocInheritance\ChildDummy::class, 'deprecated', $items];
+        yield 'inheritDoc' => [PhpDocInheritance\ChildDummy::class, 'inheritDoc', $items];
+        yield 'own tag' => [PhpDocInheritance\ChildDummy::class, 'own', Type::dict(Type::object(PhpDocInheritance\Item::class))];
+        yield 'nullable native type made non-nullable' => [PhpDocInheritance\ChildDummy::class, 'nullable', null];
+        yield 'iterable native type made an array' => [PhpDocInheritance\ChildDummy::class, 'iterable', null];
+        yield 'native self type' => [PhpDocInheritance\ChildDummy::class, 'nativeSelf', null];
+        yield 'unsupported type' => [PhpDocInheritance\ChildDummy::class, 'unsupported', null];
+        yield 'private parent method' => [PhpDocInheritance\ChildDummy::class, 'private', null];
+        yield 'parent mutator' => [PhpDocInheritance\ChildDummy::class, 'tags', $items];
+        yield 'parent mutator with a renamed parameter' => [PhpDocInheritance\ChildDummy::class, 'renamed', $items];
+        yield 'parent mutator with a wider parameter' => [PhpDocInheritance\ChildDummy::class, 'widened', null];
+        yield 'grandparent method' => [PhpDocInheritance\GrandChildDummy::class, 'items', $items];
+        yield 'chain of overrides' => [PhpDocInheritance\GrandChildDummy::class, 'chain', $items];
+
+        yield 'interface method' => [PhpDocInheritance\ImplementsInterface::class, 'items', $items];
+        yield 'interface mutator' => [PhpDocInheritance\ImplementsInterface::class, 'tags', $items];
+        yield 'interface of the parent' => [PhpDocInheritance\ChildOfImplementing::class, 'items', $items];
+        yield 'interface of the parent, not overridden' => [PhpDocInheritance\ChildOfImplementing::class, 'tags', $items];
+        yield 'first interface' => [PhpDocInheritance\ImplementsAB::class, 'items', Type::list(Type::object(PhpDocInheritance\A::class))];
+        yield 'first interface in another order' => [PhpDocInheritance\ImplementsBA::class, 'items', Type::list(Type::object(PhpDocInheritance\B::class))];
+        yield 'first documented interface' => [PhpDocInheritance\ImplementsUndocumentedFirst::class, 'items', Type::list(Type::object(PhpDocInheritance\B::class))];
+        yield 'parent interface' => [PhpDocInheritance\ImplementsSub::class, 'items', Type::list(Type::object(PhpDocInheritance\A::class))];
+        yield 'parent before interface' => [PhpDocInheritance\ParentAImplementsB::class, 'items', Type::list(Type::object(PhpDocInheritance\A::class))];
+        yield 'interface after a parent docblock without tag' => [PhpDocInheritance\DescribedParentAndInterface::class, 'items', $items];
+
+        yield 'abstract trait method' => [PhpDocInheritance\ImplementsAbstractTrait::class, 'items', $items];
+        yield 'private abstract trait method' => [PhpDocInheritance\ImplementsAbstractTrait::class, 'hidden', $items];
+        yield 'self in an abstract trait method' => [PhpDocInheritance\ImplementsAbstractTrait::class, 'selves', Type::list(Type::object(PhpDocInheritance\ImplementsAbstractTrait::class))];
+        yield 'native self type of an abstract trait method' => [PhpDocInheritance\ImplementsAbstractTrait::class, 'nativeSelf', Type::object(PhpDocInheritance\ImplementsAbstractTrait::class)];
+        yield 'concrete trait method' => [PhpDocInheritance\OverridesConcreteTrait::class, 'items', null];
+        yield 'trait method overriding a parent method' => [PhpDocInheritance\UndocumentedTraitWithParent::class, 'items', Type::list(Type::object(PhpDocInheritance\A::class))];
+        yield 'trait method implementing an interface method' => [PhpDocInheritance\UndocumentedTraitWithInterface::class, 'items', $items];
+        yield 'parent before abstract trait method' => [PhpDocInheritance\ParentVsAbstractTrait::class, 'items', Type::list(Type::object(PhpDocInheritance\A::class))];
+        yield 'interface before abstract trait method' => [PhpDocInheritance\InterfaceVsAbstractTrait::class, 'items', Type::list(Type::object(PhpDocInheritance\B::class))];
+        yield 'abstract trait method replaced by the parent method' => [PhpDocInheritance\ParentKeptOverAbstractTrait::class, 'items', null];
+        yield 'parent method declared by a trait' => [PhpDocInheritance\ChildOfParentUsingDocumentedTrait::class, 'items', $items];
+
+        yield 'class imported by the parent' => [PhpDocInheritance\Entity\ChildInEntity::class, 'thing', Type::object(PhpDocInheritance\Model\Sub\Thing::class)];
+        yield 'class in the namespace of the parent' => [PhpDocInheritance\Entity\ChildInEntity::class, 'widget', Type::object(PhpDocInheritance\Model\Widget::class)];
+        yield 'self' => [PhpDocInheritance\Entity\ChildInEntity::class, 'self', Type::object(PhpDocInheritance\Model\ParentInModel::class)];
+        yield 'static' => [PhpDocInheritance\Entity\ChildInEntity::class, 'static', Type::object(PhpDocInheritance\Entity\ChildInEntity::class)];
+        yield '$this' => [PhpDocInheritance\Entity\ChildInEntity::class, 'this', Type::object(PhpDocInheritance\Entity\ChildInEntity::class)];
+        yield 'list of self' => [PhpDocInheritance\Entity\ChildInEntity::class, 'selfList', Type::list(Type::object(PhpDocInheritance\Model\ParentInModel::class))];
+        yield 'parent' => [PhpDocInheritance\Entity\ChildInEntity::class, 'parentObject', Type::object(PhpDocInheritance\Model\GrandParentInModel::class)];
+        yield 'type alias of the parent' => [PhpDocInheritance\Entity\ChildInEntity::class, 'aliased', $items];
+        yield 'parent method declared by a trait in another namespace' => [PhpDocInheritance\Entity\ChildInEntity::class, 'gadget', Type::object(PhpDocInheritance\Model\Sub\Gadget::class)];
+
+        yield 'unbound template' => [PhpDocInheritance\UnboundChild::class, 'items', Type::list(Type::template('TItem'))];
+
+        yield 'promoted property of the parent' => [PhpDocInheritance\ChildWithoutParameter::class, 'items', $items];
+        yield 'promoted property documented by the parent constructor' => [PhpDocInheritance\ChildPromotingOwn::class, 'items', $items];
+        yield 'promoted property documented nowhere' => [PhpDocInheritance\ChildPromotingOwn::class, 'name', null];
+        yield 'promoted property promoted again' => [PhpDocInheritance\ChildPromotingAgain::class, 'items', $items];
+        yield 'property redeclaring a promoted property' => [PhpDocInheritance\ChildRedeclaringPromotedProperty::class, 'items', $items];
+        yield 'promoted property declared by the parent' => [PhpDocInheritance\ChildPromotingParentProperty::class, 'items', null];
+
+        yield 'typed property' => [PhpDocInheritance\ChildWithProperties::class, 'typed', $items];
+        yield 'untyped property' => [PhpDocInheritance\ChildWithProperties::class, 'untyped', $items];
+        yield 'protected property made public' => [PhpDocInheritance\ChildWithProperties::class, 'widened', $items];
+        yield 'private parent property' => [PhpDocInheritance\ChildWithProperties::class, 'private', null];
+        yield 'trait property declared again' => [PhpDocInheritance\ChildWithProperties::class, 'fromTrait', null];
+        yield 'interface property' => [PhpDocInheritance\ImplementsPropertyInterface::class, 'items', $items];
+        yield 'abstract property' => [PhpDocInheritance\ImplementsAbstractProperty::class, 'items', $items];
+        yield 'property after a docblock on the use statement' => [PhpDocInheritance\AfterUseDocBlockProperty::class, 'typed', $items];
+    }
+
+    /**
+     * @param class-string $class
+     */
+    #[DataProvider('inheritedBoundTemplateTypesProvider')]
+    public function testInheritedBoundTemplateTypes(string $class, string $property)
+    {
+        if (!property_exists(TypeContext::class, 'inheritedTemplateTypes')) {
+            $this->markTestSkipped('symfony/type-info 8.2 or higher is required.');
+        }
+
+        $this->assertEquals(Type::list(Type::object(PhpDocInheritance\Item::class)), $this->extractor->getType($class, $property));
+    }
+
+    /**
+     * @return iterable<string, array{class-string, string}>
+     */
+    public static function inheritedBoundTemplateTypesProvider(): iterable
+    {
+        yield 'abstract trait method after a docblock on the use statement' => [PhpDocInheritance\AfterUseDocBlock::class, 'items'];
+        yield 'template bound by the class' => [PhpDocInheritance\BoundChild::class, 'items'];
+        yield 'template bound by an implementation' => [PhpDocInheritance\BoundImplementation::class, 'items'];
+        yield 'template bound by a parent for its trait' => [PhpDocInheritance\ChildOfParentUsingGenericTrait::class, 'items'];
+        yield 'template bound through a parent' => [PhpDocInheritance\BoundLeaf::class, 'items'];
+    }
+
+    /**
+     * @param class-string $class
+     */
+    #[DataProvider('inheritedConstructorTypesProvider')]
+    public function testInheritedConstructorTypes(string $class, string $property)
+    {
+        $this->assertEquals(Type::list(Type::object(PhpDocInheritance\Item::class)), $this->extractor->getTypeFromConstructor($class, $property));
+    }
+
+    /**
+     * @return iterable<string, array{class-string, string}>
+     */
+    public static function inheritedConstructorTypesProvider(): iterable
+    {
+        yield 'promoted property' => [PhpDocInheritance\ChildPromotingOwn::class, 'items'];
+        yield 'promoted property promoted again' => [PhpDocInheritance\ChildPromotingAgain::class, 'items'];
+        yield 'parameter' => [PhpDocInheritance\ChildPlain::class, 'items'];
+        yield 'parameter at another position' => [PhpDocInheritance\ChildReordered::class, 'items'];
+        yield 'abstract parent constructor' => [PhpDocInheritance\ImplementsAbstractConstructor::class, 'items'];
+        yield 'interface constructor' => [PhpDocInheritance\ImplementsConstructorInterface::class, 'items'];
     }
 }
 

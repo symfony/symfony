@@ -27,6 +27,7 @@ use PHPStan\PhpDocParser\Parser\TypeParser;
 use PHPStan\PhpDocParser\ParserConfig;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\PropertyInfo\Util\PhpDocInheritance;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
@@ -314,10 +315,26 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
 
     private function getDocBlockFromConstructor(string &$class, string $property, ?string &$declaringTrait = null): ?ParamTagValueNode
     {
-        if (!$constructorDocBlock = $this->getConstructorDocBlock($class)) {
+        if ($constructorDocBlock = $this->getConstructorDocBlock($class)) {
+            [$phpDocNode, $constructorClass, $constructorTrait] = $constructorDocBlock;
+
+            if ($tagDocNode = $this->filterDocBlockParams($phpDocNode, $property)) {
+                [$class, $declaringTrait] = [$constructorClass, $constructorTrait];
+
+                return $tagDocNode;
+            }
+        }
+
+        try {
+            $parameter = PhpDocInheritance::getConstructorParameter((new \ReflectionClass($class))->getConstructor(), $property);
+        } catch (\ReflectionException) {
             return null;
         }
-        [$phpDocNode, $class, $declaringTrait] = $constructorDocBlock;
+
+        if (!$parameter || !$inheritedDocBlock = $this->getInheritedDocBlock($parameter)) {
+            return null;
+        }
+        [$phpDocNode, , , $declaringTrait, $class] = $inheritedDocBlock;
 
         return $this->filterDocBlockParams($phpDocNode, $property);
     }
@@ -343,7 +360,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             return null;
         }
 
-        return $this->constructorDocBlocks[$class] = [$this->getPhpDocNode($rawDocNode), $reflectionConstructor->class, $this->getDeclaringTrait($reflectionConstructor)?->name];
+        return $this->constructorDocBlocks[$class] = [$this->getPhpDocNode($rawDocNode), $reflectionConstructor->class, PhpDocInheritance::getDeclaringTrait($reflectionConstructor)?->name];
     }
 
     private function filterDocBlockParams(PhpDocNode $docNode, string $allowedParam): ?ParamTagValueNode
@@ -376,6 +393,12 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             }
 
             $data = [$docBlock, $source, null, $declaringClass, $selfClass];
+
+            if (!(self::PROPERTY === $source ? $docBlock->getVarTagValues() : $this->filterDocBlockParams($docBlock, $property))) {
+                $data = $this->getInheritedDocBlockFromProperty($class, $property) ?? $data;
+            }
+        } elseif ($inheritedData = $this->getInheritedDocBlockFromProperty($class, $property)) {
+            $data = $inheritedData;
         } elseif ([$docBlock, $_, $declaringClass, $selfClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR)) {
             $data = [$docBlock, self::ACCESSOR, null, $declaringClass, $selfClass];
         } elseif ([$docBlock, $prefix, $declaringClass, $selfClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR)) {
@@ -478,13 +501,59 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             return null;
         }
 
-        if (null === $rawDocNode = $method->getDocComment() ?: null) {
+        $phpDocNode = ($rawDocNode = $method->getDocComment()) ? $this->getPhpDocNode($rawDocNode) : null;
+
+        if (!(self::ACCESSOR === $type ? $phpDocNode?->getReturnTagValues() : $phpDocNode?->getParamTagValues()) && $inheritedDocBlock = $this->getInheritedDocBlock(self::ACCESSOR === $type ? $method : $method->getParameters()[0])) {
+            return [$inheritedDocBlock[0], $prefix, $inheritedDocBlock[3], $inheritedDocBlock[4]];
+        }
+
+        if (!$phpDocNode) {
             return null;
         }
 
-        $phpDocNode = $this->getPhpDocNode($rawDocNode);
+        return [$phpDocNode, $prefix, PhpDocInheritance::getDeclaringTrait($method)?->name ?? $method->class, $method->class];
+    }
 
-        return [$phpDocNode, $prefix, $this->getDeclaringTrait($method)?->name ?? $method->class, $method->class];
+    /**
+     * @return array{PhpDocNode, int, null, string, string}|null
+     */
+    private function getInheritedDocBlockFromProperty(string $class, string $property): ?array
+    {
+        try {
+            $reflectionProperty = new \ReflectionProperty($class, $property);
+        } catch (\ReflectionException) {
+            return null;
+        }
+
+        return $this->canAccessMemberBasedOnItsVisibility($reflectionProperty) ? $this->getInheritedDocBlock($reflectionProperty) : null;
+    }
+
+    /**
+     * Returns the docblock that a member without a type tag of its own inherits, with the tag to read, the class where the docblock is written and the class that "self" refers to in it.
+     *
+     * @return array{PhpDocNode, int, null, string, string}|null
+     */
+    private function getInheritedDocBlock(\ReflectionMethod|\ReflectionParameter|\ReflectionProperty $member): ?array
+    {
+        foreach (PhpDocInheritance::getOverriddenMembers($member) as [$overriddenMember, $docClass, $selfClass]) {
+            if (!$rawDocNode = ($overriddenMember instanceof \ReflectionParameter ? $overriddenMember->getDeclaringFunction() : $overriddenMember)->getDocComment()) {
+                continue;
+            }
+
+            $docNode = $this->getPhpDocNode($rawDocNode);
+
+            [$tagValues, $source] = match (true) {
+                $overriddenMember instanceof \ReflectionMethod => [$docNode->getReturnTagValues(), self::ACCESSOR],
+                $overriddenMember instanceof \ReflectionParameter => [$this->filterDocBlockParams($docNode, $overriddenMember->name), self::MUTATOR],
+                default => [$docNode->getVarTagValues(), self::PROPERTY],
+            };
+
+            if ($tagValues) {
+                return PhpDocInheritance::hasSameNativeType($member, $overriddenMember, $selfClass) ? [$docNode, $source, null, $docClass->name, $selfClass] : null;
+            }
+        }
+
+        return null;
     }
 
     private function getPhpDocNode(string $rawDocNode): PhpDocNode
@@ -522,23 +591,5 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
         }
 
         return new TypeContext($typeContext->calledClassName, $selfClass, $typeContext->namespace, $typeContext->uses, $typeContext->templates, $typeContext->typeAliases, $typeContext->inheritedTemplateTypes ?? []);
-    }
-
-    /**
-     * Finds the trait where a method is written, since reflection gives the class using the trait as its declaring class.
-     */
-    private function getDeclaringTrait(\ReflectionMethod $method, ?\ReflectionClass $class = null): ?\ReflectionClass
-    {
-        foreach (($class ?? $method->getDeclaringClass())->getTraits() as $trait) {
-            if ($declaringTrait = $this->getDeclaringTrait($method, $trait)) {
-                return $declaringTrait;
-            }
-
-            if ($trait->getFileName() === $method->getFileName() && $trait->getStartLine() <= $method->getStartLine() && $method->getEndLine() <= $trait->getEndLine()) {
-                return $trait;
-            }
-        }
-
-        return null;
     }
 }

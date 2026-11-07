@@ -596,6 +596,7 @@ Serializer
  * Deprecate denormalizing an array that is not a list into a `list`-typed property, in version 9.0 a `Symfony\Component\Serializer\Exception\NotNormalizableValueException` will be thrown when the input does not satisfy `array_is_list()`
  * Denormalize the elements of a union-typed collection, e.g. `array<Foo|Bar>`, instead of returning the raw data. An element that matches no member of the union, or a key whose type does not match, now throws instead of being returned as-is
  * Deprecate denormalizing a property from its PHP name when a name converter maps it to another key (e.g. with `#[SerializedName]`), in version 9.0 such a key will be handled like any unknown key
+ * A property, accessor, mutator or constructor parameter without a PHPDoc type now inherits the type of the member it overrides or implements. That member can be in a parent class or an interface, or be an abstract trait method, and must have the same native type. For example, a child class that declares a `$items` property again to add an attribute now gets the `@var list<Item>` of its parent. The Serializer then denormalizes `Item` objects instead of arrays. Add a type tag to the override, for example `@var array<mixed>`, to keep the previous type
 
 String
 ------

@@ -9,6 +9,7 @@ CHANGELOG
  * Add `Type::map()` to map a type and its parts bottom-up
  * Add `Type::getMismatches()` and `TypeMismatch` to tell where and why a value is not accepted by a type
  * Add `TypeContext::$inheritedTemplateTypes` to resolve the templates of parent classes, interfaces and traits with the types given by `@extends`, `@implements` and `@use` tags
+ * Make `PhpDocAwareReflectionTypeResolver` inherit PHPDoc types from parent classes, interfaces and abstract trait methods
 
 8.1
 ---

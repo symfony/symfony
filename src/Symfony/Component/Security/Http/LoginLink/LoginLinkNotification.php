@@ -20,6 +20,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Notification\SmsNotificationInterface;
 use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
 use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Use this notification to ease sending login link
@@ -29,10 +30,16 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
  */
 class LoginLinkNotification extends Notification implements EmailNotificationInterface, SmsNotificationInterface
 {
+    /**
+     * @param TranslatorInterface|null $translator Translates the default content and action label in the "security" domain
+     * @param string|null              $locale     The translation locale, or null to use the translator's locale
+     */
     public function __construct(
         private LoginLinkDetails $loginLinkDetails,
         string $subject,
         array $channels = [],
+        private ?TranslatorInterface $translator = null,
+        private ?string $locale = null,
     ) {
         parent::__construct($subject, $channels);
     }
@@ -47,7 +54,7 @@ class LoginLinkNotification extends Notification implements EmailNotificationInt
             ->to($recipient->getEmail())
             ->subject($this->getSubject())
             ->content($this->getContent() ?: $this->getDefaultContent('button below'))
-            ->action('Sign in', $this->loginLinkDetails->getUrl())
+            ->action(null !== $this->translator ? $this->translator->trans('Sign in', [], 'security', $this->locale) : 'Sign in', $this->loginLinkDetails->getUrl())
         ;
 
         return new EmailMessage($email);
@@ -61,6 +68,22 @@ class LoginLinkNotification extends Notification implements EmailNotificationInt
     private function getDefaultContent(string $target): string
     {
         $duration = $this->loginLinkDetails->getExpiresAt()->getTimestamp() - (class_exists(Clock::class) ? Clock::get()->now()->getTimestamp() : time());
+        if (null !== $this->translator) {
+            if ($duration >= 3600) {
+                $parameters = ['%count%' => (int) floor($duration / 3600)];
+
+                return 'button below' === $target
+                    ? $this->translator->trans('Click on the button below to confirm you want to sign in. This link will expire in %count% hour.|Click on the button below to confirm you want to sign in. This link will expire in %count% hours.', $parameters, 'security', $this->locale)
+                    : $this->translator->trans('Click on the link to confirm you want to sign in. This link will expire in %count% hour.|Click on the link to confirm you want to sign in. This link will expire in %count% hours.', $parameters, 'security', $this->locale);
+            }
+
+            $parameters = ['%count%' => (int) floor($duration / 60)];
+
+            return 'button below' === $target
+                ? $this->translator->trans('Click on the button below to confirm you want to sign in. This link will expire in %count% minute.|Click on the button below to confirm you want to sign in. This link will expire in %count% minutes.', $parameters, 'security', $this->locale)
+                : $this->translator->trans('Click on the link to confirm you want to sign in. This link will expire in %count% minute.|Click on the link to confirm you want to sign in. This link will expire in %count% minutes.', $parameters, 'security', $this->locale);
+        }
+
         $durationString = floor($duration / 60).' minute'.($duration > 60 ? 's' : '');
         if (($hours = $duration / 3600) >= 1) {
             $durationString = floor($hours).' hour'.($hours >= 2 ? 's' : '');

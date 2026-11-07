@@ -138,6 +138,21 @@ class GenericSchemaGeneratorTest extends TestCase
         $this->assertSame(['type' => 'array', 'items' => ['type' => 'string'], 'readOnly' => true], $schema->getRoot()['properties']['data']);
     }
 
+    #[DataProvider('provideUntaggedEnvelopes')]
+    public function testUntaggedParentsDoNotUseDifferentlyNamedChildTemplates(string $class, array|\ArrayObject $expected)
+    {
+        $schema = SchemaGenerator::create()->generate(Type::generic(Type::object($class), Type::string()))->flatten();
+
+        $this->assertEquals($expected, $schema->getRoot()['properties']['data']);
+    }
+
+    public static function provideUntaggedEnvelopes(): iterable
+    {
+        yield 'class' => [Generic\UntaggedChildEnvelope::class, new \ArrayObject()];
+        yield 'interface' => [Generic\UntaggedInterfaceEnvelope::class, ['readOnly' => true]];
+        yield 'trait' => [Generic\UntaggedTraitEnvelope::class, new \ArrayObject()];
+    }
+
     #[DataProvider('provideInheritedNonPublicAccessors')]
     public function testInheritedNonPublicAccessorsUseTheChildTemplateBindings(string $property)
     {

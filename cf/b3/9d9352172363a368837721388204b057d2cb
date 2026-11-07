@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-07T13:46:58Z
+
+What about keeping the property private after all? `Kernel` uses `KernelTrait` itself, so `Kernel::initializeBundles()` can fill its own copy:
+
+```php
+$this->doInitializeBundles();
+$this->bundleClasses = array_map('get_class', $this->bundles);
+```
+
+Then `parent::dumpContainer()` reads a filled list, without new API. The test would then move to HttpKernel's `KernelTest`, with a child kernel that uses `KernelTrait` again, as `MicroKernelTrait` does.
+
+---------------------------------------------------------------------------
+
+by lazerg at 2026-11-07T13:53:45Z
+
+Done in 08500be8f, the property is private again and the test now lives in HttpKernel's `KernelTest`.

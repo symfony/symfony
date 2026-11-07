@@ -35,9 +35,9 @@ class YamlFileLoader extends FileLoader
     {
         $path = $this->locator->locate($resource);
 
-        $content = $this->loadFile($path);
-
         $this->container->fileExists($path);
+
+        $content = $this->loadFile($path);
 
         // empty file
         if (null === $content) {

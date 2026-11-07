@@ -32,7 +32,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class AhaSendApiTransport extends AbstractApiTransport
 {
-    private const HOST = 'send.ahasend.com';
+    private const HOST = 'api.ahasend.com';
 
     public function __construct(
         #[\SensitiveParameter] private readonly string $apiKey,

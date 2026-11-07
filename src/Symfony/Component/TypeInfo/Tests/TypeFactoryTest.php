@@ -339,4 +339,77 @@ class TypeFactoryTest extends TestCase
         yield [Type::collection(Type::object(\Generator::class), Type::string(), Type::int()), (static fn (): iterable => yield 'string')()];
         yield [Type::collection(Type::object($arrayAccess::class)), $arrayAccess];
     }
+
+    public function testCreateFromSharedTraversable()
+    {
+        $value = new \ArrayIterator(['foo' => 1]);
+        $type = Type::collection(Type::object(\ArrayIterator::class), Type::int(), Type::string());
+
+        $this->assertEquals(Type::list($type), Type::fromValue([$value, $value]));
+    }
+
+    public function testCannotCreateFromSelfReferencingArray()
+    {
+        $value = ['foo' => 1];
+        $value['self'] = &$value;
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot create a type from a value nested more than 512 levels deep, it may contain a reference cycle.');
+
+        Type::fromValue($value);
+    }
+
+    public function testCannotCreateFromCrossReferencingArrays()
+    {
+        $build = static function (): array {
+            $a = ['foo' => 1];
+            $b = ['bar' => 2];
+            $a['b'] = &$b;
+            $b['a'] = &$a;
+
+            return $a;
+        };
+
+        $this->expectException(InvalidArgumentException::class);
+
+        Type::fromValue($build());
+    }
+
+    public function testCannotCreateFromSelfReferencingTraversable()
+    {
+        $value = new \ArrayIterator();
+        $value['self'] = $value;
+
+        $this->expectException(InvalidArgumentException::class);
+
+        Type::fromValue($value);
+    }
+
+    public function testCannotCreateFromTraversableYieldingItselfAsKey()
+    {
+        $value = new class implements \IteratorAggregate {
+            public function getIterator(): \Generator
+            {
+                yield $this => 1;
+            }
+        };
+
+        $this->expectException(InvalidArgumentException::class);
+
+        Type::fromValue($value);
+    }
+
+    public function testDepthIsResetAfterException()
+    {
+        $value = ['foo' => 1];
+        $value['self'] = &$value;
+
+        try {
+            Type::fromValue($value);
+            $this->fail('An exception should have been thrown.');
+        } catch (InvalidArgumentException) {
+        }
+
+        $this->assertEquals(Type::list(Type::int()), Type::fromValue([1]));
+    }
 }

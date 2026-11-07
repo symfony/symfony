@@ -52,6 +52,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\RootDummy\RootDummyItem;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\AnotherNamespace\DummyInAnotherNamespace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTraitWithUseDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VoidNeverReturnTypeDummy;
 use Symfony\Component\TypeInfo\Type;
 
@@ -389,6 +390,11 @@ class PhpDocExtractorTest extends TestCase
         yield ['abstractMethodInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
         yield ['overriddenAbstractMethodInTraitInAnotherNamespace', Type::object(DummyUsedInTrait::class)];
         yield ['mutatorInTraitInAnotherNamespace', Type::object(DummyInAnotherNamespace::class)];
+    }
+
+    public function testAbstractMethodInTraitAfterUseDocBlock()
+    {
+        $this->assertEquals(Type::object(DummyInAnotherNamespace::class), $this->extractor->getType(DummyUsingTraitWithUseDocBlock::class, 'abstractMethodInTraitInAnotherNamespace'));
     }
 
     public function testConstructorDefinedByTrait()

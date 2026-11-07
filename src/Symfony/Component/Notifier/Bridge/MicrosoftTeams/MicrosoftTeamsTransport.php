@@ -44,7 +44,7 @@ final class MicrosoftTeamsTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof MicrosoftTeamsOptions);
+        return $message instanceof ChatMessage && (null === $message->getOptions() || $message->getOptions() instanceof MicrosoftTeamsOptions || $message->getOptions() instanceof MicrosoftTeamsAdaptiveCardOptions);
     }
 
     /**
@@ -57,7 +57,9 @@ final class MicrosoftTeamsTransport extends AbstractTransport
         }
 
         $options = $message->getOptions()?->toArray() ?? [];
-        $options['text'] ??= $message->getSubject();
+        if (!$message->getOptions() instanceof MicrosoftTeamsAdaptiveCardOptions) {
+            $options['text'] ??= $message->getSubject();
+        }
 
         $path = $message->getRecipientId() ?? $this->path;
         $endpoint = \sprintf('%s://%s%s', $this->getHttpScheme(), $this->getEndpoint(), $path);

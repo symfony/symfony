@@ -13,6 +13,10 @@ namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\AdaptiveCard;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\TextBlock;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Version;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsAdaptiveCardOptions;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsOptions;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
@@ -39,6 +43,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
     public static function supportedMessagesProvider(): iterable
     {
         yield [new ChatMessage('Hello!')];
+        yield [new ChatMessage('Hello!', new MicrosoftTeamsAdaptiveCardOptions())];
     }
 
     public static function unsupportedMessagesProvider(): iterable
@@ -160,6 +165,42 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         $transport = self::createTransport($client);
 
         $transport->send(new ChatMessage($message, $options));
+    }
+
+    public function testSendWithAdaptiveCardOptionsDoesNotAddText()
+    {
+        $options = (new MicrosoftTeamsAdaptiveCardOptions())
+            ->card((new AdaptiveCard(Version::Version15))->body(new TextBlock('Hello!')));
+
+        $expectedBody = json_encode([
+            'type' => 'message',
+            'attachments' => [
+                [
+                    'contentType' => 'application/vnd.microsoft.card.adaptive',
+                    'contentUrl' => null,
+                    'content' => [
+                        'type' => 'AdaptiveCard',
+                        '$schema' => 'https://adaptivecards.io/schemas/adaptive-card.json',
+                        'version' => '1.5',
+                        'body' => [
+                            ['type' => 'TextBlock', 'text' => 'Hello!'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($expectedBody): ResponseInterface {
+            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+
+            return new MockResponse('', ['response_headers' => ['x-ms-service-request-id' => ['testServiceRequestId']], 'http_code' => 202]);
+        });
+
+        $transport = self::createTransport($client);
+
+        $sentMessage = $transport->send(new ChatMessage('testMessage', $options));
+
+        $this->assertSame('testServiceRequestId', $sentMessage->getMessageId());
     }
 
     public function testSendFromNotification()

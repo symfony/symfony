@@ -95,6 +95,43 @@ $chatMessage->options($microsoftTeamsOptions);
 $chatter->send($chatMessage);
 ```
 
+Sending Adaptive Cards through a Workflow
+-----------------------------------------
+
+[Workflows webhooks](https://support.microsoft.com/en-us/office/create-incoming-webhooks-with-workflows-for-microsoft-teams-8ae491c7-0394-4861-ba59-055e33f75498)
+accept [Adaptive Cards](https://adaptivecards.io/). Use the full URL of the
+workflow in the DSN:
+
+```
+MICROSOFT_TEAMS_DSN=microsoftteams://HOST/workflows/ID/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=SIGNATURE
+```
+
+Then build the card and add it to a `MicrosoftTeamsAdaptiveCardOptions`:
+
+```php
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Action\OpenUrl;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\AdaptiveCard;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Fact;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\FactSet;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\FontWeight;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\TextBlock;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard\Version;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsAdaptiveCardOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$card = (new AdaptiveCard(Version::Version15))
+    ->body((new TextBlock('Symfony Online Meeting'))->weight(FontWeight::Bolder))
+    ->body((new FactSet())
+        ->fact(new Fact('Presenter', 'Fabien Potencier'))
+        ->fact(new Fact('Duration', '90 min'))
+    )
+    ->action((new OpenUrl('https://live.symfony.com'))->title('Join'))
+    ->msTeams(['width' => 'Full']);
+
+$chatMessage = new ChatMessage('Symfony Online Meeting', (new MicrosoftTeamsAdaptiveCardOptions())->card($card));
+$chatter->send($chatMessage);
+```
+
 Sponsor
 -------
 

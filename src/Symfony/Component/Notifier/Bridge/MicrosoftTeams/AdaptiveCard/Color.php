@@ -1,0 +1,23 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Notifier\Bridge\MicrosoftTeams\AdaptiveCard;
+
+enum Color: string
+{
+    case Default = 'default';
+    case Dark = 'dark';
+    case Light = 'light';
+    case Accent = 'accent';
+    case Good = 'good';
+    case Warning = 'warning';
+    case Attention = 'attention';
+}

@@ -79,4 +79,28 @@ class YamlFileLoaderTest extends TestCase
 
         $loader->load($resource, 'en', 'domain1');
     }
+
+    public function testFileIsTrackedBeforeItIsRead()
+    {
+        $path = tempnam(sys_get_temp_dir(), 'sf_translations_');
+        file_put_contents($path, 'key: v1');
+        $loader = new class extends YamlFileLoader {
+            protected function loadResource(string $resource): array
+            {
+                $messages = parent::loadResource($resource);
+                file_put_contents($resource, 'key: v2');
+
+                return $messages;
+            }
+        };
+
+        try {
+            $catalogue = $loader->load($path, 'en');
+
+            $this->assertSame('v1', $catalogue->get('key'));
+            $this->assertFalse($catalogue->getResources()[0]->isFresh(filemtime($path)));
+        } finally {
+            unlink($path);
+        }
+    }
 }

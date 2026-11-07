@@ -1609,6 +1609,31 @@ class YamlFileLoaderTest extends TestCase
         $this->assertStringContainsString('.decorator.foo.', (string) $container->getAlias('foo'));
     }
 
+    public function testFileIsTrackedBeforeItIsRead()
+    {
+        $path = tempnam(sys_get_temp_dir(), 'sf_yaml_');
+        file_put_contents($path, "parameters:\n    foo: v1\n");
+        $container = new ContainerBuilder();
+        $loader = new class($container, new FileLocator()) extends YamlFileLoader {
+            protected function loadFile(string $file): ?array
+            {
+                $content = parent::loadFile($file);
+                file_put_contents($file, "parameters:\n    foo: v2\n");
+
+                return $content;
+            }
+        };
+
+        try {
+            $loader->load($path);
+
+            $this->assertSame('v1', $container->getParameter('foo'));
+            $this->assertFalse($container->getResources()[0]->isFresh(filemtime($path)));
+        } finally {
+            unlink($path);
+        }
+    }
+
     private static function toJsonData(mixed $value): mixed
     {
         return match (true) {

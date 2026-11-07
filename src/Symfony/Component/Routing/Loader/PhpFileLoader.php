@@ -51,6 +51,8 @@ class PhpFileLoader extends FileLoader
             return include $file;
         }, null, null);
 
+        $fileResource = new FileResource($path);
+
         if (1 === $result = $load($path)) {
             $result = null;
         }
@@ -64,7 +66,7 @@ class PhpFileLoader extends FileLoader
             throw new InvalidArgumentException(\sprintf('The return value in config file "%s" is expected to be a RouteCollection, an array or a configurator callable, but got "%s".', $path, get_debug_type($result)));
         }
 
-        $collection->addResource(new FileResource($path));
+        $collection->addResource($fileResource);
 
         return $collection;
     }

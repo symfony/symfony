@@ -62,6 +62,8 @@ class XliffFileLoader implements LoaderInterface
             }
         }
 
+        $fileResource = is_file($resource) && class_exists(FileResource::class) ? new FileResource($resource) : null;
+
         try {
             if ($this->isXmlString($resource)) {
                 $dom = XmlUtils::parse($resource);
@@ -77,8 +79,8 @@ class XliffFileLoader implements LoaderInterface
         $catalogue = new MessageCatalogue($locale);
         $this->extract($dom, $catalogue, $domain);
 
-        if (is_file($resource) && class_exists(FileResource::class)) {
-            $catalogue->addResource(new FileResource($resource));
+        if (null !== $fileResource) {
+            $catalogue->addResource($fileResource);
         }
 
         return $catalogue;

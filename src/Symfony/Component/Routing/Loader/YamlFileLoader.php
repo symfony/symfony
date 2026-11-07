@@ -51,14 +51,14 @@ class YamlFileLoader extends FileLoader
 
         $this->yamlParser ??= new YamlParser();
 
+        $collection = new RouteCollection();
+        $collection->addResource(new FileResource($path));
+
         try {
             $parsedConfig = $this->yamlParser->parseFile($path, Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
             throw new \InvalidArgumentException(\sprintf('The file "%s" does not contain valid YAML: ', $path).$e->getMessage(), 0, $e);
         }
-
-        $collection = new RouteCollection();
-        $collection->addResource(new FileResource($path));
 
         // empty file
         if (null === $parsedConfig) {

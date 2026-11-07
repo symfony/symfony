@@ -30,6 +30,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\MyController;
 use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
+use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
 
@@ -679,6 +680,31 @@ class YamlFileLoaderTest extends TestCase
         $data = (object) ['blog_show' => (object) ['path' => '/blog/{slug}', 'deprecated' => (object) ['package' => 'acme/blog', 'version' => '1.2']]];
 
         $this->assertFalse((new Validator())->validate($data, $schema)->isValid());
+    }
+
+    public function testFileIsTrackedBeforeItIsRead()
+    {
+        $path = tempnam(sys_get_temp_dir(), 'sf_routes_');
+        file_put_contents($path, 'test: { path: /v1 }');
+        $loader = new YamlFileLoader(new FileLocator());
+        (new \ReflectionProperty($loader, 'yamlParser'))->setValue($loader, new class extends Parser {
+            public function parseFile(string $filename, int $flags = 0): mixed
+            {
+                $result = parent::parseFile($filename, $flags);
+                file_put_contents($filename, 'test: { path: /v2 }');
+
+                return $result;
+            }
+        });
+
+        try {
+            $collection = $loader->load($path);
+
+            $this->assertSame('/v1', $collection->get('test')->getPath());
+            $this->assertFalse($collection->getResources()[0]->isFresh(filemtime($path)));
+        } finally {
+            unlink($path);
+        }
     }
 
     private static function toJsonData(mixed $value): mixed

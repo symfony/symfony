@@ -137,8 +137,7 @@ final class Translator extends BaseTranslator implements WarmableInterface
      */
     protected function doLoadCatalogue(string $locale): void
     {
-        parent::doLoadCatalogue($locale);
-
+        $resources = [];
         foreach ($this->scannedDirectories as $directory) {
             if (null !== $vendor = $this->findVendor($directory)) {
                 // the directories of packages only change when installing them, which updates installed.json
@@ -149,6 +148,12 @@ final class Translator extends BaseTranslator implements WarmableInterface
                 $resource = new FileExistenceResource($directory);
             }
 
+            $resources[] = $resource;
+        }
+
+        parent::doLoadCatalogue($locale);
+
+        foreach ($resources as $resource) {
             $this->catalogues[$locale]->addResource($resource);
         }
     }

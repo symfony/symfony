@@ -352,14 +352,16 @@ final class TypeContextFactory
                 throw new LogicException(\sprintf('Type alias "%s" is not imported from a valid class name.', $tag->value->importedAlias));
             }
 
-            if (isset($this->collectingTypeAliases[$importedFromType->getClassName()])) {
-                throw new LogicException(\sprintf('Cannot import "%s" type alias from "%s" as it is recursive.', $tag->value->importedAlias, $importedFromType->getClassName()));
+            $importedFromClassName = (self::$reflectionClassCache[$importedFromType->getClassName()] ??= new \ReflectionClass($importedFromType->getClassName()))->getName();
+
+            if (isset($this->collectingTypeAliases[$importedFromClassName])) {
+                throw new LogicException(\sprintf('Cannot import "%s" type alias from "%s" as it is recursive.', $tag->value->importedAlias, $importedFromClassName));
             }
 
             $this->collectingTypeAliases[$typeContext->declaringClassName] = true;
 
             try {
-                $importedFromContext = $this->createFromClassName($importedFromType->getClassName());
+                $importedFromContext = $this->createFromClassName($importedFromClassName);
             } finally {
                 unset($this->collectingTypeAliases[$typeContext->declaringClassName]);
             }
@@ -372,7 +374,7 @@ final class TypeContextFactory
                     continue;
                 }
 
-                throw new LogicException(\sprintf('Cannot find any "%s" type alias in "%s".', $tag->value->importedAlias, $importedFromType->getClassName()));
+                throw new LogicException(\sprintf('Cannot find any "%s" type alias in "%s".', $tag->value->importedAlias, $importedFromClassName));
             }
 
             $resolvedAliases[$tag->value->importedAs ?? $tag->value->importedAlias] = $typeAlias;

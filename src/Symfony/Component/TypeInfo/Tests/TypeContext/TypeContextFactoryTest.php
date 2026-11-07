@@ -40,6 +40,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPsalmCovariantTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPsalmTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithRecursiveTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithSameTemplateNameAndUntaggedParent;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithSelfImportedTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplateAndParent;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplateTypeAlias;
@@ -474,5 +475,13 @@ class TypeContextFactoryTest extends TestCase
         $this->expectExceptionMessage(\sprintf('Cannot import "Foo" type alias from "%s" as it is recursive.', DummyWithMutuallyImportedTypeAliasesA::class));
 
         $this->typeContextFactory->createFromClassName(DummyWithMutuallyImportedTypeAliasesA::class);
+    }
+
+    public function testThrowWhenImportingTypeAliasesCyclicallyWithAnotherCase()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot import "Foo" type alias from "%s" as it is recursive.', DummyWithSelfImportedTypeAlias::class));
+
+        $this->typeContextFactory->createFromClassName(DummyWithSelfImportedTypeAlias::class);
     }
 }

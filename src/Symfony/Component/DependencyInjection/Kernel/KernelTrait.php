@@ -314,7 +314,6 @@ trait KernelTrait
 
         $container = $this->getContainerBuilder();
         $container->addObjectResource($this);
-        $container->fileExists($this->getBundlesPath());
         $this->prepareContainer($container);
         $this->registerContainerConfiguration($this->getContainerLoader($container));
 
@@ -589,6 +588,8 @@ trait KernelTrait
     private function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(function (ContainerBuilder $container) use ($loader) {
+            $container->fileExists($this->getBundlesPath());
+
             $kernelClass = str_contains(static::class, "@anonymous\0") ? get_parent_class(static::class) : static::class;
 
             if (!$container->hasDefinition('kernel')) {

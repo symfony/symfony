@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
+use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -172,6 +173,22 @@ class KernelTest extends TestCase
 
         $this->assertTrue($kernel->lockHeldWhileDumping, 'The build lock should be held while the container is dumped.');
         $this->assertFalse($kernel->isLockHeld(), 'The build lock should be released once the kernel is booted.');
+    }
+
+    public function testBundleCacheIsDumpedByParentDumpContainer()
+    {
+        $cacheDir = __DIR__.'/Fixtures/var/cache/parent-dump-container-'.uniqid('', true);
+
+        $kernel = new ParentDumpContainerKernel($cacheDir);
+        $kernel->boot();
+
+        $this->assertSame(['DuplicateName'], array_keys($kernel->getBundles()));
+        $kernel->shutdown();
+
+        $kernel = new ParentDumpContainerKernel($cacheDir);
+        $kernel->boot();
+
+        $this->assertSame(['DuplicateName'], array_keys($kernel->getBundles()));
     }
 
     public function testBootInitializesBundlesAndContainer()
@@ -1038,6 +1055,53 @@ class DumpProbingKernel extends Kernel
     {
         $this->lockHeldWhileDumping = $this->isLockHeld();
 
+        parent::dumpContainer($cache, $container, $class, $baseClass);
+    }
+}
+
+class ParentDumpContainerKernel extends Kernel
+{
+    use KernelTrait {
+        initializeBundles as protected doInitializeBundles;
+    }
+
+    public function __construct(
+        private readonly string $cacheDir,
+    ) {
+        parent::__construct('test', false);
+    }
+
+    public function registerBundles(): iterable
+    {
+        return [new DuplicateNameBundleA()];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader): void
+    {
+    }
+
+    public function getCacheDir(): string
+    {
+        return $this->cacheDir;
+    }
+
+    public function getLogDir(): string
+    {
+        return parent::getLogDir();
+    }
+
+    protected function initializeBundles(): void
+    {
+        parent::initializeBundles();
+    }
+
+    protected function getKernelParameters(): array
+    {
+        return parent::getKernelParameters();
+    }
+
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, string $class, string $baseClass): void
+    {
         parent::dumpContainer($cache, $container, $class, $baseClass);
     }
 }

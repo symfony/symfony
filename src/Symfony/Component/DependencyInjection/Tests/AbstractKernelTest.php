@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -389,6 +390,17 @@ class AbstractKernelTest extends TestCase
         $kernel->boot();
 
         $this->assertCount(0, $kernel->getBundles());
+    }
+
+    public function testOverriddenBuildContainerCallingParentTracksTheBundlesFileOfTheKernel()
+    {
+        $dir = $this->varDir;
+        @mkdir($dir.'/etc', 0o777, true);
+        file_put_contents($dir.'/etc/bundles.php', '<?php return [];');
+
+        $container = (new ParentBuildContainerKernel('test', true, $dir))->getTestContainerBuilder();
+
+        $this->assertContains(realpath($dir.'/etc/bundles.php'), array_map('strval', $container->getResources()));
     }
 
     public function testBundleCacheIsNotUsedInDebugWhenNotFresh()
@@ -798,6 +810,54 @@ class PercentProjectDirKernel extends TestKernel
     protected function build(ContainerBuilder $container): void
     {
         $container->setParameter('percent.interpolated', '%kernel.project_dir%/config');
+    }
+}
+
+class PublicConfigurationKernel extends AbstractKernel
+{
+    // registers the container configuration publicly, like HttpKernel's Kernel
+    use KernelTrait {
+        registerBundles as public;
+        registerContainerConfiguration as public;
+    }
+
+    public function __construct(string $env, bool $debug, private string $dir)
+    {
+        parent::__construct($env, $debug);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->dir;
+    }
+}
+
+class ParentBuildContainerKernel extends PublicConfigurationKernel
+{
+    // uses the trait again, like MicroKernelTrait does on top of HttpKernel's Kernel
+    use KernelTrait {
+        registerBundles as public;
+        registerContainerConfiguration as private doRegisterContainerConfiguration;
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader): void
+    {
+        $this->doRegisterContainerConfiguration($loader);
+    }
+
+    public function getTestContainerBuilder(): ContainerBuilder
+    {
+        return $this->buildContainer();
+    }
+
+    protected function buildContainer(): ContainerBuilder
+    {
+        return parent::buildContainer();
+    }
+
+    private function getConfigDir(): string
+    {
+        return $this->getProjectDir().'/etc';
     }
 }
 

@@ -340,6 +340,7 @@ Mailer
 Messenger
 ---------
 
+ * The Doctrine transport table now has a nullable `acknowledged_at` column and includes it in the queue index. Update the schema with `messenger:setup-transports` or a Doctrine migration before running workers, including when `auto_setup` is enabled. Set the new `delete_after_ack` option to `false` to keep acknowledged messages in the table; these rows are excluded from receiving, listing and counting messages. Remove retained rows manually when they are no longer needed
  * The Amazon SQS transport no longer deduplicates the messages sent to a FIFO queue on their content: the
    `MessageDeduplicationId` sent by default is now unique per message, so dispatching the same message twice
    within five minutes delivers it twice. To keep deduplicating, set the id explicitly with `AmazonSqsFifoStamp`

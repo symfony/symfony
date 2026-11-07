@@ -54,6 +54,68 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $encoded[0]['headers']);
     }
 
+    public function testAcknowledgedMessagesCanBeKeptWithoutBeingRedelivered()
+    {
+        $connection = new Connection(['delete_after_ack' => false], $this->driverConnection);
+        $id = $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $connection->get();
+
+        $this->assertTrue($connection->ack($id));
+        $stored = $this->driverConnection->fetchAssociative('SELECT * FROM messenger_messages WHERE id = ?', [$id]);
+        $this->assertIsArray($stored);
+        $this->assertSame('{"message": "Hi"}', $stored['body']);
+        $this->assertSame(['type' => DummyMessage::class], json_decode($stored['headers'], true));
+        $this->assertNotNull($stored['acknowledged_at']);
+
+        $this->driverConnection->executeStatement('UPDATE messenger_messages SET delivered_at = ? WHERE id = ?', ['2000-01-01 00:00:00', $id]);
+        $connection->keepalive($id);
+        $this->driverConnection->executeStatement('UPDATE messenger_messages SET delivered_at = ? WHERE id = ?', ['2000-01-01 00:00:00', $id]);
+
+        foreach ([$connection, $this->connection] as $receiver) {
+            $this->assertNull($receiver->get());
+            $this->assertSame(0, $receiver->getMessageCount());
+            $this->assertSame([], $receiver->findAll());
+            $this->assertNull($receiver->find($id));
+        }
+
+        $nextId = $connection->send('{"message": "Next"}', []);
+        $this->assertSame(1, $connection->getMessageCount());
+        $this->assertEquals($nextId, $connection->get()[0]['id']);
+    }
+
+    public function testAcknowledgedMessagesAreDeletedByDefault()
+    {
+        $id = $this->connection->send('{"message": "Hi"}', []);
+        $this->connection->get();
+
+        $this->assertTrue($this->connection->ack($id));
+        $this->assertFalse($this->driverConnection->fetchOne('SELECT id FROM messenger_messages WHERE id = ?', [$id]));
+    }
+
+    public function testRejectedMessagesAreDeletedWhenAcknowledgedMessagesAreKept()
+    {
+        $connection = new Connection(['delete_after_ack' => false], $this->driverConnection);
+        $id = $connection->send('{"message": "Hi"}', []);
+        $connection->get();
+
+        $this->assertTrue($connection->reject($id));
+        $this->assertFalse($this->driverConnection->fetchOne('SELECT id FROM messenger_messages WHERE id = ?', [$id]));
+        $this->assertFalse($connection->ack($id));
+    }
+
+    public function testSetupUpgradesTheTableForKeepingAcknowledgedMessages()
+    {
+        $this->driverConnection->executeStatement('CREATE TABLE messenger_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, body CLOB NOT NULL, headers CLOB NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL, available_at DATETIME NOT NULL, delivered_at DATETIME DEFAULT NULL)');
+        $id = $this->connection->send('{"message": "Hi"}', []);
+
+        $this->connection->setup();
+        $connection = new Connection(['delete_after_ack' => false], $this->driverConnection);
+        $this->assertEquals($id, $connection->get()[0]['id']);
+        $this->assertTrue($connection->ack($id));
+        $this->assertNotNull($this->driverConnection->fetchOne('SELECT acknowledged_at FROM messenger_messages WHERE id = ?', [$id]));
+        $this->assertNull($connection->get());
+    }
+
     public function testKeepaliveRenewsTheLease()
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);

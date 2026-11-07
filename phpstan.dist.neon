@@ -82,3 +82,8 @@ parameters:
         -
             message: '#^Call to function method_exists\(\) with .+ will always evaluate to true\.$#'
             path: src/Symfony/Component/KeyManagement/Bridge/Doctrine*
+        # configureSchemaTable() is only used with DBAL < 4.5; newer versions use schema editors.
+        -
+            message: '#^Call to deprecated method addColumn\(\) of class Doctrine\\DBAL\\Schema\\Table:#'
+            path: src/Symfony/Component/Messenger/Bridge/Doctrine/Transport/Connection.php
+            count: 8

@@ -25,6 +25,7 @@ class RedisClusterProxy extends \RedisCluster implements ResetInterface, LazyObj
 {
     use RedisCluster62ProxyTrait;
     use RedisCluster63ProxyTrait;
+    use RedisClusterPipelineProxyTrait;
     use RedisProxyTrait {
         resetLazyObject as reset;
     }
@@ -252,11 +253,6 @@ class RedisClusterProxy extends \RedisCluster implements ResetInterface, LazyObj
     public function evalsha_ro($script_sha, $args = [], $num_keys = 0): mixed
     {
         return $this->initializeLazyObject()->evalsha_ro(...\func_get_args());
-    }
-
-    public function exec(): array|false
-    {
-        return $this->initializeLazyObject()->exec(...\func_get_args());
     }
 
     public function exists($key, ...$other_keys): \RedisCluster|bool|int

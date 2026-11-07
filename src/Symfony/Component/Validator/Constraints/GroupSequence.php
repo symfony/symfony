@@ -86,6 +86,13 @@ class GroupSequence
      */
     public function __construct(array $groups, bool $cascadeCurrentGroup = false)
     {
+        foreach ($groups as $group) {
+            if ('*' === $group || (\is_array($group) && \in_array('*', $group, true))) {
+                trigger_deprecation('symfony/validator', '8.2', 'Using "*" as a validation group name in a group sequence is deprecated. This name is reserved for future use.');
+                break;
+            }
+        }
+
         $this->groups = $groups;
         $this->cascadeCurrentGroup = $cascadeCurrentGroup;
     }

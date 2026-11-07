@@ -370,6 +370,7 @@ class PhpDocExtractorTest extends TestCase
             ['propertyInExternalTraitPrimitiveType', new Type(Type::BUILTIN_TYPE_STRING)],
             ['propertyInExternalTraitObjectSameNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
             ['propertyInExternalTraitObjectDifferentNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
+            ['redeclaredPropertyInTraitInAnotherNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
         ];
     }
 
@@ -391,6 +392,16 @@ class PhpDocExtractorTest extends TestCase
             ['methodInExternalTraitObjectSameNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
             ['methodInExternalTraitObjectDifferentNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
         ];
+    }
+
+    public function testMethodsDefinedByTraitInAnotherNamespace()
+    {
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'methodInTraitInAnotherNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'aliasedMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'overriddenMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'abstractMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'overriddenAbstractMethodInTraitInAnotherNamespace'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyInAnotherNamespace::class)], $this->extractor->getTypes(DummyUsingTrait::class, 'mutatorInTraitInAnotherNamespace'));
     }
 
     public function testConstructorDefinedByTrait()

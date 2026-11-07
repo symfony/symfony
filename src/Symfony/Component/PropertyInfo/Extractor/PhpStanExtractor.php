@@ -229,7 +229,8 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
         $reflector = $reflectionProperty->getDeclaringClass();
 
         foreach ($reflector->getTraits() as $trait) {
-            if ($trait->hasProperty($property)) {
+            // a class can declare a property of its traits again, with another doc comment
+            if ($trait->hasProperty($property) && $trait->getProperty($property)->getDocComment() === $reflectionProperty->getDocComment()) {
                 return $this->getDocBlockFromProperty($trait->getName(), $property, $reflector->isTrait() ? $selfClass : $reflector->getName());
             }
         }
@@ -245,7 +246,7 @@ final class PhpStanExtractor implements PropertyTypeExtractorInterface, Construc
 
         // or in the constructor as `@param` for promoted properties
         if (!$phpDocNode && $reflectionProperty->isPromoted()) {
-            $constructor = new \ReflectionMethod($class, '__construct');
+            $constructor = new \ReflectionMethod($reflectionProperty->class, '__construct');
             $rawDocNode = $constructor->getDocComment();
             $phpDocNode = $rawDocNode ? $this->getPhpDocNode($rawDocNode) : null;
             $source = self::MUTATOR;

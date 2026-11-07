@@ -200,6 +200,7 @@ abstract class Kernel extends AbstractKernel implements KernelInterface, Reboota
     protected function initializeBundles(): void
     {
         $this->doInitializeBundles();
+        $this->bundleClasses = array_map('get_class', $this->bundles);
 
         foreach ($this->bundles as $name => $bundle) {
             $this->bundles[$name] = !$bundle instanceof BundleInterface ? new BundleAdapter($bundle) : $bundle;

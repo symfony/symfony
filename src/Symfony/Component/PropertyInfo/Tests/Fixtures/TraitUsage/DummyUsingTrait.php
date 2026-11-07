@@ -21,9 +21,27 @@ class DummyUsingTrait
     }
 
     /**
+     * @var DummyUsedInTrait
+     */
+    public $redeclaredPropertyInTraitInAnotherNamespace;
+
+    /**
      * @return DummyUsedInTrait
      */
     public function getOverriddenMethodInTraitInAnotherNamespace()
+    {
+        return new DummyUsedInTrait();
+    }
+
+    public function getAbstractMethodInTraitInAnotherNamespace()
+    {
+        return null;
+    }
+
+    /**
+     * @return DummyUsedInTrait
+     */
+    public function getOverriddenAbstractMethodInTraitInAnotherNamespace()
     {
         return new DummyUsedInTrait();
     }

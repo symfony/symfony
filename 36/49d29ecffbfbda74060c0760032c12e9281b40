@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-07T07:26:50Z
+
+Thanks for the tests! I'd keep the rows with different names, but not the ones with matching names. In those, `ParentClass` declares `T of int`, and the test expects this `T` to get the `string` bound of the child. PHPStan and Psalm both say `int` there (and report the missing tag), so I'd rather not freeze this.
+
+Can you also move the remaining rows to `TypeContextFactoryTest`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-07T07:50:03Z
+
+I moved the rows with different names to `TypeContextFactoryTest`, with one fixture class per file. I dropped the trait row, since it runs the same code as the class row and `PhpDocAwareReflectionTypeResolverTest` already covers the templates of traits. For the same names, #67955 now makes the template of the parent win on 8.2.

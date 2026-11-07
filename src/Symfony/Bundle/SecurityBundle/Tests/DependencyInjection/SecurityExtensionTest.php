@@ -3006,6 +3006,204 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
+    public function testNamedTokenHandlersCanBeSharedAcrossFirewallsWithTheirOwnAudienceAndDefaultResourceAudience()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'token_handlers' => [
+                'oidc' => [
+                    'oidc' => [
+                        'discovery' => [
+                            'base_uri' => 'https://accounts.example.com/',
+                            'check_issuer' => true,
+                        ],
+                        'issuers' => ['https://accounts.example.com'],
+                        'claim' => 'email',
+                        'enforce_at_jwt_type' => true,
+                    ],
+                ],
+            ],
+            'firewalls' => [
+                'api' => [
+                    'pattern' => '^/api/',
+                    'stateless' => true,
+                    'access_token' => [
+                        'token_handler' => [
+                            'id' => 'oidc',
+                            'audience' => 'showcase-api',
+                        ],
+                        'resource_metadata' => [
+                            'scopes_supported' => ['proposals:write'],
+                        ],
+                    ],
+                ],
+                'mcp' => [
+                    'pattern' => '^/mcp$',
+                    'stateless' => true,
+                    'access_token' => [
+                        'token_handler' => 'oidc',
+                        'resource_metadata' => [
+                            'resource' => 'https://example.com/mcp',
+                            'scopes_supported' => ['proposals:write', 'proposals:review'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $container->compile();
+
+        $this->assertSame('showcase-api', $container->getDefinition('security.access_token_handler.api')->getArgument(2));
+        $this->assertSame('https://example.com/mcp', $container->getDefinition('security.access_token_handler.mcp')->getArgument(2));
+
+        $metadata = $container->getDefinition('security.authenticator.access_token.protected_resource_metadata_controller')->getArgument(0);
+        $this->assertSame(['https://accounts.example.com'], $metadata['api']['authorization_servers']);
+        $this->assertSame(['https://accounts.example.com'], $metadata['mcp']['authorization_servers']);
+        $this->assertSame('https://example.com/mcp', $metadata['mcp']['resource']);
+    }
+
+    public function testNamedTokenHandlerWithDpopRejectsHandlersReadingNothingOfTheToken()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'token_handlers' => [
+                'corporate_cas' => [
+                    'cas' => ['validation_url' => 'https://www.example.com/cas/validate'],
+                ],
+            ],
+            'firewalls' => [
+                'api' => [
+                    'stateless' => true,
+                    'access_token' => [
+                        'token_handler' => 'corporate_cas',
+                        'dpop' => true,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "dpop" option of the "api" firewall cannot be used with the "cas" token handler');
+
+        $container->compile();
+    }
+
+    #[DataProvider('provideNamedTokenHandlersWithoutAudienceSupport')]
+    public function testNamedTokenHandlerRejectsAudienceOnHandlersThatDoNotCheckIt(array|string $handlerConfig)
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'token_handlers' => [
+                'shared' => $handlerConfig,
+            ],
+            'firewalls' => [
+                'api' => [
+                    'stateless' => true,
+                    'access_token' => [
+                        'token_handler' => [
+                            'id' => 'shared',
+                            'audience' => 'showcase-api',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "audience" option of the "api" firewall cannot be used with the "shared" token handler: only the "oidc" and "oauth2" token handlers check an audience.');
+
+        $container->compile();
+    }
+
+    public static function provideNamedTokenHandlersWithoutAudienceSupport(): iterable
+    {
+        yield 'cas' => [['cas' => ['validation_url' => 'https://www.example.com/cas/validate']]];
+        yield 'oidc_user_info' => [['oidc_user_info' => ['base_uri' => 'https://www.example.com/userinfo', 'client' => 'oidc.client']]];
+        yield 'service id' => ['custom_token_handler_service'];
+    }
+
+    public function testSettingAudienceOnAnUnknownTokenHandlerServiceIsRejected()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'api' => [
+                    'stateless' => true,
+                    'access_token' => [
+                        'token_handler' => [
+                            'id' => 'custom_token_handler_service',
+                            'audience' => 'showcase-api',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid firewall "api": token handler "custom_token_handler_service" is not defined in "security.token_handlers", and a custom token handler service cannot configure an "audience".');
+
+        $container->compile();
+    }
+
+    #[DataProvider('provideReusableTokenHandlersWithAnAudience')]
+    public function testReusableTokenHandlerCannotSetAnAudience(array $handlerConfig)
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'token_handlers' => [
+                'shared' => $handlerConfig,
+            ],
+            'firewalls' => [
+                'api' => [
+                    'stateless' => true,
+                    'access_token' => [
+                        'token_handler' => 'shared',
+                        'resource_metadata' => ['resource' => 'https://example.com/api'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "audience" option cannot be set on a reusable token handler, because it would then win over the "resource" of every firewall referencing it.');
+
+        $container->compile();
+    }
+
+    public static function provideReusableTokenHandlersWithAnAudience(): iterable
+    {
+        yield 'oidc' => [['oidc' => ['keyset' => '{"keys":[]}', 'issuers' => ['https://accounts.example.com'], 'enforce_at_jwt_type' => true, 'audience' => 'showcase-api']]];
+        yield 'oauth2' => [['oauth2' => ['audience' => 'showcase-api']]];
+    }
+
+    public function testNamedOidcTokenHandlerRequiresAudienceWhenNotSetOnTheFirewallOrResourceMetadata()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'token_handlers' => [
+                'oidc' => [
+                    'oidc' => [
+                        'keyset' => '{"keys":[]}',
+                        'issuers' => ['https://accounts.example.com'],
+                        'enforce_at_jwt_type' => true,
+                    ],
+                ],
+            ],
+            'firewalls' => [
+                'api' => [
+                    'stateless' => true,
+                    'access_token' => [
+                        'token_handler' => 'oidc',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('You must set the "audience" of the "oidc" token handler when the "resource" of "resource_metadata" is not a URL.');
+
+        $container->compile();
+    }
+
     private function getPasswordHashersMap(array $frameworkConfigs, array $passwordHashers): array
     {
         $container = $this->getRawContainer();

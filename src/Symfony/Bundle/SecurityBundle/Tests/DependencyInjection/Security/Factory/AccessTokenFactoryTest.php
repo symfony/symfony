@@ -1458,6 +1458,19 @@ class AccessTokenFactoryTest extends TestCase
         yield 'resource_metadata with a path' => [['resource_metadata' => ['resource' => '/v1']]];
     }
 
+    public function testAudienceOnTokenHandlerRequiresId()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "audience" option of "token_handler" can only be used when referencing a token handler with "id"; set it on the "oidc" or "oauth2" token handler instead.');
+
+        $this->processConfig([
+            'token_handler' => [
+                'cas' => ['validation_url' => 'https://www.example.com/cas/validate'],
+                'audience' => 'showcase-api',
+            ],
+        ], new AccessTokenFactory($this->createTokenHandlerFactories()));
+    }
+
     public function testEachFirewallGetsItsOwnMetadata()
     {
         $container = $this->createContainerBuilder();

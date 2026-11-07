@@ -518,6 +518,15 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
     }
 
+    public function testImportWithExcludeTags()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/glob']));
+        $routeCollection = $loader->load('import_exclude.xml');
+
+        $this->assertNotNull($routeCollection->get('bar_route'));
+        $this->assertNull($routeCollection->get('baz_route'));
+    }
+
     public function testImportRouteWithNamePrefix()
     {
         $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/import_with_name_prefix']));

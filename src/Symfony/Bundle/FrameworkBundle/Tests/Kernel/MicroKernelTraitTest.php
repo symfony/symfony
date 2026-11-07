@@ -247,6 +247,7 @@ class MicroKernelTraitTest extends TestCase
         ], $parameters['.kernel.bundles_definition']);
     }
 
+    #[BackupGlobals(true)]
     public function testRelativeEnvDirsAreResolvedFromProjectDir()
     {
         $_SERVER['APP_CACHE_DIR'] = 'var/custom-cache';

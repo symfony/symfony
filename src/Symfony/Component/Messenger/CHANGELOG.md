@@ -72,6 +72,7 @@ CHANGELOG
  * Close the transports that implement `CloseableTransportInterface` when the kernel shuts down
  * Add the `$deferFlush` argument and the `deferFlush()` method to `AckStamp` and `Acknowledger`, to flush a full batch in a dispatch of its own
  * Make `BatchHandlerTrait` leave a full batch to the worker, which flushes it in a dispatch of its own right after the dispatch of the message that filled it
+ * Add the `consumable` option of transports to leave a transport that another application consumes out of `messenger:consume`
 
 8.1
 ---

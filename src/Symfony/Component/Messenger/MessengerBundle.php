@@ -234,6 +234,10 @@ class MessengerBundle extends AbstractBundle
                                 ->defaultValue(0)
                                 ->info('Order in which "messenger:consume --all" consumes this transport, higher comes first.')
                             ->end()
+                            ->booleanNode('consumable')
+                                ->defaultTrue()
+                                ->info('Whether "messenger:consume" includes this transport: set it to false to leave the transport out of "--all", of the list of transports to choose from, and of name patterns. Use it for a transport that another application consumes.')
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
@@ -607,6 +611,7 @@ class MessengerBundle extends AbstractBundle
                 'cooldown_strategy' => ['enabled' => false],
                 'rate_limiter' => null,
                 'priority' => 0,
+                'consumable' => true,
             ];
             $config['transports'][$name]['outbox'] = $outboxName;
         }
@@ -686,6 +691,9 @@ class MessengerBundle extends AbstractBundle
 
             $serializerReferencesByTransport[$name] = new Reference($transportSerializerId);
             if (str_starts_with($transport['dsn'], 'sync://')) {
+                $tags['is_sync'] = true;
+                $tags['is_consumable'] = false;
+            } elseif (!$transport['consumable']) {
                 $tags['is_consumable'] = false;
             }
             $transportDefinition = (new Definition(TransportInterface::class))

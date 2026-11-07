@@ -38,6 +38,11 @@ $container->loadFromExtension('messenger', [
             'dsn' => 'amqp://localhost/%2f/messages?exchange_name=priority',
             'priority' => 10,
         ],
+        'not_consumable' => [
+            'dsn' => 'amqp://localhost/%2f/messages?exchange_name=other_application',
+            'consumable' => false,
+        ],
+        'sync' => 'sync://',
         'failed' => 'in-memory:///',
         'redis' => 'redis://127.0.0.1:6379/messages',
         'beanstalkd' => 'beanstalkd://127.0.0.1:11300',

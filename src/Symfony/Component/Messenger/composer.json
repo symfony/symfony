@@ -30,7 +30,7 @@
         "symfony/console": "^8.2",
         "symfony/dependency-injection": "^8.2",
         "symfony/event-dispatcher": "^8.2",
-        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/http-kernel": "^8.3",
         "symfony/lock": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",
         "symfony/property-access": "^7.4|^8.0",
@@ -48,10 +48,12 @@
         "symfony/dependency-injection": "<8.2",
         "symfony/event-dispatcher": "<8.2",
         "symfony/event-dispatcher-contracts": "<2.5",
+        "symfony/http-kernel": "<8.3",
         "symfony/lock": "<7.4",
         "symfony/routing": "<8.2",
         "symfony/serializer": "<7.4.4|>=8.0,<8.0.4",
-        "symfony/service-contracts": "<3.7.1"
+        "symfony/service-contracts": "<3.7.1",
+        "symfony/web-profiler-bundle": "<8.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\": "" },

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `Profiler::reserveToken()` to reference the profile of a request before it is collected
+ * Make `TimeDataCollector` use the `REQUEST_TIME_FLOAT` of virtual requests, like the ones of profiled console commands, instead of the start time of the kernel
+
 8.2
 ---
 

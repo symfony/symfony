@@ -35,12 +35,18 @@ class Profiler implements ResetInterface
 
     private bool $initiallyEnabled = true;
 
+    /**
+     * @var \WeakMap<Request, string>
+     */
+    private \WeakMap $reservedTokens;
+
     public function __construct(
         private ProfilerStorageInterface $storage,
         private ?LoggerInterface $logger = null,
         private bool $enabled = true,
     ) {
         $this->initiallyEnabled = $enabled;
+        $this->reservedTokens = new \WeakMap();
     }
 
     /**
@@ -144,6 +150,21 @@ class Profiler implements ResetInterface
     }
 
     /**
+     * Reserves the token of the profile collected for the request.
+     *
+     * This allows referencing the profile before it exists, e.g. from a message sent while handling the request,
+     * and gives the token of the collected profile afterwards.
+     */
+    public function reserveToken(Request $request): string
+    {
+        if (null === $token = $this->reservedTokens[$request] ?? null) {
+            $this->reservedTokens[$request] = $token = bin2hex(random_bytes(3));
+        }
+
+        return $token;
+    }
+
+    /**
      * Collects data for the given Response.
      */
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): ?Profile
@@ -152,7 +173,7 @@ class Profiler implements ResetInterface
             return null;
         }
 
-        $profile = new Profile(bin2hex(random_bytes(3)));
+        $profile = new Profile($this->reserveToken($request));
         $profile->setTime(time());
         $profile->setUrl($request->getUri());
         $profile->setMethod($request->getMethod());

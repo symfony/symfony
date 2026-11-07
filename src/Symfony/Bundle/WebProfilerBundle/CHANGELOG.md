@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add a "Worker Messages" tab to the profiler search to list the profiles of the messages consumed by `messenger:consume --profile`, and link them to the profiles that sent the messages
+
 8.2
 ---
 

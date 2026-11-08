@@ -26,11 +26,14 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\BatchHandlingMiddleware;
 use Symfony\Component\Messenger\Tests\Fixtures\App\HandledByBusStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\ResettableService;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Contracts\Service\ContainerProviderInterface;
 
 class DispatchTaskTest extends TestCase
 {
+    private int $resetInterval = 1;
     private ?int $memoryLimit = null;
 
     protected function setUp(): void
@@ -100,6 +103,19 @@ class DispatchTaskTest extends TestCase
         $this->assertNotNull($sent[0]->error);
     }
 
+    public function testFailedDispatchesCountTowardsTheResetInterval()
+    {
+        ResettableService::$resets = 0;
+        $this->resetInterval = 2;
+
+        $sent = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new SecondMessage())), new DispatchEnvelopeMessage(2, new Envelope(new SecondMessage())));
+
+        $this->assertCount(2, $sent);
+        $this->assertInstanceOf(HandlerFailedException::class, $sent[0]->error);
+        $this->assertInstanceOf(HandlerFailedException::class, $sent[1]->error);
+        $this->assertSame(1, ResettableService::$resets);
+    }
+
     private function runTask(Envelope $envelope): Envelope
     {
         $sent = $this->runTaskWith(new DispatchEnvelopeMessage(1, $envelope), new FlushBatchHandlersMessage(true));
@@ -148,7 +164,7 @@ class DispatchTaskTest extends TestCase
             }
         };
 
-        $task = new DispatchTask(__DIR__.'/../Fixtures/App/bin/console', 1, $this->memoryLimit);
+        $task = new DispatchTask(__DIR__.'/../Fixtures/App/bin/console', $this->resetInterval, $this->memoryLimit);
 
         $cancellation = new class implements Cancellation {
             public function subscribe(\Closure $callback): string

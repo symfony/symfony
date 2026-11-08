@@ -302,7 +302,7 @@ class TypeContextFactoryTest extends TestCase
 
     public function testResolveInheritedTemplateTypes()
     {
-        $stringTypeResolver = new StringTypeResolver();
+        $stringTypeResolver = new StringTypeResolver(null, null, [], true);
         $typeContextFactory = new TypeContextFactory($stringTypeResolver);
 
         $this->assertEquals(Type::object(Dummy::class), $stringTypeResolver->resolve('T', $typeContextFactory->createFromClassName(DummyGrandChildEnvelope::class, Envelope::class)));
@@ -336,7 +336,7 @@ class TypeContextFactoryTest extends TestCase
     {
         $typeContext = $this->typeContextFactory->createFromClassName($calledClassName, $declaringClassName);
 
-        $this->assertEquals(Type::template('T', Type::object()), (new StringTypeResolver())->resolve('T', $typeContext));
+        $this->assertEquals(Type::template('T', Type::object()), (new StringTypeResolver(null, null, [], true))->resolve('T', $typeContext));
     }
 
     /**

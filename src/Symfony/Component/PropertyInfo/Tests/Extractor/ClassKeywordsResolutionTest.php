@@ -27,7 +27,7 @@ class ClassKeywordsResolutionTest extends TestCase
         $expected = [];
         $actual = [];
 
-        foreach ([new PhpDocExtractor(), new PhpStanExtractor()] as $extractor) {
+        foreach ([new PhpDocExtractor(), new PhpStanExtractor(null, null, null, true, true)] as $extractor) {
             foreach ([KeywordsParent::class, KeywordsChild::class, KeywordsChildInOtherNamespace::class] as $class) {
                 $type = $this->createExpectedType(KeywordsParent::class, $class, KeywordsGrandParent::class);
 

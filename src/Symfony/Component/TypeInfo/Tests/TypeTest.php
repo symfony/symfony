@@ -283,7 +283,7 @@ class TypeTest extends TestCase
         yield 'union members of the same kind' => [$union, [1, '2'], [new TypeMismatch('', $union, 'array')]];
 
         yield 'resolved type' => [
-            TypeResolver::create()->resolve('array{data: list<array{id: string, shipment?: array{departure?: string|null, ...}|null, ...}>, ...}'),
+            TypeResolver::create(null, true)->resolve('array{data: list<array{id: string, shipment?: array{departure?: string|null, ...}|null, ...}>, ...}'),
             ['data' => [['id' => 'A-1', 'shipment' => ['departure' => 20260918]]]],
             [new TypeMismatch('[data][0][shipment][departure]', Type::nullable(Type::string()), 'int')],
         ];

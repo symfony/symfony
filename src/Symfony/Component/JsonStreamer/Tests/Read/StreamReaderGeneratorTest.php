@@ -204,7 +204,7 @@ class StreamReaderGeneratorTest extends TestCase
 
     public function testDoNotSupportGrowingGenericTypes()
     {
-        $generator = new StreamReaderGenerator(new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new TypeContextFactory(new StringTypeResolver())), new ServiceContainer(), $this->streamReadersDir);
+        $generator = new StreamReaderGenerator(new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create(null, true)), new TypeContextFactory(new StringTypeResolver(null, null, [], true))), new ServiceContainer(), $this->streamReadersDir);
 
         $this->expectException(UnsupportedException::class);
         $this->expectExceptionMessage(\sprintf('"%s" contains itself with generic types that keep growing, which is not supported.', DummyWithGrowingGenerics::class));

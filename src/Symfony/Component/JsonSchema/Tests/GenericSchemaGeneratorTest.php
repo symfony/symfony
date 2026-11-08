@@ -227,7 +227,7 @@ class GenericSchemaGeneratorTest extends TestCase
 
     public function testInheritedConstructorUsesTheChildTemplateBindings()
     {
-        $phpDoc = new PhpStanExtractor();
+        $phpDoc = new PhpStanExtractor(null, null, null, true, true);
         $reflection = new ReflectionExtractor();
         $generator = new SchemaGenerator(new PropertyInfoExtractor([$reflection], [new ConstructorExtractor([$phpDoc]), $phpDoc, $reflection], [], [$reflection], [$reflection]));
         $properties = $generator->generate(Type::generic(Type::object(Generic\InheritedConstructorEnvelope::class), Type::int(), Type::string()))->flatten()->getRoot()['properties'];
@@ -486,7 +486,7 @@ class GenericSchemaGeneratorTest extends TestCase
 
     public function testCovariantSlotsFollowExtractionCapability()
     {
-        $type = (new PhpStanExtractor())->getType(Generic\CovariantTemplates::class, 'first');
+        $type = (new PhpStanExtractor(null, null, null, true, true))->getType(Generic\CovariantTemplates::class, 'first');
         $generator = SchemaGenerator::create();
         $properties = $generator->generate(Type::generic(Type::object(Generic\CovariantTemplates::class), Type::int(), Type::string()))->flatten()->getRoot()['properties'];
         $this->assertSame(['type' => 'string'], $properties['second']);
@@ -991,7 +991,7 @@ class GenericSchemaGeneratorTest extends TestCase
         };
         $reflection = new ReflectionExtractor();
 
-        return new SchemaGenerator(new PropertyInfoExtractor([$reflection], [$extractor, new PhpStanExtractor(), $reflection], [], [$reflection], [$reflection]));
+        return new SchemaGenerator(new PropertyInfoExtractor([$reflection], [$extractor, new PhpStanExtractor(null, null, null, true, true), $reflection], [], [$reflection], [$reflection]));
     }
 
     /**
@@ -1053,6 +1053,6 @@ class GenericSchemaGeneratorTest extends TestCase
         };
         $reflection = new ReflectionExtractor();
 
-        return new SchemaGenerator(new PropertyInfoExtractor([$extractor, $reflection], [$extractor, new PhpStanExtractor(), $reflection], [], [$extractor, $reflection], [$reflection]));
+        return new SchemaGenerator(new PropertyInfoExtractor([$extractor, $reflection], [$extractor, new PhpStanExtractor(null, null, null, true, true), $reflection], [], [$extractor, $reflection], [$reflection]));
     }
 }

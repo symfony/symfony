@@ -661,7 +661,7 @@ class PhpStanExtractorTest extends TestCase
     {
         $extractor = new PhpStanExtractor(null, null, null, true, false);
 
-        $this->assertEquals(Type::union(Type::string(), Type::string()), $extractor->getType(LiteralDummy::class, 'status'));
+        $this->assertEquals(Type::string(), $extractor->getType(LiteralDummy::class, 'status'));
         $this->assertEquals(Type::arrayShape(['quoted key' => Type::string()]), $extractor->getType(LiteralDummy::class, 'shape'));
     }
 

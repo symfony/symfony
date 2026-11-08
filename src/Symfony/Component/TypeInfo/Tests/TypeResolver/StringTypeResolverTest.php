@@ -230,8 +230,8 @@ class StringTypeResolverTest extends TestCase
         yield [Type::object(), \sprintf('object|%s', \DateTime::class)];
         yield [Type::nullable(Type::object()), \sprintf('%s|object|null', \DateTime::class)];
         yield [Type::int(), 'int|int'];
-        yield [Type::string(), "'asc'|'desc'"];
-        yield [Type::nullable(Type::int()), 'positive-int|0|null'];
+        yield [Type::union(Type::literal('asc'), Type::literal('desc')), "'asc'|'desc'"];
+        yield [Type::nullable(Type::union(Type::literal(0), Type::intRange(1, null))), 'positive-int|0|null'];
 
         // intersection
         yield [Type::intersection(Type::object(\DateTime::class), Type::object(\Stringable::class)), \DateTime::class.'&'.\Stringable::class];
@@ -556,7 +556,8 @@ class StringTypeResolverTest extends TestCase
     public static function disabledRefinementDataProvider(): iterable
     {
         yield [Type::string(), "'draft'"];
-        yield [Type::union(Type::string(), Type::string()), "'draft'|'live'"];
+        yield [Type::string(), "'draft'|'live'"];
+        yield [Type::nullable(Type::int()), 'positive-int|0|null'];
         yield [Type::float(), '1.5'];
         yield [Type::int(), '-1'];
         yield [Type::int(), 'positive-int'];
@@ -565,7 +566,7 @@ class StringTypeResolverTest extends TestCase
         yield [Type::int(), 'int<0, 10>'];
         yield [Type::int(), 'int<0, PHP_INT_MAX>'];
         yield [Type::arrayShape(['a b' => Type::int()]), "array{'a b': 1}"];
-        yield [Type::array(Type::string(), Type::union(Type::string(), Type::string())), "array<'en'|'de', string>"];
+        yield [Type::array(Type::string(), Type::string()), "array<'en'|'de', string>"];
         yield [Type::list(Type::int()), 'list<positive-int>'];
 
         // rejected when refinements are resolved

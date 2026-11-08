@@ -88,6 +88,59 @@ class LoginThrottlingListenerTest extends TestCase
         $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
     }
 
+    public function testPreventsLoginWithInvisibleOrControlCharactersCombiningMarksOrSpaces()
+    {
+        $request = $this->createRequest();
+        $passports = [$this->createPassport("wou\u{200B}ter"), $this->createPassport("wo\u{301}u\u{20DD}ter"), $this->createPassport(" wou\x01ter ")];
+
+        $this->requestStack->push($request);
+
+        for ($i = 0; $i < 3; ++$i) {
+            $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 3]));
+        }
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($this->createPassport('wouter')));
+    }
+
+    public function testPreventsLoginWithAccentsOrCompatibilityForms()
+    {
+        if (!class_exists(\Normalizer::class)) {
+            $this->markTestSkipped('The "intl" extension or the "symfony/polyfill-intl-normalizer" package is required.');
+        }
+
+        $request = $this->createRequest();
+        $passports = [$this->createPassport('wóuter'), $this->createPassport('ⓦouter'), $this->createPassport('ｗｏｕｔｅｒ')];
+
+        $this->requestStack->push($request);
+
+        for ($i = 0; $i < 3; ++$i) {
+            $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 3]));
+        }
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($this->createPassport('wouter')));
+    }
+
+    public function testPreventsLoginWithCaseFoldedVariants()
+    {
+        if (!\defined('MB_CASE_FOLD')) {
+            $this->markTestSkipped('The "mbstring" extension on PHP 7.3 or higher is required.');
+        }
+
+        $request = $this->createRequest();
+        $passports = [$this->createPassport('straße'), $this->createPassport('STRAẞE'), $this->createPassport('Strasse')];
+
+        $this->requestStack->push($request);
+
+        for ($i = 0; $i < 3; ++$i) {
+            $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 3]));
+        }
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($this->createPassport('strasse')));
+    }
+
     public function testPreventsLoginWhenOverGlobalThreshold()
     {
         $request = $this->createRequest();

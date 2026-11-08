@@ -110,6 +110,15 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     private function collectResults(TokenInterface $token, array $attributes, $object): \Traversable
     {
+        // Voters are asked about each attribute separately so that the unanimous strategy denies access if any of them is denied
+        if (\count($attributes) > 1 && $this->strategy instanceof UnanimousStrategy) {
+            foreach ($attributes as $attribute) {
+                yield from $this->collectResults($token, [$attribute], $object);
+            }
+
+            return;
+        }
+
         foreach ($this->getVoters($attributes, $object) as $voter) {
             $result = $voter->vote($token, $object, $attributes);
             if (!\is_int($result) || !(self::VALID_VOTES[$result] ?? false)) {

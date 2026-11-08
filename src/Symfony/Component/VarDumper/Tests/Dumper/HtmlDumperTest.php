@@ -196,6 +196,7 @@ EOTXT
     {
         return [
             [['dummy' => new ImgStub('dummy', 'img/png', '100em')], '<img src="data:img/png;base64,ZHVtbXk=" />'],
+            [['dummy' => new ImgStub('dummy', 'image/png"><script>alert(1)</script>', '')], '<img src="data:image/png&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;;base64,ZHVtbXk=" />'],
             ['foo', '<span class=sf-dump-str title="3 characters">foo</span>'],
         ];
     }

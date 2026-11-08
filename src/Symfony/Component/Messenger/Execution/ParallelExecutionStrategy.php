@@ -346,6 +346,12 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
 
     private function handleResponse(int $channelId, mixed $response, callable $onHandled): bool
     {
+        if (null === $response) {
+            $this->replaceChannel($channelId, $onHandled);
+
+            return false;
+        }
+
         if (!$response instanceof DeferredEnvelopeMessage && !$response instanceof HandledEnvelopeMessage) {
             return false;
         }
@@ -454,6 +460,24 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         }
 
         return $handled;
+    }
+
+    /**
+     * Sends the messages that a worker did not read to another worker, once that worker stopped on its memory limit.
+     */
+    private function replaceChannel(int $channelId, callable $onHandled): void
+    {
+        $channelPendingRequests = $this->pendingRequests[$channelId] ?? [];
+        unset($this->pendingRequests[$channelId]);
+        $this->removeChannel($channelId, $onHandled);
+
+        foreach ($channelPendingRequests as $requestId => $pendingRequest) {
+            if ($requestId === $this->pendingProbeRequestId) {
+                $this->pendingProbeRequestId = null;
+            }
+
+            $this->execute($pendingRequest->envelope, $pendingRequest->transportName, $this->completionCallbacks[$pendingRequest] ?? $onHandled);
+        }
     }
 
     private function getAffinityKey(Envelope $envelope): string

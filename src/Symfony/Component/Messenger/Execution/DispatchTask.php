@@ -35,7 +35,7 @@ use Symfony\Contracts\Service\ContainerProviderInterface;
 /**
  * @internal
  *
- * @implements Task<null, DispatchEnvelopeMessage|FlushBatchHandlersMessage, DeferredEnvelopeMessage|HandledEnvelopeMessage>
+ * @implements Task<null, DispatchEnvelopeMessage|FlushBatchHandlersMessage, DeferredEnvelopeMessage|HandledEnvelopeMessage|null>
  */
 final class DispatchTask implements Task
 {
@@ -131,6 +131,12 @@ final class DispatchTask implements Task
 
                 unset($ack, $acked, $acks, $dispatching, $batch, $combine, $flushes);
 
+                if (null !== $this->memoryLimit && memory_get_usage(true) >= $this->memoryLimit) {
+                    $this->flush($bus, $channel, true, $unacks, $heldAcks);
+                    $channel->send(null);
+                    break;
+                }
+
                 continue;
             }
 
@@ -173,6 +179,8 @@ final class DispatchTask implements Task
 
             if (null !== $this->memoryLimit && memory_get_usage(true) >= $this->memoryLimit) {
                 $this->flush($bus, $channel, true, $unacks, $heldAcks);
+                // the parent then sends the messages that this worker won't read to another worker
+                $channel->send(null);
                 break;
             }
         }

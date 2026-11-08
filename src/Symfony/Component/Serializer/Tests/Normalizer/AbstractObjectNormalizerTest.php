@@ -12,11 +12,15 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Persistence\Proxy;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -38,7 +42,9 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -368,6 +374,257 @@ class AbstractObjectNormalizerTest extends TestCase
         $denormalizedData = $normalizer->denormalize(['type' => 'foo', 'nested_type' => 'bar'], AbstractDummy::class);
 
         $this->assertInstanceOf(AbstractDummySecondChild::class, $denormalizedData);
+    }
+
+    /**
+     * @dataProvider provideDiscriminatorAwareNormalizers
+     */
+    public function testDenormalizeDiscriminatorMapRespectsIgnoreOnTheMappedClass(AbstractObjectNormalizer $normalizer)
+    {
+        $data = ['type' => 'restricted', 'name' => 'foo', 'verified' => true, 'secret' => 'leaked'];
+
+        $object = $normalizer->denormalize($data, RestrictedDiscriminatorBase::class);
+
+        $this->assertInstanceOf(RestrictedDiscriminatorChild::class, $object);
+        $this->assertSame('foo', $object->getName());
+        $this->assertFalse($object->getVerified());
+        $this->assertSame('default', $object->getSecret());
+
+        try {
+            $normalizer->denormalize($data, RestrictedDiscriminatorBase::class, null, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
+            $this->fail(ExtraAttributesException::class.' expected');
+        } catch (ExtraAttributesException $e) {
+            $this->assertContains('verified', $e->getExtraAttributes());
+            $this->assertContains('secret', $e->getExtraAttributes());
+        }
+    }
+
+    /**
+     * @dataProvider provideDiscriminatorAwareNormalizers
+     */
+    public function testDenormalizeDiscriminatorMapRespectsGroupsOfTheMappedClass(AbstractObjectNormalizer $normalizer)
+    {
+        $context = [AbstractNormalizer::GROUPS => ['write']];
+
+        $restricted = $normalizer->denormalize(['type' => 'restricted', 'name' => 'foo', 'role' => 'admin'], RestrictedDiscriminatorBase::class, null, $context);
+
+        $this->assertInstanceOf(RestrictedDiscriminatorChild::class, $restricted);
+        $this->assertSame('foo', $restricted->getName());
+        $this->assertSame('user', $restricted->getRole());
+
+        $open = $normalizer->denormalize(['type' => 'open', 'name' => 'foo', 'role' => 'admin'], RestrictedDiscriminatorBase::class, null, $context);
+
+        $this->assertInstanceOf(OpenDiscriminatorChild::class, $open);
+        $this->assertSame('admin', $open->getRole());
+    }
+
+    /**
+     * @dataProvider provideDiscriminatorAwareNormalizers
+     */
+    public function testDenormalizeObjectToPopulateRespectsIgnoreOnItsClass(AbstractObjectNormalizer $normalizer)
+    {
+        $object = $normalizer->denormalize(['name' => 'foo', 'verified' => true], RestrictedDiscriminatorBase::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $child = new RestrictedDiscriminatorChild(),
+        ]);
+
+        $this->assertSame($child, $object);
+        $this->assertSame('foo', $object->getName());
+        $this->assertFalse($object->getVerified());
+
+        $object = $normalizer->denormalize(['verified' => true], UnmappedParent::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $child = new UnmappedChildWithIgnoredAttribute(),
+        ]);
+
+        $this->assertSame($child, $object);
+        $this->assertFalse($object->getVerified());
+    }
+
+    /**
+     * @dataProvider provideDiscriminatorAwareNormalizers
+     */
+    public function testDenormalizeNestedDiscriminatorMapRespectsIgnoreOnTheMappedClass(AbstractObjectNormalizer $normalizer)
+    {
+        $data = ['type' => 'middle', 'nested_type' => 'leaf', 'name' => 'foo', 'verified' => true];
+
+        $object = $normalizer->denormalize($data, NestedRestrictedDiscriminatorBase::class);
+
+        $this->assertInstanceOf(NestedRestrictedDiscriminatorLeaf::class, $object);
+        $this->assertSame('foo', $object->getName());
+        $this->assertFalse($object->getVerified());
+    }
+
+    /**
+     * @dataProvider provideDiscriminatorAwareNormalizers
+     */
+    public function testDenormalizeConcreteDiscriminatorMapRootIgnoresAttributesOfOtherMappedClasses(AbstractObjectNormalizer $normalizer)
+    {
+        $root = $normalizer->denormalize(['type' => 'root', 'role' => 'admin'], ConcreteRestrictedDiscriminatorRoot::class);
+
+        $this->assertInstanceOf(ConcreteRestrictedDiscriminatorRoot::class, $root);
+        $this->assertSame('user', $root->getRole());
+
+        $other = $normalizer->denormalize(['type' => 'other', 'role' => 'admin'], ConcreteRestrictedDiscriminatorRoot::class);
+
+        $this->assertInstanceOf(ConcreteRestrictedDiscriminatorOther::class, $other);
+        $this->assertSame('admin', $other->getRole());
+    }
+
+    /**
+     * @dataProvider provideDiscriminatorAwareNormalizers
+     */
+    public function testDenormalizeDeepObjectToPopulateRespectsIgnoreOnItsClass(AbstractObjectNormalizer $normalizer)
+    {
+        $normalizer->setSerializer(new Serializer([$normalizer]));
+        $holder = new RestrictedDiscriminatorHolder();
+        $holder->setNotification($child = new RestrictedDiscriminatorChild());
+
+        $normalizer->denormalize(['notification' => ['name' => 'foo', 'verified' => true]], RestrictedDiscriminatorHolder::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $holder,
+            AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
+        ]);
+
+        $this->assertSame($child, $holder->getNotification());
+        $this->assertSame('foo', $child->getName());
+        $this->assertFalse($child->getVerified());
+    }
+
+    /**
+     * @dataProvider provideDiscriminatorAwareNormalizers
+     */
+    public function testDenormalizeObjectToPopulateIgnoresThePropertiesOfDoctrineProxies(AbstractObjectNormalizer $normalizer)
+    {
+        if (!interface_exists(Proxy::class)) {
+            $this->markTestSkipped('The "doctrine/persistence" package is not installed.');
+        }
+
+        $proxy = new class() extends RestrictedDiscriminatorChild implements Proxy {
+            public $__initializer__;
+            public $__cloner__;
+            public $__isInitialized__ = false;
+
+            public function __load(): void
+            {
+            }
+
+            public function __isInitialized(): bool
+            {
+                return $this->__isInitialized__;
+            }
+        };
+
+        $object = $normalizer->denormalize(['name' => 'foo', '__initializer__' => 'bar', '__cloner__' => 'bar', '__isInitialized__' => true], RestrictedDiscriminatorBase::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $proxy,
+        ]);
+
+        $this->assertSame($proxy, $object);
+        $this->assertSame('foo', $proxy->getName());
+        $this->assertNull($proxy->__initializer__);
+        $this->assertNull($proxy->__cloner__);
+        $this->assertFalse($proxy->__isInitialized__);
+    }
+
+    /**
+     * @dataProvider provideNormalizersWithObjectClassResolver
+     */
+    public function testDenormalizeObjectToPopulateComputesTheAllowedAttributesForTheResolvedClass(AbstractObjectNormalizer $normalizer)
+    {
+        $object = $normalizer->denormalize(['name' => 'foo', 'role' => 'admin'], RestrictedDiscriminatorBase::class, null, [
+            AbstractNormalizer::GROUPS => ['write'],
+            AbstractNormalizer::OBJECT_TO_POPULATE => $child = new RestrictedDiscriminatorChildWithWritableRole(),
+        ]);
+
+        $this->assertSame($child, $object);
+        $this->assertSame('foo', $child->getName());
+        $this->assertSame('user', $child->getRole());
+    }
+
+    /**
+     * @dataProvider provideDiscriminatorAwareNormalizers
+     */
+    public function testDenormalizeNestedDiscriminatorMapPassesTheTypePropertiesToTheConstructor(AbstractObjectNormalizer $normalizer)
+    {
+        $data = ['type' => 'middle', 'nested_type' => 'leaf', 'name' => 'foo'];
+
+        $object = $normalizer->denormalize($data, NestedConstructorDiscriminatorBase::class, null, [AbstractNormalizer::GROUPS => ['write']]);
+
+        $this->assertInstanceOf(NestedConstructorDiscriminatorLeaf::class, $object);
+        $this->assertSame('middle', $object->getType());
+        $this->assertSame('foo', $object->getName());
+    }
+
+    /**
+     * @dataProvider provideDiscriminatorAwareNormalizers
+     */
+    public function testDenormalizeIntoAMappedClassIgnoresTheTypePropertiesOfOuterMaps(AbstractObjectNormalizer $normalizer)
+    {
+        $object = $normalizer->denormalize(['type' => 'client', 'name' => 'foo'], NestedRestrictedDiscriminatorLeafWithIgnoredType::class);
+
+        $this->assertSame('server', $object->getType());
+        $this->assertSame('foo', $object->getName());
+    }
+
+    /**
+     * @dataProvider provideDiscriminatorAwareNormalizers
+     */
+    public function testDenormalizeDiscriminatorMapDoesNotWriteAnIgnoredTypeProperty(AbstractObjectNormalizer $normalizer)
+    {
+        $object = $normalizer->denormalize(['type' => 'middle', 'nested_type' => 'leaf_with_ignored_type', 'name' => 'foo'], NestedRestrictedDiscriminatorBase::class);
+
+        $this->assertInstanceOf(NestedRestrictedDiscriminatorLeafWithIgnoredType::class, $object);
+        $this->assertSame('server', $object->getType());
+        $this->assertSame('foo', $object->getName());
+
+        $object = $normalizer->denormalize(['type' => 'client', 'name' => 'foo'], NestedRestrictedDiscriminatorBase::class, null, [
+            AbstractNormalizer::OBJECT_TO_POPULATE => $leaf = new NestedRestrictedDiscriminatorLeafWithIgnoredType(),
+        ]);
+
+        $this->assertSame($leaf, $object);
+        $this->assertSame('server', $object->getType());
+        $this->assertSame('foo', $object->getName());
+    }
+
+    /**
+     * @dataProvider provideDiscriminatorAwareNormalizers
+     */
+    public function testDenormalizeDiscriminatorMapDoesNotWriteATypePropertyOfOtherGroups(AbstractObjectNormalizer $normalizer)
+    {
+        $data = ['type' => 'admin_type', 'name' => 'foo'];
+        $context = [AbstractNormalizer::GROUPS => ['write'], AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false];
+
+        $object = $normalizer->denormalize($data, RestrictedDiscriminatorBase::class, null, $context);
+
+        $this->assertInstanceOf(AdminTypeDiscriminatorChild::class, $object);
+        $this->assertSame('server', $object->getType());
+        $this->assertSame('foo', $object->getName());
+
+        $object = $normalizer->denormalize($data, RestrictedDiscriminatorBase::class, null, [AbstractNormalizer::GROUPS => ['write', 'admin']] + $context);
+
+        $this->assertSame('admin_type', $object->getType());
+    }
+
+    public static function provideDiscriminatorAwareNormalizers(): iterable
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+
+        yield 'ObjectNormalizer' => [new ObjectNormalizer($classMetadataFactory, null, null, $extractor, $discriminator)];
+        yield 'PropertyNormalizer' => [new PropertyNormalizer($classMetadataFactory, null, $extractor, $discriminator)];
+        yield 'GetSetMethodNormalizer' => [new GetSetMethodNormalizer($classMetadataFactory, null, $extractor, $discriminator)];
+    }
+
+    public static function provideNormalizersWithObjectClassResolver(): iterable
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $objectClassResolver = static function ($object): string {
+            return $object instanceof RestrictedDiscriminatorChildWithWritableRole ? RestrictedDiscriminatorChild::class : \get_class($object);
+        };
+
+        yield 'ObjectNormalizer' => [new ObjectNormalizer($classMetadataFactory, null, null, $extractor, $discriminator, $objectClassResolver)];
+        yield 'PropertyNormalizer' => [new PropertyNormalizer($classMetadataFactory, null, $extractor, $discriminator, $objectClassResolver)];
+        yield 'GetSetMethodNormalizer' => [new GetSetMethodNormalizer($classMetadataFactory, null, $extractor, $discriminator, $objectClassResolver)];
     }
 
     public function testDenormalizeBasicTypePropertiesFromXml()
@@ -1036,5 +1293,311 @@ class AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors extends Abst
         if (property_exists($object, $attribute)) {
             $object->$attribute = $value;
         }
+    }
+}
+
+/**
+ * @DiscriminatorMap(typeProperty="type", mapping={
+ *     "restricted"=RestrictedDiscriminatorChild::class,
+ *     "open"=OpenDiscriminatorChild::class,
+ *     "admin_type"=AdminTypeDiscriminatorChild::class,
+ * })
+ */
+abstract class RestrictedDiscriminatorBase
+{
+    /**
+     * @Groups({"write"})
+     */
+    private $name = '';
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+}
+
+class RestrictedDiscriminatorChild extends RestrictedDiscriminatorBase
+{
+    /**
+     * @Ignore
+     */
+    private $verified = false;
+
+    private $role = 'user';
+
+    /**
+     * @Ignore
+     */
+    private $secret;
+
+    public function __construct(string $secret = 'default')
+    {
+        $this->secret = $secret;
+    }
+
+    public function getVerified(): bool
+    {
+        return $this->verified;
+    }
+
+    public function setVerified(bool $verified): void
+    {
+        $this->verified = $verified;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): void
+    {
+        $this->role = $role;
+    }
+
+    public function getSecret(): string
+    {
+        return $this->secret;
+    }
+}
+
+class RestrictedDiscriminatorChildWithWritableRole extends RestrictedDiscriminatorChild
+{
+    /**
+     * @Groups({"write"})
+     */
+    public function setRole(string $role): void
+    {
+        parent::setRole($role);
+    }
+}
+
+class OpenDiscriminatorChild extends RestrictedDiscriminatorBase
+{
+    /**
+     * @Groups({"write"})
+     */
+    private $role = 'user';
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): void
+    {
+        $this->role = $role;
+    }
+}
+
+class AdminTypeDiscriminatorChild extends RestrictedDiscriminatorBase
+{
+    /**
+     * @Groups({"admin"})
+     */
+    private $type = 'server';
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): void
+    {
+        $this->type = $type;
+    }
+}
+
+class UnmappedParent
+{
+}
+
+class UnmappedChildWithIgnoredAttribute extends UnmappedParent
+{
+    /**
+     * @Ignore
+     */
+    private $verified = false;
+
+    public function getVerified(): bool
+    {
+        return $this->verified;
+    }
+
+    public function setVerified(bool $verified): void
+    {
+        $this->verified = $verified;
+    }
+}
+
+/**
+ * @DiscriminatorMap(typeProperty="type", mapping={
+ *     "middle"=NestedRestrictedDiscriminatorMiddle::class,
+ * })
+ */
+abstract class NestedRestrictedDiscriminatorBase
+{
+    private $name = '';
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+}
+
+/**
+ * @DiscriminatorMap(typeProperty="nested_type", mapping={
+ *     "leaf"=NestedRestrictedDiscriminatorLeaf::class,
+ *     "leaf_with_ignored_type"=NestedRestrictedDiscriminatorLeafWithIgnoredType::class,
+ * })
+ */
+abstract class NestedRestrictedDiscriminatorMiddle extends NestedRestrictedDiscriminatorBase
+{
+}
+
+class NestedRestrictedDiscriminatorLeaf extends NestedRestrictedDiscriminatorMiddle
+{
+    /**
+     * @Ignore
+     */
+    private $verified = false;
+
+    public function getVerified(): bool
+    {
+        return $this->verified;
+    }
+
+    public function setVerified(bool $verified): void
+    {
+        $this->verified = $verified;
+    }
+}
+
+class RestrictedDiscriminatorHolder
+{
+    /**
+     * @var RestrictedDiscriminatorBase|null
+     */
+    private $notification;
+
+    public function getNotification(): ?RestrictedDiscriminatorBase
+    {
+        return $this->notification;
+    }
+
+    public function setNotification(?RestrictedDiscriminatorBase $notification): void
+    {
+        $this->notification = $notification;
+    }
+}
+
+class NestedRestrictedDiscriminatorLeafWithIgnoredType extends NestedRestrictedDiscriminatorMiddle
+{
+    /**
+     * @Ignore
+     */
+    private $type = 'server';
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): void
+    {
+        $this->type = $type;
+    }
+}
+
+/**
+ * @DiscriminatorMap(typeProperty="type", mapping={
+ *     "middle"=NestedConstructorDiscriminatorMiddle::class,
+ * })
+ */
+abstract class NestedConstructorDiscriminatorBase
+{
+}
+
+/**
+ * @DiscriminatorMap(typeProperty="nested_type", mapping={
+ *     "leaf"=NestedConstructorDiscriminatorLeaf::class,
+ * })
+ */
+abstract class NestedConstructorDiscriminatorMiddle extends NestedConstructorDiscriminatorBase
+{
+}
+
+class NestedConstructorDiscriminatorLeaf extends NestedConstructorDiscriminatorMiddle
+{
+    private $type;
+
+    /**
+     * @Groups({"write"})
+     */
+    private $name;
+
+    public function __construct(string $type, string $name = '')
+    {
+        $this->type = $type;
+        $this->name = $name;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+}
+
+/**
+ * @DiscriminatorMap(typeProperty="type", mapping={
+ *     "root"=ConcreteRestrictedDiscriminatorRoot::class,
+ *     "other"=ConcreteRestrictedDiscriminatorOther::class,
+ * })
+ */
+class ConcreteRestrictedDiscriminatorRoot
+{
+    /**
+     * @Ignore
+     */
+    private $role = 'user';
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): void
+    {
+        $this->role = $role;
+    }
+}
+
+class ConcreteRestrictedDiscriminatorOther
+{
+    private $role = 'user';
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): void
+    {
+        $this->role = $role;
     }
 }

@@ -97,4 +97,15 @@ class BrevoTransportFactoryTest extends AbstractTransportFactoryTestCase
 
         yield [new Dsn('brevo+api', 'default')];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['brevo', 'brevo+smtp'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::USER, self::PASSWORD, 587))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('brevo+smtp', 'default', self::USER, self::PASSWORD, 587, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

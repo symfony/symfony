@@ -24,6 +24,8 @@ final class MailKiteSmtpTransport extends EsmtpTransport
     {
         parent::__construct('smtp.mailkite.dev', $tls ? 465 : 587, $tls, $dispatcher, $logger);
 
+        $this->setRequireTls(true);
+
         // The relay authenticates on the API key alone and ignores the username
         $this->setUsername('mailkite');
         $this->setPassword($key);

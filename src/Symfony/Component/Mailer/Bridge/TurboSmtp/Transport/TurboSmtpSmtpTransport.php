@@ -24,6 +24,7 @@ final class TurboSmtpSmtpTransport extends EsmtpTransport
     {
         parent::__construct($host, 587, false, $dispatcher, $logger);
 
+        $this->setRequireTls(true);
         $this->setUsername($username);
         $this->setPassword($password);
     }

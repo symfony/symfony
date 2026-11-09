@@ -34,7 +34,7 @@ final class ZohoCpaasTransportFactory extends AbstractTransportFactory
         }
 
         if ('zohocpaas+smtp' === $scheme || 'zohocpaas+smtps' === $scheme) {
-            return new ZohoCpaasSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $host, $dsn->getPort(), 'zohocpaas+smtps' === $scheme ?: null, $this->dispatcher, $this->logger);
+            return (new ZohoCpaasSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $host, $dsn->getPort(), 'zohocpaas+smtps' === $scheme ?: null, $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true));
         }
 
         throw new UnsupportedSchemeException($dsn, 'zohocpaas', $this->getSupportedSchemes());

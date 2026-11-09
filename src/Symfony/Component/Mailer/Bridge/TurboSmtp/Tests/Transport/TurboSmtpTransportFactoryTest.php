@@ -96,4 +96,15 @@ class TurboSmtpTransportFactoryTest extends AbstractTransportFactoryTestCase
         yield [new Dsn('turbosmtp+api', 'default')];
         yield [new Dsn('turbosmtp+api', 'default', self::USER)];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['turbosmtp', 'turbosmtp+smtp'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::USER, self::PASSWORD))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('turbosmtp+smtp', 'default', self::USER, self::PASSWORD, null, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

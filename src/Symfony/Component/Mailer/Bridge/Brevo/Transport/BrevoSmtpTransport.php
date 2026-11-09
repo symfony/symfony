@@ -24,6 +24,7 @@ final class BrevoSmtpTransport extends EsmtpTransport
     {
         parent::__construct('smtp-relay.brevo.com', $port ?? 465, null, $dispatcher, $logger);
 
+        $this->setRequireTls(true);
         $this->setUsername($username);
         $this->setPassword($password);
     }

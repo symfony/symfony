@@ -40,7 +40,7 @@ final class BrevoTransportFactory extends AbstractTransportFactory
                 ;
         }
 
-        return new $transport($this->getUser($dsn), $this->getPassword($dsn), $this->dispatcher, $this->logger, $dsn->getPort());
+        return (new $transport($this->getUser($dsn), $this->getPassword($dsn), $this->dispatcher, $this->logger, $dsn->getPort()))->setRequireTls($dsn->getBooleanOption('require_tls', true));
     }
 
     protected function getSupportedSchemes(): array

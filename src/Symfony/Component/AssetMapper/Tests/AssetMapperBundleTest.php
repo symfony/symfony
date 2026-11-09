@@ -26,6 +26,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\Definition\Configuration;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
@@ -103,6 +104,29 @@ class AssetMapperBundleTest extends TestCase
         $container = $this->createContainer(['server' => true], false);
 
         $this->assertTrue($container->hasDefinition('asset_mapper.dev_server_subscriber'));
+    }
+
+    #[TestWith(['true', true])]
+    #[TestWith(['false', false])]
+    public function testTheEnvVarOfTheServerOptionIsResolvedWhenTheContainerIsCompiled(string $env, bool $enabled)
+    {
+        $_ENV['ASSET_MAPPER_SERVER'] = $env;
+
+        try {
+            $container = new ContainerBuilder();
+            $container->setParameter('kernel.debug', !$enabled);
+            $container->setParameter('kernel.project_dir', $this->varDir);
+            $container->setParameter('kernel.share_dir', $this->varDir.'/shared');
+            $container->setParameter('kernel.bundles_metadata', []);
+            $container->registerExtension(new AssetMapperBundle()->getContainerExtension());
+            $container->loadFromExtension('asset_mapper', ['server' => '%env(bool:ASSET_MAPPER_SERVER)%']);
+
+            new MergeExtensionConfigurationPass()->process($container);
+        } finally {
+            unset($_ENV['ASSET_MAPPER_SERVER']);
+        }
+
+        $this->assertSame($enabled, $container->hasDefinition('asset_mapper.dev_server_subscriber'));
     }
 
     #[TestWith([true, 'strict'])]

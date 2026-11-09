@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve the env vars of the `asset_mapper.server` option while the container is compiled
  * Add a `$cache` argument to `CompiledAssetMapperConfigReader` to keep the decoded compiled files in a cache pool
  * Add `asset_mapper.metadata_dir` option to choose where `asset-map:compile` writes its metadata
  * Add a `$logger` argument to `ImportMapGenerator` to warn when the import map is not compiled

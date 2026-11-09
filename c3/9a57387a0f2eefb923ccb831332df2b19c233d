@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-11-09T14:24:03Z
+
+What if the static delimiter between placeholders is not a dot but something else ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-09T15:26:50Z
+
+@stof you're right, fixed!

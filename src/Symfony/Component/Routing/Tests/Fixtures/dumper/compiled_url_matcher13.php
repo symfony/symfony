@@ -20,8 +20,8 @@ return [
     ],
     [ // $dynamicRoutes
         114 => [
-            [['_route' => 'r1'], ['foo', 'foo', 'foo'], null, null, false, true, null],
-            [['_route' => 'r2'], ['foo', 'foo', 'foo'], null, null, false, true, null],
+            [['_route' => 'r1'], ['foo', 'foo', '_route'], null, null, false, true, null],
+            [['_route' => 'r2'], ['foo', 'foo', '_route'], null, null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],
     ],

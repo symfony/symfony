@@ -121,6 +121,59 @@ class LoginThrottlingListenerTest extends TestCase
         $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
     }
 
+    public function testPreventsLoginWithInvisibleOrControlCharactersCombiningMarksOrSpaces()
+    {
+        $request = $this->createRequest();
+        $passports = [$this->createPassport("wou\u{200B}ter"), $this->createPassport("wo\u{301}u\u{20DD}ter"), $this->createPassport(" wou\x01ter ")];
+
+        $this->requestStack->push($request);
+
+        for ($i = 0; $i < 3; ++$i) {
+            $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 3]));
+        }
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($this->createPassport('wouter')));
+    }
+
+    public function testPreventsLoginWithAccentsOrCompatibilityForms()
+    {
+        if (!class_exists(\Normalizer::class)) {
+            $this->markTestSkipped('The "intl" extension or the "symfony/polyfill-intl-normalizer" package is required.');
+        }
+
+        $request = $this->createRequest();
+        $passports = [$this->createPassport('wóuter'), $this->createPassport('ⓦouter'), $this->createPassport('ｗｏｕｔｅｒ')];
+
+        $this->requestStack->push($request);
+
+        for ($i = 0; $i < 3; ++$i) {
+            $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 3]));
+        }
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($this->createPassport('wouter')));
+    }
+
+    public function testPreventsLoginWithCaseFoldedVariants()
+    {
+        if (!\defined('MB_CASE_FOLD')) {
+            $this->markTestSkipped('The "mbstring" extension on PHP 7.3 or higher is required.');
+        }
+
+        $request = $this->createRequest();
+        $passports = [$this->createPassport('straße'), $this->createPassport('STRAẞE'), $this->createPassport('Strasse')];
+
+        $this->requestStack->push($request);
+
+        for ($i = 0; $i < 3; ++$i) {
+            $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 3]));
+        }
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($this->createPassport('strasse')));
+    }
+
     public function testPreventsLoginWhenOverGlobalThreshold()
     {
         $request = $this->createRequest();
@@ -352,6 +405,37 @@ class LoginThrottlingListenerTest extends TestCase
 
         $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
         $listener->checkPassport($this->createCheckPassportEvent($passport));
+    }
+
+    public function testPreventsLoginFromTheSameIpv6Network()
+    {
+        $passport = $this->createPassport('wouter');
+
+        foreach (['2001:db8:1:2::1', '2001:db8:1:2::2', '2001:db8:1:2:a:b:c:d'] as $ip) {
+            $this->requestStack->push($this->createRequest($ip));
+            $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+            $this->requestStack->pop();
+        }
+
+        $this->requestStack->push($this->createRequest('2001:db8:1:2:ffff:ffff:ffff:ffff'));
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+    }
+
+    public function testDoesNotShareTheLimitWithOtherIpv6NetworksOrIpv4MappedAddresses()
+    {
+        $passport = $this->createPassport('wouter');
+
+        foreach (['2001:db8:1:2::1', '2001:db8:1:3::1', '::ffff:192.0.2.1', '::ffff:192.0.2.2'] as $ip) {
+            $this->requestStack->push($this->createRequest($ip));
+            for ($i = 0; $i < 3; ++$i) {
+                $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+            }
+            $this->requestStack->pop();
+        }
+
+        $this->addToAssertionCount(1);
     }
 
     private function createPassport($username)

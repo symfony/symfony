@@ -245,4 +245,25 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $this->assertSame(\PGSQL_TUPLES_OK, pg_result_status(pg_get_result($waiter)));
         pg_close($waiter);
     }
+
+    public function testSaveAfterTheSessionLostTheLock()
+    {
+        $pdo = new \PDO('pgsql:host='.$this->getPostgresHost(), 'postgres', 'password');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $store = new PostgreSqlStore($pdo);
+
+        $key1 = new Key(__METHOD__);
+        $store->save($key1);
+
+        $pdo->exec('SELECT pg_advisory_unlock_all()');
+        $this->assertFalse($store->exists($key1));
+
+        $key2 = new Key(__METHOD__);
+        $store->save($key2);
+
+        $this->assertTrue($store->exists($key2));
+
+        $store->delete($key2);
+        $this->assertFalse($store->exists($key2));
+    }
 }

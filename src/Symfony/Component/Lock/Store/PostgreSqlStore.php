@@ -31,7 +31,6 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
     private ?string $username = null;
     private ?string $password = null;
     private array $connectionOptions = [];
-    private static array $storeRegistry = [];
 
     /**
      * You can either pass an existing database connection as PDO instance or
@@ -319,8 +318,8 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
 
     private function getInternalStore(): SharedLockStoreInterface
     {
-        $namespace = spl_object_id($this->getConnection());
+        static $storeRegistry = new \WeakMap();
 
-        return self::$storeRegistry[$namespace] ??= new InMemoryStore();
+        return $storeRegistry[$this->getConnection()] ??= new InMemoryStore();
     }
 }

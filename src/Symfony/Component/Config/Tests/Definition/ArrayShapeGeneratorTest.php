@@ -257,7 +257,7 @@ class ArrayShapeGeneratorTest extends TestCase
 
         $this->assertSame(<<<'CODE'
             bool|array{
-             *     enabled?: bool|\Symfony\Component\Config\Loader\ParamConfigurator, // Default: false
+             *     enabled?: bool|\Symfony\Component\Config\Loader\ParamConfigurator, // Resolved at compile time // Default: false
              * }
             CODE, ArrayShapeGenerator::generate($root->getNode()));
     }
@@ -269,7 +269,24 @@ class ArrayShapeGeneratorTest extends TestCase
 
         $this->assertSame(<<<'CODE'
             bool|array{
-             *     enabled?: bool|\Symfony\Component\Config\Loader\ParamConfigurator, // Default: true
+             *     enabled?: bool|\Symfony\Component\Config\Loader\ParamConfigurator, // Resolved at compile time // Default: true
+             * }
+            CODE, ArrayShapeGenerator::generate($root->getNode()));
+    }
+
+    public function testPhpDocTellsWhichNodesResolveTheirEnvVarsAtCompileTime()
+    {
+        $root = new ArrayNodeDefinition('root');
+        $root
+            ->children()
+                ->booleanNode('static')->info('Read by the extension.')->defaultFalse()->resolvesAtCompileTime()->end()
+                ->booleanNode('dynamic')->defaultFalse()->end()
+            ->end();
+
+        $this->assertSame(<<<'CODE'
+            array{
+             *     static?: bool|\Symfony\Component\Config\Loader\ParamConfigurator, // Read by the extension. // Resolved at compile time // Default: false
+             *     dynamic?: bool|\Symfony\Component\Config\Loader\ParamConfigurator, // Default: false
              * }
             CODE, ArrayShapeGenerator::generate($root->getNode()));
     }

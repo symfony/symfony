@@ -123,6 +123,10 @@ class YamlReferenceDumper
             $comments[] = \sprintf('Deprecated (%s)', $node->getDeprecationMessage($parentNode));
         }
 
+        if ($node instanceof BaseNode && $node->getAttribute('resolves_at_compile_time', false)) {
+            $comments[] = 'Resolved at compile time';
+        }
+
         if ($node instanceof BaseNode && null !== $alias = $node->getAttribute('alias_of')) {
             $comments[] = \sprintf('Alias of the "%s" configuration', $alias);
         }

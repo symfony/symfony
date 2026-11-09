@@ -163,6 +163,10 @@ final class ArrayShapeGenerator
             $comment .= ' // '.$info;
         }
 
+        if ($node->getAttribute('resolves_at_compile_time', false)) {
+            $comment .= ' // Resolved at compile time';
+        }
+
         if ((!$node instanceof ArrayNode || ($node = $node->getParent()) instanceof PrototypedArrayNode) && $node->hasDefaultValue()) {
             $comment .= ' // Default: '.json_encode($node->getDefaultValue(), \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_PRESERVE_ZERO_FRACTION);
         }

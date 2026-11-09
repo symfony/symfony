@@ -108,6 +108,19 @@ class RateLimitAttributeListenerTest extends TestCase
         $this->assertSame(['1.2.3.4~/login'], array_unique($keys));
     }
 
+    public function testDefaultKeyDoesNotDependOnThePercentEncodingOfThePath()
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+
+        $keys = [];
+        foreach (['/login', '/%6Cogin', '/%6cogin', '/l%6F%67in'] as $path) {
+            $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit('api'), Request::create($path, 'POST', server: ['REMOTE_ADDR' => '1.2.3.4'])));
+            $keys[] = $usedKey;
+        }
+
+        $this->assertSame(['1.2.3.4~/login'], array_unique($keys));
+    }
+
     public function testExpressionKey()
     {
         $listener = $this->makeListenerCapturingKey($usedKey);

@@ -52,7 +52,8 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         }
 
         if (null === $attribute->key) {
-            $key = ($request->getClientIp() ?? 'unknown').'~'.$request->getPathInfo();
+            // the router decodes the path, so percent-encoded spellings of a path match the same route
+            $key = ($request->getClientIp() ?? 'unknown').'~'.rawurldecode($request->getPathInfo());
         } elseif (!\is_string($key = $event->evaluate($attribute->key))) {
             throw new \TypeError(\sprintf('The value of the "$key" option of the "%s" attribute must evaluate to a string, "%s" given.', RateLimit::class, get_debug_type($key)));
         }

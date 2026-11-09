@@ -376,6 +376,34 @@ class WorkerTest extends TestCase
         $this->assertSame([1, 1], array_map(static fn (Envelope $envelope) => $envelope->last(HandledStamp::class)?->getResult(), $receiver->getAcknowledgedEnvelopes()));
     }
 
+    public function testParallelExecutionFailsTheMessagesOfAChildWhoseTaskFailed()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Hey'))],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $failure = null;
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$failure) {
+            $failure = $event->getThrowable();
+        });
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('error')->with('A parallel worker failed: {error}');
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy(__DIR__.'/Fixtures/App/bin/missing', 1, 1, null, $logger);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame(1, $receiver->getRejectCount());
+        $this->assertSame('The parallel worker stopped before returning a result.', $failure?->getMessage());
+        $this->assertStringContainsString('Unable to bootstrap the Messenger worker', $failure->getPrevious()?->getMessage());
+    }
+
     public function testParallelExecutionBatchesMessagesOnTheSameTask()
     {
         $receiver = new DummyReceiver([

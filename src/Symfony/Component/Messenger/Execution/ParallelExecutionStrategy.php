@@ -18,6 +18,7 @@ use Amp\Parallel\Worker\Worker;
 use Amp\Serialization\SerializationException;
 use Amp\Sync\Channel;
 use Amp\TimeoutCancellation;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Execution\Message\DeferredEnvelopeMessage;
@@ -70,6 +71,9 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     /** @var array<int, Future<array{int, mixed, ?\Throwable}>> */
     private array $receiveFutures = [];
 
+    /** @var array<int, \Throwable> */
+    private array $taskFailures = [];
+
     // whether a key batches is only known once a handler defers, so the first message of an
     // unknown key runs alone: spreading its siblings across channels first would strand a
     // batch on a worker that can never complete it
@@ -81,11 +85,14 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         private readonly int $concurrencyLimit = 1,
         private readonly int $resetInterval = 1,
         private readonly ?int $memoryLimit = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
     public function execute(Envelope $envelope, string $transportName, callable $onHandled): void
     {
+        $this->removeFailedChannels($onHandled);
+
         $settlementFailure = null;
 
         try {
@@ -240,6 +247,7 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         $this->workers = [];
         $this->channels = [];
         $this->receiveFutures = [];
+        $this->taskFailures = [];
     }
 
     private function getChannel(string $affinityKey, ?int $keyMode): Channel
@@ -289,6 +297,15 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
         $channelId = spl_object_id($channel);
         $this->workers[$channelId] = $worker;
         $this->channels[$channelId] = $channel;
+
+        // when nothing handles the failure of a task, like a reset of services that throws, the event loop throws it and this process stops
+        $execution->getFuture()->catch(function (\Throwable $e) use ($channelId, $channel): void {
+            if ($channel === ($this->channels[$channelId] ?? null)) {
+                $this->taskFailures[$channelId] = $e;
+            }
+
+            $this->logger?->error('A parallel worker failed: {error}', ['error' => $e->getMessage(), 'exception' => $e]);
+        })->ignore();
 
         return $channel;
     }
@@ -439,8 +456,9 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
     private function removeChannel(int $channelId, callable $onHandled, ?\Throwable $previous = null): bool
     {
         $handled = false;
+        $previous = $this->taskFailures[$channelId] ?? $previous;
 
-        unset($this->workers[$channelId], $this->channels[$channelId], $this->busyChannels[$channelId], $this->receiveFutures[$channelId]);
+        unset($this->workers[$channelId], $this->channels[$channelId], $this->busyChannels[$channelId], $this->receiveFutures[$channelId], $this->taskFailures[$channelId]);
         $channelPendingRequests = $this->pendingRequests[$channelId] ?? [];
         unset($this->pendingRequests[$channelId]);
 
@@ -477,6 +495,31 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
             }
 
             $this->execute($pendingRequest->envelope, $pendingRequest->transportName, $this->completionCallbacks[$pendingRequest] ?? $onHandled);
+        }
+    }
+
+    /**
+     * Settles the requests of the workers whose task failed, then removes these workers so that new ones get the next messages.
+     */
+    private function removeFailedChannels(callable $onHandled): void
+    {
+        foreach ($this->taskFailures as $channelId => $e) {
+            $this->armChannel($channelId);
+
+            // the outcomes that the worker sent before its task failed come first
+            while ($future = $this->receiveFutures[$channelId] ?? null) {
+                unset($this->receiveFutures[$channelId]);
+                [, $response, $error] = $future->await();
+
+                if (null !== $error) {
+                    break;
+                }
+
+                $this->handleResponse($channelId, $response, $onHandled);
+                $this->armChannel($channelId);
+            }
+
+            $this->removeChannel($channelId, $onHandled, $e);
         }
     }
 

@@ -278,6 +278,28 @@ class ParallelExecutionStrategyTest extends TestCase
         $this->assertFalse($strategy->shouldPauseConsumption());
     }
 
+    public function testAWorkerWhoseTaskFailedIsReplacedOnceItsRequestsAreSettled()
+    {
+        $failedChannel = $this->createFakeChannel([new DeferredEnvelopeMessage(1)]);
+        $channel = $this->createFakeChannel();
+        $strategy = $this->createStrategy([$failedChannel, $channel]);
+        $calls = [];
+
+        $strategy->execute(new Envelope(new DummyMessage('A')), 'async', $this->createOnHandled($calls));
+        $strategy->execute($envelopeB = new Envelope(new DummyMessage('B')), 'async', $this->createOnHandled($calls));
+        $failedChannel->push(new HandledEnvelopeMessage(2, $envelopeB, null));
+        $failedChannel->push(new ChannelException('Channel source closed unexpectedly'));
+        $this->setPrivateProperty($strategy, 'taskFailures', [spl_object_id($failedChannel) => new \RuntimeException('Reset failed.')]);
+
+        $strategy->execute($envelopeC = new Envelope(new DummyMessage('C')), 'async', $this->createOnHandled($calls));
+
+        $this->assertSame(['B', 'A'], array_map(static fn (array $call) => $call[0]->getMessage()->getMessage(), $calls));
+        $this->assertNull($calls[0][2]);
+        $this->assertSame('The parallel worker stopped before returning a result.', $calls[1][2]->getMessage());
+        $this->assertSame('Reset failed.', $calls[1][2]->getPrevious()->getMessage());
+        $this->assertSame([$envelopeC], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $channel->sent));
+    }
+
     public function testAFailureToSettleAnotherMessageIsNotChargedToTheDispatchedOne()
     {
         $busyChannel = $this->createFakeChannel();

@@ -44,6 +44,23 @@ class YamlReferenceDumperTest extends TestCase
             EOL, (new YamlReferenceDumper())->dumpNode($treeBuilder->buildTree()));
     }
 
+    public function testDumpTellsWhichNodesResolveTheirEnvVarsAtCompileTime()
+    {
+        $treeBuilder = new TreeBuilder('root');
+        $treeBuilder->getRootNode()
+            ->children()
+                ->booleanNode('static')->defaultFalse()->resolvesAtCompileTime()->end()
+                ->booleanNode('dynamic')->defaultFalse()->end()
+            ->end();
+
+        $this->assertSame(<<<'EOL'
+            root:
+                static:               false # Resolved at compile time
+                dynamic:              false
+
+            EOL, (new YamlReferenceDumper())->dumpNode($treeBuilder->buildTree()));
+    }
+
     public static function provideDumpAtPath(): array
     {
         return [

@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Config\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCache;
@@ -122,6 +125,109 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
+    public function testCheckersReceiveTheMetadataTimestamp()
+    {
+        $timestamp = time() - 100;
+        $checker = $this->createMock(ResourceCheckerInterface::class);
+        $checker->method('supports')->willReturn(true);
+        $checker->expects($this->once())->method('isFresh')
+            ->with($this->isInstanceOf(ResourceStub::class), $timestamp)
+            ->willReturn(true);
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker], $this->metaFile);
+        $cache->write('cached', [new ResourceStub()]);
+        touch($this->metaFile, $timestamp);
+        clearstatcache();
+
+        $this->assertTrue($cache->isFresh());
+    }
+
+    #[DataProvider('provideWholeSecondBuildClocks')]
+    #[Group('time-sensitive')]
+    public function testBuildDurationBackdatesOnlyMetadata(int $clockOffset, bool $checkBeforeBuild, bool $customMetadata)
+    {
+        ClockMock::withClockMock(time() + $clockOffset);
+        $metadata = $customMetadata ? $this->metaFile : $this->cacheFile.'.meta';
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [$this->createStub(ResourceCheckerInterface::class)], $metadata);
+        if ($checkBeforeBuild) {
+            unlink($this->cacheFile);
+            sleep(20);
+            $this->assertFalse($cache->isFresh());
+        }
+        sleep(10);
+        $cache->write('cached', []);
+        clearstatcache();
+
+        $restoredWriteTime = filemtime($metadata) + 10;
+        $this->assertGreaterThanOrEqual(filemtime($this->cacheFile), $restoredWriteTime);
+        $this->assertLessThanOrEqual(filemtime($metadata.'.json'), $restoredWriteTime);
+        $this->assertSame('cached', file_get_contents($this->cacheFile));
+    }
+
+    /**
+     * @return iterable<array{int, bool, bool}>
+     */
+    public static function provideWholeSecondBuildClocks(): iterable
+    {
+        foreach ([-30, 0, 30] as $clockOffset) {
+            foreach ([false, true] as $checkBeforeBuild) {
+                foreach ([false, true] as $customMetadata) {
+                    yield [$clockOffset, $checkBeforeBuild, $customMetadata];
+                }
+            }
+        }
+    }
+
+    #[Group('time-sensitive')]
+    public function testAFreshCheckRestartsTheBuildBoundary()
+    {
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [$this->createStub(ResourceCheckerInterface::class)]);
+        $cache->write('first', []);
+        sleep(20);
+        $this->assertTrue($cache->isFresh());
+        sleep(10);
+        $cache->write('second', []);
+        clearstatcache();
+
+        $restoredWriteTime = filemtime($this->cacheFile.'.meta') + 10;
+        $this->assertGreaterThanOrEqual(filemtime($this->cacheFile), $restoredWriteTime);
+        $this->assertLessThanOrEqual(filemtime($this->cacheFile.'.meta.json'), $restoredWriteTime);
+    }
+
+    #[Group('time-sensitive')]
+    public function testWritingWithoutMetadataDoesNotBackdateExistingMetadata()
+    {
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [$this->createStub(ResourceCheckerInterface::class)]);
+        $cache->write('first', []);
+        $timestamp = filemtime($this->cacheFile.'.meta');
+        sleep(10);
+        $cache->write('second');
+        clearstatcache();
+
+        $this->assertSame($timestamp, filemtime($this->cacheFile.'.meta'));
+    }
+
+    public function testAnUnchangedGeneratedFileNeedsOnlyOneCorrectiveBuild()
+    {
+        $resourceFile = tempnam(sys_get_temp_dir(), 'config_generated_');
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, [new SelfCheckingResourceChecker()]);
+        sleep(1);
+        file_put_contents($resourceFile, 'generated');
+        clearstatcache();
+
+        try {
+            $cache->write('first', [new FileResource($resourceFile)]);
+            clearstatcache();
+            $this->assertLessThan(filemtime($resourceFile), filemtime($this->cacheFile.'.meta'));
+            $this->assertFalse($cache->isFresh());
+
+            $cache->write('second', [new FileResource($resourceFile)]);
+            clearstatcache();
+            $this->assertTrue($cache->isFresh());
+        } finally {
+            unlink($resourceFile);
+        }
+    }
+
     public function testIsNotFreshWhenResourceIsModifiedInSameSecondAfterBeingLoaded()
     {
         $resourceFile = tempnam(sys_get_temp_dir(), 'config_');
@@ -134,6 +240,9 @@ class ResourceCheckerConfigCacheTest extends TestCase
             $this->assertFalse($cache->isFresh());
 
             touch($this->cacheFile, $time + 1);
+            $this->assertFalse($cache->isFresh());
+
+            touch($this->cacheFile.'.meta', $time + 1);
             $this->assertTrue($cache->isFresh());
         } finally {
             unlink($resourceFile);

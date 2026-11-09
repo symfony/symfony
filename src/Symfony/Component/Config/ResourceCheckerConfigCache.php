@@ -24,6 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class ResourceCheckerConfigCache implements ConfigCacheInterface
 {
     private string $metaFile;
+    private int $buildTime;
 
     /**
      * @param string                                    $file             The absolute cache path
@@ -36,6 +37,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         ?string $metaFile = null,
     ) {
         $this->metaFile = $metaFile ?? $file.'.meta';
+        $this->buildTime = time();
     }
 
     public function getPath(): string
@@ -54,6 +56,8 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      */
     public function isFresh(): bool
     {
+        $this->buildTime = time();
+
         if (!is_file($this->file)) {
             return false;
         }
@@ -74,7 +78,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             return false;
         }
 
-        $time = filemtime($this->file);
+        $time = filemtime($metadata);
 
         foreach ($meta as $resource) {
             foreach ($this->resourceCheckers as $checker) {
@@ -118,6 +122,14 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             $filesystem->remove([$this->metaFile, $this->metaFile.'.json']);
         } elseif (null !== $metadata) {
             $filesystem->dumpFile($this->metaFile, $ser = serialize($metadata));
+            if (0 < $elapsed = time() - $this->buildTime) {
+                // Compare inputs with the build start using the filesystem's clock.
+                try {
+                    $filesystem->touch($this->metaFile, filemtime($this->metaFile) - $elapsed);
+                } catch (IOException) {
+                    // discard touch failure (some filesystems may not support changing modification times)
+                }
+            }
             try {
                 $filesystem->chmod($this->metaFile, $mode, $umask);
             } catch (IOException) {

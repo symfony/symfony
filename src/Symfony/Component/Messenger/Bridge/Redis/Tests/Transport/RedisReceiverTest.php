@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceiver;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
@@ -136,6 +137,52 @@ class RedisReceiverTest extends TestCase
         ));
 
         $this->assertSame([], $receiver->get());
+    }
+
+    public function testGetReturnsTheRestOfTheBatchWhenRejectingAnEntryWithoutDataFails()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->method('get')->willReturn([
+            ['id' => '1', 'data' => null],
+            [
+                'id' => '2',
+                'data' => [
+                    'message' => json_encode([
+                        'body' => '{"message": "Hi"}',
+                        'headers' => [
+                            'type' => DummyMessage::class,
+                        ],
+                    ]),
+                ],
+            ],
+        ]);
+        $connection->expects($this->once())->method('reject')->with('1')
+            ->willThrowException(new TransportException('Connection lost', 0, new \RuntimeException('Connection lost')));
+
+        $receiver = new RedisReceiver($connection, new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        ));
+
+        $envelopes = $receiver->get(2);
+
+        $this->assertCount(1, $envelopes);
+        $this->assertEquals(new DummyMessage('Hi'), $envelopes[0]->getMessage());
+        $this->assertSame('2', $envelopes[0]->last(RedisReceivedStamp::class)->getId());
+    }
+
+    public function testGetThrowsWhenRejectingTheOnlyEntryWithoutDataFails()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->method('get')->willReturn([['id' => '1', 'data' => null]]);
+        $connection->expects($this->once())->method('reject')->with('1')
+            ->willThrowException($exception = new TransportException('Connection lost', 0, new \RuntimeException('Connection lost')));
+
+        $receiver = new RedisReceiver($connection, new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        ));
+
+        $this->expectExceptionObject($exception);
+        $receiver->get();
     }
 
     #[DataProvider('rejectedRedisEnvelopeProvider')]

@@ -667,6 +667,9 @@ class Connection
             }
         } catch (\RedisException|\RedisClusterException|\Relay\Exception $e) {
             $this->redis = null;
+            // the message stays pending: read it again with the other pending messages, like after a failed get()
+            unset($this->inflightIds[$id]);
+            $this->lastPendingMessageId = '0';
 
             throw new TransportException($e->getMessage(), 0, $e);
         }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Fixtures\App;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\Acknowledger;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
@@ -28,7 +29,9 @@ use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Contracts\Service\ContainerProviderInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 final class App implements ContainerProviderInterface
 {
@@ -41,6 +44,7 @@ final class App implements ContainerProviderInterface
 
         $this->container = new TestContainer([
             'messenger.routable_message_bus' => new RoutableMessageBus(new BusLocator($defaultBus, $otherBus), $defaultBus),
+            'services_resetter' => new ServicesResetter(new \ArrayIterator([new ResettableService()]), ['reset']),
         ]);
     }
 
@@ -113,6 +117,9 @@ final class BatchHandlingMiddleware implements MiddlewareInterface
         $this->middleware = new HandleMessageMiddleware(new HandlersLocator([
             DummyMessage::class => [new HandlerDescriptor(new BatchSizeReportingHandler())],
             ChildDummyMessage::class => [new HandlerDescriptor(new BatchSizeReportingHandler(), ['alias' => 'second'])],
+            SecondMessage::class => [new HandlerDescriptor(static function (): never {
+                throw new \RuntimeException('Expected handler failure.');
+            })],
         ]));
     }
 
@@ -159,5 +166,15 @@ final class BatchSizeReportingHandler implements BatchHandlerInterface
         foreach ($jobs as [, $ack]) {
             $ack->ack($batchSize);
         }
+    }
+}
+
+final class ResettableService implements ResetInterface
+{
+    public static int $resets = 0;
+
+    public function reset(): void
+    {
+        ++self::$resets;
     }
 }

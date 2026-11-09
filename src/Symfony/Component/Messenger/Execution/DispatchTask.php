@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Execution;
 use Amp\Cancellation;
 use Amp\Parallel\Worker\Task;
 use Amp\Sync\Channel;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
@@ -131,6 +132,8 @@ final class DispatchTask implements Task
 
                 unset($ack, $acked, $acks, $dispatching, $batch, $combine, $flushes);
 
+                $this->resetServices($container, $count);
+
                 if (null !== $this->memoryLimit && memory_get_usage(true) >= $this->memoryLimit) {
                     $this->flush($bus, $channel, true, $unacks, $heldAcks);
                     $channel->send(null);
@@ -173,9 +176,7 @@ final class DispatchTask implements Task
             // break the shared reference set so that each message tracks its own ack flag and batch
             unset($ack, $acked, $acks, $dispatching, $batch, $combine, $flushes);
 
-            if ($this->resetInterval > 0 && 0 === ++$count % $this->resetInterval && $container->has('services_resetter')) {
-                $container->get('services_resetter')->reset();
-            }
+            $this->resetServices($container, $count);
 
             if (null !== $this->memoryLimit && memory_get_usage(true) >= $this->memoryLimit) {
                 $this->flush($bus, $channel, true, $unacks, $heldAcks);
@@ -399,5 +400,12 @@ final class DispatchTask implements Task
         }
 
         self::sendHandled($channel, $requestId, $envelope, $e);
+    }
+
+    private function resetServices(ContainerInterface $container, int &$count): void
+    {
+        if ($this->resetInterval > 0 && 0 === ++$count % $this->resetInterval && $container->has('services_resetter')) {
+            $container->get('services_resetter')->reset();
+        }
     }
 }

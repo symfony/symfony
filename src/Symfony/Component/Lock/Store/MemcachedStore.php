@@ -62,7 +62,7 @@ class MemcachedStore implements PersistingStoreInterface
     {
         $token = $this->getUniqueToken($key);
         $key->reduceLifetime($this->initialTtl);
-        if (!$this->memcached->add((string) $key, $token, (int) ceil($this->initialTtl))) {
+        if (!$this->memcached->add((string) $key, $token, $this->getExpiration($this->initialTtl))) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         }
@@ -81,6 +81,7 @@ class MemcachedStore implements PersistingStoreInterface
 
         // Interface defines a float value but Store required an integer.
         $ttl = (int) ceil($ttl);
+        $expiration = $this->getExpiration($ttl);
 
         $token = $this->getUniqueToken($key);
 
@@ -89,7 +90,7 @@ class MemcachedStore implements PersistingStoreInterface
         $key->reduceLifetime($ttl);
         // Could happens when we ask a putOff after a timeout but in luck nobody steal the lock
         if (\Memcached::RES_NOTFOUND === $this->memcached->getResultCode()) {
-            if ($this->memcached->add((string) $key, $token, $ttl)) {
+            if ($this->memcached->add((string) $key, $token, $expiration)) {
                 return;
             }
 
@@ -102,7 +103,7 @@ class MemcachedStore implements PersistingStoreInterface
             throw new LockConflictedException();
         }
 
-        if (!$this->memcached->cas($cas, (string) $key, $token, $ttl)) {
+        if (!$this->memcached->cas($cas, (string) $key, $token, $expiration)) {
             throw new LockConflictedException();
         }
 
@@ -146,6 +147,12 @@ class MemcachedStore implements PersistingStoreInterface
         }
 
         return $key->getState(__CLASS__);
+    }
+
+    private function getExpiration(int $ttl): int
+    {
+        // memcached reads an expiration longer than 30 days as a Unix timestamp
+        return $ttl > 30 * 86400 ? time() + $ttl : $ttl;
     }
 
     private function getValueAndCas(Key $key): array

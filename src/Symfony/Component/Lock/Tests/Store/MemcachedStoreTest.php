@@ -61,6 +61,28 @@ class MemcachedStoreTest extends AbstractStoreTestCase
         $this->markTestSkipped('Memcached expects a TTL greater than 1 sec. Simulating a slow network is too hard');
     }
 
+    public function testTtlLongerThanThirtyDays()
+    {
+        $memcached = new \Memcached();
+        $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);
+
+        $store = new MemcachedStore($memcached, 31 * 86400);
+        $key = new Key(uniqid(__METHOD__, true));
+
+        $store->save($key);
+        $this->assertTrue($store->exists($key));
+
+        $store->putOffExpiration($key, 45 * 86400);
+        $this->assertTrue($store->exists($key));
+
+        $memcached->delete((string) $key);
+        $store->putOffExpiration($key, 45 * 86400);
+        $this->assertTrue($store->exists($key));
+
+        $store->delete($key);
+        $this->assertFalse($store->exists($key));
+    }
+
     public function testInvalidTtl()
     {
         $this->expectException(InvalidTtlException::class);

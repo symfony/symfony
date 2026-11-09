@@ -93,8 +93,9 @@ class MemcachedSessionHandler extends AbstractSessionHandler
 
         // If the relative TTL that is used exceeds 30 days, memcached will treat the value as Unix time.
         // We have to convert it to an absolute Unix time at this point, to make sure the TTL is correct.
+        // Memcached's text protocol parses that Unix time as a 32-bit signed integer.
         if ($ttl > 60 * 60 * 24 * 30) {
-            $ttl += time();
+            $ttl = min($ttl + time(), 2147483647);
         }
 
         return $ttl;

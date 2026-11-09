@@ -151,8 +151,8 @@ class MemcachedStore implements PersistingStoreInterface
 
     private function getExpiration(int $ttl): int
     {
-        // memcached reads an expiration longer than 30 days as a Unix timestamp
-        return $ttl > 30 * 86400 ? time() + $ttl : $ttl;
+        // memcached reads an expiration longer than 30 days as a Unix timestamp, which its text protocol parses as a 32-bit signed integer
+        return $ttl > 30 * 86400 ? min(time() + $ttl, 2147483647) : $ttl;
     }
 
     private function getValueAndCas(Key $key): array

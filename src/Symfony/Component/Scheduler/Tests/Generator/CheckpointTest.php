@@ -327,6 +327,21 @@ class CheckpointTest extends TestCase
         $checkpoint->release($now, $now->modify('60 sec'));
     }
 
+    public function testWithLockNoRefreshWhenLockExpiredBeforeADistantRun()
+    {
+        $lock = $this->createMock(LockInterface::class);
+        $lock->method('acquire')->willReturn(true);
+        $lock->method('getRemainingLifetime')->willReturn(-1.0);
+        $lock->expects($this->never())->method('refresh');
+        $lock->expects($this->never())->method('release');
+
+        $checkpoint = new Checkpoint('dummy', $lock);
+        $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
+
+        $checkpoint->acquire($now->modify('-10 min'));
+        $checkpoint->release($now, $now->modify('1 hour'));
+    }
+
     public function testWithLockNoRefreshWhenComputedTtlIsBelowOneSecond()
     {
         $lock = $this->createMock(LockInterface::class);

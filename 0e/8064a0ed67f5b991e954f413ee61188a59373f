@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by KalimeroMK at 2026-11-07T22:30:54Z
+
+- `token_handlers` moved to #67981, this one keeps the audience default — b502fed360c
+- `audience` rejected on a reusable handler, so the `resource` of each firewall wins — 2867886e4be
+- unreachable check dropped, the closure does throw first — 2867886e4be
+- `\InvalidArgumentException` so the path is added, for `oidc` and `oauth2` — b502fed360c
+- CHANGELOG says `aud` becomes mandatory in the `oauth2` introspection response — b502fed360c

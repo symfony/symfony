@@ -97,6 +97,18 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         $this->assertTrue($store2->exists($key));
     }
 
+    public function testInternalStoreIsFreedWithTheConnection()
+    {
+        $conn = $this->createPostgreSqlConnection();
+        $store = new DoctrineDbalPostgreSqlStore($conn);
+        $store->save(new Key(__METHOD__));
+
+        $internalStore = \WeakReference::create((fn () => $this->getInternalStore())->call($store));
+        unset($store, $conn);
+
+        $this->assertNull($internalStore->get());
+    }
+
     public function testWaitAndSaveAfterConflictReleasesLockFromInternalStore()
     {
         $store1 = $this->getStore();

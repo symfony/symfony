@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\RateLimiter;
 
 use Symfony\Component\HttpFoundation\RateLimiter\AbstractRequestRateLimiter;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Security\Core\Security;
 
@@ -35,14 +36,30 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
         $this->localFactory = $localFactory;
     }
 
+    /**
+     * Clears the username+IP limit only.
+     *
+     * The IP limit bounds how many usernames a single client may try, so it
+     * must survive the successful login of any one of them.
+     */
+    public function reset(Request $request): void
+    {
+        $this->createLocalLimiter($request)->reset();
+    }
+
     protected function getLimiters(Request $request): array
+    {
+        return [
+            $this->globalFactory->create($request->getClientIp()),
+            $this->createLocalLimiter($request),
+        ];
+    }
+
+    private function createLocalLimiter(Request $request): LimiterInterface
     {
         $username = $request->attributes->get(Security::LAST_USERNAME, '');
         $username = preg_match('//u', $username) ? mb_strtolower($username, 'UTF-8') : strtolower($username);
 
-        return [
-            $this->globalFactory->create($request->getClientIp()),
-            $this->localFactory->create($username.'-'.$request->getClientIp()),
-        ];
+        return $this->localFactory->create($username.'-'.$request->getClientIp());
     }
 }

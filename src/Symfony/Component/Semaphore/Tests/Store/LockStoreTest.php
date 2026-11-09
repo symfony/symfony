@@ -52,6 +52,88 @@ class LockStoreTest extends AbstractStoreTestCase
         $this->assertFalse($store->exists($key));
     }
 
+    public function testSaveReacquiresSlotsLostOnTheBackend()
+    {
+        $store = new LockStore(new LockFactory(new InMemoryStore()));
+
+        $key = new Key(__METHOD__, 2, 2);
+        $store->save($key, 10);
+
+        $key->getState(LockStore::class)[0]->release();
+
+        $store->save($key, 10);
+
+        $this->assertTrue($store->exists($key));
+    }
+
+    public function testSaveFailsWhenALostSlotWasTakenByAnotherKey()
+    {
+        $store = new LockStore(new LockFactory(new InMemoryStore()));
+
+        $key1 = new Key(__METHOD__, 1);
+        $key2 = new Key(__METHOD__, 1);
+
+        $store->save($key1, 10);
+        $key1->getState(LockStore::class)[0]->release();
+        $store->save($key2, 10);
+
+        try {
+            $store->save($key1, 10);
+            $this->fail('The store shouldn\'t save the key when its slot is held by another key');
+        } catch (SemaphoreAcquiringException) {
+        }
+
+        $this->assertFalse($store->exists($key1));
+        $this->assertTrue($store->exists($key2));
+    }
+
+    public function testSaveReleasesTheSlotsThatExpiredLocally()
+    {
+        $innerStore = new class implements LockPersistingStoreInterface {
+            public array $stored = [];
+            public array $keys = [];
+
+            public function save(LockKey $key): void
+            {
+                if (isset($this->stored[(string) $key]) && $this->stored[(string) $key] !== $key) {
+                    throw new LockConflictedException();
+                }
+                $this->stored[(string) $key] = $key;
+                $this->keys[] = $key;
+            }
+
+            public function delete(LockKey $key): void
+            {
+                if (($this->stored[(string) $key] ?? null) === $key) {
+                    unset($this->stored[(string) $key]);
+                }
+            }
+
+            public function exists(LockKey $key): bool
+            {
+                return ($this->stored[(string) $key] ?? null) === $key;
+            }
+
+            public function putOffExpiration(LockKey $key, float $ttl): void
+            {
+            }
+        };
+
+        $store = new LockStore(new LockFactory($innerStore));
+
+        $key = new Key(__METHOD__, 1);
+        $store->save($key, 10);
+
+        foreach ($innerStore->keys as $lockKey) {
+            $lockKey->reduceLifetime(-1);
+        }
+
+        $store->save($key, 10);
+
+        $this->assertTrue($store->exists($key));
+        $this->assertCount(1, $innerStore->stored);
+    }
+
     public function testPutOffExpirationReleasesRemainingLocksOnRefreshError()
     {
         $innerStore = new class implements LockPersistingStoreInterface {

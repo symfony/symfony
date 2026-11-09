@@ -243,6 +243,35 @@ class ConnectionTest extends TestCase
         Connection::fromDsn($dsn, $options);
     }
 
+    public function testFromDsnWithInvalidQueryOptions()
+    {
+        $cases = [
+            'heartbeat=abc' => 'Option "heartbeat" of the AMQP Messenger transport must be an integer.',
+            'sasl_method=EXTERNAL' => 'Option "sasl_method" of the AMQP Messenger transport must be an integer.',
+            'read_timeout=abc' => 'Option "read_timeout" of the AMQP Messenger transport must be a number.',
+            'confirm_timeout=1s' => 'Option "confirm_timeout" of the AMQP Messenger transport must be a number.',
+            'auto_setup=nope' => 'Option "auto_setup" of the AMQP Messenger transport must be a boolean.',
+            'delay[daily_delay_queues]=nope' => 'Option "delay.daily_delay_queues" of the AMQP Messenger transport must be a boolean.',
+        ];
+
+        foreach ($cases as $query => $message) {
+            try {
+                Connection::fromDsn('amqp://localhost?'.$query);
+                $this->fail(\sprintf('"%s" should have been rejected.', $query));
+            } catch (InvalidArgumentException $e) {
+                $this->assertSame($message, $e->getMessage());
+            }
+        }
+    }
+
+    public function testFromDsnWithInvalidOptions()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "heartbeat" of the AMQP Messenger transport must be an integer.');
+
+        Connection::fromDsn('amqp://localhost', ['heartbeat' => 1.5]);
+    }
+
     public function testCredentialsAreNotExposedInTrace()
     {
         if (!class_exists(\SensitiveParameterValue::class)) {
@@ -887,6 +916,17 @@ class ConnectionTest extends TestCase
         $amqpChannel->expects($this->never())->method('waitForConfirm')->with(0.5);
 
         $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $connection->publish('body');
+    }
+
+    public function testItPublishMessagesWithoutWaitingForConfirmationWhenConfirmTimeoutIsEmpty()
+    {
+        $factory = new TestAmqpFactory($this->createStub(\AMQPConnection::class), $amqpChannel = $this->createMock(\AMQPChannel::class), $this->createStub(\AMQPQueue::class), $this->createStub(\AMQPExchange::class));
+
+        $amqpChannel->expects($this->never())->method('confirmSelect');
+        $amqpChannel->expects($this->never())->method('waitForConfirm');
+
+        $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=', [], $factory);
         $connection->publish('body');
     }
 

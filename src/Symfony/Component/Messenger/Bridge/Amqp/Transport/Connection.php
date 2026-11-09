@@ -216,12 +216,25 @@ class Connection
         $exchangeOptions = $amqpOptions['exchange'];
         $queuesOptions = $amqpOptions['queues'];
         unset($amqpOptions['queues'], $amqpOptions['exchange']);
+
+        foreach (['heartbeat', 'sasl_method'] as $k) {
+            if ('' !== ($amqpOptions[$k] ?? '')) {
+                $amqpOptions[$k] = filter_var($amqpOptions[$k], \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the AMQP Messenger transport must be an integer.', $k));
+            }
+        }
+
+        foreach (['read_timeout', 'write_timeout', 'connect_timeout', 'rpc_timeout', 'confirm_timeout'] as $k) {
+            if ('' !== ($amqpOptions[$k] ?? '')) {
+                $amqpOptions[$k] = filter_var($amqpOptions[$k], \FILTER_VALIDATE_FLOAT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the AMQP Messenger transport must be a number.', $k));
+            }
+        }
+
         if (isset($amqpOptions['auto_setup'])) {
-            $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOL);
+            $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "auto_setup" of the AMQP Messenger transport must be a boolean.');
         }
 
         if (isset($amqpOptions['delay']['daily_delay_queues'])) {
-            $amqpOptions['delay']['daily_delay_queues'] = filter_var($amqpOptions['delay']['daily_delay_queues'], \FILTER_VALIDATE_BOOL);
+            $amqpOptions['delay']['daily_delay_queues'] = filter_var($amqpOptions['delay']['daily_delay_queues'], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "delay.daily_delay_queues" of the AMQP Messenger transport must be a boolean.');
         }
 
         $queuesOptions = array_map(static function ($queueOptions) {

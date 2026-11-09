@@ -61,6 +61,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\ResettableDummyReceiver;
+use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -456,6 +457,65 @@ class WorkerTest extends TestCase
         $worker->run(['sleep' => 1000000, 'time_limit' => 60]);
 
         $this->assertTrue($timeLimitLogged ?? false);
+    }
+
+    public function testWorkerClosesCloseableReceiversAfterItStopped()
+    {
+        $clock = new MockClock('2023-03-19 14:00:00+00:00');
+        $closeableReceiver = new DummyCloseableReceiver([[]]);
+        $receiver = new DummyReceiver([[]]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($clock) {
+            if ($event->isWorkerIdle()) {
+                $clock->sleep(70);
+            }
+        });
+        $dispatcher->addListener(WorkerStoppedEvent::class, static function () use ($closeableReceiver, &$closeCountWhenStopped) {
+            $closeCountWhenStopped = $closeableReceiver->closeCount;
+        });
+
+        $worker = new Worker(['closeable' => $closeableReceiver, 'other' => $receiver], new MessageBus(), $dispatcher, null, null, $clock);
+        $worker->run(['sleep' => 1000000, 'time_limit' => 60]);
+
+        $this->assertSame(0, $closeCountWhenStopped, 'Listeners of WorkerStoppedEvent can still use the receivers.');
+        $this->assertSame(1, $closeableReceiver->closeCount);
+    }
+
+    public function testWorkerClosesCloseableReceiversWhenItFails()
+    {
+        $closeableReceiver = new DummyCloseableReceiver([[]]);
+        $failingReceiver = $this->createStub(ReceiverInterface::class);
+        $failingReceiver->method('get')->willThrowException(new TransportException('Connection refused.'));
+
+        $worker = new Worker(['closeable' => $closeableReceiver, 'failing' => $failingReceiver], new MessageBus(), null, null, null, new MockClock());
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Connection refused.');
+
+        try {
+            $worker->run();
+        } finally {
+            $this->assertSame(1, $closeableReceiver->closeCount);
+        }
+    }
+
+    public function testFailingToCloseAReceiverIsLoggedAndDoesNotPreventClosingTheOthers()
+    {
+        $failingReceiver = new DummyCloseableReceiver([[new Envelope(new DummyMessage('Hey'))]], new TransportException('Connection lost.'));
+        $receiver = new DummyCloseableReceiver([[]]);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('warning')
+            ->with('Closing the transport "{transport}" failed: {error}', $this->callback(static fn (array $context) => 'failing' === $context['transport'] && 'Connection lost.' === $context['error']));
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker(['failing' => $failingReceiver, 'other' => $receiver], new MessageBus(), $dispatcher, $logger, null, new MockClock());
+        $worker->run();
+
+        $this->assertSame(1, $failingReceiver->closeCount);
+        $this->assertSame(1, $receiver->closeCount);
     }
 
     public function testWorkerReachesTheTimeLimitWhenOneMicrosecondRemains()
@@ -2178,6 +2238,27 @@ class DummyKeepaliveReceiver extends DummyReceiver implements KeepaliveReceiverI
     public function keepalive(Envelope $envelope, ?int $seconds = null): void
     {
         $this->keepaliveEnvelopes[] = $envelope;
+    }
+}
+
+class DummyCloseableReceiver extends DummyReceiver implements CloseableTransportInterface
+{
+    public int $closeCount = 0;
+
+    public function __construct(
+        array $deliveriesOfEnvelopes,
+        private ?\Throwable $closeException = null,
+    ) {
+        parent::__construct($deliveriesOfEnvelopes);
+    }
+
+    public function close(): void
+    {
+        ++$this->closeCount;
+
+        if ($this->closeException) {
+            throw $this->closeException;
+        }
     }
 }
 

@@ -426,7 +426,7 @@ trait TypeFactoryTrait
         }
 
         if (is_iterable($value)) {
-            /** @var list<BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>> $keyTypes */
+            /** @var list<Type> $keyTypes */
             $keyTypes = [];
 
             /** @var list<Type> $valueTypes */
@@ -445,13 +445,7 @@ trait TypeFactoryTrait
                 --self::$fromValueDepth;
             }
 
-            if ($keyTypes) {
-                $keyTypes = array_values(array_unique($keyTypes));
-                $keyType = \count($keyTypes) > 1 ? self::union(...$keyTypes) : $keyTypes[0];
-            } else {
-                $keyType = Type::arrayKey();
-            }
-
+            $keyType = $keyTypes ? CollectionType::mergeCollectionValueTypes($keyTypes) : Type::arrayKey();
             $valueType = $valueTypes ? CollectionType::mergeCollectionValueTypes($valueTypes) : Type::mixed();
 
             return self::collection($type, $valueType, $keyType, \is_array($value) && $value && array_is_list($value));

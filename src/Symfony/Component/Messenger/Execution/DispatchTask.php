@@ -157,14 +157,8 @@ final class DispatchTask implements Task
             }
 
             if ($flushes) {
-                $heldAcks = [];
-                try {
-                    $bus->dispatch($envelope->withoutAll(AckStamp::class)->withoutAll(NoAutoAckStamp::class)->with(new FlushBatchHandlersStamp(true), ...$flushes));
-                    self::releaseHeldAcks($channel, $heldAcks, false);
-                } catch (\Throwable) {
-                    // the messages that the batch didn't settle wait for the next flush of the worker
-                    self::releaseHeldAcks($channel, $heldAcks, true);
-                }
+                // the messages that a failed flush didn't settle wait for the next flush of the worker
+                self::dispatchFlush($bus, $channel, $envelope->withoutAll(AckStamp::class)->withoutAll(NoAutoAckStamp::class)->with(new FlushBatchHandlersStamp(true), ...$flushes), $heldAcks);
             }
 
             if ($noAutoAckStamp && !$acked) {
@@ -202,13 +196,7 @@ final class DispatchTask implements Task
             $requestId = $deferredMessage->context;
             $envelope = $deferredMessage->envelope;
 
-            $heldAcks = [];
-            try {
-                $bus->dispatch($envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(false !== $force)));
-                self::releaseHeldAcks($channel, $heldAcks, false);
-            } catch (\Throwable $e) {
-                self::releaseHeldAcks($channel, $heldAcks, true);
-
+            if ($e = self::dispatchFlush($bus, $channel, $envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(false !== $force)), $heldAcks)) {
                 if (!$deferredMessage->acked) {
                     $ackStamp = $envelope->last(AckStamp::class);
                     $envelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($envelope);
@@ -336,13 +324,8 @@ final class DispatchTask implements Task
         $envelope = $e->getEnvelope();
         $exceptions = $e->getWrappedExceptions();
 
-        $heldAcks = [];
-        try {
-            $bus->dispatch($envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(true)));
-            self::releaseHeldAcks($channel, $heldAcks, false);
-        } catch (\Throwable $flushError) {
+        if ($flushError = self::dispatchFlush($bus, $channel, $envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(true)), $heldAcks)) {
             // the failed flush may have undone what the batch did, so a retry runs it again
-            self::releaseHeldAcks($channel, $heldAcks, true);
             $acks = [];
             $exceptions += $flushError instanceof HandlerFailedException ? $flushError->getWrappedExceptions() : [$flushError];
         }
@@ -362,6 +345,27 @@ final class DispatchTask implements Task
     }
 
     /**
+     * Dispatches a flush of batch handlers, then releases the acks that the batch sent meanwhile.
+     *
+     * A failure to send these acks escapes, since it's not a failure of the flush.
+     */
+    private static function dispatchFlush(MessageBusInterface $bus, Channel $channel, Envelope $envelope, ?array &$heldAcks): ?\Throwable
+    {
+        $heldAcks = [];
+        try {
+            $bus->dispatch($envelope);
+        } catch (\Throwable $e) {
+            self::releaseHeldAcks($channel, $heldAcks, true);
+
+            return $e;
+        }
+
+        self::releaseHeldAcks($channel, $heldAcks, false);
+
+        return null;
+    }
+
+    /**
      * Releases the acks that other messages sent during a dispatch, as failures when that dispatch failed.
      *
      * Their batch was flushed during the failed dispatch, so what the batch did for them may have been undone.
@@ -370,6 +374,7 @@ final class DispatchTask implements Task
     {
         $acks = $heldAcks;
         $heldAcks = null;
+        $sendFailure = null;
 
         foreach ($acks as [$requestId, $envelope, $e, $combine]) {
             if ($dispatchFailed && null === $e && $stamp = $envelope->last(HandledStamp::class)) {
@@ -379,7 +384,16 @@ final class DispatchTask implements Task
                 $e = new HandlerFailedException($envelope, [$stamp->getHandlerName() => new RuntimeException(\sprintf('The batch of "%s" was flushed during the dispatch of another message, and that dispatch failed.', $stamp->getHandlerName()))]);
             }
 
-            self::sendBatchAck($channel, $combine([[$requestId, $envelope, $e]]));
+            try {
+                self::sendBatchAck($channel, $combine([[$requestId, $envelope, $e]]));
+            } catch (\Throwable $error) {
+                // the next acks are sent anyway, so that their messages don't run twice
+                $sendFailure ??= $error;
+            }
+        }
+
+        if (null !== $sendFailure) {
+            throw $sendFailure;
         }
     }
 

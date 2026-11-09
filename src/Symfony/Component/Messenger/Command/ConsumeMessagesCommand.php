@@ -358,6 +358,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
                 $concurrency,
                 $resetInterval,
                 $memoryLimit ? $this->convertToBytes($memoryLimit) : null,
+                $this->logger,
             );
         }
 

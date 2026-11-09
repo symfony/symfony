@@ -472,20 +472,30 @@ class Connection
 
         $messages = [];
 
-        while (\count($messages) < $fetchSize && null !== $message = $this->getPendingMessage()) {
-            $messages[] = $message;
-        }
-
-        if (\count($messages) < $fetchSize && null === $this->lastPendingMessageId && $this->nextClaim <= microtime(true)) {
-            $this->claimOldPendingMessages();
-
+        try {
             while (\count($messages) < $fetchSize && null !== $message = $this->getPendingMessage()) {
                 $messages[] = $message;
             }
-        }
 
-        if (\count($messages) < $fetchSize) {
-            $messages = [...$messages, ...$this->getNewMessages($fetchSize - \count($messages))];
+            if (\count($messages) < $fetchSize && null === $this->lastPendingMessageId && $this->nextClaim <= microtime(true)) {
+                $this->claimOldPendingMessages();
+
+                while (\count($messages) < $fetchSize && null !== $message = $this->getPendingMessage()) {
+                    $messages[] = $message;
+                }
+            }
+
+            if (\count($messages) < $fetchSize) {
+                $messages = [...$messages, ...$this->getNewMessages($fetchSize - \count($messages))];
+            }
+        } catch (TransportException $e) {
+            // a failed command may still have delivered messages, and the ones read so far are not returned: read the pending messages again
+            foreach ($messages as $message) {
+                unset($this->inflightIds[$message['id']]);
+            }
+            $this->lastPendingMessageId = '0';
+
+            throw $e;
         }
 
         return $messages ?: (isset($delayedMessagesFailure) ? throw $delayedMessagesFailure : null);

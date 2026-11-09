@@ -316,6 +316,104 @@ class ConnectionTest extends TestCase
         $this->assertNull($connection->get());
     }
 
+    public function testGetReadsThePendingMessagesAgainAfterAFailedRead()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(3))->method('xreadgroup')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], []],
+                    // Redis delivered the message, but the reply was lost
+                    [['symfony', 'consumer', ['queue' => '>'], 1, 1], new \RedisException('read error on connection')],
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => ['1-0' => ['message' => '{"body":"1","headers":[]}']]]],
+                ];
+
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return instanceof \Throwable ? throw $return : $return;
+            });
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+
+        try {
+            $connection->get();
+            $this->fail('A TransportException should have been thrown.');
+        } catch (TransportException) {
+        }
+
+        $this->assertSame('1-0', $connection->get()[0]['id']);
+    }
+
+    public function testGetReturnsTheMessagesOfAFailedBatchAgain()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(5))->method('xreadgroup')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => ['1-0' => ['message' => '{"body":"1","headers":[]}']]]],
+                    [['symfony', 'consumer', ['queue' => '1-0'], 1, 1], new \RedisException('read error on connection')],
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => ['1-0' => ['message' => '{"body":"1","headers":[]}']]]],
+                    [['symfony', 'consumer', ['queue' => '1-0'], 1, 1], []],
+                    [['symfony', 'consumer', ['queue' => '>'], 1, 1], []],
+                ];
+
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return instanceof \Throwable ? throw $return : $return;
+            });
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+
+        try {
+            $connection->get(2);
+            $this->fail('A TransportException should have been thrown.');
+        } catch (TransportException) {
+        }
+
+        $this->assertSame(['1-0'], array_column($connection->get(2), 'id'));
+    }
+
+    public function testGetReadsThePendingMessagesAgainAfterAFailedClaim()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(2))->method('xreadgroup')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], []],
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => ['redisid-123' => ['message' => '{"body":"1","headers":[]}']]]],
+                ];
+
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            });
+
+        $redis->method('xpending')->willReturnOnConsecutiveCalls(
+            [['redisid-123', 'consumer-2', 3600001, 1]],
+            // the claim went through, so the message is now pending for this consumer
+            [['redisid-123', 'consumer', 10, 2]],
+        );
+
+        // Redis claimed the message, but the reply was lost
+        $redis->expects($this->once())->method('xclaim')->willThrowException(new \RedisException('read error on connection'));
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+
+        try {
+            $connection->get();
+            $this->fail('A TransportException should have been thrown.');
+        } catch (TransportException) {
+        }
+
+        $this->assertSame('redisid-123', $connection->get()[0]['id']);
+    }
+
     public function testGetUsesFetchSizeWhenProvided()
     {
         $redis = $this->createRedisMock();

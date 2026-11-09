@@ -1,0 +1,3 @@
+orders_v1:
+    path: /api/v1/orders
+    deprecation: { since: '2027-06-30', sunset: '2026-10-01' }

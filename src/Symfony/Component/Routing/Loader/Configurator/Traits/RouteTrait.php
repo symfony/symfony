@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader\Configurator\Traits;
 
+use Symfony\Component\Routing\Attribute\RouteDeprecation;
 use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -234,15 +235,11 @@ trait RouteTrait
     /**
      * Adds the "_deprecation" entry to defaults.
      *
-     * @param string      $since  The date the route is or will be deprecated
-     * @param string|null $sunset The date the route is expected to become unresponsive
-     * @param string|null $link   The URI of the documentation describing the deprecation
-     *
      * @return $this
      */
-    final public function deprecation(string $since, ?string $sunset = null, ?string $link = null): static
+    final public function deprecation(\DateTimeInterface|string $since, \DateTimeInterface|string|null $sunset = null, ?string $link = null): static
     {
-        $this->route->addDefaults(['_deprecation' => array_filter(['since' => $since, 'sunset' => $sunset, 'link' => $link], static fn (?string $value) => null !== $value)]);
+        $this->route->addDefaults(['_deprecation' => new RouteDeprecation($since, $sunset, $link)->toArray()]);
 
         return $this;
     }

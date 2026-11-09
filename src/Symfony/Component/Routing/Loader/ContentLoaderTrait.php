@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Routing\Loader;
 
+use Symfony\Component\Routing\Attribute\RouteDeprecation;
 use Symfony\Component\Routing\Controller\RedirectController;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\Loader\Configurator\Traits\HostTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\LocalizedRouteTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\PrefixTrait;
@@ -124,7 +126,7 @@ trait ContentLoaderTrait
             $defaults['_firewall'] = $config['firewall'];
         }
         if (isset($config['deprecation'])) {
-            $defaults['_deprecation'] = $config['deprecation'];
+            $defaults['_deprecation'] = RouteDeprecation::fromArray($config['deprecation'])->toArray();
         }
 
         $routes = $this->createLocalizedRoute(new RouteCollection(), $name, $config['path']);
@@ -181,7 +183,7 @@ trait ContentLoaderTrait
             $defaults['_firewall'] = $config['firewall'];
         }
         if (isset($config['deprecation'])) {
-            $defaults['_deprecation'] = $config['deprecation'];
+            $defaults['_deprecation'] = RouteDeprecation::fromArray($config['deprecation'])->toArray();
         }
 
         $this->setCurrentDir(\dirname($path));
@@ -285,6 +287,16 @@ trait ContentLoaderTrait
         }
         if (isset($config['deprecation']) && isset($config['defaults']['_deprecation'])) {
             throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "deprecation" key and the defaults key "_deprecation" for "%s".', $path, $name));
+        }
+        if (isset($config['deprecation'])) {
+            if (!\is_array($config['deprecation'])) {
+                throw new \InvalidArgumentException(\sprintf('The "deprecation" key for "%s" in "%s" must be an array, "%s" given.', $name, $path, get_debug_type($config['deprecation'])));
+            }
+            try {
+                RouteDeprecation::fromArray($config['deprecation']);
+            } catch (InvalidArgumentException $e) {
+                throw new \InvalidArgumentException(\sprintf('The "deprecation" key for "%s" in "%s" is invalid: "%s"', $name, $path, $e->getMessage()), 0, $e);
+            }
         }
     }
 

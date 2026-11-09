@@ -103,14 +103,6 @@ class DeprecationHeaderListenerTest extends TestCase
         $this->handle(['since' => 'not a date']);
     }
 
-    public function testRejectsASunsetEarlierThanTheDeprecation()
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The "sunset" date of the deprecation of route "orders_v1" cannot be earlier than its "since" date.');
-
-        $this->handle(['since' => '2027-01-01', 'sunset' => '2026-01-01']);
-    }
-
     private function handle(mixed $deprecation, Response $response = new Response()): Response
     {
         $request = new Request();

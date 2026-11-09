@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures;
 
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Attribute\RouteDeprecation;
 
 class FooController
 {
@@ -75,7 +76,7 @@ class FooController
     {
     }
 
-    #[Route('/deprecated', deprecation: ['since' => '2026-10-01', 'sunset' => '2027-06-30', 'link' => 'https://example.com/deprecation'])]
+    #[Route('/deprecated', deprecation: new RouteDeprecation('2026-10-01', '2027-06-30', 'https://example.com/deprecation'))]
     public function deprecation()
     {
     }

@@ -235,8 +235,16 @@ final class TextWrapper
             $totalNeeded = $currentVisibleLength + $tokenVisibleLength;
 
             if ($totalNeeded > $width && $currentVisibleLength > 0) {
+                // The codes of this whitespace can end the style of the previous word, so they end this line
+                $ending = '';
+                if ($isWhitespace && $token['has_ansi']) {
+                    $tracker->processText($tokenText);
+                    $token['has_ansi'] = false;
+                    $ending = str_replace([' ', "\t"], '', $tokenText);
+                }
+
                 // Trim trailing whitespace, then add underline reset
-                $lineToWrap = rtrim($currentLine);
+                $lineToWrap = rtrim($currentLine).$ending;
                 if ('' !== $lineEndReset = $tracker->getLineEndReset()) {
                     $lineToWrap .= $lineEndReset;
                 }

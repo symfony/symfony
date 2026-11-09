@@ -175,6 +175,10 @@ class DynamoDbStore implements PersistingStoreInterface
 
     public function delete(Key $key): void
     {
+        if (!$key->hasState(__CLASS__)) {
+            return;
+        }
+
         try {
             $this->client->deleteItem(new DeleteItemInput([
                 'TableName' => $this->tableName,
@@ -196,6 +200,10 @@ class DynamoDbStore implements PersistingStoreInterface
 
     public function exists(Key $key): bool
     {
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
         $existingLock = $this->client->getItem(new GetItemInput([
             'TableName' => $this->tableName,
             'ConsistentRead' => true,
@@ -224,6 +232,10 @@ class DynamoDbStore implements PersistingStoreInterface
     {
         if ($ttl < 1) {
             throw new InvalidTtlException(\sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
+        }
+
+        if (!$key->hasState(__CLASS__)) {
+            throw new LockConflictedException();
         }
 
         $key->reduceLifetime($ttl);

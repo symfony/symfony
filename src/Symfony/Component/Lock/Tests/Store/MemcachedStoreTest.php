@@ -27,6 +27,7 @@ use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 class MemcachedStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
+    use FreshKeyTestTrait;
 
     public static function setUpBeforeClass(): void
     {

@@ -20,6 +20,7 @@ use Symfony\Component\Lock\Test\AbstractStoreTestCase;
  */
 class InMemoryStoreTest extends AbstractStoreTestCase
 {
+    use FreshKeyTestTrait;
     use SharedLockStoreTestTrait;
 
     public function getStore(): PersistingStoreInterface

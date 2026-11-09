@@ -79,11 +79,13 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
         $resource = uniqid(__METHOD__, true);
         $redis = $this->getRedisConnection();
         $redis->hset($resource, 'field', 'value');
+        $key = new Key($resource);
+        $key->setState(RedisStore::class, 'token');
 
         try {
             $this->expectException(LockStorageException::class);
             $this->expectExceptionMessage('WRONGTYPE');
-            $this->getStore()->exists(new Key($resource));
+            $this->getStore()->exists($key);
         } finally {
             $redis->del($resource);
         }

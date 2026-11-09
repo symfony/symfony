@@ -249,6 +249,10 @@ class MongoDbStore implements PersistingStoreInterface
      */
     public function putOffExpiration(Key $key, float $ttl): void
     {
+        if (!$key->hasState(__CLASS__)) {
+            throw new LockConflictedException();
+        }
+
         $key->reduceLifetime($ttl);
 
         try {
@@ -265,6 +269,10 @@ class MongoDbStore implements PersistingStoreInterface
 
     public function delete(Key $key): void
     {
+        if (!$key->hasState(__CLASS__)) {
+            return;
+        }
+
         $write = new BulkWrite();
         $write->delete(
             [
@@ -283,6 +291,10 @@ class MongoDbStore implements PersistingStoreInterface
 
     public function exists(Key $key): bool
     {
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
         $cursor = $this->getManager()->executeQuery($this->namespace, new Query(
             [
                 '_id' => (string) $key,

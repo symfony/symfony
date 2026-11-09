@@ -135,6 +135,10 @@ class RedisStore implements SharedLockStoreInterface
 
     public function putOffExpiration(Key $key, float $ttl): void
     {
+        if (!$key->hasState(__CLASS__)) {
+            throw new LockConflictedException();
+        }
+
         $script = '
             local key = KEYS[1]
             local uniqueToken = ARGV[2]
@@ -175,6 +179,10 @@ class RedisStore implements SharedLockStoreInterface
 
     public function delete(Key $key): void
     {
+        if (!$key->hasState(__CLASS__)) {
+            return;
+        }
+
         $script = '
             local key = KEYS[1]
             local uniqueToken = ARGV[1]
@@ -205,6 +213,10 @@ class RedisStore implements SharedLockStoreInterface
 
     public function exists(Key $key): bool
     {
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
         $script = '
             local key = KEYS[1]
             local uniqueToken = ARGV[2]

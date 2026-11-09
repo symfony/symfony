@@ -38,6 +38,7 @@ use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 class DoctrineDbalStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
+    use FreshKeyTestTrait;
 
     protected static string $dbFile;
 

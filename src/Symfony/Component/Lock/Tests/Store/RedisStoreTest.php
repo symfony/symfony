@@ -26,6 +26,7 @@ use Symfony\Component\Lock\Store\StoreFactory;
 #[Group('integration')]
 class RedisStoreTest extends AbstractRedisStoreTestCase
 {
+    use FreshKeyTestTrait;
     use SharedLockStoreTestTrait;
 
     public static function setUpBeforeClass(): void

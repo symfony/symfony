@@ -51,7 +51,7 @@ class CheckpointTest extends TestCase
         $this->assertTrue($checkpoint->acquire($now));
         $this->assertEquals($now, $checkpoint->time());
         $this->assertEquals(-1, $checkpoint->index());
-        $this->assertEquals([$now, -1, $now], $cache->get('cache', static fn () => []));
+        $this->assertEquals([$now, -1, $now, $now, $now], $cache->get('cache', static fn () => []));
     }
 
     public function testWithStateLoadStateOnAcquiring()
@@ -64,7 +64,7 @@ class CheckpointTest extends TestCase
         $this->assertTrue($checkpoint->acquire($startedAt = $now->modify('1 min')));
         $this->assertEquals($now, $checkpoint->time());
         $this->assertEquals(0, $checkpoint->index());
-        $this->assertEquals([$now, 0, $startedAt], $cache->get('cache', static fn () => []));
+        $this->assertEquals([$now, 0, $startedAt, $now, $startedAt], $cache->get('cache', static fn () => []));
     }
 
     public function testWithLockInitStateOnFirstAcquiring()
@@ -116,7 +116,7 @@ class CheckpointTest extends TestCase
         $this->assertSame($now, $checkpoint->time());
         $this->assertSame(3, $checkpoint->index());
         $this->assertSame($startedAt, $checkpoint->from());
-        $this->assertEquals([$now, 3, $startedAt], $cache->get('cache', static fn () => []));
+        $this->assertEquals([$now, 3, $startedAt, $now, $startedAt], $cache->get('cache', static fn () => []));
     }
 
     public function testWithLockSave()
@@ -144,7 +144,7 @@ class CheckpointTest extends TestCase
 
         $this->assertSame($now, $checkpoint->time());
         $this->assertSame(3, $checkpoint->index());
-        $this->assertEquals([$now, 3, $startTime], $cache->get('dummy', static fn () => []));
+        $this->assertEquals([$now, 3, $startTime, $now, $startTime], $cache->get('dummy', static fn () => []));
     }
 
     public function testWithCacheFullCycle()
@@ -165,7 +165,7 @@ class CheckpointTest extends TestCase
         $this->assertSame(3, $lastIndex);
         $this->assertEquals($now, $checkpoint->time());
         $this->assertSame(0, $checkpoint->index());
-        $this->assertEquals([$now, 0, $now], $cache->get('cache', static fn () => []));
+        $this->assertEquals([$now, 0, $now, $now, $now], $cache->get('cache', static fn () => []));
     }
 
     public function testWithLockResetStateAfterLockedAcquiring()
@@ -243,7 +243,7 @@ class CheckpointTest extends TestCase
         $this->assertEquals($savedTime, $checkpoint->time());
         $this->assertSame(3, $checkpoint->index());
         $this->assertEquals($startTime, $checkpoint->from());
-        $this->assertEquals([$savedTime, 3, $startTime], $cache->get('cache', static fn () => []));
+        $this->assertEquals([$savedTime, 3, $startTime, $savedTime, $startTime], $cache->get('cache', static fn () => []));
     }
 
     public function testWithLockAndCacheResetStateWhenCacheIsClearedAfterLockedAcquiring()
@@ -390,5 +390,41 @@ class CheckpointTest extends TestCase
 
         $expiry = $cache->getItem('cache')->getMetadata()[ItemInterface::METADATA_EXPIRY] ?? null;
         $this->assertGreaterThan(time() + 365 * 86400, $expiry);
+    }
+
+    public function testWithCacheKeepTimesThatHappenTwiceWhenClocksGoBack()
+    {
+        // 01:30 EST in New York and 02:30 CEST in Paris: these wall-clock times happen twice on those days
+        foreach (['America/New_York' => '2026-11-01 06:30:00', 'Europe/Paris' => '2026-10-25 00:30:00'] as $timezone => $utcTime) {
+            $time = (new \DateTimeImmutable($utcTime, new \DateTimeZone('UTC')))->setTimezone(new \DateTimeZone($timezone));
+            $cache = new ArrayAdapter();
+            (new Checkpoint('cache', new NoLock(), $cache))->acquire($time);
+
+            $checkpoint = new Checkpoint('cache', new NoLock(), $cache);
+            $this->assertTrue($checkpoint->acquire($time));
+            $this->assertSame($time->format('Y-m-d H:i:s T e'), $checkpoint->time()->format('Y-m-d H:i:s T e'));
+            $this->assertSame($time->format('Y-m-d H:i:s T e'), $checkpoint->from()->format('Y-m-d H:i:s T e'));
+        }
+    }
+
+    public function testWithCacheStateIsCompatibleWithOlderVersions()
+    {
+        $cache = new ArrayAdapter();
+        $time = new \DateTimeImmutable('2026-06-01 09:30:00', new \DateTimeZone('America/New_York'));
+        $from = new \DateTimeImmutable('2026-05-01 10:00:00', new \DateTimeZone('Europe/Paris'));
+        $cache->get('cache', static fn () => [$time, 3, $from], \INF);
+
+        $checkpoint = new Checkpoint('cache', new NoLock(), $cache);
+        $this->assertTrue($checkpoint->acquire(new \DateTimeImmutable('2026-06-01 13:31:00Z')));
+        $this->assertSame('2026-06-01 09:30:00 America/New_York', $checkpoint->time()->format('Y-m-d H:i:s e'));
+        $this->assertSame(3, $checkpoint->index());
+        $this->assertSame('2026-05-01 10:00:00 Europe/Paris', $checkpoint->from()->format('Y-m-d H:i:s e'));
+
+        // older versions read only the first three elements
+        $checkpoint->save(new \DateTimeImmutable('2026-06-01 10:30:00', new \DateTimeZone('America/New_York')), 0);
+        [$savedTime, $savedIndex, $savedFrom] = $cache->get('cache', static fn () => []);
+        $this->assertSame('2026-06-01 10:30:00 America/New_York', $savedTime->format('Y-m-d H:i:s e'));
+        $this->assertSame(0, $savedIndex);
+        $this->assertSame('2026-05-01 10:00:00 Europe/Paris', $savedFrom->format('Y-m-d H:i:s e'));
     }
 }

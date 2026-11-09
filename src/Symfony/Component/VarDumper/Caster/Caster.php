@@ -55,10 +55,6 @@ class Caster
 
         $a = $obj instanceof \Closure ? [] : (array) $obj;
 
-        if ($obj instanceof \__PHP_Incomplete_Class) {
-            return $a;
-        }
-
         if ($a) {
             static $publicProperties = [];
             $debugClass = $debugClass ?? get_debug_type($obj);
@@ -66,13 +62,16 @@ class Caster
             $i = 0;
             $prefixedKeys = [];
             foreach ($a as $k => $v) {
-                if ("\0" !== ($k[0] ?? '')) {
+                if (str_starts_with($k, "\0~")) {
+                    // "\0~" is reserved for the virtual properties added by casters
+                    $prefixedKeys[$i] = self::PREFIX_DYNAMIC.$k;
+                } elseif ("\0" !== ($k[0] ?? '')) {
                     if (!isset($publicProperties[$class])) {
                         foreach ((new \ReflectionClass($class))->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
                             $publicProperties[$class][$prop->name] = true;
                         }
                     }
-                    if (!isset($publicProperties[$class][$k])) {
+                    if (!isset($publicProperties[$class][$k]) && !$obj instanceof \__PHP_Incomplete_Class) {
                         $prefixedKeys[$i] = self::PREFIX_DYNAMIC.$k;
                     }
                 } elseif ($debugClass !== $class && 1 === strpos($k, $class)) {

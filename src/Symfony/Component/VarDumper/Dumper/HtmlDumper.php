@@ -888,7 +888,7 @@ EOHTML
         if (isset($attr['ellipsis'])) {
             $class = 'sf-dump-ellipsis';
             if (isset($attr['ellipsis-type'])) {
-                $class = sprintf('"%s sf-dump-ellipsis-%s"', $class, $attr['ellipsis-type']);
+                $class = sprintf('"%s sf-dump-ellipsis-%s"', $class, esc($attr['ellipsis-type']));
             }
             $label = esc(substr($value, -$attr['ellipsis']));
             $style = str_replace(' title="', " title=\"$v\n", $style);

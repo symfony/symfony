@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-11-09T15:48:18Z
+
+The x86 minimal-exts failure is a zstd process timeout in ChainCompressorTest on the Windows runner. It is not caused by this change.

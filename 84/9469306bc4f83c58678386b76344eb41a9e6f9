@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by skybleak333 at 2026-11-09T16:51:41Z
+
+Thanks for checking. I applied both suggestions in the test, and the description now says that a task that already moved goes back to its slot on the first restart after the upgrade.

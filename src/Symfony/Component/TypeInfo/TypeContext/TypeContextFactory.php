@@ -24,7 +24,6 @@ use PHPStan\PhpDocParser\ParserConfig;
 use Symfony\Component\TypeInfo\Exception\ExceptionInterface;
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Exception\RuntimeException;
-use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
@@ -324,7 +323,7 @@ final class TypeContextFactory
                 if (null !== $typeString) {
                     $type = $this->stringTypeResolver->resolve($typeString, $typeContext);
                 }
-            } catch (UnsupportedException) {
+            } catch (ExceptionInterface) {
             }
 
             $templates[$tag->value->name] = $type;

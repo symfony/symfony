@@ -389,6 +389,9 @@ class RouteCompilerTest extends TestCase
         yield ['{^/(?P<foo>(?(b)b))$}sD', '(?(b)b)'];
         yield ['{^/(?P<foo>(*F))$}sD', '(*F)'];
         yield ['{^/(?P<foo>(?:(?:foo)))$}sD', '((foo))'];
+        yield ['{^/(?P<foo>a(?:b)(?:c)(?:d))$}sD', "a(?P<x>b)(?<y>c)(?'z'd)"];
+        yield ['{^/(?P<foo>(?:(?:b)))$}sD', '(?<x>(b))'];
+        yield ['{^/(?P<foo>(?<=a)b(?<!c))$}sD', '(?<=a)b(?<!c)'];
     }
 }
 

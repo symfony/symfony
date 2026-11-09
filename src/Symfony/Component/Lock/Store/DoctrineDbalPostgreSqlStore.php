@@ -187,6 +187,9 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
             return $this->getInternalStore()->exists($key);
         }
 
+        // forget a lock the session lost, for example after a reconnection, so that other keys can acquire it again
+        $this->getInternalStore()->delete($key);
+
         return false;
     }
 

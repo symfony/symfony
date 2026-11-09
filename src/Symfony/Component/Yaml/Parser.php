@@ -158,7 +158,7 @@ class Parser
         }
 
         $this->locallySkippedLineNumbers = [];
-        $this->totalNumberOfLines ??= $this->numberOfParsedLines;
+        $this->totalNumberOfLines ??= $this->offset + $this->numberOfParsedLines;
 
         if (!$this->moveToNextLine()) {
             return null;

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Lock\Store;
 
-use Predis\Response\Error;
+use Predis\Response\ErrorInterface;
 use Predis\Response\ServerException;
 use Relay\Cluster as RelayCluster;
 use Relay\Relay;
@@ -371,7 +371,7 @@ class RedisStore implements SharedLockStoreInterface
             throw new LockStorageException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if ($result instanceof Error) {
+        if ($result instanceof ErrorInterface) {
             throw new LockStorageException($result->getMessage());
         }
 

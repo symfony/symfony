@@ -40,7 +40,8 @@
         "web-token/jwt-library": "^3.3.2|^4.0"
     },
     "conflict": {
-        "symfony/http-client-contracts": "<3.0"
+        "symfony/http-client-contracts": "<3.0",
+        "symfony/rate-limiter": "<7.4.5|>=8,<8.0.5"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Security\\Http\\": "" },

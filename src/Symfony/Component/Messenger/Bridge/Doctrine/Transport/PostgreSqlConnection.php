@@ -52,8 +52,8 @@ final class PostgreSqlConnection extends Connection
     {
         try {
             $this->unlisten();
-        } catch (DBALException) {
-            // a broken connection does not keep its LISTEN
+        } catch (DBALException|\Error) {
+            // a broken or closed connection does not keep its LISTEN
         }
     }
 
@@ -85,10 +85,12 @@ final class PostgreSqlConnection extends Connection
 
         $this->listening = true;
 
-        /** @var \PDO $nativeConnection */
+        /** @var \PDO|\PgSql\Connection $nativeConnection */
         $nativeConnection = $this->driverConnection->getNativeConnection();
 
-        $notification = $nativeConnection->getNotify(\PDO::FETCH_ASSOC, 0);
+        $notification = $nativeConnection instanceof \PgSql\Connection
+            ? $this->getPgSqlNotification($nativeConnection, 0)
+            : $nativeConnection->getNotify(\PDO::FETCH_ASSOC, 0);
         if (
             // no notifications, or for another table or queue
             (false === $notification || $notification['message'] !== $this->configuration['table_name'] || $notification['payload'] !== $this->configuration['queue_name'])
@@ -146,8 +148,12 @@ final class PostgreSqlConnection extends Connection
     {
         $this->listen();
 
-        /** @var \PDO $nativeConnection */
+        /** @var \PDO|\PgSql\Connection $nativeConnection */
         $nativeConnection = $this->driverConnection->getNativeConnection();
+
+        if ($nativeConnection instanceof \PgSql\Connection) {
+            return false !== $this->getPgSqlNotification($nativeConnection, $timeoutMs);
+        }
 
         return false !== $nativeConnection->getNotify(\PDO::FETCH_ASSOC, $timeoutMs);
     }
@@ -164,5 +170,27 @@ final class PostgreSqlConnection extends Connection
         if ($this->driverConnection->isConnected()) {
             $this->executeStatement(\sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
         }
+    }
+
+    /**
+     * @return array{message: string, pid: int, payload: string}|false
+     */
+    private function getPgSqlNotification(\PgSql\Connection $connection, int $timeoutMs): array|false
+    {
+        if (false !== $notification = pg_get_notify($connection, \PGSQL_ASSOC)) {
+            return $notification;
+        }
+
+        // stream_select() throws a ValueError on the socket of a connection that libpq already dropped
+        if (\PGSQL_CONNECTION_OK !== pg_connection_status($connection) || false === $socket = pg_socket($connection)) {
+            return false;
+        }
+
+        $read = [$socket];
+        $write = $except = null;
+        // A signal interrupts the wait with a warning: the worker handles the signal right after
+        @stream_select($read, $write, $except, intdiv($timeoutMs, 1000), $timeoutMs % 1000 * 1000);
+
+        return pg_get_notify($connection, \PGSQL_ASSOC);
     }
 }

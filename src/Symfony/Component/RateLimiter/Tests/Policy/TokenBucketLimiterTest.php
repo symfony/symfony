@@ -289,7 +289,7 @@ class TokenBucketLimiterTest extends TestCase
         sleep(11);
 
         $this->assertEquals(0, $limiter->reserve(9)->getWaitDuration());
-        $this->assertEquals(10, $limiter->reserve(1)->getWaitDuration());
+        $this->assertEquals(9, $limiter->reserve(1)->getWaitDuration());
     }
 
     public function testEffectivelyInfiniteBurstSizeIsCapped()
@@ -337,6 +337,38 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertSame(-2, $rateLimit->getRemainingTokens());
 
         $rateLimit->wait();
+        $this->assertTrue($limiter->consume()->isAccepted());
+    }
+
+    public function testWaitEndsAtTheNextRefill()
+    {
+        ClockMock::withClockMock(1729990800.0);
+        $limiter = $this->createLimiter(10, Rate::perMinute(10));
+        $limiter->consume(9);
+
+        sleep(50);
+
+        $rateLimit = $limiter->consume();
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(1729990860, $rateLimit->getRetryAfter()->getTimestamp());
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(1729990860, $rateLimit->getRetryAfter()->getTimestamp());
+
+        $this->assertEquals(10, $limiter->reserve()->getWaitDuration());
+        $this->assertEquals(70, $limiter->reserve(10)->getWaitDuration());
+    }
+
+    public function testConsumeIsAcceptedAfterWaitingForTheRetryAfter()
+    {
+        ClockMock::withClockMock(1729990800.0);
+        $limiter = $this->createLimiter(1, Rate::perSecond(1));
+        $limiter->consume();
+        usleep(250);
+
+        $limiter->consume()->wait();
+
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 

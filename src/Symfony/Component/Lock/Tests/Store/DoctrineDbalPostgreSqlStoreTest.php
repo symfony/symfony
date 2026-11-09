@@ -96,6 +96,18 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         $this->assertTrue($store2->exists($key));
     }
 
+    public function testInternalStoreIsFreedWithTheConnection()
+    {
+        $conn = $this->createPostgreSqlConnection();
+        $store = new DoctrineDbalPostgreSqlStore($conn);
+        $store->save(new Key(__METHOD__));
+
+        $internalStore = \WeakReference::create((fn () => $this->getInternalStore())->call($store));
+        unset($store, $conn);
+
+        $this->assertNull($internalStore->get());
+    }
+
     public function testWaitAndSaveAfterConflictReleasesLockFromInternalStore()
     {
         $store1 = $this->getStore();
@@ -246,6 +258,68 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         $store->delete($key);
         $this->assertSame(\PGSQL_TUPLES_OK, pg_result_status(pg_get_result($waiter)));
         pg_close($waiter);
+    }
+
+    public function testSaveAfterTheSessionIsLost()
+    {
+        $conn = $this->createPostgreSqlConnection();
+        $store = new DoctrineDbalPostgreSqlStore($conn);
+
+        $key1 = new Key(__METHOD__);
+        $store->save($key1);
+
+        $conn->close();
+        $store->delete($key1);
+
+        $key2 = new Key(__METHOD__);
+        $store->save($key2);
+
+        $this->assertTrue($store->exists($key2));
+        $this->assertFalse($store->exists($key1));
+
+        $store->delete($key2);
+        $this->assertFalse($store->exists($key2));
+    }
+
+    public function testSaveAfterTheSessionIsLostWithAReadLock()
+    {
+        $conn = $this->createPostgreSqlConnection();
+        $store = new DoctrineDbalPostgreSqlStore($conn);
+
+        $key1 = new Key(__METHOD__);
+        $store->saveRead($key1);
+
+        $conn->close();
+        $store->delete($key1);
+
+        $key2 = new Key(__METHOD__);
+        $store->save($key2);
+
+        $this->assertTrue($store->exists($key2));
+        $this->assertFalse($store->exists($key1));
+
+        $store->delete($key2);
+        $this->assertFalse($store->exists($key2));
+    }
+
+    public function testSaveAfterTheSessionIsLostWithoutDelete()
+    {
+        $conn = $this->createPostgreSqlConnection();
+        $store = new DoctrineDbalPostgreSqlStore($conn);
+
+        $key1 = new Key(__METHOD__);
+        $store->save($key1);
+
+        $conn->close();
+        $this->assertFalse($store->exists($key1));
+
+        $key2 = new Key(__METHOD__);
+        $store->save($key2);
+
+        $this->assertTrue($store->exists($key2));
+
+        $store->delete($key2);
+        $this->assertFalse($store->exists($key2));
     }
 
     private static function getDbalConnection(string $dsn): Connection

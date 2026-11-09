@@ -3445,6 +3445,20 @@ class ParserTest extends TestCase
         $this->assertSame([['foo' => ['bar' => "text\n"]], 'second'], $this->parser->parse($yaml));
     }
 
+    public function testBlockScalarKeepsTrailingNewlineAfterLeadingComments()
+    {
+        $yaml = <<<'YAML'
+            # comment 1
+            # comment 2
+            foo:
+              bar: |
+                text
+            z: 2
+            YAML;
+
+        $this->assertSame(['foo' => ['bar' => "text\n"], 'z' => 2], $this->parser->parse($yaml));
+    }
+
     public function testBlockScalarsInCompactNestedCollections()
     {
         $this->assertSame([['a' => "\n"], 'b'], $this->parser->parse("- a: |+\n\n- b"));

@@ -467,7 +467,12 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                 continue;
             }
 
-            $type = $this->phpDocTypeHelper->getType($tagType);
+            try {
+                $type = $this->phpDocTypeHelper->getType($tagType);
+            } catch (\InvalidArgumentException) {
+                $type = null;
+            }
+
             $types[] = $type ? $this->resolveClassKeywords($type, $typeContext) : null;
         }
 

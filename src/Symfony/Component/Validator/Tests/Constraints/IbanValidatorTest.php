@@ -165,7 +165,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['GT82TRAJ01020000001210029690'], // Guatemala
             ['IR580540105180021273113007'], // Iran
             ['IL620108000000099999999'], // Israel
-            ['CI05A00060174100178530011852'], // Ivory Coast
+            ['CI93CI0590101012167967100188'], // Ivory Coast
             ['JO94CBJO0010000000000131000302'], // Jordan
             ['KZ176010251000042993'], // Kazakhstan
             ['KW74NBOK0000000000001000372151'], // Kuwait
@@ -282,7 +282,8 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['GT82TRAJ010200000012100296901'], // Guatemala
             ['IR5805401051800212731130071'], // Iran
             ['IL6201080000000999999991'], // Israel
-            ['CI05A000601741001785300118521'], // Ivory Coast
+            ['CI93CI05901010121679671001881'], // Ivory Coast
+            ['CI05A00060174100178530011852'], // Ivory Coast (pre-2010 format)
             ['JO94CBJO00100000000001310003021'], // Jordan
             ['KZ1760102510000429931'], // Kazakhstan
             ['KW74NBOK00000000000010003721511'], // Kuwait
@@ -392,7 +393,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['GT82TRAJ01020000001210029691'], // Guatemala
             ['IR580540105180021273113008'], // Iran
             ['IL620108000000099999998'], // Israel
-            ['CI05A00060174100178530011853'], // Ivory Coast
+            ['CI92CI0590101012167967100188'], // Ivory Coast
             ['JO94CBJO0010000000000131000303'], // Jordan
             ['KZ176010251000042994'], // Kazakhstan
             ['KW74NBOK0000000000001000372152'], // Kuwait

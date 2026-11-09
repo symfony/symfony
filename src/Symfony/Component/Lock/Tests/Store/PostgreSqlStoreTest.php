@@ -83,6 +83,27 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $this->assertTrue($store2->exists($key));
     }
 
+    public function testWaitAndSaveOnANewConnectionAfterTheOldOneIsFreed()
+    {
+        $pdo = new \PDO('pgsql:host='.$this->getPostgresHost(), 'postgres', 'password');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        (new PostgreSqlStore($pdo))->save(new Key(__METHOD__));
+        $pdo = null;
+
+        // PHP reuses the object id of the freed connection for the new one
+        $pdo = new \PDO('pgsql:host='.$this->getPostgresHost(), 'postgres', 'password');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $pdo->exec('SET lock_timeout = 5000');
+        $store = new PostgreSqlStore($pdo);
+
+        $key = new Key(__METHOD__);
+        // the server can still be ending the old session
+        $store->waitAndSave($key);
+        $this->assertTrue($store->exists($key));
+
+        $store->delete($key);
+    }
+
     public function testWaitAndSaveAfterConflictReleasesLockFromInternalStore()
     {
         $store1 = $this->getStore();
@@ -239,5 +260,26 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $store->delete($key);
         $this->assertSame(\PGSQL_TUPLES_OK, pg_result_status(pg_get_result($waiter)));
         pg_close($waiter);
+    }
+
+    public function testSaveAfterTheSessionLostTheLock()
+    {
+        $pdo = new \PDO('pgsql:host='.$this->getPostgresHost(), 'postgres', 'password');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $store = new PostgreSqlStore($pdo);
+
+        $key1 = new Key(__METHOD__);
+        $store->save($key1);
+
+        $pdo->exec('SELECT pg_advisory_unlock_all()');
+        $this->assertFalse($store->exists($key1));
+
+        $key2 = new Key(__METHOD__);
+        $store->save($key2);
+
+        $this->assertTrue($store->exists($key2));
+
+        $store->delete($key2);
+        $this->assertFalse($store->exists($key2));
     }
 }

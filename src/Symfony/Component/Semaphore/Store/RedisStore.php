@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Semaphore\Store;
 
+use Predis\Response\ErrorInterface;
 use Relay\Cluster as RelayCluster;
 use Relay\Relay;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
@@ -157,7 +158,13 @@ class RedisStore implements PersistingStoreInterface
 
     public function exists(Key $key): bool
     {
-        return (bool) $this->redis->zScore(\sprintf('{%s}:weight', $key), $this->getUniqueToken($key));
+        $score = $this->redis->zScore(\sprintf('{%s}:weight', $key), $this->getUniqueToken($key));
+
+        if ($score instanceof ErrorInterface) {
+            throw new SemaphoreStorageException($score->getMessage());
+        }
+
+        return (bool) $score;
     }
 
     private function evaluate(string $script, string $resource, array $args): mixed
@@ -267,7 +274,7 @@ class RedisStore implements PersistingStoreInterface
             throw new SemaphoreStorageException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if ($result instanceof \Predis\Response\Error) {
+        if ($result instanceof ErrorInterface) {
             throw new SemaphoreStorageException($result->getMessage());
         }
 

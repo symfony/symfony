@@ -222,6 +222,7 @@ class PhpDocExtractorTest extends TestCase
         yield 'pub' => ['pub', null, null];
         yield 'stat' => ['stat', null, null];
         yield 'bar' => ['bar', 'Bar.', null];
+        yield 'invalidKeyType' => ['invalidKeyType', null, null];
     }
 
     #[DataProvider('typeWithNoPrefixesProvider')]

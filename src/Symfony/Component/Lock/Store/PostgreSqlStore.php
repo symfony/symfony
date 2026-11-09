@@ -185,6 +185,9 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
             return $this->getInternalStore()->exists($key);
         }
 
+        // forget a lock the session lost, for example after pg_advisory_unlock_all(), so that other keys can acquire it again
+        $this->getInternalStore()->delete($key);
+
         return false;
     }
 

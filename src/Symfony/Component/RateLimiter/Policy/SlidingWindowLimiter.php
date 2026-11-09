@@ -65,7 +65,12 @@ final class SlidingWindowLimiter implements LimiterInterface
             $window = $this->storage->fetch($this->id);
             if (!$window instanceof SlidingWindow) {
                 $window = new SlidingWindow($this->id, $this->interval);
-            } elseif ($window->isExpired()) {
+            }
+
+            // before the expiry check, so that the next window gets the size too
+            $window->configure($this->limit);
+
+            if ($window->isExpired()) {
                 $window = SlidingWindow::createFromPreviousWindow($window, $this->interval);
             }
 

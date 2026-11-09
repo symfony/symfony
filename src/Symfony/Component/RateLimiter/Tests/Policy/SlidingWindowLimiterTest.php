@@ -202,6 +202,82 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertSame(98, $rateLimit->getRemainingTokens());
     }
 
+    public function testReservationsWaitForTheWindowWhereTheyFit()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+
+        // the hits of the first window fade out during the second one
+        $this->assertEqualsWithDelta(22.8, $limiter->reserve(10)->getWaitDuration(), 0.01);
+        // the second window is full, so the next tokens are only available in the third one
+        $this->assertEqualsWithDelta(34.8, $limiter->reserve(10)->getWaitDuration(), 0.01);
+    }
+
+    public function testConsumeIsRefusedWhileReservationsFillTheWindow()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+        $limiter->reserve(10);
+        $limiter->reserve(10);
+
+        sleep(23);
+
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testStorageKeepsTheStateUntilTheReservationsHaveActed()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+        $limiter->reserve(10);
+        $limiter->reserve(10);
+        $limiter->reserve(10);
+
+        sleep(25);
+
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testLoweringTheLimitDoesNotTurnAcceptedHitsIntoReservations()
+    {
+        (new SlidingWindowLimiter('test', 100, new \DateInterval('PT12S'), $this->storage))->consume(50);
+
+        $this->assertEqualsWithDelta(12, $this->createLimiter()->reserve()->getWaitDuration(), 0.01);
+    }
+
+    public function testStorageKeepsTheStateOfTheNextWindowUntilItsReservationsHaveActed()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+        $limiter->reserve(10);
+        $limiter->reserve(10);
+
+        sleep(13);
+        $limiter->reserve();
+        sleep(24);
+
+        $this->assertFalse($limiter->consume()->isAccepted());
+    }
+
+    public function testLoweringTheLimitKeepsTheReservations()
+    {
+        $limiter = new SlidingWindowLimiter('test', 20, new \DateInterval('PT12S'), $this->storage);
+        $limiter->consume(20);
+        $limiter->reserve(20);
+
+        $this->assertEqualsWithDelta(24, $this->createLimiter()->reserve()->getWaitDuration(), 0.01);
+    }
+
+    public function testRaisingTheLimitKeepsTheReservations()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(10);
+        $limiter->reserve(10);
+
+        $limiter = new SlidingWindowLimiter('test', 20, new \DateInterval('PT12S'), $this->storage);
+        $this->assertEqualsWithDelta(18, $limiter->reserve()->getWaitDuration(), 0.01);
+    }
+
     public function testRejectLimitBelowOne()
     {
         $this->expectException(\InvalidArgumentException::class);

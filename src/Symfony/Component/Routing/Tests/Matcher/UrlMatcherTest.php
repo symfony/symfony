@@ -477,6 +477,49 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo/');
     }
 
+    public function testMoreThanOneTrailingSlash()
+    {
+        $this->expectException(ResourceNotFoundException::class);
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/'));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $matcher->match('/foo//');
+    }
+
+    public function testMoreThanOneTrailingSlashWithCatchAllRoute()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/'));
+        $coll->add('b', new Route('/login'));
+        $coll->add('c', new Route('/admin/'));
+        $coll->add('d', new Route('/blog/{slug}/'));
+        $coll->add('e', new Route('/{path}', [], ['path' => '.*']));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(['_route' => 'e', 'path' => '/'], $matcher->match('//'));
+        $this->assertEquals(['_route' => 'e', 'path' => 'login//'], $matcher->match('/login//'));
+        $this->assertEquals(['_route' => 'e', 'path' => 'admin//'], $matcher->match('/admin//'));
+        $this->assertEquals(['_route' => 'e', 'path' => 'admin///'], $matcher->match('/admin///'));
+        $this->assertEquals(['_route' => 'e', 'path' => 'blog/foo//'], $matcher->match('/blog/foo//'));
+    }
+
+    public function testMoreThanOneTrailingSlashWithRootRouteAfterCatchAllRoute()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{path}', [], ['path' => '.*'], [], '', [], ['POST']));
+        $coll->add('b', new Route('/'));
+
+        $matcher = $this->getUrlMatcher($coll);
+
+        try {
+            $matcher->match('//');
+            $this->fail();
+        } catch (MethodNotAllowedException $e) {
+            $this->assertSame(['POST'], $e->getAllowedMethods());
+        }
+    }
+
     public function testSchemeRequirement()
     {
         $this->getExpectedException() ?: $this->expectException(ResourceNotFoundException::class);

@@ -47,7 +47,7 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
     }
 
     /**
-     * Clears the username+IP limit only.
+     * Clears the username+IP limit, and gives back the token that the successful login took from the IP limit.
      *
      * The IP limit bounds how many usernames a single client may try, so it
      * must survive the successful login of any one of them.
@@ -55,14 +55,20 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
     public function reset(Request $request): void
     {
         $this->createLocalLimiter($request)->reset();
+        $this->createGlobalLimiter($request)->consume(-1);
     }
 
     protected function getLimiters(Request $request): array
     {
         return [
-            $this->globalFactory->create($this->hash($request->getClientIp())),
+            $this->createGlobalLimiter($request),
             $this->createLocalLimiter($request),
         ];
+    }
+
+    private function createGlobalLimiter(Request $request): LimiterInterface
+    {
+        return $this->globalFactory->create($this->hash($request->getClientIp()));
     }
 
     private function createLocalLimiter(Request $request): LimiterInterface

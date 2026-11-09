@@ -156,6 +156,24 @@ class LoginThrottlingListenerTest extends TestCase
         $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
     }
 
+    public function testSuccessfulLoginKeepsTheGlobalLimit()
+    {
+        $this->requestStack->push($this->createRequest());
+
+        // The global limit is 6 and the local one 3, so trying five different
+        // usernames, the last one successfully, leaves a single attempt.
+        foreach (['a', 'b', 'c', 'd', 'e'] as $username) {
+            $passport = $this->createPassport($username);
+            $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+        }
+        $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
+
+        $this->listener->checkPassport($this->createCheckPassportEvent($this->createPassport('f')));
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($this->createPassport('g')));
+    }
+
     private function createPassport($username)
     {
         return new SelfValidatingPassport(new UserBadge($username));

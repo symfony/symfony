@@ -408,6 +408,12 @@ EOF;
 
             [$name, $regex, $vars, $route, $hasTrailingSlash, $hasTrailingVar] = $route;
             $compiledRoute = $route->compile();
+            foreach ($vars as $i => $var) {
+                // as in UrlMatcher, a variable that is also in the host takes the value of the host: groups named "_route" are skipped
+                if (\in_array($var, $state->hostVars, true)) {
+                    $vars[$i] = '_route';
+                }
+            }
             $vars = array_merge($state->hostVars, $vars);
 
             if ($compiledRoute->getRegex() === $prevRegex) {

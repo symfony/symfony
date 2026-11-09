@@ -31,6 +31,8 @@ use Symfony\Contracts\Service\ContainerProviderInterface;
 
 class DispatchTaskTest extends TestCase
 {
+    private ?int $memoryLimit = null;
+
     protected function setUp(): void
     {
         if (!class_exists(ContextWorkerFactory::class)) {
@@ -87,6 +89,17 @@ class DispatchTaskTest extends TestCase
         }
     }
 
+    public function testItStopsAfterAFailedDispatchOnceItsMemoryLimitIsReached()
+    {
+        $this->memoryLimit = 1;
+
+        $sent = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new \stdClass())), new DispatchEnvelopeMessage(2, new Envelope(new DummyMessage('Hey'))));
+
+        $this->assertSame([HandledEnvelopeMessage::class, 'null'], array_map(get_debug_type(...), $sent));
+        $this->assertSame(1, $sent[0]->requestId);
+        $this->assertNotNull($sent[0]->error);
+    }
+
     private function runTask(Envelope $envelope): Envelope
     {
         $sent = $this->runTaskWith(new DispatchEnvelopeMessage(1, $envelope), new FlushBatchHandlersMessage(true));
@@ -135,7 +148,7 @@ class DispatchTaskTest extends TestCase
             }
         };
 
-        $task = new DispatchTask(__DIR__.'/../Fixtures/App/bin/console');
+        $task = new DispatchTask(__DIR__.'/../Fixtures/App/bin/console', 1, $this->memoryLimit);
 
         $cancellation = new class implements Cancellation {
             public function subscribe(\Closure $callback): string

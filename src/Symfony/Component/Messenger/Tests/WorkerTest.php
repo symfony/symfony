@@ -349,6 +349,31 @@ class WorkerTest extends TestCase
         $this->assertSame(1, $receiver->getAcknowledgedEnvelopes()[0]->last(HandledStamp::class)?->getResult());
     }
 
+    public function testParallelExecutionSendsTheNextMessageToAnotherChildOnceTheMemoryLimitIsReached()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Hey'))],
+            [new Envelope(new DummyMessage('Bob'))],
+            [],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console, 1, 1, 1);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame(0, $receiver->getRejectCount());
+        $this->assertSame([1, 1], array_map(static fn (Envelope $envelope) => $envelope->last(HandledStamp::class)?->getResult(), $receiver->getAcknowledgedEnvelopes()));
+    }
+
     public function testParallelExecutionBatchesMessagesOnTheSameTask()
     {
         $receiver = new DummyReceiver([

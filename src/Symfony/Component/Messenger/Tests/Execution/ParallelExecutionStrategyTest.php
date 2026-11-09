@@ -255,6 +255,29 @@ class ParallelExecutionStrategyTest extends TestCase
         $this->assertFalse($strategy->shouldPauseConsumption());
     }
 
+    public function testTheMessagesThatAnExitingWorkerDidNotReadAreSentToAnotherWorker()
+    {
+        $exitingChannel = $this->createFakeChannel([null]);
+        $channel = $this->createFakeChannel();
+        $strategy = $this->createStrategy([$exitingChannel, $channel]);
+        $calls = [];
+        $envelope = new Envelope(new DummyMessage('Hello'));
+
+        $strategy->execute($envelope, 'async', $this->createOnHandled($calls));
+
+        $this->assertSame([], $calls);
+        $this->assertCount(1, $channel->sent);
+        $this->assertSame($envelope, $channel->sent[0]->envelope);
+
+        $channel->push(new HandledEnvelopeMessage($channel->sent[0]->requestId, $envelope, null));
+
+        $this->assertTrue($strategy->wait($this->createOnHandled($calls)));
+        $this->assertCount(1, $calls);
+        $this->assertSame($envelope->getMessage(), $calls[0][0]->getMessage());
+        $this->assertNull($calls[0][2]);
+        $this->assertFalse($strategy->shouldPauseConsumption());
+    }
+
     public function testAFailureToSettleAnotherMessageIsNotChargedToTheDispatchedOne()
     {
         $busyChannel = $this->createFakeChannel();

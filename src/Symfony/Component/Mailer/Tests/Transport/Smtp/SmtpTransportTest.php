@@ -352,6 +352,23 @@ class SmtpTransportTest extends TestCase
         $this->assertSame(2, $calls);
     }
 
+    public function testParseMessageId()
+    {
+        $transport = new SmtpTransport(new DummyStream());
+        $parseMessageId = new \ReflectionMethod($transport, 'parseMessageId');
+
+        $this->assertSame('000501c4054c', $parseMessageId->invoke($transport, "250 OK queued as 000501c4054c\r\n"));
+        $this->assertSame('4ZrPq51nVbz9sWg', $parseMessageId->invoke($transport, "250 2.0.0 Ok: queued as 4ZrPq51nVbz9sWg\r\n"));
+        $this->assertSame('X8P9ZIaiT3653-UXj4ljGX', $parseMessageId->invoke($transport, "250 Ok: queued as X8P9ZIaiT3653-UXj4ljGX\r\n"));
+        $this->assertSame('0100018b1f5e6d2a-3c4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f-000000', $parseMessageId->invoke($transport, "250 Ok 0100018b1f5e6d2a-3c4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f-000000\r\n"));
+        $this->assertSame('1rXyzA-000abc-12', $parseMessageId->invoke($transport, "250 OK id=1rXyzA-000abc-12\r\n"));
+        $this->assertSame('d7ef132b5d7711eea8c8000c29c33806', $parseMessageId->invoke($transport, "250 OK ids=d7ef132b5d7711eea8c8000c29c33806\r\n"));
+        $this->assertSame('edd8d788b4a111f098b2cc28aa0a5c5a', $parseMessageId->invoke($transport, "250-super fantastic!\r\n250 OK ids=edd8d788b4a111f098b2cc28aa0a5c5a\r\n"));
+        $this->assertSame('', $parseMessageId->invoke($transport, "250 2.0.0 OK: queued\r\n"));
+        $this->assertSame('', $parseMessageId->invoke($transport, "250 ok dirdel\r\n"));
+        $this->assertSame('', $parseMessageId->invoke($transport, "250 OK\r\n"));
+    }
+
     public function testAssertResponseCodeNoCodes()
     {
         $this->expectException(LogicException::class);

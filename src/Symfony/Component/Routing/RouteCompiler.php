@@ -334,6 +334,9 @@ class RouteCompiler implements RouteCompilerInterface
                 continue;
             }
             if ('*' === $regexp[++$i] || '?' === $regexp[$i]) {
+                if (preg_match('/\G\?(?:P?<(?![=!])[^>]++>|\'[^\']++\')/', $regexp, $m, 0, $i)) {
+                    $regexp = substr_replace($regexp, '?:', $i, \strlen($m[0]));
+                }
                 ++$i;
                 continue;
             }

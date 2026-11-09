@@ -314,10 +314,8 @@ EOF;
                             // Group 1 captures the path so that host variables cannot match any part of it.
                             // Group 1 is mapped to the first host variable, then the group of that variable overwrites it.
                             // The first lookahead skips the capture when the host cannot match.
-                            // It is left out when requirements contain named groups, because a regexp can't define the same name twice.
                             $hostCheck = preg_replace('#\?P<[^>]++>#', '?:', $rx[1]);
-                            $hostCheck = preg_match('#\(\?(?:<[^=!]|\')#', $hostCheck) ? '' : '(?=(?i:'.$hostCheck.')\.)';
-                            $hostRegex = $hostCheck.'(?=[^/]*+(.*+))'.$hostRegex.'(?=\1)';
+                            $hostRegex = '(?=(?i:'.$hostCheck.')\.)(?=[^/]*+(.*+))'.$hostRegex.'(?=\1)';
                             array_unshift($state->hostVars, $state->hostVars[0]);
                         }
                     } else {

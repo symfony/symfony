@@ -395,4 +395,22 @@ class TextWrapperTest extends TestCase
     {
         $this->assertSame(["ab\e[1m", "\e[1mef\e[22m"], TextWrapper::wrapTextWithAnsi("ab \e[1m ef\e[22m", 3));
     }
+
+    public function testLinkThatWrapsIsClosedAndReopenedOnEachLine()
+    {
+        $this->assertSame(
+            ["see \e]8;;https://x.org\x07the\e]8;;\x07", "\e]8;;https://x.org\x07link text\e]8;;\x07", 'end'],
+            TextWrapper::wrapTextWithAnsi("see \e]8;;https://x.org\x07the link text\e]8;;\x07 end", 10),
+        );
+        $this->assertSame(
+            ["\e]8;;https://x.org\x07\e[4mthe link\e[24m\e]8;;\x07", "\e[4m\e]8;;https://x.org\x07text\e[24m\e]8;;\x07 end"],
+            TextWrapper::wrapTextWithAnsi("\e]8;;https://x.org\x07\e[4mthe link text\e[24m\e]8;;\x07 end", 10),
+        );
+    }
+
+    public function testLinkEndingAtWrapIsNotReopenedOnNextLine()
+    {
+        $this->assertSame(["ab \e]8;;https://x.org\x07cd\e]8;;\x07", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e]8;;https://x.org\x07cd\e]8;;\x07 ef", 5));
+        $this->assertSame(["ab \e]8;;https://x.org\e\\cd\e]8;;\e\\", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e]8;;https://x.org\e\\cd\e]8;;\e\\ ef", 5));
+    }
 }

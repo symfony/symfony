@@ -328,6 +328,24 @@ class RedisTraitTest extends TestCase
         $this->assertSame(['verify_peer' => false, 'verify_peer_name' => false, 'SNI_enabled' => true], $predisClass::$captured['parameters']['ssl']);
     }
 
+    public function testBooleanPersistentParameter()
+    {
+        $predisClass = $this->createPredisCaptureClass();
+
+        $mock = new class {
+            use RedisTrait;
+        };
+
+        $mock::createConnection('redis://localhost?persistent=false', ['class' => $predisClass]);
+        $this->assertFalse($predisClass::$captured['options']['parameters']['persistent']);
+
+        $mock::createConnection('redis://localhost?persistent=', ['class' => $predisClass]);
+        $this->assertFalse($predisClass::$captured['options']['parameters']['persistent']);
+
+        $mock::createConnection('redis://localhost?persistent=1', ['class' => $predisClass]);
+        $this->assertTrue($predisClass::$captured['options']['parameters']['persistent']);
+    }
+
     public function testInvalidBooleanParameters()
     {
         $predisClass = $this->createPredisCaptureClass();
@@ -336,7 +354,7 @@ class RedisTraitTest extends TestCase
             use RedisTrait;
         };
 
-        foreach (['ssl[verify_peer]', 'ssl[verify_peer_name]', 'lazy', 'redis_cluster'] as $parameter) {
+        foreach (['ssl[verify_peer]', 'ssl[verify_peer_name]', 'lazy', 'persistent', 'redis_cluster'] as $parameter) {
             try {
                 $mock::createConnection('redis://localhost?'.$parameter.'=ture', ['class' => $predisClass]);
                 $this->fail(\sprintf('"%s=ture" should have been rejected.', $parameter));

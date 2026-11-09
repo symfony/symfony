@@ -211,6 +211,7 @@ trait RedisTrait
         if (isset($params['lazy'])) {
             $params['lazy'] = filter_var($params['lazy'], \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Invalid Redis DSN: parameter "lazy" must be a boolean.');
         }
+        $params['persistent'] = filter_var($params['persistent'], \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Invalid Redis DSN: parameter "persistent" must be a boolean.');
         $params['redis_cluster'] = filter_var($params['redis_cluster'], \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Invalid Redis DSN: parameter "redis_cluster" must be a boolean.');
 
         if ($params['redis_cluster'] && isset($params['redis_sentinel'])) {

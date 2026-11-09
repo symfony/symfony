@@ -14,6 +14,11 @@ namespace Symfony\Component\Messenger\Execution;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
+use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
+use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
@@ -41,7 +46,19 @@ final class ParallelExecutionFailureSanitizer
         }
 
         if ($error instanceof ValidationFailedException) {
-            return new ValidationFailedException($error->getViolatingMessage(), $error->getViolations(), $envelope);
+            $error = new ValidationFailedException($error->getViolatingMessage(), $error->getViolations(), $envelope);
+        }
+
+        try {
+            serialize($error);
+        } catch (\Throwable) {
+            $previous = $error->getPrevious() ? self::sanitizeError($error->getPrevious(), $envelope) : null;
+
+            return match (true) {
+                $error instanceof RecoverableExceptionInterface => new RecoverableMessageHandlingException($error->getMessage(), (int) $error->getCode(), $previous, $error->getRetryDelay(), !method_exists($error, 'forceRetry') || $error->forceRetry()),
+                $error instanceof UnrecoverableExceptionInterface => new UnrecoverableMessageHandlingException($error->getMessage(), (int) $error->getCode(), $previous),
+                default => new RuntimeException($error->getMessage(), (int) $error->getCode(), $previous),
+            };
         }
 
         return $error;

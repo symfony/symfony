@@ -16,6 +16,9 @@ use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\Lock;
+use Symfony\Component\Lock\Store\InMemoryStore;
 use Symfony\Component\Scheduler\Exception\LogicException;
 use Symfony\Component\Scheduler\Exception\RuntimeException;
 use Symfony\Component\Scheduler\Generator\Checkpoint;
@@ -180,6 +183,61 @@ class MessageGeneratorTest extends TestCase
         $this->assertSame($message->getTrigger(), $context->trigger);
         $this->assertEquals(self::makeDateTime('22:14:00'), $context->triggeredAt);
         $this->assertEquals(self::makeDateTime('22:16:00'), $context->nextTriggerAt);
+    }
+
+    public function testRunsDueAtTheSameTimeAreLeftToTheWorkerThatTookTheExpiredLock()
+    {
+        $clock = new MockClock(self::makeDateTime('22:12:00'));
+        $first = (object) ['id' => 'first'];
+        $second = (object) ['id' => 'second'];
+        $cache = new ArrayAdapter();
+        $store = new InMemoryStore();
+        $createGenerator = static fn (Key $key) => new MessageGenerator((new Schedule())->add(RecurringMessage::every('1 minute', $first), RecurringMessage::every('1 minute', $second))->lock(new Lock($key, $store))->stateful($cache), 'dummy', $clock);
+
+        $generator1 = $createGenerator($key1 = new Key('scheduler'));
+        $generator2 = $createGenerator(new Key('scheduler'));
+        $this->assertSame([], iterator_to_array($generator1->getMessages(), false));
+
+        $clock->sleep(60);
+        $messages = $generator1->getMessages();
+        $this->assertSame($first, $messages->current());
+
+        // the lock of the first worker expires while it handles the first message
+        $store->delete($key1);
+        $key1->reduceLifetime(0);
+
+        $this->assertSame([$first, $second], iterator_to_array($generator2->getMessages(), false));
+
+        $messages->next();
+        $this->assertNull($messages->current());
+
+        // the second worker restarts before the next run
+        $generator2 = null;
+        $clock->sleep(30);
+        $this->assertSame([], iterator_to_array($createGenerator(new Key('scheduler'))->getMessages(), false));
+    }
+
+    public function testRunIsSavedWhenNoOtherWorkerTookTheExpiredLock()
+    {
+        $clock = new MockClock(self::makeDateTime('22:12:00'));
+        $first = (object) ['id' => 'first'];
+        $second = (object) ['id' => 'second'];
+        $cache = new ArrayAdapter();
+        $store = new InMemoryStore();
+        $createGenerator = static fn (Key $key) => new MessageGenerator((new Schedule())->add(RecurringMessage::every('1 minute', $first), RecurringMessage::every('1 minute', $second))->lock(new Lock($key, $store))->stateful($cache), 'dummy', $clock);
+
+        $generator = $createGenerator($key = new Key('scheduler'));
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+
+        $clock->sleep(60);
+        $messages = $generator->getMessages();
+        $this->assertSame($first, $messages->current());
+
+        // the lock expires while the worker handles the first message, then the worker stops and restarts
+        $key->reduceLifetime(0);
+        $generator = $messages = null;
+
+        $this->assertSame([$second], iterator_to_array($createGenerator(new Key('scheduler'))->getMessages(), false));
     }
 
     public function testCheckpointSavedInBrokenLoop()

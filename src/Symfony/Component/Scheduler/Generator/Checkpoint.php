@@ -33,6 +33,9 @@ final class Checkpoint implements CheckpointInterface
     ) {
     }
 
+    /**
+     * @phpstan-impure
+     */
     public function acquire(\DateTimeImmutable $now): bool
     {
         if ($this->lock && !$this->lock->acquire()) {

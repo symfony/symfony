@@ -60,6 +60,7 @@ final class MessageGenerator implements MessageGeneratorInterface
         $lastTime = $checkpoint->time()->setTimezone($now->getTimezone());
         $lastIndex = $checkpoint->index();
         $heap = $this->heap($lastTime, $startTime, $lastIndex);
+        $lock = $this->getSchedule()->getLock();
 
         while (!$heap->isEmpty() && $heap->top()[0] <= $now) {
             /** @var \DateTimeImmutable $time */
@@ -87,12 +88,22 @@ final class MessageGenerator implements MessageGeneratorInterface
 
             if ($yield) {
                 $context = new MessageContext($this->name, $id, $trigger, $time, $nextTime);
+                $lockLost = false;
                 try {
                     foreach ($recurringMessage->getMessages($context) as $message) {
                         yield $context => $message;
                     }
                 } finally {
-                    $checkpoint->save($time, $index);
+                    // when the lock expired during the run and another worker acquired it, that worker continues from the checkpoint
+                    $lockLost = $lock?->isExpired() && !$checkpoint->acquire($now);
+
+                    if (!$lockLost) {
+                        $checkpoint->save($time, $index);
+                    }
+                }
+
+                if ($lockLost) {
+                    return;
                 }
             }
         }

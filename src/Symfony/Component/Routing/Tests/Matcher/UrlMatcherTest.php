@@ -949,6 +949,17 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'a', 'bar' => 'baz'], $matcher->match('/foo/abc/baz'));
     }
 
+    public function testNamedGroupsInRequirements()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/admin/{section}/{id}', [], ['section' => '(?<s>[a-z]+)(?<!x)', 'id' => "(?'i'\\d+)"]));
+        $coll->add('b', new Route('/report/{id}', [], ['id' => '(?P<i>\d+)', 'tenant' => '(?<t>[a-z]+)'], [], '{tenant}.example.com'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'acme.example.com'));
+        $this->assertEquals(['_route' => 'a', 'section' => 'report', 'id' => '42'], $matcher->match('/admin/report/42'));
+        $this->assertEquals(['_route' => 'b', 'tenant' => 'acme', 'id' => '42'], $matcher->match('/report/42'));
+    }
+
     public function testSlashVariant()
     {
         $coll = new RouteCollection();
@@ -1021,6 +1032,16 @@ class UrlMatcherTest extends TestCase
 
         $this->assertEquals(['_route' => 'a', 'a' => 'foo'], $matcher->match('/foo'));
         $this->assertEquals(['_route' => 'a', 'a' => 'foo/'], $matcher->match('/foo/'));
+    }
+
+    public function testGreedyTrailingRequirementAfterNamedGroup()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{a}/{b}', [], ['a' => '(?P<c>[a-z]+)', 'b' => '.+']));
+
+        $matcher = $this->getUrlMatcher($coll);
+
+        $this->assertEquals(['_route' => 'a', 'a' => 'foo', 'b' => 'bar/'], $matcher->match('/foo/bar/'));
     }
 
     public function testTrailingRequirementWithDefault()

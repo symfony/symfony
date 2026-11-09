@@ -253,6 +253,68 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         pg_close($waiter);
     }
 
+    public function testSaveAfterTheSessionIsLost()
+    {
+        $conn = $this->createPostgreSqlConnection();
+        $store = new DoctrineDbalPostgreSqlStore($conn);
+
+        $key1 = new Key(__METHOD__);
+        $store->save($key1);
+
+        $conn->close();
+        $store->delete($key1);
+
+        $key2 = new Key(__METHOD__);
+        $store->save($key2);
+
+        $this->assertTrue($store->exists($key2));
+        $this->assertFalse($store->exists($key1));
+
+        $store->delete($key2);
+        $this->assertFalse($store->exists($key2));
+    }
+
+    public function testSaveAfterTheSessionIsLostWithAReadLock()
+    {
+        $conn = $this->createPostgreSqlConnection();
+        $store = new DoctrineDbalPostgreSqlStore($conn);
+
+        $key1 = new Key(__METHOD__);
+        $store->saveRead($key1);
+
+        $conn->close();
+        $store->delete($key1);
+
+        $key2 = new Key(__METHOD__);
+        $store->save($key2);
+
+        $this->assertTrue($store->exists($key2));
+        $this->assertFalse($store->exists($key1));
+
+        $store->delete($key2);
+        $this->assertFalse($store->exists($key2));
+    }
+
+    public function testSaveAfterTheSessionIsLostWithoutDelete()
+    {
+        $conn = $this->createPostgreSqlConnection();
+        $store = new DoctrineDbalPostgreSqlStore($conn);
+
+        $key1 = new Key(__METHOD__);
+        $store->save($key1);
+
+        $conn->close();
+        $this->assertFalse($store->exists($key1));
+
+        $key2 = new Key(__METHOD__);
+        $store->save($key2);
+
+        $this->assertTrue($store->exists($key2));
+
+        $store->delete($key2);
+        $this->assertFalse($store->exists($key2));
+    }
+
     private static function getDbalConnection(string $dsn): Connection
     {
         $params = class_exists(DsnParser::class) ? (new DsnParser(['sqlite' => 'pdo_sqlite']))->parse($dsn) : ['url' => $dsn];

@@ -35,4 +35,12 @@ class InMemoryStoreTest extends AbstractStoreTestCase
         $this->assertFalse($this->getStore()->exists($key));
         $this->assertFalse($key->hasState(InMemoryStore::class));
     }
+
+    public function testDeleteOnFreshKeyDoesNotCreateState()
+    {
+        $key = new Key(__METHOD__);
+
+        $this->getStore()->delete($key);
+        $this->assertFalse($key->hasState(InMemoryStore::class));
+    }
 }

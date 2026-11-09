@@ -142,7 +142,7 @@ class DateTimeNormalizerTest extends TestCase
                 '2018-12-01T18:03:06.067634',
                 new \DateTimeZone('UTC')
             ),
-            new \DateTimeZone('Europe/Kyiv'),
+            new \DateTimeZone('Europe/Helsinki'),
         ];
 
         yield [

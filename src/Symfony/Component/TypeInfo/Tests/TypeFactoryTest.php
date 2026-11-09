@@ -335,6 +335,10 @@ class TypeFactoryTest extends TestCase
         yield [Type::collection(Type::object(\Generator::class), Type::string(), Type::int()), (static fn (): iterable => yield 'string')()];
         yield [Type::collection(Type::object(\Generator::class), Type::int(), Type::object(\DateTimeImmutable::class)), (static function (): iterable { yield new \DateTimeImmutable() => 1; })()];
         yield [Type::collection(Type::object($arrayAccess::class)), $arrayAccess];
+        yield [Type::collection(Type::object(\Generator::class), Type::int(), Type::bool()), (static function (): iterable {
+            yield true => 1;
+            yield false => 2;
+        })()];
     }
 
     public function testCreateFromSharedTraversable()

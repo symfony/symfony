@@ -27,6 +27,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetad
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithArray;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDollarNamedProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDoublingGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGrowingGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
@@ -173,6 +174,16 @@ class StreamWriterGeneratorTest extends TestCase
         $this->expectExceptionMessage(\sprintf('"%s" contains itself with generic types that keep growing, which is not supported.', DummyWithGrowingGenerics::class));
 
         $generator->generate(Type::generic(Type::object(DummyWithGrowingGenerics::class), Type::int()));
+    }
+
+    public function testDoNotSupportDoublingGenericTypes()
+    {
+        $generator = new StreamWriterGenerator(new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new TypeContextFactory(new StringTypeResolver())), $this->streamWritersDir);
+
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage(\sprintf('"%s" contains itself with generic types that keep growing, which is not supported.', DummyWithDoublingGenerics::class));
+
+        $generator->generate(Type::generic(Type::object(DummyWithDoublingGenerics::class), Type::int()));
     }
 
     public function testThrowWhenStreamedNameCannotBeEncoded()

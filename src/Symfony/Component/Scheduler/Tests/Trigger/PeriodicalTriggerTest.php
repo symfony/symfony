@@ -83,6 +83,8 @@ class PeriodicalTriggerTest extends TestCase
         yield [-3600, 'The "$interval" argument must be greater than zero.'];
         yield ['0', 'The "$interval" argument must be greater than zero.'];
         yield [0, 'The "$interval" argument must be greater than zero.'];
+        yield [\NAN, 'The "$interval" argument must be greater than zero.'];
+        yield [\INF, 'The "$interval" argument must be greater than zero.'];
         yield ['PT0S', 'The "$interval" argument must be greater than zero.'];
         yield ['P0D', 'The "$interval" argument must be greater than zero.'];
         yield ['0 seconds', 'The "$interval" argument must be greater than zero.'];
@@ -264,6 +266,22 @@ class PeriodicalTriggerTest extends TestCase
             new \DateTimeImmutable('2020-02-20T03:00:00Z'),
             null,
         ];
+    }
+
+    public function testFloatInterval()
+    {
+        $from = new \DateTimeImmutable('2026-11-09 10:00:00', new \DateTimeZone('UTC'));
+
+        $trigger = new PeriodicalTrigger(1.5, $from);
+        $this->assertSame('every 1.5 seconds', (string) $trigger);
+        $this->assertSame('10:00:01.500000', $trigger->getNextRunDate($from)->format('H:i:s.u'));
+
+        $trigger = new PeriodicalTrigger(0.1, $from);
+        $run = $from;
+        for ($i = 0; $i < 10; ++$i) {
+            $run = $trigger->getNextRunDate($run);
+        }
+        $this->assertSame('10:00:01.000000', $run->format('H:i:s.u'));
     }
 
     private static function createTrigger(string|int|\DateInterval $interval): PeriodicalTrigger

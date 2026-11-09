@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\TokenParser;
 
+use Symfony\Bridge\Twig\Node\TransDefaultDomainForSelfNode;
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
 use Symfony\Bridge\Twig\NodeVisitor\TransDefaultDomainRegistry;
 use Twig\Error\SyntaxError;
@@ -46,16 +47,20 @@ final class TransDefaultDomainTokenParser extends AbstractTokenParser
                 throw new SyntaxError('The "for _self" modifier of the "trans_default_domain" tag requires a constant domain.', $token->getLine(), $source);
             }
 
+            if (!\is_string($domain = $expr->getAttribute('value'))) {
+                throw new SyntaxError(\sprintf('The "for _self" modifier of the "trans_default_domain" tag requires a string domain, "%s" given.', get_debug_type($domain)), $token->getLine(), $source);
+            }
+
             if ($this->registry->hasParsedEmbeddedTemplate($source)) {
                 throw new SyntaxError('The "trans_default_domain" tag must be used with "for _self" before any "embed" tag.', $token->getLine(), $source);
             }
 
-            $this->registry->setDomain($source, $expr->getAttribute('value'));
+            $this->registry->setDomain($source, $domain);
         }
 
         $stream->expect(Token::BLOCK_END_TYPE);
 
-        return new TransDefaultDomainNode($expr, $token->getLine(), $forSelf);
+        return $forSelf ? new TransDefaultDomainForSelfNode($domain, $token->getLine()) : new TransDefaultDomainNode($expr, $token->getLine());
     }
 
     public function getTag(): string

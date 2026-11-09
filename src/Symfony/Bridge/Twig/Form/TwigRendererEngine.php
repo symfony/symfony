@@ -22,7 +22,6 @@ use Twig\Template;
  */
 class TwigRendererEngine extends AbstractRendererEngine
 {
-    private bool $useBlockChain;
     private bool $useChainLookup;
     private Template $template;
 
@@ -39,9 +38,8 @@ class TwigRendererEngine extends AbstractRendererEngine
     ) {
         parent::__construct($defaultThemes);
 
-        $this->useBlockChain = class_exists(BlockChain::class);
         // a child class that loads resources its own way keeps the cached lookups of the parent class
-        $this->useChainLookup = $this->useBlockChain && self::class === (new \ReflectionMethod($this, 'loadResourceForBlockName'))->class;
+        $this->useChainLookup = self::class === (new \ReflectionMethod($this, 'loadResourceForBlockName'))->class;
     }
 
     public function setTheme(FormView $view, mixed $themes, bool $useDefaultThemes = true): void
@@ -109,39 +107,10 @@ class TwigRendererEngine extends AbstractRendererEngine
      */
     protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName): bool
     {
-        if ($this->useBlockChain) {
-            $chain = $this->getChain($cacheKey, $view);
+        $chain = $this->getChain($cacheKey, $view);
 
-            $this->resources[$cacheKey][$blockName] = $chain?->hasBlock($blockName) ? $chain : false;
-            $this->setResourceInheritability($cacheKey, $blockName, true);
-
-            return false !== $this->resources[$cacheKey][$blockName];
-        }
-
-        // The caller guarantees that $this->resources[$cacheKey][$block] is
-        // not set, but it doesn't have to check whether $this->resources[$cacheKey]
-        // is set. If $this->resources[$cacheKey] is set, all themes for this
-        // $cacheKey are already loaded (due to the eager population, see the doc
-        // comment of loadResourcesFromThemes()).
-        if (isset($this->resources[$cacheKey])) {
-            // As said in the previous, the caller guarantees that
-            // $this->resources[$cacheKey][$block] is not set. Since the themes are
-            // already loaded, it can only be a non-existing block.
-            $this->resources[$cacheKey][$blockName] = false;
-            $this->setResourceInheritability($cacheKey, $blockName, true);
-
-            return false;
-        }
-
-        $this->loadResourcesFromThemes($cacheKey, $view, $blockName);
-
-        // Even though we loaded the themes, it can happen that none of them
-        // contains the searched block
-        if (!isset($this->resources[$cacheKey][$blockName])) {
-            // Cache that we didn't find anything to speed up further accesses
-            $this->resources[$cacheKey][$blockName] = false;
-            $this->setResourceInheritability($cacheKey, $blockName, true);
-        }
+        $this->resources[$cacheKey][$blockName] = $chain?->hasBlock($blockName) ? $chain : false;
+        $this->setResourceInheritability($cacheKey, $blockName, true);
 
         return false !== $this->resources[$cacheKey][$blockName];
     }
@@ -179,52 +148,6 @@ class TwigRendererEngine extends AbstractRendererEngine
         }
 
         return $this->chains[$cacheKey] = new BlockChain($this->environment, $themes);
-    }
-
-    /**
-     * Loads the resources for all blocks of the themes assigned to the given view.
-     *
-     * This implementation eagerly loads all blocks of the themes assigned to the given view
-     * and all of its ancestors views. This is necessary, because Twig receives the
-     * list of blocks later. At that point, all blocks must already be loaded, for the
-     * case that the function "block()" is used in the Twig template.
-     */
-    private function loadResourcesFromThemes(string $cacheKey, FormView $view, string $blockName): void
-    {
-        // Check each theme whether it contains the searched block
-        if (isset($this->themes[$cacheKey])) {
-            for ($i = \count($this->themes[$cacheKey]) - 1; $i >= 0; --$i) {
-                $this->loadResourcesFromTheme($cacheKey, $this->themes[$cacheKey][$i]);
-                // CONTINUE LOADING (see doc comment)
-            }
-        }
-
-        // Check the default themes once we reach the root view without success
-        if (!$view->parent) {
-            if (!isset($this->useDefaultThemes[$cacheKey]) || $this->useDefaultThemes[$cacheKey]) {
-                for ($i = \count($this->defaultThemes) - 1; $i >= 0; --$i) {
-                    $this->loadResourcesFromTheme($cacheKey, $this->defaultThemes[$i]);
-                    // CONTINUE LOADING (see doc comment)
-                }
-            }
-        }
-
-        // Proceed with the themes of the parent view
-        if ($view->parent) {
-            $parentCacheKey = $view->parent->vars[self::CACHE_KEY_VAR];
-
-            if (!isset($this->resources[$parentCacheKey])) {
-                $this->loadResourceForBlockName($parentCacheKey, $view->parent, $blockName);
-            }
-
-            // EAGER CACHE POPULATION (see doc comment)
-            foreach ($this->resources[$parentCacheKey] as $nestedBlockName => $resource) {
-                if (!isset($this->resources[$cacheKey][$nestedBlockName]) && $this->isResourceInheritable($parentCacheKey, $nestedBlockName)) {
-                    $this->resources[$cacheKey][$nestedBlockName] = $resource;
-                    $this->setResourceInheritability($cacheKey, $nestedBlockName, true);
-                }
-            }
-        }
     }
 
     /**

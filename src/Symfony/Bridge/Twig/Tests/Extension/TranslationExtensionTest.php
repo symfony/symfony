@@ -12,8 +12,11 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Symfony\Bridge\Twig\Node\TransDefaultDomainForSelfNode;
 use Symfony\Component\Translation\HtmlTranslator;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
@@ -494,11 +497,42 @@ class TranslationExtensionTest extends TestCase
         $this->getTemplate('{% trans_default_domain domain for _self %}');
     }
 
-    public function testForSelfInsideBlockThrows()
+    #[DataProvider('getNonStringDomains')]
+    public function testForSelfWithNonStringDomainThrows(string $domain, string $type)
     {
         $this->expectException(SyntaxError::class);
-        $this->expectExceptionMessage('The "trans_default_domain" tag cannot be used with "for _self" inside a block');
-        $this->getTemplate('{% block content %}{% trans_default_domain "foo" for _self %}{% endblock %}');
+        $this->expectExceptionMessage(\sprintf('The "for _self" modifier of the "trans_default_domain" tag requires a string domain, "%s" given', $type));
+        $this->getTemplate('{% trans_default_domain '.$domain.' for _self %}{{ "key"|trans }}');
+    }
+
+    public static function getNonStringDomains(): iterable
+    {
+        yield ['42', 'int'];
+        yield ['false', 'bool'];
+        yield ['null', 'null'];
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('getForSelfOutsideTheRootTemplates')]
+    public function testForSelfOutsideTheRoot(string $template)
+    {
+        if (Environment::MAJOR_VERSION >= 4) {
+            $this->expectException(SyntaxError::class);
+            $this->expectExceptionMessage('The "trans_default_domain" tag can only be used at the root of a template');
+        } else {
+            $this->expectUserDeprecationMessage('Since twig/twig 3.28: Using the "trans_default_domain" tag outside the root of a template is deprecated in index at line 1.');
+        }
+
+        $this->getTemplate($template);
+    }
+
+    public static function getForSelfOutsideTheRootTemplates(): iterable
+    {
+        yield 'block' => ['{% block content %}{% trans_default_domain "foo" for _self %}{{ "key"|trans }}{% endblock %}'];
+        yield 'macro' => ['{% macro m() %}{% trans_default_domain "foo" for _self %}{{ "key"|trans }}{% endmacro %}'];
+        yield 'if' => ['{% if true %}{% trans_default_domain "foo" for _self %}{{ "key"|trans }}{% endif %}'];
+        yield 'for' => ['{% for i in 1..2 %}{% trans_default_domain "foo" for _self %}{{ "key"|trans }}{% endfor %}'];
     }
 
     public function testForSelfDeclaredTwiceThrows()
@@ -508,11 +542,24 @@ class TranslationExtensionTest extends TestCase
         $this->getTemplate('{% trans_default_domain "foo" for _self %}{% trans_default_domain "bar" for _self %}');
     }
 
+    public function testForSelfStoresTheDomainOnItsNode()
+    {
+        $twig = new Environment(new TwigArrayLoader(['index' => '{% trans_default_domain "foo" for _self %}{{ "key"|trans }}']), ['debug' => true, 'cache' => false]);
+        $twig->addExtension(new TranslationExtension(new Translator('en')));
+
+        $module = $twig->parse($twig->tokenize($twig->getLoader()->getSourceContext('index')));
+        $node = $module->getNode('body')->getNode('0')->getNode('0');
+
+        $this->assertFalse($module->hasAttribute('trans_default_domain_for_self'));
+        $this->assertInstanceOf(TransDefaultDomainForSelfNode::class, $node);
+        $this->assertSame('foo', $node->getAttribute('domain'));
+    }
+
     public function testAFailingTemplateDoesNotLeakItsDomainIntoTheNextOne()
     {
         $translator = new Translator('en');
         $loader = new TwigArrayLoader([
-            'broken' => '{% block content %}{% trans_default_domain "foo" for _self %}{% endblock %}',
+            'broken' => '{% trans_default_domain "foo" for _self %}{% trans_default_domain "foo" for _self %}',
             'other' => '{{ "key"|trans }}',
         ]);
         $twig = new Environment($loader, ['debug' => true, 'cache' => false]);

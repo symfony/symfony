@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\NodeVisitor;
 
+use Symfony\Bridge\Twig\Node\TransDefaultDomainForSelfNode;
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Environment;
@@ -33,16 +34,17 @@ use Twig\NodeVisitor\NodeVisitorInterface;
  */
 final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 {
-    private const FOR_SELF_ATTRIBUTE = 'trans_default_domain_for_self';
-
     private Scope $scope;
     private ?ModuleNode $module = null;
-    private int $blockDepth = 0;
+
+    /** @var \WeakMap<ModuleNode, true> */
+    private \WeakMap $forSelfModules;
 
     public function __construct(
         private readonly TransDefaultDomainRegistry $registry = new TransDefaultDomainRegistry(),
     ) {
         $this->scope = new Scope();
+        $this->forSelfModules = new \WeakMap();
     }
 
     public function enterNode(Node $node, Environment $env): Node
@@ -59,25 +61,20 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
 
         if ($node instanceof ModuleNode) {
             $this->module = $node;
-            $this->blockDepth = 0;
 
             if (null !== $domain = $this->registry->getDomain($node->getSourceContext())) {
                 $this->scope->set('domain', new ConstantExpression($domain, $node->getTemplateLine()));
             }
         }
 
-        if ($node instanceof BlockNode) {
-            ++$this->blockDepth;
+        if ($node instanceof TransDefaultDomainForSelfNode) {
+            $this->checkForSelfDeclaration($node);
+
+            // the domain has already been applied to the whole template when entering the ModuleNode
+            return $node;
         }
 
         if ($node instanceof TransDefaultDomainNode) {
-            if ($node->getAttribute('for_self')) {
-                $this->checkForSelfDeclaration($node);
-
-                // the domain has already been applied to the whole template when entering the ModuleNode
-                return $node;
-            }
-
             if ($node->getNode('expr') instanceof ConstantExpression) {
                 $this->scope->set('domain', $node->getNode('expr'));
 
@@ -136,17 +133,13 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
             return null;
         }
 
-        if ($node instanceof BlockNode) {
-            --$this->blockDepth;
-        }
-
         if ($node instanceof BlockNode || $node instanceof ModuleNode) {
             $this->scope = $this->scope->leave();
         }
 
         if ($node instanceof ModuleNode) {
             foreach ($node->getAttribute('embedded_templates') as $embeddedTemplate) {
-                if ($embeddedTemplate->hasAttribute(self::FOR_SELF_ATTRIBUTE)) {
+                if (isset($this->forSelfModules[$embeddedTemplate])) {
                     throw new SyntaxError('The "trans_default_domain" tag cannot be used with "for _self" inside an "embed" tag.', $embeddedTemplate->getTemplateLine(), $node->getSourceContext());
                 }
             }
@@ -162,17 +155,13 @@ final class TranslationDefaultDomainNodeVisitor implements NodeVisitorInterface
         return -10;
     }
 
-    private function checkForSelfDeclaration(TransDefaultDomainNode $node): void
+    private function checkForSelfDeclaration(TransDefaultDomainForSelfNode $node): void
     {
-        if ($this->blockDepth) {
-            throw new SyntaxError('The "trans_default_domain" tag cannot be used with "for _self" inside a block.', $node->getTemplateLine(), $node->getSourceContext());
-        }
-
-        if ($this->module->hasAttribute(self::FOR_SELF_ATTRIBUTE)) {
+        if (isset($this->forSelfModules[$this->module])) {
             throw new SyntaxError('The "trans_default_domain" tag can be used with "for _self" only once per template.', $node->getTemplateLine(), $node->getSourceContext());
         }
 
-        $this->module->setAttribute(self::FOR_SELF_ATTRIBUTE, true);
+        $this->forSelfModules[$this->module] = true;
     }
 
     private function isNamedArguments(Node $arguments): bool

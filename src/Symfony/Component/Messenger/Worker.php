@@ -133,20 +133,35 @@ class Worker
                     $envelopes = $receiver->get($fetchSize);
                 }
 
-                foreach ($envelopes as $envelope) {
-                    $envelopeHandled = true;
-                    $receipt = new \stdClass();
+                $receipts = [];
 
-                    if ($receiver instanceof KeepaliveReceiverInterface) {
+                if ($receiver instanceof KeepaliveReceiverInterface) {
+                    // the transport delivered the whole batch: keep alive the messages that wait for their turn too
+                    $envelopes = iterator_to_array($envelopes, false);
+
+                    foreach ($envelopes as $envelope) {
+                        $receipts[] = $receipt = new \stdClass();
                         $this->keepalives[$receipt] = [$transportName, $envelope];
                     }
+                }
 
-                    $this->rateLimit($transportName);
-                    $this->handleMessage($envelope, $transportName, $receipt);
-                    $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
+                try {
+                    foreach ($envelopes as $envelope) {
+                        $envelopeHandled = true;
+                        $receipt = array_shift($receipts) ?? new \stdClass();
 
-                    if ($this->shouldStop) {
-                        break 2;
+                        $this->rateLimit($transportName);
+                        $this->handleMessage($envelope, $transportName, $receipt);
+                        $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
+
+                        if ($this->shouldStop) {
+                            break 2;
+                        }
+                    }
+                } finally {
+                    // the rest of the batch is not handled when the worker stops or fails
+                    foreach ($receipts as $unhandled) {
+                        unset($this->keepalives[$unhandled]);
                     }
                 }
 

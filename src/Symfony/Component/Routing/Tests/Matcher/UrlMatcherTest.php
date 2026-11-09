@@ -1023,6 +1023,16 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'a', 'a' => 'foo/'], $matcher->match('/foo/'));
     }
 
+    public function testGreedyTrailingRequirementAfterNamedGroup()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{a}/{b}', [], ['a' => '(?P<c>[a-z]+)', 'b' => '.+']));
+
+        $matcher = $this->getUrlMatcher($coll);
+
+        $this->assertEquals(['_route' => 'a', 'a' => 'foo', 'c' => 'foo', 'b' => 'bar/'], $matcher->match('/foo/bar/'));
+    }
+
     public function testTrailingRequirementWithDefault()
     {
         $coll = new RouteCollection();

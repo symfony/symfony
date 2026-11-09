@@ -305,6 +305,24 @@ class TextWrapperTest extends TestCase
         $this->assertSame(["This is \x1b[31m中文", "\x1b[31m汉字\x1b[39m"], TextWrapper::wrapTextWithAnsi("This is \x1b[31m中文汉字\x1b[39m", 12));
     }
 
+    public function testStyleAtACjkBreakOnlyCoversItsCharacters()
+    {
+        $this->assertSame(["\x1b[44m中\x1b[49m", '文'], TextWrapper::wrapTextWithAnsi("\x1b[44m中\x1b[49m文", 2));
+        $this->assertSame(["\x1b[44mab\x1b[49m", '中'], TextWrapper::wrapTextWithAnsi("\x1b[44mab\x1b[49m中", 2));
+        $this->assertSame(['中', "\x1b[44m文\x1b[49m"], TextWrapper::wrapTextWithAnsi("中\x1b[44m文\x1b[49m", 2));
+    }
+
+    public function testStyleAtABreakInALongWordOnlyCoversItsCharacters()
+    {
+        $this->assertSame(['abc', "\x1b[44mdef\x1b[49m"], TextWrapper::wrapTextWithAnsi("abc\x1b[44mdef\x1b[49m", 3));
+        $this->assertSame(["\x1b[44mabc\x1b[49m", 'def'], TextWrapper::wrapTextWithAnsi("\x1b[44mabc\x1b[49mdef", 3));
+    }
+
+    public function testUnderlineAtANewlineOnlyCoversItsCharacters()
+    {
+        $this->assertSame(["\x1b[4mab\x1b[24m", "\x1b[4mcd\x1b[24m", "\x1b[4mef\x1b[24m", "\x1b[4mgh\x1b[24m"], TextWrapper::wrapTextWithAnsi("\x1b[4mab cd\nef gh\x1b[24m", 2));
+    }
+
     // --- Tab as word-wrap boundary tests ---
 
     public function testWrapAtTabBoundaryAsciiPath()

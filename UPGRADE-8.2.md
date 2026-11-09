@@ -13,6 +13,7 @@ AssetMapper
 
  * Add argument `$useEsm` to `ImportMapConfigReader::createRemoteEntry()`
  * The `asset_mapper.missing_import_mode` option now defaults to `strict` in debug mode. A missing import then throws an exception instead of logging a warning. Set the option to `warn` to keep the previous behavior
+ * The env vars of the `asset_mapper.server` option are now read while the container is compiled. With `server: '%env(bool:FOO)%'`, the dev server is not enabled anymore when `FOO` is false. It used to be enabled whatever the value of `FOO`. The container also fails to compile when `FOO` is not defined
 
 BrowserKit
 ----------

@@ -94,6 +94,7 @@ class AssetMapperBundle extends AbstractBundle
                 ->booleanNode('server')
                     ->info('If true, a "dev server" will return the assets from the public directory (true in "debug" mode only by default).')
                     ->defaultValue('%kernel.debug%')
+                    ->resolvesAtCompileTime()
                 ->end()
                 ->scalarNode('public_prefix')
                     ->info('The public path where the assets will be written to (and served from when "server" is true).')

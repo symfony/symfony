@@ -862,6 +862,39 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals('b', $matcher->match('/bar/abc.123')['_route']);
     }
 
+    public function testHostVariableMatchingDotsKeepsTheOrderOfRoutes()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{slug}', [], ['slug' => '\d+'], [], 'app.{sub}.{domain}'));
+        $coll->add('b', new Route('/admin/report/{id}', [], ['domain' => '.+'], [], '{domain}'));
+        $coll->add('c', new Route('/admin/{slug}/{id}', [], ['domain' => '.+'], [], '{tld}.{domain}'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'app.example.com'));
+        $this->assertSame('b', $matcher->match('/admin/report/1')['_route']);
+    }
+
+    /**
+     * @dataProvider provideHostsWithVariablesSharingTheirLabel
+     */
+    public function testHostVariableSharingItsLabelKeepsTheOrderOfRoutes(string $firstHost, string $secondHost, string $thirdHost, string $host)
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/foo', [], [], [], $firstHost));
+        $coll->add('b', new Route('/report/{id}', [], [], [], $secondHost));
+        $coll->add('c', new Route('/report/{id}', [], [], [], $thirdHost));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', $host));
+        $this->assertSame('b', $matcher->match('/report/1')['_route']);
+    }
+
+    public static function provideHostsWithVariablesSharingTheirLabel(): iterable
+    {
+        yield ['xyz-{sub}.example.com', '{sub}.example.com', 'app-{sub}.example.com', 'app-x.example.com'];
+        yield ['{c}-{b}.example.com', '{b}.example.com', '{a}-{b}.example.com', 'x-y.example.com'];
+        yield ['{c}x{b}', '{b}', '{a}x{b}', 'axb'];
+        yield ['bpi{n}.example.com', '{n}.example.com', 'api{n}.example.com', 'api1.example.com'];
+    }
+
     public function testHostVariableDoesNotMatchThePath()
     {
         $coll = new RouteCollection();

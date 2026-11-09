@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by skybleak333 at 2026-11-09T16:55:50Z
+
+Good point, thanks. `Connection::reject()` now drops the id from `inflightIds` and resets the cursor to `'0'` in its `catch`, with a test that reads the message again after a failed reject. The description says it too.

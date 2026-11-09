@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Relay\Cluster as RelayCluster;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
@@ -203,6 +204,35 @@ class RedisTraitTest extends TestCase
                 'redis://:p%40ssword@'.getenv('REDIS_AUTHENTICATED_HOST').'/3?dbindex=6',
             ],
         ];
+    }
+
+    public function testInvalidNonStringSslOption()
+    {
+        $mock = new class {
+            use RedisTrait;
+        };
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid Redis DSN: parameter "ssl[verify_peer]" must be a boolean.');
+
+        $mock::createConnection('redis://localhost:1', ['ssl' => ['verify_peer' => 2]]);
+    }
+
+    #[RequiresPhpExtension('relay')]
+    public function testInvalidRelayClusterContextOptions()
+    {
+        $mock = new class {
+            use RedisTrait;
+        };
+
+        foreach (['throw-on-error' => 'a boolean', 'max-retries' => 'an integer'] as $option => $type) {
+            try {
+                $mock::createConnection('redis://localhost:1?cluster_relay_context['.$option.']=ture', ['class' => RelayCluster::class]);
+                $this->fail(\sprintf('"cluster_relay_context[%s]=ture" should have been rejected.', $option));
+            } catch (InvalidArgumentException $e) {
+                $this->assertSame(\sprintf('Invalid Redis DSN: parameter "cluster_relay_context[%s]" must be %s.', $option, $type), $e->getMessage());
+            }
+        }
     }
 
     #[DataProvider('providePredisMasterAuthResolution')]

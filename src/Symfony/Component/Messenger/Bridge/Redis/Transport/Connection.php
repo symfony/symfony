@@ -837,8 +837,8 @@ class Connection
      */
     public function keepalive(string $id, ?int $seconds = null): void
     {
-        if (null !== $seconds && $this->redeliverTimeout < $seconds) {
-            throw new TransportException(\sprintf('Redis redeliver_timeout (%ds) cannot be smaller than the keepalive interval (%ds).', $this->redeliverTimeout, $seconds));
+        if (null !== $seconds && $this->redeliverTimeout < $seconds * 1000) {
+            throw new TransportException(\sprintf('Redis redeliver_timeout (%ds) cannot be smaller than the keepalive interval (%ds).', $this->redeliverTimeout / 1000, $seconds));
         }
 
         try {

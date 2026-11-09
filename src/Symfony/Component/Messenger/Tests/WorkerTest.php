@@ -3052,7 +3052,7 @@ class WorkerTest extends TestCase
         $worker->run();
         $worker->keepalive(2);
 
-        $this->assertSame([[$envelope], [$envelope, $envelope]], $keepalives);
+        $this->assertSame([[$envelope, $envelope], [$envelope, $envelope]], $keepalives);
         $this->assertSame([], $receiver->keepaliveEnvelopes);
         $this->assertSame(2, $receiver->getAcknowledgeCount());
     }
@@ -3195,7 +3195,7 @@ class WorkerTest extends TestCase
         $worker->run();
         $worker->keepalive(2);
 
-        $this->assertSame([[$envelope], [$envelope]], $keepalives);
+        $this->assertSame([[$envelope, $envelope], [$envelope]], $keepalives);
         $this->assertSame([], $receiver->keepaliveEnvelopes);
         $this->assertSame(1, $receiver->getAcknowledgeCount());
         $this->assertSame(1, $receiver->getRejectCount());
@@ -3366,27 +3366,106 @@ class WorkerTest extends TestCase
         $this->assertCount(0, $receiver->keepaliveEnvelopes);
     }
 
+    public function testKeepaliveIsSentForTheFetchedMessagesThatWaitForTheirTurn()
+    {
+        $first = new Envelope(new DummyMessage('Hey'));
+        $second = new Envelope(new DummyMessage('Bob'));
+        $receiver = new DummyKeepaliveReceiver([[$first, $second]]);
+
+        $keepalives = [];
+        $worker = null;
+        $handler = static function () use ($receiver, &$keepalives, &$worker) {
+            $worker->keepalive(2);
+            $keepalives[] = $receiver->keepaliveEnvelopes;
+            $receiver->keepaliveEnvelopes = [];
+        };
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]))]);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run(['fetch_size' => 2]);
+        $worker->keepalive(2);
+
+        $this->assertSame([[$first, $second], [$second]], $keepalives);
+        $this->assertSame([], $receiver->keepaliveEnvelopes);
+        $this->assertSame(2, $receiver->getAcknowledgeCount());
+    }
+
+    public function testKeepaliveIsNotSentForTheFetchedMessagesThatAStoppedWorkerLeaves()
+    {
+        $receiver = new DummyKeepaliveReceiver([[new Envelope(new DummyMessage('Hey')), new Envelope(new DummyMessage('Bob'))]]);
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor(static function () {})],
+        ]))]);
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            $event->getWorker()->stop();
+        });
+
+        $worker = new Worker([$receiver], $bus, $dispatcher, null, null, new MockClock());
+        $worker->run(['fetch_size' => 2]);
+        $worker->keepalive(2);
+
+        $this->assertSame([], $receiver->keepaliveEnvelopes);
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+    }
+
+    public function testKeepaliveIsNotSentForTheFetchedMessagesThatAFailedWorkerLeaves()
+    {
+        $receiver = new class([[new Envelope(new DummyMessage('Hey')), new Envelope(new DummyMessage('Bob'))]]) extends DummyKeepaliveReceiver {
+            public function ack(Envelope $envelope): void
+            {
+                throw new TransportException('Could not acknowledge the message.');
+            }
+        };
+        $bus = new MessageBus([new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor(static function () {})],
+        ]))]);
+
+        $worker = new Worker([$receiver], $bus, new EventDispatcher(), null, null, new MockClock());
+
+        try {
+            $worker->run(['fetch_size' => 2]);
+            $this->fail('The worker should fail when the message cannot be acknowledged.');
+        } catch (TransportException) {
+        }
+
+        $worker->keepalive(2);
+
+        $this->assertSame([], $receiver->keepaliveEnvelopes);
+    }
+
     public function testKeepaliveIsNotSentForAMessageThatIsNotHandled()
     {
         $receiver = new DummyKeepaliveReceiver([
-            [new Envelope(new DummyMessage('Hey')), new Envelope(new DummyMessage('Bob'))],
+            $envelopes = [new Envelope(new DummyMessage('Hey')), new Envelope(new DummyMessage('Bob'))],
         ]);
 
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->never())->method('dispatch');
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(WorkerMessageReceivedEvent::class, function (WorkerMessageReceivedEvent $event) use ($receiver, &$worker) {
+        $dispatcher->addListener(WorkerMessageReceivedEvent::class, function (WorkerMessageReceivedEvent $event) use ($receiver, &$worker, &$envelopes) {
             $event->shouldHandle(false);
 
             $worker->keepalive(2);
-            $this->assertSame([$event->getEnvelope()], $receiver->keepaliveEnvelopes);
+            $this->assertSame($envelopes, $receiver->keepaliveEnvelopes);
+            $this->assertSame($envelopes[0], $event->getEnvelope());
+            array_shift($envelopes);
             $receiver->keepaliveEnvelopes = [];
         });
         $received = 0;
-        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver, &$received) {
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver, &$received, &$envelopes) {
             $event->getWorker()->keepalive(2);
-            $this->assertSame([], $receiver->keepaliveEnvelopes);
+            $this->assertSame($envelopes, $receiver->keepaliveEnvelopes);
+            $receiver->keepaliveEnvelopes = [];
 
             if (2 === ++$received) {
                 $event->getWorker()->stop();

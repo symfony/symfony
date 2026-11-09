@@ -43,6 +43,7 @@
     "conflict": {
         "symfony/event-dispatcher": "<8.2",
         "symfony/http-client-contracts": "<3.0",
+        "symfony/rate-limiter": "<7.4.5|>=8,<8.0.5",
         "symfony/security-bundle": "<8.2"
     },
     "autoload": {

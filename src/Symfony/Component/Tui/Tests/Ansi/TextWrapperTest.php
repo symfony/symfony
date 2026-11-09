@@ -305,6 +305,24 @@ class TextWrapperTest extends TestCase
         $this->assertSame(["This is \x1b[31m中文", "\x1b[31m汉字\x1b[39m"], TextWrapper::wrapTextWithAnsi("This is \x1b[31m中文汉字\x1b[39m", 12));
     }
 
+    public function testStyleAtACjkBreakOnlyCoversItsCharacters()
+    {
+        $this->assertSame(["\x1b[44m中\x1b[49m", '文'], TextWrapper::wrapTextWithAnsi("\x1b[44m中\x1b[49m文", 2));
+        $this->assertSame(["\x1b[44mab\x1b[49m", '中'], TextWrapper::wrapTextWithAnsi("\x1b[44mab\x1b[49m中", 2));
+        $this->assertSame(['中', "\x1b[44m文\x1b[49m"], TextWrapper::wrapTextWithAnsi("中\x1b[44m文\x1b[49m", 2));
+    }
+
+    public function testStyleAtABreakInALongWordOnlyCoversItsCharacters()
+    {
+        $this->assertSame(['abc', "\x1b[44mdef\x1b[49m"], TextWrapper::wrapTextWithAnsi("abc\x1b[44mdef\x1b[49m", 3));
+        $this->assertSame(["\x1b[44mabc\x1b[49m", 'def'], TextWrapper::wrapTextWithAnsi("\x1b[44mabc\x1b[49mdef", 3));
+    }
+
+    public function testUnderlineAtANewlineOnlyCoversItsCharacters()
+    {
+        $this->assertSame(["\x1b[4mab\x1b[24m", "\x1b[4mcd\x1b[24m", "\x1b[4mef\x1b[24m", "\x1b[4mgh\x1b[24m"], TextWrapper::wrapTextWithAnsi("\x1b[4mab cd\nef gh\x1b[24m", 2));
+    }
+
     // --- Tab as word-wrap boundary tests ---
 
     public function testWrapAtTabBoundaryAsciiPath()
@@ -382,5 +400,35 @@ class TextWrapperTest extends TestCase
         $thumbs = "\u{1F44D}\u{1F3FD}";
 
         $this->assertSame([$thumbs.$thumbs, $thumbs], TextWrapper::wrapTextWithAnsi($thumbs.$thumbs.$thumbs, 4));
+    }
+
+    public function testStyleEndingAtWrapIsNotCarriedToNextLine()
+    {
+        $this->assertSame(["ab \e[4mcd\e[24m", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e[4mcd\e[24m ef", 5));
+        $this->assertSame(["ab \e[44;4mcd\e[24;49m", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e[44;4mcd\e[24;49m ef", 5));
+        $this->assertSame(["ab \e[4mcd\e[24m"], TextWrapper::wrapTextWithAnsi("ab \e[4mcd\e[24m ", 5));
+    }
+
+    public function testStyleStartingInWhitespaceAtWrapGoesOnWithNextWord()
+    {
+        $this->assertSame(["ab\e[1m", "\e[1mef\e[22m"], TextWrapper::wrapTextWithAnsi("ab \e[1m ef\e[22m", 3));
+    }
+
+    public function testLinkThatWrapsIsClosedAndReopenedOnEachLine()
+    {
+        $this->assertSame(
+            ["see \e]8;;https://x.org\x07the\e]8;;\x07", "\e]8;;https://x.org\x07link text\e]8;;\x07", 'end'],
+            TextWrapper::wrapTextWithAnsi("see \e]8;;https://x.org\x07the link text\e]8;;\x07 end", 10),
+        );
+        $this->assertSame(
+            ["\e]8;;https://x.org\x07\e[4mthe link\e[24m\e]8;;\x07", "\e[4m\e]8;;https://x.org\x07text\e[24m\e]8;;\x07 end"],
+            TextWrapper::wrapTextWithAnsi("\e]8;;https://x.org\x07\e[4mthe link text\e[24m\e]8;;\x07 end", 10),
+        );
+    }
+
+    public function testLinkEndingAtWrapIsNotReopenedOnNextLine()
+    {
+        $this->assertSame(["ab \e]8;;https://x.org\x07cd\e]8;;\x07", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e]8;;https://x.org\x07cd\e]8;;\x07 ef", 5));
+        $this->assertSame(["ab \e]8;;https://x.org\e\\cd\e]8;;\e\\", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e]8;;https://x.org\e\\cd\e]8;;\e\\ ef", 5));
     }
 }

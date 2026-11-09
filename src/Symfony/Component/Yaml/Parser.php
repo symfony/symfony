@@ -160,7 +160,7 @@ class Parser
         $this->locallySkippedLineNumbers = [];
         // nested parsers inherit the total number of lines from their parent
         $isRootNode = null === $this->totalNumberOfLines;
-        $this->totalNumberOfLines ??= $this->numberOfParsedLines;
+        $this->totalNumberOfLines ??= $this->offset + $this->numberOfParsedLines;
 
         if (!$this->moveToNextLine()) {
             return null;

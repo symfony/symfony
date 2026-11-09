@@ -695,6 +695,31 @@ class RateLimitAttributeListenerTest extends TestCase
         $this->assertSame(['1.2.3.4~/login'], array_unique($keys));
     }
 
+    #[DataProvider('provideDefaultKeyPathCases')]
+    public function testDefaultKeyNormalizesThePercentEncoding(string $path, string $expectedKey)
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+        $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit('api'), Request::create($path, 'POST', [], [], [], ['REMOTE_ADDR' => '1.2.3.4'])));
+
+        $this->assertSame($expectedKey, $usedKey);
+    }
+
+    public static function provideDefaultKeyPathCases(): iterable
+    {
+        yield 'plain' => ['/login', '1.2.3.4~/login'];
+        yield 'encoded letter' => ['/l%6Fgin', '1.2.3.4~/login'];
+        yield 'lowercase hex' => ['/l%6fgin', '1.2.3.4~/login'];
+        yield 'fully encoded' => ['/%6C%6F%67%69%6E', '1.2.3.4~/login'];
+        yield 'encoded slash' => ['/users/a%2fb', '1.2.3.4~/users/a/b'];
+        yield 'space and control characters' => ['/users/a%20b%0A%00', '1.2.3.4~/users/a%20b%0A%00'];
+        yield 'invalid UTF-8' => ['/users/%ff', '1.2.3.4~/users/%FF'];
+        yield 'raw invalid UTF-8' => ["/users/\xff", '1.2.3.4~/users/%FF'];
+        yield 'UTF-8' => ['/caf%c3%a9', '1.2.3.4~/caf%C3%A9'];
+        yield 'raw UTF-8' => ["/caf\xc3\xa9", '1.2.3.4~/caf%C3%A9'];
+        yield 'plus is not a space' => ['/users/a+b', '1.2.3.4~/users/a%2Bb'];
+        yield 'decoded only once' => ['/l%256Fgin', '1.2.3.4~/l%256Fgin'];
+    }
+
     public function testExpressionKey()
     {
         $listener = $this->makeListenerCapturingKey($usedKey);

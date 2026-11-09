@@ -45,7 +45,16 @@ class PeriodicalTrigger implements StatefulTriggerInterface
 
         try {
             if (\is_string($interval) && 'P' === ($interval[0] ?? '')) {
-                $this->intervalInSeconds = $this->calcInterval(new \DateInterval($interval));
+                $i = new \DateInterval($interval);
+
+                if (!$this->canBeConvertedToSeconds($i)) {
+                    $this->interval = $i;
+                    $this->description = \sprintf('every %s', $interval);
+
+                    return;
+                }
+
+                $this->intervalInSeconds = $this->calcInterval($i);
                 $this->description = \sprintf('every %d seconds (%s)', $this->intervalInSeconds, $interval);
 
                 return;

@@ -30,11 +30,18 @@ class PeriodicalTriggerTest extends TestCase
 
         $this->assertSame('2922-02-23 13:34:00+01:00', $trigger->getNextRunDate($run)->format('Y-m-d H:i:sP'));
 
-        if ($optimizable) {
-            // test that we are using the fast algorithm for short period of time
-            $p = new \ReflectionProperty($trigger, 'intervalInSeconds');
-            $this->assertNotSame(0, $p->getValue($trigger));
-        }
+        // test that we are using the fast algorithm for short period of time
+        $p = new \ReflectionProperty($trigger, 'intervalInSeconds');
+        $this->assertSame($optimizable, 0.0 !== $p->getValue($trigger));
+    }
+
+    public function testIsoIntervalWithDaysOrMonthsFollowsTheCalendar()
+    {
+        $from = new \DateTimeImmutable('2026-03-28 09:00:00', new \DateTimeZone('Europe/Paris'));
+        $this->assertSame('2026-03-29 09:00:00+02:00', (new PeriodicalTrigger('P1D', $from))->getNextRunDate($from)->format('Y-m-d H:i:sP'));
+
+        $from = new \DateTimeImmutable('2026-02-01 09:00:00', new \DateTimeZone('Europe/Paris'));
+        $this->assertSame('2026-03-01 09:00:00+01:00', (new PeriodicalTrigger('P1M', $from))->getNextRunDate($from)->format('Y-m-d H:i:sP'));
     }
 
     public static function provideForConstructor(): iterable
@@ -97,6 +104,7 @@ class PeriodicalTriggerTest extends TestCase
         yield ['every 20 seconds', new PeriodicalTrigger(20, $from, $until)];
         yield ['every 20 seconds', new PeriodicalTrigger('20', $from, $until)];
         yield ['every 2 seconds (PT2S)', new PeriodicalTrigger('PT2S', $from, $until)];
+        yield ['every P1D', new PeriodicalTrigger('P1D', $from, $until)];
         yield ['every 20 seconds', new PeriodicalTrigger('20 seconds', $from, $until)];
         yield ['every 4 minutes 20 seconds', new PeriodicalTrigger('4 minutes 20 seconds', $from, $until)];
         yield ['every 2 hours', new PeriodicalTrigger('2 hours', $from, $until)];

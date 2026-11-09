@@ -94,6 +94,10 @@ trait CompiledUrlMatcherTrait
         $supportsRedirections = 'GET' === $canonicalMethod && $this instanceof RedirectableUrlMatcherInterface;
 
         foreach ($this->staticRoutes[$trimmedPathinfo] ?? [] as [$ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, , $condition]) {
+            if ($trimmedPathinfo !== $pathinfo && str_ends_with($pathinfo, '//')) {
+                break;
+            }
+
             if ($requiredHost) {
                 if ('{' !== $requiredHost[0] ? $requiredHost !== $host : !preg_match($requiredHost, $host, $hostMatches)) {
                     continue;
@@ -161,7 +165,7 @@ trait CompiledUrlMatcherTrait
                     }
 
                     if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
-                        if ($supportsRedirections && (!$requiredMethods || isset($requiredMethods['GET']))) {
+                        if ($supportsRedirections && '/' !== $trimmedPathinfo && (!$requiredMethods || isset($requiredMethods['GET']))) {
                             $trailingSlashSchemes = $allowSchemes;
 
                             return $allow = $allowSchemes = [];

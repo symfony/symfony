@@ -131,6 +131,7 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
                 abstract_arg('request rate limiter'),
                 null, // request rate limiter id
+                true,
             ])
 
         // Authenticators

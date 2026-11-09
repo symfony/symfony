@@ -28,6 +28,7 @@ use PHPStan\PhpDocParser\ParserConfig;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Util\PhpDocInheritance;
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
@@ -124,7 +125,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
 
             try {
                 $types[] = $this->stringTypeResolver->resolve((string) $tagDocNode->value->type, $typeContext);
-            } catch (UnsupportedException) {
+            } catch (UnsupportedException|InvalidArgumentException) {
             }
         }
 
@@ -151,7 +152,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
 
         try {
             return $this->stringTypeResolver->resolve((string) $tagDocNode->type, $typeContext);
-        } catch (UnsupportedException) {
+        } catch (UnsupportedException|InvalidArgumentException) {
             return null;
         }
     }

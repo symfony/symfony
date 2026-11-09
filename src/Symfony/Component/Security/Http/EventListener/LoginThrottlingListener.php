@@ -31,11 +31,17 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 final class LoginThrottlingListener implements EventSubscriberInterface
 {
     private const UNTOUCHED_LIMITER_ATTRIBUTE = '_security_login_throttling_untouched';
+    private const CONSUMED_ATTRIBUTE = '_security_login_throttling_consumed';
 
+    /**
+     * @param bool $stateless Whether the firewall is stateless. On stateless firewalls, a successful login
+     *                        in an untouched window doesn't write to the storage of the limiter.
+     */
     public function __construct(
         private RequestStack $requestStack,
         private RequestRateLimiterInterface $limiter,
         private ?string $limiterName = null,
+        private bool $stateless = true,
     ) {
     }
 
@@ -49,33 +55,38 @@ final class LoginThrottlingListener implements EventSubscriberInterface
         $request = $this->requestStack->getMainRequest();
         $request->attributes->set(SecurityRequestAttributes::LAST_USERNAME, $passport->getBadge(UserBadge::class)->getUserIdentifier());
 
-        if ($this->limiter instanceof PeekableRequestRateLimiterInterface) {
+        $untouched = false;
+
+        if ($this->stateless && $this->limiter instanceof PeekableRequestRateLimiterInterface) {
             $limit = $this->limiter->peek($request);
             // Checking isAccepted here is not enough as peek consumes 0 token, it will
             // be accepted even if there are 0 tokens remaining to be consumed. We check both
             // anyway for safety in case third party implementations behave unexpectedly.
-            if ($limit->isAccepted() && 0 !== $limit->getRemainingTokens()) {
-                // Remember an untouched window, a successful login then has nothing to reset.
-                $request->attributes->set(self::UNTOUCHED_LIMITER_ATTRIBUTE, $limit->getRemainingTokens() === $limit->getLimit());
-
-                return;
+            if (!$limit->isAccepted() || 0 === $limit->getRemainingTokens()) {
+                $this->throwTooManyLoginAttempts($limit, $dispatcher);
             }
-        } elseif (($limit = $this->limiter->consume($request))->isAccepted()) {
+
+            $untouched = $limit->getRemainingTokens() === $limit->getLimit();
+        }
+
+        // Remember an untouched window, a successful login then has nothing to reset.
+        $request->attributes->set(self::UNTOUCHED_LIMITER_ATTRIBUTE, $untouched);
+        $request->attributes->set(self::CONSUMED_ATTRIBUTE, !$untouched);
+
+        if ($untouched) {
             return;
         }
 
-        if ($dispatcher && class_exists(RateLimitExceededEvent::class)) {
-            // peek() accepts a hit that finds no token left, but the event reports a rejection
-            $rejectedLimit = $limit->isAccepted() ? new RateLimit(0, $limit->getRetryAfter(), false, $limit->getLimit(), $limit->getResetAt()) : $limit;
-            $dispatcher->dispatch(new RateLimitExceededEvent($rejectedLimit, $this->limiterName));
+        // consume before checking the credentials, so that concurrent attempts are counted too
+        $limit = $this->limiter->consume($request);
+        if (!$limit->isAccepted()) {
+            $this->throwTooManyLoginAttempts($limit, $dispatcher);
         }
-
-        throw new TooManyLoginAttemptsAuthenticationException($this->getThreshold($limit));
     }
 
     public function onSuccessfulLogin(LoginSuccessEvent $event): void
     {
-        if ($this->limiter instanceof PeekableRequestRateLimiterInterface && $event->getRequest()->attributes->get(self::UNTOUCHED_LIMITER_ATTRIBUTE, false)) {
+        if ($event->getRequest()->attributes->get(self::UNTOUCHED_LIMITER_ATTRIBUTE, false)) {
             return;
         }
 
@@ -84,7 +95,7 @@ final class LoginThrottlingListener implements EventSubscriberInterface
 
     public function onFailedLogin(LoginFailureEvent $event): void
     {
-        if ($this->limiter instanceof PeekableRequestRateLimiterInterface) {
+        if ($this->limiter instanceof PeekableRequestRateLimiterInterface && !$event->getRequest()->attributes->get(self::CONSUMED_ATTRIBUTE, false)) {
             $this->limiter->consume($event->getRequest());
         }
     }
@@ -96,6 +107,17 @@ final class LoginThrottlingListener implements EventSubscriberInterface
             LoginFailureEvent::class => 'onFailedLogin',
             LoginSuccessEvent::class => 'onSuccessfulLogin',
         ];
+    }
+
+    private function throwTooManyLoginAttempts(RateLimit $limit, ?EventDispatcherInterface $dispatcher): never
+    {
+        if ($dispatcher && class_exists(RateLimitExceededEvent::class)) {
+            // peek() accepts a hit that finds no token left, but the event reports a rejection
+            $rejectedLimit = $limit->isAccepted() ? new RateLimit(0, $limit->getRetryAfter(), false, $limit->getLimit(), $limit->getResetAt()) : $limit;
+            $dispatcher->dispatch(new RateLimitExceededEvent($rejectedLimit, $this->limiterName));
+        }
+
+        throw new TooManyLoginAttemptsAuthenticationException($this->getThreshold($limit));
     }
 
     private function getThreshold(RateLimit $limit): int

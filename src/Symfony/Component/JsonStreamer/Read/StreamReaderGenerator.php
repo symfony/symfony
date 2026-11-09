@@ -44,6 +44,7 @@ use Symfony\Component\TypeInfo\Type\UnionType;
 final class StreamReaderGenerator
 {
     private const MAX_GENERIC_DEPTH = 512;
+    private const MAX_GENERIC_TYPE_LENGTH = 65536;
 
     private StreamerDumper $dumper;
     private ?PhpGenerator $phpGenerator = null;
@@ -145,7 +146,7 @@ final class StreamReaderGenerator
                 $context['generic_depths'][$className] ??= 0;
 
                 // a class that contains itself with growing generic types would be expanded forever
-                if (++$context['generic_depths'][$className] > self::MAX_GENERIC_DEPTH) {
+                if (++$context['generic_depths'][$className] > self::MAX_GENERIC_DEPTH || \strlen($typeString) > self::MAX_GENERIC_TYPE_LENGTH) {
                     throw new UnsupportedException(\sprintf('"%s" contains itself with generic types that keep growing, which is not supported.', $className));
                 }
             }

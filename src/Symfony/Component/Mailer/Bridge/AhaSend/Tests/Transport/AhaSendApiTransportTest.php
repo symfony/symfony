@@ -43,7 +43,7 @@ class AhaSendApiTransportTest extends TestCase
             // v1
             [
                 new AhaSendApiTransport('KEY'),
-                'ahasend+api://send.ahasend.com',
+                'ahasend+api://api.ahasend.com',
             ],
             // v2
             [
@@ -86,7 +86,7 @@ class AhaSendApiTransportTest extends TestCase
 
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
-            $this->assertSame('https://send.ahasend.com/v1/email/send', $url);
+            $this->assertSame('https://api.ahasend.com/v1/email/send', $url);
             $this->assertStringContainsString('X-Api-Key: foo', $options['headers'][0] ?? $options['request_headers'][0]);
 
             $body = json_decode($options['body'], true);

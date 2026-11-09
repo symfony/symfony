@@ -56,7 +56,8 @@ final class MessageGenerator implements MessageGeneratorInterface
         }
 
         $startTime = $checkpoint->from();
-        $lastTime = $checkpoint->time();
+        // the checkpoint has the timezone of the last run, and triggers without one use the timezone of the date they get
+        $lastTime = $checkpoint->time()->setTimezone($now->getTimezone());
         $lastIndex = $checkpoint->index();
         $heap = $this->heap($lastTime, $startTime, $lastIndex);
 

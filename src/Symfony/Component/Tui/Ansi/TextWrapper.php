@@ -22,6 +22,8 @@ final class TextWrapper
 {
     // Unicode line breaking allows a break between any two characters of these scripts
     private const CJK_PATTERN = '/[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}\p{Bopomofo}]/u';
+    // SGR codes that only turn attributes off, like \e[0m, \e[24m or \e[39;49m
+    private const SGR_OFF_PATTERN = '/^(?:\e\[(?:0|2[2-57-9]|[345]9|4:0)?(?:;(?:0|2[2-57-9]|[345]9|4:0)?)*m)+/';
 
     /**
      * Wrap a single line into chunks with position tracking.
@@ -165,6 +167,11 @@ final class TextWrapper
         $tracker = new AnsiCodeTracker();
 
         foreach ($inputLines as $inputLine) {
+            // The previous line gets the underline reset, like a wrapped line
+            if ($result && '' !== $lineEndReset = $tracker->getLineEndReset()) {
+                $result[array_key_last($result)] .= $lineEndReset;
+            }
+
             // Prepend active ANSI codes from previous lines (except for first line)
             $prefix = $result ? $tracker->getActiveCodes() : '';
             $wrapped = self::wrapSingleLine($prefix.$inputLine, $width);
@@ -235,8 +242,16 @@ final class TextWrapper
             $totalNeeded = $currentVisibleLength + $tokenVisibleLength;
 
             if ($totalNeeded > $width && $currentVisibleLength > 0) {
+                // The codes of this whitespace can end the style of the previous word, so they end this line
+                $ending = '';
+                if ($isWhitespace && $token['has_ansi']) {
+                    $tracker->processText($tokenText);
+                    $token['has_ansi'] = false;
+                    $ending = str_replace([' ', "\t"], '', $tokenText);
+                }
+
                 // Trim trailing whitespace, then add underline reset
-                $lineToWrap = rtrim($currentLine);
+                $lineToWrap = rtrim($currentLine).$ending;
                 if ('' !== $lineEndReset = $tracker->getLineEndReset()) {
                     $lineToWrap .= $lineEndReset;
                 }
@@ -435,6 +450,14 @@ final class TextWrapper
             $pieces[array_key_last($pieces)] .= $pendingAnsi;
         }
 
+        // A style that ends between two pieces ends with the first one, as a line can break between them
+        for ($k = 1, $count = \count($pieces); $k < $count; ++$k) {
+            if (preg_match(self::SGR_OFF_PATTERN, $pieces[$k], $m)) {
+                $pieces[$k - 1] .= $m[0];
+                $pieces[$k] = substr($pieces[$k], \strlen($m[0]));
+            }
+        }
+
         return array_map(static fn (string $piece): array => [
             'text' => $piece,
             'width' => AnsiUtils::visibleWidth($piece),
@@ -484,10 +507,10 @@ final class TextWrapper
         }
 
         // Process segments
+        $pendingAnsi = '';
         foreach ($segments as $seg) {
             if ('ansi' === $seg['type']) {
-                $currentLine .= $seg['value'];
-                $tracker->process($seg['value']);
+                $pendingAnsi .= $seg['value'];
                 continue;
             }
 
@@ -498,6 +521,12 @@ final class TextWrapper
             $graphemeWidth = AnsiUtils::graphemeWidth($grapheme);
 
             if ($currentWidth + $graphemeWidth > $width) {
+                // Codes that only turn styles off end this line, the others start the next one
+                if (preg_match(self::SGR_OFF_PATTERN, $pendingAnsi, $m)) {
+                    $currentLine .= $m[0];
+                    $tracker->processText($m[0]);
+                    $pendingAnsi = substr($pendingAnsi, \strlen($m[0]));
+                }
                 // Add specific reset for underline only (preserves background)
                 if ('' !== $lineEndReset = $tracker->getLineEndReset()) {
                     $currentLine .= $lineEndReset;
@@ -507,9 +536,14 @@ final class TextWrapper
                 $currentWidth = 0;
             }
 
-            $currentLine .= $grapheme;
+            $currentLine .= $pendingAnsi.$grapheme;
             $currentWidth += $graphemeWidth;
+            $tracker->processText($pendingAnsi);
+            $pendingAnsi = '';
         }
+
+        $currentLine .= $pendingAnsi;
+        $tracker->processText($pendingAnsi);
 
         if ('' !== $currentLine) {
             $lines[] = $currentLine;

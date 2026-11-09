@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Matcher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
@@ -483,6 +484,49 @@ class UrlMatcherTest extends TestCase
         $context->setMethod('POST');
         $matcher = $this->getUrlMatcher($coll, $context);
         $matcher->match('/foo/');
+    }
+
+    public function testMoreThanOneTrailingSlash()
+    {
+        $this->expectException(ResourceNotFoundException::class);
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/'));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $matcher->match('/foo//');
+    }
+
+    public function testMoreThanOneTrailingSlashWithCatchAllRoute()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/'));
+        $coll->add('b', new Route('/login'));
+        $coll->add('c', new Route('/admin/'));
+        $coll->add('d', new Route('/blog/{slug}/'));
+        $coll->add('e', new Route('/{path}', [], ['path' => '.*']));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(['_route' => 'e', 'path' => '/'], $matcher->match('//'));
+        $this->assertEquals(['_route' => 'e', 'path' => 'login//'], $matcher->match('/login//'));
+        $this->assertEquals(['_route' => 'e', 'path' => 'admin//'], $matcher->match('/admin//'));
+        $this->assertEquals(['_route' => 'e', 'path' => 'admin///'], $matcher->match('/admin///'));
+        $this->assertEquals(['_route' => 'e', 'path' => 'blog/foo//'], $matcher->match('/blog/foo//'));
+    }
+
+    public function testMoreThanOneTrailingSlashWithRootRouteAfterCatchAllRoute()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{path}', [], ['path' => '.*'], [], '', [], ['POST']));
+        $coll->add('b', new Route('/'));
+
+        $matcher = $this->getUrlMatcher($coll);
+
+        try {
+            $matcher->match('//');
+            $this->fail();
+        } catch (MethodNotAllowedException $e) {
+            $this->assertSame(['POST'], $e->getAllowedMethods());
+        }
     }
 
     public function testSchemeRequirement()
@@ -967,6 +1011,37 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals('b', $matcher->match('/bar/abc.123')['_route']);
     }
 
+    public function testHostVariableMatchingDotsKeepsTheOrderOfRoutes()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{slug}', [], ['slug' => '\d+'], [], 'app.{sub}.{domain}'));
+        $coll->add('b', new Route('/admin/report/{id}', [], ['domain' => '.+'], [], '{domain}'));
+        $coll->add('c', new Route('/admin/{slug}/{id}', [], ['domain' => '.+'], [], '{tld}.{domain}'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'app.example.com'));
+        $this->assertSame('b', $matcher->match('/admin/report/1')['_route']);
+    }
+
+    #[DataProvider('provideHostsWithVariablesSharingTheirLabel')]
+    public function testHostVariableSharingItsLabelKeepsTheOrderOfRoutes(string $firstHost, string $secondHost, string $thirdHost, string $host)
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/foo', [], [], [], $firstHost));
+        $coll->add('b', new Route('/report/{id}', [], [], [], $secondHost));
+        $coll->add('c', new Route('/report/{id}', [], [], [], $thirdHost));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', $host));
+        $this->assertSame('b', $matcher->match('/report/1')['_route']);
+    }
+
+    public static function provideHostsWithVariablesSharingTheirLabel(): iterable
+    {
+        yield ['xyz-{sub}.example.com', '{sub}.example.com', 'app-{sub}.example.com', 'app-x.example.com'];
+        yield ['{c}-{b}.example.com', '{b}.example.com', '{a}-{b}.example.com', 'x-y.example.com'];
+        yield ['{c}x{b}', '{b}', '{a}x{b}', 'axb'];
+        yield ['bpi{n}.example.com', '{n}.example.com', 'api{n}.example.com', 'api1.example.com'];
+    }
+
     public function testHostVariableDoesNotMatchThePath()
     {
         $coll = new RouteCollection();
@@ -1054,6 +1129,30 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'a', 'bar' => 'baz'], $matcher->match('/foo/abc/baz'));
     }
 
+    public function testNamedGroupsInRequirements()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/admin/{section}/{id}', [], ['section' => '(?<s>[a-z]+)(?<!x)', 'id' => "(?'i'\\d+)"]));
+        $coll->add('b', new Route('/report/{id}', [], ['id' => '(?P<i>\d+)', 'tenant' => '(?<t>[a-z]+)'], [], '{tenant}.example.com'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'acme.example.com'));
+        $this->assertEquals(['_route' => 'a', 'section' => 'report', 'id' => '42'], $matcher->match('/admin/report/42'));
+        $this->assertEquals(['_route' => 'b', 'tenant' => 'acme', 'id' => '42'], $matcher->match('/report/42'));
+    }
+
+    public function testVariableInHostAndPathTakesTheValueOfTheHost()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{tenant}/dashboard', [], [], [], '{tenant}.example.com'));
+        $coll->add('b', new Route('/{tenant}/report/{id}', [], [], [], '{id}.{tenant}.example.org'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'acme.example.com'));
+        $this->assertEquals(['_route' => 'a', 'tenant' => 'acme'], $matcher->match('/other/dashboard'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', '1.acme.example.org'));
+        $this->assertEquals(['_route' => 'b', 'tenant' => 'acme', 'id' => '1'], $matcher->match('/other/report/2'));
+    }
+
     public function testSlashVariant()
     {
         $coll = new RouteCollection();
@@ -1126,6 +1225,16 @@ class UrlMatcherTest extends TestCase
 
         $this->assertEquals(['_route' => 'a', 'a' => 'foo'], $matcher->match('/foo'));
         $this->assertEquals(['_route' => 'a', 'a' => 'foo/'], $matcher->match('/foo/'));
+    }
+
+    public function testGreedyTrailingRequirementAfterNamedGroup()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{a}/{b}', [], ['a' => '(?P<c>[a-z]+)', 'b' => '.+']));
+
+        $matcher = $this->getUrlMatcher($coll);
+
+        $this->assertEquals(['_route' => 'a', 'a' => 'foo', 'b' => 'bar/'], $matcher->match('/foo/bar/'));
     }
 
     public function testTrailingRequirementWithDefault()

@@ -160,6 +160,7 @@ class PhpStanExtractorTest extends TestCase
         yield 'foo' => ['foo'];
         yield 'bar' => ['bar'];
         yield 'baz' => ['baz'];
+        yield 'invalidKeyType' => ['invalidKeyType'];
     }
 
     #[DataProvider('typesWithNoPrefixesProvider')]

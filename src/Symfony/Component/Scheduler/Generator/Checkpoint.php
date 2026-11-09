@@ -116,8 +116,8 @@ final class Checkpoint implements CheckpointInterface
 
         if (!$nextTime) {
             $this->lock->release();
-        } elseif ($remaining = $this->lock->getRemainingLifetime()) {
-            // the lock might have expired during a long run; stores reject negative TTLs and some reject TTLs below one second
+        } elseif (0 < $remaining = $this->lock->getRemainingLifetime()) {
+            // an expired lock might be held by another worker now; some stores reject TTLs below one second
             if (1 <= $ttl = self::toTimestamp($nextTime) - self::toTimestamp($now) + $remaining) {
                 $this->lock->refresh($ttl);
             }

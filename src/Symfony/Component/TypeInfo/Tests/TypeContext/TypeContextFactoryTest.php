@@ -310,6 +310,16 @@ class TypeContextFactoryTest extends TestCase
         $this->assertEquals(Type::template('T'), $stringTypeResolver->resolve('T', $typeContextFactory->createFromClassName(SameNameEnvelope::class, Envelope::class)));
     }
 
+    public function testCollectTemplatesWithInvalidBound()
+    {
+        /**
+         * @template T of array<float, string>
+         */
+        $dummy = new class {};
+
+        $this->assertEquals(['T' => Type::mixed()], $this->typeContextFactory->createFromClassName($dummy::class)->templates);
+    }
+
     public function testDoNotCollectTemplatesWhenToStringTypeResolver()
     {
         $typeContextFactory = new TypeContextFactory();

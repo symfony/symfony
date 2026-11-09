@@ -574,6 +574,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $firewallAuthenticationProviders = [];
         [$authListeners, $defaultEntryPoint] = $this->createAuthenticationListeners($container, $id, $firewall, $firewallAuthenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint);
 
+        if ($container->hasDefinition('security.listener.login_throttling.'.$id)) {
+            $container->getDefinition('security.listener.login_throttling.'.$id)->replaceArgument(3, $firewall['stateless']);
+        }
+
         // $configuredEntryPoint is resolved into a service ID and stored in $defaultEntryPoint
         $configuredEntryPoint = $defaultEntryPoint;
 

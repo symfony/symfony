@@ -907,8 +907,20 @@ class ConnectionTest extends TestCase
         $connection = Connection::fromDsn('redis://localhost/queue?redeliver_timeout=1', [], $redis);
 
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Redis redeliver_timeout (1000s) cannot be smaller than the keepalive interval (3000s).');
-        $connection->keepalive('redisid-123', 3000);
+        $this->expectExceptionMessage('Redis redeliver_timeout (1s) cannot be smaller than the keepalive interval (5s).');
+        $connection->keepalive('redisid-123', 5);
+    }
+
+    public function testKeepaliveWithIntervalEqualToTtl()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->once())->method('xclaim')
+            ->with('queue', 'symfony', 'consumer', 0, [$id = 'redisid-123'], ['JUSTID'])
+            ->willReturn([]);
+
+        $connection = Connection::fromDsn('redis://localhost/queue?redeliver_timeout=5', [], $redis);
+        $connection->keepalive($id, 5);
     }
 
     public function testSkipAlreadyInflightPendingMessage()

@@ -70,6 +70,16 @@ EOF;
             if ($host = $route->getHost()) {
                 $matchHost = true;
                 $host = '/'.strtr(strrev($host), '}.{', '(/)');
+                // routes are grouped and reordered only on variables that take a whole label and can't match a dot,
+                // as the label of a variable that is next to other characters may also be matched by a variable alone
+                $host = preg_replace_callback('#(?<=(.))\((\w++)!?\)(?=(.?))#', static function ($m) use ($route) {
+                    if ('/' !== $m[1] || '' !== $m[3] && '/' !== $m[3]) {
+                        return '(.*)';
+                    }
+                    $requirement = $route->getRequirement(strrev($m[2]));
+
+                    return null === $requirement || preg_match('#^(?:[\w|?*+{},:)-]|\((?!\?)|\(\?[:|]|\\\\[dw]|\[(?:\w|\\\\[dw]|(?<=\w)-(?=\w)|(?<=\[)-|-(?=\]))++\])++$#', $requirement) ? $m[0] : '(.*)';
+                }, $host);
             }
 
             $routes->addRoute($host ?: '/(.*)', [$name, $route]);

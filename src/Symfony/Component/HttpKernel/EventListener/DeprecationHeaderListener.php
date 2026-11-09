@@ -16,10 +16,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Adds the deprecation headers configured via the "_deprecation" route default.
- *
- * Adds the RFC 9745 "Deprecation" header, the RFC 8594 "Sunset" header and
- * a "Link" header pointing to the deprecation documentation to the response.
+ * Adds the "Deprecation", "Sunset" and "Link" headers configured via the "_deprecation" route default.
  * Headers already set by the controller are left untouched.
  *
  * @see https://www.rfc-editor.org/rfc/rfc9745.html
@@ -46,15 +43,11 @@ class DeprecationHeaderListener implements EventSubscriberInterface
 
         $route = $request->attributes->get('_route', '');
         $since = self::toDate('since', $deprecation['since'] ?? null, $route);
-        $sunset = isset($deprecation['sunset']) ? self::toDate('sunset', $deprecation['sunset'], $route) : null;
-
-        if ($sunset && $sunset < $since) {
-            throw new \LogicException(\sprintf('The "sunset" date of the deprecation of route "%s" cannot be earlier than its "since" date.', $route));
-        }
 
         $headers->set('Deprecation', '@'.$since->getTimestamp());
 
-        if (null !== $sunset && !$headers->has('Sunset')) {
+        if (isset($deprecation['sunset']) && !$headers->has('Sunset')) {
+            $sunset = self::toDate('sunset', $deprecation['sunset'], $route);
             $headers->set('Sunset', $sunset->setTimezone(new \DateTimeZone('UTC'))->format('D, d M Y H:i:s').' GMT');
         }
 

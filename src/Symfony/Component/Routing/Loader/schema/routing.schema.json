@@ -83,19 +83,9 @@
           "properties": {
             "since": { "type": "string" },
             "sunset": { "type": "string" },
-            "link": { "type": "string" }
+            "link": { "type": "string", "format": "uri-reference" }
           },
           "required": ["since"],
-          "additionalProperties": false
-        },
-        "deprecated": {
-          "type": "object",
-          "properties": {
-            "package": { "type": "string" },
-            "version": { "type": "string" },
-            "message": { "type": "string" }
-          },
-          "required": ["package", "version"],
           "additionalProperties": false
         }
       },
@@ -167,7 +157,7 @@
           "properties": {
             "since": { "type": "string" },
             "sunset": { "type": "string" },
-            "link": { "type": "string" }
+            "link": { "type": "string", "format": "uri-reference" }
           },
           "required": ["since"],
           "additionalProperties": false

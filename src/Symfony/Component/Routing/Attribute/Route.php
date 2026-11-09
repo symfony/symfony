@@ -50,7 +50,7 @@ class Route
      * @param string|null                                       $firewall     The firewall name to use for matching this route
      * @param string|string[]|null                              $env          The env(s) in which the route is defined (i.e. "dev", "test", "prod", ["dev", "test"])
      * @param string|DeprecatedAlias|(string|DeprecatedAlias)[] $alias        The list of aliases for this route
-     * @param array<string, string>|null                        $deprecation  The RFC 9745 deprecation of the route: the "since" date it is or will be deprecated, the optional "sunset" date it will become unresponsive and the optional "link" URI documenting it
+     * @param RouteDeprecation|null                             $deprecation  The RFC 9745 deprecation of the route
      */
     public function __construct(
         public string|array|null $path = null,
@@ -70,7 +70,7 @@ class Route
         ?string $firewall = null,
         string|array|null $env = null,
         string|DeprecatedAlias|array $alias = [],
-        ?array $deprecation = null,
+        ?RouteDeprecation $deprecation = null,
     ) {
         $this->path = $path;
         $this->methods = (array) $methods;
@@ -99,7 +99,7 @@ class Route
         }
 
         if (null !== $deprecation) {
-            $this->defaults['_deprecation'] = $deprecation;
+            $this->defaults['_deprecation'] = $deprecation->toArray();
         }
     }
 }

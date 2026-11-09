@@ -67,6 +67,7 @@ class TextDescriptor extends Descriptor
         $tableRows = [];
         $shouldShowScheme = false;
         $shouldShowHost = false;
+        $shouldShowDeprecation = false;
         foreach ($routes->all() as $name => $route) {
             $controller = $route->getDefault('_controller');
 
@@ -83,6 +84,14 @@ class TextDescriptor extends Descriptor
                 'Host' => $host,
                 'Path' => $route->getPath(),
             ];
+
+            $deprecation = $route->getDefault('_deprecation');
+            if (\is_array($deprecation) && isset($deprecation['since'])) {
+                $shouldShowDeprecation = true;
+                $row['Deprecation'] = 'since '.$deprecation['since'].(isset($deprecation['sunset']) ? ', sunset '.$deprecation['sunset'] : '');
+            } else {
+                $row['Deprecation'] = '';
+            }
 
             if ($showControllers) {
                 $controllerText = $controller ? $this->formatCallable($controller) : '';
@@ -111,6 +120,12 @@ class TextDescriptor extends Descriptor
         }
 
         $tableHeaders[] = 'Path';
+
+        if ($shouldShowDeprecation) {
+            $tableHeaders[] = 'Deprecation';
+        } else {
+            array_walk($tableRows, static function (&$row) { unset($row['Deprecation']); });
+        }
 
         if ($showControllers) {
             $tableHeaders[] = 'Controller';

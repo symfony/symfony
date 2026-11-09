@@ -26,6 +26,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithBackedEnumValueTransformer;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDoublingGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGrowingGenerics;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
@@ -165,6 +166,16 @@ class StreamReaderGeneratorTest extends TestCase
         $this->expectExceptionMessage(\sprintf('"%s" contains itself with generic types that keep growing, which is not supported.', DummyWithGrowingGenerics::class));
 
         $generator->generate(Type::generic(Type::object(DummyWithGrowingGenerics::class), Type::int()), false);
+    }
+
+    public function testDoNotSupportDoublingGenericTypes()
+    {
+        $generator = new StreamReaderGenerator(new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new TypeContextFactory(new StringTypeResolver())), $this->streamReadersDir);
+
+        $this->expectException(UnsupportedException::class);
+        $this->expectExceptionMessage(\sprintf('"%s" contains itself with generic types that keep growing, which is not supported.', DummyWithDoublingGenerics::class));
+
+        $generator->generate(Type::generic(Type::object(DummyWithDoublingGenerics::class), Type::int()), false);
     }
 
     public function testGenerateRepeatedNullableObjectsOnlyOnce()

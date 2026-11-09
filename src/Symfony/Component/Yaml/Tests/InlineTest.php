@@ -445,6 +445,7 @@ class InlineTest extends TestCase
             ['{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}', ['foo: ' => 'bar', 'bar: ' => 'foo: bar']],
             ['{"foo:bar": "baz"}', ['foo:bar' => 'baz']],
             ['{"foo":"bar"}', ['foo' => 'bar']],
+            ['{foo bar: baz, foo qux: quux}', ['foo bar' => 'baz', 'foo qux' => 'quux']],
 
             // nested sequences and mappings
             ['[foo, [bar, foo]]', ['foo', ['bar', 'foo']]],
@@ -530,6 +531,7 @@ class InlineTest extends TestCase
             ['{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}', (object) ['foo: ' => 'bar', 'bar: ' => 'foo: bar']],
             ['{"foo:bar": "baz"}', (object) ['foo:bar' => 'baz']],
             ['{"foo":"bar"}', (object) ['foo' => 'bar']],
+            ['{foo bar: baz, foo qux: quux}', (object) ['foo bar' => 'baz', 'foo qux' => 'quux']],
 
             // nested sequences and mappings
             ['[foo, [bar, foo]]', ['foo', ['bar', 'foo']]],

@@ -595,7 +595,8 @@ class Inline
                 // key
                 $offsetBeforeKeyParsing = $i;
                 $isKeyQuoted = \in_array($mapping[$i], ['"', "'"], true);
-                $key = self::parseScalar($mapping, $flags, [':', ' '], $i, false);
+                $keyDelimiters = $isKeyQuoted || Parser::preg_match('#!php/(const|enum) #A', $mapping, $match, 0, $i) ? [':', ' '] : [':'];
+                $key = self::parseScalar($mapping, $flags, $keyDelimiters, $i, false);
 
                 if ($offsetBeforeKeyParsing === $i) {
                     throw new ParseException('Missing mapping key.', self::$parsedLineNumber + 1, $mapping);

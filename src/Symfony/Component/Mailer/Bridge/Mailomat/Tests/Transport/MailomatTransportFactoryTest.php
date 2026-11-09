@@ -100,4 +100,15 @@ class MailomatTransportFactoryTest extends AbstractTransportFactoryTestCase
     {
         yield [new Dsn('mailomat+api', 'default')];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['mailomat', 'mailomat+smtp', 'mailomat+smtps'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::USER, self::PASSWORD))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('mailomat+smtp', 'default', self::USER, self::PASSWORD, null, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

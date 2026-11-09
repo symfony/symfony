@@ -31,7 +31,7 @@ class MailjetTransportFactory extends AbstractTransportFactory
         }
 
         if (\in_array($scheme, ['mailjet+smtp', 'mailjet+smtps', 'mailjet'], true)) {
-            return new MailjetSmtpTransport($user, $password, $this->dispatcher, $this->logger);
+            return (new MailjetSmtpTransport($user, $password, $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true));
         }
 
         throw new UnsupportedSchemeException($dsn, 'mailjet', $this->getSupportedSchemes());

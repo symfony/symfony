@@ -36,7 +36,7 @@ final class AhaSendTransportFactory extends AbstractTransportFactory
 
         if ('ahasend+smtp' === $scheme || 'ahasend' === $scheme) {
             $password = $this->getPassword($dsn);
-            $transport = new AhaSendSmtpTransport($user, $password, $this->dispatcher, $this->logger);
+            $transport = (new AhaSendSmtpTransport($user, $password, $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true));
         }
 
         if (null === $transport) {

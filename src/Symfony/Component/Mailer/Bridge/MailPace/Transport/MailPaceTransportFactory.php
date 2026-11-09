@@ -33,7 +33,7 @@ final class MailPaceTransportFactory extends AbstractTransportFactory
         }
 
         if ('mailpace+smtp' === $scheme || 'mailpace+smtps' === $scheme || 'mailpace' === $scheme) {
-            return new MailPaceSmtpTransport($this->getUser($dsn), $this->dispatcher, $this->logger);
+            return (new MailPaceSmtpTransport($this->getUser($dsn), $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true));
         }
 
         throw new UnsupportedSchemeException($dsn, 'mailpace', $this->getSupportedSchemes());

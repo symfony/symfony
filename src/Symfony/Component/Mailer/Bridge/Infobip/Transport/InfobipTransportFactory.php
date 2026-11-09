@@ -36,7 +36,7 @@ final class InfobipTransportFactory extends AbstractTransportFactory
         }
 
         if (\in_array($schema, ['infobip+smtp', 'infobip+smtps', 'infobip'], true)) {
-            return new InfobipSmtpTransport($apiKey, $this->dispatcher, $this->logger);
+            return (new InfobipSmtpTransport($apiKey, $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true));
         }
 
         throw new UnsupportedSchemeException($dsn, 'infobip', $this->getSupportedSchemes());

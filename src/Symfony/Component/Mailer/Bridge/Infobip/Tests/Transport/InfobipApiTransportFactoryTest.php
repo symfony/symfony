@@ -97,4 +97,15 @@ class InfobipApiTransportFactoryTest extends AbstractTransportFactoryTestCase
         yield [new Dsn('infobip+api', 'default')];
         yield [new Dsn('infobip+api', 'default', self::PASSWORD)];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['infobip', 'infobip+smtp', 'infobip+smtps'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::PASSWORD))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('infobip+smtp', 'default', self::PASSWORD, null, null, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

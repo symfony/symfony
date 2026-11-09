@@ -51,6 +51,7 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
 
         $envelopes = [];
         $shouldRetry = false;
+        $rejectFailure = null;
 
         foreach ($messages as $message) {
             if (null === $message['data']) {
@@ -59,8 +60,9 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
                 try {
                     $this->connection->reject($message['id']);
                 } catch (TransportException $e) {
+                    // the other messages of the batch are in flight already: fail only when none can be returned
                     if ($e->getPrevious()) {
-                        throw $e;
+                        $rejectFailure ??= $e;
                     }
                 }
 
@@ -98,6 +100,10 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
             }
 
             $envelopes[] = $envelope->withoutAll(TransportMessageIdStamp::class)->with(...$stamps);
+        }
+
+        if (!$envelopes && $rejectFailure) {
+            throw $rejectFailure;
         }
 
         if (!$envelopes && $shouldRetry) {

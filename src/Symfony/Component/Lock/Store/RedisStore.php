@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Lock\Store;
 
-use Predis\Response\Error;
+use Predis\Response\ErrorInterface;
 use Predis\Response\ServerException;
 use Relay\Relay;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
@@ -270,7 +270,7 @@ class RedisStore implements SharedLockStoreInterface
         }
 
         // a client created with the "exceptions" option disabled, as AbstractAdapter::createConnection() does, returns errors
-        if ($result instanceof Error) {
+        if ($result instanceof ErrorInterface) {
             throw new LockStorageException($result->getMessage());
         }
 

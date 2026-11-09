@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Semaphore\Store;
 
+use Predis\Response\ErrorInterface;
 use Relay\Relay;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
+use Symfony\Component\Semaphore\Exception\RuntimeException;
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
 use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
 use Symfony\Component\Semaphore\Key;
@@ -162,7 +164,13 @@ class RedisStore implements PersistingStoreInterface
 
     public function exists(Key $key): bool
     {
-        return (bool) $this->redis->zScore(\sprintf('{%s}:weight', $key), $this->getUniqueToken($key));
+        $score = $this->redis->zScore(\sprintf('{%s}:weight', $key), $this->getUniqueToken($key));
+
+        if ($score instanceof ErrorInterface) {
+            throw new RuntimeException($score->getMessage());
+        }
+
+        return (bool) $score;
     }
 
     private function evaluate(string $script, string $resource, array $args): mixed
@@ -176,7 +184,14 @@ class RedisStore implements PersistingStoreInterface
         }
 
         if ($this->redis instanceof \Predis\ClientInterface) {
-            return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
+            $result = $this->redis->eval(...array_merge([$script, 1, $resource], $args));
+
+            // a client created with the "exceptions" option disabled, as AbstractAdapter::createConnection() does, returns errors
+            if ($result instanceof ErrorInterface) {
+                throw new RuntimeException($result->getMessage());
+            }
+
+            return $result;
         }
 
         throw new InvalidArgumentException(\sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));

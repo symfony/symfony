@@ -459,4 +459,17 @@ class AnsiCodeTrackerTest extends TestCase
         $this->assertTrue($this->tracker->hasActiveCodes());
         $this->assertSame("\x1b[1m", $this->tracker->getActiveCodes());
     }
+
+    public function testAHyperlinkStaysOpenUntilClosed()
+    {
+        $tracker = new AnsiCodeTracker();
+        $tracker->processText("\e]8;id=1;https://example.com\x07\e[1mlink\e[0m");
+        $this->assertSame("\e]8;id=1;https://example.com\x07", $tracker->getActiveCodes(), 'An SGR reset does not close it.');
+        $this->assertSame("\e]8;;\x07", $tracker->getLineEndReset());
+        $this->assertTrue($tracker->hasActiveCodes());
+
+        $tracker->process("\e]8;;\e\\");
+        $this->assertSame('', $tracker->getActiveCodes(), 'Closed, with ST too.');
+        $this->assertSame('', $tracker->getLineEndReset());
+    }
 }

@@ -36,12 +36,19 @@ final class AnsiCodeTracker
     private ?string $underlineColor = null;
     /** A styled underline, like 4:3 (curly): kept as is */
     private ?string $underlineVariant = null;
+    /** The OSC 8 sequence that opened the hyperlink being drawn, its id and parameters kept: null outside one */
+    private ?string $link = null;
 
     /**
      * Process an ANSI escape code and update tracking state.
      */
     public function process(string $ansiCode): void
     {
+        if (str_starts_with($ansiCode, "\x1b]8;")) {
+            $this->link = self::linkOf($ansiCode);
+
+            return;
+        }
         // Fast direct parsing: skip regex, extract params between \x1b[ and m
         if (\strlen($ansiCode) < 3 || "\x1b" !== $ansiCode[0] || '[' !== $ansiCode[1] || 'm' !== $ansiCode[-1]) {
             return;
@@ -58,7 +65,7 @@ final class AnsiCodeTracker
     }
 
     /**
-     * Reset all tracking state.
+     * Reset the colors and attributes, like SGR 0: a hyperlink stays open, until an OSC 8 closes it.
      */
     public function reset(): void
     {
@@ -124,11 +131,11 @@ final class AnsiCodeTracker
         }
 
         if ("\x1b[" === $codes) {
-            return '';
+            return $this->link ?? '';
         }
         $codes[-1] = 'm';
 
-        return $codes;
+        return $codes.$this->link;
     }
 
     /**
@@ -147,20 +154,17 @@ final class AnsiCodeTracker
             || $this->strikethrough
             || null !== $this->fgColor
             || null !== $this->bgColor
-            || null !== $this->underlineColor;
+            || null !== $this->underlineColor
+            || null !== $this->link;
     }
 
     /**
-     * Get reset codes for attributes that need to be turned off at line end.
-     * Specifically underline which bleeds into padding.
+     * Get the codes that turn off the underline and a hyperlink at line end, as they bleed into the padding.
      */
     public function getLineEndReset(): string
     {
-        if ($this->underline || $this->doubleUnderline) {
-            return "\x1b[24m";
-        }
-
-        return '';
+        // A hyperlink is closed at the end of the line too, and opened again on the next one, like a style
+        return ($this->underline || $this->doubleUnderline ? "\x1b[24m" : '').(null !== $this->link ? "\x1b]8;;\x07" : '');
     }
 
     /**
@@ -171,6 +175,10 @@ final class AnsiCodeTracker
         // Fast path: no escape sequences at all
         if (!str_contains($text, "\x1b")) {
             return;
+        }
+        // The last hyperlink opened or closed
+        if (str_contains($text, "\x1b]8;") && preg_match_all('/\x1b\]8;[^;\x07\x1b]*;[^\x07\x1b]*(?:\x07|\x1b\\\\)/', $text, $links)) {
+            $this->link = self::linkOf(end($links[0]));
         }
 
         // Use preg_match_all to find all SGR sequences at once (C-level scan)
@@ -185,6 +193,14 @@ final class AnsiCodeTracker
 
             $this->processParams(explode(';', $params));
         }
+    }
+
+    /**
+     * The sequence of a hyperlink opened, null for one that closes it (an empty URI).
+     */
+    private static function linkOf(string $code): ?string
+    {
+        return preg_match('/^\x1b\]8;[^;\x07\x1b]*;(?:\x07|\x1b\\\\)$/', $code) ? null : $code;
     }
 
     /**

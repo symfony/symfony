@@ -188,7 +188,7 @@ trait RedisTrait
 
         foreach ($params['ssl'] ?? [] as $streamOption => $value) {
             if (\in_array($streamOption, $booleanStreamOptions, true) && \is_string($value)) {
-                $params['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL);
+                $params['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Invalid Redis DSN: parameter "ssl[%s]" must be a boolean.', $streamOption));
             }
         }
 
@@ -209,9 +209,9 @@ trait RedisTrait
         }
 
         if (isset($params['lazy'])) {
-            $params['lazy'] = filter_var($params['lazy'], \FILTER_VALIDATE_BOOLEAN);
+            $params['lazy'] = filter_var($params['lazy'], \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Invalid Redis DSN: parameter "lazy" must be a boolean.');
         }
-        $params['redis_cluster'] = filter_var($params['redis_cluster'], \FILTER_VALIDATE_BOOLEAN);
+        $params['redis_cluster'] = filter_var($params['redis_cluster'], \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Invalid Redis DSN: parameter "redis_cluster" must be a boolean.');
 
         if ($params['redis_cluster'] && isset($params['redis_sentinel'])) {
             throw new InvalidArgumentException('Cannot use both "redis_cluster" and "redis_sentinel" at the same time.');

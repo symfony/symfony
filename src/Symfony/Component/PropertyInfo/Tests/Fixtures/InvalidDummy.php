@@ -54,4 +54,9 @@ class InvalidDummy
     public function setBaz($baz)
     {
     }
+
+    /**
+     * @var array<float, string>
+     */
+    public $invalidKeyType;
 }

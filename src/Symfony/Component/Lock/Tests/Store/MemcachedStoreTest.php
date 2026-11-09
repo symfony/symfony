@@ -83,6 +83,33 @@ class MemcachedStoreTest extends AbstractStoreTestCase
         $this->assertFalse($store->exists($key));
     }
 
+    public function testTtlEndingAfter2038()
+    {
+        $memcached = $this->createMock(\Memcached::class);
+        $memcached->expects($this->once())
+            ->method('add')
+            ->with($this->anything(), $this->anything(), 2147483647)
+            ->willReturnCallback(static function (string $key, string $value) use (&$token) {
+                $token = $value;
+
+                return true;
+            });
+        $memcached->method('get')->willReturnCallback(static function () use (&$token) {
+            return ['value' => $token, 'cas' => 1];
+        });
+        $memcached->method('getResultCode')->willReturn(\Memcached::RES_SUCCESS);
+        $memcached->expects($this->once())
+            ->method('cas')
+            ->with(1, $this->anything(), $this->anything(), 2147483647)
+            ->willReturn(true);
+
+        $store = new MemcachedStore($memcached, 100 * 365 * 86400);
+        $key = new Key(__METHOD__);
+
+        $store->save($key);
+        $store->putOffExpiration($key, 100 * 365 * 86400);
+    }
+
     public function testInvalidTtl()
     {
         $this->expectException(InvalidTtlException::class);

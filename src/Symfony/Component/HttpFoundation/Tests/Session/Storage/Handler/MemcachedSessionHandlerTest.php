@@ -128,6 +128,21 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertTrue($sessionHandler->write('id', 'data'));
     }
 
+    public function testWriteSessionWithTtlEndingAfter2038()
+    {
+        $memcached = $this->getMemcachedMock();
+        $memcached
+            ->expects($this->once())
+            ->method('set')
+            ->with(self::PREFIX.'id', 'data', 2147483647)
+            ->willReturn(true)
+        ;
+
+        $sessionHandler = new MemcachedSessionHandler($memcached, ['prefix' => self::PREFIX, 'expiretime' => 100 * 365 * 86400]);
+
+        $this->assertTrue($sessionHandler->write('id', 'data'));
+    }
+
     public function testDestroySession()
     {
         $memcached = $this->getMemcachedMock();

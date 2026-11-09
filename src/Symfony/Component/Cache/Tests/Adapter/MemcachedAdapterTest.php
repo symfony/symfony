@@ -286,4 +286,22 @@ class MemcachedAdapterTest extends AdapterTestCase
         self::assertTrue($item->isHit());
         self::assertSame('foobar', $item->get());
     }
+
+    public function testLifetimeEndingAfter2038()
+    {
+        $client = $this->createStub(\Memcached::class);
+        $client->method('getOption')->willReturnMap([[\Memcached::OPT_SERIALIZER, \Memcached::SERIALIZER_PHP]]);
+        $client->method('getResultCode')->willReturn(\Memcached::RES_SUCCESS);
+        $client->method('getMulti')->willReturn([]);
+        $client->method('setMulti')->willReturnCallback(static function (array $items, int $expiration) use (&$expirations) {
+            $expirations[] = $expiration;
+
+            return true;
+        });
+
+        $cache = new MemcachedAdapter($client);
+        $cache->save($cache->getItem('foo')->set('bar')->expiresAfter(100 * 365 * 86400));
+
+        $this->assertSame(2147483647, end($expirations));
+    }
 }

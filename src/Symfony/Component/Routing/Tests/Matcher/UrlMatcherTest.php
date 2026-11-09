@@ -993,6 +993,19 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'b', 'tenant' => 'acme', 'id' => '42'], $matcher->match('/report/42'));
     }
 
+    public function testVariableInHostAndPathTakesTheValueOfTheHost()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{tenant}/dashboard', [], [], [], '{tenant}.example.com'));
+        $coll->add('b', new Route('/{tenant}/report/{id}', [], [], [], '{id}.{tenant}.example.org'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'acme.example.com'));
+        $this->assertEquals(['_route' => 'a', 'tenant' => 'acme'], $matcher->match('/other/dashboard'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', '1.acme.example.org'));
+        $this->assertEquals(['_route' => 'b', 'tenant' => 'acme', 'id' => '1'], $matcher->match('/other/report/2'));
+    }
+
     public function testSlashVariant()
     {
         $coll = new RouteCollection();

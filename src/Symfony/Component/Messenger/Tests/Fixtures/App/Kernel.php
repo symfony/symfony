@@ -109,6 +109,10 @@ final class StampingMiddleware implements MiddlewareInterface
             $stamps[] = new ConnectionStamp(static fn () => null);
         }
 
+        if ($envelope->last(FailingResetStamp::class)) {
+            ResettableService::$failing = true;
+        }
+
         return $stack->next()->handle($envelope->with(...$stamps), $stack);
     }
 }
@@ -180,9 +184,14 @@ final class BatchSizeReportingHandler implements BatchHandlerInterface
 final class ResettableService implements ResetInterface
 {
     public static int $resets = 0;
+    public static bool $failing = false;
 
     public function reset(): void
     {
         ++self::$resets;
+
+        if (self::$failing) {
+            throw new \RuntimeException('Reset failed.');
+        }
     }
 }

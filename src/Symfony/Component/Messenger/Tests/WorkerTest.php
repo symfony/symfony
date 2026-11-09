@@ -77,6 +77,7 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectionStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\FailingResetStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\HandledByBusStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\SeenByWorkerStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
@@ -367,6 +368,31 @@ class WorkerTest extends TestCase
         });
 
         $messageExecutionStrategy = new ParallelExecutionStrategy($this->console, 1, 1, 1);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame(0, $receiver->getRejectCount());
+        $this->assertSame([1, 1], array_map(static fn (Envelope $envelope) => $envelope->last(HandledStamp::class)?->getResult(), $receiver->getAcknowledgedEnvelopes()));
+    }
+
+    public function testParallelExecutionSendsTheNextMessageToAnotherChildOnceTheResetOfServicesFails()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Hey'), [new FailingResetStamp()])],
+            [new Envelope(new DummyMessage('Bob'))],
+            [],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
         $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $messageExecutionStrategy);
 
         $worker->run();

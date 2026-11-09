@@ -28,6 +28,7 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\BatchHandlingMiddleware;
 use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectionStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\FailingResetStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\HandledByBusStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\ResettableService;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -120,6 +121,22 @@ class DispatchTaskTest extends TestCase
         $this->assertSame(1, ResettableService::$resets);
     }
 
+    public function testItStopsLikeOnItsMemoryLimitWhenTheResetOfServicesFails()
+    {
+        try {
+            $handled = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new DummyMessage('Hey'), [new FailingResetStamp()])), new DispatchEnvelopeMessage(2, new Envelope(new DummyMessage('Bob'))));
+            $failed = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new SecondMessage(), [new FailingResetStamp()])), new DispatchEnvelopeMessage(2, new Envelope(new DummyMessage('Bob'))));
+        } finally {
+            ResettableService::$failing = false;
+        }
+
+        $this->assertSame([DeferredEnvelopeMessage::class, HandledEnvelopeMessage::class, 'null', \RuntimeException::class], array_map(get_debug_type(...), $handled));
+        $this->assertSame(1, $handled[1]->envelope->last(HandledStamp::class)?->getResult());
+        $this->assertSame('Reset failed.', $handled[3]->getMessage());
+        $this->assertSame([HandledEnvelopeMessage::class, 'null', \RuntimeException::class], array_map(get_debug_type(...), $failed));
+        $this->assertInstanceOf(HandlerFailedException::class, $failed[0]->error);
+    }
+
     public function testItDoesNotSendBackTheNonSendableStampsThatItAdded()
     {
         foreach ([new ThirdMessage(), new DummyMessage('Hello')] as $message) {
@@ -204,7 +221,11 @@ class DispatchTaskTest extends TestCase
             }
         };
 
-        $task->run($channel, $cancellation);
+        try {
+            $task->run($channel, $cancellation);
+        } catch (\Throwable $e) {
+            $sent[] = $e;
+        }
 
         return $sent;
     }

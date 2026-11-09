@@ -300,6 +300,27 @@ class ParallelExecutionStrategyTest extends TestCase
         $this->assertSame([$envelopeC], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $channel->sent));
     }
 
+    public function testTheMessagesThatAWorkerWhoseTaskFailedDidNotReadAreSentToAnotherWorker()
+    {
+        $stoppedChannel = $this->createFakeChannel();
+        $crashedChannel = $this->createFakeChannel();
+        $channel = $this->createFakeChannel();
+        $strategy = $this->createStrategy([$stoppedChannel, $crashedChannel, $channel]);
+        $calls = [];
+
+        $strategy->execute($envelopeA = new Envelope(new DummyMessage('A')), 'async', $this->createOnHandled($calls));
+        $strategy->execute(new Envelope(new DummyMessage('C')), 'async', $this->createOnHandled($calls));
+        $stoppedChannel->push(null);
+        $crashedChannel->push(new ChannelException('Channel source closed unexpectedly'));
+        $this->setPrivateProperty($strategy, 'taskFailures', [spl_object_id($stoppedChannel) => new \RuntimeException('Reset failed.'), spl_object_id($crashedChannel) => new \RuntimeException('Crashed.')]);
+
+        $strategy->execute($envelopeB = new Envelope(new DummyMessage('B')), 'async', $this->createOnHandled($calls));
+
+        $this->assertSame(['C'], array_map(static fn (array $call) => $call[0]->getMessage()->getMessage(), $calls));
+        $this->assertSame('Crashed.', $calls[0][2]->getPrevious()->getMessage());
+        $this->assertSame([$envelopeA, $envelopeB], array_map(static fn (DispatchEnvelopeMessage $message) => $message->envelope, $channel->sent));
+    }
+
     public function testAFailureToSettleAnotherMessageIsNotChargedToTheDispatchedOne()
     {
         $busyChannel = $this->createFakeChannel();

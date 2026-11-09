@@ -503,7 +503,8 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
      */
     private function removeFailedChannels(callable $onHandled): void
     {
-        foreach ($this->taskFailures as $channelId => $e) {
+        // replacing a worker settles the other failed ones, so the next failure is read after each worker
+        while (null !== $channelId = array_key_first($this->taskFailures)) {
             $this->armChannel($channelId);
 
             // the outcomes that the worker sent before its task failed come first
@@ -516,10 +517,16 @@ final class ParallelExecutionStrategy implements MessageExecutionStrategyInterfa
                 }
 
                 $this->handleResponse($channelId, $response, $onHandled);
+
+                if (null === $response) {
+                    // the worker was replaced, and a new one may already reuse its id
+                    continue 2;
+                }
+
                 $this->armChannel($channelId);
             }
 
-            $this->removeChannel($channelId, $onHandled, $e);
+            $this->removeChannel($channelId, $onHandled);
         }
     }
 

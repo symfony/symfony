@@ -135,11 +135,10 @@ final class DispatchTask implements Task
 
                 unset($ack, $acked, $acks, $dispatching, $batch, $combine, $flushes);
 
-                $this->resetServices($container, $count);
+                $this->resetServices($bus, $channel, $container, $count, $unacks, $heldAcks);
 
                 if (null !== $this->memoryLimit && memory_get_usage(true) >= $this->memoryLimit) {
-                    $this->flush($bus, $channel, true, $unacks, $heldAcks);
-                    $channel->send(null);
+                    $this->stop($bus, $channel, $unacks, $heldAcks);
                     break;
                 }
 
@@ -179,12 +178,10 @@ final class DispatchTask implements Task
             // break the shared reference set so that each message tracks its own ack flag and batch
             unset($ack, $acked, $acks, $dispatching, $batch, $combine, $flushes);
 
-            $this->resetServices($container, $count);
+            $this->resetServices($bus, $channel, $container, $count, $unacks, $heldAcks);
 
             if (null !== $this->memoryLimit && memory_get_usage(true) >= $this->memoryLimit) {
-                $this->flush($bus, $channel, true, $unacks, $heldAcks);
-                // the parent then sends the messages that this worker won't read to another worker
-                $channel->send(null);
+                $this->stop($bus, $channel, $unacks, $heldAcks);
                 break;
             }
         }
@@ -421,10 +418,25 @@ final class DispatchTask implements Task
         return $envelope;
     }
 
-    private function resetServices(ContainerInterface $container, int &$count): void
+    /**
+     * Flushes the batch handlers, then tells the parent to send the messages that this worker won't read to another worker.
+     */
+    private function stop(MessageBusInterface $bus, Channel $channel, DeferredBatchMessageQueue $unacks, ?array &$heldAcks): void
+    {
+        $this->flush($bus, $channel, true, $unacks, $heldAcks);
+        $channel->send(null);
+    }
+
+    private function resetServices(MessageBusInterface $bus, Channel $channel, ContainerInterface $container, int &$count, DeferredBatchMessageQueue $unacks, ?array &$heldAcks): void
     {
         if ($this->resetInterval > 0 && 0 === ++$count % $this->resetInterval && $container->has('services_resetter')) {
-            $container->get('services_resetter')->reset();
+            try {
+                $container->get('services_resetter')->reset();
+            } catch (\Throwable $e) {
+                $this->stop($bus, $channel, $unacks, $heldAcks);
+
+                throw $e;
+            }
         }
     }
 }

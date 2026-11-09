@@ -28,6 +28,8 @@ use Symfony\Component\Security\Core\Security;
  * and folding compatibility forms like "ⓐ" requires the intl extension or symfony/polyfill-intl-normalizer.
  * Folding "ß" to "ss" requires the mbstring extension on PHP 7.3 or higher.
  *
+ * IPv6 clients are limited by their /64 network, since a client commonly gets a whole /64 network.
+ *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
 final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
@@ -55,7 +57,7 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
     protected function getLimiters(Request $request): array
     {
         return [
-            $this->globalFactory->create($request->getClientIp()),
+            $this->globalFactory->create(self::getClientNetwork($request)),
             $this->createLocalLimiter($request),
         ];
     }
@@ -74,6 +76,17 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
             $username = strtolower(trim($username));
         }
 
-        return $this->localFactory->create($username.'-'.$request->getClientIp());
+        return $this->localFactory->create($username.'-'.self::getClientNetwork($request));
+    }
+
+    private static function getClientNetwork(Request $request): ?string
+    {
+        $ip = $request->getClientIp();
+
+        if (!filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6) || 0 === strpos($packedIp = inet_pton($ip), "\0\0\0\0\0\0\0\0\0\0\xFF\xFF")) {
+            return $ip;
+        }
+
+        return inet_ntop(substr($packedIp, 0, 8).str_repeat("\0", 8)).'/64';
     }
 }

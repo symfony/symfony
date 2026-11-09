@@ -174,6 +174,37 @@ class LoginThrottlingListenerTest extends TestCase
         $this->listener->checkPassport($this->createCheckPassportEvent($this->createPassport('g')));
     }
 
+    public function testPreventsLoginFromTheSameIpv6Network()
+    {
+        $passport = $this->createPassport('wouter');
+
+        foreach (['2001:db8:1:2::1', '2001:db8:1:2::2', '2001:db8:1:2:a:b:c:d'] as $ip) {
+            $this->requestStack->push($this->createRequest($ip));
+            $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+            $this->requestStack->pop();
+        }
+
+        $this->requestStack->push($this->createRequest('2001:db8:1:2:ffff:ffff:ffff:ffff'));
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+    }
+
+    public function testDoesNotShareTheLimitWithOtherIpv6NetworksOrIpv4MappedAddresses()
+    {
+        $passport = $this->createPassport('wouter');
+
+        foreach (['2001:db8:1:2::1', '2001:db8:1:3::1', '::ffff:192.0.2.1', '::ffff:192.0.2.2'] as $ip) {
+            $this->requestStack->push($this->createRequest($ip));
+            for ($i = 0; $i < 3; ++$i) {
+                $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+            }
+            $this->requestStack->pop();
+        }
+
+        $this->addToAssertionCount(1);
+    }
+
     private function createPassport($username)
     {
         return new SelfValidatingPassport(new UserBadge($username));

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by jack-worman at 2026-11-08T02:27:36Z
+
+Maybe a better solution would be to use `_controller` instead of the path.

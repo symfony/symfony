@@ -30,6 +30,7 @@ use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Contracts\Service\ContainerProviderInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -102,7 +103,13 @@ final class StampingMiddleware implements MiddlewareInterface
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        return $stack->next()->handle($envelope->with(new HandledByBusStamp($this->busName), new SeenByWorkerStamp(array_keys($envelope->all()), $envelope->last(TrustStamp::class)?->isTrusted())), $stack);
+        $stamps = [new HandledByBusStamp($this->busName), new SeenByWorkerStamp(array_keys($envelope->all()), $envelope->last(TrustStamp::class)?->isTrusted())];
+
+        if ($envelope->last(ConnectStamp::class)) {
+            $stamps[] = new ConnectionStamp(static fn () => null);
+        }
+
+        return $stack->next()->handle($envelope->with(...$stamps), $stack);
     }
 }
 
@@ -120,6 +127,7 @@ final class BatchHandlingMiddleware implements MiddlewareInterface
             SecondMessage::class => [new HandlerDescriptor(static function (): never {
                 throw new \RuntimeException('Expected handler failure.');
             })],
+            ThirdMessage::class => [new HandlerDescriptor(static fn (): string => 'third')],
         ]));
     }
 

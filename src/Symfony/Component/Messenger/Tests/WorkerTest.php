@@ -76,6 +76,7 @@ use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectionStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\HandledByBusStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\SeenByWorkerStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
@@ -83,6 +84,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\ResettableDummyReceiver;
+use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
@@ -630,6 +632,25 @@ class WorkerTest extends TestCase
         $envelope = $receiver->getAcknowledgedEnvelopes()[0];
         $this->assertContains(ConnectionStamp::class, $envelope->last(SeenByWorkerStamp::class)?->stampClasses ?? []);
         $this->assertSame($stamp, $envelope->last(ConnectionStamp::class));
+    }
+
+    public function testParallelExecutionDropsTheNonSendableStampsThatTheChildAdded()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new ThirdMessage(), [new ConnectStamp()])],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertNull($receiver->getAcknowledgedEnvelopes()[0]->last(ConnectionStamp::class));
     }
 
     #[DataProvider('provideTrustStamps')]

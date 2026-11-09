@@ -24,11 +24,15 @@ use Symfony\Component\Messenger\Execution\Message\FlushBatchHandlersMessage;
 use Symfony\Component\Messenger\Execution\Message\HandledEnvelopeMessage;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\BatchHandlingMiddleware;
+use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectionStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\HandledByBusStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\ResettableService;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Contracts\Service\ContainerProviderInterface;
 
 class DispatchTaskTest extends TestCase
@@ -114,6 +118,20 @@ class DispatchTaskTest extends TestCase
         $this->assertInstanceOf(HandlerFailedException::class, $sent[0]->error);
         $this->assertInstanceOf(HandlerFailedException::class, $sent[1]->error);
         $this->assertSame(1, ResettableService::$resets);
+    }
+
+    public function testItDoesNotSendBackTheNonSendableStampsThatItAdded()
+    {
+        foreach ([new ThirdMessage(), new DummyMessage('Hello')] as $message) {
+            $envelope = $this->runTask(new Envelope($message, [new ReceivedStamp('async'), new ConnectStamp()]));
+
+            $this->assertNull($envelope->last(ConnectionStamp::class));
+            $this->assertSame('async', $envelope->last(ReceivedStamp::class)?->getTransportName());
+
+            $envelope = $this->runTask(new Envelope($message, [$stamp = new ConnectionStamp('42'), new ConnectStamp()]));
+
+            $this->assertSame([$stamp], $envelope->all(ConnectionStamp::class));
+        }
     }
 
     private function runTask(Envelope $envelope): Envelope

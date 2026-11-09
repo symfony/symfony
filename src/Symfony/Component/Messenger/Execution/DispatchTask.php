@@ -28,6 +28,7 @@ use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Runtime\RuntimeInterface;
 use Symfony\Component\Runtime\SymfonyRuntime;
@@ -70,14 +71,16 @@ final class DispatchTask implements Task
             }
 
             $requestId = $message->requestId;
+            $sentStamps = $message->envelope->all();
             $acked = false;
             $acks = [];
             $dispatching = true;
             $batch = null;
             $flushes = [];
-            $combine = static function (array $acks) use (&$batch, &$acked): ?array {
+            $combine = static function (array $acks) use (&$batch, &$acked, $sentStamps): ?array {
                 if ($ack = DeferredBatchMessageQueue::combineAcks($batch, $acks)) {
                     $acked = true;
+                    $ack[1] = self::withoutAddedNonSendableStamps($ack[1], $sentStamps);
                 }
 
                 return $ack;
@@ -151,7 +154,7 @@ final class DispatchTask implements Task
                 $batch = [$envelope->withoutAll(AckStamp::class), []];
                 self::sendBatchAck($channel, $combine(array_map(static fn (array $ack) => [$requestId, ...$ack], $acks)));
             } else {
-                self::sendHandled($channel, $requestId, $envelope->withoutAll(AckStamp::class), null);
+                self::sendHandled($channel, $requestId, self::withoutAddedNonSendableStamps($envelope, $sentStamps), null);
             }
 
             if ($flushes) {
@@ -400,6 +403,22 @@ final class DispatchTask implements Task
         }
 
         self::sendHandled($channel, $requestId, $envelope, $e);
+    }
+
+    /**
+     * Removes the non-sendable stamps that this worker added, since a transport wouldn't send them either.
+     *
+     * The parent replaces the stamps that it sent with its own instances. For those, this worker sends back the copies that it received.
+     */
+    private static function withoutAddedNonSendableStamps(Envelope $envelope, array $sentStamps): Envelope
+    {
+        foreach ($envelope->all() as $class => $stamps) {
+            if (is_a($class, NonSendableStampInterface::class, true) && $stamps !== ($sentStamps[$class] ?? null)) {
+                $envelope = $envelope->withoutAll($class)->with(...$sentStamps[$class] ?? []);
+            }
+        }
+
+        return $envelope;
     }
 
     private function resetServices(ContainerInterface $container, int &$count): void

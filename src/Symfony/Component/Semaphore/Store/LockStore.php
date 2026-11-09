@@ -42,14 +42,17 @@ final class LockStore implements PersistingStoreInterface
      *    a subsequent `serialize($key)` (or normalization) will throw
      *    {@see \Symfony\Component\Semaphore\Exception\UnserializableKeyException}.
      *
-     * Calling `save()` on a key that already holds state from this store is a
-     * no-op and does not re-flag the key.
+     * Calling `save()` on a key that still holds all its slots is a no-op and does not re-flag the key.
+     * When some slots were lost, all the locks of the key are released and new slots are acquired.
      */
     public function save(Key $key, float $ttlInSecond): void
     {
-        if ($this->getExistingLocks($key)) {
+        $existingLocks = $this->getExistingLocks($key);
+        if ($this->exists($key)) {
             return;
         }
+
+        $this->releaseLocks($existingLocks, $key);
 
         $locks = $this->createLocks($key, $ttlInSecond);
 

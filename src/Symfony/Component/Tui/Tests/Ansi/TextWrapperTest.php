@@ -383,4 +383,16 @@ class TextWrapperTest extends TestCase
 
         $this->assertSame([$thumbs.$thumbs, $thumbs], TextWrapper::wrapTextWithAnsi($thumbs.$thumbs.$thumbs, 4));
     }
+
+    public function testStyleEndingAtWrapIsNotCarriedToNextLine()
+    {
+        $this->assertSame(["ab \e[4mcd\e[24m", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e[4mcd\e[24m ef", 5));
+        $this->assertSame(["ab \e[44;4mcd\e[24;49m", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e[44;4mcd\e[24;49m ef", 5));
+        $this->assertSame(["ab \e[4mcd\e[24m"], TextWrapper::wrapTextWithAnsi("ab \e[4mcd\e[24m ", 5));
+    }
+
+    public function testStyleStartingInWhitespaceAtWrapGoesOnWithNextWord()
+    {
+        $this->assertSame(["ab\e[1m", "\e[1mef\e[22m"], TextWrapper::wrapTextWithAnsi("ab \e[1m ef\e[22m", 3));
+    }
 }

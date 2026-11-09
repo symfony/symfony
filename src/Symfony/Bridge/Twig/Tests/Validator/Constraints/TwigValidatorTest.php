@@ -19,7 +19,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Twig\DeprecatedCallableInfo;
 use Twig\Environment;
-use Twig\Error\Error;
 use Twig\Loader\ArrayLoader;
 use Twig\TwigFilter;
 
@@ -101,14 +100,11 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
 
     public static function getInvalidValues()
     {
-        // Twig 3.28 started reporting the column number in syntax errors
-        $column = method_exists(Error::class, 'getTemplateColumn') ? ' column 14' : '';
-
         return [
             // Invalid syntax example (missing end tag)
             ['{% if condition %}Oops', 'Unexpected end of template at line 1.', 1],
             // Another syntax error example (unclosed variable)
-            ['Hello {{ name', \sprintf('Unexpected token "end of template" ("end of print statement" expected) at line 1%s.', $column), 1],
+            ['Hello {{ name', 'Unexpected token "end of template" ("end of print statement" expected) at line 1 column 14.', 1],
             // Unknown filter error
             ['Hello {{ name|unknown_filter }}', 'Unknown "unknown_filter" filter at line 1.', 1],
             // Invalid variable syntax

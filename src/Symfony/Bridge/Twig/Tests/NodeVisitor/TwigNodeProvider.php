@@ -32,7 +32,7 @@ class TwigNodeProvider
             new BodyNode([new ConstantExpression($content, 0)]),
             null,
             new EmptyNode(),
-            class_exists(MacrosNode::class) ? new MacrosNode() : new EmptyNode(),
+            new MacrosNode(),
             new EmptyNode(),
             new EmptyNode(),
             new Source('', '')

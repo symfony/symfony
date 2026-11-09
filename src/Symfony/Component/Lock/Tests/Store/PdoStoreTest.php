@@ -54,6 +54,14 @@ class PdoStoreTest extends AbstractStoreTestCase
         return new PdoStore('sqlite:'.self::$dbFile);
     }
 
+    public function testExistsOnFreshKeyDoesNotCreateState()
+    {
+        $key = new Key(__METHOD__);
+
+        $this->assertFalse($this->getStore()->exists($key));
+        $this->assertFalse($key->hasState(PdoStore::class));
+    }
+
     public function testAbortAfterExpiration()
     {
         $this->markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');

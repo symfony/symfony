@@ -100,6 +100,10 @@ class InMemoryStore implements SharedLockStoreInterface
 
     public function exists(Key $key): bool
     {
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
         $hashKey = (string) $key;
         $token = $this->getUniqueToken($key);
 

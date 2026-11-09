@@ -57,6 +57,14 @@ class MemcachedStoreTest extends AbstractStoreTestCase
         return new MemcachedStore($memcached);
     }
 
+    public function testExistsOnFreshKeyDoesNotCreateState()
+    {
+        $key = new Key(__METHOD__);
+
+        $this->assertFalse($this->getStore()->exists($key));
+        $this->assertFalse($key->hasState(MemcachedStore::class));
+    }
+
     public function testAbortAfterExpiration()
     {
         $this->markTestSkipped('Memcached expects a TTL greater than 1 sec. Simulating a slow network is too hard');

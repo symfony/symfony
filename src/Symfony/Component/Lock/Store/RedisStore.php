@@ -205,6 +205,10 @@ class RedisStore implements SharedLockStoreInterface
 
     public function exists(Key $key): bool
     {
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
         $script = '
             local key = KEYS[1]
             local uniqueToken = ARGV[2]

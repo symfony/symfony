@@ -37,6 +37,14 @@ class ZookeeperStoreTest extends AbstractStoreTestCase
         return StoreFactory::createStore($zookeeper);
     }
 
+    public function testExistsOnFreshKeyDoesNotCreateState()
+    {
+        $key = new Key(__METHOD__);
+
+        $this->assertFalse($this->getStore()->exists($key));
+        $this->assertFalse($key->hasState(ZookeeperStore::class));
+    }
+
     #[DataProvider('provideValidConnectionString')]
     public function testCreateConnection(string $connectionString)
     {

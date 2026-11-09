@@ -120,6 +120,10 @@ class MemcachedStore implements PersistingStoreInterface
 
     public function exists(Key $key): bool
     {
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
         return $this->memcached->get((string) $key) === $this->getUniqueToken($key);
     }
 

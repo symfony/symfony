@@ -44,8 +44,8 @@ final class CompoundLimiter implements LimiterInterface
 
             if (
                 null === $minimalRateLimit
-                || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()
                 || ($minimalRateLimit->isAccepted() && !$rateLimit->isAccepted())
+                || ($minimalRateLimit->isAccepted() === $rateLimit->isAccepted() && $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens())
             ) {
                 $minimalRateLimit = $rateLimit;
             }

@@ -82,6 +82,20 @@ class CompoundLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
+    public function testConsumeIsRefusedWhenOneLimiterRefuses()
+    {
+        $limiter1 = $this->createLimiter(10, new \DateInterval('PT1M'));
+        $limiter2 = $this->createLimiter(100, new \DateInterval('PT1M'));
+        $limiter1->consume(7);
+        $limiter2->consume(94);
+        $limiter = new CompoundLimiter([$limiter1, $limiter2]);
+
+        $rateLimit = $limiter->consume(5);
+
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(3, $rateLimit->getRemainingTokens());
+    }
+
     public function testReserve()
     {
         $this->expectException(ReserveNotSupportedException::class);

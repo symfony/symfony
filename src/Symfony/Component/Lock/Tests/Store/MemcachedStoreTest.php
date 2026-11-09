@@ -116,4 +116,44 @@ class MemcachedStoreTest extends AbstractStoreTestCase
         $store = $this->getStore();
         $store->putOffExpiration(new Key('toto'), 0.1);
     }
+
+    public function testKeysRejectedByMemcachedAreHashed()
+    {
+        $memcached = new \Memcached();
+        $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);
+        $memcached->setOption(\Memcached::OPT_PREFIX_KEY, 'lock_');
+        $store = new MemcachedStore($memcached);
+
+        foreach (['', 'a b', "a\nb", str_repeat('a', 246)] as $resource) {
+            $key = new Key($resource);
+
+            $store->save($key);
+            $this->assertTrue($store->exists($key));
+            $this->assertSame($key->getState(MemcachedStore::class), $memcached->get(hash('sha256', $resource)));
+
+            $store->putOffExpiration($key, 300);
+            $this->assertTrue($store->exists($key));
+
+            $store->delete($key);
+            $this->assertFalse($store->exists($key));
+        }
+    }
+
+    public function testKeysAcceptedByMemcachedAreNotHashed()
+    {
+        $memcached = new \Memcached();
+        $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);
+        $memcached->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
+        $memcached->setOption(\Memcached::OPT_PREFIX_KEY, 'lock_');
+        $store = new MemcachedStore($memcached);
+
+        foreach (['a b', str_repeat('a', 245)] as $resource) {
+            $key = new Key($resource);
+
+            $store->save($key);
+            $this->assertSame($key->getState(MemcachedStore::class), $memcached->get($resource));
+
+            $store->delete($key);
+        }
+    }
 }

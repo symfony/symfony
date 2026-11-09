@@ -111,7 +111,7 @@ class Connection
 
         foreach ($options['ssl'] ?? [] as $streamOption => $value) {
             if (\in_array($streamOption, $booleanStreamOptions, true) && \is_string($value)) {
-                $options['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL);
+                $options['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "ssl[%s]" of the Redis Messenger transport must be a boolean.', $streamOption));
             }
         }
 

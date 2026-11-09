@@ -184,6 +184,28 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('rediss://127.0.0.1', [], $redis);
     }
 
+    public function testFromDsnWithBooleanSslOptions()
+    {
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->once())
+            ->method('connect')
+            ->with('localhost', 6379, 0.0, null, 0, 0.0, ['stream' => ['verify_peer' => false, 'verify_peer_name' => false, 'SNI_enabled' => true]])
+            ->willReturn(true);
+        $redis
+            ->method('isConnected')
+            ->willReturnOnConsecutiveCalls(false, true);
+
+        Connection::fromDsn('redis://localhost/queue?ssl[verify_peer]=false&ssl[verify_peer_name]=&ssl[SNI_enabled]=1', [], $redis);
+    }
+
+    public function testFromDsnWithInvalidSslOption()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "ssl[verify_peer]" of the Redis Messenger transport must be a boolean.');
+
+        Connection::fromDsn('redis://localhost/queue?lazy=1&ssl[verify_peer]=ture');
+    }
+
     public function testFromDsnWithQueryOptions()
     {
         $this->assertEquals(

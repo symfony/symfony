@@ -332,7 +332,7 @@ class OidcTokenHandlerTest extends TestCase
     #[DataProvider('getEncryptedTokenTypes')]
     public function testEnforcesTheAccessTokenTypeInsideAnEncryptedToken(string $type, bool $accepted)
     {
-        $encryptionKeyset = new JWKSet([new JWK(['kty' => 'oct', 'k' => 'V0hBVCBBIExPVkVMWSBLRVkgT0YgMzIgQllURVMh'])]);
+        $encryptionKeyset = new JWKSet([new JWK(['kty' => 'oct', 'k' => 'V0hBVCBBIExPVkVMWSBLRVkgT0YgMzIgQllURVMhISE'])]);
         $encryptionAlgorithms = new AlgorithmManager([new Dir(), new A128CBCHS256()]);
 
         $jwe = (new JWEBuilder($encryptionAlgorithms))
@@ -380,7 +380,7 @@ class OidcTokenHandlerTest extends TestCase
             true,
         );
         $handler->enableJweSupport(
-            new JWKSet([new JWK(['kty' => 'oct', 'k' => 'V0hBVCBBIExPVkVMWSBLRVkgT0YgMzIgQllURVMh'])]),
+            new JWKSet([new JWK(['kty' => 'oct', 'k' => 'V0hBVCBBIExPVkVMWSBLRVkgT0YgMzIgQllURVMhISE'])]),
             new AlgorithmManager([new Dir(), new A128CBCHS256()]),
             true,
         );

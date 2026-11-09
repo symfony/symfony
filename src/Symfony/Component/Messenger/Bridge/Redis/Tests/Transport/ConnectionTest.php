@@ -219,6 +219,28 @@ class ConnectionTest extends TestCase
         $this->assertInstanceOf(Connection::class, Connection::fromDsn('redis://localhost/queue?cluster=0', [], $this->createRedisMock()));
     }
 
+    #[DataProvider('provideClusterOption')]
+    public function testClusterOptionForcesRedisCluster(string $dsn, array $options)
+    {
+        $connection = Connection::fromDsn($dsn, ['lazy' => true] + $options);
+
+        $this->assertSame(['localhost:6379'], $this->getInitializerStaticVariables($connection)['hosts']);
+    }
+
+    public static function provideClusterOption(): \Generator
+    {
+        yield 'DSN' => ['redis://localhost/queue?cluster=1', []];
+        yield 'options' => ['redis://localhost/queue', ['cluster' => true]];
+    }
+
+    public function testClusterAndSentinelCannotBeUsedTogether()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot configure Redis Sentinel and Redis Cluster at the same time.');
+
+        Connection::fromDsn('redis://localhost/queue?cluster=1&sentinel=mymaster&lazy=1');
+    }
+
     public function testFromDsnWithRedisSentinelAlias()
     {
         $connection = Connection::fromDsn('redis://localhost/queue?lazy=1&redis_sentinel=mymaster', [], $this->createStub(\Redis::class));

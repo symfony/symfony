@@ -98,8 +98,8 @@ class Connection
             throw new InvalidArgumentException('Redis Sentinel support requires ext-redis>=5.2, or ext-relay.');
         }
 
-        if (null !== $sentinelMaster && $redis instanceof \RedisCluster) {
-            throw new InvalidArgumentException('Cannot configure Redis Sentinel and Redis Cluster instance at the same time.');
+        if (null !== $sentinelMaster && ($redis instanceof \RedisCluster || filter_var($options['cluster'], \FILTER_VALIDATE_BOOL))) {
+            throw new InvalidArgumentException('Cannot configure Redis Sentinel and Redis Cluster at the same time.');
         }
 
         foreach ($options['ssl'] ?? [] as $streamOption => $value) {
@@ -286,7 +286,7 @@ class Connection
         }
 
         $options['sentinel'] ??= $options['redis_sentinel'] ?? $options['sentinel_master'] ?? null;
-        unset($options['redis_sentinel'], $options['sentinel_master'], $options['cluster']);
+        unset($options['redis_sentinel'], $options['sentinel_master']);
 
         if ($invalidOptions = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS), ['host', 'port'])) {
             throw new LogicException(\sprintf('Invalid option(s) "%s" passed to the Redis Messenger transport.', implode('", "', $invalidOptions)));

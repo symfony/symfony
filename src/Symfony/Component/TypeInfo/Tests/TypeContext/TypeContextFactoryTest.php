@@ -204,6 +204,16 @@ class TypeContextFactoryTest extends TestCase
         ], $this->typeContextFactory->createFromReflection(new \ReflectionClass(DummyWithTemplateAndParentInDifferentNs::class))->templates);
     }
 
+    public function testCollectTemplatesWithInvalidBound()
+    {
+        /**
+         * @template T of array<float, string>
+         */
+        $dummy = new class {};
+
+        $this->assertEquals(['T' => Type::mixed()], $this->typeContextFactory->createFromClassName($dummy::class)->templates);
+    }
+
     public function testDoNotCollectTemplatesWhenToStringTypeResolver()
     {
         $typeContextFactory = new TypeContextFactory();

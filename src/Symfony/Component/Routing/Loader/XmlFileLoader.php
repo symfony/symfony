@@ -185,7 +185,7 @@ class XmlFileLoader extends FileLoader
 
         $exclude = [];
         foreach ($node->childNodes as $child) {
-            if ($child instanceof \DOMElement && $child->localName === $exclude && self::NAMESPACE_URI === $child->namespaceURI) {
+            if ($child instanceof \DOMElement && 'exclude' === $child->localName && self::NAMESPACE_URI === $child->namespaceURI) {
                 $exclude[] = $child->nodeValue;
             }
         }
@@ -292,6 +292,7 @@ class XmlFileLoader extends FileLoader
                     $condition = trim($n->textContent);
                     break;
                 case 'resource':
+                case 'exclude':
                     break;
                 default:
                     throw new \InvalidArgumentException(\sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement", "option" or "condition".', $n->localName, $path));

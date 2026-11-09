@@ -43,6 +43,7 @@
     "conflict": {
         "symfony/clock": "<6.4",
         "symfony/http-client-contracts": "<3.0",
+        "symfony/rate-limiter": "<6.4.33|>=7,<7.4.5|>=8,<8.0.5",
         "symfony/security-bundle": "<6.4",
         "symfony/security-csrf": "<6.4"
     },

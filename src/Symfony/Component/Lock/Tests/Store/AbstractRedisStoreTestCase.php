@@ -15,6 +15,7 @@ use Relay\Cluster as RelayCluster;
 use Relay\Relay;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Exception\LockStorageException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -55,6 +56,36 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
             $newStore->save($key2);
         } finally {
             $this->getRedisConnection()->del((string) $key1);
+        }
+    }
+
+    public function testSaveReportsErrorReplies()
+    {
+        $resource = uniqid(__METHOD__, true);
+        $redis = $this->getRedisConnection();
+        $redis->hset($resource, 'field', 'value');
+
+        try {
+            $this->expectException(LockStorageException::class);
+            $this->expectExceptionMessage('WRONGTYPE');
+            $this->getStore()->save(new Key($resource));
+        } finally {
+            $redis->del($resource);
+        }
+    }
+
+    public function testExistsReportsErrorReplies()
+    {
+        $resource = uniqid(__METHOD__, true);
+        $redis = $this->getRedisConnection();
+        $redis->hset($resource, 'field', 'value');
+
+        try {
+            $this->expectException(LockStorageException::class);
+            $this->expectExceptionMessage('WRONGTYPE');
+            $this->getStore()->exists(new Key($resource));
+        } finally {
+            $redis->del($resource);
         }
     }
 

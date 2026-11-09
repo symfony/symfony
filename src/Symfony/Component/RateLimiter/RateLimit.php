@@ -67,6 +67,6 @@ class RateLimit
             return;
         }
 
-        usleep((int) ($delta * 1e6));
+        usleep((int) ceil($delta * 1e6));
     }
 }

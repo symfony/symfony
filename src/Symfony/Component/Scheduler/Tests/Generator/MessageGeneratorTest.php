@@ -461,6 +461,26 @@ class MessageGeneratorTest extends TestCase
         $this->assertSame([$message], iterator_to_array($generator->getMessages(), false));
     }
 
+    public function testCronWithoutTimezoneKeepsTheClockTimezoneAfterARestart()
+    {
+        $clock = new MockClock('2026-11-09 00:00:00', 'UTC');
+        $cache = new ArrayAdapter();
+        $nightly = (object) ['id' => 'nightly'];
+        $newYork = (object) ['id' => 'new_york'];
+        $schedule = (new Schedule())->add(RecurringMessage::cron('0 2 * * *', $nightly), RecurringMessage::cron('0 9 * * *', $newYork, 'America/New_York'))->stateful($cache);
+
+        $generator = new MessageGenerator($schedule, 'dummy', $clock);
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+        $clock->modify('2026-11-09 02:00:30');
+        $this->assertSame([$nightly], iterator_to_array($generator->getMessages(), false));
+        $clock->modify('2026-11-09 14:00:30');
+        $this->assertSame([$newYork], iterator_to_array($generator->getMessages(), false));
+
+        $generator = new MessageGenerator($schedule, 'dummy', $clock);
+        $clock->modify('2026-11-10 02:00:30');
+        $this->assertSame([$nightly], iterator_to_array($generator->getMessages(), false));
+    }
+
     public function testThrowsWhenTriggerDoesNotMoveTheRunDateForward()
     {
         $clock = new MockClock(self::makeDateTime('22:12:00'));

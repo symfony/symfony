@@ -282,7 +282,7 @@ class MongoDbStore implements PersistingStoreInterface
 
     public function exists(Key $key): bool
     {
-        $cursor = $this->manager->executeQuery($this->namespace, new Query(
+        $cursor = $this->getManager()->executeQuery($this->namespace, new Query(
             [
                 '_id' => (string) $key,
                 'token' => $this->getUniqueToken($key),

@@ -88,6 +88,8 @@ class MongoDbStoreTest extends AbstractStoreTestCase
 
         $store = new MongoDbStore($mongo, $options);
 
+        $this->assertFalse($store->exists($key));
+
         $store->save($key);
         $this->assertTrue($store->exists($key));
 

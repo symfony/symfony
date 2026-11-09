@@ -65,7 +65,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 
     public function __toString(): string
     {
-        return 'glob.'.$this->prefix.(int) $this->recursive.$this->pattern.(int) $this->forExclusion.implode("\0", $this->excludedPrefixes);
+        return 'glob.'.$this->prefix.(int) $this->recursive.$this->pattern.(int) $this->forExclusion.implode("\0", array_keys($this->excludedPrefixes));
     }
 
     public function isFresh(int $timestamp): bool

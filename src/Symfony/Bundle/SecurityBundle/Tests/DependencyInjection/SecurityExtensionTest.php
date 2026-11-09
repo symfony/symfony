@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPas
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
@@ -1085,6 +1086,33 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertTrue($container->has('security.listener.session.'.$firewallId));
+    }
+
+    public function testLoginThrottlingListenerKnowsWhetherItsFirewallIsStateless()
+    {
+        $container = $this->getRawContainer();
+        $container->register('app.rate_limiter', RequestRateLimiterInterface::class);
+
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'api' => [
+                    'pattern' => '^/api',
+                    'stateless' => true,
+                    'http_basic' => true,
+                    'login_throttling' => ['limiter' => 'app.rate_limiter'],
+                ],
+                'main' => [
+                    'pattern' => '/.*',
+                    'http_basic' => true,
+                    'login_throttling' => ['limiter' => 'app.rate_limiter'],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition('security.listener.login_throttling.api')->getArgument(2));
+        $this->assertFalse($container->getDefinition('security.listener.login_throttling.main')->getArgument(2));
     }
 
     public function testFirewallsSharingAContextDispatchOnTheirOwnEventDispatcher()

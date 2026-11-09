@@ -24,6 +24,7 @@ final class SlidingWindow implements LimiterStateInterface
     private int $hitCount = 0;
     private int $hitCountForLastWindow = 0;
     private float $windowEndAt;
+    private ?int $maxSize = null;
 
     public function __construct(
         private string $id,
@@ -38,14 +39,31 @@ final class SlidingWindow implements LimiterStateInterface
     public static function createFromPreviousWindow(self $window, int $intervalInSeconds): self
     {
         $new = new self($window->id, $intervalInSeconds);
-        $windowEndAt = $window->windowEndAt + $intervalInSeconds;
+        $new->maxSize = $window->maxSize;
+        // without a size, no hits are carried to the next windows
+        $maxSize = $window->maxSize ?? max(1, $window->hitCount);
+        $windows = max(1, 1 + (int) ((microtime(true) - $window->windowEndAt) / $intervalInSeconds));
+        // the reserved hits beyond the size of a window act in the next ones
+        $hitCountForLastWindow = min($maxSize, max(0, $window->hitCount - ($windows - 1) * $maxSize));
 
-        if (microtime(true) < $windowEndAt) {
-            $new->hitCountForLastWindow = $window->hitCount;
-            $new->windowEndAt = $windowEndAt;
+        if (1 === $windows || $hitCountForLastWindow) {
+            $new->hitCountForLastWindow = $hitCountForLastWindow;
+            $new->hitCount = max(0, $window->hitCount - $windows * $maxSize);
+            $new->windowEndAt = $window->windowEndAt + $windows * $intervalInSeconds;
         }
 
         return $new;
+    }
+
+    public function configure(int $maxSize): void
+    {
+        if (null !== $this->maxSize && $maxSize !== $this->maxSize && $this->hitCount > 0) {
+            // full windows stay full and the last one is capped at the new size, like for fixed windows
+            $fullWindows = intdiv($this->hitCount - 1, $this->maxSize);
+            $this->hitCount = $fullWindows * $maxSize + min($this->hitCount - $fullWindows * $this->maxSize, $maxSize);
+        }
+
+        $this->maxSize = $maxSize;
     }
 
     public function getId(): string
@@ -54,11 +72,13 @@ final class SlidingWindow implements LimiterStateInterface
     }
 
     /**
-     * Returns the remaining of this timeframe and the next one.
+     * Returns the remaining of this timeframe and of the next ones its hits act in.
      */
     public function getExpirationTime(): int
     {
-        return (int) ceil($this->windowEndAt + $this->intervalInSeconds - microtime(true));
+        $windows = null !== $this->maxSize ? max(1, (int) ceil($this->hitCount / $this->maxSize)) : 1;
+
+        return (int) ceil($this->windowEndAt + $windows * $this->intervalInSeconds - microtime(true));
     }
 
     public function isExpired(): bool
@@ -101,14 +121,27 @@ final class SlidingWindow implements LimiterStateInterface
             return $toRelease * $this->intervalInSeconds / $this->hitCountForLastWindow;
         }
 
-        return ($this->windowEndAt - $time) + ($toRelease - $releasableInWindow) * $this->intervalInSeconds / max(1, $this->hitCount);
+        // the reserved hits beyond the size of a window act in the next ones: the tokens fit in the first window with room left
+        $inWindow = (int) ceil(($this->hitCount + $tokens) / $maxSize) - 1;
+        $hitCountForPreviousWindow = min($maxSize, $this->hitCount - ($inWindow - 1) * $maxSize);
+        $hitCountForWindow = max(0, $this->hitCount - $inWindow * $maxSize);
+        $toReleaseInWindow = $hitCountForPreviousWindow + $hitCountForWindow - ($maxSize - $tokens + 1);
+
+        return ($this->windowEndAt - $time) + ($inWindow - 1) * $this->intervalInSeconds + $toReleaseInWindow * $this->intervalInSeconds / max(1, $hitCountForPreviousWindow);
     }
 
     public function __serialize(): array
     {
-        return [
+        $data = [
             pack('NNN', $this->hitCount, $this->hitCountForLastWindow, $this->intervalInSeconds).$this->id => $this->windowEndAt,
         ];
+
+        // older versions read the first entry only
+        if (null !== $this->maxSize) {
+            $data[''] = $this->maxSize;
+        }
+
+        return $data;
     }
 
     public function __unserialize(array $data): void
@@ -130,6 +163,7 @@ final class SlidingWindow implements LimiterStateInterface
 
         $pack = key($data);
         $this->windowEndAt = $data[$pack];
+        $this->maxSize = $data[''] ?? null;
         ['a' => $this->hitCount, 'b' => $this->hitCountForLastWindow, 'c' => $this->intervalInSeconds] = unpack('Na/Nb/Nc', $pack);
         $this->id = substr($pack, 12);
     }

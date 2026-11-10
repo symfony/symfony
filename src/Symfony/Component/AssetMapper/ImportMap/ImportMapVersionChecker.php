@@ -158,6 +158,47 @@ class ImportMapVersionChecker
         return implode(' ', $processedSegments);
     }
 
+    /**
+     * Compares two npm versions using the semver precedence rules, where pre-releases come before their release.
+     *
+     * @internal
+     */
+    public static function compareVersions(string $version1, string $version2): int
+    {
+        [$version1, $preRelease1] = explode('-', $version1, 2) + [1 => null];
+        [$version2, $preRelease2] = explode('-', $version2, 2) + [1 => null];
+
+        if ($result = version_compare($version1, $version2)) {
+            return $result;
+        }
+        if (null === $preRelease1 || null === $preRelease2) {
+            return (null === $preRelease1) <=> (null === $preRelease2);
+        }
+
+        $identifiers1 = explode('.', $preRelease1);
+        $identifiers2 = explode('.', $preRelease2);
+
+        foreach ($identifiers1 as $i => $identifier1) {
+            if (!isset($identifiers2[$i])) {
+                return 1;
+            }
+
+            $identifier2 = $identifiers2[$i];
+            $result = match (true) {
+                ctype_digit($identifier1) && ctype_digit($identifier2) => $identifier1 <=> $identifier2,
+                ctype_digit($identifier1) => -1,
+                ctype_digit($identifier2) => 1,
+                default => strcmp($identifier1, $identifier2),
+            };
+
+            if ($result) {
+                return $result;
+            }
+        }
+
+        return \count($identifiers1) <=> \count($identifiers2);
+    }
+
     private static function cleanVersionSegment(string $segment): string
     {
         return str_replace(['v', '.x'], ['', '.*'], $segment);

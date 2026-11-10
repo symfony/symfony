@@ -180,6 +180,31 @@ class ImportMapUpdateCheckerTest extends TestCase
             ['next-patch' => new PackageUpdateInfo('next-patch', '1.2.3-beta.1', '1.2.10', 'patch')],
             null,
         ];
+        yield 'pre-release named "preview" to release' => [
+            [self::createRemoteEntry('next-preview', '11.0.0-preview.7.26381.103')],
+            ['next-preview' => new PackageUpdateInfo('next-preview', '11.0.0-preview.7.26381.103', '11.0.0', 'patch')],
+            null,
+        ];
+        yield 'numeric pre-release to release' => [
+            [self::createRemoteEntry('next-numeric', '1.2.3-1')],
+            ['next-numeric' => new PackageUpdateInfo('next-numeric', '1.2.3-1', '1.2.3', 'patch')],
+            null,
+        ];
+        yield '0.x minor update' => [
+            [self::createRemoteEntry('zero-minor', '0.186.0')],
+            ['zero-minor' => new PackageUpdateInfo('zero-minor', '0.186.0', '0.187.0', 'major')],
+            null,
+        ];
+        yield '0.x patch update' => [
+            [self::createRemoteEntry('zero-patch', '0.186.0')],
+            ['zero-patch' => new PackageUpdateInfo('zero-patch', '0.186.0', '0.186.1', 'patch')],
+            null,
+        ];
+        yield '0.0.x patch update' => [
+            [self::createRemoteEntry('zero-zero-patch', '0.0.3')],
+            ['zero-zero-patch' => new PackageUpdateInfo('zero-zero-patch', '0.0.3', '0.0.4', 'major')],
+            null,
+        ];
         yield [
             [
                 self::createRemoteEntry(
@@ -231,6 +256,21 @@ class ImportMapUpdateCheckerTest extends TestCase
             ]),
             'https://registry.npmjs.org/next-patch' => new JsonMockResponse([
                 'dist-tags' => ['latest' => '1.2.10'],
+            ]),
+            'https://registry.npmjs.org/next-preview' => new JsonMockResponse([
+                'dist-tags' => ['latest' => '11.0.0'],
+            ]),
+            'https://registry.npmjs.org/next-numeric' => new JsonMockResponse([
+                'dist-tags' => ['latest' => '1.2.3'],
+            ]),
+            'https://registry.npmjs.org/zero-minor' => new JsonMockResponse([
+                'dist-tags' => ['latest' => '0.187.0'],
+            ]),
+            'https://registry.npmjs.org/zero-patch' => new JsonMockResponse([
+                'dist-tags' => ['latest' => '0.186.1'],
+            ]),
+            'https://registry.npmjs.org/zero-zero-patch' => new JsonMockResponse([
+                'dist-tags' => ['latest' => '0.0.4'],
             ]),
         ];
 

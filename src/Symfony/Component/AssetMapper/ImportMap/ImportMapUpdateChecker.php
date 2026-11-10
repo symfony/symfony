@@ -71,7 +71,12 @@ class ImportMapUpdateChecker
 
     private function getVersionPart(string $version, int $part): ?string
     {
-        return explode('.', $version)[$part] ?? $version;
+        return explode('.', $this->getVersionCore($version))[$part] ?? $version;
+    }
+
+    private function getVersionCore(string $version): string
+    {
+        return explode('-', $version, 2)[0];
     }
 
     private function getUpdateType(string $currentVersion, string $latestVersion): string
@@ -89,6 +94,10 @@ class ImportMapUpdateChecker
             return PackageUpdateInfo::UPDATE_TYPE_MINOR;
         }
         if ($this->getVersionPart($currentVersion, 2) < $this->getVersionPart($latestVersion, 2)) {
+            return PackageUpdateInfo::UPDATE_TYPE_PATCH;
+        }
+        if ($this->getVersionCore($currentVersion) === $this->getVersionCore($latestVersion)) {
+            // only the pre-release differs: npm and Composer both accept 2.0.0-beta.4 and 2.0.0 for ^2.0.0-beta.3
             return PackageUpdateInfo::UPDATE_TYPE_PATCH;
         }
 

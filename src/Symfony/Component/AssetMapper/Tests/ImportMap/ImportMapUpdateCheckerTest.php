@@ -160,6 +160,26 @@ class ImportMapUpdateCheckerTest extends TestCase
             ), ],
             null,
         ];
+        yield 'pre-release to pre-release' => [
+            [self::createRemoteEntry('next-beta', '2.0.0-beta.3')],
+            ['next-beta' => new PackageUpdateInfo('next-beta', '2.0.0-beta.3', '2.0.0-beta.4', 'patch')],
+            null,
+        ];
+        yield 'pre-release without a dot to pre-release' => [
+            [self::createRemoteEntry('next-beta-nodot', '5.0.0-beta1')],
+            ['next-beta-nodot' => new PackageUpdateInfo('next-beta-nodot', '5.0.0-beta1', '5.0.0-beta2', 'patch')],
+            null,
+        ];
+        yield 'pre-release to release' => [
+            [self::createRemoteEntry('next-release', '2.0.0-beta.3')],
+            ['next-release' => new PackageUpdateInfo('next-release', '2.0.0-beta.3', '2.0.0', 'patch')],
+            null,
+        ];
+        yield 'pre-release to a later patch' => [
+            [self::createRemoteEntry('next-patch', '1.2.3-beta.1')],
+            ['next-patch' => new PackageUpdateInfo('next-patch', '1.2.3-beta.1', '1.2.10', 'patch')],
+            null,
+        ];
         yield [
             [
                 self::createRemoteEntry(
@@ -199,6 +219,18 @@ class ImportMapUpdateCheckerTest extends TestCase
             ]),
             'https://registry.npmjs.org/lodash' => new JsonMockResponse([
                 'dist-tags' => ['latest' => '4.17.21'], // no update
+            ]),
+            'https://registry.npmjs.org/next-beta' => new JsonMockResponse([
+                'dist-tags' => ['latest' => '2.0.0-beta.4'],
+            ]),
+            'https://registry.npmjs.org/next-beta-nodot' => new JsonMockResponse([
+                'dist-tags' => ['latest' => '5.0.0-beta2'],
+            ]),
+            'https://registry.npmjs.org/next-release' => new JsonMockResponse([
+                'dist-tags' => ['latest' => '2.0.0'],
+            ]),
+            'https://registry.npmjs.org/next-patch' => new JsonMockResponse([
+                'dist-tags' => ['latest' => '1.2.10'],
             ]),
         ];
 

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-10T13:22:04Z
+
+I changed the same-version case to `patch` instead of `major`. npm and Composer both accept `2.0.0-beta.4` and `2.0.0` for `^2.0.0-beta.3`, and `2.0.0-beta.3` to `2.0.1` was already reported as a patch update. With `major`, `5.0.0-beta1` to `5.0.0-beta2` (the naming Bootstrap used) would move from `semver-safe-update`, what it shows today, to `update-possible`.

@@ -85,11 +85,13 @@ final class AhaSendApiTransport extends AbstractApiTransport
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
         }
 
-        // one entry per recipient, each with its own generated Message-ID
+        // One entry per recipient. Responses from before "message_id_header" was added have the Message-ID header in "id".
+        // The angle brackets are removed so that the ID matches the one of the remote events.
         $messageId = null;
         foreach ($result['data'] ?? [] as $message) {
-            if (null === $messageId && !empty($message['id'])) {
-                $messageId = $message['id'];
+            $header = \array_key_exists('message_id_header', $message) ? $message['message_id_header'] : ($message['id'] ?? null);
+            if (null === $messageId && $header) {
+                $messageId = self::withoutAngleBrackets($header);
             }
             if (null !== $this->dispatcher && !empty($message['error'])) {
                 $this->dispatcher->dispatch(new AhaSendDeliveryEvent($message['error']));
@@ -305,6 +307,11 @@ final class AhaSendApiTransport extends AbstractApiTransport
         }
 
         return $formattedAddress;
+    }
+
+    private static function withoutAngleBrackets(string $messageId): string
+    {
+        return str_starts_with($messageId, '<') && str_ends_with($messageId, '>') ? substr($messageId, 1, -1) : $messageId;
     }
 
     private function getEndpoint(): string

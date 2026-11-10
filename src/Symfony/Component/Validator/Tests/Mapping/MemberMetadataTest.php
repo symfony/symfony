@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Composite;
@@ -70,6 +72,24 @@ class MemberMetadataTest extends TestCase
     {
         $this->metadata->addConstraint($constraint = new Collection(['field1' => new Required([new PropertyConstraint()])]));
         $this->assertSame($this->metadata->getConstraints(), [$constraint]);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyConstraintInStarGroupIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/validator 8.2: Using "*" as a validation group name in the "Symfony\\Component\\Validator\\Tests\\Fixtures\\ConstraintB" constraint is deprecated. This name is reserved for future use.');
+
+        $this->metadata->addConstraint(new ConstraintB(null, ['Group 1', '*']));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyValidInStarGroupIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/validator 8.2: Using "*" as a validation group name in the "Symfony\\Component\\Validator\\Constraints\\Valid" constraint is deprecated. This name is reserved for future use.');
+
+        $this->metadata->addConstraint(new Valid(groups: ['*']));
     }
 
     public function testSerialize()

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
@@ -36,5 +38,23 @@ class GroupSequenceTest extends TestCase
 
         $this->assertSame(['Group 1'], $sequence->groups);
         $this->assertFalse($sequence->cascadeCurrentGroup);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyStarGroupIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/validator 8.2: Using "*" as a validation group name in a group sequence is deprecated. This name is reserved for future use.');
+
+        new GroupSequence(['Group 1', '*']);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyStarGroupInNestedGroupsIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/validator 8.2: Using "*" as a validation group name in a group sequence is deprecated. This name is reserved for future use.');
+
+        new GroupSequence(['Group 1', ['Group 2', '*']]);
     }
 }

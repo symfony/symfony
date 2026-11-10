@@ -278,6 +278,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     protected function normalizeGroups(string|GroupSequence|array $groups): array
     {
         if (!\is_array($groups)) {
+            if ('*' === $groups) {
+                trigger_deprecation('symfony/validator', '8.2', 'Passing "*" as a validation group is deprecated. This name is reserved for future use.');
+            }
+
             return [$groups];
         }
 
@@ -291,6 +295,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             }
 
             $groups[$key] = (string) $group;
+
+            if ('*' === $groups[$key]) {
+                trigger_deprecation('symfony/validator', '8.2', 'Passing "*" as a validation group is deprecated. This name is reserved for future use.');
+            }
         }
 
         return $groups;

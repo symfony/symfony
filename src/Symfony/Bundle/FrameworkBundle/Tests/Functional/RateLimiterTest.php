@@ -68,6 +68,17 @@ class RateLimiterTest extends AbstractWebTestCase
         self::assertResponseStatusCodeSame(429);
     }
 
+    public function testPolicyAttributeOnArgument()
+    {
+        $client = self::createClient(['test_case' => 'RateLimiter']);
+
+        $this->consumeAllTokens($client, '/argument');
+
+        $client->request('GET', '/argument');
+        self::assertResponseStatusCodeSame(429);
+        $this->assertSame('slow down', $client->getResponse()->getContent());
+    }
+
     private function consumeAllTokens(KernelBrowser $client, string $uri): void
     {
         for ($i = 0; $i < 5; ++$i) {

@@ -12,8 +12,8 @@
 namespace Symfony\Component\HttpKernel\Attribute;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\RateLimiter\Attribute\PolicyInterface;
 use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
-use Symfony\Component\RateLimiter\Policy\PolicyInterface;
 
 /**
  * Rate limits the controller.

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\RateLimiter\Policy;
+namespace Symfony\Component\RateLimiter\Attribute;
 
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
@@ -17,22 +17,21 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class TokenBucketPolicy implements PolicyInterface
+#[\Attribute(\Attribute::TARGET_PARAMETER)]
+final class SlidingWindowPolicy implements PolicyInterface
 {
     /**
-     * @param int                  $limit    Maximum allowed hits in a burst
-     * @param \DateInterval|string $interval Interval at which "$amount" tokens are added back
-     * @param int                  $amount   Number of tokens added back per "$interval"
+     * @param int                  $limit    Maximum allowed hits for the passed interval
+     * @param \DateInterval|string $interval If string, must be a number followed by "second", "minute", "hour", "day", "week" or "month" (or their plural equivalent)
      */
     public function __construct(
         public readonly int $limit,
         public readonly \DateInterval|string $interval,
-        public readonly int $amount = 1,
     ) {
     }
 
     public function createFactory(RateLimiterBuilder $builder, string $id): RateLimiterFactoryInterface
     {
-        return $builder->tokenBucket($id, $this->limit, $this->interval, $this->amount);
+        return $builder->slidingWindow($id, $this->limit, $this->interval);
     }
 }

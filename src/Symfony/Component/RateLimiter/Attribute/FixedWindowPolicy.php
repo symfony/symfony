@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\RateLimiter\Policy;
+namespace Symfony\Component\RateLimiter\Attribute;
 
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
@@ -17,6 +17,7 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_PARAMETER)]
 final class FixedWindowPolicy implements PolicyInterface
 {
     /**

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-10T13:22:06Z
+
+I added a test with a listener that throws, since that's what happens on an access denied.

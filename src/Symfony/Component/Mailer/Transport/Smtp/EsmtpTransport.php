@@ -189,6 +189,10 @@ class EsmtpTransport extends SmtpTransport
         if ($this->autoTls && !$stream->isTLS() && \defined('OPENSSL_VERSION_NUMBER') && \array_key_exists('STARTTLS', $this->capabilities)) {
             $this->executeCommand("STARTTLS\r\n", [220]);
 
+            if ($stream->hasPendingData()) {
+                throw new TransportException('Unable to connect with STARTTLS: the server sent unexpected data before the TLS handshake.');
+            }
+
             if (!$stream->startTLS()) {
                 throw new TransportException('Unable to connect with STARTTLS.');
             }

@@ -28,6 +28,7 @@ use Symfony\Component\Messenger\Stamp\AckStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Runtime\RuntimeInterface;
 use Symfony\Component\Runtime\SymfonyRuntime;
@@ -70,14 +71,16 @@ final class DispatchTask implements Task
             }
 
             $requestId = $message->requestId;
+            $sentStamps = $message->envelope->all();
             $acked = false;
             $acks = [];
             $dispatching = true;
             $batch = null;
             $flushes = [];
-            $combine = static function (array $acks) use (&$batch, &$acked): ?array {
+            $combine = static function (array $acks) use (&$batch, &$acked, $sentStamps): ?array {
                 if ($ack = DeferredBatchMessageQueue::combineAcks($batch, $acks)) {
                     $acked = true;
+                    $ack[1] = self::withoutAddedNonSendableStamps($ack[1], $sentStamps);
                 }
 
                 return $ack;
@@ -132,11 +135,10 @@ final class DispatchTask implements Task
 
                 unset($ack, $acked, $acks, $dispatching, $batch, $combine, $flushes);
 
-                $this->resetServices($container, $count);
+                $this->resetServices($bus, $channel, $container, $count, $unacks, $heldAcks);
 
                 if (null !== $this->memoryLimit && memory_get_usage(true) >= $this->memoryLimit) {
-                    $this->flush($bus, $channel, true, $unacks, $heldAcks);
-                    $channel->send(null);
+                    $this->stop($bus, $channel, $unacks, $heldAcks);
                     break;
                 }
 
@@ -151,18 +153,12 @@ final class DispatchTask implements Task
                 $batch = [$envelope->withoutAll(AckStamp::class), []];
                 self::sendBatchAck($channel, $combine(array_map(static fn (array $ack) => [$requestId, ...$ack], $acks)));
             } else {
-                self::sendHandled($channel, $requestId, $envelope->withoutAll(AckStamp::class), null);
+                self::sendHandled($channel, $requestId, self::withoutAddedNonSendableStamps($envelope, $sentStamps), null);
             }
 
             if ($flushes) {
-                $heldAcks = [];
-                try {
-                    $bus->dispatch($envelope->withoutAll(AckStamp::class)->withoutAll(NoAutoAckStamp::class)->with(new FlushBatchHandlersStamp(true), ...$flushes));
-                    self::releaseHeldAcks($channel, $heldAcks, false);
-                } catch (\Throwable) {
-                    // the messages that the batch didn't settle wait for the next flush of the worker
-                    self::releaseHeldAcks($channel, $heldAcks, true);
-                }
+                // the messages that a failed flush didn't settle wait for the next flush of the worker
+                self::dispatchFlush($bus, $channel, $envelope->withoutAll(AckStamp::class)->withoutAll(NoAutoAckStamp::class)->with(new FlushBatchHandlersStamp(true), ...$flushes), $heldAcks);
             }
 
             if ($noAutoAckStamp && !$acked) {
@@ -176,12 +172,10 @@ final class DispatchTask implements Task
             // break the shared reference set so that each message tracks its own ack flag and batch
             unset($ack, $acked, $acks, $dispatching, $batch, $combine, $flushes);
 
-            $this->resetServices($container, $count);
+            $this->resetServices($bus, $channel, $container, $count, $unacks, $heldAcks);
 
             if (null !== $this->memoryLimit && memory_get_usage(true) >= $this->memoryLimit) {
-                $this->flush($bus, $channel, true, $unacks, $heldAcks);
-                // the parent then sends the messages that this worker won't read to another worker
-                $channel->send(null);
+                $this->stop($bus, $channel, $unacks, $heldAcks);
                 break;
             }
         }
@@ -202,13 +196,7 @@ final class DispatchTask implements Task
             $requestId = $deferredMessage->context;
             $envelope = $deferredMessage->envelope;
 
-            $heldAcks = [];
-            try {
-                $bus->dispatch($envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(false !== $force)));
-                self::releaseHeldAcks($channel, $heldAcks, false);
-            } catch (\Throwable $e) {
-                self::releaseHeldAcks($channel, $heldAcks, true);
-
+            if ($e = self::dispatchFlush($bus, $channel, $envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(false !== $force)), $heldAcks)) {
                 if (!$deferredMessage->acked) {
                     $ackStamp = $envelope->last(AckStamp::class);
                     $envelope = ParallelExecutionFailureSanitizer::decorateFailedEnvelope($envelope);
@@ -336,13 +324,8 @@ final class DispatchTask implements Task
         $envelope = $e->getEnvelope();
         $exceptions = $e->getWrappedExceptions();
 
-        $heldAcks = [];
-        try {
-            $bus->dispatch($envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(true)));
-            self::releaseHeldAcks($channel, $heldAcks, false);
-        } catch (\Throwable $flushError) {
+        if ($flushError = self::dispatchFlush($bus, $channel, $envelope->withoutAll(AckStamp::class)->with(new FlushBatchHandlersStamp(true)), $heldAcks)) {
             // the failed flush may have undone what the batch did, so a retry runs it again
-            self::releaseHeldAcks($channel, $heldAcks, true);
             $acks = [];
             $exceptions += $flushError instanceof HandlerFailedException ? $flushError->getWrappedExceptions() : [$flushError];
         }
@@ -362,6 +345,27 @@ final class DispatchTask implements Task
     }
 
     /**
+     * Dispatches a flush of batch handlers, then releases the acks that the batch sent meanwhile.
+     *
+     * A failure to send these acks escapes, since it's not a failure of the flush.
+     */
+    private static function dispatchFlush(MessageBusInterface $bus, Channel $channel, Envelope $envelope, ?array &$heldAcks): ?\Throwable
+    {
+        $heldAcks = [];
+        try {
+            $bus->dispatch($envelope);
+        } catch (\Throwable $e) {
+            self::releaseHeldAcks($channel, $heldAcks, true);
+
+            return $e;
+        }
+
+        self::releaseHeldAcks($channel, $heldAcks, false);
+
+        return null;
+    }
+
+    /**
      * Releases the acks that other messages sent during a dispatch, as failures when that dispatch failed.
      *
      * Their batch was flushed during the failed dispatch, so what the batch did for them may have been undone.
@@ -370,6 +374,7 @@ final class DispatchTask implements Task
     {
         $acks = $heldAcks;
         $heldAcks = null;
+        $sendFailure = null;
 
         foreach ($acks as [$requestId, $envelope, $e, $combine]) {
             if ($dispatchFailed && null === $e && $stamp = $envelope->last(HandledStamp::class)) {
@@ -379,7 +384,16 @@ final class DispatchTask implements Task
                 $e = new HandlerFailedException($envelope, [$stamp->getHandlerName() => new RuntimeException(\sprintf('The batch of "%s" was flushed during the dispatch of another message, and that dispatch failed.', $stamp->getHandlerName()))]);
             }
 
-            self::sendBatchAck($channel, $combine([[$requestId, $envelope, $e]]));
+            try {
+                self::sendBatchAck($channel, $combine([[$requestId, $envelope, $e]]));
+            } catch (\Throwable $error) {
+                // the next acks are sent anyway, so that their messages don't run twice
+                $sendFailure ??= $error;
+            }
+        }
+
+        if (null !== $sendFailure) {
+            throw $sendFailure;
         }
     }
 
@@ -402,10 +416,41 @@ final class DispatchTask implements Task
         self::sendHandled($channel, $requestId, $envelope, $e);
     }
 
-    private function resetServices(ContainerInterface $container, int &$count): void
+    /**
+     * Removes the non-sendable stamps that this worker added, since a transport wouldn't send them either.
+     *
+     * The parent replaces the stamps that it sent with its own instances. For those, this worker sends back the copies that it received.
+     */
+    private static function withoutAddedNonSendableStamps(Envelope $envelope, array $sentStamps): Envelope
+    {
+        foreach ($envelope->all() as $class => $stamps) {
+            if (is_a($class, NonSendableStampInterface::class, true) && $stamps !== ($sentStamps[$class] ?? null)) {
+                $envelope = $envelope->withoutAll($class)->with(...$sentStamps[$class] ?? []);
+            }
+        }
+
+        return $envelope;
+    }
+
+    /**
+     * Flushes the batch handlers, then tells the parent to send the messages that this worker won't read to another worker.
+     */
+    private function stop(MessageBusInterface $bus, Channel $channel, DeferredBatchMessageQueue $unacks, ?array &$heldAcks): void
+    {
+        $this->flush($bus, $channel, true, $unacks, $heldAcks);
+        $channel->send(null);
+    }
+
+    private function resetServices(MessageBusInterface $bus, Channel $channel, ContainerInterface $container, int &$count, DeferredBatchMessageQueue $unacks, ?array &$heldAcks): void
     {
         if ($this->resetInterval > 0 && 0 === ++$count % $this->resetInterval && $container->has('services_resetter')) {
-            $container->get('services_resetter')->reset();
+            try {
+                $container->get('services_resetter')->reset();
+            } catch (\Throwable $e) {
+                $this->stop($bus, $channel, $unacks, $heldAcks);
+
+                throw $e;
+            }
         }
     }
 }

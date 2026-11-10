@@ -76,6 +76,8 @@ use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Stamp\TrustStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectionStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\FailingResetStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\HandledByBusStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\SeenByWorkerStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
@@ -83,6 +85,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\ResettableDummyReceiver;
+use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
@@ -374,6 +377,59 @@ class WorkerTest extends TestCase
         $this->assertSame([1, 1], array_map(static fn (Envelope $envelope) => $envelope->last(HandledStamp::class)?->getResult(), $receiver->getAcknowledgedEnvelopes()));
     }
 
+    public function testParallelExecutionSendsTheNextMessageToAnotherChildOnceTheResetOfServicesFails()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Hey'), [new FailingResetStamp()])],
+            [new Envelope(new DummyMessage('Bob'))],
+            [],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame(0, $receiver->getRejectCount());
+        $this->assertSame([1, 1], array_map(static fn (Envelope $envelope) => $envelope->last(HandledStamp::class)?->getResult(), $receiver->getAcknowledgedEnvelopes()));
+    }
+
+    public function testParallelExecutionFailsTheMessagesOfAChildWhoseTaskFailed()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Hey'))],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $failure = null;
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$failure) {
+            $failure = $event->getThrowable();
+        });
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('error')->with('A parallel worker failed: {error}');
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy(__DIR__.'/Fixtures/App/bin/missing', 1, 1, null, $logger);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame(1, $receiver->getRejectCount());
+        $this->assertSame('The parallel worker stopped before returning a result.', $failure?->getMessage());
+        $this->assertStringContainsString('Unable to bootstrap the Messenger worker', $failure->getPrevious()?->getMessage());
+    }
+
     public function testParallelExecutionBatchesMessagesOnTheSameTask()
     {
         $receiver = new DummyReceiver([
@@ -630,6 +686,25 @@ class WorkerTest extends TestCase
         $envelope = $receiver->getAcknowledgedEnvelopes()[0];
         $this->assertContains(ConnectionStamp::class, $envelope->last(SeenByWorkerStamp::class)?->stampClasses ?? []);
         $this->assertSame($stamp, $envelope->last(ConnectionStamp::class));
+    }
+
+    public function testParallelExecutionDropsTheNonSendableStampsThatTheChildAdded()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new ThirdMessage(), [new ConnectStamp()])],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, null, null, new MockClock(), $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertNull($receiver->getAcknowledgedEnvelopes()[0]->last(ConnectionStamp::class));
     }
 
     #[DataProvider('provideTrustStamps')]

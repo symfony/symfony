@@ -24,11 +24,17 @@ use Symfony\Component\Messenger\Execution\Message\FlushBatchHandlersMessage;
 use Symfony\Component\Messenger\Execution\Message\HandledEnvelopeMessage;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\BatchHandlingMiddleware;
+use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectionStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\ConnectStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\App\FailingResetStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\HandledByBusStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\App\ResettableService;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyStampHoldingAnObject;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\ThirdMessage;
 use Symfony\Contracts\Service\ContainerProviderInterface;
 
 class DispatchTaskTest extends TestCase
@@ -116,6 +122,58 @@ class DispatchTaskTest extends TestCase
         $this->assertSame(1, ResettableService::$resets);
     }
 
+    public function testItStopsLikeOnItsMemoryLimitWhenTheResetOfServicesFails()
+    {
+        try {
+            $handled = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new DummyMessage('Hey'), [new FailingResetStamp()])), new DispatchEnvelopeMessage(2, new Envelope(new DummyMessage('Bob'))));
+            $failed = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new SecondMessage(), [new FailingResetStamp()])), new DispatchEnvelopeMessage(2, new Envelope(new DummyMessage('Bob'))));
+        } finally {
+            ResettableService::$failing = false;
+        }
+
+        $this->assertSame([DeferredEnvelopeMessage::class, HandledEnvelopeMessage::class, 'null', \RuntimeException::class], array_map(get_debug_type(...), $handled));
+        $this->assertSame(1, $handled[1]->envelope->last(HandledStamp::class)?->getResult());
+        $this->assertSame('Reset failed.', $handled[3]->getMessage());
+        $this->assertSame([HandledEnvelopeMessage::class, 'null', \RuntimeException::class], array_map(get_debug_type(...), $failed));
+        $this->assertInstanceOf(HandlerFailedException::class, $failed[0]->error);
+    }
+
+    public function testItDoesNotSendBackTheNonSendableStampsThatItAdded()
+    {
+        foreach ([new ThirdMessage(), new DummyMessage('Hello')] as $message) {
+            $envelope = $this->runTask(new Envelope($message, [new ReceivedStamp('async'), new ConnectStamp()]));
+
+            $this->assertNull($envelope->last(ConnectionStamp::class));
+            $this->assertSame('async', $envelope->last(ReceivedStamp::class)?->getTransportName());
+
+            $envelope = $this->runTask(new Envelope($message, [$stamp = new ConnectionStamp('42'), new ConnectStamp()]));
+
+            $this->assertSame([$stamp], $envelope->all(ConnectionStamp::class));
+        }
+    }
+
+    public function testAnOutcomeThatCannotBeSentEndsTheTask()
+    {
+        $stamp = new DummyStampHoldingAnObject(static fn () => null);
+
+        $flushed = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new DummyMessage('Hey'), [$stamp])), new FlushBatchHandlersMessage(true));
+        $full = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new DummyMessage('Hey'))), new DispatchEnvelopeMessage(2, new Envelope(new DummyMessage('Bob'), [$stamp])));
+
+        $this->assertSame([DeferredEnvelopeMessage::class, \Exception::class], array_map(get_debug_type(...), $flushed));
+        $this->assertSame([DeferredEnvelopeMessage::class, HandledEnvelopeMessage::class, \Exception::class], array_map(get_debug_type(...), $full));
+        $this->assertSame("Serialization of 'Closure' is not allowed", $full[2]->getMessage());
+    }
+
+    public function testAnOutcomeThatCannotBeSentDoesNotLoseTheOtherOutcomesOfItsBatch()
+    {
+        $sent = $this->runTaskWith(new DispatchEnvelopeMessage(1, new Envelope(new DummyMessage('Hey'), [new DummyStampHoldingAnObject(static fn () => null)])), new DispatchEnvelopeMessage(2, new Envelope(new DummyMessage('Bob'))));
+
+        $this->assertSame([DeferredEnvelopeMessage::class, HandledEnvelopeMessage::class, \Exception::class], array_map(get_debug_type(...), $sent));
+        $this->assertSame(2, $sent[1]->requestId);
+        $this->assertNull($sent[1]->error);
+        $this->assertSame(2, $sent[1]->envelope->last(HandledStamp::class)?->getResult());
+    }
+
     private function runTask(Envelope $envelope): Envelope
     {
         $sent = $this->runTaskWith(new DispatchEnvelopeMessage(1, $envelope), new FlushBatchHandlersMessage(true));
@@ -142,6 +200,8 @@ class DispatchTaskTest extends TestCase
 
             public function send(mixed $data): void
             {
+                // like a real channel, fail on what cannot be serialized
+                serialize($data);
                 $this->sent[] = $data;
             }
 
@@ -186,7 +246,11 @@ class DispatchTaskTest extends TestCase
             }
         };
 
-        $task->run($channel, $cancellation);
+        try {
+            $task->run($channel, $cancellation);
+        } catch (\Throwable $e) {
+            $sent[] = $e;
+        }
 
         return $sent;
     }

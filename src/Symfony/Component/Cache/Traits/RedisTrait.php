@@ -395,8 +395,8 @@ trait RedisTrait
 
                     foreach ($context as $name => $value) {
                         match ($name) {
-                            'use-cache', 'client-tracking', 'throw-on-error', 'client-invalidations', 'reply-literal', 'persistent', => $context[$name] = filter_var($value, \FILTER_VALIDATE_BOOLEAN),
-                            'max-retries', 'serializer', 'compression', 'compression-level', => $context[$name] = filter_var($value, \FILTER_VALIDATE_INT),
+                            'use-cache', 'client-tracking', 'throw-on-error', 'client-invalidations', 'reply-literal', 'persistent', => $context[$name] = filter_var($value, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Invalid Redis DSN: parameter "cluster_relay_context[%s]" must be a boolean.', $name)),
+                            'max-retries', 'serializer', 'compression', 'compression-level', => $context[$name] = filter_var($value, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Invalid Redis DSN: parameter "cluster_relay_context[%s]" must be an integer.', $name)),
                             default => null,
                         };
                     }
@@ -827,7 +827,7 @@ trait RedisTrait
     {
         foreach ($options as $name => $value) {
             match ($name) {
-                'allow_self_signed', 'capture_peer_cert', 'capture_peer_cert_chain', 'disable_compression', 'SNI_enabled', 'verify_peer', 'verify_peer_name', => $options[$name] = filter_var($value, \FILTER_VALIDATE_BOOLEAN),
+                'allow_self_signed', 'capture_peer_cert', 'capture_peer_cert_chain', 'disable_compression', 'SNI_enabled', 'verify_peer', 'verify_peer_name', => $options[$name] = filter_var($value, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Invalid Redis DSN: parameter "ssl[%s]" must be a boolean.', $name)),
                 default => null,
             };
         }

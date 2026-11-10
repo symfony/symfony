@@ -41,6 +41,7 @@ class RoutingConfigurator
     final public function import(string|array $resource, ?string $type = null, bool $ignoreErrors = false, string|array|null $exclude = null): ImportConfigurator
     {
         $this->loader->setCurrentDir(\dirname($this->path));
+        $this->loader->trackGlobResource($resource, $this->collection);
 
         $imported = $this->loader->import($resource, $type, $ignoreErrors, $this->file, $exclude) ?: [];
         if (!\is_array($imported)) {

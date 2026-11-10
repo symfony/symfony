@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
@@ -20,9 +19,11 @@ use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\ErrorHandler\BufferingLogger;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Debug\ErrorHandlerConfigurator;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\EventListener\DebugHandlersListener;
 use Symfony\Component\HttpKernel\HttpKernel;
@@ -34,6 +35,43 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class DebugHandlersListenerTest extends TestCase
 {
+    public function testKernelExceptionsAreLoggedWithoutLegacyControls()
+    {
+        if (!method_exists(ErrorHandler::class, 'configure')) {
+            $this->markTestSkipped('The error handler does not support configuring the default loggers.');
+        }
+
+        $logger = new BufferingLogger();
+        $handler = new class($logger) extends ErrorHandler {
+            public function throwAt(int $levels, bool $replace = false): int
+            {
+                throw new \LogicException('Legacy error configuration was called.');
+            }
+        };
+        $exception = new \RuntimeException('Failed');
+        $request = Request::create('/');
+        $kernel = $this->createMock(HttpKernel::class);
+        $kernel->expects($this->once())->method('terminateWithException')->with($exception, $request);
+        $listener = new DebugHandlersListener();
+
+        set_exception_handler([$handler, 'handleException']);
+        try {
+            $listener->configure(new KernelEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+        } finally {
+            restore_exception_handler();
+        }
+
+        $exitCode = new \ReflectionProperty(ErrorHandler::class, 'exitCode');
+        $previousExitCode = $exitCode->getValue();
+        try {
+            $handler->handleException($exception);
+        } finally {
+            $exitCode->setValue(null, $previousExitCode);
+        }
+
+        $this->assertSame([], $logger->cleanLogs());
+    }
+
     public function testConfigure()
     {
         $userHandler = static fn () => null;
@@ -87,31 +125,26 @@ class DebugHandlersListenerTest extends TestCase
     {
         $listener = new DebugHandlersListener(null);
         $event = new KernelEvent($this->createStub(HttpKernel::class), Request::create('/'), HttpKernelInterface::MAIN_REQUEST);
-        $eHandler = new class extends ErrorHandler {
-            public int $setLoggersCalls = 0;
-
-            public function setLoggers(array $loggers): array
-            {
-                ++$this->setLoggersCalls;
-
-                return parent::setLoggers($loggers);
-            }
-        };
-        $eHandler->setDefaultLogger(new NullLogger());
+        $logger = new BufferingLogger();
+        $otherLogger = new BufferingLogger();
+        $eHandler = new ErrorHandler();
+        (new ErrorHandlerConfigurator($logger, \E_ALL, 0, false, false))->configure($eHandler);
         $otherHandler = new ErrorHandler();
-        $otherHandler->setDefaultLogger(new NullLogger());
+        (new ErrorHandlerConfigurator($otherLogger, \E_ALL, 0, false, false))->configure($otherHandler);
 
         set_exception_handler([$eHandler, 'handleException']);
         try {
             $listener->configure($event);
-            $setLoggersCalls = $eHandler->setLoggersCalls;
+            $this->assertFalse($eHandler->handleError(\E_ERROR, 'First request', __FILE__, __LINE__));
+
+            (new ErrorHandlerConfigurator($logger, \E_ALL, 0, false, false))->configure($eHandler);
             $listener->configure($event);
+            $this->assertTrue($eHandler->handleError(\E_ERROR, 'Second request', __FILE__, __LINE__));
         } finally {
             restore_exception_handler();
         }
 
-        $this->assertSame($setLoggersCalls, $eHandler->setLoggersCalls);
-        $this->assertNull($eHandler->setLoggers([])[\E_ERROR][0]);
+        $this->assertSame('Error: Second request', $logger->cleanLogs()[0][1] ?? null);
 
         set_exception_handler([$otherHandler, 'handleException']);
         try {
@@ -120,7 +153,8 @@ class DebugHandlersListenerTest extends TestCase
             restore_exception_handler();
         }
 
-        $this->assertNull($otherHandler->setLoggers([])[\E_ERROR][0]);
+        $this->assertFalse($otherHandler->handleError(\E_ERROR, 'Other handler', __FILE__, __LINE__));
+        $this->assertSame([], $otherLogger->cleanLogs());
     }
 
     public function testResetRestoresTheExceptionHandlerReplacedForTheMainRequest()

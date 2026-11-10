@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `ErrorHandler::configure()` to configure loggers, debug mode, error conversion and logging levels
+ * Deprecate `ErrorHandler::setDefaultLogger()`, `setLoggers()`, `throwAt()`, `scopeAt()`, `traceAt()` and `screamAt()` in favor of `configure()`
+ * Add argument `$log` to `ErrorHandler::setExceptionHandler()` to let a custom handler take care of exception logging
+
 8.2
 ---
 

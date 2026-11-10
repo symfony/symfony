@@ -20,6 +20,9 @@ use Symfony\Component\Lock\Key;
  */
 class KeyTest extends TestCase
 {
+    /**
+     * @group time-sensitive
+     */
     public function testSerialize()
     {
         $key = new Key(__METHOD__);

@@ -34,6 +34,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -103,71 +104,75 @@ class Worker
             }
         }
 
-        while (!$this->shouldStop) {
-            if (null !== $endTime && $this->clock->now()->format('U.u') >= $endTime) {
-                $this->logger?->info('Worker stopped due to time limit of {timeLimit}s exceeded', ['timeLimit' => $options['time_limit']]);
-                break;
-            }
-
-            $envelopeHandled = false;
-            $envelopeHandledStart = $this->clock->now();
-            foreach ($this->receivers as $transportName => $receiver) {
-                if ($queueNames) {
-                    $envelopes = $receiver->getFromQueues($queueNames);
-                } else {
-                    $envelopes = $receiver->get();
-                }
-
-                foreach ($envelopes as $envelope) {
-                    $envelopeHandled = true;
-                    $receipt = new \stdClass();
-
-                    if ($receiver instanceof KeepaliveReceiverInterface) {
-                        $this->keepalives[$receipt] = [$transportName, $envelope];
-                    }
-
-                    $this->rateLimit($transportName);
-                    $this->handleMessage($envelope, $transportName, $receipt);
-                    $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
-
-                    if ($this->shouldStop) {
-                        break 2;
-                    }
-                }
-
-                // after handling a single receiver, quit and start the loop again
-                // this should prevent multiple lower priority receivers from
-                // blocking too long before the higher priority are checked
-                if ($envelopeHandled) {
+        try {
+            while (!$this->shouldStop) {
+                if (null !== $endTime && $this->clock->now()->format('U.u') >= $endTime) {
+                    $this->logger?->info('Worker stopped due to time limit of {timeLimit}s exceeded', ['timeLimit' => $options['time_limit']]);
                     break;
                 }
-            }
 
-            if (!$envelopeHandled && $this->flush(false)) {
-                continue;
-            }
+                $envelopeHandled = false;
+                $envelopeHandledStart = $this->clock->now();
+                foreach ($this->receivers as $transportName => $receiver) {
+                    if ($queueNames) {
+                        $envelopes = $receiver->getFromQueues($queueNames);
+                    } else {
+                        $envelopes = $receiver->get();
+                    }
 
-            if (!$this->flush(30.0) && !$envelopeHandled) {
-                $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, true));
+                    foreach ($envelopes as $envelope) {
+                        $envelopeHandled = true;
+                        $receipt = new \stdClass();
 
-                if ($this->shouldStop) {
+                        if ($receiver instanceof KeepaliveReceiverInterface) {
+                            $this->keepalives[$receipt] = [$transportName, $envelope];
+                        }
+
+                        $this->rateLimit($transportName);
+                        $this->handleMessage($envelope, $transportName, $receipt);
+                        $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
+
+                        if ($this->shouldStop) {
+                            break 2;
+                        }
+                    }
+
+                    // after handling a single receiver, quit and start the loop again
+                    // this should prevent multiple lower priority receivers from
+                    // blocking too long before the higher priority are checked
+                    if ($envelopeHandled) {
+                        break;
+                    }
+                }
+
+                if (!$envelopeHandled && $this->flush(false)) {
                     continue;
                 }
 
-                if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->clock->now()->format('U.u') - $envelopeHandledStart->format('U.u')))) {
-                    if (null !== $endTime) {
-                        $sleep = min($sleep, (int) ceil(1e6 * ($endTime - $this->clock->now()->format('U.u'))));
+                if (!$this->flush(30.0) && !$envelopeHandled) {
+                    $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, true));
+
+                    if ($this->shouldStop) {
+                        continue;
                     }
 
-                    if (0 < $sleep) {
-                        $this->clock->sleep($sleep / 1e6);
+                    if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->clock->now()->format('U.u') - $envelopeHandledStart->format('U.u')))) {
+                        if (null !== $endTime) {
+                            $sleep = min($sleep, (int) ceil(1e6 * ($endTime - $this->clock->now()->format('U.u'))));
+                        }
+
+                        if (0 < $sleep) {
+                            $this->clock->sleep($sleep / 1e6);
+                        }
                     }
                 }
             }
-        }
 
-        $this->flush(true);
-        $this->eventDispatcher?->dispatch(new WorkerStoppedEvent($this));
+            $this->flush(true);
+            $this->eventDispatcher?->dispatch(new WorkerStoppedEvent($this));
+        } finally {
+            $this->closeReceivers();
+        }
     }
 
     private function handleMessage(Envelope $envelope, string $transportName, object $receipt): void
@@ -546,5 +551,20 @@ class Worker
         }
 
         return new HandlerFailedException($envelope->withoutAll(HandledStamp::class)->with(...$stamps), $exceptions);
+    }
+
+    private function closeReceivers(): void
+    {
+        foreach ($this->receivers as $transportName => $receiver) {
+            if (!$receiver instanceof CloseableTransportInterface) {
+                continue;
+            }
+
+            try {
+                $receiver->close();
+            } catch (\Throwable $e) {
+                $this->logger?->warning('Closing the transport "{transport}" failed: {error}', ['transport' => $transportName, 'error' => $e->getMessage(), 'exception' => $e]);
+            }
+        }
     }
 }

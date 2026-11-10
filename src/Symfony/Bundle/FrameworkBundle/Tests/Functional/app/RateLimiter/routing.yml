@@ -9,3 +9,7 @@ own_pool:
 inline:
     path: /inline
     controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\RateLimiterController::inline
+
+argument:
+    path: /argument
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\RateLimiterController::argument

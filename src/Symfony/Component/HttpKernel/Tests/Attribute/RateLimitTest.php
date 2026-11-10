@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\Attribute;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
-use Symfony\Component\RateLimiter\Policy\SlidingWindowPolicy;
+use Symfony\Component\RateLimiter\Attribute\SlidingWindowPolicy;
 
 class RateLimitTest extends TestCase
 {

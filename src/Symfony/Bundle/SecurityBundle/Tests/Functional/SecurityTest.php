@@ -205,6 +205,18 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertFalse($accessDecisionManager->decide($user, [new Expression('is_granted("ROLE_ADMIN")')]));
         $this->assertSame(['ROLE_ADMIN'], $checks);
     }
+
+    public function testProfileListsOnlyTheAccessDecisionsOfItsRequest()
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml', 'debug' => true]);
+        $client->disableReboot();
+
+        $client->request('GET', '/profile');
+        $this->assertCount(1, $client->getProfile()->getCollector('security')->getAccessDecisionLog());
+
+        $client->request('GET', '/profile');
+        $this->assertCount(1, $client->getProfile()->getCollector('security')->getAccessDecisionLog());
+    }
 }
 
 final class UserWithoutEquatable implements UserInterface, PasswordAuthenticatedUserInterface

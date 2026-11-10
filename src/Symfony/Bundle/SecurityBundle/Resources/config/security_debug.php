@@ -22,6 +22,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('debug.security.access.decision_manager.inner'),
             ])
+            ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore'])
 
         ->set('debug.security.voter.vote_listener', VoteListener::class)
             ->args([

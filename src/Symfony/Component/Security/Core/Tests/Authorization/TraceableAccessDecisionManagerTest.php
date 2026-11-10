@@ -265,4 +265,24 @@ class TraceableAccessDecisionManagerTest extends TestCase
 
         $this->assertEquals('-', $adm->getStrategy());
     }
+
+    public function testResetClearsTheDecisionLog()
+    {
+        $voter = $this->createStub(VoterInterface::class);
+        $sut = new TraceableAccessDecisionManager(new AccessDecisionManager([$voter]));
+        $voter->method('vote')->willReturnCallback(static function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter) {
+            $sut->addVoterVote($voter, $attributes, VoterInterface::ACCESS_GRANTED);
+
+            return VoterInterface::ACCESS_GRANTED;
+        });
+
+        $token = new NullToken();
+        $sut->decide($token, ['attr1']);
+        $sut->reset();
+        $sut->decide($token, ['attr2']);
+
+        $this->assertSame([['attr2']], array_column($sut->getDecisionLog(), 'attributes'));
+        $this->assertSame('affirmative', $sut->getStrategy());
+        $this->assertContains($voter, $sut->getVoters());
+    }
 }

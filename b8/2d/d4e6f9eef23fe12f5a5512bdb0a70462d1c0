@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-10T00:44:15Z
+
+Thanks for the PR! I updated it so that Config doesn't change. A new protected method in Config is new API, which we don't add in patch releases. That method also made high-deps fail. DI now tracks the glob in its own `import()`, and Routing does it in `parseImport()` and `RoutingConfigurator::import()`. So an empty glob returns `null` again.

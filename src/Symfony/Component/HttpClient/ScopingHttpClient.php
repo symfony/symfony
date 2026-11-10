@@ -32,6 +32,11 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
     private $defaultOptionsByRegexp;
     private $defaultRegexp;
 
+    /**
+     * @param array $defaultOptionsByRegexp The default options, indexed by the regexp that the URL of a request must match.
+     *                                      A regexp should end with a "/", for example "https://api\.github\.com/",
+     *                                      so that it doesn't match other hosts.
+     */
     public function __construct(HttpClientInterface $client, array $defaultOptionsByRegexp, ?string $defaultRegexp = null)
     {
         $this->client = $client;
@@ -46,7 +51,7 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
     public static function forBaseUri(HttpClientInterface $client, string $baseUri, array $defaultOptions = [], ?string $regexp = null): self
     {
         if (null === $regexp) {
-            $regexp = preg_quote(implode('', self::resolveUrl(self::parseUrl('.'), self::parseUrl($baseUri))));
+            $regexp = preg_quote(self::removeUserinfo(implode('', self::resolveUrl(self::parseUrl('.'), self::parseUrl($baseUri)))));
         }
 
         $defaultOptions['base_uri'] = $baseUri;
@@ -90,7 +95,7 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
         }
 
         foreach ($this->defaultOptionsByRegexp as $regexp => $defaultOptions) {
-            if (preg_match("{{$regexp}}A", $url)) {
+            if (preg_match("{{$regexp}}A", self::removeUserinfo($url))) {
                 if (null === $e || $regexp !== $this->defaultRegexp) {
                     $options = self::mergeDefaultOptions($options, $defaultOptions, true);
                 }
@@ -135,5 +140,10 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
         $clone->client = $this->client->withOptions($options);
 
         return $clone;
+    }
+
+    private static function removeUserinfo(string $url): string
+    {
+        return preg_replace('{^([^:/?#]++://)[^/?#]*@}', '$1', $url);
     }
 }

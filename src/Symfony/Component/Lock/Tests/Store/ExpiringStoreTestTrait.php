@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -129,5 +130,19 @@ trait ExpiringStoreTestTrait
         $this->assertTrue($store->exists($key2));
 
         $store->delete($key2);
+    }
+
+    public function testPutOffExpirationOnFreshKeyThrows()
+    {
+        $key = new Key(static::class.__METHOD__);
+        $store = $this->getStore();
+
+        try {
+            $store->putOffExpiration($key, 10);
+            $this->fail('The store should not extend a lock that the key does not own.');
+        } catch (LockConflictedException) {
+        }
+
+        $this->assertSame([], $key->__serialize()['state']);
     }
 }

@@ -71,6 +71,10 @@ class MemcachedStore implements PersistingStoreInterface
         $ttl = (int) ceil($ttl);
         $expiration = $this->getExpiration($ttl);
 
+        if (!$key->hasState(__CLASS__)) {
+            throw new LockConflictedException();
+        }
+
         $token = $this->getUniqueToken($key);
 
         [$value, $cas] = $this->getValueAndCas($key);
@@ -100,6 +104,10 @@ class MemcachedStore implements PersistingStoreInterface
 
     public function delete(Key $key): void
     {
+        if (!$key->hasState(__CLASS__)) {
+            return;
+        }
+
         $token = $this->getUniqueToken($key);
 
         [$value, $cas] = $this->getValueAndCas($key);
@@ -121,6 +129,10 @@ class MemcachedStore implements PersistingStoreInterface
 
     public function exists(Key $key): bool
     {
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
         return $this->memcached->get((string) $key) === $this->getUniqueToken($key);
     }
 

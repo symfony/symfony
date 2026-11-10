@@ -28,6 +28,7 @@ use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 class PdoStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
+    use FreshKeyTestTrait;
 
     protected static string $dbFile;
 

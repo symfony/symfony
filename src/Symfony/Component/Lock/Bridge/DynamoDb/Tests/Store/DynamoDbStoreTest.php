@@ -18,6 +18,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Lock\Bridge\DynamoDb\Store\DynamoDbStore;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -222,16 +223,54 @@ class DynamoDbStoreTest extends TestCase
 
     public function testDeleteOfALockHeldBySomeoneElseIsIgnored()
     {
-        $httpClient = new MockHttpClient(new MockResponse(json_encode([
-            '__type' => 'com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException',
-            'message' => 'The conditional request failed',
-        ]), ['http_code' => 400, 'response_headers' => ['content-type' => 'application/x-amz-json-1.0']]));
+        $httpClient = new MockHttpClient(static function (string $method, string $url, array $options) {
+            if (isset(json_decode($options['body'], true)['Item'])) {
+                return new MockResponse('{}', ['response_headers' => ['content-type' => 'application/x-amz-json-1.0']]);
+            }
+
+            return new MockResponse(json_encode([
+                '__type' => 'com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException',
+                'message' => 'The conditional request failed',
+            ]), ['http_code' => 400, 'response_headers' => ['content-type' => 'application/x-amz-json-1.0']]);
+        });
 
         $store = new DynamoDbStore($this->createClient($httpClient), ['table_name' => 'table']);
 
-        $store->delete(new Key(__METHOD__));
+        $key = new Key(__METHOD__);
+        $store->save($key);
+        $store->delete($key);
 
-        $this->addToAssertionCount(1);
+        $this->assertSame(2, $httpClient->getRequestsCount());
+    }
+
+    public function testExistsWithoutStateDoesNotSendRequest()
+    {
+        $store = new DynamoDbStore($this->createClient($this->httpClient), ['table_name' => 'table']);
+
+        $this->assertFalse($store->exists(new Key(__METHOD__)));
+        $this->assertSame(0, $this->httpClient->getRequestsCount());
+    }
+
+    public function testDeleteWithoutStateDoesNotSendRequest()
+    {
+        $store = new DynamoDbStore($this->createClient($this->httpClient), ['table_name' => 'table']);
+
+        $store->delete(new Key(__METHOD__));
+        $this->assertSame(0, $this->httpClient->getRequestsCount());
+    }
+
+    public function testPutOffExpirationWithoutStateThrows()
+    {
+        $store = new DynamoDbStore($this->createClient($this->httpClient), ['table_name' => 'table']);
+        $key = new Key(__METHOD__);
+
+        try {
+            $store->putOffExpiration($key, 10);
+            $this->fail('The store should not extend a lock that the key does not own.');
+        } catch (LockConflictedException) {
+        }
+
+        $this->assertSame(0, $this->httpClient->getRequestsCount());
     }
 
     private function createClient(HttpClientInterface $httpClient): DynamoDbClient

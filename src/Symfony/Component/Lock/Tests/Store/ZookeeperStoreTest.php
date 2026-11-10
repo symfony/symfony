@@ -26,6 +26,7 @@ use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 #[Group('integration')]
 class ZookeeperStoreTest extends AbstractStoreTestCase
 {
+    use FreshKeyTestTrait;
     use UnserializableTestTrait;
 
     public function getStore(): ZookeeperStore

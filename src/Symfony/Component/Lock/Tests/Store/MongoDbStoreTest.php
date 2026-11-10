@@ -36,6 +36,7 @@ require_once __DIR__.'/stubs/mongodb.php';
 class MongoDbStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
+    use FreshKeyTestTrait;
 
     public static function setUpBeforeClass(): void
     {
@@ -103,6 +104,20 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         yield ['mongodb://localhost/test?collection=lock', []];
         yield ['mongodb://localhost/test', ['collection' => 'lock']];
         yield ['mongodb://localhost/', ['database' => 'test', 'collection' => 'lock']];
+    }
+
+    public function testExistsWithSharedKey()
+    {
+        $key = new Key(__METHOD__);
+
+        $store = new MongoDbStore('mongodb://localhost/test?collection=lock');
+        $store->save($key);
+
+        // The store of the other process has not connected to MongoDB yet.
+        $otherStore = new MongoDbStore('mongodb://localhost/test?collection=lock');
+        $this->assertTrue($otherStore->exists(unserialize(serialize($key))));
+
+        $store->delete($key);
     }
 
     public function testConstructWithClient()

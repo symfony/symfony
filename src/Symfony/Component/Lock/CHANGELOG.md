@@ -10,6 +10,7 @@ CHANGELOG
  * Add `MysqlStore` and `DoctrineDbalMysqlStore`, based on MySQL `GET_LOCK()` and usable with the `mysql+advisory:` DSN
  * Add argument `$removeOnRelease` to `FlockStore` and the `flock+remove` DSN to remove the lock file when an exclusive lock is released
  * Add `close()` to `DoctrineDbalMysqlStore`, `DoctrineDbalPostgreSqlStore`, `DoctrineDbalStore`, `MysqlStore`, `PdoStore`, `PostgreSqlStore` and `RedisStore`, called when the kernel shuts down
+ * Make the lock stores skip the backend in `exists()`, `delete()` and `putOffExpiration()` when the key has no lock state; `putOffExpiration()` now throws a `LockConflictedException` instead of creating or taking over the lock
 
 8.1
 ---

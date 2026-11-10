@@ -194,6 +194,10 @@ class DoctrineDbalStore implements PersistingStoreInterface
             throw new InvalidTtlException(\sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
         }
 
+        if (!$key->hasState(__CLASS__)) {
+            throw new LockConflictedException();
+        }
+
         $key->reduceLifetime($ttl);
 
         $sql = "UPDATE $this->table SET $this->expirationCol = {$this->getCurrentTimestampStatement()} + ?, $this->tokenCol = ? WHERE $this->idCol = ? AND ($this->tokenCol = ? OR $this->expirationCol <= {$this->getCurrentTimestampStatement()})";
@@ -221,6 +225,10 @@ class DoctrineDbalStore implements PersistingStoreInterface
 
     public function delete(Key $key): void
     {
+        if (!$key->hasState(__CLASS__)) {
+            return;
+        }
+
         $this->conn->delete($this->table, [
             $this->idCol => $this->getKeyName($key),
             $this->tokenCol => $this->getUniqueToken($key),
@@ -229,6 +237,10 @@ class DoctrineDbalStore implements PersistingStoreInterface
 
     public function exists(Key $key): bool
     {
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = ? AND $this->tokenCol = ? AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";
         $result = $this->conn->fetchOne($sql, [
             $this->getKeyName($key),

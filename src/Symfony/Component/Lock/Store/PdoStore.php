@@ -187,6 +187,10 @@ class PdoStore implements PersistingStoreInterface
             throw new InvalidTtlException(\sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
         }
 
+        if (!$key->hasState(__CLASS__)) {
+            throw new LockConflictedException();
+        }
+
         $key->reduceLifetime($ttl);
 
         $sql = "UPDATE $this->table SET $this->expirationCol = {$this->getCurrentTimestampStatement()} + $ttl, $this->tokenCol = :token1 WHERE $this->idCol = :id AND ($this->tokenCol = :token2 OR $this->expirationCol <= {$this->getCurrentTimestampStatement()})";
@@ -208,6 +212,10 @@ class PdoStore implements PersistingStoreInterface
 
     public function delete(Key $key): void
     {
+        if (!$key->hasState(__CLASS__)) {
+            return;
+        }
+
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token";
         $stmt = $this->getConnection()->prepare($sql);
 
@@ -218,6 +226,10 @@ class PdoStore implements PersistingStoreInterface
 
     public function exists(Key $key): bool
     {
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";
         $stmt = $this->getConnection()->prepare($sql);
 

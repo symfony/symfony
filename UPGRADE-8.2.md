@@ -298,6 +298,7 @@ Lock
 ----
 
  * Add argument `$advisory` to `StoreFactory::createStore()`
+ * `putOffExpiration()` throws a `LockConflictedException` when the key has no lock state; `MongoDbStore`, `MemcachedStore`, `PdoStore`, `DoctrineDbalStore` and `DynamoDbStore` used to create the lock or take it over
 
 Loco Translation Provider
 -------------------------

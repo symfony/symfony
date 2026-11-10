@@ -315,6 +315,68 @@ class RedisTraitTest extends TestCase
         ];
     }
 
+    public function testBooleanSslOptions()
+    {
+        $predisClass = $this->createPredisCaptureClass();
+
+        $mock = new class {
+            use RedisTrait;
+        };
+
+        $mock::createConnection('redis://localhost?ssl[verify_peer]=false&ssl[verify_peer_name]=&ssl[SNI_enabled]=1', ['class' => $predisClass]);
+
+        $this->assertSame(['verify_peer' => false, 'verify_peer_name' => false, 'SNI_enabled' => true], $predisClass::$captured['parameters']['ssl']);
+    }
+
+    public function testBooleanSslOptionsPerHost()
+    {
+        $predisClass = $this->createPredisCaptureClass();
+
+        $mock = new class {
+            use RedisTrait;
+        };
+
+        $mock::createConnection('rediss:?host[localhost][ssl][verify_peer]=false&host[localhost][ssl][verify_peer_name]=&host[localhost][ssl][SNI_enabled]=1', ['class' => $predisClass]);
+
+        $this->assertSame(['verify_peer' => false, 'verify_peer_name' => false, 'SNI_enabled' => true], $predisClass::$captured['parameters']['ssl']);
+    }
+
+    public function testBooleanPersistentParameter()
+    {
+        $predisClass = $this->createPredisCaptureClass();
+
+        $mock = new class {
+            use RedisTrait;
+        };
+
+        $mock::createConnection('redis://localhost?persistent=false', ['class' => $predisClass]);
+        $this->assertFalse($predisClass::$captured['options']['parameters']['persistent']);
+
+        $mock::createConnection('redis://localhost?persistent=', ['class' => $predisClass]);
+        $this->assertFalse($predisClass::$captured['options']['parameters']['persistent']);
+
+        $mock::createConnection('redis://localhost?persistent=1', ['class' => $predisClass]);
+        $this->assertTrue($predisClass::$captured['options']['parameters']['persistent']);
+    }
+
+    public function testInvalidBooleanParameters()
+    {
+        $predisClass = $this->createPredisCaptureClass();
+
+        $mock = new class {
+            use RedisTrait;
+        };
+
+        foreach (['ssl[verify_peer]', 'ssl[verify_peer_name]', 'host[localhost][ssl][verify_peer]', 'lazy', 'persistent', 'redis_cluster'] as $parameter) {
+            try {
+                $mock::createConnection('redis://localhost?'.$parameter.'=ture', ['class' => $predisClass]);
+                $this->fail(\sprintf('"%s=ture" should have been rejected.', $parameter));
+            } catch (InvalidArgumentException $e) {
+                $this->assertSame(\sprintf('Invalid Redis DSN: parameter "%s" must be a boolean.', $parameter), $e->getMessage());
+            }
+        }
+    }
+
     private function assertAuthMatchesExpected(string|array|null $expectedAuth, array $parameters): void
     {
         if (null === $expectedAuth) {

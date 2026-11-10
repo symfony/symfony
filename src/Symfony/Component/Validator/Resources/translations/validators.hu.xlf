@@ -452,7 +452,7 @@
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target>Ez a érték érvénytelen hetet jelent az ISO 8601 formátumban.</target>
+                <target>Ez az érték érvénytelen hetet jelent az ISO 8601 formátumban.</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
@@ -460,11 +460,11 @@
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target>Ez az érték nem lehet a "{{ min }}". hétnél korábbi.</target>
+                <target>Ez az érték nem lehet korábbi a következő hétnél: {{ min }}.</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target>Ez az érték nem lehet a "{{ max }}". hétnél későbbi.</target>
+                <target>Ez az érték nem lehet későbbi a következő hétnél: {{ max }}.</target>
             </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
@@ -532,11 +532,11 @@
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target>Nem támogatott videókodek „{{ codec }}".</target>
+                <target>Nem támogatott videókodek „{{ codec }}”.</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target>Nem támogatott videókonténer „{{ container }}".</target>
+                <target>Nem támogatott videókonténer „{{ container }}”.</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>

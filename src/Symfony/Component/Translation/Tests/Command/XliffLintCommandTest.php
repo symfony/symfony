@@ -190,6 +190,56 @@ class XliffLintCommandTest extends TestCase
         self::assertStringMatchesFormat('%A::error file=%s,line=6,col=47::Opening and ending tag mismatch: target line 6 and source%A', trim($tester->getDisplay()));
     }
 
+    public function testLintCorrectFileWithJunitFormat()
+    {
+        $filename = $this->createFile('note', 'en', 'messages&team.%locale%.xlf');
+        $tester = $this->createCommandTester();
+
+        $tester->execute(['filename' => $filename, '--format' => 'junit'], ['decorated' => false]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $xml = simplexml_load_string($tester->getDisplay());
+        $this->assertNotFalse($xml);
+        $this->assertSame('1', (string) $xml->testsuite['tests']);
+        $this->assertSame('0', (string) $xml->testsuite['failures']);
+        $this->assertSame($filename, (string) $xml->testsuite->testcase['file']);
+        $this->assertCount(0, $xml->testsuite->testcase->failure);
+    }
+
+    public function testLintCorrectAndIncorrectFilesWithJunitFormat()
+    {
+        $valid = $this->createFile();
+        $invalid = $this->createFile('note <target>', 'en', 'broken.%locale%.xlf');
+        $tester = $this->createCommandTester();
+
+        $tester->execute(['filename' => [$valid, $invalid], '--format' => 'junit'], ['decorated' => false]);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $xml = simplexml_load_string($tester->getDisplay());
+        $this->assertNotFalse($xml);
+        $this->assertSame('2', (string) $xml->testsuite['tests']);
+        $this->assertSame('1', (string) $xml->testsuite['failures']);
+        $this->assertSame($valid, (string) $xml->testsuite->testcase[0]['file']);
+        $this->assertSame($invalid, (string) $xml->testsuite->testcase[1]['file']);
+        $this->assertCount(0, $xml->testsuite->testcase[0]->failure);
+        $this->assertSame('error', (string) $xml->testsuite->testcase[1]->failure['type']);
+        $this->assertStringContainsString('Opening and ending tag mismatch', (string) $xml->testsuite->testcase[1]->failure);
+    }
+
+    public function testLintJunitFormatEscapesInvalidXmlError()
+    {
+        $filename = $this->createFile('note <target name="a&b">');
+        $tester = $this->createCommandTester();
+
+        $tester->execute(['filename' => $filename, '--format' => 'junit'], ['decorated' => false]);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $xml = simplexml_load_string($tester->getDisplay());
+        $this->assertNotFalse($xml);
+        $this->assertSame('1', (string) $xml->testsuite['failures']);
+        $this->assertCount(1, $xml->testsuite->testcase->failure);
+    }
+
     public function testLintAutodetectsGithubActionEnvironment()
     {
         $prev = getenv('GITHUB_ACTIONS');
@@ -310,7 +360,7 @@ class XliffLintCommandTest extends TestCase
 
     public static function provideCompletionSuggestions()
     {
-        yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
+        yield 'option' => [['--format', ''], ['txt', 'json', 'github', 'junit']];
     }
 
     public function testValidateDoesNotResolveExternalEntitiesByDefault()

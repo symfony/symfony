@@ -104,7 +104,7 @@ class Connection
 
         foreach ($options['ssl'] ?? [] as $streamOption => $value) {
             if (\in_array($streamOption, ['allow_self_signed', 'capture_peer_cert', 'capture_peer_cert_chain', 'disable_compression', 'SNI_enabled', 'verify_peer', 'verify_peer_name'], true) && \is_string($value)) {
-                $options['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL);
+                $options['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "ssl[%s]" of the Redis Messenger transport must be a boolean.', $streamOption));
             }
         }
 
@@ -293,9 +293,9 @@ class Connection
         }
         foreach (self::DEFAULT_OPTIONS as $k => $v) {
             $options[$k] = match (\gettype($v)) {
-                'integer' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_INT),
-                'boolean' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_BOOL),
-                'double' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_FLOAT),
+                'integer' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the Redis Messenger transport must be an integer.', $k)),
+                'boolean' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the Redis Messenger transport must be a boolean.', $k)),
+                'double' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_FLOAT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the Redis Messenger transport must be a number.', $k)),
                 default => $options[$k] ?? $v,
             };
         }

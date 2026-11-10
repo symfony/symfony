@@ -129,6 +129,16 @@ trait RedisTrait
         $tls = 'rediss' === $scheme || 'valkeys' === $scheme;
         $tcpScheme = $tls ? 'tls' : 'tcp';
 
+        $booleanStreamOptions = [
+            'allow_self_signed',
+            'capture_peer_cert',
+            'capture_peer_cert_chain',
+            'disable_compression',
+            'SNI_enabled',
+            'verify_peer',
+            'verify_peer_name',
+        ];
+
         if (isset($params['query'])) {
             parse_str($params['query'], $query);
 
@@ -139,6 +149,11 @@ trait RedisTrait
                 foreach ($hosts as $host => $parameters) {
                     if (\is_string($parameters)) {
                         parse_str($parameters, $parameters);
+                    }
+                    foreach ($parameters['ssl'] ?? [] as $streamOption => $value) {
+                        if (\in_array($streamOption, $booleanStreamOptions, true) && \is_string($value)) {
+                            $parameters['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Invalid Redis DSN: parameter "host[%s][ssl][%s]" must be a boolean.', $host, $streamOption));
+                        }
                     }
                     if (false === $i = strrpos($host, ':')) {
                         $hosts[$host] = ['scheme' => $tcpScheme, 'host' => $host, 'port' => 6379] + $parameters;
@@ -179,19 +194,9 @@ trait RedisTrait
 
         $params += $query + $options + self::$defaultConnectionOptions;
 
-        $booleanStreamOptions = [
-            'allow_self_signed',
-            'capture_peer_cert',
-            'capture_peer_cert_chain',
-            'disable_compression',
-            'SNI_enabled',
-            'verify_peer',
-            'verify_peer_name',
-        ];
-
         foreach ($params['ssl'] ?? [] as $streamOption => $value) {
             if (\in_array($streamOption, $booleanStreamOptions, true) && \is_string($value)) {
-                $params['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL);
+                $params['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Invalid Redis DSN: parameter "ssl[%s]" must be a boolean.', $streamOption));
             }
         }
 
@@ -228,7 +233,7 @@ trait RedisTrait
 
         foreach (['lazy', 'persistent', 'cluster'] as $option) {
             if (!\is_bool($params[$option] ?? false)) {
-                $params[$option] = filter_var($params[$option], \FILTER_VALIDATE_BOOLEAN);
+                $params[$option] = filter_var($params[$option], \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Invalid Redis DSN: parameter "%s" must be a boolean.', $option));
             }
         }
 

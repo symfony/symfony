@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\Loader\Configurator\Routes;
 use Symfony\Component\Routing\Loader\Configurator\RoutesReference;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\Routing\Loader\Configurator\Traits\GlobResourceTrait;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -31,6 +32,8 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class PhpFileLoader extends FileLoader
 {
+    use GlobResourceTrait;
+
     /**
      * Loads a PHP file.
      */

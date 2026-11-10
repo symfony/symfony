@@ -261,6 +261,36 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('sqs://default?foo=foo', ['bar' => 'bar']);
     }
 
+    public function testFromDsnWithInvalidQueryOptionValues()
+    {
+        $cases = [
+            'visibility_timeout=abc' => 'Option "visibility_timeout" of the Amazon SQS Messenger transport must be an integer.',
+            'visibility_timeout=' => 'Option "visibility_timeout" of the Amazon SQS Messenger transport must be an integer.',
+            'wait_time=abc' => 'Option "wait_time" of the Amazon SQS Messenger transport must be an integer.',
+            'buffer_size=abc' => 'Option "buffer_size" of the Amazon SQS Messenger transport must be an integer.',
+            'retry_delay=abc' => 'Option "retry_delay" of the Amazon SQS Messenger transport must be an integer.',
+            'delete_on_rejection=nope' => 'Option "delete_on_rejection" of the Amazon SQS Messenger transport must be a boolean.',
+            'auto_setup=nope' => 'Option "auto_setup" of the Amazon SQS Messenger transport must be a boolean.',
+        ];
+
+        foreach ($cases as $query => $message) {
+            try {
+                Connection::fromDsn('sqs://default/queue?'.$query);
+                $this->fail(\sprintf('"%s" should have been rejected.', $query));
+            } catch (\InvalidArgumentException $e) {
+                $this->assertSame($message, $e->getMessage());
+            }
+        }
+    }
+
+    public function testFromDsnWithInvalidOptionValues()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "visibility_timeout" of the Amazon SQS Messenger transport must be an integer.');
+
+        Connection::fromDsn('sqs://default/queue', ['visibility_timeout' => 1.5]);
+    }
+
     public function testKeepGettingPendingMessages()
     {
         $client = $this->createMock(SqsClient::class);

@@ -100,6 +100,7 @@ class CachedMappedAssetFactoryTest extends TestCase
         $newSourceTimestamp = $cacheTimestamp + 1;
         touch($sourcePath, $sourceTimestamp);
         touch($cachePath, $cacheTimestamp);
+        touch($cachePath.'.meta', $cacheTimestamp);
         clearstatcache();
 
         $configCache = new ConfigCache($cachePath, true);

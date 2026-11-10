@@ -87,3 +87,8 @@ Symfony\Component\Serializer\Tests\Fixtures\Attributes\ContextDummy:
     methodWithContext:
       contexts:
         - context: { method: method_with_context }
+
+Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthZeroDummy:
+    attributes:
+        child:
+            max_depth: 0

@@ -38,7 +38,7 @@ final class TurboSmtpTransportFactory extends AbstractTransportFactory
         if ('turbosmtp+smtp' === $scheme || 'turbosmtp' === $scheme) {
             $host = 'default' === $dsn->getHost() ? 'pro.turbo-smtp.com' : $dsn->getHost();
 
-            return new TurboSmtpSmtpTransport($host, $user, $password, $this->dispatcher, $this->logger);
+            return (new TurboSmtpSmtpTransport($host, $user, $password, $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true));
         }
 
         throw new UnsupportedSchemeException($dsn, 'turbosmtp', $this->getSupportedSchemes());

@@ -100,4 +100,15 @@ class MailKiteTransportFactoryTest extends AbstractTransportFactoryTestCase
     {
         yield [new Dsn('mailkite+api', 'default')];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['mailkite', 'mailkite+smtp', 'mailkite+smtps'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::USER))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('mailkite+smtp', 'default', self::USER, null, null, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

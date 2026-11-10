@@ -34,7 +34,7 @@ final class MailKiteTransportFactory extends AbstractTransportFactory
         }
 
         if ('mailkite' === $scheme || 'mailkite+smtp' === $scheme || 'mailkite+smtps' === $scheme) {
-            return new MailKiteSmtpTransport($this->getUser($dsn), 'mailkite+smtps' === $scheme, $this->dispatcher, $this->logger);
+            return (new MailKiteSmtpTransport($this->getUser($dsn), 'mailkite+smtps' === $scheme, $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true));
         }
 
         throw new UnsupportedSchemeException($dsn, 'mailkite', $this->getSupportedSchemes());

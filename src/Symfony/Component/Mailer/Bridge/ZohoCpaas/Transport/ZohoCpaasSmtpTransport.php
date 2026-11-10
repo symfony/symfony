@@ -41,6 +41,7 @@ final class ZohoCpaasSmtpTransport extends EsmtpTransport
     {
         parent::__construct($host ?? 'smtp.zeptomail.com', $port ?? (true === $tls ? 465 : 587), $tls, $dispatcher, $logger);
 
+        $this->setRequireTls(true);
         $this->setUsername($username);
         $this->setPassword($password);
     }

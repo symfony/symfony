@@ -54,4 +54,14 @@ class RateLimitTest extends TestCase
         $rateLimit->wait(); // wait until $retryAfter (~2.5 seconds)
         $this->assertEqualsWithDelta($retryAfter, microtime(true), 0.49);
     }
+
+    public function testWaitForMoreThanUsleepCanTakeOn32BitPlatforms()
+    {
+        ClockMock::register(RateLimit::class);
+        $retryAfter = time() + 3600.5;
+        $rateLimit = new RateLimit(10, \DateTimeImmutable::createFromFormat('U.u', $retryAfter), true, 10);
+
+        $rateLimit->wait();
+        $this->assertEqualsWithDelta($retryAfter, microtime(true), 0.49);
+    }
 }

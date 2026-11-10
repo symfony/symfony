@@ -72,6 +72,12 @@ class RateLimit
             return;
         }
 
+        // on 32-bit platforms, usleep() cannot take more than about 35 minutes
+        if (1 <= $seconds = (int) $delta) {
+            sleep($seconds);
+            $delta -= $seconds;
+        }
+
         usleep((int) ceil($delta * 1e6));
     }
 }

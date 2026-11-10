@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-11-09T17:36:25Z
+
+Thanks for the review.
+
+- `DoctrineDbalStore` and `DynamoDbStore` now have the same guard in `exists()`, `delete()` and `putOffExpiration()`.
+- The `putOffExpiration()` test moved to `ExpiringStoreTestTrait` and asserts `LockConflictedException`, so a silent `return;` fails the test.
+- Removed the `@psalm-require-extends` annotations.
+- `UPGRADE-8.2.md` now lists `PdoStore`, `DoctrineDbalStore` and `DynamoDbStore`, and the Lock CHANGELOG has an entry.
+- About the key copy: this is intended. `exists()` no longer writes the token as a side effect, so ownership starts at `save()` and `acquire()`. The documented sharing flow serializes the key after acquiring it.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-11-09T19:42:45Z
+
+Fixed in the last push:
+
+- Removed `ExpiringStoreTestTrait` and `FreshKeyTestTrait` from the DynamoDB functional test, so the bridge no longer references `Symfony\Component\Lock\Tests`.
+- The three guards are tested in the bridge unit test with the empty `MockHttpClient`: `testExistsWithoutStateDoesNotSendRequest`, `testDeleteWithoutStateDoesNotSendRequest` and `testPutOffExpirationWithoutStateThrows`.
+- `testDeleteOfALockHeldBySomeoneElseIsIgnored` now saves the key first and asserts two requests, as suggested.

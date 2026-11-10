@@ -1,0 +1,70 @@
+# Deptrac: границы между МОДУЛЯМИ (bounded contexts).
+# Модуль видит только себя, Shared и Contract/ других модулей.
+#
+#   vendor/bin/deptrac analyse --config-file=deptrac.modules.yaml
+#
+# Новый модуль: скопируйте слой Billing, замените имя, добавьте модуль в ruleset
+# и в список разрешённых для Admin.
+
+deptrac:
+  paths:
+    - ./src
+
+  analyser:
+    types:
+      - class
+      - use
+
+  layers:
+    - name: Shared
+      collectors:
+        - type: directory
+          value: src/Shared/.*
+
+    # Публичные API всех модулей: интерфейсы, DTO, интеграционные события.
+    - name: Contracts
+      collectors:
+        - type: directory
+          value: src/[^/]+/Contract/.*
+
+    # Дашборд EasyAdmin: единственное место, которому можно видеть все модули.
+    - name: Admin
+      collectors:
+        - type: directory
+          value: src/Admin/.*
+
+    # ---------- Модули (замените на свои) ----------
+    - name: Billing
+      collectors:
+        - type: bool
+          must:
+            - type: directory
+              value: src/Billing/.*
+          must_not:
+            - type: directory
+              value: src/Billing/Contract/.*
+
+    - name: Catalog
+      collectors:
+        - type: bool
+          must:
+            - type: directory
+              value: src/Catalog/.*
+          must_not:
+            - type: directory
+              value: src/Catalog/Contract/.*
+
+  ruleset:
+    Shared: ~
+    Contracts: ~
+    Admin:
+      - Shared
+      - Contracts
+      - Billing
+      - Catalog
+    Billing:
+      - Shared
+      - Contracts
+    Catalog:
+      - Shared
+      - Contracts

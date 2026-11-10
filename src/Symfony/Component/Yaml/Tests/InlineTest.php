@@ -915,6 +915,41 @@ class InlineTest extends TestCase
         Inline::parse('{this, is not, supported}');
     }
 
+    public function testNotSupportedMissingValueBeforeAKey()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Malformed inline YAML string: "{foo, bar: baz}" at line 1.');
+        Inline::parse('{foo, bar: baz}');
+    }
+
+    public function testNotSupportedMissingValueBeforeAMapping()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Malformed inline YAML string: "[{foo}, {bar: baz}]" at line 1.');
+        Inline::parse('[{foo}, {bar: baz}]');
+    }
+
+    public function testComplexMappingKeyThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Complex mappings are not supported at line 1 (near "{? foo: bar}").');
+        Inline::parse('{? foo: bar}');
+    }
+
+    public function testSequenceAsMappingKeyThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Complex mappings are not supported at line 1 (near "{[foo]: bar}").');
+        Inline::parse('{[foo]: bar}');
+    }
+
+    public function testMappingAsMappingKeyThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Complex mappings are not supported at line 1 (near "{&a {foo: bar}: baz}").');
+        Inline::parse('{&a {foo: bar}: baz}');
+    }
+
     public function testUnterminatedSequenceEndingWithTag()
     {
         $this->expectException(ParseException::class);
@@ -945,6 +980,14 @@ class InlineTest extends TestCase
         $this->expectExceptionMessage('Malformed inline YAML string: "{foo: &bar"');
 
         Inline::parse('{foo: &bar');
+    }
+
+    public function testUnterminatedMappingEndingWithKeyAnchor()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Malformed inline YAML string: "{&foo"');
+
+        Inline::parse('{&foo');
     }
 
     public function testVeryLongQuotedStrings()
@@ -1368,6 +1411,22 @@ class InlineTest extends TestCase
             '{ foo: &a bar, baz: *a }',
             ['foo' => 'bar', 'baz' => 'bar'],
         ];
+        yield 'plain key in mapping' => [
+            '{ &a foo: bar, baz: *a }',
+            ['foo' => 'bar', 'baz' => 'foo'],
+        ];
+        yield 'quoted key in mapping' => [
+            '{ &a "foo bar": baz, qux: *a }',
+            ['foo bar' => 'baz', 'qux' => 'foo bar'],
+        ];
+        yield 'key in mapping in sequence' => [
+            '[{ &a foo: bar }, *a]',
+            [['foo' => 'bar'], 'foo'],
+        ];
+        yield 'alias as key in mapping' => [
+            '{ foo: &a bar, *a : baz }',
+            ['foo' => 'bar', 'bar' => 'baz'],
+        ];
     }
 
     public function testParseAnchoredMergeKey()
@@ -1399,6 +1458,14 @@ class InlineTest extends TestCase
         $this->expectExceptionMessage('Merge items must be arrays');
 
         Inline::parse('{ <<: [foo] }');
+    }
+
+    public function testParseAliasOfACollectionAsMappingKeyThrowsParseException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Non-string keys are not supported');
+
+        Inline::parse('{ foo: &a [bar], *a : baz }');
     }
 
     public function testParseKeyStartingWithNulByteWithMapObjectsThrowsParseException()

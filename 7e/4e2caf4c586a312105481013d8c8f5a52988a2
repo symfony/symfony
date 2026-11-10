@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-10T00:30:55Z
+
+PR updated to keep only the encoding, so `FileSchemaResolver` and the relative `$ref` test are gone.

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `ProcessBundle`
  * Add `Process::inheritStdio()` and `Process::isStdioInherited()` to run a process with the standard input, output and error of the current process
+ * Add `Process::disableInput()` and `Process::isInputDisabled()` to give the null device as standard input to the process, instead of a pipe
 
 7.3
 ---

@@ -780,6 +780,115 @@ class ProcessTest extends TestCase
         $process->setIdleTimeout(1);
     }
 
+    public function testInputIsNotDisabledByDefault()
+    {
+        $process = $this->getProcess('foo');
+        $this->assertFalse($process->isInputDisabled());
+        $this->assertSame($process, $process->disableInput());
+        $this->assertTrue($process->isInputDisabled());
+    }
+
+    public function testDisableInputGivesTheNullDeviceAsStandardInput()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('fstat() does not tell the null device from a pipe on Windows.');
+        }
+
+        $code = 'echo fstat(STDIN)["mode"] & 0170000;';
+
+        $process = $this->getProcessForCode($code);
+        $process->run();
+        $this->assertSame((string) 0o010000, $process->getOutput(), 'Without disabling the input, the standard input is a pipe.');
+
+        $process = $this->getProcessForCode($code);
+        $process->disableInput();
+        $process->run();
+        $this->assertSame((string) 0o020000, $process->getOutput(), 'With the input disabled, the standard input is the null device.');
+    }
+
+    public function testDisableInputWhileStdioIsInherited()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('fstat() does not tell the null device from a pipe on Windows.');
+        }
+
+        $autoload = is_file(\dirname(__DIR__).'/vendor/autoload.php') ? \dirname(__DIR__).'/vendor/autoload.php' : \dirname(__DIR__, 5).'/vendor/autoload.php';
+
+        // The inner process inherits the standard streams of the outer one, whose standard input is a pipe
+        $process = $this->getProcessForCode(\sprintf(
+            'require %s; $p = new %s([PHP_BINARY, "-r", %s]); $p->inheritStdio(); $p->disableInput(); $p->run();',
+            var_export($autoload, true),
+            Process::class,
+            var_export('echo fstat(STDIN)["mode"] & 0170000;', true),
+        ), input: 'input meant for the outer process');
+        $process->run();
+
+        $this->assertSame((string) 0o020000, $process->getOutput());
+    }
+
+    public function testDisableInputWhileRunning()
+    {
+        $process = $this->getProcessForCode('sleep(30);');
+        $process->start();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Disabling input while the process is running is not possible.');
+
+        $process->disableInput();
+    }
+
+    public function testDisableInputWhileInputIsSet()
+    {
+        $process = $this->getProcess('foo', null, null, 'input');
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Input cannot be disabled while an input is set.');
+
+        $process->disableInput();
+    }
+
+    public function testSetInputWhileInputIsDisabled()
+    {
+        $process = $this->getProcess('foo');
+        $process->disableInput();
+        $this->assertSame($process, $process->setInput(null));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Input cannot be set while the input is disabled.');
+
+        $process->setInput('input');
+    }
+
+    public function testDisableInputWhileTtyIsEnabled()
+    {
+        if (!Process::isTtySupported()) {
+            $this->markTestSkipped('There is no TTY support');
+        }
+
+        $process = $this->getProcess('foo');
+        $process->setTty(true);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Input cannot be disabled while the TTY mode is enabled.');
+
+        $process->disableInput();
+    }
+
+    public function testTtyWhileInputIsDisabled()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows does not have /dev/tty support');
+        }
+
+        $process = $this->getProcess('foo');
+        $process->disableInput();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('TTY mode cannot be enabled while the input is disabled.');
+
+        $process->setTty(true);
+    }
+
     public function testExitCodeTextIsNullWhenExitCodeIsNull()
     {
         $process = $this->getProcess('');

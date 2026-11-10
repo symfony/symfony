@@ -22,6 +22,8 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
  * Resolves the RateLimiterFactoryInterface arguments of a controller that carry a policy attribute,
  * such as #[SlidingWindowPolicy], to a factory of limiters that only this argument uses.
  *
+ * Several policies on the same argument are combined into a compound limiter.
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class RateLimiterFactoryValueResolver implements ValueResolverInterface
@@ -37,10 +39,17 @@ final class RateLimiterFactoryValueResolver implements ValueResolverInterface
             return [];
         }
 
-        if (1 < \count($policies)) {
-            throw new \LogicException(\sprintf('Cannot resolve the "$%s" argument of "%s()": it has several policy attributes.', $argument->getName(), $argument->getControllerName()));
+        $id = $argument->getControllerName().'$'.$argument->getName();
+
+        if (1 === \count($policies)) {
+            return [$policies[0]->createFactory($this->builder, $id)];
         }
 
-        return [$policies[0]->createFactory($this->builder, $argument->getControllerName().'$'.$argument->getName())];
+        $factories = [];
+        foreach ($policies as $i => $policy) {
+            $factories[] = $policy->createFactory($this->builder, $id.'#'.$i);
+        }
+
+        return [$this->builder->compound(...$factories)];
     }
 }

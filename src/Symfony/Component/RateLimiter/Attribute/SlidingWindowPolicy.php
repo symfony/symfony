@@ -17,7 +17,7 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_PARAMETER)]
 final class SlidingWindowPolicy implements PolicyInterface
 {
     /**

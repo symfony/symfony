@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Yaml\Tests\Schema;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\RuntimeException;
 use Symfony\Component\Yaml\Schema\SchemaValidator;
@@ -63,6 +64,39 @@ class SchemaValidatorTest extends TestCase
 
         $this->assertNotEmpty($errors);
         $this->assertSame(0, $errors[0]['line']);
+    }
+
+    #[DataProvider('provideDirectoryNames')]
+    public function testSchemaPathIsEncodedAsFileUri(string $dirName)
+    {
+        $dir = sys_get_temp_dir().'/sf-schema-'.bin2hex(random_bytes(4)).$dirName;
+        $schema = $dir.'/schema.json';
+
+        mkdir($dir);
+        file_put_contents($schema, json_encode([
+            'type' => 'object',
+            'properties' => ['version' => ['type' => 'integer']],
+        ]));
+
+        try {
+            $content = 'version: not-an-integer';
+            $errors = (new SchemaValidator())->validate(Yaml::parse($content), $schema, $content);
+
+            $this->assertCount(1, $errors);
+            $this->assertSame(1, $errors[0]['line']);
+        } finally {
+            @unlink($schema);
+            @rmdir($dir);
+        }
+    }
+
+    public static function provideDirectoryNames(): iterable
+    {
+        yield [' with space'];
+        yield ['#hash'];
+        yield ['%percent'];
+        yield ['%20'];
+        yield ['-é'];
     }
 
     public function testErrorLineIsResolvedFromNestedKey()

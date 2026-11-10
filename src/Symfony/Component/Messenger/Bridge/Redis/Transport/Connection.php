@@ -104,13 +104,13 @@ class Connection
             throw new InvalidArgumentException('Redis Sentinel support requires ext-redis>=6.1, or ext-relay.');
         }
 
-        if (null !== $sentinelMaster && $redis instanceof \RedisCluster) {
-            throw new InvalidArgumentException('Cannot configure Redis Sentinel and Redis Cluster instance at the same time.');
+        if (null !== $sentinelMaster && ($redis instanceof \RedisCluster || filter_var($options['cluster'], \FILTER_VALIDATE_BOOL))) {
+            throw new InvalidArgumentException('Cannot configure Redis Sentinel and Redis Cluster at the same time.');
         }
 
         foreach ($options['ssl'] ?? [] as $streamOption => $value) {
             if (\in_array($streamOption, ['allow_self_signed', 'capture_peer_cert', 'capture_peer_cert_chain', 'disable_compression', 'SNI_enabled', 'verify_peer', 'verify_peer_name'], true) && \is_string($value)) {
-                $options['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL);
+                $options['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "ssl[%s]" of the Redis Messenger transport must be a boolean.', $streamOption));
             }
         }
 
@@ -292,16 +292,16 @@ class Connection
         }
 
         $options['sentinel'] ??= $options['redis_sentinel'] ?? $options['sentinel_master'] ?? null;
-        unset($options['redis_sentinel'], $options['sentinel_master'], $options['cluster']);
+        unset($options['redis_sentinel'], $options['sentinel_master']);
 
         if ($invalidOptions = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS), ['host', 'port'])) {
             throw new LogicException(\sprintf('Invalid option(s) "%s" passed to the Redis Messenger transport.', implode('", "', $invalidOptions)));
         }
         foreach (self::DEFAULT_OPTIONS as $k => $v) {
             $options[$k] = match (\gettype($v)) {
-                'integer' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_INT),
-                'boolean' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_BOOL),
-                'double' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_FLOAT),
+                'integer' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the Redis Messenger transport must be an integer.', $k)),
+                'boolean' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the Redis Messenger transport must be a boolean.', $k)),
+                'double' => filter_var($options[$k] ?? $v, \FILTER_VALIDATE_FLOAT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the Redis Messenger transport must be a number.', $k)),
                 default => $options[$k] ?? $v,
             };
         }

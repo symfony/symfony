@@ -95,8 +95,8 @@ class Connection
             $value = $options[$k] ?? $query[$k] ?? $v;
 
             $configuration[$k] = match (\gettype($v)) {
-                'integer' => filter_var($value, \FILTER_VALIDATE_INT),
-                'boolean' => filter_var($value, \FILTER_VALIDATE_BOOL),
+                'integer' => filter_var($value, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the Beanstalkd Messenger transport must be an integer.', $k)),
+                'boolean' => filter_var($value, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the Beanstalkd Messenger transport must be a boolean.', $k)),
                 default => $value,
             };
         }

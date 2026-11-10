@@ -58,9 +58,7 @@ class RedisStore implements PersistingStoreInterface
             redis.call("ZINTERSTORE", weightKey, 2, weightKey, timeKey, "WEIGHTS", 1, 0)
 
             -- Semaphore already acquired?
-            if redis.call("ZSCORE", timeKey, identifier) then
-                return true
-            end
+            local acquired = redis.call("ZSCORE", timeKey, identifier)
 
             -- Try to get a semaphore
             local semaphores = redis.call("ZRANGE", weightKey, 0, -1, "WITHSCORES")
@@ -71,7 +69,7 @@ class RedisStore implements PersistingStoreInterface
             end
 
             -- Could we get the semaphore ?
-            if count + weight > limit then
+            if not acquired and count + weight > limit then
                 return false
             end
 
@@ -81,15 +79,15 @@ class RedisStore implements PersistingStoreInterface
 
             -- Extend the TTL
             local maxExpiration = redis.call("ZREVRANGE", timeKey, 0, 0, "WITHSCORES")[2]
-            redis.call("EXPIREAT", weightKey, maxExpiration + 10)
-            redis.call("EXPIREAT", timeKey, maxExpiration + 10)
+            redis.call("EXPIREAT", weightKey, math.ceil(maxExpiration) + 10)
+            redis.call("EXPIREAT", timeKey, math.ceil(maxExpiration) + 10)
 
             return true
         ';
 
         $args = [
             $this->getUniqueToken($key),
-            time(),
+            microtime(true),
             $ttlInSecond,
             $key->getLimit(),
             $key->getWeight(),
@@ -123,13 +121,13 @@ class RedisStore implements PersistingStoreInterface
                 return 1
             end
 
-            redis.call("EXPIREAT", weightKey, maxExpiration + 10)
-            redis.call("EXPIREAT", timeKey, maxExpiration + 10)
+            redis.call("EXPIREAT", weightKey, math.ceil(maxExpiration) + 10)
+            redis.call("EXPIREAT", timeKey, math.ceil(maxExpiration) + 10)
 
             return added
         ';
 
-        $ret = $this->evaluate($script, \sprintf('{%s}', $key), [time() + $ttlInSecond, $this->getUniqueToken($key)]);
+        $ret = $this->evaluate($script, \sprintf('{%s}', $key), [microtime(true) + $ttlInSecond, $this->getUniqueToken($key)]);
 
         // Occurs when redis has been reset
         if (false === $ret) {

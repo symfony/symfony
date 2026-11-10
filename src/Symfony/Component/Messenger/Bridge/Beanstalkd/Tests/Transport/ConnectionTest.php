@@ -138,6 +138,33 @@ final class ConnectionTest extends TestCase
         Connection::fromDsn('beanstalkd://127.0.0.1?new_option=woops');
     }
 
+    public function testFromDsnWithInvalidQueryOptions()
+    {
+        $cases = [
+            'ttr=1.5' => 'Option "ttr" of the Beanstalkd Messenger transport must be an integer.',
+            'ttr=' => 'Option "ttr" of the Beanstalkd Messenger transport must be an integer.',
+            'timeout=10s' => 'Option "timeout" of the Beanstalkd Messenger transport must be an integer.',
+            'bury_on_reject=nope' => 'Option "bury_on_reject" of the Beanstalkd Messenger transport must be a boolean.',
+        ];
+
+        foreach ($cases as $query => $message) {
+            try {
+                Connection::fromDsn('beanstalkd://127.0.0.1?'.$query);
+                $this->fail(\sprintf('"%s" should have been rejected.', $query));
+            } catch (MessengerInvalidArgumentException $e) {
+                $this->assertSame($message, $e->getMessage());
+            }
+        }
+    }
+
+    public function testFromDsnWithInvalidOptions()
+    {
+        $this->expectException(MessengerInvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "ttr" of the Beanstalkd Messenger transport must be an integer.');
+
+        Connection::fromDsn('beanstalkd://127.0.0.1', ['ttr' => 'abc']);
+    }
+
     public function testGet()
     {
         $id = '1234';

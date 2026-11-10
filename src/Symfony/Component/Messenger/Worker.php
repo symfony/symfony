@@ -43,6 +43,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -132,162 +133,166 @@ class Worker
         }
 
         try {
-            while (!$this->shouldStop) {
-                if (null !== $endTime && $this->now() >= $endTime) {
-                    $this->logger?->info('Worker stopped due to time limit of {timeLimit}s exceeded', ['timeLimit' => $options['time_limit']]);
-                    break;
-                }
-
-                $envelopeHandled = false;
-                $envelopeHandledStart = $this->now();
-                $fetchSize = max(1, $options['fetch_size'] ?? 1);
-
-                if ($this->messageExecutionStrategy->shouldPauseConsumption()
-                    && $this->messageExecutionStrategy->wait($this->completionCallback)
-                ) {
-                    if ($this->shouldStop) {
+            try {
+                while (!$this->shouldStop) {
+                    if (null !== $endTime && $this->now() >= $endTime) {
+                        $this->logger?->info('Worker stopped due to time limit of {timeLimit}s exceeded', ['timeLimit' => $options['time_limit']]);
                         break;
                     }
 
-                    continue;
-                }
+                    $envelopeHandled = false;
+                    $envelopeHandledStart = $this->now();
+                    $fetchSize = max(1, $options['fetch_size'] ?? 1);
 
-                // drain buffered envelopes first: they are already off the broker and must not
-                // be starved by fetching new messages from higher-priority receivers
-                $receivers = $bufferedEnvelopes ? array_intersect_key($this->receivers, $bufferedEnvelopes) + $this->receivers : $this->receivers;
-
-                foreach ($receivers as $transportName => $receiver) {
-                    if ($envelopes = $bufferedEnvelopes[$transportName] ?? null) {
-                        unset($bufferedEnvelopes[$transportName]);
-                        // advance past the last handled envelope now that the worker is ready
-                        // again; lazy receivers fetch from the broker only at this point
-                        $envelopes->next();
-
-                        // the buffer is drained: poll the receivers again, in their order of priority
-                        if (!$envelopes->valid()) {
-                            continue 2;
-                        }
-                    } else {
-                        $status = ($this->cooldownStrategies[$transportName] ?? null)?->checkStatus($transportName);
-
-                        if ($status?->isCoolingDown()) {
-                            if (!isset($this->coolingDownTransports[$transportName])) {
-                                $this->eventDispatcher?->dispatch(new WorkerTransportCoolingDownEvent($transportName, $status));
-                            }
-
-                            $this->coolingDownTransports[$transportName] = $status;
-
-                            continue;
-                        }
-
-                        unset($this->coolingDownTransports[$transportName]);
-
-                        $envelopes = $this->fetch($transportName, $receiver, $queueNames, $fetchSize);
-
-                        if ($receiver instanceof KeepaliveReceiverInterface) {
-                            // the transport delivered the whole batch: keep alive the messages that wait for their turn too
-                            $envelopes = new \ArrayIterator(iterator_to_array($envelopes, false));
-
-                            foreach ($envelopes as $envelope) {
-                                $waitingReceipts[$transportName][] = $receipt = new \stdClass();
-                                $this->keepalives[$receipt] = [$transportName, $envelope];
-                            }
-                        }
-
-                        $envelopes->rewind();
-                    }
-
-                    for (; $envelopes->valid(); $envelopes->next()) {
-                        $envelope = $envelopes->current();
-                        $envelopeHandled = true;
-                        $receipt = isset($waitingReceipts[$transportName][0]) ? array_shift($waitingReceipts[$transportName]) : new \stdClass();
-
-                        $this->rateLimit($transportName);
-                        $this->handleMessage($envelope, $transportName, $receipt, $options['bus_name'] ?? null);
-                        $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
-
-                        if ($this->messageExecutionStrategy->shouldPauseConsumption()) {
-                            $bufferedEnvelopes[$transportName] = $envelopes;
-
-                            break 2;
-                        }
-
+                    if ($this->messageExecutionStrategy->shouldPauseConsumption()
+                        && $this->messageExecutionStrategy->wait($this->completionCallback)
+                    ) {
                         if ($this->shouldStop) {
-                            break 2;
-                        }
-                    }
-
-                    // after handling a single receiver, quit and start the loop again
-                    // this should prevent multiple lower priority receivers from
-                    // blocking too long before the higher priority are checked
-                    if ($envelopeHandled) {
-                        break;
-                    }
-                }
-
-                if (!$envelopeHandled && $this->flush(false)) {
-                    continue;
-                }
-
-                if (!$this->flush(30.0) && !$envelopeHandled) {
-                    if ($options['stop_when_empty']) {
-                        // the messages in flight and the pending batches can dispatch new messages
-                        if ($this->flush(true)) {
-                            continue;
+                            break;
                         }
 
-                        if ($this->coolingDownTransports) {
-                            $this->logger?->info('Worker stopped because no message was available outside of the transports that are cooling down: {transports}', ['transports' => implode(', ', array_keys($this->coolingDownTransports))]);
-                        } else {
-                            $this->logger?->info('Worker stopped because no message was available');
-                        }
-
-                        break;
-                    }
-
-                    $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, true));
-
-                    if ($this->shouldStop) {
                         continue;
                     }
 
-                    if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->now() - $envelopeHandledStart))) {
-                        if (null !== $endTime) {
-                            $sleep = min($sleep, (int) ceil(1e6 * ($endTime - $this->now())));
+                    // drain buffered envelopes first: they are already off the broker and must not
+                    // be starved by fetching new messages from higher-priority receivers
+                    $receivers = $bufferedEnvelopes ? array_intersect_key($this->receivers, $bufferedEnvelopes) + $this->receivers : $this->receivers;
+
+                    foreach ($receivers as $transportName => $receiver) {
+                        if ($envelopes = $bufferedEnvelopes[$transportName] ?? null) {
+                            unset($bufferedEnvelopes[$transportName]);
+                            // advance past the last handled envelope now that the worker is ready
+                            // again; lazy receivers fetch from the broker only at this point
+                            $envelopes->next();
+
+                            // the buffer is drained: poll the receivers again, in their order of priority
+                            if (!$envelopes->valid()) {
+                                continue 2;
+                            }
+                        } else {
+                            $status = ($this->cooldownStrategies[$transportName] ?? null)?->checkStatus($transportName);
+
+                            if ($status?->isCoolingDown()) {
+                                if (!isset($this->coolingDownTransports[$transportName])) {
+                                    $this->eventDispatcher?->dispatch(new WorkerTransportCoolingDownEvent($transportName, $status));
+                                }
+
+                                $this->coolingDownTransports[$transportName] = $status;
+
+                                continue;
+                            }
+
+                            unset($this->coolingDownTransports[$transportName]);
+
+                            $envelopes = $this->fetch($transportName, $receiver, $queueNames, $fetchSize);
+
+                            if ($receiver instanceof KeepaliveReceiverInterface) {
+                                // the transport delivered the whole batch: keep alive the messages that wait for their turn too
+                                $envelopes = new \ArrayIterator(iterator_to_array($envelopes, false));
+
+                                foreach ($envelopes as $envelope) {
+                                    $waitingReceipts[$transportName][] = $receipt = new \stdClass();
+                                    $this->keepalives[$receipt] = [$transportName, $envelope];
+                                }
+                            }
+
+                            $envelopes->rewind();
                         }
 
-                        foreach ($this->coolingDownTransports as $status) {
-                            if ($end = $status->getEnd()) {
-                                $sleep = (int) min($sleep, ceil(1e6 * ((float) $end->format('U.u') - $this->now())));
+                        for (; $envelopes->valid(); $envelopes->next()) {
+                            $envelope = $envelopes->current();
+                            $envelopeHandled = true;
+                            $receipt = isset($waitingReceipts[$transportName][0]) ? array_shift($waitingReceipts[$transportName]) : new \stdClass();
+
+                            $this->rateLimit($transportName);
+                            $this->handleMessage($envelope, $transportName, $receipt, $options['bus_name'] ?? null);
+                            $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
+
+                            if ($this->messageExecutionStrategy->shouldPauseConsumption()) {
+                                $bufferedEnvelopes[$transportName] = $envelopes;
+
+                                break 2;
+                            }
+
+                            if ($this->shouldStop) {
+                                break 2;
                             }
                         }
 
-                        if (0 < $sleep) {
-                            $sleepStart = $this->now();
+                        // after handling a single receiver, quit and start the loop again
+                        // this should prevent multiple lower priority receivers from
+                        // blocking too long before the higher priority are checked
+                        if ($envelopeHandled) {
+                            break;
+                        }
+                    }
 
-                            // messages in flight are acknowledged as soon as they are handled, instead of after the sleep
-                            if (!$this->messageExecutionStrategy->wait($this->completionCallback, $sleep / 1e6)) {
-                                $sleep -= (int) (1e6 * ($this->now() - $sleepStart));
+                    if (!$envelopeHandled && $this->flush(false)) {
+                        continue;
+                    }
 
-                                if (0 < $sleep) {
-                                    $this->clock->sleep($sleep / 1e6);
+                    if (!$this->flush(30.0) && !$envelopeHandled) {
+                        if ($options['stop_when_empty']) {
+                            // the messages in flight and the pending batches can dispatch new messages
+                            if ($this->flush(true)) {
+                                continue;
+                            }
+
+                            if ($this->coolingDownTransports) {
+                                $this->logger?->info('Worker stopped because no message was available outside of the transports that are cooling down: {transports}', ['transports' => implode(', ', array_keys($this->coolingDownTransports))]);
+                            } else {
+                                $this->logger?->info('Worker stopped because no message was available');
+                            }
+
+                            break;
+                        }
+
+                        $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, true));
+
+                        if ($this->shouldStop) {
+                            continue;
+                        }
+
+                        if (0 < $sleep = (int) ($options['sleep'] - 1e6 * ($this->now() - $envelopeHandledStart))) {
+                            if (null !== $endTime) {
+                                $sleep = min($sleep, (int) ceil(1e6 * ($endTime - $this->now())));
+                            }
+
+                            foreach ($this->coolingDownTransports as $status) {
+                                if ($end = $status->getEnd()) {
+                                    $sleep = (int) min($sleep, ceil(1e6 * ((float) $end->format('U.u') - $this->now())));
+                                }
+                            }
+
+                            if (0 < $sleep) {
+                                $sleepStart = $this->now();
+
+                                // messages in flight are acknowledged as soon as they are handled, instead of after the sleep
+                                if (!$this->messageExecutionStrategy->wait($this->completionCallback, $sleep / 1e6)) {
+                                    $sleep -= (int) (1e6 * ($this->now() - $sleepStart));
+
+                                    if (0 < $sleep) {
+                                        $this->clock->sleep($sleep / 1e6);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        } finally {
-            // the rest of the batches is not handled when the worker stops or fails
-            foreach ($waitingReceipts as $receipts) {
-                foreach ($receipts as $receipt) {
-                    unset($this->keepalives[$receipt]);
+            } finally {
+                // the rest of the batches is not handled when the worker stops or fails
+                foreach ($waitingReceipts as $receipts) {
+                    foreach ($receipts as $receipt) {
+                        unset($this->keepalives[$receipt]);
+                    }
                 }
             }
-        }
 
-        $this->flush(true);
-        $this->eventDispatcher?->dispatch(new WorkerStoppedEvent($this));
+            $this->flush(true);
+            $this->eventDispatcher?->dispatch(new WorkerStoppedEvent($this));
+        } finally {
+            $this->closeReceivers();
+        }
     }
 
     /**
@@ -610,5 +615,20 @@ class Worker
         }
 
         return new \stdClass();
+    }
+
+    private function closeReceivers(): void
+    {
+        foreach ($this->receivers as $transportName => $receiver) {
+            if (!$receiver instanceof CloseableTransportInterface) {
+                continue;
+            }
+
+            try {
+                $receiver->close();
+            } catch (\Throwable $e) {
+                $this->logger?->warning('Closing the transport "{transport}" failed: {error}', ['transport' => $transportName, 'error' => $e->getMessage(), 'exception' => $e]);
+            }
+        }
     }
 }

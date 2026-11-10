@@ -179,6 +179,7 @@ trait ContentLoaderTrait
         }
 
         $this->setCurrentDir(\dirname($path));
+        $this->trackGlobResource($config['resource'], $collection);
 
         /** @var RouteCollection[] $imported */
         $imported = $this->import($config['resource'], $type, false, $file, $exclude) ?: [];

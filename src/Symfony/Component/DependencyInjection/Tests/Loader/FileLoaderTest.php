@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -83,6 +84,17 @@ class FileLoaderTest extends TestCase
         $expectedKeys = ['a_string', 'foo', 'values', 'mixedcase', 'constant', 'bar', 'escape', 'foo_bar'];
 
         $this->assertEquals($expectedKeys, array_keys($actual), '->load() imports and merges imported files');
+        $this->assertContainsEquals(new GlobResource(self::$fixturesPath, '/{F}ixtures/{php,yaml}/services2.{php,yml}', false), $container->getResources());
+    }
+
+    public function testImportGlobMatchingNoFilesTracksTheGlob()
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath));
+
+        $loader->import(self::$fixturesPath.'/Fixtures/yaml/*.missing');
+
+        $this->assertEquals([new GlobResource(self::$fixturesPath.'/Fixtures/yaml', '/*.missing', false)], $container->getResources());
     }
 
     public function testRegisterClasses()

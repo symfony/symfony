@@ -250,7 +250,8 @@ class MemcachedAdapter extends AbstractAdapter
         }
 
         if ($lifetime && $lifetime > 30 * 86400) {
-            $lifetime += time();
+            // memcached reads an expiration longer than 30 days as a Unix timestamp, which its text protocol parses as a 32-bit signed integer
+            $lifetime = min($lifetime + time(), 2147483647);
         }
 
         $encodedValues = [];

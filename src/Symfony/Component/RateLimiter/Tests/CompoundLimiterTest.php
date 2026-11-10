@@ -29,6 +29,7 @@ class CompoundLimiterTest extends TestCase
         $this->storage = new InMemoryStorage();
 
         ClockMock::register(InMemoryStorage::class);
+        ClockMock::register(FixedWindowLimiter::class);
     }
 
     public function testConsume()
@@ -89,6 +90,24 @@ class CompoundLimiterTest extends TestCase
 
         $this->assertFalse($rateLimit->isAccepted());
         $this->assertSame(3, $rateLimit->getRemainingTokens());
+    }
+
+    public function testConsumeOfTheLastTokensTellsTheLatestRetryAfter()
+    {
+        ClockMock::withClockMock(1729990780.75);
+        $limiter1 = $this->createLimiter(10, new \DateInterval('PT1M'));
+        $limiter2 = $this->createLimiter(20, new \DateInterval('PT1H'));
+        $limiter1->consume(9);
+        $limiter2->consume(19);
+        $limiter = new CompoundLimiter([$limiter1, $limiter2]);
+
+        $rateLimit = $limiter->consume();
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertSame(1729994381, $rateLimit->getRetryAfter()->getTimestamp());
+
+        $rateLimit->wait();
+        $this->assertTrue($limiter->consume()->isAccepted());
     }
 
     public function testReserve()

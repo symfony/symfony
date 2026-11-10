@@ -134,6 +134,37 @@ class LockStoreTest extends AbstractStoreTestCase
         $this->assertCount(1, $innerStore->stored);
     }
 
+    public function testSaveTwicePutsOffExpiration()
+    {
+        $innerStore = new class implements LockPersistingStoreInterface {
+            public function save(LockKey $key): void
+            {
+            }
+
+            public function delete(LockKey $key): void
+            {
+            }
+
+            public function exists(LockKey $key): bool
+            {
+                return true;
+            }
+
+            public function putOffExpiration(LockKey $key, float $ttl): void
+            {
+                $key->reduceLifetime($ttl);
+            }
+        };
+
+        $store = new LockStore(new LockFactory($innerStore));
+
+        $key = new Key(__METHOD__, 1);
+        $store->save($key, 10);
+        $store->save($key, 100);
+
+        $this->assertGreaterThan(90, $key->getState(LockStore::class)[0]->getRemainingLifetime());
+    }
+
     public function testPutOffExpirationReleasesRemainingLocksOnRefreshError()
     {
         $innerStore = new class implements LockPersistingStoreInterface {

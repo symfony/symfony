@@ -44,7 +44,7 @@ final class CompoundLimiter implements LimiterInterface
                 return $rateLimit;
             }
 
-            if (null === $minimalRateLimit || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
+            if (null === $minimalRateLimit || self::isMoreRestrictive($rateLimit, $minimalRateLimit)) {
                 $minimalRateLimit = $rateLimit;
             }
         }
@@ -57,5 +57,23 @@ final class CompoundLimiter implements LimiterInterface
         foreach ($this->limiters as $limiter) {
             $limiter->reset();
         }
+    }
+
+    private static function isMoreRestrictive(RateLimit $rateLimit, RateLimit $minimalRateLimit): bool
+    {
+        if ($rateLimit->isAccepted() !== $minimalRateLimit->isAccepted()) {
+            return !$rateLimit->isAccepted();
+        }
+
+        // the latest retry-after is when all the refusing limiters accept the hit again
+        if (!$rateLimit->isAccepted() && $rateLimit->getRetryAfter() != $minimalRateLimit->getRetryAfter()) {
+            return $rateLimit->getRetryAfter() > $minimalRateLimit->getRetryAfter();
+        }
+
+        if ($rateLimit->getRemainingTokens() !== $minimalRateLimit->getRemainingTokens()) {
+            return $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens();
+        }
+
+        return $rateLimit->getRetryAfter() > $minimalRateLimit->getRetryAfter();
     }
 }

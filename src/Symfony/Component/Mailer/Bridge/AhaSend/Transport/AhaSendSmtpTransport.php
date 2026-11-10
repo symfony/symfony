@@ -44,6 +44,12 @@ class AhaSendSmtpTransport extends EsmtpTransport
         return parent::send($message, $envelope);
     }
 
+    protected function parseMessageId(string $mtaResult): string
+    {
+        // keep the Message-ID header as the message id, since AhaSend reports that header in its webhooks
+        return '';
+    }
+
     private function addAhaSendHeaders(Message $message): void
     {
         $headers = $message->getHeaders();

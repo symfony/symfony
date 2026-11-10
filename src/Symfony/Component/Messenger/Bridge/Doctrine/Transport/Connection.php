@@ -134,7 +134,13 @@ class Connection implements ResetInterface
         $configuration = ['connection' => $params['host']];
         $configuration += $query + $options + static::DEFAULT_OPTIONS;
 
-        $configuration['auto_setup'] = filter_var($configuration['auto_setup'], \FILTER_VALIDATE_BOOL);
+        foreach (static::DEFAULT_OPTIONS as $k => $v) {
+            $configuration[$k] = match (\gettype($v)) {
+                'integer' => filter_var($configuration[$k], \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the Doctrine Messenger transport must be an integer.', $k)),
+                'boolean' => filter_var($configuration[$k], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the Doctrine Messenger transport must be a boolean.', $k)),
+                default => $configuration[$k],
+            };
+        }
 
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(static::DEFAULT_OPTIONS));

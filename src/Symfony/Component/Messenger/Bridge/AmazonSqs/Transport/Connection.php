@@ -148,13 +148,13 @@ class Connection
 
         $options = $query + $options + self::DEFAULT_OPTIONS;
         $configuration = [
-            'buffer_size' => (int) $options['buffer_size'],
-            'wait_time' => (int) $options['wait_time'],
+            'buffer_size' => filter_var($options['buffer_size'], \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "buffer_size" of the Amazon SQS Messenger transport must be an integer.'),
+            'wait_time' => filter_var($options['wait_time'], \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "wait_time" of the Amazon SQS Messenger transport must be an integer.'),
             'poll_timeout' => $options['poll_timeout'],
-            'visibility_timeout' => null !== $options['visibility_timeout'] ? (int) $options['visibility_timeout'] : null,
-            'delete_on_rejection' => filter_var($options['delete_on_rejection'], \FILTER_VALIDATE_BOOL),
-            'retry_delay' => (int) $options['retry_delay'],
-            'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOL),
+            'visibility_timeout' => null !== $options['visibility_timeout'] ? filter_var($options['visibility_timeout'], \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "visibility_timeout" of the Amazon SQS Messenger transport must be an integer.') : null,
+            'delete_on_rejection' => filter_var($options['delete_on_rejection'], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "delete_on_rejection" of the Amazon SQS Messenger transport must be a boolean.'),
+            'retry_delay' => filter_var($options['retry_delay'], \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "retry_delay" of the Amazon SQS Messenger transport must be an integer.'),
+            'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "auto_setup" of the Amazon SQS Messenger transport must be a boolean.'),
             'queue_name' => (string) $options['queue_name'],
             'queue_attributes' => $options['queue_attributes'],
             'queue_tags' => $options['queue_tags'],

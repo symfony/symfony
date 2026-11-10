@@ -664,6 +664,33 @@ class ConnectionTest extends TestCase
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }
 
+    public function testBuildConfigurationWithInvalidQueryOptions()
+    {
+        $cases = [
+            'redeliver_timeout=1h' => 'Option "redeliver_timeout" of the Doctrine Messenger transport must be an integer.',
+            'redeliver_timeout=1.5' => 'Option "redeliver_timeout" of the Doctrine Messenger transport must be an integer.',
+            'redeliver_timeout=' => 'Option "redeliver_timeout" of the Doctrine Messenger transport must be an integer.',
+            'auto_setup=nope' => 'Option "auto_setup" of the Doctrine Messenger transport must be a boolean.',
+        ];
+
+        foreach ($cases as $query => $message) {
+            try {
+                Connection::buildConfiguration('doctrine://default?'.$query);
+                $this->fail(\sprintf('"%s" should have been rejected.', $query));
+            } catch (InvalidArgumentException $e) {
+                $this->assertSame($message, $e->getMessage());
+            }
+        }
+    }
+
+    public function testBuildConfigurationWithInvalidOptions()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "redeliver_timeout" of the Doctrine Messenger transport must be an integer.');
+
+        Connection::buildConfiguration('doctrine://default', ['redeliver_timeout' => 1.5]);
+    }
+
     public function testFind()
     {
         $queryBuilder = $this->getQueryBuilderMock();

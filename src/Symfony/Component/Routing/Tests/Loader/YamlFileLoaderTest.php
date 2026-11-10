@@ -20,6 +20,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\Routing\Controller\RedirectController;
 use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\DirectoryLoader;
@@ -275,6 +276,8 @@ class YamlFileLoaderTest extends TestCase
 
         $route = $routeCollection->get('baz_route');
         $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
+
+        $this->assertContainsEquals(new GlobResource(__DIR__.'/../Fixtures/glob', '/ba?.yml', false), $routeCollection->getResources());
     }
 
     public function testImportRouteWithNamePrefix()

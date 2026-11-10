@@ -197,6 +197,21 @@ abstract class AbstractStoreTestCase extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testSaveAndPutOffExpirationWithFractionalTtl()
+    {
+        $store = $this->getStore();
+        $key = new Key(uniqid(__METHOD__, true), 1);
+
+        $store->save($key, 2.5);
+        $this->assertTrue($store->exists($key));
+
+        $store->putOffExpiration($key, 3.5);
+        $this->assertTrue($store->exists($key));
+
+        $store->delete($key);
+        $this->assertFalse($store->exists($key));
+    }
+
     public function testPutOffExpirationWhenSaveHasNotBeenCalled()
     {
         // This test simulate the key has expired since it does not exist

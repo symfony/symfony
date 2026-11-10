@@ -33,12 +33,12 @@ class PeriodicalTrigger implements StatefulTriggerInterface
         $this->until = \is_string($until) ? new DatePoint($until, $timezone) : $until;
 
         if (\is_int($interval) || \is_float($interval) || \is_string($interval) && ctype_digit($interval)) {
-            if (0 >= (int) $interval) {
+            if (!is_finite($seconds = (float) $interval) || 0 >= $seconds) {
                 throw new InvalidArgumentException('The "$interval" argument must be greater than zero.');
             }
 
-            $this->intervalInSeconds = (int) $interval;
-            $this->description = \sprintf('every %d seconds', $this->intervalInSeconds);
+            $this->intervalInSeconds = $seconds;
+            $this->description = \sprintf('every %s seconds', $seconds);
 
             return;
         }
@@ -113,6 +113,12 @@ class PeriodicalTrigger implements StatefulTriggerInterface
             $recurrencesPassed = floor($delta / $this->intervalInSeconds);
             $nextRunTimestamp = ($recurrencesPassed + 1) * $this->intervalInSeconds + $from;
             $nextRun = (\PHP_INT_SIZE >= 8 ? \DateTimeImmutable::createFromTimestamp($nextRunTimestamp) : \DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $nextRunTimestamp)))->setTimezone($fromDate->getTimezone());
+
+            if ($nextRun <= $run) {
+                // floor() can be one too low because of rounding errors, for example with an interval of 0.1 seconds
+                $nextRunTimestamp = ($recurrencesPassed + 2) * $this->intervalInSeconds + $from;
+                $nextRun = (\PHP_INT_SIZE >= 8 ? \DateTimeImmutable::createFromTimestamp($nextRunTimestamp) : \DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $nextRunTimestamp)))->setTimezone($fromDate->getTimezone());
+            }
 
             if ($this->from > $nextRun) {
                 return $this->from;

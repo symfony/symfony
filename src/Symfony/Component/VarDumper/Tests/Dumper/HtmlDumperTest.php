@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Caster\EnumStub;
 use Symfony\Component\VarDumper\Caster\ImgStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
@@ -175,6 +176,41 @@ EOTXT
             ,
             $out
         );
+    }
+
+    public function testObjectKeysAreNotParsedAsAttributes()
+    {
+        $key = "\0~separator=<img src=x>&ellipsis=1&ellipsis-type=\"><img src=y>\0foo";
+
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', null);
+        $incompleteObject = unserialize(sprintf('O:8:"Foo\Buzz":1:{s:%d:"%s";s:3:"bar";}', \strlen($key), $key));
+        ini_set('unserialize_callback_func', $unserializeCallbackHandler);
+
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('');
+        $dumper->setDumpBoundaries('', '');
+        $cloner = new VarCloner();
+
+        foreach ([(object) [$key => 'bar'], $incompleteObject] as $var) {
+            $out = $dumper->dump($cloner->cloneVar($var), true);
+
+            $this->assertStringNotContainsString('<img', $out);
+            $this->assertStringContainsString('<span class=sf-dump-public title="Runtime added dynamic property">', $out);
+        }
+    }
+
+    public function testVirtualKeyAttributesAreEscaped()
+    {
+        $var = [new EnumStub(["\0~separator=<b>&ellipsis=1&ellipsis-type=\"><i>\0foo" => 'bar'])];
+
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('');
+        $dumper->setDumpBoundaries('', '');
+        $out = $dumper->dump((new VarCloner())->cloneVar($var), true);
+
+        $this->assertStringNotContainsString('<b>', $out);
+        $this->assertStringNotContainsString('"><i>', $out);
+        $this->assertStringContainsString('&lt;b&gt;', $out);
     }
 
     /**

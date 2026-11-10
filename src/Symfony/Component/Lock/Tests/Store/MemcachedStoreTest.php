@@ -84,10 +84,77 @@ class MemcachedStoreTest extends AbstractStoreTestCase
         $this->assertFalse($store->exists($key));
     }
 
+    public function testTtlEndingAfter2038()
+    {
+        $memcached = $this->createMock(\Memcached::class);
+        $memcached->expects($this->once())
+            ->method('add')
+            ->with($this->anything(), $this->anything(), 2147483647)
+            ->willReturnCallback(static function (string $key, string $value) use (&$token) {
+                $token = $value;
+
+                return true;
+            });
+        $memcached->method('get')->willReturnCallback(static function () use (&$token) {
+            return ['value' => $token, 'cas' => 1];
+        });
+        $memcached->method('getResultCode')->willReturn(\Memcached::RES_SUCCESS);
+        $memcached->expects($this->once())
+            ->method('cas')
+            ->with(1, $this->anything(), $this->anything(), 2147483647)
+            ->willReturn(true);
+
+        $store = new MemcachedStore($memcached, 100 * 365 * 86400);
+        $key = new Key(__METHOD__);
+
+        $store->save($key);
+        $store->putOffExpiration($key, 100 * 365 * 86400);
+    }
+
     public function testInvalidTtl()
     {
         $this->expectException(InvalidTtlException::class);
         $store = $this->getStore();
         $store->putOffExpiration(new Key('toto'), 0.1);
+    }
+
+    public function testKeysRejectedByMemcachedAreHashed()
+    {
+        $memcached = new \Memcached();
+        $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);
+        $memcached->setOption(\Memcached::OPT_PREFIX_KEY, 'lock_');
+        $store = new MemcachedStore($memcached);
+
+        foreach (['', 'a b', "a\nb", str_repeat('a', 246)] as $resource) {
+            $key = new Key($resource);
+
+            $store->save($key);
+            $this->assertTrue($store->exists($key));
+            $this->assertSame($key->getState(MemcachedStore::class), $memcached->get(hash('sha256', $resource)));
+
+            $store->putOffExpiration($key, 300);
+            $this->assertTrue($store->exists($key));
+
+            $store->delete($key);
+            $this->assertFalse($store->exists($key));
+        }
+    }
+
+    public function testKeysAcceptedByMemcachedAreNotHashed()
+    {
+        $memcached = new \Memcached();
+        $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);
+        $memcached->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
+        $memcached->setOption(\Memcached::OPT_PREFIX_KEY, 'lock_');
+        $store = new MemcachedStore($memcached);
+
+        foreach (['a b', str_repeat('a', 245)] as $resource) {
+            $key = new Key($resource);
+
+            $store->save($key);
+            $this->assertSame($key->getState(MemcachedStore::class), $memcached->get($resource));
+
+            $store->delete($key);
+        }
     }
 }

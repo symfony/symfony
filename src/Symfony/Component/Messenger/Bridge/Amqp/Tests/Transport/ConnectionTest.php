@@ -247,6 +247,36 @@ class ConnectionTest extends TestCase
         Connection::fromDsn($dsn, $options);
     }
 
+    public function testFromDsnWithInvalidQueryOptions()
+    {
+        $cases = [
+            'heartbeat=abc' => 'Option "heartbeat" of the AMQP Messenger transport must be an integer.',
+            'sasl_method=EXTERNAL' => 'Option "sasl_method" of the AMQP Messenger transport must be an integer.',
+            'read_timeout=abc' => 'Option "read_timeout" of the AMQP Messenger transport must be a number.',
+            'confirm_timeout=1s' => 'Option "confirm_timeout" of the AMQP Messenger transport must be a number.',
+            'auto_setup=nope' => 'Option "auto_setup" of the AMQP Messenger transport must be a boolean.',
+            'delay[daily_delay_queues]=nope' => 'Option "delay.daily_delay_queues" of the AMQP Messenger transport must be a boolean.',
+            'queues=nope' => 'Option "queues" of the AMQP Messenger transport must be an array or a boolean.',
+        ];
+
+        foreach ($cases as $query => $message) {
+            try {
+                Connection::fromDsn('amqp://localhost?'.$query);
+                $this->fail(\sprintf('"%s" should have been rejected.', $query));
+            } catch (InvalidArgumentException $e) {
+                $this->assertSame($message, $e->getMessage());
+            }
+        }
+    }
+
+    public function testFromDsnWithInvalidOptions()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "heartbeat" of the AMQP Messenger transport must be an integer.');
+
+        Connection::fromDsn('amqp://localhost', ['heartbeat' => 1.5]);
+    }
+
     public function testCredentialsAreNotExposedInTrace()
     {
         if (!class_exists(\SensitiveParameterValue::class)) {
@@ -818,6 +848,20 @@ class ConnectionTest extends TestCase
         }
     }
 
+    public function testNoCaCertOnSslConnectionWhenCaCertIsFalse()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No CA certificate has been provided.');
+
+        $oldCaCertValue = ini_set('amqp.cacert', '');
+
+        try {
+            Connection::fromDsn('amqps://', ['cacert' => false]);
+        } finally {
+            ini_set('amqp.cacert', $oldCaCertValue);
+        }
+    }
+
     public function testAmqpStampHeadersAreUsed()
     {
         $factory = new TestAmqpFactory(
@@ -951,6 +995,17 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
+    public function testItPublishMessagesWithoutWaitingForConfirmationWhenConfirmTimeoutIsEmpty()
+    {
+        $factory = new TestAmqpFactory($this->createStub(\AMQPConnection::class), $amqpChannel = $this->createMock(\AMQPChannel::class), $this->createStub(\AMQPQueue::class), $this->createStub(\AMQPExchange::class));
+
+        $amqpChannel->expects($this->never())->method('confirmSelect');
+        $amqpChannel->expects($this->never())->method('waitForConfirm');
+
+        $connection = Connection::fromDsn('amqp://localhost?confirm_timeout=', [], $factory);
+        $connection->publish('body');
+    }
+
     public function testSetChannelToConfirmMessage()
     {
         $factory = new TestAmqpFactory(
@@ -1037,6 +1092,82 @@ class ConnectionTest extends TestCase
                 'verify' => false,
             ])
         );
+    }
+
+    public function testItReadsTheVerifyOptionAsABoolean()
+    {
+        $factory = $this->createStub(AmqpFactory::class);
+        $factory->method('createConnection')->willReturnCallback(function (array $credentials) use (&$connectionOptions) {
+            $connectionOptions = $credentials;
+
+            return $this->createStub(\AMQPConnection::class);
+        });
+        $factory->method('createChannel')->willReturn($this->createStub(\AMQPChannel::class));
+
+        $cases = [
+            'verify=true' => true,
+            'verify=yes' => true,
+            'verify=on' => true,
+            'verify=1' => true,
+            'verify=false' => false,
+            'verify=no' => false,
+            'verify=off' => false,
+            'verify=0' => false,
+            'verify=' => false,
+        ];
+
+        foreach ($cases as $query => $verify) {
+            Connection::fromDsn('amqps://localhost?cacert=/etc/ssl/certs&'.$query, [], $factory)->channel();
+            $this->assertSame($verify, $connectionOptions['verify'], $query);
+        }
+
+        Connection::fromDsn('amqps://localhost?cacert=/etc/ssl/certs', ['verify' => 'true'], $factory)->channel();
+        $this->assertTrue($connectionOptions['verify']);
+
+        Connection::fromDsn('amqps://localhost?cacert=/etc/ssl/certs', ['verify' => null], $factory)->channel();
+        $this->assertArrayNotHasKey('verify', $connectionOptions);
+    }
+
+    public function testItRejectsInvalidVerifyOptions()
+    {
+        foreach (['verify=ture', 'verify=2', 'verify[]=1'] as $query) {
+            try {
+                Connection::fromDsn('amqps://localhost?cacert=/etc/ssl/certs&'.$query);
+                $this->fail('"'.$query.'" should have been rejected.');
+            } catch (InvalidArgumentException $e) {
+                $this->assertSame('Option "verify" of the AMQP Messenger transport must be a boolean.', $e->getMessage());
+            }
+        }
+    }
+
+    public function testTheAmqpExtensionGetsTheVerifyOption()
+    {
+        $factory = $this->createStub(AmqpFactory::class);
+        $factory->method('createConnection')->willReturnCallback(function (array $credentials) use (&$verify) {
+            $verify = (new AmqpFactory())->createConnection($credentials)->getVerify();
+
+            return $this->createStub(\AMQPConnection::class);
+        });
+        $factory->method('createChannel')->willReturn($this->createStub(\AMQPChannel::class));
+
+        $cases = [
+            'verify=true' => true,
+            'verify=yes' => true,
+            'verify=on' => true,
+            'verify=1' => true,
+            'verify=false' => false,
+            'verify=no' => false,
+            'verify=off' => false,
+            'verify=0' => false,
+        ];
+
+        foreach ($cases as $query => $expected) {
+            Connection::fromDsn('amqps://localhost?cacert=/etc/ssl/certs&'.$query, [], $factory)->channel();
+            $this->assertSame($expected, $verify, $query);
+        }
+
+        Connection::fromDsn('amqps://localhost?cacert=/etc/ssl/certs', ['verify' => null], $factory)->channel();
+        $this->assertSame((new AmqpFactory())->createConnection([])->getVerify(), $verify);
     }
 
     public function testItCanRetryPublishWhenAMQPConnectionExceptionIsThrown()

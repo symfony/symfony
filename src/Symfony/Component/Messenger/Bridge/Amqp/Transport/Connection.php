@@ -215,19 +215,32 @@ class Connection
         }
 
         if (!\is_array($queuesOptions = $amqpOptions['queues'] ?? true)) {
-            $queuesOptions = filter_var($queuesOptions, \FILTER_VALIDATE_BOOL) ? [$exchangeName => []] : [];
+            $queuesOptions = (filter_var($queuesOptions, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "queues" of the AMQP Messenger transport must be an array or a boolean.')) ? [$exchangeName => []] : [];
         } else {
             $queuesOptions = $amqpOptions['queues'];
         }
 
         $exchangeOptions = $amqpOptions['exchange'];
         unset($amqpOptions['queues'], $amqpOptions['exchange']);
+
+        foreach (['heartbeat', 'sasl_method'] as $k) {
+            if ('' !== ($amqpOptions[$k] ?? '')) {
+                $amqpOptions[$k] = filter_var($amqpOptions[$k], \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the AMQP Messenger transport must be an integer.', $k));
+            }
+        }
+
+        foreach (['read_timeout', 'write_timeout', 'connect_timeout', 'rpc_timeout', 'confirm_timeout'] as $k) {
+            if ('' !== ($amqpOptions[$k] ?? '')) {
+                $amqpOptions[$k] = filter_var($amqpOptions[$k], \FILTER_VALIDATE_FLOAT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Option "%s" of the AMQP Messenger transport must be a number.', $k));
+            }
+        }
+
         if (isset($amqpOptions['auto_setup'])) {
-            $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOL);
+            $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "auto_setup" of the AMQP Messenger transport must be a boolean.');
         }
 
         if (isset($amqpOptions['delay']['daily_delay_queues'])) {
-            $amqpOptions['delay']['daily_delay_queues'] = filter_var($amqpOptions['delay']['daily_delay_queues'], \FILTER_VALIDATE_BOOL);
+            $amqpOptions['delay']['daily_delay_queues'] = filter_var($amqpOptions['delay']['daily_delay_queues'], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "delay.daily_delay_queues" of the AMQP Messenger transport must be a boolean.');
         }
 
         $queuesOptions = array_map(static function ($queueOptions) {
@@ -247,6 +260,13 @@ class Connection
 
         if ($useAmqps && !self::hasCaCertConfigured($amqpOptions)) {
             throw new InvalidArgumentException('No CA certificate has been provided. Set "amqp.cacert" in your php.ini or pass the "cacert" parameter in the DSN to use SSL. Alternatively, you can use amqp:// to use without SSL.');
+        }
+
+        // ext-amqp casts "verify" to an integer, which turns null and strings like "true" into false
+        if (null === ($amqpOptions['verify'] ?? null)) {
+            unset($amqpOptions['verify']);
+        } else {
+            $amqpOptions['verify'] = filter_var($amqpOptions['verify'], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "verify" of the AMQP Messenger transport must be a boolean.');
         }
 
         return new self($amqpOptions, $exchangeOptions, $queuesOptions, $amqpFactory);
@@ -295,7 +315,7 @@ class Connection
 
     private static function hasCaCertConfigured(array $amqpOptions): bool
     {
-        return (isset($amqpOptions['cacert']) && '' !== $amqpOptions['cacert']) || '' !== \ini_get('amqp.cacert');
+        return !\in_array($amqpOptions['cacert'] ?? null, [null, false, ''], true) || '' !== \ini_get('amqp.cacert');
     }
 
     /**

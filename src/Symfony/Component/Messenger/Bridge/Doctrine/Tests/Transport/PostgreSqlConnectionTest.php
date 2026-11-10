@@ -55,6 +55,23 @@ class PostgreSqlConnectionTest extends TestCase
         $connection->__unserialize([]);
     }
 
+    public function testBuildConfigurationWithInvalidQueryOptions()
+    {
+        $cases = [
+            'check_delayed_interval=1m' => 'Option "check_delayed_interval" of the Doctrine Messenger transport must be an integer.',
+            'get_notify_timeout=abc' => 'Option "get_notify_timeout" of the Doctrine Messenger transport must be an integer.',
+        ];
+
+        foreach ($cases as $query => $message) {
+            try {
+                PostgreSqlConnection::buildConfiguration('doctrine://default?'.$query);
+                $this->fail(\sprintf('"%s" should have been rejected.', $query));
+            } catch (\InvalidArgumentException $e) {
+                $this->assertSame($message, $e->getMessage());
+            }
+        }
+    }
+
     public function testListenOnConnection()
     {
         $driverConnection = $this->createStub(Connection::class);

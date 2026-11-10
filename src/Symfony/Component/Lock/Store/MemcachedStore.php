@@ -53,7 +53,7 @@ class MemcachedStore implements PersistingStoreInterface
     {
         $token = $this->getUniqueToken($key);
         $key->reduceLifetime($this->initialTtl);
-        if (!$this->memcached->add((string) $key, $token, $this->getExpiration($this->initialTtl))) {
+        if (!$this->memcached->add($this->getKeyName($key), $token, $this->getExpiration($this->initialTtl))) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         }
@@ -78,7 +78,7 @@ class MemcachedStore implements PersistingStoreInterface
         $key->reduceLifetime($ttl);
         // Could happens when we ask a putOff after a timeout but in luck nobody steal the lock
         if (\Memcached::RES_NOTFOUND === $this->memcached->getResultCode()) {
-            if ($this->memcached->add((string) $key, $token, $expiration)) {
+            if ($this->memcached->add($this->getKeyName($key), $token, $expiration)) {
                 return;
             }
 
@@ -91,7 +91,7 @@ class MemcachedStore implements PersistingStoreInterface
             throw new LockConflictedException();
         }
 
-        if (!$this->memcached->cas($cas, (string) $key, $token, $expiration)) {
+        if (!$this->memcached->cas($cas, $this->getKeyName($key), $token, $expiration)) {
             throw new LockConflictedException();
         }
 
@@ -110,18 +110,18 @@ class MemcachedStore implements PersistingStoreInterface
         }
 
         // To avoid concurrency in deletion, the trick is to extends the TTL then deleting the key
-        if (!$this->memcached->cas($cas, (string) $key, $token, 2)) {
+        if (!$this->memcached->cas($cas, $this->getKeyName($key), $token, 2)) {
             // Someone steal our lock. It does not belongs to us anymore. Nothing to do.
             return;
         }
 
         // Now, we are the owner of the lock for 2 more seconds, we can delete it.
-        $this->memcached->delete((string) $key);
+        $this->memcached->delete($this->getKeyName($key));
     }
 
     public function exists(Key $key): bool
     {
-        return $this->memcached->get((string) $key) === $this->getUniqueToken($key);
+        return $this->memcached->get($this->getKeyName($key)) === $this->getUniqueToken($key);
     }
 
     private function getUniqueToken(Key $key): string
@@ -136,14 +136,14 @@ class MemcachedStore implements PersistingStoreInterface
 
     private function getExpiration(int $ttl): int
     {
-        // memcached reads an expiration longer than 30 days as a Unix timestamp
-        return $ttl > 30 * 86400 ? time() + $ttl : $ttl;
+        // memcached reads an expiration longer than 30 days as a Unix timestamp, which its text protocol parses as a 32-bit signed integer
+        return $ttl > 30 * 86400 ? min(time() + $ttl, 2147483647) : $ttl;
     }
 
     private function getValueAndCas(Key $key): array
     {
         if ($this->useExtendedReturn ??= version_compare(phpversion('memcached'), '2.9.9', '>')) {
-            $extendedReturn = $this->memcached->get((string) $key, null, \Memcached::GET_EXTENDED);
+            $extendedReturn = $this->memcached->get($this->getKeyName($key), null, \Memcached::GET_EXTENDED);
             if (\Memcached::GET_ERROR_RETURN_VALUE === $extendedReturn) {
                 return [$extendedReturn, 0.0];
             }
@@ -152,8 +152,34 @@ class MemcachedStore implements PersistingStoreInterface
         }
 
         $cas = 0.0;
-        $value = $this->memcached->get((string) $key, null, $cas);
+        $value = $this->memcached->get($this->getKeyName($key), null, $cas);
 
         return [$value, $cas];
+    }
+
+    /**
+     * Returns the name of the key in memcached, hashing the names that memcached rejects.
+     *
+     * Keys can't be longer than 250 bytes, prefix included. With the text protocol, they can't contain
+     * spaces or control characters, nor non-ASCII characters with php-memcached < 3.3 or its verify_key
+     * option. With the binary protocol, php-memcached only rejects "\n".
+     */
+    private function getKeyName(Key $key): string
+    {
+        $name = (string) $key;
+
+        if ($this->memcached->getOption(\Memcached::OPT_BINARY_PROTOCOL)) {
+            $invalidChars = '/\n/';
+        } elseif ($this->memcached->getOption(\Memcached::OPT_VERIFY_KEY) || version_compare(phpversion('memcached'), '3.3', '<')) {
+            $invalidChars = '/[^\x21-\x7E]/';
+        } else {
+            $invalidChars = '/[\x00-\x20\x7F]/';
+        }
+
+        if ('' === $name || \strlen($this->memcached->getOption(\Memcached::OPT_PREFIX_KEY).$name) > 250 || preg_match($invalidChars, $name)) {
+            return hash('sha256', $name);
+        }
+
+        return $name;
     }
 }

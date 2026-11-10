@@ -81,6 +81,16 @@ abstract class FileLoader extends BaseFileLoader
             throw new \TypeError(\sprintf('Invalid argument $ignoreErrors provided to "%s::import()": boolean or "not_found" expected, "%s" given.', static::class, get_debug_type($ignoreErrors)));
         }
 
+        if (\is_string($resource) && \strlen($resource) !== strcspn($resource, '*?{[') && !str_contains($resource, "\n")) {
+            foreach ($this->glob($resource, false, $globResource, true) as $_) {
+                break;
+            }
+
+            foreach (\is_array($globResource) ? $globResource : [$globResource] as $r) {
+                $this->container->addResource($r);
+            }
+        }
+
         ++$this->importing;
         try {
             return parent::import(...$args);

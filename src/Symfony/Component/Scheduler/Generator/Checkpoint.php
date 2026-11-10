@@ -33,6 +33,9 @@ final class Checkpoint implements CheckpointInterface
     ) {
     }
 
+    /**
+     * @phpstan-impure
+     */
     public function acquire(\DateTimeImmutable $now): bool
     {
         if ($this->lock && !$this->lock->acquire()) {
@@ -47,11 +50,17 @@ final class Checkpoint implements CheckpointInterface
             $state = !$this->reset && isset($this->time) ? [$this->time, $this->index, $this->from] : [$now, -1, $now];
             $this->reset = false;
 
-            [$this->time, $this->index, $this->from] = $this->cache->get($this->name, static function (CacheItemInterface $item) use ($state) {
+            [$this->time, $this->index, $this->from, $time, $from] = $this->cache->get($this->name, static function (CacheItemInterface $item) use ($state) {
                 $item->expiresAfter(self::CACHE_EXPIRY);
 
                 return $state;
-            }) + [2 => $now];
+            }) + [2 => $now, 3 => null, 4 => null];
+
+            if ($time && $from) {
+                $this->time = $time->setTimezone($this->time->getTimezone());
+                $this->from = $from->setTimezone($this->from->getTimezone());
+            }
+
             $this->save($this->time, $this->index);
         } elseif ($this->reset) {
             $this->reset = false;
@@ -86,18 +95,23 @@ final class Checkpoint implements CheckpointInterface
         $this->from ??= $time;
         $from = $this->from;
 
+        // A serialized date can come back one hour off when clocks go back, so the UTC copies keep the exact times.
+        // Older versions read only the first three elements.
+        $utc = new \DateTimeZone('UTC');
+        $state = [$time, $index, $from, $time->setTimezone($utc), $from->setTimezone($utc)];
+
         if (!$this->cache instanceof CacheItemPoolInterface) {
-            $this->cache?->get($this->name, static function (CacheItemInterface $item) use ($time, $index, $from) {
+            $this->cache?->get($this->name, static function (CacheItemInterface $item) use ($state) {
                 $item->expiresAfter(self::CACHE_EXPIRY);
 
-                return [$time, $index, $from];
+                return $state;
             }, \INF);
 
             return;
         }
 
         $item = $this->cache->getItem($this->name);
-        $item->set([$time, $index, $from]);
+        $item->set($state);
         $item->expiresAfter(self::CACHE_EXPIRY);
 
         // Cache pools report backend failures only through the return value of save(). Going on would

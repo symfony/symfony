@@ -18,7 +18,7 @@
     "require": {
         "php": ">=8.4.1",
         "psr/event-dispatcher": "^1",
-        "symfony/mailer": "^8.2"
+        "symfony/mailer": "^8.3"
     },
     "require-dev": {
         "symfony/http-client": "^7.4|^8.0",

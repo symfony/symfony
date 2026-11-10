@@ -80,7 +80,7 @@ class MailgunHttpTransport extends AbstractHttpTransport
             throw new HttpTransportException('Unable to send an email: '.$result['message'].\sprintf(' (code %d).', $statusCode), $response);
         }
 
-        $message->setMessageId($result['id']);
+        $message->setTransportMessageId($result['id']);
 
         return $response;
     }

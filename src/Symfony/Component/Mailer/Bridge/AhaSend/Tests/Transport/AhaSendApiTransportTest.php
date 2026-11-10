@@ -178,7 +178,7 @@ class AhaSendApiTransportTest extends TestCase
         $mailer = new AhaSendApiTransport('aha-sk-foo', $client, accountId: 'SAMPLE-ACCOUNT-ID');
         $sentMessage = $mailer->send($email);
 
-        $this->assertSame('3f8e2b1a-7c4d-4e2a-9b1e-2f3a4b5c6d7e', $sentMessage->getMessageId());
+        $this->assertSame('3f8e2b1a-7c4d-4e2a-9b1e-2f3a4b5c6d7e', $sentMessage->getTransportMessageId());
     }
 
     public static function provideSendResponses(): iterable
@@ -203,7 +203,7 @@ class AhaSendApiTransportTest extends TestCase
 
         $sentMessage = (new AhaSendApiTransport('aha-sk-foo', $client, null, null, 'SAMPLE-ACCOUNT-ID'))->send($email);
 
-        $this->assertSame($expectedMessageId, $sentMessage->getMessageId());
+        $this->assertSame($expectedMessageId, $sentMessage->getTransportMessageId());
     }
 
     #[Group('legacy')]
@@ -311,7 +311,7 @@ class AhaSendApiTransportTest extends TestCase
         $sentMessage = $transport->send($email);
 
         $this->assertSame(['someone@gmil.com: Invalid recipient', 'other@gmil.com: Invalid recipient'], $dispatchedErrors);
-        $this->assertSame('3f8e2b1a-7c4d-4e2a-9b1e-2f3a4b5c6d7e', $sentMessage->getMessageId());
+        $this->assertSame('3f8e2b1a-7c4d-4e2a-9b1e-2f3a4b5c6d7e', $sentMessage->getTransportMessageId());
     }
 
     public function testCustomHeader()

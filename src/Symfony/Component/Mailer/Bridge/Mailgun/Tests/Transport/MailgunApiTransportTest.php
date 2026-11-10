@@ -199,7 +199,7 @@ class MailgunApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        $this->assertSame('foobar', $message->getTransportMessageId());
     }
 
     public function testSendWithMultipleTagHeaders()
@@ -231,7 +231,7 @@ class MailgunApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar2', $message->getMessageId());
+        $this->assertSame('foobar2', $message->getTransportMessageId());
     }
 
     public function testSendWithInlineAttachmentsSharingANamePrefix()
@@ -262,7 +262,7 @@ class MailgunApiTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getMessageId());
+        $this->assertSame('foobar', $message->getTransportMessageId());
     }
 
     public function testSendThrowsForErrorResponse()

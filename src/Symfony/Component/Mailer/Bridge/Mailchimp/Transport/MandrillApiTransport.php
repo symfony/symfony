@@ -74,7 +74,7 @@ class MandrillApiTransport extends AbstractApiTransport implements RemoteTemplat
         }
 
         $firstRecipient = reset($result);
-        $sentMessage->setMessageId($firstRecipient['_id']);
+        $sentMessage->setTransportMessageId($firstRecipient['_id']);
 
         return $response;
     }

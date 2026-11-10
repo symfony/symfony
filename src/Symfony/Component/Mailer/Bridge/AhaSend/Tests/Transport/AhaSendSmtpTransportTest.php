@@ -65,7 +65,7 @@ class AhaSendSmtpTransportTest extends TestCase
         $sentMessage = $transport->send((new Email())->from('foo@example.com')->to('bar@example.com')->text('Test email body'));
 
         $this->assertSame(1, preg_match('/^Message-ID: <([^>]++)>\r$/m', $sentMessage->toString(), $matches));
-        $this->assertSame($matches[1], $sentMessage->getMessageId());
+        $this->assertSame($matches[1], $sentMessage->getTransportMessageId());
     }
 
     public function testCustomHeader()

@@ -72,7 +72,7 @@ final class TurboSmtpApiTransport extends AbstractApiTransport
         }
 
         if (isset($result['mid'])) {
-            $sentMessage->setMessageId((string) $result['mid']);
+            $sentMessage->setTransportMessageId((string) $result['mid']);
         }
 
         return $response;

@@ -56,9 +56,11 @@ final class TraceableFirewallListener extends FirewallListener implements ResetI
 
         foreach ($listeners as $listener) {
             if ($listener instanceof LazyFirewallContext) {
-                \Closure::bind(function () use (&$wrappedLazyListeners, &$wrappedListeners, &$authenticatorManagerListener) {
+                $contextListeners = [];
+                \Closure::bind(function () use (&$wrappedLazyListeners, &$wrappedListeners, &$authenticatorManagerListener, &$contextListeners) {
                     $listeners = [];
                     foreach ($this->listeners as $listener) {
+                        $contextListeners[] = $listener;
                         if (!$authenticatorManagerListener && $listener instanceof TraceableAuthenticatorManagerListener) {
                             $authenticatorManagerListener = $listener;
                         }
@@ -77,7 +79,15 @@ final class TraceableFirewallListener extends FirewallListener implements ResetI
                     $this->listeners = $listeners;
                 }, $listener, FirewallContext::class)();
 
-                $listener($event);
+                try {
+                    $listener($event);
+                } finally {
+                    // The context outlives the request: put its listeners back so that the next request does not wrap the wrapped ones.
+                    // Listeners that run lazily keep their wrapper, the context captured them when it was called.
+                    \Closure::bind(function () use ($contextListeners) {
+                        $this->listeners = $contextListeners;
+                    }, $listener, FirewallContext::class)();
+                }
             } else {
                 $wrappedListener = $listener instanceof FirewallListenerInterface ? new WrappedLazyListener($listener) : new WrappedListener($listener);
                 $wrappedListener($event);

@@ -1,0 +1,160 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-07T14:10:48Z
+
+I extracted the part where loaders create their resource before reading the file into #67975, as a fix for #66320 on 8.2. Thanks for spotting it!
+
+---------------------------------------------------------------------------
+
+by ruudk at 2026-11-07T16:54:23Z
+
+@X-Coder264 As you asked in https://github.com/symfony/symfony/issues/67939#issuecomment-6704914238, I tested this PR in our app. I replaced Config, DependencyInjection, Routing and Translation with the PR head (31c5444) and compared it with the same components from the current 8.2 branch (7f2bdb4). The rest stayed on 8.1.11. As you asked, I removed our workarounds: no backdating of the container, router or translator caches, and none of our own resources or freshness shortcuts. I cleared the cache before each run.
+
+In each test, I made a change that makes the container stale, started a container build (3.5 to 8 s), and edited one more file 1.5 s into that build. Then I checked the app 10 s after the build.
+
+| Edit during the build | 8.2 | PR |
+| --- | --- | --- |
+| Parameter in a PHP config file | stale, 4 of 4 | correct, 4 of 4 |
+| New constructor dependency of a controller | correct, 4 of 4 | correct, 4 of 4 |
+| New service class found by service discovery | correct, 4 of 4 | correct, 4 of 4 |
+
+- **Stale container:** none with the PR.
+- **Rebuilds without changes:** none. 40 requests without changes rebuilt neither the container, the routes nor the catalogue. After a translation edit, both versions behaved the same.
+- **Latency:** the median of 40 debug requests was 84 ms, against 81 ms on 8.2. That's about 3 ms more, in line with your benchmark.
+
+I did not test routes or translations edited during a build.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2026-11-07T17:57:13Z
+
+A follow-up to my previous comment. That test edited the file at one moment in the build, which made it look as if only config files were affected. I repeated it with the edit at 10, 30, 50, 70 and 90% of the build. The setup was the same: 8.2 at 7f2bdb4 against this PR at 31c5444, with our workarounds removed. Each cell counts the runs where the app still showed the old state, or failed, 8 s after the build.
+
+| Edit during the build | 8.2 | PR |
+| --- | --- | --- |
+| Parameter in a PHP config file | 8 of 10 | 0 of 10 |
+| New constructor dependency of a controller | 2 of 10 | 0 of 10 |
+| New service class, used by a controller | 3 of 10 | 0 of 10 |
+| Route in a YAML route file | 0 of 5 | 0 of 5 |
+| Message in a PHP translation file | 0 of 5 | 0 of 5 |
+
+On 8.2, the class edits left a container that still passed the old constructor arguments. Every request then failed with `Too few arguments to function FreshnessProbeController::__construct()`. The config edit only came through when it was made at 90% of the build.
+
+This test can't reach routes and translations: the router cache was built in 0.3 s, and the catalogue is read at the end of the request, after the container build, so my edits always landed before they were read.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-11-07T19:51:00Z
+
+Thanks @ruudk for testing this in your application and repeating the edits at different stages of the build. Your follow-up confirms that the remaining failures also affect constructor changes and service discovery. Your tests covered the original PR version, comparing Config, DependencyInjection, Routing and Translation with their 8.2 versions while the rest of the application stayed on 8.1.11.
+
+I have rebased onto current 8.2, including #67968 and #67975. The file-loader ordering changes extracted into #67975 are now upstream, together with #67968's directory content comparison that prevents repeated same-second rebuilds.
+
+The remaining changes address bugs still present on 8.2:
+
+- Configuration edited after parsing or during compilation can leave an outdated container that still appears fresh.
+- Class changes during compilation can leave the container using the previous constructor arguments.
+- Services or route files added after discovery can be omitted while the resulting cache still appears fresh.
+- Route edits can be missed during object callbacks or when routing caches and resource checkers share state.
+- Translation edits can leave catalogues stale. Newly discovered translation files can also remain missing from a catalogue even after the container rebuilds.
+
+Using this PR's `ConfigCacheFreshnessTest` and its application fixture against upstream 8.2, 17 of the 30 scenarios fail. On the rebased PR, all 30 pass, including the checks that the corrected caches are subsequently reused. Generated reference/schema files are captured after writing and remain fresh.
+
+@nicolas-grekas, regarding the feature freeze: this is technically a bug fix rather than a feature, and it introduces no public API breaking changes. Both points support merging it in 8.2 instead of waiting for 8.3.
+
+For a production deployment that leaves the completed release files unchanged and runs `cache:clear`/warmup with `kernel.debug=false` before switching traffic, the concurrent-edit races fixed here are absent. Once warmed, normal production requests reuse their caches without running the affected resource-freshness checks. The main benefit is in debug-on development, where source edits can overlap cache rebuilds. The modified cache-building code still executes during deployment, so this limits production exposure rather than eliminating all risk.
+
+I have good confidence in the covered regressions from the local component and application tests. Ruud's independent testing also supports the original approach, although it does not validate this latest post rebase state. This remains a meaningful change to central freshness behavior across four components. The production diff touches eight files; most of the overall diff consists of tests and fixtures.
+
+CI has also reported the older-branch glob assertions, FabBot's suggestion on the restored upstream exception message, and PHPStan treating a hash restored by native PHP unserialization as unwritten. There is now a regression demonstrating that legacy hash restoration.
+
+I have kept the full fix scope together for now so the remaining freshness bugs can be reviewed together. I'll leave the decision on merging this during the 8.2 freeze or waiting for 8.3 to you.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-09T19:39:20Z
+
+What about comparing resources with the moment the build started instead? `ResourceCheckerConfigCache` can move the mtime of its meta file back by the time the build took. A file saved during the build is then newer than the cache. #66320 already compares the content of a file saved in the same second:
+
+```diff
+     private string $metaFile;
++    private int $buildTime;
+@@ __construct()
+         $this->metaFile = $metaFile ?? $file.'.meta';
++        $this->buildTime = time();
+@@ isFresh()
++        $this->buildTime = time();
++
+         if (!is_file($this->file)) {
+@@
+-        $time = filemtime($this->file);
++        $time = filemtime($metadata);
+@@ write()
++            if (0 < $elapsed = time() - $this->buildTime) {
++                @touch($this->metaFile, filemtime($this->metaFile) - $elapsed);
++            }
+```
+
+I tried it in a small app, with one more edit at 10 to 90% of a 3s rebuild as ruudk did. Each of his three edits was picked up in 10 runs out of 10, where 8.2 missed 9, 10 and 9 of them. It misses a class added to a discovered directory when nothing else changes. It also misses the URL generator when it's dumped later in the request, from the routes loaded for the matcher. Your `GlobResource` and `FileResource` changes could cover those as follow-ups. The cost is one more rebuild when `reference.php` changes after the first second of a build. WDYT?
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-11-09T22:15:12Z
+
+@nicolas-grekas, thanks. I agree that this smaller bug fix is a better fit for the 8.2 feature freeze.
+
+I have reworked the production change to follow your proposal. `ResourceCheckerConfigCache` records the build start in its constructor and resets it when checking freshness. When writing metadata, it subtracts the elapsed build time from the metadata file’s mtime. Subsequent checks use that timestamp instead of the compiled cache file’s mtime. I reverted the broader resource and loader changes, so the production diff is now confined to this class, without public API breaking changes.
+
+The configuration and constructor-change scenarios recover on the next request and then reuse the corrected container. I kept all 30 application scenarios in FrameworkBundle’s `ConfigCacheFreshnessTest`. The 18 scenarios requiring further work are explicitly skipped, each with a reason explaining the remaining issue. Several cover different paths through the same underlying problem.
+
+Once this PR is merged, I will send a follow-up PR with the remaining fixes, adapted to this approach. It will initially target 8.2 and can be retargeted to 8.3 once that branch exists. That follow-up will fix the remaining issues and re-enable all 18 skipped scenarios, so that all 30 scenarios pass.
+
+The skipped scenarios cover the following remaining behavior. The extra-rebuild cases depend on timing and subsequently settle:
+
+- **YAML routes: stale generated URL.** The matcher can recover to `/v2`, while the generator continues returning `/v1`. Its cache is built later from an already-loaded route collection, so the edit predates the generator’s build-start timestamp.
+
+- **PHP routes: stale generated URL.** The same ordering occurs with a PHP route configuration: the later generator cache accepts resources consumed before its own build started and retains `/v1`.
+
+- **Object route callback: stale routes.** The callback returns the old `/v1` routes while editing its source to `/v2`. Because its resource is constructed after the callback, the metadata records the changed file as its baseline and can accept the old routes as fresh.
+
+- **Shared matcher and generator collection: stale generated URL.** An edit between the two dumps invalidates the matcher, but the generator is subsequently dumped from the earlier collection. It can keep generating `/v1`; matching that URL can then fail against the corrected matcher.
+
+- **Directory routes: stale generated URL.** An existing route file changes during loading. The matcher can rebuild correctly, but the later generator still accepts the earlier collection and generates `/v1`.
+
+- **Route added during directory discovery: missing route update in the generator.** The matcher can discover the added file on its next build, while the generator retains the earlier directory contents and generates `/v1` instead of `/v2`. Directory discovery state needs to survive reuse by a later cache build.
+
+- **Route added after an old directory snapshot: missing route update in the generator.** This covers the same problem when the original directory and files have old mtimes. The later generator’s cutoff can accept the directory even though its consumed entry list omitted the added file.
+
+- **Unchanged recent route directory: extra rebuild only.** The URL correctly remains `/v1`, but the test can observe an additional container and routing-cache rebuild before reuse settles. Its assertion requires immediate reuse, which the smaller build-start approach does not guarantee in this timing window.
+
+- **Unchanged directory and route cache sharing a timestamp: extra matcher rebuild only.** The directory timestamp matches the route-cache file’s timestamp but can be newer than the earlier metadata cutoff. The matcher rebuilds despite unchanged directory contents; the route remains correct.
+
+- **Actual container and router snapshots checked together: incorrect freshness verdict.** This scenario already produces the correct `/v2` URL, but the older input snapshot is still accepted as fresh. It needs both retained `FileResource` state and checker memoization that does not share a fresh verdict between different snapshots. The failure here is the freshness decision, rather than a stale URL in this particular scenario.
+
+- **YAML translation: stale fallback value.** The primary catalogue updates to `v2`, while the French catalogue retains fallback `v1`. The latter was built later using resources already consumed for the English catalogue, so their edit predates its cutoff.
+
+- **XLIFF translation: stale fallback value.** The primary translation recovers to `v2`, but the later catalogue still accepts its previously consumed fallback resources and returns `v1`.
+
+- **Qt translation: stale fallback value.** The primary catalogue updates, while the later fallback-containing catalogue retains `v1` because its own build-start timestamp does not describe when those resources were consumed.
+
+- **ICU DAT translation: stale fallback message.** The primary catalogue picks up the replacement bundle, but the later catalogue retains the old “Symfony 2 is great” fallback instead of “Symfony 2 is super”. Its resource baseline needs to remain tied to the earlier read.
+
+- **ICU RES translation: stale fallback message.** The replacement resource bundle reaches the primary catalogue, while the later catalogue still accepts and serves the previous fallback message for the same reason.
+
+- **Translation file discovery: stale translation inventory/catalogue.** A file added after container discovery can remain missing. Even if the container subsequently rebuilds and discovers it, an existing catalogue can still appear fresh and return `v1`. This needs both preserved discovery state and catalogue identity that changes with the discovered filenames.
+
+- **Unchanged recent translation directory: extra rebuild only.** The translation correctly remains `v1`, but the container can rebuild once more before settling. The test requires immediate reuse; avoiding that conservative invalidation remains part of the follow-up work.
+
+- **Service glob discovery: missing service.** A class added after discovery remains absent from the container. `GlobResource` can acquire its baseline during serialization, after the addition, instead of retaining the filenames actually consumed by discovery.
+
+Separately from those 18 application scenarios, I retained a skipped unit regression for fractional clock offsets. With PHP’s clock 1.5 seconds ahead of the filesystem, integer duration arithmetic can leave the metadata cutoff one filesystem second too late and miss an edit. The follow-up will also address that case and re-enable its test.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-11-09T23:56:53Z
+
+@nicolas-grekas, I removed the FrameworkBundle application fixture and the skipped fractional-clock test. This PR now contains only `ResourceCheckerConfigCache` and `ResourceCheckerConfigCacheTest`.
+
+I’ve preserved the removed coverage for the follow-up PR, which will include the remaining fixes so that all 30 application scenarios and the fractional-clock regression pass. I’ll send it after this PR merges, initially targeting 8.2; it can be retargeted to 8.3 once that branch exists.
+
+I also updated the commit message and PR description to reflect the reduced scope.

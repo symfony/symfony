@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-10T00:39:19Z
+
+I moved `closeReceivers()` into a `finally`, with a test, so that the transports are also closed when the worker stops on an exception.

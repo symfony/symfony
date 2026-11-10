@@ -21,6 +21,7 @@ final class MailomatSmtpTransport extends EsmtpTransport
     {
         parent::__construct('smtp.mailomat.cloud', 587, false, $dispatcher, $logger);
 
+        $this->setRequireTls(true);
         $this->setUsername($username);
         $this->setPassword($password);
     }

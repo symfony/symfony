@@ -29,6 +29,7 @@ class AhaSendSmtpTransport extends EsmtpTransport
     {
         parent::__construct('send.ahasend.com', 587, false, $dispatcher, $logger);
 
+        $this->setRequireTls(true);
         $this->setUsername($username);
         $this->setPassword($password);
     }

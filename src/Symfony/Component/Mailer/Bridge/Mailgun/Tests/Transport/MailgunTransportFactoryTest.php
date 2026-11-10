@@ -124,4 +124,15 @@ class MailgunTransportFactoryTest extends AbstractTransportFactoryTestCase
 
         yield [new Dsn('mailgun+api', 'default', null, self::PASSWORD)];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['mailgun+smtp', 'mailgun+smtps'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::USER, self::PASSWORD))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('mailgun+smtp', 'default', self::USER, self::PASSWORD, null, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

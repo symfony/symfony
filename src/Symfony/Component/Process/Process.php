@@ -93,6 +93,7 @@ class Process implements \IteratorAggregate
     private bool $tty = false;
     private bool $pty;
     private bool $stdioInherited = false;
+    private bool $inputDisabled = false;
     private array $options = ['suppress_errors' => true, 'bypass_shell' => true];
     private array $ignoredSignals = [];
 
@@ -660,6 +661,43 @@ class Process implements \IteratorAggregate
     }
 
     /**
+     * Gives the null device as standard input to the process, instead of a pipe.
+     *
+     * Some commands behave differently when their standard input is a pipe, even an empty one
+     * (e.g. ripgrep searches it instead of the working directory). With the input disabled,
+     * they see no input at all, whatever the standard input of the current process is.
+     *
+     * @return $this
+     *
+     * @throws RuntimeException In case the process is already running
+     * @throws LogicException   In case an input is set or the TTY mode is enabled
+     */
+    public function disableInput(): static
+    {
+        if ($this->isRunning()) {
+            throw new RuntimeException('Disabling input while the process is running is not possible.');
+        }
+        if (null !== $this->input) {
+            throw new LogicException('Input cannot be disabled while an input is set.');
+        }
+        if ($this->tty) {
+            throw new LogicException('Input cannot be disabled while the TTY mode is enabled.');
+        }
+
+        $this->inputDisabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Returns true in case the input is disabled, false otherwise.
+     */
+    public function isInputDisabled(): bool
+    {
+        return $this->inputDisabled;
+    }
+
+    /**
      * Returns the current output of the process (STDOUT).
      *
      * @throws LogicException in case the output has been disabled
@@ -1118,7 +1156,7 @@ class Process implements \IteratorAggregate
      * @return $this
      *
      * @throws RuntimeException In case the TTY mode is not supported
-     * @throws LogicException   In case the standard streams are inherited
+     * @throws LogicException   In case the standard streams are inherited or the input is disabled
      */
     public function setTty(bool $tty): static
     {
@@ -1128,6 +1166,10 @@ class Process implements \IteratorAggregate
 
         if ($tty && $this->stdioInherited) {
             throw new LogicException('TTY mode cannot be enabled while the standard streams are inherited.');
+        }
+
+        if ($tty && $this->inputDisabled) {
+            throw new LogicException('TTY mode cannot be enabled while the input is disabled.');
         }
 
         if ($tty && !self::isTtySupported()) {
@@ -1274,12 +1316,15 @@ class Process implements \IteratorAggregate
      *
      * @return $this
      *
-     * @throws LogicException In case the process is running
+     * @throws LogicException In case the process is running or the input is disabled
      */
     public function setInput(mixed $input): static
     {
         if ($this->isRunning()) {
             throw new LogicException('Input cannot be set while the process is running.');
+        }
+        if (null !== $input && $this->inputDisabled) {
+            throw new LogicException('Input cannot be set while the input is disabled.');
         }
 
         $this->input = ProcessUtils::validateInput(__METHOD__, $input);
@@ -1408,7 +1453,13 @@ class Process implements \IteratorAggregate
             $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $hasCallback, $this->stdioInherited);
         }
 
-        return $this->processPipes->getDescriptors();
+        $descriptors = $this->processPipes->getDescriptors();
+
+        if ($this->inputDisabled) {
+            $descriptors[0] = ['file', '\\' === \DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null', 'r'];
+        }
+
+        return $descriptors;
     }
 
     /**

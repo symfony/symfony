@@ -57,6 +57,7 @@ use Symfony\Component\TypeInfo\Type\IntRangeType;
 use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\RefinementTypeInterface;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
@@ -252,6 +253,8 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             $type instanceof ObjectType => $this->buildObjectSchema($type, $config, $parent, $document),
             $type instanceof IntRangeType => $this->buildIntRangeSchema($type),
             $type instanceof LiteralType => $this->buildLiteralSchema($type, $config->dialect),
+            // a refinement this generator does not know is described by its builtin type
+            $type instanceof RefinementTypeInterface => $this->buildTypeSchema($type->getWrappedType(), $config, $parent, $document),
             $type instanceof BuiltinType => $this->buildBuiltinSchema($type, $config->dialect),
             default => throw new InvalidArgumentException(\sprintf('Cannot generate a JSON Schema for type "%s".', $type)),
         };
@@ -282,6 +285,20 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         $schemas = [];
         $dropUnrepresentable = array_any($types, static fn (Type $t): bool => !$t->isIdentifiedBy(TypeIdentifier::NULL) && self::isRepresentable($t));
 
+        // literals sharing a builtin type become a single enum, and "non-zero-int" a single integer, so that both can be made nullable in any dialect
+        $literalValues = [];
+        $ranges = [];
+
+        foreach ($types as $t) {
+            if ($t instanceof LiteralType) {
+                $literalValues[(string) $t->getWrappedType()][] = $t->getValue();
+            } elseif ($t instanceof IntRangeType) {
+                $ranges[] = [$t->getMin(), $t->getMax()];
+            }
+        }
+
+        $isNonZeroInt = 2 === \count($ranges) && \in_array([null, -1], $ranges, true) && \in_array([1, null], $ranges, true);
+
         foreach ($types as $t) {
             if ($t instanceof BuiltinType && TypeIdentifier::NULL === $t->getTypeIdentifier()) {
                 $nullable = true;
@@ -293,7 +310,11 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 continue;
             }
 
-            $schema = $this->buildTypeSchema($t, $config, $parent, $document);
+            $schema = match (true) {
+                $isNonZeroInt && $t instanceof IntRangeType => ['type' => 'integer', 'not' => $config->dialect->const(0)],
+                $t instanceof LiteralType && 1 < \count($values = $literalValues[(string) $t->getWrappedType()]) => DialectKeywords::enum($this->buildBuiltinSchema($t->getWrappedType(), $config->dialect), $values),
+                default => $this->buildTypeSchema($t, $config, $parent, $document),
+            };
 
             if (!\in_array($schema, $schemas, true)) {
                 $schemas[] = $schema;

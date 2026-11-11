@@ -107,7 +107,8 @@ final class SwiftRegistryIbanProvider
 
         foreach ($lines as $line) {
             $columns = str_getcsv($line, "\t", '"', '\\');
-            $propertyLabel = array_shift($columns);
+            // str_getcsv() returns [null] for an empty line
+            $propertyLabel = (string) array_shift($columns);
 
             if (!isset($properties[$propertyLabel])) {
                 continue;
@@ -144,27 +145,57 @@ final class WikipediaIbanProvider
     {
         $formats = [];
 
-        foreach ($this->readIbanFormatsTable() as $item) {
-            if (!preg_match('/^([A-Z]{2})/', $item['IBAN Fields'], $matches)) {
+        foreach ($this->readIbanFormatsTables() as [$ibanFields, $bbanFormat, $country]) {
+            if (!preg_match('/^([A-Z]{2})/', $ibanFields, $matches)) {
                 continue;
             }
 
             $countryCode = $matches[1];
 
-            $formats[$countryCode] = [$this->buildIbanRegexp($countryCode, $item['BBAN Format']), $item['Country']];
+            $formats[$countryCode] = [$this->buildIbanRegexp($countryCode, $bbanFormat), $country];
         }
 
         return $formats;
     }
 
     /**
-     * @return list<array<string, string|int>>
+     * Reads the tables of IBAN countries ("IBAN Fields" column) and of partial IBAN countries ("Example" column).
+     *
+     * @return list<array{string, string, string}>
      */
-    private function readIbanFormatsTable(): array
+    private function readIbanFormatsTables(): array
     {
-        $tablesResponse = file_get_contents('https://www.wikitable2json.com/api/International_Bank_Account_Number?table=3&keyRows=1&clearRef=true');
+        $tablesResponse = file_get_contents('https://www.wikitable2json.com/api/International_Bank_Account_Number?keyRows=1&clearRef=true');
 
-        return json_decode($tablesResponse, true, 512, \JSON_THROW_ON_ERROR)[0];
+        $items = [];
+        $missingColumns = ['iban fields' => true, 'example' => true];
+
+        foreach (json_decode($tablesResponse, true, 512, \JSON_THROW_ON_ERROR) as $table) {
+            $columns = array_keys(array_change_key_case($table[0] ?? []));
+            $ibanColumn = in_array('iban fields', $columns, true) ? 'iban fields' : 'example';
+
+            if (array_diff([$ibanColumn, 'bban format', 'country'], $columns)) {
+                continue;
+            }
+
+            unset($missingColumns[$ibanColumn]);
+
+            foreach ($table as $row) {
+                $row = array_change_key_case($row);
+
+                if (!isset($row[$ibanColumn], $row['bban format'], $row['country'])) {
+                    throw new RuntimeException(sprintf('Unexpected row in the Wikipedia table with the "%s" column: "%s".', $ibanColumn, json_encode($row)));
+                }
+
+                $items[] = [$row[$ibanColumn], $row['bban format'], preg_replace('/\[[^\]]*\]/', '', $row['country'])];
+            }
+        }
+
+        if ($missingColumns) {
+            throw new RuntimeException(sprintf('Cannot find the Wikipedia table with the "%s" column.', array_key_first($missingColumns)));
+        }
+
+        return $items;
     }
 
     private function buildIbanRegexp(string $countryCode, string $bbanFormat): string

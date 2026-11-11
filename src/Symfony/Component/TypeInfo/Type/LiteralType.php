@@ -24,9 +24,9 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @extends Type<T>
  *
- * @implements WrappingTypeInterface<BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::FLOAT>|BuiltinType<TypeIdentifier::STRING>>
+ * @implements RefinementTypeInterface<BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::FLOAT>|BuiltinType<TypeIdentifier::STRING>>
  */
-final class LiteralType extends Type implements WrappingTypeInterface
+final class LiteralType extends Type implements RefinementTypeInterface
 {
     /**
      * @var BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::FLOAT>|BuiltinType<TypeIdentifier::STRING>

@@ -32,10 +32,23 @@ class IntRangeTypeTest extends TestCase
         new IntRangeType(10, 0);
     }
 
+    public function testCannotCreateRangeWithIntegerLimits()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new IntRangeType(\PHP_INT_MIN, \PHP_INT_MAX);
+    }
+
     public function testGetBounds()
     {
         $this->assertSame(0, (new IntRangeType(0, 10))->getMin());
         $this->assertSame(10, (new IntRangeType(0, 10))->getMax());
+    }
+
+    public function testIntegerLimitsAreNoBound()
+    {
+        $this->assertEquals(new IntRangeType(0, null), new IntRangeType(0, \PHP_INT_MAX));
+        $this->assertEquals(new IntRangeType(null, 0), new IntRangeType(\PHP_INT_MIN, 0));
     }
 
     public function testIsIdentifiedBy()

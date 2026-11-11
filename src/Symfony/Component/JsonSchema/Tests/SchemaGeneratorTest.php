@@ -30,6 +30,7 @@ use Symfony\Component\JsonSchema\Schema;
 use Symfony\Component\JsonSchema\SchemaDocument;
 use Symfony\Component\JsonSchema\SchemaGenerator;
 use Symfony\Component\JsonSchema\Tests\Fixtures\AccountWithAccessors;
+use Symfony\Component\JsonSchema\Tests\Fixtures\ArrayDefaults;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Author;
 use Symfony\Component\JsonSchema\Tests\Fixtures\AuthorSpotlight;
 use Symfony\Component\JsonSchema\Tests\Fixtures\AuthorWithBiography;
@@ -497,6 +498,43 @@ class SchemaGeneratorTest extends TestCase
 
         $this->assertSameSchema(['type' => 'array', 'items' => ['$ref' => '#/$defs/Author']], $schema->getRoot());
         $this->assertSame(['Author'], array_keys($schema->getDefinitions()));
+    }
+
+    #[DataProvider('provideArraysThatAreNotLists')]
+    public function testArrayThatIsNotAListBecomesAnArrayOrAnObject(Type $type, array|\ArrayObject $valueSchema)
+    {
+        $schema = SchemaGenerator::create()->generate($type);
+
+        $this->assertSameSchema(['anyOf' => [
+            ['type' => 'array', 'items' => $valueSchema],
+            ['type' => 'object', 'additionalProperties' => $valueSchema],
+        ]], $schema->getRoot());
+    }
+
+    public static function provideArraysThatAreNotLists(): iterable
+    {
+        yield 'integer keys' => [Type::array(Type::string(), Type::int()), ['type' => 'string']];
+        yield 'integer and string keys' => [Type::array(Type::string(), Type::union(Type::int(), Type::string())), ['type' => 'string']];
+        yield 'default keys' => [Type::array(Type::string()), ['type' => 'string']];
+        yield 'any value' => [Type::array(), new \ArrayObject()];
+    }
+
+    public function testNullableIntegerKeyedArrayAlsoAcceptsNull()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::nullable(Type::array(Type::string(), Type::int())));
+
+        $this->assertSameSchema(['anyOf' => [
+            ['type' => 'array', 'items' => ['type' => 'string']],
+            ['type' => 'object', 'additionalProperties' => ['type' => 'string']],
+            ['type' => 'null'],
+        ]], $schema->getRoot());
+    }
+
+    public function testIntegerKeyedCollectionObjectStaysAnArray()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::collection(Type::object(\ArrayIterator::class), Type::string(), Type::int()));
+
+        $this->assertSameSchema(['type' => 'array', 'items' => ['type' => 'string']], $schema->getRoot());
     }
 
     public function testBuiltinRootTypeHasNoDefinition()
@@ -1156,6 +1194,13 @@ class SchemaGeneratorTest extends TestCase
 
         $this->assertSame('[]', json_encode($properties['reviewers']['default']));
         $this->assertSame('{}', json_encode($properties['authorsByRole']['default']));
+    }
+
+    public function testEmptyArrayDefaultOfAnArrayThatIsNotAListIsAnEmptyJsonArray()
+    {
+        $properties = SchemaGenerator::create()->generate(Type::object(ArrayDefaults::class))->getDefinitions()['ArrayDefaults']['properties'];
+
+        $this->assertSame('[]', json_encode($properties['labelsById']['default']));
     }
 
     public function testObjectDefaultValuesOfConstructorArgumentsAreNotInstantiated()

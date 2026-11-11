@@ -345,11 +345,16 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         $valueSchema = $this->buildTypeSchema($type->getCollectionValueType(), $config, $parent, $document);
         $keyType = $type->getCollectionKeyType();
 
-        if (!$type->isList() && $keyType instanceof BuiltinType && TypeIdentifier::STRING === $keyType->getTypeIdentifier()) {
-            return ['type' => 'object', 'additionalProperties' => $valueSchema];
-        }
-
-        return ['type' => 'array', 'items' => $valueSchema];
+        return match (true) {
+            $type->isList() => ['type' => 'array', 'items' => $valueSchema],
+            $keyType instanceof BuiltinType && TypeIdentifier::STRING === $keyType->getTypeIdentifier() => ['type' => 'object', 'additionalProperties' => $valueSchema],
+            // an array with keys that are not sequential integers is encoded as a JSON object
+            $type->isIdentifiedBy(TypeIdentifier::ARRAY) => ['anyOf' => [
+                ['type' => 'array', 'items' => $valueSchema],
+                ['type' => 'object', 'additionalProperties' => $valueSchema],
+            ]],
+            default => ['type' => 'array', 'items' => $valueSchema],
+        };
     }
 
     /**
@@ -980,6 +985,9 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     {
         if ([] === $value) {
             $types = (array) ($schema['type'] ?? []);
+            foreach ($schema['anyOf'] ?? [] as $branch) {
+                $types = [...$types, ...(array) ($branch['type'] ?? [])];
+            }
 
             return match (true) {
                 \in_array('array', $types, true) => [],

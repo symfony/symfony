@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\PropertyInfo\DependencyInjection\PhpStanExtractorResolverPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoConstructorPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\RemovePropertyInfoCachePass;
@@ -43,6 +45,7 @@ class PropertyInfoBundle extends AbstractBundle
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new PropertyInfoPass());
+        $container->addCompilerPass(new PhpStanExtractorResolverPass());
         $container->addCompilerPass(new PropertyInfoConstructorPass());
         $container->addCompilerPass(new RemovePropertyInfoCachePass());
     }
@@ -91,7 +94,7 @@ class PropertyInfoBundle extends AbstractBundle
             && ContainerBuilder::willBeAvailable('phpdocumentor/type-resolver', ContextFactory::class, ['symfony/framework-bundle', 'symfony/property-info'])
         ) {
             $container->register('property_info.phpstan_extractor', PhpStanExtractor::class)
-                ->setArguments([null, null, null, true, '%.type_info.resolve_refinements%'])
+                ->setArguments([null, null, null, true, new Reference('type_info.resolver.string')])
                 ->addTag('property_info.type_extractor', ['priority' => -1000])
                 ->addTag('property_info.constructor_extractor', ['priority' => -1000]);
         }

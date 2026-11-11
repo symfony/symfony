@@ -92,6 +92,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\RefinementTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 class SchemaGeneratorTest extends TestCase
@@ -1315,7 +1316,7 @@ class SchemaGeneratorTest extends TestCase
     {
         $reflectionExtractor = new ReflectionExtractor();
 
-        return new PropertyInfoExtractor([$reflectionExtractor], [new PhpStanExtractor(null, null, null, true, true), $reflectionExtractor], [], [$reflectionExtractor], [$reflectionExtractor]);
+        return new PropertyInfoExtractor([$reflectionExtractor], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), $reflectionExtractor], [], [$reflectionExtractor], [$reflectionExtractor]);
     }
 
     private function assertSameSchema(array $expected, array|Schema $actual): void

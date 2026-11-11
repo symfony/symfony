@@ -16,7 +16,7 @@ framework:
     profiler:
         only_exceptions: false
     type_info:
-        resolve_refinements: true
+        refinements: true
 
 services:
     logger: { class: Psr\Log\NullLogger }

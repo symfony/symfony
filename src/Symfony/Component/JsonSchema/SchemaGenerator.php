@@ -128,7 +128,8 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         $descriptionExtractors = [];
 
         if (class_exists(PhpDocParser::class) && class_exists(ContextFactory::class)) {
-            $phpStanExtractor = new PhpStanExtractor(null, null, null, true, true);
+            // older symfony/property-info and symfony/type-info ignore the extra arguments
+            $phpStanExtractor = new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true));
             array_unshift($typeExtractors, $phpStanExtractor);
             $descriptionExtractors[] = $phpStanExtractor;
         }

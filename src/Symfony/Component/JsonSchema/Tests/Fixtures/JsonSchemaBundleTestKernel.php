@@ -62,7 +62,7 @@ class JsonSchemaBundleTestKernel extends AbstractKernel
     {
         // the option exists only where refinements do
         if (method_exists(Type::class, 'literal')) {
-            $container->extension('type_info', ['resolve_refinements' => true]);
+            $container->extension('type_info', ['refinements' => true]);
         }
 
         foreach ($this->extensionConfigs as $name => $config) {

@@ -14,6 +14,7 @@ namespace Symfony\Component\TypeInfo\TypeResolver;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
+use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
@@ -61,16 +62,16 @@ final class TypeResolver implements TypeResolverInterface
 
     /**
      * @param array<string, TypeResolverInterface>|null $resolvers
-     * @param bool|null                                 $resolveRefinements Whether the string type resolver resolves PHPDoc refinements, such as literals and integer ranges. Not passing true is deprecated since 8.2, refinements will always be resolved as of 9.0
+     * @param list<Refinement>|bool|null                $refinements The PHPDoc refinements the string type resolver resolves instead of their builtin type, true for all of them, including those added later. Not passing it is deprecated since 8.2, all refinements will be resolved by default as of 9.0
      */
-    public static function create(?array $resolvers = null, ?bool $resolveRefinements = null): self
+    public static function create(?array $resolvers = null, array|bool|null $refinements = null): self
     {
         if (null === $resolvers) {
-            if (true !== $resolveRefinements && class_exists(PhpDocParser::class)) {
-                trigger_deprecation('symfony/type-info', '8.2', 'Not passing true for the "$resolveRefinements" argument of "%s()" is deprecated; PHPDoc refinements will always be resolved in 9.0.', __METHOD__);
+            if (null === $refinements && class_exists(PhpDocParser::class)) {
+                trigger_deprecation('symfony/type-info', '8.2', 'Not passing the "$refinements" argument of "%s()" is deprecated; all PHPDoc refinements will be resolved by default in 9.0. Pass true to resolve them now, or false to keep their builtin types.', __METHOD__);
             }
 
-            $stringTypeResolver = class_exists(PhpDocParser::class) ? new StringTypeResolver(null, null, [], $resolveRefinements ?? false) : null;
+            $stringTypeResolver = class_exists(PhpDocParser::class) ? new StringTypeResolver(null, null, [], $refinements ?? false) : null;
             $typeContextFactory = new TypeContextFactory($stringTypeResolver);
             $reflectionTypeResolver = new ReflectionTypeResolver();
 

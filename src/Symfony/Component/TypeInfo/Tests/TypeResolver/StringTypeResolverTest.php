@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
+use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnum;
@@ -572,8 +573,6 @@ class StringTypeResolverTest extends TestCase
     }
 
     #[DataProvider('disabledRefinementDataProvider')]
-    #[Group('legacy')]
-    #[IgnoreDeprecations]
     public function testDoNotResolveRefinementsWhenDisabled(Type $expectedType, string $string)
     {
         $resolver = new StringTypeResolver(null, null, [], false);
@@ -609,20 +608,38 @@ class StringTypeResolverTest extends TestCase
 
     #[Group('legacy')]
     #[IgnoreDeprecations]
-    public function testNotPassingTrueForResolveRefinementsIsDeprecated()
+    public function testNotPassingRefinementsIsDeprecated()
     {
-        $this->expectUserDeprecationMessage('Since symfony/type-info 8.2: Not passing true for the "$resolveRefinements" argument of "Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver::__construct()" is deprecated; PHPDoc refinements will always be resolved in 9.0.');
+        $this->expectUserDeprecationMessage('Since symfony/type-info 8.2: Not passing the "$refinements" argument of "Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver::__construct()" is deprecated; all PHPDoc refinements will be resolved by default in 9.0. Pass true to resolve them now, or false to keep their builtin types.');
 
-        new StringTypeResolver();
+        $this->assertEquals(Type::int(), (new StringTypeResolver())->resolve('positive-int'));
     }
 
-    #[Group('legacy')]
-    #[IgnoreDeprecations]
-    public function testPassingFalseForResolveRefinementsIsDeprecated()
+    public function testResolveOnlyTheGivenRefinements()
     {
-        $this->expectUserDeprecationMessage('Since symfony/type-info 8.2: Not passing true for the "$resolveRefinements" argument of "Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver::__construct()" is deprecated; PHPDoc refinements will always be resolved in 9.0.');
+        $resolver = new StringTypeResolver(null, null, [], [Refinement::IntRange]);
 
-        new StringTypeResolver(null, null, [], false);
+        $this->assertEquals(Type::intRange(1, null), $resolver->resolve('positive-int'));
+        $this->assertEquals(Type::intRange(0, 10), $resolver->resolve('int<0, 10>'));
+        $this->assertEquals(Type::string(), $resolver->resolve("'draft'|'live'"));
+        $this->assertEquals(Type::int(), $resolver->resolve('1'));
+
+        $resolver = new StringTypeResolver(null, null, [], [Refinement::Literal]);
+
+        $this->assertEquals(Type::int(), $resolver->resolve('positive-int'));
+        $this->assertEquals(Type::int(), $resolver->resolve('int<0, 10>'));
+        $this->assertEquals(Type::union(Type::literal('draft'), Type::literal('live')), $resolver->resolve("'draft'|'live'"));
+        $this->assertEquals(Type::literal(1), $resolver->resolve('1'));
+
+        $this->assertEquals(Type::int(), (new StringTypeResolver(null, null, [], []))->resolve('positive-int'));
+    }
+
+    public function testCannotPassAnythingButRefinementsInTheList()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$refinements" argument must be a boolean or a list of "Symfony\Component\TypeInfo\Refinement" cases, "string" given in the list.');
+
+        new StringTypeResolver(null, null, [], ['literal']);
     }
 
     public function testCannotResolveThisWithoutTypeContext()

@@ -40,6 +40,7 @@ use PHPStan\PhpDocParser\ParserConfig;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
+use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
@@ -74,18 +75,25 @@ final class StringTypeResolver implements TypeResolverInterface
     private readonly TypeParser $parser;
 
     /**
-     * @param array<string, string> $extraTypeAliases
-     * @param bool|null             $resolveRefinements Whether to resolve PHPDoc refinements, such as literals and integer ranges. Not passing true is deprecated since 8.2, refinements will always be resolved as of 9.0
+     * @var list<Refinement>
+     */
+    private readonly array $refinements;
+
+    /**
+     * @param array<string, string>      $extraTypeAliases
+     * @param list<Refinement>|bool|null $refinements      The PHPDoc refinements to resolve instead of their builtin type, true for all of them, including those added later. Not passing it is deprecated since 8.2, all refinements will be resolved by default as of 9.0
      */
     public function __construct(
         ?Lexer $lexer = null,
         ?TypeParser $parser = null,
         private readonly array $extraTypeAliases = [],
-        private readonly ?bool $resolveRefinements = null,
+        array|bool|null $refinements = null,
     ) {
-        if (true !== $resolveRefinements) {
-            trigger_deprecation('symfony/type-info', '8.2', 'Not passing true for the "$resolveRefinements" argument of "%s()" is deprecated; PHPDoc refinements will always be resolved in 9.0.', __METHOD__);
+        if (null === $refinements) {
+            trigger_deprecation('symfony/type-info', '8.2', 'Not passing the "$refinements" argument of "%s()" is deprecated; all PHPDoc refinements will be resolved by default in 9.0. Pass true to resolve them now, or false to keep their builtin types.', __METHOD__);
         }
+
+        $this->refinements = self::normalizeRefinements($refinements ?? false);
 
         if (class_exists(ParserConfig::class)) {
             $this->lexer = $lexer ?? new Lexer(new ParserConfig([]));
@@ -199,7 +207,7 @@ final class StringTypeResolver implements TypeResolverInterface
                 return CollectionType::mergeCollectionValueTypes($types);
             }
 
-            if ($this->resolveRefinements) {
+            if ($this->resolves(Refinement::Literal)) {
                 $literal = match (true) {
                     $node->constExpr instanceof ConstExprStringNode => $node->constExpr->value,
                     $node->constExpr instanceof ConstExprIntegerNode => self::parseInteger($node->constExpr->value),
@@ -284,7 +292,7 @@ final class StringTypeResolver implements TypeResolverInterface
             $type ??= $this->getTypeFromNode($node->type, $typeContext);
 
             if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
-                if (!$this->resolveRefinements || !$type instanceof BuiltinType || 2 !== \count($node->genericTypes)) {
+                if (!$this->resolves(Refinement::IntRange) || !$type instanceof BuiltinType || 2 !== \count($node->genericTypes)) {
                     return $type;
                 }
 
@@ -428,11 +436,11 @@ final class StringTypeResolver implements TypeResolverInterface
             'true' => Type::true(),
             'false' => Type::false(),
             'int', 'integer' => Type::int(),
-            'non-zero-int' => $this->resolveRefinements ? Type::union(Type::intRange(null, -1), Type::intRange(1, null)) : Type::int(),
-            'positive-int' => $this->resolveRefinements ? Type::intRange(1, null) : Type::int(),
-            'negative-int' => $this->resolveRefinements ? Type::intRange(null, -1) : Type::int(),
-            'non-positive-int' => $this->resolveRefinements ? Type::intRange(null, 0) : Type::int(),
-            'non-negative-int' => $this->resolveRefinements ? Type::intRange(0, null) : Type::int(),
+            'non-zero-int' => $this->resolves(Refinement::IntRange) ? Type::union(Type::intRange(null, -1), Type::intRange(1, null)) : Type::int(),
+            'positive-int' => $this->resolves(Refinement::IntRange) ? Type::intRange(1, null) : Type::int(),
+            'negative-int' => $this->resolves(Refinement::IntRange) ? Type::intRange(null, -1) : Type::int(),
+            'non-positive-int' => $this->resolves(Refinement::IntRange) ? Type::intRange(null, 0) : Type::int(),
+            'non-negative-int' => $this->resolves(Refinement::IntRange) ? Type::intRange(0, null) : Type::int(),
             'float', 'double' => Type::float(),
             'string',
             'class-string',
@@ -665,6 +673,31 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         return $value;
+    }
+
+    private function resolves(Refinement $refinement): bool
+    {
+        return \in_array($refinement, $this->refinements, true);
+    }
+
+    /**
+     * @param list<Refinement>|bool $refinements
+     *
+     * @return list<Refinement>
+     */
+    private static function normalizeRefinements(array|bool $refinements): array
+    {
+        if (\is_bool($refinements)) {
+            return $refinements ? Refinement::cases() : [];
+        }
+
+        foreach ($refinements as $refinement) {
+            if (!$refinement instanceof Refinement) {
+                throw new InvalidArgumentException(\sprintf('The "$refinements" argument must be a boolean or a list of "%s" cases, "%s" given in the list.', Refinement::class, get_debug_type($refinement)));
+            }
+        }
+
+        return array_values($refinements);
     }
 
     private static function parseInteger(string $value): int

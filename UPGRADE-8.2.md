@@ -451,12 +451,12 @@ PasswordHasher
 PropertyInfo
 ------------
 
- * Deprecate not passing `true` for the `$resolveRefinements` argument of `PhpStanExtractor::__construct()`; PHPDoc refinements will always be resolved in 9.0.
-   `getType()` then returns `LiteralType` and `IntRangeType` instances for literals and integer ranges, see the TypeInfo section:
+ * Deprecate not passing the `$stringTypeResolver` argument of `PhpStanExtractor::__construct()`; the default one will resolve all PHPDoc refinements in 9.0.
+   The refinements are those of the given `StringTypeResolver`, so `getType()` can then return `LiteralType` and `IntRangeType` instances for literals and integer ranges, see the TypeInfo section:
 
    ```diff
    -$extractor = new PhpStanExtractor();
-   +$extractor = new PhpStanExtractor(null, null, null, true, true);
+   +$extractor = new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true));
    ```
 
 RateLimiter
@@ -652,15 +652,16 @@ TwigBundle
 TypeInfo
 --------
 
- * Deprecate not passing `true` for the `$resolveRefinements` argument of `StringTypeResolver::__construct()` and `TypeResolver::create()`, and not setting the `type_info.resolve_refinements` option to `true`; PHPDoc refinements will always be resolved in 9.0.
-   Literals and integer ranges are then resolved as `LiteralType` and `IntRangeType`, which wrap a `BuiltinType`.
+ * Deprecate not passing the `$refinements` argument of `StringTypeResolver::__construct()` and `TypeResolver::create()`, and not setting the `type_info.refinements` option; all PHPDoc refinements will be resolved by default in 9.0.
+   `true` resolves all of them, including those added later, `false` none, and a list of `Refinement` cases only those.
+   Literals and integer ranges are resolved as `LiteralType` and `IntRangeType`, which wrap a `BuiltinType`.
    `non-zero-int` is resolved as the union `int<min, -1>|int<1, max>`, so unwrapping alone does not turn it back into an `int`.
    Before enabling them, replace `instanceof BuiltinType` checks and `getTypeIdentifier()` calls with `isIdentifiedBy()`, or unwrap the `WrappingTypeInterface` types:
 
    ```yaml
    # config/packages/type_info.yaml
    type_info:
-       resolve_refinements: true
+       refinements: true # or a list, such as [literal, int_range]
    ```
 
    ```diff

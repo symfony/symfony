@@ -36,7 +36,7 @@ class CollectionTypeTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), $keyType, Type::bool()), isList: true);
+        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), $keyType, Type::bool()), true);
     }
 
     /**

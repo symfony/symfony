@@ -10,8 +10,8 @@ CHANGELOG
  * Add `Type::getMismatches()` and `TypeMismatch` to tell where and why a value is not accepted by a type
  * Add `TypeContext::$inheritedTemplateTypes` to resolve the templates of parent classes, interfaces and traits with the types given by `@extends`, `@implements` and `@use` tags
  * Make `PhpDocAwareReflectionTypeResolver` inherit PHPDoc types from parent classes, interfaces and abstract trait methods
- * Add `LiteralType` and `IntRangeType`, and the `Type::literal()` and `Type::intRange()` factories
- * Add `Type::withoutRefinements()` to replace literals and integer ranges with their builtin type
+ * Add `LiteralType` and `IntRangeType`, which implement the new `RefinementTypeInterface`, and the `Type::literal()` and `Type::intRange()` factories
+ * Add `Type::withoutRefinements()` to replace refinements, such as literals and integer ranges, with their builtin type
  * Add a `$resolveRefinements` argument to `StringTypeResolver::__construct()` and `TypeResolver::create()`, and a `resolve_refinements` option to `TypeInfoBundle`, to resolve literals and integer ranges as `LiteralType` and `IntRangeType`
  * Deprecate not passing `true` for the `$resolveRefinements` argument of `StringTypeResolver::__construct()` and `TypeResolver::create()`, and not setting the `type_info.resolve_refinements` option to `true`
 

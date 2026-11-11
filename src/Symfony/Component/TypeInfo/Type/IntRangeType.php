@@ -22,16 +22,24 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @extends Type<int>
  *
- * @implements WrappingTypeInterface<BuiltinType<TypeIdentifier::INT>>
+ * @implements RefinementTypeInterface<BuiltinType<TypeIdentifier::INT>>
  */
-final class IntRangeType extends Type implements WrappingTypeInterface
+final class IntRangeType extends Type implements RefinementTypeInterface
 {
     private readonly BuiltinType $type;
+    private readonly ?int $min;
+    private readonly ?int $max;
 
-    public function __construct(
-        private readonly ?int $min,
-        private readonly ?int $max,
-    ) {
+    /**
+     * @param int|null $min the lower bound, null or PHP_INT_MIN for none
+     * @param int|null $max the upper bound, null or PHP_INT_MAX for none
+     */
+    public function __construct(?int $min, ?int $max)
+    {
+        // the integer limits are no bound at all
+        $min = \PHP_INT_MIN === $min ? null : $min;
+        $max = \PHP_INT_MAX === $max ? null : $max;
+
         if (null === $min && null === $max) {
             throw new InvalidArgumentException(\sprintf('Cannot create "%s" without bounds, use "int" instead.', self::class));
         }
@@ -40,6 +48,8 @@ final class IntRangeType extends Type implements WrappingTypeInterface
             throw new InvalidArgumentException(\sprintf('Cannot create "%s" with a minimum (%d) greater than its maximum (%d).', self::class, $min, $max));
         }
 
+        $this->min = $min;
+        $this->max = $max;
         $this->type = Type::int();
     }
 

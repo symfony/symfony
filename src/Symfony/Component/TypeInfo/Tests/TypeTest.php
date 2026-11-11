@@ -14,6 +14,7 @@ namespace Symfony\Component\TypeInfo\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyRefinementType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
@@ -248,6 +249,13 @@ class TypeTest extends TestCase
         yield 'object' => [Type::object(\Countable::class), new \stdClass(), [new TypeMismatch('', Type::object(\Countable::class), 'stdClass')]];
         yield 'nullable' => [Type::nullable(Type::int()), '1', [new TypeMismatch('', Type::nullable(Type::int()), 'string')]];
         yield 'union' => [Type::union(Type::int(), Type::string()), 1.5, [new TypeMismatch('', Type::union(Type::int(), Type::string()), 'float')]];
+        yield 'integer range' => [Type::intRange(1, 5), 9, [new TypeMismatch('', Type::intRange(1, 5), 'int')]];
+        yield 'template of an integer range' => [Type::template('T', Type::intRange(1, 5)), 9, [new TypeMismatch('', Type::template('T', Type::intRange(1, 5)), 'int')]];
+        yield 'template of a literal union' => [Type::template('T', Type::union(Type::literal('a'), Type::literal('b'))), 'c', [new TypeMismatch('', Type::template('T', Type::union(Type::literal('a'), Type::literal('b'))), 'string')]];
+        yield 'list of integer ranges' => [Type::list(Type::intRange(1, 5)), [1, 9], [new TypeMismatch('[1]', Type::intRange(1, 5), 'int')]];
+        yield 'template of a nullable type' => [Type::template('T', Type::nullable(Type::int())), null, []];
+        yield 'template of a list of integer ranges' => [Type::template('T', Type::list(Type::intRange(1, 5))), [9], [new TypeMismatch('', Type::template('T', Type::list(Type::intRange(1, 5))), 'array')]];
+        yield 'refinement without a check of its own' => [new DummyRefinementType(), 1, [new TypeMismatch('', new DummyRefinementType(), 'int')]];
 
         yield 'list items' => [Type::list(Type::int()), [1, '2', 3, '4'], [new TypeMismatch('[1]', Type::int(), 'string'), new TypeMismatch('[3]', Type::int(), 'string')]];
         yield 'not a list' => [Type::list(Type::int()), [1 => 1], [new TypeMismatch('', Type::list(Type::int()), 'array')]];

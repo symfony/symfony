@@ -7,6 +7,7 @@ return function (Symfony\Component\DependencyInjection\Loader\Configurator\Conta
             'aliases' => [
                 'CustomAlias' => 'int',
             ],
+            'refinements' => true,
         ],
     ]);
 };

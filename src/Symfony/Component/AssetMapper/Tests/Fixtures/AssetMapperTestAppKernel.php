@@ -47,6 +47,7 @@ class AssetMapperTestAppKernel extends Kernel
             }
 
             $container->loadFromExtension('framework', [
+                'type_info' => ['refinements' => true],
                 'http_client' => true,
                 'assets' => null,
                 'asset_mapper' => $assetMapper,

@@ -1,5 +1,7 @@
 framework:
     secret: test
+    type_info:
+        refinements: true
     router: { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml" }
     test: ~
     session:

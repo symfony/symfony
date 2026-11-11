@@ -64,6 +64,7 @@ class NoTemplatingEntryKernel extends Kernel
         $loader->load(static function (ContainerBuilder $container) {
             $config = [
                 'secret' => '$ecret',
+                'type_info' => ['refinements' => true],
                 'form' => ['enabled' => false],
             ];
 

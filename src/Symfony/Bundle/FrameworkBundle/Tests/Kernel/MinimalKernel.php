@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 
 abstract class MinimalKernel extends Kernel
@@ -35,5 +36,10 @@ abstract class MinimalKernel extends Kernel
     public function getLogDir(): string
     {
         return $this->cacheDir;
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->prependExtensionConfig('framework', ['type_info' => ['refinements' => true]]);
     }
 }

@@ -305,11 +305,7 @@ final class StringTypeResolver implements TypeResolverInterface
                     $min = $this->getIntRangeBound($node->genericTypes[0], 'min', $typeContext);
                     $max = $this->getIntRangeBound($node->genericTypes[1], 'max', $typeContext);
 
-                    // the integer limits are no bound at all
-                    if ((null === $min || \PHP_INT_MIN === $min) && (null === $max || \PHP_INT_MAX === $max)) {
-                        return $type;
-                    }
-
+                    // a range without bounds, such as "int<min, max>", is rejected as well
                     return Type::intRange($min, $max);
                 } catch (\DomainException|InvalidArgumentException) {
                     return $type;

@@ -130,7 +130,17 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
         }
 
         if ($type instanceof UnionType) {
-            return array_values(array_unique(array_merge(...array_map(self::getKeyTypeIdentifiers(...), $type->getTypes()))));
+            $typeIdentifiers = [];
+            foreach ($type->getTypes() as $t) {
+                // a member that is not checked accepts any key
+                if (!$identifiers = self::getKeyTypeIdentifiers($t)) {
+                    return [];
+                }
+
+                $typeIdentifiers = [...$typeIdentifiers, ...$identifiers];
+            }
+
+            return array_values(array_unique($typeIdentifiers));
         }
 
         // only int and string keys are checked, any other key type, such as "mixed" for an unbound template, is left as is

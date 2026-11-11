@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithConfiguredTypeAlias;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeInfoBundle;
@@ -77,6 +78,18 @@ class TypeInfoBundleTest extends TestCase
         new TypeInfoBundle()->getContainerExtension()->load([['refinements' => true], ['refinements' => null]], $container);
 
         $this->assertFalse($container->getDefinition('type_info.resolver.string')->getArgument(3));
+    }
+
+    public function testRefinementsOptionAcceptsEnumCases()
+    {
+        if (!class_exists(PhpDocParser::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" dependency is required.');
+        }
+
+        $container = new ContainerBuilder();
+        new TypeInfoBundle()->getContainerExtension()->load([['refinements' => [Refinement::Literal]]], $container);
+
+        $this->assertEquals([Refinement::Literal], $container->getDefinition('type_info.resolver.string')->getArgument(3));
     }
 }
 

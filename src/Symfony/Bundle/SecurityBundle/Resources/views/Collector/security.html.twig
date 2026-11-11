@@ -264,7 +264,11 @@
                     {% elseif collector.enabled %}
                         <div class="empty">
                             <p>
-                                There is no security token.
+                                {% if collector.lazyFirewallPending %}
+                                    The firewall is lazy and nothing triggered it during this stateless request, so the profiler did not run it.
+                                {% else %}
+                                    There is no security token.
+                                {% endif %}
                                 {% if collector.deauthProfileToken %}
                                     It was removed in
                                     <a href="{{ path('_profiler', {token: collector.deauthProfileToken, panel: 'security'}) }}">

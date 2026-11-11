@@ -80,6 +80,44 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertNull($collector->getFirewall());
     }
 
+    #[DataProvider('provideLazyFirewallOnStatelessRequest')]
+    public function testCollectDoesNotTriggerLazyFirewallOnStatelessRequest(bool $stateless, bool $statelessFirewall, bool $firewallRun, bool $expectedPending)
+    {
+        $tokenStorage = new TokenStorage();
+        $initialized = false;
+        $tokenStorage->setInitializer(function () use (&$initialized) {
+            $initialized = true;
+        });
+
+        $request = new Request();
+        $request->attributes->set('_stateless', $stateless);
+        if ($firewallRun) {
+            $request->attributes->set('_security_firewall_run', '_security_main');
+        }
+
+        $firewallMap = $this->createStub(FirewallMap::class);
+        $firewallMap
+            ->method('getFirewallConfig')
+            ->willReturn(new FirewallConfig('main', 'security.user_checker.main', stateless: $statelessFirewall));
+
+        $collector = new SecurityDataCollector($tokenStorage, null, null, null, $firewallMap, null);
+        $collector->collect($request, new Response());
+
+        $this->assertTrue($collector->isEnabled());
+        $this->assertFalse($collector->isAuthenticated());
+        $this->assertNull($collector->getTokenClass());
+        $this->assertSame($expectedPending, $collector->isLazyFirewallPending());
+        $this->assertSame(!$expectedPending, $initialized, 'The collector triggers the lazy firewall, unless the request is stateless and the firewall did not run.');
+    }
+
+    public static function provideLazyFirewallOnStatelessRequest(): iterable
+    {
+        yield 'stateless request, lazy firewall not triggered' => [true, false, false, true];
+        yield 'stateless request, firewall already run' => [true, false, true, false];
+        yield 'stateless request, stateless firewall' => [true, true, false, false];
+        yield 'stateful request, lazy firewall not triggered' => [false, false, false, false];
+    }
+
     #[DataProvider('provideRoles')]
     public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles)
     {

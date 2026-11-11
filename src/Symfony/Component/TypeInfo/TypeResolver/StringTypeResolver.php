@@ -208,19 +208,19 @@ final class StringTypeResolver implements TypeResolverInterface
             }
 
             if ($this->resolves(Refinement::Literal)) {
-                $literal = match (true) {
-                    $node->constExpr instanceof ConstExprStringNode => $node->constExpr->value,
-                    $node->constExpr instanceof ConstExprIntegerNode => self::parseInteger($node->constExpr->value),
-                    $node->constExpr instanceof ConstExprFloatNode => (float) $node->constExpr->value,
-                    default => null,
-                };
+                try {
+                    $literal = match (true) {
+                        $node->constExpr instanceof ConstExprStringNode => $node->constExpr->value,
+                        $node->constExpr instanceof ConstExprIntegerNode => self::parseInteger($node->constExpr->value),
+                        $node->constExpr instanceof ConstExprFloatNode => (float) $node->constExpr->value,
+                        default => null,
+                    };
 
-                if (null !== $literal) {
-                    try {
+                    if (null !== $literal) {
                         return Type::literal($literal);
-                    } catch (InvalidArgumentException $e) {
-                        throw new \DomainException($e->getMessage(), 0, $e);
                     }
+                } catch (\DomainException|InvalidArgumentException) {
+                    // a malformed literal, such as "09" or "1e400", is its builtin type
                 }
             }
 
@@ -292,26 +292,27 @@ final class StringTypeResolver implements TypeResolverInterface
             $type ??= $this->getTypeFromNode($node->type, $typeContext);
 
             if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
-                if (!$this->resolves(Refinement::IntRange) || !$type instanceof BuiltinType || 2 !== \count($node->genericTypes)) {
+                if (!$this->resolves(Refinement::IntRange) || !$type instanceof BuiltinType) {
                     return $type;
                 }
 
-                $min = $this->getIntRangeBound($node->genericTypes[0], 'min', $typeContext);
-                $max = $this->getIntRangeBound($node->genericTypes[1], 'max', $typeContext);
-
-                if (false === $min || false === $max) {
-                    return $type;
-                }
-
-                // the integer limits are no bound at all
-                if ((null === $min || \PHP_INT_MIN === $min) && (null === $max || \PHP_INT_MAX === $max)) {
+                // a malformed range, such as "int<0, 5, 9>" or "int<5, 1>", is its builtin type
+                if (2 !== \count($node->genericTypes)) {
                     return $type;
                 }
 
                 try {
+                    $min = $this->getIntRangeBound($node->genericTypes[0], 'min', $typeContext);
+                    $max = $this->getIntRangeBound($node->genericTypes[1], 'max', $typeContext);
+
+                    // the integer limits are no bound at all
+                    if ((null === $min || \PHP_INT_MIN === $min) && (null === $max || \PHP_INT_MAX === $max)) {
+                        return $type;
+                    }
+
                     return Type::intRange($min, $max);
-                } catch (InvalidArgumentException $e) {
-                    throw new \DomainException($e->getMessage(), 0, $e);
+                } catch (\DomainException|InvalidArgumentException) {
+                    return $type;
                 }
             }
 
@@ -619,9 +620,9 @@ final class StringTypeResolver implements TypeResolverInterface
     }
 
     /**
-     * @return int|false|null the bound, null when unbounded, or false when it is a constant that cannot be resolved
+     * @return int|null the bound, or null when unbounded
      */
-    private function getIntRangeBound(TypeNode $node, string $unboundedKeyword, ?TypeContext $typeContext): int|false|null
+    private function getIntRangeBound(TypeNode $node, string $unboundedKeyword, ?TypeContext $typeContext): ?int
     {
         if ($node instanceof ConstTypeNode && $node->constExpr instanceof ConstExprIntegerNode) {
             return self::parseInteger($node->constExpr->value);
@@ -635,7 +636,7 @@ final class StringTypeResolver implements TypeResolverInterface
 
         if ($node instanceof ConstTypeNode && $node->constExpr instanceof ConstFetchNode && !str_contains($node->constExpr->name, '*')) {
             if (null === $className = $this->getConstantClassName($node->constExpr, $typeContext)) {
-                return false;
+                throw new \DomainException(\sprintf('Cannot find the class of the "%s" integer range bound.', $node));
             }
 
             // reflection reads private and protected constants as well
@@ -645,9 +646,8 @@ final class StringTypeResolver implements TypeResolverInterface
 
             try {
                 $value = $constant->getValue();
-            } catch (\Error) {
-                // its value may depend on a class that is not installed
-                return false;
+            } catch (\Error $e) {
+                throw new \DomainException(\sprintf('Cannot evaluate the "%s" integer range bound: %s', $node, $e->getMessage()), 0, $e);
             }
         } elseif ($node instanceof IdentifierTypeNode && !\in_array($node->name, ['min', 'max'], true)) {
             $name = $node->name;
@@ -660,9 +660,8 @@ final class StringTypeResolver implements TypeResolverInterface
                 $name = $typeContext->namespace.'\\'.$name;
             }
 
-            // the constant may be defined by code that has not run yet
             if (!\defined($name)) {
-                return false;
+                throw new \DomainException(\sprintf('No "%s" constant found.', $name));
             }
 
             $value = \constant($name);

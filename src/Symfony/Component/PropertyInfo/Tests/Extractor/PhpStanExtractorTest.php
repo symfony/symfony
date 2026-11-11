@@ -648,6 +648,13 @@ class PhpStanExtractorTest extends TestCase
         $this->assertEquals(Type::int(), (new PhpStanExtractor())->getType(IntRangeDummy::class, 'a'));
     }
 
+    public function testMalformedRefinementsGiveTheTypeWithoutRefinements()
+    {
+        $this->assertEquals(Type::int(), $this->extractor->getType(IntRangeDummy::class, 'malformed'));
+        $this->assertEquals(Type::list(Type::int()), $this->extractor->getType(IntRangeDummy::class, 'invertedInList'));
+        $this->assertEquals(Type::int(), $this->extractor->getType(IntRangeDummy::class, 'missingBound'));
+    }
+
     public function testDoNotResolveRefinementsTheResolverDoesNotResolve()
     {
         $extractor = new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], false));

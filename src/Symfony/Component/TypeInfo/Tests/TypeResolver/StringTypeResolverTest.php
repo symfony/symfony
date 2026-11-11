@@ -494,8 +494,6 @@ class StringTypeResolverTest extends TestCase
         yield [Type::literal(1), '+1'];
         yield [Type::intRange(1, 10), 'int<+1, 10>'];
         yield [Type::literal(16), '+0x10'];
-        yield [Type::int(), 'int<0>'];
-        yield [Type::int(), 'int<0, 5, 9>'];
     }
 
     #[DataProvider('resolveIntRangeWithConstantBoundDataProvider')]
@@ -519,10 +517,6 @@ class StringTypeResolverTest extends TestCase
         yield [Type::intRange(0, 1), 'int<0, '.DummyWithConstants::class.'::DUMMY_INT_A>'];
         yield [Type::intRange(1, null), 'int<self::DUMMY_INT_A, max>', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
         yield [Type::intRange(1, 10), 'int<self::MIN, self::MAX>', $typeContextFactory->createFromClassName(DummyWithRangeConstants::class)];
-        yield [Type::int(), 'int<0, UNDEFINED_CONSTANT>'];
-        // "string" reads as a constant name
-        yield [Type::int(), 'int<0, string>'];
-        yield [Type::int(), 'int<0, '.DummyWithRangeConstants::class.'::BROKEN>'];
     }
 
     public function testResolveIntRangeWithNamespacedConstantBound()
@@ -541,35 +535,41 @@ class StringTypeResolverTest extends TestCase
         $this->assertEquals(Type::int(), $this->resolver->resolve('int<0, SymfonyTypeInfoRangeBound\\MAX>', $typeContext));
     }
 
-    #[DataProvider('invalidRefinementDataProvider')]
-    public function testCannotResolveInvalidRefinement(string $string)
+    #[DataProvider('malformedRefinementDataProvider')]
+    public function testResolveMalformedRefinementToItsBuiltinType(Type $expectedType, string $string)
     {
-        $this->expectException(UnsupportedException::class);
-
-        $this->resolver->resolve($string);
+        $this->assertEquals($expectedType, $this->resolver->resolve($string));
     }
 
     /**
-     * @return iterable<array{0: string}>
+     * @return iterable<array{0: Type, 1: string}>
      */
-    public static function invalidRefinementDataProvider(): iterable
+    public static function malformedRefinementDataProvider(): iterable
     {
-        yield ['int<5, 1>'];
-        yield ["int<'a', 5>"];
-        yield ['int<max, 5>'];
-        yield ['9223372036854775808'];
-        yield ['0x8000000000000000'];
-        yield ['-9223372036854775809'];
-        yield ['-0x8000000000000001'];
-        yield ['09'];
-        yield ['-0129'];
-        yield ['int<09, 10>'];
-        yield ['1e400'];
-        yield ['-1e400'];
-        yield ['int<0, PHP_VERSION>'];
-        yield ['int<0, '.DummyWithConstants::class.'::DUMMY_STRING_A>'];
-        yield ['int<0, '.DummyWithConstants::class.'::UNDEFINED>'];
-        yield ['int<0, UndefinedClass::MAX>'];
+        yield [Type::int(), 'int<5, 1>'];
+        yield [Type::int(), "int<'a', 5>"];
+        yield [Type::int(), 'int<0>'];
+        yield [Type::int(), 'int<0, 5, 9>'];
+        // "string" reads as a constant name
+        yield [Type::int(), 'int<0, string>'];
+        yield [Type::int(), 'int<0, UNDEFINED_CONSTANT>'];
+        yield [Type::int(), 'int<0, '.DummyWithRangeConstants::class.'::BROKEN>'];
+        yield [Type::int(), 'int<max, 5>'];
+        yield [Type::int(), '9223372036854775808'];
+        yield [Type::int(), '0x8000000000000000'];
+        yield [Type::int(), '-9223372036854775809'];
+        yield [Type::int(), '-0x8000000000000001'];
+        yield [Type::int(), '09'];
+        yield [Type::int(), '-0129'];
+        yield [Type::int(), 'int<09, 10>'];
+        yield [Type::float(), '1e400'];
+        yield [Type::float(), '-1e400'];
+        yield [Type::int(), 'int<0, PHP_VERSION>'];
+        yield [Type::int(), 'int<0, '.DummyWithConstants::class.'::DUMMY_STRING_A>'];
+        yield [Type::int(), 'int<0, '.DummyWithConstants::class.'::UNDEFINED>'];
+        yield [Type::int(), 'int<0, UndefinedClass::MAX>'];
+        yield [Type::list(Type::int()), 'list<int<5, 1>>'];
+        yield [Type::union(Type::literal('a'), Type::int()), "'a'|int<5, 1>"];
     }
 
     #[DataProvider('disabledRefinementDataProvider')]
@@ -599,11 +599,13 @@ class StringTypeResolverTest extends TestCase
         yield [Type::array(Type::string(), Type::string()), "array<'en'|'de', string>"];
         yield [Type::list(Type::int()), 'list<positive-int>'];
 
-        // rejected when refinements are resolved
+        // malformed when refinements are resolved
         yield [Type::int(), 'int<5, 1>'];
         yield [Type::int(), "int<'a', 5>"];
         yield [Type::float(), '1e400'];
         yield [Type::int(), '09'];
+        yield [Type::int(), 'int<0>'];
+        yield [Type::int(), 'int<0, UNDEFINED_CONSTANT>'];
     }
 
     #[Group('legacy')]

@@ -52,7 +52,7 @@ class TypeInfoBundle extends AbstractBundle
                     ->info(\sprintf('The PHPDoc refinements to resolve instead of their builtin type (%s), true for all of them, including those added later, or false for none. Not setting it is deprecated since Symfony 8.2, all refinements will be resolved by default as of 9.0.', $refinements))
                     ->defaultNull()
                     ->validate()
-                        ->ifTrue(static fn (mixed $refinements): bool => null !== $refinements && !\is_bool($refinements) && (!\is_array($refinements) || !array_is_list($refinements) || array_any($refinements, static fn (mixed $refinement): bool => !\is_string($refinement) || null === Refinement::tryFrom($refinement))))
+                        ->ifTrue(static fn (mixed $refinements): bool => null !== $refinements && !\is_bool($refinements) && (!\is_array($refinements) || !array_is_list($refinements) || array_any($refinements, static fn (mixed $refinement): bool => !$refinement instanceof Refinement && (!\is_string($refinement) || null === Refinement::tryFrom($refinement)))))
                         ->thenInvalid(\sprintf('The "refinements" option must be a boolean or a list of %s, %%s given.', $refinements))
                     ->end()
                 ->end()
@@ -74,7 +74,7 @@ class TypeInfoBundle extends AbstractBundle
                 trigger_deprecation('symfony/type-info', '8.2', 'Not setting the "type_info.refinements" option is deprecated; all PHPDoc refinements will be resolved by default in 9.0. Set it to true to resolve them now, or to false to keep their builtin types.');
             }
 
-            $refinements = \is_array($config['refinements']) ? array_map(Refinement::from(...), $config['refinements']) : $config['refinements'] ?? false;
+            $refinements = \is_array($config['refinements']) ? array_map(static fn (Refinement|string $refinement): Refinement => $refinement instanceof Refinement ? $refinement : Refinement::from($refinement), $config['refinements']) : $config['refinements'] ?? false;
 
             $container->register('type_info.resolver.string', StringTypeResolver::class)
                 ->setArguments([null, null, $config['aliases'], $refinements]);

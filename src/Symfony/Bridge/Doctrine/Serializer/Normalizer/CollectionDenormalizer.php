@@ -153,7 +153,7 @@ final class CollectionDenormalizer implements DenormalizerInterface, Denormalize
     }
 
     /**
-     * @return list<string>
+     * @return list<'int'|'string'>
      */
     private static function getKeyTypeIdentifiers(mixed $keyType): array
     {
@@ -161,21 +161,27 @@ final class CollectionDenormalizer implements DenormalizerInterface, Denormalize
             return [];
         }
 
-        // a refined key, such as "positive-int" or "'en'|'de'", is validated against its builtin type; the lowest symfony/type-info has no refinements to remove
-        if (method_exists($keyType, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
-            $keyType = $keyType->withoutRefinements();
+        // a template key is checked against its bound, and a refined one, such as "positive-int" or "'en'|'de'", against its builtin type
+        while ($keyType instanceof WrappingTypeInterface && !$keyType instanceof UnionType) {
+            $keyType = $keyType->getWrappedType();
         }
 
-        $identifiers = [];
+        if ($keyType instanceof UnionType) {
+            $typeIdentifiers = [];
+            foreach ($keyType->getTypes() as $t) {
+                // a member that is not checked accepts any key
+                if (!$identifiers = self::getKeyTypeIdentifiers($t)) {
+                    return [];
+                }
 
-        foreach ($keyType instanceof UnionType ? $keyType->getTypes() : [$keyType] as $t) {
-            // only int and string keys can be validated this way, any other key type is left as is
-            if ($t instanceof BuiltinType && \in_array($t->getTypeIdentifier(), [TypeIdentifier::INT, TypeIdentifier::STRING], true)) {
-                $identifiers[] = $t->getTypeIdentifier()->value;
+                $typeIdentifiers = [...$typeIdentifiers, ...$identifiers];
             }
+
+            return array_values(array_unique($typeIdentifiers));
         }
 
-        return $identifiers;
+        // only int and string keys are checked, any other key type, such as "mixed" for an unbound template, is left as is
+        return $keyType instanceof BuiltinType && \in_array($keyType->getTypeIdentifier(), [TypeIdentifier::INT, TypeIdentifier::STRING], true) ? [$keyType->getTypeIdentifier()->value] : [];
     }
 
     /**

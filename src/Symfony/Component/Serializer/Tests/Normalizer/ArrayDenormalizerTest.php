@@ -87,6 +87,17 @@ class ArrayDenormalizerTest extends TestCase
         $denormalizer->denormalize(['b' => 'c'], 'string[]', null, ['key_type' => Type::template('TKey', Type::int())]);
     }
 
+    public function testDenormalizeDoesNotCheckUnionKeyWithUncheckableMember()
+    {
+        $nestedDenormalizer = $this->createStub(DenormalizerInterface::class);
+        $nestedDenormalizer->method('denormalize')->willReturnArgument(0);
+
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($nestedDenormalizer);
+
+        $this->assertSame(['b' => 'c'], $denormalizer->denormalize(['b' => 'c'], 'string[]', null, ['key_type' => Type::union(Type::int(), Type::template('TKey'))]));
+    }
+
     public function testDenormalizeRejectsRefinedKeyOfAnotherBuiltinType()
     {
         $denormalizer = new ArrayDenormalizer();

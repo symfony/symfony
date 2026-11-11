@@ -172,6 +172,24 @@ class CollectionDenormalizerTest extends TestCase
         $serializer->denormalize(['foo' => 'bar'], Collection::class, 'json', ['key_type' => Type::int(), 'value_type' => Type::string()]);
     }
 
+    public function testDenormalizeChecksTemplateKeyAgainstItsBound()
+    {
+        $serializer = $this->createSerializer();
+
+        $this->assertSame(['foo' => 'bar'], $serializer->denormalize(['foo' => 'bar'], Collection::class, 'json', ['key_type' => Type::template('TKey'), 'value_type' => Type::string()])->toArray());
+
+        $this->expectException(NotNormalizableValueException::class);
+
+        $serializer->denormalize(['foo' => 'bar'], Collection::class, 'json', ['key_type' => Type::template('TKey', Type::int()), 'value_type' => Type::string()]);
+    }
+
+    public function testDenormalizeDoesNotCheckUnionKeyWithUncheckableMember()
+    {
+        $collection = $this->createSerializer()->denormalize(['foo' => 'bar'], Collection::class, 'json', ['key_type' => Type::union(Type::int(), Type::template('TKey')), 'value_type' => Type::string()]);
+
+        $this->assertSame(['foo' => 'bar'], $collection->toArray());
+    }
+
     #[DataProvider('provideRefinedKeyTypes')]
     public function testDenormalizeRejectsAnInvalidRefinedKeyType(\Closure $keyType, array $data)
     {

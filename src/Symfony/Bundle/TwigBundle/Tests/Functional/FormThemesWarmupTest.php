@@ -112,6 +112,7 @@ class FormThemesWarmupKernel extends Kernel
             $container
                 ->loadFromExtension('framework', [
                     'secret' => '$ecret',
+                    'type_info' => ['refinements' => true],
                     'csrf_protection' => false,
                     'form' => ['enabled' => true, 'csrf_protection' => false],
                 ])

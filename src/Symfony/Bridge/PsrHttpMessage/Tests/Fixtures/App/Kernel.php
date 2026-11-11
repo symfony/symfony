@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Kernel as SymfonyKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\TypeInfo\Refinement;
 
 class Kernel extends SymfonyKernel
 {
@@ -49,6 +50,8 @@ class Kernel extends SymfonyKernel
         $container->extension('framework', [
             'secret' => 'for your eyes only',
             'test' => true,
+            // the lowest symfony/framework-bundle has no refinements to configure
+            ...(class_exists(Refinement::class) ? ['type_info' => ['refinements' => true]] : []),
         ]);
 
         $container->services()

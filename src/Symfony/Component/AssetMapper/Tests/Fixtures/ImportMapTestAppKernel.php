@@ -35,6 +35,7 @@ class ImportMapTestAppKernel extends Kernel
     {
         $loader->load(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
+                'type_info' => ['refinements' => true],
                 'http_client' => true,
                 'assets' => null,
                 'asset_mapper' => [

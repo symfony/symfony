@@ -100,6 +100,6 @@ class FlexStyleMicroKernel extends Kernel
                 ->factory([$this, 'createHalloween'])
                 ->arg('$halloween', '%halloween%');
 
-        $c->extension('framework', []);
+        $c->extension('framework', ['type_info' => ['refinements' => true]]);
     }
 }

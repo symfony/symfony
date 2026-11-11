@@ -187,7 +187,7 @@ class MicroKernelTraitTest extends TestCase
 
             protected function configureContainer(ContainerConfigurator $c): void
             {
-                $c->extension('framework', []);
+                $c->extension('framework', ['type_info' => ['refinements' => true]]);
                 $c->services()->set('logger', NullLogger::class);
             }
 
@@ -405,7 +405,7 @@ class DebugWarmupKernel extends Kernel
 
     protected function configureContainer(ContainerConfigurator $c): void
     {
-        $c->extension('framework', ['http_method_override' => false, 'handle_all_throwables' => true]);
+        $c->extension('framework', ['http_method_override' => false, 'handle_all_throwables' => true, 'type_info' => ['refinements' => true]]);
         $c->services()->set('logger', NullLogger::class);
     }
 

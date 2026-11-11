@@ -147,11 +147,11 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
             },
             $constraint instanceof Length => [...$schema, ...array_filter(['minLength' => $constraint->min, 'maxLength' => $constraint->max], self::isSet(...))],
             $constraint instanceof Count => [...$schema, ...array_filter(['minItems' => $constraint->min, 'maxItems' => $constraint->max], self::isSet(...))],
-            $constraint instanceof Range => [...$schema, ...array_filter(['minimum' => $constraint->min, 'maximum' => $constraint->max], self::isNumber(...))],
-            $constraint instanceof GreaterThan => self::isNumber($constraint->value) && null === $constraint->propertyPath ? [...$schema, ...$dialect->exclusiveMinimum($constraint->value)] : $schema,
-            $constraint instanceof GreaterThanOrEqual => self::isNumber($constraint->value) && null === $constraint->propertyPath ? [...$schema, 'minimum' => $constraint->value] : $schema,
-            $constraint instanceof LessThan => self::isNumber($constraint->value) && null === $constraint->propertyPath ? [...$schema, ...$dialect->exclusiveMaximum($constraint->value)] : $schema,
-            $constraint instanceof LessThanOrEqual => self::isNumber($constraint->value) && null === $constraint->propertyPath ? [...$schema, 'maximum' => $constraint->value] : $schema,
+            $constraint instanceof Range => self::withBound(self::withBound($schema, 'minimum', $constraint->min, false, $dialect), 'maximum', $constraint->max, false, $dialect),
+            $constraint instanceof GreaterThan => null === $constraint->propertyPath ? self::withBound($schema, 'minimum', $constraint->value, true, $dialect) : $schema,
+            $constraint instanceof GreaterThanOrEqual => null === $constraint->propertyPath ? self::withBound($schema, 'minimum', $constraint->value, false, $dialect) : $schema,
+            $constraint instanceof LessThan => null === $constraint->propertyPath ? self::withBound($schema, 'maximum', $constraint->value, true, $dialect) : $schema,
+            $constraint instanceof LessThanOrEqual => null === $constraint->propertyPath ? self::withBound($schema, 'maximum', $constraint->value, false, $dialect) : $schema,
             $constraint instanceof DivisibleBy => self::isNumber($constraint->value) && 0 != $constraint->value && null === $constraint->propertyPath ? [...$schema, 'multipleOf' => abs($constraint->value)] : $schema,
             $constraint instanceof Regex => $constraint->match && null !== ($pattern = $constraint->getHtmlPattern()) ? [...$schema, 'pattern' => '^('.$pattern.')$'] : $schema,
             $constraint instanceof Choice => $this->applyChoice($constraint, $schema),
@@ -203,6 +203,48 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
             },
             ...array_filter(['minItems' => $constraint->min, 'maxItems' => $constraint->max], self::isSet(...)),
         ];
+    }
+
+    /**
+     * Keeps the stricter of the bound already in the schema, such as that of an integer range, and the given one.
+     *
+     * @param array<string, mixed> $schema
+     * @param 'minimum'|'maximum'  $keyword
+     *
+     * @return array<string, mixed>
+     */
+    private static function withBound(array $schema, string $keyword, mixed $value, bool $exclusive, Dialect $dialect): array
+    {
+        if (!self::isNumber($value)) {
+            return $schema;
+        }
+
+        $exclusiveKeyword = 'minimum' === $keyword ? 'exclusiveMinimum' : 'exclusiveMaximum';
+        $isStricter = 'minimum' === $keyword ? static fn ($bound, $than): bool => $bound > $than : static fn ($bound, $than): bool => $bound < $than;
+
+        // the current bound is inclusive, exclusive through a boolean flag (OpenAPI 3.0), or exclusive through its own number
+        $current = $schema[$keyword] ?? null;
+        $currentIsExclusive = self::isNumber($current) && true === ($schema[$exclusiveKeyword] ?? null);
+        if (self::isNumber($schema[$exclusiveKeyword] ?? null) && (!self::isNumber($current) || !$isStricter($current, $schema[$exclusiveKeyword]))) {
+            $current = $schema[$exclusiveKeyword];
+            $currentIsExclusive = true;
+        }
+
+        if (self::isNumber($current) && ($isStricter($current, $value) || ($current == $value && ($currentIsExclusive || !$exclusive)))) {
+            return $schema;
+        }
+
+        unset($schema[$exclusiveKeyword]);
+
+        if (!$exclusive) {
+            $schema[$keyword] = $value;
+
+            return $schema;
+        }
+
+        unset($schema[$keyword]);
+
+        return [...$schema, ...('minimum' === $keyword ? $dialect->exclusiveMinimum($value) : $dialect->exclusiveMaximum($value))];
     }
 
     private static function isSet(mixed $value): bool

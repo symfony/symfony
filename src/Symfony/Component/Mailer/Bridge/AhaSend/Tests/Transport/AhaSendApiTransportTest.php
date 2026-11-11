@@ -79,7 +79,7 @@ class AhaSendApiTransportTest extends TestCase
             $this->assertSame('<html lang="en"><body><p>Test email body</p></body></html>', $body['content']['html_body']);
             $this->assertSame('bar2@example.com', $body['content']['reply_to']['email']);
             $this->assertSame('Mr. Recipient', $body['content']['reply_to']['name']);
-            $this->assertSame('baz@example.com', $body['content']['headers']['Bcc']);
+            $this->assertArrayNotHasKey('Bcc', $body['content']['headers'] ?? []);
 
             return new JsonMockResponse([
                 'success_count' => 3,
@@ -148,6 +148,19 @@ class AhaSendApiTransportTest extends TestCase
         $this->assertArrayHasKey('headers', $payload['content']);
         $this->assertArrayHasKey('foo', $payload['content']['headers']);
         $this->assertEquals('bar', $payload['content']['headers']['foo']);
+    }
+
+    public function testBccHeaderIsNotSentWhateverTheCaseOfItsName()
+    {
+        $email = (new Email())->from('foo@example.com')->to('bar@example.com')->text('content');
+        $email->getHeaders()->addMailboxListHeader('BCC', ['baz@example.com']);
+
+        $transport = new AhaSendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(AhaSendApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, Envelope::create($email));
+
+        $this->assertSame(['bar@example.com', 'baz@example.com'], array_column($payload['recipients'], 'email'));
+        $this->assertArrayNotHasKey('headers', $payload['content']);
     }
 
     public function testReplyTo()

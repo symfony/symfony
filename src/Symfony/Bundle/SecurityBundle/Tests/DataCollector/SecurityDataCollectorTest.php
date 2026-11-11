@@ -85,7 +85,7 @@ class SecurityDataCollectorTest extends TestCase
     {
         $tokenStorage = new TokenStorage();
         $initialized = false;
-        $tokenStorage->setInitializer(function () use (&$initialized) {
+        $tokenStorage->setInitializer(static function () use (&$initialized) {
             $initialized = true;
         });
 

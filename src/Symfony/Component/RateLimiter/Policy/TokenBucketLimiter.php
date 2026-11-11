@@ -84,7 +84,7 @@ final class TokenBucketLimiter implements LimiterInterface
                     $retryAfter = $bucket->getTimer() + $this->rate->calculateTimeForTokens(1);
                 }
 
-                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp($availableTokens === $tokens ? ceil($retryAfter) : floor($retryAfter)), true, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now)));
+                $reservation = new Reservation($now, new RateLimit($bucket->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp($availableTokens === $tokens ? ceil($retryAfter) : floor($retryAfter)), true, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now, $bucket->getTimer())));
             } else {
                 // peeking with 0 tokens tells when the next token is available
                 $remainingTokens = max(1, $tokens) - $availableTokens;
@@ -92,7 +92,7 @@ final class TokenBucketLimiter implements LimiterInterface
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
-                    $rateLimit = new RateLimit($availableTokens, \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens, $now));
+                    $rateLimit = new RateLimit($availableTokens, \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens, $now, $bucket->getTimer()));
 
                     throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), $rateLimit);
                 }
@@ -101,7 +101,7 @@ final class TokenBucketLimiter implements LimiterInterface
                 // so no tokens are left for other processes.
                 $bucket->setTokens($availableTokens - $tokens);
 
-                $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now)));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromTimestamp(ceil($now + $waitDuration)), false, $this->maxBurst, $this->resetAt($availableTokens - $tokens, $now, $bucket->getTimer())));
             }
 
             if (0 !== $tokens) {
@@ -123,12 +123,13 @@ final class TokenBucketLimiter implements LimiterInterface
         }
     }
 
-    private function resetAt(int $availableTokens, float $now): \DateTimeImmutable
+    private function resetAt(int $availableTokens, float $now, float $timer): \DateTimeImmutable
     {
         if ($availableTokens >= $this->maxBurst) {
             return \DateTimeImmutable::createFromTimestamp((int) $now);
         }
 
-        return \DateTimeImmutable::createFromTimestamp((int) ceil($now + $this->rate->calculateTimeForTokens($this->maxBurst - $availableTokens)));
+        // the bucket refills at whole intervals from its timer, not from now
+        return \DateTimeImmutable::createFromTimestamp((int) ceil($timer + $this->rate->calculateTimeForTokens($this->maxBurst - $availableTokens)));
     }
 }

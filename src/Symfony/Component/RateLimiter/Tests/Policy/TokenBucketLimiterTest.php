@@ -398,6 +398,19 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertEquals(70, $limiter->reserve(10)->getWaitDuration());
     }
 
+    public function testResetTimeIsCountedFromTheLastRefill()
+    {
+        ClockMock::withClockMock(1729990800.0);
+        $limiter = $this->createLimiter(10, Rate::perMinute(10));
+        $limiter->consume(5);
+
+        sleep(50);
+
+        $this->assertSame(1729990860, $limiter->consume(5)->getResetAt()->getTimestamp());
+        $this->assertSame(1729990860, $limiter->consume()->getResetAt()->getTimestamp());
+        $this->assertSame(1729990920, $limiter->reserve(10)->getRateLimit()->getResetAt()->getTimestamp());
+    }
+
     public function testConsumeIsAcceptedAfterWaitingForTheRetryAfter()
     {
         ClockMock::withClockMock(1729990800.0);

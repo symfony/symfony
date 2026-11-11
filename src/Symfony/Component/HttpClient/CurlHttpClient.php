@@ -239,7 +239,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
         if (!\is_string($body)) {
             if (\is_resource($body)) {
-                $curlopts[\CURLOPT_READDATA] = $body;
+                // curl reads php://temp and php://memory through a copy that ignores where the stream was moved, so read it through PHP
+                $curlopts[\CURLOPT_READFUNCTION] = static fn ($ch, $fd, $length) => false !== ($data = fread($body, $length)) ? $data : '';
             } else {
                 $curlopts[\CURLOPT_READFUNCTION] = static function ($ch, $fd, $length) use ($body) {
                     static $eof = false;

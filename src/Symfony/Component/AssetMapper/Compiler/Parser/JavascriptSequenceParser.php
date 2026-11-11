@@ -167,7 +167,7 @@ final class JavascriptSequenceParser
     }
 
     /**
-     * @param int<self::STATE_*> $type
+     * @param self::STATE_* $type
      */
     private function endsWithSequence(int $type, int $cursor): void
     {
@@ -177,7 +177,7 @@ final class JavascriptSequenceParser
     }
 
     /**
-     * @param int<self::STATE_*> $type
+     * @param self::STATE_* $type
      */
     private function setSequence(int $type, ?int $end = null): void
     {

@@ -220,6 +220,16 @@ class HttpClientTraitTest extends TestCase
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foo', 'auth_basic' => 'foo:bar'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
+    public function testNullAuthNtlmOptionWithoutNtlmSupport()
+    {
+        [, $options] = self::prepareRequest('GET', 'http://example.com', ['auth_ntlm' => null], HttpClientInterface::OPTIONS_DEFAULTS);
+        $this->assertNull($options['auth_ntlm']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "auth_ntlm" is not supported by');
+        self::prepareRequest('GET', 'http://example.com', ['auth_ntlm' => 'foo:bar'], HttpClientInterface::OPTIONS_DEFAULTS);
+    }
+
     public function testSetJSONAndBodyOptions()
     {
         $this->expectException(InvalidArgumentException::class);

@@ -13,12 +13,16 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DnsMock;
+use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpClient\TraceableHttpClient;
+use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class NoPrivateNetworkHttpClientTest extends TestCase
@@ -234,6 +238,107 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $this->assertSame('kept', $headers['x-custom']);
         $this->assertArrayNotHasKey('authorization', $headers);
         $this->assertArrayNotHasKey('cookie', $headers);
+    }
+
+    /**
+     * @requires extension openssl
+     */
+    public function testRedirectToADifferentSchemeDropsTheDefaultCredentialsOfTheDecoratedClient()
+    {
+        TestRedirectServer::start();
+        $client = new NoPrivateNetworkHttpClient(new NativeHttpClient([
+            'auth_bearer' => 'foo',
+            'headers' => ['Cookie' => 'a=b', 'X-Custom' => 'kept'],
+        ]), '10.0.0.0/8');
+
+        $response = $client->request('GET', 'https://127.0.0.1:8059/', [
+            'verify_peer' => false,
+            'verify_host' => false,
+        ]);
+        $headers = $response->toArray();
+
+        $this->assertSame('http://127.0.0.1:8059/', $response->getInfo('url'));
+        $this->assertSame('kept', $headers['x-custom']);
+        $this->assertArrayNotHasKey('authorization', $headers);
+        $this->assertArrayNotHasKey('cookie', $headers);
+    }
+
+    public function testRedirectToAnotherOriginDropsDefaultCredentials()
+    {
+        $requests = [];
+        $mockClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests) {
+            $requests[] = [$url, $options['normalized_headers']['authorization'][0] ?? null, $options['normalized_headers']['cookie'][0] ?? null, $options['auth_ntlm'] ?? null];
+
+            switch (\count($requests) % 4) {
+                case 1: return new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://104.26.14.6/same-origin']);
+                case 2: return new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://104.26.14.7/other-origin']);
+                case 3: return new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://104.26.14.6/back']);
+                default: return new MockResponse('OK');
+            }
+        });
+
+        $client = new NoPrivateNetworkHttpClient($mockClient->withOptions([
+            'auth_basic' => 'foo:bar',
+            'headers' => ['Cookie' => 'a=b'],
+            'auth_ntlm' => 'foo:bar',
+        ]));
+        $client->request('GET', 'https://104.26.14.6/')->getContent();
+
+        $client = (new NoPrivateNetworkHttpClient($mockClient))->withOptions([
+            'auth_bearer' => 'foo',
+            'headers' => ['Cookie' => 'a=b'],
+        ]);
+        $client->request('GET', 'https://104.26.14.6/')->getContent();
+
+        $client = new NoPrivateNetworkHttpClient(new TraceableHttpClient($mockClient->withOptions(['headers' => ['Authorization' => 'Bearer foo']])));
+        $client->request('GET', 'https://104.26.14.6/', ['auth_ntlm' => 'foo:bar'])->getContent();
+
+        $this->assertSame([
+            ['https://104.26.14.6/', 'Authorization: Basic Zm9vOmJhcg==', 'Cookie: a=b', 'foo:bar'],
+            ['https://104.26.14.6/same-origin', 'Authorization: Basic Zm9vOmJhcg==', 'Cookie: a=b', 'foo:bar'],
+            ['https://104.26.14.7/other-origin', null, null, null],
+            ['https://104.26.14.6/back', 'Authorization: Basic Zm9vOmJhcg==', 'Cookie: a=b', 'foo:bar'],
+            ['https://104.26.14.6/', 'Authorization: Bearer foo', 'Cookie: a=b', null],
+            ['https://104.26.14.6/same-origin', 'Authorization: Bearer foo', 'Cookie: a=b', null],
+            ['https://104.26.14.7/other-origin', null, null, null],
+            ['https://104.26.14.6/back', 'Authorization: Bearer foo', 'Cookie: a=b', null],
+            ['https://104.26.14.6/', 'Authorization: Bearer foo', null, 'foo:bar'],
+            ['https://104.26.14.6/same-origin', 'Authorization: Bearer foo', null, 'foo:bar'],
+            ['https://104.26.14.7/other-origin', null, null, null],
+            ['https://104.26.14.6/back', 'Authorization: Bearer foo', null, 'foo:bar'],
+        ], $requests);
+    }
+
+    public function testRedirectToAnotherOriginDropsDefaultCredentialsBehindOtherDecorators()
+    {
+        $requests = [];
+        $mockClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests) {
+            $requests[] = [$url, $options['normalized_headers']['authorization'][0] ?? null, $options['normalized_headers']['cookie'][0] ?? null, $options['auth_ntlm'] ?? null];
+
+            return 1 === \count($requests) % 2 ? new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://104.26.14.7/other-origin']) : new MockResponse('OK');
+        });
+        $mockClient = $mockClient->withOptions([
+            'auth_bearer' => 'foo',
+            'headers' => ['Cookie' => 'a=b'],
+            'auth_ntlm' => 'foo:bar',
+        ]);
+
+        $decorators = [
+            new ScopingHttpClient($mockClient, ['https://104\.26\.14\.7/' => ['headers' => ['X-Scope' => 'b']]]),
+            new CachingHttpClient($mockClient, $this->createMock(StoreInterface::class)),
+            new NoPrivateNetworkHttpClient($mockClient),
+            new NoPrivateNetworkHttpClient(new ScopingHttpClient($mockClient, ['https://104\.26\.14\.7/' => []])),
+        ];
+
+        foreach ($decorators as $decorator) {
+            $client = new NoPrivateNetworkHttpClient($decorator);
+            $client->request('GET', 'https://104.26.14.6/', ['extra' => ['no_cache' => true]])->getContent();
+        }
+
+        $this->assertSame(array_merge(...array_fill(0, 4, [
+            ['https://104.26.14.6/', 'Authorization: Bearer foo', 'Cookie: a=b', 'foo:bar'],
+            ['https://104.26.14.7/other-origin', null, null, null],
+        ])), $requests);
     }
 
     public function testRedirectDoesNotRepeatTheQueryOption()

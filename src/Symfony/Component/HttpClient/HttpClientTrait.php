@@ -13,8 +13,8 @@ namespace Symfony\Component\HttpClient;
 
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\ArrayBodyCaster;
 use Symfony\Component\HttpClient\Internal\Dechunker;
-use Symfony\Component\HttpClient\Response\StreamableInterface;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -342,24 +342,13 @@ trait HttpClientTrait
             static $cookie;
 
             $streams = [];
-            array_walk_recursive($body, $caster = static function (&$v) use (&$caster, &$streams, &$cookie) {
-                if (\is_resource($v) || $v instanceof StreamableInterface) {
-                    $cookie = hash('xxh128', $cookie ??= random_bytes(8), true);
-                    $k = substr(strtr(base64_encode($cookie), '+/', '-_'), 0, -2);
-                    $streams[$k] = $v instanceof StreamableInterface ? $v->toStream(false) : $v;
-                    $v = $k;
-                } elseif (\is_object($v)) {
-                    if ($vars = get_object_vars($v)) {
-                        array_walk_recursive($vars, $caster);
-                        $v = $vars;
-                    } elseif ($v instanceof \Stringable) {
-                        $v = (string) $v;
-                    } else {
-                        $v = [];
-                    }
-                }
+            $body = ArrayBodyCaster::cast($body, static function ($stream) use (&$streams, &$cookie) {
+                $cookie = hash('xxh128', $cookie ??= random_bytes(8), true);
+                $k = substr(strtr(base64_encode($cookie), '+/', '-_'), 0, -2);
+                $streams[$k] = $stream;
+
+                return $k;
             });
-            $caster = null;
 
             if ('' === $body = http_build_query($body, '', '&')) {
                 return '';

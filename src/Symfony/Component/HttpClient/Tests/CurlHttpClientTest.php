@@ -40,6 +40,21 @@ class CurlHttpClientTest extends HttpClientTestCase
         return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false], 6, 50);
     }
 
+    public function testPostRewoundResourceAgain()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $h = fopen('php://temp', 'w+');
+        fwrite($h, 'foo=0123456789');
+
+        foreach ([1, 2] as $attempt) {
+            rewind($h);
+            $response = $client->request('POST', 'http://localhost:8057/post', ['body' => $h]);
+
+            $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray(), "Request #{$attempt}");
+        }
+    }
+
     public function testTimeoutIsNotAFatalError()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {

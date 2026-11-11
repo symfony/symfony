@@ -126,6 +126,48 @@ class RememberMeTest extends AbstractWebTestCase
         $this->assertNull($cookieJar->get('REMEMBERME'));
     }
 
+    public function testStatelessRouteDoesNotUseSession()
+    {
+        $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => ['config.yml', 'config_session.yml'], 'debug' => true]);
+        $client->catchExceptions(false);
+
+        $client->request('GET', '/stateless');
+        $this->assertSame('stateless', $client->getResponse()->getContent());
+
+        $client->request('POST', '/login', [
+            '_username' => 'johannes',
+            '_password' => 'test',
+        ]);
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+
+        $client->request('GET', '/stateless');
+        $this->assertSame('stateless', $client->getResponse()->getContent());
+    }
+
+    public function testProfilerDoesNotTriggerLazyFirewallOnStatelessRoute()
+    {
+        $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => 'lazy_config.yml', 'debug' => true]);
+        $client->catchExceptions(false);
+
+        $client->request('POST', '/login', [
+            '_username' => 'johannes',
+            '_password' => 'test',
+        ]);
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+
+        $client->request('GET', '/stateless');
+        $this->assertSame('stateless', $client->getResponse()->getContent());
+
+        $client->getCookieJar()->expire('MOCKSESSID');
+
+        $client->request('GET', '/stateless');
+        $this->assertSame('stateless', $client->getResponse()->getContent());
+        $this->assertFalse($client->getProfile()->getCollector('security')->isAuthenticated());
+
+        $client->request('GET', '/profile');
+        $this->assertSame('johannes', $client->getResponse()->getContent());
+    }
+
     public static function provideConfigs(): iterable
     {
         yield [['root_config' => 'config_session.yml']];

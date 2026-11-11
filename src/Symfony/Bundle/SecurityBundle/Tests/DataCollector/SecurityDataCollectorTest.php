@@ -76,6 +76,41 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertNull($collector->getFirewall());
     }
 
+    public function testCollectDoesNotTriggerLazyFirewallOnStatelessRequest()
+    {
+        $cases = [
+            'stateless request, lazy firewall not triggered' => [true, false, true, false, false],
+            'stateless request, firewall already run' => [true, false, true, true, true],
+            'stateless request, stateless firewall' => [true, true, true, false, true],
+            'stateless request, security disabled' => [true, false, false, false, true],
+            'stateful request, lazy firewall not triggered' => [false, false, true, false, true],
+        ];
+
+        foreach ($cases as $case => [$stateless, $statelessFirewall, $securityEnabled, $firewallRun, $expectedInitialized]) {
+            $initialized = false;
+            $tokenStorage = new TokenStorage();
+            $tokenStorage->setInitializer(static function () use (&$initialized) {
+                $initialized = true;
+            });
+
+            $request = new Request();
+            $request->attributes->set('_stateless', $stateless);
+            if ($firewallRun) {
+                $request->attributes->set('_security_firewall_run', '_security_main');
+            }
+
+            $firewallMap = $this->createStub(FirewallMap::class);
+            $firewallMap->method('getFirewallConfig')->willReturn(new FirewallConfig('main', 'security.user_checker.main', null, $securityEnabled, $statelessFirewall));
+
+            $collector = new SecurityDataCollector($tokenStorage, null, null, null, $firewallMap, null);
+            $collector->collect($request, new Response());
+
+            $this->assertTrue($collector->isEnabled(), $case);
+            $this->assertFalse($collector->isAuthenticated(), $case);
+            $this->assertSame($expectedInitialized, $initialized, $case);
+        }
+    }
+
     /** @dataProvider provideRoles */
     public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles)
     {

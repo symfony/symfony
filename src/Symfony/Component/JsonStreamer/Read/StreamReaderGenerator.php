@@ -69,7 +69,8 @@ final class StreamReaderGenerator
         $generateContent = function () use ($type, $decodeFromStream, $options): string {
             $this->phpGenerator ??= new PhpGenerator($this->transformers);
 
-            return $this->phpGenerator->generate($this->createDataModel($type, $options), $decodeFromStream, $options);
+            // refinements are stripped once where a type enters the data model, here and for each property
+            return $this->phpGenerator->generate($this->createDataModel($type->withoutRefinements(), $options), $decodeFromStream, $options);
         };
 
         $this->dumper->dump($type, $path, $generateContent);
@@ -103,11 +104,6 @@ final class StreamReaderGenerator
 
         if ($type instanceof IntersectionType) {
             throw new UnsupportedException(\sprintf('Intersection types are not supported ("%s").', (string) $type));
-        }
-
-        // the lowest symfony/type-info has no refinements to remove
-        if (method_exists($type, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
-            $type = $type->withoutRefinements();
         }
 
         if ($type instanceof UnionType) {
@@ -163,7 +159,7 @@ final class StreamReaderGenerator
 
                 $propertiesNodes[$streamedName] = [
                     'name' => $propertyMetadata->getName(),
-                    'value' => $this->createDataModel($propertyMetadata->getType(), $options, $context),
+                    'value' => $this->createDataModel($propertyMetadata->getType()->withoutRefinements(), $options, $context),
                     'accessor' => static function (string $accessor) use ($propertyMetadata): string {
                         foreach ($propertyMetadata->getValueTransformers() as $valueTransformer) {
                             if (\is_string($valueTransformer)) {

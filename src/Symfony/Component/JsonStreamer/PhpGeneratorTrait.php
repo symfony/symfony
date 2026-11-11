@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\JsonStreamer;
 
-use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\BuiltinType;
-use Symfony\Component\TypeInfo\TypeIdentifier;
-
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
@@ -60,15 +56,5 @@ trait PhpGeneratorTrait
     private function line(string $line, array $context): string
     {
         return str_repeat('    ', $context['indentation_level']).$line."\n";
-    }
-
-    private static function getCollectionKeyTypeIdentifier(Type $type): ?TypeIdentifier
-    {
-        // the lowest symfony/type-info has no refinements to remove
-        if (method_exists($type, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
-            $type = $type->withoutRefinements();
-        }
-
-        return $type instanceof BuiltinType ? $type->getTypeIdentifier() : null;
     }
 }

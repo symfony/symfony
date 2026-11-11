@@ -69,7 +69,8 @@ final class StreamWriterGenerator
         $generateContent = function () use ($type, $options): string {
             $this->phpGenerator ??= new PhpGenerator($this->transformers);
 
-            return $this->phpGenerator->generate($this->createDataModel($type, '$data', $options), $options);
+            // refinements are stripped once where a type enters the data model, here and for each property
+            return $this->phpGenerator->generate($this->createDataModel($type->withoutRefinements(), '$data', $options), $options);
         };
 
         $this->dumper->dump($type, $path, $generateContent);
@@ -103,11 +104,6 @@ final class StreamWriterGenerator
 
         if ($type instanceof IntersectionType) {
             throw new UnsupportedException(\sprintf('Intersection types are not supported ("%s").', (string) $type));
-        }
-
-        // the lowest symfony/type-info has no refinements to remove
-        if (method_exists($type, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
-            $type = $type->withoutRefinements();
         }
 
         if ($type instanceof UnionType) {
@@ -192,7 +188,7 @@ final class StreamWriterGenerator
                     $propertyAccessor = "$functionName($arguments)";
                 }
 
-                $propertiesNodes[$streamedName] = $this->createDataModel($propertyMetadata->getType(), $propertyAccessor, $options, $context);
+                $propertiesNodes[$streamedName] = $this->createDataModel($propertyMetadata->getType()->withoutRefinements(), $propertyAccessor, $options, $context);
             }
 
             if ($genericType) {

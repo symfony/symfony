@@ -224,7 +224,7 @@ final class PhpGenerator
 
             $collectionKeyType = $dataModelNode->getType()->getCollectionKeyType();
 
-            if (TypeIdentifier::INT === self::getCollectionKeyTypeIdentifier($collectionKeyType)) {
+            if ($collectionKeyType instanceof BuiltinType && TypeIdentifier::INT === $collectionKeyType->getTypeIdentifier()) {
                 $php = $this->appendString('[', $context)
                     .$this->flushBuffer($context)
                     .$this->line('$prefix'.$context['depth'].' = \'\';', $context)

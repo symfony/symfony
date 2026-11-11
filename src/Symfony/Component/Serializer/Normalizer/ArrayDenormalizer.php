@@ -56,16 +56,7 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
 
         $typeIdentifiers = [];
         if (null !== $keyType = ($context['key_type'] ?? null)) {
-            /** @var list<BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>> */
-            $keyTypes = $keyType instanceof UnionType ? $keyType->getTypes() : [$keyType];
-
-            $typeIdentifiers = array_map(static function (Type $t): string {
-                while ($t instanceof WrappingTypeInterface) {
-                    $t = $t->getWrappedType();
-                }
-
-                return $t instanceof BuiltinType ? $t->getTypeIdentifier()->value : (string) $t;
-            }, $keyTypes);
+            $typeIdentifiers = self::getKeyTypeIdentifiers($keyType);
         }
 
         $valueType = $context['value_type'] ?? null;
@@ -126,6 +117,24 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
         }
 
         return true;
+    }
+
+    /**
+     * @return list<'int'|'string'>
+     */
+    private static function getKeyTypeIdentifiers(Type $type): array
+    {
+        // a template key is checked against its bound, and a refined one, such as "positive-int" or "'en'|'de'", against its builtin type
+        while ($type instanceof WrappingTypeInterface && !$type instanceof UnionType) {
+            $type = $type->getWrappedType();
+        }
+
+        if ($type instanceof UnionType) {
+            return array_values(array_unique(array_merge(...array_map(self::getKeyTypeIdentifiers(...), $type->getTypes()))));
+        }
+
+        // only int and string keys are checked, any other key type, such as "mixed" for an unbound template, is left as is
+        return $type instanceof BuiltinType && \in_array($type->getTypeIdentifier(), [TypeIdentifier::INT, TypeIdentifier::STRING], true) ? [$type->getTypeIdentifier()->value] : [];
     }
 
     /**

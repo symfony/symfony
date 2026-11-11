@@ -61,6 +61,12 @@ final class CollectionDenormalizer implements DenormalizerInterface, Denormalize
         }
 
         $valueType = $context['value_type'] ?? null;
+
+        // a refined element, such as "positive-int" or "'draft'|'live'", is validated against its builtin type; the lowest symfony/type-info has no refinements to remove
+        if ($valueType instanceof Type && method_exists($valueType, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+            $valueType = $valueType->withoutRefinements();
+        }
+
         $elementClass = self::getElementClass($valueType);
         $keyTypeIdentifiers = self::getKeyTypeIdentifiers($context['key_type'] ?? null);
         $collectionClass = $this->resolveCollectionClass($type);

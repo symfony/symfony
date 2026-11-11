@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\TypeInfo\Type;
@@ -65,6 +66,36 @@ class ArrayDenormalizerTest extends TestCase
 
         $this->assertSame([1 => 'a'], $denormalizer->denormalize([1 => 'a'], 'string[]', null, ['key_type' => Type::intRange(1, null)]));
         $this->assertSame(['a' => 'b'], $denormalizer->denormalize(['a' => 'b'], 'string[]', null, ['key_type' => Type::union(Type::literal('a'), Type::literal('b'))]));
+        $this->assertSame([-5 => 'a'], $denormalizer->denormalize([-5 => 'a'], 'string[]', null, ['key_type' => Type::intRange(1, null)]));
+    }
+
+    public function testDenormalizeChecksTemplateKeyAgainstItsBound()
+    {
+        $nestedDenormalizer = $this->createStub(DenormalizerInterface::class);
+        $nestedDenormalizer->method('denormalize')->willReturnArgument(0);
+
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($nestedDenormalizer);
+
+        $this->assertSame([3 => 'a'], $denormalizer->denormalize([3 => 'a'], 'string[]', null, ['key_type' => Type::template('TKey', Type::int())]));
+        $this->assertSame([3 => 'a', 'b' => 'c'], $denormalizer->denormalize([3 => 'a', 'b' => 'c'], 'string[]', null, ['key_type' => Type::template('TKey', Type::union(Type::int(), Type::string()))]));
+        $this->assertSame([3 => 'a', 'b' => 'c'], $denormalizer->denormalize([3 => 'a', 'b' => 'c'], 'string[]', null, ['key_type' => Type::template('TKey')]));
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The type of the key "b" must be "int" ("string" given).');
+
+        $denormalizer->denormalize(['b' => 'c'], 'string[]', null, ['key_type' => Type::template('TKey', Type::int())]);
+    }
+
+    public function testDenormalizeRejectsRefinedKeyOfAnotherBuiltinType()
+    {
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($this->createStub(DenormalizerInterface::class));
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The type of the key "0" must be "string" ("int" given).');
+
+        $denormalizer->denormalize([0 => 'a'], 'string[]', null, ['key_type' => Type::union(Type::literal('a'), Type::literal('b'))]);
     }
 
     public function testDenormalizeSplitsObjectToPopulatePerItem()

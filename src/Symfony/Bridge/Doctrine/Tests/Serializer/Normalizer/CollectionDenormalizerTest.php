@@ -186,6 +186,17 @@ class CollectionDenormalizerTest extends TestCase
         $serializer->denormalize($data, Collection::class, 'json', ['key_type' => $keyType(), 'value_type' => Type::string()]);
     }
 
+    public function testDenormalizeChecksRefinedValuesAgainstTheirBuiltinType()
+    {
+        if (!method_exists(Type::class, 'intRange')) {
+            $this->markTestSkipped('Refined types need symfony/type-info 8.2 or higher.');
+        }
+
+        $collection = $this->createSerializer()->denormalize([-5], Collection::class, 'json', ['key_type' => Type::int(), 'value_type' => Type::intRange(1, null)]);
+
+        $this->assertSame([-5], $collection->toArray());
+    }
+
     public static function provideRefinedKeyTypes(): iterable
     {
         yield 'int range' => [static fn () => Type::intRange(1, null), ['foo' => 'bar']];

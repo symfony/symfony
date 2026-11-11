@@ -177,6 +177,7 @@
         <ul class="inline-list">
             {% for child in form %}
                 <li>{{ form_widget(child, {
+                        label_required: false,
                         parent_label_class: label_attr.class|default(''),
                     }) }}</li>
             {% endfor %}
@@ -185,6 +186,7 @@
         <div {{ block('widget_container_attributes') }}>
             {% for child in form %}
                 {{ form_widget(child, {
+                    label_required: false,
                     parent_label_class: label_attr.class|default(''),
                 }) }}
             {% endfor %}
@@ -247,7 +249,7 @@
 {%- endblock radio_label %}
 
 {% block checkbox_radio_label -%}
-    {% if required %}
+    {% if label_required ?? required %}
         {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
     {% endif %}
     {% if errors|length > 0 -%}

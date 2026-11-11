@@ -1953,6 +1953,39 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame(['a' => [1, 2]], $dummy->countsByName);
     }
 
+    public function testDenormalizeTriesRefinedUnionMembersInTheOrderOfTheirBuiltinTypes()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()]));
+
+        // "'auto'|int" is tried as "int|string", as without refinements, so a numeric string from CSV becomes an integer
+        $dummy = $normalizer->denormalize(['mode' => '5'], RefinedScalarCollectionsDummy::class, 'csv');
+
+        $this->assertSame(5, $dummy->mode);
+    }
+
+    public function testDenormalizeChecksRefinedCollectionKeysAgainstTheirBuiltinType()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()]));
+
+        $dummy = $normalizer->denormalize(['intsOrStringsById' => [-5 => 'a']], RefinedScalarCollectionsDummy::class);
+
+        $this->assertSame([-5 => 'a'], $dummy->intsOrStringsById);
+    }
+
+    public function testDenormalizeCollectsRefinedScalarCollectionElementErrors()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()]))]);
+
+        try {
+            $serializer->denormalize(['nonZeroInts' => ['nope', 2, 'nah']], RefinedScalarCollectionsDummy::class, null, [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+            $this->fail(\sprintf('A "%s" should have been thrown.', PartialDenormalizationException::class));
+        } catch (PartialDenormalizationException $e) {
+            $this->assertSame(['nonZeroInts[0]', 'nonZeroInts[2]'], array_map(static fn (NotNormalizableValueException $e) => $e->getPath(), $e->getNotNormalizableValueErrors()));
+        }
+    }
+
     public function testDenormalizeCollectsScalarCollectionElementErrors()
     {
         $serializer = new Serializer([new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors()]);
@@ -3311,6 +3344,15 @@ class RefinedScalarCollectionsDummy
 {
     /** @var array<string, list<positive-int>> */
     public array $countsByName = [];
+
+    /** @var list<non-zero-int> */
+    public array $nonZeroInts = [];
+
+    /** @var array<positive-int, int|string> */
+    public array $intsOrStringsById = [];
+
+    /** @var 'auto'|int */
+    public string|int $mode = 'auto';
 }
 
 class UnionCollectionDocBlockDummy

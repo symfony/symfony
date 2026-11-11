@@ -12,8 +12,8 @@ CHANGELOG
  * Make `PhpDocAwareReflectionTypeResolver` inherit PHPDoc types from parent classes, interfaces and abstract trait methods
  * Add `LiteralType` and `IntRangeType`, which implement the new `RefinementTypeInterface`, and the `Type::literal()` and `Type::intRange()` factories
  * Add `Type::withoutRefinements()` to replace refinements, such as literals and integer ranges, with their builtin type
- * Add a `$resolveRefinements` argument to `StringTypeResolver::__construct()` and `TypeResolver::create()`, and a `resolve_refinements` option to `TypeInfoBundle`, to resolve literals and integer ranges as `LiteralType` and `IntRangeType`
- * Deprecate not passing `true` for the `$resolveRefinements` argument of `StringTypeResolver::__construct()` and `TypeResolver::create()`, and not setting the `type_info.resolve_refinements` option to `true`
+ * Add the `Refinement` enum, a `$refinements` argument to `StringTypeResolver::__construct()` and `TypeResolver::create()`, and a `refinements` option to `TypeInfoBundle`, to resolve literals and integer ranges as `LiteralType` and `IntRangeType`
+ * Deprecate not passing the `$refinements` argument of `StringTypeResolver::__construct()` and `TypeResolver::create()`, and not setting the `type_info.refinements` option
 
 8.1
 ---

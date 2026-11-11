@@ -12,7 +12,10 @@
 namespace Symfony\Component\TypeInfo\Tests;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -59,6 +62,22 @@ class TypeInfoBundleTest extends TestCase
         $this->assertEquals(Type::int(), $resolver->resolve('CustomAlias'));
         $this->assertEquals(Type::int(), $resolver->resolve(new \ReflectionProperty(DummyWithConfiguredTypeAlias::class, 'customAlias')));
     }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testSettingTheRefinementsOptionToNullIsNotSettingIt()
+    {
+        if (!class_exists(PhpDocParser::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" dependency is required.');
+        }
+
+        $this->expectUserDeprecationMessage('Since symfony/type-info 8.2: Not setting the "type_info.refinements" option is deprecated; all PHPDoc refinements will be resolved by default in 9.0. Set it to true to resolve them now, or to false to keep their builtin types.');
+
+        $container = new ContainerBuilder();
+        new TypeInfoBundle()->getContainerExtension()->load([['refinements' => true], ['refinements' => null]], $container);
+
+        $this->assertFalse($container->getDefinition('type_info.resolver.string')->getArgument(3));
+    }
 }
 
 class TestTypeInfoKernel extends AbstractKernel
@@ -86,7 +105,7 @@ class TestTypeInfoKernel extends AbstractKernel
             'aliases' => [
                 'CustomAlias' => 'int',
             ],
-            'resolve_refinements' => true,
+            'refinements' => true,
         ]);
         $container->services()->alias('test.type_info.resolver', 'type_info.resolver')->public();
     }

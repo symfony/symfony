@@ -1,4 +1,4 @@
 framework:
     secret: test
     type_info:
-        resolve_refinements: true
+        refinements: true

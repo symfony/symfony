@@ -80,6 +80,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummyWithContex
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectInner;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectOuter;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 class AbstractObjectNormalizerTest extends TestCase
 {
@@ -2022,7 +2023,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeConvertsNestedRefinedScalarCollectionElements()
     {
-        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()]));
+        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()]));
 
         $dummy = $normalizer->denormalize(['countsByName' => ['a' => ['1', '2']]], RefinedScalarCollectionsDummy::class, null, [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => true]);
 
@@ -2031,7 +2032,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeTriesRefinedUnionMembersInTheOrderOfTheirBuiltinTypes()
     {
-        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()]));
+        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()]));
 
         // "'auto'|int" is tried as "int|string", as without refinements, so a numeric string from CSV becomes an integer
         $dummy = $normalizer->denormalize(['mode' => '5'], RefinedScalarCollectionsDummy::class, 'csv');
@@ -2041,7 +2042,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeChecksRefinedCollectionKeysAgainstTheirBuiltinType()
     {
-        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()]));
+        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()]));
 
         $dummy = $normalizer->denormalize(['intsOrStringsById' => [-5 => 'a']], RefinedScalarCollectionsDummy::class);
 
@@ -2050,7 +2051,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeCollectsRefinedScalarCollectionElementErrors()
     {
-        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()]))]);
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()]))]);
 
         try {
             $serializer->denormalize(['nonZeroInts' => ['nope', 2, 'nah']], RefinedScalarCollectionsDummy::class, null, [
@@ -2353,7 +2354,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testTemplateTypeWhenAnObjectIsPassedToDenormalize()
     {
-        $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
+        $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
             protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
             {
                 return true;
@@ -2372,7 +2373,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeTemplateType()
     {
-        $normalizer = new class(classMetadataFactory: new ClassMetadataFactory(new AttributeLoader()), propertyTypeExtractor: new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
+        $normalizer = new class(classMetadataFactory: new ClassMetadataFactory(new AttributeLoader()), propertyTypeExtractor: new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
             protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
             {
                 return true;
@@ -2692,7 +2693,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     private static function createGenericTypeSerializer(): Serializer
     {
-        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(null, null, null, true, true), new ReflectionExtractor()]));
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()]));
 
         return new Serializer([new ArrayDenormalizer(), $normalizer]);
     }

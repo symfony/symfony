@@ -31,13 +31,13 @@ class PropertyInfoBundleExtensionTest extends TestCase
         $this->assertTrue($container->has('property_info.constructor_extractor'));
     }
 
-    public function testPhpStanExtractorResolvesRefinementsAccordingToTheTypeInfoConfiguration()
+    public function testPhpStanExtractorUsesTheTypeInfoStringResolver()
     {
         if (!class_exists(PhpDocParser::class) || !class_exists(ContextFactory::class)) {
             $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
         }
 
-        $this->assertSame('%.type_info.resolve_refinements%', $this->createContainerFromFile('property_info')->getDefinition('property_info.phpstan_extractor')->getArgument(4));
+        $this->assertEquals(new Reference('type_info.resolver.string'), $this->createContainerFromFile('property_info')->getDefinition('property_info.phpstan_extractor')->getArgument(4));
     }
 
     public function testPropertyInfoWithConstructorExtractorDisabled()

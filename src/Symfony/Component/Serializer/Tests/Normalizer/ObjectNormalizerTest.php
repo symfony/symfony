@@ -93,6 +93,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObjectWithGetters;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -1093,7 +1094,7 @@ class ObjectNormalizerTest extends TestCase
             $this->markTestSkipped('phpstan/phpdoc-parser required for this test');
         }
 
-        $extractor = new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, true), new PhpDocExtractor(), new ReflectionExtractor()]);
+        $extractor = new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
         $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
 

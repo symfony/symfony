@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
+use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
@@ -37,20 +38,17 @@ class TypeResolverTest extends TestCase
 
     #[Group('legacy')]
     #[IgnoreDeprecations]
-    public function testNotPassingTrueForResolveRefinementsIsDeprecated()
+    public function testNotPassingRefinementsIsDeprecated()
     {
-        $this->expectUserDeprecationMessage('Since symfony/type-info 8.2: Not passing true for the "$resolveRefinements" argument of "Symfony\Component\TypeInfo\TypeResolver\TypeResolver::create()" is deprecated; PHPDoc refinements will always be resolved in 9.0.');
+        $this->expectUserDeprecationMessage('Since symfony/type-info 8.2: Not passing the "$refinements" argument of "Symfony\Component\TypeInfo\TypeResolver\TypeResolver::create()" is deprecated; all PHPDoc refinements will be resolved by default in 9.0. Pass true to resolve them now, or false to keep their builtin types.');
 
         TypeResolver::create();
     }
 
-    #[Group('legacy')]
-    #[IgnoreDeprecations]
-    public function testPassingFalseForResolveRefinementsIsDeprecated()
+    public function testCreateWithoutRefinements()
     {
-        $this->expectUserDeprecationMessage('Since symfony/type-info 8.2: Not passing true for the "$resolveRefinements" argument of "Symfony\Component\TypeInfo\TypeResolver\TypeResolver::create()" is deprecated; PHPDoc refinements will always be resolved in 9.0.');
-
-        TypeResolver::create(null, false);
+        $this->assertEquals(Type::int(), TypeResolver::create(null, false)->resolve('positive-int'));
+        $this->assertEquals(Type::union(Type::literal('a'), Type::literal('b')), TypeResolver::create(null, [Refinement::Literal])->resolve("'a'|'b'"));
     }
 
     public function testCannotFindResolver()

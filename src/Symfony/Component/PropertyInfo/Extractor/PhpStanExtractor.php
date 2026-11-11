@@ -64,15 +64,15 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     private array $contexts = [];
 
     /**
-     * @param list<string>|null $mutatorPrefixes
-     * @param list<string>|null $accessorPrefixes
-     * @param list<string>|null $arrayMutatorPrefixes
-     * @param bool|null         $resolveRefinements   Whether to resolve PHPDoc refinements, such as literals and integer ranges. Not passing true is deprecated since 8.2, refinements will always be resolved as of 9.0
+     * @param list<string>|null       $mutatorPrefixes
+     * @param list<string>|null       $accessorPrefixes
+     * @param list<string>|null       $arrayMutatorPrefixes
+     * @param StringTypeResolver|null $stringTypeResolver   The resolver of the PHPDoc types, which decides the PHPDoc refinements to resolve. Not passing it is deprecated since 8.2, the default one will resolve all refinements as of 9.0
      */
-    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null, private bool $allowPrivateAccess = true, ?bool $resolveRefinements = null)
+    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null, private bool $allowPrivateAccess = true, ?StringTypeResolver $stringTypeResolver = null)
     {
-        if (true !== $resolveRefinements) {
-            trigger_deprecation('symfony/property-info', '8.2', 'Not passing true for the "$resolveRefinements" argument of "%s()" is deprecated; PHPDoc refinements will always be resolved in 9.0.', __METHOD__);
+        if (null === $stringTypeResolver) {
+            trigger_deprecation('symfony/property-info', '8.2', 'Not passing the "$stringTypeResolver" argument of "%s()" is deprecated; the default one will resolve all PHPDoc refinements in 9.0. Pass a "%s" to choose the refinements to resolve.', __METHOD__, StringTypeResolver::class);
         }
 
         if (!class_exists(ContextFactory::class)) {
@@ -95,7 +95,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             $this->phpDocParser = new PhpDocParser(new TypeParser($constExprParser = new ConstExprParser(true, true), true), $constExprParser);
             $this->lexer = new Lexer();
         }
-        $this->stringTypeResolver = new StringTypeResolver(null, null, [], $resolveRefinements ?? false);
+        $this->stringTypeResolver = $stringTypeResolver ?? new StringTypeResolver(null, null, [], false);
         $this->typeContextFactory = new TypeContextFactory($this->stringTypeResolver);
     }
 

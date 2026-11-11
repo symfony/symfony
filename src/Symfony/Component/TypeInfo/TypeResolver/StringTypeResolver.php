@@ -47,6 +47,7 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\RefinementTypeInterface;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 use Symfony\Component\TypeInfo\TypeIdentifier;
@@ -295,10 +296,7 @@ final class StringTypeResolver implements TypeResolverInterface
                 }
 
                 // the integer limits are no bound at all
-                $min = \PHP_INT_MIN === $min ? null : $min;
-                $max = \PHP_INT_MAX === $max ? null : $max;
-
-                if (null === $min && null === $max) {
+                if ((null === $min || \PHP_INT_MIN === $min) && (null === $max || \PHP_INT_MAX === $max)) {
                     return $type;
                 }
 
@@ -348,6 +346,7 @@ final class StringTypeResolver implements TypeResolverInterface
 
         if ($node instanceof UnionTypeNode) {
             $types = [];
+            $seenTypes = [];
             $identifiers = [];
 
             foreach ($node->types as $nodeType) {
@@ -358,11 +357,12 @@ final class StringTypeResolver implements TypeResolverInterface
                 }
 
                 foreach ($type instanceof UnionType ? $type->getTypes() : [$type] as $t) {
-                    // "int|positive-int" and "'a'|'b'" mean "int" and "string"
-                    if (\in_array($t, $types)) {
+                    // as in UnionType: a loose comparison alone finds "'10'|'1e1'" equal, a string comparison alone merges types that only print the same
+                    if (\in_array($t, $seenTypes[(string) $t] ?? [])) {
                         continue;
                     }
 
+                    $seenTypes[(string) $t][] = $t;
                     $types[] = $t;
 
                     if ($t instanceof BuiltinType) {
@@ -370,6 +370,9 @@ final class StringTypeResolver implements TypeResolverInterface
                     }
                 }
             }
+
+            // "1|int" and "'a'|string" mean "int" and "string", as do "int|positive-int" and "'a'|'b'" without refinements
+            $types = array_values(array_filter($types, static fn (Type $t): bool => !$t instanceof RefinementTypeInterface || !isset($identifiers[$t->getWrappedType()->getTypeIdentifier()->value])));
 
             // "true|false" and "bool|true" mean "bool", "object|Foo" means "object"
             if (isset($identifiers['bool']) || isset($identifiers['true'], $identifiers['false'])) {
@@ -627,16 +630,25 @@ final class StringTypeResolver implements TypeResolverInterface
                 return false;
             }
 
-            if (!\defined($constant = $className.'::'.$node->constExpr->name)) {
+            // reflection reads private and protected constants as well
+            if (false === $constant = (new \ReflectionClass($className))->getReflectionConstant($node->constExpr->name)) {
                 throw new \DomainException(\sprintf('No "%s" constant found in "%s".', $node->constExpr->name, $className));
             }
 
-            $value = \constant($constant);
+            try {
+                $value = $constant->getValue();
+            } catch (\Error) {
+                // its value may depend on a class that is not installed
+                return false;
+            }
         } elseif ($node instanceof IdentifierTypeNode && !\in_array($node->name, ['min', 'max'], true)) {
-            $name = ltrim($node->name, '\\');
+            $name = $node->name;
 
-            // like PHP, an unqualified constant falls back to the global one
-            if ($typeContext?->namespace && !str_starts_with($node->name, '\\') && \defined($typeContext->namespace.'\\'.$name)) {
+            if (str_contains($name, '\\')) {
+                // like PHP, a qualified name resolves through the imports and the namespace, with no fallback
+                $name = $typeContext?->normalize($name) ?? ltrim($name, '\\');
+            } elseif ($typeContext?->namespace && \defined($typeContext->namespace.'\\'.$name)) {
+                // an unqualified one falls back to the global constant
                 $name = $typeContext->namespace.'\\'.$name;
             }
 
@@ -657,7 +669,8 @@ final class StringTypeResolver implements TypeResolverInterface
 
     private static function parseInteger(string $value): int
     {
-        preg_match('/^(-?)(0[xbo]|0(?=.))?(.*)$/i', $value, $matches);
+        // the lexer allows a leading "+", which changes nothing
+        preg_match('/^(?:\+|(-))?(0[xbo]|0(?=.))?(.*)$/i', $value, $matches);
         [, $sign, $prefix, $digits] = $matches;
 
         $base = match (strtolower($prefix)) {

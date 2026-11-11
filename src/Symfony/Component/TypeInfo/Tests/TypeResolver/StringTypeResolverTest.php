@@ -27,6 +27,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyEnum;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithConstants;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithConstantsInterface;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithRangeConstants;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplateTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTypeAliases;
@@ -484,6 +485,16 @@ class StringTypeResolverTest extends TestCase
         yield [Type::intRange(null, 5), 'int<min, 5>'];
         yield [Type::intRange(-5, null), 'int<-5, max>'];
         yield [Type::int(), 'int<min, max>'];
+        yield [Type::int(), '1|int'];
+        yield [Type::string(), "'a'|string"];
+        yield [Type::nullable(Type::int()), 'positive-int|int|null'];
+        yield [Type::union(Type::intRange(0, null), Type::intRange(null, 0)), 'non-negative-int|int<min, 0>'];
+        yield [Type::union(Type::literal('10'), Type::literal('1e1')), "'10'|'1e1'"];
+        yield [Type::literal(1), '+1'];
+        yield [Type::intRange(1, 10), 'int<+1, 10>'];
+        yield [Type::literal(16), '+0x10'];
+        yield [Type::int(), 'int<0>'];
+        yield [Type::int(), 'int<0, 5, 9>'];
     }
 
     #[DataProvider('resolveIntRangeWithConstantBoundDataProvider')]
@@ -506,7 +517,27 @@ class StringTypeResolverTest extends TestCase
         yield [Type::intRange(0, null), 'int<0, PHP_INT_MAX>', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
         yield [Type::intRange(0, 1), 'int<0, '.DummyWithConstants::class.'::DUMMY_INT_A>'];
         yield [Type::intRange(1, null), 'int<self::DUMMY_INT_A, max>', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
+        yield [Type::intRange(1, 10), 'int<self::MIN, self::MAX>', $typeContextFactory->createFromClassName(DummyWithRangeConstants::class)];
         yield [Type::int(), 'int<0, UNDEFINED_CONSTANT>'];
+        // "string" reads as a constant name
+        yield [Type::int(), 'int<0, string>'];
+        yield [Type::int(), 'int<0, '.DummyWithRangeConstants::class.'::BROKEN>'];
+    }
+
+    public function testResolveIntRangeWithNamespacedConstantBound()
+    {
+        $namespace = __NAMESPACE__.'\\RangeBound';
+        \defined($namespace.'\\Imported\\MAX') || \define($namespace.'\\Imported\\MAX', 10);
+        \defined($namespace.'\\Current\\Sub\\MAX') || \define($namespace.'\\Current\\Sub\\MAX', 20);
+        \defined('SymfonyTypeInfoRangeBound\\MAX') || \define('SymfonyTypeInfoRangeBound\\MAX', 30);
+
+        $typeContext = new TypeContext('Foo', 'Foo', $namespace.'\\Current', ['Limits' => $namespace.'\\Imported']);
+
+        // a qualified name resolves through the imports, then the namespace, and never falls back to the global one
+        $this->assertEquals(Type::intRange(0, 10), $this->resolver->resolve('int<0, Limits\\MAX>', $typeContext));
+        $this->assertEquals(Type::intRange(0, 20), $this->resolver->resolve('int<0, Sub\\MAX>', $typeContext));
+        $this->assertEquals(Type::intRange(0, 30), $this->resolver->resolve('int<0, \\SymfonyTypeInfoRangeBound\\MAX>', $typeContext));
+        $this->assertEquals(Type::int(), $this->resolver->resolve('int<0, SymfonyTypeInfoRangeBound\\MAX>', $typeContext));
     }
 
     #[DataProvider('invalidRefinementDataProvider')]

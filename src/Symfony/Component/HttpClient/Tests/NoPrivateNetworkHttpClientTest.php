@@ -19,6 +19,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class NoPrivateNetworkHttpClientTest extends TestCase
@@ -246,6 +247,60 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         ]);
 
         $this->assertSame('/', $response->toArray()['REQUEST_URI']);
+    }
+
+    /**
+     * @requires extension openssl
+     */
+    public function testDecoratedClientAppliesItsDefaultPeerFingerprint()
+    {
+        TestRedirectServer::start();
+        $client = new NoPrivateNetworkHttpClient(new NativeHttpClient(['peer_fingerprint' => ['sha256' => str_repeat('0', 64)]]), '10.0.0.0/8');
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('peer_fingerprint match failure');
+
+        $client->request('GET', 'https://127.0.0.1:8059/', ['verify_peer' => false, 'verify_host' => false])->getHeaders();
+    }
+
+    public function testDecoratedClientAppliesItsDefaultOptions()
+    {
+        $requests = [];
+        $mockClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests) {
+            $requests[] = [$url, $options['cafile'] ?? null, $options['proxy'] ?? null, $options['timeout'], $options['max_redirects'], $options['normalized_headers']['accept']];
+
+            return 1 === \count($requests) % 2 ? new MockResponse('', ['http_code' => 302, 'redirect_url' => 'https://104.26.14.7/']) : new MockResponse('OK');
+        });
+
+        $client = new NoPrivateNetworkHttpClient($mockClient->withOptions([
+            'cafile' => '/path/to/ca.pem',
+            'proxy' => 'http://proxy.example:3128',
+            'timeout' => 7,
+            'headers' => ['Accept' => 'application/json'],
+        ]));
+        $client->request('GET', 'https://104.26.14.6/')->getContent();
+
+        $client = new NoPrivateNetworkHttpClient(ScopingHttpClient::forBaseUri($mockClient, 'https://104.26.14.6/', ['cafile' => '/path/to/ca.pem']));
+        $client->request('GET', 'https://104.26.14.6/')->getContent();
+
+        $progress = false;
+        $client = (new NoPrivateNetworkHttpClient($mockClient))->withOptions([
+            'max_redirects' => 0,
+            'user_data' => 'foo',
+            'on_progress' => static function () use (&$progress) { $progress = true; },
+        ]);
+        $response = $client->request('GET', 'https://104.26.14.6/');
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('foo', $response->getInfo('user_data'));
+        $this->assertTrue($progress);
+
+        $this->assertSame([
+            ['https://104.26.14.6/', '/path/to/ca.pem', 'http://proxy.example:3128', 7.0, 0, ['Accept: application/json']],
+            ['https://104.26.14.7/', '/path/to/ca.pem', 'http://proxy.example:3128', 7.0, 0, ['Accept: application/json']],
+            ['https://104.26.14.6/', '/path/to/ca.pem', null, (float) \ini_get('default_socket_timeout'), 0, ['Accept: */*']],
+            ['https://104.26.14.7/', null, null, (float) \ini_get('default_socket_timeout'), 0, ['Accept: */*']],
+            ['https://104.26.14.6/', null, null, (float) \ini_get('default_socket_timeout'), 0, ['Accept: */*']],
+        ], $requests);
     }
 
     public function testHeadersArePassedOnRedirect()

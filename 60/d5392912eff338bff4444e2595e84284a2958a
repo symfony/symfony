@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T10:04:24Z
+
+I pushed a change that also removes the expiry from the metadata when an item is saved again without one. Before that, the first expiry stayed in the metadata and was copied to the previous adapters:
+
+```php
+$item = $cache->getItem('key')->expiresAfter(2)->set('value');
+$cache->save($item);
+$cache->save($item->expiresAfter(null));
+// after a miss in the first adapter, the item was copied back to it with the 2s expiry
+```
+
+The Psalm failure is a false positive: the closure is bound to `CacheItem`.

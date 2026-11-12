@@ -161,6 +161,19 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransfor
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ChildWithoutClassTransformerTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ParentSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ParentTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\Address as NestedMergeReadAddress;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\DublinAddress;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\ExpensiveSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\HookSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\InterfaceMapped;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\NestedSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\Other as NestedMergeReadOther;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\ParentTypedSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\Plain;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\ReverseSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\SubAddress;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\Target as NestedMergeReadTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRead\WithPrivateProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRecursion\Source as NestedMergeRecursionSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRecursion\Target as NestedMergeRecursionTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\InnerTargetA;
@@ -1592,6 +1605,135 @@ final class ObjectMapperTest extends TestCase
 
         $this->assertInstanceOf(NestedMergeRecursionTarget::class, $mapped);
         $this->assertSame('root', $mapped->name);
+    }
+
+    #[DataProvider('provideAccessor')]
+    public function testUnmappedSourcePropertiesAreNotRead(?PropertyAccessorInterface $accessor)
+    {
+        ExpensiveSource::$reads = 0;
+
+        $mapped = (new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor))->map(new ExpensiveSource());
+
+        $this->assertInstanceOf(NestedMergeReadTarget::class, $mapped);
+        $this->assertSame('foo', $mapped->label);
+        $this->assertSame(0, ExpensiveSource::$reads);
+    }
+
+    #[DataProvider('provideNestedMergeProperties')]
+    public function testNestedMergeStillReadsPropertiesHoldingAMappedObject(?PropertyAccessorInterface $accessor, string $property)
+    {
+        $source = new NestedSource();
+        $source->{$property} = new NestedMergeReadAddress();
+
+        $mapped = (new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor))->map($source);
+
+        $this->assertSame('Dublin', $mapped->city);
+    }
+
+    public static function provideNestedMergeProperties(): iterable
+    {
+        foreach (['nullable', 'union', 'iface', 'untyped'] as $property) {
+            foreach (self::provideAccessor() as $name => [$accessor]) {
+                yield "{$property} {$name}" => [$accessor, $property];
+            }
+        }
+    }
+
+    #[DataProvider('provideAccessor')]
+    public function testNestedMergeThroughSelfTypedProperty(?PropertyAccessorInterface $accessor)
+    {
+        $child = new NestedSource();
+        $child->nullable = new NestedMergeReadAddress();
+        $source = new ParentTypedSource();
+        $source->child = $child;
+
+        $mapped = (new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor))->map($source);
+
+        $this->assertSame('Dublin', $mapped->city);
+    }
+
+    #[DataProvider('provideAdvancedNestedMergeProperties')]
+    public function testNestedMergeThroughObjectMixedAbstractAndIntersectionTypes(string $property, object $value)
+    {
+        $source = new NestedSource();
+        $source->{$property} = $value;
+
+        $mapped = (new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor()))->map($source);
+
+        $this->assertSame('Dublin', $mapped->city);
+    }
+
+    public static function provideAdvancedNestedMergeProperties(): iterable
+    {
+        yield 'object' => ['object', new NestedMergeReadAddress()];
+        yield 'mixed' => ['mixed', new NestedMergeReadAddress()];
+        yield 'concrete class holding a mapped subclass' => ['base', new SubAddress()];
+        yield 'mapped to an interface of the target' => ['viaInterface', new InterfaceMapped()];
+        yield 'abstract' => ['abstract', new DublinAddress()];
+        yield 'intersection' => ['intersection', new NestedMergeReadAddress()];
+    }
+
+    public function testNestedMergeThroughParentTypedProperty()
+    {
+        $inner = new NestedSource();
+        $inner->nullable = new NestedMergeReadAddress();
+        $source = new ParentTypedSource();
+        $source->parentValue = $inner;
+
+        $mapped = (new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor()))->map($source);
+
+        $this->assertSame('Dublin', $mapped->city);
+    }
+
+    #[DataProvider('provideAccessor')]
+    public function testNestedMergeWithReverseClassMapOnUnattributedClasses(?PropertyAccessorInterface $accessor)
+    {
+        $source = new ReverseSource();
+        $source->nested = new Plain();
+
+        $metadataFactory = new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), [
+            ReverseSource::class => NestedMergeReadTarget::class,
+            Plain::class => NestedMergeReadTarget::class,
+        ]);
+
+        $this->assertSame('Paris', (new ObjectMapper($metadataFactory, $accessor))->map($source)->city);
+    }
+
+    public function testUnmappedSourcePropertiesAreReadOnlyForTheMatchingTarget()
+    {
+        ExpensiveSource::$reads = 0;
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor());
+
+        $mapper->map(new ExpensiveSource());
+        $mapper->map(new ExpensiveSource());
+        $this->assertSame(0, ExpensiveSource::$reads);
+
+        $mapper->map(new ExpensiveSource(), NestedMergeReadOther::class);
+        $this->assertGreaterThan(0, ExpensiveSource::$reads);
+
+        ExpensiveSource::$reads = 0;
+        $mapper->map(new ExpensiveSource());
+        $this->assertSame(0, ExpensiveSource::$reads);
+    }
+
+    #[DataProvider('provideAccessor')]
+    public function testNestedMergeThroughHookedProperty(?PropertyAccessorInterface $accessor)
+    {
+        $mapped = (new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor))->map(new HookSource());
+
+        $this->assertSame('Dublin', $mapped->city);
+    }
+
+    #[DataProvider('provideAccessor')]
+    public function testUnattributedSourceIgnoresPrivatePropertiesOfTheTargetParent(?PropertyAccessorInterface $accessor)
+    {
+        $target = new class extends WithPrivateProperty {
+            public string $city;
+        };
+
+        $mapped = (new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), $accessor))->map(new Plain(), $target);
+
+        $this->assertSame('Paris', $mapped->city);
     }
 
     public function testNestedMappingWithClassTransform()

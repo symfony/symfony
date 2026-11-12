@@ -27,6 +27,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoBundle;
 use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\Type;
 
 class PropertyInfoBundleTest extends TestCase
@@ -97,6 +98,10 @@ class PropertyInfoBundleTest extends TestCase
             $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
         }
 
+        if (!enum_exists(Refinement::class)) {
+            $this->markTestSkipped('The "type_info.refinements" option needs symfony/type-info 8.2 or higher.');
+        }
+
         $kernel = new TestPropertyInfoKernel('test', false, $this->varDir);
         $kernel->boot();
 
@@ -107,6 +112,10 @@ class PropertyInfoBundleTest extends TestCase
     {
         if (!class_exists(PhpDocParser::class) || !class_exists(ContextFactory::class)) {
             $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
+        }
+
+        if (!enum_exists(Refinement::class)) {
+            $this->markTestSkipped('The "type_info.refinements" option needs symfony/type-info 8.2 or higher.');
         }
 
         $kernel = new TestPropertyInfoKernel('literals', false, $this->varDir, refinements: ['literal']);
@@ -123,6 +132,10 @@ class PropertyInfoBundleTest extends TestCase
             $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
         }
 
+        if (!enum_exists(Refinement::class)) {
+            $this->markTestSkipped('The "type_info.refinements" option needs symfony/type-info 8.2 or higher.');
+        }
+
         $kernel = new TestPropertyInfoKernel('test', false, $this->varDir);
         $kernel->boot();
 
@@ -135,6 +148,10 @@ class PropertyInfoBundleTest extends TestCase
     {
         if (!class_exists(PhpDocParser::class) || !class_exists(ContextFactory::class)) {
             $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
+        }
+
+        if (!enum_exists(Refinement::class)) {
+            $this->markTestSkipped('The "type_info.refinements" option needs symfony/type-info 8.2 or higher.');
         }
 
         $deprecations = [];
@@ -228,7 +245,7 @@ class TestPropertyInfoKernel extends AbstractKernel
 
     private function configureContainer(ContainerConfigurator $container): void
     {
-        $container->extension('type_info', $this->withTypeInfo ? ['aliases' => ['PropertyInfoBundleAlias' => 'int']] + (null !== $this->refinements ? ['refinements' => $this->refinements] : []) : ['enabled' => false]);
+        $container->extension('type_info', $this->withTypeInfo ? ['aliases' => ['PropertyInfoBundleAlias' => 'int']] + (null !== $this->refinements && enum_exists(Refinement::class) ? ['refinements' => $this->refinements] : []) : ['enabled' => false]);
 
         $services = $container->services();
         $services

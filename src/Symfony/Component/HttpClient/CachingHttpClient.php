@@ -197,7 +197,13 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
         }
 
         if (isset($requestCacheControl['no-store'])) {
-            return new AsyncResponse($this->client, $method, $url, $options);
+            $this->isInnerRequest = true;
+
+            try {
+                return new AsyncResponse($this, $method, $url, $options);
+            } finally {
+                $this->isInnerRequest = false;
+            }
         }
 
         $requestHash = self::hash($method.$fullUrl.serialize(array_intersect_key($options['normalized_headers'], self::RESPONSE_INFLUENCING_HEADERS)));

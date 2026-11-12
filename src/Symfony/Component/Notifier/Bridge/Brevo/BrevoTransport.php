@@ -77,7 +77,7 @@ final class BrevoTransport extends AbstractTransport
             $body['tag'] = $options['tag'];
         }
 
-        $endpoint = \sprintf('%s://%s/v3/transactionalSMS/sms', $this->getHttpScheme(), $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/v3/transactionalSMS/send', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'json' => $body,
             'headers' => [

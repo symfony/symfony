@@ -110,4 +110,15 @@ class PostmarkTransportFactoryTest extends AbstractTransportFactoryTestCase
     {
         yield [new Dsn('postmark+api', 'default')];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['postmark', 'postmark+smtp', 'postmark+smtps'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::USER))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('postmark+smtp', 'default', self::USER, null, null, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

@@ -99,6 +99,8 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         $message = 'testMessage';
 
         $expectedBody = json_encode([
+            '@context' => 'https://schema.org/extensions',
+            '@type' => 'MessageCard',
             'text' => $message,
         ]);
 
@@ -121,6 +123,8 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         ]);
 
         $expectedBody = json_encode([
+            '@context' => 'https://schema.org/extensions',
+            '@type' => 'MessageCard',
             'text' => $optionsTextMessage,
         ]);
 
@@ -168,6 +172,8 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         $chatMessage = ChatMessage::fromNotification($notification);
 
         $expectedBody = json_encode([
+            '@context' => 'https://schema.org/extensions',
+            '@type' => 'MessageCard',
             'text' => $message,
         ]);
 

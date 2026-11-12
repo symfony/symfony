@@ -8,11 +8,19 @@ DSN example
 -----------
 
 ```
-MICROSOFT_TEAMS_DSN=microsoftteams://default/PATH
+MICROSOFT_TEAMS_DSN=microsoftteams://HOST/PATH
 ```
 
 where:
- - `PATH` has the following format: `webhookb2/{uuid}@{uuid}/IncomingWebhook/{id}/{uuid}`
+ - `HOST/PATH` is the URL of a Workflows webhook without its `https://` prefix,
+   query string included, for example
+   `default123.45.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/678/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=SIGNATURE`
+
+To get this URL, create a workflow in the Teams channel from the "Send webhook
+alerts to a channel" template. See [Send messages in Teams using incoming webhooks](https://support.microsoft.com/en-us/workflows/send-messages-in-teams-using-incoming-webhooks).
+
+Office 365 connectors (`outlook.office.com/webhookb2/...` URLs) stopped working
+in May 2026, see [their retirement notice](https://devblogs.microsoft.com/microsoft365dev/retirement-of-office-365-connectors-within-microsoft-teams/).
 
 Adding text to a Message
 ------------------------
@@ -32,6 +40,8 @@ Adding Interactions to a Message
 
 With a Microsoft Teams Message, you can use the `MicrosoftTeamsOptions` class
 to add [MessageCard options](https://docs.microsoft.com/en-us/outlook/actionable-messages/message-card-reference).
+Note that Workflows webhooks display the content of MessageCards but not their
+action buttons.
 
 ```php
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\ActionCard;

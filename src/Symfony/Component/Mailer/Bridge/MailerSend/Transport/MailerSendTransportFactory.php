@@ -28,7 +28,7 @@ final class MailerSendTransportFactory extends AbstractTransportFactory
                 ->setHost('default' === $dsn->getHost() ? null : $dsn->getHost())
                 ->setPort($dsn->getPort()),
 
-            'mailersend', 'mailersend+smtp' => new MailerSendSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $this->dispatcher, $this->logger),
+            'mailersend', 'mailersend+smtp' => (new MailerSendSmtpTransport($this->getUser($dsn), $this->getPassword($dsn), $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true)),
 
             default => throw new UnsupportedSchemeException($dsn, 'mailersend', $this->getSupportedSchemes()),
         };

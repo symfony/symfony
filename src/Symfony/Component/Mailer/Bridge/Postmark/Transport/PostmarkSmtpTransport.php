@@ -34,6 +34,7 @@ class PostmarkSmtpTransport extends EsmtpTransport
     {
         parent::__construct('smtp.postmarkapp.com', 587, false, $dispatcher, $logger);
 
+        $this->setRequireTls(true);
         $this->setUsername($id);
         $this->setPassword($id);
     }

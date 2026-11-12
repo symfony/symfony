@@ -41,7 +41,9 @@
                 {% set absolute_url = absolute_url(location) %}
                 <p>This request redirects to <strong>{{ absolute_url }}</strong></p>
 
-                <p><a class="btn" href="{{ absolute_url }}">Follow redirect</a></p>
+                {% if absolute_url matches '{^https?://}i' %}
+                    <p><a class="btn" href="{{ absolute_url }}">Follow redirect</a></p>
+                {% endif %}
 
                 <p class="sf-redirection-help">
                     The redirect was intercepted by the Symfony Web Debug toolbar to help debugging.

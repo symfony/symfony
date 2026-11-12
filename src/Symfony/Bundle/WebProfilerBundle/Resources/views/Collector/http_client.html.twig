@@ -123,7 +123,7 @@
                                         {% if header matches '/^x-debug-token: .*$/i' %}
                                             {% set profiler_token = (header.getValue|slice('x-debug-token: '|length)) %}
                                         {% endif %}
-                                        {% if header matches '/^x-debug-token-link: .*$/i' %}
+                                        {% if header matches '{^x-debug-token-link: https?://}i' %}
                                             {% set profiler_link = (header.getValue|slice('x-debug-token-link: '|length)) %}
                                         {% endif %}
                                     {% endfor %}

@@ -115,4 +115,15 @@ class MailtrapTransportFactoryTest extends AbstractTransportFactoryTestCase
     {
         yield [new Dsn('mailtrap+api', 'default')];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['mailtrap', 'mailtrap+smtp', 'mailtrap+smtps'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::USER))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('mailtrap+smtp', 'default', self::USER, null, null, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

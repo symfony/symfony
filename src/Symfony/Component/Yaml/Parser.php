@@ -294,7 +294,7 @@ class Parser
                 }
 
                 try {
-                    $key = Inline::parseScalar($values['key']);
+                    $key = str_starts_with($values['key'], '*') ? $this->parseValue($values['key'], $flags, $context) : Inline::parseScalar($values['key']);
                 } catch (ParseException $e) {
                     $e->setParsedLine($this->getRealCurrentLineNb() + 1);
                     $e->setSnippet($this->currentLine);

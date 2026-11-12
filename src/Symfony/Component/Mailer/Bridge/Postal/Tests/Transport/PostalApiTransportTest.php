@@ -52,8 +52,9 @@ class PostalApiTransportTest extends TestCase
             $this->assertStringContainsString('X-Server-API-Key: TOKEN', $options['headers'][0] ?? $options['request_headers'][0]);
 
             $body = json_decode($options['body'], true);
-            $this->assertSame('fabpot@symfony.com', $body['from']);
-            $this->assertSame('saif.gmati@symfony.com', $body['to'][0]);
+            $this->assertSame('"Fabien" <fabpot@symfony.com>', $body['from']);
+            $this->assertSame(['"Saif Eddin" <saif.gmati@symfony.com>'], $body['to']);
+            $this->assertSame(['"Jeremy" <jeremy@derusse.com>'], $body['cc']);
             $this->assertSame('Hello!', $body['subject']);
             $this->assertSame('Hello There!', $body['plain_body']);
             $this->assertSame('<h1>Hello There!</h1>', $body['html_body']);
@@ -61,7 +62,7 @@ class PostalApiTransportTest extends TestCase
             $this->assertSame('attachment.txt', $body['attachments'][0]['name']);
             $this->assertSame('text/plain', $body['attachments'][0]['content_type']);
             $this->assertSame(base64_encode('some attachment'), $body['attachments'][0]['data']);
-            $this->assertSame('foo@bar.fr', $body['reply_to']);
+            $this->assertSame('"Foo" <foo@bar.fr>', $body['reply_to']);
 
             return new JsonMockResponse(['data' => ['message_id' => 'foobar']], [
                 'http_code' => 200,
@@ -74,6 +75,7 @@ class PostalApiTransportTest extends TestCase
         $mail->subject('Hello!')
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->cc(new Address('jeremy@derusse.com', 'Jeremy'))
             ->replyTo(new Address('foo@bar.fr', 'Foo'))
             ->text('Hello There!')
             ->html('<h1>Hello There!</h1>')

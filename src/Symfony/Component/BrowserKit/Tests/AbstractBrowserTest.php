@@ -634,6 +634,29 @@ class AbstractBrowserTest extends TestCase
         $this->assertEquals($headers, $client->getRequest()->getServer());
     }
 
+    #[DataProvider('provideRedirectsAndCredentials')]
+    public function testFollowRedirectDropsCredentialsWhenTheOriginChanges(string $location, bool $keepsCredentials)
+    {
+        $credentials = ['HTTP_Authorization' => 'Bearer foo', 'HTTP_COOKIE' => 'foo=bar'];
+
+        $client = $this->getBrowser();
+        $client->setNextResponse(new Response('', 302, ['Location' => $location]));
+        $client->request('GET', 'http://www.example.com/foo/', [], [], $credentials);
+
+        $this->assertSame($keepsCredentials ? $credentials : [], array_intersect_key($client->getRequest()->getServer(), $credentials));
+    }
+
+    public static function provideRedirectsAndCredentials(): iterable
+    {
+        yield 'same origin' => ['http://www.example.com/redirected', true];
+        yield 'relative path' => ['redirected', true];
+        yield 'absolute path' => ['/redirected', true];
+        yield 'other host' => ['http://www.example.org/redirected', false];
+        yield 'other scheme' => ['https://www.example.com/redirected', false];
+        yield 'other port' => ['http://www.example.com:8080/redirected', false];
+        yield 'protocol-relative' => ['//www.example.org/redirected', false];
+    }
+
     public function testIsFollowingRedirects()
     {
         $client = $this->getBrowser();

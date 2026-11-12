@@ -14,6 +14,19 @@
         finish: function() {}
     };
 
+    var parseUrl = function(url) {
+        var a = document.createElement('a');
+        a.href = url;
+
+        return a;
+    };
+
+    var isSameOrigin = function(url) {
+        url = parseUrl(url);
+
+        return url.protocol === location.protocol && url.host === location.host;
+    };
+
     var extractHeaders = function(xhr, stackElement) {
         /* Read all headers to avoid CORS warnings for headers that aren't exposed. */
         var allHeaders = xhr.getAllResponseHeaders();
@@ -24,6 +37,9 @@
         }
         if (ret = allHeaders.match(/^x-debug-token-link:\s+(.*)$/im)) {
             stackElement.profilerUrl = ret[1];
+        }
+        if (!isSameOrigin(xhr.responseURL || stackElement.url)) {
+            return;
         }
         if (ret = allHeaders.match(/^Symfony-Debug-Toolbar-Replace:\s+(.*)$/im)) {
             stackElement.toolbarReplaceFinished = false;
@@ -70,8 +86,10 @@
                     stackElement.statusCode = r.status;
                     stackElement.profile = r.headers.get('x-debug-token');
                     stackElement.profilerUrl = r.headers.get('x-debug-token-link');
-                    stackElement.toolbarReplaceFinished = false;
-                    stackElement.toolbarReplace = '1' === r.headers.get('Symfony-Debug-Toolbar-Replace');
+                    if (isSameOrigin(r.url || url)) {
+                        stackElement.toolbarReplaceFinished = false;
+                        stackElement.toolbarReplace = '1' === r.headers.get('Symfony-Debug-Toolbar-Replace');
+                    }
                     ajaxStack.finish(stackElement);
                 }, function (e){
                     stackElement.error = true;

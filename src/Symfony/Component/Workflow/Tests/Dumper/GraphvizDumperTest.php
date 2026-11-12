@@ -324,6 +324,24 @@ class GraphvizDumperTest extends TestCase
         $this->assertStringNotContainsString('<tag>', $dump);
     }
 
+    public function testDumpEscapesBackslashesInHtmlLabels()
+    {
+        $transition = new Transition('t1', 'a', 'b');
+
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata[$transition] = ['step' => 'App\Workflow\NotifyCustomer'];
+
+        $store = new InMemoryMetadataStore(['class' => 'App\Workflow\Order'], ['a' => ['label' => 'App\Place']], $transitionsMetadata);
+        $definition = new Definition(['a', 'b'], [$transition], null, $store);
+
+        $dump = (new GraphvizDumper())->dump($definition, null, ['with-metadata' => true, 'label' => 'App\Title']);
+
+        $this->assertStringContainsString('<<B>App\\\\Place</B>', $dump);
+        $this->assertStringContainsString('step: App\\\\Workflow\\\\NotifyCustomer', $dump);
+        $this->assertStringContainsString('<<B>App\\\\Title</B>', $dump);
+        $this->assertStringContainsString('class: App\\\\Workflow\\\\Order', $dump);
+    }
+
     public static function provideSimpleWorkflowDumpWithoutMarkingWithMetadata(): string
     {
         return 'digraph workflow {
@@ -384,7 +402,7 @@ class GraphvizDumperTest extends TestCase
 
         $dump = (new GraphvizDumper())->dump($definition, null, ['listeners' => $listeners]);
 
-        $this->assertStringContainsString('Listener #0: App\\Listener\\OnTransition::__invoke()', $dump);
+        $this->assertStringContainsString('Listener #0: App\\\\Listener\\\\OnTransition::__invoke()', $dump);
         $this->assertStringContainsString('Listener #1: Guard: is_granted(&quot;ROLE_USER&quot;)', $dump);
     }
 

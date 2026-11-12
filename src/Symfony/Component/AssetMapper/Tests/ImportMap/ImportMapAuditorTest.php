@@ -129,6 +129,13 @@ class ImportMapAuditorTest extends TestCase
         yield [false, '1.0.0', '> 1.0.0, < 1.2.0'];
         yield [true, '1.1.0', '> 1.0.0, < 1.2.0'];
         yield [false, '1.2.0', '> 1.0.0, < 1.2.0'];
+        yield [true, '11.0.0-preview.7.26381.103', '< 11.0.0'];
+        yield [true, '11.0.0-preview.7.26381.103', '< 11.0.0-rc.1'];
+        yield [true, '1.2.3-pre.1', '>= 1.0.0, < 1.2.3'];
+        yield [true, '1.2.3-1', '< 1.2.3'];
+        yield [true, '1.0.0-alpha.1', '< 1.0.0-alpha.beta'];
+        yield [true, '4.0.0-canary.9', '>= 4.0.0-canary.0, < 4.0.0-canary.34'];
+        yield [false, '4.0.0-canary.34', '>= 4.0.0-canary.0, < 4.0.0-canary.34'];
     }
 
     public function testAuditError()

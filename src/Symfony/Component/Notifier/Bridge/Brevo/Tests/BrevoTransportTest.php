@@ -56,4 +56,19 @@ final class BrevoTransportTest extends TransportTestCase
 
         $transport->send(new SmsMessage('phone', 'testMessage'));
     }
+
+    public function testSendUsesTheTransactionalSmsSendEndpoint()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://host.test/v3/transactionalSMS/send', $url);
+            $this->assertSame(['sender' => '0611223344', 'recipient' => '0699887766', 'content' => 'Hello!'], json_decode($options['body'], true));
+
+            return new MockResponse(json_encode(['messageId' => 1511882900176220]), ['http_code' => 201]);
+        });
+
+        $sentMessage = self::createTransport($client)->send(new SmsMessage('0699887766', 'Hello!'));
+
+        $this->assertSame('1511882900176220', $sentMessage->getMessageId());
+    }
 }

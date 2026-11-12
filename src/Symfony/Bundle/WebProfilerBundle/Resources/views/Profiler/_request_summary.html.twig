@@ -55,7 +55,7 @@
         {% endif %}
 
         {% set referer = request_collector ? request_collector.requestheaders.get('referer') : null %}
-        {% if referer %}
+        {% if referer and referer matches '{^https?://}i' %}
             <dt>Referer</dt>
             <dd>
                 <span class="icon icon-referer">{{ source('@WebProfiler/Icon/referrer.svg') }}</span>

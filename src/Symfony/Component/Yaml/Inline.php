@@ -608,19 +608,37 @@ class Inline
                 }
 
                 // key
+                $keyAnchor = self::parseAnchor($mapping, $i);
+
+                if (!isset($mapping[$i])) {
+                    break;
+                }
+
+                if (Parser::preg_match('/\?[ \t]|[\[{]/A', $mapping, $match, 0, $i)) {
+                    throw new ParseException('Complex mappings are not supported.', self::$parsedLineNumber + 1, $mapping);
+                }
+
                 $offsetBeforeKeyParsing = $i;
                 $isKeyQuoted = \in_array($mapping[$i], ['"', "'"], true);
-                $key = self::parseScalar($mapping, $flags, [':', ' '], $i, false);
+                $keyDelimiters = $isKeyQuoted || Parser::preg_match('#!php/(const|enum) #A', $mapping, $match, 0, $i) ? [':', ' '] : [':'];
+                $key = self::parseScalar($mapping, $flags, $keyDelimiters, $i, false);
 
                 if ($offsetBeforeKeyParsing === $i) {
                     throw new ParseException('Missing mapping key.', self::$parsedLineNumber + 1, $mapping);
                 }
 
-                $isKeyEvaluated = '!php/const' === $key || '!php/enum' === $key;
+                if (!$isKeyQuoted && str_contains($key, ',')) {
+                    throw new ParseException(\sprintf('Malformed inline YAML string: "%s".', $mapping), self::$parsedLineNumber + 1, null, self::$parsedFilename);
+                }
+
+                $isKeyEvaluated = '!php/const' === $key || '!php/enum' === $key || (!$isKeyQuoted && str_starts_with($key, '*'));
 
                 if ($isKeyEvaluated) {
-                    $key .= ' '.self::parseScalar($mapping, $flags, ['(?<!:):(?!:)'], $i, false);
-                    $key = self::evaluateScalar($state, $key, $flags);
+                    if ('*' !== $key[0]) {
+                        $key .= ' '.self::parseScalar($mapping, $flags, ['(?<!:):(?!:)'], $i, false);
+                    }
+
+                    $key = self::evaluateScalar($state, $key, $flags, $references);
 
                     if (!\is_string($key) && !\is_int($key)) {
                         throw new ParseException((is_numeric($key) ? 'Numeric' : 'Non-string').' keys are not supported. Quote your evaluable mapping keys instead.', self::$parsedLineNumber + 1, $mapping);
@@ -645,6 +663,11 @@ class Inline
 
                 if (!$isKeyQuoted && (!isset($mapping[$i + 1]) || !\in_array($mapping[$i + 1], [' ', ',', '[', ']', '{', '}', "\n"], true))) {
                     throw new ParseException('Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}").', self::$parsedLineNumber + 1, $mapping);
+                }
+
+                if (null !== $keyAnchor) {
+                    $references[$keyAnchor] = $key;
+                    $state->anchorNodeCounts[$keyAnchor] = 0;
                 }
 
                 $isMergeKey = !$isKeyQuoted && !$isKeyEvaluated && '<<' === $key;

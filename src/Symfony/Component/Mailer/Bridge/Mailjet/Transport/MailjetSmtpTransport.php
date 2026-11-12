@@ -26,6 +26,7 @@ class MailjetSmtpTransport extends EsmtpTransport
     {
         parent::__construct('in-v3.mailjet.com', 587, false, $dispatcher, $logger);
 
+        $this->setRequireTls(true);
         $this->setUsername($username);
         $this->setPassword($password);
     }

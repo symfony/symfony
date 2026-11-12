@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Exception\UnserializableKeyException;
 use Symfony\Component\Lock\Key;
@@ -20,6 +21,7 @@ use Symfony\Component\Lock\Key;
  */
 class KeyTest extends TestCase
 {
+    #[Group('time-sensitive')]
     public function testSerialize()
     {
         $key = new Key(__METHOD__);

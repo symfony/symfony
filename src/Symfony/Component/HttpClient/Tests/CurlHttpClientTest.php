@@ -264,7 +264,8 @@ class CurlHttpClientTest extends HttpClientTestCase
             $p->stop();
         }
 
-        $this->assertSame($expectedUrl, $response->getInfo('url'));
+        // libcurl < 8.23 keeps the user info of the URL in CURLINFO_EFFECTIVE_URL
+        $this->assertSame($expectedUrl, preg_replace('{//[^/@]++@}', '//', $response->getInfo('url')));
         $this->assertSame($expectCredentials ? ['Bearer foo', 'foo=bar'] : [null, null], [$body['HTTP_AUTHORIZATION'] ?? null, $body['HTTP_COOKIE'] ?? null]);
     }
 

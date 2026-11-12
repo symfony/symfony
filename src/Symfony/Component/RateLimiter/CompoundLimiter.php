@@ -58,7 +58,7 @@ final class CompoundLimiter implements LimiterInterface
             return $minimalRateLimit;
         }
 
-        return new RateLimit($minimalRateLimit->getRemainingTokens(), $minimalRateLimit->getRetryAfter(), $minimalRateLimit->isAccepted(), $minimalRateLimit->getLimit(), $resetAt);
+        return $minimalRateLimit->withResetAt($resetAt);
     }
 
     public function reset(): void

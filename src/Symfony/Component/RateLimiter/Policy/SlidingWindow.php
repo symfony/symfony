@@ -25,24 +25,30 @@ final class SlidingWindow implements LimiterStateInterface
     private int $hitCountForLastWindow = 0;
     private float $windowEndAt;
     private ?int $maxSize = null;
+    private ?float $now = null;
 
+    /**
+     * @param float|null $now the current time, defaulting to microtime(true) when the window is used
+     */
     public function __construct(
         private string $id,
         private int $intervalInSeconds,
+        ?float $now = null,
     ) {
         if ($intervalInSeconds < 1) {
             throw new InvalidIntervalException(\sprintf('The interval must be positive integer, "%d" given.', $intervalInSeconds));
         }
-        $this->windowEndAt = microtime(true) + $intervalInSeconds;
+        $this->now = $now;
+        $this->windowEndAt = ($now ?? microtime(true)) + $intervalInSeconds;
     }
 
     public static function createFromPreviousWindow(self $window, int $intervalInSeconds): self
     {
-        $new = new self($window->id, $intervalInSeconds);
+        $new = new self($window->id, $intervalInSeconds, $window->now);
         $new->maxSize = $window->maxSize;
         // without a size, no hits are carried to the next windows
         $maxSize = $window->maxSize ?? max(1, $window->hitCount);
-        $windows = max(1, 1 + (int) ((microtime(true) - $window->windowEndAt) / $intervalInSeconds));
+        $windows = max(1, 1 + (int) ((($window->now ?? microtime(true)) - $window->windowEndAt) / $intervalInSeconds));
         // the reserved hits beyond the size of a window act in the next ones
         $hitCountForLastWindow = min($maxSize, max(0, $window->hitCount - ($windows - 1) * $maxSize));
 
@@ -55,8 +61,13 @@ final class SlidingWindow implements LimiterStateInterface
         return $new;
     }
 
-    public function configure(int $maxSize): void
+    /**
+     * @param float|null $now the current time, defaulting to microtime(true) when the window is used
+     */
+    public function configure(int $maxSize, ?float $now = null): void
     {
+        $this->now = $now;
+
         if (null !== $this->maxSize && $maxSize !== $this->maxSize && $this->hitCount > 0) {
             // full windows stay full and the last one is capped at the new size, like for fixed windows
             $fullWindows = intdiv($this->hitCount - 1, $this->maxSize);
@@ -78,12 +89,12 @@ final class SlidingWindow implements LimiterStateInterface
     {
         $windows = null !== $this->maxSize ? max(1, (int) ceil($this->hitCount / $this->maxSize)) : 1;
 
-        return (int) ceil($this->windowEndAt + $windows * $this->intervalInSeconds - microtime(true));
+        return (int) ceil($this->windowEndAt + $windows * $this->intervalInSeconds - ($this->now ?? microtime(true)));
     }
 
     public function isExpired(): bool
     {
-        return microtime(true) > $this->windowEndAt;
+        return ($this->now ?? microtime(true)) > $this->windowEndAt;
     }
 
     public function add(int $hits = 1): void
@@ -97,7 +108,7 @@ final class SlidingWindow implements LimiterStateInterface
     public function getHitCount(): int
     {
         $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
-        $percentOfCurrentTimeFrame = min((microtime(true) - $startOfWindow) / $this->intervalInSeconds, 1);
+        $percentOfCurrentTimeFrame = min((($this->now ?? microtime(true)) - $startOfWindow) / $this->intervalInSeconds, 1);
 
         return (int) floor($this->hitCountForLastWindow * (1 - $percentOfCurrentTimeFrame) + $this->hitCount);
     }
@@ -119,7 +130,7 @@ final class SlidingWindow implements LimiterStateInterface
             return $this->windowEndAt - $this->intervalInSeconds / $this->hitCountForLastWindow;
         }
 
-        return microtime(true);
+        return $this->now ?? microtime(true);
     }
 
     public function calculateTimeForTokens(int $maxSize, int $tokens): float
@@ -129,7 +140,7 @@ final class SlidingWindow implements LimiterStateInterface
             return 0;
         }
 
-        $time = microtime(true);
+        $time = $this->now ?? microtime(true);
         $windowPassed = min(($time - ($this->windowEndAt - $this->intervalInSeconds)) / $this->intervalInSeconds, 1);
         // Hits of the previous window fade out during the current one,
         // while hits of the current window count in full until it ends and only fade out during the next one

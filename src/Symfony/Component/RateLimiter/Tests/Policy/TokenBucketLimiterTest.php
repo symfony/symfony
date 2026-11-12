@@ -14,6 +14,7 @@ namespace Symfony\Component\RateLimiter\Tests\Policy;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\Policy\Rate;
 use Symfony\Component\RateLimiter\Policy\TokenBucket;
@@ -421,6 +422,69 @@ class TokenBucketLimiterTest extends TestCase
         $limiter->consume()->wait();
 
         $this->assertTrue($limiter->consume()->isAccepted());
+    }
+
+    public function testReserveUsesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new TokenBucketLimiter('test', 2, new Rate(new \DateInterval('PT10S')), new InMemoryStorage($clock), null, $clock);
+
+        $reservation = $limiter->reserve();
+
+        $this->assertSame(1000000000.25, $reservation->getTimeToAct());
+        $this->assertEqualsWithDelta(0.0, $reservation->getWaitDuration(), 1e-6);
+        $this->assertSame(1, $reservation->getRateLimit()->getRemainingTokens());
+    }
+
+    public function testConsumeUsesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new TokenBucketLimiter('test', 1, new Rate(new \DateInterval('PT10S')), new InMemoryStorage($clock), null, $clock);
+
+        $this->assertTrue($limiter->consume()->isAccepted());
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(1000000011, $rateLimit->getRetryAfter()->getTimestamp());
+
+        $clock->sleep(5);
+        $this->assertFalse($limiter->consume()->isAccepted());
+
+        $clock->sleep(5);
+        $this->assertTrue($limiter->consume()->isAccepted());
+    }
+
+    public function testReservationWaitAdvancesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new TokenBucketLimiter('test', 1, new Rate(new \DateInterval('PT10S')), new InMemoryStorage($clock), null, $clock);
+
+        $limiter->reserve();
+        $reservation = $limiter->reserve();
+        $this->assertSame(1000000010.25, $reservation->getTimeToAct());
+        $this->assertEqualsWithDelta(10.0, $reservation->getWaitDuration(), 1e-6);
+
+        $reservation->wait();
+
+        $this->assertSame('1000000010.250000', $clock->now()->format('U.u'));
+        $this->assertEqualsWithDelta(0.0, $reservation->getWaitDuration(), 1e-6);
+    }
+
+    public function testMaxWaitDurationExceededRateLimitUsesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new TokenBucketLimiter('test', 1, new Rate(new \DateInterval('PT10S')), new InMemoryStorage($clock), null, $clock);
+        $limiter->reserve();
+
+        try {
+            $limiter->reserve(1, 1);
+            $this->fail('MaxWaitDurationExceededException not thrown.');
+        } catch (MaxWaitDurationExceededException $e) {
+            $this->assertSame(1000000011, $e->getRateLimit()->getRetryAfter()->getTimestamp());
+            $e->getRateLimit()->wait();
+        }
+
+        $this->assertSame('1000000011', $clock->now()->format('U'));
     }
 
     private function createLimiter($initialTokens = 10, ?Rate $rate = null)

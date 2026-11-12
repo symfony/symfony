@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\Policy\CalendarAlignedWindow;
@@ -854,6 +855,104 @@ class FixedWindowLimiterTest extends TestCase
         $this->expectExceptionMessage('The interval must be positive integer, "0" given.');
 
         new FixedWindowLimiter('test', 10, \DateInterval::createFromDateString('200 milliseconds'), $this->storage);
+    }
+
+    public function testReserveUsesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new FixedWindowLimiter('test', 2, new \DateInterval('PT1M'), new InMemoryStorage($clock), null, null, $clock);
+
+        $reservation = $limiter->reserve();
+
+        $this->assertSame(1000000000.25, $reservation->getTimeToAct());
+        $this->assertEqualsWithDelta(0.0, $reservation->getWaitDuration(), 1e-6);
+        $this->assertSame(1, $reservation->getRateLimit()->getRemainingTokens());
+        $this->assertSame(1000000000, $reservation->getRateLimit()->getRetryAfter()->getTimestamp());
+    }
+
+    public function testConsumeUsesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new FixedWindowLimiter('test', 2, new \DateInterval('PT1M'), new InMemoryStorage($clock), null, null, $clock);
+
+        $this->assertTrue($limiter->consume(2)->isAccepted());
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertGreaterThanOrEqual(1000000060, $rateLimit->getRetryAfter()->getTimestamp());
+        $this->assertLessThanOrEqual(1000000061, $rateLimit->getRetryAfter()->getTimestamp());
+        $this->assertGreaterThanOrEqual(1000000060, $rateLimit->getResetAt()->getTimestamp());
+        $this->assertLessThanOrEqual(1000000061, $rateLimit->getResetAt()->getTimestamp());
+
+        $clock->sleep(30);
+        $this->assertFalse($limiter->consume()->isAccepted());
+
+        $clock->sleep(31);
+        $rateLimit = $limiter->consume();
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(1, $rateLimit->getRemainingTokens());
+    }
+
+    public function testWaitingOnTheRateLimitAdvancesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new FixedWindowLimiter('test', 1, new \DateInterval('PT10S'), new InMemoryStorage($clock), null, null, $clock);
+
+        $limiter->consume();
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+
+        $rateLimit->wait();
+
+        $this->assertSame($rateLimit->getRetryAfter()->getTimestamp(), (int) $clock->now()->format('U'));
+        $this->assertTrue($limiter->consume()->isAccepted());
+    }
+
+    public function testReservationWaitAdvancesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new FixedWindowLimiter('test', 1, new \DateInterval('PT10S'), new InMemoryStorage($clock), null, null, $clock);
+
+        $limiter->reserve();
+        $reservation = $limiter->reserve();
+        $this->assertGreaterThan(0, $reservation->getWaitDuration());
+
+        $reservation->wait();
+
+        $this->assertEqualsWithDelta($reservation->getTimeToAct(), (float) $clock->now()->format('U.u'), 1e-6);
+        $this->assertEqualsWithDelta(0.0, $reservation->getWaitDuration(), 1e-6);
+    }
+
+    public function testMaxWaitDurationExceededRateLimitUsesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new FixedWindowLimiter('test', 1, new \DateInterval('PT10S'), new InMemoryStorage($clock), null, null, $clock);
+        $limiter->reserve();
+
+        try {
+            $limiter->reserve(1, 1);
+            $this->fail('MaxWaitDurationExceededException not thrown.');
+        } catch (MaxWaitDurationExceededException $e) {
+            $e->getRateLimit()->wait();
+        }
+
+        $this->assertSame($e->getRateLimit()->getRetryAfter()->getTimestamp(), (int) $clock->now()->format('U'));
+    }
+
+    public function testCalendarAlignedWindowUsesTheClock()
+    {
+        $clock = new MockClock('2001-09-09 12:00:00', 'UTC');
+        $anchor = new \DateTimeImmutable('2001-09-09 00:00:00', new \DateTimeZone('UTC'));
+        $limiter = new FixedWindowLimiter('test', 1, new \DateInterval('P1D'), new InMemoryStorage($clock), null, $anchor, $clock);
+
+        $this->assertTrue($limiter->consume()->isAccepted());
+
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame($anchor->modify('+1 day')->getTimestamp(), $rateLimit->getRetryAfter()->getTimestamp());
+
+        $clock->modify('+12 hours');
+        $this->assertTrue($limiter->consume()->isAccepted());
     }
 
     private function createLimiter(string $dateIntervalString = 'PT1M'): FixedWindowLimiter

@@ -14,6 +14,8 @@ namespace Symfony\Component\RateLimiter\Tests\Policy;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
+use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
@@ -335,6 +337,76 @@ class SlidingWindowLimiterTest extends TestCase
         $this->expectExceptionMessage('Cannot set the limit of "Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter" to 0, as that would never accept any hit.');
 
         new SlidingWindowLimiter('test', -1, new \DateInterval('PT12S'), $this->storage);
+    }
+
+    public function testReserveUsesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new SlidingWindowLimiter('test', 2, new \DateInterval('PT10S'), new InMemoryStorage($clock), null, $clock);
+
+        $reservation = $limiter->reserve();
+
+        $this->assertSame(1000000000.25, $reservation->getTimeToAct());
+        $this->assertEqualsWithDelta(0.0, $reservation->getWaitDuration(), 1e-6);
+        $this->assertSame(1, $reservation->getRateLimit()->getRemainingTokens());
+    }
+
+    public function testConsumeUsesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new SlidingWindowLimiter('test', 2, new \DateInterval('PT10S'), new InMemoryStorage($clock), null, $clock);
+
+        $this->assertTrue($limiter->consume(2)->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+
+        // half of the previous window's hits have faded out
+        $clock->sleep(15);
+        $rateLimit = $limiter->consume();
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+    }
+
+    public function testConsumeAfterTheWindowsElapsedOnTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new SlidingWindowLimiter('test', 2, new \DateInterval('PT10S'), new InMemoryStorage($clock), null, $clock);
+
+        $this->assertTrue($limiter->consume(2)->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+
+        $clock->sleep(20.5);
+        $this->assertTrue($limiter->consume(2)->isAccepted());
+    }
+
+    public function testReservationWaitAdvancesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new SlidingWindowLimiter('test', 1, new \DateInterval('PT10S'), new InMemoryStorage($clock), null, $clock);
+
+        $limiter->reserve();
+        $reservation = $limiter->reserve();
+        $this->assertEqualsWithDelta(10.0, $reservation->getWaitDuration(), 1e-6);
+
+        $reservation->wait();
+
+        $this->assertEqualsWithDelta(1000000010.25, (float) $clock->now()->format('U.u'), 1e-6);
+    }
+
+    public function testMaxWaitDurationExceededRateLimitUsesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new SlidingWindowLimiter('test', 1, new \DateInterval('PT10S'), new InMemoryStorage($clock), null, $clock);
+        $limiter->reserve();
+
+        try {
+            $limiter->reserve(1, 1);
+            $this->fail('MaxWaitDurationExceededException not thrown.');
+        } catch (MaxWaitDurationExceededException $e) {
+            $this->assertSame(1000000011, $e->getRateLimit()->getRetryAfter()->getTimestamp());
+            $e->getRateLimit()->wait();
+        }
+
+        $this->assertSame('1000000011', $clock->now()->format('U'));
     }
 
     private function createLimiter(): SlidingWindowLimiter

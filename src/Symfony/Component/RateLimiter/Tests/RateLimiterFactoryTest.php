@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
 use Symfony\Component\RateLimiter\Policy\NoLimiter;
@@ -162,6 +163,80 @@ class RateLimiterFactoryTest extends TestCase
             'interval' => '5 seconds',
             'anchor_at' => '2024-01-05 00:00:00 UTC',
         ], new InMemoryStorage());
+    }
+
+    #[DataProvider('clockConfigProvider')]
+    public function testLimitersUseTheClock(array $config)
+    {
+        $clock = new MockClock('@1000000000.25');
+        $factory = new RateLimiterFactory($config, new InMemoryStorage($clock), null, $clock);
+
+        $reservation = $factory->create('key')->reserve();
+
+        $this->assertSame(1000000000.25, $reservation->getTimeToAct());
+        $this->assertEqualsWithDelta(0.0, $reservation->getWaitDuration(), 1e-6);
+    }
+
+    public static function clockConfigProvider()
+    {
+        yield 'token_bucket' => [[
+            'policy' => 'token_bucket',
+            'id' => 'test',
+            'limit' => 5,
+            'rate' => ['interval' => '5 seconds'],
+        ]];
+        yield 'fixed_window' => [[
+            'policy' => 'fixed_window',
+            'id' => 'test',
+            'limit' => 5,
+            'interval' => '5 seconds',
+        ]];
+        yield 'sliding_window' => [[
+            'policy' => 'sliding_window',
+            'id' => 'test',
+            'limit' => 5,
+            'interval' => '5 seconds',
+        ]];
+        yield 'no_limit' => [[
+            'policy' => 'no_limit',
+            'id' => 'test',
+        ]];
+    }
+
+    #[DataProvider('limitedClockConfigProvider')]
+    public function testLimitersRecoverWhenTheClockAdvances(array $config)
+    {
+        $clock = new MockClock('@1000000000.25');
+        $factory = new RateLimiterFactory($config, new InMemoryStorage($clock), null, $clock);
+        $limiter = $factory->create('key');
+
+        $this->assertTrue($limiter->consume()->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+
+        $clock->sleep(30);
+        $this->assertTrue($limiter->consume()->isAccepted());
+    }
+
+    public static function limitedClockConfigProvider()
+    {
+        yield 'token_bucket' => [[
+            'policy' => 'token_bucket',
+            'id' => 'test',
+            'limit' => 1,
+            'rate' => ['interval' => '10 seconds'],
+        ]];
+        yield 'fixed_window' => [[
+            'policy' => 'fixed_window',
+            'id' => 'test',
+            'limit' => 1,
+            'interval' => '10 seconds',
+        ]];
+        yield 'sliding_window' => [[
+            'policy' => 'sliding_window',
+            'id' => 'test',
+            'limit' => 1,
+            'interval' => '10 seconds',
+        ]];
     }
 
     #[Group('time-sensitive')]

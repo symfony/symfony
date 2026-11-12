@@ -171,6 +171,47 @@ class SlidingWindowTest extends TestCase
         $this->assertEqualsWithDelta(10, $window->calculateTimeForTokens(10, 3), 0.01);
     }
 
+    public function testGivenTimeIsUsedInsteadOfMicrotime()
+    {
+        $window = new SlidingWindow('foo', 10, 1000000000.0);
+
+        $this->assertFalse($window->isExpired());
+        $this->assertSame(20, $window->getExpirationTime());
+
+        $window->configure(5, 1000000005.0);
+        $this->assertFalse($window->isExpired());
+        $this->assertSame(15, $window->getExpirationTime());
+
+        $window->configure(5, 1000000010.5);
+        $this->assertTrue($window->isExpired());
+    }
+
+    public function testCalculateTimeForTokensUsesTheGivenTime()
+    {
+        $window = new SlidingWindow('foo', 10, 1000000000.0);
+        $window->configure(1, 1000000000.0);
+        $window->add();
+
+        $window->configure(1, 1000000004.0);
+        $this->assertEqualsWithDelta(6, $window->calculateTimeForTokens(1, 1), 0.01);
+    }
+
+    public function testCreateFromPreviousWindowKeepsTheGivenTime()
+    {
+        $window = new SlidingWindow('foo', 10, 1000000000.0);
+        $window->configure(10, 1000000000.0);
+        $window->add(10);
+
+        $window->configure(10, 1000000015.0);
+        $this->assertTrue($window->isExpired());
+
+        $new = SlidingWindow::createFromPreviousWindow($window, 10);
+
+        $this->assertFalse($new->isExpired());
+        // half of the previous window's hits have faded out
+        $this->assertSame(5, $new->getHitCount());
+    }
+
     public function testUnserializeRejectsObjectInTypedIdProperty()
     {
         $data = [

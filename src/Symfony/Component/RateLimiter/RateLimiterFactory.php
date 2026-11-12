@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -32,6 +33,7 @@ final class RateLimiterFactory implements RateLimiterFactoryInterface
         array $config,
         private StorageInterface $storage,
         private ?LockFactory $lockFactory = null,
+        private ?ClockInterface $clock = null,
     ) {
         $options = new OptionsResolver();
         self::configureOptions($options);
@@ -42,16 +44,16 @@ final class RateLimiterFactory implements RateLimiterFactoryInterface
     public function create(?string $key = null): LimiterInterface
     {
         if ('no_limit' === $this->config['policy']) {
-            return new NoLimiter();
+            return new NoLimiter($this->clock);
         }
 
         $id = $this->config['id'].'-'.$key;
         $lock = $this->lockFactory?->createLock($id);
 
         return match ($this->config['policy']) {
-            'token_bucket' => new TokenBucketLimiter($id, $this->config['limit'], $this->config['rate'], $this->storage, $lock),
-            'fixed_window' => new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock, $this->config['anchor_at']),
-            'sliding_window' => new SlidingWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock),
+            'token_bucket' => new TokenBucketLimiter($id, $this->config['limit'], $this->config['rate'], $this->storage, $lock, $this->clock),
+            'fixed_window' => new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock, $this->config['anchor_at'], $this->clock),
+            'sliding_window' => new SlidingWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock, $this->clock),
             default => throw new \LogicException(\sprintf('Limiter policy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['policy'])),
         };
     }

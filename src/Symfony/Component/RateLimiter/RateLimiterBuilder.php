@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
@@ -24,6 +25,7 @@ final class RateLimiterBuilder
     public function __construct(
         private StorageInterface $storage,
         private ?LockFactory $lockFactory = null,
+        private ?ClockInterface $clock = null,
     ) {
     }
 
@@ -99,6 +101,6 @@ final class RateLimiterBuilder
 
     private function factory(array $config): RateLimiterFactory
     {
-        return new RateLimiterFactory($config, $this->storage, $this->lockFactory);
+        return new RateLimiterFactory($config, $this->storage, $this->lockFactory, $this->clock);
     }
 }

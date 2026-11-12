@@ -17,11 +17,13 @@
     ],
     "require": {
         "php": ">=8.4.1",
+        "psr/clock": "^1.0",
         "symfony/options-resolver": "^7.4|^8.0"
     },
     "require-dev": {
         "psr/cache": "^1.0|^2.0|^3.0",
         "symfony/cache": "^7.4.8|^8.0.8",
+        "symfony/clock": "^7.4|^8.0",
         "symfony/config": "^8.2",
         "symfony/dependency-injection": "^8.2",
         "symfony/lock": "^7.4|^8.0"

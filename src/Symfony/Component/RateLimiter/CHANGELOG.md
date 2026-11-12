@@ -11,6 +11,7 @@ CHANGELOG
  * Allow `\DateInterval` for the `interval` and `rate.interval` options of `RateLimiterFactory`
  * Add `RateLimit::getResetAt()`
  * Add a `$keys` argument to `CompoundRateLimiterFactory`, and accept a map in the `limiters` option of a compound rate limiter, to fix the key of some of its sub-limiters
+ * Add an optional PSR-20 `$clock` argument to `RateLimiterFactory`, `RateLimiterBuilder`, the limiters, `RateLimit`, `Reservation` and `InMemoryStorage`; the `rate_limiter` services use the `clock` service
 
 8.1
 ---

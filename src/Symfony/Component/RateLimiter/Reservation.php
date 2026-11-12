@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\RateLimiter;
 
+use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\ClockInterface as SymfonyClockInterface;
+
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
@@ -22,6 +25,7 @@ final class Reservation
     public function __construct(
         private float $timeToAct,
         private RateLimit $rateLimit,
+        private ?ClockInterface $clock = null,
     ) {
     }
 
@@ -32,7 +36,9 @@ final class Reservation
 
     public function getWaitDuration(): float
     {
-        return max(0, (-microtime(true)) + $this->timeToAct);
+        $now = $this->clock ? (float) $this->clock->now()->format('U.u') : microtime(true);
+
+        return max(0, (-$now) + $this->timeToAct);
     }
 
     public function getRateLimit(): RateLimit
@@ -42,6 +48,12 @@ final class Reservation
 
     public function wait(): void
     {
+        if ($this->clock instanceof SymfonyClockInterface) {
+            $this->clock->sleep($this->getWaitDuration());
+
+            return;
+        }
+
         usleep((int) ($this->getWaitDuration() * 1e6));
     }
 }

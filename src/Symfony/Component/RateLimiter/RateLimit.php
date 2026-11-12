@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\RateLimiter;
 
+use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\ClockInterface as SymfonyClockInterface;
 use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
 
 /**
@@ -24,6 +26,7 @@ class RateLimit
         private bool $accepted,
         private int $limit,
         private ?\DateTimeImmutable $resetAt = null,
+        private ?ClockInterface $clock = null,
     ) {
     }
 
@@ -69,10 +72,27 @@ class RateLimit
         return $this->resetAt;
     }
 
+    /**
+     * @internal
+     */
+    public function withResetAt(?\DateTimeImmutable $resetAt): static
+    {
+        $rateLimit = clone $this;
+        $rateLimit->resetAt = $resetAt;
+
+        return $rateLimit;
+    }
+
     public function wait(): void
     {
-        $delta = (\PHP_INT_SIZE >= 8 ? $this->retryAfter->getTimestamp() + $this->retryAfter->getMicrosecond() / 1e6 : (float) $this->retryAfter->format('U.u')) - microtime(true);
+        $delta = (\PHP_INT_SIZE >= 8 ? $this->retryAfter->getTimestamp() + $this->retryAfter->getMicrosecond() / 1e6 : (float) $this->retryAfter->format('U.u')) - ($this->clock ? (float) $this->clock->now()->format('U.u') : microtime(true));
         if ($delta <= 0) {
+            return;
+        }
+
+        if ($this->clock instanceof SymfonyClockInterface) {
+            $this->clock->sleep($delta);
+
             return;
         }
 

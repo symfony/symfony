@@ -14,9 +14,11 @@ namespace Symfony\Component\RateLimiter\Tests;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\RateLimiter\CompoundLimiter;
 use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
+use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 
 #[Group('time-sensitive')]
@@ -30,6 +32,7 @@ class CompoundLimiterTest extends TestCase
 
         ClockMock::register(InMemoryStorage::class);
         ClockMock::register(FixedWindowLimiter::class);
+        ClockMock::register(RateLimit::class);
     }
 
     public function testConsume()
@@ -148,6 +151,29 @@ class CompoundLimiterTest extends TestCase
         $this->expectException(ReserveNotSupportedException::class);
 
         (new CompoundLimiter([$this->createLimiter(4, new \DateInterval('PT1S'))]))->reserve();
+    }
+
+    public function testRateLimitWithTheLatestResetTimeKeepsTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $storage = new InMemoryStorage($clock);
+        $limiter = new CompoundLimiter([
+            new FixedWindowLimiter('first', 1, new \DateInterval('PT1S'), $storage, null, null, $clock),
+            new FixedWindowLimiter('second', 10, new \DateInterval('PT1M'), $storage, null, null, $clock),
+        ]);
+
+        $rateLimit = $limiter->consume();
+
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertSame(1, $rateLimit->getLimit());
+        $this->assertSame(1000000002, $rateLimit->getRetryAfter()->getTimestamp());
+        // the reset time is the one of the limiter back to full capacity last
+        $this->assertSame(1000000061, $rateLimit->getResetAt()->getTimestamp());
+
+        $rateLimit->wait();
+
+        $this->assertSame('1000000002', $clock->now()->format('U'));
     }
 
     private function createLimiter(int $limit, \DateInterval $interval): FixedWindowLimiter

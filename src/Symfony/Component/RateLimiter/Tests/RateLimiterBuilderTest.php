@@ -13,6 +13,7 @@ namespace Symfony\Component\RateLimiter\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\InMemoryStore;
 use Symfony\Component\RateLimiter\CompoundLimiter;
@@ -74,6 +75,30 @@ class RateLimiterBuilderTest extends TestCase
     {
         yield 'string' => ['2024-01-01 00:00:00'];
         yield 'DateTimeImmutable' => [new \DateTimeImmutable('2024-01-01 00:00:00', new \DateTimeZone('UTC'))];
+    }
+
+    public function testFactoriesPassTheClockToTheLimiters()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $builder = new RateLimiterBuilder(new InMemoryStorage($clock), null, $clock);
+
+        $this->assertSame(1000000000.25, $builder->slidingWindow('sliding', 5, '1 minute')->create()->reserve()->getTimeToAct());
+        $this->assertSame(1000000000.25, $builder->fixedWindow('fixed', 5, '1 minute')->create()->reserve()->getTimeToAct());
+        $this->assertSame(1000000000.25, $builder->tokenBucket('bucket', 5, '1 hour', 2)->create()->reserve()->getTimeToAct());
+        $this->assertSame(1000000000.25, $builder->noop()->create()->reserve()->getTimeToAct());
+    }
+
+    public function testLimitersRecoverWhenTheClockAdvances()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $builder = new RateLimiterBuilder(new InMemoryStorage($clock), null, $clock);
+        $limiter = $builder->fixedWindow('foo', 1, '1 minute')->create('key');
+
+        $this->assertTrue($limiter->consume()->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted());
+
+        $clock->sleep(61);
+        $this->assertTrue($limiter->consume()->isAccepted());
     }
 
     public function testLockIsCreatedPerKey()

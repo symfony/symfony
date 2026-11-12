@@ -14,6 +14,7 @@ namespace Symfony\Component\RateLimiter\Tests\Policy;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\RateLimiter\Policy\NoLimiter;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Reservation;
@@ -50,5 +51,32 @@ class NoLimiterTest extends TestCase
         } finally {
             date_default_timezone_set($originalTimezone);
         }
+    }
+
+    public function testConsumeUsesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new NoLimiter($clock);
+
+        $rateLimit = $limiter->consume();
+
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame('1000000000.250000', $rateLimit->getRetryAfter()->format('U.u'));
+    }
+
+    public function testReserveUsesTheClock()
+    {
+        $clock = new MockClock('@1000000000.25');
+        $limiter = new NoLimiter($clock);
+
+        $reservation = $limiter->reserve();
+
+        $this->assertSame(1000000000.25, $reservation->getTimeToAct());
+        $this->assertSame('1000000000.250000', $reservation->getRateLimit()->getRetryAfter()->format('U.u'));
+        $this->assertEqualsWithDelta(0.0, $reservation->getWaitDuration(), 1e-6);
+
+        $reservation->wait();
+        $reservation->getRateLimit()->wait();
+        $this->assertSame('1000000000.250000', $clock->now()->format('U.u'));
     }
 }

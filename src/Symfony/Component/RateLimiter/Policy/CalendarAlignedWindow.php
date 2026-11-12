@@ -22,6 +22,7 @@ final class CalendarAlignedWindow implements LimiterStateInterface
 {
     private int $hitCount = 0;
     private ?\DateTimeImmutable $anchor = null;
+    private ?float $now = null;
 
     public function __construct(
         private string $id,
@@ -51,11 +52,12 @@ final class CalendarAlignedWindow implements LimiterStateInterface
     {
         $periods = max(1, (int) ceil($this->hitCount / $this->maxSize));
 
-        return max(0, $this->getPeriodBoundary($periods)->getTimestamp() - time());
+        return max(0, $this->getPeriodBoundary($periods)->getTimestamp() - (int) ($this->now ?? time()));
     }
 
     public function configure(\DateInterval $interval, int $maxSize, \DateTimeImmutable $anchor, float $now): void
     {
+        $this->now = $now;
         $this->interval = $interval;
         $this->anchor = $anchor;
         $this->periodStart = $this->periodStart->setTimezone($anchor->getTimezone());

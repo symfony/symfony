@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Reservation;
@@ -25,16 +26,21 @@ use Symfony\Component\RateLimiter\Reservation;
  */
 final class NoLimiter implements LimiterInterface
 {
+    public function __construct(
+        private ?ClockInterface $clock = null,
+    ) {
+    }
+
     public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
     {
-        $now = microtime(true);
+        $now = $this->clock ? (float) $this->clock->now()->format('U.u') : microtime(true);
 
-        return new Reservation($now, new RateLimit(\PHP_INT_MAX, \DateTimeImmutable::createFromTimestamp($now)->setTimezone(new \DateTimeZone(date_default_timezone_get())), true, \PHP_INT_MAX));
+        return new Reservation($now, new RateLimit(\PHP_INT_MAX, \DateTimeImmutable::createFromTimestamp($now)->setTimezone(new \DateTimeZone(date_default_timezone_get())), true, \PHP_INT_MAX, null, $this->clock), $this->clock);
     }
 
     public function consume(int $tokens = 1): RateLimit
     {
-        return new RateLimit(\PHP_INT_MAX, \DateTimeImmutable::createFromTimestamp(microtime(true))->setTimezone(new \DateTimeZone(date_default_timezone_get())), true, \PHP_INT_MAX);
+        return new RateLimit(\PHP_INT_MAX, \DateTimeImmutable::createFromTimestamp($this->clock ? (float) $this->clock->now()->format('U.u') : microtime(true))->setTimezone(new \DateTimeZone(date_default_timezone_get())), true, \PHP_INT_MAX, null, $this->clock);
     }
 
     public function reset(): void

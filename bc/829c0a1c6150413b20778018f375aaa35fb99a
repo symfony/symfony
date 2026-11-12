@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T09:23:04Z
+
+I pushed one more fix. When the schedule changed again before the new message ran, the generator already knew the message and started it from the last run. Adding a `*/5` cron at 12:00:30 and another message at 12:02:30 still gave 48 runs at once. The generator now remembers when it first saw each message added at runtime.

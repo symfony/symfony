@@ -646,6 +646,17 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->expectNotToPerformAssertions();
     }
 
+    public function testPipeBody()
+    {
+        $process = proc_open([\PHP_BINARY, '-r', 'echo "foo=0123456789";'], [1 => ['pipe', 'w']], $pipes);
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', ['body' => $pipes[1]]);
+
+        $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray());
+        proc_close($process);
+    }
+
     public function testMisspelledScheme()
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);

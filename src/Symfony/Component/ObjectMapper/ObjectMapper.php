@@ -221,6 +221,10 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 continue;
             }
 
+            if (!$this->mayHoldNestedSource($source, $property, $targetName)) {
+                continue;
+            }
+
             if (!$this->isReadable($source, $propertyName, $refl)) {
                 continue;
             }
@@ -305,6 +309,21 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
         // an uninitialized property is not readable, unless unset() re-enabled magic methods on it
         return $property->isInitialized($source) || isset($source->{$propertyName});
+    }
+
+    private function mayHoldNestedSource(object $source, \ReflectionProperty $property, string $targetName): bool
+    {
+        if ($property->hasHooks() || !$property->getDeclaringClass()->isInstance($source)) {
+            return true;
+        }
+
+        if (!$property->isInitialized($source)) {
+            return false;
+        }
+
+        $value = $property->getValue($source);
+
+        return \is_object($value) && array_any($this->metadataFactory->create($value), static fn (Mapping $m): bool => \is_string($m->target) && is_a($targetName, $m->target, true));
     }
 
     private function getRawValue(object $source, string $propertyName): mixed

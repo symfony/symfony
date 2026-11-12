@@ -99,6 +99,8 @@ class FrankenPhpWorkerRunner implements RunnerInterface
                 // Collect cycles between requests, before PHP does it in the middle of one
                 gc_collect_cycles();
             }
+
+            memory_reset_peak_usage();
         } while ($ret && (0 >= $this->loopMax || ++$loops < $this->loopMax));
 
         return 0;

@@ -167,6 +167,7 @@ trait TagAwareTestTrait
 
         $i = $pool->getItem('k');
         $this->assertSame(['foo' => 'foo'], $i->getMetadata()[CacheItem::METADATA_TAGS]);
+        $this->assertArrayNotHasKey(CacheItem::METADATA_EXPIRY, $i->getMetadata());
     }
 
     public function testRefreshAfterExpires()

@@ -66,7 +66,13 @@ class ©
         }
 
         $metadata = unpack('Vexpiry/nctime', $pack);
-        $metadata['expiry'] += self::EXPIRY_OFFSET;
+
+        if (self::INT32_MAX === $metadata['expiry']) {
+            // the item has no expiry, see __serialize()
+            unset($metadata['expiry']);
+        } else {
+            $metadata['expiry'] += self::EXPIRY_OFFSET;
+        }
 
         if (!$metadata['ctime'] = ((0x4000 | $metadata['ctime']) << 16 >> (0x1F & $metadata['ctime'])) - 1) {
             unset($metadata['ctime']);

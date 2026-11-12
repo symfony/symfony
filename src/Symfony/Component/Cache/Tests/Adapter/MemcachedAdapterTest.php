@@ -18,6 +18,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Exception\CacheException;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 #[Group('integration')]
 class MemcachedAdapterTest extends AdapterTestCase
@@ -187,6 +188,55 @@ class MemcachedAdapterTest extends AdapterTestCase
         $this->assertSame(1, $client->getOption(\Memcached::OPT_SOCKET_RECV_SIZE));
         $this->assertSame(2, $client->getOption(\Memcached::OPT_SOCKET_SEND_SIZE));
         $this->assertSame(8, $client->getOption(\Memcached::OPT_RETRY_TIMEOUT));
+    }
+
+    public function testBooleanOptionsFromDsn()
+    {
+        $client = MemcachedAdapter::createConnection('memcached://localhost:11222?compression=true&libketama_compatible=true&tcp_nodelay=on&binary_protocol=yes&connect_timeout=500');
+
+        $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
+        $this->assertSame(1, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
+        $this->assertSame(1, $client->getOption(\Memcached::OPT_TCP_NODELAY));
+        $this->assertSame(1, $client->getOption(\Memcached::OPT_BINARY_PROTOCOL));
+        $this->assertSame(500, $client->getOption(\Memcached::OPT_CONNECT_TIMEOUT));
+
+        $client = MemcachedAdapter::createConnection('memcached://localhost:11222?compression=false&libketama_compatible=0&tcp_nodelay=');
+
+        $this->assertFalse($client->getOption(\Memcached::OPT_COMPRESSION));
+        $this->assertSame(0, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
+        $this->assertSame(0, $client->getOption(\Memcached::OPT_TCP_NODELAY));
+    }
+
+    public function testConstantNameOptionsFromDsn()
+    {
+        $client = MemcachedAdapter::createConnection('memcached://localhost:11222?libketama_hash=md5&compression_type=zlib');
+
+        $this->assertSame(\Memcached::HASH_MD5, $client->getOption(\Memcached::OPT_LIBKETAMA_HASH));
+        $this->assertSame(\Memcached::COMPRESSION_ZLIB, $client->getOption(\Memcached::OPT_COMPRESSION_TYPE));
+
+        $client = MemcachedAdapter::createConnection('memcached://localhost:11222?compression_type='.\Memcached::COMPRESSION_ZLIB);
+
+        $this->assertSame(\Memcached::COMPRESSION_ZLIB, $client->getOption(\Memcached::OPT_COMPRESSION_TYPE));
+    }
+
+    public function testInvalidOptionsFromDsn()
+    {
+        $cases = [
+            'compression=ture' => 'Invalid Memcached DSN: parameter "compression" must be a boolean.',
+            'libketama_compatible=2' => 'Invalid Memcached DSN: parameter "libketama_compatible" must be a boolean.',
+            'connect_timeout=1s' => 'Invalid Memcached DSN: parameter "connect_timeout" must be an integer.',
+            'retry_timeout=' => 'Invalid Memcached DSN: parameter "retry_timeout" must be an integer.',
+            'compression_type=foo' => 'Invalid Memcached DSN: parameter "compression_type" must be an integer.',
+        ];
+
+        foreach ($cases as $query => $message) {
+            try {
+                MemcachedAdapter::createConnection('memcached://localhost:11222?'.$query);
+                $this->fail(\sprintf('"%s" should have been rejected.', $query));
+            } catch (InvalidArgumentException $e) {
+                $this->assertSame($message, $e->getMessage());
+            }
+        }
     }
 
     public function testClear()

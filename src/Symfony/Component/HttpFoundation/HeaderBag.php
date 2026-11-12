@@ -193,7 +193,7 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
             return null !== $default ? \DateTimeImmutable::createFromInterface($default) : null;
         }
 
-        if (false === $date = \DateTimeImmutable::createFromFormat(\DATE_RFC2822, $value)) {
+        if (null === $date = self::parseHttpDate($value)) {
             throw new \RuntimeException(\sprintf('The "%s" HTTP header is not parseable (%s).', $key, $value));
         }
 
@@ -293,5 +293,41 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
         $parts = HeaderUtils::split($header, ',=');
 
         return HeaderUtils::combine($parts);
+    }
+
+    /**
+     * Parses a date in one of the three formats of RFC 9110 Section 5.6.7, in any letter case.
+     *
+     * As with \DATE_RFC2822, IMF-fixdate also accepts one-digit days and hours, zone abbreviations and numeric offsets.
+     */
+    private static function parseHttpDate(string $value): ?\DateTimeImmutable
+    {
+        $value = trim($value);
+
+        if (preg_match('/^([a-z]{3}), (\d{1,2}) ([a-z]{3}) (\d{4}) (\d{1,2}:\d\d:\d\d) ([a-z]+|[+-]\d{4})$/i', $value, $m)) {
+            [, $weekday, $day, $month, $year, $time, $zone] = $m;
+        } elseif (preg_match('/^([a-z]{6,9}), (\d\d)-([a-z]{3})-(\d\d) (\d\d:\d\d:\d\d) ([a-z]+|[+-]\d{4})$/i', $value, $m)) {
+            [, $weekday, $day, $month, $year, $time, $zone] = $m;
+
+            // a two-digit year that is more than 50 years in the future is in the past century
+            $year = (int) $year + 100 * intdiv($currentYear = (int) (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Y'), 100);
+            $year -= $year > $currentYear + 50 ? 100 : 0;
+        } elseif (preg_match('/^([a-z]{3}) ([a-z]{3}) ([ \d]\d) (\d\d:\d\d:\d\d) (\d{4})$/i', $value, $m)) {
+            [, $weekday, $month, $day, $time, $year] = $m;
+            $zone = 'GMT';
+        } else {
+            return null;
+        }
+
+        if (false === $date = \DateTimeImmutable::createFromFormat('!j M Y H:i:s O', \sprintf('%d %s %d %s %s', $day, $month, $year, $time, $zone))) {
+            return null;
+        }
+
+        // reject out of range days or times, which PHP reports as warnings, and weekday names that don't match the date
+        if (false !== \DateTimeImmutable::getLastErrors() || 0 !== strcasecmp($weekday, $date->format(3 < \strlen($weekday) ? 'l' : 'D'))) {
+            return null;
+        }
+
+        return $date;
     }
 }

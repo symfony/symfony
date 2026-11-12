@@ -1779,6 +1779,17 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
+    public function testSessionListenerInTestMode()
+    {
+        $container = $this->createContainer();
+        (new FrameworkExtension())->load([['test' => true, 'session' => ['storage_factory_id' => 'session.storage.factory.mock_file']]], $container);
+
+        $this->assertSame('test.session.listener', (string) $container->getAlias('session_listener'));
+
+        $expected = ['session_factory', 'logger', 'session_collector', 'request_stack'];
+        $this->assertEquals($expected, array_keys($container->findDefinition('session_listener')->getArgument(0)->getValues()));
+    }
+
     public function testRobotsTagListenerIsRegisteredInDebugMode()
     {
         $container = $this->createContainer(['kernel.debug' => true]);

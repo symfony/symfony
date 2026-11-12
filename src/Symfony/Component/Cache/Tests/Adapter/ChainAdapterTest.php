@@ -19,6 +19,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemTagAwareAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
@@ -265,6 +266,95 @@ class ChainAdapterTest extends AdapterTestCase
 
         $this->assertFalse($adapter2->getItem('key')->isHit(), 'Item should have expired in adapter2');
         $this->assertFalse($adapter1->getItem('key')->isHit(), 'Item should have expired in adapter1 with original TTL, not defaultLifetime');
+    }
+
+    public function testItemExpiryIsPreservedWhenPropagatedFromFilesystemAdapter()
+    {
+        $adapter1 = new ArrayAdapter(100);
+        $adapter2 = new FilesystemAdapter('', 100);
+
+        $cache = new ChainAdapter([$adapter1, $adapter2], 100);
+
+        $cache->save($cache->getItem('key')->expiresAfter(2)->set('value'));
+
+        $adapter1->clear();
+        $cache->getItem('key');
+        $this->assertTrue($adapter1->hasItem('key'));
+
+        sleep(3);
+
+        $this->assertFalse($adapter2->getItem('key')->isHit(), 'Item should have expired in adapter2');
+        $this->assertFalse($adapter1->getItem('key')->isHit(), 'Item should have expired in adapter1 with original TTL, not defaultLifetime');
+    }
+
+    public function testItemSavedAgainWithoutExpiryIsPropagatedWithDefaultLifetime()
+    {
+        $adapter1 = new ArrayAdapter(100);
+        $adapter2 = new FilesystemAdapter('', 100);
+
+        $cache = new ChainAdapter([$adapter1, $adapter2], 100);
+
+        $item = $cache->getItem('key')->expiresAfter(2)->set('value');
+        $cache->save($item);
+        $cache->save($item->expiresAfter(null));
+
+        $adapter1->clear();
+        $cache->getItem('key');
+
+        sleep(3);
+
+        $this->assertTrue($adapter2->getItem('key')->isHit());
+        $this->assertTrue($adapter1->getItem('key')->isHit(), 'Item should have been propagated to adapter1 with defaultLifetime, not the expiry it was first saved with');
+    }
+
+    public function testPropagationToTagAwareAdapterWithDefaultLifetime()
+    {
+        $adapter1 = new FilesystemTagAwareAdapter('tag-aware');
+        $adapter2 = new FilesystemAdapter('plain');
+
+        $adapter2->save($adapter2->getItem('key')->set('value'));
+
+        $cache = new ChainAdapter([$adapter1, $adapter2], 100);
+
+        $warnings = [];
+        set_error_handler(static function (int $type, string $message) use (&$warnings): bool {
+            $warnings[] = $message;
+
+            return true;
+        });
+
+        try {
+            $this->assertSame('value', $cache->getItem('key')->get());
+            $adapter1->commit();
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $warnings);
+        $this->assertTrue($adapter1->getItem('key')->isHit());
+    }
+
+    public function testDefaultLifetimeAppliesToTaggedItemsPropagatedToPreviousAdapters()
+    {
+        $adapter1 = new ArrayAdapter(2);
+        $adapter2 = new FilesystemAdapter('', 2);
+
+        $cache = new TagAwareAdapter(new ChainAdapter([$adapter1, $adapter2], 2));
+
+        $cache->get('key', static function (ItemInterface $item) {
+            $item->tag('tag');
+
+            return 'value';
+        });
+
+        $adapter1->clear();
+        $this->assertTrue($cache->getItem('key')->isHit());
+        $this->assertTrue($adapter1->hasItem('key'));
+
+        sleep(3);
+
+        $this->assertFalse($adapter2->getItem('key')->isHit(), 'Item should have expired in adapter2');
+        $this->assertFalse($cache->getItem('key')->isHit(), 'Item should have expired in adapter1 after the default lifetime');
     }
 
     public function testExpirationOnAllAdapters()

@@ -49,7 +49,7 @@
                 {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
                 {{- form_widget(child, {attr: child_attr}) -}}
                 {%- if child.vars.label is not same as(false) -%}
-                    {{- form_label(child, null, {translation_domain: choice_translation_domain, label_attr: {class: ''}}) -}}
+                    {{- form_label(child, null, {translation_domain: choice_translation_domain, label_attr: {class: ''}, required: false}) -}}
                 {%- endif -%}
             </label>
             {{- form_help(child) -}}

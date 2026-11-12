@@ -63,6 +63,74 @@ class HeaderBagTest extends TestCase
         $bag->getDate('foo');
     }
 
+    #[DataProvider('provideHttpDates')]
+    public function testGetDateParsesHttpDates(string $value)
+    {
+        $previousTimezone = date_default_timezone_get();
+        date_default_timezone_set('Europe/Paris');
+
+        try {
+            $this->assertSame(784111777, (new HeaderBag(['foo' => $value]))->getDate('foo')->getTimestamp());
+        } finally {
+            date_default_timezone_set($previousTimezone);
+        }
+    }
+
+    public static function provideHttpDates(): iterable
+    {
+        yield 'IMF-fixdate' => ['Sun, 06 Nov 1994 08:49:37 GMT'];
+        yield 'RFC 850' => ['Sunday, 06-Nov-94 08:49:37 GMT'];
+        yield 'asctime' => ['Sun Nov  6 08:49:37 1994'];
+        yield 'lowercase' => ['sunday, 06-nov-94 08:49:37 gmt'];
+        yield 'UTC' => ['Sun, 06 Nov 1994 08:49:37 UTC'];
+        yield 'numeric offset' => ['Sun, 06 Nov 1994 10:49:37 +0200'];
+        yield 'one-digit day and hour' => ['Sun, 6 Nov 1994 8:49:37 GMT'];
+        yield 'zone abbreviation' => ['Sun, 06 Nov 1994 09:49:37 CET'];
+    }
+
+    public function testGetDateReadsTwoDigitYearsMoreThan50YearsAheadInThePastCentury()
+    {
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $nextFiftyYears = $now->setDate((int) $now->format('Y') + 50, 1, 1)->setTime(0, 0);
+        $pastCentury = $now->setDate((int) $now->format('Y') + 51 - 100, 1, 1)->setTime(0, 0);
+
+        $this->assertSame($nextFiftyYears->format('Y-m-d H:i:s'), (new HeaderBag(['foo' => $nextFiftyYears->format('l, d-M-y H:i:s \G\M\T')]))->getDate('foo')->format('Y-m-d H:i:s'));
+        $this->assertSame($pastCentury->format('Y-m-d H:i:s'), (new HeaderBag(['foo' => $pastCentury->format('l, d-M-y H:i:s \G\M\T')]))->getDate('foo')->format('Y-m-d H:i:s'));
+    }
+
+    #[DataProvider('provideHttpDatesAfter2038')]
+    public function testGetDateParsesDatesAfter2038(string $value, string $expected)
+    {
+        $this->assertSame($expected, (new HeaderBag(['foo' => $value]))->getDate('foo')->format('Y-m-d H:i:s'));
+    }
+
+    public static function provideHttpDatesAfter2038(): iterable
+    {
+        yield 'IMF-fixdate' => ['Thu, 31 Dec 2099 23:59:59 GMT', '2099-12-31 23:59:59'];
+        yield 'RFC 850' => ['Saturday, 01-Jan-50 00:00:00 GMT', '2050-01-01 00:00:00'];
+        yield 'asctime' => ['Thu Dec 31 23:59:59 2099', '2099-12-31 23:59:59'];
+    }
+
+    #[DataProvider('provideInvalidHttpDates')]
+    public function testGetDateRejectsInvalidDates(string $value)
+    {
+        $this->expectException(\RuntimeException::class);
+
+        (new HeaderBag(['foo' => $value]))->getDate('foo');
+    }
+
+    public static function provideInvalidHttpDates(): iterable
+    {
+        yield 'mismatching weekday' => ['Mon, 06 Nov 1994 08:49:37 GMT'];
+        yield 'mismatching weekday in RFC 850' => ['Monday, 06-Nov-94 08:49:37 GMT'];
+        yield 'mismatching weekday in asctime' => ['Mon Nov  6 08:49:37 1994'];
+        yield 'out of range day' => ['Thu, 31 Nov 1994 08:49:37 GMT'];
+        yield 'out of range hour' => ['Sun, 06 Nov 1994 24:49:37 GMT'];
+        yield 'two-digit year' => ['Sun, 06 Nov 94 08:49:37 GMT'];
+        yield 'timestamp' => ['784111777'];
+        yield 'negative number' => ['-1'];
+    }
+
     public function testGetCacheControlHeader()
     {
         $bag = new HeaderBag();

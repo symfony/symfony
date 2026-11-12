@@ -178,12 +178,43 @@ class MemcachedAdapter extends AbstractAdapter
             if (!\array_key_exists('LIBKETAMA_COMPATIBLE', $options) && !\array_key_exists(\Memcached::OPT_LIBKETAMA_COMPATIBLE, $options)) {
                 $client->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
             }
+            $booleanOptions = [
+                'AUTO_EJECT_HOSTS',
+                'BINARY_PROTOCOL',
+                'BUFFER_WRITES',
+                'CACHE_LOOKUPS',
+                'COMPRESSION',
+                'HASH_WITH_PREFIX_KEY',
+                'LIBKETAMA_COMPATIBLE',
+                'NO_BLOCK',
+                'NOREPLY',
+                'RANDOMIZE_REPLICA_READ',
+                'REMOVE_FAILED_SERVERS',
+                'SORT_HOSTS',
+                'TCP_KEEPALIVE',
+                'TCP_NODELAY',
+                'USE_UDP',
+                'VERIFY_KEY',
+            ];
+            $constantPrefixes = [
+                'COMPRESSION_TYPE' => 'COMPRESSION_',
+                'LIBKETAMA_HASH' => 'HASH_',
+            ];
             foreach ($options as $name => $value) {
                 if (\is_int($name)) {
                     continue;
                 }
                 if ('HASH' === $name || 'SERIALIZER' === $name || 'DISTRIBUTION' === $name) {
                     $value = \constant('Memcached::'.$name.'_'.strtoupper($value));
+                } elseif (\is_string($value) && isset($constantPrefixes[$name]) && \defined('Memcached::'.$constantPrefixes[$name].strtoupper($value))) {
+                    $value = \constant('Memcached::'.$constantPrefixes[$name].strtoupper($value));
+                } elseif (\is_string($value) && 'PREFIX_KEY' !== $name && \defined('Memcached::OPT_'.$name)) {
+                    // ext-memcached reads the other options as integers, which turns strings like "true" into 0
+                    if (\in_array($name, $booleanOptions, true)) {
+                        $value = filter_var($value, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Invalid Memcached DSN: parameter "%s" must be a boolean.', strtolower($name)));
+                    } else {
+                        $value = filter_var($value, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Invalid Memcached DSN: parameter "%s" must be an integer.', strtolower($name)));
+                    }
                 }
                 unset($options[$name]);
 

@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient;
 
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\ArrayBodyCaster;
 use Symfony\Component\HttpClient\Internal\Dechunker;
 use Symfony\Component\HttpClient\Response\StreamableInterface;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
@@ -178,6 +179,16 @@ trait HttpClientTrait
             // Validate and resolve URL
             $url = self::parseUrl($url, $options['query']);
             $url = self::resolveUrl($url, $baseUri, $defaultOptions['query'] ?? []);
+
+            // Send the user info of the URL as an Authorization header, so that it never ends up in reported URLs
+            if (false !== $i = strrpos($url['authority'], '@')) {
+                if (!isset($options['normalized_headers']['authorization']) && !isset($options['auth_ntlm'])) {
+                    $userinfo = explode(':', substr($url['authority'], 2, $i - 2), 2);
+                    $options['normalized_headers']['authorization'] = ['Authorization: Basic '.base64_encode(rawurldecode($userinfo[0]).':'.rawurldecode($userinfo[1] ?? ''))];
+                }
+
+                $url['authority'] = '//'.substr($url['authority'], 1 + $i);
+            }
         }
 
         // Finalize normalization of options
@@ -342,29 +353,20 @@ trait HttpClientTrait
             static $cookie;
 
             $streams = [];
-            $caster = static function (&$v) use (&$caster, &$streams, &$cookie) {
-                if (\is_resource($v) || $v instanceof StreamableInterface) {
-                    $cookie = hash('xxh128', $cookie ??= random_bytes(8), true);
-                    $k = substr(strtr(base64_encode($cookie), '+/', '-_'), 0, -2);
-                    $streams[$k] = $v instanceof StreamableInterface ? $v->toStream(false) : $v;
-                    $v = $k;
-                } elseif (\is_object($v)) {
-                    if ($vars = get_object_vars($v)) {
-                        array_walk_recursive($vars, $caster);
-                        $v = $vars;
-                    } elseif ($v instanceof \Stringable) {
-                        $v = (string) $v;
-                    } else {
-                        $v = [];
-                    }
-                }
+            $onStream = static function ($stream) use (&$streams, &$cookie) {
+                $cookie = hash('xxh128', $cookie ??= random_bytes(8), true);
+                $k = substr(strtr(base64_encode($cookie), '+/', '-_'), 0, -2);
+                $streams[$k] = $stream;
+
+                return $k;
+            };
+            $castStream = static function (&$v) use ($onStream) {
+                [$v] = ArrayBodyCaster::cast([$v], $onStream);
             };
 
-            if (null === $pairs = self::encodePairs($body, 'body', \PHP_QUERY_RFC1738, $caster)) {
-                array_walk_recursive($body, $caster);
-                $pairs = http_build_query($body, '', '&');
+            if (null === $pairs = self::encodePairs($body, 'body', \PHP_QUERY_RFC1738, $castStream)) {
+                $pairs = http_build_query(ArrayBodyCaster::cast($body, $onStream), '', '&');
             }
-            $caster = null;
 
             if ('' === $body = $pairs) {
                 return '';

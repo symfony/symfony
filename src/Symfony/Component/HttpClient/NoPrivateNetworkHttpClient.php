@@ -22,6 +22,9 @@ use Symfony\Contracts\Service\ShutdownInterface;
 /**
  * Decorator that blocks requests to private networks by default.
  *
+ * Behind an HTTP proxy, the proxy resolves the hosts of the requests itself,
+ * so it must block private destinations on its own.
+ *
  * @author Hallison Boaventura <hallisonboaventura@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */

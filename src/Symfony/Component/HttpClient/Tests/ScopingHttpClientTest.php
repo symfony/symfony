@@ -210,7 +210,7 @@ class ScopingHttpClientTest extends TestCase
         yield 'network-path reference' => ['//safe.example/api/users/1', 'https://safe.example/api/users/1'];
         yield 'network-path reference with the default port' => ['//safe.example:443/api/users/1', 'https://safe.example/api/users/1'];
         yield 'network-path reference with an uppercase host' => ['//SAFE.Example/api/users/1', 'https://safe.example/api/users/1'];
-        yield 'network-path reference with userinfo' => ['//user@safe.example/api/users/1', 'https://user@safe.example/api/users/1'];
+        yield 'network-path reference with userinfo' => ['//user@safe.example/api/users/1', 'https://safe.example/api/users/1'];
         yield 'absolute URL' => ['https://safe.example/api/users/1', 'https://safe.example/api/users/1'];
     }
 
@@ -236,13 +236,13 @@ class ScopingHttpClientTest extends TestCase
     {
         yield 'absolute URL' => ['https://evil.example/steal', 'https://evil.example/steal'];
         yield 'network-path reference' => ['//evil.example/steal', 'https://evil.example/steal'];
-        yield 'network-path reference with userinfo naming the base host' => ['//safe.example@evil.example/steal', 'https://safe.example@evil.example/steal'];
+        yield 'network-path reference with userinfo naming the base host' => ['//safe.example@evil.example/steal', 'https://evil.example/steal'];
         yield 'network-path reference with another port' => ['//safe.example:8443/api/users/1', 'https://safe.example:8443/api/users/1'];
         yield 'network-path reference with the default port of another scheme' => ['//safe.example:80/api/users/1', 'https://safe.example:80/api/users/1'];
     }
 
     #[DataProvider('provideUrlsOnABaseUriWithUserinfo')]
-    public function testForBaseUriWithUserinfoAppliesOptionsOnItsHost(string $url, string $expectedUrl)
+    public function testForBaseUriWithUserinfoAppliesOptionsOnItsHost(string $url, string $expectedUrl, bool $withUserinfo)
     {
         $client = ScopingHttpClient::forBaseUri(new MockHttpClient(null, null), 'https://user:pass@safe.example/api/', [
             'headers' => ['X-Api-Key' => 'scope-secret'],
@@ -251,14 +251,15 @@ class ScopingHttpClientTest extends TestCase
         $response = $client->request('GET', $url);
 
         $this->assertSame($expectedUrl, $response->getInfo('url'));
+        $this->assertSame($withUserinfo, \in_array('Authorization: Basic '.base64_encode('user:pass'), $response->getRequestOptions()['headers'], true));
         $this->assertContains('X-Api-Key: scope-secret', $response->getRequestOptions()['headers']);
     }
 
     public static function provideUrlsOnABaseUriWithUserinfo(): iterable
     {
-        yield 'relative path' => ['users/1', 'https://user:pass@safe.example/api/users/1'];
-        yield 'absolute URL' => ['https://safe.example/api/users/1', 'https://safe.example/api/users/1'];
-        yield 'absolute URL with the userinfo of the base URI' => ['https://user:pass@safe.example/api/users/1', 'https://user:pass@safe.example/api/users/1'];
+        yield 'relative path' => ['users/1', 'https://safe.example/api/users/1', true];
+        yield 'absolute URL' => ['https://safe.example/api/users/1', 'https://safe.example/api/users/1', false];
+        yield 'absolute URL with the userinfo of the base URI' => ['https://user:pass@safe.example/api/users/1', 'https://safe.example/api/users/1', true];
     }
 
     #[DataProvider('provideUrlsWithUserinfo')]
@@ -270,7 +271,7 @@ class ScopingHttpClientTest extends TestCase
 
         $response = $client->request('GET', $url);
 
-        $this->assertSame($url, $response->getInfo('url'));
+        $this->assertSame($inScope ? 'https://api.github.com/' : 'https://evil.example/', $response->getInfo('url'));
         $this->assertSame($inScope, \in_array('Authorization: Bearer scope-secret', $response->getRequestOptions()['headers'], true));
     }
 

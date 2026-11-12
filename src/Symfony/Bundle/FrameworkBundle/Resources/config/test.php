@@ -39,6 +39,9 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service_locator([
                     'session_factory' => service('session.factory')->ignoreOnInvalid(),
+                    'logger' => service('logger')->ignoreOnInvalid(),
+                    'session_collector' => service('data_collector.request.session_collector')->ignoreOnInvalid(),
+                    'request_stack' => service('request_stack')->ignoreOnInvalid(),
                 ]),
                 param('kernel.debug'),
                 param('session.storage.options'),

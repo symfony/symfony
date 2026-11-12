@@ -539,6 +539,73 @@ class MessageGeneratorTest extends TestCase
         $this->assertSame([$nightly], iterator_to_array($generator->getMessages(), false));
     }
 
+    public function testMessageAddedAtRuntimeStartsFromNow()
+    {
+        $clock = new MockClock('2026-11-09 08:00:00', 'UTC');
+        $daily = (object) ['id' => 'daily'];
+        $everyFiveMinutes = (object) ['id' => 'every_five_minutes'];
+        $schedule = (new Schedule())->add(RecurringMessage::cron('0 0 * * *', $daily));
+
+        $generator = new MessageGenerator($schedule, 'dummy', $clock);
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+
+        $clock->modify('2026-11-09 12:00:30');
+        $schedule->add(RecurringMessage::cron('*/5 * * * *', $everyFiveMinutes));
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+
+        $clock->modify('2026-11-09 12:05:30');
+        $this->assertSame([$everyFiveMinutes], iterator_to_array($generator->getMessages(), false));
+    }
+
+    public function testMessageAddedAtRuntimeStillStartsFromWhenItWasAddedAfterTheScheduleChangesAgain()
+    {
+        $clock = new MockClock('2026-11-09 08:00:00', 'UTC');
+        $daily = (object) ['id' => 'daily'];
+        $everyFiveMinutes = (object) ['id' => 'every_five_minutes'];
+        $hourly = (object) ['id' => 'hourly'];
+        $schedule = (new Schedule())->add(RecurringMessage::cron('0 0 * * *', $daily));
+
+        $generator = new MessageGenerator($schedule, 'dummy', $clock);
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+
+        $clock->modify('2026-11-09 12:00:30');
+        $schedule->add(RecurringMessage::cron('*/5 * * * *', $everyFiveMinutes));
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+
+        $clock->modify('2026-11-09 12:02:30');
+        $schedule->add(RecurringMessage::cron('0 * * * *', $hourly));
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+
+        $clock->modify('2026-11-09 12:05:30');
+        $this->assertSame([$everyFiveMinutes], iterator_to_array($generator->getMessages(), false));
+    }
+
+    public function testMessageAddedAtRuntimeDoesNotRunAgainWhenTheScheduleIsRebuiltInAnotherOrder()
+    {
+        $clock = new MockClock('2026-11-09 08:00:00', 'UTC');
+        $daily = RecurringMessage::cron('0 0 * * *', (object) ['id' => 'daily']);
+        $hourly = RecurringMessage::cron('0 * * * *', (object) ['id' => 'hourly']);
+        $everyFiveMinutes = RecurringMessage::cron('*/5 * * * *', $message = (object) ['id' => 'every_five_minutes']);
+        $schedule = (new Schedule())->add($daily);
+
+        $generator = new MessageGenerator($schedule, 'dummy', $clock);
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+
+        $clock->modify('2026-11-09 12:00:30');
+        $schedule->add($everyFiveMinutes);
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+
+        $clock->modify('2026-11-09 12:05:30');
+        $this->assertSame([$message], iterator_to_array($generator->getMessages(), false));
+
+        $clock->modify('2026-11-09 12:06:30');
+        $schedule->clear()->add($hourly, $daily, $everyFiveMinutes);
+        $this->assertSame([], iterator_to_array($generator->getMessages(), false));
+
+        $clock->modify('2026-11-09 12:10:30');
+        $this->assertSame([$message], iterator_to_array($generator->getMessages(), false));
+    }
+
     public function testThrowsWhenTriggerDoesNotMoveTheRunDateForward()
     {
         $clock = new MockClock(self::makeDateTime('22:12:00'));

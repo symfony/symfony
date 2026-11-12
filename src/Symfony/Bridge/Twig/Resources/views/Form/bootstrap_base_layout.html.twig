@@ -148,6 +148,7 @@
         {%- for child in form %}
             {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
             {{- form_widget(child, {
+                label_required: false,
                 parent_label_class: label_attr.class|default(''),
                 translation_domain: choice_translation_domain,
                 attr: child_attr,
@@ -159,6 +160,7 @@
             {%- for child in form %}
                 {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
                 {{- form_widget(child, {
+                    label_required: false,
                     parent_label_class: label_attr.class|default(''),
                     translation_domain: choice_translation_domain,
                     attr: child_attr,

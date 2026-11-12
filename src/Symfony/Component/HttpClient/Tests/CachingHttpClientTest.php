@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
@@ -1565,6 +1566,26 @@ class CachingHttpClientTest extends TestCase
         $this->assertSame('foobar', $collected);
     }
 
+    public function testItCanStreamNoStoreResponseWithOtherResponses()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('foo', ['http_code' => 200]),
+            new MockResponse('bar', ['http_code' => 200]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $noStoreResponse = $client->request('GET', 'http://example.com/foo', ['headers' => ['Cache-Control' => 'no-store']]);
+        $asyncResponse = $client->request('GET', 'http://example.com/bar');
+
+        $collected = '';
+        foreach ($client->stream([$noStoreResponse, $asyncResponse]) as $chunk) {
+            $collected .= $chunk->getContent();
+        }
+
+        $this->assertSame('foobar', $collected);
+    }
+
     public function testMultipleChunksResponse()
     {
         $client = $this->buildClient([
@@ -1759,16 +1780,18 @@ class CachingHttpClientTest extends TestCase
         $this->assertSame('fresh payload', $response->getContent(false));
     }
 
-    public function testInvalidExpiresDoesNotProvideExplicitFreshness()
+    #[DataProvider('provideInvalidExpires')]
+    public function testInvalidExpiresDoesNotProvideExplicitFreshness(string|array $expires)
     {
         $mockClient = new MockHttpClient([
             new MockResponse('invalid expires', [
                 'http_code' => 302,
                 'response_headers' => [
-                    'Expires' => 'not-a-date',
+                    'Expires' => $expires,
+                    'ETag' => '"v1"',
                 ],
             ]),
-            new MockResponse('fresh redirect', ['http_code' => 302]),
+            $secondResponse = new MockResponse('fresh redirect', ['http_code' => 302]),
         ]);
 
         $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
@@ -1780,6 +1803,221 @@ class CachingHttpClientTest extends TestCase
         $response = $client->request('GET', 'http://example.com/invalid-expires');
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('fresh redirect', $response->getContent(false));
+        $this->assertArrayNotHasKey('if-none-match', $secondResponse->getRequestOptions()['normalized_headers']);
+    }
+
+    #[DataProvider('provideInvalidExpires')]
+    public function testInvalidExpiresMeansAlreadyExpired(string|array $expires)
+    {
+        $previousTimezone = date_default_timezone_get();
+        date_default_timezone_set('Europe/Paris');
+
+        try {
+            $mockClient = new MockHttpClient([
+                new MockResponse('first', ['response_headers' => [
+                    'Expires' => $expires,
+                    'Last-Modified' => gmdate('D, d M Y H:i:s', time() - 30 * 86400).' GMT',
+                ]]),
+                new MockResponse('second'),
+            ]);
+
+            $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+            $this->assertSame('first', $client->request('GET', 'http://example.com/invalid-expires')->getContent());
+            $this->assertSame('second', $client->request('GET', 'http://example.com/invalid-expires')->getContent());
+        } finally {
+            date_default_timezone_set($previousTimezone);
+        }
+    }
+
+    public static function provideInvalidExpires(): iterable
+    {
+        yield ['0'];
+        yield ['-1'];
+        yield ['3600'];
+        yield ['not-a-date'];
+        yield [['0', 'Thu, 01 Jan 2099 00:00:00 GMT']];
+        yield ['Thu, 01 Jan 2099 00:00:00 +0100'];
+        yield ['Fri, 01 Jan 2099 00:00:00 GMT'];
+    }
+
+    #[DataProvider('provideHttpDateFormats')]
+    public function testExpiresIsReadAsUtcInEachHttpDateFormat(\Closure $format)
+    {
+        $previousTimezone = date_default_timezone_get();
+        date_default_timezone_set('America/New_York');
+
+        try {
+            $mockClient = new MockHttpClient([
+                new MockResponse('first', ['response_headers' => ['Expires' => $format(time() + 60)]]),
+                new MockResponse('second'),
+            ]);
+
+            $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+            $this->assertSame('first', $client->request('GET', 'http://example.com/expires')->getContent());
+            $this->assertSame('first', $client->request('GET', 'http://example.com/expires')->getContent());
+
+            sleep(61);
+
+            $this->assertSame('second', $client->request('GET', 'http://example.com/expires')->getContent());
+        } finally {
+            date_default_timezone_set($previousTimezone);
+        }
+    }
+
+    public static function provideHttpDateFormats(): iterable
+    {
+        yield 'IMF-fixdate' => [static fn (int $time): string => gmdate('D, d M Y H:i:s \G\M\T', $time)];
+        yield 'RFC 850' => [static fn (int $time): string => gmdate('l, d-M-y H:i:s \G\M\T', $time)];
+        yield 'asctime' => [static fn (int $time): string => \sprintf('%s %2d %s', gmdate('D M', $time), gmdate('j', $time), gmdate('H:i:s Y', $time))];
+        yield 'IMF-fixdate with +0000' => [static fn (int $time): string => gmdate('D, d M Y H:i:s +0000', $time)];
+        yield 'IMF-fixdate with UTC' => [static fn (int $time): string => gmdate('D, d M Y H:i:s \U\T\C', $time)];
+        yield 'IMF-fixdate in lowercase' => [static fn (int $time): string => strtolower(gmdate('D, d M Y H:i:s \G\M\T', $time))];
+    }
+
+    public function testExpiresAfter2038()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('first', ['response_headers' => ['Expires' => 'Thu, 01 Jan 2099 00:00:00 GMT']]),
+            new MockResponse('second'),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $this->assertSame('first', $client->request('GET', 'http://example.com/expires')->getContent());
+        $this->assertSame('first', $client->request('GET', 'http://example.com/expires')->getContent());
+    }
+
+    public function testRfc850TwoDigitYearMoreThan50YearsAheadIsInThePastCentury()
+    {
+        $utc = new \DateTimeZone('UTC');
+        $nextFiftyYears = new \DateTimeImmutable(((int) gmdate('Y') + 50).'-01-01', $utc);
+        $pastCentury = new \DateTimeImmutable(((int) gmdate('Y') + 51 - 100).'-01-01', $utc);
+
+        $mockClient = new MockHttpClient([
+            new MockResponse('next fifty years', ['response_headers' => ['Expires' => $nextFiftyYears->format('l, d-M-y H:i:s \G\M\T')]]),
+            new MockResponse('past century', ['response_headers' => ['Expires' => $pastCentury->format('l, d-M-y H:i:s \G\M\T')]]),
+            new MockResponse('fresh'),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $this->assertSame('next fifty years', $client->request('GET', 'http://example.com/next-fifty-years')->getContent());
+        $this->assertSame('next fifty years', $client->request('GET', 'http://example.com/next-fifty-years')->getContent());
+        $this->assertSame('past century', $client->request('GET', 'http://example.com/past-century')->getContent());
+        $this->assertSame('fresh', $client->request('GET', 'http://example.com/past-century')->getContent());
+    }
+
+    public function testInvalidLastModifiedGivesNoHeuristicFreshness()
+    {
+        $previousTimezone = date_default_timezone_get();
+        date_default_timezone_set('America/New_York');
+
+        try {
+            $mockClient = new MockHttpClient([
+                new MockResponse('first', ['response_headers' => ['Last-Modified' => '-1']]),
+                new MockResponse('second'),
+            ]);
+
+            $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+            $this->assertSame('first', $client->request('GET', 'http://example.com/invalid-last-modified')->getContent());
+            $this->assertSame('second', $client->request('GET', 'http://example.com/invalid-last-modified')->getContent());
+        } finally {
+            date_default_timezone_set($previousTimezone);
+        }
+    }
+
+    public function testInvalidLastModifiedIsNotSentAsValidator()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('first', ['response_headers' => ['Last-Modified' => '-1', 'Cache-Control' => 'max-age=0']]),
+            $secondResponse = new MockResponse('second'),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $this->assertSame('first', $client->request('GET', 'http://example.com/invalid-last-modified')->getContent());
+        $this->assertSame('second', $client->request('GET', 'http://example.com/invalid-last-modified')->getContent());
+        $this->assertArrayNotHasKey('if-modified-since', $secondResponse->getRequestOptions()['normalized_headers']);
+    }
+
+    public function testInvalidLastModifiedDoesNotMatchClientIfModifiedSince()
+    {
+        $previousTimezone = date_default_timezone_get();
+        date_default_timezone_set('America/New_York');
+
+        try {
+            $mockClient = new MockHttpClient([
+                new MockResponse('cached', ['response_headers' => ['Last-Modified' => '-1', 'Cache-Control' => 'max-age=300']]),
+            ]);
+
+            $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+            $this->assertSame('cached', $client->request('GET', 'http://example.com/invalid-last-modified')->getContent());
+
+            $response = $client->request('GET', 'http://example.com/invalid-last-modified', [
+                'headers' => ['If-Modified-Since' => gmdate('D, d M Y H:i:s \G\M\T')],
+            ]);
+
+            $this->assertSame(200, $response->getStatusCode());
+            $this->assertSame('cached', $response->getContent());
+        } finally {
+            date_default_timezone_set($previousTimezone);
+        }
+    }
+
+    #[DataProvider('provideInvalidDates')]
+    public function testInvalidIfModifiedSinceIsIgnored(string $ifModifiedSince)
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('cached', ['response_headers' => ['Last-Modified' => 'Wed, 21 Oct 2015 07:28:00 GMT', 'Cache-Control' => 'max-age=300']]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $this->assertSame('cached', $client->request('GET', 'http://example.com/invalid-if-modified-since')->getContent());
+
+        $response = $client->request('GET', 'http://example.com/invalid-if-modified-since', [
+            'headers' => ['If-Modified-Since' => $ifModifiedSince],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('cached', $response->getContent());
+    }
+
+    public static function provideInvalidDates(): iterable
+    {
+        yield ['-1'];
+        yield ['3600'];
+    }
+
+    #[DataProvider('provideInvalidDateHeaders')]
+    public function testInvalidDateFallsBackToTheResponseTime(array $headers)
+    {
+        $previousTimezone = date_default_timezone_get();
+        date_default_timezone_set('America/New_York');
+
+        try {
+            $mockClient = new MockHttpClient([
+                new MockResponse('first', ['response_headers' => $headers]),
+                new MockResponse('second'),
+            ]);
+
+            $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+            $this->assertSame('first', $client->request('GET', 'http://example.com/invalid-date')->getContent());
+            $this->assertSame('first', $client->request('GET', 'http://example.com/invalid-date')->getContent());
+        } finally {
+            date_default_timezone_set($previousTimezone);
+        }
+    }
+
+    public static function provideInvalidDateHeaders(): iterable
+    {
+        yield [['Date' => '-1', 'Cache-Control' => 'max-age=600']];
+        yield [['Date' => '3600', 'Expires' => 'Thu, 01 Jan 2099 00:00:00 GMT']];
     }
 
     public function testPublicNonDefaultStatusCodeUsesHeuristicFreshness()

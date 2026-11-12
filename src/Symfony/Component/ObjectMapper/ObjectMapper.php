@@ -44,6 +44,8 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
  */
 final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInterface
 {
+    use ClassHierarchyTrait;
+
     /**
      * Tracks recursive references.
      */
@@ -244,6 +246,10 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 continue;
             }
 
+            if (!$this->mayHoldNestedSource($source, $this->getPropertyFromHierarchy($this->getReflectionClass($classMetadata['readMetadataFromTarget'] ? $declaredTarget : $source), $propertyName), $targetName)) {
+                continue;
+            }
+
             if (!$this->isReadable($source, $propertyName, $propertyMetadata['mergeReadability'], $sourceVars)) {
                 continue;
             }
@@ -322,6 +328,21 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             PropertyReadability::INITIALIZED => \array_key_exists($propertyName, $sourceVars ??= (array) $source) || isset($source->{$propertyName}),
             PropertyReadability::DYNAMIC => property_exists($source, $propertyName) || isset($source->{$propertyName}),
         };
+    }
+
+    private function mayHoldNestedSource(object $source, ?\ReflectionProperty $property, string $targetName): bool
+    {
+        if (!$property || $property->hasHooks() || !$property->getDeclaringClass()->isInstance($source)) {
+            return true;
+        }
+
+        if (!$property->isInitialized($source)) {
+            return false;
+        }
+
+        $value = $property->getValue($source);
+
+        return \is_object($value) && array_any($this->metadataFactory->create($value), static fn (Mapping $m): bool => \is_string($m->target) && is_a($targetName, $m->target, true));
     }
 
     /**

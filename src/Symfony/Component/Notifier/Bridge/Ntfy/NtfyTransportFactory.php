@@ -31,7 +31,7 @@ final class NtfyTransportFactory extends AbstractTransportFactory
         $topic = substr($dsn->getPath(), 1);
 
         // "secureHttp" is the legacy spelling of the "ssl" option
-        $ssl = $this->getSsl($dsn) ?? !\in_array($dsn->getOption('secureHttp', true), [0, false, 'false', 'off', 'no'], true);
+        $ssl = $this->getSsl($dsn) ?? $dsn->getBooleanOption('secureHttp', true);
 
         $transport = (new NtfyTransport($topic, $ssl))->setHost($host);
         if ($port = $dsn->getPort()) {

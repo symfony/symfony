@@ -31,7 +31,7 @@ final class SpotHitTransportFactory extends AbstractTransportFactory
         $token = $this->getUser($dsn);
         $from = $dsn->getOption('from');
         $smsLong = filter_var($dsn->getOption('smslong', '-'), \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE);
-        $smsLongNBr = filter_var($dsn->getOption('smslongnbr', '-'), \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE);
+        $smsLongNBr = filter_var($dsn->getOption('smslongnbr', '-'), \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE);
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

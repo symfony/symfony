@@ -92,7 +92,7 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('remember me handler'),
-                service('security.token_storage'),
+                service('security.untracked_token_storage'),
                 abstract_arg('options'),
                 service('logger')->nullOnInvalid(),
             ])

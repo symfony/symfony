@@ -330,6 +330,8 @@ Mailer
 
  * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0. The
    boolean values it accepts are `1`/`0`, `true`/`false`, `on`/`off`, `yes`/`no` and the empty string, which reads as `false`
+ * Deprecate passing a value that is not a boolean to the `verify_peer` and `auto_tls` DSN options of the SMTP transport;
+   it will throw in 9.0. An empty value keeps reading as `true` for these two options
  * Deprecate the autowiring aliases named after the webhook request parsers of the bridges, type `Symfony\Component\Webhook\Client\RequestParserInterface` and select the parser with `#[Target]` instead:
 
    ```php

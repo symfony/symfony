@@ -76,6 +76,18 @@ class SweegoApiTransportTest extends TestCase
         $this->assertEquals('bar', $payload['headers']['foo']);
     }
 
+    public function testBccHeaderIsNotSentWhateverTheCaseOfItsName()
+    {
+        $email = (new Email())->from('foo@example.com')->to('bar@example.com')->text('content');
+        $email->getHeaders()->addMailboxListHeader('BCC', ['baz@example.com']);
+
+        $transport = new SweegoApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(SweegoApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, Envelope::create($email));
+
+        $this->assertSame([], $payload['headers']);
+    }
+
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {

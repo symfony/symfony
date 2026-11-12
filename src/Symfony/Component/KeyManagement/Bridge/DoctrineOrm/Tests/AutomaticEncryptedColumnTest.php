@@ -16,6 +16,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\TypeRegistry;
@@ -603,6 +604,9 @@ class AutomaticEncryptedColumnTest extends TestCase
             }
         });
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        if (method_exists($config, 'setUseSchemaEditorApi') && method_exists(Schema::class, 'edit')) {
+            $config->setUseSchemaEditorApi(true);
+        }
         $config->enableNativeLazyObjects(true);
         if (null !== $cache) {
             $config->setMetadataCache($cache);

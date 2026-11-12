@@ -14,6 +14,7 @@ namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Tests\EventListener
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
@@ -58,6 +59,9 @@ class BlindIndexListenerTest extends TestCase
         $config = ORMSetup::createConfiguration(true);
         $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Fixtures'], true));
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        if (method_exists($config, 'setUseSchemaEditorApi') && method_exists(Schema::class, 'edit')) {
+            $config->setUseSchemaEditorApi(true);
+        }
         $config->enableNativeLazyObjects(true);
 
         $eventManager = new EventManager();

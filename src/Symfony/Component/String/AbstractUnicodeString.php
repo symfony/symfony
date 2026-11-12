@@ -76,6 +76,7 @@ abstract class AbstractUnicodeString extends AbstractString
      *
      * @param string[]|\Transliterator[]|\Closure[] $rules See "*-Latin" rules from Transliterator::listIDs()
      */
+    #[\NoDiscard]
     public function ascii(array $rules = []): self
     {
         $str = clone $this;
@@ -241,6 +242,7 @@ abstract class AbstractUnicodeString extends AbstractString
      * @param string      $locale In the format language_region (e.g. tr_TR)
      * @param string|null $regexp A pattern matching the parts to convert, or null to convert the whole string
      */
+    #[\NoDiscard]
     public function localeLower(string $locale /* , ?string $regexp = null */): static
     {
         $regexp = 2 <= \func_num_args() ? func_get_arg(1) : null;
@@ -280,6 +282,7 @@ abstract class AbstractUnicodeString extends AbstractString
         return $matches;
     }
 
+    #[\NoDiscard]
     public function normalize(int $form = self::NFC): static
     {
         if (!\in_array($form, [self::NFC, self::NFD, self::NFKC, self::NFKD], true)) {

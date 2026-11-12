@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T10:08:33Z
+
+Thanks for the fix. `0`, `-1` and `3600` are now read as already expired, as RFC 9111 says.
+
+I pushed three changes on top:
+- asctime dates have no zone, and `strtotime()` read them in the default timezone. With America/New_York, an asctime `Expires` one hour ahead was fresh for 6 hours. They're now read as UTC.
+- only the first `Expires` line counts now. `Expires: 0` followed by a valid date was still fresh. Section 4.2.1 says to use the first line or to consider the response stale.
+- `+0000`, `UTC` and lowercase dates are accepted again. They mean the same instant as GMT, and `+0000` is what `DATE_RFC1123` gives in PHP, so making them stale would be a regression.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T14:08:45Z
+
+I pushed one more change: `Last-Modified`, `Date` and `If-Modified-Since` now go through the same parser. For example, `Last-Modified: -1` no longer gives heuristic freshness.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T15:04:21Z
+
+I pushed one more change: the parser moved to an internal `HttpDateTrait`. It rejects out of range values and weekday names that don't match the date. It reads RFC 850 years as RFC 9110 says, and it works after 2038 on 32-bit PHP. `StreamWrapper` uses it for `mtime`.

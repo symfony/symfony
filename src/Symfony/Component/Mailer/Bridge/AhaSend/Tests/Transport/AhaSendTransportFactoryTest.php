@@ -97,4 +97,15 @@ class AhaSendTransportFactoryTest extends AbstractTransportFactoryTestCase
         yield [new Dsn('ahasend+smtp', 'default', self::USER)];
         yield [new Dsn('ahasend', 'default', self::USER)];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['ahasend', 'ahasend+smtp'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::USER, self::PASSWORD))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('ahasend+smtp', 'default', self::USER, self::PASSWORD, null, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

@@ -21,6 +21,7 @@ final class InfobipSmtpTransport extends EsmtpTransport
     {
         parent::__construct('smtp-api.infobip.com', 587, false, $dispatcher, $logger);
 
+        $this->setRequireTls(true);
         $this->setUsername('App');
         $this->setPassword($key);
     }

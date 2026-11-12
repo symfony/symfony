@@ -119,4 +119,15 @@ class MandrillTransportFactoryTest extends AbstractTransportFactoryTestCase
 
         yield [new Dsn('mandrill+smtp', 'default', self::USER)];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['mandrill+smtp', 'mandrill+smtps'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::USER, self::PASSWORD))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('mandrill+smtp', 'default', self::USER, self::PASSWORD, null, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

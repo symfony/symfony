@@ -313,7 +313,8 @@ class GraphvizDumper implements DumperInterface
             $value = json_encode($value, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
         }
 
-        return htmlspecialchars((string) $value, \ENT_XML1 | \ENT_QUOTES, 'UTF-8');
+        // Graphviz interprets escape sequences like \N in HTML labels too
+        return str_replace('\\', '\\\\', htmlspecialchars((string) $value, \ENT_XML1 | \ENT_QUOTES, 'UTF-8'));
     }
 
     /**

@@ -31,6 +31,7 @@ final class MailtrapSmtpTransport extends EsmtpTransport
     {
         parent::__construct('live.smtp.mailtrap.io', 587, false, $dispatcher, $logger);
 
+        $this->setRequireTls(true);
         $this->setUsername('api');
         $this->setPassword($password);
     }

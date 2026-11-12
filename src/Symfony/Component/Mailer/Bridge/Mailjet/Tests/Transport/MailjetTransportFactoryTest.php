@@ -100,4 +100,15 @@ class MailjetTransportFactoryTest extends AbstractTransportFactoryTestCase
     {
         yield [new Dsn('mailjet+smtp', 'default')];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['mailjet', 'mailjet+smtp', 'mailjet+smtps'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::USER, self::PASSWORD))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('mailjet+smtp', 'default', self::USER, self::PASSWORD, null, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

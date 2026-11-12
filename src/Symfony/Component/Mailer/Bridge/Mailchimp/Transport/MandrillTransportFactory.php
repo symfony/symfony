@@ -39,7 +39,7 @@ final class MandrillTransportFactory extends AbstractTransportFactory
         if ('mandrill+smtp' === $scheme || 'mandrill+smtps' === $scheme) {
             $password = $this->getPassword($dsn);
 
-            return new MandrillSmtpTransport($user, $password, $this->dispatcher, $this->logger);
+            return (new MandrillSmtpTransport($user, $password, $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true));
         }
 
         throw new UnsupportedSchemeException($dsn, 'mandrill', $this->getSupportedSchemes());

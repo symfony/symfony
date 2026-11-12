@@ -26,6 +26,7 @@ class MailgunSmtpTransport extends EsmtpTransport
     {
         parent::__construct('us' !== ($region ?: 'us') ? \sprintf('smtp.%s.mailgun.org', $region) : 'smtp.mailgun.org', 587, false, $dispatcher, $logger);
 
+        $this->setRequireTls(true);
         $this->setUsername($username);
         $this->setPassword($password);
     }

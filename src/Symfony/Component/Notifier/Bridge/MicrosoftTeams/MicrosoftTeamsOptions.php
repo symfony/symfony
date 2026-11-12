@@ -54,12 +54,6 @@ final class MicrosoftTeamsOptions implements MessageOptionsInterface
     public function toArray(): array
     {
         $options = $this->options;
-
-        // Send a text, not a message card
-        if (1 === \count($options) && isset($options['text'])) {
-            return $options;
-        }
-
         $options['@type'] = 'MessageCard';
         $options['@context'] = 'https://schema.org/extensions';
 

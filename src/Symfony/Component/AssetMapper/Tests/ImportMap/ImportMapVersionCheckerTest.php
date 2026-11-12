@@ -441,6 +441,14 @@ class ImportMapVersionCheckerTest extends TestCase
         ];
     }
 
+    public function testCompareVersions()
+    {
+        $versions = ['1.0.0', '1.0.0-rc.10', '1.0.0-rc.1', '1.0.0-preview.7', '1.0.0-pre.1', '1.0.0-beta.11', '1.0.0-beta.2', '1.0.0-beta', '1.0.0-alpha.beta', '1.0.0-alpha.1', '1.0.0-alpha', '1.0.0-1', '0.9.0'];
+        usort($versions, ImportMapVersionChecker::compareVersions(...));
+
+        $this->assertSame(['0.9.0', '1.0.0-1', '1.0.0-alpha', '1.0.0-alpha.1', '1.0.0-alpha.beta', '1.0.0-beta', '1.0.0-beta.2', '1.0.0-beta.11', '1.0.0-pre.1', '1.0.0-preview.7', '1.0.0-rc.1', '1.0.0-rc.10', '1.0.0'], $versions);
+    }
+
     private static function createRemoteEntry(string $importName, string $version, ?string $packageModuleSpecifier = null): ImportMapEntry
     {
         $packageModuleSpecifier ??= $importName;

@@ -35,7 +35,7 @@ final class MailtrapTransportFactory extends AbstractTransportFactory
         }
 
         if ('mailtrap+smtp' === $scheme || 'mailtrap+smtps' === $scheme || 'mailtrap' === $scheme) {
-            return new MailtrapSmtpTransport($user, $this->dispatcher, $this->logger);
+            return (new MailtrapSmtpTransport($user, $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true));
         }
 
         throw new UnsupportedSchemeException($dsn, 'mailtrap', $this->getSupportedSchemes());

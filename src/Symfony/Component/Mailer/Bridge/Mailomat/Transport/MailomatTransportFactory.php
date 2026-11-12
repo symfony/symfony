@@ -33,7 +33,7 @@ final class MailomatTransportFactory extends AbstractTransportFactory
         }
 
         if (\in_array($schema, ['mailomat+smtp', 'mailomat+smtps', 'mailomat'], true)) {
-            return new MailomatSmtpTransport($dsn->getUser(), $dsn->getPassword(), $this->dispatcher, $this->logger);
+            return (new MailomatSmtpTransport($dsn->getUser(), $dsn->getPassword(), $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true));
         }
 
         throw new UnsupportedSchemeException($dsn, 'mailomat', $this->getSupportedSchemes());

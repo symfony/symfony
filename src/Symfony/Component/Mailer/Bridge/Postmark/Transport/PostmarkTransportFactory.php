@@ -35,7 +35,7 @@ final class PostmarkTransportFactory extends AbstractTransportFactory
         }
 
         if ('postmark+smtp' === $scheme || 'postmark+smtps' === $scheme || 'postmark' === $scheme) {
-            $transport = new PostmarkSmtpTransport($user, $this->dispatcher, $this->logger);
+            $transport = (new PostmarkSmtpTransport($user, $this->dispatcher, $this->logger))->setRequireTls($dsn->getBooleanOption('require_tls', true));
         }
 
         if (null !== $transport) {

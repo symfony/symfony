@@ -108,7 +108,16 @@ class ImportMapAuditor
                 $range = ['=', $range[0]];
             }
 
-            if (!version_compare($version, $range[1], $range[0])) {
+            $result = ImportMapVersionChecker::compareVersions($version, $range[1]);
+            $matches = match ($range[0]) {
+                '<' => $result < 0,
+                '<=' => $result <= 0,
+                '>' => $result > 0,
+                '>=' => $result >= 0,
+                '=' => 0 === $result,
+            };
+
+            if (!$matches) {
                 return false;
             }
         }

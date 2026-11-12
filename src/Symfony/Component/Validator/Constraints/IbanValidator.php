@@ -51,8 +51,8 @@ class IbanValidator extends ConstraintValidator
         'BH' => 'BH\d{2}[A-Z]{4}[\dA-Z]{14}', // Bahrain
         'BI' => 'BI\d{2}\d{5}\d{5}\d{11}\d{2}', // Burundi
         'BJ' => 'BJ\d{2}[\dA-Z]{2}\d{22}', // Benin
-        'BR' => 'BR\d{2}\d{8}\d{5}\d{10}[A-Z]{1}[\dA-Z]{1}', // Brazil
-        'BY' => 'BY\d{2}[\dA-Z]{4}\d{4}[\dA-Z]{16}', // Republic of Belarus
+        'BR' => 'BR\d{2}[\dA-Z]{8}\d{5}\d{10}[\dA-Z]{1}[\dA-Z]{1}', // Brazil
+        'BY' => 'BY\d{2}[\dA-Z]{4}\d{4}[\dA-Z]{16}', // Belarus
         'CF' => 'CF\d{2}\d{23}', // Central African Republic
         'CG' => 'CG\d{2}\d{23}', // Congo, Republic of the
         'CH' => 'CH\d{2}\d{5}[\dA-Z]{12}', // Switzerland
@@ -71,7 +71,7 @@ class IbanValidator extends ConstraintValidator
         'EG' => 'EG\d{2}\d{4}\d{4}\d{17}', // Egypt
         'ES' => 'ES\d{2}\d{4}\d{4}\d{1}\d{1}\d{10}', // Spain
         'FI' => 'FI\d{2}\d{3}\d{11}', // Finland
-        'FK' => 'FK\d{2}[A-Z]{2}\d{12}', // Falkland Islands
+        'FK' => 'FK\d{2}[A-Z]{2}\d{12}', // Falkland Islands (Malvinas)
         'FO' => 'FO\d{2}\d{4}\d{9}\d{1}', // Faroe Islands
         'FR' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // France
         'GA' => 'GA\d{2}\d{23}', // Gabon
@@ -105,10 +105,10 @@ class IbanValidator extends ConstraintValidator
         'LY' => 'LY\d{2}\d{3}\d{3}\d{15}', // Libya
         'MA' => 'MA\d{2}\d{24}', // Morocco
         'MC' => 'MC\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // Monaco
-        'MD' => 'MD\d{2}[\dA-Z]{2}[\dA-Z]{18}', // Moldova
+        'MD' => 'MD\d{2}[\dA-Z]{2}[\dA-Z]{18}', // Moldova, Republic of
         'ME' => 'ME\d{2}\d{3}\d{13}\d{2}', // Montenegro
         'MG' => 'MG\d{2}\d{23}', // Madagascar
-        'MK' => 'MK\d{2}\d{3}[\dA-Z]{10}\d{2}', // Macedonia
+        'MK' => 'MK\d{2}\d{3}[\dA-Z]{10}\d{2}', // North Macedonia
         'ML' => 'ML\d{2}[\dA-Z]{2}\d{22}', // Mali
         'MN' => 'MN\d{2}\d{4}\d{12}', // Mongolia
         'MR' => 'MR\d{2}\d{5}\d{5}\d{11}\d{2}', // Mauritania
@@ -127,7 +127,7 @@ class IbanValidator extends ConstraintValidator
         'QA' => 'QA\d{2}[A-Z]{4}[\dA-Z]{21}', // Qatar
         'RO' => 'RO\d{2}[A-Z]{4}[\dA-Z]{16}', // Romania
         'RS' => 'RS\d{2}\d{3}\d{13}\d{2}', // Serbia
-        'RU' => 'RU\d{2}\d{9}\d{5}[\dA-Z]{15}', // Russia
+        'RU' => 'RU\d{2}\d{9}\d{5}[\dA-Z]{15}', // Russian Federation
         'SA' => 'SA\d{2}\d{2}[\dA-Z]{18}', // Saudi Arabia
         'SC' => 'SC\d{2}[A-Z]{4}\d{2}\d{2}\d{16}[A-Z]{3}', // Seychelles
         'SD' => 'SD\d{2}\d{2}\d{12}', // Sudan
@@ -137,16 +137,16 @@ class IbanValidator extends ConstraintValidator
         'SM' => 'SM\d{2}[A-Z]{1}\d{5}\d{5}[\dA-Z]{12}', // San Marino
         'SN' => 'SN\d{2}[A-Z]{2}\d{22}', // Senegal
         'SO' => 'SO\d{2}\d{4}\d{3}\d{12}', // Somalia
-        'ST' => 'ST\d{2}\d{8}\d{11}\d{2}', // Sao Tome and Principe
+        'ST' => 'ST\d{2}\d{4}\d{4}\d{11}\d{2}', // Sao Tome and Principe
         'SV' => 'SV\d{2}[A-Z]{4}\d{20}', // El Salvador
         'TD' => 'TD\d{2}\d{23}', // Chad
         'TG' => 'TG\d{2}[A-Z]{2}\d{22}', // Togo
         'TL' => 'TL\d{2}\d{3}\d{14}\d{2}', // Timor-Leste
         'TN' => 'TN\d{2}\d{2}\d{3}\d{13}\d{2}', // Tunisia
-        'TR' => 'TR\d{2}\d{5}\d{1}[\dA-Z]{16}', // Turkey
+        'TR' => 'TR\d{2}\d{5}\d{1}[\dA-Z]{16}', // Turkiye
         'UA' => 'UA\d{2}\d{6}[\dA-Z]{19}', // Ukraine
-        'VA' => 'VA\d{2}\d{3}\d{15}', // Vatican City State
-        'VG' => 'VG\d{2}[A-Z]{4}\d{16}', // Virgin Islands
+        'VA' => 'VA\d{2}\d{3}\d{15}', // Holy See
+        'VG' => 'VG\d{2}[A-Z]{4}\d{16}', // Virgin Islands (British)
         'XK' => 'XK\d{2}\d{4}\d{10}\d{2}', // Kosovo
         'YE' => 'YE\d{2}[A-Z]{4}\d{4}[\dA-Z]{18}', // Yemen
     ];

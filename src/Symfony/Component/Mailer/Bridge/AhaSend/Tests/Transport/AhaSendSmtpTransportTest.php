@@ -50,7 +50,7 @@ class AhaSendSmtpTransportTest extends TestCase
 
             public function isTLS(): bool
             {
-                return false;
+                return true;
             }
 
             protected function getReadConnectionDescription(): string

@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
@@ -57,6 +58,9 @@ final class DoctrineTestHelper
         $config->setEntityNamespaces(['SymfonyTestsDoctrine' => 'Symfony\Bridge\Doctrine\Tests\Fixtures']);
         $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Tests/Fixtures' => 'Symfony\Bridge\Doctrine\Tests\Fixtures'], true));
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        if (method_exists($config, 'setUseSchemaEditorApi') && method_exists(Schema::class, 'edit')) {
+            $config->setUseSchemaEditorApi(true);
+        }
         $config->enableNativeLazyObjects(true);
 
         return $config;

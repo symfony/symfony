@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Decorates the original AccessDecisionManager class to log information
@@ -22,7 +23,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  *
  * @internal
  */
-class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
+class TraceableAccessDecisionManager implements AccessDecisionManagerInterface, ResetInterface
 {
     private ?string $strategy = null;
     /** @var array<VoterInterface> */

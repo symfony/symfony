@@ -3346,7 +3346,7 @@ class ParserTest extends TestCase
     public function testEvalRefException()
     {
         $yaml = <<<EOE
-            foo: { &foo { a: Steve, <<: *foo} }
+            foo: { bar: &foo { a: Steve, <<: *foo } }
             EOE;
 
         $this->expectException(ParseException::class);
@@ -4187,6 +4187,22 @@ class ParserTest extends TestCase
             ['foo' => 'FOO', 'bar' => 'FOO'],
             $this->parser->parse('{ foo: &a "FOO", bar: *a }'),
         );
+    }
+
+    public function testParseInlineMappingWithAnchoredKey()
+    {
+        $this->assertSame(['map' => ['foo' => 'bar'], 'alias' => 'foo'], $this->parser->parse("map: { &a foo: bar }\nalias: *a\n"));
+    }
+
+    public function testParseAliasAsMappingKey()
+    {
+        $yaml = <<<YAML
+            foo: &a bar
+            *a : baz
+            map: { *a : qux }
+            YAML;
+
+        $this->assertSame(['foo' => 'bar', 'bar' => 'baz', 'map' => ['bar' => 'qux']], $this->parser->parse($yaml));
     }
 
     private function assertSameData($expected, $actual)

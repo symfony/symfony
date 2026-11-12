@@ -100,4 +100,15 @@ final class MailPaceTransportFactoryTest extends AbstractTransportFactoryTestCas
     {
         yield [new Dsn('mailpace+api', 'default')];
     }
+
+    public function testSmtpTransportRequiresTls()
+    {
+        $factory = $this->getFactory();
+
+        foreach (['mailpace', 'mailpace+smtp', 'mailpace+smtps'] as $scheme) {
+            $this->assertTrue($factory->create(new Dsn($scheme, 'default', self::USER))->isTlsRequired());
+        }
+
+        $this->assertFalse($factory->create(new Dsn('mailpace+smtp', 'default', self::USER, null, null, ['require_tls' => 'false']))->isTlsRequired());
+    }
 }

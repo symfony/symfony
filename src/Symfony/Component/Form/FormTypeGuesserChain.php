@@ -16,7 +16,7 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 
-class FormTypeGuesserChain implements FormTypeGuesserInterface
+class FormTypeGuesserChain implements MinLengthTypeGuesserInterface
 {
     private array $guessers = [];
     private array $guesses = [];
@@ -56,6 +56,13 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
         $key = 'guessRequired:'.$class.'::'.$property;
 
         return \array_key_exists($key, $this->guesses) ? $this->guesses[$key] : $this->guesses[$key] = $this->guess(static fn ($guesser) => $guesser->guessRequired($class, $property));
+    }
+
+    public function guessMinLength(string $class, string $property): ?ValueGuess
+    {
+        $key = 'guessMinLength:'.$class.'::'.$property;
+
+        return \array_key_exists($key, $this->guesses) ? $this->guesses[$key] : $this->guesses[$key] = $this->guess(static fn ($guesser) => $guesser instanceof MinLengthTypeGuesserInterface ? $guesser->guessMinLength($class, $property) : null);
     }
 
     public function guessMaxLength(string $class, string $property): ?ValueGuess

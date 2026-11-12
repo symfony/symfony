@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Ntfy\Tests;
 
 use Symfony\Component\Notifier\Bridge\Ntfy\NtfyTransportFactory;
 use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
@@ -23,6 +24,25 @@ final class NtfyTransportFactoryTest extends AbstractTransportFactoryTestCase
     public function createFactory(): TransportFactoryInterface
     {
         return new NtfyTransportFactory();
+    }
+
+    public function testSecureHttpOption()
+    {
+        $cases = [
+            '' => true,
+            'secureHttp=1' => true,
+            'secureHttp=on' => true,
+            'secureHttp=0' => false,
+            'secureHttp=' => false,
+            'secureHttp=off' => false,
+            'secureHttp=Off' => false,
+            'secureHttp=FALSE' => false,
+        ];
+
+        foreach ($cases as $query => $secureHttp) {
+            $transport = $this->createFactory()->create(new Dsn('ntfy://user:password@default/test?'.$query));
+            $this->assertSame($secureHttp, (new \ReflectionProperty($transport, 'secureHttp'))->getValue($transport), $query);
+        }
     }
 
     public static function createProvider(): iterable

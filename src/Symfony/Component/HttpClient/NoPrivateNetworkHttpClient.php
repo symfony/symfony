@@ -104,12 +104,13 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         unset($options['query']);
         $options['max_redirects'] = 0;
         $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = $options['headers'];
+        $bodyOffset = \is_resource($options['body']) && stream_get_meta_data($options['body'])['seekable'] ? ftell($options['body']) : false;
 
         if (isset($options['normalized_headers']['host']) || isset($options['normalized_headers']['authorization']) || isset($options['normalized_headers']['cookie'])) {
             $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static fn ($h) => 0 !== stripos($h, 'Host:') && 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:'));
         }
 
-        return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context) use (&$method, &$options, $maxRedirects, &$redirectHeaders, $subnets, $ipFlags, $dnsCache): \Generator {
+        return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context) use (&$method, &$options, $maxRedirects, &$redirectHeaders, $subnets, $ipFlags, $dnsCache, $bodyOffset): \Generator {
             if (null !== $chunk->getError() || $chunk->isTimeout() || !$chunk->isFirst()) {
                 yield $chunk;
 
@@ -141,6 +142,8 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
                     $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], $filterContentHeaders);
                     $redirectHeaders['with_auth'] = array_filter($redirectHeaders['with_auth'], $filterContentHeaders);
                 }
+            } elseif (false !== $bodyOffset && isset($options['body'])) {
+                fseek($options['body'], $bodyOffset);
             }
 
             // Authorization and Cookie headers MUST NOT follow except for the initial scheme, host and port

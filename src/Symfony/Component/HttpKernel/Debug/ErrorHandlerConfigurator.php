@@ -44,6 +44,7 @@ class ErrorHandlerConfigurator
         private bool $scream = true,
         private bool $scope = true,
         private ?LoggerInterface $deprecationLogger = null,
+        private bool $logDeprecationsOnce = false,
     ) {
         $this->levels = $levels ?? \E_ALL;
         $this->throwAt = \is_int($throwAt) ? $throwAt : (null === $throwAt ? null : ($throwAt ? \E_ALL : null));
@@ -72,6 +73,9 @@ class ErrorHandlerConfigurator
                 $handler->scopeAt($levels & ~\E_USER_DEPRECATED & ~\E_DEPRECATED);
             } else {
                 $handler->scopeAt(0, true);
+            }
+            if (method_exists($handler, 'logDeprecationsOnce')) {
+                $handler->logDeprecationsOnce($this->logDeprecationsOnce);
             }
             $this->logger = $this->deprecationLogger = $this->levels = null;
         }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Log each deprecation message only once per process when `kernel.debug` is `false`
+
 8.2
 ---
 

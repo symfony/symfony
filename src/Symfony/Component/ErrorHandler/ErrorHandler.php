@@ -90,6 +90,8 @@ class ErrorHandler
     private int $tracedErrors = 0x77FB; // E_ALL - E_STRICT - E_PARSE
     private int $screamedErrors = 0x55; // E_ERROR + E_CORE_ERROR + E_COMPILE_ERROR + E_PARSE
     private int $loggedErrors = 0;
+    private bool $logDeprecationsOnce = false;
+    private array $loggedDeprecations = [];
     private \Closure $configureException;
 
     private bool $isRecursive = false;
@@ -362,6 +364,19 @@ class ErrorHandler
     }
 
     /**
+     * Sets whether each deprecation message is logged only once.
+     *
+     * Up to 100 messages are remembered, then the list starts over.
+     */
+    public function logDeprecationsOnce(bool $once): bool
+    {
+        $prev = $this->logDeprecationsOnce;
+        $this->logDeprecationsOnce = $once;
+
+        return $prev;
+    }
+
+    /**
      * Re-registers as a PHP error handler if levels changed.
      */
     private function reRegister(int $prev): void
@@ -414,6 +429,16 @@ class ErrorHandler
         }
 
         $logMessage = $this->levels[$type].': '.$message;
+
+        if ($this->logDeprecationsOnce && !$this->isRecursive && $type & (\E_DEPRECATED | \E_USER_DEPRECATED)) {
+            if (isset($this->loggedDeprecations[$logMessage])) {
+                return !$silenced;
+            }
+            if (100 <= \count($this->loggedDeprecations)) {
+                $this->loggedDeprecations = [];
+            }
+            $this->loggedDeprecations[$logMessage] = true;
+        }
 
         if (!$throw && !($type & $level)) {
             if (!isset(self::$silencedErrorCache[$id = $file.':'.$line])) {

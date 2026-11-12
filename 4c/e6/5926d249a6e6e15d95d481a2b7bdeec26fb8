@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T09:23:02Z
+
+I pushed an extended test. It now also checks the reset time of accepted hits and of reservations. Without it, the tests stayed green when these two cases counted from now.

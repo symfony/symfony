@@ -15,12 +15,30 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class CachingHttpClientTest extends TestCase
 {
+    public function testStreamMixesResponsesFromTheCacheAndFromTheClient()
+    {
+        // MockHttpClient returns MockResponse instances, which stream() would take for responses from the cache
+        $mockClient = new TraceableHttpClient(new MockHttpClient([new MockResponse('through the cache'), new MockResponse('not cacheable')]));
+        $client = new CachingHttpClient($mockClient, new Store(sys_get_temp_dir().'/sf_http_cache'));
+
+        $get = $client->request('GET', 'http://example.com/foo');
+        $post = $client->request('POST', 'http://example.com/bar', ['body' => 'payload']);
+
+        $contents = [];
+        foreach ($client->stream([$get, $post]) as $response => $chunk) {
+            $contents[$response->getInfo('url')] = ($contents[$response->getInfo('url')] ?? '').$chunk->getContent();
+        }
+
+        $this->assertSame(['http://example.com/foo' => 'through the cache', 'http://example.com/bar' => 'not cacheable'], $contents);
+    }
+
     public function testRequestHeaders()
     {
         $options = [

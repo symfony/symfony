@@ -136,7 +136,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
 
         return new ResponseStream((function () use ($mockResponses, $clientResponses, $timeout) {
             yield from MockResponse::stream($mockResponses, $timeout);
-            yield $this->client->stream($clientResponses, $timeout);
+            yield from $this->client->stream($clientResponses, $timeout);
         })());
     }
 

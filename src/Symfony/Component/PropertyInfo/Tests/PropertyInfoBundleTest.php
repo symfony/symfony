@@ -27,6 +27,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoBundle;
 use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\Type;
 
 class PropertyInfoBundleTest extends TestCase
@@ -111,6 +112,10 @@ class PropertyInfoBundleTest extends TestCase
             $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
         }
 
+        if (!ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/type-info'])) {
+            $this->markTestSkipped('TypeInfoBundle registers no string type resolver when "phpstan/phpdoc-parser" is only a dev dependency.');
+        }
+
         $kernel = new TestPropertyInfoKernel('test', false, $this->varDir);
         $kernel->boot();
 
@@ -121,6 +126,10 @@ class PropertyInfoBundleTest extends TestCase
     {
         if (!class_exists(PhpDocParser::class) || !class_exists(ContextFactory::class)) {
             $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
+        }
+
+        if (!ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/type-info'])) {
+            $this->markTestSkipped('TypeInfoBundle registers no string type resolver when "phpstan/phpdoc-parser" is only a dev dependency.');
         }
 
         $kernel = new TestPropertyInfoKernel('literals', false, $this->varDir, refinements: ['literal']);
@@ -137,6 +146,10 @@ class PropertyInfoBundleTest extends TestCase
             $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
         }
 
+        if (!ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/type-info'])) {
+            $this->markTestSkipped('TypeInfoBundle registers no string type resolver when "phpstan/phpdoc-parser" is only a dev dependency.');
+        }
+
         $kernel = new TestPropertyInfoKernel('test', false, $this->varDir);
         $kernel->boot();
 
@@ -149,6 +162,10 @@ class PropertyInfoBundleTest extends TestCase
     {
         if (!class_exists(PhpDocParser::class) || !class_exists(ContextFactory::class)) {
             $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
+        }
+
+        if (!ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/type-info'])) {
+            $this->markTestSkipped('TypeInfoBundle registers no string type resolver when "phpstan/phpdoc-parser" is only a dev dependency.');
         }
 
         $deprecations = [];
@@ -255,7 +272,7 @@ class TestPropertyInfoKernel extends AbstractKernel
 
     private function configureContainer(ContainerConfigurator $container): void
     {
-        $container->extension('type_info', $this->withTypeInfo ? ['aliases' => ['PropertyInfoBundleAlias' => 'int']] + (null !== $this->refinements ? ['refinements' => $this->refinements] : []) : ['enabled' => false]);
+        $container->extension('type_info', $this->withTypeInfo ? ['aliases' => ['PropertyInfoBundleAlias' => 'int']] + (null !== $this->refinements && enum_exists(Refinement::class) ? ['refinements' => $this->refinements] : []) : ['enabled' => false]);
 
         $services = $container->services();
         $services

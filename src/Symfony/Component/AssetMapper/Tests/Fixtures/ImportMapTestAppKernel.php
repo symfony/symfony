@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\TypeInfo\Refinement;
 
 class ImportMapTestAppKernel extends Kernel
 {
@@ -35,7 +36,7 @@ class ImportMapTestAppKernel extends Kernel
     {
         $loader->load(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
-                'type_info' => ['refinements' => true],
+                ...(class_exists(Refinement::class) ? ['type_info' => ['refinements' => true]] : []),
                 'http_client' => true,
                 'assets' => null,
                 'asset_mapper' => [

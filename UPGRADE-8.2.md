@@ -656,7 +656,8 @@ TypeInfo
    `true` resolves all of them, including those added later, `false` none, and a list of `Refinement` cases only those.
    Literals and integer ranges are resolved as `LiteralType` and `IntRangeType`, which wrap a `BuiltinType`.
    `non-zero-int` is resolved as the union `int<min, -1>|int<1, max>`, so unwrapping alone does not turn it back into an `int`.
-   Before enabling them, replace `instanceof BuiltinType` checks and `getTypeIdentifier()` calls with `isIdentifiedBy()`, or unwrap the `WrappingTypeInterface` types:
+   Before enabling them, call `Type::withoutRefinements()` where the builtin types are enough, which also turns `non-zero-int` back into an `int`,
+   or replace `instanceof BuiltinType` checks and `getTypeIdentifier()` calls with `isIdentifiedBy()`:
 
    ```yaml
    # config/packages/type_info.yaml
@@ -667,6 +668,11 @@ TypeInfo
    ```diff
    -$resolver = TypeResolver::create();
    +$resolver = TypeResolver::create(null, true);
+   ```
+
+   ```diff
+   -$type = $resolver->resolve($reflectionProperty);
+   +$type = $resolver->resolve($reflectionProperty)->withoutRefinements();
    ```
 
 Uid

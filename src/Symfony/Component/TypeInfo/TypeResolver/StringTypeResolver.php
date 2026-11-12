@@ -635,13 +635,11 @@ final class StringTypeResolver implements TypeResolverInterface
                 throw new \DomainException(\sprintf('Cannot find the class of the "%s" integer range bound.', $node));
             }
 
-            // reflection reads private and protected constants as well
-            if (false === $constant = (new \ReflectionClass($className))->getReflectionConstant($node->constExpr->name)) {
-                throw new \DomainException(\sprintf('No "%s" constant found in "%s".', $node->constExpr->name, $className));
-            }
-
             try {
-                $value = $constant->getValue();
+                // reflection reads private and protected constants as well
+                $value = (new \ReflectionClassConstant($className, $node->constExpr->name))->getValue();
+            } catch (\ReflectionException) {
+                throw new \DomainException(\sprintf('No "%s" constant found in "%s".', $node->constExpr->name, $className));
             } catch (\Error $e) {
                 throw new \DomainException(\sprintf('Cannot evaluate the "%s" integer range bound: %s', $node, $e->getMessage()), 0, $e);
             }

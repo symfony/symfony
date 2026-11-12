@@ -103,7 +103,7 @@ class TypeInfoBundleExtensionTest extends TestCase
         $container->loadFromExtension('type_info', ['refinements' => ['literal', 'nope']]);
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The "refinements" option must be a boolean or a list of "literal", "int_range", ["literal","nope"] given.');
+        $this->expectExceptionMessage('The "refinements" option must be a boolean or a list of "literal", "int_range"; ["literal","nope"] given.');
 
         $container->compile();
     }

@@ -22,12 +22,12 @@ namespace Symfony\Component\TypeInfo;
 enum Refinement: string
 {
     /**
-     * Literals, such as "'draft'", "1" or "1.5".
+     * String, integer and float literals: "'draft'", "1" and "1.5". References to class constants are not covered.
      */
     case Literal = 'literal';
 
     /**
-     * Integer ranges, such as "int<0, 10>" or "positive-int".
+     * Integer ranges: "int<min, max>", "positive-int", "negative-int", "non-positive-int", "non-negative-int" and "non-zero-int".
      */
     case IntRange = 'int_range';
 }

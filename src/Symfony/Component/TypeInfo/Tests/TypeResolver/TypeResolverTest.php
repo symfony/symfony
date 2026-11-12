@@ -14,6 +14,7 @@ namespace Symfony\Component\TypeInfo\Tests\TypeResolver;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
@@ -49,6 +50,14 @@ class TypeResolverTest extends TestCase
     {
         $this->assertEquals(Type::int(), TypeResolver::create(null, false)->resolve('positive-int'));
         $this->assertEquals(Type::union(Type::literal('a'), Type::literal('b')), TypeResolver::create(null, [Refinement::Literal])->resolve("'a'|'b'"));
+    }
+
+    public function testCannotCreateWithResolversAndRefinements()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$refinements" argument cannot be used together with the "$resolvers" argument; configure the refinements on the given resolvers instead.');
+
+        TypeResolver::create([], true);
     }
 
     public function testCannotFindResolver()

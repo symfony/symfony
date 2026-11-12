@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by dalerazimov at 2026-11-12T11:53:22Z
+
+> Thanks for the fix, the prefetched messages now go back to the queue as soon as the worker stops.
+>
+> One concern: for persistent connections, `pdisconnect()` destroys the connection that `persistent=true` asks to keep. On 8.2, transports are closed on every kernel shutdown, so with `FRANKENPHP_RESET_KERNEL` this reconnects on every request. Three send+close cycles open 1 connection to the broker on 8.2, and 3 with this PR.
+
+@nicolas-grekas I have updated close() to preserve persistent connections when no consumer was registered. Three send/close cycles now reuse a single connection, as they did before.
+
+The prefetch fix still works as expected.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T12:00:32Z
+
+Thanks, makes sense. What about checking `$this->amqpChannel->getConnection()->isPersistent()` instead of the option? Then `close()` can't disagree with how `channel()` connected.
+
+@isihussain `channel()` uses the same `'true' ===` check on 8.2, so changing only `close()` would call `pdisconnect()` on a transient connection. #68113 makes `persistent` a real boolean in both places on 6.4.
+
+---------------------------------------------------------------------------
+
+by dalerazimov at 2026-11-12T12:11:07Z
+
+Thank you! I have updated close() to use isPersistent().

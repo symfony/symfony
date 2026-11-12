@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Instagram;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -33,8 +34,8 @@ final class InstagramTransportFactory extends AbstractTransportFactory
         $accessToken = $this->getUser($dsn);
         $userId = $dsn->getRequiredOption('user_id');
         $apiVersion = $dsn->getOption('api_version', self::DEFAULT_API_VERSION);
-        $pollAttempts = (int) $dsn->getOption('poll_attempts', InstagramTransport::POLL_ATTEMPTS);
-        $pollDelay = (float) $dsn->getOption('poll_delay', InstagramTransport::POLL_DELAY_SECONDS);
+        $pollAttempts = filter_var($dsn->getOption('poll_attempts', InstagramTransport::POLL_ATTEMPTS), \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "poll_attempts" of the Instagram Notifier transport must be an integer.');
+        $pollDelay = filter_var($dsn->getOption('poll_delay', InstagramTransport::POLL_DELAY_SECONDS), \FILTER_VALIDATE_FLOAT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "poll_delay" of the Instagram Notifier transport must be a number.');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

@@ -29,7 +29,7 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'smtp', $this->getSupportedSchemes());
         }
 
-        $autoTls = '' === $dsn->getOption('auto_tls') || filter_var($dsn->getOption('auto_tls', true), \FILTER_VALIDATE_BOOL);
+        $autoTls = '' === $dsn->getOption('auto_tls') || $dsn->getBooleanOption('auto_tls', true);
         $tls = 'smtps' === $dsn->getScheme() ? true : ($autoTls ? null : false);
         $port = $dsn->getPort(0);
         $host = $dsn->getHost();
@@ -52,7 +52,7 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
         }
         $streamOptions = $stream->getStreamOptions();
 
-        if ('' !== $dsn->getOption('verify_peer') && !filter_var($dsn->getOption('verify_peer', true), \FILTER_VALIDATE_BOOL)) {
+        if ('' !== $dsn->getOption('verify_peer') && !$dsn->getBooleanOption('verify_peer', true)) {
             $streamOptions['ssl']['verify_peer'] = false;
             $streamOptions['ssl']['verify_peer_name'] = false;
         }

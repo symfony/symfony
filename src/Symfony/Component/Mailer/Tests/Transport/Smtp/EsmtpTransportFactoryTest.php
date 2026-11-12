@@ -12,6 +12,8 @@
 namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
@@ -55,6 +57,11 @@ class EsmtpTransportFactoryTest extends AbstractTransportFactoryTestCase
 
         yield [
             new Dsn('smtp', 'localhost'),
+            $transport,
+        ];
+
+        yield [
+            Dsn::fromString('smtp://localhost?auto_tls='),
             $transport,
         ];
 
@@ -245,5 +252,27 @@ class EsmtpTransportFactoryTest extends AbstractTransportFactoryTestCase
         yield ['0'];
         yield ['-1'];
         yield ['abc'];
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testNonBooleanVerifyPeerOption()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/mailer 8.2: Value "ture" of the "verify_peer" DSN option is not a boolean; reading it as false is deprecated and will throw in 9.0.');
+
+        $transport = $this->getFactory()->create(Dsn::fromString('smtps://example.com?verify_peer=ture'));
+
+        $this->assertFalse($transport->getStream()->getStreamOptions()['ssl']['verify_peer']);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testNonBooleanAutoTlsOption()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/mailer 8.2: Value "ture" of the "auto_tls" DSN option is not a boolean; reading it as false is deprecated and will throw in 9.0.');
+
+        $transport = $this->getFactory()->create(Dsn::fromString('smtp://example.com?auto_tls=ture'));
+
+        $this->assertFalse($transport->isAutoTls());
     }
 }

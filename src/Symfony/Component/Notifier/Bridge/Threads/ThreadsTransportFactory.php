@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Threads;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -33,8 +34,8 @@ final class ThreadsTransportFactory extends AbstractTransportFactory
         $accessToken = $this->getUser($dsn);
         $userId = $dsn->getRequiredOption('user_id');
         $apiVersion = $dsn->getOption('api_version', self::DEFAULT_API_VERSION);
-        $pollAttempts = (int) $dsn->getOption('poll_attempts', ThreadsTransport::POLL_ATTEMPTS);
-        $pollDelay = (float) $dsn->getOption('poll_delay', ThreadsTransport::POLL_DELAY_SECONDS);
+        $pollAttempts = filter_var($dsn->getOption('poll_attempts', ThreadsTransport::POLL_ATTEMPTS), \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "poll_attempts" of the Threads Notifier transport must be an integer.');
+        $pollDelay = filter_var($dsn->getOption('poll_delay', ThreadsTransport::POLL_DELAY_SECONDS), \FILTER_VALIDATE_FLOAT, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "poll_delay" of the Threads Notifier transport must be a number.');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

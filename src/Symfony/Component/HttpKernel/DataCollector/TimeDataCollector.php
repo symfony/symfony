@@ -33,7 +33,10 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
-        if (null !== $this->kernel) {
+        if ($request->attributes->has('_virtual_type')) {
+            // virtual requests can be handled by a long-running process, like the messages consumed by a worker, long after the kernel started
+            $startTime = $request->server->get('REQUEST_TIME_FLOAT');
+        } elseif (null !== $this->kernel) {
             $startTime = $this->kernel->getStartTime();
         } else {
             $startTime = $request->server->get('REQUEST_TIME_FLOAT');

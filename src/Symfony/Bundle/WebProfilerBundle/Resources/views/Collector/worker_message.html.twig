@@ -1,0 +1,43 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block menu %}
+    <span class="label">
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/messenger.svg') }}</span>
+        <strong>Worker Message</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Consumed Message</h2>
+
+    <table>
+        <tbody>
+            <tr>
+                <th scope="row" class="font-normal">Message</th>
+                <td>{{ profiler_dump(collector.message, maxDepth: 2) }}</td>
+            </tr>
+            <tr>
+                <th scope="row" class="font-normal">Transport</th>
+                <td>{{ collector.transport }}</td>
+            </tr>
+            <tr>
+                <th scope="row" class="font-normal">Attempt</th>
+                <td>{{ collector.attempt }}</td>
+            </tr>
+            <tr>
+                <th scope="row" class="font-normal">Sent from</th>
+                <td>
+                    {% if collector.originToken %}
+                        <a href="{{ path('_profiler', {token: collector.originToken, panel: 'messenger'}) }}">{{ collector.originToken }}</a>
+                    {% else %}
+                        <span class="text-muted">n/a</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th scope="row" class="font-normal">Envelope stamps <span class="block text-muted">when acknowledged</span></th>
+                <td>{{ profiler_dump(collector.stamps, maxDepth: 2) }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

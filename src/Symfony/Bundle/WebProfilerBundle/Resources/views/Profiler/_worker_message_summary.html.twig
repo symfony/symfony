@@ -1,0 +1,60 @@
+{% set result = profile.statuscode|default(3) %}
+{% set css_class = result == 2 ? 'status-error' : result == 0 ? 'status-success' : 'status-warning' %}
+
+<div class="status {{ css_class }}">
+    {% if result == 2 %}
+        <p class="status-error-details">
+            <span class="icon">{{ source('@WebProfiler/Icon/alert-circle.svg') }}</span>
+            <span class="status-response-status-code">Rejected</span>
+            <span class="status-response-status-text">The message failed and will not be retried</span>
+        </p>
+    {% endif %}
+
+    <h2>
+        <span class="status-request-method">
+            {{ profile.method }}
+        </span>
+
+        {{ profile.url|abbr_class }}
+    </h2>
+
+    <dl class="metadata">
+        <dt>Result</dt>
+        <dd>
+            {% if result == 0 %}
+                <span class="status-response-status-code">Handled</span>
+            {% elseif result == 1 %}
+                <span class="status-response-status-code">Failed</span>
+                <span class="status-response-status-text">will be retried</span>
+            {% elseif result == 2 %}
+                <span class="status-response-status-code">Failed</span>
+            {% elseif profile.hasErrors %}
+                <span class="status-response-status-code">Pending</span>
+                <span class="status-response-status-text">the worker failed before the message was acknowledged</span>
+            {% else %}
+                <span class="status-response-status-code">Pending</span>
+                <span class="status-response-status-text">acknowledged later, e.g. by a batch handler handling it with the next messages</span>
+            {% endif %}
+        </dd>
+
+        {% if worker_message_collector %}
+            <dt>Attempt</dt>
+            <dd>{{ worker_message_collector.attempt }}</dd>
+        {% endif %}
+
+        <dt>Sent from</dt>
+        <dd>
+            {% if profile.ip %}
+                <a href="{{ path('_profiler', {token: profile.ip}) }}">{{ profile.ip }}</a>
+            {% else %}
+                <span class="text-muted">n/a</span>
+            {% endif %}
+        </dd>
+
+        <dt>Profiled on</dt>
+        <dd><time data-convert-to-user-timezone data-render-as-datetime datetime="{{ profile.time|date('c') }}">{{ profile.time|date('r') }}</time></dd>
+
+        <dt>Token</dt>
+        <dd>{{ profile.token }}</dd>
+    </dl>
+</div>

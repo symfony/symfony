@@ -36,7 +36,9 @@ class LinkStub extends ConstStub
             }
             $href = substr($href, 7);
         } elseif (str_contains($href, '://')) {
-            $this->attr['href'] = $href;
+            if (preg_match('{^https?://}i', $href)) {
+                $this->attr['href'] = $href;
+            }
 
             return;
         }

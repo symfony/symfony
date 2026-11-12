@@ -18,6 +18,8 @@ use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Kernel;
@@ -27,8 +29,9 @@ class WebProfilerBundleKernel extends Kernel
 {
     use MicroKernelTrait;
 
-    public function __construct()
-    {
+    public function __construct(
+        private bool $interceptRedirects = false,
+    ) {
         parent::__construct('test', false);
     }
 
@@ -46,6 +49,7 @@ class WebProfilerBundleKernel extends Kernel
         $routes->import(__DIR__.'/../../Resources/config/routing/profiler.xml')->prefix('/_profiler');
         $routes->import(__DIR__.'/../../Resources/config/routing/wdt.xml')->prefix('/_wdt');
         $routes->add('_', '/')->controller('kernel::homepageController');
+        $routes->add('redirect', '/redirect')->controller('kernel::redirectController');
         $routes->add('csp', '/csp')->controller('kernel::cspController');
     }
 
@@ -69,13 +73,13 @@ class WebProfilerBundleKernel extends Kernel
 
         $container->loadFromExtension('web_profiler', [
             'toolbar' => true,
-            'intercept_redirects' => false,
+            'intercept_redirects' => $this->interceptRedirects,
         ]);
     }
 
     public function getCacheDir(): string
     {
-        return sys_get_temp_dir().'/cache-'.spl_object_id($this);
+        return sys_get_temp_dir().'/cache-'.spl_object_id($this).($this->interceptRedirects ? '-intercept' : '');
     }
 
     public function getLogDir(): string
@@ -92,6 +96,11 @@ class WebProfilerBundleKernel extends Kernel
     public function homepageController(): Response
     {
         return new Response('<html><head></head><body>Homepage Controller.</body></html>');
+    }
+
+    public function redirectController(Request $request): Response
+    {
+        return new RedirectResponse($request->query->get('location'));
     }
 
     public function cspController(): Response

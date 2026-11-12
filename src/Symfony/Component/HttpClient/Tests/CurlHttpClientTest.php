@@ -17,6 +17,7 @@ use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
 use Symfony\Component\Process\Process;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 /**
  * @requires extension curl
@@ -444,6 +445,41 @@ class CurlHttpClientTest extends HttpClientTestCase
 
         self::assertSame('Response has been canceled.', $process->getOutput());
         self::assertSame('', $process->getErrorOutput());
+    }
+
+    /**
+     * @dataProvider provideRelativeRedirectsToGet
+     */
+    public function testRelativeRedirectToGetDropsCredentialsOnOtherOrigins(string $url, string $expectedUrl, bool $expectCredentials)
+    {
+        if (false === strpos(file_get_contents(\dirname((new \ReflectionClass(TestHttpServer::class))->getFileName()).'/Fixtures/web/index.php'), "case '/custom':")) {
+            $this->markTestSkipped('The installed symfony/http-client-contracts has no "/custom" route.');
+        }
+
+        $p = TestHttpServer::start(8067);
+
+        try {
+            $client = $this->getHttpClient(__FUNCTION__);
+            $response = $client->request('GET', $url, [
+                'auth_bearer' => 'foo',
+                'headers' => ['Cookie' => 'foo=bar'],
+            ]);
+            $body = $response->toArray();
+        } finally {
+            $p->stop();
+        }
+
+        $this->assertSame($expectedUrl, $response->getInfo('url'));
+        $this->assertSame($expectCredentials ? ['Bearer foo', 'foo=bar'] : [null, null], [$body['HTTP_AUTHORIZATION'] ?? null, $body['HTTP_COOKIE'] ?? null]);
+    }
+
+    public static function provideRelativeRedirectsToGet(): iterable
+    {
+        $seeOther = 'custom?'.http_build_query(['status' => 303, 'headers' => ['Location: /']]);
+
+        yield 'same origin' => ['http://localhost:8057/'.$seeOther, 'http://localhost:8057/', true];
+        yield 'same origin with user info' => ['http://foo:bar@localhost:8057/'.$seeOther, 'http://localhost:8057/', true];
+        yield 'other origin' => ['http://localhost:8057/custom?'.http_build_query(['status' => 302, 'headers' => ['Location: http://localhost:8067/'.$seeOther]]), 'http://localhost:8067/', false];
     }
 
     /**

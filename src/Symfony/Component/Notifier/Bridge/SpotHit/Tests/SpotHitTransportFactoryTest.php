@@ -35,8 +35,16 @@ final class SpotHitTransportFactoryTest extends AbstractTransportFactoryTestCase
             'spothit://api_token@default?from=MyCompany',
         ];
         yield [
+            'spothit://spot-hit.fr?from=MyCompany&smslongnbr=3',
+            'spothit://api_token@default?from=MyCompany&smslongnbr=3',
+        ];
+        yield [
             'spothit://spot-hit.fr?from=MyCompany&smslong=1',
             'spothit://api_token@default?from=MyCompany&smslong=1',
+        ];
+        yield [
+            'spothit://spot-hit.fr?from=MyCompany&smslong=0',
+            'spothit://api_token@default?from=MyCompany&smslong=false',
         ];
     }
 

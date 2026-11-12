@@ -43,6 +43,21 @@ class CurlHttpClientTest extends HttpClientTestCase
         return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false, 'extra' => ['use_persistent_connections' => $usePersistentConnections]], 6, 50);
     }
 
+    public function testPostRewoundResourceAgain()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $h = fopen('php://temp', 'w+');
+        fwrite($h, 'foo=0123456789');
+
+        foreach ([1, 2] as $attempt) {
+            rewind($h);
+            $response = $client->request('POST', 'http://localhost:8057/post', ['body' => $h]);
+
+            $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray(), "Request #{$attempt}");
+        }
+    }
+
     public function testTimeoutIsNotAFatalError()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
@@ -378,6 +393,15 @@ class CurlHttpClientTest extends HttpClientTestCase
         self::assertStringNotContainsString('Re-using existing connection', $response->getInfo('debug'));
     }
 
+    public function testAuthNtlmWinsOverUserinfo()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://foo:bar@127.0.0.1:8057/', ['auth_ntlm' => 'user:pass']);
+
+        $this->assertMatchesRegularExpression('/^NTLM [^ ,]++$/', $response->toArray()['HTTP_AUTHORIZATION']);
+        $this->assertSame('http://127.0.0.1:8057/', $response->getInfo('url'));
+    }
+
     public function testNtlmStateNotMutatedByNonNtlmRequest()
     {
         // A plain (non-NTLM) request must not touch the NTLM origin map. This guards against
@@ -524,7 +548,7 @@ class CurlHttpClientTest extends HttpClientTestCase
     #[DataProvider('provideRelativeRedirectsToGet')]
     public function testRelativeRedirectToGetDropsCredentialsOnOtherOrigins(string $url, string $expectedUrl, bool $expectCredentials)
     {
-        if (false === strpos(file_get_contents(\dirname((new \ReflectionClass(TestHttpServer::class))->getFileName()).'/Fixtures/web/index.php'), "case '/custom':")) {
+        if (!str_contains(file_get_contents(\dirname((new \ReflectionClass(TestHttpServer::class))->getFileName()).'/Fixtures/web/index.php'), "case '/custom':")) {
             $this->markTestSkipped('The installed symfony/http-client-contracts has no "/custom" route.');
         }
 

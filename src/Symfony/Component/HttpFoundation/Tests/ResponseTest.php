@@ -177,6 +177,41 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isNotModified($request));
     }
 
+    public function testIsNotModifiedIgnoresInvalidDates()
+    {
+        $request = new Request();
+        $response = new Response();
+
+        $request->headers->set('If-Modified-Since', '-1');
+        $response->headers->set('Last-Modified', 'Sun, 25 Aug 2013 18:33:31 GMT');
+        $this->assertFalse($response->isNotModified($request));
+
+        $request->headers->set('If-Modified-Since', 'Mon, 25 Aug 2013 18:33:31 GMT');
+        $this->assertFalse($response->isNotModified($request));
+
+        $request->headers->set('If-Modified-Since', 'Sun, 25 Aug 2013 18:33:31 GMT');
+        $response->headers->set('Last-Modified', 'not a date');
+        $this->assertFalse($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedReadsAsctimeDatesAsUtc()
+    {
+        $previousTimezone = date_default_timezone_get();
+        date_default_timezone_set('Europe/Paris');
+
+        try {
+            $request = new Request();
+            $request->headers->set('If-Modified-Since', 'Sun Aug 25 18:33:31 2013');
+
+            $response = new Response();
+            $response->headers->set('Last-Modified', 'Sun, 25 Aug 2013 18:33:31 GMT');
+
+            $this->assertTrue($response->isNotModified($request));
+        } finally {
+            date_default_timezone_set($previousTimezone);
+        }
+    }
+
     public function testIsNotModifiedEtag()
     {
         $etagOne = 'randomly_generated_etag';
@@ -344,6 +379,28 @@ class ResponseTest extends ResponseTestCase
 
         $response = new Response();
         $this->assertNull($response->getMaxAge(), '->getMaxAge() returns null if no freshness information available');
+    }
+
+    public function testGetMaxAgeReadsExpiresInEachHttpDateFormat()
+    {
+        $expires = time() + 3600;
+        $response = new Response('', 200, ['Date' => gmdate('D, d M Y H:i:s \G\M\T', $expires - 3600)]);
+
+        $response->headers->set('Expires', gmdate('l, d-M-y H:i:s \G\M\T', $expires));
+        $this->assertSame(3600, $response->getMaxAge());
+
+        $response->headers->set('Expires', \sprintf('%s %2d %s', gmdate('D M', $expires), gmdate('j', $expires), gmdate('H:i:s Y', $expires)));
+        $this->assertSame(3600, $response->getMaxAge());
+
+        $response->headers->set('Expires', gmdate('D', $expires + 86400).gmdate(', d M Y H:i:s \G\M\T', $expires));
+        $this->assertSame(0, $response->getMaxAge());
+    }
+
+    public function testGetExpiresAfter2038()
+    {
+        $response = new Response('', 200, ['Expires' => 'Thu, 31 Dec 2099 23:59:59 GMT']);
+
+        $this->assertSame('2099-12-31 23:59:59', $response->getExpires()->format('Y-m-d H:i:s'));
     }
 
     public function testSetSharedMaxAge()

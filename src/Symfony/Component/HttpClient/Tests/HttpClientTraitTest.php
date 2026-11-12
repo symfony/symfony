@@ -369,6 +369,40 @@ b'])]
         $this->assertSame('Authorization: Basic '.$result, $options['normalized_headers']['authorization'][0]);
     }
 
+    public function testPrepareRequestMovesUserinfoToAuthBasic()
+    {
+        [$url, $options] = self::prepareRequest('GET', 'http://foo:bar%3Dbar@example.com/', ['proxy' => 'http://user:pass@proxy.example:3128'], HttpClientInterface::OPTIONS_DEFAULTS);
+        $this->assertSame('http://example.com/', implode('', $url));
+        $this->assertSame(['Authorization: Basic '.base64_encode('foo:bar=bar')], $options['normalized_headers']['authorization']);
+        $this->assertContains('Authorization: Basic '.base64_encode('foo:bar=bar'), $options['headers']);
+        $this->assertSame('http://user:pass@proxy.example:3128', $options['proxy']);
+
+        [$url, $options] = self::prepareRequest('GET', 'http://foo@example.com/', [], HttpClientInterface::OPTIONS_DEFAULTS);
+        $this->assertSame('http://example.com/', implode('', $url));
+        $this->assertSame(['Authorization: Basic '.base64_encode('foo:')], $options['normalized_headers']['authorization']);
+
+        [, $defaults] = self::prepareRequest(null, null, ['base_uri' => 'http://foo:bar@example.com/api/'], HttpClientInterface::OPTIONS_DEFAULTS);
+        [$url, $options] = self::prepareRequest('GET', 'users', [], $defaults);
+        $this->assertSame('http://example.com/api/users', implode('', $url));
+        $this->assertSame(['Authorization: Basic '.base64_encode('foo:bar')], $options['normalized_headers']['authorization']);
+
+        [$url, $options] = self::prepareRequest('GET', 'http://foo:bar@example.com/', ['auth_basic' => 'baz:qux'], HttpClientInterface::OPTIONS_DEFAULTS);
+        $this->assertSame('http://example.com/', implode('', $url));
+        $this->assertSame(['Authorization: Basic '.base64_encode('baz:qux')], $options['normalized_headers']['authorization']);
+
+        [$url, $options] = self::prepareRequest('GET', 'http://foo:bar@example.com/', ['auth_bearer' => 'baz'], HttpClientInterface::OPTIONS_DEFAULTS);
+        $this->assertSame('http://example.com/', implode('', $url));
+        $this->assertSame(['Authorization: Bearer baz'], $options['normalized_headers']['authorization']);
+
+        [$url, $options] = self::prepareRequest('GET', 'http://foo:bar@example.com/', ['headers' => ['Authorization' => 'Custom baz']], HttpClientInterface::OPTIONS_DEFAULTS);
+        $this->assertSame('http://example.com/', implode('', $url));
+        $this->assertSame(['Authorization: Custom baz'], $options['normalized_headers']['authorization']);
+
+        [$url, $options] = self::prepareRequest('GET', 'http://foo:bar@example.com/', ['auth_ntlm' => 'baz:qux'], HttpClientInterface::OPTIONS_DEFAULTS, true);
+        $this->assertSame('http://example.com/', implode('', $url));
+        $this->assertArrayNotHasKey('authorization', $options['normalized_headers']);
+    }
+
     public static function provideFingerprints()
     {
         foreach (['md5', 'sha1', 'sha256'] as $algo) {

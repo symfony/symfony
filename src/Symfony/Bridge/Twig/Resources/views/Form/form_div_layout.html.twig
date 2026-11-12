@@ -50,7 +50,7 @@
     <div {{ block('widget_container_attributes') }}>
     {%- for child in form %}
         {{- form_widget(child) -}}
-        {{- form_label(child, null, {translation_domain: choice_translation_domain}) -}}
+        {{- form_label(child, null, {translation_domain: choice_translation_domain, required: false}) -}}
     {% endfor -%}
     </div>
 {%- endblock choice_widget_expanded -%}

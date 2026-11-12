@@ -52,6 +52,15 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
+        $firewallConfig = $this->firewallMap instanceof FirewallMap ? $this->firewallMap->getFirewallConfig($request) : null;
+
+        // triggering a lazy firewall can use the session, which a stateless request forbids
+        $lazyFirewallPending = $request->attributes->getBoolean('_stateless')
+            && !$request->attributes->has('_security_firewall_run')
+            && null !== $firewallConfig
+            && $firewallConfig->isSecurityEnabled()
+            && !$firewallConfig->isStateless();
+
         if (null === $this->tokenStorage) {
             $this->data = [
                 'enabled' => false,
@@ -67,7 +76,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'inherited_roles' => [],
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             ];
-        } elseif (null === $token = $this->tokenStorage->getToken()) {
+        } elseif ($lazyFirewallPending || null === $token = $this->tokenStorage->getToken()) {
             $this->data = [
                 'enabled' => true,
                 'authenticated' => false,
@@ -165,31 +174,28 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
         // collect firewall context information
         $this->data['firewall'] = null;
-        if ($this->firewallMap instanceof FirewallMap) {
-            $firewallConfig = $this->firewallMap->getFirewallConfig($request);
-            if (null !== $firewallConfig) {
-                $this->data['firewall'] = [
-                    'name' => $firewallConfig->getName(),
-                    'request_matcher' => $firewallConfig->getRequestMatcher(),
-                    'security_enabled' => $firewallConfig->isSecurityEnabled(),
-                    'stateless' => $firewallConfig->isStateless(),
-                    'provider' => $firewallConfig->getProvider(),
-                    'context' => $firewallConfig->getContext(),
-                    'entry_point' => $firewallConfig->getEntryPoint(),
-                    'access_denied_handler' => $firewallConfig->getAccessDeniedHandler(),
-                    'access_denied_url' => $firewallConfig->getAccessDeniedUrl(),
-                    'user_checker' => $firewallConfig->getUserChecker(),
-                    'authenticators' => $firewallConfig->getAuthenticators(),
-                ];
+        if (null !== $firewallConfig) {
+            $this->data['firewall'] = [
+                'name' => $firewallConfig->getName(),
+                'request_matcher' => $firewallConfig->getRequestMatcher(),
+                'security_enabled' => $firewallConfig->isSecurityEnabled(),
+                'stateless' => $firewallConfig->isStateless(),
+                'provider' => $firewallConfig->getProvider(),
+                'context' => $firewallConfig->getContext(),
+                'entry_point' => $firewallConfig->getEntryPoint(),
+                'access_denied_handler' => $firewallConfig->getAccessDeniedHandler(),
+                'access_denied_url' => $firewallConfig->getAccessDeniedUrl(),
+                'user_checker' => $firewallConfig->getUserChecker(),
+                'authenticators' => $firewallConfig->getAuthenticators(),
+            ];
 
-                // generate exit impersonation path from current request
-                if ($this->data['impersonated'] && null !== $switchUserConfig = $firewallConfig->getSwitchUser()) {
-                    $exitPath = $request->getRequestUri();
-                    $exitPath .= null === $request->getQueryString() ? '?' : '&';
-                    $exitPath .= \sprintf('%s=%s', urlencode($switchUserConfig['parameter']), SwitchUserListener::EXIT_VALUE);
+            // generate exit impersonation path from current request
+            if ($this->data['impersonated'] && null !== $switchUserConfig = $firewallConfig->getSwitchUser()) {
+                $exitPath = $request->getRequestUri();
+                $exitPath .= null === $request->getQueryString() ? '?' : '&';
+                $exitPath .= \sprintf('%s=%s', urlencode($switchUserConfig['parameter']), SwitchUserListener::EXIT_VALUE);
 
-                    $this->data['impersonation_exit_path'] = $exitPath;
-                }
+                $this->data['impersonation_exit_path'] = $exitPath;
             }
         }
 
@@ -201,7 +207,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
         $this->data['authenticators'] = $this->firewall ? $this->firewall->getAuthenticatorsInfo() : [];
 
-        if ($this->data['listeners'] && !($this->data['firewall']['stateless'] ?? true)) {
+        if ($this->data['listeners'] && !($this->data['firewall']['stateless'] ?? true) && !$lazyFirewallPending) {
             $authCookieName = "{$this->data['firewall']['name']}_auth_profile_token";
             $deauthCookieName = "{$this->data['firewall']['name']}_deauth_profile_token";
             $profileToken = $response->headers->get('X-Debug-Token');

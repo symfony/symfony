@@ -48,7 +48,7 @@
             <label class="flex items-center label mb-2">
                 {{- form_widget(child) -}}
                 {%- if child.vars.label is not same as(false) -%}
-                    {{- form_label(child, null, {translation_domain: choice_translation_domain, label_attr: {class: ''}}) -}}
+                    {{- form_label(child, null, {translation_domain: choice_translation_domain, label_attr: {class: ''}, required: false}) -}}
                 {%- endif -%}
             </label>
         {% endfor -%}

@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
+use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
@@ -649,6 +650,17 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->expectNotToPerformAssertions();
     }
 
+    public function testPipeBody()
+    {
+        $process = proc_open([\PHP_BINARY, '-r', 'echo "foo=0123456789";'], [1 => ['pipe', 'w']], $pipes);
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/post', ['body' => $pipes[1]]);
+
+        $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray());
+        proc_close($process);
+    }
+
     public function testMisspelledScheme()
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);
@@ -743,6 +755,65 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('http://localhost:8057/', $response->getInfo('redirect_url'));
+    }
+
+    public function testNoPrivateNetworkWithUserinfoAndRedirect()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $client = new NoPrivateNetworkHttpClient($client, '104.26.14.6/32');
+        $response = $client->request('GET', 'http://foo:bar@localhost:8057/302/relative');
+
+        $this->assertSame('foo', $response->toArray()['PHP_AUTH_USER']);
+        $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
+    }
+
+    public function testUserinfoFollowsRedirectsToTheSameOriginOnly()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        foreach ([$client, new NoPrivateNetworkHttpClient($client, '104.26.14.6/32')] as $client) {
+            // "/301" redirects to another origin when it gets the credentials, and "/302" redirects back when it doesn't
+            $response = $client->request('GET', 'http://foo:bar@localhost:8057/301');
+
+            $this->assertSame('foo', $response->toArray()['PHP_AUTH_USER'] ?? null);
+            $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
+            $this->assertSame(2, $response->getInfo('redirect_count'));
+        }
+    }
+
+    public function testUserinfoIsNotReported()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $logger = new TestLogger();
+
+        if ($client instanceof LoggerAwareInterface) {
+            $client->setLogger($logger);
+        }
+
+        $progressInfo = [];
+        $response = $client->request('GET', 'http://foo:bar@localhost:8057/302/relative', [
+            'on_progress' => static function (int $dlNow, int $dlSize, array $info) use (&$progressInfo) {
+                $progressInfo[] = [$info['url'] ?? null, $info['original_url'] ?? null, $info['redirect_url'] ?? null];
+            },
+        ]);
+
+        $this->assertSame('foo', $response->toArray()['PHP_AUTH_USER']);
+        $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
+        $this->assertSame('http://localhost:8057/302/relative', $response->getInfo('original_url'));
+
+        $response = $client->request('GET', 'http://foo:bar@localhost:8057/302/relative', ['max_redirects' => 0]);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('http://localhost:8057/', $response->getInfo('redirect_url'));
+
+        try {
+            $client->request('GET', 'http://foo:bar@localhost:8057/404')->getContent();
+            $this->fail(ClientException::class.' expected');
+        } catch (ClientException $e) {
+            $this->assertSame('HTTP/1.1 404 Not Found returned for "http://localhost:8057/404".', $e->getMessage());
+        }
+
+        $this->assertStringNotContainsString('foo:bar', json_encode([$progressInfo, $logger->logs]));
     }
 
     public function testNoPrivateNetworkStream()

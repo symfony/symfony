@@ -92,6 +92,7 @@ class FrankenPhpWorkerRunner implements RunnerInterface
             $sfRequest = $sfResponse = null;
 
             gc_collect_cycles();
+            memory_reset_peak_usage();
         } while ($ret && (0 >= $this->loopMax || ++$loops < $this->loopMax));
 
         return 0;

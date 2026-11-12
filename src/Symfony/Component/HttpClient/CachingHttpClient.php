@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Caching\Freshness;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
+use Symfony\Component\HttpClient\Internal\HttpDateTrait;
 use Symfony\Component\HttpClient\Internal\OutgoingRequest;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
@@ -50,6 +51,7 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
         AsyncDecoratorTrait::withOptions insteadof HttpClientTrait;
     }
     use HttpClientTrait;
+    use HttpDateTrait;
 
     /**
      * The status codes that are cacheable by default.
@@ -177,7 +179,13 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
         }
 
         if (isset($requestCacheControl['no-store'])) {
-            return new AsyncResponse($this->client, $method, $url, $options);
+            $this->isInnerRequest = true;
+
+            try {
+                return new AsyncResponse($this, $method, $url, $options);
+            } finally {
+                $this->isInnerRequest = false;
+            }
         }
 
         $requestHash = self::hash($method.$fullUrl.serialize(array_intersect_key($options['normalized_headers'], self::RESPONSE_INFLUENCING_HEADERS)));
@@ -214,7 +222,7 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
                     $sentCacheValidator = true;
                 }
 
-                if (isset($cachedData['headers']['last-modified'][0])) {
+                if (isset($cachedData['headers']['last-modified'][0]) && null !== self::parseHttpDate($cachedData['headers']['last-modified'][0])) {
                     $options['headers']['If-Modified-Since'] = $cachedData['headers']['last-modified'][0];
                     $sentCacheValidator = true;
                 }
@@ -729,15 +737,14 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             return false;
         }
 
-        $lastModified = strtotime($cachedData['headers']['last-modified'][0]);
-        if (false === $lastModified) {
+        if (null === $lastModified = self::parseHttpDate($cachedData['headers']['last-modified'][0])) {
             return false;
         }
 
         foreach ($requestHeaders['if-modified-since'] as $ifModifiedSince) {
             $ifModifiedSince = substr($ifModifiedSince, 19);
 
-            if (false !== $modifiedSince = strtotime($ifModifiedSince)) {
+            if (null !== $modifiedSince = self::parseHttpDate($ifModifiedSince)) {
                 return $lastModified <= $modifiedSince;
             }
         }
@@ -855,13 +862,15 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             return max(0, $maxAge - $age);
         }
 
-        foreach ($headers['expires'] ?? [] as $expire) {
-            if (false !== $expirationTimestamp = strtotime($expire)) {
-                $dateTimestamp = self::getDateHeaderTimestamp($headers) ?? $responseTime;
-                $timeUntilExpiration = $expirationTimestamp - $dateTimestamp - $age;
-
-                return max($timeUntilExpiration, 0);
+        if (isset($headers['expires'][0])) {
+            // RFC 9111 Sections 4.2.1 and 5.3: only the first Expires counts, and an invalid date, especially "0", means that the response is already expired
+            if (null === $expirationTimestamp = self::parseHttpDate($headers['expires'][0])) {
+                return 0;
             }
+
+            $dateTimestamp = self::getDateHeaderTimestamp($headers) ?? $responseTime;
+
+            return max($expirationTimestamp - $dateTimestamp - $age, 0);
         }
 
         if (null !== $heuristicFreshnessLifetime = $this->determineHeuristicFreshnessLifetime($headers, $cacheControl, $requestTime)) {
@@ -882,7 +891,7 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
         }
 
         foreach ($headers['last-modified'] as $lastModified) {
-            if (false === $lastModifiedTimestamp = strtotime($lastModified)) {
+            if (null === $lastModifiedTimestamp = self::parseHttpDate($lastModified)) {
                 continue;
             }
 
@@ -918,7 +927,7 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
     private static function getDateHeaderTimestamp(array $headers): ?int
     {
         foreach ($headers['date'] ?? [] as $date) {
-            if (false !== $timestamp = strtotime($date)) {
+            if (null !== $timestamp = self::parseHttpDate($date)) {
                 return $timestamp;
             }
         }
@@ -1003,7 +1012,7 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             return null;
         }
 
-        return time() + $maxAge;
+        return min(time() + $maxAge, \PHP_INT_MAX);
     }
 
     /**
@@ -1102,13 +1111,7 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             return true;
         }
 
-        foreach ($headers['expires'] ?? [] as $expires) {
-            if (false !== strtotime($expires)) {
-                return true;
-            }
-        }
-
-        return false;
+        return isset($headers['expires'][0]) && null !== self::parseHttpDate($headers['expires'][0]);
     }
 
     /**

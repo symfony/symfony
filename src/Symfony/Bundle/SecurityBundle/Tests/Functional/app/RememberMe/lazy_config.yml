@@ -1,0 +1,8 @@
+imports:
+    - { resource: ./config.yml }
+    - { resource: ./config_session.yml }
+
+security:
+    firewalls:
+        default:
+            lazy: true

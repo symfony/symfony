@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
@@ -152,6 +154,200 @@ class RetryableHttpClientTest extends TestCase
         }
     }
 
+    public function testRetrySendsTheStreamBodyAgain()
+    {
+        $body = fopen('php://temp', 'r+');
+        fwrite($body, 'skipped payload');
+        fseek($body, 8);
+
+        $sentBodies = [];
+        $client = new RetryableHttpClient(new MockHttpClient(static function (string $method, string $url, array $options) use (&$sentBodies) {
+            $sentBodies[] = self::readBody($options['body']);
+
+            return new MockResponse('', ['http_code' => 1 === \count($sentBodies) ? 503 : 200]);
+        }), new GenericRetryStrategy([503], 0), 1);
+
+        $this->assertSame(200, $client->request('PUT', 'http://example.com/', ['body' => $body])->getStatusCode());
+        $this->assertSame(['payload', 'payload'], $sentBodies);
+    }
+
+    public function testRetrySendsTheStreamsOfAMultipartBodyAgain()
+    {
+        $file = fopen('php://temp', 'r+');
+        fwrite($file, 'payload');
+        rewind($file);
+
+        $sentBodies = [];
+        $client = new RetryableHttpClient(new MockHttpClient(static function (string $method, string $url, array $options) use (&$sentBodies) {
+            $sentBodies[] = self::readBody($options['body']);
+
+            return new MockResponse('', ['http_code' => 1 === \count($sentBodies) ? 503 : 200]);
+        }), new GenericRetryStrategy([503], 0), 1);
+
+        $this->assertSame(200, $client->request('POST', 'http://example.com/', ['body' => ['form' => ['file' => $file]]])->getStatusCode());
+        $this->assertCount(2, $sentBodies);
+        $this->assertStringContainsString("\r\n\r\npayload\r\n", $sentBodies[1]);
+    }
+
+    public function testRetrySendsTheStreamsNestedInObjectsAgain()
+    {
+        $form = new \stdClass();
+        $form->file = fopen('php://temp', 'r+');
+        fwrite($form->file, 'payload');
+        rewind($form->file);
+
+        $sentBodies = [];
+        $client = new RetryableHttpClient(new MockHttpClient(static function (string $method, string $url, array $options) use (&$sentBodies) {
+            $sentBodies[] = self::readBody($options['body']);
+
+            return new MockResponse('', ['http_code' => 1 === \count($sentBodies) ? 503 : 200]);
+        }), new GenericRetryStrategy([503], 0), 1);
+
+        $this->assertSame(200, $client->request('POST', 'http://example.com/', ['body' => ['form' => $form]])->getStatusCode());
+        $this->assertCount(2, $sentBodies);
+        $this->assertStringContainsString("\r\n\r\npayload\r\n", $sentBodies[1]);
+    }
+
+    public function testRetrySendsAResponseUsedAsBodyPartAgainOnlyWhenItIsBuffered()
+    {
+        foreach ([true, false] as $buffer) {
+            $part = (new MockHttpClient(new MockResponse('payload')))->request('GET', 'http://example.com/file.txt', ['buffer' => $buffer]);
+
+            $sentBodies = [];
+            $client = new RetryableHttpClient(new MockHttpClient(static function (string $method, string $url, array $options) use (&$sentBodies) {
+                $sentBodies[] = self::readBody($options['body']);
+
+                return new MockResponse('', ['http_code' => 1 === \count($sentBodies) ? 503 : 200]);
+            }), new GenericRetryStrategy([503], 0), 1);
+
+            $this->assertSame($buffer ? 200 : 503, $client->request('POST', 'http://example.com/', ['body' => ['file' => $part]])->getStatusCode());
+            $this->assertCount($buffer ? 2 : 1, $sentBodies);
+
+            foreach ($sentBodies as $body) {
+                $this->assertStringContainsString("\r\n\r\npayload\r\n", $body);
+            }
+        }
+    }
+
+    public function testRetrySendsTheBodiesThatAreBuiltForEachRequestAgain()
+    {
+        $bodies = [
+            'generator closure' => static function () {
+                yield 'pay';
+                yield 'load';
+            },
+            'iterator' => new \ArrayIterator(['pay', 'load']),
+        ];
+
+        foreach ($bodies as $type => $body) {
+            $sentBodies = [];
+            $client = new RetryableHttpClient(new MockHttpClient(static function (string $method, string $url, array $options) use (&$sentBodies) {
+                $sentBodies[] = self::readBody($options['body']);
+
+                return new MockResponse('', ['http_code' => 1 === \count($sentBodies) ? 503 : 200]);
+            }), new GenericRetryStrategy([503], 0), 1);
+
+            $this->assertSame(200, $client->request('PUT', 'http://example.com/', ['body' => $body])->getStatusCode(), $type);
+            $this->assertSame(['payload', 'payload'], $sentBodies, $type);
+        }
+    }
+
+    public function testNoRetryWhenTheBodyCannotBeSentAgain()
+    {
+        $chunks = ['pay', 'load'];
+        $bodies = [
+            'generator' => (static function () {
+                yield 'pay';
+                yield 'load';
+            })(),
+            'closure' => static function () use (&$chunks) {
+                return array_shift($chunks) ?? '';
+            },
+        ];
+
+        foreach ($bodies as $type => $body) {
+            $sentBodies = [];
+            $client = new RetryableHttpClient(new MockHttpClient(static function (string $method, string $url, array $options) use (&$sentBodies) {
+                $sentBodies[] = self::readBody($options['body']);
+
+                return new MockResponse('', ['http_code' => 1 === \count($sentBodies) ? 503 : 200]);
+            }), new GenericRetryStrategy([503], 0), 1);
+
+            $this->assertSame(503, $client->request('PUT', 'http://example.com/', ['body' => $body])->getStatusCode(), $type);
+            $this->assertSame(['payload'], $sentBodies, $type);
+        }
+    }
+
+    public function testRetrySendsTheStreamBodyAgainWithCurl()
+    {
+        if (!\extension_loaded('curl')) {
+            $this->markTestSkipped('This test requires the curl extension.');
+        }
+
+        TestHttpServer::start();
+
+        foreach (['file' => tmpfile(), 'php://temp' => fopen('php://temp', 'r+')] as $type => $body) {
+            fwrite($body, 'foo=0123456789');
+            rewind($body);
+
+            // Retrying on 200 makes the test server receive the body twice
+            $client = new RetryableHttpClient(new CurlHttpClient(), new GenericRetryStrategy([200], 0), 1);
+            $response = $client->request('POST', 'http://localhost:8057/post', ['body' => $body]);
+
+            $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray(), $type);
+            $this->assertSame(1, $response->getInfo('retry_count'), $type);
+        }
+    }
+
+    public function testRetrySendsTheBodyWhenTheFirstAttemptFailedBeforeReadingIt()
+    {
+        if (!\extension_loaded('curl')) {
+            $this->markTestSkipped('This test requires the curl extension.');
+        }
+
+        TestHttpServer::start();
+
+        [$writer, $stream] = stream_socket_pair('\\' === \DIRECTORY_SEPARATOR ? \STREAM_PF_INET : \STREAM_PF_UNIX, \STREAM_SOCK_STREAM, \STREAM_IPPROTO_IP);
+        fwrite($writer, 'foo=0123456789');
+        fclose($writer);
+
+        $chunks = ['foo=', '0123456789'];
+        $bodies = [
+            'generator' => (static function () {
+                yield 'foo=';
+                yield '0123456789';
+            })(),
+            'closure' => static function () use (&$chunks) {
+                return array_shift($chunks) ?? '';
+            },
+            'stream that is not seekable' => $stream,
+        ];
+
+        foreach ($bodies as $type => $body) {
+            $client = new RetryableHttpClient(new CurlHttpClient(), new GenericRetryStrategy([], 0), 1);
+            $response = $client->request('POST', 'post', ['base_uri' => ['http://does.not.exists/', 'http://localhost:8057/'], 'body' => $body]);
+
+            $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray(), $type);
+        }
+    }
+
+    public function testNoRetryWhenTheStreamBodyIsNotSeekable()
+    {
+        [$writer, $body] = stream_socket_pair('\\' === \DIRECTORY_SEPARATOR ? \STREAM_PF_INET : \STREAM_PF_UNIX, \STREAM_SOCK_STREAM, \STREAM_IPPROTO_IP);
+        fwrite($writer, 'payload');
+        fclose($writer);
+
+        $sentBodies = [];
+        $client = new RetryableHttpClient(new MockHttpClient(static function (string $method, string $url, array $options) use (&$sentBodies) {
+            $sentBodies[] = self::readBody($options['body']);
+
+            return new MockResponse('', ['http_code' => 1 === \count($sentBodies) ? 503 : 200]);
+        }), new GenericRetryStrategy([503], 0), 1);
+
+        $this->assertSame(503, $client->request('PUT', 'http://example.com/', ['body' => $body])->getStatusCode());
+        $this->assertSame(['payload'], $sentBodies);
+    }
+
     public function testRetryWithDnsIssue()
     {
         $client = new RetryableHttpClient(
@@ -231,6 +427,27 @@ class RetryableHttpClientTest extends TestCase
         $this->assertArrayHasKey('delay', $logger->context);
         $this->assertNotNull($delay);
         $this->assertSame((int) ($retryAfter * 1000), $delay);
+    }
+
+    #[DataProvider('provideRetryAfterDates')]
+    public function testRetryAfterHttpDate(string $retryAfter, int $delay)
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('', ['http_code' => 503, 'response_headers' => ['Retry-After' => $retryAfter]]),
+            new MockResponse(''),
+        ]);
+        $client = new RetryableHttpClient($mockClient, new GenericRetryStrategy(GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES, 100, 1, 0, 0), 1, $logger = new TestLogger());
+
+        $client->request('GET', 'http://example.com/foo-bar')->getContent();
+
+        $this->assertSame([\sprintf('Try #1 after %dms, status code: 503', $delay)], $logger->logs);
+    }
+
+    public static function provideRetryAfterDates(): iterable
+    {
+        yield 'HTTP-date in the past' => ['Thu, 01 Jan 1970 00:00:00 GMT', 0];
+        yield 'not an HTTP-date' => ['yesterday', 100];
+        yield 'mismatched weekday name' => ['Fri, 01 Jan 1970 00:00:00 GMT', 100];
     }
 
     public function testRetryOnErrorAssertContent()
@@ -682,5 +899,23 @@ class RetryableHttpClientTest extends TestCase
         }
 
         $this->assertSame(2, $retryCount, 'The request should have been retried once');
+    }
+
+    private static function readBody($body): string
+    {
+        if (\is_resource($body)) {
+            return stream_get_contents($body);
+        }
+
+        if (!$body instanceof \Closure) {
+            return $body;
+        }
+
+        $data = '';
+        while ('' !== $chunk = $body(16372)) {
+            $data .= $chunk;
+        }
+
+        return $data;
     }
 }

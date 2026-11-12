@@ -87,7 +87,7 @@
 {% block checkbox_radio_label -%}
     {# Do not display the label if widget is not defined in order to prevent double label rendering #}
     {%- if widget is defined -%}
-        {%- if required -%}
+        {%- if label_required ?? required -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
         {%- endif -%}
         {%- if parent_label_class is defined -%}

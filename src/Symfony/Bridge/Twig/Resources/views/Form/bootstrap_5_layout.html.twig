@@ -262,6 +262,7 @@
     <div {{ block('widget_container_attributes') }}>
         {%- for child in form %}
             {{- form_widget(child, {
+                label_required: false,
                 parent_label_class: label_attr.class|default(''),
                 translation_domain: choice_translation_domain,
                 valid: valid,
@@ -302,7 +303,7 @@
         {%- if not compound -%}
             {% set label_attr = label_attr|merge({for: id}) %}
         {%- endif -%}
-        {%- if required -%}
+        {%- if label_required ?? required -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
         {%- endif -%}
         {%- if parent_label_class is defined -%}

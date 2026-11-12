@@ -366,7 +366,7 @@ trait AbstractAdapterTrait
         if (\is_string($key) && isset($this->ids[$key])) {
             $id = $this->ids[$key];
         } else {
-            \assert('' !== CacheItem::validateKey($key));
+            CacheItem::validateKey($key);
             $this->ids[$key] = $key;
 
             if (\count($this->ids) > 1000) {

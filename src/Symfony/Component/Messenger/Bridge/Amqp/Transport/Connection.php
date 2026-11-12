@@ -239,6 +239,10 @@ class Connection
             $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "auto_setup" of the AMQP Messenger transport must be a boolean.');
         }
 
+        if (isset($amqpOptions['persistent'])) {
+            $amqpOptions['persistent'] = filter_var($amqpOptions['persistent'], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "persistent" of the AMQP Messenger transport must be a boolean.');
+        }
+
         if (isset($amqpOptions['delay']['daily_delay_queues'])) {
             $amqpOptions['delay']['daily_delay_queues'] = filter_var($amqpOptions['delay']['daily_delay_queues'], \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException('Option "delay.daily_delay_queues" of the AMQP Messenger transport must be a boolean.');
         }
@@ -570,7 +574,7 @@ class Connection
     {
         if (!isset($this->amqpChannel)) {
             $connection = $this->amqpFactory->createConnection($this->connectionOptions);
-            $connectMethod = 'true' === ($this->connectionOptions['persistent'] ?? 'false') ? 'pconnect' : 'connect';
+            $connectMethod = filter_var($this->connectionOptions['persistent'] ?? false, \FILTER_VALIDATE_BOOL) ? 'pconnect' : 'connect';
 
             try {
                 $connection->{$connectMethod}();
@@ -590,7 +594,7 @@ class Connection
 
             $this->lastActivityTime = time();
         } elseif (0 < ($this->connectionOptions['heartbeat'] ?? 0) && time() > $this->lastActivityTime + 2 * $this->connectionOptions['heartbeat'] && 0 === $this->inFlightMessages) {
-            $disconnectMethod = 'true' === ($this->connectionOptions['persistent'] ?? 'false') ? 'pdisconnect' : 'disconnect';
+            $disconnectMethod = filter_var($this->connectionOptions['persistent'] ?? false, \FILTER_VALIDATE_BOOL) ? 'pdisconnect' : 'disconnect';
             $this->amqpChannel->getConnection()->{$disconnectMethod}();
         }
 

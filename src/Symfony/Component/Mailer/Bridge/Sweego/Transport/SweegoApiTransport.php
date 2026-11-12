@@ -148,9 +148,9 @@ final class SweegoApiTransport extends AbstractApiTransport
     private function prepareHeaders(Headers $headers): array
     {
         $headersPrepared = [];
-        foreach ($headers->all() as $header) {
-            // Sweego API does not accept those headers.
-            if (\in_array($header->getName(), ['To', 'From', 'Subject', 'Reply-To'], true)) {
+        foreach ($headers->all() as $name => $header) {
+            // Sweego API does not accept those headers, and a Bcc header would show the Bcc addresses to every recipient.
+            if (\in_array($name, ['to', 'bcc', 'from', 'subject', 'reply-to'], true)) {
                 continue;
             }
 

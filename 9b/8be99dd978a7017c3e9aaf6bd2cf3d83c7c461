@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T14:07:06Z
+
+On second thought, I'd prefer the reset in `FrankenPhpWorkerRunner`, next to `gc_collect_cycles()`. The runner runs the request loop and already cleans up between requests there. That also keeps the same behavior with and without debug. Can you move it back, without the comment?

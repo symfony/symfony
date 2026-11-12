@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T09:23:00Z
+
+I pushed a reshaped test, without data providers. On 7.4, they would need to become attributes.
+
+Each theme now renders a form with its own name. The renderer caches the blocks of child views by name, so a loop over themes would otherwise reuse the blocks of the previous theme. I also dropped the cases about names like `vars` and `parent`, since the templates never read `form.parent` or `form.vars`.

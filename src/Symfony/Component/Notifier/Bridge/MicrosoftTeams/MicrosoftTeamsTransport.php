@@ -57,7 +57,7 @@ final class MicrosoftTeamsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $options = $message->getOptions()?->toArray() ?? [];
+        $options = ($message->getOptions() ?? new MicrosoftTeamsOptions())->toArray();
         $options['text'] ??= $message->getSubject();
 
         $path = $message->getRecipientId() ?? $this->path;

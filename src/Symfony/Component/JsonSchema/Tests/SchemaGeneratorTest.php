@@ -78,6 +78,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\Shape;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Shelf;
 use Symfony\Component\JsonSchema\Tests\Fixtures\StrictInput;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Ticket;
+use Symfony\Component\JsonSchema\Tests\Fixtures\UnboundedDistance;
 use Symfony\Component\JsonSchema\Tests\Fixtures\UnionProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ValidatedRegistration;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Vehicle;
@@ -1156,6 +1157,28 @@ class SchemaGeneratorTest extends TestCase
 
         $this->assertSame('[]', json_encode($properties['reviewers']['default']));
         $this->assertSame('{}', json_encode($properties['authorsByRole']['default']));
+    }
+
+    public function testDefaultValuesThatCannotBeEncodedAreSkipped()
+    {
+        $generator = SchemaGenerator::create();
+        $parameters = $generator->generateForParameters((new \ReflectionMethod(UnboundedDistance::class, 'search'))->getParameters())->getRoot()['properties'];
+        $properties = $generator->generate(Type::object(UnboundedDistance::class))->getDefinitions()['UnboundedDistance']['properties'];
+        $binary = $generator->generateForParameters((new \ReflectionFunction(static function (string $signature = "\x89PNG") {}))->getParameters())->getRoot()['properties'];
+
+        $this->assertSameSchema(['type' => 'number'], $parameters['maxDistance']);
+        $this->assertSameSchema(['type' => 'number'], $properties['max']);
+        $this->assertSameSchema(['type' => 'number'], $properties['ratio']);
+        $this->assertSameSchema(['type' => 'number'], $properties['min']);
+        $this->assertSameSchema(['type' => 'string'], $binary['signature']);
+    }
+
+    public function testInfiniteBoundsOfConstraintsAreSkipped()
+    {
+        $properties = SchemaGenerator::create()->generate(Type::object(UnboundedDistance::class))->getDefinitions()['UnboundedDistance']['properties'];
+
+        $this->assertSameSchema(['type' => 'number', 'default' => 1.0, 'minimum' => 0], $properties['radius']);
+        $this->assertSameSchema(['type' => 'number', 'default' => 1.0], $properties['offset']);
     }
 
     public function testObjectDefaultValuesOfConstructorArgumentsAreNotInstantiated()

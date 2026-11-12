@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T10:30:28Z
+
+Thanks @skybleak333. I merged #68096 here, because the curl change alone made retries and redirects of file streams send an empty body. Generators, closures and streams that aren't seekable are now retried when nothing was read yet, for example after a DNS error with curl. Generator closures and iterators are rebuilt for each request, so they're retried as before. I also made `NoPrivateNetworkHttpClient` rewind the body on 307 and 308 redirects.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T14:21:43Z
+
+Thanks again @skybleak333. The retry now finds the streams of the body with the same code that sends it. So streams in objects and responses used as body parts are covered too.

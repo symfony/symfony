@@ -32,6 +32,23 @@ class AbstractRequestRateLimiterTest extends TestCase
         $this->assertSame($expected, $rateLimiter->consume(new Request()));
     }
 
+    #[DataProvider('provideRateLimitsWithResetTimes')]
+    public function testConsumeTellsWhenAllLimitersAreBackToFullCapacity(array $rateLimits, RateLimit $expected)
+    {
+        if (!method_exists(RateLimit::class, 'getResetAt')) {
+            $this->markTestSkipped('This test requires symfony/rate-limiter 8.2 or higher.');
+        }
+
+        $rateLimiter = new MockAbstractRequestRateLimiter(array_map(function (RateLimit $rateLimit) {
+            $limiter = $this->createStub(LimiterInterface::class);
+            $limiter->method('consume')->willReturn($rateLimit);
+
+            return $limiter;
+        }, $rateLimits));
+
+        $this->assertEquals($expected, $rateLimiter->consume(new Request()));
+    }
+
     public function testConsumeWithoutLimiterAddsSpecialNoLimiter()
     {
         $rateLimiter = new MockAbstractRequestRateLimiter([]);
@@ -86,6 +103,38 @@ class AbstractRequestRateLimiterTest extends TestCase
                 $expected = new RateLimit(0, $now, false, 1), // denied
             ],
             $expected,
+        ];
+    }
+
+    public static function provideRateLimitsWithResetTimes(): iterable
+    {
+        $now = new \DateTimeImmutable('2026-11-12 10:00:00');
+        $inOneMinute = $now->modify('+1 minute');
+        $inOneHour = $now->modify('+1 hour');
+
+        yield 'Same remaining tokens, earliest reset first' => [
+            [new RateLimit(9, $now, true, 10, $inOneMinute), new RateLimit(9, $now, true, 10, $inOneHour)],
+            new RateLimit(9, $now, true, 10, $inOneHour),
+        ];
+
+        yield 'Same remaining tokens, latest reset first' => [
+            [new RateLimit(9, $now, true, 10, $inOneHour), new RateLimit(9, $now, true, 10, $inOneMinute)],
+            new RateLimit(9, $now, true, 10, $inOneHour),
+        ];
+
+        yield 'Fewest remaining tokens with the earliest reset' => [
+            [new RateLimit(1, $now, true, 10, $inOneMinute), new RateLimit(9, $now, true, 20, $inOneHour)],
+            new RateLimit(1, $now, true, 10, $inOneHour),
+        ];
+
+        yield 'Denied with the earliest reset' => [
+            [new RateLimit(9, $now, true, 20, $inOneHour), new RateLimit(0, $inOneMinute, false, 1, $inOneMinute)],
+            new RateLimit(0, $inOneMinute, false, 1, $inOneHour),
+        ];
+
+        yield 'Reset time unknown for one limiter' => [
+            [new RateLimit(1, $now, true, 10), new RateLimit(9, $now, true, 20, $inOneHour)],
+            new RateLimit(1, $now, true, 10, $inOneHour),
         ];
     }
 }

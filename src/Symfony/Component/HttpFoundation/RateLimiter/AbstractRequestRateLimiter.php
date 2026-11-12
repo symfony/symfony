@@ -42,13 +42,23 @@ abstract class AbstractRequestRateLimiter implements PeekableRequestRateLimiterI
         }
 
         $minimalRateLimit = null;
+        $resetAt = null;
         foreach ($limiters as $limiter) {
             $rateLimit = $limiter->consume($tokens);
 
             $minimalRateLimit = $minimalRateLimit ? self::getMinimalRateLimit($minimalRateLimit, $rateLimit) : $rateLimit;
+
+            // the latest reset time is when all the limiters are back to their full capacity
+            if (method_exists($rateLimit, 'getResetAt')) {
+                $resetAt = max($resetAt, $rateLimit->getResetAt());
+            }
         }
 
-        return $minimalRateLimit;
+        if (null === $resetAt || $resetAt == $minimalRateLimit->getResetAt()) {
+            return $minimalRateLimit;
+        }
+
+        return new RateLimit($minimalRateLimit->getRemainingTokens(), $minimalRateLimit->getRetryAfter(), $minimalRateLimit->isAccepted(), $minimalRateLimit->getLimit(), $resetAt);
     }
 
     public function reset(Request $request): void

@@ -37,11 +37,16 @@ final class CompoundLimiter implements LimiterInterface
     public function consume(int $tokens = 1): RateLimit
     {
         $minimalRateLimit = null;
+        $resetAt = null;
         foreach ($this->limiters as $limiter) {
             $rateLimit = $limiter->consume($tokens);
 
+            // the latest reset time is when all the consulted limiters are back to their full capacity
+            $resetAt = max($resetAt, $rateLimit->getResetAt());
+
             if (!$rateLimit->isAccepted()) {
-                return $rateLimit;
+                $minimalRateLimit = $rateLimit;
+                break;
             }
 
             if (null === $minimalRateLimit || self::isMoreRestrictive($rateLimit, $minimalRateLimit)) {
@@ -49,7 +54,11 @@ final class CompoundLimiter implements LimiterInterface
             }
         }
 
-        return $minimalRateLimit;
+        if ($resetAt == $minimalRateLimit->getResetAt()) {
+            return $minimalRateLimit;
+        }
+
+        return new RateLimit($minimalRateLimit->getRemainingTokens(), $minimalRateLimit->getRetryAfter(), $minimalRateLimit->isAccepted(), $minimalRateLimit->getLimit(), $resetAt);
     }
 
     public function reset(): void

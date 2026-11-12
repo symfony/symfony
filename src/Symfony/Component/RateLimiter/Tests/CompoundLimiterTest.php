@@ -110,6 +110,39 @@ class CompoundLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
+    public function testConsumeTellsWhenAllLimitersAreBackToFullCapacity()
+    {
+        ClockMock::withClockMock(1729990780.75);
+        $limiter1 = $this->createLimiter(10, new \DateInterval('PT1M'));
+        $limiter2 = $this->createLimiter(20, new \DateInterval('PT1H'));
+        $limiter2->consume(10);
+
+        $this->assertSame(1729994381, (new CompoundLimiter([$limiter1, $limiter2]))->consume()->getResetAt()->getTimestamp());
+        $this->assertSame(1729994381, (new CompoundLimiter([$limiter2, $limiter1]))->consume()->getResetAt()->getTimestamp());
+
+        $limiter1->consume(7);
+        $rateLimit = (new CompoundLimiter([$limiter1, $limiter2]))->consume();
+
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertSame(1729990841, $rateLimit->getRetryAfter()->getTimestamp());
+        $this->assertSame(1729994381, $rateLimit->getResetAt()->getTimestamp());
+    }
+
+    public function testRefusalTellsWhenTheConsultedLimitersAreBackToFullCapacity()
+    {
+        ClockMock::withClockMock(1729990780.75);
+        $limiter1 = $this->createLimiter(10, new \DateInterval('PT1H'));
+        $limiter2 = $this->createLimiter(1, new \DateInterval('PT1M'));
+        $limiter2->consume();
+
+        $rateLimit = (new CompoundLimiter([$limiter1, $limiter2]))->consume();
+
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertSame(1729990841, $rateLimit->getRetryAfter()->getTimestamp());
+        $this->assertSame(1729994381, $rateLimit->getResetAt()->getTimestamp());
+    }
+
     public function testReserve()
     {
         $this->expectException(ReserveNotSupportedException::class);

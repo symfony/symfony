@@ -15,6 +15,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
@@ -66,6 +67,9 @@ class EncryptedColumnListenerTest extends TestCase
         $this->config = ORMSetup::createConfiguration(true);
         $this->config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Fixtures'], true));
         $this->config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        if (method_exists($this->config, 'setUseSchemaEditorApi') && method_exists(Schema::class, 'edit')) {
+            $this->config->setUseSchemaEditorApi(true);
+        }
         $this->config->enableNativeLazyObjects(true);
     }
 

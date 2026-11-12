@@ -17,6 +17,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
@@ -335,6 +336,9 @@ class KeyManagementBundleTest extends TestCase
         $config = ORMSetup::createConfiguration(true);
         $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/Fixtures/Entity'], true));
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        if (method_exists($config, 'setUseSchemaEditorApi') && method_exists(Schema::class, 'edit')) {
+            $config->setUseSchemaEditorApi(true);
+        }
         $config->enableNativeLazyObjects(true);
         $eventManager = new EventManager();
         $eventManager->addEventListener(Events::loadClassMetadata, $container->get('test.encrypted_column_listener'));

@@ -159,10 +159,10 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             return $this->legacyRequest($method, $url, $options);
         }
 
-        [$fullUrl, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
+        [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
 
-        $fullUrl = implode('', $fullUrl);
-        $fullUrlTag = self::hash($fullUrl);
+        $url = implode('', $url);
+        $fullUrlTag = self::hash($url);
         $requestCacheControl = self::parseRequestCacheControlHeader($options['normalized_headers']['cache-control'] ?? []);
 
         if ('' !== $options['body'] || ($options['extra']['no_cache'] ?? false) || isset($options['normalized_headers']['range']) || !\in_array($method, self::CACHEABLE_METHODS, true)) {
@@ -206,7 +206,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             }
         }
 
-        $requestHash = self::hash($method.$fullUrl.serialize(array_intersect_key($options['normalized_headers'], self::RESPONSE_INFLUENCING_HEADERS)));
+        $requestHash = self::hash($method.$url.serialize(array_intersect_key($options['normalized_headers'], self::RESPONSE_INFLUENCING_HEADERS)));
         $varyKey = "vary_{$requestHash}";
         $varyFields = $this->cache->get($varyKey, static fn ($item, &$save): array => ($save = false) ?: [], 0);
 

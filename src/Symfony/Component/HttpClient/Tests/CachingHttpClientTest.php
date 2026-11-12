@@ -1543,6 +1543,63 @@ class CachingHttpClientTest extends TestCase
         $this->assertSame('foobar', $collected);
     }
 
+    public function testDefaultBaseUriIsResolved()
+    {
+        $requestedUrls = [];
+        $mockClient = new MockHttpClient(static function (string $method, string $url) use (&$requestedUrls) {
+            $requestedUrls[] = $url;
+
+            return new MockResponse('foo', ['response_headers' => ['Cache-Control' => 'max-age=300']]);
+        }, null);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter, ['base_uri' => 'http://example.com/api/', 'query' => ['a' => '1']]);
+
+        $response = $client->request('GET', 'foo');
+        $this->assertSame('foo', $response->getContent());
+        $this->assertSame('http://example.com/api/foo?a=1', $response->getInfo('url'));
+
+        $response = $client->request('GET', 'foo');
+        $this->assertSame('foo', $response->getContent());
+        $this->assertSame('http://example.com/api/foo?a=1', $response->getInfo('url'));
+        $this->assertSame('http://example.com/api/foo?a=1', $response->getInfo('original_url'));
+
+        $response = $client->request('GET', 'http://example.com/api/foo?a=1');
+        $this->assertSame('foo', $response->getContent());
+
+        $this->assertSame(['http://example.com/api/foo?a=1'], $requestedUrls);
+    }
+
+    public function testRequestBaseUriIsResolved()
+    {
+        $requestedUrls = [];
+        $mockClient = new MockHttpClient(static function (string $method, string $url) use (&$requestedUrls) {
+            $requestedUrls[] = $url;
+
+            return new MockResponse('foo', ['response_headers' => ['Cache-Control' => 'max-age=300']]);
+        }, null);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $response = $client->request('GET', 'http://example.com/api/foo');
+        $this->assertSame('foo', $response->getContent());
+
+        $response = $client->request('GET', 'foo', ['base_uri' => 'http://example.com/api/']);
+        $this->assertSame('foo', $response->getContent());
+        $this->assertSame('http://example.com/api/foo', $response->getInfo('url'));
+
+        $response = $client->request('GET', 'bar', ['base_uri' => 'http://example.com/api/', 'headers' => ['Cache-Control' => 'no-store']]);
+        $this->assertSame('foo', $response->getContent());
+
+        $response = $client->request('POST', 'bar', ['base_uri' => 'http://example.com/api/']);
+        $this->assertSame('foo', $response->getContent());
+
+        $response = $client->request('GET', 'baz', ['base_uri' => 'http://example.com/api/', 'headers' => ['Cache-Control' => 'only-if-cached']]);
+        $this->assertSame(504, $response->getStatusCode());
+        $this->assertSame('http://example.com/api/baz', $response->getInfo('url'));
+
+        $this->assertSame(['http://example.com/api/foo', 'http://example.com/api/bar', 'http://example.com/api/bar'], $requestedUrls);
+    }
+
     public function testMultipleChunksResponse()
     {
         $mockClient = new MockHttpClient([

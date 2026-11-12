@@ -187,7 +187,7 @@ class MicroKernelTraitTest extends TestCase
 
             protected function configureContainer(ContainerConfigurator $c): void
             {
-                $c->extension('framework', []);
+                $c->extension('framework', ['type_info' => ['refinements' => true]]);
                 $c->services()->set('logger', NullLogger::class);
             }
 
@@ -370,7 +370,7 @@ class MicroKernelTraitTest extends TestCase
         $fs = new Filesystem();
         $fs->mkdir($configDir.'/packages');
         file_put_contents($configDir.'/bundles.php', "<?php\n\nreturn [\n    Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle::class => ['all' => true],\n];\n");
-        file_put_contents($configDir.'/packages/framework.yaml', "framework:\n    secret: \$ecret\n    http_method_override: false\n    test: true\n");
+        file_put_contents($configDir.'/packages/framework.yaml', "framework:\n    secret: \$ecret\n    http_method_override: false\n    test: true\n    type_info:\n        refinements: true\n");
 
         $kernel = $this->kernel = new CustomConfigDirKernel($projectDir);
 
@@ -405,7 +405,7 @@ class DebugWarmupKernel extends Kernel
 
     protected function configureContainer(ContainerConfigurator $c): void
     {
-        $c->extension('framework', ['http_method_override' => false, 'handle_all_throwables' => true]);
+        $c->extension('framework', ['http_method_override' => false, 'handle_all_throwables' => true, 'type_info' => ['refinements' => true]]);
         $c->services()->set('logger', NullLogger::class);
     }
 

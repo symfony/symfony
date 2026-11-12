@@ -448,6 +448,17 @@ PasswordHasher
    These hashers never need rehashing, so the hashers listed in `migrate_from` are never used.
    Use `auto` or a custom hasher whose `needsRehash()` method can return `true` instead
 
+PropertyInfo
+------------
+
+ * Deprecate not passing the `$stringTypeResolver` argument of `PhpStanExtractor::__construct()`; the default one will resolve all PHPDoc refinements in 9.0.
+   The refinements are those of the given `StringTypeResolver`, so `getType()` can then return `LiteralType` and `IntRangeType` instances for literals and integer ranges, see the TypeInfo section:
+
+   ```diff
+   -$extractor = new PhpStanExtractor();
+   +$extractor = new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true));
+   ```
+
 RateLimiter
 -----------
 
@@ -637,6 +648,32 @@ TwigBundle
  * The cache warmer compiles only the form themes of `TwigBridge` that are listed in `twig.form_themes`, named in templates, or used or extended by those.
    A theme picked at runtime, through a variable in a `form_theme` tag or through `FormRenderer::setTheme()`, is compiled on first use.
    When the cache directory is read-only, name such a theme in one of your templates, e.g. in a comment, to have it warmed up
+
+TypeInfo
+--------
+
+ * Deprecate not passing the `$refinements` argument of `StringTypeResolver::__construct()` and `TypeResolver::create()`, and not setting the `type_info.refinements` option; all PHPDoc refinements will be resolved by default in 9.0.
+   `true` resolves all of them, including those added later, `false` none, and a list of `Refinement` cases only those.
+   Literals and integer ranges are resolved as `LiteralType` and `IntRangeType`, which wrap a `BuiltinType`.
+   `non-zero-int` is resolved as the union `int<min, -1>|int<1, max>`, so unwrapping alone does not turn it back into an `int`.
+   Before enabling them, call `Type::withoutRefinements()` where the builtin types are enough, which also turns `non-zero-int` back into an `int`,
+   or replace `instanceof BuiltinType` checks and `getTypeIdentifier()` calls with `isIdentifiedBy()`:
+
+   ```yaml
+   # config/packages/type_info.yaml
+   type_info:
+       refinements: true # or a list, such as [literal, int_range]
+   ```
+
+   ```diff
+   -$resolver = TypeResolver::create();
+   +$resolver = TypeResolver::create(null, true);
+   ```
+
+   ```diff
+   -$type = $resolver->resolve($reflectionProperty);
+   +$type = $resolver->resolve($reflectionProperty)->withoutRefinements();
+   ```
 
 Uid
 ---

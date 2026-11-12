@@ -76,8 +76,8 @@ class CollectionType extends Type implements WrappingTypeInterface
             return;
         }
 
-        if ($keyType instanceof TemplateType) {
-            $this->assertValidArrayKeyType($keyType->getBound(), $rootType);
+        if ($keyType instanceof WrappingTypeInterface) {
+            $this->assertValidArrayKeyType($keyType->getWrappedType(), $rootType);
 
             return;
         }
@@ -207,7 +207,7 @@ class CollectionType extends Type implements WrappingTypeInterface
         if (is_iterable($value)) {
             foreach ($value as $k => $v) {
                 // key or value do not match
-                if (!$keyType->accepts($k) || !$valueType->accepts($v)) {
+                if (!self::acceptsKey($keyType, $k) || !$valueType->accepts($v)) {
                     return false;
                 }
             }
@@ -227,7 +227,7 @@ class CollectionType extends Type implements WrappingTypeInterface
         $mismatches = [];
 
         foreach ($value as $k => $v) {
-            if (!$keyType->accepts($k)) {
+            if (!self::acceptsKey($keyType, $k)) {
                 return [new TypeMismatch('', $this, 'array')];
             }
 
@@ -247,6 +247,15 @@ class CollectionType extends Type implements WrappingTypeInterface
         $type = $this->type->map($mapper);
 
         return $mapper($type === $this->type ? $this : new self($type, $this->isList));
+    }
+
+    /**
+     * PHP turns numeric string keys into integers, so an integer key is checked as a string as well
+     * against a refined key type, such as "'1'". A plain "string" keeps rejecting integer keys.
+     */
+    private static function acceptsKey(Type $keyType, mixed $key): bool
+    {
+        return $keyType->accepts($key) || \is_int($key) && $keyType !== $keyType->withoutRefinements() && $keyType->accepts((string) $key);
     }
 
     public function __toString(): string

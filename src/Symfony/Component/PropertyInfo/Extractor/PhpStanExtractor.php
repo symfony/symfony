@@ -64,12 +64,17 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     private array $contexts = [];
 
     /**
-     * @param list<string>|null $mutatorPrefixes
-     * @param list<string>|null $accessorPrefixes
-     * @param list<string>|null $arrayMutatorPrefixes
+     * @param list<string>|null       $mutatorPrefixes
+     * @param list<string>|null       $accessorPrefixes
+     * @param list<string>|null       $arrayMutatorPrefixes
+     * @param StringTypeResolver|null $stringTypeResolver   The resolver of the PHPDoc types, which decides the PHPDoc refinements to resolve. Not passing it is deprecated since 8.2, the default one will resolve all refinements as of 9.0
      */
-    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null, private bool $allowPrivateAccess = true)
+    public function __construct(?array $mutatorPrefixes = null, ?array $accessorPrefixes = null, ?array $arrayMutatorPrefixes = null, private bool $allowPrivateAccess = true, ?StringTypeResolver $stringTypeResolver = null)
     {
+        if (null === $stringTypeResolver) {
+            trigger_deprecation('symfony/property-info', '8.2', 'Not passing the "$stringTypeResolver" argument of "%s()" is deprecated; the default one will resolve all PHPDoc refinements in 9.0. Pass a "%s" to choose the refinements to resolve.', __METHOD__, StringTypeResolver::class);
+        }
+
         if (!class_exists(ContextFactory::class)) {
             throw new \LogicException(\sprintf('Unable to use the "%s" class as the "phpdocumentor/type-resolver" package is not installed. Try running composer require "phpdocumentor/type-resolver".', __CLASS__));
         }
@@ -90,7 +95,7 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             $this->phpDocParser = new PhpDocParser(new TypeParser($constExprParser = new ConstExprParser(true, true), true), $constExprParser);
             $this->lexer = new Lexer();
         }
-        $this->stringTypeResolver = new StringTypeResolver();
+        $this->stringTypeResolver = $stringTypeResolver ?? new StringTypeResolver(null, null, [], false);
         $this->typeContextFactory = new TypeContextFactory($this->stringTypeResolver);
     }
 

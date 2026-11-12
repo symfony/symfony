@@ -135,6 +135,11 @@ final class PropertyInfoLoader implements LoaderInterface
 
     private function getTypeConstraint(TypeInfoType $type): ?Type
     {
+        // a refinement, such as "non-zero-int" or "'a'|'b'", is constrained by its builtin type; the lowest symfony/type-info has no refinements to remove
+        if (method_exists($type, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+            $type = $type->withoutRefinements();
+        }
+
         if ($type instanceof CompositeTypeInterface) {
             return $type->isIdentifiedBy(
                 TypeIdentifier::INT,

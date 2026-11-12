@@ -30,13 +30,29 @@ class CollectionTypeTest extends TestCase
         new CollectionType(Type::int());
     }
 
-    public function testCanOnlyConstructListWithIntKeyType()
+    #[DataProvider('cannotConstructWithInvalidKeyTypeDataProvider')]
+    public function testCannotConstructWithInvalidKeyType(string $expectedMessage, Type $keyType)
     {
-        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::bool()), isList: true);
-        $this->addToAssertionCount(1);
-
         $this->expectException(InvalidArgumentException::class);
-        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool()), isList: true);
+        $this->expectExceptionMessage($expectedMessage);
+
+        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), $keyType, Type::bool()), true);
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: Type}>
+     */
+    public static function cannotConstructWithInvalidKeyTypeDataProvider(): iterable
+    {
+        yield ['"string" is not a valid list key type.', Type::string()];
+        yield ['"1.5" is not a valid list key type.', Type::literal(1.5)];
+    }
+
+    public function testCanConstructWithRefinedKeyType()
+    {
+        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::intRange(1, null), Type::bool()));
+        new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::union(Type::literal('a'), Type::literal('b')), Type::bool()));
+        $this->addToAssertionCount(1);
     }
 
     public function testIsList()
@@ -197,6 +213,21 @@ class CollectionTypeTest extends TestCase
         yield 'nested collection arguments' => [Type::array(Type::template('T', Type::int())), Type::array(Type::template('T', Type::string()))];
         yield 'enum and object' => [Type::enum(DummyEnum::class), Type::object(DummyEnum::class)];
         yield 'backed enum and object' => [Type::enum(DummyBackedEnum::class), Type::object(DummyBackedEnum::class)];
+    }
+
+    public function testAcceptsIntegerKeysAsNumericStringLiterals()
+    {
+        $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::union(Type::literal('1'), Type::literal('a')), Type::int()));
+
+        $this->assertTrue($type->accepts(['1' => 5, 'a' => 6]));
+        $this->assertSame([], $type->getMismatches(['1' => 5]));
+        $this->assertFalse($type->accepts(['2' => 5]));
+        $this->assertNotSame([], $type->getMismatches(['2' => 5]));
+
+        // without a refinement, a string key type does not accept the integer PHP made of a numeric string
+        $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::int()));
+
+        $this->assertFalse($type->accepts(['1' => 5]));
     }
 
     public function testMergeCollectionValueTypesPreservesNestedUnionMembers()

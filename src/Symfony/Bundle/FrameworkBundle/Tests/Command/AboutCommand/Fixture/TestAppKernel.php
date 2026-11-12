@@ -35,7 +35,7 @@ class TestAppKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(static function (ContainerBuilder $container) {
-            $container->loadFromExtension('framework', []);
+            $container->loadFromExtension('framework', ['type_info' => ['refinements' => true]]);
         });
     }
 

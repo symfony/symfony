@@ -12,6 +12,7 @@
 namespace Symfony\Component\TypeInfo;
 
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\RefinementTypeInterface;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
@@ -74,19 +75,16 @@ abstract class Type implements \Stringable
      */
     public function accepts(mixed $value): bool
     {
-        $specification = static function (Type $type) use (&$specification, $value): bool {
-            if ($type instanceof WrappingTypeInterface) {
-                return $type->wrappedTypeIsSatisfiedBy($specification);
-            }
+        // one level at a time, so that a wrapped type with its own check, such as a nullable type, a collection or an integer range, keeps it
+        if ($this instanceof WrappingTypeInterface) {
+            return $this->getWrappedType()->accepts($value);
+        }
 
-            if ($type instanceof CompositeTypeInterface) {
-                return $type->composedTypesAreSatisfiedBy($specification);
-            }
+        if ($this instanceof CompositeTypeInterface) {
+            return $this->composedTypesAreSatisfiedBy(static fn (Type $type): bool => $type->accepts($value));
+        }
 
-            return $type->accepts($value);
-        };
-
-        return $this->isSatisfiedBy($specification);
+        return false;
     }
 
     /**
@@ -109,6 +107,16 @@ abstract class Type implements \Stringable
     public function map(callable $mapper): self
     {
         return $mapper($this);
+    }
+
+    /**
+     * Replaces the refinements in the type and in its parts, such as literals and integer ranges, with their builtin type.
+     *
+     * Parts that become identical are merged, so "1|2" becomes "int" and "?non-zero-int" becomes "?int".
+     */
+    public function withoutRefinements(): self
+    {
+        return $this->map(static fn (self $type): self => $type instanceof RefinementTypeInterface ? $type->getWrappedType() : $type);
     }
 
     /**

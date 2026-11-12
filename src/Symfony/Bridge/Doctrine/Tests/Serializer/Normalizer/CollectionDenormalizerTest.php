@@ -31,6 +31,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 class CollectionDenormalizerTest extends TestCase
 {
@@ -172,6 +173,87 @@ class CollectionDenormalizerTest extends TestCase
         $serializer->denormalize(['foo' => 'bar'], Collection::class, 'json', ['key_type' => Type::int(), 'value_type' => Type::string()]);
     }
 
+    public function testDenormalizeChecksTemplateKeyAgainstItsBound()
+    {
+        $serializer = $this->createSerializer();
+
+        $this->assertSame(['foo' => 'bar'], $serializer->denormalize(['foo' => 'bar'], Collection::class, 'json', ['key_type' => Type::template('TKey'), 'value_type' => Type::string()])->toArray());
+
+        $this->expectException(NotNormalizableValueException::class);
+
+        $serializer->denormalize(['foo' => 'bar'], Collection::class, 'json', ['key_type' => Type::template('TKey', Type::int()), 'value_type' => Type::string()]);
+    }
+
+    public function testDenormalizeDoesNotCheckUnionKeyWithUncheckableMember()
+    {
+        $collection = $this->createSerializer()->denormalize(['foo' => 'bar'], Collection::class, 'json', ['key_type' => Type::union(Type::int(), Type::template('TKey')), 'value_type' => Type::string()]);
+
+        $this->assertSame(['foo' => 'bar'], $collection->toArray());
+    }
+
+    #[DataProvider('provideUnionKeyTypesWithMembersThatMatchNoKey')]
+    public function testDenormalizeChecksUnionKeyAgainstItsIntAndStringMembers(Type $keyType)
+    {
+        $serializer = $this->createSerializer();
+
+        $this->assertSame([3 => 'bar'], $serializer->denormalize([3 => 'bar'], Collection::class, 'json', ['key_type' => $keyType, 'value_type' => Type::string()])->toArray());
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The type of the key "s" must be "int" ("string" given).');
+
+        $serializer->denormalize(['s' => 'bar'], Collection::class, 'json', ['key_type' => $keyType, 'value_type' => Type::string()]);
+    }
+
+    public static function provideUnionKeyTypesWithMembersThatMatchNoKey(): iterable
+    {
+        yield '?int' => [Type::nullable(Type::int())];
+        yield 'int|object' => [Type::union(Type::int(), Type::object(\stdClass::class))];
+        yield 'int|bool' => [Type::union(Type::int(), Type::bool())];
+    }
+
+    #[DataProvider('provideRefinedKeyTypes')]
+    public function testDenormalizeRejectsAnInvalidRefinedKeyType(\Closure $keyType, array $data)
+    {
+        if (!method_exists(Type::class, 'intRange')) {
+            $this->markTestSkipped('Refined types need symfony/type-info 8.2 or higher.');
+        }
+
+        $serializer = $this->createSerializer();
+
+        $this->expectException(NotNormalizableValueException::class);
+
+        $serializer->denormalize($data, Collection::class, 'json', ['key_type' => $keyType(), 'value_type' => Type::string()]);
+    }
+
+    public function testDenormalizeChecksRefinedKeysAgainstTheirBuiltinType()
+    {
+        if (!method_exists(Type::class, 'intRange')) {
+            $this->markTestSkipped('Refined types need symfony/type-info 8.2 or higher.');
+        }
+
+        $collection = $this->createSerializer()->denormalize([-5 => 'bar'], Collection::class, 'json', ['key_type' => Type::intRange(1, null), 'value_type' => Type::string()]);
+
+        $this->assertSame([-5 => 'bar'], $collection->toArray());
+    }
+
+    public function testDenormalizeChecksRefinedValuesAgainstTheirBuiltinType()
+    {
+        if (!method_exists(Type::class, 'intRange')) {
+            $this->markTestSkipped('Refined types need symfony/type-info 8.2 or higher.');
+        }
+
+        $collection = $this->createSerializer()->denormalize([-5], Collection::class, 'json', ['key_type' => Type::int(), 'value_type' => Type::intRange(1, null)]);
+
+        $this->assertSame([-5], $collection->toArray());
+    }
+
+    public static function provideRefinedKeyTypes(): iterable
+    {
+        yield 'int range' => [static fn () => Type::intRange(1, null), ['foo' => 'bar']];
+        yield 'int literal' => [static fn () => Type::literal(1), ['foo' => 'bar']];
+        yield 'string literals' => [static fn () => Type::union(Type::literal('en'), Type::literal('de')), [0 => 'bar']];
+    }
+
     public function testDenormalizeEntityWithACollectionProperty()
     {
         $serializer = $this->createSerializer();
@@ -243,7 +325,7 @@ class CollectionDenormalizerTest extends TestCase
 
     public static function provideTypeExtractors(): iterable
     {
-        yield 'phpstan' => [new PropertyInfoExtractor([], [new PhpStanExtractor(), new ReflectionExtractor()])];
+        yield 'phpstan' => [new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], false)), new ReflectionExtractor()])];
         yield 'phpdoc' => [new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])];
     }
 

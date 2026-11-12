@@ -80,6 +80,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummyWithContex
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectInner;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectOuter;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 class AbstractObjectNormalizerTest extends TestCase
 {
@@ -1944,6 +1945,48 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame(['a' => [1, 2]], $dummy->intsByName);
     }
 
+    public function testDenormalizeConvertsNestedRefinedScalarCollectionElements()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()]));
+
+        $dummy = $normalizer->denormalize(['countsByName' => ['a' => ['1', '2']]], RefinedScalarCollectionsDummy::class, null, [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => true]);
+
+        $this->assertSame(['a' => [1, 2]], $dummy->countsByName);
+    }
+
+    public function testDenormalizeTriesRefinedUnionMembersInTheOrderOfTheirBuiltinTypes()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()]));
+
+        // "'auto'|int" is tried as "int|string", as without refinements, so a numeric string from CSV becomes an integer
+        $dummy = $normalizer->denormalize(['mode' => '5'], RefinedScalarCollectionsDummy::class, 'csv');
+
+        $this->assertSame(5, $dummy->mode);
+    }
+
+    public function testDenormalizeChecksRefinedCollectionKeysAgainstTheirBuiltinType()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()]));
+
+        $dummy = $normalizer->denormalize(['intsOrStringsById' => [-5 => 'a']], RefinedScalarCollectionsDummy::class);
+
+        $this->assertSame([-5 => 'a'], $dummy->intsOrStringsById);
+    }
+
+    public function testDenormalizeCollectsRefinedScalarCollectionElementErrors()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()]))]);
+
+        try {
+            $serializer->denormalize(['nonZeroInts' => ['nope', 2, 'nah']], RefinedScalarCollectionsDummy::class, null, [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+            $this->fail(\sprintf('A "%s" should have been thrown.', PartialDenormalizationException::class));
+        } catch (PartialDenormalizationException $e) {
+            $this->assertSame(['nonZeroInts[0]', 'nonZeroInts[2]'], array_map(static fn (NotNormalizableValueException $e) => $e->getPath(), $e->getNotNormalizableValueErrors()));
+        }
+    }
+
     public function testDenormalizeCollectsScalarCollectionElementErrors()
     {
         $serializer = new Serializer([new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors()]);
@@ -2235,7 +2278,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testTemplateTypeWhenAnObjectIsPassedToDenormalize()
     {
-        $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpStanExtractor(), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
+        $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
             protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
             {
                 return true;
@@ -2254,7 +2297,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeTemplateType()
     {
-        $normalizer = new class(classMetadataFactory: new ClassMetadataFactory(new AttributeLoader()), propertyTypeExtractor: new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
+        $normalizer = new class(classMetadataFactory: new ClassMetadataFactory(new AttributeLoader()), propertyTypeExtractor: new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
             protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
             {
                 return true;
@@ -2574,7 +2617,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     private static function createGenericTypeSerializer(): Serializer
     {
-        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(), new ReflectionExtractor()]));
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), new ReflectionExtractor()]));
 
         return new Serializer([new ArrayDenormalizer(), $normalizer]);
     }
@@ -3296,6 +3339,21 @@ class ScalarCollectionsDummy
 
     /** @var array<string, string>[] */
     public array $stringMaps = [];
+}
+
+class RefinedScalarCollectionsDummy
+{
+    /** @var array<string, list<positive-int>> */
+    public array $countsByName = [];
+
+    /** @var list<non-zero-int> */
+    public array $nonZeroInts = [];
+
+    /** @var array<positive-int, int|string> */
+    public array $intsOrStringsById = [];
+
+    /** @var 'auto'|int */
+    public string|int $mode = 'auto';
 }
 
 class UnionCollectionDocBlockDummy

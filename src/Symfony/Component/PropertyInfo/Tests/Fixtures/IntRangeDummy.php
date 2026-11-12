@@ -27,4 +27,19 @@ class IntRangeDummy
      * @var int<50, max>
      */
     public $c;
+
+    /**
+     * @var int<0, 5, 9>
+     */
+    public $malformed;
+
+    /**
+     * @var list<int<5, 1>>
+     */
+    public $invertedInList;
+
+    /**
+     * @var int<0, self::MISSING>
+     */
+    public $missingBound;
 }

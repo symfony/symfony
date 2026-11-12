@@ -36,7 +36,7 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
     {
         $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
             'foo' => new PropertyMetadata('foo', Type::objectShape(['item' => Type::template('T'), 'total' => ['type' => Type::int(), 'optional' => true]])),
-        ]), new TypeContextFactory(new StringTypeResolver()));
+        ]), new TypeContextFactory(new StringTypeResolver(null, null, [], true)));
 
         $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::bool())]);
 
@@ -49,7 +49,7 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
     {
         $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
             'foo' => new PropertyMetadata('foo', Type::template('T')),
-        ]), new TypeContextFactory(new StringTypeResolver()));
+        ]), new TypeContextFactory(new StringTypeResolver(null, null, [], true)));
 
         $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::int())]);
         $this->assertEquals(['foo' => new PropertyMetadata('foo', Type::int())], $metadata);
@@ -74,7 +74,7 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
     {
         $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
             'foo' => new PropertyMetadata('foo', Type::arrayShape(['items' => Type::list(Type::template('T')), 'total' => ['type' => Type::int(), 'optional' => true]], false, Type::string(), Type::template('T'))),
-        ]), new TypeContextFactory(new StringTypeResolver()));
+        ]), new TypeContextFactory(new StringTypeResolver(null, null, [], true)));
 
         $metadata = $loader->load(DummyWithGenerics::class, context: ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::bool())]);
 
@@ -87,7 +87,7 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
     {
         $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
             'foo' => new PropertyMetadata('foo', new ArrayShapeType([['type' => Type::template('T'), 'optional' => false]], Type::int(), Type::template('T'), true)),
-        ]), new TypeContextFactory(new StringTypeResolver()));
+        ]), new TypeContextFactory(new StringTypeResolver(null, null, [], true)));
 
         $metadata = $loader->load(DummyWithGenerics::class, context: ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::bool())]);
 
@@ -101,7 +101,7 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
         $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
             'nullable' => new PropertyMetadata('nullable', Type::nullable(Type::template('T'))),
             'union' => new PropertyMetadata('union', Type::union(Type::template('T'), Type::string())),
-        ]), new TypeContextFactory(new StringTypeResolver()));
+        ]), new TypeContextFactory(new StringTypeResolver(null, null, [], true)));
 
         $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::mixed())]);
 
@@ -116,7 +116,7 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
         $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
             'union' => new PropertyMetadata('union', Type::union(Type::template('T'), Type::int())),
             'nullableUnion' => new PropertyMetadata('nullableUnion', Type::union(Type::template('T'), Type::int(), Type::null())),
-        ]), new TypeContextFactory(new StringTypeResolver()));
+        ]), new TypeContextFactory(new StringTypeResolver(null, null, [], true)));
 
         $metadata = $loader->load(DummyWithGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithGenerics::class), Type::int())]);
 
@@ -135,7 +135,7 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
 
     public function testReplaceGenericsOfParentClasses()
     {
-        $loader = new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new TypeContextFactory(new StringTypeResolver()));
+        $loader = new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create(null, true)), new TypeContextFactory(new StringTypeResolver(null, null, [], true)));
 
         $metadata = $loader->load(DummyWithInheritedGenerics::class, [], ['original_type' => Type::generic(Type::object(DummyWithInheritedGenerics::class), Type::int(), Type::object(ClassicDummy::class))]);
 
@@ -160,7 +160,7 @@ class GenericTypePropertyMetadataLoaderTest extends TestCase
 
     public function testReplaceGenericsOfParentClassesOfNonGenericClass()
     {
-        $loader = new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new TypeContextFactory(new StringTypeResolver()));
+        $loader = new GenericTypePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create(null, true)), new TypeContextFactory(new StringTypeResolver(null, null, [], true)));
 
         $metadata = $loader->load(DummyWithConcreteInheritedGenerics::class, [], ['original_type' => Type::object(DummyWithConcreteInheritedGenerics::class)]);
 

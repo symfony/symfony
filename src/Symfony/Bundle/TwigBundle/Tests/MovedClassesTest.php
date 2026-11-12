@@ -84,6 +84,7 @@ class MovedClassesKernel extends Kernel
         $loader->load(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
                 'secret' => '$ecret',
+                'type_info' => ['refinements' => true],
                 'form' => ['enabled' => false],
                 'router' => ['resource' => __DIR__.'/Functional/Resources/config/template_routing.yml'],
             ]);

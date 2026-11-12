@@ -12,6 +12,8 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
@@ -63,8 +65,10 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingGenericTr
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\VoidNeverReturnTypeDummy;
 use Symfony\Component\TypeInfo\Exception\LogicException;
+use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContext;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 require_once __DIR__.'/../Fixtures/Extractor/DummyNamespace.php';
 require_once __DIR__.'/../Fixtures/InheritedTemplates.php';
@@ -80,7 +84,7 @@ class PhpStanExtractorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->extractor = new PhpStanExtractor();
+        $this->extractor = new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true));
         $this->phpDocExtractor = new PhpDocExtractor();
     }
 
@@ -166,7 +170,7 @@ class PhpStanExtractorTest extends TestCase
     #[DataProvider('typesWithNoPrefixesProvider')]
     public function testExtractTypesWithNoPrefixes(string $property, ?Type $type)
     {
-        $noPrefixExtractor = new PhpStanExtractor([], [], []);
+        $noPrefixExtractor = new PhpStanExtractor([], [], [], true, new StringTypeResolver(null, null, [], true));
 
         $this->assertEquals($type, $noPrefixExtractor->getType(Dummy::class, $property));
     }
@@ -225,7 +229,7 @@ class PhpStanExtractorTest extends TestCase
     #[DataProvider('typesWithCustomPrefixesProvider')]
     public function testExtractTypesWithCustomPrefixes(string $property, ?Type $type)
     {
-        $customExtractor = new PhpStanExtractor(['add', 'remove'], ['is', 'can']);
+        $customExtractor = new PhpStanExtractor(['add', 'remove'], ['is', 'can'], null, true, new StringTypeResolver(null, null, [], true));
 
         $this->assertEquals($type, $customExtractor->getType(Dummy::class, $property));
     }
@@ -571,8 +575,9 @@ class PhpStanExtractorTest extends TestCase
         yield ['traitString', Type::string()];
         yield ['interfaceString', Type::string()];
         yield ['literalString', Type::string()];
-        yield ['positiveInt', Type::int()];
-        yield ['negativeInt', Type::int()];
+        yield ['positiveInt', Type::intRange(1, null)];
+        yield ['negativeInt', Type::intRange(null, -1)];
+        yield ['nonZeroInt', Type::union(Type::intRange(null, -1), Type::intRange(1, null))];
         yield ['nonEmptyArray', Type::array()];
         yield ['nonEmptyList', Type::list()];
         yield ['scalar', Type::union(Type::int(), Type::float(), Type::string(), Type::bool())];
@@ -614,14 +619,54 @@ class PhpStanExtractorTest extends TestCase
      */
     public static function intRangeTypeProvider(): iterable
     {
-        yield ['a', Type::int()];
-        yield ['b', Type::nullable(Type::int())];
-        yield ['c', Type::int()];
+        yield ['a', Type::intRange(0, 100)];
+        yield ['b', Type::nullable(Type::intRange(null, 100))];
+        yield ['c', Type::intRange(50, null)];
     }
 
-    public function testExtractorLiteralType()
+    #[DataProvider('literalTypeProvider')]
+    public function testExtractorLiteralType(string $property, ?Type $type)
     {
-        $this->assertEquals(Type::arrayShape(['quoted key' => Type::string()]), $this->extractor->getType(LiteralDummy::class, 'shape'));
+        $this->assertEquals($type, $this->extractor->getType(LiteralDummy::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: ?Type}>
+     */
+    public static function literalTypeProvider(): iterable
+    {
+        yield ['status', Type::union(Type::literal('draft'), Type::literal('published'))];
+        yield ['shape', Type::arrayShape(['quoted key' => Type::literal("it's")])];
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testNotPassingAStringTypeResolverIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/property-info 8.2: Not passing the "$stringTypeResolver" argument of "Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor::__construct()" is deprecated; the default one will resolve all PHPDoc refinements in 9.0. Pass a "Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver" to choose the refinements to resolve.');
+
+        $this->assertEquals(Type::int(), (new PhpStanExtractor())->getType(IntRangeDummy::class, 'a'));
+    }
+
+    public function testMalformedRefinementsGiveTheTypeWithoutRefinements()
+    {
+        $this->assertEquals(Type::int(), $this->extractor->getType(IntRangeDummy::class, 'malformed'));
+        $this->assertEquals(Type::list(Type::int()), $this->extractor->getType(IntRangeDummy::class, 'invertedInList'));
+        $this->assertEquals(Type::int(), $this->extractor->getType(IntRangeDummy::class, 'missingBound'));
+    }
+
+    public function testDoNotResolveRefinementsTheResolverDoesNotResolve()
+    {
+        $extractor = new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], false));
+
+        $this->assertEquals(Type::int(), $extractor->getType(IntRangeDummy::class, 'a'));
+        $this->assertEquals(Type::string(), $extractor->getType(LiteralDummy::class, 'status'));
+        $this->assertEquals(Type::arrayShape(['quoted key' => Type::string()]), $extractor->getType(LiteralDummy::class, 'shape'));
+
+        $extractor = new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], [Refinement::IntRange]));
+
+        $this->assertEquals(Type::intRange(0, 100), $extractor->getType(IntRangeDummy::class, 'a'));
+        $this->assertEquals(Type::string(), $extractor->getType(LiteralDummy::class, 'status'));
     }
 
     #[DataProvider('php80TypesProvider')]
@@ -653,7 +698,7 @@ class PhpStanExtractorTest extends TestCase
     #[DataProvider('allowPrivateAccessProvider')]
     public function testAllowPrivateAccess(bool $allowPrivateAccess, Type $expectedType)
     {
-        $extractor = new PhpStanExtractor(null, null, null, $allowPrivateAccess);
+        $extractor = new PhpStanExtractor(null, null, null, $allowPrivateAccess, new StringTypeResolver(null, null, [], true));
 
         $this->assertEquals($expectedType, $extractor->getType(DummyPropertyAndGetterWithDifferentTypes::class, 'foo'));
     }

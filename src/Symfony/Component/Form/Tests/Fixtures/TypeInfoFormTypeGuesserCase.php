@@ -34,6 +34,21 @@ class TypeInfoFormTypeGuesserCase
     public array $array;
     public TypeInfoFormTypeGuesserCaseEnum $enum;
     private ?int $privateInt;
+
+    /** @var positive-int */
+    public int $positiveInt;
+    /** @var int<0, 100>|null */
+    public ?int $nullableIntRange;
+    /** @var 1 */
+    public int $intLiteral;
+    /** @var 'draft' */
+    public string $stringLiteral;
+    /** @var non-zero-int */
+    public int $nonZeroInt;
+    /** @var 1|2|3 */
+    public int $intLiteralUnion;
+    /** @var 1|'one' */
+    public int|string $mixedLiteralUnion;
 }
 
 class TypeInfoFormTypeGuesserCaseDateTime extends \DateTimeImmutable

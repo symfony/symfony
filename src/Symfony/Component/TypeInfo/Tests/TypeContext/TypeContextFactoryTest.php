@@ -86,7 +86,7 @@ class TypeContextFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->typeContextFactory = new TypeContextFactory(new StringTypeResolver());
+        $this->typeContextFactory = new TypeContextFactory(new StringTypeResolver(null, null, [], true));
     }
 
     public function testCollectClassNames()
@@ -302,7 +302,7 @@ class TypeContextFactoryTest extends TestCase
 
     public function testResolveInheritedTemplateTypes()
     {
-        $stringTypeResolver = new StringTypeResolver();
+        $stringTypeResolver = new StringTypeResolver(null, null, [], true);
         $typeContextFactory = new TypeContextFactory($stringTypeResolver);
 
         $this->assertEquals(Type::object(Dummy::class), $stringTypeResolver->resolve('T', $typeContextFactory->createFromClassName(DummyGrandChildEnvelope::class, Envelope::class)));
@@ -336,7 +336,7 @@ class TypeContextFactoryTest extends TestCase
     {
         $typeContext = $this->typeContextFactory->createFromClassName($calledClassName, $declaringClassName);
 
-        $this->assertEquals(Type::template('T', Type::object()), (new StringTypeResolver())->resolve('T', $typeContext));
+        $this->assertEquals(Type::template('T', Type::object()), (new StringTypeResolver(null, null, [], true))->resolve('T', $typeContext));
     }
 
     /**
@@ -417,7 +417,7 @@ class TypeContextFactoryTest extends TestCase
 
     public function testCollectTypeAliasesWithExtraTypeAliases()
     {
-        $typeContextFactory = new TypeContextFactory(new StringTypeResolver(), [
+        $typeContextFactory = new TypeContextFactory(new StringTypeResolver(null, null, [], true), [
             'Custom' => Type::int(),
             'CustomArray' => Type::list(Type::bool()), // will be overridden by the resolved type alias
         ]);
@@ -463,7 +463,7 @@ class TypeContextFactoryTest extends TestCase
 
         $this->expectException(UnsupportedException::class);
 
-        (new StringTypeResolver())->resolve('Invalid', $typeContext);
+        (new StringTypeResolver(null, null, [], true))->resolve('Invalid', $typeContext);
     }
 
     public function testThrowWhenTypeAliasNotImportedFromValidClassName()

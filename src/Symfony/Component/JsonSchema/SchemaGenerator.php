@@ -53,8 +53,11 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
+use Symfony\Component\TypeInfo\Type\IntRangeType;
+use Symfony\Component\TypeInfo\Type\LiteralType;
 use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\RefinementTypeInterface;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
@@ -125,7 +128,8 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         $descriptionExtractors = [];
 
         if (class_exists(PhpDocParser::class) && class_exists(ContextFactory::class)) {
-            $phpStanExtractor = new PhpStanExtractor();
+            // older symfony/property-info and symfony/type-info ignore the extra arguments
+            $phpStanExtractor = new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true));
             array_unshift($typeExtractors, $phpStanExtractor);
             $descriptionExtractors[] = $phpStanExtractor;
         }
@@ -190,7 +194,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
 
         foreach ($parameters as $parameter) {
             try {
-                $type = ($this->typeResolver ??= TypeResolver::create())->resolve($parameter);
+                $type = ($this->typeResolver ??= TypeResolver::create(null, true))->resolve($parameter);
             } catch (UnsupportedException) {
                 $type = null;
             }
@@ -248,6 +252,10 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             $type instanceof GenericType => $this->buildGenericSchema($type, $config, $parent, $document),
             $type instanceof TemplateType => $this->buildTypeSchema($type->getWrappedType(), $config, $parent, $document),
             $type instanceof ObjectType => $this->buildObjectSchema($type, $config, $parent, $document),
+            $type instanceof IntRangeType => $this->buildIntRangeSchema($type),
+            $type instanceof LiteralType => $this->buildLiteralSchema($type, $config->dialect),
+            // a refinement this generator does not know is described by its builtin type
+            $type instanceof RefinementTypeInterface => $this->buildTypeSchema($type->getWrappedType(), $config, $parent, $document),
             $type instanceof BuiltinType => $this->buildBuiltinSchema($type, $config->dialect),
             default => throw new InvalidArgumentException(\sprintf('Cannot generate a JSON Schema for type "%s".', $type)),
         };
@@ -278,6 +286,20 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         $schemas = [];
         $dropUnrepresentable = array_any($types, static fn (Type $t): bool => !$t->isIdentifiedBy(TypeIdentifier::NULL) && self::isRepresentable($t));
 
+        // literals sharing a builtin type become a single enum, and "non-zero-int" a single integer, so that both can be made nullable in any dialect
+        $literalValues = [];
+        $ranges = [];
+
+        foreach ($types as $t) {
+            if ($t instanceof LiteralType) {
+                $literalValues[(string) $t->getWrappedType()][] = $t->getValue();
+            } elseif ($t instanceof IntRangeType) {
+                $ranges[] = [$t->getMin(), $t->getMax()];
+            }
+        }
+
+        $isNonZeroInt = 2 === \count($ranges) && \in_array([null, -1], $ranges, true) && \in_array([1, null], $ranges, true);
+
         foreach ($types as $t) {
             if ($t instanceof BuiltinType && TypeIdentifier::NULL === $t->getTypeIdentifier()) {
                 $nullable = true;
@@ -289,7 +311,11 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 continue;
             }
 
-            $schema = $this->buildTypeSchema($t, $config, $parent, $document);
+            $schema = match (true) {
+                $isNonZeroInt && $t instanceof IntRangeType => ['type' => 'integer', 'not' => $config->dialect->const(0)],
+                $t instanceof LiteralType && 1 < \count($values = $literalValues[(string) $t->getWrappedType()]) => DialectKeywords::enum($this->buildBuiltinSchema($t->getWrappedType(), $config->dialect), $values),
+                default => $this->buildTypeSchema($t, $config, $parent, $document),
+            };
 
             if (!\in_array($schema, $schemas, true)) {
                 $schemas[] = $schema;
@@ -344,6 +370,11 @@ final class SchemaGenerator implements SchemaGeneratorInterface
     {
         $valueSchema = $this->buildTypeSchema($type->getCollectionValueType(), $config, $parent, $document);
         $keyType = $type->getCollectionKeyType();
+
+        // the lowest symfony/type-info has no refinements to remove
+        if (method_exists($keyType, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+            $keyType = $keyType->withoutRefinements();
+        }
 
         if (!$type->isList() && $keyType instanceof BuiltinType && TypeIdentifier::STRING === $keyType->getTypeIdentifier()) {
             return ['type' => 'object', 'additionalProperties' => $valueSchema];
@@ -435,6 +466,32 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             TypeIdentifier::MIXED => [],
             default => throw new InvalidArgumentException(\sprintf('Cannot generate a JSON Schema for type "%s".', $type)),
         };
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildIntRangeSchema(IntRangeType $type): array
+    {
+        $schema = ['type' => 'integer'];
+
+        if (null !== $min = $type->getMin()) {
+            $schema['minimum'] = $min;
+        }
+
+        if (null !== $max = $type->getMax()) {
+            $schema['maximum'] = $max;
+        }
+
+        return $schema;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildLiteralSchema(LiteralType $type, Dialect $dialect): array
+    {
+        return [...$this->buildBuiltinSchema($type->getWrappedType(), $dialect), ...$dialect->const($type->getValue())];
     }
 
     /**
@@ -882,7 +939,7 @@ final class SchemaGenerator implements SchemaGeneratorInterface
             return $this->templateNames[$class] = [];
         }
 
-        $this->typeContextFactory ??= new TypeContextFactory(new StringTypeResolver());
+        $this->typeContextFactory ??= new TypeContextFactory(new StringTypeResolver(null, null, [], true));
 
         return $this->templateNames[$class] = array_keys($this->typeContextFactory->createFromClassName($class)->templates);
     }

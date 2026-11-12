@@ -12,10 +12,14 @@
 namespace Symfony\Component\TypeInfo\Tests\DependencyInjection;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\TypeInfoBundle;
 
 class TypeInfoBundleExtensionTest extends TestCase
@@ -27,6 +31,8 @@ class TypeInfoBundleExtensionTest extends TestCase
         $this->assertTrue($container->has('type_info.resolver'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testTypeInfoEnabledWithoutConfiguration()
     {
         $container = $this->createContainerFromFile('type_info_default_config');
@@ -54,6 +60,52 @@ class TypeInfoBundleExtensionTest extends TestCase
 
         $this->assertSame(['CustomAlias' => 'int'], $container->getDefinition('type_info.type_context_factory')->getArgument(1));
         $this->assertSame(['CustomAlias' => 'int'], $container->getDefinition('type_info.resolver.string')->getArgument(2));
+    }
+
+    public function testRefinementsArePassedToTheStringResolver()
+    {
+        if (!class_exists(PhpDocParser::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" dependency is required.');
+        }
+
+        $this->assertTrue($this->createContainerFromFile('type_info')->getDefinition('type_info.resolver.string')->getArgument(3));
+
+        $container = $this->createContainer();
+        $container->loadFromExtension('type_info', ['refinements' => ['int_range']]);
+        $container->compile();
+
+        $this->assertSame([Refinement::IntRange], $container->getDefinition('type_info.resolver.string')->getArgument(3));
+
+        $container = $this->createContainer();
+        $container->loadFromExtension('type_info', ['refinements' => false]);
+        $container->compile();
+
+        $this->assertFalse($container->getDefinition('type_info.resolver.string')->getArgument(3));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testNotSettingRefinementsIsDeprecated()
+    {
+        if (!class_exists(PhpDocParser::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" dependency is required.');
+        }
+
+        $this->expectUserDeprecationMessage('Since symfony/type-info 8.2: Not setting the "type_info.refinements" option is deprecated; all PHPDoc refinements will be resolved by default in 9.0. Set it to true to resolve them now, or to false to keep their builtin types.');
+
+        // the services still get an explicit value, so they do not trigger deprecations of their own
+        $this->assertFalse($this->createContainerFromFile('type_info_default_config')->getDefinition('type_info.resolver.string')->getArgument(3));
+    }
+
+    public function testRefinementsMustBeKnown()
+    {
+        $container = $this->createContainer();
+        $container->loadFromExtension('type_info', ['refinements' => ['literal', 'nope']]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "refinements" option must be a boolean or a list of "literal", "int_range"; ["literal","nope"] given.');
+
+        $container->compile();
     }
 
     private function createContainerFromFile(string $file): ContainerBuilder

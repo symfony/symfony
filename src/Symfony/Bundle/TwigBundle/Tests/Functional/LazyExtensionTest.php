@@ -85,6 +85,7 @@ class LazyExtensionKernel extends Kernel
     {
         $loader->load(static function (ContainerBuilder $container) {
             $container->setParameter('kernel.secret', 'secret');
+            $container->loadFromExtension('framework', ['type_info' => ['refinements' => true]]);
             $container->register(ExtensionDependency::class, ExtensionDependency::class);
             $container->register(ExtensionWithDependency::class, ExtensionWithDependency::class)
                 ->setAutowired(true)

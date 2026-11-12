@@ -61,8 +61,14 @@ final class CollectionDenormalizer implements DenormalizerInterface, Denormalize
         }
 
         $valueType = $context['value_type'] ?? null;
+
+        // a refined element, such as "positive-int" or "'draft'|'live'", is validated against its builtin type; the lowest symfony/type-info has no refinements to remove
+        if ($valueType instanceof Type && method_exists($valueType, 'withoutRefinements')) { // @phpstan-ignore function.alreadyNarrowedType
+            $valueType = $valueType->withoutRefinements();
+        }
+
         $elementClass = self::getElementClass($valueType);
-        $keyTypeIdentifiers = self::getKeyTypeIdentifiers($context['key_type'] ?? null);
+        $keyTypeIdentifiers = self::getKeyTypeIdentifiers($context['key_type'] ?? null) ?? [];
         $collectionClass = $this->resolveCollectionClass($type);
         $collection = new $collectionClass();
 
@@ -147,24 +153,43 @@ final class CollectionDenormalizer implements DenormalizerInterface, Denormalize
     }
 
     /**
-     * @return list<string>
+     * @return list<'int'|'string'>|null The builtin types a key is checked against, null when it cannot be checked
      */
-    private static function getKeyTypeIdentifiers(mixed $keyType): array
+    private static function getKeyTypeIdentifiers(mixed $keyType): ?array
     {
         if (!$keyType instanceof Type) {
+            return null;
+        }
+
+        // a template key is checked against its bound, and a refined one, such as "positive-int" or "'en'|'de'", against its builtin type
+        while ($keyType instanceof WrappingTypeInterface && !$keyType instanceof UnionType) {
+            $keyType = $keyType->getWrappedType();
+        }
+
+        if ($keyType instanceof UnionType) {
+            $typeIdentifiers = [];
+            foreach ($keyType->getTypes() as $t) {
+                // a member that cannot be checked accepts any key
+                if (null === $identifiers = self::getKeyTypeIdentifiers($t)) {
+                    return null;
+                }
+
+                $typeIdentifiers = [...$typeIdentifiers, ...$identifiers];
+            }
+
+            return array_values(array_unique($typeIdentifiers));
+        }
+
+        if (!$keyType instanceof BuiltinType) {
             return [];
         }
 
-        $identifiers = [];
-
-        foreach ($keyType instanceof UnionType ? $keyType->getTypes() : [$keyType] as $t) {
-            // only int and string keys can be validated this way, any other key type is left as is
-            if ($t instanceof BuiltinType && \in_array($t->getTypeIdentifier(), [TypeIdentifier::INT, TypeIdentifier::STRING], true)) {
-                $identifiers[] = $t->getTypeIdentifier()->value;
-            }
-        }
-
-        return $identifiers;
+        // only int and string keys are checked; "mixed", such as an unbound template, cannot be, and any other type, such as "null" or an object, matches no key
+        return match ($keyType->getTypeIdentifier()) {
+            TypeIdentifier::INT, TypeIdentifier::STRING => [$keyType->getTypeIdentifier()->value],
+            TypeIdentifier::MIXED => null,
+            default => [],
+        };
     }
 
     /**

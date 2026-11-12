@@ -36,6 +36,8 @@ class TypeInfoBundle extends AbstractBundle
 
     public function configure(DefinitionConfigurator $definition): void
     {
+        $refinements = implode(', ', array_map(static fn (Refinement $refinement): string => '"'.$refinement->value.'"', Refinement::cases()));
+
         $definition->rootNode()
             ->canBeDisabled()
             ->children()
@@ -45,6 +47,14 @@ class TypeInfoBundle extends AbstractBundle
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('name')
                     ->scalarPrototype()->end()
+                ->end()
+                ->variableNode('refinements')
+                    ->info(\sprintf('The PHPDoc refinements to resolve instead of their builtin type (%s), true for all of them, including those added later, or false for none. Not setting it is deprecated since Symfony 8.2, all refinements will be resolved by default as of 9.0.', $refinements))
+                    ->defaultNull()
+                    ->validate()
+                        ->ifTrue(static fn (mixed $refinements): bool => null !== $refinements && !\is_bool($refinements) && (!\is_array($refinements) || !array_is_list($refinements) || array_any($refinements, static fn (mixed $refinement): bool => !$refinement instanceof Refinement && (!\is_string($refinement) || null === Refinement::tryFrom($refinement)))))
+                        ->thenInvalid(\sprintf('The "refinements" option must be a boolean or a list of %s; %%s given.', $refinements))
+                    ->end()
                 ->end()
             ->end()
         ;
@@ -59,8 +69,15 @@ class TypeInfoBundle extends AbstractBundle
         $configurator->import('Resources/config/type_info.php');
 
         if (ContainerBuilder::willBeAvailable('phpstan/phpdoc-parser', PhpDocParser::class, ['symfony/framework-bundle', 'symfony/type-info'])) {
+            // refinements only come from PHPDoc types
+            if (null === $config['refinements']) {
+                trigger_deprecation('symfony/type-info', '8.2', 'Not setting the "type_info.refinements" option is deprecated; all PHPDoc refinements will be resolved by default in 9.0. Set it to true to resolve them now, or to false to keep their builtin types.');
+            }
+
+            $refinements = \is_array($config['refinements']) ? array_map(static fn (Refinement|string $refinement): Refinement => $refinement instanceof Refinement ? $refinement : Refinement::from($refinement), $config['refinements']) : $config['refinements'] ?? false;
+
             $container->register('type_info.resolver.string', StringTypeResolver::class)
-                ->setArguments([null, null, $config['aliases']]);
+                ->setArguments([null, null, $config['aliases'], $refinements]);
 
             $container->register('type_info.resolver.reflection_parameter.phpdoc_aware', PhpDocAwareReflectionTypeResolver::class)
                 ->setArguments([new Reference('type_info.resolver.reflection_parameter'), new Reference('type_info.resolver.string'), new Reference('type_info.type_context_factory')]);

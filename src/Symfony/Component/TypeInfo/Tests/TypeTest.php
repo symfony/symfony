@@ -14,6 +14,7 @@ namespace Symfony\Component\TypeInfo\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyRefinementType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
@@ -210,6 +211,30 @@ class TypeTest extends TestCase
         Type::union(Type::template('T'), Type::int())->map(self::replaceTemplate(Type::void()));
     }
 
+    #[DataProvider('withoutRefinementsDataProvider')]
+    public function testWithoutRefinements(Type $type, Type $expected)
+    {
+        $this->assertEquals($expected, $type->withoutRefinements());
+    }
+
+    /**
+     * @return iterable<array{0: Type, 1: Type}>
+     */
+    public static function withoutRefinementsDataProvider(): iterable
+    {
+        $nonZeroInt = Type::union(Type::intRange(null, -1), Type::intRange(1, null));
+
+        yield [Type::string(), Type::string()];
+        yield [Type::literal('a'), Type::string()];
+        yield [Type::intRange(1, null), Type::int()];
+        yield [$nonZeroInt, Type::int()];
+        yield [Type::nullable($nonZeroInt), Type::nullable(Type::int())];
+        yield [Type::union(Type::literal('a'), Type::literal('b')), Type::string()];
+        yield [Type::union(Type::literal('a'), Type::string()), Type::string()];
+        yield [Type::union(Type::literal(1), Type::literal('one')), Type::union(Type::int(), Type::string())];
+        yield [Type::array(Type::literal(1.5), $nonZeroInt), Type::array(Type::float(), Type::int())];
+    }
+
     #[DataProvider('provideGetMismatches')]
     public function testGetMismatches(Type $type, mixed $value, array $expectedMismatches)
     {
@@ -224,6 +249,13 @@ class TypeTest extends TestCase
         yield 'object' => [Type::object(\Countable::class), new \stdClass(), [new TypeMismatch('', Type::object(\Countable::class), 'stdClass')]];
         yield 'nullable' => [Type::nullable(Type::int()), '1', [new TypeMismatch('', Type::nullable(Type::int()), 'string')]];
         yield 'union' => [Type::union(Type::int(), Type::string()), 1.5, [new TypeMismatch('', Type::union(Type::int(), Type::string()), 'float')]];
+        yield 'integer range' => [Type::intRange(1, 5), 9, [new TypeMismatch('', Type::intRange(1, 5), 'int')]];
+        yield 'template of an integer range' => [Type::template('T', Type::intRange(1, 5)), 9, [new TypeMismatch('', Type::template('T', Type::intRange(1, 5)), 'int')]];
+        yield 'template of a literal union' => [Type::template('T', Type::union(Type::literal('a'), Type::literal('b'))), 'c', [new TypeMismatch('', Type::template('T', Type::union(Type::literal('a'), Type::literal('b'))), 'string')]];
+        yield 'list of integer ranges' => [Type::list(Type::intRange(1, 5)), [1, 9], [new TypeMismatch('[1]', Type::intRange(1, 5), 'int')]];
+        yield 'template of a nullable type' => [Type::template('T', Type::nullable(Type::int())), null, []];
+        yield 'template of a list of integer ranges' => [Type::template('T', Type::list(Type::intRange(1, 5))), [9], [new TypeMismatch('', Type::template('T', Type::list(Type::intRange(1, 5))), 'array')]];
+        yield 'refinement without a check of its own' => [new DummyRefinementType(), 1, [new TypeMismatch('', new DummyRefinementType(), 'int')]];
 
         yield 'list items' => [Type::list(Type::int()), [1, '2', 3, '4'], [new TypeMismatch('[1]', Type::int(), 'string'), new TypeMismatch('[3]', Type::int(), 'string')]];
         yield 'not a list' => [Type::list(Type::int()), [1 => 1], [new TypeMismatch('', Type::list(Type::int()), 'array')]];
@@ -259,7 +291,7 @@ class TypeTest extends TestCase
         yield 'union members of the same kind' => [$union, [1, '2'], [new TypeMismatch('', $union, 'array')]];
 
         yield 'resolved type' => [
-            TypeResolver::create()->resolve('array{data: list<array{id: string, shipment?: array{departure?: string|null, ...}|null, ...}>, ...}'),
+            TypeResolver::create(null, true)->resolve('array{data: list<array{id: string, shipment?: array{departure?: string|null, ...}|null, ...}>, ...}'),
             ['data' => [['id' => 'A-1', 'shipment' => ['departure' => 20260918]]]],
             [new TypeMismatch('[data][0][shipment][departure]', Type::nullable(Type::string()), 'int')],
         ];

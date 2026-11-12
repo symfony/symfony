@@ -13,6 +13,7 @@ namespace Symfony\Component\JsonSchema\Tests;
 
 use PHPStan\PhpDocParser\ParserConfig;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -68,6 +69,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingDefinitionPolicy;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingDefinitionProcessor;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingNameConverter;
 use Symfony\Component\JsonSchema\Tests\Fixtures\RecordingPropertyListExtractor;
+use Symfony\Component\JsonSchema\Tests\Fixtures\RefinedProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ScalarProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SearchTool;
 use Symfony\Component\JsonSchema\Tests\Fixtures\SelfReferencingCategory;
@@ -79,6 +81,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\Shelf;
 use Symfony\Component\JsonSchema\Tests\Fixtures\StrictInput;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Ticket;
 use Symfony\Component\JsonSchema\Tests\Fixtures\UnionProperties;
+use Symfony\Component\JsonSchema\Tests\Fixtures\ValidatedRefinedProperties;
 use Symfony\Component\JsonSchema\Tests\Fixtures\ValidatedRegistration;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Vehicle;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -87,7 +90,9 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\RefinementTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 class SchemaGeneratorTest extends TestCase
@@ -505,6 +510,139 @@ class SchemaGeneratorTest extends TestCase
 
         $this->assertSameSchema(['type' => ['integer', 'null']], $schema->getRoot());
         $this->assertSame([], $schema->getDefinitions());
+    }
+
+    #[RequiresMethod(Type::class, 'intRange')]
+    public function testIntRangeBecomesBounds()
+    {
+        $generator = SchemaGenerator::create();
+
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 0, 'maximum' => 100], $generator->generate(Type::intRange(0, 100))->getRoot());
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 1], $generator->generate(Type::intRange(1, null))->getRoot());
+        $this->assertSameSchema(['type' => 'integer', 'maximum' => -1], $generator->generate(Type::intRange(null, -1))->getRoot());
+        $this->assertSameSchema(['type' => 'integer', 'not' => ['const' => 0]], $generator->generate(Type::union(Type::intRange(null, -1), Type::intRange(1, null)))->getRoot());
+        $this->assertSameSchema(['anyOf' => [['type' => 'integer', 'minimum' => 10], ['type' => 'integer', 'maximum' => -1]]], $generator->generate(Type::union(Type::intRange(null, -1), Type::intRange(10, null)))->getRoot());
+    }
+
+    #[RequiresMethod(Type::class, 'literal')]
+    public function testLiteralBecomesConst()
+    {
+        $generator = SchemaGenerator::create();
+
+        $this->assertSameSchema(['type' => 'string', 'const' => 'draft'], $generator->generate(Type::literal('draft'))->getRoot());
+        $this->assertSameSchema(['type' => 'integer', 'const' => 1], $generator->generate(Type::literal(1))->getRoot());
+        $this->assertSameSchema(['type' => 'number', 'const' => 1.5], $generator->generate(Type::literal(1.5))->getRoot());
+        $this->assertSameSchema(['type' => 'string', 'enum' => ['draft', 'live']], $generator->generate(Type::union(Type::literal('draft'), Type::literal('live')))->getRoot());
+        $this->assertSameSchema(['anyOf' => [['type' => 'string', 'enum' => ['draft', 'live']], ['type' => 'integer', 'const' => 1]]], $generator->generate(Type::union(Type::literal('draft'), Type::literal(1), Type::literal('live')))->getRoot());
+    }
+
+    #[RequiresMethod(Type::class, 'literal')]
+    public function testNullableLiteralBecomesEnum()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::nullable(Type::literal('draft')));
+
+        $this->assertSameSchema(['type' => ['string', 'null'], 'enum' => ['draft', null]], $schema->getRoot());
+    }
+
+    public function testRefinedPhpDocTypesAreDescribed()
+    {
+        if ((new \ReflectionMethod(PhpStanExtractor::class, '__construct'))->getNumberOfParameters() < 5) {
+            $this->markTestSkipped('Resolving refinements needs symfony/property-info 8.2 or higher.');
+        }
+
+        $properties = SchemaGenerator::create()->generate(Type::object(RefinedProperties::class))->getDefinitions()['RefinedProperties']['properties'];
+
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 1], $properties['page']);
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 1], $properties['quantity']);
+        $this->assertSameSchema(['type' => ['integer', 'null'], 'minimum' => 0, 'maximum' => 100], $properties['percentage']);
+        $this->assertSameSchema(['type' => 'integer', 'not' => ['const' => 0]], $properties['offset']);
+        $this->assertSameSchema(['type' => 'string', 'enum' => ['draft', 'live']], $properties['status']);
+    }
+
+    public function testValidatorBoundsKeepTheStricterRefinedBound()
+    {
+        if ((new \ReflectionMethod(PhpStanExtractor::class, '__construct'))->getNumberOfParameters() < 5) {
+            $this->markTestSkipped('Resolving refinements needs symfony/property-info 8.2 or higher.');
+        }
+
+        $properties = SchemaGenerator::create()->generate(Type::object(ValidatedRefinedProperties::class))->getDefinitions()['ValidatedRefinedProperties']['properties'];
+
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 1, 'maximum' => 10], $properties['looser']);
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 2, 'maximum' => 8], $properties['stricter']);
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 1, 'maximum' => 5], $properties['mixed']);
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 5, 'maximum' => 10], $properties['looserExclusive']);
+        $this->assertSameSchema(['type' => 'integer', 'maximum' => 10, 'exclusiveMinimum' => 5], $properties['stricterExclusive']);
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 5], $properties['inclusiveAfterExclusive']);
+    }
+
+    public function testOpenApi30ValidatorBoundsKeepTheStricterRefinedBound()
+    {
+        if ((new \ReflectionMethod(PhpStanExtractor::class, '__construct'))->getNumberOfParameters() < 5) {
+            $this->markTestSkipped('Resolving refinements needs symfony/property-info 8.2 or higher.');
+        }
+
+        $properties = SchemaGenerator::create()->generate(Type::object(ValidatedRefinedProperties::class), new Configuration(dialect: Dialect::openApi30()))->getDefinitions()['ValidatedRefinedProperties']['properties'];
+
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 5, 'maximum' => 10], $properties['looserExclusive']);
+        $this->assertSameSchema(['type' => 'integer', 'maximum' => 10, 'minimum' => 5, 'exclusiveMinimum' => true], $properties['stricterExclusive']);
+        $this->assertSameSchema(['type' => 'integer', 'minimum' => 5], $properties['inclusiveAfterExclusive']);
+    }
+
+    #[RequiresMethod(Type::class, 'withoutRefinements')]
+    public function testUnknownRefinementIsDescribedByItsBuiltinType()
+    {
+        $nonEmptyString = new class extends Type implements RefinementTypeInterface {
+            public function getWrappedType(): Type
+            {
+                return Type::string();
+            }
+
+            public function wrappedTypeIsSatisfiedBy(callable $specification): bool
+            {
+                return $this->getWrappedType()->isSatisfiedBy($specification);
+            }
+
+            public function __toString(): string
+            {
+                return 'non-empty-string';
+            }
+        };
+
+        $this->assertSameSchema(['type' => 'string'], SchemaGenerator::create()->generate($nonEmptyString)->getRoot());
+    }
+
+    #[RequiresMethod(Type::class, 'literal')]
+    public function testOpenApi30LiteralBecomesEnum()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::literal('draft'), new Configuration(dialect: Dialect::openApi30()));
+
+        $this->assertSameSchema(['type' => 'string', 'enum' => ['draft']], $schema->getRoot());
+    }
+
+    #[RequiresMethod(Type::class, 'literal')]
+    public function testOpenApi30NullableRefinementsKeepTheirType()
+    {
+        $generator = SchemaGenerator::create();
+        $config = new Configuration(dialect: Dialect::openApi30());
+
+        $this->assertSameSchema(['type' => 'string', 'enum' => ['a', 'b', null], 'nullable' => true], $generator->generate(Type::nullable(Type::union(Type::literal('a'), Type::literal('b'))), $config)->getRoot());
+        $this->assertSameSchema(['type' => 'integer', 'not' => ['enum' => [0]], 'nullable' => true], $generator->generate(Type::nullable(Type::union(Type::intRange(null, -1), Type::intRange(1, null))), $config)->getRoot());
+    }
+
+    #[RequiresMethod(Type::class, 'literal')]
+    public function testCollectionWithLiteralStringKeyBecomesAnObject()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::array(Type::int(), Type::literal('a')));
+
+        $this->assertSameSchema(['type' => 'object', 'additionalProperties' => ['type' => 'integer']], $schema->getRoot());
+    }
+
+    #[RequiresMethod(Type::class, 'withoutRefinements')]
+    public function testCollectionWithLiteralStringUnionKeyBecomesAnObject()
+    {
+        $schema = SchemaGenerator::create()->generate(Type::array(Type::int(), Type::union(Type::literal('en'), Type::literal('de'))));
+
+        $this->assertSameSchema(['type' => 'object', 'additionalProperties' => ['type' => 'integer']], $schema->getRoot());
     }
 
     public function testArrayShapeBecomesAnInlineObject()
@@ -1178,7 +1316,7 @@ class SchemaGeneratorTest extends TestCase
     {
         $reflectionExtractor = new ReflectionExtractor();
 
-        return new PropertyInfoExtractor([$reflectionExtractor], [new PhpStanExtractor(), $reflectionExtractor], [], [$reflectionExtractor], [$reflectionExtractor]);
+        return new PropertyInfoExtractor([$reflectionExtractor], [new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true)), $reflectionExtractor], [], [$reflectionExtractor], [$reflectionExtractor]);
     }
 
     private function assertSameSchema(array $expected, array|Schema $actual): void

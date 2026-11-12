@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\PropertyInfo\Tests;
 
+use phpDocumentor\Reflection\Types\ContextFactory;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -23,6 +27,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoBundle;
 use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\Type;
 
 class PropertyInfoBundleTest extends TestCase
@@ -87,6 +92,99 @@ class PropertyInfoBundleTest extends TestCase
         $this->assertSame(['foo', 'bar'], $kernel->getContainer()->get('test.property_info')->getProperties(PropertyInfoBundleSubject::class));
     }
 
+    public function testRefinementsAreResolvedAccordingToTheTypeInfoConfiguration()
+    {
+        if (!class_exists(PhpDocParser::class) || !class_exists(ContextFactory::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
+        }
+
+        if (!enum_exists(Refinement::class)) {
+            $this->markTestSkipped('The "type_info.refinements" option needs symfony/type-info 8.2 or higher.');
+        }
+
+        $kernel = new TestPropertyInfoKernel('test', false, $this->varDir);
+        $kernel->boot();
+
+        $this->assertEquals(Type::intRange(1, null), $kernel->getContainer()->get('test.property_info')->getType(PropertyInfoBundleSubject::class, 'count'));
+    }
+
+    public function testOnlyTheConfiguredRefinementsAreResolved()
+    {
+        if (!class_exists(PhpDocParser::class) || !class_exists(ContextFactory::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
+        }
+
+        if (!enum_exists(Refinement::class)) {
+            $this->markTestSkipped('The "type_info.refinements" option needs symfony/type-info 8.2 or higher.');
+        }
+
+        $kernel = new TestPropertyInfoKernel('literals', false, $this->varDir, refinements: ['literal']);
+        $kernel->boot();
+        $propertyInfo = $kernel->getContainer()->get('test.property_info');
+
+        $this->assertEquals(Type::int(), $propertyInfo->getType(PropertyInfoBundleSubject::class, 'count'));
+        $this->assertEquals(Type::union(Type::literal('a'), Type::literal('b')), $propertyInfo->getType(PropertyInfoBundleSubject::class, 'letter'));
+    }
+
+    public function testTypeAliasesAreResolved()
+    {
+        if (!class_exists(PhpDocParser::class) || !class_exists(ContextFactory::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
+        }
+
+        if (!enum_exists(Refinement::class)) {
+            $this->markTestSkipped('The "type_info.refinements" option needs symfony/type-info 8.2 or higher.');
+        }
+
+        $kernel = new TestPropertyInfoKernel('test', false, $this->varDir);
+        $kernel->boot();
+
+        $this->assertEquals(Type::int(), $kernel->getContainer()->get('test.property_info')->getType(PropertyInfoBundleSubject::class, 'aliased'));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testNotSettingTheRefinementsOptionIsDeprecatedOnce()
+    {
+        if (!class_exists(PhpDocParser::class) || !class_exists(ContextFactory::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
+        }
+
+        if (!enum_exists(Refinement::class)) {
+            $this->markTestSkipped('The "type_info.refinements" option needs symfony/type-info 8.2 or higher.');
+        }
+
+        $deprecations = [];
+        set_error_handler(static function (int $type, string $message) use (&$deprecations): bool {
+            $deprecations[] = $message;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+
+        try {
+            $kernel = new TestPropertyInfoKernel('unset', false, $this->varDir, refinements: null);
+            $kernel->boot();
+            $type = $kernel->getContainer()->get('test.property_info')->getType(PropertyInfoBundleSubject::class, 'count');
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame(['Since symfony/type-info 8.2: Not setting the "type_info.refinements" option is deprecated; all PHPDoc refinements will be resolved by default in 9.0. Set it to true to resolve them now, or to false to keep their builtin types.'], array_values(array_filter($deprecations, static fn (string $message): bool => str_contains($message, 'refinements'))));
+        $this->assertEquals(Type::int(), $type);
+    }
+
+    public function testNoRefinementsAreResolvedWithoutDeprecationWhenTypeInfoIsDisabled()
+    {
+        if (!class_exists(PhpDocParser::class) || !class_exists(ContextFactory::class)) {
+            $this->markTestSkipped('"phpstan/phpdoc-parser" and "phpdocumentor/type-resolver" dependencies are required.');
+        }
+
+        $kernel = new TestPropertyInfoKernel('no_type_info', false, $this->varDir, withTypeInfo: false);
+        $kernel->boot();
+
+        $this->assertEquals(Type::int(), $kernel->getContainer()->get('test.property_info')->getType(PropertyInfoBundleSubject::class, 'count'));
+    }
+
     public function testNothingIsRegisteredWhenDisabled()
     {
         $container = new ContainerBuilder();
@@ -101,6 +199,21 @@ class PropertyInfoBundleTest extends TestCase
 class PropertyInfoBundleSubject
 {
     public string $foo = 'bar';
+
+    /**
+     * @var positive-int
+     */
+    public int $count = 1;
+
+    /**
+     * @var 'a'|'b'
+     */
+    public string $letter = 'a';
+
+    /**
+     * @var PropertyInfoBundleAlias
+     */
+    public $aliased;
 }
 
 class PropertyInfoBundleListExtractor implements PropertyListExtractorInterface
@@ -115,7 +228,7 @@ class TestPropertyInfoKernel extends AbstractKernel
 {
     use KernelTrait;
 
-    public function __construct(string $env, bool $debug, private string $dir, private bool $withCacheSystem = false)
+    public function __construct(string $env, bool $debug, private string $dir, private bool $withCacheSystem = false, private array|bool|null $refinements = true, private bool $withTypeInfo = true)
     {
         parent::__construct($env, $debug);
     }
@@ -132,6 +245,8 @@ class TestPropertyInfoKernel extends AbstractKernel
 
     private function configureContainer(ContainerConfigurator $container): void
     {
+        $container->extension('type_info', $this->withTypeInfo ? ['aliases' => ['PropertyInfoBundleAlias' => 'int']] + (null !== $this->refinements && enum_exists(Refinement::class) ? ['refinements' => $this->refinements] : []) : ['enabled' => false]);
+
         $services = $container->services();
         $services
             ->set(PropertyInfoBundleListExtractor::class)->autoconfigure()

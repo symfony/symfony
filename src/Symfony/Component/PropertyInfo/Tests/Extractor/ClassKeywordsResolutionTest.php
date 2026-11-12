@@ -19,6 +19,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\KeywordsGrandParent;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\KeywordsParent;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\OtherNamespace\KeywordsChild as KeywordsChildInOtherNamespace;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 class ClassKeywordsResolutionTest extends TestCase
 {
@@ -27,7 +28,7 @@ class ClassKeywordsResolutionTest extends TestCase
         $expected = [];
         $actual = [];
 
-        foreach ([new PhpDocExtractor(), new PhpStanExtractor()] as $extractor) {
+        foreach ([new PhpDocExtractor(), new PhpStanExtractor(null, null, null, true, new StringTypeResolver(null, null, [], true))] as $extractor) {
             foreach ([KeywordsParent::class, KeywordsChild::class, KeywordsChildInOtherNamespace::class] as $class) {
                 $type = $this->createExpectedType(KeywordsParent::class, $class, KeywordsGrandParent::class);
 

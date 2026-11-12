@@ -36,7 +36,7 @@
         {%- for child in form %}
             <div class="flex items-center">
                 {{- form_widget(child) -}}
-                {{- form_label(child, null, { translation_domain: choice_translation_domain }) -}}
+                {{- form_label(child, null, { translation_domain: choice_translation_domain, required: false }) -}}
             </div>
         {% endfor -%}
     </div>

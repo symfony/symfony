@@ -147,6 +147,7 @@
     {%- if '-inline' in label_attr.class|default('') -%}
         {%- for child in form %}
             {{- form_widget(child, {
+                label_required: false,
                 parent_label_class: label_attr.class|default(''),
                 translation_domain: choice_translation_domain,
             }) -}}
@@ -155,6 +156,7 @@
         <div {{ block('widget_container_attributes') }}>
             {%- for child in form %}
                 {{- form_widget(child, {
+                    label_required: false,
                     parent_label_class: label_attr.class|default(''),
                     translation_domain: choice_translation_domain,
                 }) -}}

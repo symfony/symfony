@@ -1145,7 +1145,11 @@ class Response
         }
         // Only do If-Modified-Since date comparison when If-None-Match is not present as per https://tools.ietf.org/html/rfc7232#section-3.3.
         elseif ($modifiedSince && $lastModified) {
-            $notModified = strtotime($modifiedSince) >= strtotime($lastModified);
+            try {
+                $notModified = $request->headers->getDate('If-Modified-Since') >= $this->getLastModified();
+            } catch (\RuntimeException) {
+                // invalid dates are ignored, as RFC 9110 Section 13.1.3 says for If-Modified-Since
+            }
         }
 
         if ($notModified) {

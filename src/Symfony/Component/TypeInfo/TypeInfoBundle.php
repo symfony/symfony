@@ -53,7 +53,7 @@ class TypeInfoBundle extends AbstractBundle
                     ->defaultNull()
                     ->validate()
                         ->ifTrue(static fn (mixed $refinements): bool => null !== $refinements && !\is_bool($refinements) && (!\is_array($refinements) || !array_is_list($refinements) || array_any($refinements, static fn (mixed $refinement): bool => !$refinement instanceof Refinement && (!\is_string($refinement) || null === Refinement::tryFrom($refinement)))))
-                        ->thenInvalid(\sprintf('The "refinements" option must be a boolean or a list of %s, %%s given.', $refinements))
+                        ->thenInvalid(\sprintf('The "refinements" option must be a boolean or a list of %s; %%s given.', $refinements))
                     ->end()
                 ->end()
             ->end()

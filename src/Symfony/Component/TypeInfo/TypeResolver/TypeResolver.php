@@ -13,6 +13,7 @@ namespace Symfony\Component\TypeInfo\TypeResolver;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Refinement;
 use Symfony\Component\TypeInfo\Type;
@@ -63,9 +64,15 @@ final class TypeResolver implements TypeResolverInterface
     /**
      * @param array<string, TypeResolverInterface>|null $resolvers
      * @param list<Refinement>|bool|null                $refinements The PHPDoc refinements the string type resolver resolves instead of their builtin type, true for all of them, including those added later. Not passing it is deprecated since 8.2, all refinements will be resolved by default as of 9.0
+     *
+     * @throws InvalidArgumentException When both resolvers and refinements are passed, as the refinements only configure the default resolvers
      */
     public static function create(?array $resolvers = null, array|bool|null $refinements = null): self
     {
+        if (null !== $resolvers && null !== $refinements) {
+            throw new InvalidArgumentException('The "$refinements" argument cannot be used together with the "$resolvers" argument; configure the refinements on the given resolvers instead.');
+        }
+
         if (null === $resolvers) {
             if (null === $refinements && class_exists(PhpDocParser::class)) {
                 trigger_deprecation('symfony/type-info', '8.2', 'Not passing the "$refinements" argument of "%s()" is deprecated; all PHPDoc refinements will be resolved by default in 9.0. Pass true to resolve them now, or false to keep their builtin types.', __METHOD__);

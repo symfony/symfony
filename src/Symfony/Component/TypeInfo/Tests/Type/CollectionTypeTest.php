@@ -215,6 +215,21 @@ class CollectionTypeTest extends TestCase
         yield 'backed enum and object' => [Type::enum(DummyBackedEnum::class), Type::object(DummyBackedEnum::class)];
     }
 
+    public function testAcceptsIntegerKeysAsNumericStringLiterals()
+    {
+        $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::union(Type::literal('1'), Type::literal('a')), Type::int()));
+
+        $this->assertTrue($type->accepts(['1' => 5, 'a' => 6]));
+        $this->assertSame([], $type->getMismatches(['1' => 5]));
+        $this->assertFalse($type->accepts(['2' => 5]));
+        $this->assertNotSame([], $type->getMismatches(['2' => 5]));
+
+        // without a refinement, a string key type does not accept the integer PHP made of a numeric string
+        $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::int()));
+
+        $this->assertFalse($type->accepts(['1' => 5]));
+    }
+
     public function testMergeCollectionValueTypesPreservesNestedUnionMembers()
     {
         $generic = Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::string());

@@ -179,6 +179,16 @@ trait HttpClientTrait
             // Validate and resolve URL
             $url = self::parseUrl($url, $options['query']);
             $url = self::resolveUrl($url, $baseUri, $defaultOptions['query'] ?? []);
+
+            // Send the user info of the URL as an Authorization header, so that it never ends up in reported URLs
+            if (false !== $i = strrpos($url['authority'], '@')) {
+                if (!isset($options['normalized_headers']['authorization']) && !isset($options['auth_ntlm'])) {
+                    $userinfo = explode(':', substr($url['authority'], 2, $i - 2), 2);
+                    $options['normalized_headers']['authorization'] = ['Authorization: Basic '.base64_encode(rawurldecode($userinfo[0]).':'.rawurldecode($userinfo[1] ?? ''))];
+                }
+
+                $url['authority'] = '//'.substr($url['authority'], 1 + $i);
+            }
         }
 
         // Finalize normalization of options

@@ -319,6 +319,15 @@ class CurlHttpClientTest extends HttpClientTestCase
         self::assertStringNotContainsString('Re-using existing connection', $response->getInfo('debug'));
     }
 
+    public function testAuthNtlmWinsOverUserinfo()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://foo:bar@127.0.0.1:8057/', ['auth_ntlm' => 'user:pass']);
+
+        $this->assertMatchesRegularExpression('/^NTLM [^ ,]++$/', $response->toArray()['HTTP_AUTHORIZATION']);
+        $this->assertSame('http://127.0.0.1:8057/', $response->getInfo('url'));
+    }
+
     public function testNtlmStateNotMutatedByNonNtlmRequest()
     {
         // A plain (non-NTLM) request must not touch the NTLM origin map. This guards against
@@ -467,7 +476,7 @@ class CurlHttpClientTest extends HttpClientTestCase
      */
     public function testRelativeRedirectToGetDropsCredentialsOnOtherOrigins(string $url, string $expectedUrl, bool $expectCredentials)
     {
-        if (false === strpos(file_get_contents(\dirname((new \ReflectionClass(TestHttpServer::class))->getFileName()).'/Fixtures/web/index.php'), "case '/custom':")) {
+        if (!str_contains(file_get_contents(\dirname((new \ReflectionClass(TestHttpServer::class))->getFileName()).'/Fixtures/web/index.php'), "case '/custom':")) {
             $this->markTestSkipped('The installed symfony/http-client-contracts has no "/custom" route.');
         }
 

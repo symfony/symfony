@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpFactory;
@@ -1683,6 +1684,34 @@ class ConnectionTest extends TestCase
         (new \ReflectionProperty($connection, 'lastActivityTime'))->setValue($connection, time() - 3);
 
         $connection->get(self::DEFAULT_EXCHANGE_NAME);
+    }
+
+    #[TestWith(['amqp://localhost', false, 'connect', 'disconnect'])]
+    #[TestWith(['amqp://localhost?prefetch_count=3', true, 'connect', 'disconnect'])]
+    #[TestWith(['amqp://localhost?persistent=true', false, 'pconnect', null])]
+    #[TestWith(['amqp://localhost?persistent=true&prefetch_count=3', false, 'pconnect', null])]
+    #[TestWith(['amqp://localhost?persistent=true&prefetch_count=3', true, 'pconnect', 'pdisconnect'])]
+    public function testCloseKeepsOnlyPersistentConnectionsThatDidNotConsume(string $dsn, bool $consume, string $connectMethod, ?string $disconnectMethod)
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createStub(\AMQPChannel::class),
+            $this->createStub(\AMQPQueue::class),
+            $this->createStub(\AMQPExchange::class)
+        );
+
+        $amqpChannel->method('getConnection')->willReturn($amqpConnection);
+        $amqpChannel->method('isConnected')->willReturn(true);
+        $amqpConnection->expects($this->exactly(2))->method($connectMethod);
+        $amqpConnection->method('isPersistent')->willReturn('pconnect' === $connectMethod);
+        $amqpConnection->expects('disconnect' === $disconnectMethod ? $this->once() : $this->never())->method('disconnect');
+        $amqpConnection->expects('pdisconnect' === $disconnectMethod ? $this->once() : $this->never())->method('pdisconnect');
+
+        $connection = Connection::fromDsn($dsn, [], $factory);
+        $connection->close();
+        $consume ? $connection->consume(['messages'], 1) : $connection->publish('body');
+        $connection->close();
+        $connection->channel();
     }
 
     public function testClearResetsInFlightMessagesCounter()

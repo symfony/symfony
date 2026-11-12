@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -122,11 +123,7 @@ class AmqpExtIntegrationTest extends TestCase
         // an empty queue returns once the read timeout expires
         $this->assertSame([], iterator_to_array($receiver->get(2)));
 
-        // registering a consumer makes the channel and the queue reference each other, so the
-        // connection has to be closed explicitly or the consumer keeps taking the messages the
-        // next tests send
-        $connection->channel()->getConnection()->disconnect();
-        $connection->clear();
+        $connection->close();
     }
 
     public function testItSendsABatchOfMessagesAndWaitsForTheirConfirmsOnce()
@@ -542,6 +539,99 @@ class AmqpExtIntegrationTest extends TestCase
         $transport->send(new Envelope(new DummyMessage('Second')));
         $this->assertEquals(new DummyMessage('First'), iterator_to_array($transport->get())[0]->getMessage());
         $this->assertEquals(new DummyMessage('Second'), iterator_to_array($transport->get())[0]->getMessage());
+    }
+
+    #[TestWith([['prefetch_count' => 3]])]
+    #[TestWith([['prefetch_count' => 3, 'persistent' => 'true']])]
+    #[TestWith([[]])]
+    #[TestWith([['persistent' => 'true']])]
+    public function testClosingTheTransportReleasesTheMessagesItDidNotHandle(array $options)
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), $options);
+        $connection->setup();
+        $connection->purgeQueues();
+        $transport = new AmqpTransport($connection, $this->createSerializer());
+        $transport->send(new Envelope(new DummyMessage('First')));
+        $transport->send(new Envelope(new DummyMessage('Second')));
+        $transport->send(new Envelope(new DummyMessage('Third')));
+
+        $transport->ack(iterator_to_array($transport->get())[0]);
+        $transport->close();
+
+        $this->assertSame(2, $transport->getMessageCount());
+
+        $transport->send(new Envelope(new DummyMessage('Fourth')));
+        $receiver = new AmqpReceiver(Connection::fromDsn(getenv('MESSENGER_AMQP_DSN')), $this->createSerializer());
+        $this->assertEquals(
+            [new DummyMessage('Second'), new DummyMessage('Third'), new DummyMessage('Fourth')],
+            array_map(static fn (Envelope $envelope) => $envelope->getMessage(), iterator_to_array($receiver->get(10), false)),
+        );
+
+        $transport->send(new Envelope(new DummyMessage('Fifth')));
+        $envelopes = iterator_to_array($transport->get());
+        $this->assertEquals(new DummyMessage('Fifth'), $envelopes[0]->getMessage());
+        $transport->ack($envelopes[0]);
+        $transport->close();
+    }
+
+    #[TestWith([['persistent' => 'true']])]
+    #[TestWith([['persistent' => 'true', 'prefetch_count' => 3]])]
+    public function testClosingAPersistentTransportThatDidNotConsumeKeepsItsConnection(array $options)
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), $options);
+        $connection->setup();
+        $connection->purgeQueues();
+
+        $exclusiveQueue = new \AMQPQueue($connection->channel());
+        $exclusiveQueue->setFlags(\AMQP_EXCLUSIVE);
+        $exclusiveQueue->declareQueue();
+        $exclusiveQueueName = $exclusiveQueue->getName();
+        unset($exclusiveQueue);
+        $connection->close();
+
+        for ($i = 0; $i < 3; ++$i) {
+            $transport = new AmqpTransport(Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), $options), $this->createSerializer());
+            $transport->send(new Envelope(new DummyMessage('Hello')));
+            $transport->close();
+        }
+
+        $this->assertNotNull($connection->get($connection->getQueueNames()[0]));
+        $connection->close();
+
+        $exclusiveQueue = new \AMQPQueue($connection->channel());
+        $exclusiveQueue->setName($exclusiveQueueName);
+        $exclusiveQueue->setFlags(\AMQP_PASSIVE);
+        $exclusiveQueue->declareQueue();
+        $exclusiveQueue->delete();
+
+        $this->assertSame(3, $connection->countMessagesInQueues());
+    }
+
+    #[TestWith([[]])]
+    #[TestWith([['persistent' => 'true']])]
+    public function testClosingATransportWhoseConnectionWasDroppedByTheBroker(array $options)
+    {
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), ['prefetch_count' => 3] + $options);
+        $connection->setup();
+        $connection->purgeQueues();
+        $transport = new AmqpTransport($connection, $this->createSerializer());
+        $transport->send(new Envelope(new DummyMessage('First')));
+        $transport->send(new Envelope(new DummyMessage('Second')));
+        iterator_to_array($transport->get());
+
+        // RabbitMQ does not implement the "immediate" flag: it closes the connection when this asynchronous publish arrives
+        $connection->exchange()->publish('', null, \AMQP_IMMEDIATE);
+
+        $observer = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
+        for ($i = 0; 2 !== $observer->countMessagesInQueues() && $i < 100; ++$i) {
+            usleep(10000);
+        }
+        $this->assertSame(2, $observer->countMessagesInQueues());
+        $this->assertTrue($connection->channel()->isConnected());
+
+        $transport->close();
+
+        $this->assertSame(2, $transport->getMessageCount());
     }
 
     public function testAFailedMessageReachesAFailureTransportOnTheDefaultExchange()

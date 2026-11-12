@@ -49,6 +49,7 @@ use Symfony\Component\JsonSchema\Tests\Fixtures\FailingPropertySchemaProvider;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FallbackClassSchemaResolver;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FixedPropertySchemaProvider;
 use Symfony\Component\JsonSchema\Tests\Fixtures\FixedSchemaPropertySchemaEnricher;
+use Symfony\Component\JsonSchema\Tests\Fixtures\GroupedPathArticle;
 use Symfony\Component\JsonSchema\Tests\Fixtures\GroupedProduct;
 use Symfony\Component\JsonSchema\Tests\Fixtures\IdentifierDefinitionProcessor;
 use Symfony\Component\JsonSchema\Tests\Fixtures\Inventory;
@@ -85,6 +86,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
@@ -1148,6 +1150,29 @@ class SchemaGeneratorTest extends TestCase
             ],
             'required' => ['title'],
         ], $definition['properties']['meta']);
+    }
+
+    public function testDisallowingExtraAttributesClosesTheObjectsOfASerializedPath()
+    {
+        $definition = SchemaGenerator::create()->generate(Type::object(PublishedArticle::class), new Configuration(allowExtraAttributes: false))->getDefinitions()['PublishedArticle-closed'];
+
+        $this->assertFalse($definition['additionalProperties']);
+        $this->assertFalse($definition['properties']['meta']['additionalProperties'] ?? null);
+        $this->assertFalse($definition['properties']['meta']['properties']['author']['additionalProperties'] ?? null);
+    }
+
+    public function testSerializedPathLimitedToGroupsFollowsTheConfiguredGroups()
+    {
+        if (!property_exists(SerializedPath::class, 'groups')) {
+            $this->markTestSkipped('Serialized paths limited to some groups need symfony/serializer 8.2 or higher.');
+        }
+
+        $generator = SchemaGenerator::create();
+        $read = $generator->generate(Type::object(GroupedPathArticle::class), new Configuration(groups: ['article:read']))->getDefinitions()['GroupedPathArticle-article.read'];
+        $list = $generator->generate(Type::object(GroupedPathArticle::class), new Configuration(groups: ['article:list']))->getDefinitions()['GroupedPathArticle-article.list'];
+
+        $this->assertSameSchema(['type' => 'object', 'properties' => ['title' => ['type' => 'string', 'default' => '']]], $read['properties']['meta'] ?? []);
+        $this->assertSame(['title'], array_keys($list['properties']));
     }
 
     public function testEmptyArrayDefaultsFollowTheType()

@@ -581,8 +581,8 @@ final class SchemaGenerator implements SchemaGeneratorInterface
                 $propertySchema = $enricher->enrich($propertySchema, $config, $document);
             }
 
-            $path = $this->getSerializedPath($class, $property) ?? [$this->getSerializedName($property, $class, $config)];
-            self::setPropertySchema($definition, $path, self::wrapReferenceSiblings($propertySchema->schema, $config->dialect), $propertySchema->required);
+            $path = $this->getSerializedPath($class, $property, $config) ?? [$this->getSerializedName($property, $class, $config)];
+            self::setPropertySchema($definition, $path, self::wrapReferenceSiblings($propertySchema->schema, $config->dialect), $propertySchema->required, $config->allowExtraAttributes);
         }
 
         $typeProperties = [];
@@ -629,13 +629,13 @@ final class SchemaGenerator implements SchemaGeneratorInterface
      *
      * @return list<string>|null
      */
-    private function getSerializedPath(string $class, string $property): ?array
+    private function getSerializedPath(string $class, string $property, Configuration $config): ?array
     {
         if (null === $this->classMetadataFactory || !$this->classMetadataFactory->hasMetadataFor($class)) {
             return null;
         }
 
-        return ($this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata()[$property] ?? null)?->getSerializedPath()?->getElements();
+        return ($this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata()[$property] ?? null)?->getSerializedPath($config->groups)?->getElements();
     }
 
     /**
@@ -686,13 +686,13 @@ final class SchemaGenerator implements SchemaGeneratorInterface
      * @param list<string>         $path
      * @param array<string, mixed> $schema
      */
-    private static function setPropertySchema(array &$object, array $path, array $schema, bool $required): void
+    private static function setPropertySchema(array &$object, array $path, array $schema, bool $required, bool $allowExtraAttributes): void
     {
         $key = array_shift($path);
 
         if ($path) {
-            $object['properties'][$key] ??= ['type' => 'object'];
-            self::setPropertySchema($object['properties'][$key], $path, $schema, $required);
+            $object['properties'][$key] ??= $allowExtraAttributes ? ['type' => 'object'] : ['type' => 'object', 'additionalProperties' => false];
+            self::setPropertySchema($object['properties'][$key], $path, $schema, $required, $allowExtraAttributes);
         } else {
             $object['properties'][$key] = $schema;
         }

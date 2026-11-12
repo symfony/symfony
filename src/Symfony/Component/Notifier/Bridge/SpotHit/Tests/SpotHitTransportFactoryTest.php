@@ -35,6 +35,10 @@ final class SpotHitTransportFactoryTest extends TransportFactoryTestCase
             'spothit://spot-hit.fr?from=MyCompany&smslong=1',
             'spothit://api_token@default?from=MyCompany&smslong=1',
         ];
+        yield [
+            'spothit://spot-hit.fr?from=MyCompany&smslong=0',
+            'spothit://api_token@default?from=MyCompany&smslong=false',
+        ];
     }
 
     public static function supportsProvider(): iterable

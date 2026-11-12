@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\TransportException;
@@ -231,6 +232,27 @@ class RetryableHttpClientTest extends TestCase
         $this->assertArrayHasKey('delay', $logger->context);
         $this->assertNotNull($delay);
         $this->assertSame((int) ($retryAfter * 1000), $delay);
+    }
+
+    #[DataProvider('provideRetryAfterDates')]
+    public function testRetryAfterHttpDate(string $retryAfter, int $delay)
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('', ['http_code' => 503, 'response_headers' => ['Retry-After' => $retryAfter]]),
+            new MockResponse(''),
+        ]);
+        $client = new RetryableHttpClient($mockClient, new GenericRetryStrategy(GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES, 100, 1, 0, 0), 1, $logger = new TestLogger());
+
+        $client->request('GET', 'http://example.com/foo-bar')->getContent();
+
+        $this->assertSame([\sprintf('Try #1 after %dms, status code: 503', $delay)], $logger->logs);
+    }
+
+    public static function provideRetryAfterDates(): iterable
+    {
+        yield 'HTTP-date in the past' => ['Thu, 01 Jan 1970 00:00:00 GMT', 0];
+        yield 'not an HTTP-date' => ['yesterday', 100];
+        yield 'mismatched weekday name' => ['Fri, 01 Jan 1970 00:00:00 GMT', 100];
     }
 
     public function testRetryOnErrorAssertContent()

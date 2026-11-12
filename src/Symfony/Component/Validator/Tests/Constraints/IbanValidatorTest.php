@@ -153,6 +153,8 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['BJ11B00610100400271101192591'], // Benin
             ['BR9700360305000010009795493P1'], // Brazil
             ['BR1800000000141455123924100C2'], // Brazil
+            ['BR6699999A03000010009795493C1'], // Brazil (alphanumeric bank code)
+            ['BR8799999A0300001000979549301'], // Brazil (numeric account type)
             ['VG96VPVG0000012345678901'], // British Virgin Islands
             ['BF42BF0840101300463574000390'], // Burkina Faso
             ['BI4210000100010000332045181'], // Burundi
@@ -385,6 +387,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             ['BJ11B00610100400271101192592'], // Benin
             ['BR9700360305000010009795493P2'], // Brazil
             ['BR1800000000141455123924100C3'], // Brazil
+            ['BR6599999A03000010009795493C1'], // Brazil (alphanumeric bank code)
             ['VG96VPVG0000012345678902'], // British Virgin Islands
             ['BF41BF0840101300463574000390'], // Burkina Faso
             ['BI3210000100010000332045181'], // Burundi

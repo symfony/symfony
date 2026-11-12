@@ -57,6 +57,25 @@ class CurlHttpClientTest extends HttpClientTestCase
         }
     }
 
+    #[TestWith([''])]
+    #[TestWith(['skipped '])]
+    public function testRedirect307SendsTheResourceBodyAgain(string $skipped)
+    {
+        if (!\defined('CURLOPT_SEEKFUNCTION')) {
+            $this->markTestSkipped('CURLOPT_SEEKFUNCTION is not available.');
+        }
+
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $h = fopen('php://temp', 'w+');
+        fwrite($h, $skipped.'foo=0123456789');
+        fseek($h, \strlen($skipped));
+
+        $response = $client->request('POST', 'http://localhost:8057/307', ['body' => $h]);
+
+        $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray());
+    }
+
     public function testTimeoutIsNotAFatalError()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
@@ -321,6 +340,37 @@ class CurlHttpClientTest extends HttpClientTestCase
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('/302', $response->toArray()['REQUEST_URI'] ?? null);
+    }
+
+    public function testRedirect307DoesNotWaitFor100Continue()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('POST', 'http://localhost:8057/307', ['body' => ['foo' => str_repeat('a', 2 << 20)]]);
+
+        $this->assertSame(2 << 20, \strlen($response->toArray()['foo']));
+        $this->assertStringNotContainsStringIgnoringCase('Expect: 100-continue', $response->getInfo('debug'));
+    }
+
+    public function testRedirect307DoesNotSendAChunkedBodyWithAContentLength()
+    {
+        if (!\defined('CURLOPT_SEEKFUNCTION')) {
+            $this->markTestSkipped('CURLOPT_SEEKFUNCTION is not available.');
+        }
+
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $h = fopen('php://temp', 'w+');
+        fwrite($h, 'foo=0123456789');
+        rewind($h);
+
+        $response = $client->request('POST', 'http://localhost:8057/307', [
+            'body' => $h,
+            'headers' => ['Content-Length' => 14],
+        ]);
+
+        $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray());
+        $this->assertStringNotContainsStringIgnoringCase('Transfer-Encoding: chunked', $response->getInfo('debug'));
     }
 
     public function testNtlmRequiresFreshConnectionStateIsEmptyByDefault()

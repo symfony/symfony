@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -96,6 +97,30 @@ class ArrayDenormalizerTest extends TestCase
         $denormalizer->setDenormalizer($nestedDenormalizer);
 
         $this->assertSame(['b' => 'c'], $denormalizer->denormalize(['b' => 'c'], 'string[]', null, ['key_type' => Type::union(Type::int(), Type::template('TKey'))]));
+    }
+
+    #[DataProvider('provideUnionKeyTypesWithMembersThatMatchNoKey')]
+    public function testDenormalizeChecksUnionKeyAgainstItsIntAndStringMembers(Type $keyType)
+    {
+        $nestedDenormalizer = $this->createStub(DenormalizerInterface::class);
+        $nestedDenormalizer->method('denormalize')->willReturnArgument(0);
+
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($nestedDenormalizer);
+
+        $this->assertSame([3 => 'a'], $denormalizer->denormalize([3 => 'a'], 'string[]', null, ['key_type' => $keyType]));
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The type of the key "s" must be "int" ("string" given).');
+
+        $denormalizer->denormalize(['s' => 'a'], 'string[]', null, ['key_type' => $keyType]);
+    }
+
+    public static function provideUnionKeyTypesWithMembersThatMatchNoKey(): iterable
+    {
+        yield '?int' => [Type::nullable(Type::int())];
+        yield 'int|object' => [Type::union(Type::int(), Type::object(\stdClass::class))];
+        yield 'int|bool' => [Type::union(Type::int(), Type::bool())];
     }
 
     public function testDenormalizeRejectsRefinedKeyOfAnotherBuiltinType()

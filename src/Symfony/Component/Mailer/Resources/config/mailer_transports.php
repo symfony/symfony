@@ -33,6 +33,7 @@ use Symfony\Component\Mailer\Bridge\PufferPost\Transport\PufferPostTransportFact
 use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
+use Symfony\Component\Mailer\Bridge\SendPulse\Transport\SendPulseTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sweego\Transport\SweegoTransportFactory;
 use Symfony\Component\Mailer\Bridge\TurboSmtp\Transport\TurboSmtpTransportFactory;
 use Symfony\Component\Mailer\Bridge\ZohoCpaas\Transport\ZohoCpaasTransportFactory;
@@ -78,6 +79,7 @@ return static function (ContainerConfigurator $container) {
         'resend' => ResendTransportFactory::class,
         'scaleway' => ScalewayTransportFactory::class,
         'sendgrid' => SendgridTransportFactory::class,
+        'sendpulse' => SendPulseTransportFactory::class,
         'sendmail' => SendmailTransportFactory::class,
         'smtp' => EsmtpTransportFactory::class,
         'sweego' => SweegoTransportFactory::class,

@@ -36,6 +36,19 @@ class AmpHttpClientTest extends HttpClientTestCase
         parent::testResolve();
     }
 
+    /**
+     * @requires extension zlib
+     */
+    public function testZlibStreamBody()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $body = fopen('compress.zlib://data:application/gzip;base64,'.base64_encode(gzencode('foo=0123456789')), 'r');
+
+        $response = $client->request('POST', 'http://localhost:8057/post', ['body' => $body]);
+
+        $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray());
+    }
+
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
         return new AmpHttpClient(['verify_peer' => false, 'verify_host' => false, 'timeout' => 5]);

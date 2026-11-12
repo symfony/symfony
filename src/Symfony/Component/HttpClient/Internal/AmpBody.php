@@ -42,7 +42,7 @@ class AmpBody implements RequestBody, InputStream
 
         if (\is_resource($body)) {
             $this->offset = ftell($body);
-            $this->length = fstat($body)['size'];
+            $this->length = stream_get_meta_data($body)['seekable'] ? fstat($body)['size'] ?? -1 : -1;
             $this->body = new ResourceInputStream($body);
         } elseif (\is_string($body)) {
             $this->length = \strlen($body);

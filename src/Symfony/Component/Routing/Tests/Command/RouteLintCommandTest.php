@@ -195,6 +195,6 @@ class RouteLintCommandTest extends TestCase
 
     private function getNormalizedDisplay(CommandTester $tester): string
     {
-        return preg_replace('/\s+/', ' ', str_replace(['[ERROR]', '[WARNING]', '[OK]'], '',$tester->getDisplay()));
+        return preg_replace('/\s+/', ' ', str_replace(['[ERROR]', '[WARNING]', '[OK]'], '', $tester->getDisplay()));
     }
 }

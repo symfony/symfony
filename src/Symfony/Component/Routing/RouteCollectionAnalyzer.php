@@ -221,7 +221,7 @@ final class RouteCollectionAnalyzer
 
     private function fill(string $pattern, array $parameters): string
     {
-        return preg_replace_callback('#\{!?([\w\x80-\xFF]+)\}#', static fn ($m) => $parameters[$m[1]] ?? $m[0], $pattern);
+        return (string) preg_replace_callback('#\{!?([\w\x80-\xFF]+)\}#', static fn ($m) => $parameters[$m[1]] ?? $m[0], $pattern);
     }
 
     /**

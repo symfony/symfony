@@ -56,7 +56,7 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
 
         $typeIdentifiers = [];
         if (null !== $keyType = ($context['key_type'] ?? null)) {
-            $typeIdentifiers = self::getKeyTypeIdentifiers($keyType);
+            $typeIdentifiers = self::getKeyTypeIdentifiers($keyType) ?? [];
         }
 
         $valueType = $context['value_type'] ?? null;
@@ -120,9 +120,9 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
     }
 
     /**
-     * @return list<'int'|'string'>
+     * @return list<'int'|'string'>|null The builtin types a key is checked against, null when it cannot be checked
      */
-    private static function getKeyTypeIdentifiers(Type $type): array
+    private static function getKeyTypeIdentifiers(Type $type): ?array
     {
         // a template key is checked against its bound, and a refined one, such as "positive-int" or "'en'|'de'", against its builtin type
         while ($type instanceof WrappingTypeInterface && !$type instanceof UnionType) {
@@ -132,9 +132,9 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
         if ($type instanceof UnionType) {
             $typeIdentifiers = [];
             foreach ($type->getTypes() as $t) {
-                // a member that is not checked accepts any key
-                if (!$identifiers = self::getKeyTypeIdentifiers($t)) {
-                    return [];
+                // a member that cannot be checked accepts any key
+                if (null === $identifiers = self::getKeyTypeIdentifiers($t)) {
+                    return null;
                 }
 
                 $typeIdentifiers = [...$typeIdentifiers, ...$identifiers];
@@ -143,8 +143,16 @@ class ArrayDenormalizer implements DenormalizerInterface, DenormalizerAwareInter
             return array_values(array_unique($typeIdentifiers));
         }
 
-        // only int and string keys are checked, any other key type, such as "mixed" for an unbound template, is left as is
-        return $type instanceof BuiltinType && \in_array($type->getTypeIdentifier(), [TypeIdentifier::INT, TypeIdentifier::STRING], true) ? [$type->getTypeIdentifier()->value] : [];
+        if (!$type instanceof BuiltinType) {
+            return [];
+        }
+
+        // only int and string keys are checked; "mixed", such as an unbound template, cannot be, and any other type, such as "null" or an object, matches no key
+        return match ($type->getTypeIdentifier()) {
+            TypeIdentifier::INT, TypeIdentifier::STRING => [$type->getTypeIdentifier()->value],
+            TypeIdentifier::MIXED => null,
+            default => [],
+        };
     }
 
     /**

@@ -15,6 +15,7 @@ use Cache\IntegrationTests\CachePoolTest;
 use PHPUnit\Framework\Assert;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Contracts\Cache\CallbackInterface;
@@ -37,6 +38,25 @@ abstract class AdapterTestCase extends CachePoolTest
             $this->skippedTests['testDeleteItemInvalidKeys'] =
             $this->skippedTests['testDeleteItemsInvalidKeys'] = 'Keys are checked only when assert() is enabled.';
         } catch (\Exception $e) {
+        }
+    }
+
+    public function testInvalidKeyWithoutAssertions()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool();
+        $assertions = '-1' === \ini_get('zend.assertions') ? false : ini_set('zend.assertions', '0');
+
+        try {
+            $this->expectException(InvalidArgumentException::class);
+            $cache->getItem('user@name');
+        } finally {
+            if (false !== $assertions) {
+                ini_set('zend.assertions', $assertions);
+            }
         }
     }
 

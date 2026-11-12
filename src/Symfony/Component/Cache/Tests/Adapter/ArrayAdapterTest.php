@@ -24,6 +24,7 @@ class ArrayAdapterTest extends AdapterTestCase
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testClearWithInvalidPrefix' => 'ArrayAdapter does not validate the prefix.',
+        'testInvalidKeyWithoutAssertions' => 'ArrayAdapter checks keys only when assert() is enabled.',
     ];
 
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface

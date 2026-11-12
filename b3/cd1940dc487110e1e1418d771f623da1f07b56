@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T09:23:05Z
+
+I pushed a change so that the skipped headers match whatever the case of their names. A `BCC` header added by hand was still sent. I also extended the merge-up notes for 8.2.

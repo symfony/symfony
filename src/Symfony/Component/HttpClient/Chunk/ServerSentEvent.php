@@ -35,6 +35,8 @@ final class ServerSentEvent extends DataChunk implements ChunkInterface
             $content = substr($content, 3);
         }
 
+        $data = null;
+
         foreach (preg_split("/(?:\r\n|[\r\n])/", $content) as $line) {
             if (0 === $i = strpos($line, ':')) {
                 continue;
@@ -49,10 +51,10 @@ final class ServerSentEvent extends DataChunk implements ChunkInterface
                     $this->id = substr($line, $i);
                     break;
                 case 'event':
-                    $this->type = substr($line, $i);
+                    $this->type = '' !== ($type = substr($line, $i)) ? $type : 'message';
                     break;
                 case 'data':
-                    $this->data .= ('' === $this->data ? '' : "\n").substr($line, $i);
+                    $data = (null === $data ? '' : $data."\n").substr($line, $i);
                     break;
                 case 'retry':
                     $retry = substr($line, $i);
@@ -64,6 +66,8 @@ final class ServerSentEvent extends DataChunk implements ChunkInterface
                     break;
             }
         }
+
+        $this->data = $data ?? '';
     }
 
     public function getId(): string

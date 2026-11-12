@@ -78,6 +78,31 @@ class ServerSentEventTest extends TestCase
         $this->assertSame("<tag>\n\n  <foo />\n\n\n</tag>", $sse->getData());
     }
 
+    public function testParseEmptyEventType()
+    {
+        $rawData = <<<STR
+            event:
+            data: test
+
+            STR;
+
+        $sse = new ServerSentEvent($rawData);
+        $this->assertSame('message', $sse->getType());
+        $this->assertSame('test', $sse->getData());
+    }
+
+    public function testParseEmptyFirstDataLine()
+    {
+        $rawData = <<<STR
+            data:
+            data: test
+
+            STR;
+
+        $sse = new ServerSentEvent($rawData);
+        $this->assertSame("\ntest", $sse->getData());
+    }
+
     public function testGetArrayData()
     {
         $this->assertSame(['foo' => 'bar'], (new ServerSentEvent(<<<STR

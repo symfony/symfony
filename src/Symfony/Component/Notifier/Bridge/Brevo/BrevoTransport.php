@@ -55,7 +55,7 @@ final class BrevoTransport extends AbstractTransport
 
         $sender = $message->getFrom() ?: $this->sender;
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v3/transactionalSMS/sms', [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v3/transactionalSMS/send', [
             'json' => [
                 'sender' => $sender,
                 'recipient' => $message->getPhone(),

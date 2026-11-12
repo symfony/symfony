@@ -98,6 +98,31 @@ class FrankenPhpWorkerRunnerTest extends TestCase
         $this->assertFalse(self::$handlingRequest);
     }
 
+    public function testEachRequestReportsItsOwnMemoryPeak()
+    {
+        $peaks = [];
+        $application = $this->createMock(TestAppInterface::class);
+        $application->expects($this->exactly(2))->method('handle')->willReturnCallback(static function () use (&$peaks): Response {
+            if (!$peaks) {
+                $allocation = str_repeat('x', 10 * 1024 * 1024);
+                unset($allocation);
+            }
+            $peaks[] = memory_get_peak_usage();
+
+            return new Response();
+        });
+        self::$requests = 2;
+        $server = $_SERVER;
+
+        try {
+            (new FrankenPhpWorkerRunner($application, 2))->run();
+        } finally {
+            $_SERVER = $server;
+        }
+
+        $this->assertLessThan($peaks[0] - 5 * 1024 * 1024, $peaks[1]);
+    }
+
     #[DataProvider('provideTerminationFailures')]
     public function testTerminationFailureIsRethrownAfterTheRequestCompletesAndStopsTheWorker(\Throwable $failure, int $requests, int $loopMax)
     {

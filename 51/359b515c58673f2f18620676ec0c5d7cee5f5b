@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-12T10:10:58Z
+
+Thanks @isihussain. I pushed an update. The collector now uses the check from #68099 instead of reading the private initializer of `TokenStorage`. Functional tests in `RememberMeTest` replace the wiring test, which would have failed on 7.4.

@@ -1523,6 +1523,26 @@ class CachingHttpClientTest extends TestCase
         $this->assertSame('foobar', $collected);
     }
 
+    public function testItCanStreamNoStoreResponseWithOtherResponses()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('foo', ['http_code' => 200]),
+            new MockResponse('bar', ['http_code' => 200]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $noStoreResponse = $client->request('GET', 'http://example.com/foo', ['headers' => ['Cache-Control' => 'no-store']]);
+        $asyncResponse = $client->request('GET', 'http://example.com/bar');
+
+        $collected = '';
+        foreach ($client->stream([$noStoreResponse, $asyncResponse]) as $chunk) {
+            $collected .= $chunk->getContent();
+        }
+
+        $this->assertSame('foobar', $collected);
+    }
+
     public function testMultipleChunksResponse()
     {
         $mockClient = new MockHttpClient([

@@ -257,4 +257,24 @@ class StubCasterTest extends TestCase
 
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
+
+    public function testLinkStubWithNonHttpUrl()
+    {
+        $var = [new LinkStub('javascript:alert(1)//://')];
+
+        $cloner = new VarCloner();
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $dump = $dumper->dump($cloner->cloneVar($var), true);
+
+        $expectedDump = <<<'EODUMP'
+<foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp data-depth=1 class=sf-dump-expanded>
+  <span class=sf-dump-index>0</span> => "<span class=sf-dump-str title="24 characters">javascript:alert(1)//://</span>"
+</samp>]
+</bar>
+EODUMP;
+
+        $this->assertStringMatchesFormat($expectedDump, $dump);
+    }
 }

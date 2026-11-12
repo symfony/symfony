@@ -122,6 +122,53 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertSame('_', $crawler->filter('.metrics .metric .value')->eq(0)->text());
     }
 
+    #[DataProvider('provideRefererLinks')]
+    public function testPanelActionLinksToHttpRefererOnly(string $referer, bool $isLinked)
+    {
+        $kernel = new WebProfilerBundleKernel();
+        $client = new KernelBrowser($kernel);
+
+        $client->request('POST', '/', [], [], ['HTTP_REFERER' => $referer]);
+        $crawler = $client->request('GET', '/_profiler/latest');
+
+        $this->assertCount($isLinked ? 1 : 0, $crawler->filter('a.referer'));
+    }
+
+    public static function provideRefererLinks(): iterable
+    {
+        yield ['http://localhost/form', true];
+        yield ['HTTPS://localhost/form', true];
+        yield ['javascript:alert(1)', false];
+        yield [' javascript:alert(1)', false];
+    }
+
+    #[DataProvider('provideRedirectLocations')]
+    public function testToolbarRedirectLinksToHttpLocationOnly(string $location, bool $isLinked)
+    {
+        $kernel = new WebProfilerBundleKernel(true);
+        $client = new KernelBrowser($kernel);
+
+        $crawler = $client->request('GET', '/redirect', ['location' => $location]);
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+
+        $links = $crawler->filter('.block-exception a');
+        if ($isLinked) {
+            $this->assertCount(1, $links);
+        }
+        foreach ($links as $link) {
+            $this->assertSame(1, preg_match('{^(https?://|/)}i', $link->getAttribute('href')));
+        }
+    }
+
+    public static function provideRedirectLocations(): iterable
+    {
+        yield ['http://localhost/target', true];
+        yield ['/target', true];
+        yield ['javascript:alert(1)', false];
+        yield ['javascript://%0aalert(1)', false];
+    }
+
     public function testToolbarActionWithProfilerDisabled()
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);

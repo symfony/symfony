@@ -450,10 +450,11 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
             if ($redirectHeaders && isset($location['authority'])) {
                 // Authorization and Cookie headers MUST NOT follow except for the initial scheme and authority
-                $requestHeaders = $url['scheme'] === $redirectHeaders['scheme'] && $location['authority'] === $redirectHeaders['authority'] ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
-                curl_setopt($ch, \CURLOPT_HTTPHEADER, $requestHeaders);
+                $redirectHeaders['current'] = $url['scheme'] === $redirectHeaders['scheme'] && $location['authority'] === $redirectHeaders['authority'] ? 'with_auth' : 'no_auth';
+                curl_setopt($ch, \CURLOPT_HTTPHEADER, $redirectHeaders[$redirectHeaders['current']]);
             } elseif ($noContent && $redirectHeaders) {
-                curl_setopt($ch, \CURLOPT_HTTPHEADER, $redirectHeaders['with_auth']);
+                // A relative redirect stays on the origin of the previous request
+                curl_setopt($ch, \CURLOPT_HTTPHEADER, $redirectHeaders[$redirectHeaders['current'] ?? 'with_auth']);
             }
 
             $proxy = self::getProxyUrl($options['proxy'], $url);

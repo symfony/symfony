@@ -51,13 +51,16 @@ final class TraceableFirewallListener extends FirewallListener implements ResetI
     protected function callListeners(RequestEvent $event, iterable $listeners): void
     {
         $requestListeners = [];
+        $contexts = [];
         foreach ($listeners as $listener) {
             if ($listener instanceof LazyFirewallContext) {
+                $contextListeners = [];
                 $contextWrappedListeners = [];
                 $contextAuthenticatorManagerListener = null;
 
-                \Closure::bind(function () use (&$contextWrappedListeners, &$contextAuthenticatorManagerListener) {
+                \Closure::bind(function () use (&$contextListeners, &$contextWrappedListeners, &$contextAuthenticatorManagerListener) {
                     foreach ($this->listeners as $listener) {
+                        $contextListeners[] = $listener;
                         if ($listener instanceof TraceableAuthenticatorManagerListener) {
                             $contextAuthenticatorManagerListener ??= $listener;
                         }
@@ -72,6 +75,7 @@ final class TraceableFirewallListener extends FirewallListener implements ResetI
                 $this->authenticatorManagerListener ??= $contextAuthenticatorManagerListener;
                 $this->wrappedListeners = array_merge($this->wrappedListeners, $contextWrappedListeners);
 
+                $contexts[] = [$listener, $contextListeners];
                 $requestListeners[] = $listener;
             } else {
                 if ($listener instanceof TraceableAuthenticatorManagerListener) {
@@ -87,15 +91,25 @@ final class TraceableFirewallListener extends FirewallListener implements ResetI
             }
         }
 
-        foreach ($requestListeners as $listener) {
-            if (!$listener instanceof FirewallListenerInterface) {
-                $listener($event);
-            } elseif (false !== $listener->supports($event->getRequest())) {
-                $listener->authenticate($event);
-            }
+        try {
+            foreach ($requestListeners as $listener) {
+                if (!$listener instanceof FirewallListenerInterface) {
+                    $listener($event);
+                } elseif (false !== $listener->supports($event->getRequest())) {
+                    $listener->authenticate($event);
+                }
 
-            if ($event->hasResponse()) {
-                break;
+                if ($event->hasResponse()) {
+                    break;
+                }
+            }
+        } finally {
+            // The contexts outlive the request: put their listeners back so that the next request does not wrap the wrapped ones.
+            // Listeners that run lazily keep their wrapper, the contexts captured them when they were called.
+            foreach ($contexts as [$context, $contextListeners]) {
+                \Closure::bind(function () use ($contextListeners) {
+                    $this->listeners = $contextListeners;
+                }, $context, FirewallContext::class)();
             }
         }
     }

@@ -294,7 +294,8 @@ class GraphvizDumper implements DumperInterface
             return $value ? '1' : '0';
         }
 
-        return htmlspecialchars($value, \ENT_XML1 | \ENT_QUOTES, 'UTF-8');
+        // Graphviz interprets escape sequences like \N in HTML labels too
+        return str_replace('\\', '\\\\', htmlspecialchars($value, \ENT_XML1 | \ENT_QUOTES, 'UTF-8'));
     }
 
     /**

@@ -95,7 +95,7 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Batch
 
     public function close(): void
     {
-        $this->connection->clear();
+        $this->connection->close();
     }
 
     private function getReceiver(): AmqpReceiver

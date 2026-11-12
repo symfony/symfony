@@ -872,6 +872,22 @@ class Connection
         }
     }
 
+    public function close(): void
+    {
+        if (isset($this->amqpChannel)) {
+            $amqpConnection = $this->amqpChannel->getConnection();
+
+            // clearing returns a persistent connection to the pool, unless it consumed: its channel and queues then reference each other, and it buffers prefetched messages that its next consumer would get
+            if (!$amqpConnection->isPersistent()) {
+                $amqpConnection->disconnect();
+            } elseif ($this->consumers) {
+                $amqpConnection->pdisconnect();
+            }
+        }
+
+        $this->clear();
+    }
+
     public function clear(): void
     {
         unset($this->amqpChannel, $this->amqpExchange, $this->amqpDelayExchange);

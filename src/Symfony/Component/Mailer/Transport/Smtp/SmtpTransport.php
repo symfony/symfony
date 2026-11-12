@@ -192,7 +192,7 @@ class SmtpTransport extends AbstractTransport
 
         trigger_deprecation('symfony/mailer', '8.3', 'Overriding "%s::parseMessageId()" is deprecated, override "parseTransportMessageId()" instead.', static::class);
 
-        return $this->parseMessageId($mtaResult);
+        return $this->parseMessageId($mtaResult); // @phpstan-ignore method.deprecated
     }
 
     public function __toString(): string

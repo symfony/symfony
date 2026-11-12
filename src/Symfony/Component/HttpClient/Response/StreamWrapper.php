@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Response;
 
+use Symfony\Component\HttpClient\Internal\HttpDateTrait;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -22,6 +23,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class StreamWrapper
 {
+    use HttpDateTrait;
+
     /** @var resource|null */
     public $context;
 
@@ -299,7 +302,7 @@ class StreamWrapper
             'rdev' => 0,
             'size' => (int) ($headers['content-length'][0] ?? -1),
             'atime' => 0,
-            'mtime' => strtotime($headers['last-modified'][0] ?? '') ?: 0,
+            'mtime' => self::parseHttpDate($headers['last-modified'][0] ?? '') ?? 0,
             'ctime' => 0,
             'blksize' => 0,
             'blocks' => 0,

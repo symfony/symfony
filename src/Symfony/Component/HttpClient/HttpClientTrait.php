@@ -13,8 +13,8 @@ namespace Symfony\Component\HttpClient;
 
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\ArrayBodyCaster;
 use Symfony\Component\HttpClient\Internal\Dechunker;
-use Symfony\Component\HttpClient\Response\StreamableInterface;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Component\Mime\MimeTypes;
 
@@ -178,6 +178,16 @@ trait HttpClientTrait
             // Validate and resolve URL
             $url = self::parseUrl($url, $options['query']);
             $url = self::resolveUrl($url, $baseUri, $defaultOptions['query'] ?? []);
+
+            // Send the user info of the URL as an Authorization header, so that it never ends up in reported URLs
+            if (false !== $i = strrpos($url['authority'], '@')) {
+                if (!isset($options['normalized_headers']['authorization']) && !isset($options['auth_ntlm'])) {
+                    $userinfo = explode(':', substr($url['authority'], 2, $i - 2), 2);
+                    $options['normalized_headers']['authorization'] = ['Authorization: Basic '.base64_encode(rawurldecode($userinfo[0]).':'.rawurldecode($userinfo[1] ?? ''))];
+                }
+
+                $url['authority'] = '//'.substr($url['authority'], 1 + $i);
+            }
         }
 
         // Finalize normalization of options
@@ -341,24 +351,13 @@ trait HttpClientTrait
             static $cookie;
 
             $streams = [];
-            array_walk_recursive($body, $caster = static function (&$v) use (&$caster, &$streams, &$cookie) {
-                if (\is_resource($v) || $v instanceof StreamableInterface) {
-                    $cookie = hash('xxh128', $cookie ??= random_bytes(8), true);
-                    $k = substr(strtr(base64_encode($cookie), '+/', '-_'), 0, -2);
-                    $streams[$k] = $v instanceof StreamableInterface ? $v->toStream(false) : $v;
-                    $v = $k;
-                } elseif (\is_object($v)) {
-                    if ($vars = get_object_vars($v)) {
-                        array_walk_recursive($vars, $caster);
-                        $v = $vars;
-                    } elseif ($v instanceof \Stringable) {
-                        $v = (string) $v;
-                    } else {
-                        $v = [];
-                    }
-                }
+            $body = ArrayBodyCaster::cast($body, static function ($stream) use (&$streams, &$cookie) {
+                $cookie = hash('xxh128', $cookie ??= random_bytes(8), true);
+                $k = substr(strtr(base64_encode($cookie), '+/', '-_'), 0, -2);
+                $streams[$k] = $stream;
+
+                return $k;
             });
-            $caster = null;
 
             if ('' === $body = http_build_query($body, '', '&')) {
                 return '';

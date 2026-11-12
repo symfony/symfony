@@ -255,6 +255,7 @@ class ConnectionTest extends TestCase
             'read_timeout=abc' => 'Option "read_timeout" of the AMQP Messenger transport must be a number.',
             'confirm_timeout=1s' => 'Option "confirm_timeout" of the AMQP Messenger transport must be a number.',
             'auto_setup=nope' => 'Option "auto_setup" of the AMQP Messenger transport must be a boolean.',
+            'persistent=nope' => 'Option "persistent" of the AMQP Messenger transport must be a boolean.',
             'delay[daily_delay_queues]=nope' => 'Option "delay.daily_delay_queues" of the AMQP Messenger transport must be a boolean.',
         ];
 
@@ -330,6 +331,50 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('amqp://localhost?persistent=true', [], $factory);
         $connection->publish('body');
+    }
+
+    public function testItReadsThePersistentOptionAsABoolean()
+    {
+        $amqpConnection = $this->createStub(\AMQPConnection::class);
+        foreach (['connect', 'pconnect', 'disconnect', 'pdisconnect'] as $method) {
+            $amqpConnection->method($method)->willReturnCallback(static function () use (&$calls, $method) {
+                $calls[] = $method;
+            });
+        }
+        $amqpChannel = $this->createStub(\AMQPChannel::class);
+        $amqpChannel->method('getConnection')->willReturn($amqpConnection);
+        $factory = new TestAmqpFactory($amqpConnection, $amqpChannel, $this->createStub(\AMQPQueue::class), $this->createStub(\AMQPExchange::class));
+
+        $getCalls = static function (Connection $connection) use (&$calls): array {
+            $calls = [];
+            $connection->channel();
+            (new \ReflectionProperty($connection, 'lastActivityTime'))->setValue($connection, time() - 3);
+            $connection->channel();
+
+            return $calls;
+        };
+
+        $cases = [
+            'persistent=true' => true,
+            'persistent=yes' => true,
+            'persistent=on' => true,
+            'persistent=1' => true,
+            'persistent=false' => false,
+            'persistent=no' => false,
+            'persistent=off' => false,
+            'persistent=0' => false,
+            'persistent=' => false,
+        ];
+
+        foreach ($cases as $query => $persistent) {
+            $expected = $persistent ? ['pconnect', 'pdisconnect'] : ['connect', 'disconnect'];
+            $this->assertSame($expected, $getCalls(Connection::fromDsn('amqp://localhost?heartbeat=1&'.$query, [], $factory)), $query);
+        }
+
+        $this->assertSame(['pconnect', 'pdisconnect'], $getCalls(Connection::fromDsn('amqp://localhost?heartbeat=1', ['persistent' => true], $factory)));
+        $this->assertSame(['connect', 'disconnect'], $getCalls(Connection::fromDsn('amqp://localhost?heartbeat=1', ['persistent' => false], $factory)));
+        $this->assertSame(['connect', 'disconnect'], $getCalls(Connection::fromDsn('amqp://localhost?heartbeat=1', ['persistent' => null], $factory)));
+        $this->assertSame(['connect', 'disconnect'], $getCalls(new Connection(['heartbeat' => 1, 'persistent' => 'false'], [], [], $factory)));
     }
 
     public function testItSetupsTheConnectionWithDefaults()

@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DnsMock;
+use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -225,6 +226,27 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         ]);
 
         $this->assertSame('/', $response->toArray()['REQUEST_URI']);
+    }
+
+    public function testRedirectSendsTheStreamBodyAgain()
+    {
+        TestHttpServer::start();
+
+        $clients = ['native' => new NativeHttpClient()];
+        if (\extension_loaded('curl')) {
+            $clients['curl'] = new CurlHttpClient();
+        }
+
+        foreach ($clients as $type => $client) {
+            $body = fopen('php://temp', 'r+');
+            fwrite($body, 'skipped foo=0123456789');
+            fseek($body, 8);
+
+            $client = new NoPrivateNetworkHttpClient($client, '10.0.0.0/8');
+            $response = $client->request('POST', 'http://localhost:8057/307', ['body' => $body]);
+
+            $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray(), $type);
+        }
     }
 
     public function testHeadersArePassedOnRedirect()

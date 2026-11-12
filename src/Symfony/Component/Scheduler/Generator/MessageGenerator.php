@@ -24,6 +24,8 @@ final class MessageGenerator implements MessageGeneratorInterface
     private ?Schedule $schedule = null;
     private TriggerHeap $triggerHeap;
     private bool $heapInitialized = false;
+    /** @var array<string, \DateTimeImmutable|null> */
+    private array $addedAt = [];
     private ?\DateTimeImmutable $waitUntil;
 
     public function __construct(
@@ -59,7 +61,7 @@ final class MessageGenerator implements MessageGeneratorInterface
         // the checkpoint has the timezone of the last run, and triggers without one use the timezone of the date they get
         $lastTime = $checkpoint->time()->setTimezone($now->getTimezone());
         $lastIndex = $checkpoint->index();
-        $heap = $this->heap($lastTime, $startTime, $lastIndex);
+        $heap = $this->heap($lastTime, $startTime, $lastIndex, $now);
         $lock = $this->getSchedule()->getLock();
 
         while (!$heap->isEmpty() && $heap->top()[0] <= $now) {
@@ -122,7 +124,7 @@ final class MessageGenerator implements MessageGeneratorInterface
         return $this->schedule ??= $this->scheduleProvider->getSchedule();
     }
 
-    private function heap(\DateTimeImmutable $time, \DateTimeImmutable $startTime, int $lastIndex): TriggerHeap
+    private function heap(\DateTimeImmutable $time, \DateTimeImmutable $startTime, int $lastIndex, \DateTimeImmutable $now): TriggerHeap
     {
         if (isset($this->triggerHeap) && $this->triggerHeap->time <= $time) {
             return $this->triggerHeap;
@@ -139,21 +141,29 @@ final class MessageGenerator implements MessageGeneratorInterface
         // yield-then-advance cycle (not after a partial yield), so re-probing $time
         // would re-emit entries that are already advanced past.
         $probeTime = !$this->heapInitialized && $lastIndex >= 0 ? $time->setTimezone(new \DateTimeZone('UTC'))->modify('-1 microsecond')->setTimezone($time->getTimezone()) : $time;
+        $rebuilt = $this->heapInitialized;
         $this->heapInitialized = true;
+        $addedAt = [];
 
         foreach ($this->getSchedule()->getRecurringMessages() as $index => $recurringMessage) {
             $trigger = $recurringMessage->getTrigger();
+            $id = $recurringMessage->getId();
 
             if ($trigger instanceof StatefulTriggerInterface) {
                 $trigger->continue($startTime);
             }
 
-            if (!$nextTime = $trigger->getNextRunDate($probeTime)) {
+            // a message added to a running schedule starts from the time it was added, its earlier runs were never due
+            $added = $addedAt[$id] = $rebuilt ? (\array_key_exists($id, $this->addedAt) ? $this->addedAt[$id] : $now) : null;
+
+            if (!$nextTime = $trigger->getNextRunDate($added && $added > $probeTime ? $added : $probeTime)) {
                 continue;
             }
 
             $heap->insert([$nextTime, $index, $recurringMessage]);
         }
+
+        $this->addedAt = $addedAt;
 
         return $this->triggerHeap = $heap;
     }

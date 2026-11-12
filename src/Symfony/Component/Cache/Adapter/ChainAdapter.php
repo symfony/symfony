@@ -39,6 +39,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
     private int $adapterCount;
 
     private static \Closure $syncItem;
+    private static \Closure $setExpiryMetadata;
 
     /**
      * @param CacheItemPoolInterface[] $adapters        The ordered list of adapters used to fetch cached items
@@ -85,6 +86,22 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
                 }
 
                 return $item;
+            },
+            null,
+            CacheItem::class
+        );
+        self::$setExpiryMetadata ??= \Closure::bind(
+            static function (CacheItemInterface $item) {
+                if (!$item instanceof CacheItem) {
+                    return;
+                }
+
+                if ($item->expiry) {
+                    // keep the expiry so that it can be restored when the item is propagated to previous adapters
+                    $item->newMetadata[CacheItem::METADATA_EXPIRY] = $item->expiry;
+                } else {
+                    unset($item->newMetadata[CacheItem::METADATA_EXPIRY]);
+                }
             },
             null,
             CacheItem::class
@@ -236,6 +253,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
 
     public function save(CacheItemInterface $item): bool
     {
+        (self::$setExpiryMetadata)($item);
         $saved = true;
         $i = $this->adapterCount;
 
@@ -248,6 +266,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
 
     public function saveDeferred(CacheItemInterface $item): bool
     {
+        (self::$setExpiryMetadata)($item);
         $saved = true;
         $i = $this->adapterCount;
 

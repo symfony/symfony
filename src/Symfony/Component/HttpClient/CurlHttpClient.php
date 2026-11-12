@@ -246,7 +246,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
 
             if (\is_resource($body)) {
-                $curlopts[\CURLOPT_READDATA] = $body;
+                // Not CURLOPT_READDATA: curl would then read streams such as php://temp through a FILE* that PHP creates once and that ignores later rewinds
+                $curlopts[\CURLOPT_READFUNCTION] = static fn ($ch, $fd, $length) => false !== ($data = fread($body, $length)) ? $data : '';
             } else {
                 $curlopts[\CURLOPT_READFUNCTION] = static function ($ch, $fd, $length) use ($body) {
                     static $eof = false;

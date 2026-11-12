@@ -45,7 +45,7 @@ class AmpBodyV5 implements HttpContent, ReadableStream, \IteratorAggregate
 
         if (\is_resource($body)) {
             $this->offset = ftell($body);
-            $this->length = fstat($body)['size'];
+            $this->length = stream_get_meta_data($body)['seekable'] ? fstat($body)['size'] ?? -1 : -1;
             $this->body = new ReadableResourceStream($body);
         } elseif (\is_string($body)) {
             $this->length = \strlen($body);

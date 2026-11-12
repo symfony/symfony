@@ -1,0 +1,8 @@
+imports:
+    - { resource: early_expiration_tagged_chain.yml }
+
+framework:
+    cache:
+        pools:
+            cache.early_expiration:
+                tags: false

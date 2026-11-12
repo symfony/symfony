@@ -1,0 +1,10 @@
+imports:
+    - { resource: early_expiration_tagged.yml }
+
+framework:
+    cache:
+        pools:
+            cache.early_expiration:
+                adapters:
+                    - cache.adapter.array
+                    - cache.adapter.filesystem

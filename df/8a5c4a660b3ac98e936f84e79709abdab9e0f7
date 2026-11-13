@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-13T13:09:25Z
+
+Thanks for the PR. I rebased it on 7.4. Apps that use POST for GraphQL subscriptions get reconnected today, so this shouldn't change in a 6.4 patch release.
+
+I also added a test for the reconnection after an idle timeout, which sent the POST again too. And I removed the `strtoupper()` call, since the client already rejects lowercase methods.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-13T13:39:55Z
+
+Thank you @skybleak333.

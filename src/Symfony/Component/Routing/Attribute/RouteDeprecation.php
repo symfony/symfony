@@ -43,8 +43,8 @@ final class RouteDeprecation
             throw new InvalidArgumentException('The "sunset" date of a route deprecation cannot be earlier than its "since" date.');
         }
 
-        if (null !== $link && ('' === $link || preg_match('/[\x00-\x20\x7F<>]/', $link))) {
-            throw new InvalidArgumentException(\sprintf('The "link" of a route deprecation must be a URI without whitespace, control characters, "<" or ">", "%s" given.', $link));
+        if (null !== $link && ('' === $link || preg_match('/[<>"\r\n]/', $link))) {
+            throw new InvalidArgumentException(\sprintf('The "link" of a route deprecation must be a non-empty URI without "<", ">", double quotes or line breaks, "%s" given.', $link));
         }
     }
 

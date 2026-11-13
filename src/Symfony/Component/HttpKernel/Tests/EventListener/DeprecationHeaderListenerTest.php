@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -103,13 +105,42 @@ class DeprecationHeaderListenerTest extends TestCase
         $this->handle(['since' => 'not a date']);
     }
 
-    private function handle(mixed $deprecation, Response $response = new Response()): Response
+    #[DataProvider('provideInvalidLinks')]
+    public function testSkipsAnInvalidLink(mixed $link)
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
+            ->method('warning')
+            ->with($this->stringContains('was not sent'), ['route' => 'orders_v1', 'link' => $link]);
+
+        $response = $this->handle(['since' => '2026-01-01', 'link' => $link], logger: $logger);
+
+        $this->assertSame('@1767225600', $response->headers->get('Deprecation'));
+        $this->assertFalse($response->headers->has('Link'));
+    }
+
+    public static function provideInvalidLinks(): iterable
+    {
+        yield 'not a string' => [['https://example.com']];
+        yield 'empty' => [''];
+        yield 'breaking the header' => ['https://example.com>; rel="next"'];
+        yield 'line break' => ["https://example.com\r\nX-Foo: bar"];
+    }
+
+    public function testSkipsAnInvalidLinkWithoutLogger()
+    {
+        $response = $this->handle(['since' => '2026-01-01', 'link' => "https://example.com\r\nX-Foo: bar"]);
+
+        $this->assertFalse($response->headers->has('Link'));
+    }
+
+    private function handle(mixed $deprecation, Response $response = new Response(), ?LoggerInterface $logger = null): Response
     {
         $request = new Request();
         $request->attributes->set('_route', 'orders_v1');
         $request->attributes->set('_deprecation', $deprecation);
 
-        new DeprecationHeaderListener()->onKernelResponse(new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response));
+        new DeprecationHeaderListener($logger)->onKernelResponse(new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response));
 
         return $response;
     }

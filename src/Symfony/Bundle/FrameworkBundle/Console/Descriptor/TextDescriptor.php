@@ -62,12 +62,12 @@ class TextDescriptor extends Descriptor
     {
         $showAliases = $options['show_aliases'] ?? false;
         $showControllers = $options['show_controllers'] ?? false;
+        $showDeprecations = $options['show_deprecations'] ?? false;
         $rawOutput = isset($options['raw_text']) && $options['raw_text'];
 
         $tableRows = [];
         $shouldShowScheme = false;
         $shouldShowHost = false;
-        $shouldShowDeprecation = false;
         foreach ($routes->all() as $name => $route) {
             $controller = $route->getDefault('_controller');
 
@@ -85,12 +85,12 @@ class TextDescriptor extends Descriptor
                 'Path' => $route->getPath(),
             ];
 
-            $deprecation = $route->getDefault('_deprecation');
-            if (\is_array($deprecation) && isset($deprecation['since'])) {
-                $shouldShowDeprecation = true;
-                $row['Deprecation'] = 'since '.$deprecation['since'].(isset($deprecation['sunset']) ? ', sunset '.$deprecation['sunset'] : '');
-            } else {
+            if ($showDeprecations) {
+                $deprecation = $route->getDefault('_deprecation');
                 $row['Deprecation'] = '';
+                if (\is_array($deprecation) && isset($deprecation['since'])) {
+                    $row['Deprecation'] = 'since '.$deprecation['since'].(isset($deprecation['sunset']) ? ', sunset '.$deprecation['sunset'] : '');
+                }
             }
 
             if ($showControllers) {
@@ -121,10 +121,8 @@ class TextDescriptor extends Descriptor
 
         $tableHeaders[] = 'Path';
 
-        if ($shouldShowDeprecation) {
+        if ($showDeprecations) {
             $tableHeaders[] = 'Deprecation';
-        } else {
-            array_walk($tableRows, static function (&$row) { unset($row['Deprecation']); });
         }
 
         if ($showControllers) {

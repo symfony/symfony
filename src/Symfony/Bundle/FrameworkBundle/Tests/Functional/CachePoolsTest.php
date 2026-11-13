@@ -13,12 +13,16 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\Error\Warning;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Cache\EarlyExpirationConsumer;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Messenger\EarlyExpirationMessage;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 
 class CachePoolsTest extends AbstractWebTestCase
 {
@@ -62,6 +66,41 @@ class CachePoolsTest extends AbstractWebTestCase
             }
             $this->markTestSkipped($e->getMessage());
         }
+    }
+
+    #[TestWith(['early_expiration_tagged.yml', 'cache.early_expiration'])]
+    #[TestWith(['early_expiration_tagged_chain.yml', 'cache.early_expiration'])]
+    #[TestWith(['early_expiration_taggable.yml', '.cache.early_expiration.taggable'])]
+    #[TestWith(['early_expiration_taggable_chain.yml', '.cache.early_expiration.taggable'])]
+    public function testTagAwareEarlyExpiration(string $config, string $poolId)
+    {
+        static::bootKernel(['root_config' => $config]);
+        $container = static::getContainer();
+        $consumer = $container->get(EarlyExpirationConsumer::class);
+        $pool = $consumer->cacheEarlyExpiration;
+        $computation = $consumer->computation;
+        $transport = $container->get('messenger.transport.async');
+        $this->assertFalse(static::$kernel->getContainer()->has('cache.early_expiration'));
+        $pool->clear();
+
+        $this->assertSame(1, $pool->get('key', $computation));
+        $this->assertSame(1, $pool->get('key', $computation, \INF));
+        $this->assertSame(1, $computation->calls);
+        $this->assertCount(1, $transport->getSent());
+        $envelope = $transport->get()[0];
+        $this->assertInstanceOf(EarlyExpirationMessage::class, $message = $envelope->getMessage());
+        $this->assertSame($poolId, $message->getPool());
+
+        $container->get('cache.bus')->dispatch($envelope->with(new ReceivedStamp('async')));
+
+        $this->assertSame(2, $pool->get('key', $computation, 0));
+        $this->assertSame(2, $computation->calls);
+
+        $pool->invalidateTags(['group']);
+
+        $this->assertFalse($pool->hasItem('key'));
+        $this->assertSame(3, $pool->get('key', $computation, 0));
+        $this->assertSame(3, $computation->calls);
     }
 
     private function doTestCachePools($options, $adapterClass)

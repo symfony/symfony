@@ -1,0 +1,26 @@
+imports:
+    - { resource: default.yml }
+
+framework:
+    cache:
+        pools:
+            cache.early_expiration:
+                adapter: cache.adapter.filesystem
+                tags: true
+                early_expiration_message_bus: cache.bus
+    messenger:
+        buses:
+            cache.bus: ~
+        transports:
+            async:
+                dsn: 'in-memory://?serialize=true'
+        routing:
+            Symfony\Component\Cache\Messenger\EarlyExpirationMessage: async
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Cache\EarlyExpirationComputation:
+        autoconfigure: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Cache\EarlyExpirationConsumer:
+        autowire: true
+        public: true

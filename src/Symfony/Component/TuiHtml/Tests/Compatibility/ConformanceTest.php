@@ -117,7 +117,9 @@ final class ConformanceTest extends TestCase
     {
         $columns = (int) ($options['columns'] ?? 60);
         $rows = (int) ($options['rows'] ?? 80);
-        $builder = new HtmlBuilder(new CssStyleSheet(new FilesystemStylesheetLoader([self::DIR]), null, false));
+        $styleSheet = new CssStyleSheet(new FilesystemStylesheetLoader([self::DIR]), null, false);
+        $styleSheet->setAnimationHandlers(null, static fn (): float => 0.0);
+        $builder = new HtmlBuilder($styleSheet);
         $view = $builder->build($html);
         $terminal = new VirtualTerminal($columns, $rows);
         $tui = new Tui(null, $terminal);

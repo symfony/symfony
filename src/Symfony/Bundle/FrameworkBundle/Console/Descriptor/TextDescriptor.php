@@ -62,6 +62,7 @@ class TextDescriptor extends Descriptor
     {
         $showAliases = $options['show_aliases'] ?? false;
         $showControllers = $options['show_controllers'] ?? false;
+        $showDeprecations = $options['show_deprecations'] ?? false;
         $rawOutput = isset($options['raw_text']) && $options['raw_text'];
 
         $tableRows = [];
@@ -83,6 +84,14 @@ class TextDescriptor extends Descriptor
                 'Host' => $host,
                 'Path' => $route->getPath(),
             ];
+
+            if ($showDeprecations) {
+                $deprecation = $route->getDefault('_deprecation');
+                $row['Deprecation'] = '';
+                if (\is_array($deprecation) && isset($deprecation['since'])) {
+                    $row['Deprecation'] = 'since '.$deprecation['since'].(isset($deprecation['sunset']) ? ', sunset '.$deprecation['sunset'] : '');
+                }
+            }
 
             if ($showControllers) {
                 $controllerText = $controller ? $this->formatCallable($controller) : '';
@@ -111,6 +120,10 @@ class TextDescriptor extends Descriptor
         }
 
         $tableHeaders[] = 'Path';
+
+        if ($showDeprecations) {
+            $tableHeaders[] = 'Deprecation';
+        }
 
         if ($showControllers) {
             $tableHeaders[] = 'Controller';

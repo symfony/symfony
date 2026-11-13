@@ -2,6 +2,7 @@ blog_show:
     path:         /blog/{slug}
     defaults:     { _controller: "MyBundle:Blog:show", _stateless: true }
     firewall:     api
+    deprecation:  { since: '2026-10-01', sunset: '2027-06-30', link: 'https://example.com/deprecation' }
     host:         "{locale}.example.com"
     requirements: { 'locale': '\w+' }
     methods:      ['GET','POST','put','OpTiOnS']

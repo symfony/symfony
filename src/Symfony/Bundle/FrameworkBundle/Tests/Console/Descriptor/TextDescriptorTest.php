@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\TextDescriptor;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -67,6 +68,34 @@ class TextDescriptorTest extends AbstractDescriptorTestCase
         static::$fileLinkFormatter = new FileLinkFormatter('myeditor://open?file=%f&line=%l');
         $expectedDescription = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/route_collection_1_link_raw.txt');
         $this->assertDescription($expectedDescription, static::getRouteCollectionWithControllers(), ['show_controllers' => true]);
+    }
+
+    public function testDescribeRouteCollectionShowsDeprecations()
+    {
+        $collection = new RouteCollection();
+        $collection->add('orders_v1', new Route('/api/v1/orders', ['_deprecation' => ['since' => '2026-10-01T00:00:00+00:00', 'sunset' => '2027-06-30T00:00:00+00:00']]));
+        $collection->add('orders_v2', new Route('/api/v2/orders'));
+
+        $output = new BufferedOutput();
+        static::getDescriptor()->describe($output, $collection, ['show_deprecations' => true]);
+        $lines = array_map(static fn (string $line) => trim(preg_replace('/[\s|]+/', ' ', $line)), explode("\n", $output->fetch()));
+
+        $this->assertSame('Name Method Path Deprecation', $lines[1]);
+        $this->assertSame('orders_v1 ANY /api/v1/orders since 2026-10-01T00:00:00+00:00, sunset 2027-06-30T00:00:00+00:00', $lines[3]);
+        $this->assertSame('orders_v2 ANY /api/v2/orders', $lines[4]);
+    }
+
+    public function testDescribeRouteCollectionHidesDeprecationsByDefault()
+    {
+        $collection = new RouteCollection();
+        $collection->add('orders_v1', new Route('/api/v1/orders', ['_deprecation' => ['since' => '2026-10-01T00:00:00+00:00']]));
+
+        $output = new BufferedOutput();
+        static::getDescriptor()->describe($output, $collection);
+        $lines = array_map(static fn (string $line) => trim(preg_replace('/[\s|]+/', ' ', $line)), explode("\n", $output->fetch()));
+
+        $this->assertSame('Name Method Path', $lines[1]);
+        $this->assertSame('orders_v1 ANY /api/v1/orders', $lines[3]);
     }
 
     protected function normalizeOutput(string $output): string

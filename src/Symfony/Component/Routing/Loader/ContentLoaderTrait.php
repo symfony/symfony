@@ -285,10 +285,10 @@ trait ContentLoaderTrait
         if (isset($config['firewall']) && isset($config['defaults']['_firewall'])) {
             throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "firewall" key and the defaults key "_firewall" for "%s".', $path, $name));
         }
-        if (isset($config['deprecation']) && isset($config['defaults']['_deprecation'])) {
-            throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "deprecation" key and the defaults key "_deprecation" for "%s".', $path, $name));
-        }
         if (isset($config['deprecation'])) {
+            if (isset($config['defaults']['_deprecation'])) {
+                throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "deprecation" key and the defaults key "_deprecation" for "%s".', $path, $name));
+            }
             if (!\is_array($config['deprecation'])) {
                 throw new \InvalidArgumentException(\sprintf('The "deprecation" key for "%s" in "%s" must be an array, "%s" given.', $name, $path, get_debug_type($config['deprecation'])));
             }

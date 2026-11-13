@@ -180,7 +180,11 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.reset', ['method' => '?reset'])
 
         ->set('deprecation_header_listener', DeprecationHeaderListener::class)
+            ->args([
+                service('logger')->ignoreOnInvalid(),
+            ])
             ->tag('kernel.event_subscriber')
+            ->tag('monolog.logger', ['channel' => 'request'])
 
         ->set('controller.is_signature_valid_attribute_listener', IsSignatureValidAttributeListener::class)
             ->args([

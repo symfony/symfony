@@ -59,7 +59,7 @@ CHANGELOG
  * Close the lazy Redis connection of the session handler created from `framework.session.handler_id` when the kernel shuts down
  * Add the `debug:autoconfiguration` command to list the classes, interfaces and attributes used for autoconfiguration
  * Register `DeprecationHeaderListener` to handle the `_deprecation` route default
- * Show the deprecation of routes in the `debug:router` list
+ * Add the `--show-deprecations` option to the `debug:router` command
 
 8.1
 ---

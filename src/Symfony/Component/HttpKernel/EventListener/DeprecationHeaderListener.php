@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -26,6 +27,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class DeprecationHeaderListener implements EventSubscriberInterface
 {
+    public function __construct(
+        private ?LoggerInterface $logger = null,
+    ) {
+    }
+
     public function onKernelResponse(ResponseEvent $event): void
     {
         $request = $event->getRequest();
@@ -48,11 +54,16 @@ class DeprecationHeaderListener implements EventSubscriberInterface
 
         if (isset($deprecation['sunset']) && !$headers->has('Sunset')) {
             $sunset = self::toDate('sunset', $deprecation['sunset'], $route);
-            $headers->set('Sunset', $sunset->setTimezone(new \DateTimeZone('UTC'))->format('D, d M Y H:i:s').' GMT');
+            $headers->set('Sunset', $sunset->setTimezone(new \DateTimeZone('GMT'))->format('D, d M Y H:i:s T'));
         }
 
         if (isset($deprecation['link'])) {
-            $headers->set('Link', \sprintf('<%s>; rel="deprecation"', $deprecation['link']), false);
+            $link = $deprecation['link'];
+            if (\is_string($link) && '' !== $link && !preg_match('/[<>"\r\n]/', $link)) {
+                $headers->set('Link', \sprintf('<%s>; rel="deprecation"', $link), false);
+            } else {
+                $this->logger?->warning('The "Link" header of the deprecation of route "{route}" was not sent: the link must be a non-empty URI without "<", ">", double quotes or line breaks.', ['route' => $route, 'link' => $link]);
+            }
         }
     }
 

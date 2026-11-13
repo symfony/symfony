@@ -35,7 +35,7 @@ use Symfony\Component\Tui\Widget\DropdownWidget;
  *
  *     <!-- covers: css.properties.color css.types.color.rgb -->
  *     <!-- variant: dark-40 columns=40 scheme=dark -->
- *     <!-- requires: IntlChar -->
+ *     <!-- requires: GdImage IntlChar -->
  *
  * and is rendered in the regular and condensed densities, plus each variant, unless a class it requires is missing
  * (options: columns, rows, scheme, density, contrast, forced-colors,
@@ -51,11 +51,20 @@ final class ConformanceTest extends TestCase
     public function testFixture(string $fixture, string $variant, array $options)
     {
         $html = file_get_contents(self::DIR.'/'.$fixture.'.html');
-        // A fixture drawn otherwise without a class, like the visual order of bidirectional text without IntlChar
-        if (preg_match('/<!--\s*requires:\s*(\S+)\s*-->/', $html, $requires) && !class_exists($requires[1])) {
-            $this->markTestSkipped(\sprintf('The %s class is needed.', $requires[1]));
+        // The expected output needs every class the fixture names, like GD for images and IntlChar for visual RTL.
+        preg_match_all('/<!--\s*requires:\s*(.*?)\s*-->/', $html, $requirements);
+        foreach ($requirements[1] as $classes) {
+            foreach (preg_split('/\s+/', trim($classes), -1, \PREG_SPLIT_NO_EMPTY) ?: [] as $class) {
+                if (!class_exists($class)) {
+                    $this->markTestSkipped(\sprintf('The %s class is needed.', $class));
+                }
+            }
         }
         $snapshot = self::DIR.'/'.$fixture.'.'.$variant.'.txt';
+        // Bundled and external GD rasterize some shape edges differently: each reference stays exact.
+        if (\defined('GD_BUNDLED') && \GD_BUNDLED && file_exists($bundled = self::DIR.'/'.$fixture.'.'.$variant.'.bundled-gd.txt')) {
+            $snapshot = $bundled;
+        }
         $actual = $this->render($html, $options);
 
         if (getenv('TUI_UPDATE_COMPAT')) {

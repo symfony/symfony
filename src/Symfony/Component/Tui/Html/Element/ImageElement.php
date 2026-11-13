@@ -214,7 +214,7 @@ final class ImageElement implements ElementFactoryInterface
         }
 
         $areas = [];
-        foreach ($map->getElementsByTagName('area') as $index => $area) {
+        foreach (iterator_to_array($map->getElementsByTagName('area'), false) as $index => $area) {
             $href = trim($area->getAttribute('href') ?? '');
             if ('' === $href) {
                 continue;

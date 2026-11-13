@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\VarExporter\ProxyHelper;
 
 /**
@@ -43,6 +45,8 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
         $parameterBag = $container->getParameterBag();
         $controllers = [];
         $controllerClasses = [];
+        $propertyInfoClasses = [];
+        $propertyInfoWarmer = $container->hasDefinition('property_info.cache_warmer') ? $container->getDefinition('property_info.cache_warmer') : null;
 
         $publicAliases = [];
         foreach ($container->getAliases() as $id => $alias) {
@@ -124,6 +128,22 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 $args = [];
                 $erroredIds = 0;
                 foreach ($parameters as $p) {
+                    if ($propertyInfoWarmer) {
+                        $payloadAttributes = $p->getAttributes(MapRequestPayload::class, \ReflectionAttribute::IS_INSTANCEOF);
+                        if ($payloadAttributes || $p->getAttributes(MapQueryString::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+                            if (($mappedClass = ProxyHelper::exportType($p, true)) && class_exists($mappedClass)) {
+                                $propertyInfoClasses[$mappedClass] = true;
+                            }
+
+                            foreach ($payloadAttributes as $attribute) {
+                                $arguments = $attribute->getArguments();
+                                if (($mappedClass = $arguments['type'] ?? $arguments[5] ?? null) && \is_string($mappedClass) && class_exists($mappedClass)) {
+                                    $propertyInfoClasses[$mappedClass] = true;
+                                }
+                            }
+                        }
+                    }
+
                     /** @var \ReflectionParameter $p */
                     $type = preg_replace('/(^|[(|&])\\\\/', '\1', $target = ltrim(ProxyHelper::exportType($p) ?? '', '?'));
                     $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
@@ -240,6 +260,12 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
         if ($container->hasDefinition('serialize_controller_result_listener.cache_warmer')) {
             $container->getDefinition('serialize_controller_result_listener.cache_warmer')
                 ->replaceArgument(0, array_values(array_unique($controllerClasses)));
+        }
+
+        if ($propertyInfoWarmer && $propertyInfoClasses) {
+            $classes = array_unique(array_merge($propertyInfoWarmer->getArgument(1), array_keys($propertyInfoClasses)));
+            sort($classes);
+            $propertyInfoWarmer->replaceArgument(1, $classes);
         }
     }
 }

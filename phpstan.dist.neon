@@ -43,7 +43,9 @@ parameters:
         # out on the interface so implementers are not forced to add it
         -
             message: '#^Method Symfony\\Component\\Serializer\\Mapping\\AttributeMetadataInterface\:\:(get|set)Serialized(Name|Path)\(\) invoked with [12] parameters?, [01] required\.$#'
-            path: src/Symfony/Component/Serializer/*.php
+            paths:
+                - src/Symfony/Component/JsonSchema/SchemaGenerator.php
+                - src/Symfony/Component/Serializer/*.php
         # the $fetchSize argument is a commented-out argument of ReceiverInterface::get(), documented
         # with @param on implementations so DebugClassLoader does not report them
         -

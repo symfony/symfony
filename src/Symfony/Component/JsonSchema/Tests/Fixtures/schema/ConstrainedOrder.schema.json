@@ -18,6 +18,36 @@
                     "default": [],
                     "minItems": 1
                 },
+                "notesByLine": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "default": {},
+                    "minProperties": 1
+                },
+                "quantitiesBySize": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    },
+                    "default": {},
+                    "minProperties": 1,
+                    "maxProperties": 3
+                },
+                "sizesByLine": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string",
+                        "enum": [
+                            "small",
+                            "large"
+                        ]
+                    },
+                    "default": {},
+                    "minProperties": 1,
+                    "maxProperties": 2
+                },
                 "quantity": {
                     "type": "integer",
                     "default": 5,
@@ -45,7 +75,8 @@
             },
             "required": [
                 "reference",
-                "lines"
+                "lines",
+                "notesByLine"
             ]
         }
     }

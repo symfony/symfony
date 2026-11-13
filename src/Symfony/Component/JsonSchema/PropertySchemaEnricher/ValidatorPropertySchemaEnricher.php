@@ -139,14 +139,16 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
      */
     private function apply(Constraint $constraint, array $schema, Dialect $dialect, ?Type $type): array
     {
+        [$values, $minCount, $maxCount] = \in_array('object', (array) ($schema['type'] ?? []), true) ? ['additionalProperties', 'minProperties', 'maxProperties'] : ['items', 'minItems', 'maxItems'];
+
         return match (true) {
             $constraint instanceof NotBlank => match (true) {
                 (bool) $type?->isIdentifiedBy(TypeIdentifier::STRING) => [...$schema, 'minLength' => max(1, $schema['minLength'] ?? 1)],
-                (bool) $type?->isIdentifiedBy(TypeIdentifier::ARRAY, TypeIdentifier::ITERABLE) => [...$schema, 'minItems' => max(1, $schema['minItems'] ?? 1)],
+                (bool) $type?->isIdentifiedBy(TypeIdentifier::ARRAY, TypeIdentifier::ITERABLE) => [...$schema, $minCount => max(1, $schema[$minCount] ?? 1)],
                 default => $schema,
             },
             $constraint instanceof Length => [...$schema, ...array_filter(['minLength' => $constraint->min, 'maxLength' => $constraint->max], self::isSet(...))],
-            $constraint instanceof Count => [...$schema, ...array_filter(['minItems' => $constraint->min, 'maxItems' => $constraint->max], self::isSet(...))],
+            $constraint instanceof Count => [...$schema, ...array_filter([$minCount => $constraint->min, $maxCount => $constraint->max], self::isSet(...))],
             $constraint instanceof Range => [...$schema, ...array_filter(['minimum' => $constraint->min, 'maximum' => $constraint->max], self::isNumber(...))],
             $constraint instanceof GreaterThan => self::isNumber($constraint->value) && null === $constraint->propertyPath ? [...$schema, ...$dialect->exclusiveMinimum($constraint->value)] : $schema,
             $constraint instanceof GreaterThanOrEqual => self::isNumber($constraint->value) && null === $constraint->propertyPath ? [...$schema, 'minimum' => $constraint->value] : $schema,
@@ -154,7 +156,7 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
             $constraint instanceof LessThanOrEqual => self::isNumber($constraint->value) && null === $constraint->propertyPath ? [...$schema, 'maximum' => $constraint->value] : $schema,
             $constraint instanceof DivisibleBy => self::isNumber($constraint->value) && 0 != $constraint->value && null === $constraint->propertyPath ? [...$schema, 'multipleOf' => abs($constraint->value)] : $schema,
             $constraint instanceof Regex => $constraint->match && null !== ($pattern = $constraint->getHtmlPattern()) ? [...$schema, 'pattern' => '^('.$pattern.')$'] : $schema,
-            $constraint instanceof Choice => $this->applyChoice($constraint, $schema),
+            $constraint instanceof Choice => $this->applyChoice($constraint, $schema, $values, $minCount, $maxCount),
             $constraint instanceof Unique => [...$schema, 'uniqueItems' => true],
             $constraint instanceof Email => [...$schema, 'format' => 'email'],
             $constraint instanceof Url => [...$schema, 'format' => 'uri'],
@@ -182,7 +184,7 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
      *
      * @return array<string, mixed>
      */
-    private function applyChoice(Choice $constraint, array $schema): array
+    private function applyChoice(Choice $constraint, array $schema, string $values, string $minCount, string $maxCount): array
     {
         if (!\is_array($constraint->choices) || !$constraint->match) {
             return $schema;
@@ -196,12 +198,12 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
 
         return [
             ...$schema,
-            'items' => match ($items = $schema['items'] ?? true) {
+            $values => match ($items = $schema[$values] ?? true) {
                 true => ['enum' => $choices],
                 false => false,
                 default => [...$items, 'enum' => $choices],
             },
-            ...array_filter(['minItems' => $constraint->min, 'maxItems' => $constraint->max], self::isSet(...)),
+            ...array_filter([$minCount => $constraint->min, $maxCount => $constraint->max], self::isSet(...)),
         ];
     }
 

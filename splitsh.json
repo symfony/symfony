@@ -62,6 +62,7 @@
         "brevo-mailer": "src/Symfony/Component/Mailer/Bridge/Brevo",
         "cloudflare-mailer": "src/Symfony/Component/Mailer/Bridge/Cloudflare",
         "google-mailer": "src/Symfony/Component/Mailer/Bridge/Google",
+        "groundmail-mailer": "src/Symfony/Component/Mailer/Bridge/Groundmail",
         "infobip-mailer": "src/Symfony/Component/Mailer/Bridge/Infobip",
         "mail-kite-mailer": "src/Symfony/Component/Mailer/Bridge/MailKite",
         "mail-pace-mailer": "src/Symfony/Component/Mailer/Bridge/MailPace",

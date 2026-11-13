@@ -40,6 +40,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Google\Transport\GmailTransportFactory::class,
             'package' => 'symfony/google-mailer',
         ],
+        'groundmail' => [
+            'class' => Bridge\Groundmail\Transport\GroundmailTransportFactory::class,
+            'package' => 'symfony/groundmail-mailer',
+        ],
         'infobip' => [
             'class' => Bridge\Infobip\Transport\InfobipTransportFactory::class,
             'package' => 'symfony/infobip-mailer',

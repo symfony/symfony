@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-11-12T20:56:00Z
+
+Rebased onto fresh 7.4. The disabled-profiler path now wraps the callback too, while keeping call collection disabled. Explicitly tagged pools and the autowired tag-aware wrappers now dispatch through their outer `TagAwareAdapter`, retaining the storage dispatcher for raw-storage aliases. Regression coverage uses private pools and callbacks and checks dispatch, worker refresh and tag invalidation.
+
+---------------------------------------------------------------------------
+
+by X-Coder264 at 2026-11-12T21:40:43Z
+
+@nicolas-grekas `TagAwareAdapter` computes through its own callback wrapper without calling the inner pool’s `get()`, bypassing the storage dispatcher. This affects both `tags: true` and the implicit wrapper used for `TagAwareCacheInterface` autowiring. The facade needs its own dispatcher, and private facades also need the reversible tag. The storage dispatcher remains necessary for raw-storage aliases.
+
+We could centralize this in `CachePoolPass` using the existing `cache.taggable` metadata, removing the duplicated dispatcher definition. FrameworkBundle’s low-deps CI job can install an older Cache version whose compiler pass lacks the fix, so moving only the wiring while leaving the current FrameworkBundle functional tests unchanged would fail that job.
+
+There are three options:
+
+1. Keep the facade wiring in `FrameworkExtension`. This duplicates the dispatcher definition but fixes this case even with older Cache versions.
+2. Move it into `CachePoolPass` and require patched Cache releases. The FrameworkBundle tests could remain unchanged, but this would exclude older currently allowed Cache versions.
+3. Move both the wiring and the regression coverage into Cache, without a dependency bump. This would avoid that low-deps failure: Cache’s tests would verify its patched compiler pass, and FrameworkBundle’s tests would no longer require the fix from older Cache versions. Those older combinations would retain the existing behavior of recomputing during the request instead of dispatching to a worker.
+
+Which approach would you prefer?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-13T13:38:55Z
+
+Thanks for the update. Let's keep option 1. On 7.4, FrameworkBundle is where the tag-aware facades are defined, and a bug fix shouldn't require a newer Cache component. On 8.2, this code moves to CacheBundle anyway, next to CachePoolPass.

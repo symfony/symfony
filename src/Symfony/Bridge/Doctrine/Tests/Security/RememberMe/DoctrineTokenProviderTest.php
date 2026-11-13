@@ -118,6 +118,79 @@ class DoctrineTokenProviderTest extends TestCase
         $this->assertFalse($provider->verifyToken($token, $oldValue));
     }
 
+    public function testOutdatedTokenCannotBeUsedWithTheSeriesOfItsCopy()
+    {
+        $provider = $this->bootstrapProvider();
+        $series = base64_encode(random_bytes(64));
+
+        $token = new PersistentToken('someClass', 'someUser', $series, 'oldValue', new \DateTime('2013-01-26T18:23:51'));
+        $provider->createNewToken($token);
+        $provider->updateExistingToken($token, 'newValue', new \DateTime('-5 seconds'));
+        $provider->updateToken($series, 'newValue', new \DateTime('-5 seconds'));
+
+        $copy = $provider->loadTokenBySeries(preg_replace('{=+$}', '_', $series));
+
+        $this->assertFalse($provider->verifyToken($copy, 'oldValue'));
+    }
+
+    public function testDeleteTokenAlsoDeletesTheCopyOfTheOutdatedToken()
+    {
+        $provider = $this->bootstrapProvider();
+        $series = base64_encode(random_bytes(64));
+
+        $token = new PersistentToken('someClass', 'someUser', $series, 'oldValue', new \DateTime('2013-01-26T18:23:51'));
+        $provider->createNewToken($token);
+        $provider->updateExistingToken($token, 'newValue', new \DateTime('-5 seconds'));
+        $provider->updateToken($series, 'newValue', new \DateTime('-5 seconds'));
+        $provider->deleteTokenBySeries($series);
+
+        $this->expectException(TokenNotFoundException::class);
+
+        $provider->loadTokenBySeries(preg_replace('{=+$}', '_', $series));
+    }
+
+    /**
+     * @dataProvider provideSeriesGeneratedByTheHandler
+     */
+    public function testVerifyTokenAcceptsTheSeriesGeneratedByTheHandler(string $series)
+    {
+        $provider = $this->bootstrapProvider();
+        $provider->createNewToken(new PersistentToken('someClass', 'someUser', $series, 'tokenValue', new \DateTime()));
+
+        $this->assertTrue($provider->verifyToken($provider->loadTokenBySeries($series), 'tokenValue'));
+    }
+
+    public static function provideSeriesGeneratedByTheHandler(): iterable
+    {
+        yield 'current format' => [strtr(base64_encode(random_bytes(33)), '+/=', '-_~')];
+        yield 'format before Symfony 5.4.19' => [base64_encode(random_bytes(64))];
+    }
+
+    /**
+     * @dataProvider provideSeriesNotGeneratedByTheHandler
+     */
+    public function testVerifyTokenRefusesTheSeriesNotGeneratedByTheHandler(string $series)
+    {
+        $provider = $this->bootstrapProvider();
+        // Stands for the row of a copy that the collation of the series column could match
+        $provider->createNewToken(new PersistentToken('someClass', 'someUser', $series, 'tokenValue', new \DateTime()));
+
+        $this->assertFalse($provider->verifyToken($provider->loadTokenBySeries($series), 'tokenValue'));
+    }
+
+    public static function provideSeriesNotGeneratedByTheHandler(): iterable
+    {
+        $series = strtr(base64_encode(random_bytes(33)), '+/=', '-_~');
+        yield 'copy followed by a space' => [$series.'_ '];
+        yield 'copy with an accented letter' => ['é'.substr($series, 1).'_'];
+        yield 'copy of a copy' => [$series.'__'];
+        yield 'series followed by a newline' => [$series."\n"];
+
+        $series = preg_replace('{=+$}', '_', base64_encode(random_bytes(64)));
+        yield 'copy of a series created before Symfony 5.4.19, followed by a space' => [$series.' '];
+        yield 'copy of a series created before Symfony 5.4.19, with an accented letter' => ['é'.substr($series, 1)];
+    }
+
     /**
      * @return DoctrineTokenProvider
      */

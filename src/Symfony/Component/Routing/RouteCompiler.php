@@ -34,8 +34,10 @@ class RouteCompiler implements RouteCompilerInterface
      */
     public const VARIABLE_MAXIMUM_LENGTH = 32;
 
+    private const FIREWALL_ATTRIBUTES = ['_firewall', '_firewall_context'];
+
     /**
-     * @throws \InvalidArgumentException if a path variable is named _fragment or _firewall, or a host variable is named _firewall
+     * @throws \InvalidArgumentException if a path variable is named _fragment, or if a host or path variable is named or mapped to _firewall or _firewall_context
      * @throws \LogicException           if a variable is referenced more than once
      * @throws \DomainException          if a variable name starts with a digit or if it is too long to be successfully used as
      *                                   a PCRE subpattern
@@ -54,9 +56,12 @@ class RouteCompiler implements RouteCompilerInterface
             $variables = $hostVariables;
 
             foreach ($hostVariables as $hostParam) {
-                // "_firewall" selects the firewall handling the route; as a host parameter it would let the Host header choose it
-                if ('_firewall' === $hostParam) {
+                // "_firewall" and "_firewall_context" select the firewall handling the route; as host parameters they would let the Host header choose it
+                if (\in_array($hostParam, self::FIREWALL_ATTRIBUTES, true)) {
                     throw new \InvalidArgumentException(\sprintf('Route host "%s" cannot contain "%s" as a host parameter.', $host, $hostParam));
+                }
+                if (null !== $attribute = self::getMappedFirewallAttribute($route, $hostParam)) {
+                    throw new \InvalidArgumentException(\sprintf('Route host "%s" cannot map the "%s" host parameter to "%s".', $host, $hostParam, $attribute));
                 }
             }
 
@@ -81,9 +86,12 @@ class RouteCompiler implements RouteCompilerInterface
         $pathVariables = $result['variables'];
 
         foreach ($pathVariables as $pathParam) {
-            // "_firewall" selects the firewall handling the route; as a path parameter it would let the URL choose it
-            if ('_fragment' === $pathParam || '_firewall' === $pathParam) {
+            // "_firewall" and "_firewall_context" select the firewall handling the route; as path parameters they would let the URL choose it
+            if ('_fragment' === $pathParam || \in_array($pathParam, self::FIREWALL_ATTRIBUTES, true)) {
                 throw new \InvalidArgumentException(\sprintf('Route pattern "%s" cannot contain "%s" as a path parameter.', $route->getPath(), $pathParam));
+            }
+            if (null !== $attribute = self::getMappedFirewallAttribute($route, $pathParam)) {
+                throw new \InvalidArgumentException(\sprintf('Route pattern "%s" cannot map the "%s" path parameter to "%s".', $route->getPath(), $pathParam, $attribute));
             }
         }
 
@@ -102,6 +110,20 @@ class RouteCompiler implements RouteCompilerInterface
             $hostVariables,
             array_unique($variables)
         );
+    }
+
+    private static function getMappedFirewallAttribute(Route $route, string $parameter): ?string
+    {
+        foreach ([$route->getDefault('_route_mapping'), $route->getOption('mapping')] as $mapping) {
+            $attribute = $mapping[$parameter] ?? null;
+            $attribute = \is_array($attribute) ? $attribute[0] ?? null : $attribute;
+
+            if (\in_array($attribute, self::FIREWALL_ATTRIBUTES, true)) {
+                return $attribute;
+            }
+        }
+
+        return null;
     }
 
     private static function compilePattern(Route $route, string $pattern, bool $isHost): array

@@ -1571,9 +1571,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * for this argument allows filtering which attributes should be passed to the callable.
      *
      * @template T
+     * @template R of \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter
      *
-     * @param class-string<T>                                $attributeClass
-     * @param callable(ChildDefinition, T, \Reflector): void $configurator
+     * @param class-string<T>                       $attributeClass
+     * @param callable(ChildDefinition, T, R): void $configurator
      */
     public function registerAttributeForAutoconfiguration(string $attributeClass, callable $configurator): void
     {

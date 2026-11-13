@@ -11,7 +11,7 @@ CHANGELOG
  * Log the access tokens rejected by `OidcTokenHandler` at the `debug` level instead of `error`
  * Make `FormLoginAuthenticator` a `ReAuthenticationEntryPointInterface`, sending the user back to the login form with their identifier filled in
  * Add `AuthenticationUtils::getReAuthenticationAttribute()` and `SecurityRequestAttributes::RE_AUTHENTICATION_ATTRIBUTE`, the security attribute the current request is asking a re-authentication for
- * Add `SenderConstraintInterface`, `DpopSenderConstraint` and the `$senderConstraint` argument of `AccessTokenAuthenticator`, to accept only the access tokens bound to a key the request proves it holds (RFC 9449)
+ * Add `SenderConstraintInterface`, `DpopSenderConstraint` and the `$senderConstraint` argument of `AccessTokenAuthenticator`, to accept only the access tokens bound to a key the request proves it holds (RFC 9449); without it, `AccessTokenAuthenticator` refuses DPoP-bound tokens
  * Add `DpopProofFactory`, to bind the tokens of an OIDC provider to a key the client holds (RFC 9449)
  * Add `OidcBackChannelLogout`, `OidcLogoutToken`, `OidcEndedSessions`, `OidcBackChannelLogoutListener` and `OidcSessionEndedException` to support OpenID Connect Back-Channel Logout
  * Add `CheckRefreshedUserEvent`, dispatched when a user restored from the session has been reloaded from its user provider, and `RefreshedUserCheckerListener`, which runs a user checker on it so an account disabled during a session is rejected on the next request

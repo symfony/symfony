@@ -1459,7 +1459,7 @@ class FrameworkExtension extends Extension
             $config['handler_id'] ??= 'session.handler.native_file';
 
             if (!\array_key_exists('save_path', $config)) {
-                $config['save_path'] = '%kernel.cache_dir%/sessions';
+                $config['save_path'] = '%kernel.share_dir%/sessions';
             }
             $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);
 

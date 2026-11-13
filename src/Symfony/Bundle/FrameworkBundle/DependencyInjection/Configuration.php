@@ -793,7 +793,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('gc_probability')->end()
                         ->scalarNode('gc_maxlifetime')->end()
                         ->scalarNode('save_path')
-                            ->info('Defaults to "%kernel.cache_dir%/sessions" if the "handler_id" option is not null.')
+                            ->info('Defaults to "%kernel.share_dir%/sessions" if the "handler_id" option is not null.')
                         ->end()
                         ->integerNode('metadata_update_threshold')
                             ->defaultValue(0)

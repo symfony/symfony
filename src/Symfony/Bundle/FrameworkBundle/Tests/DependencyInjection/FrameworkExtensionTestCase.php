@@ -877,6 +877,20 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals('/path/to/sessions', $container->getParameter('session.save_path'));
     }
 
+    public function testSessionDefaultSavePathUsesShareDir()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'session' => ['handler_id' => 'session.handler.native_file'],
+            ]);
+        }, ['kernel.cache_dir' => '/cache', 'kernel.share_dir' => '/share']);
+
+        $this->assertSame('/share/sessions', $container->getParameter('session.save_path'));
+    }
+
     public function testNullSessionHandler()
     {
         $container = $this->createContainerFromFile('session');

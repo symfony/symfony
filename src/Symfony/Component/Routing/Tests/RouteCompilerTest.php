@@ -278,24 +278,61 @@ class RouteCompilerTest extends TestCase
         $route->compile();
     }
 
-    public function testRouteWithFirewallAsPathParameter()
+    #[DataProvider('provideFirewallAttributes')]
+    public function testRouteWithFirewallAsPathParameter(string $attribute)
     {
-        $route = new Route('/{_firewall}');
+        $route = new Route('/{'.$attribute.'}');
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('cannot contain "_firewall" as a path parameter');
+        $this->expectExceptionMessage(\sprintf('cannot contain "%s" as a path parameter', $attribute));
 
         $route->compile();
     }
 
-    public function testRouteWithFirewallAsHostParameter()
+    #[DataProvider('provideFirewallAttributes')]
+    public function testRouteWithFirewallAsHostParameter(string $attribute)
     {
-        $route = new Route('/admin', [], [], [], '{_firewall}.example.com');
+        $route = new Route('/admin', [], [], [], '{'.$attribute.'}.example.com');
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('cannot contain "_firewall" as a host parameter');
+        $this->expectExceptionMessage(\sprintf('cannot contain "%s" as a host parameter', $attribute));
 
         $route->compile();
+    }
+
+    public static function provideFirewallAttributes(): iterable
+    {
+        yield ['_firewall'];
+        yield ['_firewall_context'];
+    }
+
+    #[DataProvider('provideFirewallMappings')]
+    public function testRouteMappingParameterToFirewall(string $path, string $host, array $defaults, array $options, string $message)
+    {
+        $route = new Route($path, $defaults, [], $options, $host);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($message);
+
+        $route->compile();
+    }
+
+    public static function provideFirewallMappings(): iterable
+    {
+        yield 'inline' => ['/switch/{name:_firewall}', '', [], [], 'cannot map the "name" path parameter to "_firewall"'];
+        yield 'inline with property' => ['/switch/{name:_firewall.id}', '', [], [], 'cannot map the "name" path parameter to "_firewall"'];
+        yield 'inline context' => ['/switch/{name:_firewall_context}', '', [], [], 'cannot map the "name" path parameter to "_firewall_context"'];
+        yield 'inline in host' => ['/admin', '{name:_firewall}.example.com', [], [], 'cannot map the "name" host parameter to "_firewall"'];
+        yield 'default' => ['/switch/{name}', '', ['_route_mapping' => ['name' => '_firewall_context']], [], 'cannot map the "name" path parameter to "_firewall_context"'];
+        yield 'option' => ['/switch/{name}', '', [], ['mapping' => ['name' => '_firewall']], 'cannot map the "name" path parameter to "_firewall"'];
+        yield 'option with property' => ['/switch/{name}', '{sub}.example.com', [], ['mapping' => ['sub' => ['_firewall_context', 'id']]], 'cannot map the "sub" host parameter to "_firewall_context"'];
+    }
+
+    public function testRouteMappingParameterNextToFirewallDefault()
+    {
+        $route = new Route('/switch/{name:user}', ['_firewall' => 'main'], [], ['mapping' => ['name' => 'user']]);
+
+        $this->assertSame(['name'], $route->compile()->getVariables());
     }
 
     #[DataProvider('getVariableNamesStartingWithADigit')]

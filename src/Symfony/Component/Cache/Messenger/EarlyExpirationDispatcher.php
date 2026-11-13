@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Messenger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Internal\ChainAdapterCallback;
 use Symfony\Component\DependencyInjection\ReverseContainer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
@@ -39,8 +40,8 @@ class EarlyExpirationDispatcher
     public function __invoke(callable $callback, CacheItem $item, bool &$save, AdapterInterface $pool, \Closure $setMetadata, ?LoggerInterface $logger = null, ?float $beta = null): mixed
     {
         if (!$item->isHit() || null === $message = EarlyExpirationMessage::create($this->reverseContainer, $callback, $item, $pool)) {
-            // The item is stale or the callback cannot be reversed: we must compute the value now
-            $logger?->info('Computing item "{key}" online: '.($item->isHit() ? 'callback cannot be reversed' : 'item is stale'), ['key' => $item->getKey()]);
+            // The item is stale or the callback or pool cannot be reversed: we must compute the value now
+            $logger?->info('Computing item "{key}" online: '.($item->isHit() ? 'callback or pool cannot be reversed' : 'item is stale'), ['key' => $item->getKey()]);
 
             return null !== $this->callbackWrapper ? ($this->callbackWrapper)($callback, $item, $save, $pool, $setMetadata, $logger, $beta) : $callback($item, $save);
         }
@@ -57,6 +58,9 @@ class EarlyExpirationDispatcher
 
         // The item's value is not stale, no need to write it to the backend
         $save = false;
+        // The handler owns saving through the entire chain, including the decision not to save.
+        // Early recomputation may have cleared the item's expiry: do not backfill earlier adapters with the old value.
+        ChainAdapterCallback::fromCallable($callback)?->cancelSave();
 
         foreach ($envelope->all(HandledStamp::class) as $stamp) {
             if (($result = $stamp->getResult()) instanceof EarlyExpirationResult && $message->getItem() === $result->item) {

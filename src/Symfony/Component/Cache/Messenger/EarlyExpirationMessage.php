@@ -13,6 +13,8 @@ namespace Symfony\Component\Cache\Messenger;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Internal\ChainAdapterCallback;
+use Symfony\Component\Cache\Internal\TraceableAdapterCallback;
 use Symfony\Component\DependencyInjection\ReverseContainer;
 
 /**
@@ -22,6 +24,16 @@ final class EarlyExpirationMessage
 {
     public static function create(ReverseContainer $reverseContainer, callable $callback, CacheItem $item, AdapterInterface $pool): ?self
     {
+        while (true) {
+            $wrapper = $callback instanceof \Closure ? (new \ReflectionFunction($callback))->getClosureThis() : $callback;
+            if (!$wrapper instanceof ChainAdapterCallback && !$wrapper instanceof TraceableAdapterCallback) {
+                break;
+            }
+
+            $callback = $wrapper->callback;
+            $pool = $wrapper->pool;
+        }
+
         try {
             $item = clone $item;
             $item->set(null);
@@ -29,7 +41,9 @@ final class EarlyExpirationMessage
             return null;
         }
 
-        $pool = $reverseContainer->getId($pool);
+        if (null === $pool = $reverseContainer->getId($pool)) {
+            return null;
+        }
 
         if ($callback instanceof \Closure && !($r = new \ReflectionFunction($callback))->isAnonymous()) {
             $callback = [$r->getClosureThis() ?? $r->getClosureCalledClass()?->name, $r->name];

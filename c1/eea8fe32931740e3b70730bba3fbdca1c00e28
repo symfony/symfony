@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-13T13:12:17Z
+
+I added string defaults that are not valid UTF-8 and infinite bounds such as `#[Range(max: \INF)]`, since they break `json_encode()` the same way.

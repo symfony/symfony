@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add the `token_handlers` section to declare reusable token handlers that `access_token` firewalls reference by name
+
 8.2
 ---
 

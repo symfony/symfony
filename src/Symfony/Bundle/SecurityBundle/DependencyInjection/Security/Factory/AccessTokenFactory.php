@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Jose\Component\Core\Algorithm;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\TokenHandlerFactoryInterface;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -92,15 +93,29 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                 ->acceptAndWrap(['string'], 'id')
 
                 ->validate()
-                    ->ifTrue(static fn ($v) => \is_array($v) && 1 < \count($v))
+                    ->always(static function (array $v): array {
+                        if (!$v['audience']) {
+                            unset($v['audience']);
+                        }
+
+                        return $v;
+                    })
+                ->end()
+
+                ->validate()
+                    ->ifTrue(static fn ($v) => \is_array($v) && 1 < \count(array_diff_key($v, ['audience' => true])))
                     ->then(static fn () => throw new InvalidConfigurationException('You cannot configure multiple token handlers.'))
                 ->end()
 
                 // "isRequired" must be set otherwise the following custom validation is not called
                 ->isRequired()
                 ->validate()
-                    ->ifTrue(static fn ($v) => \is_array($v) && !$v)
+                    ->ifTrue(static fn ($v) => \is_array($v) && !array_diff_key($v, ['audience' => true]))
                     ->then(static fn () => throw new InvalidConfigurationException('You must set a token handler.'))
+                ->end()
+                ->validate()
+                    ->ifTrue(static fn ($v) => isset($v['audience']) && !isset($v['id']))
+                    ->then(static fn () => throw new InvalidConfigurationException('The "audience" option of "token_handler" can only be used when referencing a token handler with "id"; set it on the "oidc" or "oauth2" token handler instead.'))
                 ->end()
 
                 ->children()
@@ -109,6 +124,11 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                             $factory->addConfiguration($tokenHandlerNodeBuilder);
                         }
                     })
+                    ->arrayNode('audience')
+                        ->info('Identifiers of this resource server, one of which the "aud" of the token must name when "id" references an "oidc" or "oauth2" token handler from "security.token_handlers". A single identifier may be given as a string. Defaults to the "resource" of "resource_metadata" when it is a URL.')
+                        ->acceptAndWrap(['string'])
+                        ->scalarPrototype()->cannotBeEmpty()->end()
+                    ->end()
                 ->end()
             ->end()
             ->arrayNode('resource_metadata')
@@ -211,6 +231,81 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                         ->info('Allowed time drift in seconds for the "iat" of a proof, both ways.')
                         ->defaultValue(5)
                         ->min(0)
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    public function addTokenHandlersConfiguration(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->validate()
+                ->always(static function (array $v): array {
+                    $tokenHandlers = [];
+                    foreach ($v['token_handlers'] ?? [] as $name => $handler) {
+                        $tokenHandlers[str_replace('-', '_', $name)] = $handler;
+                    }
+
+                    foreach ($v['firewalls'] ?? [] as $firewallName => $firewall) {
+                        if (!isset($firewall['access_token']['token_handler']['id'])) {
+                            continue;
+                        }
+
+                        $handlerId = $firewall['access_token']['token_handler']['id'];
+                        $audience = $firewall['access_token']['token_handler']['audience'] ?? [];
+
+                        if (!isset($tokenHandlers[$normalizedId = str_replace('-', '_', $handlerId)])) {
+                            if ($audience) {
+                                throw new InvalidConfigurationException(\sprintf('Invalid firewall "%s": token handler "%s" is not defined in "security.token_handlers", and a custom token handler service cannot configure an "audience".', $firewallName, $handlerId));
+                            }
+
+                            continue;
+                        }
+
+                        $tokenHandler = $tokenHandlers[$normalizedId];
+                        $type = array_key_first($tokenHandler);
+
+                        if ($audience) {
+                            if ('oidc' !== $type && 'oauth2' !== $type) {
+                                throw new InvalidConfigurationException(\sprintf('The "audience" option of the "%s" firewall cannot be used with the "%s" token handler: only the "oidc" and "oauth2" token handlers check an audience.', $firewallName, $handlerId));
+                            }
+
+                            $tokenHandler[$type]['audience'] = $audience;
+                        }
+
+                        $firewall['access_token']['token_handler'] = $tokenHandler;
+                        $v['firewalls'][$firewallName]['access_token'] = self::finalizeTokenHandler($firewall['access_token']);
+                    }
+
+                    return $v;
+                })
+            ->end()
+            ->children()
+                ->arrayNode('token_handlers', 'token_handler')
+                    ->info('Reusable token handlers that "access_token" firewalls can reference by name.')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->acceptAndWrap(['string'], 'id')
+                        ->validate()
+                            ->ifTrue(static fn ($v) => \is_array($v) && 1 < \count($v))
+                            ->then(static fn () => throw new InvalidConfigurationException('You cannot configure multiple token handlers.'))
+                        ->end()
+                        ->validate()
+                            ->ifTrue(static fn ($v) => \is_array($v) && !$v)
+                            ->then(static fn () => throw new InvalidConfigurationException('You must set a token handler.'))
+                        ->end()
+                        ->validate()
+                            ->ifTrue(static fn ($v) => (bool) ($v['oidc']['audience'] ?? $v['oauth2']['audience'] ?? []))
+                            ->then(static fn () => throw new \InvalidArgumentException('The "audience" option cannot be set on a reusable token handler, because it would then win over the "resource" of every firewall referencing it. Set it on the firewall instead, or let it default to the "resource" of its "resource_metadata".'))
+                        ->end()
+                        ->children()
+                            ->appendFromCallback(function (NodeBuilder $tokenHandlerNodeBuilder) {
+                                foreach ($this->tokenHandlerFactories as $factory) {
+                                    $factory->addConfiguration($tokenHandlerNodeBuilder);
+                                }
+                            })
+                        ->end()
                     ->end()
                 ->end()
             ->end()

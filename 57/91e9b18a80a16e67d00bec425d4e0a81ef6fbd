@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-13T13:12:03Z
+
+I added a fix for `#[SerializedPath]` limited to some groups. The schema used that path for every group.

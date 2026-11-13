@@ -25,6 +25,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException as SerializerInvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
@@ -212,17 +213,8 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             return null;
         }
 
-        if (null === $format = $request->getContentTypeFormat()) {
-            throw new UnsupportedMediaTypeHttpException('Unsupported format.');
-        }
-
-        if ($attribute->acceptFormat && !\in_array($format, (array) $attribute->acceptFormat, true)) {
-            throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
-        }
-
-        if (!$attribute->acceptFormat && !\in_array($format, ['form', 'json', 'xml'], true)) {
-            throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, "%s" must be explicitly listed in "acceptFormat".', $format));
-        }
+        $format = $request->getContentTypeFormat();
+        $this->checkMapRequestPayloadFormat($attribute, $format);
 
         if ('array' === $argument->getType() && null !== $attribute->type) {
             $type = $attribute->type.'[]';
@@ -246,6 +238,33 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             throw new BadRequestHttpException(\sprintf('Request payload contains invalid "%s" data.', $format), $e);
         } catch (UnexpectedPropertyException $e) {
             throw new BadRequestHttpException(\sprintf('Request payload contains invalid "%s" property.', $e->property), $e);
+        }
+    }
+
+    private function checkMapRequestPayloadFormat(MapRequestPayload $attribute, ?string $format): void
+    {
+        if (null === $format) {
+            throw new UnsupportedMediaTypeHttpException('Unsupported format.');
+        }
+
+        if ($attribute->acceptFormat) {
+            if (!\in_array($format, (array) $attribute->acceptFormat, true)) {
+                throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
+            }
+
+            return;
+        }
+
+        if (\in_array($format, ['form', 'json', 'xml'], true)) {
+            return;
+        }
+
+        if (\in_array($format, ['csv', 'yaml'], true)) {
+            throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, "%s" must be explicitly listed in "acceptFormat".', $format));
+        }
+
+        if (!$this->serializer instanceof DecoderInterface || $this->serializer->supportsDecoding($format)) {
+            trigger_deprecation('symfony/http-kernel', '7.4', 'Decoding the "%s" format with #[MapRequestPayload] without listing it in "acceptFormat" is deprecated, it will be rejected in 8.2.', $format);
         }
     }
 

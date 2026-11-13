@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +28,7 @@ use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -796,12 +799,47 @@ class RequestPayloadValueResolverTest extends TestCase
             'expectedExceptionMessage' => 'Unsupported format, "csv" must be explicitly listed in "acceptFormat".',
         ];
 
-        yield 'configure with no format, sends plain text' => [
+        yield 'configure with no format, sends a format without decoder' => [
             'acceptFormat' => null,
             'contentType' => 'text/plain',
             'content' => 'price: 50',
-            'expectedExceptionMessage' => 'Unsupported format, "txt" must be explicitly listed in "acceptFormat".',
+            'expectedExceptionMessage' => 'Unsupported format: "txt".',
         ];
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testDecodableFormatNotListedInAcceptFormatIsDeprecated()
+    {
+        $jsonLdDecoder = new class implements DecoderInterface {
+            public function decode(string $data, string $format, array $context = []): mixed
+            {
+                return json_decode($data, true, flags: \JSON_THROW_ON_ERROR);
+            }
+
+            public function supportsDecoding(string $format): bool
+            {
+                return 'jsonld' === $format;
+            }
+        };
+        $serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder(), $jsonLdDecoder]);
+        $resolver = new RequestPayloadValueResolver($serializer, (new ValidatorBuilder())->getValidator());
+
+        $request = Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/ld+json'], '{"price": 50}');
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $this->expectUserDeprecationMessage('Since symfony/http-kernel 7.4: Decoding the "jsonld" format with #[MapRequestPayload] without listing it in "acceptFormat" is deprecated, it will be rejected in 8.2.');
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertEquals([new RequestPayload(50)], $event->getArguments());
     }
 
     #[DataProvider('provideValidationGroupsOnManyTypes')]

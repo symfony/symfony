@@ -11,6 +11,7 @@ CHANGELOG
  * Make `Profile` final and `Profiler::__sleep()` internal
  * Collect the application runner class
  * Allow configuring `DumpListener` to use a different dumper when CLI profiling is enabled
+ * Deprecate decoding formats other than form, JSON and XML with `#[MapRequestPayload]` when they are not listed in `acceptFormat`
 
 7.3
 ---

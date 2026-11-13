@@ -105,6 +105,8 @@ HttpKernel
  * Deprecate implementing `__sleep/wakeup()` on kernels; use `__(un)serialize()` instead
  * Deprecate implementing `__sleep/wakeup()` on data collectors; use `__(un)serialize()` instead
  * Make `Profile` final and `Profiler::__sleep()` internal
+ * Deprecate decoding formats other than form, JSON and XML with `#[MapRequestPayload]` when they are not listed in `acceptFormat`;
+   list them explicitly, e.g. `#[MapRequestPayload(acceptFormat: ['json', 'jsonld'])]`
 
 JsonStreamer
 ------------

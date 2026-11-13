@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
@@ -37,6 +38,13 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     private const UTF8_BOM = "\xEF\xBB\xBF";
 
     private const FORMULAS_START_CHARACTERS = ['=', '-', '+', '@', "\t", "\r"];
+
+    // PHP frees nested arrays recursively, so a deep enough header can overflow the C stack
+    private const MAX_HEADER_DEPTH = 512;
+
+    // Each row walks the levels of its headers again and creates their arrays, so both are bounded by the size of the data
+    private const MAX_LEVELS_PER_BYTE = 16;
+    private const MAX_ARRAYS_PER_BYTE = 4;
 
     private $defaultContext = [
         self::DELIMITER_KEY => ',',
@@ -159,6 +167,8 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $nbHeaders = 0;
         $headerCount = [];
         $result = [];
+        $levelBudget = self::MAX_LEVELS_PER_BYTE * \strlen($data);
+        $arrayBudget = self::MAX_ARRAYS_PER_BYTE * \strlen($data);
 
         [$delimiter, $enclosure, $escapeChar, $keySeparator, , , , $asCollection] = $this->getCsvOptions($context);
 
@@ -175,7 +185,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                     $headerCount = array_fill(0, $nbCols, 1);
                 } else {
                     foreach ($cols as $col) {
-                        $header = explode($keySeparator, $col ?? '');
+                        $header = explode($keySeparator, $col ?? '', self::MAX_HEADER_DEPTH + 1);
+                        if (\count($header) > self::MAX_HEADER_DEPTH) {
+                            throw new NotEncodableValueException(sprintf('CSV headers cannot be nested more than %d levels deep.', self::MAX_HEADER_DEPTH));
+                        }
                         $headers[] = $header;
                         $headerCount[] = \count($header);
                     }
@@ -187,6 +200,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             $item = [];
             for ($i = 0; ($i < $nbCols) && ($i < $nbHeaders); ++$i) {
                 $depth = $headerCount[$i];
+                if (0 > $levelBudget -= $depth) {
+                    throw new NotEncodableValueException('CSV headers are nested too deeply for the size of the data.');
+                }
+
                 $arr = &$item;
                 for ($j = 0; $j < $depth; ++$j) {
                     $headerName = $headers[$i][$j];
@@ -203,6 +220,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                     }
 
                     if (!isset($arr[$headerName])) {
+                        if (0 > --$arrayBudget) {
+                            throw new NotEncodableValueException('CSV headers are nested too deeply for the size of the data.');
+                        }
+
                         $arr[$headerName] = [];
                     }
 

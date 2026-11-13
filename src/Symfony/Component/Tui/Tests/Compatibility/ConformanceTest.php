@@ -66,7 +66,11 @@ final class ConformanceTest extends TestCase
         }
 
         $this->assertFileExists($snapshot, 'Run the tests with TUI_UPDATE_COMPAT=1 to write the snapshot.');
-        $this->assertSame(file_get_contents($snapshot), $actual);
+        if (str_contains($html, '<!-- gd-color-rounding -->')) {
+            AnsiSnapshot::assertSameWithColorRounding(file_get_contents($snapshot), $actual);
+        } else {
+            $this->assertSame(file_get_contents($snapshot), $actual);
+        }
     }
 
     public static function provideFixtures(): iterable

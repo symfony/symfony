@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-13T13:12:10Z
+
+I added `#[Choice(multiple: true, min: 1, max: 2)]` on such arrays, which now uses `additionalProperties`, `minProperties` and `maxProperties` too.

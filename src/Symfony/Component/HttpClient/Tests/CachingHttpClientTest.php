@@ -31,6 +31,8 @@ use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 #[Group('time-sensitive')]
 class CachingHttpClientTest extends TestCase
 {
+    use TestServerPortTrait;
+
     private TagAwareAdapterInterface $cacheAdapter;
 
     protected function setUp(): void
@@ -2852,14 +2854,14 @@ class CachingHttpClientTest extends TestCase
 
         $client = new TraceableHttpClient(new CachingHttpClient(new NativeHttpClient(), $this->cacheAdapter));
 
-        $response = $client->request('GET', 'http://localhost:8057/304/etag');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/304/etag');
         $this->assertSame(200, $response->getStatusCode());
         if (!$body = $response->getContent()) {
             $this->markTestSkipped('Legacy symfony/http-client-contracts in use');
         }
 
         // the server returns 304 when If-None-Match matches
-        $response = $client->request('GET', 'http://localhost:8057/304/etag');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/304/etag');
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame($body, $response->getContent());
     }

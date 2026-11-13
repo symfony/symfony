@@ -19,10 +19,12 @@ class TestHttpServer
     private static array $process = [];
 
     /**
+     * @param int         $port             Defaults to the SYMFONY_HTTP_CLIENT_TEST_PORT env var, or 8057
      * @param string|null $workingDirectory
      */
     public static function start(int $port = 8057/* , ?string $workingDirectory = null */): Process
     {
+        $port = \func_num_args() ? $port : self::getDefaultPort();
         $workingDirectory = \func_get_args()[1] ?? __DIR__.'/Fixtures/web';
 
         if (0 > $port) {
@@ -55,8 +57,15 @@ class TestHttpServer
 
     public static function stop(int $port = 8057)
     {
+        $port = \func_num_args() ? $port : self::getDefaultPort();
+
         if (isset(self::$process[$port])) {
             self::$process[$port]->stop();
         }
+    }
+
+    private static function getDefaultPort(): int
+    {
+        return (int) (getenv('SYMFONY_HTTP_CLIENT_TEST_PORT') ?: 8057);
     }
 }

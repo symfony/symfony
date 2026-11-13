@@ -27,6 +27,8 @@ use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class NoPrivateNetworkHttpClientTest extends TestCase
 {
+    use TestServerPortTrait;
+
     public static function getExcludeIpData(): array
     {
         return [
@@ -148,7 +150,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         DnsMock::withMockedHosts(['example.com' => [['type' => 'A', 'ip' => '104.26.14.6']]]);
 
         $resolved = [];
-        $client = new NoPrivateNetworkHttpClient(new MockHttpClient(function (string $method, string $url, array $options) use (&$resolved) {
+        $client = new NoPrivateNetworkHttpClient(new MockHttpClient(static function (string $method, string $url, array $options) use (&$resolved) {
             $resolved[] = $options['resolve'] ?? [];
 
             return new MockResponse('foo', ['primary_ip' => '104.26.14.6']);
@@ -202,7 +204,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         TestRedirectServer::start();
         $client = new NoPrivateNetworkHttpClient(new NativeHttpClient(), '10.0.0.0/8');
 
-        $response = $client->request('GET', 'https://127.0.0.1:8059/', [
+        $response = $client->request('GET', 'https://127.0.0.1:'.self::port(8059).'/', [
             'auth_basic' => 'foo:bar',
             'headers' => ['Cookie' => 'a=b', 'X-Custom' => 'kept'],
             'verify_peer' => false,
@@ -210,7 +212,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         ]);
         $headers = $response->toArray();
 
-        $this->assertSame('http://127.0.0.1:8059/', $response->getInfo('url'));
+        $this->assertSame('http://127.0.0.1:'.self::port(8059).'/', $response->getInfo('url'));
         $this->assertSame('kept', $headers['x-custom']);
         $this->assertArrayNotHasKey('authorization', $headers);
         $this->assertArrayNotHasKey('cookie', $headers);
@@ -221,8 +223,8 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         TestHttpServer::start();
         $client = new NoPrivateNetworkHttpClient(new NativeHttpClient(), '10.0.0.0/8');
 
-        $response = $client->request('GET', 'http://localhost:8057/302', [
-            'query' => ['location' => 'http://127.0.0.1:8057/', 'foo' => 'bar'],
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/302', [
+            'query' => ['location' => 'http://127.0.0.1:'.self::port().'/', 'foo' => 'bar'],
         ]);
 
         $this->assertSame('/', $response->toArray()['REQUEST_URI']);
@@ -243,7 +245,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
             fseek($body, 8);
 
             $client = new NoPrivateNetworkHttpClient($client, '10.0.0.0/8');
-            $response = $client->request('POST', 'http://localhost:8057/307', ['body' => $body]);
+            $response = $client->request('POST', 'http://localhost:'.self::port().'/307', ['body' => $body]);
 
             $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray(), $type);
         }

@@ -25,6 +25,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException as SerializerInvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
@@ -220,8 +221,20 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
         }
 
-        if (!$attribute->acceptFormat && !\in_array($format, ['form', 'json', 'xml'], true)) {
+        $contentType = trim(explode(';', $request->headers->get('CONTENT_TYPE', ''), 2)[0]);
+        $suffix = str_starts_with($contentType, 'application/') ? strrchr($contentType, '+') : false;
+        $suffixFormat = match ($suffix) {
+            '+json' => 'json',
+            '+xml' => 'xml',
+            default => null,
+        };
+
+        if (!$attribute->acceptFormat && null === $suffixFormat && !\in_array($format, ['form', 'json', 'xml'], true)) {
             throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, "%s" must be explicitly listed in "acceptFormat".', $format));
+        }
+
+        if (null !== $suffixFormat && (!$this->serializer instanceof DecoderInterface || !$this->serializer->supportsDecoding($format))) {
+            $format = $suffixFormat;
         }
 
         if ('array' === $argument->getType() && null !== $attribute->type) {

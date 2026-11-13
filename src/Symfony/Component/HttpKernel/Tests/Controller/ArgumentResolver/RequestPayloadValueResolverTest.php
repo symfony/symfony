@@ -26,6 +26,7 @@ use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -709,6 +710,89 @@ class RequestPayloadValueResolverTest extends TestCase
             'contentType' => 'text/csv',
             'content' => "price\n50",
         ];
+
+        yield 'configure with no format, sends jsonld without a decoder' => [
+            'acceptFormat' => null,
+            'contentType' => 'application/ld+json',
+            'content' => '{"price": 50}',
+        ];
+
+        yield 'configure with no format, sends jsonapi without a decoder' => [
+            'acceptFormat' => null,
+            'contentType' => 'application/vnd.api+json',
+            'content' => '{"price": 50}',
+        ];
+
+        yield 'configure with no format, sends a json variant with parameters' => [
+            'acceptFormat' => null,
+            'contentType' => 'application/ld+json; charset=utf-8; profile="urn:example+yaml"',
+            'content' => '{"price": 50}',
+        ];
+
+        yield 'configure with no format, sends an xml variant without a decoder' => [
+            'acceptFormat' => null,
+            'contentType' => 'application/hal+xml',
+            'content' => '<?xml version="1.0"?><request><price>50</price></request>',
+        ];
+
+        yield 'configure with no format, sends an xml variant with parameters' => [
+            'acceptFormat' => null,
+            'contentType' => 'application/atom+xml; charset=utf-8',
+            'content' => '<?xml version="1.0"?><request><price>50</price></request>',
+        ];
+
+        yield 'configure with jsonapi, sends jsonapi without a decoder' => [
+            'acceptFormat' => 'jsonapi',
+            'contentType' => 'application/vnd.api+json',
+            'content' => '{"price": 50}',
+        ];
+
+        yield 'configure with hal, sends an xml variant without a decoder' => [
+            'acceptFormat' => 'hal',
+            'contentType' => 'application/hal+xml',
+            'content' => '<?xml version="1.0"?><request><price>50</price></request>',
+        ];
+    }
+
+    #[DataProvider('providePayloadFormatsSupportedByTheSerializer')]
+    public function testPayloadFormatSupportedByTheSerializerIsNotNormalized(string $format, string $contentType, string $content, ?string $acceptFormat, DecoderInterface $decoder)
+    {
+        $decoder = new class($format, $decoder) implements DecoderInterface {
+            public function __construct(private string $format, private DecoderInterface $decoder)
+            {
+            }
+
+            public function decode(string $data, string $format, array $context = []): mixed
+            {
+                $decoded = $this->decoder->decode($data, $format, $context);
+                $decoded['price'] *= 21;
+
+                return $decoded;
+            }
+
+            public function supportsDecoding(string $format): bool
+            {
+                return $this->format === $format;
+            }
+        };
+        $serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder(), new XmlEncoder(), $decoder]);
+        $resolver = new RequestPayloadValueResolver($serializer);
+        $request = Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => $contentType], $content);
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [new MapRequestPayload(acceptFormat: $acceptFormat)]);
+        $event = new ControllerArgumentsEvent($this->createStub(HttpKernelInterface::class), static function () {}, [...$resolver->resolve($request, $argument)], $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertEquals([new RequestPayload(1050)], $event->getArguments());
+    }
+
+    public static function providePayloadFormatsSupportedByTheSerializer(): iterable
+    {
+        yield 'jsonld' => ['jsonld', 'application/ld+json', '{"price": 50}', null, new JsonEncoder()];
+        yield 'jsonapi' => ['jsonapi', 'application/vnd.api+json', '{"price": 50}', null, new JsonEncoder()];
+        yield 'xml' => ['hal', 'application/hal+xml', '<request><price>50</price></request>', null, new XmlEncoder()];
+        yield 'explicit format' => ['jsonld', 'application/ld+json', '{"price": 50}', 'jsonld', new JsonEncoder()];
+        yield 'parameters' => ['jsonld', 'application/ld+json; charset=utf-8', '{"price": 50}', null, new JsonEncoder()];
     }
 
     #[DataProvider('provideMismatchedFormatContext')]
@@ -799,6 +883,27 @@ class RequestPayloadValueResolverTest extends TestCase
         yield 'configure with no format, sends plain text' => [
             'acceptFormat' => null,
             'contentType' => 'text/plain',
+            'content' => 'price: 50',
+            'expectedExceptionMessage' => 'Unsupported format, "txt" must be explicitly listed in "acceptFormat".',
+        ];
+
+        yield 'configure with xml, sends an xml variant' => [
+            'acceptFormat' => 'xml',
+            'contentType' => 'application/hal+xml',
+            'content' => '<request><price>50</price></request>',
+            'expectedExceptionMessage' => 'Unsupported format, expects "xml", but "hal" given.',
+        ];
+
+        yield 'configure with no format, sends yaml with a json suffix in a parameter' => [
+            'acceptFormat' => null,
+            'contentType' => 'application/x-yaml; profile=+json',
+            'content' => 'price: 50',
+            'expectedExceptionMessage' => 'Unsupported format, "yaml" must be explicitly listed in "acceptFormat".',
+        ];
+
+        yield 'configure with no format, sends plain text with an xml suffix in a parameter' => [
+            'acceptFormat' => null,
+            'contentType' => 'text/plain; profile=+xml',
             'content' => 'price: 50',
             'expectedExceptionMessage' => 'Unsupported format, "txt" must be explicitly listed in "acceptFormat".',
         ];

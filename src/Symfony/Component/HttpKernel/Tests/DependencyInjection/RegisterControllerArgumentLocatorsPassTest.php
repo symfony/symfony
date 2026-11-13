@@ -31,6 +31,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\Tests\Fixtures\DataCollector\DummyController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
@@ -152,6 +155,21 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $expected = ['bar' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'bar'))];
         $this->assertEquals($expected, $locator->getArgument(0));
+    }
+
+    public function testMappedControllerArgumentClassesAreAddedToPropertyInfoCacheWarmer()
+    {
+        $container = new ContainerBuilder();
+        $container->register('argument_resolver.service')->addArgument([]);
+        $container->register('property_info.cache_warmer')->setArguments([null, [\DateTimeImmutable::class], null]);
+        $container->register('controller', MappedDtoController::class)->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $expected = [\DateTimeImmutable::class, PayloadDto::class, QueryDto::class, ArrayItemDto::class, PositionalItemDto::class];
+        sort($expected);
+
+        $this->assertSame($expected, $container->getDefinition('property_info.cache_warmer')->getArgument(1));
     }
 
     public function testExplicitArgument()
@@ -1073,4 +1091,47 @@ class WithUnionWithBuiltinType
     public function fooAction(ControllerDummy|string $service)
     {
     }
+}
+
+class MappedDtoController
+{
+    public function payload(#[MapRequestPayload] ?PayloadDto $payload)
+    {
+    }
+
+    public function query(#[MapQueryString] QueryDto $query)
+    {
+    }
+
+    public function list(#[MapRequestPayload(type: ArrayItemDto::class)] array $items)
+    {
+    }
+
+    public function positionalList(#[MapRequestPayload(null, [], null, RequestPayloadValueResolver::class, Response::HTTP_UNPROCESSABLE_ENTITY, PositionalItemDto::class)] array $items)
+    {
+    }
+
+    public function unrelated(ControllerDummy $service)
+    {
+    }
+}
+
+class PayloadDto
+{
+    public string $name;
+}
+
+class QueryDto
+{
+    public int $page;
+}
+
+class ArrayItemDto
+{
+    public bool $active;
+}
+
+class PositionalItemDto
+{
+    public int $id;
 }

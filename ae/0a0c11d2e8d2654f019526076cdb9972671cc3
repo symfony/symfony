@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-13T12:59:40Z
+
+Thanks for the PR. I rebased it on 8.2. Changes to phpdoc types go to the dev branch, since they change what static analysis reports in apps. I also bounded `R` to `\ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter`. With `\Reflector`, a configurator typed `\ReflectionClassConstant` or `\ReflectionFunction` passed the check, but the pass never calls it.

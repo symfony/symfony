@@ -17,6 +17,7 @@ use Symfony\Component\Tui\Exception\RenderException;
 use Symfony\Component\Tui\Style\Align;
 use Symfony\Component\Tui\Style\AutoMargin;
 use Symfony\Component\Tui\Style\BackgroundLayout;
+use Symfony\Component\Tui\Style\BlendMode;
 use Symfony\Component\Tui\Style\Border;
 use Symfony\Component\Tui\Style\BorderPattern;
 use Symfony\Component\Tui\Style\Color;
@@ -249,7 +250,7 @@ final class Renderer implements WidgetRendererInterface
     /** @var \WeakMap<AbstractWidget, \WeakReference<AbstractWidget>> The anchor of each widget its style names none for */
     private \WeakMap $implicitAnchors;
 
-    /** @var \WeakMap<AbstractWidget, array<string, list<string>>> The scroll state of the widgets where they were last drawn: stuck, snapped and scrollable */
+    /** @var \WeakMap<AbstractWidget, array{stuck?: list<'top'|'bottom'>, snapped?: list<'x'|'y'>, scrollable?: list<'top'|'bottom'|'left'|'right'>, scrolled?: list<'top'|'bottom'|'left'|'right'>, targetCurrent?: bool, offset?: array{array{}|array{int, int}, array{}|array{int, int}}}> The scroll state of the widgets where they were last drawn: stuck, snapped and scrollable */
     private \WeakMap $scrollStates;
 
     /** @var \WeakMap<ContainerWidget, array<'stuck'|'x'|'y', list<\WeakReference<AbstractWidget>>>> The widgets each scroll container marked stuck or snapped */
@@ -666,7 +667,7 @@ final class Renderer implements WidgetRendererInterface
                 $over = $rgb($color);
                 foreach ($halves as $half => $pixel) {
                     $color = null !== $mode && $real[$half] ? $mode->blend($pixel, $over) : $over;
-                    $halves[$half] = $alpha >= 1.0 ? $color : array_map(static fn (int $a, int $b): int => (int) round($a + ($b - $a) * $alpha), $pixel, $color);
+                    $halves[$half] = $alpha >= 1.0 ? $color : [(int) round($pixel[0] + ($color[0] - $pixel[0]) * $alpha), (int) round($pixel[1] + ($color[1] - $pixel[1]) * $alpha), (int) round($pixel[2] + ($color[2] - $pixel[2]) * $alpha)];
                     $real[$half] = true;
                 }
             }
@@ -1457,7 +1458,7 @@ final class Renderer implements WidgetRendererInterface
         $style = $this->resolveStyle($overlay);
         $position = $style->getPosition();
         // Nor one that draws nothing, invisible or transparent
-        if (true !== $position?->isOutOfFlow() || ($position->zIndex ?? 0) < 0 || true === $style->getInvisible() || true === $style->getTransparent()) {
+        if (true !== $position?->isOutOfFlow() || $position->zIndex < 0 || true === $style->getInvisible() || true === $style->getTransparent()) {
             return null;
         }
         for ($current = $overlay; $current !== $root; $current = $current->getParent()) {
@@ -1473,7 +1474,7 @@ final class Renderer implements WidgetRendererInterface
      * The key of a widget in the stacking order; an absolute ::before before the children of its owner, an ::after
      * after them, like CSS, not in its list of children.
      *
-     * @param array<int, array<int, int>> $indexes
+     * @param array<int, array<int, int|string>> $indexes
      *
      * @return array{path: list<int>, levels: list<array{int, int}>, under: bool|AbstractWidget, context?: AbstractWidget|null}|null
      */
@@ -1604,7 +1605,7 @@ final class Renderer implements WidgetRendererInterface
                 return substr($background->toBackgroundCode(), 2, -1);
             }
             // Down to <html> and <body>, which pass the height of the screen: not the first box of the page
-            $child = $widget instanceof ParentInterface ? ($widget->all()[0] ?? null) : null;
+            $child = $widget->all()[0] ?? null;
             $widget = $child instanceof ContainerWidget && $child->passesDefiniteHeight() ? $child : null;
         }
 
@@ -2075,8 +2076,8 @@ final class Renderer implements WidgetRendererInterface
             return null;
         }
         $style = $this->resolveStyle($parent);
-        $row = $rect->row + ($style->getMargin()->top ?? 0) + ($style->getBorder()?->top ?? 0) + ($style->getPadding()->top ?? 0);
-        $col = $rect->col + ($style->getMargin()->left ?? 0) + ($style->getBorder()?->left ?? 0) + ($style->getPadding()->left ?? 0);
+        $row = $rect->row + ($style->getMargin()->top ?? 0) + ($style->getBorder()->top ?? 0) + ($style->getPadding()->top ?? 0);
+        $col = $rect->col + ($style->getMargin()->left ?? 0) + ($style->getBorder()->left ?? 0) + ($style->getPadding()->left ?? 0);
         // In a flow of blocks, under the last one before it that was drawn; in a row or a grid, at the start, like CSS
         if (null === $style->getDirection() && null === $style->getGridTemplate()) {
             foreach ($parent->all() as $child) {
@@ -2141,7 +2142,7 @@ final class Renderer implements WidgetRendererInterface
                 if (null !== $style->getPosition() && !$style->getPosition()->isOutOfFlow() && !$style->getHidden() && null !== ($place = $this->staticPlace($ancestor))
                     && null !== ($parentRect = $this->positionTracker->getWidgetRect($ancestor->getParent()))) {
                     $parentStyle = $this->resolveStyle($ancestor->getParent());
-                    $end = $parentRect->col + $parentRect->columns - ($parentStyle->getMargin()->right ?? 0) - ($parentStyle->getBorder()?->right ?? 0) - ($parentStyle->getPadding()->right ?? 0);
+                    $end = $parentRect->col + $parentRect->columns - ($parentStyle->getMargin()->right ?? 0) - ($parentStyle->getBorder()->right ?? 0) - ($parentStyle->getPadding()->right ?? 0);
 
                     return [$place[0], $place[1], max(1, min($columns, $end - $place[1])), 1];
                 }
@@ -2186,6 +2187,7 @@ final class Renderer implements WidgetRendererInterface
         return $lines;
     }
 
+    /** @param-out bool $hit */
     private function doRenderWidgetLines(AbstractWidget $widget, RenderContext $context, ?int $stretchRows, ?bool &$hit = null): LineBufferInterface
     {
         $hit = false;
@@ -2353,7 +2355,7 @@ final class Renderer implements WidgetRendererInterface
         if ($widget instanceof CheckboxWidget) {
             $border = $resolvedStyle->getBorder();
             $compact = $widget->isDrawnByCss() && null !== $border && $border->top + $border->bottom > 0 && ($resolvedStyle->getMaxRows() ?? \PHP_INT_MAX) <= $border->top + $border->bottom;
-            $widget->setCompactMark($border?->color ?? $resolvedStyle->getColor(), $resolvedStyle->getBackground(), $compact);
+            $widget->setCompactMark($border->color ?? $resolvedStyle->getColor(), $resolvedStyle->getBackground(), $compact);
             if ($compact) {
                 $resolvedStyle = $resolvedStyle->withBorder(new Border(0, 0, 0, 0))->withBackground(null)->withRows(1, 1);
             }
@@ -2388,7 +2390,7 @@ final class Renderer implements WidgetRendererInterface
             $lines = $this->chromeApplier->apply(new ArrayLineBuffer([]), $context->getColumns(), $resolvedStyle, $widget);
         } elseif ($widget instanceof ContainerWidget) {
             $lines = $this->renderContainer($widget, $styledContext, $resolvedStyle);
-        } elseif ($widget instanceof HorizontalRuleWidget && ($resolvedStyle->getBorder()?->top ?? 0) + ($resolvedStyle->getBorder()?->bottom ?? 0) > 0) {
+        } elseif ($widget instanceof HorizontalRuleWidget && ($resolvedStyle->getBorder()->top ?? 0) + ($resolvedStyle->getBorder()->bottom ?? 0) > 0) {
             // A rule given a border, like hr { border: 0; border-top: 1px solid }: the border is the rule, like CSS
             $lines = $this->chromeApplier->apply(new ArrayLineBuffer([]), $context->getColumns(), $resolvedStyle, $widget);
         } else {
@@ -2466,6 +2468,8 @@ final class Renderer implements WidgetRendererInterface
      * Drops the margin rows a parent and its first or last child share: the larger margin stays.
      *
      * @param list<AbstractWidget> $children
+     *
+     * @param-out int $dropped
      */
     private function collapseParentMargins(Style $style, array $children, LineBufferInterface $lines, int $columns, ?int &$dropped = null, bool $bottomOnly = false): LineBufferInterface
     {
@@ -2527,6 +2531,8 @@ final class Renderer implements WidgetRendererInterface
 
     /**
      * The rows the children of a container pull into its bottom border by their negative bottom margins.
+     *
+     * @param ParentInterface&AbstractWidget $container
      *
      * @internal
      */
@@ -2595,11 +2601,14 @@ final class Renderer implements WidgetRendererInterface
      */
     private function declaredStyle(AbstractWidget $widget): Style
     {
-        if (($this->styleCache[$widget][0] ?? null) !== $widget->getRenderRevision()) {
-            $this->resolveStyle($widget);
+        $cached = $this->styleCache[$widget] ?? null;
+        if (null === $cached || $cached[0] !== $widget->getRenderRevision()) {
+            $resolved = $this->resolveStyle($widget);
+
+            return $this->styleCache[$widget][2] ?? $resolved;
         }
 
-        return $this->styleCache[$widget][2];
+        return $cached[2];
     }
 
     /**
@@ -2965,7 +2974,7 @@ final class Renderer implements WidgetRendererInterface
                         $contentWidth = $gap * max(0, \count($children) - 1);
                         // Those on a line of their own, like a block among inline boxes, as wide as the widest of them
                         $ownLines = 0;
-                        foreach (array_values($children) as $index => $child) {
+                        foreach ($children as $index => $child) {
                             $childStyle = $this->resolveStyle($child);
                             $childWidth = $this->measureIntrinsicWidth($child, $innerColumns, $rows);
                             if ($childStyle->getOwnLine()) {
@@ -3273,7 +3282,7 @@ final class Renderer implements WidgetRendererInterface
     {
         // A legend in the top border, out of the flow, like the one of a <fieldset>
         $legend = $widget->getLegend();
-        if (null !== $legend && ($legend->getParent() !== $widget || ($resolvedStyle->getBorder()?->top ?? 0) < 1 || $this->resolveStyle($legend)->getHidden())) {
+        if (null !== $legend && ($legend->getParent() !== $widget || ($resolvedStyle->getBorder()->top ?? 0) < 1 || $this->resolveStyle($legend)->getHidden())) {
             $legend = null;
         }
         $children = [];
@@ -3328,7 +3337,7 @@ final class Renderer implements WidgetRendererInterface
         // Not lost to an absolute box measured past its height, see renderPositioned()
         if ($context->shouldFillRows() || (null !== $fixedRows && ($fixedRows === $resolvedStyle->getMaxRows() || null !== $resolvedStyle->getAspectRatio() || true === ($this->unboundedRows[$widget] ?? null)))) {
             $this->definiteRows[$widget] = $context->shouldFillRows() && null === $fixedRows ? $innerRows : (int) $fixedRows;
-        } elseif ((null === $fixedRows || $resolvedStyle->getDocumentHeight()) && $widget instanceof ContainerWidget && $widget->passesDefiniteHeight() && null !== ($parent = $widget->getParent()) && null !== ($parentRows = $this->definiteRows[$parent] ?? null)) {
+        } elseif ((null === $fixedRows || $resolvedStyle->getDocumentHeight()) && $widget->passesDefiniteHeight() && null !== ($parent = $widget->getParent()) && null !== ($parentRows = $this->definiteRows[$parent] ?? null)) {
             // <html> and <body>, as tall as their content, pass the height of the frame on to percentages, their height
             // of 100% too, which their content overflows, see CssStyleSheet::computeDeclarations()
             $this->definiteRows[$widget] = max((int) ($fixedRows ?? 0), $this->chromeApplier->computeInnerDimensions($columns, $parentRows, $resolvedStyle)[1]);
@@ -3372,7 +3381,7 @@ final class Renderer implements WidgetRendererInterface
             // Its height, or its least height, like min-height: 100vh: what its content does not take is free
             if (null !== $fixedRows) {
                 $columnRows = (int) $fixedRows;
-            } elseif ($context->shouldFillRows() && null === $fixedRows) {
+            } elseif ($context->shouldFillRows()) {
                 $columnRows = $innerRows;
             }
         }
@@ -3500,7 +3509,7 @@ final class Renderer implements WidgetRendererInterface
                 $childStyle = $this->resolveStyle($child);
                 // Of a width set as a length, not a max-width nor a percentage, which are as wide as the box at most
                 if (null !== ($width = $childStyle->getMaxColumns()) && $width > $innerColumns && !$childStyle->getHidden() && !($childStyle->getPosition()?->isOutOfFlow() ?? false)) {
-                    $wide[] = [$child, min($width + ($childStyle->getMargin()?->left ?? 0) + ($childStyle->getMargin()?->right ?? 0), self::MAX_CLIPPED_COLUMNS)];
+                    $wide[] = [$child, min($width + ($childStyle->getMargin()->left ?? 0) + ($childStyle->getMargin()->right ?? 0), self::MAX_CLIPPED_COLUMNS)];
                 }
             }
             $wide = array_values(array_filter($wide, fn (array $entry): bool => $this->hasLengthWidth($entry[0])));
@@ -3706,6 +3715,8 @@ final class Renderer implements WidgetRendererInterface
 
         // The captions of a table drawn here, its borders separate or without rows, are outside its box, like CSS: above
         // and below its border and its background, like the caption under the image of a thumbnail of Wikipedia
+        $captions = $bottomLines = [];
+        $boxColumns = $columns;
         if (TableRole::Table === $resolvedStyle->getTableRole()) {
             $margin = $resolvedStyle->withResolvedBox($columns)->getMargin();
             [$top, $topLines, $bottom, $bottomLines, $captions] = $this->captionRows($children, $innerColumns, $innerRows, \count($childLines), $boxColumns = max(1, $columns - ($margin->left ?? 0) - ($margin->right ?? 0)));
@@ -3773,9 +3784,7 @@ final class Renderer implements WidgetRendererInterface
      * its text going on through them; the junctions follow.
      *
      * @param AbstractWidget[] $children
-     */
-    /**
-     * @param bool $widthOnly Whether only its width is wanted: one blank line as wide as it, its cells not drawn
+     * @param bool             $widthOnly Whether only its width is wanted: one blank line as wide as it, its cells not drawn
      */
     private function renderCollapsedTable(ContainerWidget $table, array $children, RenderContext $context, Style $style, bool $widthOnly = false): ?LineBufferInterface
     {
@@ -4329,10 +4338,11 @@ final class Renderer implements WidgetRendererInterface
             return true;
         }
         $style = $this->resolveStyle($widget);
+        $margin = $style->getMargin();
         $zero = static fn (?object $box): bool => null === $box || (0 === $box->top && 0 === $box->right && 0 === $box->bottom && 0 === $box->left);
         if (null !== $style->getFloat() || null !== $style->getPosition() || null !== $style->getScroll() || null !== $style->getDirection() || null !== $style->getGridTemplate()
             || null !== $style->getTableRole() || null !== $style->getBackground()
-            || ($box ? !$zero($style->getBorder()) || !$zero($style->getPadding()) || !$zero($style->getMargin()) : true === $style->getMargin()?->hasPercents() || true === $style->getPadding()?->hasPercents() || !$zero($style->getMarginPull()) || min($style->getMargin()?->top ?? 0, $style->getMargin()?->right ?? 0, $style->getMargin()?->bottom ?? 0, $style->getMargin()?->left ?? 0) < 0)
+            || ($box ? !$zero($style->getBorder()) || !$zero($style->getPadding()) || !$zero($style->getMargin()) : true === $style->getMargin()?->hasPercents() || true === $style->getPadding()?->hasPercents() || !$zero($style->getMarginPull()) || (null !== $margin && min($margin->top, $margin->right, $margin->bottom, $margin->left) < 0))
             || null !== $style->getAutoMargin() || null !== $style->getMaxColumns() || null !== $style->getWidthPercent() || null !== $style->getMinColumns()
             || null !== $style->getMinRows() || null !== $style->getMaxRows() || null !== $style->getContentWidth() || true === $style->getHidden()) {
             return true;
@@ -4563,11 +4573,11 @@ final class Renderer implements WidgetRendererInterface
         $sides = $style->getBorder();
         // Its margins in percentages too, shares of the width of its containing block
         $margin = $style->withResolvedBox($context->getContainingColumns())->getMargin();
-        $border = (($sides?->bottom ?? 0) > 0 ? 1 : 0) + max(0, $margin?->bottom ?? 0);
-        $lead = (($sides?->left ?? 0) > 0 ? 1 : 0) + max(0, $margin?->left ?? 0);
+        $border = (($sides->bottom ?? 0) > 0 ? 1 : 0) + max(0, $margin->bottom ?? 0);
+        $lead = (($sides->left ?? 0) > 0 ? 1 : 0) + max(0, $margin->left ?? 0);
         $blank = static function (string $line) use ($sides, $lead): bool {
             $text = rtrim(AnsiUtils::stripAnsiCodes($line));
-            if (($sides?->right ?? 0) > 0) {
+            if (($sides->right ?? 0) > 0) {
                 $text = mb_substr($text, 0, -1);
             }
 
@@ -4575,7 +4585,7 @@ final class Renderer implements WidgetRendererInterface
         };
         // Its content box ends above its bottom padding, which its content drawn past it goes over
         $padding = $style->withResolvedBox($context->getContainingColumns())->getPadding();
-        $inside = \count($lines) - $border - max(0, $padding?->bottom ?? 0);
+        $inside = \count($lines) - $border - max(0, $padding->bottom ?? 0);
         for ($drawn = \count($measured) - $border; $drawn > $inside && $blank($measured->getLine($drawn - 1)); --$drawn) {
         }
         if ($drawn <= $inside) {
@@ -4586,11 +4596,11 @@ final class Renderer implements WidgetRendererInterface
         unset($this->fitsSetHeight[$widget]);
         // Its box at its height, like CSS, its content drawn on past it: over its bottom padding and border, then under
         // them, without its background nor its side borders
-        $box = max(0, \count($lines) - max(0, $margin?->bottom ?? 0));
-        $from = max(0, $box - (($sides?->bottom ?? 0) > 0 ? 1 : 0) - max(0, $padding?->bottom ?? 0));
-        $start = $lead + max(0, $padding?->left ?? 0);
+        $box = max(0, \count($lines) - max(0, $margin->bottom ?? 0));
+        $from = max(0, $box - (($sides->bottom ?? 0) > 0 ? 1 : 0) - max(0, $padding->bottom ?? 0));
+        $start = $lead + max(0, $padding->left ?? 0);
         // As wide as a row of its box, the room it was given when it draws none, like height: 0
-        $width = max(0, ($box > 0 ? AnsiUtils::visibleWidth($lines->getLine($box - 1)) : $context->getColumns()) - $start - (($sides?->right ?? 0) > 0 ? 1 : 0) - max(0, $padding?->right ?? 0) - max(0, $margin?->right ?? 0));
+        $width = max(0, ($box > 0 ? AnsiUtils::visibleWidth($lines->getLine($box - 1)) : $context->getColumns()) - $start - (($sides->right ?? 0) > 0 ? 1 : 0) - max(0, $padding->right ?? 0) - max(0, $margin->right ?? 0));
         $background = $style->getBackground()?->toBackgroundCode();
         // Its rows above its bottom padding as its content laid out past its height draws them, those after over its box
         // at its height, its margin under it kept
@@ -4769,7 +4779,7 @@ final class Renderer implements WidgetRendererInterface
         };
         foreach ($children as $child) {
             $position = $this->resolveStyle($child)->getPosition();
-            if (PositionMode::Relative === $position?->mode && (0 !== ($position->zIndex ?? 0) || ($position->zIndex >= 0 && $followsAbsolute($child)))) {
+            if (PositionMode::Relative === $position?->mode && (0 !== $position->zIndex || $followsAbsolute($child))) {
                 $lifted[$child] = true;
             } else {
                 unset($this->liftedRelatives[$child]);
@@ -4783,7 +4793,7 @@ final class Renderer implements WidgetRendererInterface
             $dx = ($position->inset('left', $columns) ?? -($position->inset('right', $columns) ?? 0)) + $tx;
             // Not moved, only drawn over the absolute elements before it: left in its lines, so that what comes after it
             // in the flow still draws over it, like when nothing is under it, and drawn again from them over those
-            if (0 === $dx && 0 === $dy && isset($lifted[$child]) && ($position->zIndex ?? 0) <= 0) {
+            if (0 === $dx && 0 === $dy && isset($lifted[$child]) && $position->zIndex <= 0) {
                 unset($lifted[$child]);
                 if ($this->isInsideEffect($child, false, false)) {
                     unset($this->liftedRelatives[$child]);
@@ -4844,7 +4854,7 @@ final class Renderer implements WidgetRendererInterface
         // Then drawn at their offsets; those of a positive z-index with the absolute ones, over those of a lower one
         foreach ($moves as $index => [$child, $row, $col, $boxColumns, $boxRows, $dy, $dx]) {
             $box = $boxes[$index];
-            $zIndex = $this->resolveStyle($child)->getPosition()?->zIndex ?? 0;
+            $zIndex = $this->resolveStyle($child)->getPosition()->zIndex ?? 0;
             if (isset($lifted[$child]) && !$this->isInsideEffect($child, isset($past[$child]), 0 !== $dx)) {
                 $this->liftedRelatives[$child] = [$zIndex, array_values($box), $boxColumns, $boxRows];
                 $this->positionTracker->shiftContentPositions([$child], max(0, $col + $dx) - $col, $dy);
@@ -5255,7 +5265,7 @@ final class Renderer implements WidgetRendererInterface
         if (null !== ($scroll = $style->getScroll())?->snap && $this->positionTracker->isActive() && $total > $viewport) {
             $top = $this->snap($widget, $scroll, $children, $top, $total, $viewport, $contentRow);
         }
-        $widget->setScrollMetrics($top, $total, $viewport, $style->getScroll()?->contained ?? false);
+        $widget->setScrollMetrics($top, $total, $viewport, $style->getScroll()->contained ?? false);
         if ($this->positionTracker->isActive()) {
             $this->recordScroll($widget, $top, $total, $viewport, false);
             $this->recordCurrentMarker($widget, $top, $total, $viewport, $contentRow, false);
@@ -5498,7 +5508,7 @@ final class Renderer implements WidgetRendererInterface
         $controls = [];
         $before = [];
         // scroll-marker-group: the markers of the children, the current one matching :target-current
-        $group = null;
+        $group = '';
         if (null !== $position) {
             $groupStyle = $this->styleSheet->resolveElement($widget, 'scroll-marker-group');
             $group = '';
@@ -5572,7 +5582,7 @@ final class Renderer implements WidgetRendererInterface
         }
         $style = $this->resolveStyle($widget);
 
-        return $rows + ($style->getPadding()?->top ?? 0) + ($style->getPadding()?->bottom ?? 0) + ($style->getBorder()?->top ?? 0) + ($style->getBorder()?->bottom ?? 0);
+        return $rows + ($style->getPadding()->top ?? 0) + ($style->getPadding()->bottom ?? 0) + ($style->getBorder()->top ?? 0) + ($style->getBorder()->bottom ?? 0);
     }
 
     /**
@@ -5942,7 +5952,7 @@ final class Renderer implements WidgetRendererInterface
                     $laterStyle = $this->resolveStyle($later);
                     $box = $this->positionTracker->getWidgetRect($later);
                     $paint = null !== $box ? ($this->flowPaints[$later][$box->columns.':'.$box->rows] ?? null) : null;
-                    if (null === $paint || null === $box || $laterStyle->getPosition()?->isOutOfFlow() || ($laterStyle->getPosition()?->zIndex ?? 0) < 0
+                    if (null === $paint || null === $box || $laterStyle->getPosition()?->isOutOfFlow() || ($laterStyle->getPosition()->zIndex ?? 0) < 0
                         || $target < $box->row || $target >= $box->row + \count($paint)) {
                         continue;
                     }

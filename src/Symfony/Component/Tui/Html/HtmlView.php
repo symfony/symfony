@@ -464,8 +464,13 @@ final class HtmlView
         // kept behind it
         if (null !== $parent) {
             self::$parts ??= new \WeakMap();
-            self::$parts[$tui] ??= new \WeakMap();
-            self::$parts[$tui][$this] = true;
+            $parts = self::$parts[$tui] ?? null;
+            if (null === $parts) {
+                /** @var \WeakMap<self, true> $parts */
+                $parts = new \WeakMap();
+                self::$parts[$tui] = $parts;
+            }
+            $parts[$this] = true;
         } else {
             self::$screens ??= new \WeakMap();
             if (null !== $previous = (self::$screens[$tui] ?? null)?->get()) {
@@ -535,8 +540,8 @@ final class HtmlView
             return $this;
         }
         $this->isMounted = false;
-        if (isset(self::$parts[$tui])) {
-            unset(self::$parts[$tui][$this]);
+        if (null !== $parts = self::$parts[$tui] ?? null) {
+            unset($parts[$this]);
         }
         // The page of the whole screen: the views mounted in parts of it too, which go with it
         if ($this === (self::$screens[$tui] ?? null)?->get() && null !== $root = $this->root) {
@@ -689,7 +694,12 @@ final class HtmlView
     private function provideStyles(Tui $tui): void
     {
         self::$mounted ??= new \WeakMap();
-        $mounted = self::$mounted[$tui] ??= new \WeakMap();
+        $mounted = self::$mounted[$tui] ?? null;
+        if (null === $mounted) {
+            /** @var \WeakMap<CssStyleSheet, int> $mounted */
+            $mounted = new \WeakMap();
+            self::$mounted[$tui] = $mounted;
+        }
         $mounted[$this->styleSheet] = ($mounted[$this->styleSheet] ?? 0) + 1;
         $tui->addStyleProvider($this->styleSheet);
     }
@@ -1049,7 +1059,9 @@ final class HtmlView
      */
     public function getReturnValue(AbstractWidget $dialog): string
     {
-        return $this->returnValues[$dialog] ?? '';
+        $value = $this->returnValues[$dialog] ?? null;
+
+        return null !== $value ? $value : '';
     }
 
     /**
@@ -1389,10 +1401,10 @@ final class HtmlView
             // A ::scroll-marker scrolls to the child it stands for
             if (str_starts_with($action, 'marker:')) {
                 if (null !== $child = $container->getScrollMarkers()[1][(int) substr($action, 7)][0] ?? null) {
-                    $this->tui?->reveal($child);
+                    $this->tui->reveal($child);
                     // Drawn again, so that it scrolls there
                     $container->invalidate();
-                    $this->tui?->requestRender();
+                    $this->tui->requestRender();
                 }
 
                 return true;
@@ -1401,7 +1413,7 @@ final class HtmlView
             $page = max(1, (int) floor(0.85 * ($vertical ? $container->getClientHeight() : $container->getClientWidth())));
             $sign = \in_array($action, ['up', 'left'], true) ? -1 : 1;
             $vertical ? $container->scrollBy($sign * $page) : $container->scrollByColumns($sign * $page);
-            $this->tui?->requestRender();
+            $this->tui->requestRender();
 
             return true;
         }
@@ -1726,7 +1738,7 @@ final class HtmlView
         }
         foreach (array_reverse($children) as $child) {
             $style = $child->getContext()?->resolveStyle($child);
-            if ($style?->getPosition()?->isOutOfFlow() || ($style?->getPosition()?->zIndex ?? 0) < 0) {
+            if ($style?->getPosition()?->isOutOfFlow() || ($style?->getPosition()->zIndex ?? 0) < 0) {
                 continue;
             }
             if (null !== $hit = $this->flowAt($child, $row, $col)) {

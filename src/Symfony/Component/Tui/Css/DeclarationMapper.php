@@ -737,8 +737,14 @@ class DeclarationMapper implements SupportProviderInterface
             return $s->withBorder(new Border($width, $width, $width, $width, $pattern, $color));
         }, Support::partial('Any width above 0 draws a one-cell border, thick ones with heavy lines; dashed and dotted have their own lines, groove, ridge, inset and outset are solid. The lines of a box right under another join those of the other where they go on from them, like the items of a list group, └ over │ making ├. An empty ::before, ::after or element drawn by its borders, one side of a color and one beside it transparent, like the caret of a dropdown of Bootstrap, is a triangle pointing away from that side, ▾ ▴ ▸ ◂, in its color.'));
         $this->addProperty('border-width', static function (Style $s, string $v, MediaContext $m) {
-            $widths = array_map(static fn (string $p) => self::borderWidth($p, $m), Value::split($v));
-            if (!$widths || \in_array(null, $widths, true) || \count($widths) > 4) {
+            $widths = [];
+            foreach (Value::split($v) as $part) {
+                if (null === $width = self::borderWidth($part, $m)) {
+                    return false;
+                }
+                $widths[] = $width;
+            }
+            if (!$widths || \count($widths) > 4) {
                 return false;
             }
             $border = Border::from($widths);
@@ -806,14 +812,20 @@ class DeclarationMapper implements SupportProviderInterface
                     $widths[$side] = 0;
                 }
             }
-            $drawn = array_values(array_filter($patterns, static fn (string $pattern) => BorderPattern::NONE !== $pattern));
+            $drawn = array_values(array_filter($patterns, static fn (?string $pattern) => BorderPattern::NONE !== $pattern));
             $border = $border->withWidths(...$widths)->withPattern($drawn[0]);
 
-            return $s->withBorder(1 === \count(array_unique($drawn)) ? $border : $border->withSidePatterns(array_map(static fn (string $pattern) => BorderPattern::NONE === $pattern ? null : $pattern, $patterns)));
+            return $s->withBorder(1 === \count(array_unique($drawn)) ? $border : $border->withSidePatterns(array_map(static fn (?string $pattern) => BorderPattern::NONE === $pattern ? null : $pattern, $patterns)));
         }, Support::supported('One to four styles, by side, like the other box sides; Tui patterns (rounded, tall, wide...) are accepted too.'));
         $this->addProperty('border-color', static function (Style $s, string $v, MediaContext $m) {
-            $colors = array_map(static fn (string $part) => Value::color($part, $m), Value::split($v));
-            if (!$colors || \count($colors) > 4 || \in_array(false, $colors, true)) {
+            $colors = [];
+            foreach (Value::split($v) as $part) {
+                if (false === $color = Value::color($part, $m)) {
+                    return false;
+                }
+                $colors[] = $color;
+            }
+            if (!$colors || \count($colors) > 4) {
                 return false;
             }
             if (1 === \count($colors)) {
@@ -1570,7 +1582,7 @@ class DeclarationMapper implements SupportProviderInterface
                     $sides[$side] = max($sides[$side], 1);
                 }
             }
-            $style = $style->withMarginPull(new Padding(...$sides));
+            $style = $style->withMarginPull(new Padding($sides[0], $sides[1], $sides[2], $sides[3]));
         }
         // A border image with translucent colors, over what is behind the box, like a background
         if (!$media->forcedColors && ($borderImage = $style->getBorderImage()) instanceof Gradient && $borderImage->isTranslucent()) {
@@ -2548,7 +2560,7 @@ class DeclarationMapper implements SupportProviderInterface
             return null;
         }
 
-        return ($m[1] ?? '').($m[2] ?? '').($m[3] ?? '');
+        return $m[1].($m[2] ?? '').($m[3] ?? '');
     }
 
     /**
@@ -3052,7 +3064,7 @@ class DeclarationMapper implements SupportProviderInterface
                 default => null,
             };
 
-            return null !== $size ? ['length', 0.0, new PercentLength(true, [$size, \is_int($minimum) ? [0.0, (float) $minimum] : $minimum])] : [$max[0], $max[1], $minimum];
+            return null !== $size ? ['length', 0.0, new PercentLength(true, [\is_int($size) ? [0.0, (float) $size] : $size, \is_int($minimum) ? [0.0, (float) $minimum] : $minimum])] : [$max[0], $max[1], $minimum];
         }
 
         return match (true) {
@@ -3624,10 +3636,11 @@ class DeclarationMapper implements SupportProviderInterface
             }
             $values = [];
             foreach ($radii as $radius) {
-                $values[] = \in_array($radius, ['closest-side', 'farthest-side'], true) ? $radius : ($length($radius) ?? false);
-                if (false === end($values)) {
+                $radiusValue = \in_array($radius, ['closest-side', 'farthest-side'], true) ? $radius : $length($radius);
+                if (null === $radiusValue) {
                     return false;
                 }
+                $values[] = $radiusValue;
             }
 
             return new FloatShape($name, $box, $values, $position, rowRatio: $ratio);
@@ -3644,9 +3657,10 @@ class DeclarationMapper implements SupportProviderInterface
             }
             $insets = [];
             foreach ($sides as $side) {
-                if (null === $insets[] = $length($side, true)) {
+                if (null === $inset = $length($side, true)) {
                     return false;
                 }
+                $insets[] = $inset;
             }
             // Like margin: top, right, bottom, left, the missing ones from the opposite side
             $insets = [$insets[0], $insets[1] ?? $insets[0], $insets[2] ?? $insets[0], $insets[3] ?? $insets[1] ?? $insets[0]];
@@ -3664,9 +3678,10 @@ class DeclarationMapper implements SupportProviderInterface
                     }
                     $lengths = [];
                     foreach ($values as $radius) {
-                        if (null === $lengths[] = $length($radius)) {
+                        if (null === $radiusLength = $length($radius)) {
                             return false;
                         }
+                        $lengths[] = $radiusLength;
                     }
                     $corners[] = [$lengths[0], $lengths[1] ?? $lengths[0], $lengths[2] ?? $lengths[0], $lengths[3] ?? $lengths[1] ?? $lengths[0]];
                 }
@@ -4070,11 +4085,11 @@ class DeclarationMapper implements SupportProviderInterface
         }
 
         if ('padding' === $box) {
-            return $style->withPadding(new Padding(...$cells, percents: $percents ?: null));
+            return $style->withPadding(new Padding($cells[0], $cells[1], $cells[2], $cells[3], $percents ?: null));
         }
 
-        return $style->withMargin(new Padding(...$cells, percents: $percents ?: null))->withAutoMargin(AutoMargin::fromSides($autoSides[3], $autoSides[1]))->withAutoMarginRows([$autoSides[0], $autoSides[2]])
-            ->withMarginPull([0, 0, 0, 0] === $pull ? null : new Padding(...$pull))->withMarginHairline($hairline);
+        return $style->withMargin(new Padding($cells[0], $cells[1], $cells[2], $cells[3], $percents ?: null))->withAutoMargin(AutoMargin::fromSides($autoSides[3], $autoSides[1]))->withAutoMarginRows([$autoSides[0], $autoSides[2]])
+            ->withMarginPull([0, 0, 0, 0] === $pull ? null : new Padding($pull[0], $pull[1], $pull[2], $pull[3]))->withMarginHairline($hairline);
     }
 
     /**
@@ -4165,7 +4180,7 @@ class DeclarationMapper implements SupportProviderInterface
         if (\count($halves) > 2) {
             return null;
         }
-        $radii = [];
+        $radii = [0, 0, 0, 0];
         foreach ($halves as $i => $half) {
             $parts = Value::split($half);
             if (!$parts || \count($parts) > 4) {
@@ -4251,13 +4266,13 @@ class DeclarationMapper implements SupportProviderInterface
             if (isset($declarations['border-'.$corner.'-radius']) && null !== $radius = self::radius(Value::split($declarations['border-'.$corner.'-radius'])[0] ?? '', $media)) {
                 $radii[$index] = $radius;
             }
-            if (isset($declarations['corner-'.$corner.'-shape']) && false !== $shape = self::cornerShapeParts($declarations['corner-'.$corner.'-shape'])[0] ?? false) {
+            if (isset($declarations['corner-'.$corner.'-shape']) && false !== ($shape = self::cornerShapeParts($declarations['corner-'.$corner.'-shape'])[0] ?? false)) {
                 $shapes[$index] = $shape;
             }
         }
-        $corners = [];
+        $corners = [null, null, null, null];
         foreach ($radii as $index => $radius) {
-            $corners[] = $radius > 0 && 'square' !== $shapes[$index] ? $shapes[$index] : null;
+            $corners[$index] = $radius > 0 && 'square' !== $shapes[$index] ? $shapes[$index] : null;
         }
 
         return [null, null, null, null] === $corners ? null : $corners;
@@ -4565,31 +4580,25 @@ class DeclarationMapper implements SupportProviderInterface
     {
         $order = array_flip(array_keys($declarations));
         $shorthand = isset($declarations['background']) ? self::backgroundShorthand($declarations['background'], $media, $index) : [];
-        $part = static function (string $property, string $component) use ($declarations, $order, $shorthand, $media, $index) {
-            if (isset($declarations[$property]) && (!isset($order['background']) || $order[$property] > $order['background'])) {
-                return self::backgroundLayoutPart($property, $declarations[$property], $media, $index);
-            }
+        $value = static fn (string $property): ?string => isset($declarations[$property]) && (!isset($order['background']) || $order[$property] > $order['background']) ? $declarations[$property] : null;
 
-            return $shorthand[$component] ?? null;
-        };
-
-        $clip = $part('background-clip', 'clip');
-        $origin = $part('background-origin', 'origin');
-        $size = $part('background-size', 'size');
+        $clip = null !== ($v = $value('background-clip')) ? self::backgroundLayoutPart('background-clip', $v, $media, $index) : ($shorthand['clip'] ?? null);
+        $origin = null !== ($v = $value('background-origin')) ? self::backgroundLayoutPart('background-origin', $v, $media, $index) : ($shorthand['origin'] ?? null);
+        $size = null !== ($v = $value('background-size')) ? self::backgroundLayoutPart('background-size', $v, $media, $index) : ($shorthand['size'] ?? null);
         $fit = $size[2] ?? null;
         $size = null !== $size ? [$size[0], $size[1]] : null;
-        $position = $part('background-position', 'position');
-        $repeat = $part('background-repeat', 'repeat');
-        if (null !== $x = $part('background-position-x', '')) {
+        $position = null !== ($v = $value('background-position')) ? self::backgroundLayoutPart('background-position', $v, $media, $index) : ($shorthand['position'] ?? null);
+        $repeat = null !== ($v = $value('background-repeat')) ? self::backgroundLayoutPart('background-repeat', $v, $media, $index) : ($shorthand['repeat'] ?? null);
+        if (null !== $x = null !== ($v = $value('background-position-x')) ? self::backgroundLayoutPart('background-position-x', $v, $media, $index) : null) {
             $position = [$x, ($position ?? [1 => new BackgroundLength()])[1]];
         }
-        if (null !== $y = $part('background-position-y', '')) {
+        if (null !== $y = null !== ($v = $value('background-position-y')) ? self::backgroundLayoutPart('background-position-y', $v, $media, $index) : null) {
             $position = [($position ?? [new BackgroundLength()])[0], $y];
         }
-        if (null !== $x = $part('background-repeat-x', '')) {
+        if (null !== $x = null !== ($v = $value('background-repeat-x')) ? self::backgroundLayoutPart('background-repeat-x', $v, $media, $index) : null) {
             $repeat = [$x, ($repeat ?? [1 => BackgroundLayout::REPEAT])[1]];
         }
-        if (null !== $y = $part('background-repeat-y', '')) {
+        if (null !== $y = null !== ($v = $value('background-repeat-y')) ? self::backgroundLayoutPart('background-repeat-y', $v, $media, $index) : null) {
             $repeat = [($repeat ?? [BackgroundLayout::REPEAT])[0], $y];
         }
         if (null === $clip && null === $origin && null === $size && null === $position && null === $repeat) {
@@ -4652,7 +4661,7 @@ class DeclarationMapper implements SupportProviderInterface
      * The layout parts of the first layer of the background shorthand, by component: position / size, repeat, and
      * the boxes, the first one being the origin and the clip, a second one the clip.
      *
-     * @return array{clip?: string, origin?: string, size?: array{?BackgroundLength, ?BackgroundLength}, position?: array{BackgroundLength, BackgroundLength}, repeat?: array{string, string}}
+     * @return array{clip?: 'border-box'|'padding-box'|'content-box'|'text', origin?: 'border-box'|'padding-box'|'content-box', size?: array{?BackgroundLength, ?BackgroundLength, 2?: 'cover'|'contain'}, position?: array{BackgroundLength, BackgroundLength}, repeat?: array{'repeat'|'no-repeat'|'space'|'round', 'repeat'|'no-repeat'|'space'|'round'}}
      */
     private static function backgroundShorthand(string $value, MediaContext $media, int $index = 0): array
     {
@@ -4700,7 +4709,11 @@ class DeclarationMapper implements SupportProviderInterface
     /**
      * The value of a longhand of the background layout, of its first layer; null when it is not valid.
      *
-     * @return string|array{?BackgroundLength, ?BackgroundLength}|array{BackgroundLength, BackgroundLength}|array{string, string}|BackgroundLength|null
+     * @template T of string
+     *
+     * @param T $property
+     *
+     * @return (T is 'background-clip' ? 'border-box'|'padding-box'|'content-box'|'text'|null : (T is 'background-origin' ? 'border-box'|'padding-box'|'content-box'|null : (T is 'background-size' ? array{?BackgroundLength, ?BackgroundLength, 2?: 'cover'|'contain'}|null : (T is 'background-position' ? array{BackgroundLength, BackgroundLength}|null : (T is 'background-repeat' ? array{'repeat'|'no-repeat'|'space'|'round', 'repeat'|'no-repeat'|'space'|'round'}|null : (T is 'background-repeat-x'|'background-repeat-y' ? 'repeat'|'no-repeat'|'space'|'round'|null : BackgroundLength|null))))))
      */
     private static function backgroundLayoutPart(string $property, string $value, MediaContext $media, int $index = 0): string|array|BackgroundLength|null
     {
@@ -4761,6 +4774,11 @@ class DeclarationMapper implements SupportProviderInterface
         return null;
     }
 
+    /**
+     * @phpstan-assert-if-true 'repeat'|'no-repeat'|'space'|'round' $keyword
+     *
+     * @psalm-assert-if-true 'repeat'|'no-repeat'|'space'|'round' $keyword
+     */
     private static function isRepeat(string $keyword): bool
     {
         return \in_array($keyword, [BackgroundLayout::REPEAT, BackgroundLayout::NO_REPEAT, BackgroundLayout::SPACE, BackgroundLayout::ROUND], true);
@@ -4922,7 +4940,7 @@ class DeclarationMapper implements SupportProviderInterface
                 if (null === $color) {
                     unset($declarations[$property]);
                 } else {
-                    $declarations[$property] = preg_replace('/\bcurrentcolor\b/i', $color, $value);
+                    $declarations[$property] = preg_replace('/\bcurrentcolor\b/i', $color, $value) ?? $value;
                 }
             }
         }
@@ -4972,6 +4990,7 @@ class DeclarationMapper implements SupportProviderInterface
         $widths = [null, null, null, null];
         foreach ($declarations as $property => $value) {
             $value = strtolower(trim($value));
+            $m = [];
             if ('border' === $property || preg_match('/^border-(top|right|bottom|left|block|inline|block-start|block-end|inline-start|inline-end)$/', $property, $m)) {
                 // A shorthand sets the width, medium without one
                 $width = 1;

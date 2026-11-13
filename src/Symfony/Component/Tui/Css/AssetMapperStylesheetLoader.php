@@ -44,7 +44,22 @@ final class AssetMapperStylesheetLoader implements StylesheetLoaderInterface
             ?? $this->findByPublicPath($path)
             ?? throw new InvalidArgumentException(\sprintf('The stylesheet "%s" is not a mapped asset.', $href));
 
-        return $asset->content ?? (string) file_get_contents($asset->sourcePath);
+        if (null !== $asset->content) {
+            return $asset->content;
+        }
+        // Only a local file selected by the application's asset map can be read.
+        /**
+         * @psalm-taint-escape file
+         * @psalm-taint-escape ssrf
+         * @psalm-taint-escape url_component
+         * @psalm-taint-escape url_path
+         */
+        $source = realpath($asset->sourcePath);
+        if (false === $source || !is_file($source) || !is_readable($source)) {
+            throw new InvalidArgumentException(\sprintf('The stylesheet "%s" has no readable local source.', $href));
+        }
+
+        return (string) file_get_contents($source);
     }
 
     private function findByPublicPath(string $path): ?MappedAsset

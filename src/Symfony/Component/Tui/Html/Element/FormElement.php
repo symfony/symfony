@@ -55,8 +55,8 @@ final class FormElement implements ElementFactoryInterface
      * Wires a control of a form: a reset button restores the initial values, a submit button submits the form, Enter
      * in a single-line field submits it through its first submit button.
      *
-     * @param list<array{AbstractWidget, \Dom\Element}> $controls The controls of the form so far, this one included
-     * @param list<\Closure(): void>                    $initial  How to restore them
+     * @param \Closure(): list<array{AbstractWidget, \Dom\Element}> $controls The controls of the form so far, this one included
+     * @param \Closure(): list<\Closure(): void>                    $initial  How to restore them
      *
      * @internal
      */

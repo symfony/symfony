@@ -163,7 +163,7 @@ class DropdownWidget extends ContainerWidget implements NativeAppearanceInterfac
         }
         // As wide as its items with the border and padding its style gives it, like ::picker(select) { padding: 0 2ch }
         if (null !== $resolved = $this->getContext()?->resolveStyle($this->list)) {
-            $chrome = ($resolved->getBorder()?->left ?? 0) + ($resolved->getBorder()?->right ?? 0) + ($resolved->getPadding()?->left ?? 0) + ($resolved->getPadding()?->right ?? 0);
+            $chrome = ($resolved->getBorder()->left ?? 0) + ($resolved->getBorder()->right ?? 0) + ($resolved->getPadding()->left ?? 0) + ($resolved->getPadding()->right ?? 0);
             if (($style = $this->list->getStyle() ?? new Style())->getMaxColumns() !== $columns = $this->listColumns($chrome)) {
                 $this->list->setStyle($style->withMaxColumns($columns));
             }

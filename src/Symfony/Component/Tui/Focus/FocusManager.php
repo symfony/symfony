@@ -95,7 +95,9 @@ class FocusManager
 
     public function getTabIndex(AbstractWidget $widget): int
     {
-        return $this->tabIndexes[$widget] ?? 0;
+        $index = $this->tabIndexes[$widget] ?? null;
+
+        return null !== $index ? $index : 0;
     }
 
     /**

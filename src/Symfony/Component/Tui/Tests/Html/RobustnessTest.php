@@ -24,6 +24,20 @@ use Symfony\Component\Tui\Tui;
  */
 final class RobustnessTest extends TestCase
 {
+    public function testSvgBackgroundDoesNotPreventTextRenderingWithoutGd()
+    {
+        $terminal = new VirtualTerminal(20, 4);
+        $tui = new Tui(null, $terminal);
+        $svg = 'data:image/svg+xml,'.rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" width="8" height="16"><rect width="8" height="16" fill="red"/></svg>');
+        (new HtmlBuilder())->build('<p style="background-image: url('.$svg.')">visible</p>')->mount($tui);
+        $tui->start();
+        $tui->processRender();
+        $screen = new ScreenBuffer(20, 4);
+        $screen->write($terminal->getOutput());
+        $this->assertStringContainsString('visible', $screen->getScreen());
+        $tui->stop();
+    }
+
     public function testAWideSubgridClipsItsFarItemsAndTheirPositions()
     {
         $terminal = new VirtualTerminal(40, 8);

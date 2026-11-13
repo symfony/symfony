@@ -28,7 +28,7 @@ final class TabsElement implements ElementFactoryInterface
     {
         $position = TabPosition::tryFrom(strtolower($element->getAttribute('position') ?? '')) ?? TabPosition::Top;
         $tabs = new TabsWidget([], $position);
-        foreach ($element->children as $child) {
+        for ($child = $element->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
             if (null !== $widget = $builder->buildElement($child)) {
                 $tabs->add($widget);
             }

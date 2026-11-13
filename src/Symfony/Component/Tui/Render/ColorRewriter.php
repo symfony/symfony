@@ -87,7 +87,8 @@ final class ColorRewriter
                     $rgb = null;
                     if (\count($sub) > 1) {
                         if ('2' === $sub[1] && \count($sub) >= 5) {
-                            $rgb = array_map(intval(...), \array_slice($sub, -3));
+                            $last = \count($sub) - 1;
+                            $rgb = [(int) $sub[$last - 2], (int) $sub[$last - 1], (int) $sub[$last]];
                         } elseif ('5' === $sub[1] && isset($sub[2])) {
                             $rgb = self::palette((int) $sub[2]);
                         }

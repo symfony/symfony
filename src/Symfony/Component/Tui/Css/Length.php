@@ -241,6 +241,7 @@ final class Length
                     'rad' => rad2deg($number),
                     default => $number * 360,
                 }),
+                default => throw new \UnhandledMatchError(),
             };
         }
 

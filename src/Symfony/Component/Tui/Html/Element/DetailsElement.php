@@ -98,7 +98,7 @@ final class DetailsElement implements ElementFactoryInterface
      */
     private static function summaryText(\Dom\Element $summary, HtmlBuilder $builder): array
     {
-        $copy = $summary->cloneNode(true);
+        $copy = clone $summary;
         $originals = iterator_to_array($summary->querySelectorAll('*'), false);
         $copies = iterator_to_array($copy->querySelectorAll('*'), false);
         $end = [];

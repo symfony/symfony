@@ -41,14 +41,14 @@ final class Animation
     ];
 
     /**
-     * @param string                                                                                              $name        The @keyframes name
-     * @param float                                                                                               $duration    In seconds
-     * @param float                                                                                               $delay       In seconds
-     * @param float                                                                                               $iterations  How many times it plays, INF for ever
-     * @param array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>|list<array{float, float}>} $timing      The function (linear, ease, ease-in, ease-out, ease-in-out, cubic-bezier, steps), its steps, where they jump (start, end, none or both), the control points of a cubic-bezier() or the points of a linear()
-     * @param string                                                                                              $timeline    What drives it, like animation-timeline: auto for time, scroll(...), view(...) or the name of a scroll or view timeline
-     * @param array{array{string, float}, array{string, float}}                                                   $range       Where it starts and ends on a view timeline, like animation-range: a range (normal, cover, contain, entry, exit) and a percentage of it
-     * @param 'replace'|'add'|'accumulate'                                                                        $composition How its keyframes combine with the element's own values, like animation-composition
+     * @param string                                                                                                        $name        The @keyframes name
+     * @param float                                                                                                         $duration    In seconds
+     * @param float                                                                                                         $delay       In seconds
+     * @param float                                                                                                         $iterations  How many times it plays, INF for ever
+     * @param array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>, points?: list<array{float, float}>} $timing      The function (linear, ease, ease-in, ease-out, ease-in-out, cubic-bezier, steps), its steps, where they jump (start, end, none or both), the control points of a cubic-bezier() or the points of a linear()
+     * @param string                                                                                                        $timeline    What drives it, like animation-timeline: auto for time, scroll(...), view(...) or the name of a scroll or view timeline
+     * @param array{array{string, float}, array{string, float}}                                                             $range       Where it starts and ends on a view timeline, like animation-range: a range (normal, cover, contain, entry, exit) and a percentage of it
+     * @param 'replace'|'add'|'accumulate'                                                                                  $composition How its keyframes combine with the element's own values, like animation-composition
      */
     private function __construct(
         public readonly string $name,
@@ -197,7 +197,7 @@ final class Animation
     /**
      * Reads a layer of the animation shorthand.
      *
-     * @return array{name: string|null, duration: float|null, delay: float|null, iterations: float, direction: string, fill: string, timing: array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>|list<array{float, float}>}, paused: bool}
+     * @return array{name: string|null, duration: float|null, delay: float|null, iterations: float, direction: string, fill: string, timing: array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>, points?: list<array{float, float}>}, paused: bool}
      */
     /**
      * The start and end of animation-range: one range for both, like entry, or two edges, like entry 10% exit 90%.
@@ -214,26 +214,20 @@ final class Animation
         }
         // The start, then the end, each a name and a percentage, or one of them
         $edges = [];
-        $current = null;
-        foreach ($parts as $part) {
+        for ($i = 0, $count = \count($parts); $i < $count; ++$i) {
+            $part = $parts[$i];
             if (\in_array($part, $names, true)) {
-                if (null !== $current) {
-                    $edges[] = $current;
+                $percent = null;
+                if (isset($parts[$i + 1]) && preg_match('/^(-?\d*\.?\d+)%$/', $parts[$i + 1], $m)) {
+                    $percent = (float) $m[1];
+                    ++$i;
                 }
-                $current = [$part, null];
+                $edges[] = [$part, $percent];
             } elseif (preg_match('/^(-?\d*\.?\d+)%$/', $part, $m)) {
-                $current = null === $current ? ['normal', (float) $m[1]] : (null === $current[1] ? [$current[0], (float) $m[1]] : null);
-                if (null === $current) {
-                    return null;
-                }
-                $edges[] = $current;
-                $current = null;
+                $edges[] = ['normal', (float) $m[1]];
             } else {
                 return null;
             }
-        }
-        if (null !== $current) {
-            $edges[] = $current;
         }
         if (!$edges || \count($edges) > 2) {
             return null;
@@ -544,21 +538,21 @@ final class Animation
     /**
      * A timing function, cut into steps: smooth ones in as many as bound the styles computed.
      *
-     * @param array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>|list<array{float, float}>} $timing
+     * @param array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>, points?: list<array{float, float}>} $timing
      */
     public static function ease(array $timing, float $t): float
     {
         [$function, $steps, $position] = $timing;
-        $t = match (true) {
+        $t = match ($timing[0]) {
             // Like steps(): jump-start jumps at the start of each step, jump-end at its end, jump-none holds the first and last
             // values for a step each, jump-both jumps at both ends
-            'steps' === $function => min(1.0, match ($position) {
+            'steps' => min(1.0, match ($position) {
                 'start' => ceil($t * $steps) / $steps,
                 'none' => floor($t * $steps) / ($steps - 1),
                 'both' => (floor($t * $steps) + 1) / ($steps + 1),
                 default => floor($t * $steps) / $steps,
             }),
-            'linear' === $function => isset($timing[3]) ? self::piecewise($timing[3], $t) : $t,
+            'linear' => isset($timing['points']) ? self::piecewise($timing['points'], $t) : $t,
             default => self::bezier($timing[3] ?? self::BEZIERS[$function] ?? self::BEZIERS['ease'], $t),
         };
 
@@ -579,7 +573,7 @@ final class Animation
     }
 
     /**
-     * @return array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>|list<array{float, float}>}|null
+     * @return array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>, points?: list<array{float, float}>}|null
      */
     public static function timing(string $value): ?array
     {
@@ -604,7 +598,7 @@ final class Animation
     }
 
     /**
-     * @return array{string, int, 'end', list<float>}|null
+     * @return array{'cubic-bezier', int, 'end', list<float>}|null
      */
     private static function cubicBezier(string $arguments): ?array
     {
@@ -624,7 +618,7 @@ final class Animation
     /**
      * The points of linear(): each stop an output, at one or two input percentages, the missing inputs spread evenly.
      *
-     * @return array{string, int, 'end', list<array{float, float}>}|null
+     * @return array{0: 'linear', 1: int, 2: 'end', points: list<array{float, float}>}|null
      */
     private static function linearStops(string $arguments): ?array
     {
@@ -675,7 +669,7 @@ final class Animation
             $i = $end;
         }
 
-        return ['linear', 0, 'end', $stops];
+        return ['linear', 0, 'end', 'points' => $stops];
     }
 
     /**

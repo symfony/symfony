@@ -44,7 +44,7 @@ final class ContainerQuery
     /**
      * Whether the scroll state of a scroll-state container passes the scroll-state() tests.
      *
-     * @param array{stuck?: list<string>, snapped?: list<string>, scrollable?: list<string>, scrolled?: list<string>} $state The sides it is stuck to (top, bottom, left, right), the axes it is snapped on (x, y), the sides it can be scrolled to, and the sides it was last scrolled to
+     * @param array{stuck?: list<string>, snapped?: list<string>, scrollable?: list<string>, scrolled?: list<string>, offset?: array{array{0?: int, 1?: int}, array{0?: int, 1?: int}}, targetCurrent?: bool} $state The sides it is stuck to (top, bottom, left, right), the axes it is snapped on (x, y), the sides it can be scrolled to, and the sides it was last scrolled to
      */
     public function matchesScrollState(array $state): bool
     {

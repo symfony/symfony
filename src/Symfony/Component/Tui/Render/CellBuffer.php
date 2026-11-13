@@ -172,15 +172,15 @@ final class CellBuffer
      * Lines are parsed: ANSI escape codes are interpreted and stored as
      * cell attributes; visible characters are placed into the grid.
      *
-     * @param string[]    $lines       ANSI-formatted lines
-     * @param int         $startRow    Row offset to start writing
-     * @param int         $startCol    Column offset to start writing
-     * @param bool        $transparent When true, cells with no explicit background preserve
-     *                                 the existing buffer background (transparency). Cells that
-     *                                 are spaces with default bg/attrs, whatever their fg, are fully transparent
-     *                                 and leave the buffer cell entirely unchanged.
-     * @param string|null $seeThrough  A background, as SGR parameters like 48;2;255;255;255, that a transparent layer
-     *                                 treats as none: the one it inherited from what it is drawn in
+     * @param array<int, string> $lines       ANSI-formatted lines
+     * @param int                $startRow    Row offset to start writing
+     * @param int                $startCol    Column offset to start writing
+     * @param bool               $transparent When true, cells with no explicit background preserve
+     *                                        the existing buffer background (transparency). Cells that
+     *                                        are spaces with default bg/attrs, whatever their fg, are fully transparent
+     *                                        and leave the buffer cell entirely unchanged.
+     * @param string|null        $seeThrough  A background, as SGR parameters like 48;2;255;255;255, that a transparent layer
+     *                                        treats as none: the one it inherited from what it is drawn in
      */
     public function writeAnsiLines(array $lines, int $startRow = 0, int $startCol = 0, bool $transparent = false, ?string $seeThrough = null): void
     {

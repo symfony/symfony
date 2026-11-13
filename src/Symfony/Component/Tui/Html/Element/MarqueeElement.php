@@ -30,7 +30,7 @@ final class MarqueeElement implements ElementFactoryInterface
 {
     public function create(\Dom\Element $element, HtmlBuilder $builder): AbstractWidget
     {
-        foreach ($element->children as $child) {
+        for ($child = $element->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
             if (!$builder->isInline($child) || $builder->getStyleSheet()->mayBeBlock($child)) {
                 return (new ContainerElement())->create($element, $builder);
             }

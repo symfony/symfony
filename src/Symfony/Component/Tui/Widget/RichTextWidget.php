@@ -1460,6 +1460,7 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
                 }
             }
         }
+        /** @var \SplObjectStorage<InlineNode, list<array{string, list<Style>}>> $pieces */
         $pieces = new \SplObjectStorage();
         foreach ($texts as [$node, $start]) {
             $length = \strlen($node->text);
@@ -1599,9 +1600,9 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
     }
 
     /**
-     * @param list<InlineNode>                                                                                                                  $nodes
-     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int} $state
-     * @param list<Style>                                                                                                                       $styles
+     * @param list<InlineNode>                                                                                                                                                                                             $nodes
+     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int, atomic?: int, drawn?: bool, breakAfter?: bool, pendingMarks?: list<Style>} $state
+     * @param list<Style>                                                                                                                                                                                                  $styles
      */
     private function walk(array $nodes, array &$state, array $styles, ?string $transform, string $whiteSpace, int $letterSpacing = 0, ?string $script = null, bool $reversed = false, int $wordSpacing = 0): void
     {
@@ -1758,7 +1759,7 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
                 $this->walkRuby($node->children, $state, $nodeStyles, $nodeTransform, $nodeWhiteSpace, $format->letterSpacing, $format->script ?? $script, $nodeReversed, $format->wordSpacing);
             } else {
                 $state['atomic'] = ($state['atomic'] ?? 0) + ($atomic ? 1 : 0);
-                $this->walk($node->children, $state, $nodeStyles, $nodeTransform, $nodeWhiteSpace, null !== $format ? $format->letterSpacing : $letterSpacing, $format->script ?? $script, $nodeReversed, null !== $format ? $format->wordSpacing : $wordSpacing);
+                $this->walk($node->children, $state, $nodeStyles, $nodeTransform, $nodeWhiteSpace, null !== $format ? $format->letterSpacing : $letterSpacing, (null !== $format ? $format->script : null) ?? $script, $nodeReversed, null !== $format ? $format->wordSpacing : $wordSpacing);
                 $state['atomic'] -= $atomic ? 1 : 0;
             }
             $this->hyphenator = $outerHyphenator;
@@ -1823,9 +1824,9 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
      * them pair one to one, the annotations left over going with the last base; the white space between them is not
      * drawn.
      *
-     * @param list<InlineNode>                                                                                                                  $nodes
-     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int} $state
-     * @param list<Style>                                                                                                                       $styles
+     * @param list<InlineNode>                                                                                                                                                                                             $nodes
+     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int, atomic?: int, drawn?: bool, breakAfter?: bool, pendingMarks?: list<Style>} $state
+     * @param list<Style>                                                                                                                                                                                                  $styles
      */
     private function walkRuby(array $nodes, array &$state, array $styles, ?string $transform, string $whiteSpace, int $letterSpacing, ?string $script, bool $reversed, int $wordSpacing): void
     {
@@ -1923,7 +1924,7 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
     /**
      * Adds a ruby base marked with its annotation, the base as wide as the annotation, and the base kept on one line.
      *
-     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int} $state
+     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int, atomic?: int, drawn?: bool, breakAfter?: bool, pendingMarks?: list<Style>} $state
      */
     private function putRuby(array &$state, string $base, string $annotation, bool $under = false, bool $start = false, bool $mark = false): void
     {
@@ -1958,8 +1959,8 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
      * Marks the characters of the text composed since an offset with the emphasis mark of their format, like
      * text-emphasis: each a ruby base, its mark the annotation; not the spaces, the punctuation nor the controls.
      *
-     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int} $state
-     * @param list<Style>                                                                                                                       $styles
+     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int, atomic?: int, drawn?: bool, breakAfter?: bool, pendingMarks?: list<Style>} $state
+     * @param list<Style>                                                                                                                                                                                                  $styles
      */
     private function emphasize(array &$state, int $at, array $styles): void
     {
@@ -2016,8 +2017,8 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
     }
 
     /**
-     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int} $state
-     * @param list<Style>                                                                                                                       $styles
+     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int, atomic?: int, drawn?: bool, breakAfter?: bool, pendingMarks?: list<Style>} $state
+     * @param list<Style>                                                                                                                                                                                                  $styles
      */
     private function emit(array &$state, string $text, array $styles, ?string $transform, string $whiteSpace, int $letterSpacing = 0, ?string $script = null, bool $words = false, int $wordSpacing = 0): void
     {
@@ -2058,7 +2059,7 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
                 'lowercase' => mb_strtolower($text),
                 'capitalize' => preg_replace_callback('/(^|[\s\p{P}])(\p{Ll})/u', static fn (array $m) => $m[1].mb_strtoupper($m[2]), $text),
                 // Like text-transform: full-width, the ASCII characters as their full-width forms, two columns each
-                'full-width' => preg_replace_callback('/[!-~]/', static fn (array $m) => mb_chr(\ord($m[0]) + 0xFEE0), $text) ?? $text,
+                'full-width' => preg_replace_callback('/[!-~]/', static fn (array $m) => mb_chr(\ord($m[0]) + 0xFEE0) ?: $m[0], $text) ?? $text,
                 'full-size-kana' => self::toFullSizeKana($text),
                 'small-caps' => self::toSmallCaps($text),
                 'diagonal-fractions' => self::toFractions($text),
@@ -2203,9 +2204,9 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
     /**
      * Adds a styled part, the columns of it still on the first line with the ::first-line style under its own.
      *
-     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int} $state
-     * @param list<Style>                                                                                                                       $styles
-     * @param \Closure(string, list<Style>): string                                                                                             $styled
+     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int, atomic?: int, drawn?: bool, breakAfter?: bool, pendingMarks?: list<Style>} $state
+     * @param list<Style>                                                                                                                                                                                                  $styles
+     * @param \Closure(string, list<Style>): string                                                                                                                                                                        $styled
      */
     private function put(array &$state, string $part, array $styles, \Closure $styled): void
     {
@@ -2233,11 +2234,11 @@ class RichTextWidget extends TextWidget implements InlineContentInterface
      *
      * Unicode has them for digits, signs and some letters: x², H₂O. A run
      * with a character that has none is left on the line, like before.
-     */
-    /**
+     *
+     *
      * Adds styled text as is: a pending space first, like emit().
      *
-     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int} $state
+     * @param array{text: string, index: int, pendingSpace: bool, firstLetter: bool, spaced: bool, link: int, firstLine: int, firstLineAt: int, atomic?: int, drawn?: bool, breakAfter?: bool, pendingMarks?: list<Style>} $state
      */
     private function emitRaw(array &$state, string $text): void
     {

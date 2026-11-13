@@ -23,20 +23,33 @@ require_once dirname(__DIR__, 2).'/Widget/Text/Hyphenator.php';
 
 use Symfony\Component\Tui\Widget\Text\Hyphenator;
 
-if (2 !== $argc || !is_dir($argv[1])) {
+$arguments = $_SERVER['argv'] ?? [];
+if (2 !== count($arguments) || !is_dir($arguments[1])) {
     fwrite(\STDERR, "Usage: php update-hyphenation.php path/to/hyph-utf8/patterns\n");
+    exit(1);
+}
+
+// The caller selects the local source directory of this maintenance command.
+/**
+ * @psalm-taint-escape file
+ * @psalm-taint-escape ssrf
+ * @psalm-taint-escape url_component
+ * @psalm-taint-escape url_path
+ */
+$source = realpath($arguments[1]);
+if (false === $source) {
     exit(1);
 }
 
 $target = dirname(__DIR__, 2).'/Widget/Text/hyphenation';
 foreach (['en-us', 'fr', 'de-1996', 'es'] as $tag) {
-    $tex = file_get_contents($argv[1]."/tex/hyph-$tag.tex");
-    $patterns = file_get_contents($argv[1]."/txt/hyph-$tag.pat.txt");
+    $tex = file_get_contents($source."/tex/hyph-$tag.tex");
+    $patterns = file_get_contents($source."/txt/hyph-$tag.pat.txt");
     if (false === $tex || false === $patterns) {
         fwrite(\STDERR, "The patterns of $tag cannot be read.\n");
         exit(1);
     }
-    $exceptions = is_file($argv[1]."/txt/hyph-$tag.hyp.txt") ? (string) file_get_contents($argv[1]."/txt/hyph-$tag.hyp.txt") : '';
+    $exceptions = is_file($source."/txt/hyph-$tag.hyp.txt") ? (string) file_get_contents($source."/txt/hyph-$tag.hyp.txt") : '';
 
     // The comments that start the file: its title, copyright, notice and licence
     preg_match('/\A(?:%[^\n]*\n)+/', $tex, $header);

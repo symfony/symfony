@@ -88,7 +88,7 @@ final class PathCompleter
         }
         // ~ is the home directory, kept as typed
         $home = getenv('HOME') ?: null;
-        $path = null !== $home && ('~' === $value || str_starts_with($value, '~/')) ? $home.substr($value, 1) : $value;
+        $path = null !== $home && str_starts_with($value, '~/') ? $home.substr($value, 1) : $value;
         $slash = strrpos($path, '/');
         $directory = false === $slash ? '.' : ('' === substr($path, 0, $slash) ? '/' : substr($path, 0, $slash));
         $typed = false === ($at = strrpos($value, '/')) ? '' : substr($value, 0, $at + 1);

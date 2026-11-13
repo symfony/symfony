@@ -27,7 +27,7 @@ use Symfony\Component\Tui\Widget\Util\StringUtils;
  */
 final class ButtonElement implements ElementFactoryInterface
 {
-    /** @var \WeakMap<\Dom\Element, array{0: RasterImage|VectorImage, 1: int}>|null The icons drawn, made once for each of their elements */
+    /** @var \WeakMap<\Dom\Element, array{0: RasterImage|VectorImage, 1: int}|null>|null The icons drawn, made once for each of their elements */
     private static ?\WeakMap $icons = null;
 
     public function create(\Dom\Element $element, HtmlBuilder $builder): AbstractWidget
@@ -93,7 +93,7 @@ final class ButtonElement implements ElementFactoryInterface
     private static function conditional(\Dom\Element $element, HtmlBuilder $builder): array
     {
         $conditional = [];
-        foreach ($element->children as $child) {
+        for ($child = $element->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
             if ($builder->getStyleSheet()->mayChangeDisplay($child)) {
                 $conditional[] = $child;
             }

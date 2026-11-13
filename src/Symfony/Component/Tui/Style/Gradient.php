@@ -160,7 +160,7 @@ final class Gradient
             $this->lastUnder = [$over, (string) $over?->toBackgroundCode()];
         }
         $key .= '>'.$this->lastUnder[1];
-        if (\array_key_exists($key, $this->memo)) {
+        if (\array_key_exists($key, $this->memo) && !\is_array($this->memo[$key])) {
             return $this->memo[$key];
         }
 
@@ -203,8 +203,8 @@ final class Gradient
     private function sampleKeyed(int $column, int $row, int $columns, int $rows): array
     {
         $key = $this->placeAt($column, $row, $columns, $rows, $t, $stops);
-        if (\array_key_exists($key, $this->memo)) {
-            return [...$this->memo[$key], $key];
+        if (\is_array($cached = $this->memo[$key] ?? null)) {
+            return [$cached[0], $cached[1], $key];
         }
         if ($this->repeating) {
             // The stops again and again, before the first one and past the last one
@@ -216,7 +216,9 @@ final class Gradient
             $t = $first + fmod(fmod($t - $first, $period) + $period, $period);
         }
 
-        return [...$this->remember($key, self::colorOf($stops, $t)), $key];
+        [$color, $alpha] = $this->remember($key, self::colorOf($stops, $t));
+
+        return [$color, $alpha, $key];
     }
 
     /**

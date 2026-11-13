@@ -262,16 +262,16 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
     /** The URL relative links are resolved against, like the href of <base>, for :visited */
     private ?string $baseUrl = null;
 
-    /** @var \WeakMap<AbstractWidget, array{int, Density, bool, bool, string, string}> Revision, density, focus-within, an invalid control within, language and direction when last mirrored */
+    /** @var \WeakMap<AbstractWidget, array{int, Density, bool, bool, string, string, 6?: list<\Dom\Element>}> Revision, density, focus-within, an invalid control within, language and direction when last mirrored */
     private \WeakMap $synced;
 
     private ?AbstractWidget $root = null;
 
     /** @var \WeakMap<AbstractWidget, array{int, int}> The content size of the containers, from the last frame */
     private \WeakMap $containerSizes;
-    /** @var \WeakMap<AbstractWidget, array<string, list<string>>> The scroll state of the scroll-state containers in the last frame */
+    /** @var \WeakMap<AbstractWidget, array{stuck?: list<'top'|'bottom'>, snapped?: list<'x'|'y'>, scrollable?: list<'top'|'bottom'|'left'|'right'>, scrolled?: list<'top'|'bottom'|'left'|'right'>, targetCurrent?: bool, offset?: array{array{}|array{int, int}, array{}|array{int, int}}}> The scroll state of the scroll-state containers in the last frame */
     private \WeakMap $scrollStates;
-    /** @var (\Closure(AbstractWidget): array<string, mixed>)|null */
+    /** @var (\Closure(AbstractWidget): array{stuck: list<'top'|'bottom'>, snapped: list<'x'|'y'>, scrollable: list<'top'|'bottom'|'left'|'right'>, scrolled: list<'top'|'bottom'|'left'|'right'>, targetCurrent: bool, offset: array{array{}|array{int, int}, array{}|array{int, int}}})|null */
     private ?\Closure $scrollStateOf = null;
     /** @var array<string, array{params: list<array{string, ?string, ?string}>, returns: ?string, body: list<array{list<array{string, string}>, string, string}>}> The custom functions of @function rules, by name */
     private array $functions = [];
@@ -301,7 +301,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
     /** @var array{array<string, string>, array<string, string>}|null The declarations of the last parent, and those its children inherit, see inherit() */
     private ?array $inheritable = null;
 
-    /** @var array{\Dom\Document, array{array<string, true>, array<string, true>, array<string, true>}, array<string, list<string>|list<int>>}|null The document of the elements mayDeclare() was last asked of, held, its names, and the selectors that may match in it by property */
+    /** @var array{\Dom\Document, array{array<string, true>, array<string, true>, array<string, true>}, array<string, list<string>>, 3?: array<string, list<int>>}|null The document of the elements mayDeclare() was last asked of, held, its names, and the selectors that may match in it by property */
     private ?array $declaringIn = null;
 
     /**
@@ -411,7 +411,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
     /** @var \WeakMap<AbstractWidget, array<string, array{string, float}>> The animations of each animated widget, by name and occurrence, and when each started */
     private \WeakMap $animationStarts;
 
-    /** @var \WeakMap<AbstractWidget, array{values: array<string, string>, running: array<string, array{string, string, float, float, float, array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>|list<array{float, float}>}}>, shown: bool}> The values last computed for the transitioned properties of each widget, its running transitions, and whether it was displayed */
+    /** @var \WeakMap<AbstractWidget, array{values: array<string, string>, running: array<string, array{string, string, float, float, float, array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>, points?: list<array{float, float}>}}>, shown: bool}> The values last computed for the transitioned properties of each widget, its running transitions, and whether it was displayed */
     private \WeakMap $transitions;
 
     /** @var \WeakMap<AbstractWidget, bool> Whether each control draws its own look, see appearance */
@@ -469,7 +469,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
     /** The patterns that break the words of text with hyphens: auto, by their language */
     private HyphenatorRegistry $hyphenators;
 
-    /** @var array<string, string> The language of each mirrored widget, by object id, and of each inline node, by id and index; "" when unknown */
+    /** @var array<int|string, string> The language of each mirrored widget, by object id, and of each inline node, by id and index; "" when unknown */
     private array $languages = [];
 
     /** @var \WeakMap<AbstractWidget, true> The anonymous text blocks, around text between blocks: their inline elements are children of their parent */
@@ -949,7 +949,9 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
 
     public function getPositionedPseudoElements(AbstractWidget $widget): array
     {
-        return $this->positionedPseudos[$widget] ?? [];
+        $pseudos = $this->positionedPseudos[$widget] ?? null;
+
+        return null !== $pseudos ? $pseudos : [];
     }
 
     /**
@@ -979,7 +981,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                 $middle = $top + max(self::pixels($this->substitute($declarations['height'] ?? '', $declarations)) ?? 0.0, $border('top') + $border('bottom')) / 2;
                 // In the top padding of its element, which rounds to no row: no row of its own, the glyph would cover
                 // the text, like the caret of the tab of python.org in its padding of 8px, left out
-                if ($middle >= 0 && $middle < $this->topPadding() && 0 === (($this->styles[$this->pseudoOwner] ?? null)?->getPadding()?->top ?? 0)) {
+                if ($middle >= 0 && $middle < $this->topPadding() && 0 === (($this->styles[$this->pseudoOwner] ?? null)?->getPadding()->top ?? 0)) {
                     return true;
                 }
                 $declarations['top'] = ((int) floor($middle / $rowHeight) * $rowHeight).'px';
@@ -1125,7 +1127,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
             if ($document !== ($this->declaringIn[0] ?? null)) {
                 $this->declaringIn = [$document, $this->documentNames($document), []];
             }
-            $indexes = $this->declaringIn[2][$key] ??= array_values(array_filter($indexes, fn (int $index): bool => $this->mayMatchNames($this->rules[$index]->selector->native, $this->declaringIn[1])));
+            $indexes = $this->declaringIn[3][$key] ??= array_values(array_filter($indexes, fn (int $index): bool => $this->mayMatchNames($this->rules[$index]->selector->native, $this->declaringIn[1])));
         }
         $matching = [];
         foreach ($indexes as $index) {
@@ -1378,6 +1380,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
         $document = $element->isConnected ? $element->ownerDocument : null;
         if (null !== $document && !isset($matches[$documentId = spl_object_id($document)])) {
             $names = $this->documentNames($document);
+            /** @var \SplObjectStorage<\Dom\Element, list<int>> $found */
             $found = new \SplObjectStorage();
             foreach ($indexes as $index) {
                 $rule = $this->rules[$index];
@@ -1437,7 +1440,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                     $candidates[spl_object_id($element)] = $this->displayRulesOf($element, $matches);
                 }
                 $stateful = array_any(array_merge(...array_values($candidates)), fn (int $index): bool => $this->rules[$index]->selector->dynamic);
-            } elseif ($statesOnly && null !== $last && !$stateful) {
+            } elseif (null !== $last && !$stateful) {
                 // Only states changed, which no rule of them depends on: displayed as they were
                 continue;
             }
@@ -1636,6 +1639,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
      */
     private function svgMatchesOf(\Dom\Document $document, array $rules): \SplObjectStorage
     {
+        /** @var \SplObjectStorage<\Dom\Element, list<int>> $matches */
         $matches = new \SplObjectStorage();
         $names = $this->documentNames($document);
         foreach ($rules as $index) {
@@ -1683,8 +1687,8 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
             $this->svgMedia = $media->getKey();
             $this->svgCascade = new \WeakMap();
         }
-        if (isset($this->svgCascade[$element])) {
-            return $this->svgCascade[$element];
+        if (null !== $cached = $this->svgCascade[$element] ?? null) {
+            return $cached;
         }
         $inherited = null !== $element->parentElement ? $this->svgCascade($element->parentElement)[1] : [];
 
@@ -1841,20 +1845,15 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
     /**
      * Adds CSS source; adding the same source twice is a no-op.
      *
-     * @param string|null $media A media query list the whole source applies to
+     * @param string|null $media   A media query list the whole source applies to
+     * @param string|null $scope   The selector of the element the style sheet is in, the root of its @scope without one
+     * @param int|null    $tree    The shadow tree the style sheet is in, like a <style> of a <template shadowrootmode>, its
+     *                             rules matching there only; 0 for the document when it has shadow trees (@internal)
+     * @param int         $context How deep that tree is in others: the document wins over it, but for important
+     *                             declarations (@internal)
      *
      * @return $this
-     */
-    /**
-     * @param string|null $scope The selector of the element the style sheet is in, the root of its @scope without one
-     *
      * @return $this
-     */
-    /**
-     * @param int|null $tree    The shadow tree the style sheet is in, like a <style> of a <template shadowrootmode>, its
-     *                          rules matching there only; 0 for the document when it has shadow trees (@internal)
-     * @param int      $context How deep that tree is in others: the document wins over it, but for important
-     *                          declarations (@internal)
      */
     public function add(string $css, ?string $media = null, ?string $scope = null, ?int $tree = null, int $context = 0): static
     {
@@ -2236,7 +2235,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
      * @param string $lang The language of the parent, "" when unknown
      * @param string $dir  The direction of the parent, "ltr" or "rtl"
      *
-     * @return array{\Dom\Element, bool, bool} The element, whether it or a descendant has the focus, and whether it or a descendant is invalid
+     * @return array{\Dom\Element, bool, bool, 3?: list<\Dom\Element>|null} The element, whether it or a descendant has the focus, and whether it or a descendant is invalid
      */
     private function mirror(AbstractWidget $widget, Density $density, string $lang, string $dir, bool &$structureChanged, bool &$stateChanged): array
     {
@@ -2452,8 +2451,8 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
     private function mirrorInline(AbstractWidget&InlineContentInterface $widget, int $id, string $lang, string $dir, bool &$structureChanged): array
     {
         $nodes = $widget->getInlineNodes();
-        if (isset($this->inlineMirrors[$widget]) && $this->inlineMirrors[$widget][0] === $nodes && $this->inlineMirrors[$widget][2] === $lang && $this->inlineMirrors[$widget][3] === $dir) {
-            return $this->inlineMirrors[$widget][1];
+        if (null !== ($cached = $this->inlineMirrors[$widget] ?? null) && $cached[0] === $nodes && $cached[2] === $lang && $cached[3] === $dir) {
+            return $cached[1];
         }
 
         $index = 0;
@@ -2478,7 +2477,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                 if ('a' === $element->localName && '' !== trim($element->getAttribute('href') ?? '')) {
                     $links[] = $element;
                 }
-                $collect($element->children);
+                $collect(array_values(array_filter(iterator_to_array($element->childNodes), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)));
             }
         };
         $collect($elements);
@@ -3302,7 +3301,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                     }, $value) ?? $value;
                 }
                 if (str_contains($value, 'sibling-')) {
-                    $value = preg_replace_callback('/(?<![\w-])sibling-(index|count)\(\s*\)/i', static fn (array $m) => (string) (('index' === strtolower($m[1]) ? $index : $count) ?? throw new InvalidArgumentException('The element has no siblings.')), $value);
+                    $value = preg_replace_callback('/(?<![\w-])sibling-(index|count)\(\s*\)/i', static fn (array $m) => (string) (('index' === strtolower($m[1]) ? $index : $count) ?? throw new InvalidArgumentException('The element has no siblings.')), $value) ?? $value;
                 }
                 if (str_contains($value, 'attr(')) {
                     $value = $this->substituteAttributes($value, $attributes);
@@ -3711,7 +3710,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
     }
 
     /**
-     * @param array{string, string, float, float, float, array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>|list<array{float, float}>}} $running
+     * @param array{string, string, float, float, float, array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>, points?: list<array{float, float}>}} $running
      */
     private static function transitionValue(array $running, float $now, MediaContext $media): string
     {
@@ -4367,7 +4366,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                 [$current, $item] = [$item, $item->getParent()];
             }
 
-            return $item instanceof ParentInterface && 'li' === ($this->descriptions[$item][0] ?? null) && $this->firstInFlow($item, $widget, $computed) === ($current ?? $widget) ? $this->elements[spl_object_id($item)] ?? null : null;
+            return $item instanceof ParentInterface && 'li' === ($this->descriptions[$item][0] ?? null) && $this->firstInFlow($item, $widget, $computed) === $current ? $this->elements[spl_object_id($item)] ?? null : null;
         }
         $element = $this->elements[$id] ?? null;
         if (null === $element || 'li' === $element->localName || 'li' !== $element->parentElement?->localName) {
@@ -4531,7 +4530,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
         $id = spl_object_id($list);
         if (!isset($this->listOrdinals[$id]) || $this->listOrdinals[$id][0] !== $list) {
             $items = [];
-            foreach ($list->children as $child) {
+            for ($child = $list->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
                 if ('li' === $child->localName) {
                     $items[] = $child;
                 }
@@ -5106,7 +5105,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
      */
     private static function unescape(string $string): string
     {
-        return preg_replace_callback('/\\\\([0-9a-fA-F]{1,6})\s?|\\\\(.)/s', static fn (array $m) => '' !== $m[1] ? (mb_chr(min(\intval($m[1], 16), 0x10FFFF)) ?: "\u{FFFD}") : $m[2], $string);
+        return preg_replace_callback('/\\\\([0-9a-fA-F]{1,6})\s?|\\\\(.)/s', static fn (array $m) => '' !== $m[1] ? (mb_chr(min(\intval($m[1], 16), 0x10FFFF)) ?: "\u{FFFD}") : $m[2], $string) ?? $string;
     }
 
     /**
@@ -5264,7 +5263,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
 
         // Its header read, the image decoded when it is first drawn: those of rules that never apply cost nothing
         $image = null !== $image?->peekSize() ? $image : null;
-        $this->imageBytes += \strlen($image?->data ?? '');
+        $this->imageBytes += \strlen($image->data ?? '');
 
         return $this->images[$url] = $image;
     }
@@ -5501,7 +5500,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
             $size = max(1, min(7, '' === $m[1] ? (int) $m[2] : 3 + ('+' === $m[1] ? 1 : -1) * (int) $m[2]));
             $hints[] = 'font-size: '.['x-small', 'small', 'medium', 'large', 'x-large', 'xx-large', 'xxx-large'][$size - 1];
         }
-        if ('font' === $tagName && preg_match('/^[\w\s,"\'-]+$/u', $face = trim($attributes['face'] ?? '')) && '' !== $face) {
+        if ('font' === $tagName && preg_match('/^[\w\s,"\'-]+$/u', $face = trim($attributes['face'] ?? ''))) {
             $hints[] = 'font-family: '.$face;
         }
         // A color only: nothing else can go through
@@ -5883,14 +5882,14 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
         $style = $this->computeStyle($this->inherit($declarations, $computed), $this->media ?? new MediaContext());
         // An inline block takes no line of the text it is in, like the caret of a dropdown of Bootstrap in its link:
         // not underlined with it
-        if (null !== $style && preg_match('/^inline-(?:block|flex|grid)\b/i', trim($this->substitute($own['display'] ?? '', $computed)))) {
+        if (preg_match('/^inline-(?:block|flex|grid)\b/i', trim($this->substitute($own['display'] ?? '', $computed)))) {
             $style = $style->withUnderline(false)->withStrikethrough(false)->withOverline(false);
         }
         // A margin of less than a column, like the .255em of Bootstrap, or one not drawn on a background: a column still,
         // a glyph not touching the text
         $glyph = $triangle[0];
         foreach (['left' => 'margin-left', 'right' => 'margin-right'] as $side => $property) {
-            if (0 === (null === $style->getBackground() ? $style->getMargin()?->{$side} ?? 0 : 0) && preg_match('/^\s*(?:\d*\.)?\d*[1-9]/', $own[$property] ?? '') && !preg_match('/^\s*-/', $own[$property] ?? '')) {
+            if (0 === (null === $style->getBackground() ? $style->getMargin()->{$side} ?? 0 : 0) && preg_match('/^\s*(?:\d*\.)?\d*[1-9]/', $own[$property] ?? '') && !preg_match('/^\s*-/', $own[$property] ?? '')) {
                 $glyph = 'left' === $side ? ' '.$glyph : $glyph.' ';
             }
         }

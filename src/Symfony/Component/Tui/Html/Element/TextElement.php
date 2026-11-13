@@ -50,7 +50,7 @@ final class TextElement implements ElementFactoryInterface
             return (new ContainerElement())->create($element, $builder);
         }
         // Blocks inside, or an inline element placed out of the flow, like a positioned badge, or floated: a container
-        foreach ($element->children as $child) {
+        for ($child = $element->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
             if ($builder->isTextAlternative($child)) {
                 continue;
             }

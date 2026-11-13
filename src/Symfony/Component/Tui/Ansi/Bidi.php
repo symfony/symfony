@@ -392,7 +392,7 @@ final class Bidi
             }
         }
 
-        return array_values($order);
+        return $order;
     }
 
     /**
@@ -426,9 +426,7 @@ final class Bidi
                 $next && null !== $forms[2] => $forms[2],
                 default => $forms[0],
             };
-            if (null !== $form) {
-                $units[$i]['text'] = mb_chr($form).mb_substr($unit['text'], 1);
-            }
+            $units[$i]['text'] = mb_chr($form).mb_substr($unit['text'], 1);
         }
     }
 

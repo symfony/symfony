@@ -38,7 +38,7 @@ final class BackdropTint
         $rgb = $tint->toRgb();
         $tint = [$rgb['r'], $rgb['g'], $rgb['b']];
         $this->rewriter = new ColorRewriter(
-            static fn (array $color): array => array_map(static fn (int $value, int $to) => (int) round($value + ($to - $value) * $percent / 100), $color, $tint),
+            static fn (array $color): array => [(int) round($color[0] + ($tint[0] - $color[0]) * $percent / 100), (int) round($color[1] + ($tint[1] - $color[1]) * $percent / 100), (int) round($color[2] + ($tint[2] - $color[2]) * $percent / 100)],
             $scheme,
             // An opaque tint paints the cells on the terminal background too
             100 === $percent ? $tint : null,

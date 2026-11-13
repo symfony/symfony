@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Tui\Tests\Style;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Style\FloatShape;
 use Symfony\Component\Tui\Style\RasterImage;
@@ -42,6 +43,7 @@ final class FloatShapeTest extends TestCase
         $this->assertSame([4, 6, 6], $triangle->profile(6, 3, 'right', grow: 1.0), 'The shape-margin: a column further and the slope reached earlier, within the box.');
     }
 
+    #[RequiresPhpExtension('gd')]
     public function testAnImageItsPixelsMoreOpaqueThanTheThreshold()
     {
         // 32 by 32 pixels, 4 columns and 2 rows: opaque on the left half, half transparent on the right

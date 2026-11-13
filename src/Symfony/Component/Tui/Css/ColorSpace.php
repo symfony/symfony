@@ -293,6 +293,7 @@ final class ColorSpace
             'lch' => self::toLinearSrgb('lab', self::polarToRectangular($channels)),
             'oklab' => self::oklabToLinearSrgb($channels),
             'oklch' => self::oklabToLinearSrgb(self::polarToRectangular($channels)),
+            default => throw new \UnhandledMatchError(),
         };
     }
 
@@ -317,6 +318,7 @@ final class ColorSpace
             'lch' => self::rectangularToPolar(self::xyzD50ToLab(self::multiply(self::D65_TO_D50, $xyz))),
             'oklab' => self::linearSrgbToOklab($linear),
             'oklch' => self::rectangularToPolar(self::linearSrgbToOklab($linear)),
+            default => throw new \UnhandledMatchError(),
         };
     }
 

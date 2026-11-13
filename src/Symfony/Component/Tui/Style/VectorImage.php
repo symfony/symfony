@@ -42,7 +42,7 @@ final class VectorImage
     private const SKIPPED = ['defs', 'title', 'desc', 'metadata', 'style', 'script', 'symbol', 'clippath', 'mask', 'marker', 'pattern', 'lineargradient', 'radialgradient', 'filter', 'foreignobject', 'switch', 'image'];
 
     /**
-     * @var list<array{subpaths: list<array{points: list<array{float, float}>, closed: bool}>, fill: array{int, int, int, float}|array{'gradient', 'linear'|'radial', list<array{float, int, int, int, float}>, list<float>}|array{'pattern', self|null, array{float, float, float, float}, array{float, float, float, float, float, float}, array{int, int, int, float}|'current'|null}|'current'|null, fillOpacity: float, stroke: array{int, int, int, float}|array{'pattern', self|null, array{float, float, float, float}, array{float, float, float, float, float, float}, array{int, int, int, float}|'current'|null}|'current'|null, strokeOpacity: float, strokeWidth: float, dashes: list<float>|null, dashOffset: float, cap: 'butt'|'round'|'square', join: 'miter'|'round'|'bevel', miterLimit: float, evenOdd: bool, clips: list<int>, masks: list<int>, filters: list<int>}|array{text: string, label: string, middle: bool, at: array{float, float}, size: float, anchor: string, fill: array{int, int, int, float}|array{'gradient', 'linear'|'radial', list<array{float, int, int, int, float}>, list<float>}|'current'|null, fillOpacity: float, clips: list<int>, masks: list<int>, filters: list<int>}>
+     * @var list<array{subpaths: list<array{points: list<array{float, float}>, closed: bool}>, fill: array{int, int, int, float}|array{'gradient', 'linear'|'radial', list<array{float, int, int, int, float}>, list<float>}|array{'pattern', self|null, array{float, float, float, float}, array{float, float, float, float, float, float}, array{int, int, int, float}|'current'|null}|'current'|null, fillOpacity: float, stroke: array{int, int, int, float}|array{'pattern', self|null, array{float, float, float, float}, array{float, float, float, float, float, float}, array{int, int, int, float}|'current'|null}|'current'|null, strokeOpacity: float, strokeWidth: float, dashes: list<float>|null, dashOffset: float, cap: 'butt'|'round'|'square', join: 'miter'|'round'|'bevel', miterLimit: float, evenOdd: bool, clips: list<int>, masks: list<int>, filters: list<int>}|array{text: string, label: string, middle: bool, at: array{float, float}, size: float, anchor: string, fill: array{int, int, int, float}|array{'gradient', 'linear'|'radial', list<array{float, int, int, int, float}>, list<float>}|array{'pattern', self|null, array{float, float, float, float}, array{float, float, float, float, float, float}, array{int, int, int, float}|'current'|null}|'current'|null, fillOpacity: float, clips: list<int>, masks: list<int>, filters: list<int>}>
      */
     private array $shapes = [];
     private int $points = 0;
@@ -183,7 +183,7 @@ final class VectorImage
      */
     public function toPng(int $width, int $height, array $currentColor, array $skip = [], float $minStroke = 0.0): ?string
     {
-        if ($width <= 0 || $height <= 0) {
+        if (!\function_exists('imagecreatetruecolor') || $width <= 0 || $height <= 0) {
             return null;
         }
         $scale = min(1.0, self::MAX_SIDE / max($width, $height));
@@ -463,6 +463,8 @@ final class VectorImage
     /**
      * Fades the pixels of the layer in a box by those of a mask drawn on a canvas of the same size: by their luminance
      * times their alpha, or by their alpha alone; pixel by pixel, counted as work before.
+     *
+     * @param array{int, int, int, int} $box
      */
     private static function fade(\GdImage $layer, ?\GdImage $mask, bool $luminance, array $box, int &$work): bool
     {
@@ -627,7 +629,7 @@ final class VectorImage
                 $this->using[] = $element;
                 $moved = self::multiply($matrix, [1.0, 0.0, 0.0, 1.0, self::length($element->getAttribute('x'), $this->viewBox[2]), self::length($element->getAttribute('y'), $this->viewBox[3])]);
                 if ('symbol' === strtolower($target->localName)) {
-                    foreach ($target->children as $child) {
+                    for ($child = $target->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
                         $this->walk($child, $moved, $properties);
                     }
                 } else {
@@ -655,7 +657,7 @@ final class VectorImage
 
             return;
         }
-        foreach ($element->children as $child) {
+        for ($child = $element->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
             if (\count($this->shapes) >= self::MAX_SHAPES || $this->points >= self::MAX_POINTS) {
                 return;
             }
@@ -762,7 +764,7 @@ final class VectorImage
             return null;
         };
         $content = $element;
-        for ($depth = 0; !$content->children->length && $depth < 8; ++$depth) {
+        for ($depth = 0; null === $content->firstElementChild && $depth < 8; ++$depth) {
             $href = trim($content->getAttribute('href') ?? $content->getAttributeNS('http://www.w3.org/1999/xlink', 'href') ?? '');
             if (null === ($next = str_starts_with($href, '#') ? $this->ids[substr($href, 1)] ?? null : null) || 'pattern' !== strtolower($next->localName)) {
                 break;
@@ -806,7 +808,7 @@ final class VectorImage
         $image->walks = $this->walks;
         $image->points = $this->points;
         $inherited = $this->inheritedProperties($content);
-        foreach ($content->children as $child) {
+        for ($child = $content->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
             $image->walk($child, self::IDENTITY, $inherited);
         }
         $this->walks = $image->walks;
@@ -974,7 +976,7 @@ final class VectorImage
     private function primitives(\Dom\Element $filter, float $scale): ?array
     {
         $primitives = [];
-        foreach ($filter->children as $element) {
+        for ($element = $filter->firstElementChild; null !== $element; $element = $element->nextElementSibling) {
             $own = $this->properties($element);
             $number = static fn (string $name, float $default): float => self::numbers($element->getAttribute($name) ?? '')[0] ?? $default;
             $color = static fn () => self::paint($own['flood-color'] ?? $element->getAttribute('flood-color') ?? 'black', null);
@@ -985,7 +987,7 @@ final class VectorImage
                 'feflood' => ['type' => 'flood', 'color' => $color(), 'opacity' => $opacity()],
                 'fedropshadow' => ['type' => 'shadow', 'dx' => $number('dx', 2.0) * $scale, 'dy' => $number('dy', 2.0) * $scale, 'std' => max(0.0, $number('stdDeviation', 2.0)) * $scale, 'color' => $color(), 'opacity' => $opacity()],
                 'fecolormatrix' => ['type' => 'matrix', 'matrix' => self::colorMatrix(strtolower(trim($element->getAttribute('type') ?? 'matrix')), $element->getAttribute('values'))],
-                'femerge' => ['type' => 'merge', 'inputs' => \array_slice(array_values(array_map(static fn (\Dom\Element $node) => $node->getAttribute('in'), array_filter(iterator_to_array($element->children), static fn (\Dom\Element $node) => 'femergenode' === strtolower($node->localName)))), 0, 16)],
+                'femerge' => ['type' => 'merge', 'inputs' => \array_slice(array_values(array_map(static fn (\Dom\Element $node) => $node->getAttribute('in'), array_filter(array_values(array_filter(iterator_to_array($element->childNodes), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)), static fn (\Dom\Element $node) => 'femergenode' === strtolower($node->localName)))), 0, 16)],
                 'fecomposite' => ['type' => 'composite', 'operator' => \in_array($operator = strtolower(trim($element->getAttribute('operator') ?? 'over')), ['over', 'in', 'out', 'atop', 'xor'], true) ? $operator : 'over'],
                 default => null,
             };
@@ -1101,8 +1103,11 @@ final class VectorImage
      * images of the region, each counted as work, the last result put back.
      *
      * @param \Closure(array{float, float}): array{float, float} $map
-     * @param array{int, int, int, int}                          $box   Left, top, right and bottom, in the canvas
-     * @param array{float, float}                                $scale The pixels of the canvas per unit of the view box
+     *
+     * @param-out array{int, int, int, int} $box
+     *
+     * @param array{int, int, int, int} $box   Left, top, right and bottom, in the canvas
+     * @param array{float, float}       $scale The pixels of the canvas per unit of the view box
      */
     private function applyFilter(\GdImage $layer, int $filter, \Closure $map, array &$box, array $scale, int $canvasWidth, int $canvasHeight, int &$work): bool
     {
@@ -1392,7 +1397,7 @@ final class VectorImage
         $image->walks = $this->walks;
         $image->points = $this->points;
         $inherited = $this->inheritedProperties($mask);
-        foreach ($mask->children as $child) {
+        for ($child = $mask->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
             $image->walk($child, $content, $inherited);
         }
         $this->walks = $image->walks;
@@ -1448,7 +1453,7 @@ final class VectorImage
         $this->clipping[] = $path;
         $shapes = [];
         $rule = $this->properties($path)['clip-rule'] ?? 'nonzero';
-        foreach ($path->children as $child) {
+        for ($child = $path->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
             $this->clipShapes($child, $matrix, $rule, $shapes);
         }
         array_pop($this->clipping);
@@ -1686,7 +1691,7 @@ final class VectorImage
 
         // Its content inherits the properties of what holds the <marker>, not those of the shape
         $inherited = $this->inheritedProperties($marker);
-        foreach ($marker->children as $child) {
+        for ($child = $marker->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
             if (\count($this->shapes) >= self::MAX_SHAPES || $this->points >= self::MAX_POINTS) {
                 return;
             }
@@ -1901,7 +1906,7 @@ final class VectorImage
     {
         $stops = [];
         $last = 0.0;
-        foreach ($gradient->children as $stop) {
+        for ($stop = $gradient->firstElementChild; null !== $stop; $stop = $stop->nextElementSibling) {
             if ('stop' !== strtolower($stop->localName) || \count($stops) >= 32) {
                 continue;
             }
@@ -2505,6 +2510,8 @@ final class VectorImage
     /**
      * The subpaths of path data, its curves and arcs flattened into lines; drawn up to the first error, like SVG.
      *
+     * @param-out list<list<int>> $vertices
+     *
      * @param list<list<int>>|null $vertices Set to the indexes of the points of each subpath that end a command, where markers go
      *
      * @return list<array{points: list<array{float, float}>, closed: bool}>
@@ -2547,7 +2554,7 @@ final class VectorImage
 
             return null;
         };
-        $close = static function (bool $closed) use (&$points, &$subpaths, &$kept, &$vertices, &$marks): void {
+        $close = static function (bool $closed, array &$points, array &$marks) use (&$subpaths, &$kept, &$vertices): void {
             if (\count($points) > 1) {
                 $subpaths[] = ['points' => $points, 'closed' => $closed];
                 $vertices[] = $marks;
@@ -2577,7 +2584,7 @@ final class VectorImage
             $dy = $relative ? $y : 0.0;
             switch (strtoupper($command)) {
                 case 'Z':
-                    $close(true);
+                    $close(true, $points, $marks);
                     [$x, $y] = [$startX, $startY];
                     $control = null;
                     // Another command follows; numbers after Z are an error
@@ -2587,7 +2594,7 @@ final class VectorImage
                     if (null === ($px = $number()) || null === ($py = $number())) {
                         break 2;
                     }
-                    $close(false);
+                    $close(false, $points, $marks);
                     [$x, $y] = [$startX, $startY] = [$px + $dx, $py + $dy];
                     $points = [[$x, $y]];
                     $marks = [0];
@@ -2679,7 +2686,7 @@ final class VectorImage
             $points[] = [$x, $y];
             $marks[] = \count($points) - 1;
         }
-        $close(false);
+        $close(false, $points, $marks);
 
         return $subpaths;
     }
@@ -2854,7 +2861,12 @@ final class VectorImage
             return null;
         }
 
-        $size = (float) $m[1] * self::UNITS[strtolower($m[2] ?? 'px') ?: 'px'];
+        $unit = strtolower($m[2] ?? 'px') ?: 'px';
+        $factor = self::UNITS[$unit] ?? null;
+        if (null === $factor) {
+            return null;
+        }
+        $size = (float) $m[1] * $factor;
 
         return $size > 0 && $size <= self::MAX_LENGTH ? $size : null;
     }

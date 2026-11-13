@@ -36,6 +36,9 @@ final class SelectElement implements ElementFactoryInterface
         $rich = !$multiple && !is_numeric($size) && (null !== $element->querySelector('selectedcontent') || null !== $element->querySelector('option *'));
         $contents = [];
         foreach ($element->querySelectorAll('option') as $option) {
+            if (!$option instanceof \Dom\Element) {
+                continue;
+            }
             $group = 'optgroup' === strtolower($option->parentElement->localName ?? '') ? $option->parentElement : null;
             if ($option->hasAttribute('disabled') || $option->hasAttribute('hidden') || $group?->hasAttribute('disabled')) {
                 continue;
@@ -82,7 +85,7 @@ final class SelectElement implements ElementFactoryInterface
             $dropdown = new DropdownWidget($list);
             // Its field is a part of it, like the inside of a <select> in browsers, that the button rules of the page
             // do not style; the <button> of a customizable select is the page's
-            if (!array_any(iterator_to_array($element->children), static fn (\Dom\Element $child) => 'button' === strtolower($child->localName))) {
+            if (!array_any(array_values(array_filter(iterator_to_array($element->childNodes), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)), static fn (\Dom\Element $child) => 'button' === strtolower($child->localName))) {
                 $builder->getStyleSheet()->describe($dropdown->getField(), 'tui-select-field');
             }
             if ($contents) {

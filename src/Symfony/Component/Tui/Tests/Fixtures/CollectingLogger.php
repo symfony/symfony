@@ -18,7 +18,7 @@ final class CollectingLogger extends AbstractLogger
     /** @var list<string> */
     public array $messages = [];
 
-    public function log($level, \Stringable|string $message, array $context = []): void
+    public function log($level, $message, array $context = []): void
     {
         $this->messages[] = (string) $message;
     }

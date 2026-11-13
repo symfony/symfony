@@ -76,7 +76,7 @@ final class ScreenWriter
      */
     public function setColors(int $colors): void
     {
-        if ($colors === ($this->colorDepth?->colors ?? MediaContext::TRUE_COLORS)) {
+        if ($colors === ($this->colorDepth->colors ?? MediaContext::TRUE_COLORS)) {
             return;
         }
         $this->colorDepth = $colors < MediaContext::TRUE_COLORS ? new ColorDepth($colors) : null;

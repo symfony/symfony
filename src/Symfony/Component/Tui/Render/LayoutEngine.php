@@ -284,7 +284,7 @@ final class LayoutEngine
 
         if ($fixed) {
             $firstRow = array_values(array_filter($layout, static fn (array $entry) => 0 === $entry[5]));
-            $widths = $this->fixedTableWidths($columnWidths, array_map(static fn (array $entry) => \array_slice($entry, 0, 3), $firstRow), $columnCount, $columns, max($columnCount, $columns - $gap * ($columnCount - 1)), $gap);
+            $widths = $this->fixedTableWidths($columnWidths, array_map(static fn (array $entry) => [$entry[0], $entry[1], $entry[2]], $firstRow), $columnCount, $columns, max($columnCount, $columns - $gap * ($columnCount - 1)), $gap);
             $this->assignCellWidths($table, $layout, $widths, $columnCount, $gap);
             $this->spanRows($table, $tableRows, $layout, $rows);
 
@@ -487,11 +487,12 @@ final class LayoutEngine
                 return 0;
             }
             $key = $cell->getRenderRevision().':'.$this->cellWidths[$cell].':'.$rows;
-            if (($this->cellHeights[$cell][0] ?? null) !== $key) {
-                $this->cellHeights[$cell] = [$key, \count($this->widgetRenderer->renderWidgetLines($cell, new RenderContext($this->cellWidths[$cell], $rows, null, $this->fontRegistry)))];
+            $cached = $this->cellHeights[$cell] ?? null;
+            if (null === $cached || $cached[0] !== $key) {
+                $this->cellHeights[$cell] = $cached = [$key, \count($this->widgetRenderer->renderWidgetLines($cell, new RenderContext($this->cellWidths[$cell], $rows, null, $this->fontRegistry)))];
             }
 
-            return $this->cellHeights[$cell][1];
+            return $cached[1];
         };
         $heights = array_fill(0, \count($tableRows), 0);
         $spanning = array_map(static fn (array $span) => $span[0], $spans);
@@ -877,7 +878,7 @@ final class LayoutEngine
         $contentWidths = [];
         foreach ($placed as $index => [$child, , $column, , $span]) {
             // A subgrid: its items in the columns of this grid they are in
-            if ($this->isSubgrid($child)) {
+            if ($child instanceof ContainerWidget && $this->isSubgrid($child)) {
                 foreach ($this->subgridWidths($child, $span, $columns, $rows) as $offset => $width) {
                     $contentWidths[$column + $offset] = max($contentWidths[$column + $offset] ?? 0, $width);
                 }
@@ -938,7 +939,7 @@ final class LayoutEngine
         foreach ($placed as $index => [$child, , $column, , $span]) {
             $geometry[$index] = [array_sum(\array_slice($widths, $column, $span)) + $columnGap * ($span - 1), array_sum(\array_slice($widths, 0, $column)) + $columnGap * $column];
             // The columns a subgrid spans, for its own layout
-            if ($this->isSubgrid($child)) {
+            if ($child instanceof ContainerWidget && $this->isSubgrid($child)) {
                 $this->subgridTracks ??= new \WeakMap();
                 $this->subgridTracks[$child] = [array_values(\array_slice($widths, $column, $span)), $columnGap];
             }
@@ -1008,8 +1009,8 @@ final class LayoutEngine
             $box = $children[0]->getParent();
             // Its padding and border above its first row and below its last, in the rows of its parent, like CSS
             $boxStyle = $this->widgetRenderer->resolveStyle($box);
-            $above = ($boxStyle->getPadding()?->top ?? 0) + ($boxStyle->getBorder()?->top ?? 0);
-            $below = ($boxStyle->getPadding()?->bottom ?? 0) + ($boxStyle->getBorder()?->bottom ?? 0);
+            $above = ($boxStyle->getPadding()->top ?? 0) + ($boxStyle->getBorder()->top ?? 0);
+            $below = ($boxStyle->getPadding()->bottom ?? 0) + ($boxStyle->getBorder()->bottom ?? 0);
             // Every row it spans, those its items leave empty too: its bottom below the last of them, like CSS
             $span = max(\count($heights), $rowTracks[4] ?? 0);
             foreach ($rowTracks[0] && \count($heights) <= \count($rowTracks[0]) ? range(0, $span - 1) : [] as $row) {
@@ -1156,7 +1157,7 @@ final class LayoutEngine
             // The order it is painted in over the items it overlaps: by its z-index, a grid item taking one positioned
             // or not, then in the order of the document
             $childStyle = $this->widgetRenderer->resolveStyle($child);
-            $items[] = [$lines, $tops[$row] + $shift, $offset, $width, [$childStyle->getPosition()?->zIndex ?? $childStyle->getZIndex() ?? 0, $index]];
+            $items[] = [$lines, $tops[$row] + $shift, $offset, $width, [$childStyle->getPosition()->zIndex ?? $childStyle->getZIndex() ?? 0, $index]];
         }
         usort($items, static fn (array $a, array $b) => $a[2] <=> $b[2]);
 
@@ -1307,7 +1308,11 @@ final class LayoutEngine
         // Each piece drawn: its lines, row, column, width, whether text flows in it, and the shape of a float; the floats
         // as well: side, first row, rows, width, the columns its shape takes at each of its rows, and its columns from the side
         $pieces = [];
-        $floats = $exclusion;
+        $floats = array_map(
+            /** @return array{string, int, int, int, list<int>|null, int, bool, LineBufferInterface|null, int|null} */
+            static fn (array $float): array => [$float[0], $float[1], $float[2], $float[3], $float[4] ?? null, $float[5] ?? 0, $float[6] ?? false, $float[7] ?? null, $float[8] ?? null],
+            $exclusion,
+        );
         $y = 0;
         // The top of the last float placed, which the next one may not be above
         $floatTop = 0;
@@ -1325,7 +1330,7 @@ final class LayoutEngine
         $live = [];
         $seen = 0;
         foreach ($children as $index => $child) {
-            $floor = null !== $previous ? $pieces[$previous[1]][1] : 0;
+            $floor = null !== $previous ? $pieces[$previous[1]]->row : 0;
             $live = array_filter([...$live, ...\array_slice($floats, $seen)], static fn (array $float): bool => $float[1] + $float[2] >= $floor);
             $seen = \count($floats);
             $style = $this->widgetRenderer->resolveStyle($child);
@@ -1358,12 +1363,12 @@ final class LayoutEngine
             // a cleared block's only as far as its border stays under the floats it clears
             if ($collapseMargins && null !== $previous && !$floated) {
                 [$before, $at] = $previous;
-                $lines = $pieces[$at][0];
+                $lines = $pieces[$at]->lines;
                 if ($marginOwner !== $before) {
                     $bottom = $this->collapsedMargin($before, false, $columns);
                     $beforeStyle = $this->widgetRenderer->resolveStyle($before);
                     $empty = $before instanceof ContainerWidget && null === $beforeStyle->getDirection() && null === $beforeStyle->getGridTemplate() && null === $beforeStyle->getScroll()
-                        && \count($lines) === max($bottom, $beforeStyle->withResolvedBox($columns)->getMargin()?->top ?? 0);
+                        && \count($lines) === max($bottom, $beforeStyle->withResolvedBox($columns)->getMargin()->top ?? 0);
                     $adjoiningMargin = $empty ? max($adjoiningMargin, $bottom) : $bottom;
                     $marginOwner = $before;
                     if (!$empty) {
@@ -1375,16 +1380,16 @@ final class LayoutEngine
                 if (null !== $clear && $clearedTo > $y - $collapsed + $marginAbove) {
                     $collapsed = max(0, min($collapsed, $y + $marginAbove - $clearedTo));
                 }
-                if ($collapsed > 0 && $pieces[$at][1] + \count($lines) === $y) {
+                if ($collapsed > 0 && $pieces[$at]->row + \count($lines) === $y) {
                     $remaining = $collapsed;
                     while ($remaining > 0 && $marginPieces) {
                         $piece = $marginPieces[array_key_last($marginPieces)];
-                        $lines = $pieces[$piece][0];
-                        if ($pieces[$piece][1] + \count($lines) !== $y) {
+                        $lines = $pieces[$piece]->lines;
+                        if ($pieces[$piece]->row + \count($lines) !== $y) {
                             break;
                         }
                         $taken = min($remaining, \count($lines));
-                        $pieces[$piece][0] = new ArrayLineBuffer(\array_slice($lines->toArray(), 0, \count($lines) - $taken));
+                        $pieces[$piece]->lines = new ArrayLineBuffer(\array_slice($lines->toArray(), 0, \count($lines) - $taken));
                         $y -= $taken;
                         $remaining -= $taken;
                         if ($taken === \count($lines)) {
@@ -1419,7 +1424,7 @@ final class LayoutEngine
                 self::clearFloatsAround($child, false);
                 // At its width, a percentage of the block it is in, like the columns of float: left; width: 70% and 25%
                 // side by side, or its content's, beside the floats already on that side
-                $percent = null === $style->getMaxColumns() && null !== $style->getWidthPercent() ? (int) $style->resolveWidthPercent($columns) + ($style->getMargin()?->left ?? 0) + ($style->getMargin()?->right ?? 0) : null;
+                $percent = null === $style->getMaxColumns() && null !== $style->getWidthPercent() ? (int) $style->resolveWidthPercent($columns) + ($style->getMargin()->left ?? 0) + ($style->getMargin()->right ?? 0) : null;
                 $saved = $this->positionTracker->suppressStack();
                 $wanted = $percent ?? $style->getMaxColumns() ?? $this->widgetRenderer->measureIntrinsicWidth($child, $columns, $rows);
                 $this->positionTracker->restoreStack($saved);
@@ -1467,26 +1472,26 @@ final class LayoutEngine
                 $last = array_key_last($pieces);
                 // Its last line of text, not the margin, padding or border under it, like those of a paragraph
                 $before = $index > 0 ? $this->widgetRenderer->resolveStyle($children[$index - 1]) : null;
-                $bare = null !== $before && 0 === ($before->getMargin()?->bottom ?? 0) && 0 === ($before->getPadding()?->bottom ?? 0) && 0 === ($before->getBorder()?->bottom ?? 0)
+                $bare = null !== $before && 0 === ($before->getMargin()->bottom ?? 0) && 0 === ($before->getPadding()->bottom ?? 0) && 0 === ($before->getBorder()->bottom ?? 0)
                     // A run of text, not a block like a <p>, which the float goes under, like CSS
                     && !$this->widgetRenderer->isElementBox($children[$index - 1]);
-                if ('right' === $side && $top === $y && null !== $last && $y > 0 && $bare && $children[$index - 1] instanceof TextWidget && !$pieces[$last][4] && $pieces[$last][1] + \count($pieces[$last][0]) === $y
-                    && $x >= $pieces[$last][2] && $x > $pieces[$last][2] + AnsiUtils::visibleWidth(rtrim(AnsiUtils::stripAnsiCodes($pieces[$last][0]->getLine(\count($pieces[$last][0]) - 1))))
+                if ('right' === $side && $top === $y && null !== $last && $y > 0 && $bare && $children[$index - 1] instanceof TextWidget && !$pieces[$last]->flow && $pieces[$last]->row + \count($pieces[$last]->lines) === $y
+                    && $x >= $pieces[$last]->column && $x > $pieces[$last]->column + AnsiUtils::visibleWidth(rtrim(AnsiUtils::stripAnsiCodes($pieces[$last]->lines->getLine(\count($pieces[$last]->lines) - 1))))
                     && self::floatsWidth($live, 'right', $y - 1, false) === $right) {
                     $top = $y - 1;
                     // Drawn over the room its line leaves, like the text flowing around a float
-                    $pieces[$last][4] = true;
+                    $pieces[$last]->flow = true;
                 }
                 // A left float after the text of its line, like an icon floated after a word: at the start of the last line of
                 // that text when there is room on it, the line moved right beside it, like CSS, not below it
-                if ('left' === $side && $top === $y && null !== $last && $y > 0 && $bare && $children[$index - 1] instanceof TextWidget && !$pieces[$last][4] && $pieces[$last][1] + \count($pieces[$last][0]) === $y
-                    && $x === $pieces[$last][2] && self::floatsWidth($live, 'left', $y - 1, false) === $left
-                    && $width + 1 + AnsiUtils::visibleWidth(rtrim(AnsiUtils::stripAnsiCodes($lastLine = $pieces[$last][0]->getLine(\count($pieces[$last][0]) - 1)))) <= $pieces[$last][3]) {
+                if ('left' === $side && $top === $y && null !== $last && $y > 0 && $bare && $children[$index - 1] instanceof TextWidget && !$pieces[$last]->flow && $pieces[$last]->row + \count($pieces[$last]->lines) === $y
+                    && $x === $pieces[$last]->column && self::floatsWidth($live, 'left', $y - 1, false) === $left
+                    && $width + 1 + AnsiUtils::visibleWidth(rtrim(AnsiUtils::stripAnsiCodes($lastLine = $pieces[$last]->lines->getLine(\count($pieces[$last]->lines) - 1)))) <= $pieces[$last]->columns) {
                     $top = $y - 1;
-                    $moved = $pieces[$last][0]->toArray();
-                    $moved[\count($moved) - 1] = AnsiUtils::sliceToWidth(str_repeat(' ', $width + 1).$lastLine, 0, $pieces[$last][3]);
-                    $pieces[$last][0] = new ArrayLineBuffer($moved);
-                    $pieces[$last][4] = true;
+                    $moved = $pieces[$last]->lines->toArray();
+                    $moved[\count($moved) - 1] = AnsiUtils::sliceToWidth(str_repeat(' ', $width + 1).$lastLine, 0, $pieces[$last]->columns);
+                    $pieces[$last]->lines = new ArrayLineBuffer($moved);
+                    $pieces[$last]->flow = true;
                 }
                 $lines = $this->renderGridItem($child, $width, $rows, null, $absRow + $top, $absCol + $x, $tracked, null !== $percent ? $columns : null);
                 $profile = null;
@@ -1494,7 +1499,7 @@ final class LayoutEngine
                     $edges = static fn (?object $box): array => null === $box ? [0, 0, 0, 0] : [$box->top, $box->right, $box->bottom, $box->left];
                     $profile = $shape->profile($width, max(1, \count($lines)), $side, $edges($style->getMargin()), $edges($style->getBorder()), $edges($style->getPadding()), $style->getShapeMargin() ?? 0.0, $style->getShapeImageThreshold() ?? 0.0);
                 }
-                $pieces[] = [$lines, $top, $x, $width, false, null === $profile ? null : [$side, $profile]];
+                $pieces[] = new FlowPiece($lines, $top, $x, $width, false, null === $profile ? null : [$side, $profile]);
                 // A percentage, the next one against it; its lines, for those going on past the block
                 $floats[] = [$side, $top, max(1, \count($lines)), $width, $profile, 'left' === $side ? $left : $right, null !== $percent, $lines, $top];
                 $floatTop = $top;
@@ -1503,16 +1508,16 @@ final class LayoutEngine
 
             // The text of a block beside floats flows around them: under them once they end, like CSS; a block holding
             // blocks passes them on to what it holds, the text of its paragraphs flowing around them too
-            if (($child instanceof TextWidget || $container) && self::floatsBottom($live, null) > $y && array_any($live, static fn (array $float) => $float[1] + $float[2] > $y)) {
-                $chromeTop = ($style->getMargin()?->top ?? 0) + ($style->getBorder()?->top ?? 0) + ($style->getPadding()?->top ?? 0);
-                $chromeLeft = ($style->getMargin()?->left ?? 0) + ($style->getBorder()?->left ?? 0) + ($style->getPadding()?->left ?? 0);
-                $chromeRight = ($style->getMargin()?->right ?? 0) + ($style->getBorder()?->right ?? 0) + ($style->getPadding()?->right ?? 0);
+            if (($child instanceof TextWidget || ($child instanceof ContainerWidget && $container)) && self::floatsBottom($live, null) > $y && array_any($live, static fn (array $float) => $float[1] + $float[2] > $y)) {
+                $chromeTop = ($style->getMargin()->top ?? 0) + ($style->getBorder()->top ?? 0) + ($style->getPadding()->top ?? 0);
+                $chromeLeft = ($style->getMargin()->left ?? 0) + ($style->getBorder()->left ?? 0) + ($style->getPadding()->left ?? 0);
+                $chromeRight = ($style->getMargin()->right ?? 0) + ($style->getBorder()->right ?? 0) + ($style->getPadding()->right ?? 0);
                 // A ::before that clears, an empty block as tall as the rows of the floats it clears beside its content,
                 // like CSS: its content under them, among the floats left
                 // Its ::before under the margins collapsed above it, its own included, not that of its first child, like CSS:
                 // none when that is past the floats
                 // No more than the rows drawn
-                $edge = ($style->getBorder()?->top ?? 0) + ($style->getPadding()?->top ?? 0);
+                $edge = ($style->getBorder()->top ?? 0) + ($style->getPadding()->top ?? 0);
                 $above = max($chromeTop - $edge, $lead);
                 $clearance = null !== $beforeClear ? min(Renderer::MAX_LINES, max(0, self::floatsBottom($live, 'both' === $beforeClear[0] ? null : $beforeClear[0]) - $y - $above - $edge)) : 0;
                 $contentTop = $y + $chromeTop + $clearance;
@@ -1537,14 +1542,12 @@ final class LayoutEngine
                         }
                     }
                     // Kept until it changes, so that its render stays cached while the floats stay
-                    if ($child instanceof ContainerWidget) {
-                        // The margins collapsed above it through its top, which the ::before of its first child is under
-                        $child->setFloatExclusion($inner, $clearance, 0 === $clearance && 0 === $edge ? $above - $chromeTop : 0);
-                        $child->setFloatsPast(true);
-                    }
+                    // The margins collapsed above it through its top, which the ::before of its first child is under
+                    $child->setFloatExclusion($inner, $clearance, 0 === $clearance && 0 === $edge ? $above - $chromeTop : 0);
+                    $child->setFloatsPast(true);
                 }
                 $lines = $this->renderGridItem($child, $columns, $rows, null, $absRow + $y, $absCol, $tracked);
-                $pieces[] = [$lines, $y, 0, $columns, true, null];
+                $pieces[] = new FlowPiece($lines, $y, 0, $columns, true, null);
                 $previous = [$child, array_key_last($pieces)];
                 $escapedBottom = max($escapedBottom, $this->escapeFloats($child, $style, $y, 0, $columns, $columns, $pieces, $floats));
                 $y += \count($lines);
@@ -1556,14 +1559,14 @@ final class LayoutEngine
             // CSS draws its border; one of its own, like overflow: hidden, beside them
             if ($child instanceof HorizontalRuleWidget && ($left > 0 || $right > 0) && !$this->widgetRenderer->establishesFormattingContext($child)) {
                 $lines = $this->renderGridItem($child, $columns, $rows, null, $absRow + $y, $absCol, $tracked);
-                $pieces[] = [$lines, $y, 0, $columns, true, null];
+                $pieces[] = new FlowPiece($lines, $y, 0, $columns, true, null);
                 $previous = [$child, array_key_last($pieces)];
                 $y += \count($lines);
                 continue;
             }
             $lines = $this->renderGridItem($child, $room, $rows, null, $absRow + $y, $absCol + $left, $tracked);
             // A cleared block: the floats over the rows of its margin beside them, see above
-            $pieces[] = [$lines, $y, $left, $room, $movedPast && 0 === $left, null];
+            $pieces[] = new FlowPiece($lines, $y, $left, $room, $movedPast && 0 === $left, null);
             $previous = [$child, array_key_last($pieces)];
             $escapedBottom = max($escapedBottom, $this->escapeFloats($child, $style, $y, $left, $room, $columns, $pieces, $floats));
             $y += \count($lines);
@@ -1588,13 +1591,13 @@ final class LayoutEngine
             }
         }
         // Drawn row by row, the pieces of a row from the left
-        usort($pieces, static fn (array $a, array $b) => $a[2] <=> $b[2]);
+        usort($pieces, static fn (FlowPiece $a, FlowPiece $b) => $a->column <=> $b->column);
         // By bands of rows between the tops and bottoms of the pieces, those of a band the same on each of its rows: the
         // rows of a block of many, like padding: 99999, not each looking at all of them
         $bounds = [0 => true, $total => true];
         foreach ($pieces as $piece) {
-            $bounds[max(0, min($total, $piece[1]))] = true;
-            $bounds[max(0, min($total, $piece[1] + \count($piece[0])))] = true;
+            $bounds[max(0, min($total, $piece->row))] = true;
+            $bounds[max(0, min($total, $piece->row + \count($piece->lines)))] = true;
         }
         ksort($bounds);
         $bounds = array_keys($bounds);
@@ -1610,7 +1613,7 @@ final class LayoutEngine
         // The pieces of each band, swept down: those starting at it added, those ending at it dropped, in the order of
         // their columns
         $starts = array_keys($pieces);
-        usort($starts, static fn (int $a, int $b) => $pieces[$a][1] <=> $pieces[$b][1]);
+        usort($starts, static fn (int $a, int $b) => $pieces[$a]->row <=> $pieces[$b]->row);
         $next = 0;
         $starting = \count($starts);
         // Each live piece with the row under it
@@ -1619,8 +1622,8 @@ final class LayoutEngine
         $out = [];
         for ($band = 0, $bands = \count($bounds) - 1; $band < $bands; ++$band) {
             $changed = false;
-            for (; $next < $starting && $pieces[$starts[$next]][1] <= $bounds[$band]; ++$next) {
-                $live[$starts[$next]] = $pieces[$starts[$next]][1] + \count($pieces[$starts[$next]][0]);
+            for (; $next < $starting && $pieces[$starts[$next]]->row <= $bounds[$band]; ++$next) {
+                $live[$starts[$next]] = $pieces[$starts[$next]]->row + \count($pieces[$starts[$next]]->lines);
                 $changed = true;
             }
             foreach ($live as $index => $end) {
@@ -1640,8 +1643,8 @@ final class LayoutEngine
                 // Text flowing around floats is under them: the floats are drawn over it
                 $flowing = null;
                 foreach ($active as $index => $piece) {
-                    if ($piece[4]) {
-                        $flowing = [$index, $piece[0]->getLine($row - $piece[1])];
+                    if ($piece->flow) {
+                        $flowing = [$index, $piece->lines->getLine($row - $piece->row)];
                     }
                 }
                 if (null !== $flowing) {
@@ -1649,7 +1652,13 @@ final class LayoutEngine
                     // Under the text that comes over them where their shape leaves room, the floats shaped
                     $under = [];
                     $over = [];
-                    foreach ($active as $index => [$lines, $top, $x, $width, $flow, $shape]) {
+                    foreach ($active as $index => $piece) {
+                        $lines = $piece->lines;
+                        $top = $piece->row;
+                        $x = $piece->column;
+                        $width = $piece->columns;
+                        $flow = $piece->flow;
+                        $shape = $piece->shape;
                         if ($flow) {
                             continue;
                         }
@@ -1672,7 +1681,11 @@ final class LayoutEngine
                 }
                 $text = '';
                 $used = 0;
-                foreach ($active as $index => [$lines, $top, $x, $width]) {
+                foreach ($active as $index => $piece) {
+                    $lines = $piece->lines;
+                    $top = $piece->row;
+                    $x = $piece->column;
+                    $width = $piece->columns;
                     if ($x < $used) {
                         continue;
                     }
@@ -1691,8 +1704,11 @@ final class LayoutEngine
      * drawn over it again and past it, over its padding, border and margin too, and beside the blocks after it, like
      * CSS; the row under them, 0 when none. The only place they are moved from the box of the block to the one around.
      *
-     * @param list<array{LineBufferInterface, int, int, int, bool, array{string, list<int>}|null}>                        $pieces See layoutFloats()
-     * @param list<array{string, int, int, int, 4?: list<int>|null, 5?: int, 6?: bool, 7?: LineBufferInterface, 8?: int}> $floats See layoutFloats()
+     * @param list<FlowPiece>                                                                                   $pieces See layoutFloats()
+     * @param list<array{string, int, int, int, list<int>|null, int, bool, LineBufferInterface|null, int|null}> $floats See layoutFloats()
+     *
+     * @param-out list<FlowPiece> $pieces
+     * @param-out list<array{string, int, int, int, list<int>|null, int, bool, LineBufferInterface|null, int|null}> $floats
      */
     private function escapeFloats(AbstractWidget $child, Style $style, int $y, int $x, int $width, int $columns, array &$pieces, array &$floats): int
     {
@@ -1706,18 +1722,21 @@ final class LayoutEngine
         }
         // The rows of the block past its content, its padding, border and margin, drawn as text is: the floats over
         // them, like CSS paints floats over the borders of the blocks in the flow
-        $pieces[array_key_last($pieces)][4] = true;
+        if (!$pieces) {
+            return 0;
+        }
+        $pieces[array_key_last($pieces)]->flow = true;
         $margin = $style->getMargin();
         $border = $style->getBorder();
         $padding = $style->getPadding();
-        $base = $y + ($margin?->top ?? 0) + ($border?->top ?? 0) + ($padding?->top ?? 0);
-        $start = $x + ($margin?->left ?? 0) + ($border?->left ?? 0) + ($padding?->left ?? 0);
-        $end = $columns - $x - $width + ($margin?->right ?? 0) + ($border?->right ?? 0) + ($padding?->right ?? 0);
+        $base = $y + ($margin->top ?? 0) + ($border->top ?? 0) + ($padding->top ?? 0);
+        $start = $x + ($margin->left ?? 0) + ($border->left ?? 0) + ($padding->left ?? 0);
+        $end = $columns - $x - $width + ($margin->right ?? 0) + ($border->right ?? 0) + ($padding->right ?? 0);
         $bottom = 0;
         foreach ($escaped as [$side, $top, $height, $floatWidth, $profile, $edge, $percent, $floatLines, $from]) {
             $edge += 'left' === $side ? $start : $end;
             $floatX = 'left' === $side ? $edge : $columns - $edge - $floatWidth;
-            $pieces[] = [$floatLines, $base + $from, $floatX, $floatWidth, false, null === $profile ? null : [$side, \array_slice($profile, $from - $top)]];
+            $pieces[] = new FlowPiece($floatLines, $base + $from, $floatX, $floatWidth, false, null === $profile ? null : [$side, \array_slice($profile, $from - $top)]);
             $floats[] = [$side, $base + $top, $height, $floatWidth, $profile, $edge, $percent, $floatLines, $base + $from];
             $bottom = max($bottom, $base + $top + $height);
         }
@@ -2372,9 +2391,9 @@ final class LayoutEngine
             }
             // A percentage width is of the column, not of the content, like the full-width bar of the header of GitHub
             $style = $this->widgetRenderer->resolveStyle($child);
-            $percent = null === $style->getMaxColumns() && null !== $style->getWidthPercent() && !$style->isWidthPercentMax() ? (int) $style->resolveWidthPercent($columns) + ($style->getMargin()?->left ?? 0) + ($style->getMargin()?->right ?? 0) : null;
+            $percent = null === $style->getMaxColumns() && null !== $style->getWidthPercent() && !$style->isWidthPercentMax() ? (int) $style->resolveWidthPercent($columns) + ($style->getMargin()->left ?? 0) + ($style->getMargin()->right ?? 0) : null;
             // No narrower than its min-width
-            $percent = null !== $percent ? max($percent, ($style->getMinColumns() ?? 0) + ($style->getMargin()?->left ?? 0) + ($style->getMargin()?->right ?? 0)) : null;
+            $percent = null !== $percent ? max($percent, ($style->getMinColumns() ?? 0) + ($style->getMargin()->left ?? 0) + ($style->getMargin()->right ?? 0)) : null;
             $width = max(1, min($columns, $percent ?? $this->widgetRenderer->measureIntrinsicWidth($child, $columns, $rows)));
             $placed[$index] = [$width, match ($placement) {
                 'start' => 0,
@@ -2634,7 +2653,7 @@ final class LayoutEngine
                 // Right under the box before it, its sides go on from that box's bottom, like the items of a list group
                 // of Bootstrap without a top border: their lines join, └ over │ making ├
                 [$above, $below] = self::joinStacked($last->getLine(\count($last) - 1), $childLines->getLine(0));
-                if (null !== $above) {
+                if (null !== $above && null !== $below) {
                     self::takeLastLines($segments, 1);
                     $segments[] = new ArrayLineBuffer([$above]);
                     $childLines = new ArrayLineBuffer([$below, ...\array_slice($childLines->toArray(), 1)]);
@@ -2647,7 +2666,7 @@ final class LayoutEngine
                 $bottom = $this->collapsedMargin($child, false, $columns);
                 $childStyle = $this->widgetRenderer->resolveStyle($child);
                 $empty = $child instanceof ContainerWidget && null === $childStyle->getDirection() && null === $childStyle->getGridTemplate() && null === $childStyle->getScroll()
-                    && \count($childLines) === max($bottom, $childStyle->withResolvedBox($columns)->getMargin()?->top ?? 0);
+                    && \count($childLines) === max($bottom, $childStyle->withResolvedBox($columns)->getMargin()->top ?? 0);
                 $adjoiningMargin = $empty ? max($adjoiningMargin, $bottom) : $bottom;
             }
             $previous = $child;
@@ -2702,8 +2721,8 @@ final class LayoutEngine
             // see ChromeApplier::apply()
             $box = $style->withResolvedBox($columns);
             // Not a widget that draws itself, like the summary of a <details> closed
-            if ($widget instanceof ContainerWidget && null === $style->getMinRows() && null === $style->getMinRowsPercent() && 0 === ($box->getBorder()?->top ?? 0) + ($box->getBorder()?->bottom ?? 0) + ($box->getPadding()?->top ?? 0) + ($box->getPadding()?->bottom ?? 0)) {
-                return max(0, $box->getMargin()?->top ?? 0, $box->getMargin()?->bottom ?? 0);
+            if ($widget instanceof ContainerWidget && null === $style->getMinRows() && null === $style->getMinRowsPercent() && 0 === ($box->getBorder()->top ?? 0) + ($box->getBorder()->bottom ?? 0) + ($box->getPadding()->top ?? 0) + ($box->getPadding()->bottom ?? 0)) {
+                return max(0, $box->getMargin()->top ?? 0, $box->getMargin()->bottom ?? 0);
             }
 
             return $margin;
@@ -2834,9 +2853,9 @@ final class LayoutEngine
      *
      * @param AbstractWidget[] $children
      * @param int|null         $minRows  The least height of the row, like a wrapped line stretched by align-content
-     */
-    /**
-     * @param bool $inline A line of inline content, whose auto margins are none, like CSS
+     * @param bool             $inline   A line of inline content, whose auto margins are none, like CSS
+     *
+     * @phpstan-impure
      */
     private function layoutHorizontal(array $children, int $columns, int $rows, int $gap, ?VerticalAlign $verticalAlign = null, ?Justify $justify = null, ?int $minRows = null, bool $inline = false): LineBufferInterface
     {
@@ -3001,7 +3020,7 @@ final class LayoutEngine
                 return false;
             }
             $style = $this->widgetRenderer->resolveStyle($children[$index]);
-            $chrome = ($style->getBorder()?->top ?? 0) + ($style->getBorder()?->bottom ?? 0);
+            $chrome = ($style->getBorder()->top ?? 0) + ($style->getBorder()->bottom ?? 0);
             $scroll = $style->getScroll();
             if ($children[$index] instanceof ContainerWidget && $scroll?->horizontal && $scroll->bar
                 && ($scroll->alwaysSideways || $children[$index]->getScrollWidth() > $children[$index]->getClientWidth())) {
@@ -3043,7 +3062,7 @@ final class LayoutEngine
         foreach ($children as $index => $child) {
             $aligns[$index] = $this->widgetRenderer->resolveStyle($child)->getAlignSelf() ?? $verticalAlign;
         }
-        $bordered = array_any($children, fn (AbstractWidget $child): bool => ($this->widgetRenderer->resolveStyle($child)->getBorder()?->top ?? 0) > 0);
+        $bordered = array_any($children, fn (AbstractWidget $child): bool => ($this->widgetRenderer->resolveStyle($child)->getBorder()->top ?? 0) > 0);
         if ($bordered) {
             foreach ($children as $index => $child) {
                 $border = $this->widgetRenderer->resolveStyle($child)->getBorder();
@@ -3322,7 +3341,7 @@ final class LayoutEngine
      * Two lines one above the other, the lines of boxes in them joined where one goes on from the other, like └ over │
      * making ├ over │, or ─ over │ making ┬; null when none does.
      *
-     * @return array{?string, ?string}
+     * @return array{null, null}|array{string, string}
      */
     private static function joinStacked(string $upper, string $lower): array
     {
@@ -3541,9 +3560,9 @@ final class LayoutEngine
      * flex: 0 children get their intrinsic width (measured by rendering).
      * flex: N children share remaining space proportionally.
      *
-     * @param AbstractWidget[]  $children
-     * @param array<int, ?int>  $flexValues
-     * @param array<int, Style> $percents   The styles of the children with a percentage width, which comes before flex
+     * @param AbstractWidget[]           $children
+     * @param array<int, int|float|null> $flexValues
+     * @param array<int, Style>          $percents   The styles of the children with a percentage width, which comes before flex
      *
      * @return array<int, int>
      */
@@ -3744,9 +3763,9 @@ final class LayoutEngine
      *
      * When the minimums alone do not fit, they are ignored.
      *
-     * @param array<int, int> $widths
-     * @param array<int, int> $shrinks
-     * @param array<int, int> $minimums
+     * @param array<int, int>       $widths
+     * @param array<int, int|float> $shrinks
+     * @param array<int, int>       $minimums
      *
      * @return array<int, int>
      */

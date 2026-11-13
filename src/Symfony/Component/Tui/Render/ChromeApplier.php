@@ -222,14 +222,14 @@ final class ChromeApplier
         $border = $style->getBorder();
         $padding = $style->getPadding();
 
-        $borderLeft = $border?->left ?? 0;
-        $borderRight = $border?->right ?? 0;
-        $borderTop = $border?->top ?? 0;
-        $borderBottom = $border?->bottom ?? 0;
-        $paddingLeft = $padding?->left ?? 0;
-        $paddingRight = $padding?->right ?? 0;
-        $paddingTop = $padding?->top ?? 0;
-        $paddingBottom = $padding?->bottom ?? 0;
+        $borderLeft = $border->left ?? 0;
+        $borderRight = $border->right ?? 0;
+        $borderTop = $border->top ?? 0;
+        $borderBottom = $border->bottom ?? 0;
+        $paddingLeft = $padding->left ?? 0;
+        $paddingRight = $padding->right ?? 0;
+        $paddingTop = $padding->top ?? 0;
+        $paddingBottom = $padding->bottom ?? 0;
 
         $hasVerticalPadding = $paddingTop || $paddingBottom;
 
@@ -299,7 +299,7 @@ final class ChromeApplier
         }
 
         // background-clip: the cells out of the clip box show what is behind the box, the text keeping its colors
-        $clip = $style->getBackgroundLayout()?->clip ?? BackgroundLayout::BORDER_BOX;
+        $clip = $style->getBackgroundLayout()->clip ?? BackgroundLayout::BORDER_BOX;
         $borderStyle = $paddingStyle = $contentStyle = $style;
         if (BackgroundLayout::BORDER_BOX !== $clip && null !== $style->getBackground()) {
             $unpainted = $style->withBackground($outerStyle?->getBackground());
@@ -517,14 +517,14 @@ final class ChromeApplier
         $border = $style->getBorder();
         $padding = $style->getPadding();
 
-        return !($border?->top ?? 0)
-            && !($border?->right ?? 0)
-            && !($border?->bottom ?? 0)
-            && !($border?->left ?? 0)
-            && !($padding?->top ?? 0)
-            && !($padding?->right ?? 0)
-            && !($padding?->bottom ?? 0)
-            && !($padding?->left ?? 0)
+        return !($border->top ?? 0)
+            && !($border->right ?? 0)
+            && !($border->bottom ?? 0)
+            && !($border->left ?? 0)
+            && !($padding->top ?? 0)
+            && !($padding->right ?? 0)
+            && !($padding->bottom ?? 0)
+            && !($padding->left ?? 0)
             && null === $style->getTextAlign()
             && null === $style->getMinRows()
             && null === $style->getMaxRows()
@@ -547,12 +547,12 @@ final class ChromeApplier
         // The room the shadow takes on the right and below, its spread and blur counted
         [$shadowX, $shadowY] = null === $shadow ? [0, 0] : ($shadow->inset ? [$shadow->x, $shadow->y] : $shadow->extents());
 
-        $hChrome = ($border?->left ?? 0) + ($border?->right ?? 0)
-            + ($padding?->left ?? 0) + ($padding?->right ?? 0)
-            + ($margin?->left ?? 0) + ($margin?->right ?? 0) + $shadowX;
-        $vChrome = ($border?->top ?? 0) + ($border?->bottom ?? 0)
-            + ($padding?->top ?? 0) + ($padding?->bottom ?? 0)
-            + ($margin?->top ?? 0) + ($margin?->bottom ?? 0) + $shadowY;
+        $hChrome = ($border->left ?? 0) + ($border->right ?? 0)
+            + ($padding->left ?? 0) + ($padding->right ?? 0)
+            + ($margin->left ?? 0) + ($margin->right ?? 0) + $shadowX;
+        $vChrome = ($border->top ?? 0) + ($border->bottom ?? 0)
+            + ($padding->top ?? 0) + ($padding->bottom ?? 0)
+            + ($margin->top ?? 0) + ($margin->bottom ?? 0) + $shadowY;
 
         return [
             max(1, $columns - $hChrome),
@@ -572,8 +572,8 @@ final class ChromeApplier
 
         $margin = $style->getMargin();
 
-        $top = ($border?->top ?? 0) + ($padding?->top ?? 0) + ($margin?->top ?? 0);
-        $left = ($border?->left ?? 0) + ($padding?->left ?? 0) + ($margin?->left ?? 0);
+        $top = ($border->top ?? 0) + ($padding->top ?? 0) + ($margin->top ?? 0);
+        $left = ($border->left ?? 0) + ($padding->left ?? 0) + ($margin->left ?? 0);
 
         return [$top, $left];
     }

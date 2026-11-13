@@ -19,7 +19,7 @@ namespace Symfony\Component\Tui\Css;
 final class Transition
 {
     /**
-     * @param array<string, array{float, float, array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>|list<array{float, float}>}, bool}> $properties Duration, delay, timing and whether discrete values change halfway (allow-discrete) by property, "all" for every one
+     * @param array<string, array{float, float, array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>, points?: list<array{float, float}>}, bool}> $properties Duration, delay, timing and whether discrete values change halfway (allow-discrete) by property, "all" for every one
      */
     private function __construct(
         public readonly array $properties,
@@ -86,7 +86,7 @@ final class Transition
     /**
      * How a property is transitioned, null when it is not.
      *
-     * @return array{float, float, array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>|list<array{float, float}>}, bool}|null
+     * @return array{float, float, array{0: string, 1: int, 2: 'start'|'end'|'none'|'both', 3?: list<float>, points?: list<array{float, float}>}, bool}|null
      */
     public function of(string $property): ?array
     {

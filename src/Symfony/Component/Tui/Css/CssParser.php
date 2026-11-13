@@ -73,6 +73,7 @@ final class CssParser
             'flex' => $inline ? 'inline-flex' : 'flex',
             'grid' => $inline ? 'inline-grid' : 'grid',
             'ruby' => $inline ? 'ruby' : 'block',
+            default => throw new \UnhandledMatchError(),
         };
     }
 
@@ -1116,7 +1117,9 @@ final class CssParser
      * The next { from a statement, the search before reused while it is ahead: a block of many declarations, like the
      * :root of hundreds of custom properties of Bulma, is not searched to its end again for each of them.
      *
-     * @param array{int, ?int}|null $last The offset searched from, and the brace found or null, then where it stopped
+     * @param-out array{int, ?int, ?int} $last
+     *
+     * @param array{int, ?int, ?int}|null $last The offset searched from, and the brace found or null, then where it stopped
      */
     private static function nextBrace(string $css, int $offset, ?array &$last): ?int
     {

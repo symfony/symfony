@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Tui\Style;
 
+use Symfony\Component\Tui\Exception\RenderException;
+
 /**
  * A raster image (PNG, JPEG, GIF, WebP...), decoded with the GD extension, resampled to cells of two pixels each.
  *
@@ -295,6 +297,9 @@ final class RasterImage
         $columns = max(1, min(1000, $columns));
         $rows = max(1, min(1000, $rows));
         $scaled = imagecreatetruecolor($columns, $rows * 2);
+        if (false === $scaled) {
+            throw new RenderException(\sprintf('Unable to allocate a %dx%d image.', $columns, $rows * 2));
+        }
         imagealphablending($scaled, false);
         imagesavealpha($scaled, true);
         imagefill($scaled, 0, 0, imagecolorallocatealpha($scaled, 0, 0, 0, 127) ?: 0);
@@ -324,6 +329,9 @@ final class RasterImage
     private function resample(\GdImage $image, int $columns, int $rows): \GdImage
     {
         $scaled = imagecreatetruecolor($columns, $rows * 2);
+        if (false === $scaled) {
+            throw new RenderException(\sprintf('Unable to allocate a %dx%d image.', $columns, $rows * 2));
+        }
         imagealphablending($scaled, false);
         imagesavealpha($scaled, true);
         imagefill($scaled, 0, 0, imagecolorallocatealpha($scaled, 0, 0, 0, 127) ?: 0);

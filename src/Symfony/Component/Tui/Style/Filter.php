@@ -62,6 +62,7 @@ final class Filter
                 'contrast' => array_map(static fn (float $c) => ($c - 0.5) * $amount + 0.5, $color),
                 'invert' => array_map(static fn (float $c) => min(1.0, $amount) * (1 - $c) + (1 - min(1.0, $amount)) * $c, $color),
                 'opacity' => array_map(static fn (float $c, int $b) => $c * min(1.0, $amount) + $b / 255 * (1 - min(1.0, $amount)), $color, array_values($behind)),
+                default => throw new \UnhandledMatchError(),
             };
             // Each function works on colors in the gamut, like the filter primitives one after the other
             $color = array_map(static fn (float $c) => max(0.0, min(1.0, $c)), $color);

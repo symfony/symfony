@@ -87,17 +87,17 @@ final class Border
         foreach ([0, 1, 2, 3] as $side) {
             $sides[] = null !== ($sideColors[$side] ?? null) ? Color::from($sideColors[$side]) : null;
         }
-        $this->sideColors = $sides;
+        $this->sideColors = [$sides[0], $sides[1], $sides[2], $sides[3]];
         $patterns = [];
         foreach ([0, 1, 2, 3] as $side) {
             $patterns[] = null !== ($sidePatterns[$side] ?? null) ? self::normalizePattern($sidePatterns[$side]) : null;
         }
-        $this->sidePatterns = $patterns;
+        $this->sidePatterns = [$patterns[0], $patterns[1], $patterns[2], $patterns[3]];
         $shapes = [];
         foreach ([0, 1, 2, 3] as $corner) {
             $shapes[] = \in_array($cornerShapes[$corner] ?? null, ['round', 'bevel'], true) ? $cornerShapes[$corner] : null;
         }
-        $this->cornerShapes = $shapes;
+        $this->cornerShapes = [$shapes[0], $shapes[1], $shapes[2], $shapes[3]];
     }
 
     /**
@@ -339,9 +339,9 @@ final class Border
 
             return $width > 0 ? $pattern->applyBorderSegment(str_repeat('' !== $char ? $char : ' ', $width), $pattern->getStrategies()[$row][$column], $outerStyle, $innerStyle, $color) : '';
         };
-        $row = fn (BorderPattern $pattern, int $row, ?Color $color): string => $segment($pattern, $row, 0, $this->left, $color, $this->cornerChar(0 === $row ? 0 : 3, BorderPattern::corner($pattern, $left, $row, 0)))
+        $row = fn (BorderPattern $pattern, int $row, ?Color $color): string => $segment($pattern, $row, 0, $this->left, $color, $this->cornerChar(0 === $row ? 0 : 3, BorderPattern::corner($pattern, $left, 0 === $row ? 0 : 2, 0)))
                 .$segment($pattern, $row, 1, $innerWidth, $color)
-                .$segment($pattern, $row, 2, $this->right, $color, $this->cornerChar(0 === $row ? 1 : 2, BorderPattern::corner($pattern, $right, $row, 2)));
+                .$segment($pattern, $row, 2, $this->right, $color, $this->cornerChar(0 === $row ? 1 : 2, BorderPattern::corner($pattern, $right, 0 === $row ? 0 : 2, 2)));
 
         $lines = [];
         for ($i = 0; $i < $this->top; ++$i) {

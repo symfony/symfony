@@ -48,9 +48,11 @@ final class PictureElement implements ElementFactoryInterface
         }
         $document = $img->ownerDocument;
         $picture = $document->createElement('picture');
-        $source = $picture->appendChild($document->createElement('source'));
+        $source = $document->createElement('source');
+        $picture->appendChild($source);
         $source->setAttribute('srcset', (string) $img->getAttribute('srcset'));
-        $fallback = $picture->appendChild($document->createElement('img'));
+        $fallback = $document->createElement('img');
+        $picture->appendChild($fallback);
         foreach ($img->attributes as $attribute) {
             if ('srcset' !== $attribute->name) {
                 try {
@@ -132,7 +134,7 @@ final class PictureElement implements ElementFactoryInterface
         usort($densities, static fn (array $a, array $b) => $a[0] <=> $b[0]);
 
         $candidates = [];
-        foreach (array_values($densities) as $index => [$density, $url]) {
+        foreach ($densities as $index => [$density, $url]) {
             $candidates[] = [$index < \count($densities) - 1 ? '(max-resolution: '.rtrim(rtrim(\sprintf('%.4F', $density), '0'), '.').'dppx)' : '', $url];
         }
 
@@ -159,7 +161,7 @@ final class PictureElement implements ElementFactoryInterface
         $picture = new ContainerWidget();
         $img = null;
         $sources = [];
-        foreach ($element->children as $child) {
+        for ($child = $element->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
             $tagName = strtolower($child->localName);
             if ('img' === $tagName) {
                 $img = $child;

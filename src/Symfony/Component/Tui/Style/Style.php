@@ -121,7 +121,7 @@ final class Style
     private ?FloatShape $floatShape = null;
     private ?bool $imageFromImage = null;
     private ?bool $pixelated = null;
-    /** @var array{list<array{0: Gradient|RasterImage, 1: BackgroundLayout, 2?: ?BlendMode}>, Color}|null */
+    /** @var array{list<array{0: Gradient|RasterImage, 1: BackgroundLayout, 2?: ?BlendMode}>, Color, bool}|null */
     private ?array $backgroundLayers = null;
     private ?float $shapeMargin = null;
     private ?float $shapeImageThreshold = null;
@@ -2051,7 +2051,7 @@ final class Style
     }
 
     /**
-     * @return array{bool, bool}|null Whether the top and the bottom margins are auto, null for neither
+     * @return float|null The least width as a percentage of the containing block
      */
     public function getMinWidthPercent(): ?float
     {

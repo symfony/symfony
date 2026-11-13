@@ -70,7 +70,7 @@ final class Padding
             $sides[$side] = (int) floor($percent instanceof PercentLength ? $percent->at(max(0, $base)) : max(0, $base) * $percent[0] / 100 + $percent[1]);
         }
 
-        return new self(...$sides);
+        return new self($sides[0], $sides[1], $sides[2], $sides[3]);
     }
 
     /**

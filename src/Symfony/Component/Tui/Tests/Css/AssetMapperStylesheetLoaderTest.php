@@ -49,6 +49,17 @@ final class AssetMapperStylesheetLoaderTest extends TestCase
         }
     }
 
+    public function testRejectsAStreamAsTheMappedSource()
+    {
+        $assetMapper = $this->createStub(AssetMapperInterface::class);
+        $assetMapper->method('getAsset')->willReturn(new MappedAsset('raw.css', 'data:text/plain,p%20%7B%20color:%20red%20%7D', '/assets/raw-1.css', '/assets/raw.css'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The stylesheet "raw.css" has no readable local source.');
+
+        (new AssetMapperStylesheetLoader($assetMapper))->load('raw.css');
+    }
+
     public function testThrowsForAnUnmappedStylesheet()
     {
         $loader = new AssetMapperStylesheetLoader($this->createAssetMapper());

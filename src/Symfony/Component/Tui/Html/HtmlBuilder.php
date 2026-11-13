@@ -346,7 +346,7 @@ final class HtmlBuilder
         }
         $text = StringUtils::stripControlBytes(StringUtils::sanitizeUtf8($text));
 
-        return $preserveWhitespace ? $text : preg_replace('/[ \t\r\n\f]+/', ' ', $text);
+        return $preserveWhitespace ? $text : (preg_replace('/[ \t\r\n\f]+/', ' ', $text) ?? $text);
     }
 
     /**
@@ -526,7 +526,7 @@ final class HtmlBuilder
      */
     private function holdsBlock(\Dom\Element $element): bool
     {
-        foreach ($element->children as $child) {
+        for ($child = $element->firstElementChild; null !== $child; $child = $child->nextElementSibling) {
             $tagName = strtolower($child->localName);
             if ((\in_array($tagName, self::BLOCKS, true) && !$this->isInline($child)) || ('br' !== $tagName && \in_array($tagName, self::INLINE, true) && !\in_array($tagName, self::MATHML, true) && $this->holdsBlock($child))) {
                 return true;
@@ -541,7 +541,7 @@ final class HtmlBuilder
      */
     private function holdsBlockInFlow(\Dom\Element $element): bool
     {
-        return array_any(iterator_to_array($element->children), fn (\Dom\Element $child) => \in_array(strtolower($child->localName), self::BLOCKS, true) && !$this->isInline($child) && !$this->styleSheet->staysOutOfFlow($child));
+        return array_any(array_values(array_filter(iterator_to_array($element->childNodes), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)), fn (\Dom\Element $child) => \in_array(strtolower($child->localName), self::BLOCKS, true) && !$this->isInline($child) && !$this->styleSheet->staysOutOfFlow($child));
     }
 
     /**
@@ -631,7 +631,7 @@ final class HtmlBuilder
         // wrapping its box, flex by default, that a page displays otherwise, like the inline-block .checkbox of Bulma:
         // its box and its text are lined up in a line of their own
         $flex = $this->styleSheet->mayBlockifyChildren($element) && !('label' === strtolower($element->localName) && $this->styleSheet->mayDisplayOtherwiseThanItems($element) && array_any(
-            iterator_to_array($element->children),
+            array_values(array_filter(iterator_to_array($element->childNodes), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)),
             static fn (\Dom\Element $child) => 'input' === strtolower($child->localName) && \in_array(strtolower(trim($child->getAttribute('type') ?? '')), ['checkbox', 'radio'], true),
         ));
 
@@ -646,7 +646,8 @@ final class HtmlBuilder
         $runStart = 0;
         $previous = null;
         $lined = !$flex || $sometimesFlex;
-        $settle = function (int $end) use (&$widgets, &$spans, &$previous, $lined): void {
+        /** @param list<AbstractWidget> $widgets */
+        $settle = function (int $end, ?array $previous, array $widgets) use (&$spans, $lined): void {
             if (!$lined || null === $previous) {
                 return;
             }
@@ -657,7 +658,7 @@ final class HtmlBuilder
         };
 
         foreach (iterator_to_array($element->childNodes) as $child) {
-            $settle(\strlen($text));
+            $settle(\strlen($text), $previous, $widgets);
             $childStart = \strlen($text);
             if (!$inline) {
                 $runStart = $childStart;
@@ -757,10 +758,10 @@ final class HtmlBuilder
                 }
             }
         }
-        $settle(\strlen($text));
+        $settle(\strlen($text), $previous, $widgets);
         $previous = [\count($widgets), $runStart, \strlen($text), \strlen($text)];
         $this->addAnonymousText($inline, $widgets);
-        $settle(\strlen($text));
+        $settle(\strlen($text), $previous, $widgets);
 
         if ($controls) {
             $widgets = $this->lineUpInlineControls($widgets, $controls, $boxes, [$text, $spans], $sometimesFlex);
@@ -875,7 +876,8 @@ final class HtmlBuilder
     {
         $result = [];
         $run = [];
-        $flush = function () use (&$run, &$result, $controls, $boxes, $sources, $items): void {
+        /** @param list<AbstractWidget> $run */
+        $flush = function (array &$run) use (&$result, $controls, $boxes, $sources, $items): void {
             // A control alone keeps its line, like a field taking the width of a form; a button alone too, as wide as its
             // content, like under a paragraph, and an inline box
             if (!array_any($run, static fn (AbstractWidget $widget) => \in_array($widget, $controls, true)) || (1 === \count($run) && !$run[0] instanceof ButtonWidget && !\in_array($run[0], $boxes, true))) {
@@ -922,11 +924,11 @@ final class HtmlBuilder
             if (\in_array($widget, $controls, true) || $this->styleSheet->isAnonymous($widget)) {
                 $run[] = $widget;
             } else {
-                $flush();
+                $flush($run);
                 $result[] = $widget;
             }
         }
-        $flush();
+        $flush($run);
 
         return $result;
     }
@@ -1088,7 +1090,7 @@ final class HtmlBuilder
                 $view->setAutofocus($focusTarget);
             }
             // The first <legend> of a <fieldset> is drawn in its border, like browsers
-            if ('fieldset' === $tagName && $widget instanceof ContainerWidget && 'legend' === strtolower($element->firstElementChild?->localName ?? '') && null !== $first = $widget->all()[0] ?? null) {
+            if ('fieldset' === $tagName && $widget instanceof ContainerWidget && 'legend' === strtolower($element->firstElementChild->localName ?? '') && null !== $first = $widget->all()[0] ?? null) {
                 $widget->setLegend($first);
             }
             if ($this->styleSheet->mayBeInitialTarget($element)) {
@@ -1135,7 +1137,7 @@ final class HtmlBuilder
             if (null === $host || !\in_array($mode, ['open', 'closed'], true) || $host->hasAttribute(Selector::HOST_ATTRIBUTE) || !self::canHostShadowRoot($host)) {
                 continue;
             }
-            foreach ($host->children as $other) {
+            for ($other = $host->firstElementChild; null !== $other; $other = $other->nextElementSibling) {
                 $other->removeAttribute('shadowrootmode');
             }
             $tree = ++$trees;
@@ -1329,7 +1331,7 @@ final class HtmlBuilder
                 continue;
             }
             $legend = null;
-            foreach ($ancestor->children as $candidate) {
+            for ($candidate = $ancestor->firstElementChild; null !== $candidate; $candidate = $candidate->nextElementSibling) {
                 if ('legend' === strtolower($candidate->localName)) {
                     $legend = $candidate;
                     break;

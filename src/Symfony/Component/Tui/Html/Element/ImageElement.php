@@ -84,7 +84,7 @@ final class ImageElement implements ElementFactoryInterface
             return $frame;
         }
         // An <img srcset> of several candidates: the one for the density of the terminal, like a <picture>
-        if ('img' === strtolower($element->localName) && $element->hasAttribute('srcset') && 'picture' !== strtolower($element->parentElement?->localName ?? '') && null !== $picture = PictureElement::fromSrcset($element, $builder)) {
+        if ('img' === strtolower($element->localName) && $element->hasAttribute('srcset') && 'picture' !== strtolower($element->parentElement->localName ?? '') && null !== $picture = PictureElement::fromSrcset($element, $builder)) {
             return $picture;
         }
         // A candidate of a srcset not drawn yet, like the 2x image on a terminal of 1dppx: read when it is first drawn
@@ -253,7 +253,7 @@ final class ImageElement implements ElementFactoryInterface
             $alternative = $builder->getAttributeText($element, 'alt');
         } else {
             $alternative = $builder->getAttributeText($element, 'aria-label') ?? $builder->getAttributeText($element, 'title');
-            foreach (null === $alternative ? $element->children : [] as $child) {
+            for ($child = null === $alternative ? $element->firstElementChild : null; null !== $child; $child = $child->nextElementSibling) {
                 if ('title' === strtolower($child->localName)) {
                     $alternative = $child->textContent;
                     break;

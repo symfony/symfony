@@ -564,6 +564,8 @@ final class Selector
     /**
      * PHP's engine only tests the nearest ancestor for a compound that starts with a pseudo-class taking a selector,
      * like ":is(.a) p" or ":not(.b) p": an explicit universal selector, "*:is(.a) p", makes it test them all.
+     *
+     * @param-out null $position
      */
     private static function insertUniversal(string &$out, ?int &$position): void
     {

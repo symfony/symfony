@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Tui\Tests\Html;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Html\HtmlBuilder;
 use Symfony\Component\Tui\Terminal\ScreenBuffer;
@@ -78,6 +79,7 @@ final class ShapeOutsideTest extends TestCase
         $this->assertSame(['            ab cd ef gh', '             ij kl mn op', '             qr st uv wx', '             yz'], $lines, 'Its padding within the room the shape takes.');
     }
 
+    #[RequiresPhpExtension('gd')]
     public function testTheLinesWrapAroundTheOpaquePixelsOfAnImage()
     {
         $image = imagecreatetruecolor(64, 64);

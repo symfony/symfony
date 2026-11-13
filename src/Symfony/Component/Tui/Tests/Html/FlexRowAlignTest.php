@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Tests\Html;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Html\HtmlBuilder;
 use Symfony\Component\Tui\Render\Renderer;
@@ -69,6 +70,7 @@ final class FlexRowAlignTest extends TestCase
         $tui->stop();
     }
 
+    #[RequiresPhpExtension('gd')]
     public function testRoundedImageRowsDoNotHideTheFirstRowOfAnIcon()
     {
         $terminal = new VirtualTerminal(20, 6);

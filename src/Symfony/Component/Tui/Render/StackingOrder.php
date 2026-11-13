@@ -40,7 +40,7 @@ final class StackingOrder
      */
     public static function isContext(Style $style): bool
     {
-        return true === $style->getIsolated() || 0 !== ($style->getPosition()?->zIndex ?? 0);
+        return true === $style->getIsolated() || 0 !== ($style->getPosition()->zIndex ?? 0);
     }
 
     /**
@@ -48,7 +48,7 @@ final class StackingOrder
      */
     public static function isRaised(?Position $position): bool
     {
-        return null !== $position && ($position->isOutOfFlow() || (PositionMode::Relative === $position->mode && 0 !== ($position->zIndex ?? 0)));
+        return null !== $position && ($position->isOutOfFlow() || (PositionMode::Relative === $position->mode && 0 !== $position->zIndex));
     }
 
     /**
@@ -59,8 +59,8 @@ final class StackingOrder
      * z-index 0 at its own depth, under the levels of what is inside it of z-index 0 and more. Its place tells where it
      * is drawn: over the flow (false), under it (true), or under the content of a context drawn over the flow.
      *
-     * @param \Closure(AbstractWidget): Style $style
-     * @param array<int, array<int, int>>     $indexes The places of the children of the parents met, shared by the keys of one sort
+     * @param \Closure(AbstractWidget): Style    $style
+     * @param array<int, array<int, int|string>> $indexes The places of the children of the parents met, shared by the keys of one sort
      *
      * @return array{path: list<int>, levels: list<array{int, int}>, under: bool|AbstractWidget, context?: AbstractWidget|null}|null
      */
@@ -104,7 +104,7 @@ final class StackingOrder
                 $contexts = [];
             }
             // A context in the flow is drawn with it, whatever its z-index
-            $levels[] = [$top ? \PHP_INT_MAX : ($raised ? $position?->zIndex ?? 0 : max(0, $position?->zIndex ?? 0)), $depth + 1];
+            $levels[] = [$top ? \PHP_INT_MAX : ($raised ? $position->zIndex ?? 0 : max(0, $position->zIndex ?? 0)), $depth + 1];
             $owners[] = $raised ? $current : null;
             $contexts[] = $current;
             if ($current === $widget && $context) {

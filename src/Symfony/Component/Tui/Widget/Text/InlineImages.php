@@ -122,22 +122,24 @@ final class InlineImages
                 $out .= preg_replace_callback('/[\x{100000}-\x{10FFFF}]/u', function (array $m) use ($tracker, $scheme): string {
                     $code = mb_ord($m[0]) - self::BASE;
                     [$image, $columns] = $this->of($code) ?? [null, 0];
+                    $raster = $image;
                     if ($image instanceof VectorImage) {
                         // The color its glyphs are drawn in: in reverse video, that of the background
-                        $image = $tracker->isInverse()
+                        $raster = $tracker->isInverse()
                             ? $this->vectorCells($image, $columns, null !== ($background = $tracker->getBackground()) ? self::foregroundOf($background) : null, $scheme, true)
                             : $this->vectorCells($image, $columns, $tracker->getForeground(), $scheme);
                     }
-                    if (null === $image || $code % 16 >= $columns) {
+                    if (null === $raster || $code % 16 >= $columns) {
                         return ' ';
                     }
-                    [$top, $bottom] = $image->cells($columns, 1)[0][$code % 16] ?? [null, null];
-                    $cell = match (true) {
-                        null === $top && null === $bottom => null,
-                        null === $bottom => "\e[38;2;".implode(';', $top).'m▀',
-                        null === $top => "\e[38;2;".implode(';', $bottom).'m▄',
-                        default => "\e[38;2;".implode(';', $top).';48;2;'.implode(';', $bottom).'m▀',
-                    };
+                    [$top, $bottom] = $raster->cellAt($columns, 1, $code % 16, 0);
+                    if (null === $top) {
+                        $cell = null === $bottom ? null : "\e[38;2;".implode(';', $bottom).'m▄';
+                    } elseif (null === $bottom) {
+                        $cell = "\e[38;2;".implode(';', $top).'m▀';
+                    } else {
+                        $cell = "\e[38;2;".implode(';', $top).';48;2;'.implode(';', $bottom).'m▀';
+                    }
 
                     // Transparent: a space in the style of the text; else the cell, then the style of the text again
                     return null === $cell ? ' ' : "\e[0m".$cell."\e[0m".$tracker->getActiveCodes();
@@ -187,7 +189,7 @@ final class InlineImages
         };
         // The text of the color scheme, or its background in reverse video
         $rgb ??= (ColorScheme::Light === $scheme) !== $inverse ? [0, 0, 0] : [229, 229, 229];
-        $rgb = array_map(static fn (mixed $channel): int => max(0, min(255, (int) $channel)), \array_slice($rgb, 0, 3));
+        $rgb = [max(0, min(255, (int) $rgb[0])), max(0, min(255, (int) $rgb[1])), max(0, min(255, (int) $rgb[2]))];
         $key = spl_object_id($image).'@'.implode(',', $rgb).'@'.$columns;
         if (!\array_key_exists($key, $this->vectorCells)) {
             if (\count($this->vectorCells) >= 64) {

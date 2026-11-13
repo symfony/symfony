@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Tui\Tests\Css;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Compatibility\Support;
 use Symfony\Component\Tui\Compatibility\SupportLevel;
@@ -259,6 +260,7 @@ final class DeclarationMapperTest extends TestCase
         $this->assertFalse($this->mapper->supports('position-area', 'x-start inline-end'), 'Two keywords of the same axis.');
     }
 
+    #[RequiresPhpExtension('gd')]
     public function testBackgroundImage()
     {
         $image = new RasterImage((string) file_get_contents(__DIR__.'/../Fixtures/Compat/quadrants.png'));

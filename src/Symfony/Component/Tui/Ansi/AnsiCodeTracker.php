@@ -324,6 +324,7 @@ final class AnsiCodeTracker
             38 => $this->fgColor = $value,
             48 => $this->bgColor = $value,
             58 => $this->underlineColor = $value,
+            default => throw new \UnhandledMatchError(),
         };
     }
 }

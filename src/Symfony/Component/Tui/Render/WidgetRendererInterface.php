@@ -58,6 +58,8 @@ interface WidgetRendererInterface
 
     /**
      * The rows the children of a container pull into its bottom border by their negative bottom margins.
+     *
+     * @param ParentInterface&AbstractWidget $container
      */
     public function getBottomPull(ParentInterface $container): int;
 

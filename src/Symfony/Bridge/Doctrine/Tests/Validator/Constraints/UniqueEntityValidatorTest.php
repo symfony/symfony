@@ -510,7 +510,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         ));
 
         $this->buildViolation('This value is already used.')
-            ->atPath('property.path.single')
+            ->atPath('property.path.singleId')
             ->setParameter('{{ value }}', 1)
             ->setInvalidValue(1)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
@@ -910,9 +910,36 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $this->validate($dto, $constraint);
 
         $this->buildViolation('myMessage')
-            ->atPath('property.path.name')
+            ->atPath('property.path.primaryName')
             ->setParameter('{{ value }}', '"Foo"')
             ->setInvalidValue('Foo')
+            ->setCause([$entity])
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testValidateMappingOfFieldNamesWithErrorPath()
+    {
+        $constraint = new UniqueEntity(
+            message: 'myMessage',
+            fields: ['primaryName' => 'name', 'secondaryName' => 'name2'],
+            em: self::EM_NAME,
+            entityClass: DoubleNameEntity::class,
+            errorPath: 'secondaryName',
+        );
+
+        $entity = new DoubleNameEntity(1, 'Foo', 'Bar');
+        $dto = new CreateDoubleNameEntity('Foo', 'Bar');
+
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $this->validate($dto, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->atPath('property.path.secondaryName')
+            ->setParameter('{{ value }}', '"Bar"')
+            ->setInvalidValue('Bar')
             ->setCause([$entity])
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();

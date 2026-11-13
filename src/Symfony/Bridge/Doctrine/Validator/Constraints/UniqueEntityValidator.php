@@ -227,8 +227,8 @@ class UniqueEntityValidator extends ConstraintValidator
             }
         }
 
-        $errorPath = $constraint->errorPath ?? current($fields);
-        $invalidValue = $criteria[$errorPath] ?? $criteria[current($fields)];
+        $errorPath = $constraint->errorPath ?? (\is_string(key($fields)) ? key($fields) : current($fields));
+        $invalidValue = $criteria[$fields[$errorPath] ?? $errorPath] ?? $criteria[current($fields)];
 
         $this->context->buildViolation($constraint->message)
             ->atPath($errorPath)

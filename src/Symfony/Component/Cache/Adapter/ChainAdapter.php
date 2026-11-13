@@ -16,6 +16,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\BadMethodCallException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Internal\ChainAdapterCallback;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ContractsTrait;
@@ -127,15 +128,10 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
             }
         }
 
-        $doSave = true;
-        $callback = static function (CacheItem $item, bool &$save) use ($callback, &$doSave) {
-            $value = $callback($item, $save);
-            $doSave = $save;
+        $chainCallback = new ChainAdapterCallback($callback, $this);
+        $callback = $chainCallback(...);
 
-            return $value;
-        };
-
-        $wrap = function (?CacheItem $item = null, bool &$save = true) use ($key, $callback, $beta, &$wrap, &$doSave, &$metadata) {
+        $wrap = function (?CacheItem $item = null, bool &$save = true) use ($key, $callback, $beta, &$wrap, $chainCallback, &$metadata) {
             static $lastItem;
             static $i = 0;
             $adapter = $this->adapters[$i];
@@ -151,7 +147,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
             if (null !== $item) {
                 (self::$syncItem)($lastItem ??= $item, $item, $this->defaultLifetime, $metadata);
             }
-            $save = $doSave;
+            $save = $chainCallback->save;
 
             return $value;
         };

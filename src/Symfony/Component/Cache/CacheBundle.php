@@ -20,6 +20,7 @@ use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass;
+use Symfony\Component\Cache\Messenger\EarlyExpirationDispatcher;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Application;
@@ -243,11 +244,11 @@ class CacheBundle extends AbstractBundle
                 $pool['reset'] = 'reset';
             }
 
+            $tagAwareId = $name;
             if ($isNativeTagAware && 'cache.app' === $name) {
                 $container->setAlias('cache.app.taggable', $name);
                 $definition->addTag('cache.taggable', ['pool' => $name]);
             } elseif ($isNativeTagAware) {
-                $tagAwareId = $name;
                 $container->setAlias('.'.$name.'.inner', $name);
                 $definition->addTag('cache.taggable', ['pool' => $name]);
             } elseif ($pool['tags']) {
@@ -274,6 +275,19 @@ class CacheBundle extends AbstractBundle
             }
 
             if (!\in_array($name, ['cache.app', 'cache.system'], true)) {
+                if ($tagAwareId !== $name && isset($pool['early_expiration_message_bus'])) {
+                    $container->getDefinition($tagAwareId)
+                        ->addTag('container.reversible')
+                        ->addMethodCall('setCallbackWrapper', [(new Definition(EarlyExpirationDispatcher::class))
+                            ->addArgument(new Reference($pool['early_expiration_message_bus']))
+                            ->addArgument(new Reference('reverse_container'))
+                            ->addArgument((new Definition('callable'))
+                                ->setFactory([new Reference($tagAwareId), 'setCallbackWrapper'])
+                                ->addArgument(null)
+                            ),
+                        ]);
+                }
+
                 $container->registerAliasForArgument($tagAwareId, TagAwareCacheInterface::class, $pool['name'] ?? $name);
                 $container->registerAliasForArgument($name, CacheInterface::class, $pool['name'] ?? $name);
                 $container->registerAliasForArgument($name, CacheItemPoolInterface::class, $pool['name'] ?? $name);

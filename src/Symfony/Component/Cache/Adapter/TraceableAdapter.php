@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\BadMethodCallException;
+use Symfony\Component\Cache\Internal\TraceableAdapterCallback;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -49,25 +50,21 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, NamespacedPo
         if (!$this->pool instanceof CacheInterface) {
             throw new BadMethodCallException(\sprintf('Cannot call "%s::get()": this class doesn\'t implement "%s".', get_debug_type($this->pool), CacheInterface::class));
         }
+
+        $callback = new TraceableAdapterCallback($callback, $this);
+
         if ($this->disabled?->__invoke()) {
-            return $this->pool->get($key, $callback, $beta, $metadata);
+            return $this->pool->get($key, $callback(...), $beta, $metadata);
         }
-
-        $isHit = true;
-        $callback = static function (CacheItem $item, bool &$save) use ($callback, &$isHit) {
-            $isHit = $item->isHit();
-
-            return $callback($item, $save);
-        };
 
         $event = $this->start(__FUNCTION__);
         try {
-            $value = $this->pool->get($key, $callback, $beta, $metadata);
+            $value = $this->pool->get($key, $callback(...), $beta, $metadata);
             $event->result[$key] = get_debug_type($value);
         } finally {
             $event->end = microtime(true);
         }
-        if ($isHit) {
+        if ($callback->isHit) {
             ++$event->hits;
         } else {
             ++$event->misses;

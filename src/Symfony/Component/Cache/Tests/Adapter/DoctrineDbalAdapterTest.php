@@ -48,6 +48,137 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         return new DoctrineDbalAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig()), '', $defaultLifetime);
     }
 
+    public function testWalDsnUsesNormalSynchronousMode()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        $connection = null;
+        try {
+            $cache = new DoctrineDbalAdapter('sqlite://localhost/'.$file.'?wal=1');
+            $connection = (new \ReflectionProperty($cache, 'conn'))->getValue($cache);
+            $this->assertFalse($connection->isConnected());
+
+            $this->assertTrue($cache->save($cache->getItem('key')->set('value')));
+            $this->assertSame('wal', $connection->fetchOne('PRAGMA journal_mode'));
+            $this->assertSame(1, (int) $connection->fetchOne('PRAGMA synchronous'));
+
+            $cache->reset(true);
+            $this->assertTrue($cache->getItem('key')->isHit());
+            $this->assertSame(1, (int) $connection->fetchOne('PRAGMA synchronous'));
+        } finally {
+            $connection?->close();
+            @unlink($file);
+        }
+    }
+
+    public function testWalDsnConfiguresBeforeCreatingTheTable()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        $connection = null;
+        try {
+            $cache = new DoctrineDbalAdapter('sqlite://localhost/'.$file.'?wal=1');
+            $cache->getItem('missing');
+            $cache->reset(true);
+            $cache->createTable();
+            $connection = (new \ReflectionProperty($cache, 'conn'))->getValue($cache);
+
+            $this->assertSame('wal', $connection->fetchOne('PRAGMA journal_mode'));
+            $this->assertSame(1, (int) $connection->fetchOne('PRAGMA synchronous'));
+        } finally {
+            $connection?->close();
+            @unlink($file);
+        }
+    }
+
+    public function testWalDsnConfiguresBeforeClearingAfterReset()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        $connection = null;
+        try {
+            $cache = new DoctrineDbalAdapter('sqlite://localhost/'.$file.'?wal=1', 'ns');
+            $this->assertTrue($cache->save($cache->getItem('key')->set('value')));
+            $connection = (new \ReflectionProperty($cache, 'conn'))->getValue($cache);
+
+            $cache->reset(true);
+            $this->assertTrue($cache->clear());
+            $this->assertSame(1, (int) $connection->fetchOne('PRAGMA synchronous'));
+        } finally {
+            $connection?->close();
+            @unlink($file);
+        }
+    }
+
+    #[RequiresPhpExtension('sqlite3')]
+    public function testWalDsnWithNativeSqliteDriver()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        $connection = null;
+        try {
+            $cache = new DoctrineDbalAdapter('sqlite://localhost/'.$file.'?driver=sqlite3&wal=1');
+            $connection = (new \ReflectionProperty($cache, 'conn'))->getValue($cache);
+
+            $this->assertTrue($cache->save($cache->getItem('key')->set('value')));
+            $this->assertSame('wal', $connection->fetchOne('PRAGMA journal_mode'));
+            $this->assertSame(1, (int) $connection->fetchOne('PRAGMA synchronous'));
+        } finally {
+            $connection?->close();
+            @unlink($file);
+        }
+    }
+
+    public function testInvalidWalDsnOptionIsRejected()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('wal');
+
+        new DoctrineDbalAdapter('sqlite://localhost/:memory:?wal=maybe');
+    }
+
+    public function testWalCannotBeEnabledForAnInMemoryDatabase()
+    {
+        $cache = new DoctrineDbalAdapter('sqlite://localhost/:memory:?wal=1');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('WAL');
+
+        (new \ReflectionMethod($cache, 'getConnection'))->invoke($cache);
+    }
+
+    public function testWalOffKeepsTheDefaultJournalMode()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        $connection = null;
+        try {
+            $baseline = new \PDO('sqlite:'.$file);
+            $expectedSynchronous = (int) $baseline->query('PRAGMA synchronous')->fetchColumn();
+            unset($baseline);
+
+            $cache = new DoctrineDbalAdapter('sqlite://localhost/'.$file.'?wal=0');
+            $connection = (new \ReflectionProperty($cache, 'conn'))->getValue($cache);
+            $this->assertTrue($cache->save($cache->getItem('key')->set('value')));
+            $this->assertSame('delete', $connection->fetchOne('PRAGMA journal_mode'));
+            $this->assertSame($expectedSynchronous, (int) $connection->fetchOne('PRAGMA synchronous'));
+        } finally {
+            $connection?->close();
+            @unlink($file);
+        }
+    }
+
+    public function testProvidedConnectionKeepsItsSynchronousMode()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        $connection = null;
+        try {
+            $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => $file], $this->getDbalConfig());
+            $connection->executeStatement('PRAGMA journal_mode=WAL');
+            $connection->executeStatement('PRAGMA synchronous=FULL');
+            $cache = new DoctrineDbalAdapter($connection);
+            $this->assertTrue($cache->save($cache->getItem('key')->set('value')));
+            $this->assertSame(2, (int) $connection->fetchOne('PRAGMA synchronous'));
+        } finally {
+            $connection?->close();
+            @unlink($file);
+        }
+    }
+
     public function testConfigureSchemaDecoratedDbalDriver()
     {
         if (file_exists(self::$dbFile)) {

@@ -40,6 +40,10 @@ class PdoTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInt
      * a DSN string that will be used to lazy-connect to the database when the
      * cache is actually used.
      *
+     * Add `?wal=1` to a SQLite DSN to enable WAL and `synchronous=NORMAL`.
+     * WAL requires a local file accessed from one host.
+     * WAL remains enabled in the database after removing the option or using `?wal=0`.
+     *
      * List of available options:
      *  * db_table: The name of the cache item table [default: cache_items]
      *  * db_id_col: The column where to store the cache id [default: item_id]

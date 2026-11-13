@@ -18,6 +18,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -97,6 +98,15 @@ class ValidationBundleTest extends TestCase
     {
         $this->assertContains('setMappingCache', $this->methodCalls([]));
         $this->assertNotContains('setMappingCache', $this->methodCalls([], debug: true));
+    }
+
+    public function testValidatorCacheWarmerCollectsClassProviders()
+    {
+        $warmer = $this->load([])->getDefinition('validator.mapping.cache_warmer');
+
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $warmer->getArgument(2));
+        $this->assertSame('validator.warmup_class_provider', $warmer->getArgument(2)->getTag());
+        $this->assertSame([['priority' => 25]], $warmer->getTag('kernel.cache_warmer'));
     }
 
     public function testTheMetadataIsOnlySharedOutsideDebugMode()

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `validator.warmup_class_provider` tag to warm metadata for classes discovered outside validator mappings
  * Default the `validation.not_compromised_password.enabled` option to `false` when `framework.test` is enabled
  * Add the `Audio` constraint for validating audio files
  * Allow nesting a group-less `Valid` constraint in `Sequentially` to cascade only after preceding constraints pass

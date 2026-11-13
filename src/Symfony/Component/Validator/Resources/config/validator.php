@@ -68,8 +68,9 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('validator.builder'),
                 param('validator.mapping.cache.file'),
+                tagged_iterator('validator.warmup_class_provider'),
             ])
-            ->tag('kernel.cache_warmer')
+            ->tag('kernel.cache_warmer', ['priority' => 25])
 
         ->set('cache.validator')
             ->parent('cache.system')

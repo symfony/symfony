@@ -362,6 +362,90 @@ class RouterTest extends TestCase
         $router->getRouteCollection();
     }
 
+    public function testLocalizedHostsFromContainerParameter()
+    {
+        $routes = new RouteCollection();
+        $route = new Route('/dashboard');
+        $route->setHost('%routing.hosts%');
+        $routes->add('dashboard', $route, 10);
+
+        $hosts = ['ar' => 'ar.example.com', 'en' => 'en.example.com'];
+        $router = new Router(
+            $this->getPsr11ServiceContainer($routes),
+            'foo',
+            [],
+            null,
+            $this->getParameterBag(['routing.hosts' => $hosts]),
+        );
+
+        $collection = $router->getRouteCollection();
+        $this->assertNull($collection->get('dashboard'));
+        $this->assertSame('ar.example.com', $collection->get('dashboard.ar')->getHost());
+        $this->assertSame('en.example.com', $collection->get('dashboard.en')->getHost());
+        $this->assertSame('ar', $collection->get('dashboard.ar')->getDefault('_locale'));
+        $this->assertSame('dashboard', $collection->get('dashboard.ar')->getDefault('_canonical_route'));
+        $this->assertSame(10, $collection->getPriority('dashboard.ar'));
+        $this->assertSame(10, $collection->getPriority('dashboard.en'));
+        $this->assertContainsEquals(new ContainerParametersResource(['routing.hosts' => $hosts]), $collection->getResources());
+    }
+
+    public function testLocalizedHostsFromContainerParameterWithExistingLocale()
+    {
+        $routes = new RouteCollection();
+        $route = new Route('/dashboard', ['_locale' => 'ar']);
+        $route->setHost('%routing.hosts%');
+        $routes->add('dashboard.ar', $route);
+
+        $router = new Router(
+            $this->getPsr11ServiceContainer($routes),
+            'foo',
+            [],
+            null,
+            $this->getParameterBag(['routing.hosts' => ['ar' => 'ar.example.com', 'en' => 'en.example.com']]),
+        );
+
+        $collection = $router->getRouteCollection();
+        $this->assertSame(1, $collection->count());
+        $this->assertSame('ar.example.com', $collection->get('dashboard.ar')->getHost());
+    }
+
+    public function testLocalizedHostsFromSymfonyContainerParameter()
+    {
+        $routes = new RouteCollection();
+        $route = new Route('/dashboard');
+        $route->setHost('%routing.hosts%');
+        $routes->add('dashboard', $route);
+
+        $container = $this->getServiceContainer($routes);
+        $container->setParameter('routing.hosts', ['ar' => 'ar.example.com', 'fr' => 'fr.example.com']);
+
+        $router = new Router($container, 'foo');
+
+        $this->assertSame('ar.example.com', $router->getRouteCollection()->get('dashboard.ar')->getHost());
+        $this->assertSame('fr.example.com', $router->getRouteCollection()->get('dashboard.fr')->getHost());
+    }
+
+    public function testRejectInvalidLocalizedHostsFromParameter()
+    {
+        $routes = new RouteCollection();
+        $route = new Route('/dashboard');
+        $route->setHost('%routing.hosts%');
+        $routes->add('dashboard', $route);
+
+        $router = new Router(
+            $this->getPsr11ServiceContainer($routes),
+            'foo',
+            [],
+            null,
+            $this->getParameterBag(['routing.hosts' => ['ar' => ['invalid']]]),
+        );
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The routing host parameter "routing.hosts" must be an array of locale names mapped to host strings.');
+
+        $router->getRouteCollection();
+    }
+
     public function testHostPlaceholders()
     {
         $routes = new RouteCollection();

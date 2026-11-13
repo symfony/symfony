@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Routing\Exception\LogicException;
+use Symfony\Component\Routing\Loader\Configurator\Traits\HostTrait;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router as BaseRouter;
@@ -34,6 +35,8 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 final class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberInterface
 {
+    use HostTrait;
+
     private array $collectedParameters = [];
     /**
      * @var \Closure(string):mixed
@@ -80,6 +83,7 @@ final class Router extends BaseRouter implements WarmableInterface, ServiceSubsc
             }
 
             $this->collection = $collection;
+            $this->resolveLocalizedHosts($this->collection);
             $this->resolveParameters($this->collection);
             $this->collection->addResource(new ContainerParametersResource($this->collectedParameters));
 
@@ -151,6 +155,41 @@ final class Router extends BaseRouter implements WarmableInterface, ServiceSubsc
             }
             $route->setMethods(array_merge([], ...$methods));
             $route->setCondition($this->resolve($route->getCondition()));
+        }
+    }
+
+    /**
+     * Expands locale-specific host maps provided as container parameters.
+     *
+     * The route loader cannot expand a "%hosts%" placeholder into localized
+     * routes because the container parameter is only available to this router.
+     */
+    private function resolveLocalizedHosts(RouteCollection $collection): void
+    {
+        foreach ($collection->all() as $name => $route) {
+            if (!preg_match('/^%([^%\s]+)%$/D', $route->getHost(), $matches) || str_starts_with($matches[1], 'env(')) {
+                continue;
+            }
+
+            $hosts = ($this->paramFetcher)($matches[1]);
+            if (!\is_array($hosts)) {
+                continue;
+            }
+
+            foreach ($hosts as $locale => $host) {
+                if (!\is_string($locale) || !\is_string($host)) {
+                    throw new RuntimeException(\sprintf('The routing host parameter "%s" must be an array of locale names mapped to host strings.', $matches[1]));
+                }
+            }
+
+            $this->collectedParameters[$matches[1]] = $hosts;
+
+            $localizedRoutes = new RouteCollection();
+            $localizedRoutes->add($name, $route, $collection->getPriority($name) ?? 0);
+            $this->addHost($localizedRoutes, $hosts);
+
+            $collection->remove($name);
+            $collection->addCollection($localizedRoutes);
         }
     }
 

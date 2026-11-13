@@ -63,6 +63,9 @@ final class Selector
         'focus-visible' => 'focus',
     ];
 
+    private ?string $htmlNative = null;
+    private ?string $svgNative = null;
+
     private function __construct(
         public readonly string $source,
         public readonly string $native,
@@ -310,7 +313,7 @@ final class Selector
     /**
      * @return array{string, int}
      */
-    private static function rewrite(string $selector, bool &$dynamic, ?string &$pseudoElement, bool $topLevel): array
+    private static function rewrite(string $selector, bool &$dynamic, ?string &$pseudoElement, bool $topLevel, bool $html = false, bool $legacy = false): array
     {
         $out = '';
         $ids = $classes = $types = 0;
@@ -319,9 +322,10 @@ final class Selector
         $compoundStart = true;
 
         $universalAt = null;
+        $legacyLogical = false;
         $picker = false;
         while ($i < $length) {
-            self::insertUniversal($out, $universalAt);
+            self::insertUniversal($out, $universalAt, $legacy, $legacyLogical);
             $char = $selector[$i];
 
             if ((null !== $pseudoElement || $picker) && !\in_array($char, [':', ' ', "\t", "\n"], true)) {
@@ -329,6 +333,10 @@ final class Selector
             }
 
             if (' ' === $char || "\t" === $char || "\n" === $char || '>' === $char || '+' === $char || '~' === $char) {
+                if ($legacyLogical) {
+                    $out .= ':is(*)';
+                    $legacyLogical = false;
+                }
                 $out .= $char;
                 $compoundStart = true;
                 ++$i;
@@ -451,7 +459,7 @@ final class Selector
                     $i = $end + 1;
                 }
                 // Where the compound starts, in case what the pseudo-class becomes needs a universal selector before it
-                $universalAt = $compoundStart ? \strlen($out) : null;
+                $universalAt = $compoundStart || $legacy ? \strlen($out) : null;
                 $compoundStart = false;
 
                 if (\in_array($name, self::LOGICAL, true)) {
@@ -468,7 +476,7 @@ final class Selector
                             $part = substr(ltrim($part), 1);
                         }
                         $ignored = null;
-                        [$rewritten, $partSpecificity] = self::rewrite(trim($part), $dynamic, $ignored, false);
+                        [$rewritten, $partSpecificity] = self::rewrite(trim($part), $dynamic, $ignored, false, $html, $legacy);
                         $parts[] = $prefix.trim($rewritten);
                         $max = max($max, $partSpecificity);
                     }
@@ -487,7 +495,7 @@ final class Selector
                     ++$classes;
                     if (null !== $argument && preg_match('/\sof\s+(.+)$/s', $argument, $m)) {
                         $ignored = null;
-                        $max = self::rewrite($m[1], $dynamic, $ignored, false)[1];
+                        $max = self::rewrite($m[1], $dynamic, $ignored, false, $html, $legacy)[1];
                         $ids += intdiv($max, 10000);
                         $classes += intdiv($max % 10000, 100);
                         $types += $max % 100;
@@ -546,7 +554,7 @@ final class Selector
                 if ('' !== $name) {
                     ++$types;
                     // As written: the native engine matches HTML names in any case, and SVG ones, like feFlood, in theirs
-                    $out .= $name.($noNamespace ? ':not(*)' : '');
+                    $out .= ($html ? self::htmlType($name) : $name).($noNamespace ? ':not(*)' : '');
                     $i += \strlen($name);
                     $compoundStart = false;
                     continue;
@@ -556,23 +564,110 @@ final class Selector
             throw new InvalidArgumentException(\sprintf('Unexpected "%s" in selector "%s".', $char, $selector));
         }
 
-        self::insertUniversal($out, $universalAt);
+        self::insertUniversal($out, $universalAt, $legacy, $legacyLogical);
 
         return [$out, $ids * 10000 + min($classes, 99) * 100 + min($types, 99)];
     }
 
     /**
      * PHP's engine only tests the nearest ancestor for a compound that starts with a pseudo-class taking a selector,
-     * like ":is(.a) p" or ":not(.b) p": an explicit universal selector, "*:is(.a) p", makes it test them all.
+     * like ":is(.a) p" or ":not(.b) p": an explicit universal selector makes it test them all.
+     * Older engines need a neutral final pseudo-class instead.
      *
      * @param-out null $position
      */
-    private static function insertUniversal(string &$out, ?int &$position): void
+    private static function insertUniversal(string &$out, ?int &$position, bool $legacy, bool &$legacyLogical): void
     {
         if (null !== $position && preg_match('/\G:(?:is|where|not|has|nth-[a-z-]+)\(/', $out, $m, 0, $position)) {
-            $out = substr($out, 0, $position).'*'.substr($out, $position);
+            if ($legacy) {
+                $legacyLogical = true;
+            } else {
+                $out = substr($out, 0, $position).'*'.substr($out, $position);
+            }
         }
         $position = null;
+    }
+
+    /** The selector for the HTML mirror, with HTML type names matched without case. */
+    public function forHtml(): string
+    {
+        return $this->htmlNative ??= $this->nativeFor(true);
+    }
+
+    /** The selector for SVG, whose type names retain their case. */
+    public function forSvg(): string
+    {
+        return $this->svgNative ??= $this->nativeFor(false);
+    }
+
+    private function nativeFor(bool $html): string
+    {
+        if (!self::legacyEngine()) {
+            return $this->native;
+        }
+        $dynamic = false;
+        $pseudo = null;
+
+        return trim(self::rewrite($this->source, $dynamic, $pseudo, true, $html, true)[0]) ?: '*';
+    }
+
+    /** @return \Traversable<int, \Dom\Element> */
+    public static function queryAll(\Dom\Document $document, string $selector): \Traversable
+    {
+        if (!self::legacyEngine() || !str_contains($selector, ':nth-') || null === $type = self::subjectType($selector)) {
+            return $document->querySelectorAll($selector);
+        }
+        // Older engines count the siblings of unrelated elements before testing the subject's type.
+        $matches = [];
+        foreach ($document->getElementsByTagNameNS('*', $type) as $element) {
+            if ($element->matches($selector)) {
+                $matches[] = $element;
+            }
+        }
+
+        return new \ArrayIterator($matches);
+    }
+
+    private static function htmlType(string $name): string
+    {
+        if (str_contains($name, '\\')) {
+            $name = preg_replace_callback('/\\\\([0-9a-fA-F]{1,6})[ \t\r\n\f]?/', static function (array $match): string {
+                $code = \intval($match[1], 16);
+
+                return $code >= 65 && $code <= 90 ? '\\'.dechex($code + 32).' ' : $match[0];
+            }, $name) ?? $name;
+        }
+
+        return strtolower($name);
+    }
+
+    private static function subjectType(string $selector): ?string
+    {
+        if (str_contains($selector, '\\') || 1 !== \count(self::splitTopLevel($selector))) {
+            return null;
+        }
+        $depth = $start = 0;
+        for ($i = 0, $length = \strlen($selector); $i < $length; ++$i) {
+            $char = $selector[$i];
+            if ('"' === $char || "'" === $char) {
+                $i = self::skipString($selector, $i) - 1;
+            } elseif ('(' === $char || '[' === $char) {
+                ++$depth;
+            } elseif (')' === $char || ']' === $char) {
+                --$depth;
+            } elseif (0 === $depth && \in_array($char, [' ', "\t", "\n", '>', '+', '~'], true)) {
+                $start = $i + 1;
+            }
+        }
+
+        return preg_match('/\G([a-zA-Z][\w-]*)(?=[.#:\[]|$)/', $selector, $match, 0, $start) ? $match[1] : null;
+    }
+
+    private static function legacyEngine(): bool
+    {
+        static $legacy;
+
+        return $legacy ??= class_exists(\Dom\HTMLDocument::class) && 1 === \count(\Dom\HTMLDocument::createFromString('<!doctype html><div class="a"><section><p></p></section></div>', \LIBXML_NOERROR)->querySelectorAll(':is(.a) p'));
     }
 
     private static function rewriteUnsupported(string $name, ?string $argument, string $selector): ?string

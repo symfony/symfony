@@ -30,7 +30,7 @@ final class SelectorMatchingTest extends TestCase
     {
         $document = \Dom\HTMLDocument::createFromString(self::HTML, \LIBXML_NOERROR);
 
-        $matched = array_map(static fn (\Dom\Element $element) => $element->id, iterator_to_array($document->querySelectorAll(Selector::parse($selector)->native)));
+        $matched = array_map(static fn (\Dom\Element $element) => $element->id, iterator_to_array($document->querySelectorAll(Selector::parse($selector)->forHtml())));
         $this->assertSame($ids, $matched);
     }
 
@@ -51,12 +51,11 @@ final class SelectorMatchingTest extends TestCase
         yield 'lang, rewritten to :is()' => [':lang(fr) p', []];
     }
 
-    public function testTheNativeEngineAloneMissesThem()
+    public function testAnImplicitUniversalSelectorMatchesDeeperAncestors()
     {
         $document = \Dom\HTMLDocument::createFromString(self::HTML, \LIBXML_NOERROR);
 
-        $this->assertCount(0, $document->querySelectorAll(':is(.a) p'), 'If this fails, PHP fixed it: the universal selector Selector adds can go.');
-        $this->assertCount(1, $document->querySelectorAll(Selector::parse(':is(.a) p')->native));
+        $this->assertCount(1, $document->querySelectorAll(Selector::parse(':is(.a) p')->forHtml()));
     }
 
     public function testALongListIsNotExpanded()
@@ -65,7 +64,7 @@ final class SelectorMatchingTest extends TestCase
         $selector = str_repeat(':is(.a, .b, .c, .d, .e, .f, .g, .h) ', 6).'p';
         $start = hrtime(true);
 
-        $this->assertSame(str_repeat('*:is(.a, .b, .c, .d, .e, .f, .g, .h) ', 6).'p', Selector::parse($selector)->native);
+        $this->assertLessThan(2 * \strlen($selector), \strlen(Selector::parse($selector)->forHtml()));
         $this->assertLessThan(100_000_000, hrtime(true) - $start, 'Well under 100ms.');
     }
 
@@ -142,6 +141,29 @@ final class SelectorMatchingTest extends TestCase
         $this->assertSame('#ff0000', $sheet->getComputedValue($view->getById('q'), 'color'));
     }
 
+    /** @param list<string> $ids */
+    #[DataProvider('provideStructuralQueries')]
+    public function testStructuralQueriesKeepTheirSubjects(string $selector, array $ids)
+    {
+        $document = \Dom\HTMLDocument::createFromString('<!doctype html><section><span></span><p id="a" title="x > p"></p><p id="b"><em id="e"></em></p></section>', \LIBXML_NOERROR);
+        $native = implode(', ', array_map(static fn (Selector $part) => $part->forHtml(), Selector::parseList($selector)));
+        $elements = Selector::queryAll($document, $native);
+
+        $this->assertSame($ids, array_map(static fn (\Dom\Element $element) => $element->id, iterator_to_array($elements, false)));
+    }
+
+    public static function provideStructuralQueries(): iterable
+    {
+        yield 'typed subject' => ['p:nth-child(2)', ['a']];
+        yield 'ancestor' => ['section > p:nth-child(3)', ['b']];
+        yield 'attribute subject' => ['[title="x > p"]:nth-child(2)', ['a']];
+        yield 'quoted combinator' => ['p:nth-child(2):is([title="x > p"])', ['a']];
+        yield 'functional ancestor' => [':is(section) > p:nth-child(2)', ['a']];
+        yield 'selector list' => ['p:nth-child(2), em', ['a', 'e']];
+        yield 'functional list' => [':is(p:nth-child(2), em)', ['a', 'e']];
+        yield 'escaped uppercase type' => ['\\50:nth-child(2)', ['a']];
+    }
+
     public function testTypesMatchHtmlElementsInAnyCaseAndSvgOnesInTheirs()
     {
         $sheet = new CssStyleSheet();
@@ -151,7 +173,7 @@ final class SelectorMatchingTest extends TestCase
 
         $builder = new HtmlBuilder();
         $builder->build('<style>#f feFlood { flood-color: #00ff00 } #f feflood { flood-opacity: .5 }</style><svg><filter id="f"><feFlood/></filter></svg>');
-        $flood = \Dom\HTMLDocument::createFromString('<!doctype html><svg><filter id="f"><feFlood/></filter></svg>', \LIBXML_NOERROR)->getElementsByTagName('feFlood')->item(0);
+        $flood = \Dom\XMLDocument::createFromString('<svg xmlns="http://www.w3.org/2000/svg"><filter id="f"><feFlood/></filter></svg>')->getElementsByTagName('feFlood')->item(0);
         $this->assertSame(['flood-color' => '#00ff00'], $builder->getStyleSheet()->svgDeclarations($flood, ['flood-color', 'flood-opacity']), 'An SVG element in its case only.');
     }
 }

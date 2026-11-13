@@ -2222,7 +2222,7 @@ final class Renderer implements WidgetRendererInterface
         // A stretched render is cached apart from the natural one, and a percentage one by the height it is a share of
         $cacheRows = null !== $stretchRows ? -1 - $stretchRows : $context->getRows();
         if (null !== $definite) {
-            $cacheRows = $cacheRows * 20_011 + $definite + 1;
+            $cacheRows .= ':height:'.$definite;
         }
         // In a row, two containing blocks can give the same share: the render of each is its own, as is that of a width
         // that is a share of its containing block, not of an item of a row, which the row gives its share, see below
@@ -2230,7 +2230,7 @@ final class Renderer implements WidgetRendererInterface
         // The block the box is sized from: the one around, or the box that clips it, see above
         $sizedFrom = $boxPercents ? $containing : ($sharedWidth ? $context->getContainingColumns() : $cacheColumns);
         if ($sizedFrom !== $cacheColumns) {
-            $cacheRows = $cacheRows * 30_011 - $sizedFrom - 1;
+            $cacheRows .= ':width:'.$sizedFrom;
         }
         $cached = $widget->getRenderCache($cacheColumns, $cacheRows);
         // Under its own key, which the sizes it is a share of change, not only that of its columns and rows

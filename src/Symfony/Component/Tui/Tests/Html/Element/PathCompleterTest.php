@@ -29,14 +29,18 @@ final class PathCompleterTest extends TestCase
         foreach (['photo.png', 'Photo.JPG', 'notes.txt', 'report.pdf', '.hidden.png'] as $file) {
             touch($this->dir.'/'.$file);
         }
-        symlink($this->dir.'/missing', $this->dir.'/notes-link');
-        touch($this->dir."/notes\nbreak.txt");
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            symlink($this->dir.'/missing', $this->dir.'/notes-link');
+            touch($this->dir."/notes\nbreak.txt");
+        }
     }
 
     protected function tearDown(): void
     {
         foreach (['photo.png', 'Photo.JPG', 'notes.txt', 'report.pdf', '.hidden.png', 'notes-link', "notes\nbreak.txt"] as $file) {
-            unlink($this->dir.'/'.$file);
+            if (file_exists($this->dir.'/'.$file) || is_link($this->dir.'/'.$file)) {
+                unlink($this->dir.'/'.$file);
+            }
         }
         rmdir($this->dir.'/photos');
         rmdir($this->dir);

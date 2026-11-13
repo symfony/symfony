@@ -53,7 +53,7 @@ abstract class AbstractWidget
     private ?LineBufferInterface $renderCacheLines = null;
     private int $renderCacheRevision = -1;
     private int $renderCacheColumns = -1;
-    private int $renderCacheRows = -1;
+    private int|string $renderCacheRows = -1;
     /** @var array<mixed> What the Renderer keeps with the lines cached, see setRenderCache() */
     private array $renderCacheExtra = [];
     /** @var array<string, array{LineBufferInterface, array<mixed>}> The renders of the same revision in other sizes, a layout trying a few, by "columns:rows", the oldest first, each with its extra */
@@ -400,14 +400,14 @@ abstract class AbstractWidget
      *
      * The cache is keyed on (renderRevision, columns, rows). A cache hit
      * means the widget's state and available dimensions have not changed
-     * since the last render, so the Renderer can skip the entire pipeline
+     * since the last render. The rows key may include containing dimensions, so the Renderer can skip the entire pipeline
      * (style resolution, layout, chrome, content rendering).
      *
      * @internal Used by the Renderer
      *
      * @return LineBufferInterface|null Cached lines, or null on miss
      */
-    final public function getRenderCache(int $columns, int $rows): ?LineBufferInterface
+    final public function getRenderCache(int $columns, int|string $rows): ?LineBufferInterface
     {
         if ($this->renderCacheRevision === $this->getRenderRevision()
             && $this->renderCacheColumns === $columns
@@ -426,7 +426,7 @@ abstract class AbstractWidget
      *
      * @return array<mixed>
      */
-    final public function getRenderCacheExtra(int $columns, int $rows): array
+    final public function getRenderCacheExtra(int $columns, int|string $rows): array
     {
         if ($this->renderCacheRevision !== $this->getRenderRevision()) {
             return [];
@@ -445,7 +445,7 @@ abstract class AbstractWidget
      *
      * @param array<mixed> $extra What the render gives besides its lines, kept and dropped with them, see getRenderCacheExtra()
      */
-    final public function setRenderCache(LineBufferInterface $lines, int $columns, int $rows, array $extra = []): void
+    final public function setRenderCache(LineBufferInterface $lines, int $columns, int|string $rows, array $extra = []): void
     {
         // The render in another size of the same revision kept too, a few of them
         if (null !== $this->renderCacheLines && $this->renderCacheRevision === $this->getRenderRevision() && [$this->renderCacheColumns, $this->renderCacheRows] !== [$columns, $rows]) {

@@ -31,6 +31,20 @@ final class RenderCacheTest extends TestCase
         $this->assertNull($widget->getRenderCache(20, 10));
     }
 
+    public function testContainingDimensionsStayInSeparateKeysWithoutIntegerArithmetic()
+    {
+        $widget = new TextWidget('a');
+        $height = new ArrayLineBuffer(['height']);
+        $width = new ArrayLineBuffer(['width']);
+        $widget->setRenderCache($height, 40, '10000:height:2147483647:width:40', ['height']);
+        $widget->setRenderCache($width, 40, '10000:height:40:width:2147483647', ['width']);
+
+        $this->assertSame($height, $widget->getRenderCache(40, '10000:height:2147483647:width:40'));
+        $this->assertSame($width, $widget->getRenderCache(40, '10000:height:40:width:2147483647'));
+        $this->assertSame(['height'], $widget->getRenderCacheExtra(40, '10000:height:2147483647:width:40'));
+        $this->assertNull($widget->getRenderCache(40, 10000));
+    }
+
     public function testOnlyAFewSizesAreKept()
     {
         $widget = new TextWidget('a');

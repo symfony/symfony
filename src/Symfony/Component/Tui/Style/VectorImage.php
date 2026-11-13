@@ -116,6 +116,7 @@ final class VectorImage
      */
     public static function fromElement(\Dom\Element $svg, ?\Closure $cascade = null): ?self
     {
+        SvgNames::normalize($svg);
         $box = self::numbers($svg->getAttribute('viewBox') ?? '');
         $box = 4 === \count($box) && $box[2] > 0 && $box[3] > 0 ? $box : null;
         $width = self::size($svg->getAttribute('width'));
@@ -987,7 +988,7 @@ final class VectorImage
                 'feflood' => ['type' => 'flood', 'color' => $color(), 'opacity' => $opacity()],
                 'fedropshadow' => ['type' => 'shadow', 'dx' => $number('dx', 2.0) * $scale, 'dy' => $number('dy', 2.0) * $scale, 'std' => max(0.0, $number('stdDeviation', 2.0)) * $scale, 'color' => $color(), 'opacity' => $opacity()],
                 'fecolormatrix' => ['type' => 'matrix', 'matrix' => self::colorMatrix(strtolower(trim($element->getAttribute('type') ?? 'matrix')), $element->getAttribute('values'))],
-                'femerge' => ['type' => 'merge', 'inputs' => \array_slice(array_values(array_map(static fn (\Dom\Element $node) => $node->getAttribute('in'), array_filter(array_values(array_filter(iterator_to_array($element->childNodes), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)), static fn (\Dom\Element $node) => 'femergenode' === strtolower($node->localName)))), 0, 16)],
+                'femerge' => ['type' => 'merge', 'inputs' => \array_slice(array_values(array_map(static fn (\Dom\Element $node) => $node->getAttribute('in'), array_filter(array_values(array_filter(iterator_to_array($element->childNodes, false), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)), static fn (\Dom\Element $node) => 'femergenode' === strtolower($node->localName)))), 0, 16)],
                 'fecomposite' => ['type' => 'composite', 'operator' => \in_array($operator = strtolower(trim($element->getAttribute('operator') ?? 'over')), ['over', 'in', 'out', 'atop', 'xor'], true) ? $operator : 'over'],
                 default => null,
             };

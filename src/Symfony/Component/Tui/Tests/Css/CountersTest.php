@@ -72,7 +72,7 @@ final class CountersTest extends TestCase
 
     public function testListMarkersAreBounded()
     {
-        $this->assertSame(['2147483647. a'], $this->texts('<ol start="99999999999999999999" style="list-style-type: upper-roman"><li>a</li></ol>'));
+        $this->assertSame(['2147483647. a', '2147483647. b'], $this->texts('<ol start="99999999999999999999" style="list-style-type: upper-roman"><li>a</li><li>b</li></ol>'));
     }
 
     public function testQuotesNestDeeperThanTheirPairs()

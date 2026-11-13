@@ -1127,12 +1127,12 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
             if ($document !== ($this->declaringIn[0] ?? null)) {
                 $this->declaringIn = [$document, $this->documentNames($document), []];
             }
-            $indexes = $this->declaringIn[3][$key] ??= array_values(array_filter($indexes, fn (int $index): bool => $this->mayMatchNames($this->rules[$index]->selector->native, $this->declaringIn[1])));
+            $indexes = $this->declaringIn[3][$key] ??= array_values(array_filter($indexes, fn (int $index): bool => $this->mayMatchNames($this->rules[$index]->selector->forHtml(), $this->declaringIn[1])));
         }
         $matching = [];
         foreach ($indexes as $index) {
             try {
-                if ($element->matches($this->rules[$index]->selector->native)) {
+                if ($element->matches($this->rules[$index]->selector->forHtml())) {
                     $matching[] = $index;
                 }
             } catch (\Throwable) {
@@ -1194,7 +1194,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                 }
                 foreach ($rule->declarations as $declaration) {
                     if ('content' === $declaration->property && !preg_match('/^(?:none|normal)\s*(?:!important)?$/i', trim($declaration->value))) {
-                        $selectors[$rule->selector->dynamic ? self::withoutStates($rule->selector->native) : $rule->selector->native] = true;
+                        $selectors[$rule->selector->dynamic ? self::withoutStates($rule->selector->forHtml()) : $rule->selector->forHtml()] = true;
                         break;
                     }
                 }
@@ -1384,12 +1384,12 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
             $found = new \SplObjectStorage();
             foreach ($indexes as $index) {
                 $rule = $this->rules[$index];
-                if (!$this->mayMatchNames($rule->selector->native, $names)) {
+                if (!$this->mayMatchNames($rule->selector->forHtml(), $names)) {
                     continue;
                 }
-                $selector = $rule->selector->dynamic ? self::withoutStates($rule->selector->native) : $rule->selector->native;
+                $selector = $rule->selector->dynamic ? self::withoutStates($rule->selector->forHtml()) : $rule->selector->forHtml();
                 try {
-                    $elements = '' !== $selector ? $document->querySelectorAll($selector) : [];
+                    $elements = '' !== $selector ? Selector::queryAll($document, $selector) : [];
                 } catch (\Throwable) {
                     continue;
                 }
@@ -1412,7 +1412,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
         return array_values(array_filter($indexes, function (int $index) use ($element): bool {
             $rule = $this->rules[$index];
             try {
-                return $element->matches($rule->selector->dynamic ? self::withoutStates($rule->selector->native) : $rule->selector->native);
+                return $element->matches($rule->selector->dynamic ? self::withoutStates($rule->selector->forHtml()) : $rule->selector->forHtml());
             } catch (\Throwable) {
                 return false;
             }
@@ -1459,7 +1459,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                             }
                         }
                         try {
-                            if (!$rule->selector->dynamic || $element->matches($rule->selector->native)) {
+                            if (!$rule->selector->dynamic || $element->matches($rule->selector->forHtml())) {
                                 $matching[] = $index;
                             }
                         } catch (\Throwable) {
@@ -1644,11 +1644,11 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
         $names = $this->documentNames($document);
         foreach ($rules as $index) {
             $rule = $this->rules[$index];
-            if (!$this->mayMatchNames($rule->selector->native, $names)) {
+            if (!$this->mayMatchNames($rule->selector->forSvg(), $names)) {
                 continue;
             }
             try {
-                $elements = $document->querySelectorAll($rule->selector->native);
+                $elements = Selector::queryAll($document, $rule->selector->forSvg());
             } catch (\Throwable) {
                 // Valid CSS the native engine does not support: skipped, like in the cascade
                 continue;
@@ -1714,7 +1714,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
             $rules = $this->svgDocument[3] ??= (function () use ($document, $rules): array {
                 $names = $this->documentNames($document);
 
-                return array_values(array_filter($rules, fn (int $index): bool => $this->mayMatchNames($this->rules[$index]->selector->native, $names)));
+                return array_values(array_filter($rules, fn (int $index): bool => $this->mayMatchNames($this->rules[$index]->selector->forSvg(), $names)));
             })();
         }
         foreach ($rules as $index) {
@@ -1725,7 +1725,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                 }
             }
             try {
-                if ($element->matches($rule->selector->native)) {
+                if ($element->matches($rule->selector->forSvg())) {
                     $matching[] = $index;
                 }
             } catch (\Throwable) {
@@ -1780,7 +1780,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                 foreach ($rule->declarations as $declaration) {
                     if ($property === $declaration->property && preg_match('/^'.$pattern.'/i', trim($declaration->value))) {
                         // In any state, like input:invalid + .error: the states left out, which the document has not
-                        $selector = $rule->selector->dynamic ? self::withoutStates($rule->selector->native) : $rule->selector->native;
+                        $selector = $rule->selector->dynamic ? self::withoutStates($rule->selector->forHtml()) : $rule->selector->forHtml();
                         if ('' !== $selector) {
                             $selectors[$selector] = true;
                         }
@@ -2477,7 +2477,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                 if ('a' === $element->localName && '' !== trim($element->getAttribute('href') ?? '')) {
                     $links[] = $element;
                 }
-                $collect(array_values(array_filter(iterator_to_array($element->childNodes), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)));
+                $collect(array_values(array_filter(iterator_to_array($element->childNodes, false), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)));
             }
         };
         $collect($elements);
@@ -2757,7 +2757,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
             }
 
             // A rule requiring states no widget has cannot match: skip the query
-            if ($dynamic && !str_contains($rule->selector->native, ':not(') && preg_match_all('/\['.Selector::STATE_ATTRIBUTE.'~="([^"]+)"\]/', $rule->selector->native, $m)) {
+            if ($dynamic && !str_contains($rule->selector->forHtml(), ':not(') && preg_match_all('/\['.Selector::STATE_ATTRIBUTE.'~="([^"]+)"\]/', $rule->selector->forHtml(), $m)) {
                 foreach ($m[1] as $state) {
                     if (!($present[$state] ??= null !== $this->document->querySelector(Selector::stateSelector($state)))) {
                         continue 2;
@@ -2773,7 +2773,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
             // A rule naming elements the document has none of matches nothing: not queried, which can take long, like
             // mroot > :nth-child(2) among thousands of siblings, matched from the right
             $tags ??= $this->documentNames();
-            if (!$this->mayMatchNames($rule->selector->native, $tags)) {
+            if (!$this->mayMatchNames($rule->selector->forHtml(), $tags)) {
                 continue;
             }
             // The elements of a rule of every state: kept while the document stays as it is, like in another media,
@@ -2782,7 +2782,7 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
                 $elements = $this->staticRuleElements[$index];
             } else {
                 try {
-                    $elements = iterator_to_array($this->document->querySelectorAll($rule->selector->native), false);
+                    $elements = iterator_to_array(Selector::queryAll($this->document, $rule->selector->forHtml()), false);
                 } catch (\Throwable) {
                     // Valid CSS the native engine does not support: skip the rule
                     $elements = [];
@@ -4893,9 +4893,9 @@ final class CssStyleSheet implements ScrollStateAwareInterface, IntrinsicSizeAwa
     /**
      * Counters are 32-bit integers: big values cannot overflow, nor make styles explode.
      */
-    private static function clampCounter(int $value): int
+    private static function clampCounter(int|float $value): int
     {
-        return max(-2147483648, min(2147483647, $value));
+        return (int) max(-2147483648, min(2147483647, $value));
     }
 
     private function enterCounterScope(): void

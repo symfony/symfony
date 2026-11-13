@@ -85,7 +85,7 @@ final class SelectElement implements ElementFactoryInterface
             $dropdown = new DropdownWidget($list);
             // Its field is a part of it, like the inside of a <select> in browsers, that the button rules of the page
             // do not style; the <button> of a customizable select is the page's
-            if (!array_any(array_values(array_filter(iterator_to_array($element->childNodes), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)), static fn (\Dom\Element $child) => 'button' === strtolower($child->localName))) {
+            if (!array_any(array_values(array_filter(iterator_to_array($element->childNodes, false), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)), static fn (\Dom\Element $child) => 'button' === strtolower($child->localName))) {
                 $builder->getStyleSheet()->describe($dropdown->getField(), 'tui-select-field');
             }
             if ($contents) {

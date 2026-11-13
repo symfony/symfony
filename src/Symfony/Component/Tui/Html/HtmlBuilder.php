@@ -22,6 +22,7 @@ use Symfony\Component\Tui\Html\Element\TextElement;
 use Symfony\Component\Tui\Style\DefaultStyleSheet;
 use Symfony\Component\Tui\Style\RasterImage;
 use Symfony\Component\Tui\Style\Style;
+use Symfony\Component\Tui\Style\SvgNames;
 use Symfony\Component\Tui\Style\VectorImage;
 use Symfony\Component\Tui\Widget\AbstractWidget;
 use Symfony\Component\Tui\Widget\ButtonWidget;
@@ -213,6 +214,7 @@ final class HtmlBuilder
             $this->userAgentStylesLoaded = true;
         }
 
+        [$html, $selectTag] = LegacyParser::prepare($html);
         $document = \Dom\HTMLDocument::createFromString(
             preg_match('/^\s*(<!doctype|<html)/i', $html) ? $html : '<!DOCTYPE html><html><body>'.$html.'</body></html>',
             \LIBXML_NOERROR,
@@ -227,6 +229,10 @@ final class HtmlBuilder
 
         try {
             $depths = $this->composeShadowRoots($document);
+            LegacyParser::restore($document, $selectTag);
+            foreach ($document->getElementsByTagName('svg') as $svg) {
+                SvgNames::normalize($svg);
+            }
             $this->loadStyles($document, $depths);
             $this->collectLabels($document);
 
@@ -541,7 +547,7 @@ final class HtmlBuilder
      */
     private function holdsBlockInFlow(\Dom\Element $element): bool
     {
-        return array_any(array_values(array_filter(iterator_to_array($element->childNodes), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)), fn (\Dom\Element $child) => \in_array(strtolower($child->localName), self::BLOCKS, true) && !$this->isInline($child) && !$this->styleSheet->staysOutOfFlow($child));
+        return array_any(array_values(array_filter(iterator_to_array($element->childNodes, false), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)), fn (\Dom\Element $child) => \in_array(strtolower($child->localName), self::BLOCKS, true) && !$this->isInline($child) && !$this->styleSheet->staysOutOfFlow($child));
     }
 
     /**
@@ -631,7 +637,7 @@ final class HtmlBuilder
         // wrapping its box, flex by default, that a page displays otherwise, like the inline-block .checkbox of Bulma:
         // its box and its text are lined up in a line of their own
         $flex = $this->styleSheet->mayBlockifyChildren($element) && !('label' === strtolower($element->localName) && $this->styleSheet->mayDisplayOtherwiseThanItems($element) && array_any(
-            array_values(array_filter(iterator_to_array($element->childNodes), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)),
+            array_values(array_filter(iterator_to_array($element->childNodes, false), static fn (\Dom\Node $node): bool => $node instanceof \Dom\Element)),
             static fn (\Dom\Element $child) => 'input' === strtolower($child->localName) && \in_array(strtolower(trim($child->getAttribute('type') ?? '')), ['checkbox', 'radio'], true),
         ));
 
@@ -657,7 +663,7 @@ final class HtmlBuilder
             }
         };
 
-        foreach (iterator_to_array($element->childNodes) as $child) {
+        foreach (iterator_to_array($element->childNodes, false) as $child) {
             $settle(\strlen($text), $previous, $widgets);
             $childStart = \strlen($text);
             if (!$inline) {
@@ -1154,7 +1160,7 @@ final class HtmlBuilder
                 $slots[$slot->getAttribute('name') ?? ''] ??= $slot;
             }
             $assigned = [];
-            foreach (iterator_to_array($host->childNodes) as $child) {
+            foreach (iterator_to_array($host->childNodes, false) as $child) {
                 $host->removeChild($child);
                 $name = $child instanceof \Dom\Element ? $child->getAttribute('slot') ?? '' : '';
                 if ($child !== $template && ($child instanceof \Dom\Element || $child instanceof \Dom\Text) && isset($slots[$name])) {
@@ -1173,7 +1179,7 @@ final class HtmlBuilder
                     $slot->appendChild($node);
                 }
             }
-            foreach (iterator_to_array($content->childNodes) as $node) {
+            foreach (iterator_to_array($content->childNodes, false) as $node) {
                 $host->appendChild($node);
             }
         }

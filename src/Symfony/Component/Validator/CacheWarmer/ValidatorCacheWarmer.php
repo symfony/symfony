@@ -30,11 +30,13 @@ use Symfony\Component\Validator\ValidatorBuilder;
 final class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
 {
     /**
-     * @param string $phpArrayFile The PHP file where metadata are cached
+     * @param string                           $phpArrayFile   The PHP file where metadata are cached
+     * @param iterable<iterable<class-string>> $classProviders
      */
     public function __construct(
         private ValidatorBuilder $validatorBuilder,
         string $phpArrayFile,
+        private iterable $classProviders = [],
     ) {
         parent::__construct($phpArrayFile);
     }
@@ -48,15 +50,29 @@ final class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
         $loaders = $this->validatorBuilder->getLoaders();
         $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), $arrayAdapter);
 
+        $classes = [];
         foreach ($this->extractSupportedLoaders($loaders) as $loader) {
-            foreach ($loader->getMappedClasses() as $mappedClass) {
-                try {
-                    if ($metadataFactory->hasMetadataFor($mappedClass)) {
-                        $metadataFactory->getMetadataFor($mappedClass);
-                    }
-                } catch (\Exception $e) {
-                    $this->ignoreAutoloadException($mappedClass, $e);
+            array_push($classes, ...$loader->getMappedClasses());
+        }
+        foreach ($this->classProviders as $provider) {
+            if (!is_iterable($provider)) {
+                throw new \LogicException(\sprintf('Validator warmup class providers must be iterable, "%s" given.', get_debug_type($provider)));
+            }
+
+            foreach ($provider as $class) {
+                $classes[] = $class;
+            }
+        }
+        $classes = array_unique($classes);
+        sort($classes);
+
+        foreach ($classes as $class) {
+            try {
+                if ($metadataFactory->hasMetadataFor($class)) {
+                    $metadataFactory->getMetadataFor($class);
                 }
+            } catch (\Exception $e) {
+                $this->ignoreAutoloadException($class, $e);
             }
         }
 

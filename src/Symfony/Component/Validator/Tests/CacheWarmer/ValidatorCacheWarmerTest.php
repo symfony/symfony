@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Validator\CacheWarmer\ValidatorCacheWarmer;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\ValidatorBuilder;
 
@@ -141,6 +142,22 @@ class ValidatorCacheWarmerTest extends TestCase
         $this->assertFileExists($file);
     }
 
+    public function testWarmUpFromClassProvider()
+    {
+        $validatorBuilder = new ValidatorBuilder();
+        $validatorBuilder->enableAttributeMapping();
+
+        $file = tempnam(sys_get_temp_dir(), __FUNCTION__);
+        @unlink($file);
+
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file, [new \ArrayIterator([ValidatorWarmupSubject::class])]);
+        $warmer->warmUp(\dirname($file), \dirname($file));
+
+        $item = $this->getArrayPool($file)->getItem(strtr(ValidatorWarmupSubject::class, '\\', '.'));
+        $this->assertTrue($item->isHit());
+        $this->assertInstanceOf(NotBlank::class, $item->get()->getPropertyMetadata('name')[0]->getConstraints()[0]);
+    }
+
     /**
      * Test that the cache warming process is not broken if a class loader
      * throws an exception (on class / file not found for example).
@@ -204,4 +221,10 @@ class ValidatorCacheWarmerTest extends TestCase
             spl_autoload_unregister($classLoader);
         }
     }
+}
+
+class ValidatorWarmupSubject
+{
+    #[NotBlank]
+    public string $name;
 }

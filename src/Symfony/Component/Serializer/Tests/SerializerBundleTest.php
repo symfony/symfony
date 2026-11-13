@@ -18,6 +18,7 @@ use Symfony\Bridge\Doctrine\Serializer\Normalizer\CollectionDenormalizer;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveMissingDependenciesPass as ContainerRemoveMissingDependenciesPass;
@@ -32,9 +33,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBa
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\DependencyInjection\RemoveMissingDependenciesPass;
-use Symfony\Component\Serializer\Mapping\Factory\SharedClassMetadataFactory;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Serializer\Mapping\Factory\SharedClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
@@ -125,7 +126,6 @@ class SerializerBundleTest extends TestCase
         $this->assertSame(['api' => ['include_built_in_normalizers' => true, 'include_built_in_encoders' => true, 'default_context' => ['enable_max_depth' => false]]], $container->getParameter('.serializer.named_serializers'));
     }
 
-
     public function testSerializerCacheActivated()
     {
         $container = $this->load(['enabled' => true]);
@@ -134,6 +134,16 @@ class SerializerBundleTest extends TestCase
 
         $cache = $container->getDefinition('serializer.mapping.cache_class_metadata_factory')->getArgument(1);
         $this->assertEquals(new Reference('serializer.mapping.cache.symfony'), $cache);
+    }
+
+    public function testSerializerCacheWarmerCollectsClassProviders()
+    {
+        $warmer = $this->load(['enabled' => true])->getDefinition('serializer.mapping.cache_warmer');
+
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $warmer->getArgument(2));
+        $this->assertSame('serializer.warmup_class_provider', $warmer->getArgument(2)->getTag());
+        $this->assertEquals(new Reference('cache.serializer', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $warmer->getArgument(3));
+        $this->assertSame([['priority' => 50]], $warmer->getTag('kernel.cache_warmer'));
     }
 
     public function testSerializerCacheUsedWithoutAttributesAndMappingFiles()

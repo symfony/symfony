@@ -84,6 +84,16 @@ class PropertyInfoCacheWarmerTest extends TestCase
         $this->assertFileDoesNotExist($this->dir.'/property_info.php');
     }
 
+    public function testClassProviderMustBeIterable()
+    {
+        $warmer = new PropertyInfoCacheWarmer($this->createExtractor(), [], $this->dir.'/property_info.php', [new \stdClass()]);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Property info warmup class providers must be iterable, "stdClass" given.');
+
+        $warmer->warmUp($this->dir, $this->dir);
+    }
+
     private function createExtractor(): PropertyInfoExtractor
     {
         $reflectionExtractor = new ReflectionExtractor();

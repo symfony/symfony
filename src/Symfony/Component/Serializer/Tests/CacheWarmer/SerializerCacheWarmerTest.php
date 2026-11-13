@@ -13,9 +13,12 @@ namespace Symfony\Component\Serializer\Tests\CacheWarmer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\CacheWarmer\SerializerCacheWarmer;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -124,6 +127,37 @@ class SerializerCacheWarmerTest extends TestCase
         $this->assertFileExists($file);
     }
 
+    public function testWarmUpFromClassProvider()
+    {
+        $file = tempnam(sys_get_temp_dir(), __FUNCTION__);
+        @unlink($file);
+
+        $warmer = new SerializerCacheWarmer([new AttributeLoader()], $file, [new \ArrayIterator([SerializerWarmupSubject::class])]);
+        $warmer->warmUp(\dirname($file), \dirname($file));
+
+        $item = $this->getArrayPool($file)->getItem(strtr(SerializerWarmupSubject::class, '\\', '_'));
+        $this->assertTrue($item->isHit());
+        $this->assertSame(['api'], $item->get()->getAttributesMetadata()['name']->getGroups());
+    }
+
+    public function testWarmUpRemovesFallbackCopies()
+    {
+        $file = tempnam(sys_get_temp_dir(), __FUNCTION__);
+        @unlink($file);
+
+        $fallback = new ArrayAdapter();
+        $key = strtr(SerializerWarmupSubject::class, '\\', '_');
+        $fallback->save($fallback->getItem($key)->set('stale'));
+        $fallback->save($fallback->getItem('other')->set('keep'));
+
+        $warmer = new SerializerCacheWarmer([new AttributeLoader()], $file, [new \ArrayIterator([SerializerWarmupSubject::class])], $fallback);
+        $warmer->warmUp(\dirname($file), \dirname($file));
+
+        $this->assertFalse($fallback->hasItem($key));
+        $this->assertSame('keep', $fallback->getItem('other')->get());
+        $this->assertTrue($this->getArrayPool($file)->getItem($key)->isHit());
+    }
+
     /**
      * Test that the cache warming process is not broken if a class loader
      * throws an exception (on class / file not found for example).
@@ -182,4 +216,10 @@ class SerializerCacheWarmerTest extends TestCase
             spl_autoload_unregister($classLoader);
         }
     }
+}
+
+class SerializerWarmupSubject
+{
+    #[Groups(['api'])]
+    public string $name;
 }

@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Serializer\CacheWarmer;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\CacheWarmer\AbstractPhpFileCacheWarmer;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
@@ -29,12 +31,15 @@ use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 final class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
 {
     /**
-     * @param LoaderInterface[] $loaders      The serializer metadata loaders
-     * @param string            $phpArrayFile The PHP file where metadata are cached
+     * @param LoaderInterface[]                $loaders        The serializer metadata loaders
+     * @param string                           $phpArrayFile   The PHP file where metadata are cached
+     * @param iterable<iterable<class-string>> $classProviders
      */
     public function __construct(
         private array $loaders,
         string $phpArrayFile,
+        private iterable $classProviders = [],
+        private ?CacheItemPoolInterface $fallbackPool = null,
     ) {
         parent::__construct($phpArrayFile);
     }
@@ -44,23 +49,44 @@ final class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
         if (!$buildDir) {
             return false;
         }
-        if (!$this->loaders) {
-            return true;
-        }
-
         $metadataFactory = new CacheClassMetadataFactory(new ClassMetadataFactory(new LoaderChain($this->loaders)), $arrayAdapter);
 
+        $classes = [];
         foreach ($this->extractSupportedLoaders($this->loaders) as $loader) {
-            foreach ($loader->getMappedClasses() as $mappedClass) {
-                try {
-                    $metadataFactory->getMetadataFor($mappedClass);
-                } catch (\Exception $e) {
-                    $this->ignoreAutoloadException($mappedClass, $e);
-                }
+            array_push($classes, ...$loader->getMappedClasses());
+        }
+        foreach ($this->classProviders as $provider) {
+            if (!is_iterable($provider)) {
+                throw new \LogicException(\sprintf('Serializer warmup class providers must be iterable, "%s" given.', get_debug_type($provider)));
+            }
+
+            foreach ($provider as $class) {
+                $classes[] = $class;
+            }
+        }
+        $classes = array_unique($classes);
+        sort($classes);
+
+        foreach ($classes as $class) {
+            try {
+                $metadataFactory->getMetadataFor($class);
+            } catch (\Exception $e) {
+                $this->ignoreAutoloadException($class, $e);
             }
         }
 
         return true;
+    }
+
+    /**
+     * @return string[] A list of classes to preload on PHP 7.4+
+     */
+    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values): array
+    {
+        $preload = parent::warmUpPhpArrayAdapter($phpArrayAdapter, $values);
+        $this->fallbackPool?->deleteItems(array_keys($values));
+
+        return $preload;
     }
 
     /**

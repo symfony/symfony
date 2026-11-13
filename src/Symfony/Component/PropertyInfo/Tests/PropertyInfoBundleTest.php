@@ -79,6 +79,20 @@ class PropertyInfoBundleTest extends TestCase
         $this->assertSame([], $container->get('test.cache')->getValues());
     }
 
+    public function testTaggedClassProviderWarmsAdditionalClasses()
+    {
+        $kernel = new TestPropertyInfoKernel('cached', false, $this->varDir, true);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $container->get('test.cache_warmer')->warmUp($kernel->getCacheDir(), $kernel->getBuildDir());
+
+        $propertyInfo = $container->get('test.property_info');
+        $this->assertSame(['bar'], $propertyInfo->getProperties(PropertyInfoWarmupSubject::class));
+        $this->assertEquals(Type::string(), $propertyInfo->getType(PropertyInfoWarmupSubject::class, 'bar'));
+        $this->assertSame([], $container->get('test.cache')->getValues());
+    }
+
     public function testTaggedExtractorsAreCollectedThroughAutoconfiguration()
     {
         $kernel = new TestPropertyInfoKernel('test', false, $this->varDir);
@@ -108,6 +122,19 @@ class PropertyInfoBundleListExtractor implements PropertyListExtractorInterface
     public function getProperties(string $class, array $context = []): ?array
     {
         return PropertyInfoBundleSubject::class === $class ? ['foo', 'bar'] : null;
+    }
+}
+
+class PropertyInfoWarmupSubject
+{
+    public string $bar;
+}
+
+class PropertyInfoWarmupProvider implements \IteratorAggregate
+{
+    public function getIterator(): \Traversable
+    {
+        yield PropertyInfoWarmupSubject::class;
     }
 }
 
@@ -141,6 +168,7 @@ class TestPropertyInfoKernel extends AbstractKernel
         if ($this->withCacheSystem) {
             $services
                 ->set('cache.system', ArrayAdapter::class)
+                ->set(PropertyInfoWarmupProvider::class)->tag('property_info.warmup_class_provider')
                 ->alias('test.cache', 'cache.property_info')->public()
                 ->alias('test.cache_warmer', 'property_info.cache_warmer')->public()
             ;

@@ -54,8 +54,8 @@ return static function (ContainerConfigurator $container) {
             ->args([service('property_info.cache.inner'), service('property_info.cache.adapter')])
 
         ->set('property_info.cache_warmer', PropertyInfoCacheWarmer::class)
-            ->args([service('property_info.cache.inner'), [], '%kernel.build_dir%/property_info.php'])
-            ->tag('kernel.cache_warmer')
+            ->args([service('property_info.cache.inner'), [], '%kernel.build_dir%/property_info.php', tagged_iterator('property_info.warmup_class_provider')])
+            ->tag('kernel.cache_warmer', ['priority' => 100])
 
         // Extractor
         ->set('property_info.reflection_extractor', ReflectionExtractor::class)

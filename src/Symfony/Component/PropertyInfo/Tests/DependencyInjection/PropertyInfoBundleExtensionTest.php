@@ -53,7 +53,7 @@ class PropertyInfoBundleExtensionTest extends TestCase
         $this->assertEquals(new Reference('property_info.cache.adapter'), $container->getDefinition('property_info.cache')->getArgument(1));
         $this->assertEquals(new Reference('cache.property_info'), $container->getDefinition('property_info.cache.adapter')->getArgument(1));
         $this->assertSame('cache.system', $container->getDefinition('cache.property_info')->getParent());
-        $this->assertTrue($container->getDefinition('property_info.cache_warmer')->hasTag('kernel.cache_warmer'));
+        $this->assertSame([['priority' => 100]], $container->getDefinition('property_info.cache_warmer')->getTag('kernel.cache_warmer'));
     }
 
     public function testPropertyInfoCacheDisabledInDebug()

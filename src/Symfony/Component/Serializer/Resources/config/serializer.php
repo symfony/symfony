@@ -175,8 +175,8 @@ return static function (ContainerConfigurator $container) {
 
         // Cache
         ->set('serializer.mapping.cache_warmer', SerializerCacheWarmer::class)
-            ->args([abstract_arg('The serializer metadata loaders'), param('serializer.mapping.cache.file')])
-            ->tag('kernel.cache_warmer')
+            ->args([abstract_arg('The serializer metadata loaders'), param('serializer.mapping.cache.file'), tagged_iterator('serializer.warmup_class_provider'), service('cache.serializer')->ignoreOnInvalid()])
+            ->tag('kernel.cache_warmer', ['priority' => 50])
 
         ->set('cache.serializer')
             ->parent('cache.system')

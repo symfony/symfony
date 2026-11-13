@@ -103,6 +103,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'property_info.list_extractor',
         'property_info.name_extractor',
         'property_info.type_extractor',
+        'property_info.warmup_class_provider',
         'proxy',
         'rate_limiter',
         'remote_event.consumer',
@@ -122,6 +123,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'security.voter',
         'serializer.encoder',
         'serializer.normalizer',
+        'serializer.warmup_class_provider',
         'texter.transport_factory',
         'translation.dumper',
         'translation.extractor',
@@ -136,6 +138,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'validator.constraint_validator',
         'validator.group_provider',
         'validator.initializer',
+        'validator.warmup_class_provider',
         'workflow',
     ];
 

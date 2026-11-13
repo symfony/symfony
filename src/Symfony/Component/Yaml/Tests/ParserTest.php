@@ -1876,6 +1876,38 @@ class ParserTest extends TestCase
         $this->assertSameData(['date' => $expectedDate], $this->parser->parse($yaml, Yaml::PARSE_DATETIME));
     }
 
+    #[DataProvider('getDateTimeAsStringTests')]
+    public function testParseDateTimeAsString(string $yaml, mixed $expected)
+    {
+        $this->assertSameData($expected, $this->parser->parse($yaml, Yaml::PARSE_DATETIME_AS_STRING));
+    }
+
+    public static function getDateTimeAsStringTests(): iterable
+    {
+        yield 'root scalar' => ['2002-12-14', '2002-12-14'];
+        yield 'multi-line root scalar' => ["2002-12-14\n01:23:45", '2002-12-14 01:23:45'];
+        yield 'mapping value' => ['date: 2002-12-14', ['date' => '2002-12-14']];
+        yield 'multi-line mapping value' => ["date: 2002-12-14\n  01:23:45", ['date' => '2002-12-14 01:23:45']];
+        yield 'date and time separated by a space' => ['date: 2002-12-14 01:23:45', ['date' => '2002-12-14 01:23:45']];
+        yield 'date and time with a fraction and a time zone' => ['date: 2002-12-14t01:23:45.670 -5', ['date' => '2002-12-14t01:23:45.670 -5']];
+        yield 'date that does not exist' => ['date: 2002-02-30', ['date' => '2002-02-30']];
+        yield 'sequence item' => ['- 2002-12-14', ['2002-12-14']];
+        yield 'flow sequence' => ['[2002-12-14, 2002-12-15]', ['2002-12-14', '2002-12-15']];
+        yield 'flow mapping value' => ['{date: 2002-12-14}', ['date' => '2002-12-14']];
+        yield 'flow mapping key' => ['{2002-12-14: foo}', ['2002-12-14' => 'foo']];
+        yield 'block mapping key' => ['2002-12-14: foo', ['2002-12-14' => 'foo']];
+        yield 'aliased value' => ["a: &date 2002-12-14\nb: *date", ['a' => '2002-12-14', 'b' => '2002-12-14']];
+        yield 'alias as a block mapping key' => ["a: &date 2002-12-14\n*date : foo", ['a' => '2002-12-14', '2002-12-14' => 'foo']];
+    }
+
+    public function testParseDateTimeAsStringCannotBeUsedWithParseDateTime()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The Yaml::PARSE_DATETIME and Yaml::PARSE_DATETIME_AS_STRING flags cannot be used together.');
+
+        $this->parser->parse('date: 2002-12-14', Yaml::PARSE_DATETIME | Yaml::PARSE_DATETIME_AS_STRING);
+    }
+
     #[DataProvider('parserThrowsExceptionWithCorrectLineNumberProvider')]
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
     {

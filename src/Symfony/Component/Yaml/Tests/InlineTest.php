@@ -680,6 +680,18 @@ class InlineTest extends TestCase
         $this->assertSame($timezone, $date->format('O'));
     }
 
+    #[DataProvider('getTimestampTests')]
+    public function testParseTimestampAsString(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond, string $timezone)
+    {
+        $this->assertSame($yaml, Inline::parse($yaml, Yaml::PARSE_DATETIME_AS_STRING));
+        $this->assertSame(['nested' => [$yaml]], Inline::parse("{nested: [$yaml]}", Yaml::PARSE_DATETIME_AS_STRING));
+    }
+
+    public function testParseInvalidDateAsString()
+    {
+        $this->assertSame('2024-50-50', Inline::parse('2024-50-50', Yaml::PARSE_DATETIME_AS_STRING));
+    }
+
     public function testParseTimestampBeforeUnixEpochAsUnixTimestamp()
     {
         $this->assertSame(-1.5, Inline::parse('1969-12-31T23:59:58.5Z'));

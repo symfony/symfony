@@ -107,6 +107,10 @@ class Parser
             throw new ParseException('The YAML value does not appear to be valid UTF-8.', -1, null, $this->filename);
         }
 
+        if ($flags & Yaml::PARSE_DATETIME && $flags & Yaml::PARSE_DATETIME_AS_STRING) {
+            throw new \InvalidArgumentException('The Yaml::PARSE_DATETIME and Yaml::PARSE_DATETIME_AS_STRING flags cannot be used together.');
+        }
+
         $this->refs = [];
         $state = $this->getState();
         $state->reset();
@@ -294,7 +298,7 @@ class Parser
                 }
 
                 try {
-                    $key = str_starts_with($values['key'], '*') ? $this->parseValue($values['key'], $flags, $context) : Inline::parseScalar($values['key']);
+                    $key = str_starts_with($values['key'], '*') ? $this->parseValue($values['key'], $flags, $context) : Inline::parseScalar($values['key'], Yaml::PARSE_DATETIME_AS_STRING & $flags);
                 } catch (ParseException $e) {
                     $e->setParsedLine($this->getRealCurrentLineNb() + 1);
                     $e->setSnippet($this->currentLine);
@@ -593,7 +597,7 @@ class Parser
                     }
 
                     try {
-                        return Inline::parse(trim($value), 0, $this->refs, $this->state);
+                        return Inline::parse(trim($value), Yaml::PARSE_DATETIME_AS_STRING & $flags, $this->refs, $this->state);
                     } catch (ParseException) {
                         // fall-through to the ParseException thrown below
                     }

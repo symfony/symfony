@@ -37,6 +37,7 @@ trait PdoTrait
     private ?string $password = null;
     private array $connectionOptions = [];
     private string $namespace;
+    private bool $useWal = false;
 
     private function init(#[\SensitiveParameter] \PDO|string $connOrDsn, string $namespace = '', int $defaultLifetime = 0, #[\SensitiveParameter] array $options = [], ?MarshallerInterface $marshaller = null): void
     {
@@ -55,6 +56,7 @@ trait PdoTrait
 
             $this->conn = $connOrDsn;
         } else {
+            $this->useWal = self::extractWalOption($connOrDsn);
             $this->dsn = $connOrDsn;
         }
 
@@ -79,8 +81,12 @@ trait PdoTrait
             return $dsn;
         }
 
+        $useWal = self::extractWalOption($dsn);
         $pdo = new \PDO($dsn);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        if ($useWal) {
+            self::enableWal($pdo);
+        }
 
         return $pdo;
     }
@@ -343,8 +349,12 @@ trait PdoTrait
     private function getConnection(): \PDO
     {
         if (!isset($this->conn)) {
-            $this->conn = new \PDO($this->dsn, $this->username, $this->password, $this->connectionOptions);
-            $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $conn = new \PDO($this->dsn, $this->username, $this->password, $this->connectionOptions);
+            $conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            if ($this->useWal) {
+                self::enableWal($conn);
+            }
+            $this->conn = $conn;
         }
 
         return $this->conn;
@@ -432,5 +442,50 @@ trait PdoTrait
 
             $statement->execute();
         }
+    }
+
+    private static function extractWalOption(string &$dsn): bool
+    {
+        if (!str_starts_with($dsn, 'sqlite:') || false === $question = strpos($dsn, '?')) {
+            return false;
+        }
+
+        $fragment = strpos($dsn, '#', $question);
+        $query = false === $fragment ? substr($dsn, $question + 1) : substr($dsn, $question + 1, $fragment - $question - 1);
+        $parts = explode('&', $query);
+        $wal = null;
+
+        foreach ($parts as $i => $part) {
+            if ('wal' !== $part && !str_starts_with($part, 'wal=')) {
+                continue;
+            }
+            if (null !== $wal) {
+                throw new InvalidArgumentException('Invalid SQLite DSN: parameter "wal" must be specified only once.');
+            }
+
+            $value = substr($part, 4);
+            $wal = '' !== $value ? filter_var($value, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) : null;
+            if (null === $wal) {
+                throw new InvalidArgumentException('Invalid SQLite DSN: parameter "wal" must be a boolean.');
+            }
+            unset($parts[$i]);
+        }
+
+        if (null === $wal) {
+            return false;
+        }
+
+        $dsn = substr($dsn, 0, $question).($parts ? '?'.implode('&', $parts) : '').(false === $fragment ? '' : substr($dsn, $fragment));
+
+        return $wal;
+    }
+
+    private static function enableWal(\PDO $conn): void
+    {
+        if ('wal' !== $conn->query('PRAGMA journal_mode=WAL')->fetchColumn()) {
+            throw new InvalidArgumentException('SQLite WAL mode could not be enabled.');
+        }
+
+        $conn->exec('PRAGMA synchronous=NORMAL');
     }
 }

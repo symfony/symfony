@@ -72,6 +72,32 @@ class CacheBundleTest extends TestCase
         $this->assertSame('bar', $pool->getItem('foo')->get());
     }
 
+    #[RequiresPhpExtension('pdo_sqlite')]
+    public function testWalProviderIsUsedByAppAndDerivedPools()
+    {
+        $container = $this->boot([
+            'default_provider' => 'sqlite:%kernel.cache_dir%/app.sqlite?wal=1',
+            'pools' => ['cache.child' => ['public' => true]],
+        ]);
+        $app = $container->get('test.cache.app');
+        $child = $container->get('cache.child');
+
+        try {
+            $this->assertInstanceOf(PdoAdapter::class, $app);
+            $this->assertInstanceOf(PdoAdapter::class, $child);
+            $this->assertTrue($app->save($app->getItem('key')->set('app')));
+            $this->assertTrue($child->save($child->getItem('key')->set('child')));
+
+            $file = $container->getParameter('kernel.cache_dir').'/app.sqlite';
+            $this->assertFileExists($file);
+            $this->assertFileDoesNotExist($file.'?wal=1');
+            $this->assertSame(2, (int) (new \PDO('sqlite:'.$file))->query('SELECT COUNT(*) FROM cache_items')->fetchColumn());
+        } finally {
+            $app->reset(true);
+            $child->reset(true);
+        }
+    }
+
     public function testTheEarlyExpirationHandlerIsDroppedWhenNoPoolUsesIt()
     {
         $this->assertFalse($this->boot()->has('cache.early_expiration_handler'));

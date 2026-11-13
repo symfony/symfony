@@ -7,6 +7,365 @@ in 8.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v8.2.0...v8.2.1
 
+## 8.2.0-BETA2 (2026-11-13)
+
+### AssetMapper
+
+ * bug #68081 [AssetMapper] Fix comparing 0.x and pre-release versions in `importmap:outdated` and `importmap:audit` (nicolas-grekas)
+ * bug #68076 [AssetMapper] Compare pre-releases in importmap:outdated (Amoifr)
+ * bug #68023 [AssetMapper] Resolve the env vars of `asset_mapper.server` when the container is compiled (lazerg)
+ * minor #68056 [AssetMapper] Backdate the meta file too in `CachedMappedAssetFactoryTest` (nicolas-grekas)
+
+### BrowserKit
+
+ * bug #68061 [BrowserKit][HttpClient] Don't send credentials to other origins on redirects (nicolas-grekas)
+
+### Cache
+
+ * bug #68129 [Cache][FrameworkBundle] Fix async recomputation for chains and decorated pools (X-Coder264)
+ * bug #68123 [Cache] Check cache keys even when assertions are disabled (nicolas-grekas)
+ * bug #68091 [Cache] Fix ChainAdapter losing the expiry of items propagated from FilesystemAdapter (skybleak333)
+ * bug #68090 [Cache] Fix items without expiry read back as expiring in 2090 (skybleak333)
+ * bug #68113 [Cache][Messenger][Notifier] Fix AMQP, Memcached, Ntfy and Spot-Hit misreading DSN option values (nicolas-grekas)
+ * bug #68047 [Cache][Messenger] Fix Redis connections and the Beanstalkd transport reading invalid option values as 0 or false (nicolas-grekas)
+ * bug #68039 [Cache][Messenger] Fix Redis connections and Messenger transports misreading integer and boolean options (nicolas-grekas)
+ * bug #68038 [Cache][HttpFoundation][Lock] Fix memcached items with a TTL ending after 2038 expiring at once (nicolas-grekas)
+ * bug #67924 [Cache][FrameworkBundle][Routing][Serializer][Translation][TwigBundle][Validator] Preserve legacy types of moved services (X-Coder264)
+ * bug #67850 [Cache] Declare the temporary tag set as KEYS[2] in RedisTagAwareAdapter::doInvalidate() (srebb)
+ * bug #67864 [Cache] Fix fetching long keys with MemcachedAdapter::getItems() (lazerg)
+
+### CI
+
+ * minor #67930 [CI] Add the repository of patched packages to components that declare their own repositories (nicolas-grekas)
+
+### Config
+
+ * bug #67960 [Config] Compare resource freshness with cache build start (X-Coder264)
+ * bug #67977 [Config][Routing] Fix excluded paths in XML route imports and in `GlobResource` ids (nicolas-grekas)
+ * bug #67968 [Config] Compare the content of directory entries modified in the same second as the cache (nicolas-grekas)
+ * bug #67952 [Config] Fix DirectoryResource checking the parent directory on Windows (nicolas-grekas)
+ * bug #67927 [Config] Fix EnumNode error messages for INF, NAN and enum cases without a backing value (nicolas-grekas)
+ * bug #67911 [Config] Do not treat NAN as a placeholder (haraldpdl)
+ * minor #68033 [Config] Tell in config references when env vars are resolved at compile time (nicolas-grekas)
+
+### Console
+
+ * bug #67934 [Console] Fix formatting and wrapping text with escaped tag delimiters (nicolas-grekas)
+ * bug #67903 [Console] Fix wrapping escaped tags and text wider than 138 columns (nicolas-grekas)
+ * bug #67897 [Console] Fix the width of tags and URLs when wrapping text (nicolas-grekas)
+ * bug #67890 [Console] Count wide characters as two columns when wrapping and truncating (b84330808)
+
+### DependencyInjection
+
+ * bug #67976 [DependencyInjection][Routing] Track the glob resource of `import()` so new files are detected (abp002)
+ * bug #67975 [DependencyInjection][Routing][Translation] Track loaded files before reading them (nicolas-grekas)
+ * bug #67970 [DependencyInjection] Fix `parent::buildContainer()` tracking the default `bundles.php` of a `MicroKernelTrait` kernel (nicolas-grekas)
+ * bug #67938 [DependencyInjection][HttpKernel] Fix type-hinting `file_locator` and `services_resetter` with their deprecated HttpKernel types (nicolas-grekas)
+ * bug #67861 [DependencyInjection] Fix resolving env placeholders with many env vars (simoheinonen)
+ * minor #68137 [DependencyInjection] Fix attribute configurator phpdoc rejecting narrowed reflectors (HypeMC)
+
+### DoctrineBridge
+
+ * bug #68142 [DoctrineBridge] Fix UniqueEntity default error path when fields is a mapping (lazerg)
+ * minor #68104 [DoctrineBridge] Use the schema editor API of Doctrine ORM in tests (nicolas-grekas)
+
+### Finder
+
+ * bug #67926 [Finder] Fix Glob::toRegex() when the delimiter is a slash (nicolas-grekas)
+ * bug #67915 [Finder] Fix three bracket expressions Glob::toRegex() gets wrong (KalimeroMK)
+
+### Form
+
+ * bug #67962 [Form] Review Macedonian (mk) translations (KalimeroMK)
+ * bug #67865 [Form] Let a validation_groups callable return false to disable validation (KalimeroMK)
+ * minor #68071 [Form][Validator] Review Hungarian translations (connorhu)
+ * minor #67989 [Form][Validator] Review Catalan (ca) translations (Victor-369)
+ * minor #67866 [Form] Review Bulgarian (bg) translations (alkinbg)
+
+### FrameworkBundle
+
+ * bug #68112 [FrameworkBundle] Give the test session listener the same services as the real one (nicolas-grekas)
+ * bug #68065 [FrameworkBundle][HttpClient] Match scopes against the URL without its userinfo (nicolas-grekas)
+ * bug #67891 [FrameworkBundle] Lint and compile the `$if` expressions of `#[RateLimit]` (HypeMC)
+ * minor #67971 [FrameworkBundle] Restore the `APP_*_DIR` server variables set by `MicroKernelTraitTest` (nicolas-grekas)
+ * minor #67899 [FrameworkBundle] Check that controller.expression_language lists every Expression property of the HttpKernel attributes (nicolas-grekas)
+
+### HtmlSanitizer
+
+ * bug #67886 [HtmlSanitizer] Don't treat elements and attributes that act on the page as safe (nicolas-grekas)
+ * bug #67885 [HtmlSanitizer] Block `html` and `body` in `allowSafeElements()` and don't let links expose `window.opener` (nicolas-grekas)
+ * bug #67879 [HtmlSanitizer] Don't treat `link`, `meta`, `plaintext` and `referrerpolicy` as safe (nicolas-grekas)
+
+### HttpClient
+
+ * bug #68130 [HttpClient] Don't send an event source request again when its method is not idempotent (skybleak333)
+ * bug #68131 [HttpClient] Fix parsing an SSE event with an empty type or an empty first data line (skybleak333)
+ * bug #68128 [HttpClient] Fix CurlHttpClient resending request bodies on redirects (nicolas-grekas)
+ * bug #68125 [HttpClient] Read Retry-After dates as HTTP-dates in RetryableHttpClient (nicolas-grekas)
+ * bug #68094 [HttpClient] Fix taking invalid HTTP dates for valid ones (skybleak333)
+ * bug #68120 [HttpClient] Don't report the user info of URLs (nicolas-grekas)
+ * bug #68109 [HttpClient] Fix CachingHttpClient failing to stream `no-store` requests together with other requests (nicolas-grekas)
+ * bug #68114 [HttpClient] Fix AmpHttpClient sending `Content-Length: 0` for pipe bodies (nicolas-grekas)
+ * bug #68095 [HttpClient] Fix sending an empty body when a stream body is sent again (skybleak333, nicolas-grekas)
+ * bug #68093 [HttpClient] Fix CachingHttpClient::stream() yielding a stream instead of its chunks (skybleak333)
+ * bug #67925 [HttpClient] Keep the response decorated by TraceableResponse usable until it is freed (lazerg)
+ * bug #67922 [HttpClient] Fix the allow list of NoPrivateNetworkHttpClient letting its whole address family through (nicolas-grekas)
+ * bug #67859 [HttpClient] Reject `CURLOPT_COOKIE` and `CURLOPT_UNRESTRICTED_AUTH` in `extra.curl` (nicolas-grekas)
+ * bug #67851 [HttpClient] Fix an inverted check in `AmpResolverV5::query()` (nicolas-grekas)
+ * bug #67842 [HttpClient][Validator] Add the deprecated IPv6 site-local range to the private subnets (nicolas-grekas)
+ * bug #67849 [HttpClient] Fix a typo in NoPrivateNetworkHttpClient (Jontsa)
+ * bug #67858 [HttpClient] Use the first `Location` header in CurlHttpClient, like curl does (nicolas-grekas)
+ * minor #68102 [HttpClient] Document that the proxy must block private destinations behind NoPrivateNetworkHttpClient (nicolas-grekas)
+ * minor #68119 [HttpClient] Fix testing redirects with user info on libcurl < 8.23 (nicolas-grekas)
+ * minor #67870 [HttpClient] Conflict with amphp/amp < 3.0.1, whose weakClosure() breaks on PHP 8.4 (phcorp)
+
+### HttpFoundation
+
+ * bug #68121 [HttpFoundation] Parse HTTP dates as RFC 9110 says (nicolas-grekas)
+ * bug #68106 [HttpFoundation][RateLimiter] Fix combined limiters reporting a reset time before all their limiters are back to full capacity (nicolas-grekas)
+ * bug #67921 [HttpFoundation] Check IPv4-mapped, 6to4, Teredo and NAT64 addresses as their IPv4 address in IpUtils::isPrivateIp() (nicolas-grekas)
+ * bug #67874 [HttpFoundation] Cap the size of the cache of IpUtils (nicolas-grekas)
+
+### HttpKernel
+
+ * bug #67985 [HttpKernel] Normalize percent-encoding in the default #[RateLimit] key (jack-worman)
+ * bug #67966 [HttpKernel] Fix the bundle cache dumped by `parent::dumpContainer()` in a `MicroKernelTrait` kernel (lazerg)
+ * bug #67950 [HttpKernel] Fix HttpCache serving must-revalidate responses stale while another process revalidates them (nicolas-grekas)
+ * bug #67949 [HttpKernel] Fix the HttpCache lock being released when another process stores the same URL (nicolas-grekas)
+ * bug #67946 [HttpKernel] Fix HttpCache serving a 503 after validating a no-cache entry when the cache is locked (nicolas-grekas)
+ * bug #67944 [HttpKernel] Release the cache lock when a revalidated response is not stored (KalimeroMK)
+ * bug #67847 [HttpKernel][Security] Split methods on commas in `#[IsGranted]`, `#[IsCsrfTokenValid]` and `#[IsSignatureValid]` (nicolas-grekas)
+ * minor #68152 [HttpKernel] Warm property info for mapped controller arguments (nicolas-grekas)
+ * minor #67892 [HttpKernel] Allow extending `#[RateLimit]` and `#[Lock]` attributes (HypeMC)
+
+### JsonSchema
+
+ * feature #67853 [JsonSchema] Preserve generic class arguments in schema definitions (X-Coder264)
+ * bug #68135 [JsonSchema] Skip values that JSON cannot encode (skybleak333)
+ * bug #68134 [JsonSchema] Use object keywords for Count, NotBlank and Choice on arrays described as objects (skybleak333)
+ * bug #68133 [JsonSchema] Fix the schema of properties that have a serialized path (skybleak333)
+ * bug #67857 [JsonSchema] Preserve serialized item types in list-shaped arrays (X-Coder264)
+ * minor #67954 [JsonSchema] Cover untagged template inheritance with tests (X-Coder264)
+
+### JsonStreamer
+
+ * bug #68004 [JsonStreamer] Stop expanding generic types that get too long (nicolas-grekas)
+ * bug #67933 [JsonStreamer][TypeInfo] Keep list shapes as lists (nicolas-grekas)
+ * bug #67932 [JsonStreamer][TypeInfo] Fix resolving unions that repeat the same type (nicolas-grekas)
+ * bug #67931 [JsonStreamer] Resolve the templates of nested generic types (nicolas-grekas)
+ * bug #67901 [JsonStreamer] Resolve the templates of inherited properties when the streamed class is not generic (nicolas-grekas)
+ * bug #67855 [JsonStreamer] Resolve the templates of inherited properties through ``@extends`` tags (nicolas-grekas)
+
+### KeyManagement
+
+ * minor #68108 [KeyManagement] Use the schema editor API of Doctrine ORM in tests (nicolas-grekas)
+
+### Lock
+
+ * bug #68041 [Lock] Fix MemcachedStore with keys that memcached rejects (nicolas-grekas)
+ * bug #68037 [Lock][Semaphore] Fix RedisStore taking Predis error replies for a success (nicolas-grekas)
+ * bug #68029 [Lock] Fix RedisStore taking Predis error replies for a success (skybleak333)
+ * bug #68028 [Lock] Fix MemcachedStore locks with a TTL longer than 30 days expiring at once (skybleak333)
+ * bug #68027 [Lock] Fix MongoDbStore::exists() failing before the store connected (skybleak333)
+ * bug #67996 [Lock] Fix the PostgreSQL stores inheriting the locks of freed connections (nicolas-grekas)
+ * bug #67994 [Lock] Fix DoctrineDbalPostgreSqlStore refusing locks after the session is lost (skybleak333)
+ * minor #68080 [Lock] Freeze the clock in `KeyTest` (nicolas-grekas)
+ * minor #68031 [Lock] Do not query the store when the key has no state (GromNaN)
+
+### Mailer
+
+ * bug #68111 [Mailer][Sweego] Do not send Bcc addresses as a header (nicolas-grekas)
+ * bug #68100 [Mailer][AhaSend] Do not send Bcc addresses as a header (Sameer1122)
+ * bug #68084 [Mailer][Postal] Keep the display names of the addresses (abp002)
+ * bug #68063 [Mailer] Require TLS when more bridges connect with STARTTLS (nicolas-grekas)
+ * bug #68062 [Mailer] Require TLS when bridges connect with STARTTLS (nicolas-grekas)
+ * bug #67979 [Mailer][AhaSend] Take the Message-ID from message_id_header, without angle brackets (Sameer1122)
+ * bug #68044 [Mailer][AhaSend] Use the Message-ID header as the id of messages sent over SMTP (nicolas-grekas)
+ * bug #67978 [Mailer][AhaSend] Call api.ahasend.com for the API (Sameer1122)
+ * bug #67980 [Mailer] Don't take a word of the SMTP reply as the message id (nicolas-grekas)
+ * minor #68117 [Mailer][Notifier] Deprecate non-boolean `verify_peer` and `auto_tls` SMTP options, and validate the poll options of Instagram and Threads (nicolas-grekas)
+
+### Messenger
+
+ * bug #68110 [Messenger] Close AMQP connections when the transport closes (dalerazimov)
+ * bug #68012 [Messenger] Close the `CloseableTransportInterface`s when the worker stops (wikando-ck)
+ * bug #68045 [Messenger] Fix parallel workers crashing or hanging on errors in their child processes (nicolas-grekas)
+ * bug #68043 [Messenger] Fix the Redis transport ignoring the `cluster` option (nicolas-grekas)
+ * bug #67988 [Messenger] Fix parallel workers crashing on errors that cannot be serialized (lazerg)
+ * bug #68022 [Messenger] Fix RedisReceiver losing the rest of a batch when rejecting an entry without data fails (skybleak333)
+ * bug #68013 [Messenger] Fix LISTEN/NOTIFY with the DBAL pgsql driver (FluffyDiscord)
+ * bug #68020 [Messenger] Fix the Redis transport losing pending messages after a failed read (skybleak333)
+ * bug #67986 [Messenger] Reset services after a failed parallel dispatch (Stella050408)
+ * bug #68017 [Messenger] Fix the Redis keepalive check comparing milliseconds with seconds (skybleak333)
+ * bug #67993 [Messenger] Keep alive the fetched messages that wait for their turn (skybleak333)
+ * bug #67987 [Messenger] Fix replacing a parallel worker that reached its memory limit (nicolas-grekas)
+ * bug #67912 [Messenger] Stop the worker when a signal arrives before it is created (haraldpdl)
+
+### Mime
+
+ * bug #67871 [Mime] Fix SMimeSigner splitting a CRLF across chunk boundaries (w3dev-dk)
+
+### Notifier
+
+ * bug #68116 [Notifier] Fix the Ntfy and Spot-Hit transports misreading `secureHttp` and `smslongnbr` (nicolas-grekas)
+ * bug #68105 [Notifier][Brevo] Use the non-deprecated transactionalSMS/send endpoint (amenophis)
+ * bug #68103 [Notifier][MicrosoftTeams] Fix text-only messages sent to Workflows webhooks and document their setup (nicolas-grekas)
+
+### ObjectMapper
+
+ * bug #68118 [ObjectMapper] Fix unmapped source properties being read needlessly (GaryPEGEOT)
+ * bug #67916 [ObjectMapper] Resolve self and parent property types when inferring nested mappings (nicolas-grekas)
+ * bug #67889 [ObjectMapper] Fix mapping nested objects into properties typed self or parent (alexisLefebvre)
+
+### PropertyAccess
+
+ * bug #67902 [PropertyAccess] Limit the caches that grow with the input (nicolas-grekas)
+ * minor #67937 [PropertyAccess][Serializer] Declare the return type of __set() in tests (nicolas-grekas)
+
+### PropertyInfo
+
+ * feature #68155 [PropertyInfo][Serializer][Validator] Warm classes from tagged providers (nicolas-grekas)
+ * feature #67967 [PropertyInfo][TypeInfo] Inherit PHPDoc types from parent classes, interfaces and abstract trait methods (nicolas-grekas)
+ * bug #68006 [PropertyInfo][TypeInfo] Don't throw on docblock types with invalid array keys (nicolas-grekas)
+ * bug #67958 [PropertyInfo] Fix reading the PHPDoc of abstract trait methods after a docblock on the `use` statement (nicolas-grekas)
+ * bug #67956 [PropertyInfo] Fix reading the PHPDoc of trait members and of inherited promoted properties (nicolas-grekas)
+ * bug #67948 [PropertyInfo] Fix resolving the PHPDoc types of trait methods and of classes using traits (nicolas-grekas)
+ * bug #67942 [PropertyInfo] Fix resolving the PHPDoc types of trait methods (nicolas-grekas)
+ * bug #67943 [PropertyInfo] Preserve inherited templates in trait contexts (X-Coder264)
+ * bug #67935 [PropertyInfo] Fix resolving `self`, `static`, `parent` and `$this` with `getType()` and `getTypeFromConstructor()` (nicolas-grekas)
+
+### RateLimiter
+
+ * bug #68088 [RateLimiter] Fix TokenBucketLimiter counting the reset time from now (skybleak333)
+ * bug #68057 [RateLimiter] Fix `RateLimit::wait()` for delays over 35 minutes on 32-bit platforms (nicolas-grekas)
+ * bug #68040 [RateLimiter] Fix CompoundLimiter telling to retry before all its limiters accept the hit again (nicolas-grekas)
+ * bug #68021 [RateLimiter] Fix SlidingWindowLimiter letting reservations through faster than the limit (skybleak333)
+ * bug #68019 [RateLimiter] Fix TokenBucketLimiter counting the wait for the next tokens from now (skybleak333)
+ * bug #68016 [RateLimiter] Fix CompoundLimiter accepting a hit that one limiter refused (skybleak333)
+
+### Routing
+
+ * bug #68143 [Routing] Reject route parameters named or mapped to "_firewall" and "_firewall_context" (nicolas-grekas)
+ * bug #68018 [Routing] Fix compiled matchers accepting extra trailing slashes on static routes (nicolas-grekas)
+ * bug #68003 [Routing] Use the host value of variables that are both in the host and the path in compiled matchers (nicolas-grekas)
+ * bug #68014 [Routing] Fix the order of routes with host variables in compiled matchers (nicolas-grekas)
+ * bug #68002 [Routing] Make named groups in requirements non-capturing, like unnamed ones (nicolas-grekas)
+ * bug #67947 [Routing][TwigBundle] Keep `routing.loader` a `DelegatingLoader` in apps that use TwigBundle (nicolas-grekas)
+ * bug #67929 [Routing] Prevent `{_route}` host placeholders from matching the path in compiled matchers (nicolas-grekas)
+
+### Runtime
+
+ * bug #68107 [Runtime] Reset the memory peak between FrankenPHP worker requests (polem)
+
+### Scheduler
+
+ * bug #68089 [Scheduler] Fix a message added to a running schedule running all its earlier slots at once (skybleak333)
+ * bug #68034 [Scheduler] Fix losing or repeating runs, and truncating float intervals (nicolas-grekas)
+ * bug #68026 [Scheduler] Fix ISO 8601 intervals with days, weeks or months being counted as a fixed number of seconds (skybleak333)
+ * bug #68025 [Scheduler] Fix cron triggers without a timezone taking the one of the last run after a restart (skybleak333)
+ * bug #68030 [Scheduler] Fix the worker crashing when its lock expired during a long run (skybleak333)
+
+### Security
+
+ * bug #68144 [Security] Refuse DPoP-bound access tokens presented as bearer tokens (nicolas-grekas)
+ * bug #68078 [Security][SecurityBundle] Fix profiles listing the access decisions of previous requests (nicolas-grekas)
+ * bug #68008 [Security] Count login attempts before checking their credentials (nicolas-grekas)
+ * bug #68010 [Security] Limit login attempts of IPv6 clients by their /64 network (nicolas-grekas)
+ * bug #68007 [Security] Keep the IP limit of login throttling on successful logins (nicolas-grekas)
+ * bug #67991 [Security] Remove accents and invisible characters from login throttling keys (nicolas-grekas)
+ * bug #67845 [Security] Fix the login throttling message announcing one minute too many (lazerg)
+ * bug #67875 [Security] Reject X509 DNs whose identifier attribute appears more than once (nicolas-grekas)
+ * bug #67876 [Security] Clear the pre-authenticated token when REMOTE_USER is empty (nicolas-grekas)
+
+### SecurityBundle
+
+ * feature #67963 [SecurityBundle] Default the audience of the oidc and oauth2 token handlers to the resource of resource_metadata (KalimeroMK)
+ * bug #68098 [SecurityBundle] Avoid unintended session usage with remember-me on stateless routes (isihussain)
+ * bug #68075 [SecurityBundle] Put the listeners of a lazy firewall context back after tracing them (Amoifr)
+
+### Semaphore
+
+ * bug #68042 [Semaphore] Fix RedisStore expiring semaphores too early (nicolas-grekas)
+ * bug #68011 [Semaphore] Fix LockStore::save() trusting slots that were lost on the backend (skybleak333)
+
+### Serializer
+
+ * bug #67913 [Serializer] Refuse an object where an array of objects is expected (haraldpdl)
+ * bug #67883 [Serializer] Don't read untyped attributes with deep_object_to_populate (nicolas-grekas)
+ * bug #67878 [Serializer] Don't call methods named after the attributes being denormalized (nicolas-grekas)
+ * bug #67887 [Serializer][Templating] Limit more caches that grow with the input (nicolas-grekas)
+ * bug #67888 [Serializer] Limit the caches that grow with unknown keys (nicolas-grekas)
+ * bug #67884 [Serializer][Templating] Limit the caches that grow with each input value (nicolas-grekas)
+ * bug #67882 [Serializer] Apply ignored attributes to setter and adder aliases (nicolas-grekas)
+ * bug #67877 [Serializer] Ignore undeclared property paths with brackets (nicolas-grekas)
+
+### Translation
+
+ * minor #67957 [Translation] Add the license terms of the XML schemas (nicolas-grekas)
+
+### Tui
+
+ * bug #67997 [Tui] Don't leave a style open at the end of a wrapped line (nicolas-grekas)
+ * bug #67998 [Tui] Close a hyperlink at the end of a wrapped line and reopen it on the next one (phcorp)
+ * bug #67995 [Tui] Don't carry a style that ends where a line wraps over to the next line (phcorp)
+ * bug #67893 [Tui] Restore inherited styles after a styled sub-element (nicolas-grekas)
+ * bug #67869 [Tui] Keep styled underlines (SGR 4:n) on wrapped lines (phcorp)
+ * bug #67868 [Tui] Restore the widget style after a sub-element styled with applyElement() (phcorp)
+ * bug #67867 [Tui] Fix the tracked rects of subtrees rendered without position tracking (phcorp)
+
+### TwigBridge
+
+ * bug #68086 [TwigBridge] Remove required class from expanded choice option labels (X-Coder264)
+ * bug #67999 [TwigBridge] Check the domain and the position of `trans_default_domain ... for _self` and require Twig 3.29 (nicolas-grekas)
+
+### TypeInfo
+
+ * feature #67856 [TypeInfo][Serializer][JsonStreamer] Resolve templates inherited through ``@extends``, ``@implements`` and ``@use`` tags (nicolas-grekas)
+ * bug #68005 [TypeInfo] Fix `Type::fromValue()` for generators that yield boolean keys (nicolas-grekas)
+ * bug #67972 [TypeInfo] Fix `Type::fromValue()` for string keys that name a callable (nicolas-grekas)
+ * bug #67965 [TypeInfo] Throw `UnsupportedException` on malformed type strings (nicolas-grekas)
+ * bug #67964 [TypeInfo] Fix infinite recursion when a type alias import uses another case for the class name (nicolas-grekas)
+ * bug #67974 [TypeInfo] Fix infinite recursion in `Type::fromValue()` with cyclic values (lazerg)
+ * bug #67955 [TypeInfo] Don't let the templates of a child class shadow the ones of its untagged parent (nicolas-grekas)
+ * bug #67951 [TypeInfo] Fix resolving the PHPDoc types of a class with the imports of its traits (nicolas-grekas)
+ * bug #67920 [TypeInfo] Keep distinct members when mapping unions and intersections (nicolas-grekas)
+ * bug #67918 [TypeInfo] Collect contravariant templates and reduce redundant unions in `Type::map()` (nicolas-grekas)
+ * bug #67936 [TypeInfo] Fix resolving the PHPDoc types of trait members (nicolas-grekas)
+ * bug #67904 [TypeInfo] Preserve distinct union and intersection members (X-Coder264)
+ * minor #67953 [TypeInfo] Cover untagged template inheritance with tests (X-Coder264)
+
+### Validator
+
+ * bug #68097 [Validator] Fix the IBAN formats sync script and synchronize formats (egbavou)
+ * bug #67984 [Validator] Fix IBAN format for Côte d'Ivoire (egbavou)
+ * bug #67848 [Validator] Sync the non-public subnets of the `Ip` constraint with `IpUtils::PRIVATE_SUBNETS` (nicolas-grekas)
+
+### VarDumper
+
+ * bug #68060 [VarDumper] Don't turn object property names into dump attributes and link only to http(s) URLs (nicolas-grekas)
+ * bug #68058 [VarDumper] Escape the content type of images in HtmlDumper (nicolas-grekas)
+
+### WebProfilerBundle
+
+ * bug #68059 [WebProfilerBundle] Ignore debug headers of cross-origin responses and only link to http(s) URLs (nicolas-grekas)
+
+### Workflow
+
+ * bug #68082 [Workflow] Escape backslashes in Graphviz HTML labels (fabpot)
+
+### Yaml
+
+ * bug #68077 [Yaml] Fix anchors, aliases and unsupported entries in flow mapping keys (nicolas-grekas)
+ * bug #68069 [Yaml] Keep spaces in plain flow mapping keys (eyupcanakman)
+ * bug #67973 [Yaml] Encode schema paths in file URIs (Tong-bit-art)
+ * bug #68024 [Yaml] Fix block scalars losing their trailing newline after leading comments (eyupcanakman)
+ * bug #67881 [Yaml] Don't copy long nested blocks at each nesting level (nicolas-grekas)
+ * bug #67880 [Yaml] Bound the number of nodes that collection aliases expand to (nicolas-grekas)
+
+### Other
+
+ * minor #68085 Missing translations for Albanian (sq) (isihussain)
+
 ## 8.2.0-BETA1 (2026-11-04)
 
 ### AhaSend

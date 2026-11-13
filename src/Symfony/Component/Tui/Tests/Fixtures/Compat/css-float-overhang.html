@@ -1,0 +1,30 @@
+<!-- covers: css.properties.float css.properties.clear -->
+<!-- variant: narrow columns=36 -->
+<style>
+  .img { float: left; width: 8ch; height: 4; border: 1px solid }
+  .note { float: right; width: 10ch; border: 1px solid yellow }
+  .box { border: 1px solid green; padding: 0 1ch }
+  .cf::after { content: ""; display: table; clear: both }
+  .slope { float: left; width: 12ch; height: 4; background: linear-gradient(to bottom right, #1e3a8a 50%, transparent 50%); shape-outside: polygon(0 0, 100% 0, 0 100%) }
+</style>
+<div><p><span class="img">IMG</span>A float in a paragraph goes on past it:</p></div>
+<p>the next paragraph flows beside it, then takes the whole width once it ends, like CSS.</p>
+<section><div><p>Nested further, a note <span class="note">A note at the right</span></p></div></section>
+<p>beside the note still, its blocks letting it out.</p>
+<div><p><span class="img">IMG</span>A float going on past its paragraph,</p></div>
+<p style="clear: left">and a paragraph cleared below it.</p>
+<div><p><span class="slope"></span>Its shape too:</p></div>
+<p>the lines after the paragraph follow the edge of the triangle.</p>
+<div style="display: flow-root"><p><span class="img">IMG</span>A formatting context of its own keeps it,</p></div>
+<p>the next paragraph below it.</p>
+<div class="box"><p><span class="img">IMG</span>In a box with a border,</p></div>
+<p>it goes on past its border and padding, drawn over the bottom border, like CSS, the box not drawn around it.</p>
+<div style="padding-left: 4ch; border-left: 1px solid"><div><p><span class="note">Indented</span>In a padded block in a block, at the right,</p></div></div>
+<p>the next paragraph beside it.</p>
+<div class="box cf"><p><span class="img">IMG</span>A box cleared by its ::after keeps it,</p></div>
+<p>the next paragraph below it.</p>
+<p>In an item of a list: kept in it, the markers of the next items not covered</p>
+<ol><li><span class="img">IMG</span>List item one</li><li>List item two</li></ol>
+<div><p><span class="img">IMG</span>A rule after a float going on past its paragraph,</p></div>
+<hr>
+<p>its line drawn under the float, like the border of a block, like CSS.</p>

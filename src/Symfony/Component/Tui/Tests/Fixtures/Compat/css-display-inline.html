@@ -1,0 +1,12 @@
+<!-- covers: css.properties.display -->
+<style>
+  .crumbs { margin: 0; padding: 0; list-style: none }
+  .crumbs li { display: inline }
+  .crumbs li.right { float: right }
+  p.inline, div.inline { display: inline }
+  .menu li { display: inline }
+  @media (min-width: 400ch) { .menu li { display: block } }
+</style>
+<ul class="crumbs"><li class="right"><a href="#index">index</a></li><li><a href="#docs">Docs</a> &raquo;</li> <li><a href="#library">Library</a> &raquo;</li> <li>functools</li></ul>
+<div><p class="inline">A paragraph displayed inline,</p> <div class="inline">a block too,</div> and the text after them, in one line, like CSS.</div>
+<ul class="menu"><li>Displayed inline</li> <li>but as blocks</li> <li>in a wider screen: blocks</li></ul>

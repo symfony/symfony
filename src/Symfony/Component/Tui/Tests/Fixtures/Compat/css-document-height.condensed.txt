@@ -1,0 +1,10 @@
+line 1 of a page whose body is as tall as the screen
+line 2 of a page whose body is as tall as the screen
+line 3 of a page whose body is as tall as the screen
+line 4 of a page whose body is as tall as the screen
+line 5 of a page whose body is as tall as the screen
+line 6 of a page whose body is as tall as the screen
+line 7 of a page whose body is as tall as the screen
+line 8 of a page whose body is as tall as the screen
+line 9 of a page whose body is as tall as the screen
+the last line, past the height of the body, like browsers

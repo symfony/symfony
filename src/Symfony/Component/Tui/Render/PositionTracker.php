@@ -87,6 +87,19 @@ final class PositionTracker
     }
 
     /**
+     * Forgets where a widget and what it holds were, like one not drawn this frame: they take no pointer, and are
+     * tracked again when drawn.
+     */
+    public function forget(AbstractWidget $widget): void
+    {
+        unset($this->widgetPositions[$widget]);
+        $this->untracked[$widget] = true;
+        foreach ($widget instanceof ParentInterface ? $widget->all() : [] as $child) {
+            $this->forget($child);
+        }
+    }
+
+    /**
      * Record a widget's absolute position.
      */
     public function setWidgetRect(AbstractWidget $widget, WidgetRect $rect): void
@@ -194,6 +207,82 @@ final class PositionTracker
         }
     }
 
+    /**
+     * Shifts the positions of scrolled content and clips them to the rows shown: a widget scrolled out has no position.
+     *
+     * @param AbstractWidget[] $children
+     */
+    public function scrollContentPositions(array $children, int $rowOffset, int $top, int $bottom): void
+    {
+        foreach ($children as $child) {
+            $this->clipSubtree($child, $rowOffset, $top, $bottom);
+        }
+    }
+
+    /**
+     * Shifts the positions of content scrolled sideways and clips them to the columns shown: a widget scrolled out has
+     * no position.
+     *
+     * @param AbstractWidget[] $children
+     */
+    public function scrollContentColumns(array $children, int $colOffset, int $left, int $right): void
+    {
+        foreach ($children as $child) {
+            $this->clipSubtreeColumns($child, $colOffset, $left, $right);
+        }
+    }
+
+    private function clipSubtreeColumns(AbstractWidget $widget, int $colOffset, int $left, int $right): void
+    {
+        if (isset($this->widgetPositions[$widget])) {
+            $rect = $this->widgetPositions[$widget];
+            $from = max($left, $rect->col + $colOffset);
+            $to = min($right, $rect->col + $colOffset + $rect->columns);
+            if ($to > $from && $from === $rect->col + $colOffset && $to - $from === $rect->columns) {
+                $this->widgetPositions[$widget] = new WidgetRect($rect->row, $from, $rect->columns, $rect->rows);
+            } else {
+                $this->untracked[$widget] = true;
+                if ($to > $from) {
+                    $this->widgetPositions[$widget] = new WidgetRect($rect->row, $from, $to - $from, $rect->rows);
+                } else {
+                    unset($this->widgetPositions[$widget]);
+                }
+            }
+        }
+
+        if ($widget instanceof ParentInterface) {
+            foreach ($widget->all() as $child) {
+                $this->clipSubtreeColumns($child, $colOffset, $left, $right);
+            }
+        }
+    }
+
+    private function clipSubtree(AbstractWidget $widget, int $rowOffset, int $top, int $bottom): void
+    {
+        if (isset($this->widgetPositions[$widget])) {
+            $rect = $this->widgetPositions[$widget];
+            $from = max($top, $rect->row + $rowOffset);
+            $to = min($bottom, $rect->row + $rowOffset + $rect->rows);
+            if ($to > $from && $from === $rect->row + $rowOffset && $to - $from === $rect->rows) {
+                $this->widgetPositions[$widget] = new WidgetRect($from, $rect->col, $rect->columns, $rect->rows);
+            } else {
+                // Clipped: its rect no longer tells where its descendants are, they must be tracked again
+                $this->untracked[$widget] = true;
+                if ($to > $from) {
+                    $this->widgetPositions[$widget] = new WidgetRect($from, $rect->col, $rect->columns, $to - $from);
+                } else {
+                    unset($this->widgetPositions[$widget]);
+                }
+            }
+        }
+
+        if ($widget instanceof ParentInterface) {
+            foreach ($widget->all() as $child) {
+                $this->clipSubtree($child, $rowOffset, $top, $bottom);
+            }
+        }
+    }
+
     private function shiftSubtree(AbstractWidget $widget, int $rowOffset, int $colOffset): void
     {
         if (isset($this->widgetPositions[$widget])) {
@@ -203,6 +292,7 @@ final class PositionTracker
                 $rect->col + $colOffset,
                 $rect->columns,
                 $rect->rows,
+                $rect->fragments,
             );
         }
 

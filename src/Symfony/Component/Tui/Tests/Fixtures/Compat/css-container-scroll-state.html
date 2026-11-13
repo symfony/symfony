@@ -1,0 +1,27 @@
+<!-- covers: css.at-rules.container.scroll-state -->
+<!-- variant: scrolled scroll=#box:3 -->
+<!-- variant: snapped scroll=#snap:2 -->
+<style>
+  .box { height: 7; overflow-y: auto; border: 1px solid; max-width: 40ch; container: box / scroll-state }
+  h2 { position: sticky; top: 0; container-type: scroll-state; margin: 0; font-weight: normal }
+  @container scroll-state(stuck: top) { .stuck { color: red; font-weight: bold } }
+  @container box scroll-state(scrollable: bottom) { .more { color: green } }
+  @container box scroll-state(scrollable: top) { .back { color: green } }
+  @container box scroll-state(scrolled: bottom) { .dir { color: yellow } }
+  @container not scroll-state(stuck: top) { .loose { color: cyan } }
+  .snap { height: 5; overflow-y: auto; scroll-snap-type: y mandatory; border: 1px solid; max-width: 40ch }
+  .snap p { scroll-snap-align: start; container-type: scroll-state; margin: 0 }
+  @container scroll-state(snapped: y) { .snap span { color: magenta; font-weight: bold } }
+</style>
+<div class="box" id="box">
+  <h2><span class="stuck">stuck</span> <span class="loose">loose</span> <span class="more">more↓</span> <span class="back">back↑</span> <span class="dir">went↓</span></h2>
+  <p>one</p><p>two</p><p>three</p><p>four</p><p>five</p><p>six</p><p>seven</p><p>eight</p>
+</div>
+<div class="snap" id="snap">
+  <p><span>Snapped item 1</span></p>
+  <p><span>Snapped item 2</span></p>
+  <p><span>Snapped item 3</span></p>
+  <p><span>Snapped item 4</span></p>
+  <p><span>Snapped item 5</span></p>
+  <p><span>Snapped item 6</span></p>
+</div>

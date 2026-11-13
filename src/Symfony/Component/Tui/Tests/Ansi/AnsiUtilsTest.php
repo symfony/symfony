@@ -978,7 +978,12 @@ class AnsiUtilsTest extends TestCase
     {
         $this->assertSame(["\u{2068}Alice\u{2069} \u{2068}Bob\u{2069}"], TextWrapper::wrapTextWithAnsi("\u{2068}Alice\u{2069} \u{2068}Bob\u{2069}", 9));
         $this->assertSame(["\u{2068}Alice\u{2069}", "\u{2068}Bob\u{2069}"], TextWrapper::wrapTextWithAnsi("\u{2068}Alice\u{2069} \u{2068}Bob\u{2069}", 5));
-        $this->assertSame(["ab\u{200B}c", "d\u{200B}ef"], TextWrapper::wrapTextWithAnsi("ab\u{200B}cd\u{200B}ef", 3));
+        // A zero-width space takes no column, and is where a line can break (UAX #14), not kept at the end of the line
+        $this->assertSame(['ab', 'cd', 'ef'], TextWrapper::wrapTextWithAnsi("ab\u{200B}cd\u{200B}ef", 3));
+        $this->assertSame(["ab\u{200B}cd"], TextWrapper::wrapTextWithAnsi("ab\u{200B}cd", 4));
+        // A soft hyphen takes no room, and shows where the line breaks
+        $this->assertSame(['coop'], TextWrapper::wrapTextWithAnsi("co\u{00AD}op", 10));
+        $this->assertSame(['hyphen-', 'ation'], TextWrapper::wrapTextWithAnsi("hy\u{00AD}phen\u{00AD}ation", 8));
         $this->assertSame(["abcde\u{0301}", 'fgh'], array_map(AnsiUtils::stripAnsiCodes(...), TextWrapper::wrapTextWithAnsi("abcde\x1b[1m\u{0301}\x1b[0mfgh", 5)));
     }
 
@@ -1082,5 +1087,44 @@ class AnsiUtilsTest extends TestCase
             $this->assertSame(8196 - $i, AnsiUtils::visibleWidth($text));
             $this->assertSame(str_repeat('x', 8192 - $i).$family."y\x1b[0m", AnsiUtils::truncateToWidth($text, 8195 - $i, ''));
         }
+    }
+
+    public function testReapplyBackgroundAfterResets()
+    {
+        $bg = "\x1b[48;5;4m";
+        $this->assertSame("a\x1b[0m{$bg}b", AnsiUtils::reapplyBackgroundAfterResets("a\x1b[0mb", $bg));
+        $this->assertSame("a\x1b[m{$bg}b", AnsiUtils::reapplyBackgroundAfterResets("a\x1b[mb", $bg));
+        $this->assertSame("a\x1b[1;49m{$bg}b", AnsiUtils::reapplyBackgroundAfterResets("a\x1b[1;49mb", $bg));
+        $this->assertSame("a\x1b[38;2;0;0;0;49m{$bg}b", AnsiUtils::reapplyBackgroundAfterResets("a\x1b[38;2;0;0;0;49mb", $bg));
+        // The zero channels of a color are not resets, nor a background set after a reset
+        $this->assertSame("a\x1b[38;2;0;0;0mb", AnsiUtils::reapplyBackgroundAfterResets("a\x1b[38;2;0;0;0mb", $bg));
+        $this->assertSame("a\x1b[38;2;0;0;0;48;2;153;153;51mb", AnsiUtils::reapplyBackgroundAfterResets("a\x1b[38;2;0;0;0;48;2;153;153;51mb", $bg));
+        $this->assertSame("a\x1b[0;48;5;1mb", AnsiUtils::reapplyBackgroundAfterResets("a\x1b[0;48;5;1mb", $bg));
+        $this->assertSame("a\x1b[38;5;0mb", AnsiUtils::reapplyBackgroundAfterResets("a\x1b[38;5;0mb", $bg));
+        $this->assertSame('plain', AnsiUtils::reapplyBackgroundAfterResets('plain', $bg));
+    }
+
+    public function testSplitAroundCutsTheColumnsBeforeAndAfterARangeInOnePass()
+    {
+        $this->assertSame(['ab', 'ef'], AnsiUtils::splitAround('abcdef', 2, 2));
+        $this->assertSame(['ab  ', ''], AnsiUtils::splitAround('ab', 4, 1), 'Padded to the start of the range.');
+        // The codes before the part after it come with it, like sliceToWidth()
+        $this->assertSame(["\e[1ma", "\e[1m\e[22md"], AnsiUtils::splitAround("\e[1mab\e[22mcd", 1, 2));
+        // A wide character across an edge: its columns on each side as spaces
+        $this->assertSame(['a ', ' b'], AnsiUtils::splitAround('a日本b', 2, 2));
+        $this->assertSame(['a日', 'b'], AnsiUtils::splitAround('a日本b', 3, 2));
+        // Only the codes that still count: those after the last reset, before the part after
+        $this->assertSame("\e[0;4m\e[39mb", AnsiUtils::splitAround("a\e[1m\e[31mx\e[0;4m\e[39mb", 1, 1)[1]);
+    }
+
+    public function testDrawingOverARowAgainAndAgainDoesNotPileUpCodes()
+    {
+        $line = str_repeat("\e[1mab\e[22m\e[31mcd\e[39m", 10);
+        for ($i = 0; $i < 50; ++$i) {
+            [$left, $right] = AnsiUtils::splitAround($line, $i % 30, 4);
+            $line = $left."\e[0m\e[7mover\e[0m".$right;
+        }
+        $this->assertSame(40, AnsiUtils::visibleWidth($line));
+        $this->assertLessThan(1000, \strlen($line));
     }
 }

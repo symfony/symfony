@@ -1,0 +1,35 @@
+<!-- covers: css.properties.direction css.properties.unicode-bidi css.properties.margin-inline-start css.properties.margin-inline-end css.properties.margin-block-start css.properties.margin-block-end css.properties.padding-inline-start css.properties.padding-inline-end css.properties.padding-block-start css.properties.padding-block-end css.properties.inset-inline-start css.properties.inset-inline-end css.properties.inset-block-start css.properties.inset-block-end css.properties.inset-inline css.properties.inset-block -->
+<!-- variant: narrow columns=30 -->
+<!-- variant: select focus=#rtl-select keys=enter -->
+<!-- requires: IntlChar -->
+<style>
+  .tabs { display: flex; gap: 2ch; border-block-end: 1px solid }
+  .note { border: 1px solid; padding-inline-start: 2; padding-inline-end: 0; padding-block-start: 0; padding-block-end: 0; max-width: 24ch; margin-block-start: 1; margin-block-end: 0; margin-inline-start: 0; margin-inline-end: 0 }
+  .box { position: relative; height: 3; border: 1px dashed }
+  .badge { position: absolute; inset-inline-start: 0; inset-block-start: 0; color: yellow }
+  .pin { position: absolute; inset-inline: auto 1; inset-block: auto 0; inset-inline-end: 1; inset-block-end: 0 }
+  bdi { unicode-bidi: isolate }
+  .grid { display: grid; grid-template-columns: 8ch 1fr 6ch; gap: 0 1ch }
+  .grid > * { border: 1px solid }
+  .check { display: flex; gap: 1ch } .check i { width: 3ch; font-style: normal }
+</style>
+<div dir="rtl">
+  <p>היום יפה, and <bdi>English</bdi> inside</p>
+  <nav class="tabs"><span>ראשי</span><span>אודות</span><span>צור קשר</span></nav>
+  <div class="note">הערה: padding on the start side</div>
+  <div class="grid"><div>אחד</div><div>שתיים, the wide column</div><div>שלוש</div></div>
+  <div class="check"><i>[x]</i><span>תווית, beside its box</span></div>
+  <div class="box"><div class="badge">חדש</div><div class="pin">סוף</div></div>
+</div>
+<p dir="auto">مرحبا بالعالم, by dir="auto"</p>
+<p dir="auto">Hello, by dir="auto"</p>
+<ul dir="rtl"><li>أول</li><li>ثاني, a longer item that wraps onto a second line in a narrow screen</li></ul>
+<ol dir="rtl" style="color: cyan"><li>الأول</li></ol>
+<style>[dir="rtl"] li::marker { color: yellow }</style>
+<p dir="rtl">מחיר: 25.50 ש"ח (כולל <b>מע"מ</b>) [1]</p>
+<p>Isolated: the user <bdi>إيان</bdi> wrote 3 posts; not isolated: <span>إيان</span> 3 posts.</p>
+<p style="unicode-bidi: plaintext">שלום world, from its first letter</p>
+<p>Embedded: <span style="unicode-bidi: embed; direction: rtl">abc, def</span>; overridden: <span style="unicode-bidi: bidi-override; direction: rtl">abc, def</span>.</p>
+<p dir="rtl"><button>بحث</button> <input placeholder="ابحث هنا" aria-label="Search"></p>
+<div dir="rtl"><select id="rtl-select" aria-label="Fruit"><option>تفاحة</option><option>موزة</option></select></div>
+<p>under the select</p>

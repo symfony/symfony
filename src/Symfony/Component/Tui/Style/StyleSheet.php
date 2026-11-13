@@ -92,6 +92,9 @@ class StyleSheet
     /** @var array<int, array<string, Style>> Breakpoint rules keyed by min-columns threshold */
     private array $breakpoints = [];
 
+    /** @var list<StyleProviderInterface> */
+    private array $providers = [];
+
     /**
      * @param array<string, Style> $rules Map of selectors to styles
      */
@@ -128,6 +131,42 @@ class StyleSheet
     }
 
     /**
+     * Add a provider whose styles apply after the rules of this stylesheet.
+     *
+     * Providers apply in the order they are added: a later one wins.
+     *
+     * @return $this
+     */
+    public function addProvider(StyleProviderInterface $provider): static
+    {
+        if (!\in_array($provider, $this->providers, true)) {
+            $this->providers[] = $provider;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes a provider added with addProvider().
+     *
+     * @return $this
+     */
+    public function removeProvider(StyleProviderInterface $provider): static
+    {
+        $this->providers = array_values(array_filter($this->providers, static fn (StyleProviderInterface $added) => $added !== $provider));
+
+        return $this;
+    }
+
+    /**
+     * @return list<StyleProviderInterface>
+     */
+    public function getProviders(): array
+    {
+        return $this->providers;
+    }
+
+    /**
      * Merge another stylesheet's rules into this one.
      *
      * Rules from the other stylesheet override rules in this one
@@ -146,6 +185,10 @@ class StyleSheet
             foreach ($rules as $selector => $style) {
                 $this->breakpoints[$minColumns][$selector] = $style;
             }
+        }
+
+        foreach ($other->providers as $provider) {
+            $this->addProvider($provider);
         }
 
         return $this;
@@ -198,8 +241,9 @@ class StyleSheet
      * 3. CSS class selectors (.class): only classes from {@see getCssClasses()}
      * 4. State selectors (:focus, :disabled, etc.)
      * 5. Breakpoint rules (ascending min-columns order)
-     * 6. Extra styles from subclasses (see {@see resolveExtraStyles()})
-     * 7. Instance style (widget's own style)
+     * 6. Styles from providers (see {@see addProvider()})
+     * 7. Extra styles from subclasses (see {@see resolveExtraStyles()})
+     * 8. Instance style (widget's own style)
      *
      * @param int|null $columns Current terminal width (for responsive breakpoints)
      */
@@ -259,10 +303,17 @@ class StyleSheet
             $applicableStyles = $this->resolveBreakpoints($widget, $columns, $applicableStyles, $cssClasses);
         }
 
-        // 6. Extra styles from subclasses (e.g. utility classes)
+        // 6. Styles from providers
+        foreach ($this->providers as $provider) {
+            foreach ($provider->getStyles($widget) as $style) {
+                $applicableStyles[] = $style;
+            }
+        }
+
+        // 7. Extra styles from subclasses (e.g. utility classes)
         $applicableStyles = $this->resolveExtraStyles($widget, $applicableStyles);
 
-        // 7. Instance style
+        // 8. Instance style
         if ($widget->getStyle()) {
             $applicableStyles[] = $widget->getStyle();
         }
@@ -282,6 +333,7 @@ class StyleSheet
      * 2. .class::element (e.g., '.my-list::selected')
      * 3. FQCN::element:state (e.g., SelectListWidget::class.'::selected:focus')
      * 4. .class::element:state (e.g., '.my-list::selected:focus')
+     * 5. Styles from providers (see {@see addProvider()})
      *
      * Example stylesheet rules:
      *
@@ -327,6 +379,13 @@ class StyleSheet
                 if (isset($this->rules[$selector])) {
                     $applicableStyles[] = $this->rules[$selector];
                 }
+            }
+        }
+
+        // 5. Styles from providers
+        foreach ($this->providers as $provider) {
+            foreach ($provider->getElementStyles($widget, $element) as $style) {
+                $applicableStyles[] = $style;
             }
         }
 

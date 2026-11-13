@@ -1,0 +1,6 @@
+Labels displayed from 768px, 96 columns, like the search
+button of Bootstrap:
+[ Search ] [ Menu ] [ ↓ ]
+Shown on hover only, or hidden by its style attribute or
+hidden:
+[ Copy ] [ Save ] [ Ok ]

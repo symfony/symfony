@@ -1,0 +1,19 @@
+┌──────────────────────────────────────────────────────────┐
+│                                                         ⟨33m┃⟨0m│
+│Build started                                            ⟨90m│⟨0m│
+└──────────────────────────────────────────────────────────┘
+                                                           ┃
+Scroll draws a bar even when the content fits              ┃
+                                                           ┃
+
+No scrollbar
+                                                           │
+A thin scrollbar                                           ⟨2m┊⟨0m
+
+auto draws none when it fits
+
+⟨48;2;31;41;55m                                                            ⟨0m
+⟨48;2;31;41;55mstable keeps the bar column, here empty                     ⟨0m
+⟨48;2;31;41;55m                                                            ⟨0m
+                                                           ┃
+Slide one                                                  ⟨2m│⟨0m

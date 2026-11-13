@@ -1,0 +1,11 @@
+<!-- covers: html.elements.button -->
+<!-- variant: hovered hover=#card -->
+<!-- variant: focused focus=#ok -->
+<style>
+  .label { display: none }
+  .card:hover .label { display: inline }
+  .hint { display: none }
+  nav:focus-within .hint { display: inline }
+</style>
+<div class="card" id="card"><p>A label shown while its card is hovered: <button><span class="label">Edit </span>✎</button></p></div>
+<nav><p>A hint shown while the focus is in the nav: <button id="ok">Ok<span class="hint"> (enter)</span></button></p></nav>

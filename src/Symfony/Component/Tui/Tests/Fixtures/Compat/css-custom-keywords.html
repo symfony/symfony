@@ -1,0 +1,15 @@
+<!-- covers: css.properties.custom-property css.types.var -->
+<style>
+  .table { --state: initial; --type: initial; --color: green; --accent: unset }
+  .table td { color: var(--state, var(--type, var(--color))); padding: 0 1ch }
+  .table .active { --state: red }
+  .table .accent { color: var(--accent, blue) }
+  .ring { color: green; box-shadow: var(--inset,) 0 0 0 1px var(--ring, #888); margin: 1 1ch; width: 30ch }
+  .ring span { color: var(--missing,) }
+</style>
+<table class="table">
+  <tr><td>Green, the fallback of the state and the type set to initial</td></tr>
+  <tr><td class="active">Red, the state set on the cell</td></tr>
+  <tr><td class="accent">Blue, unset inheriting nothing</td></tr>
+</table>
+<div class="ring">A ring, an empty fallback before it: <span>green, of a value empty</span></div>

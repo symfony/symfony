@@ -28,6 +28,8 @@ use Symfony\Component\Tui\Render\Renderer;
 use Symfony\Component\Tui\Render\RenderRequestorInterface;
 use Symfony\Component\Tui\Render\ScreenWriter;
 use Symfony\Component\Tui\Render\WidgetRect;
+use Symfony\Component\Tui\Style\MediaContext;
+use Symfony\Component\Tui\Style\StyleProviderInterface;
 use Symfony\Component\Tui\Style\StyleSheet;
 use Symfony\Component\Tui\Terminal\Terminal;
 use Symfony\Component\Tui\Terminal\TerminalInterface;
@@ -75,6 +77,9 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private ?\Closure $onTick = null;
 
     private bool $renderRequested = false;
+
+    /** The timer drawing the frames of a scroll container gliding, see Renderer::isScrolling() */
+    private ?string $glideTimer = null;
     private bool $running = false;
     private bool $stopped = false;
     private bool $ticking = false;
@@ -109,6 +114,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $this->root->expandVertically(true);
         $this->renderer = $renderer ?? new Renderer($styleSheet, $fontRegistry);
         $this->screenWriter = new ScreenWriter($this->terminal);
+        $this->screenWriter->setColors($this->renderer->getMediaContext()->colors);
 
         // Share the KeyParser so Kitty protocol state is consistent
         $this->focusManager = new FocusManager(
@@ -116,6 +122,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
             keybindings: $this->keybindings,
             eventDispatcher: $this->eventDispatcher,
         );
+        $this->focusManager->setRectResolver($this->renderer->getWidgetRect(...));
 
         $this->widgetTree = new WidgetTree($this, $this->keybindings, $this->focusManager, $this->renderer, $this->terminal, $this->eventDispatcher);
         $this->widgetTree->setRoot($this->root);
@@ -183,6 +190,54 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     public function addStyleSheet(StyleSheet $styleSheet): static
     {
         $this->renderer->addStyleSheet($styleSheet);
+
+        return $this;
+    }
+
+    /**
+     * Add a style provider, like a CSS stylesheet, on top of the stylesheets.
+     *
+     * @return $this
+     */
+    public function addStyleProvider(StyleProviderInterface $provider): static
+    {
+        $this->renderer->getStyleSheet()->addProvider($provider);
+        $this->requestRender();
+
+        return $this;
+    }
+
+    /**
+     * Removes a provider added with addStyleProvider().
+     *
+     * @return $this
+     */
+    public function removeStyleProvider(StyleProviderInterface $provider): static
+    {
+        $this->renderer->getStyleSheet()->removeProvider($provider);
+        $this->requestRender();
+
+        return $this;
+    }
+
+    public function getMediaContext(): MediaContext
+    {
+        return $this->renderer->getMediaContext();
+    }
+
+    /**
+     * Set what media queries are evaluated against: color scheme, density,
+     * contrast and motion preferences, cell pixel size.
+     *
+     * The terminal size of the context is kept up to date by the renderer.
+     *
+     * @return $this
+     */
+    public function setMediaContext(MediaContext $mediaContext): static
+    {
+        $this->renderer->setMediaContext($mediaContext);
+        $this->screenWriter->setColors($mediaContext->colors);
+        $this->requestRender();
 
         return $this;
     }
@@ -297,8 +352,9 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
             $this->terminal->write("\r\n");
         }
 
-        // Restore default cursor shape (DECSCUSR 0) and show cursor
+        // Restore default cursor shape (DECSCUSR 0) and color (OSC 112), and show cursor
         $this->terminal->write("\x1b[0 q");
+        $this->screenWriter->restoreCursorColor();
         $this->terminal->showCursor();
         $this->terminal->stop();
     }
@@ -355,6 +411,18 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     }
 
     /**
+     * Removes a listener added with addListener().
+     *
+     * @return $this
+     */
+    public function removeListener(callable $listener): static
+    {
+        $this->eventDispatcher->removeListener($this->resolveEventClass($listener), $listener);
+
+        return $this;
+    }
+
+    /**
      * @return class-string
      */
     private function resolveEventClass(callable $listener): string
@@ -400,6 +468,18 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     }
 
     /**
+     * Places an absolute or fixed widget next to another when its style names no anchor, like the button that opens
+     * a popover is its anchor.
+     *
+     * @internal
+     */
+    public function setImplicitAnchor(AbstractWidget $widget, ?AbstractWidget $anchor): void
+    {
+        $this->renderer->setImplicitAnchor($widget, $anchor);
+        $this->requestRender();
+    }
+
+    /**
      * Returns where a widget was drawn during the last render, or null if it was not drawn.
      *
      * A widget's own render() reports the height of its content, not the row the layout gave it,
@@ -409,6 +489,44 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     public function getWidgetRect(AbstractWidget $widget): ?WidgetRect
     {
         return $this->renderer->getWidgetRect($widget);
+    }
+
+    /**
+     * Returns the control of a scroll container drawn at a cell, like a CSS ::scroll-button(): the container and what
+     * it does, or null.
+     *
+     * @return array{ContainerWidget, string}|null
+     *
+     * @internal
+     */
+    public function getScrollControlAt(int $row, int $col): ?array
+    {
+        return $this->renderer->getScrollControlAt($row, $col);
+    }
+
+    /**
+     * Scrolls a widget into view in the scroll containers around it, like Element::scrollIntoView().
+     */
+    public function reveal(AbstractWidget $widget): void
+    {
+        $this->renderer->reveal($widget);
+        $this->requestRender();
+    }
+
+    /**
+     * Returns the fragment (#id) a link drawn at a cell of the last frame goes to, null when there is none.
+     */
+    public function getFragmentLinkAt(int $row, int $col): ?string
+    {
+        return $this->renderer->getFragmentLinkAt($row, $col);
+    }
+
+    /**
+     * Returns the id of the link drawn at a cell of the last frame, see RichTextWidget::linkId(), null when there is none.
+     */
+    public function getLinkAt(int $row, int $col): ?string
+    {
+        return $this->renderer->getLinkAt($row, $col);
     }
 
     /**
@@ -491,9 +609,23 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     {
         if ($this->renderRequested) {
             $this->renderRequested = false;
+            $this->renderer->invalidateGlides();
             $columns = $this->terminal->getColumns();
             $rows = $this->terminal->getRows();
-            $this->screenWriter->writeFrame($this->renderer->renderFrame($this->root, $columns, $rows));
+            $frame = $this->renderer->renderFrame($this->root, $columns, $rows);
+            // The focus on a widget the frame does not draw, like one CSS hides: on the first one that is, drawn again
+            if ($this->focusManager->leaveUndrawn()) {
+                $frame = $this->renderer->renderFrame($this->root, $columns, $rows);
+            }
+            $this->screenWriter->writeFrame($frame);
+
+            // A scroll container gliding (scroll-behavior: smooth) draws frames until it is there
+            if ($this->renderer->isScrolling()) {
+                $this->glideTimer ??= $this->scheduleInterval($this->requestRender(...), 1 / 60);
+            } elseif (null !== $this->glideTimer) {
+                $this->cancelInterval($this->glideTimer);
+                $this->glideTimer = null;
+            }
         }
     }
 

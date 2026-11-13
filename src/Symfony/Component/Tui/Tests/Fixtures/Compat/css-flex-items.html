@@ -1,0 +1,25 @@
+<!-- covers: css.properties.display css.properties.justify-content html.elements.a html.elements.span -->
+<!-- variant: narrow columns=30 -->
+<style>
+  nav { display: flex; gap: 1ch; justify-content: space-between }
+  nav > * { flex: none }
+  nav > a { color: blue }
+  nav > .active { font-weight: bold }
+  nav > a::before { content: "[" } nav > a::after { content: "]" }
+  .tags { display: flex; gap: 1ch }
+  .tags > span { flex: none; background: gray }
+  @media (max-width: 40ch) { .responsive { display: flex } }
+  .inherits { display: inherit; gap: inherit }
+  .wide-block { display: flex; gap: 1ch } @media (min-width: 41ch) { .wide-block { display: block } }
+</style>
+<main>
+  <nav><a href="https://symfony.com" class="active">Home</a> <a href="https://symfony.com/doc">Docs</a> text run <span>span</span></nav>
+  <p class="tags">a paragraph lays out items too: <span>text</span> <span>spans</span></p>
+  <div class="tags"><span>php</span> <span>tui</span><br><span>css</span></div>
+  <div class="tags"><div class="inherits"><span>its</span><span>own</span><span>items</span></div> <span>display: inherit</span></div>
+  <div class="responsive"><b>flex</b> <i>only when narrow</i></div>
+  <div class="wide-block">a block when wide: <b>one</b> line, <button>OK</button> too</div>
+  <div class="wide-block">spaced as written: <b>bold</b>! <i>x</i><i>y</i></div>
+</main>
+<div><a href="#vote" style="display: inline-flex; flex-direction: column; text-decoration: none" class="upvoter">118</a> an inline flex column, its ::before an item over its text, like the arrow over the score of lobste.rs</div>
+<style>.upvoter::before { content: "▲" }</style>

@@ -1,0 +1,14 @@
+☰ Menu: a hidden checkbox, still focused and checked
+┌──────────────────────────────────────────────────────────┐
+│                                                          │
+│Home                                                      │
+│                                                          │
+│About                                                     │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+
+Before ⟨2m     ⟨0m after: its room kept
+
+
+
+End

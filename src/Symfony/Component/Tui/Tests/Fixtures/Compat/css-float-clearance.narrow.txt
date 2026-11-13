@@ -1,0 +1,72 @@
+[logo]⟨48;2;55;65;81m────────⟨0m
+⟨48;2;55;65;81m│             ⟨0mA tagline at the right
+⟨48;2;55;65;81m│A bordered menu whose ::before    │⟨0m
+⟨48;2;55;65;81m│clears: its box beside the floats,│⟨0m
+⟨48;2;55;65;81m│its content below them            │⟨0m
+⟨48;2;55;65;81m└──────────────────────────────────┘⟨0m
+
+[L]⟨48;2;55;65;81m────────────────────────────⟨0m┌───┐
+⟨48;2;55;65;81m│A ::before that clears the    ⟨0m│[R]│
+⟨48;2;55;65;81m│left float only: its content  ⟨0m│   │
+⟨48;2;55;65;81m│below it, beside the right    ⟨0m└───┘
+⟨48;2;55;65;81m│one still                         │⟨0m
+⟨48;2;55;65;81m└──────────────────────────────────┘⟨0m
+
+[logo]⟨48;2;55;65;81m─────────────────────────────┐⟨0m
+⟨48;2;55;65;81m│⟨0m⟨36;48;2;55;65;81mBelow the floats⟨0m⟨48;2;55;65;81m                  │⟨0m
+⟨48;2;55;65;81m│The text of a ::before that clears│⟨0m
+⟨48;2;55;65;81m│goes below the float, then the    │⟨0m
+⟨48;2;55;65;81m│content                           │⟨0m
+⟨48;2;55;65;81m└──────────────────────────────────┘⟨0m
+
+[tall]⟨48;2;55;65;81m─────────────────────────────┐⟨0m
+      ⟨48;2;55;65;81m                             │⟨0m
+      ⟨48;2;55;65;81m                             │⟨0m
+⟨48;2;55;65;81m│Nested: the floats of a block     │⟨0m
+⟨48;2;55;65;81m│around reach it, its content below│⟨0m
+⟨48;2;55;65;81m│them                              │⟨0m
+⟨48;2;55;65;81m└──────────────────────────────────┘⟨0m
+
+[logo]⟨48;2;55;65;81m────────⟨0m
+⟨48;2;55;65;81m│             ⟨0mA tagline at the right
+⟨48;2;55;65;81m│A bordered text whose ::before    │⟨0m
+⟨48;2;55;65;81m│clears: its box beside the floats,│⟨0m
+⟨48;2;55;65;81m│its lines below them              │⟨0m
+⟨48;2;55;65;81m└──────────────────────────────────┘⟨0m
+
+[L]⟨48;2;55;65;81m────────────────────────────⟨0m┌───┐
+⟨48;2;55;65;81m│A ⟨0m⟨1;48;2;55;65;81mtext⟨0m⟨48;2;55;65;81m whose ::before clears  ⟨0m│[R]│
+⟨48;2;55;65;81m│the left float only: its      ⟨0m│   │
+⟨48;2;55;65;81m│lines below it, beside the    ⟨0m└───┘
+⟨48;2;55;65;81m│right one still                   │⟨0m
+⟨48;2;55;65;81m└──────────────────────────────────┘⟨0m
+
+[logo]⟨48;2;55;65;81m─────────────────────────────┐⟨0m
+⟨48;2;55;65;81m│⟨0m⟨36;48;2;55;65;81mBelow the floats⟨0m⟨48;2;55;65;81m                  │⟨0m
+⟨48;2;55;65;81m│The text of a ::before that clears│⟨0m
+⟨48;2;55;65;81m│  goes below the float, then the  │⟨0m
+⟨48;2;55;65;81m│               text               │⟨0m
+⟨48;2;55;65;81m└──────────────────────────────────┘⟨0m
+
+A paragraph, its bottom margin above
+the block after it
+
+[logo]⟨48;2;55;65;81m                              ⟨0m
+⟨48;2;55;65;81m                                    ⟨0m
+⟨48;2;55;65;81m                                    ⟨0m
+⟨48;2;55;65;81mA block whose ::before clears: the  ⟨0m
+⟨48;2;55;65;81mmargin of its first paragraph below ⟨0m
+⟨48;2;55;65;81mthe floats, the block where the     ⟨0m
+⟨48;2;55;65;81mmargin above it puts it             ⟨0m
+
+[logo]
+
+縦
+書
+き
+
+┌───┐
+│F  │
+└───┘
+After an empty block whose ::before
+clears: below the float

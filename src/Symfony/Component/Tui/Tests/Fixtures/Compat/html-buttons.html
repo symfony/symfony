@@ -1,0 +1,17 @@
+<!-- covers: html.elements.button -->
+<!-- variant: focus-save focus=#save -->
+<style>
+  button { color: cyan }
+  .danger::label { color: red }
+.bare::before, .bare::after { content: none }
+  .icon::before { content: "<" } .icon::after { content: ">" }
+</style>
+<main>
+  <button id="save">Save</button>
+  <button class="danger" aria-label="Delete the file">Delete</button>
+  <button id="off" disabled>Disabled</button>
+  <button class="bare" aria-label="Bare">bare</button>
+  <button class="icon" aria-label="Icon">x</button>
+  <input type="image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAPUlEQVRYhe3VsQ3AQAwDMSn77+wfQkUaqj+AcONechnWqU6+Ld8HAAAAAAAA0OTGj94u9e8XAAAAAAAAAHghNAU9l77oWAAAAABJRU5ErkJggg==" alt="Go">
+  <button style="color: #22c55e"><svg viewBox="0 0 24 24"><title>Download</title><path d="M4 2 H20 V14 H24 L12 24 L0 14 H4 Z" fill="currentColor"/></svg> Download</button>
+</main>

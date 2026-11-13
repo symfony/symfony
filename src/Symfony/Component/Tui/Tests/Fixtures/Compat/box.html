@@ -1,0 +1,56 @@
+<!-- covers: css.properties.padding css.properties.padding-top css.properties.padding-right css.properties.padding-bottom css.properties.padding-left css.properties.padding-inline css.properties.padding-block css.properties.border css.properties.border-width css.properties.border-style css.properties.border-color css.properties.border-top css.properties.border-right css.properties.border-bottom css.properties.border-left css.properties.border-radius css.properties.width css.properties.max-width css.properties.text-align css.properties.font-weight css.properties.font-style css.properties.text-decoration css.properties.text-decoration-line css.properties.font-family css.properties.display css.properties.visibility css.properties.caret-shape css.properties.caret-color css.properties.caret css.properties.caret-animation css.types.length css.properties.margin css.properties.margin-top css.properties.margin-right css.properties.margin-bottom css.properties.margin-left css.properties.margin-inline css.properties.margin-block -->
+<!-- variant: hidpi dppx=2 -->
+<style>
+  main { background: blue }
+  .margin { margin: 1 4ch; border: 1px solid; background: black }
+  .sides-margin { margin-top: 1; margin-right: 2ch; margin-bottom: 0; margin-left: 6ch }
+  .logical-margin { margin-inline: 2ch 0; margin-block: 1 0 }
+  .pad { padding: 1 2ch }
+  .sides { padding-top: 1; padding-right: 1ch; padding-bottom: 0; padding-left: 4ch }
+  .logical { padding-inline: 2ch; padding-block: 0 }
+  .px { padding: 16px 16px; border: 1px solid }
+  .border { border: 1px solid red; border-radius: 1ch }
+  .longhand { border-width: 1px; border-style: double; border-color: cyan }
+  .top { border-top: 1px solid; border-bottom: thin solid }
+  .left { border-left: 1px solid yellow; border-right: medium solid }
+  .narrow { max-width: 20ch }
+  .fixed { width: 30ch; text-align: center }
+  .right { text-align: right }
+  .b { font-weight: 700 }
+  .i { font-style: italic }
+  .u { text-decoration: underline }
+  .s { text-decoration-line: line-through }
+  .figlet { font-family: small }
+  .web { font-family: Inter, "Helvetica Neue", sans-serif }
+  .gone { display: none }
+  .invisible { visibility: hidden }
+  input { caret-shape: underscore; caret-color: orange }
+  .clear { border: 1px solid transparent; background: blue }
+  .halfrow { padding: .5rem 1rem; border: 1px solid }
+  .steady { caret: block manual; caret-animation: manual }
+</style>
+<main>
+  <div class="margin">margin, painted like the parent</div>
+  <div class="sides-margin">margin sides</div>
+  <div class="logical-margin">margin inline and block</div>
+  <div class="pad">padding</div>
+  <div class="sides">padding sides</div>
+  <div class="logical">padding inline and block</div>
+  <div class="px">px padding</div>
+  <div class="border">rounded border</div>
+  <div class="longhand">border longhands</div>
+  <div class="top">top and bottom borders</div>
+  <div class="left">left and right borders</div>
+  <p class="narrow">max-width keeps this sentence within twenty columns</p>
+  <p class="fixed">width centered</p>
+  <p class="right">right aligned</p>
+  <p class="b">bold</p><p class="i">italic</p><p class="u">underline</p><p class="s">line-through</p>
+  <p class="figlet">Hi</p>
+<p class="web">A web font stack: the terminal font</p>
+  <p class="gone">display none</p>
+  <p class="invisible">visibility hidden</p>
+  <input aria-label="Caret" value="caret">
+  <div class="clear">border: 1px solid transparent: its room, in the background</div>
+  <div class="halfrow">padding: .5rem 1rem: no rows above and below</div>
+  <input class="steady" aria-label="Steady caret" value="steady caret">
+</main>

@@ -1,0 +1,13 @@
+
+The insets are from inside the border of the box, past its
+margin:
+
+    ┌──────────────────────────────────────────────────┐
+    │⟨31mTL⟨0m                                                │
+    │first line of the box                             │
+    │                                                  │
+    │second line                                       │
+    │                                                ⟨32mBR⟨0m│
+    └──────────────────────────────────────────────────┘
+
+after

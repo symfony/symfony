@@ -210,6 +210,11 @@ class LoaderWidget extends AbstractWidget
             return false;
         }
 
+        // Honor prefers-reduced-motion: the spinner stays still
+        if ($this->getContext()?->getMediaContext()->reducedMotion) {
+            return false;
+        }
+
         $this->frame = ($this->frame + $steps) % \count($this->frames);
         $this->invalidate();
 

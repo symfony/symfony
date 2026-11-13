@@ -1,0 +1,9 @@
+⟨7m[ Menu ]⟨0m [ Delete… ]
+
+The page under the popov⟨36m┌──────────┐⟨0mialog.
+                        ⟨36m│⟨0m          ⟨36m│⟨0m
+[ Help ]                ⟨36m│⟨0m Open     ⟨36m│⟨0m
+                        ⟨36m│⟨0m          ⟨36m│⟨0m
+                        ⟨36m│⟨0m Save as… ⟨36m│⟨0m
+                        ⟨36m│⟨0m          ⟨36m│⟨0m
+                        ⟨36m└──────────┘⟨0m

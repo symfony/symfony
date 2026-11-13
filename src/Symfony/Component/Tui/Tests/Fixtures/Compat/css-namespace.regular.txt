@@ -1,0 +1,10 @@
+
+⟨32m*|p: green⟨0m
+
+⟨1m*|*: bold⟨0m
+
+svg|p: not red
+
+|p: not red
+
+::part(), :host(), ::highlight(), :autofill: not red

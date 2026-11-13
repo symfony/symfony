@@ -1,0 +1,18 @@
+
+[ Native ] ⟨38;2;255;255;255;48;2;37;99;235m Styled ⟨0m
+
+┌───────────────────────┐ ⟨44m                     ⟨0m
+│ Bordered: no brackets │ ⟨44m  On its background  ⟨0m
+└───────────────────────┘ ⟨44m                     ⟨0m
+
+┌──────────────────────────────────────────────────┐
+│ appearance: button, bordered: no brackets either │
+└──────────────────────────────────────────────────┘
+
+⟨38;2;148;163;184m☐⟨0m  drawn by CSS too small for its border
+⟨38;2;13;110;253m☑⟨0m  checked
+⟨38;2;13;110;253m◉⟨0m  a radio
+
+[ ] a native box
+○ off a switch drawn by CSS
+No marker ⟨48;2;30;41;59m Base select ⟨0m⟨36;48;2;30;41;59m▾⟨0m⟨48;2;30;41;59m ⟨0m

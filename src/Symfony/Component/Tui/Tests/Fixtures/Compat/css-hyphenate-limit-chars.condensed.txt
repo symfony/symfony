@@ -1,0 +1,21 @@
+┌──────────┐
+│Any extra-│
+│ordinary  │
+│hyphen    │
+└──────────┘
+┌──────────┐
+│Any       │
+│extraordi-│
+│nary      │
+│hyphen    │
+└──────────┘
+┌──────────┐
+│Any       │
+│extraordin│
+│ary hyphen│
+└──────────┘
+┌──────────┐
+│Any extra-│
+│ordinary  │
+│hyphen    │
+└──────────┘

@@ -1,0 +1,21 @@
+
+⟨1;36mThe default styles⟨0m
+
+Paragraphs, lists, quotes and blocks of code are a line
+apart, like the default style sheets of browsers.
+
+A second paragraph.
+
+⟨1;34mA list⟨0m
+
+• An item
+  ◦ A list in it, not apart
+• Another item
+
+A block of code
+
+⟨3m  A quote⟨0m
+
+     A figure, indented
+
+⟨3mAn address, in italics⟨0m

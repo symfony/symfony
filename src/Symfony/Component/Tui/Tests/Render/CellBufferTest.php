@@ -267,6 +267,25 @@ class CellBufferTest extends TestCase
         $this->assertSame('ABCXYFGHIJ', $plain);
     }
 
+    public function testTransparentSpacesWithAForegroundColorDrawNothing()
+    {
+        $buf = new CellBuffer(6, 1);
+        $buf->writeAnsiLines(['ABCDEF']);
+        $buf->writeAnsiLines(["\e[31m  X \e[39m\e[41m \e[49m"], transparent: true);
+
+        $this->assertSame('ABXD F', preg_replace('/\x1b\[[0-9;]*m/', '', $buf->toLines()[0]), 'A space with a background covers what is below.');
+    }
+
+    public function testTintKeepsTheCharacters()
+    {
+        $buf = new CellBuffer(4, 1);
+        $buf->writeAnsiLines(["\e[31mABCD\e[39m"]);
+        $buf->tint(0, 1, 2, '48;2;1;2;3');
+        $buf->tint(5, 0, 1, '41');
+
+        $this->assertSame("\e[0;31mA\e[0;31;48;2;1;2;3mBC\e[0;31mD\e[0m", $buf->toLines()[0]);
+    }
+
     public function testRoundtripPlainText()
     {
         // Write plain lines, read back; should match (with padding)
@@ -281,16 +300,16 @@ class CellBufferTest extends TestCase
         $this->assertSame('!         ', $plain[2]);
     }
 
-    public function testOscHyperlinkStripped()
+    public function testOscHyperlinksAreKept()
     {
-        $buf = new CellBuffer(20, 1);
-        // OSC 8 hyperlink should be consumed (not rendered as visible chars)
+        $buf = new CellBuffer(12, 1);
         $buf->writeAnsiLines(["\x1b]8;;https://example.com\x07Link\x1b]8;;\x07 Text"]);
 
-        $lines = $buf->toLines();
-        $plain = preg_replace('/\x1b\[[0-9;]*m/', '', $lines[0]);
-        // Only "Link Text" should be visible
-        $this->assertStringStartsWith('Link Text', $plain);
+        $this->assertSame("\x1b]8;;https://example.com\x07Link\x1b]8;;\x07 Text   ", $buf->toLines()[0]);
+
+        // Written over, transparent: the cells kept keep their link, those written over take the new one
+        $buf->writeAnsiLines(["  \x1b]8;id=1;https://other.test\x07X\x1b]8;;\x07"], transparent: true);
+        $this->assertSame("\x1b]8;;https://example.com\x07Li\x1b]8;id=1;https://other.test\x07X\x1b]8;;https://example.com\x07k\x1b]8;;\x07 Text   ", $buf->toLines()[0]);
     }
 
     public function testBrightForegroundColors()
@@ -396,6 +415,14 @@ class CellBufferTest extends TestCase
         $this->assertSame('ABCD ', $plain);
     }
 
+    public function testACombiningMarkOnATransparentSpaceStillDrawsItsInk()
+    {
+        $buffer = new CellBuffer(3, 1);
+        $buffer->writeAnsiLines(['abc']);
+        $buffer->writeAnsiLines([" \u{0301} "], 0, 0, true);
+        $this->assertSame(" \u{0301}bc", $buffer->toLines()[0]);
+    }
+
     public function testCombiningMarkStaysInTheCellOfItsBaseCharacter()
     {
         $buf = new CellBuffer(4, 1);
@@ -431,6 +458,53 @@ class CellBufferTest extends TestCase
         $buf->writeAnsiLines(["\u{2068}ab\u{2069}"]);
 
         $this->assertSame("ab\u{2069}  ", $buf->toLines()[0]);
+    }
+
+    public function testZeroWidthCharacterAtTheStartOfALineWrittenOverOthersIsDropped()
+    {
+        // Like a slice of a line cut after a character, the zero-width one after it going with the slice
+        $buf = new CellBuffer(6, 1);
+        $buf->writeAnsiLines(["a\u{200B}b\u{200B}c"]);
+        $buf->writeAnsiLines(["\u{200B}b\u{200B}c"], 0, 1, true);
+
+        $this->assertSame("a\u{200B}b\u{200B}c   ", $buf->toLines()[0]);
+    }
+
+    public function testColorsGivenWithColonsAreReadLikeThoseWithSemicolons()
+    {
+        $buf = new CellBuffer(4, 1);
+        $buf->writeAnsiLines(["\e[38:2::255:0:0ma\e[48:5:21mb\e[38:2:0:255:0:0:0:0mc\e[0md"]);
+        $other = new CellBuffer(4, 1);
+        $other->writeAnsiLines(["\e[38;2;255;0;0ma\e[48;5;21mb\e[38;2;255;0;0mc\e[0md"]);
+
+        $this->assertSame($other->toLines()[0], $buf->toLines()[0]);
+    }
+
+    public function testZeroWidthCharacterAfterACellSkippedAsSeeThroughIsDropped()
+    {
+        $buf = new CellBuffer(10, 1);
+        $buf->writeAnsiLines(['abcdefghij']);
+        $buf->writeAnsiLines(["\t\u{200B}x"], 0, 0, true);
+
+        $this->assertSame('abcxefghij', $buf->toLines()[0]);
+    }
+
+    public function testATabOfAForegroundAloneIsSeeThroughLikeASpace()
+    {
+        $buf = new CellBuffer(6, 1);
+        $buf->writeAnsiLines(['abcdef']);
+        $buf->writeAnsiLines(["\e[31m\tX"], 0, 0, true);
+
+        $this->assertSame('abc', substr(preg_replace('/\e\[[0-9;]*m/', '', $buf->toLines()[0]), 0, 3));
+    }
+
+    public function testSubParametersOfAnSgrSequenceAreNotReadAsCodes()
+    {
+        $buf = new CellBuffer(6, 1);
+        // A dotted underline, then a curly one in a color, then none
+        $buf->writeAnsiLines(["\e[4:4mab\e[24m\e[4:3;58:2::255:0:0mc\e[4:0md\e[58;2;0;0;255mef"]);
+
+        $this->assertSame("\e[0;4mabc\e[0mdef", $buf->toLines()[0], 'Not a blue background nor dim cells.');
     }
 
     public function testCursorMarkerAfterZeroWidthCharacters()
@@ -483,5 +557,30 @@ class CellBufferTest extends TestCase
         $buf->writeAnsiLines(['漢'], 0, 1);
 
         $this->assertSame(' 漢 ', $buf->toLines()[0]);
+    }
+
+    public function testTranspose()
+    {
+        $buf = new CellBuffer(6, 3);
+        $buf->writeAnsiLines(["\e[31m縦書\e[0m", 'ab', 'c']);
+
+        // Each row a column, from the right, each as wide as its widest character, its colors kept
+        $turned = $buf->transpose()->toLines();
+        $this->assertSame(['ca縦', ' b書'], array_map(AnsiUtils::stripAnsiCodes(...), $turned));
+        $this->assertStringContainsString('31m縦', $turned[0]);
+        $this->assertSame(['縦ac', '書b '], array_map(AnsiUtils::stripAnsiCodes(...), $buf->transpose(false)->toLines()), 'From the left.');
+    }
+
+    public function testJoinBoxRowJoinsTheLinesOfARowWithThoseUnderItAndDropsTheHiddenOnes()
+    {
+        $gray = "\e[38;2;170;170;170m";
+        $white = "\e[38;2;255;255;255m";
+        $buffer = new CellBuffer(8, 2);
+        $buffer->writeAnsiLines([$gray.'│  │'."\e[0m", $gray.'────────'."\e[0m"]);
+        // The bottom of a tab in the color of the page, over the line under the tabs
+        $buffer->writeAnsiLines([$white.'└──┘'."\e[0m"], 1, 0, true);
+        $buffer->joinBoxRow(1, array_fill(0, 8, '─'), '48;2;255;255;255');
+
+        $this->assertSame('│  └────', AnsiUtils::stripAnsiCodes($buffer->toLines()[1]), 'Its corners in the color of its sides, its hidden bottom blank, the line joined to its right side.');
     }
 }

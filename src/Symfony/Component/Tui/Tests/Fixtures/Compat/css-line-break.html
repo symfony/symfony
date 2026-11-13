@@ -1,0 +1,10 @@
+<!-- covers: css.properties.line-break -->
+<style>
+  p { width: 15ch; border: 1px solid }
+  .anywhere { line-break: anywhere }
+  .strict { line-break: strict }
+  .pre-wrap { line-break: anywhere; white-space: pre-wrap }
+</style>
+<p class="anywhere">Lines break anywhere in words</p>
+<p class="strict">Lines break at spaces, strict</p>
+<p class="pre-wrap">Kept   spaces, anywhere</p>

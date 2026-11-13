@@ -1,0 +1,52 @@
+⟨44m                                                            ⟨0m
+⟨44m    ⟨0m⟨40m┌──────────────────────────────────────────────────┐⟨0m⟨44m    ⟨0m
+⟨44m    ⟨0m⟨40m│margin, painted like the parent                   │⟨0m⟨44m    ⟨0m
+⟨44m    ⟨0m⟨40m└──────────────────────────────────────────────────┘⟨0m⟨44m    ⟨0m
+⟨44m                                                            ⟨0m
+⟨44m      margin sides                                          ⟨0m
+⟨44m                                                            ⟨0m
+⟨44m  margin inline and block                                   ⟨0m
+⟨44m                                                            ⟨0m
+⟨44m  padding                                                   ⟨0m
+⟨44m                                                            ⟨0m
+⟨44m                                                            ⟨0m
+⟨44m    padding sides                                           ⟨0m
+⟨44m  padding inline and block                                  ⟨0m
+⟨44m┌──────────────────────────────────────────────────────────┐⟨0m
+⟨44m│                                                          │⟨0m
+⟨44m│  px padding                                              │⟨0m
+⟨44m│                                                          │⟨0m
+⟨44m└──────────────────────────────────────────────────────────┘⟨0m
+⟨31;44m╭──────────────────────────────────────────────────────────╮⟨0m
+⟨31;44m│⟨0m⟨44mrounded border                                            ⟨0m⟨31;44m│⟨0m
+⟨31;44m╰──────────────────────────────────────────────────────────╯⟨0m
+⟨36;44m╔══════════════════════════════════════════════════════════╗⟨0m
+⟨36;44m║⟨0m⟨44mborder longhands                                          ⟨0m⟨36;44m║⟨0m
+⟨36;44m╚══════════════════════════════════════════════════════════╝⟨0m
+⟨44m────────────────────────────────────────────────────────────⟨0m
+⟨44mtop and bottom borders                                      ⟨0m
+⟨44m┌──────────────────────────────────────────────────────────┐⟨0m
+⟨33;44m│⟨0m⟨44mleft and right borders                                    │⟨0m
+⟨44mmax-width keeps this                                        ⟨0m
+⟨44msentence within                                             ⟨0m
+⟨44mtwenty columns                                              ⟨0m
+⟨44m        width centered                                      ⟨0m
+⟨44m                                               right aligned⟨0m
+⟨1;44mbold⟨0m⟨44m                                                        ⟨0m
+⟨3;44mitalic⟨0m⟨44m                                                      ⟨0m
+⟨4;44munderline⟨0m⟨44m                                                   ⟨0m
+⟨9;44mline-through⟨0m⟨44m                                                ⟨0m
+⟨44m  _  _   _                                                  ⟨0m
+⟨44m | || | (_)                                                 ⟨0m
+⟨44m | __ | | |                                                 ⟨0m
+⟨44m |_||_| |_|                                                 ⟨0m
+⟨44mA web font stack: the terminal font                         ⟨0m
+⟨44m                                                            ⟨0m
+⟨44m> caret                                                     ⟨0m
+⟨44m                                                            ⟨0m
+⟨44m border: 1px solid transparent: its room, in the background ⟨0m
+⟨44m                                                            ⟨0m
+⟨44m┌──────────────────────────────────────────────────────────┐⟨0m
+⟨44m│  padding: .5rem 1rem: no rows above and below            │⟨0m
+⟨44m└──────────────────────────────────────────────────────────┘⟨0m
+⟨44m> steady caret                                              ⟨0m

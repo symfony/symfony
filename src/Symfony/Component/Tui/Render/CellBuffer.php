@@ -62,6 +62,9 @@ final class CellBuffer
     /** @var int[] Attribute bitmask (bold|dim|italic|underline|blink|reverse|strikethrough) */
     private array $attrs;
 
+    /** @var string[] The OSC 8 hyperlink of each cell, its parameters and URI ("params;uri"), or "" for none */
+    private array $links;
+
     /* Whether a wide character has been placed, so writes have to repair cell pairs */
     private bool $hasWideChars = false;
 
@@ -85,11 +88,77 @@ final class CellBuffer
         $this->fg = array_fill(0, $size, '');
         $this->bg = array_fill(0, $size, '');
         $this->attrs = array_fill(0, $size, 0);
+        $this->links = array_fill(0, $size, '');
     }
 
     public function getWidth(): int
     {
         return $this->width;
+    }
+
+    /**
+     * The cells turned for a vertical writing mode: each row a column, one character a row, the first row the
+     * rightmost column (or the leftmost, left to right), each column as wide as its widest character.
+     *
+     * Their colors, attributes and links are kept; a row's trailing blank cells are left out.
+     */
+    public function transpose(bool $rightToLeft = true): self
+    {
+        // The characters of each row, without the halves of wide ones and the blank end
+        $columns = [];
+        for ($row = 0; $row < $this->height; ++$row) {
+            $cells = [];
+            for ($col = 0; $col < $this->width; ++$col) {
+                $i = $row * $this->width + $col;
+                if (0 !== $this->widths[$i]) {
+                    $cells[] = $i;
+                }
+            }
+            while ($cells && ' ' === $this->chars[end($cells)] && '' === $this->bg[end($cells)]) {
+                array_pop($cells);
+            }
+            $columns[] = $cells;
+        }
+        $pitches = [];
+        foreach ($columns as $index => $cells) {
+            $pitches[$index] = 1;
+            foreach ($cells as $i) {
+                $pitches[$index] = max($pitches[$index], $this->widths[$i]);
+            }
+        }
+        $width = max(1, array_sum($pitches));
+        $height = max(1, ...array_map('count', $columns));
+        $turned = new self($width, $height);
+        $turned->hasWideChars = $this->hasWideChars;
+        $x = $rightToLeft ? $width : 0;
+        foreach ($columns as $index => $cells) {
+            $pitch = $pitches[$index];
+            if ($rightToLeft) {
+                $x -= $pitch;
+            }
+            foreach ($cells as $y => $i) {
+                $j = $y * $width + $x;
+                $turned->chars[$j] = $this->chars[$i];
+                $turned->widths[$j] = $this->widths[$i];
+                $turned->fg[$j] = $this->fg[$i];
+                $turned->bg[$j] = $this->bg[$i];
+                $turned->attrs[$j] = $this->attrs[$i];
+                $turned->links[$j] = $this->links[$i];
+                if (2 === $this->widths[$i] && $pitch > 1) {
+                    $turned->widths[$j + 1] = 0;
+                    $turned->bg[$j + 1] = $this->bg[$i];
+                    $turned->links[$j + 1] = $this->links[$i];
+                } elseif ($pitch > 1) {
+                    // A narrow character in a column of wide ones: the column's other cell in its background
+                    $turned->bg[$j + 1] = $this->bg[$i];
+                }
+            }
+            if (!$rightToLeft) {
+                $x += $pitch;
+            }
+        }
+
+        return $turned;
     }
 
     public function getHeight(): int
@@ -103,15 +172,17 @@ final class CellBuffer
      * Lines are parsed: ANSI escape codes are interpreted and stored as
      * cell attributes; visible characters are placed into the grid.
      *
-     * @param string[] $lines       ANSI-formatted lines
-     * @param int      $startRow    Row offset to start writing
-     * @param int      $startCol    Column offset to start writing
-     * @param bool     $transparent When true, cells with no explicit background preserve
-     *                              the existing buffer background (transparency). Cells that
-     *                              are plain spaces with default fg/bg/attrs are fully transparent
-     *                              and leave the buffer cell entirely unchanged.
+     * @param string[]    $lines       ANSI-formatted lines
+     * @param int         $startRow    Row offset to start writing
+     * @param int         $startCol    Column offset to start writing
+     * @param bool        $transparent When true, cells with no explicit background preserve
+     *                                 the existing buffer background (transparency). Cells that
+     *                                 are spaces with default bg/attrs, whatever their fg, are fully transparent
+     *                                 and leave the buffer cell entirely unchanged.
+     * @param string|null $seeThrough  A background, as SGR parameters like 48;2;255;255;255, that a transparent layer
+     *                                 treats as none: the one it inherited from what it is drawn in
      */
-    public function writeAnsiLines(array $lines, int $startRow = 0, int $startCol = 0, bool $transparent = false): void
+    public function writeAnsiLines(array $lines, int $startRow = 0, int $startCol = 0, bool $transparent = false, ?string $seeThrough = null): void
     {
         $width = $this->width;
         $height = $this->height;
@@ -129,8 +200,11 @@ final class CellBuffer
             $fgState = '';
             $bgState = '';
             $attrState = 0;
+            $linkState = '';
 
             $col = $startCol;
+            // Where the last cell skipped as see-through ends: no character of this line before it
+            $skippedTo = -1;
             $i = 0;
             $len = \strlen($line);
             $rowOffset = $row * $width;
@@ -143,9 +217,10 @@ final class CellBuffer
                 // A following high byte may be a combining mark that belongs
                 // to this character, so leave that case to grapheme_extract().
                 if ($ord >= 0x20 && $ord <= 0x7E && (!$hasHighByte || !isset($line[$i + 1]) || \ord($line[$i + 1]) < 0x80)) {
-                    // In transparent mode, skip fully unstyled spaces (fully transparent cell)
-                    if ($transparent && ' ' === $line[$i] && '' === $fgState && '' === $bgState && 0 === $attrState) {
-                        ++$col;
+                    // In transparent mode, skip the spaces that draw nothing: no background nor attribute, a foreground
+                    // color alone not being seen (fully transparent cell)
+                    if ($transparent && ' ' === $line[$i] && '' === $bgState && 0 === $attrState) {
+                        $skippedTo = ++$col;
                         ++$i;
                         continue;
                     }
@@ -158,6 +233,7 @@ final class CellBuffer
                     $this->fg[$idx] = $fgState;
                     $this->bg[$idx] = $transparent && '' === $bgState ? $this->bg[$idx] : $bgState;
                     $this->attrs[$idx] = $attrState;
+                    $this->links[$idx] = $linkState;
                     ++$col;
                     ++$i;
                     continue;
@@ -186,6 +262,9 @@ final class CellBuffer
                         // Only parse SGR (ends with 'm')
                         if ('m' === $line[$j]) {
                             $this->parseSgrInline($line, $i + 2, $j, $fgState, $bgState, $attrState);
+                            if ($transparent && $bgState === $seeThrough) {
+                                $bgState = '';
+                            }
                         }
                         $i = $seqEnd;
                         continue;
@@ -223,12 +302,13 @@ final class CellBuffer
                     if (']' === $next || 'P' === $next || '^' === $next || 'X' === $next) {
                         $j = $i + 2;
                         while ($j < $len) {
-                            if ("\x07" === $line[$j]) {
-                                $i = $j + 1;
-                                break;
-                            }
-                            if ("\x1b" === $line[$j] && isset($line[$j + 1]) && '\\' === $line[$j + 1]) {
-                                $i = $j + 2;
+                            $end = "\x07" === $line[$j] ? 1 : ("\x1b" === $line[$j] && isset($line[$j + 1]) && '\\' === $line[$j + 1] ? 2 : 0);
+                            if ($end > 0) {
+                                // An OSC 8 hyperlink: the cells after it link to its URI, until one without a URI
+                                if (']' === $next && str_starts_with($body = substr($line, $i + 2, $j - $i - 2), '8;') && \count($parts = explode(';', substr($body, 2), 2)) > 1) {
+                                    $linkState = '' === $parts[1] ? '' : substr($body, 2);
+                                }
+                                $i = $j + $end;
                                 break;
                             }
                             ++$j;
@@ -274,8 +354,9 @@ final class CellBuffer
                 // Tab
                 if (0x09 === $ord) {
                     for ($s = 0; $s < AnsiUtils::TAB_WIDTH && $col < $width; ++$s) {
-                        if ($transparent && '' === $fgState && '' === $bgState && 0 === $attrState) {
-                            ++$col;
+                        // Like a space, whatever its foreground
+                        if ($transparent && '' === $bgState && 0 === $attrState) {
+                            $skippedTo = ++$col;
                             continue;
                         }
                         if ($this->hasWideChars) {
@@ -287,6 +368,7 @@ final class CellBuffer
                         $this->fg[$idx] = $fgState;
                         $this->bg[$idx] = $transparent && '' === $bgState ? $this->bg[$idx] : $bgState;
                         $this->attrs[$idx] = $attrState;
+                        $this->links[$idx] = $linkState;
                         ++$col;
                     }
                     ++$i;
@@ -310,8 +392,9 @@ final class CellBuffer
                 $charWidth = AnsiUtils::graphemeWidth($grapheme);
 
                 // A zero-width grapheme gets no cell of its own: it joins the character before it, and is dropped at the start of a row
+                // or of the line written, or after a cell it skipped, which hold no character of it before it: the one under it has its own
                 if (0 === $charWidth) {
-                    if ($col > 0) {
+                    if ($col > $startCol && $col !== $skippedTo) {
                         $lead = $rowOffset + $col - 1;
                         while ($lead > $rowOffset && 0 === $this->widths[$lead]) {
                             --$lead;
@@ -334,6 +417,7 @@ final class CellBuffer
                         $this->fg[$idx] = $fgState;
                         $this->bg[$idx] = $transparent && '' === $bgState ? $this->bg[$idx] : $bgState;
                         $this->attrs[$idx] = $attrState;
+                        $this->links[$idx] = $linkState;
                         ++$col;
                     }
                     $i = $nextPos;
@@ -353,6 +437,7 @@ final class CellBuffer
                 $this->fg[$idx] = $fgState;
                 $this->bg[$idx] = $transparent && '' === $bgState ? $this->bg[$idx] : $bgState;
                 $this->attrs[$idx] = $attrState;
+                $this->links[$idx] = $linkState;
 
                 // For wide characters, mark continuation cell(s)
                 for ($w = 1; $w < $charWidth; ++$w) {
@@ -399,6 +484,21 @@ final class CellBuffer
     }
 
     /**
+     * Sets the background of a range of cells of a row, keeping their characters and their other attributes.
+     *
+     * @param string $background A background color code, like "48;2;30;30;46"
+     */
+    public function tint(int $row, int $col, int $columns, string $background): void
+    {
+        if ($row < 0 || $row >= $this->height) {
+            return;
+        }
+        for ($i = max(0, $col), $end = min($this->width, $col + $columns); $i < $end; ++$i) {
+            $this->bg[$row * $this->width + $i] = $background;
+        }
+    }
+
+    /**
      * Get the cursor position found during parsing, if any.
      *
      * @return array{row: int, col: int}|null
@@ -419,6 +519,77 @@ final class CellBuffer
     {
         $this->cursorRow = null;
         $this->cursorCol = null;
+    }
+
+    /**
+     * Joins the lines of boxes on a row with those that were under them, like the border of a tab drawn over the line
+     * under the tabs: each glyph takes the lines of the one under it too, then drops a line to its left or right that
+     * nothing goes on with there, or that goes on in a glyph drawn in the color of its background, which shows nothing.
+     *
+     * @param array<int, string> $under      The glyphs of boxes that were under the row, by column
+     * @param string|null        $background The background the cells without one are drawn on, as SGR parameters
+     */
+    public function joinBoxRow(int $row, array $under, ?string $background = null): void
+    {
+        $background ??= '';
+        $arms = LayoutEngine::BOX_ARMS;
+        $offset = $row * $this->width;
+        // The lines each cell shows: none for a glyph in the color of its background
+        $shown = [];
+        $joined = [];
+        for ($col = 0; $col < $this->width; ++$col) {
+            $idx = $offset + $col;
+            $glyph = $this->chars[$idx];
+            if (!isset($arms[$glyph])) {
+                continue;
+            }
+            $joined[$col] = $arms[$glyph] | (isset($under[$col], $arms[$under[$col]]) ? $arms[$under[$col]] : 0);
+            $shown[$col] = !self::sameColor($this->fg[$idx], '' !== $this->bg[$idx] ? $this->bg[$idx] : $background);
+            // A corner drawn in the color of a hidden side, under a side shown: in the color of that side, which goes
+            // down to the line, like CSS splits a corner between its sides
+            $above = $idx - $this->width;
+            if (!$shown[$col] && $row > 0 && 0 !== ($arms[$glyph] & 0b1000) && 0 !== (($arms[$this->chars[$above]] ?? 0) & 0b0100) && !self::sameColor($this->fg[$above], '' !== $this->bg[$above] ? $this->bg[$above] : $background)) {
+                $this->fg[$idx] = $this->fg[$above];
+                $shown[$col] = true;
+            }
+        }
+        foreach ($joined as $col => $lines) {
+            // Drawn in the color of its background, it shows nothing: a space, which shows nothing without colors too
+            if (!$shown[$col]) {
+                $this->chars[$offset + $col] = ' ';
+                continue;
+            }
+            if (!($shown[$col - 1] ?? false) || 0 === (($joined[$col - 1] ?? 0) & 0b0001)) {
+                $lines &= ~0b0010;
+            }
+            if (!($shown[$col + 1] ?? false) || 0 === (($joined[$col + 1] ?? 0) & 0b0010)) {
+                $lines &= ~0b0001;
+            }
+            // A line going one way only is drawn across the cell
+            $lines = match ($lines) {
+                0b1000, 0b0100 => 0b1100,
+                0b0010, 0b0001 => 0b0011,
+                default => $lines,
+            };
+            if (false !== $glyph = array_search($lines, $arms, true)) {
+                $this->chars[$offset + $col] = $glyph;
+            }
+        }
+    }
+
+    /**
+     * Whether a foreground and a background SGR state are the same color, like white on white.
+     */
+    private static function sameColor(string $fg, string $bg): bool
+    {
+        if ('' === $fg || '' === $bg) {
+            return false;
+        }
+        if (str_starts_with($fg, '38;') && str_starts_with($bg, '48;')) {
+            return substr($fg, 3) === substr($bg, 3);
+        }
+
+        return is_numeric($fg) && is_numeric($bg) && (int) $fg + 10 === (int) $bg;
     }
 
     /**
@@ -444,6 +615,7 @@ final class CellBuffer
             $currentFg = '';
             $currentBg = '';
             $currentAttrs = 0;
+            $currentLink = '';
             $rowOffset = $row * $width;
 
             for ($col = 0; $col < $width; ++$col) {
@@ -466,10 +638,18 @@ final class CellBuffer
                     $currentAttrs = $cellAttrs;
                 }
 
+                if ($this->links[$idx] !== $currentLink) {
+                    $currentLink = $this->links[$idx];
+                    $line .= "\x1b]8;".('' === $currentLink ? ';' : $currentLink)."\x07";
+                }
+
                 $line .= $chars[$idx];
             }
 
             // Reset at end of line
+            if ('' !== $currentLink) {
+                $line .= "\x1b]8;;\x07";
+            }
             if ('' !== $currentFg || '' !== $currentBg || 0 !== $currentAttrs) {
                 $line .= "\x1b[0m";
             }
@@ -548,14 +728,39 @@ final class CellBuffer
         $hasNum = false;
         /** @var int[] $codes */
         $codes = [];
+        // The sub-parameters after a colon, like the style of 4:3 for a curly underline: 4:0 turns it off, the
+        // others are an underline; the colors given with colons, like 58:2::r:g:b, are skipped
+        $sub = null;
 
         for ($p = $start; $p <= $end; ++$p) {
             $ch = $line[$p] ?? 'm';
             if ($ch >= '0' && $ch <= '9') {
                 $num = $num * 10 + \ord($ch) - 48;
                 $hasNum = true;
+            } elseif (':' === $ch) {
+                if (null === $sub) {
+                    $sub = [$hasNum ? $num : 0];
+                } else {
+                    $sub[] = $hasNum ? $num : 0;
+                }
+                $num = 0;
+                $hasNum = false;
             } elseif (';' === $ch || 'm' === $ch) {
-                $codes[] = $hasNum ? $num : 0;
+                if (null !== $sub) {
+                    $sub[] = $hasNum ? $num : 0;
+                    // The colors given with colons as with semicolons: 38:5:n, and 38:2:id:r:g:b, its color space id empty
+                    // or not, its tolerance after it; an unknown code ignored
+                    if ((38 === $sub[0] || 48 === $sub[0]) && 2 === ($sub[1] ?? null) && \count($sub) >= 5) {
+                        array_push($codes, $sub[0], 2, ...\array_slice($sub, \count($sub) >= 6 ? 3 : 2, 3));
+                    } elseif ((38 === $sub[0] || 48 === $sub[0]) && 5 === ($sub[1] ?? null) && isset($sub[2])) {
+                        array_push($codes, $sub[0], 5, $sub[2]);
+                    } elseif (4 === $sub[0]) {
+                        $codes[] = 0 === $sub[1] ? 24 : 4;
+                    }
+                    $sub = null;
+                } else {
+                    $codes[] = $hasNum ? $num : 0;
+                }
                 $num = 0;
                 $hasNum = false;
             }
@@ -614,6 +819,9 @@ final class CellBuffer
                     $fg = '38;2;'.$codes[$i + 2].';'.$codes[$i + 3].';'.$codes[$i + 4];
                     $i += 4;
                 }
+            } elseif (58 === $c && $i + 1 < $count) {
+                // The color of the underline, not kept: its parameters skipped
+                $i += 5 === $codes[$i + 1] ? 2 : (2 === $codes[$i + 1] ? 4 : 0);
             } elseif (48 === $c && $i + 1 < $count) {
                 if (5 === $codes[$i + 1] && $i + 2 < $count) {
                     $bg = '48;5;'.$codes[$i + 2];

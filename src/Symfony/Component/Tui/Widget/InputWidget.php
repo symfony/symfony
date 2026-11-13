@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Widget;
 
 use Symfony\Component\Tui\Ansi\AnsiUtils;
+use Symfony\Component\Tui\Ansi\Bidi;
 use Symfony\Component\Tui\Event\CancelEvent;
 use Symfony\Component\Tui\Event\ChangeEvent;
 use Symfony\Component\Tui\Event\SubmitEvent;
@@ -29,7 +30,7 @@ use Symfony\Component\Tui\Widget\Util\StringUtils;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class InputWidget extends AbstractWidget implements FocusableInterface
+class InputWidget extends AbstractWidget implements FocusableInterface, FieldSizingInterface
 {
     use BracketedPasteTrait;
     use FocusableTrait;
@@ -38,6 +39,16 @@ class InputWidget extends AbstractWidget implements FocusableInterface
     private Line $line;
     private string $prompt = '> ';
     private bool $submitted = false;
+    private string $placeholder = '';
+    private bool $readOnly = false;
+    private bool $masked = false;
+    /** Whether it is as wide as its value, like field-sizing: content */
+    private bool $contentSized = false;
+    private ?int $preferredColumns = null;
+    private ?int $maxLength = null;
+
+    /** @var list<string> */
+    private array $suggestions = [];
 
     public function __construct(
         ?Keybindings $keybindings = null,
@@ -111,17 +122,133 @@ class InputWidget extends AbstractWidget implements FocusableInterface
     }
 
     /**
+     * Sets the hint shown while the value is empty, styled by the "placeholder" sub-element.
+     *
      * @return $this
      */
-    public function setValue(string $value): static
+    public function setPlaceholder(string $placeholder): static
+    {
+        $placeholder = StringUtils::stripControlBytes(StringUtils::sanitizeUtf8(str_replace(["\r", "\n"], ' ', $placeholder)));
+        if ($this->placeholder !== $placeholder) {
+            $this->placeholder = $placeholder;
+            $this->invalidate();
+            $this->syncPlaceholderState();
+        }
+
+        return $this;
+    }
+
+    public function getPlaceholder(): string
+    {
+        return $this->placeholder;
+    }
+
+    /**
+     * A read-only input keeps its focus and cursor, but ignores edits.
+     *
+     * @return $this
+     */
+    public function setReadOnly(bool $readOnly = true): static
+    {
+        $this->readOnly = $readOnly;
+
+        return $this;
+    }
+
+    public function isReadOnly(): bool
+    {
+        return $this->readOnly;
+    }
+
+    /**
+     * Limits the characters typing or pasting can bring the value to, like
+     * maxlength; setValue() is not limited.
+     *
+     * @return $this
+     */
+    public function setMaxLength(?int $maxLength): static
+    {
+        $this->maxLength = null !== $maxLength ? max(0, $maxLength) : null;
+
+        return $this;
+    }
+
+    /**
+     * Sets values the input suggests, like a <datalist>: the first one that
+     * extends the value is drawn after the cursor, and Tab or Right takes it.
+     *
+     * @param list<string> $suggestions
+     *
+     * @return $this
+     */
+    public function setSuggestions(array $suggestions): static
+    {
+        $suggestions = array_values(array_filter(array_map(static fn (string $s) => StringUtils::stripControlBytes(StringUtils::sanitizeUtf8(str_replace(["\r", "\n"], ' ', $s))), $suggestions), static fn (string $s) => '' !== $s));
+        if ($this->suggestions !== $suggestions) {
+            $this->suggestions = $suggestions;
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns what the first matching suggestion adds to the value, null when none extends it.
+     */
+    public function getCompletion(): ?string
+    {
+        $value = $this->line->getText();
+        if ('' === $value || $this->masked) {
+            return null;
+        }
+        foreach ($this->suggestions as $suggestion) {
+            if (mb_strlen($suggestion) > mb_strlen($value) && 0 === mb_stripos($suggestion, $value)) {
+                return mb_substr($suggestion, mb_strlen($value));
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * A masked input draws a bullet for each character, like a password field.
+     *
+     * @return $this
+     */
+    public function setMasked(bool $masked = true): static
+    {
+        if ($this->masked !== $masked) {
+            $this->masked = $masked;
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    public function isMasked(): bool
+    {
+        return $this->masked;
+    }
+
+    /**
+     * @param bool $dispatch Whether to dispatch a ChangeEvent when the value changes, like an edit by the user
+     *
+     * @return $this
+     */
+    public function setValue(string $value, bool $dispatch = false): static
     {
         $value = StringUtils::stripControlBytes(StringUtils::sanitizeUtf8($value));
         // When setting a new value, move cursor to the end of the string
         $newCursor = \strlen($value);
         if ($this->line->getText() !== $value || $this->line->getCursor() !== $newCursor) {
+            $changed = $this->line->getText() !== $value;
             $this->line->setText($value);
             $this->line->setCursor($newCursor);
             $this->invalidate();
+            $this->syncPlaceholderState();
+            if ($dispatch && $changed) {
+                $this->dispatch(new ChangeEvent($this, $value));
+            }
         }
 
         return $this;
@@ -149,7 +276,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
 
         try {
             // Handle bracketed paste mode
-            if (null !== $pastedText = $this->processBracketedPaste($data)) {
+            if (null !== ($pastedText = $this->processBracketedPaste($data)) && !$this->readOnly) {
                 $this->handlePaste($pastedText);
             }
 
@@ -178,7 +305,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
             }
 
             // Deletion (line-level, then word-level, then char-level)
-            if ($kb->matches($data, 'delete_to_line_start')) {
+            if (!$this->readOnly && $kb->matches($data, 'delete_to_line_start')) {
                 if ('' !== $this->line->deleteToStart()) {
                     $this->notifyChange();
                 }
@@ -186,7 +313,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
                 return;
             }
 
-            if ($kb->matches($data, 'delete_to_line_end')) {
+            if (!$this->readOnly && $kb->matches($data, 'delete_to_line_end')) {
                 if ('' !== $this->line->deleteToEnd()) {
                     $this->notifyChange();
                 }
@@ -194,7 +321,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
                 return;
             }
 
-            if ($kb->matches($data, 'delete_word_backward')) {
+            if (!$this->readOnly && $kb->matches($data, 'delete_word_backward')) {
                 if ('' !== $this->line->deleteWordBackward()) {
                     $this->notifyChange();
                 }
@@ -202,7 +329,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
                 return;
             }
 
-            if ($kb->matches($data, 'delete_char_backward')) {
+            if (!$this->readOnly && $kb->matches($data, 'delete_char_backward')) {
                 if ($this->line->deleteCharBackward()) {
                     $this->notifyChange();
                 }
@@ -210,10 +337,18 @@ class InputWidget extends AbstractWidget implements FocusableInterface
                 return;
             }
 
-            if ($kb->matches($data, 'delete_char_forward')) {
+            if (!$this->readOnly && $kb->matches($data, 'delete_char_forward')) {
                 if ($this->line->deleteCharForward()) {
                     $this->notifyChange();
                 }
+
+                return;
+            }
+
+            // Take the suggestion: Tab, or Right at the end
+            if (!$this->readOnly && null !== ($completion = $this->getCompletion()) && $this->line->getCursor() === \strlen($this->line->getText())
+                && ("\t" === $data || $kb->matches($data, 'cursor_right'))) {
+                $this->setValue($this->line->getText().$completion, true);
 
                 return;
             }
@@ -257,7 +392,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
 
             // Regular character input
             $data = $kb->getParser()->decodePrintable($data) ?? $data;
-            if (!StringUtils::hasControlChars($data)) {
+            if (!$this->readOnly && !StringUtils::hasControlChars($data) && '' !== $data = $this->fit($data)) {
                 $this->line->insert($data);
                 $this->notifyChange();
             }
@@ -266,6 +401,58 @@ class InputWidget extends AbstractWidget implements FocusableInterface
                 $this->invalidate();
             }
         }
+    }
+
+    /**
+     * Makes it as wide as its value, or its placeholder when empty, and the cursor after it, like CSS field-sizing:
+     * content; a box set narrower still cuts it, scrolling.
+     */
+    public function setContentSized(bool $contentSized): void
+    {
+        if ($this->contentSized !== $contentSized) {
+            $this->contentSized = $contentSized;
+            $this->invalidate();
+        }
+    }
+
+    public function isContentSized(): bool
+    {
+        return $this->contentSized;
+    }
+
+    /**
+     * Sets the characters of the value it is as wide as where its content sizes it, like in a row or a table cell, its
+     * prompt and cursor besides, like the size attribute of HTML; null, the default, for the room it has.
+     */
+    public function setPreferredColumns(?int $columns): void
+    {
+        $columns = null !== $columns ? max(1, min(1000, $columns)) : null;
+        if ($this->preferredColumns !== $columns) {
+            $this->preferredColumns = $columns;
+            $this->invalidate();
+        }
+    }
+
+    /**
+     * The columns it takes where its content sizes it, see setPreferredColumns(); null for the room it has.
+     */
+    public function getPreferredColumns(): ?int
+    {
+        return null !== $this->preferredColumns ? AnsiUtils::visibleWidth($this->prompt) + $this->preferredColumns + 1 : null;
+    }
+
+    /**
+     * The columns its content takes: the prompt, the value (masked or not) or the placeholder, and the cursor.
+     */
+    public function getContentColumns(): int
+    {
+        $value = $this->line->getText();
+        $width = $this->masked ? (grapheme_strlen($value) ?: 0) : AnsiUtils::visibleWidth($value);
+        if ('' === $value) {
+            $width = AnsiUtils::visibleWidth($this->placeholder);
+        }
+
+        return AnsiUtils::visibleWidth($this->prompt) + $width + 1;
     }
 
     /**
@@ -296,6 +483,12 @@ class InputWidget extends AbstractWidget implements FocusableInterface
                 break;
             }
             $bytePos += \strlen($g);
+        }
+
+        // Masked, like a password field: one bullet per character, the cursor where it was
+        if ($this->masked) {
+            $graphemes = array_fill(0, \count($graphemes), '•');
+            $value = implode('', $graphemes);
         }
 
         $totalWidth = AnsiUtils::visibleWidth($value);
@@ -334,8 +527,27 @@ class InputWidget extends AbstractWidget implements FocusableInterface
         $afterCursor = implode('', \array_slice($visibleGraphemes, $cursorVisibleIndex + 1));
 
         $cursorStyle = $this->resolveElement('cursor');
-        $marker = $this->focused ? AnsiUtils::cursorMarker($cursorStyle->getCursorShape() ?? CursorShape::Block) : '';
-        $textWithCursor = $beforeCursor.$marker.$atCursor.$afterCursor;
+        $marker = $this->focused ? AnsiUtils::cursorMarker($cursorStyle->getCursorShape() ?? CursorShape::Block, $cursorStyle->getCaretColor()) : '';
+        if ('' === $value && '' !== $this->placeholder) {
+            // The cursor sits on the first character of the hint
+            $textWithCursor = $marker.$this->resolveElement('placeholder')->apply(AnsiUtils::truncateToWidth($this->placeholder, $availableColumns, ''));
+        } elseif (null !== ($completion = $this->getCompletion()) && $cursor === \strlen($value) && $cursorVisibleIndex === \count($visibleGraphemes)) {
+            // A suggestion completing the value: dim after the cursor, which sits on its first character
+            $room = max(0, $availableColumns - AnsiUtils::visibleWidth($beforeCursor));
+            $ghost = $this->resolveElement('suggestion')->apply(AnsiUtils::truncateToWidth($completion, $room, ''));
+            $textWithCursor = $beforeCursor.$marker.$ghost;
+        } else {
+            $textWithCursor = $beforeCursor.$marker.$atCursor.$afterCursor;
+        }
+
+        // Bidirectional text in visual order, in the direction of its first strong character, like unicode-bidi:
+        // plaintext; the cursor with the character it is on
+        // The hint too, shown while the value is empty, like the placeholder of a search field of an Arabic page
+        $shown = '' === $value ? $this->placeholder : $value;
+        if (!$this->masked && Bidi::isAvailable() && Bidi::hasRightToLeft($shown)) {
+            $level = Bidi::direction($shown) ?? 0;
+            $textWithCursor = Bidi::reorderLine($textWithCursor, $level);
+        }
 
         // Pad to width
         $visualLength = AnsiUtils::visibleWidth($textWithCursor);
@@ -448,7 +660,7 @@ class InputWidget extends AbstractWidget implements FocusableInterface
         $cleanText = StringUtils::decodeCtrlLetterKeys(StringUtils::sanitizeUtf8($text));
         // Clean pasted text - remove newlines
         $cleanText = str_replace(["\r\n", "\r", "\n"], '', $cleanText);
-        $cleanText = StringUtils::stripControlBytes($cleanText);
+        $cleanText = $this->fit(StringUtils::stripControlBytes($cleanText));
 
         if ('' === $cleanText) {
             return;
@@ -461,6 +673,24 @@ class InputWidget extends AbstractWidget implements FocusableInterface
     private function notifyChange(): void
     {
         $this->invalidate();
+        $this->syncPlaceholderState();
         $this->dispatch(new ChangeEvent($this, $this->line->getText()));
+    }
+
+    /**
+     * Cuts what an edit inserts to the room maxlength leaves, like browsers.
+     */
+    private function fit(string $text): string
+    {
+        if (null === $this->maxLength) {
+            return $text;
+        }
+
+        return mb_substr($text, 0, max(0, $this->maxLength - mb_strlen($this->line->getText())));
+    }
+
+    private function syncPlaceholderState(): void
+    {
+        $this->setState('placeholder-shown', '' !== $this->placeholder && '' === $this->line->getText());
     }
 }

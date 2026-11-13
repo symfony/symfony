@@ -1,0 +1,15 @@
+<!-- covers: css.properties.align-content css.properties.place-content -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .lines { display: flex; flex-wrap: wrap; height: 7; max-width: 24ch; border: 1px solid; column-gap: 1ch; margin-bottom: 1 }
+  .lines > span { background: blue }
+  .center { align-content: center }
+  .between { align-content: space-between }
+  .stretch { align-content: normal }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; height: 7; max-width: 24ch; border: 1px solid; place-content: space-evenly start }
+  .grid > span { background: green }
+</style>
+<div class="lines center"><span>centered lines</span><span>of tags</span><span>wrapping</span></div>
+<div class="lines between"><span>first line</span><span>at the top</span><span>last at the bottom</span></div>
+<div class="lines stretch"><span>stretched lines</span><span>by default</span><span>sharing rows</span></div>
+<div class="grid"><span>evenly</span><span>spaced</span><span>grid</span><span>rows</span></div>

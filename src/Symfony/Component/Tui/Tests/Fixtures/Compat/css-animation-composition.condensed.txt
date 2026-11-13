@@ -1,0 +1,3 @@
+⟨38;2;0;64;0m  replace: 2 columns, #004000⟨0m
+⟨38;2;64;64;0m     add: 3 + 2 columns, #400000 + #004000⟨0m
+⟨38;2;0;64;0m     accumulate, replace: 5 columns, #004000⟨0m

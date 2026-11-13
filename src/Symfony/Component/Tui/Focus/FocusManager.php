@@ -16,8 +16,11 @@ use Symfony\Component\Tui\Event\FocusEvent;
 use Symfony\Component\Tui\Input\Key;
 use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Render\RenderRequestorInterface;
+use Symfony\Component\Tui\Render\WidgetRect;
 use Symfony\Component\Tui\Widget\AbstractWidget;
 use Symfony\Component\Tui\Widget\FocusableInterface;
+use Symfony\Component\Tui\Widget\LinksInterface;
+use Symfony\Component\Tui\Widget\ParentInterface;
 
 /**
  * Owns the focused-widget state and handles focus navigation.
@@ -42,6 +45,12 @@ class FocusManager
 
     private Keybindings $keybindings;
 
+    /** @var \WeakMap<AbstractWidget, int> */
+    private \WeakMap $tabIndexes;
+
+    /** @var (\Closure(AbstractWidget): ?WidgetRect)|null Where a widget was drawn in the last frame, for reading-flow */
+    private ?\Closure $rectOf = null;
+
     /**
      * @internal constructed by the framework; access via {@see WidgetContext::getFocusManager()}
      */
@@ -52,6 +61,41 @@ class FocusManager
     ) {
         $bindings = array_merge(self::DEFAULT_BINDINGS, $keybindings?->all() ?? []);
         $this->keybindings = new Keybindings($bindings, $keybindings?->getParser());
+        $this->tabIndexes = new \WeakMap();
+    }
+
+    /**
+     * Set the position of a widget in the focus cycle, like HTML tabindex.
+     *
+     * Widgets with a positive index come first, in ascending order, then
+     * the ones with index 0 (the default) in the order they were added.
+     * A negative index takes the widget out of the cycle: it can still be
+     * focused with setFocus().
+     *
+     * @return $this
+     */
+    public function setTabIndex(AbstractWidget $widget, int $tabIndex): static
+    {
+        $this->tabIndexes[$widget] = $tabIndex;
+
+        return $this;
+    }
+
+    /**
+     * Tells where widgets were drawn in the last frame, which the visual reading flows (reading-flow: grid-rows) follow.
+     *
+     * @param (\Closure(AbstractWidget): ?WidgetRect)|null $rectOf
+     *
+     * @internal
+     */
+    public function setRectResolver(?\Closure $rectOf): void
+    {
+        $this->rectOf = $rectOf;
+    }
+
+    public function getTabIndex(AbstractWidget $widget): int
+    {
+        return $this->tabIndexes[$widget] ?? 0;
     }
 
     /**
@@ -82,6 +126,31 @@ class FocusManager
         $this->renderRequestor->requestRender();
     }
 
+    /** Whether a widget takes the focus by itself when nothing has it, see setTabStart() */
+    private bool $autoFocus = true;
+
+    /**
+     * Leaves the focus to the first Tab, like browsers on a page: nothing takes it by itself, the first widget attached
+     * nor the next one when the focused one goes away or is hidden.
+     * False gives it back to the first focusable, like before.
+     *
+     * @internal
+     */
+    public function setTabStart(bool $tabStart = true): void
+    {
+        $this->autoFocus = !$tabStart;
+    }
+
+    /**
+     * Whether the focus is left to the first Tab, see setTabStart().
+     *
+     * @internal
+     */
+    public function isTabStart(): bool
+    {
+        return !$this->autoFocus;
+    }
+
     /**
      * Get the currently focused widget.
      */
@@ -98,7 +167,7 @@ class FocusManager
         if (!\in_array($widget, $this->focusables, true)) {
             $this->focusables[] = $widget;
 
-            if (null === $this->focused) {
+            if ($this->autoFocus && null === $this->focused && $this->isInCycle($widget)) {
                 $this->setFocus($widget);
             }
         }
@@ -116,8 +185,7 @@ class FocusManager
         }
 
         if ($this->focused === $widget) {
-            $next = $this->focusables[0] ?? null;
-            $this->setFocus($next);
+            $this->setFocus($this->autoFocus ? $this->getCycle()[0] ?? null : null);
         }
 
         return $this;
@@ -158,8 +226,10 @@ class FocusManager
 
     public function handleInput(string $data): bool
     {
-        // Only handle focus navigation when there are multiple focusables
-        if (\count($this->focusables) <= 1) {
+        // Only handle focus navigation when there are multiple focusables, or one without the focus yet, like a page
+        // nobody went through yet, which the first Tab goes into
+        $count = \count($this->getCycle());
+        if (0 === $count || (1 === $count && null !== $this->focused)) {
             return false;
         }
 
@@ -180,18 +250,19 @@ class FocusManager
 
     public function focusNext(): ?FocusableInterface
     {
-        if (!$count = \count($this->focusables)) {
+        $cycle = $this->getCycle();
+        if (!$count = \count($cycle)) {
             return null;
         }
 
-        if (false === $index = array_search($this->focused, $this->focusables, true)) {
+        if (false === $index = array_search($this->focused, $cycle, true)) {
             $index = -1;
         } else {
             $index = (int) $index;
         }
 
         $nextIndex = ($index + 1) % $count;
-        $next = $this->focusables[$nextIndex];
+        $next = $cycle[$nextIndex];
         $this->setFocus($next);
 
         return $next;
@@ -199,21 +270,196 @@ class FocusManager
 
     public function focusPrevious(): ?FocusableInterface
     {
-        if (!$count = \count($this->focusables)) {
+        $cycle = $this->getCycle();
+        if (!$count = \count($cycle)) {
             return null;
         }
 
-        if (false === $index = array_search($this->focused, $this->focusables, true)) {
+        if (false === $index = array_search($this->focused, $cycle, true)) {
             $index = 0;
         } else {
             $index = (int) $index;
         }
 
         $previousIndex = ($index - 1 + $count) % $count;
-        $previous = $this->focusables[$previousIndex];
+        $previous = $cycle[$previousIndex];
         $this->setFocus($previous);
 
         return $previous;
+    }
+
+    /**
+     * Returns the widgets F6 cycles through, in order.
+     *
+     * Disabled widgets and the ones with a negative tab index are skipped.
+     *
+     * @return list<FocusableInterface&AbstractWidget>
+     */
+    public function getCycle(): array
+    {
+        $positive = [];
+        $default = [];
+        foreach ($this->focusables as $position => $widget) {
+            if (!$this->isInCycle($widget)) {
+                continue;
+            }
+            $tabIndex = $this->tabIndexes[$widget] ?? 0;
+            if ($tabIndex > 0) {
+                $positive[] = [$tabIndex, $position, $widget];
+            } else {
+                $default[] = $widget;
+            }
+        }
+
+        usort($positive, static fn (array $a, array $b) => [$a[0], $a[1]] <=> [$b[0], $b[1]]);
+
+        return [...array_column($positive, 2), ...$this->inReadingFlow($default)];
+    }
+
+    /**
+     * The widgets in the order of the reading flows around them, like CSS reading-flow: the ones inside a reading-flow
+     * container are ordered again among the places they take.
+     *
+     * @param list<FocusableInterface&AbstractWidget> $widgets
+     *
+     * @return list<FocusableInterface&AbstractWidget>
+     */
+    private function inReadingFlow(array $widgets): array
+    {
+        // The outermost reading-flow container of each widget
+        $groups = [];
+        foreach ($widgets as $index => $widget) {
+            $container = null;
+            for ($current = $widget->getParent(); null !== $current; $current = $current->getParent()) {
+                if (null !== $current->getContext()?->resolveStyle($current)->getReadingFlow()) {
+                    $container = $current;
+                }
+            }
+            if (null !== $container) {
+                $groups[spl_object_id($container)][0] = $container;
+                $groups[spl_object_id($container)][1][] = $index;
+            }
+        }
+
+        foreach ($groups as [$container, $indexes]) {
+            $keys = [];
+            foreach ($indexes as $index) {
+                $keys[$index] = $this->readingKey($container, $widgets[$index]);
+            }
+            $sorted = $indexes;
+            usort($sorted, static fn (int $a, int $b) => self::compareKeys($keys[$a], $keys[$b]) ?: $a <=> $b);
+            $placed = $widgets;
+            foreach ($indexes as $i => $index) {
+                $placed[$index] = $widgets[$sorted[$i]];
+            }
+            $widgets = $placed;
+        }
+
+        return $widgets;
+    }
+
+    /**
+     * Compares reading keys item by item, a shorter one first when it starts the other.
+     *
+     * @param list<int|float> $a
+     * @param list<int|float> $b
+     */
+    private static function compareKeys(array $a, array $b): int
+    {
+        foreach ($a as $i => $value) {
+            if (!isset($b[$i])) {
+                return 1;
+            }
+            if (0 !== $order = $value <=> $b[$i]) {
+                return $order;
+            }
+        }
+
+        return \count($a) <=> \count($b);
+    }
+
+    /**
+     * Where a widget comes in the reading flows from a container down to it: by each ancestor, the place of the child
+     * holding it.
+     *
+     * @return list<int|float>
+     */
+    private function readingKey(AbstractWidget $container, AbstractWidget $widget): array
+    {
+        $path = [];
+        for ($current = $widget; null !== $current && $current !== $container; $current = $current->getParent()) {
+            $path[] = $current;
+        }
+        $key = [];
+        $parent = $container;
+        foreach (array_reverse($path) as $child) {
+            $siblings = $parent instanceof ParentInterface ? $parent->all() : [];
+            $position = (int) array_search($child, $siblings, true);
+            $style = $parent->getContext()?->resolveStyle($parent);
+            $flow = $style?->getReadingFlow();
+            if (null === $flow) {
+                array_push($key, 0, 0, 0, $position);
+                $parent = $child;
+                continue;
+            }
+            $childStyle = $child->getContext()?->resolveStyle($child);
+            $rect = null !== $this->rectOf ? ($this->rectOf)($child) : null;
+            // The visual flows by where the children were drawn, the others by order then as written
+            [$first, $second] = match ($flow) {
+                'flex-visual', 'grid-rows' => null !== $rect ? [$rect->row, $rect->col] : [0, $position],
+                'grid-columns' => null !== $rect ? [$rect->col, $rect->row] : [0, $position],
+                'flex-flow', 'grid-order' => [$childStyle?->getOrder() ?? 0, $position],
+                default => [0, $position],
+            };
+            array_push($key, $childStyle?->getReadingOrder() ?? 0, $first, $second, $position);
+            $parent = $child;
+        }
+
+        return $key;
+    }
+
+    private function isInCycle(AbstractWidget $widget): bool
+    {
+        return ($this->tabIndexes[$widget] ?? 0) >= 0 && !\in_array('disabled', $widget->getStateFlags(), true) && self::isDrawn($widget);
+    }
+
+    /**
+     * Moves the focus off a widget that is not drawn, like one CSS hides once styled, to the first one of the cycle,
+     * not text with links, like the first Tab of a page, which would show a link as current, unclipping a skip link
+     * that shows on focus; to none without another.
+     *
+     * @internal
+     *
+     * @return bool Whether the focus moved
+     */
+    public function leaveUndrawn(): bool
+    {
+        if (null === $this->focused || null === $this->focused->getContext() || self::isDrawn($this->focused)) {
+            return false;
+        }
+        $this->setFocus($this->autoFocus ? array_values(array_filter($this->getCycle(), static fn (AbstractWidget $widget) => !$widget instanceof LinksInterface))[0] ?? null : null);
+
+        return true;
+    }
+
+    /**
+     * A widget hidden by its style, or inside a hidden one or one whose content is hidden, cannot take the focus.
+     */
+    private static function isDrawn(AbstractWidget $widget): bool
+    {
+        for ($current = $widget; null !== $current; $current = $current->getParent()) {
+            $style = $current->getContext()?->resolveStyle($current);
+            if (null !== $style && ($style->getHidden() || $style->getInvisible() || ($current !== $widget && $style->getContentHidden()))) {
+                return false;
+            }
+            // Like the HTML inert attribute, nothing under it takes the focus; interactivity: inert is inherited, which
+            // auto undoes
+            if ($current->hasState('inert') || ($current === $widget && true === $style?->getInert())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function notifyFocusChanged(?AbstractWidget $focused, ?AbstractWidget $previous): void

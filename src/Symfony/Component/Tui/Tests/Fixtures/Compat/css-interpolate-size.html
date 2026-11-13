@@ -1,0 +1,11 @@
+<!-- covers: css.properties.interpolate-size css.types.calc-size -->
+<!-- variant: open hover=.box -->
+<style>
+  :root { interpolate-size: allow-keywords }
+  .box { height: 2; overflow: hidden; border: 1px solid; max-width: 30ch; transition: height 300ms }
+  .box:hover { height: auto }
+  .sized { height: calc-size(auto, size); border: 1px solid; max-width: 30ch }
+</style>
+<p>Hovered, the box opens to its content through the heights between (see InterpolateSizeTest).</p>
+<div class="box"><p>one</p><p>two</p><p>three</p><p>four</p></div>
+<div class="sized"><p>calc-size(auto, size) is as tall as its content</p></div>

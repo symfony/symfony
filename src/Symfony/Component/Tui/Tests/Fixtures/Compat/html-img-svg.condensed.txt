@@ -1,0 +1,4 @@
+An SVG source, drawn at its size, half red and half blue:
+⟨38;2;255;0;0;48;2;255;0;0m▀▀▀▀⟨0m⟨38;2;0;0;255;48;2;0;0;255m▀▀▀▀⟨0m
+⟨38;2;255;0;0;48;2;255;0;0m▀▀▀▀⟨0m⟨38;2;0;0;255;48;2;0;0;255m▀▀▀▀⟨0m
+Not an image: its text alternative [broken]

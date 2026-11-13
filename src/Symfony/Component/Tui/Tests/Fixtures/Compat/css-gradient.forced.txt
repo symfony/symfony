@@ -1,0 +1,52 @@
+
+ A banner: three colors from left to right
+
+┌──────────────────────────────────────────────────────────┐
+│                                                          │
+│ A card, its gradient going down and to the right; ⟨1;7mthis⟨0m   │
+│ keeps its own background.                                │
+└──────────────────────────────────────────────────────────┘
+
+A radial glow
+
+
+
+After the glow.
+
+Repeating stripes, 2 columns each
+
+Repeating rings
+
+
+
+
+A circle at 20%
+
+
+
+
+Radii at a corner
+
+
+
+
+A conic wheel
+
+
+
+
+in oklch: through the hues between them
+
+in hsl longer hue: around the wheel the long way
+
+Repeating rays
+
+
+
+
+ Fading to transparent: the panel shows
+
+ Half a white veil over it, then none
+
+A stop at calc(100% - 2rem): the color to two rows from the
+end, then the fade

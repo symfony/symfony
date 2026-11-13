@@ -1,0 +1,11 @@
+<!-- covers: css.properties.width css.properties.flex-grow -->
+<style>
+  .group { display: flex; margin-bottom: 1 }
+  .group > * { border: 1px solid; padding: 0 1ch }
+  .field { flex: 1 1 auto; width: 1%; min-width: 0 }
+  .half { flex-grow: 1; width: 50% }
+  .share { width: 25% }
+</style>
+<div class="group"><span>@</span><span class="field">a field grows from its 1%</span><span>Go</span></div>
+<div class="group"><span class="half">half, growing</span><span>end</span></div>
+<div class="group"><span class="share">a quarter</span><span>does not grow</span></div>

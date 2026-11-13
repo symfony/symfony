@@ -23,9 +23,21 @@ use Symfony\Component\Tui\Style\Padding;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\TextAlign;
 use Symfony\Component\Tui\Style\VerticalAlign;
+use Symfony\Component\Tui\Terminal\ScreenBuffer;
 
 class StyleTest extends TestCase
 {
+    public function testEquals()
+    {
+        $style = new Style(color: 'red', padding: new Padding(1, 2, 1, 2));
+        $this->assertTrue($style->equals(new Style(color: 'red', padding: new Padding(1, 2, 1, 2))), 'Other objects of the same values.');
+        $style->getAnsiRestore();
+        $this->assertTrue($style->equals(new Style(color: 'red', padding: new Padding(1, 2, 1, 2))), 'The codes computed from it apart.');
+        $this->assertFalse($style->equals(new Style(color: 'blue', padding: new Padding(1, 2, 1, 2))));
+        $this->assertFalse((new Style())->withRows(0, 0)->equals((new Style())->withRows(null, null)), 'Strictly: 0 rows is not auto.');
+        $this->assertFalse($style->equals(null));
+    }
+
     public function testBorderWithSingleElementArray()
     {
         $style = Style::border([2], BorderPattern::DOUBLE, 'red');
@@ -262,6 +274,14 @@ class StyleTest extends TestCase
         $this->assertSame($expected, $style->apply($text));
     }
 
+    public function testComputedCssResetsAreKeptWhenStylesAreMerged()
+    {
+        $style = Style::mergeAll([new Style()->withCssCascade(), new Style(null, null, 'blue', 'red')]);
+        $screen = new ScreenBuffer(4, 1);
+        $screen->write($style->apply("\e[39mtext"));
+        $this->assertSame("\e[44m", $screen->getCells()[0][0]['style']);
+    }
+
     public function testWithoutLayoutPropertiesStripsAllLayoutProperties()
     {
         $style = new Style()
@@ -445,5 +465,41 @@ class StyleTest extends TestCase
         $this->assertSame(Align::Right, $result->getAlign());
         $this->assertSame(VerticalAlign::Center, $result->getVerticalAlign());
         $this->assertSame(2, $result->getFlex());
+    }
+
+    public function testDefaultsSetLaterWinWhenMerged()
+    {
+        $set = (new Style())->withWritingMode('vertical-rl')->withFontScale(2)->withCaretColor(Color::hex('#ff0000'));
+        $back = (new Style())->withWritingMode(null)->withFontScale(null)->withCaretColor(null);
+
+        $merged = Style::mergeAll([$set, $back]);
+        $this->assertNull($merged->getWritingMode());
+        $this->assertNull($merged->getFontScale());
+        $this->assertNull($merged->getCaretColor());
+
+        // Not set: the earlier ones stay
+        $merged = Style::mergeAll([$set, new Style()]);
+        $this->assertSame('vertical-rl', $merged->getWritingMode());
+        $this->assertSame(2, $merged->getFontScale());
+        $this->assertSame('#ff0000', $merged->getCaretColor()?->toHex());
+    }
+
+    public function testAConcealedStyleDrawsItsTextAsSpacesOnItsBackground()
+    {
+        $style = new Style(background: Color::hex('#0000ff'))->withConcealed();
+
+        $this->assertSame("\x1b[48;2;0;0;255m  \x1b[1m  \x1b[22m \x1b[49m", $style->apply("ab\x1b[1m一\x1b[22mc"));
+        $this->assertTrue(Style::mergeAll([$style, new Style()])->getConcealed());
+        $this->assertFalse(Style::mergeAll([$style, new Style()->withConcealed(false)])->getConcealed());
+        $this->assertSame('ab', Style::mergeAll([$style->withBackground(null), new Style()->withConcealed(false)])->apply('ab'));
+    }
+
+    public function testTheRowsAddedToPercentageHeightsAreMergedWithThem()
+    {
+        $style = new Style()->withRowsPercent(100, 50, -2, 1);
+
+        $this->assertSame([-2, 1], Style::mergeAll([$style, new Style()])->getRowsPercentOffsets());
+        $this->assertSame([0, 1], Style::mergeAll([$style, new Style()->withRowsPercent(80, null)])->getRowsPercentOffsets(), 'Another least height, without rows.');
+        $this->assertSame([0, 0], $style->withoutLayoutProperties()->getRowsPercentOffsets());
     }
 }

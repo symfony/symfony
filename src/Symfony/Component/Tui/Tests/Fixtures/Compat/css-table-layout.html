@@ -1,0 +1,21 @@
+<!-- covers: css.properties.table-layout css.properties.empty-cells css.properties.vertical-align -->
+<!-- variant: narrow columns=30 -->
+<style>
+  table { table-layout: fixed; width: 40ch; margin-bottom: 1 }
+  td { border: 1px solid }
+  .first { width: 8ch }
+  .collapse { border-collapse: collapse }
+  .auto { width: auto; max-width: none; table-layout: fixed }
+  .hide { empty-cells: hide; width: auto; table-layout: auto }
+  .hide td { background: #1e3a8a }
+  .valign td { border: 1px solid }
+  .valign .top { vertical-align: top }
+  .valign .bottom { vertical-align: bottom }
+</style>
+<table><tr><td>even</td><td>columns</td><td>c</td></tr><tr><td>a long cell in a later row wraps</td><td>x</td><td>y</td></tr></table>
+<table><tr><td class="first">set</td><td>the rest</td><td>shared</td></tr><tr><td>longer than its column</td><td>x</td><td>y</td></tr></table>
+<table><col style="width: 25ch"><tr><td>col width</td><td>rest</td></tr></table>
+<table class="collapse"><tr><td>collapsed</td><td>and</td><td>fixed</td></tr><tr><td>a long cell in a later row</td><td>x</td><td>y</td></tr></table>
+<table class="auto"><tr><td>no width:</td><td>auto</td></tr><tr><td>a long cell sizes its column</td><td>x</td></tr></table>
+<table class="hide"><tr><td>empty cells</td><td></td><td>are hidden</td></tr><tr><td> </td><td>keeping</td><td>their room</td></tr></table>
+<table class="valign"><tr><td>a cell<br>of three<br>lines</td><td>middle,<br>the default</td><td class="top">top</td><td class="bottom">bottom</td></tr></table>

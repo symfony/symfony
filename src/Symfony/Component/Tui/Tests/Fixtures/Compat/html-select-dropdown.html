@@ -1,0 +1,25 @@
+<!-- covers: html.elements.select html.elements.option css.selectors.picker css.selectors.picker-icon css.selectors.checkmark html.elements.selectedcontent -->
+<!-- variant: open keys=f6,enter -->
+<!-- variant: moved keys=f6,enter,down -->
+<!-- variant: chosen keys=f6,enter,down,enter -->
+<!-- variant: bordered focus=#bordered keys=enter -->
+<style>
+  select::picker(select) { border-color: cyan; background: #1e293b; padding-right: 2ch }
+  select::picker-icon { content: "⌄"; color: cyan }
+  select::checkmark { content: "✓"; color: lime }
+  select[size]::checkmark { content: none }
+  option .up { color: lime }
+  option .down { color: red }
+  /* The rules of the buttons of the page: not the field of a select, but the <button> of a customizable one */
+  button { border: 1px solid magenta }
+  #bordered { border: 1px solid; padding: 0 1ch }
+</style>
+<label>Fruit <select name="fruit"><option>Apple</option><option selected>Banana</option><option>Cherry</option></select></label>
+<p>The list opens over this text,</p>
+<p>and these lines,</p>
+<p>without moving them.</p>
+<select size="2" aria-label="Sized"><option>Size makes</option><option>a list</option></select>
+<select aria-label="Country" style="appearance: base-select"><button><selectedcontent></selectedcontent></button><option><span>FR</span> France</option><option selected>Japan <small>(JP)</small></option></select>
+<select aria-label="Server"><option><b>EU</b> Paris <span class="up">up</span></option><option selected><b>US</b> Boston <span class="down">down</span></option></select>
+<select id="bordered" aria-label="Bordered"><option>Its list opens below its border</option><option>Two</option></select>
+<p>under the select</p>

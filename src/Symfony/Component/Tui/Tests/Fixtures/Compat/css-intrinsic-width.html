@@ -1,0 +1,24 @@
+<!-- covers: css.properties.width css.properties.max-width -->
+<!-- variant: narrow columns=40 -->
+<style>
+div { border: 1px solid; margin-bottom: 1 }
+.fit { width: fit-content }
+.min { width: min-content }
+.max { width: max-content; margin: 0 auto }
+.stretch { width: -webkit-fill-available }
+.long { width: fit-content }
+.upto { width: fit-content(24ch) }
+.indented { width: fit-content; margin-left: 4ch }
+.narrow { width: min-content; margin-left: 4ch }
+.capped { max-width: min-content }
+</style>
+<div class="fit">Fit to the content</div>
+<div class="min">The narrowest box</div>
+<div class="max">Centered, as wide as it is</div>
+<div class="stretch">Stretched</div>
+<div class="upto">fit-content(24ch): the content, up to 24 columns</div>
+<div class="upto">Short</div>
+<div class="indented">Its margin outside its box</div>
+<div class="narrow">min-content indented</div>
+<div class="capped">max-width: min-content</div>
+<div class="long">A text much longer than the screen keeps to the room it gets and wraps there</div>

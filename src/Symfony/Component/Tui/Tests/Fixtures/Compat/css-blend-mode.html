@@ -1,0 +1,33 @@
+<!-- covers: css.properties.mix-blend-mode css.properties.isolation css.properties.background-blend-mode css.types.blend-mode -->
+<style>
+  .page { background: rgb(51 102 204); color: rgb(255 255 255); padding: 0 1ch }
+  .card { background: rgb(153 153 51); color: rgb(0 0 0) }
+  .multiply { mix-blend-mode: multiply }
+  .screen { mix-blend-mode: screen }
+  .difference { mix-blend-mode: difference }
+  .luminosity { mix-blend-mode: luminosity }
+  .plus { mix-blend-mode: plus-lighter }
+  .isolated { isolation: isolate }
+  .faded { opacity: .99 }
+  .invalid { mix-blend-mode: plus-ish }
+  .stripes { background: rgb(204 51 51) linear-gradient(to right, rgb(0 0 0), rgb(255 255 255)); background-blend-mode: screen, multiply; color: rgb(255 255 255) }
+  .bad-list { background: rgb(204 51 51) linear-gradient(to right, rgb(0 0 0), rgb(255 255 255)); background-blend-mode: screen, plus-lighter }
+  .layered { height: 2; width: 30ch; background: linear-gradient(to right, #ef4444, #3b82f6), repeating-linear-gradient(to right, #ffffff 0 2ch, #6b7280 2ch 4ch); background-blend-mode: multiply }
+</style>
+<div class="page">
+  <p class="card">Normal: the card as it is</p>
+  <p class="card multiply">Multiply: darker, the text black</p>
+  <p class="card screen">Screen: lighter, the text the page</p>
+  <p class="card difference">Difference</p>
+  <p class="card luminosity">Luminosity</p>
+  <p class="card plus">Plus lighter</p>
+  <p class="card invalid">An invalid mode is normal</p>
+  <div class="multiply"><p class="card">Inherited by what it contains</p></div>
+</div>
+<div class="isolated"><p class="card multiply">Isolated: nothing behind to blend with</p></div>
+<div class="page"><div class="isolated"><p class="card multiply">Isolated without a background: as it is</p></div></div>
+<div class="page"><div class="faded"><p class="card multiply">Inside a translucent group: as it is</p></div></div>
+<p class="card multiply">Over the terminal background</p>
+<p class="stripes">The gradient screened over the red, the first mode</p>
+<p class="bad-list">Plus lighter is not a background blend mode</p>
+<div class="layered">Two layers, the gradient multiplied over the stripes</div>

@@ -1,0 +1,27 @@
+
+Items inline-block on a wide
+screen, side by side; blocks
+on a narrow one, a line each:
+
+⟨38;2;255;255;255;48;2;29;78;216m Download⟨0m⟨48;2;29;78;216m                     ⟨0m
+⟨38;2;255;255;255;48;2;29;78;216m Docs⟨0m⟨48;2;29;78;216m                         ⟨0m
+⟨38;2;255;255;255;48;2;29;78;216m Community⟨0m⟨48;2;29;78;216m                    ⟨0m
+⟨38;2;255;255;255;48;2;29;78;216m Tools⟨0m⟨48;2;29;78;216m                        ⟨0m
+
+Of a width, kept where they
+are blocks:
+
+⟨38;2;255;255;255;48;2;29;78;216m Download⟨0m⟨48;2;29;78;216m   ⟨0m
+⟨38;2;255;255;255;48;2;29;78;216m Docs⟨0m⟨48;2;29;78;216m       ⟨0m
+
+┌────────────────────────────┐
+│ ⟨4mDonate⟨0m                     │
+└────────────────────────────┘
+a link, a block on a narrow
+screen only
+
+⟨4mAbout⟨0m
+⟨4mPhilosophy⟨0m
+⟨4mLicenses⟨0m
+
+after the menu

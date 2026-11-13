@@ -1,0 +1,16 @@
+<!-- covers: css.properties.all css.types.global_keywords -->
+<style>
+  .card { color: #fbbf24; border: 1px solid; padding: 0 1ch }
+  .card h2 { color: #60a5fa; text-decoration: underline; border-bottom: 1px solid }
+  .card h2.unset { all: unset }
+  .card h2.initial { all: initial }
+  .card button.revert { all: revert }
+  button { color: #ef4444; border: none }
+</style>
+<div class="card">
+  <h2>A styled heading</h2>
+  <h2 class="unset">all: unset, the card's color</h2>
+  <h2 class="initial">all: initial, the terminal's</h2>
+  <button class="revert">all: revert, the user agent's button</button>
+</div>
+<p><button style="all: unset">all: unset, no brackets</button> <button style="all: unset; all: revert">all: revert, the brackets back</button></p>

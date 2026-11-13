@@ -1,0 +1,17 @@
+<!-- covers: css.properties.font-variant-position -->
+<style>
+  .sup { font-variant-position: super }
+  .sub { font-variant-position: sub }
+  .back { vertical-align: baseline }
+  .other { vertical-align: middle }
+  .shorthand { font-variant: small-caps oldstyle-nums common-ligatures }
+  .shorthand-super { font-variant: super tabular-nums }
+  .petite { font-variant: all-petite-caps stylistic(fancy) }
+</style>
+<p>E = mc<span class="sup">2</span>, H<span class="sub">2</span>O</p>
+<p class="sup">123 (the whole block)</p>
+<p class="sub">x <span class="back">456 inherits it</span> <span class="other">789 middle: on the line</span></p>
+<p class="sup">Words: only when Unicode has every letter</p>
+<p class="shorthand">Caps with old style numbers 123</p>
+<p>x<span class="shorthand-super">2</span> through the shorthand</p>
+<p class="petite">Petite caps are small caps</p>

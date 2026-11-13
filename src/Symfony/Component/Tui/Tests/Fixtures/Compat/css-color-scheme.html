@@ -1,0 +1,14 @@
+<!-- covers: css.properties.color-scheme -->
+<!-- variant: light scheme=light -->
+<style>
+  p { color: light-dark(blue, yellow) }
+  .always-dark { color-scheme: dark }
+  .always-light { color-scheme: only light }
+  .both { color-scheme: light dark }
+</style>
+<main>
+  <p>Follows the terminal: blue when light, yellow when dark</p>
+  <section class="always-dark"><p>Always dark: yellow</p></section>
+  <section class="always-light"><p>Always light: blue</p></section>
+  <section class="both"><p>Both: follows the terminal</p></section>
+</main>

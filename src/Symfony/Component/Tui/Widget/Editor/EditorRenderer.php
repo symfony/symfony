@@ -12,7 +12,9 @@
 namespace Symfony\Component\Tui\Widget\Editor;
 
 use Symfony\Component\Tui\Ansi\AnsiUtils;
+use Symfony\Component\Tui\Ansi\Bidi;
 use Symfony\Component\Tui\Ansi\TextWrapper;
+use Symfony\Component\Tui\Style\Color;
 use Symfony\Component\Tui\Style\CursorShape;
 use Symfony\Component\Tui\Style\Style;
 
@@ -43,15 +45,18 @@ final class EditorRenderer
      * @param bool                                                                                   $focused            Whether the editor has focus
      * @param CursorShape                                                                            $cursorShape        Cursor shape
      * @param Style                                                                                  $frameStyle         Style for borders
+     * @param int|null                                                                               $scrollLeft         The columns scrolled past on the left, each line on one row; null to wrap them
      *
      * @return string[]
      */
-    public function render(array $lines, array $viewport, int $cursorLine, int $cursorCol, int $columns, int $maxDisplayRows, bool $verticallyExpanded, bool $focused, CursorShape $cursorShape, Style $frameStyle): array
+    public function render(array $lines, array $viewport, int $cursorLine, int $cursorCol, int $columns, int $maxDisplayRows, bool $verticallyExpanded, bool $focused, CursorShape $cursorShape, Style $frameStyle, ?int $scrollLeft = null, ?Color $caretColor = null, bool $framed = true): array
     {
         $result = [];
 
         // Top border (with scroll indicator if scrolled down)
-        $result[] = $this->renderFrameRow($viewport['lines_above'], '↑', $columns, $frameStyle);
+        if ($framed) {
+            $result[] = $this->renderFrameRow($viewport['lines_above'], '↑', $columns, $frameStyle);
+        }
 
         // Render visible lines
         $contentRows = [];
@@ -61,7 +66,7 @@ final class EditorRenderer
             $line = $lines[$lineIndex] ?? '';
             $isCursorLine = $lineIndex === $cursorLine;
 
-            $rendered = $this->renderLine($line, $isCursorLine, $cursorCol, $columns, $cursorShape, $focused);
+            $rendered = $this->renderLine($line, $isCursorLine, $cursorCol, $columns, $cursorShape, $focused, $scrollLeft, $caretColor);
             if (null !== $rendered['cursor_row']) {
                 $cursorRow = \count($contentRows) + $rendered['cursor_row'];
             }
@@ -97,7 +102,9 @@ final class EditorRenderer
         }
 
         // Bottom border (with scroll indicator if more content below)
-        $result[] = $this->renderFrameRow($viewport['lines_below'], '↓', $columns, $frameStyle);
+        if ($framed) {
+            $result[] = $this->renderFrameRow($viewport['lines_below'], '↓', $columns, $frameStyle);
+        }
 
         return $result;
     }
@@ -133,13 +140,14 @@ final class EditorRenderer
      *                                                      (one or more if wrapped), and which of
      *                                                      them carries the cursor
      */
-    private function renderLine(string $line, bool $isCursorLine, int $cursorCol, int $columns, CursorShape $cursorShape, bool $focused): array
+    private function renderLine(string $line, bool $isCursorLine, int $cursorCol, int $columns, CursorShape $cursorShape, bool $focused, ?int $scrollLeft = null, ?Color $caretColor = null): array
     {
-        $chunks = TextWrapper::wrapLineIntoChunks($line, $columns);
+        $chunks = null === $scrollLeft ? TextWrapper::wrapLineIntoChunks($line, $columns) : [self::visibleSlice($line, $scrollLeft, $columns)];
 
         $result = [];
         $cursorRow = null;
         $chunkCount = \count($chunks);
+        $level = Bidi::isAvailable() && Bidi::hasRightToLeft($line) ? Bidi::direction($line) ?? 0 : null;
 
         foreach ($chunks as $i => $chunk) {
             $chunkText = $chunk['text'];
@@ -164,7 +172,13 @@ final class EditorRenderer
 
             if ($hasCursor) {
                 $cursorRow ??= \count($result);
-                $displayLine = $this->renderCursorInChunk($chunkText, $cursorPosInChunk, $columns, $cursorShape, $focused);
+                $displayLine = $this->renderCursorInChunk($chunkText, $cursorPosInChunk, $columns, $cursorShape, $focused, $caretColor);
+            }
+
+            // Bidirectional text in visual order, each line of the text a paragraph in the direction of its first strong
+            // character, like unicode-bidi: plaintext; the cursor with the character it is on
+            if (null !== $level) {
+                $displayLine = Bidi::reorderLine($displayLine, $level);
             }
 
             // A grapheme cannot be split, so a chunk still overflows when one
@@ -187,9 +201,40 @@ final class EditorRenderer
     }
 
     /**
+     * The part of a line in view when it is scrolled sideways, as a chunk: a wide character cut on the left is a space.
+     *
+     * @return array{text: string, start_index: int, end_index: int}
+     */
+    private static function visibleSlice(string $line, int $from, int $columns): array
+    {
+        $text = '';
+        $start = null;
+        $byte = 0;
+        $column = 0;
+        foreach (grapheme_str_split($line) ?: [] as $grapheme) {
+            $width = AnsiUtils::visibleWidth($grapheme);
+            if ($column >= $from + $columns) {
+                break;
+            }
+            if ($column >= $from) {
+                // Its bytes where the line's are, the spaces of a cut character before them
+                $start ??= $byte - \strlen($text);
+                $text .= $grapheme;
+            } elseif ($column + $width > $from) {
+                $text .= str_repeat(' ', $column + $width - $from);
+            }
+            $column += $width;
+            $byte += \strlen($grapheme);
+        }
+
+        // The cursor past the end of what is in view, like at the end of the line
+        return ['text' => $text, 'start_index' => $start ?? $byte, 'end_index' => $byte];
+    }
+
+    /**
      * Render a chunk of text with the cursor marker inserted at the given byte position.
      */
-    private function renderCursorInChunk(string $chunkText, int $cursorPosInChunk, int $columns, CursorShape $cursorShape, bool $focused): string
+    private function renderCursorInChunk(string $chunkText, int $cursorPosInChunk, int $columns, CursorShape $cursorShape, bool $focused, ?Color $caretColor = null): string
     {
         $atCursor = '';
         $afterCursor = '';
@@ -228,7 +273,7 @@ final class EditorRenderer
             $atCursor = $chunkText[$cursorPosInChunk] ?? '';
         }
 
-        $marker = $focused ? AnsiUtils::cursorMarker($cursorShape) : '';
+        $marker = $focused ? AnsiUtils::cursorMarker($cursorShape, $caretColor) : '';
 
         if ('' !== $afterCursor || '' !== $atCursor) {
             // Cursor is on a character

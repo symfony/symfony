@@ -1,0 +1,23 @@
+<!-- covers: css.selectors.valid css.selectors.invalid css.selectors.user-valid css.selectors.user-invalid css.selectors.in-range css.selectors.out-of-range -->
+<style>
+  input:valid { border: 1px solid green }
+  input:invalid { border: 1px solid red }
+  input:out-of-range { font-weight: bold }
+  input:in-range { font-style: italic }
+  input[type="checkbox"]:invalid { color: red }
+  form:has(:invalid) > p { color: red }
+</style>
+<form>
+  <p>The form has an invalid field (red)</p>
+  <input aria-label="Name" required value="">
+  <input aria-label="Email" type="email" value="ada@example.com">
+  <input aria-label="Bad email" type="email" value="not an email">
+  <input aria-label="Code" pattern="[A-Z]{3}" value="ABC">
+  <input aria-label="Age" type="number" min="0" max="150" value="200">
+  <input aria-label="Count" type="number" min="1" value="3">
+  <input aria-label="Readonly" readonly required value="">
+  <label><input type="checkbox" required> Accept (box in red)</label>
+</form>
+<style>.message { display: none; color: red } input:invalid + .message { display: block } .tip:hover > .hint { position: absolute }</style>
+<div><input type="email" value="not-an-email" aria-label="Email"><span class="message">An error shown by input:invalid + .message</span></div>
+<div><input type="email" value="ada@example.com" aria-label="Email"><span class="message">Not shown: the value is valid</span></div>

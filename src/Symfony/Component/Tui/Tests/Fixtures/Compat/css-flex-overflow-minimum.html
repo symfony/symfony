@@ -1,0 +1,10 @@
+<!-- covers: css.properties.overflow css.properties.min-width css.properties.flex-shrink -->
+<style>
+  .row { display: flex; column-gap: 1ch; width: 20ch; border: 1px solid }
+  .name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis }
+</style>
+<p>A clipped item shrinks past its content before the icon beside it, like the file names of GitHub:</p>
+<div class="row"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M2 1h8l4 4v10H2z"/></svg><div class="name">.git-blame-ignore-revs</div></div>
+<div class="row"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M2 1h8l4 4v10H2z"/></svg><div class="name">.gitignore</div></div>
+<p>Links beside a search field, the row too narrow for both at their min-content, like the header of Cloudflare: the field ellipsized, not a word broken</p>
+<div style="display: flex; justify-content: space-between"><div style="display: flex"><span>Cloudflare</span><nav style="display: flex; margin-left: 1rem"><a href="#d" style="padding: 0 .5rem">Directory</a><a href="#a" style="padding: 0 .5rem">API</a><a href="#c" style="padding: 0 .5rem">Changelog</a></nav></div><div style="display: flex"><button>Search Ctrl K</button><a href="#l" style="flex-shrink: 0; padding: 0 .5rem">Log in</a></div></div>

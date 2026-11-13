@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Tests\Widget;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\CancelEvent;
@@ -24,6 +25,66 @@ use Symfony\Component\Tui\Widget\InputWidget;
 
 class InputTest extends TestCase
 {
+    #[RequiresPhpExtension('intl')]
+    public function testRightToLeftTextIsDrawnInVisualOrder()
+    {
+        $input = new InputWidget();
+        $input->setValue('שלום world');
+        $input->setFocused(true);
+        $plain = static fn (string $line) => preg_replace('/\e\[[0-9;:]*m|\e[\]_][^\x07]*\x07/', '', $line);
+
+        $line = $input->render(new RenderContext(20, 1))[0];
+        $this->assertSame('>  world םולש', rtrim($plain($line)), 'From the right, its first strong character being Hebrew.');
+        $this->assertLessThan(strpos($line, 'world'), strpos($line, AnsiUtils::CURSOR_MARKER_PREFIX), 'The cursor at its end, on the left.');
+
+        $input->setValue('hello');
+        $this->assertSame('> hello', rtrim($plain($input->render(new RenderContext(20, 1))[0])), 'Left to right text as is.');
+    }
+
+    public function testPlaceholderShowsWhileEmpty()
+    {
+        $input = new InputWidget();
+        $input->setPlaceholder("Search\nfiles");
+
+        $this->assertTrue($input->hasState('placeholder-shown'));
+        $this->assertSame('> Search files', rtrim(AnsiUtils::stripAnsiCodes($input->render(new RenderContext(40, 24))[0])));
+        $this->assertSame(40, AnsiUtils::visibleWidth($input->render(new RenderContext(40, 24))[0]));
+        $this->assertSame('> Sea', AnsiUtils::stripAnsiCodes($input->render(new RenderContext(5, 24))[0]), 'The hint is truncated without ellipsis.');
+
+        $input->handleInput('a');
+        $this->assertFalse($input->hasState('placeholder-shown'));
+        $this->assertSame('> a', rtrim(AnsiUtils::stripAnsiCodes($input->render(new RenderContext(40, 24))[0])));
+
+        $input->setValue('');
+        $this->assertTrue($input->hasState('placeholder-shown'));
+
+        $input->setPlaceholder('');
+        $this->assertFalse($input->hasState('placeholder-shown'));
+    }
+
+    public function testReadOnlyIgnoresEditsButMovesTheCursor()
+    {
+        $input = new InputWidget();
+        $input->setValue('abc');
+        $input->setReadOnly();
+        $changes = 0;
+        $input->onChange(static function () use (&$changes) { ++$changes; });
+
+        foreach (['x', "\x7f", "\x1b[3~", "\x15", "\x0b", "\x17", "\x1b[200~pasted\x1b[201~"] as $data) {
+            $input->handleInput($data);
+        }
+        $input->handleInput("\x1b[D");
+
+        $this->assertSame('abc', $input->getValue());
+        $this->assertSame(0, $changes);
+        $this->assertTrue($input->isReadOnly());
+
+        $submitted = null;
+        $input->onSubmit(static function (SubmitEvent $event) use (&$submitted) { $submitted = $event->getValue(); });
+        $input->handleInput("\r");
+        $this->assertSame('abc', $submitted, 'A read-only input still submits.');
+    }
+
     public function testRenderEmpty()
     {
         $input = new InputWidget();

@@ -1,0 +1,18 @@
+<!-- covers: css.properties.font-variant-numeric -->
+<style>
+  .frac { font-variant-numeric: diagonal-fractions }
+  .ord { font-variant-numeric: ordinal }
+  .zero { font-variant-numeric: slashed-zero tabular-nums }
+  .all { font-variant-numeric: lining-nums proportional-nums diagonal-fractions ordinal slashed-zero }
+  .shorthand { font-variant: small-caps diagonal-fractions ordinal }
+  .invalid { font-variant-numeric: diagonal-fractions stacked-fractions }
+  .stacked { font-variant-numeric: stacked-fractions oldstyle-nums }
+</style>
+<p class="frac">Add 1/2 cup, 3/4 spoon and 5/16 inch, on 12/25/2026</p>
+<p class="ord">The 1st, 2nd, 3rd and 21th of May, 4x4 and 1stars; le 1er, la 2e; 10px, 3am</p>
+<p class="zero">Room 101, 2030 and 0.05</p>
+<p class="all">1/4 of the 10th, 100/1000</p>
+<p class="shorthand">Small caps on the 2nd, 1/3 left</p>
+<p class="invalid">Two fraction values are invalid: 1/2</p>
+<p class="stacked">Stacked fractions are left to the font: 1/2</p>
+<p class="frac">Inherited by <span>1/8 of a span</span></p>

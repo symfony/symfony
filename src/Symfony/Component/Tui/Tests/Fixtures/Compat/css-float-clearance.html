@@ -1,0 +1,47 @@
+<!-- covers: css.properties.float css.properties.clear -->
+<!-- variant: narrow columns=36 -->
+<style>
+  .cleared::before { content: ""; display: block; clear: both }
+  .left::before { content: ""; display: block; clear: left }
+  .labelled::before { content: "Below the floats"; display: block; clear: both; color: cyan }
+  .menu { border: 1px solid; background: #374151 }
+  p { margin: 0 }
+  section { display: flow-root; margin-bottom: 1 }
+</style>
+<section>
+<div><span style="float: left">[logo]</span><span style="float: right; margin-top: 1">A tagline at the right</span></div>
+<div class="cleared menu"><p>A bordered menu whose ::before clears: its box beside the floats, its content below them</p></div>
+</section>
+<section>
+<div><span style="float: left">[L]</span><span style="float: right; height: 4; border: 1px solid">[R]</span></div>
+<div class="left menu"><p>A ::before that clears the left float only: its content below it, beside the right one still</p></div>
+</section>
+<section>
+<div><span style="float: left">[logo]</span></div>
+<div class="labelled menu"><p>The text of a ::before that clears goes below the float, then the content</p></div>
+</section>
+<section>
+<div><span style="float: left; height: 3">[tall]</span><div class="menu"><div class="cleared"><p>Nested: the floats of a block around reach it, its content below them</p></div></div></div>
+</section>
+<section>
+<div><span style="float: left">[logo]</span><span style="float: right; margin-top: 1">A tagline at the right</span></div>
+<div class="cleared menu">A bordered text whose ::before clears: its box beside the floats, its lines below them</div>
+</section>
+<section>
+<div><span style="float: left">[L]</span><span style="float: right; height: 4; border: 1px solid">[R]</span></div>
+<p class="left menu">A <b>text</b> whose ::before clears the left float only: its lines below it, beside the right one still</p>
+</section>
+<section>
+<div><span style="float: left">[logo]</span></div>
+<div class="labelled menu" style="text-align: center">The text of a ::before that clears goes below the float, then the text</div>
+</section>
+<section>
+<p style="margin-bottom: 1">A paragraph, its bottom margin above the block after it</p>
+<span style="float: left">[logo]</span>
+<div class="cleared" style="background: #374151"><p style="margin-top: 2">A block whose ::before clears: the margin of its first paragraph below the floats, the block where the margin above it puts it</p></div>
+</section>
+<section>
+<span style="float: left; height: 2">[logo]</span>
+<p class="cleared" style="writing-mode: vertical-rl; height: 3">縦書き</p>
+</section>
+<div><span style="float: left; height: 3; width: 5ch; border: 1px solid">F</span><div class="cleared"></div>After an empty block whose ::before clears: below the float</div>

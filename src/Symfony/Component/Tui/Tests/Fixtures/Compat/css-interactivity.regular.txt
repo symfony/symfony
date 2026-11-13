@@ -1,0 +1,6 @@
+⟨2m                                                            ⟨0m
+⟨2mThe form is busy: its buttons take neither the focus nor    ⟨0m
+⟨2mclicks.                                                     ⟨0m
+⟨2m                                                            ⟨0m
+⟨2m[ Inert ] [ Takes the focus back ]                          ⟨0m
+[ Interactive ]

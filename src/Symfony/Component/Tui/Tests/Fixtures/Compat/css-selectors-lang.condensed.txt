@@ -1,0 +1,10 @@
+ ⟨1;4;34mheading (underlined)⟨0m
+ ⟨1;4;32mheading 3 (underlined, green)⟨0m
+ ⟨1;34mbonjour (blue)⟨0m
+ ⟨1;34mbonjour du Québec (blue)⟨0m
+ ⟨1;3mguten Tag (italic, inherited)⟨0m
+                                               right to left
+ ⟨1mleft to right (bold)⟨0m
+ ⟨1mhello (closest is en, not blue)⟨0m
+ ⟨1mclosest is ltr (bold)⟨0m
+ ⟨1menglish, ⟨0m⟨1;3mdeutsch (italic)⟨0m

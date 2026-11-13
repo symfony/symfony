@@ -1,0 +1,29 @@
+<!-- covers: css.properties.filter css.types.filter-function -->
+<!-- variant: light scheme=light -->
+<style>
+  .card { background: #1d4ed8; color: #fde047; border: 1px solid #22c55e; padding: 0 1ch; margin-bottom: 1 }
+  .gray { filter: grayscale(1) }
+  .sepia { filter: sepia(100%) }
+  .hue { filter: hue-rotate(120deg) }
+  .dark { filter: brightness(0.5) contrast(1.5) }
+  .fade { filter: opacity(40%) }
+  .chain { filter: saturate(0.3) invert(0.2) }
+  .nested { filter: grayscale(1) } .nested b { color: #ef4444 }
+</style>
+<div class="card">no filter</div>
+<div class="card gray">grayscale(1)</div>
+<div class="card sepia">sepia(100%)</div>
+<div class="card hue">hue-rotate(120deg)</div>
+<div class="card dark">brightness(0.5) contrast(1.5)</div>
+<div class="card fade">opacity(40%)</div>
+<div class="card chain">saturate(0.3) invert(0.2)</div>
+<div class="card nested">what it contains: <b>red too</b></div>
+<p class="sepia">terminal text, sepia</p>
+<style>
+  .dropped { filter: drop-shadow(1ch 1 2px #333333) grayscale(1); border: 1px solid; max-width: 30ch; color: red }
+  .blurred { filter: blur(2px); color: green }
+  .both { box-shadow: 2ch 1 #444444; filter: drop-shadow(1ch 1 #ff0000); border: 1px solid; max-width: 20ch }
+</style>
+<div class="dropped">drop-shadow(): the shadow of the box, gray</div>
+<p class="blurred">blur(): accepted, not drawn</p>
+<div class="both">box-shadow wins</div>

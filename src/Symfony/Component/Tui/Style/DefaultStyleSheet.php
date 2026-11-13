@@ -75,12 +75,15 @@ final class DefaultStyleSheet
 
             // InputWidget
             InputWidget::class.'::cursor' => new Style(cursorShape: CursorShape::Block),
+            InputWidget::class.'::placeholder' => new Style(dim: true),
+            InputWidget::class.'::suggestion' => new Style(dim: true),
 
             // EditorWidget
             EditorWidget::class.'::cursor' => new Style(cursorShape: CursorShape::Block),
             EditorWidget::class.'::frame' => new Style()->withColor('gray'),
 
             // SelectListWidget
+            SelectListWidget::class.'::group' => new Style(bold: true),
             SelectListWidget::class.'::selected' => new Style()->withBold(),
             SelectListWidget::class.'::selected:focus' => new Style()->withBold(),
             SelectListWidget::class.'::description' => new Style()->withColor('gray'),

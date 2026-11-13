@@ -1,0 +1,19 @@
+<!-- covers: html.elements.textarea.cols html.elements.table.width html.elements.td.width html.elements.table.border html.elements.table.bgcolor html.elements.td.bgcolor html.elements.td.nowrap html.elements.td.align html.elements.p.align html.elements.input.size css.properties.field-sizing -->
+<style>.overridden { text-align: left }</style>
+<p align="center">Centered by its align attribute</p>
+<p align="center" class="overridden">A CSS rule wins over the attribute</p>
+<textarea cols="24" aria-label="Notes">24 columns wide</textarea>
+<input size="12" aria-label="Short" value="12 chars">
+<textarea rows="1" aria-label="Fixed">One line shown
+the second scrolled</textarea>
+<textarea rows="1" aria-label="Grows" style="field-sizing: content">field-sizing: content
+grows to two lines</textarea>
+<textarea cols="24" wrap="off" aria-label="Unwrapped">wrap="off": this line stays on one row</textarea>
+<table width="400" border="1" bgcolor="#1f2937">
+  <tr><td align="right" width="96">right</td><td nowrap bgcolor="#7c2d12">does not wrap at all here</td></tr>
+</table>
+<div style="display: flex; justify-content: space-between"><input placeholder="20 characters by default"><span>beside it, not squeezed</span></div>
+<table border="1" cellpadding="8"><tr><td>cellpadding</td><td>a column each side</td></tr></table>
+<table border="1" cellspacing="4"><tr><td>cellspacing</td><td>keeps the cells apart</td></tr></table>
+<table cellspacing="0" bgcolor="#1f2937"><tr><td bgcolor="#7c2d12">cellspacing="0"</td><td>side by side</td></tr></table>
+<hr width="50%" align="left">

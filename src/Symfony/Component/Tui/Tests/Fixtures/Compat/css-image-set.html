@@ -1,0 +1,13 @@
+<!-- covers: css.types.image.image-set -->
+<!-- variant: hidpi dppx=2 -->
+<style>
+  div { height: 2; margin-bottom: 1; color: white }
+  .set { background-image: image-set(url(quadrants.png) 1x, "magenta.png" 2x) }
+  .webkit { background: -webkit-image-set(url(magenta.png) 2x, url(quadrants.png) 1x) no-repeat }
+  .typed { background-image: image-set(url(nowhere.svg) type("image/svg+xml"), url(quadrants.png) type("image/png")) }
+  .gradient { background-image: image-set(linear-gradient(to right, red, blue) 1x, url(magenta.png) 2x) }
+</style>
+<div class="set">quadrants at 1x, magenta at 2x</div>
+<div class="webkit">The same, prefixed</div>
+<div class="typed">A type that cannot be drawn is left out</div>
+<div class="gradient">A gradient at 1x</div>

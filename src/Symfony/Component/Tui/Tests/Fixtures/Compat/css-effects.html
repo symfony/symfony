@@ -1,0 +1,25 @@
+<!-- covers: css.properties.box-shadow css.properties.opacity css.selectors.modal css.selectors.backdrop -->
+<!-- variant: modal modal=#confirm rows=16 -->
+<!-- variant: no-backdrop modal=#plain rows=16 -->
+<!-- variant: tinted modal=#tinted rows=16 -->
+<style>
+  .card { border: 1px solid; box-shadow: 1ch 1 0 #333333; max-width: 30ch; margin-bottom: 1 }
+  .soft { box-shadow: 2px 16px 4px rgba(0, 0, 0, .5); border: 1px solid; max-width: 30ch }
+  .inset { box-shadow: inset 0 0 4px black; border: 1px solid }
+  .inset-offset { box-shadow: inset 2ch 1 #444444; border: 1px solid; padding: 1 2; max-width: 30ch }
+  .both { box-shadow: 1ch 1 #333333, inset -1ch -1 #660000; padding: 0 1ch; max-width: 30ch; margin-bottom: 1 }
+  .faded { opacity: .5; color: #ffffff; background: #1e3a8a }
+  .ghost { opacity: 0.25 }
+  #plain::backdrop { background: none }
+  #tinted::backdrop { background: rgb(30 64 175 / 40%) }
+</style>
+<div class="card"><p>A card with a drop shadow</p></div>
+<div class="soft"><p>A soft shadow, rounded to cells</p></div>
+<div class="inset"><p>An inset shadow without an offset is not drawn</p></div>
+<div class="inset-offset"><p>An inset shadow along the top and left</p></div>
+<div class="both"><p>A drop shadow, and an inset one along the bottom and right</p></div>
+<p class="faded">Faded to half its colors</p>
+<p class="ghost">A ghost of a line</p>
+<dialog id="confirm"><p>Discard changes?</p><button>Discard</button></dialog>
+<dialog id="plain"><p>No backdrop</p></dialog>
+<dialog id="tinted"><p>A blue backdrop</p></dialog>

@@ -1,0 +1,50 @@
+<!-- covers: css.properties.text-transform css.properties.list-style css.properties.list-style-type css.properties.text-overflow css.properties.white-space css.properties.text-indent css.properties.content css.selectors.before css.selectors.after css.selectors.marker css.selectors.any-link css.selectors.link html.elements.abbr html.elements.cite html.elements.q html.elements.sub html.elements.sup html.elements.time html.elements.span -->
+<!-- variant: light scheme=light -->
+<style>
+  p.lead { color: cyan }
+  .hot { color: red; font-weight: bold }
+  .gone { display: none }
+  .tag::before { content: "#"; color: green }
+  .note::before { content: "\2139  " }
+  .ext::after { content: " (" attr(data-host) ")"; font-style: italic }
+  .upper { text-transform: uppercase }
+  .lower { text-transform: lowercase }
+  .cap { text-transform: capitalize }
+  ul.plain > li { list-style: none }
+  ol.roman > li { list-style-type: upper-roman }
+  ol.alpha > li { list-style-type: lower-alpha }
+  ul.arrows > li::marker { content: "→ "; color: magenta; font-weight: bold }
+  ol.roman > li::marker { color: yellow }
+  ul.stars > li { list-style-type: "* " }
+  .nowrap { white-space: nowrap; text-overflow: ellipsis }
+  .preline { white-space: pre-line }
+  .indent { text-indent: 4ch; max-width: 30ch }
+  .hang { padding-left: 2ch; text-indent: -2ch; max-width: 30ch }
+  .logo { display: block; width: 12ch; overflow: hidden; text-indent: -200px; border: 1px solid }
+  .logo.right { text-indent: 9999px }
+  .far { text-indent: 9999px; max-width: 20ch }
+  a:any-link { color: blue }
+  a:link { font-weight: bold }
+  p strong { color: yellow }
+</style>
+<p class="lead">Block <span class="hot">hot</span> back to cyan <span class="gone">hidden</span><span class="tag">tag</span></p>
+<p class="note">A <a href="https://symfony.com" class="ext" data-host="symfony.com">link</a>, <strong>strong</strong>, <abbr title="Cascading Style Sheets">CSS</abbr>, <cite>cite</cite>, <q>quote</q>, H<sub>2</sub>O, x<sup>2</sup>, <time>noon</time></p>
+<p class="upper">upper <em>case</em></p>
+<p class="lower">LOWER CASE</p>
+<p class="cap">capitalize every word</p>
+<ul><li>disc<ul><li>circle<ul><li>square</li></ul></li></ul></li></ul>
+<ul class="plain"><li>no marker</li></ul>
+<ol class="roman" start="3"><li>three</li><li>four</li></ol>
+<ol class="alpha" reversed><li>b</li><li>a</li></ol>
+<ul class="arrows"><li>custom marker</li></ul>
+<ul class="stars"><li>string marker</li></ul>
+<p class="nowrap">a line that does not wrap and is cut with an ellipsis when it is longer than the terminal</p>
+<p>no-break&nbsp;&nbsp;&nbsp;spaces are not collapsed</p>
+<p>&nbsp;</p>
+<p class="preline">pre-line   collapses spaces
+but keeps line breaks</p>
+<p class="indent">The first line of this paragraph starts four columns in, the next ones do not.</p>
+<p class="hang">A hanging indent: the first line goes over the padding, the next ones do not.</p>
+<a class="logo" href="#">A logo instead</a>
+<a class="logo right" href="#">A logo pushed right</a>
+<p class="far">First words out of sight, the others after them</p>

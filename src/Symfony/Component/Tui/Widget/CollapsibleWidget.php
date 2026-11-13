@@ -14,8 +14,11 @@ namespace Symfony\Component\Tui\Widget;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\CollapseEvent;
 use Symfony\Component\Tui\Event\ExpandEvent;
+use Symfony\Component\Tui\Event\ToggleEvent;
 use Symfony\Component\Tui\Input\Key;
 use Symfony\Component\Tui\Render\RenderContext;
+use Symfony\Component\Tui\Style\Style;
+use Symfony\Component\Tui\Widget\Util\StringUtils;
 
 /**
  * A collapsible panel with a summary header and expandable content.
@@ -48,10 +51,18 @@ use Symfony\Component\Tui\Render\RenderContext;
  *
  * @author Sylvain Blondeau <contact@sylvainblondeau.dev>
  */
-class CollapsibleWidget extends AbstractWidget implements FocusableInterface, ParentInterface
+class CollapsibleWidget extends AbstractWidget implements FocusableInterface, ParentInterface, ActivatableInterface, PartsInterface
 {
     use FocusableTrait;
     use KeybindingsTrait;
+    /** @var array<string, string> */
+    private array $summaryAttributes;
+    private ?Style $summaryStyle = null;
+    /** @var array{?string, ?string, bool} The content before and after the summary, like summary::after, and whether the latter is at the end of the line */
+    private array $summaryContent = [null, null, false];
+    private string $summaryEnd = '';
+    private bool $summaryHidden = false;
+    private ?string $marker = null;
 
     public function __construct(
         private string $summary,
@@ -61,14 +72,91 @@ class CollapsibleWidget extends AbstractWidget implements FocusableInterface, Pa
         private readonly string $collapsedSymbol = '▶',
         private readonly string $expandedSymbol = '▼',
     ) {
+        $this->summaryAttributes = [];
         if ($expanded) {
             $this->attachChild($content);
         }
+        $this->setState('open', $expanded);
     }
 
     public function getSummary(): string
     {
         return $this->summary;
+    }
+
+    /**
+     * The attributes of the summary, which a style provider matches like a <summary>.
+     *
+     * @param array<string, string> $attributes
+     *
+     * @return $this
+     */
+    public function setSummaryAttributes(array $attributes): static
+    {
+        $this->summaryAttributes = $attributes;
+        $this->invalidate();
+
+        return $this;
+    }
+
+    public function getParts(): array
+    {
+        return ['summary' => ['summary', $this->summaryAttributes]];
+    }
+
+    /**
+     * The style of the summary, and the content of its marker: the symbol, or none.
+     */
+    public function setPartStyle(string $part, ?Style $style, ?string $marker): void
+    {
+        $marker = null !== $marker ? StringUtils::stripControlBytes(StringUtils::sanitizeUtf8($marker)) : null;
+        // Computed again each cascade: equal values change nothing
+        if ('summary' !== $part || ($style == $this->summaryStyle && $marker === $this->marker)) {
+            return;
+        }
+        $this->summaryStyle = $style;
+        $this->marker = $marker;
+        $this->invalidate();
+    }
+
+    /**
+     * Sets whether the summary is drawn, like CSS summary { display: none }: its content alone then, while open.
+     */
+    public function setSummaryHidden(bool $hidden): void
+    {
+        if ($hidden !== $this->summaryHidden) {
+            $this->summaryHidden = $hidden;
+            $this->invalidate();
+        }
+    }
+
+    /**
+     * Sets the text drawn at the end of the line of the summary, like what floats at its right.
+     */
+    public function setSummaryEnd(string $text): static
+    {
+        $text = trim(StringUtils::stripControlBytes(StringUtils::sanitizeUtf8($text)));
+        if ($text !== $this->summaryEnd) {
+            $this->summaryEnd = $text;
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets the content drawn before and after the summary, like CSS summary::before and summary::after, the latter
+     * at the end of the line when $apart, like a "+" in a summary of display: flex; justify-content: space-between.
+     */
+    public function setPartContent(string $part, ?string $before, ?string $after, bool $apart = false): void
+    {
+        $clean = static fn (?string $text): ?string => null !== $text ? StringUtils::stripControlBytes(StringUtils::sanitizeUtf8($text)) : null;
+        $content = [$clean($before), $clean($after), $apart];
+        if ('summary' !== $part || $content === $this->summaryContent) {
+            return;
+        }
+        $this->summaryContent = $content;
+        $this->invalidate();
     }
 
     /**
@@ -148,7 +236,10 @@ class CollapsibleWidget extends AbstractWidget implements FocusableInterface, Pa
             $this->detachChild($this->content);
             $this->dispatch(new CollapseEvent($this));
         }
+        $this->setState('open', $this->expanded);
         $this->invalidate();
+        // Once the state is the new one, like the toggle event of a <details>
+        $this->dispatch(new ToggleEvent($this, $this->expanded ? 'closed' : 'open', $this->expanded ? 'open' : 'closed'));
     }
 
     public function expand(): void
@@ -173,13 +264,36 @@ class CollapsibleWidget extends AbstractWidget implements FocusableInterface, Pa
     public function render(RenderContext $context): array
     {
         $columns = $context->getColumns();
-        $symbol = $this->expanded ? $this->expandedSymbol : $this->collapsedSymbol;
-        $header = $this->applyElement('symbol', $symbol).' '.$this->applyElement('summary', $this->summary);
+        // The marker of the summary: the symbol, what summary::marker gives, or none (list-style: none)
+        $symbol = $this->marker ?? ($this->expanded ? $this->expandedSymbol : $this->collapsedSymbol);
+        [$before, $after, $apart] = $this->summaryContent;
+        // What floats at the right of the summary, like the source link of a method of rustdoc: at the end of the line
+        if ('' !== $this->summaryEnd) {
+            $after = $this->summaryEnd.($apart && null !== $after && '' !== $after ? ' '.$after : '');
+            $text = ($before ?? '').$this->summary.(!$this->summaryContent[2] ? $this->summaryContent[1] ?? '' : '');
+            $apart = true;
+        } else {
+            $text = ($before ?? '').$this->summary.($apart ? '' : $after ?? '');
+        }
+        $summary = $this->applyElement('summary', null !== $this->summaryStyle ? $this->summaryStyle->apply($text) : $text);
+        $header = '' === $symbol ? $summary : $this->applyElement('symbol', $symbol).(null !== $this->marker ? '' : ' ').$summary;
+        // The content after it at the end of the line, like the "+" of a summary of justify-content: space-between
+        if ($apart && null !== $after && '' !== $after) {
+            $after = $this->applyElement('summary', null !== $this->summaryStyle ? $this->summaryStyle->apply($after) : $after);
+            $header = AnsiUtils::truncateToWidth($header, max(0, $columns - AnsiUtils::visibleWidth($after) - 1)).str_repeat(' ', max(1, $columns - AnsiUtils::visibleWidth($header) - AnsiUtils::visibleWidth($after))).$after;
+        }
         $description = null !== $this->description ? $this->applyElement('description', $this->description) : null;
 
         $lines = [];
 
-        if (null !== $description && ($spacing = $columns - AnsiUtils::visibleWidth($header) - AnsiUtils::visibleWidth($description)) >= 1) {
+        // A summary of display: none, like those of the docs of rustdoc without scripts: its content alone, when open
+        if ($this->summaryHidden) {
+            $header = null;
+            $description = null;
+        }
+        if (null === $header) {
+            // Not drawn
+        } elseif (null !== $description && ($spacing = $columns - AnsiUtils::visibleWidth($header) - AnsiUtils::visibleWidth($description)) >= 1) {
             $lines[] = $header.str_repeat(' ', $spacing).$description;
         } else {
             $lines[] = AnsiUtils::truncateToWidth($header, $columns);
@@ -223,5 +337,12 @@ class CollapsibleWidget extends AbstractWidget implements FocusableInterface, Pa
             'expand' => [Key::RIGHT],
             'collapse' => [Key::LEFT],
         ];
+    }
+
+    public function activate(): bool
+    {
+        $this->toggle();
+
+        return true;
     }
 }

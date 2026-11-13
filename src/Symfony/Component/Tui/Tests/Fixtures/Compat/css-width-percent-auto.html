@@ -1,0 +1,9 @@
+<!-- covers: css.properties.width -->
+<style>
+  .toolbar { display: flex; flex-wrap: wrap; gap: 1ch }
+  .group { display: flex }
+  .group span { border: 1px solid; padding: 0 1ch }
+  .group input { flex: 1 1 auto; width: 1%; border: 1px solid }
+</style>
+<div class="toolbar"><button>1</button><div class="group"><span>@</span><input placeholder="a field"></div></div>
+<p>The field of width: 1% is as wide as its content in a group sized by its content, like CSS.</p>

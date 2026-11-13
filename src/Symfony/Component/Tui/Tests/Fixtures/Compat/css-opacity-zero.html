@@ -1,0 +1,11 @@
+<!-- covers: css.properties.opacity -->
+<!-- variant: checked focus=#toggle keys=space -->
+<style>
+  .toggle { position: absolute; opacity: 0 }
+  .menu { display: none } .toggle:checked ~ .menu { display: block; border: 1px solid }
+  .ghost { opacity: 0 }
+</style>
+<input type="checkbox" id="toggle" class="toggle"><label for="toggle">☰ Menu: a hidden checkbox, still focused and checked</label><nav class="menu"><p>Home</p><p>About</p></nav>
+<p>Before <span class="ghost">ghost</span> after: its room kept</p>
+<p class="ghost">A transparent paragraph keeps its row</p>
+<p>End</p>

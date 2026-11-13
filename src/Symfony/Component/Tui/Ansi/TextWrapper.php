@@ -139,12 +139,13 @@ final class TextWrapper
      * Returns lines where each line is <= width visible chars.
      * Active ANSI codes are preserved across line breaks.
      *
-     * @param string $text  Text to wrap (may contain ANSI codes and newlines)
-     * @param int    $width Maximum visible width per line
+     * @param string $text   Text to wrap (may contain ANSI codes and newlines)
+     * @param int    $width  Maximum visible width per line
+     * @param string $hyphen What ends a line broken at a soft hyphen
      *
      * @return string[] Array of wrapped lines (not padded to width)
      */
-    public static function wrapTextWithAnsi(string $text, int $width): array
+    public static function wrapTextWithAnsi(string $text, int $width, string $hyphen = '-'): array
     {
         if ('' === $text) {
             return [''];
@@ -157,7 +158,7 @@ final class TextWrapper
 
         // Fast path: single line (no newlines), skip explode/tracker overhead
         if (!str_contains($text, "\n") && !str_contains($text, "\r")) {
-            return self::wrapSingleLine($text, $width);
+            return self::wrapSingleLine($text, $width, $hyphen);
         }
 
         // Handle newlines by processing each line separately
@@ -174,7 +175,7 @@ final class TextWrapper
 
             // Prepend active ANSI codes from previous lines (except for first line)
             $prefix = $result ? $tracker->getActiveCodes() : '';
-            $wrapped = self::wrapSingleLine($prefix.$inputLine, $width);
+            $wrapped = self::wrapSingleLine($prefix.$inputLine, $width, $hyphen);
             array_push($result, ...$wrapped);
 
             // Update tracker with codes from this line for next iteration
@@ -188,32 +189,117 @@ final class TextWrapper
     }
 
     /**
-     * Wrap a single line of text.
+     * Wrap text with ANSI codes preserved, each line in a width of its own, like text flowing around a float.
+     *
+     * @param \Closure(int): int $widthAt The width of a line, by its index from 0
+     * @param string             $hyphen  What ends a line broken at a soft hyphen
      *
      * @return string[]
      */
-    private static function wrapSingleLine(string $line, int $width): array
+    public static function wrapTextWithAnsiWidths(string $text, \Closure $widthAt, string $hyphen = '-'): array
+    {
+        if ('' === $text) {
+            return [''];
+        }
+
+        // A row without room, like one beside floats as wide as the line, stays empty: the text goes on below it, like
+        // the line boxes of CSS moving down past the floats, however tall; the rows only go forward, so that each is
+        // asked once, a hundred thousand at most
+        $rows = [];
+        $rowAt = static function (int $index) use (&$rows, $widthAt): int {
+            while (\count($rows) <= $index) {
+                $row = [] === $rows ? 0 : end($rows) + 1;
+                for ($skipped = 0; $skipped < 100_000 && $widthAt($row) <= 0; ++$skipped) {
+                    ++$row;
+                }
+                $rows[] = $row;
+            }
+
+            return $rows[$index];
+        };
+
+        $result = [];
+        $placed = 0;
+        $tracker = new AnsiCodeTracker();
+        foreach (self::splitLines($text) as $inputLine) {
+            $prefix = $placed > 0 ? $tracker->getActiveCodes() : '';
+            $offset = $placed;
+            foreach (self::wrapSingleLine($prefix.$inputLine, static fn (int $index): int => max(1, $widthAt($rowAt($offset + $index))), $hyphen) as $index => $line) {
+                $row = $rowAt($offset + $index);
+                while (\count($result) < $row) {
+                    $result[] = '';
+                }
+                $result[] = $line;
+                ++$placed;
+            }
+            if (str_contains($inputLine, "\x1b")) {
+                $tracker->processText($inputLine);
+            }
+        }
+
+        return $result ?: [''];
+    }
+
+    /**
+     * Wrap a single line of text.
+     *
+     * @param int|\Closure(int): int $widths The width of the lines, or of each line by its index
+     * @param string                 $hyphen What ends a line broken at a soft hyphen
+     *
+     * @return string[]
+     */
+    private static function wrapSingleLine(string $line, int|\Closure $widths, string $hyphen = '-'): array
     {
         if ('' === $line) {
             return [''];
         }
 
-        $visibleLength = AnsiUtils::visibleWidth($line);
+        $wrapped = [];
+        // The width of each line asked once: a long word broken asks for those of the lines after it
+        if ($widths instanceof \Closure) {
+            $known = [];
+            $widths = static function (int $line) use ($widths, &$known): int {
+                return $known[$line] ??= $widths($line);
+            };
+        }
+        $width = \is_int($widths) ? $widths : $widths(0);
+
+        // A soft hyphen is drawn only where the line breaks: elsewhere it takes no room
+        $softHyphens = str_contains($line, "\u{00AD}");
+        $visibleLength = AnsiUtils::visibleWidth($softHyphens ? str_replace("\u{00AD}", '', $line) : $line);
         if ($visibleLength <= $width) {
-            return [$line];
+            return [$softHyphens ? str_replace("\u{00AD}", '', $line) : $line];
         }
 
-        $wrapped = [];
         $tracker = new AnsiCodeTracker();
         $tokens = self::splitIntoTokensWithAnsi($line);
+        // Words joined by no-break spaces too wide for a line, like the words of an inline block or of a nowrap element:
+        // broken at those spaces rather than inside a word
+        if (str_contains($line, "\u{00A0}")) {
+            $tokens = self::splitWideAtNoBreakSpaces($tokens, self::narrowest($widths, 0, $width));
+        }
 
         $currentLine = '';
         $currentVisibleLength = 0;
+        $afterSoftHyphen = false;
 
-        foreach ($tokens as $token) {
+        // The rest of the word after each piece of it, which a piece before a soft hyphen goes with unless the hyphen fits
+        $rest = [];
+        if ($softHyphens) {
+            $after = 0;
+            for ($i = \count($tokens) - 1; $i >= 0; --$i) {
+                $rest[$i] = $after;
+                $after = !$tokens[$i]['is_whitespace'] || ($tokens[$i]['soft_hyphen'] ?? false) ? $tokens[$i]['width'] + $after : 0;
+            }
+        }
+        $hyphenWidth = AnsiUtils::visibleWidth($hyphen);
+
+        foreach ($tokens as $index => $token) {
             $tokenText = $token['text'];
             $tokenVisibleLength = $token['width'];
             $isWhitespace = $token['is_whitespace'];
+            $hyphenate = $afterSoftHyphen;
+            $afterSoftHyphen = $token['soft_hyphen'] ?? false;
 
             // Token itself is too long - break it character by character
             if ($tokenVisibleLength > $width && !$isWhitespace) {
@@ -222,17 +308,19 @@ final class TextWrapper
                         $currentLine .= $lineEndReset;
                     }
                     $wrapped[] = rtrim($currentLine);
+                    $width = \is_int($widths) ? $widths : $widths(\count($wrapped));
                     $currentLine = '';
                     $currentVisibleLength = 0;
                 }
 
-                // Break long token
-                $broken = self::breakLongWord($tokenText, $width, $tracker);
+                // Break long token: in pieces as wide as the narrowest of the lines it goes on
+                $broken = self::breakLongWord($tokenText, self::narrowest($widths, \count($wrapped), $width), $tracker);
                 $brokenLines = $broken['lines'];
                 $lastIndex = \count($brokenLines) - 1;
                 for ($i = 0; $i < $lastIndex; ++$i) {
                     $wrapped[] = rtrim($brokenLines[$i]);
                 }
+                $width = \is_int($widths) ? $widths : $widths(\count($wrapped));
                 $currentLine = $brokenLines[$lastIndex] ?? '';
                 $currentVisibleLength = $broken['last_width'];
                 continue;
@@ -240,6 +328,14 @@ final class TextWrapper
 
             // Check if adding this token would exceed width
             $totalNeeded = $currentVisibleLength + $tokenVisibleLength;
+            // A piece of a word before a soft hyphen: the line can break after it only with room for the hyphen
+            if (!$isWhitespace && ($tokens[$index + 1]['soft_hyphen'] ?? false) && $totalNeeded <= $width && $totalNeeded + $rest[$index] > $width && $totalNeeded + $hyphenWidth > $width) {
+                $totalNeeded = $width + 1;
+            }
+
+            if (($token['break_before'] ?? false) && $currentVisibleLength > 0) {
+                $totalNeeded = $width + 1;
+            }
 
             if ($totalNeeded > $width && $currentVisibleLength > 0) {
                 // The codes of this whitespace can end the style of the previous word, so they end this line
@@ -249,13 +345,27 @@ final class TextWrapper
                     $token['has_ansi'] = false;
                     $ending = str_replace([' ', "\t"], '', $tokenText);
                 }
-
-                // Trim trailing whitespace, then add underline reset
-                $lineToWrap = rtrim($currentLine).$ending;
+                // Trim trailing whitespace, then add underline reset; a break at a soft hyphen shows it
+                $lineToWrap = (str_contains($currentLine, "\u{200B}") ? preg_replace('/[ \t\x{200B}]+$/u', '', $currentLine) ?? rtrim($currentLine) : rtrim($currentLine)).$ending.($hyphenate && !$isWhitespace && $currentVisibleLength + AnsiUtils::visibleWidth($hyphen) <= $width ? $hyphen : '');
                 if ('' !== $lineEndReset = $tracker->getLineEndReset()) {
                     $lineToWrap .= $lineEndReset;
                 }
                 $wrapped[] = $lineToWrap;
+                $width = \is_int($widths) ? $widths : $widths(\count($wrapped));
+
+                // A word too long for the narrower line it goes on: broken there
+                if (!$isWhitespace && $tokenVisibleLength > $width) {
+                    $broken = self::breakLongWord($tokenText, self::narrowest($widths, \count($wrapped), $width), $tracker);
+                    $brokenLines = $broken['lines'];
+                    $lastIndex = \count($brokenLines) - 1;
+                    for ($i = 0; $i < $lastIndex; ++$i) {
+                        $wrapped[] = rtrim($brokenLines[$i]);
+                    }
+                    $width = \is_int($widths) ? $widths : $widths(\count($wrapped));
+                    $currentLine = $brokenLines[$lastIndex] ?? '';
+                    $currentVisibleLength = $broken['last_width'];
+                    continue;
+                }
 
                 if ($isWhitespace) {
                     // Don't start new line with whitespace
@@ -282,13 +392,68 @@ final class TextWrapper
 
         // Trailing whitespace kept before an ANSI reset (e.g. from a highlighted
         // blank line) can push a line past the requested width; clamp each line.
-        return $wrapped ? array_map(static fn (string $line): string => AnsiUtils::truncateToWidth($line, $width, ''), $wrapped) : [''];
+        if (!$wrapped) {
+            return [''];
+        }
+
+        return \is_int($widths)
+            ? array_map(static fn (string $line): string => AnsiUtils::truncateToWidth($line, $widths, ''), $wrapped)
+            : array_map(static fn (string $line, int $index): string => AnsiUtils::truncateToWidth($line, $widths($index), ''), $wrapped, array_keys($wrapped));
+    }
+
+    /**
+     * Splits the words wider than a line at their no-break spaces, each run of them a whitespace token.
+     *
+     * @param array<int, array{text: string, width: int, is_whitespace: bool, has_ansi: bool, soft_hyphen?: bool}> $tokens
+     *
+     * @return array<int, array{text: string, width: int, is_whitespace: bool, has_ansi: bool, soft_hyphen?: bool, break_before?: bool}>
+     */
+    private static function splitWideAtNoBreakSpaces(array $tokens, int $width): array
+    {
+        $split = [];
+        foreach ($tokens as $token) {
+            if ($token['is_whitespace'] || $token['width'] <= $width || !str_contains($token['text'], "\u{00A0}")) {
+                $split[] = $token;
+                continue;
+            }
+            // On a line of its own, like an inline block too wide for the rest of the line
+            $first = true;
+            foreach (preg_split('/((?:\x{00A0})+)/u', $token['text'], -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY) ?: [$token['text']] as $piece) {
+                $split[] = [
+                    'text' => $piece,
+                    'width' => AnsiUtils::visibleWidth($piece),
+                    'is_whitespace' => '' === str_replace("\u{00A0}", '', $piece),
+                    'has_ansi' => str_contains($piece, "\x1b"),
+                    'break_before' => $first,
+                ];
+                $first = false;
+            }
+        }
+
+        return $split;
+    }
+
+    /**
+     * The narrowest of the next lines, from one: the width the pieces of a broken word fit in, whatever line they land on.
+     *
+     * @param int|\Closure(int): int $widths
+     */
+    private static function narrowest(int|\Closure $widths, int $from, int $width): int
+    {
+        if (\is_int($widths)) {
+            return $widths;
+        }
+        for ($line = $from; $line < $from + 64; ++$line) {
+            $width = min($width, $widths($line));
+        }
+
+        return max(1, $width);
     }
 
     /**
      * Split text into tokens (words and whitespace runs) while keeping ANSI codes attached.
      *
-     * @return array<int, array{text: string, width: int, is_whitespace: bool, has_ansi: bool}>
+     * @return array<int, array{text: string, width: int, is_whitespace: bool, has_ansi: bool, soft_hyphen?: bool}>
      */
     private static function splitIntoTokensWithAnsi(string $text): array
     {
@@ -393,6 +558,31 @@ final class TextWrapper
             ];
         }
 
+        // A zero-width space (<wbr>) or a soft hyphen is where a word can break: a whitespace token that takes no room
+        if (str_contains($text, "\u{200B}") || str_contains($text, "\u{00AD}")) {
+            $split = [];
+            foreach ($tokens as $token) {
+                if ($token['is_whitespace'] || (!str_contains($token['text'], "\u{200B}") && !str_contains($token['text'], "\u{00AD}"))) {
+                    $split[] = $token;
+                    continue;
+                }
+                $pieces = preg_split("/(\u{200B}|\u{00AD})/u", $token['text'], -1, \PREG_SPLIT_DELIM_CAPTURE) ?: [$token['text']];
+                foreach ($pieces as $k => $piece) {
+                    if (1 === $k % 2) {
+                        // The soft hyphen itself is not drawn: a hyphen is added where the line breaks
+                        $split[] = "\u{00AD}" === $piece
+                            ? ['text' => '', 'width' => 0, 'is_whitespace' => true, 'has_ansi' => false, 'soft_hyphen' => true]
+                            : ['text' => "\u{200B}", 'width' => 0, 'is_whitespace' => true, 'has_ansi' => false];
+                        continue;
+                    }
+                    if ('' !== $piece) {
+                        $split[] = ['text' => $piece, 'width' => AnsiUtils::visibleWidth($piece), 'is_whitespace' => false, 'has_ansi' => str_contains($piece, "\x1b")];
+                    }
+                }
+            }
+            $tokens = $split;
+        }
+
         if (!preg_match(self::CJK_PATTERN, $text)) {
             return $tokens;
         }
@@ -406,7 +596,8 @@ final class TextWrapper
     }
 
     /**
-     * Split a word into one token per CJK grapheme, as a line can break between any two of them.
+     * Split a word into one token per CJK grapheme, as a line can break between any two of them, but around a word
+     * joiner.
      *
      * @return list<array{text: string, width: int, is_whitespace: bool, has_ansi: bool}>
      */
@@ -415,6 +606,7 @@ final class TextWrapper
         $pieces = [];
         $current = '';
         $pendingAnsi = '';
+        $glue = false;
         $length = \strlen($word);
 
         for ($i = 0; $i < $length;) {
@@ -430,7 +622,12 @@ final class TextWrapper
             $i = $end;
 
             foreach (grapheme_str_split($text) ?: [$text] as $grapheme) {
-                if (preg_match(self::CJK_PATTERN, $grapheme)) {
+                // A word joiner (U+2060) keeps the characters on both sides of it together, like a ruby base
+                $joined = "\u{2060}" === $grapheme || $glue;
+                $glue = "\u{2060}" === $grapheme;
+                if ($joined && '' === $current && $pieces) {
+                    $pieces[array_key_last($pieces)] .= $pendingAnsi.$grapheme;
+                } elseif (!$joined && preg_match(self::CJK_PATTERN, $grapheme)) {
                     if ('' !== $current) {
                         $pieces[] = $current;
                         $current = '';

@@ -1,0 +1,19 @@
+<!-- covers: css.properties.flex-basis css.properties.flex css.properties.visibility -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .row { display: flex; gap: 1ch }
+  .row > p { background: blue }
+  .fixed > p { flex: 0 0 12ch }
+  .grow > .a { flex: 1 1 20ch } .grow > .b { flex: 1 1 0 }
+  .basis > p { flex-basis: 8ch }
+  .ghost { visibility: hidden }
+  .third > p { flex: 0 0 30% }
+</style>
+<main>
+  <div class="row fixed"><p>12 columns</p><p>12 columns too</p></div>
+  <div class="row grow"><p class="a">20 + half the rest</p><p class="b">half the rest</p></div>
+  <div class="row basis"><p>8 wide</p><p class="ghost">invisible, keeps its room</p><p>after the gap</p></div>
+  <div class="row third"><p>30% of the row</p><p>30% too</p></div>
+</main>
+<p>flex: none and a width: that width, its basis, like the slides of a carousel, not the width of its content</p>
+<div style="display: flex"><div style="width: 20ch; flex: none; border: 1px solid">slide one</div><div style="width: 20ch; flex: none; border: 1px solid">slide two</div></div>

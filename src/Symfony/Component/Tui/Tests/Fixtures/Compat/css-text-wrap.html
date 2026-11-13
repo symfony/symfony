@@ -1,0 +1,43 @@
+<!-- covers: css.properties.line-clamp css.properties.-webkit-line-clamp css.properties.word-break css.properties.overflow-wrap css.properties.word-wrap css.properties.hyphens css.properties.hyphenate-character css.properties.text-wrap css.properties.text-wrap-mode css.properties.text-wrap-style css.properties.tab-size -->
+<!-- variant: narrow columns=24 -->
+<style>
+  p, pre { margin: 0 0 1; max-width: 22ch }
+  .clamp { line-clamp: 2 }
+  .webkit { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical }
+  .ids { word-break: break-all; overflow-wrap: anywhere }
+  .legacy { word-wrap: break-word }
+  .ko { max-width: 12ch }
+  .ko.keep { word-break: keep-all }
+  .soft { hyphens: manual; max-width: 9ch }
+  .hard { hyphens: none; max-width: 9ch }
+  .dash { hyphenate-character: "="; max-width: 8ch }
+  .title { text-wrap: balance; font-weight: bold }
+  .style { text-wrap-style: balance }
+  .pretty { text-wrap: pretty; max-width: 24ch }
+  .plain { max-width: 24ch }
+  .one { text-wrap-mode: nowrap; text-overflow: ellipsis }
+  pre { tab-size: 4 }
+  .scroll { overflow: auto; max-width: 22ch; word-break: break-all }
+  .scroll pre { white-space: pre-wrap; margin: 0 }
+  pre.wide { tab-size: 6ch }
+  pre.px { tab-size: 24px }
+</style>
+<p class="clamp">A long description that would take several lines is clamped to two of them.</p>
+<p class="webkit">The prefixed spelling, clamped to a single line.</p>
+<p class="ids">id=8f14e45fceea167a5a36dedd4bea2543 breaks anywhere</p>
+<p class="ko" lang="ko">한국어 문장을 나누지 않습니다</p>
+<p class="ko keep" lang="ko">한국어 문장을 나누지 않습니다</p>
+<p class="legacy">Supercalifragilisticexpialidocious</p>
+<p class="soft">Internationali&shy;zation and locali&shy;zation</p>
+<p class="hard">Internationali&shy;zation and locali&shy;zation</p>
+<p class="dash">Configu&shy;ration file</p>
+<p class="title">A balanced title wrapping on two lines</p>
+<p class="style">Another balanced block of text here</p>
+<p class="plain">Keep the last word in company</p>
+<p class="pretty">Keep the last word in company</p>
+<p class="one">One line only, however long it is</p>
+<div class="scroll"><pre>path("articles/int:year/int:month/")</pre></div>
+<pre>name&#9;size
+a.txt&#9;12</pre>
+<pre class="wide">6ch&#9;stop</pre>
+<pre class="px">24px&#9;stop</pre>

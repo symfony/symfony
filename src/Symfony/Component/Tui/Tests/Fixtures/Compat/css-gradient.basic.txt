@@ -1,0 +1,56 @@
+
+⟨97;100m A ban⟨0m⟨97;104mner: three colors from left to right⟨0m⟨45m                  ⟨0m
+
+⟨90;100m┌⟨0m⟨90;40m─────────────────────────────────────────────────────⟨0m⟨90;100m─────⟨0m⟨90;40m┐⟨0m
+⟨90;40m│⟨0m⟨40m                                                          ⟨0m⟨90;40m│⟨0m
+⟨90;40m│⟨0m⟨40m A card, its gradient going down and to the right; ⟨0m⟨1;7;30;43mthis⟨0m⟨40m   ⟨0m⟨90;40m│⟨0m
+⟨90;100m│⟨0m⟨40m keeps its own background.                           ⟨0m⟨100m     ⟨0m⟨90;40m│⟨0m
+⟨90;40m└──────────────────────────────────────────────────────────┘⟨0m
+⟨40m     ⟨0m⟨41m                    ⟨0m⟨40m     ⟨0m
+⟨41mA radial g⟨0m⟨100ml⟨0m⟨43mow      ⟨0m⟨100m ⟨0m⟨41m          ⟨0m
+⟨41m       ⟨0m⟨100m ⟨0m⟨43m              ⟨0m⟨100m ⟨0m⟨41m       ⟨0m
+⟨41m          ⟨0m⟨100m ⟨0m⟨43m        ⟨0m⟨100m ⟨0m⟨41m          ⟨0m
+
+After the glow.
+
+⟨97;100mRe⟨0m⟨97;43mpe⟨0m⟨97;100mat⟨0m⟨97;43min⟨0m⟨97;100mg ⟨0m⟨97;43mst⟨0m⟨97;100mri⟨0m⟨97;43mpe⟨0m⟨97;100ms,⟨0m⟨97;43m 2⟨0m⟨97;100m c⟨0m⟨97;43mol⟨0m⟨97;100mum⟨0m⟨97;43mns⟨0m⟨97;100m e⟨0m⟨97;43mac⟨0m⟨97;100mh⟨0m⟨100m ⟨0m⟨43m  ⟨0m⟨100m  ⟨0m⟨43m  ⟨0m⟨100m  ⟨0m⟨43m  ⟨0m⟨100m  ⟨0m⟨43m  ⟨0m⟨100m  ⟨0m⟨43m  ⟨0m⟨100m  ⟨0m⟨43m  ⟨0m⟨100m  ⟨0m⟨43m  ⟨0m
+
+⟨100mR⟨0m⟨40me⟨0m⟨100mpe⟨0m⟨107ma⟨0m⟨100mti⟨0m⟨40mng⟨0m⟨100m r⟨0m⟨47min⟨0m⟨107mgs  ⟨0m⟨47m  ⟨0m⟨100m  ⟨0m⟨40m  ⟨0m⟨100m  ⟨0m⟨107m ⟨0m⟨100m  ⟨0m⟨40m ⟨0m⟨100m ⟨0m
+⟨47m ⟨0m⟨100m ⟨0m⟨40m ⟨0m⟨100m ⟨0m⟨107m ⟨0m⟨100m ⟨0m⟨40m  ⟨0m⟨100m ⟨0m⟨47m  ⟨0m⟨100m  ⟨0m⟨40m    ⟨0m⟨100m  ⟨0m⟨47m  ⟨0m⟨100m ⟨0m⟨40m  ⟨0m⟨100m ⟨0m⟨107m ⟨0m⟨100m ⟨0m⟨40m ⟨0m⟨100m ⟨0m⟨47m ⟨0m
+⟨100m  ⟨0m⟨47m  ⟨0m⟨100m  ⟨0m⟨47m  ⟨0m⟨100m  ⟨0m⟨47m  ⟨0m⟨100m  ⟨0m⟨47m  ⟨0m⟨100m  ⟨0m⟨47m  ⟨0m⟨100m  ⟨0m⟨47m  ⟨0m⟨100m  ⟨0m⟨47m  ⟨0m⟨100m  ⟨0m
+⟨47m ⟨0m⟨100m ⟨0m⟨40m ⟨0m⟨100m ⟨0m⟨107m ⟨0m⟨100m ⟨0m⟨40m  ⟨0m⟨100m ⟨0m⟨47m  ⟨0m⟨100m  ⟨0m⟨40m    ⟨0m⟨100m  ⟨0m⟨47m  ⟨0m⟨100m ⟨0m⟨40m  ⟨0m⟨100m ⟨0m⟨107m ⟨0m⟨100m ⟨0m⟨40m ⟨0m⟨100m ⟨0m⟨47m ⟨0m
+
+⟨100mA circle at 20%               ⟨0m
+⟨100m                              ⟨0m
+⟨100m     ⟨0m⟨43m  ⟨0m⟨100m                       ⟨0m
+⟨100m                              ⟨0m
+
+⟨40mRadii at a corner             ⟨0m
+⟨40m                              ⟨0m
+⟨40m                              ⟨0m
+⟨40m                          ⟨0m⟨100m    ⟨0m
+
+⟨46mA conic⟨0m⟨104m whe⟨0m⟨100mel                 ⟨0m
+⟨46m        ⟨0m⟨104m  ⟨0m⟨100m           ⟨0m⟨41m         ⟨0m
+⟨42m         ⟨0m⟨101m                     ⟨0m
+⟨42m    ⟨0m⟨100m  ⟨0m⟨43m       ⟨0m⟨101m                 ⟨0m
+
+⟨97;101min oklc⟨0m⟨97;45mh: through the hues bet⟨0m⟨97;104mween them⟨0m⟨104m                     ⟨0m
+
+⟨30;101min ⟨0m⟨30;100mhs⟨0m⟨30;43ml longer h⟨0m⟨30;103mu⟨0m⟨30;43me: around the⟨0m⟨30;102m wheel t⟨0m⟨30;46mhe long way⟨0m⟨46m         ⟨0m⟨104m   ⟨0m
+
+⟨107mRepe⟨0m⟨40matin⟨0m⟨107mg ⟨0m⟨40mra⟨0m⟨107my⟨0m⟨40ms ⟨0m⟨107m  ⟨0m⟨40m ⟨0m⟨107m  ⟨0m⟨40m  ⟨0m⟨107m    ⟨0m⟨40m    ⟨0m
+⟨40m    ⟨0m⟨107m      ⟨0m⟨40m  ⟨0m⟨107m   ⟨0m⟨40m   ⟨0m⟨107m  ⟨0m⟨40m      ⟨0m⟨107m    ⟨0m
+⟨40m                              ⟨0m
+⟨107m    ⟨0m⟨40m      ⟨0m⟨107m  ⟨0m⟨40m   ⟨0m⟨107m   ⟨0m⟨40m  ⟨0m⟨107m      ⟨0m⟨40m    ⟨0m
+
+⟨100m ⟨0m⟨97;100mFading to transparent: the panel shows⟨0m⟨100m                     ⟨0m
+⟨100m                                                            ⟨0m
+⟨100m ⟨0m⟨30;100mHalf a white veil over it, then none⟨0m⟨100m                       ⟨0m
+⟨100m                                                            ⟨0m
+⟨97;100mA stop at calc(100% - 2rem): the color to two rows from the ⟨0m
+⟨97;100mend, then the fade⟨0m⟨100m                                          ⟨0m
+⟨97;100m                                                            ⟨0m
+⟨97;100m                                                            ⟨0m
+⟨97;40m                                                            ⟨0m
+⟨97;40m                                                            ⟨0m

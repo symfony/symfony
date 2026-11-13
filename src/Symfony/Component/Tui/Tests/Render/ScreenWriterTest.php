@@ -18,6 +18,8 @@ use Symfony\Component\Tui\Exception\RenderException;
 use Symfony\Component\Tui\Render\ArrayLineBuffer;
 use Symfony\Component\Tui\Render\ConcatenatedLineBuffer;
 use Symfony\Component\Tui\Render\ScreenWriter;
+use Symfony\Component\Tui\Style\Color;
+use Symfony\Component\Tui\Style\CursorShape;
 use Symfony\Component\Tui\Terminal\ScreenBuffer;
 use Symfony\Component\Tui\Terminal\TerminalInterface;
 use Symfony\Component\Tui\Terminal\VirtualTerminal;
@@ -402,6 +404,85 @@ class ScreenWriterTest extends TestCase
 
         // Marker should be stripped
         $this->assertStringNotContainsString($marker, $output);
+    }
+
+    public function testScaledTextIsDrawnOverTheRowsItCovers()
+    {
+        $terminal = new VirtualTerminal(40, 10);
+        $writer = new ScreenWriter($terminal);
+
+        $marker = AnsiUtils::scaledTextMarker("\x1b[1mBig\x1b[22m", 2);
+        $writer->writeFrame(new ArrayLineBuffer(['Before', $marker.'      ', '      ', 'After']));
+        $output = $terminal->getOutput();
+
+        $this->assertStringNotContainsString(AnsiUtils::SCALED_MARKER_PREFIX, $output);
+        // Once the rows are written, from the row of the text, at its column
+        $drawn = strpos($output, "\x1b]66;s=2;Big\x07");
+        $this->assertNotFalse($drawn);
+        $this->assertGreaterThan(strpos($output, 'After'), $drawn);
+        $this->assertStringContainsString("\x1b[2A\x1b[1G\x1b[1m\x1b]66;s=2;Big\x07", $output);
+
+        // Drawn again when a row it covers is written again, not when nothing changed
+        $terminal->clearOutput();
+        $writer->writeFrame(new ArrayLineBuffer(['Before', $marker.'      ', '      ', 'After']));
+        $this->assertStringNotContainsString("\x1b]66;", $terminal->getOutput());
+        $writer->writeFrame(new ArrayLineBuffer(['Before', $marker.'      ', '    x ', 'After']));
+        $this->assertStringContainsString("\x1b]66;s=2;Big\x07", $terminal->getOutput());
+    }
+
+    public function testScaledTextIsDrawnAgainWhenTheViewportIsRedrawn()
+    {
+        $terminal = new VirtualTerminal(40, 4);
+        $writer = new ScreenWriter($terminal);
+        $marker = AnsiUtils::scaledTextMarker('Big', 2);
+
+        $lines = ['a', 'b', 'c', 'd', 'e', $marker.'      ', '      ', 'f'];
+        $writer->writeFrame(new ArrayLineBuffer($lines));
+        // Its last row gone, the screen shows one row higher, drawn again: the row of the text did not change
+        $terminal->clearOutput();
+        $writer->writeFrame(new ArrayLineBuffer(\array_slice($lines, 0, 7)));
+        $this->assertStringContainsString("\x1b]66;s=2;Big\x07", $terminal->getOutput());
+    }
+
+    public function testCaretColorIsGivenToTheTerminalCursor()
+    {
+        $terminal = new VirtualTerminal(80, 24);
+        $writer = new ScreenWriter($terminal);
+
+        $marker = AnsiUtils::cursorMarker(CursorShape::Bar, Color::hex('#FF8800'));
+        $writer->writeFrame(new ArrayLineBuffer(["Hello{$marker}World"]));
+        $this->assertStringContainsString("\x1b]12;#ff8800\x07", $terminal->getOutput());
+        $this->assertStringNotContainsString($marker, $terminal->getOutput());
+
+        // The same color is not sent again
+        $terminal->clearOutput();
+        $writer->writeFrame(new ArrayLineBuffer(["Hell{$marker}oWorld"]));
+        $this->assertStringNotContainsString("\x1b]12;", $terminal->getOutput());
+
+        // A caret of the terminal color gives it back
+        $terminal->clearOutput();
+        $writer->writeFrame(new ArrayLineBuffer(['Hello'.AnsiUtils::cursorMarker().'World']));
+        $this->assertStringContainsString("\x1b]112\x07", $terminal->getOutput());
+
+        // Once given back, it is not sent again, nor when the cursor goes away
+        $terminal->clearOutput();
+        $writer->writeFrame(new ArrayLineBuffer(['HelloWorld']));
+        $this->assertStringNotContainsString("\x1b]112\x07", $terminal->getOutput());
+    }
+
+    public function testCaretColorIsGivenBackWhenTheCursorGoesAway()
+    {
+        $terminal = new VirtualTerminal(80, 24);
+        $writer = new ScreenWriter($terminal);
+
+        $writer->writeFrame(new ArrayLineBuffer(['Hello'.AnsiUtils::cursorMarker(CursorShape::Block, Color::hex('#00ff00'))]));
+        $terminal->clearOutput();
+        $writer->writeFrame(new ArrayLineBuffer(['Hello']));
+        $this->assertStringContainsString("\x1b]112\x07", $terminal->getOutput());
+
+        $terminal->clearOutput();
+        $writer->restoreCursorColor();
+        $this->assertSame('', $terminal->getOutput());
     }
 
     public function testCursorIsShownWhenContentShrinkMakesItVisible()

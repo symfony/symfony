@@ -1,0 +1,25 @@
+⟨100m                                                            ⟨0m
+⟨44mone                                                         ⟨0m
+⟨100m                                                            ⟨0m
+⟨44mone row between: the margins collapse                       ⟨0m
+⟨100m                                                            ⟨0m
+⟨100m                                                            ⟨0m
+⟨44mtwo rows: the larger one stays                              ⟨0m
+⟨100m                                                            ⟨0m
+⟨100m                                                            ⟨0m
+⟨44mparent 2 and child 1: 2 rows above, not 3                   ⟨0m
+⟨100m                                                            ⟨0m
+⟨100m                                                            ⟨0m
+⟨100m┌──────────────────────────────────────────────────────────┐⟨0m
+⟨100m│                                                          │⟨0m
+⟨100m│⟨0m⟨44ma border keeps them apart                                 ⟨0m⟨100m│⟨0m
+⟨100m│                                                          │⟨0m
+⟨100m└──────────────────────────────────────────────────────────┘⟨0m
+⟨100m                                                            ⟨0m
+⟨100m                                                            ⟨0m
+⟨100m                                                            ⟨0m
+⟨44min a flex column                                            ⟨0m
+⟨100m                                                            ⟨0m
+⟨100m                                                            ⟨0m
+⟨44mmargins add up                                              ⟨0m
+⟨100m                                                            ⟨0m

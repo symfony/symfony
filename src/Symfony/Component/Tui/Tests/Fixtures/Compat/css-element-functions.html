@@ -1,0 +1,24 @@
+<!-- covers: css.types.attr css.types.sibling-index css.types.sibling-count css.types.if -->
+<!-- variant: narrow columns=40 -->
+<style>
+  ul { list-style: none; padding: 0 }
+  li { padding-left: calc((sibling-index() - 1) * 2ch) }
+  li::before { content: "of " }
+  li::after { content: " (" attr(data-note) ")" }
+  .bar { display: flex; gap: 1ch }
+  .bar span { order: calc(sibling-count() - sibling-index()); color: attr(data-color type(<color>), gray) }
+  .card { --tone: warning; padding-left: if(media(width < 50): 0; else: 4ch); color: if(style(--tone: warning): yellow; style(--tone: danger): red; else: inherit) }
+  .card .badge { background: if(supports(color: oklch(0.5 0.1 200)): oklch(0.5 0.1 200); else: blue) }
+  .meter { width: attr(data-width ch, 10ch); background: blue }
+</style>
+<main>
+  <ul>
+    <li data-note="first">one</li>
+    <li data-note="second">two, indented by its index</li>
+    <li data-note="third">three</li>
+  </ul>
+  <div class="bar"><span data-color="red">a (red, last)</span><span data-color="lime">b (lime)</span><span data-color="nope">c (gray, first)</span></div>
+  <div class="card">warning card, indented when wide<p class="badge">badge</p></div>
+  <div class="meter" data-width="20">20 columns</div>
+  <div class="meter">10 columns</div>
+</main>

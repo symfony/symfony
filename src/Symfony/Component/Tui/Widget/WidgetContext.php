@@ -17,6 +17,7 @@ use Symfony\Component\Tui\Focus\FocusManager;
 use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Render\Renderer;
+use Symfony\Component\Tui\Style\MediaContext;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Terminal\TerminalInterface;
 use Symfony\Component\Tui\Tui;
@@ -73,9 +74,35 @@ final class WidgetContext
         return $this->eventDispatcher;
     }
 
+    /**
+     * Returns the resolved style of a widget for the current frame.
+     */
+    public function resolveStyle(AbstractWidget $widget): Style
+    {
+        return $this->renderer->resolveStyle($widget);
+    }
+
+    /**
+     * Tells the renderer that a widget changed, which may change the styles it resolved.
+     *
+     * @internal
+     */
+    public function invalidateStyles(): void
+    {
+        $this->renderer->invalidateStyles();
+    }
+
     public function resolveElement(AbstractWidget $widget, string $element): Style
     {
         return $this->renderer->getStyleSheet()->resolveElement($widget, $element);
+    }
+
+    /**
+     * Returns what media queries are evaluated against, user preferences included.
+     */
+    public function getMediaContext(): MediaContext
+    {
+        return $this->renderer->getMediaContext();
     }
 
     public function getTerminalColumns(): int

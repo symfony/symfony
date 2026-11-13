@@ -1,0 +1,8 @@
+⟨38;2;34;197;94m● Live, pulsing green⟨0m
+⟨31m● REC, blinking⟨0m
+Sliding, at its first keyframe during the delay
+⟨38;2;34;197;94mPaused: its first frame⟨0m
+Bouncing, with cubic-bezier()
+⟨38;2;34;197;94mEasing in, with linear() stops⟨0m
+⟨38;2;34;197;94mPulsing and blinking, two animations⟨0m
+    ⟨48;2;38;141;157mH⟨0m⟨48;2;48;145;161ma⟨0m⟨48;2;58;150;165ml⟨0m⟨48;2;67;154;168mf⟨0m⟨48;2;75;158;171mw⟨0m⟨48;2;87;163;176ma⟨0m⟨48;2;97;168;179my⟨0m⟨48;2;107;173;183m ⟨0m⟨48;2;117;177;187ma⟨0m⟨48;2;127;182;191mc⟨0m⟨48;2;136;186;194mr⟨0m⟨48;2;144;190;197mo⟨0m⟨48;2;156;195;202ms⟨0m⟨48;2;166;200;205ms⟨0m⟨48;2;176;204;209m ⟨0m⟨48;2;186;209;213m ⟨0m⟨48;2;196;214;216m ⟨0m⟨48;2;205;218;220m ⟨0m⟨48;2;215;223;224m ⟨0m⟨48;2;225;227;228m ⟨0m

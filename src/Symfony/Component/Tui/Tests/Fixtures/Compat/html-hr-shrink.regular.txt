@@ -1,0 +1,11 @@
+[ Menu ]
+┌────────────────┐
+│ Action         │
+│ ⟨90m──────────────⟨0m │
+│ Something else │
+└────────────────┘
+┌─────┐   A divider takes the width of a box sized by its
+│Left │   content, not more, like in the menu above.
+├⟨90m─────⟨0m┤
+│Float│
+└─────┘

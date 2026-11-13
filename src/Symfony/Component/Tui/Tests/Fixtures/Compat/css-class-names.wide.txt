@@ -1,0 +1,11 @@
+
+Class names of a page, like those of Bulma, style only what its rules say: columns side by side on a
+wide screen only.
+
+┌──────────────┐  ┌───────────────┐
+│ First column │  │ Second column │
+└──────────────┘  └───────────────┘
+
+⟨32mA paragraph of class h4, green and nothing more⟨0m
+
+⟨31mIts classes in the order of the page: [class^="col-"] red⟨0m

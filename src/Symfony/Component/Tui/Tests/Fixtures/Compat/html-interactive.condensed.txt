@@ -1,0 +1,26 @@
+┌──────────────────────────────────────────────────────────┐
+│ An open dialog                                           │
+└──────────────────────────────────────────────────────────┘
+Right under the closed dialogs: they take no room
+▼ ⟨1mFirst (open)⟨0m
+⟨36m│ One⟨0m
+▶ ⟨1mSecond (closed: one at a time)⟨0m
+[ Inert: no focus, no pointer ]
+Line height two puts a blank
+
+row between the lines of this
+
+paragraph
+letter-spacing: .1em: ★★★★★ not spread
+line-height: 1.5, the spacing
+of the text of many pages: no
+blank rows
+⟨1mS P A C E D⟨0m
+clipped
+E = mc², H₂O, xⁿ⁺¹, a? (no superscript ?, on the line)
+[⟨31m━━━━━━━━━━━━━━━━━━━━━━━━━⟨0m━━━]  90%
+[⟨33m━━━━━━━━━━━━━━⟨0m━━━━━━━━━━━━━━]  50%
+[⟨32m━━━━━⟨0m━━━━━━━━━━━━━━━━━━━━━━━]  20%
+⟨1mA question, its + at the end of the line⟨0m                   ⟨1m+⟨0m
+⟨1mAn open one: −⟨0m                                             ⟨1m−⟨0m
+⟨36m│ Its answer.⟨0m

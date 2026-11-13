@@ -1,0 +1,14 @@
+<!-- covers: css.properties.accent-color css.properties.pointer-events css.properties.cursor -->
+<style>
+  form { accent-color: magenta }
+  .green { accent-color: green }
+  .ghost { pointer-events: none }
+  .help { cursor: help }
+</style>
+<form>
+  <label><input type="checkbox" checked> Magenta box, from the form</label>
+  <label class="green"><input type="radio" checked> Green radio</label>
+  <progress value="0.6"></progress>
+  <p class="ghost">Clicks go through</p>
+  <p class="help">A help cursor</p>
+</form>

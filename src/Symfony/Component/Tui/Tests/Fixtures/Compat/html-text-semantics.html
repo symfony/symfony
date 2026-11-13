@@ -1,0 +1,19 @@
+<!-- covers: html.elements.dfn html.elements.var html.elements.samp html.elements.data html.elements.bdi html.elements.bdo html.elements.wbr html.elements.col html.elements.colgroup -->
+<!-- variant: narrow columns=24 -->
+<!-- requires: IntlChar -->
+<style>
+  table { border: 1px solid }
+  th { font-weight: bold }
+  .price { width: 10ch; background: #1e3a8a }
+  th { background: #374151 }
+</style>
+<p>A <dfn>glyph</dfn> is drawn; <var>n</var> cells; the shell said <samp>ok</samp>; <data value="42">forty-two</data>; user <bdi>إيان</bdi>.</p>
+<p><ruby>東<rp>(</rp><rt>tō</rt><rp>)</rp>京<rp>(</rp><rt>kyō</rt><rp>)</rp></ruby> without rp: <ruby>漢<rt>kan</rt></ruby></p>
+<p>Backwards: <bdo dir="rtl">Tui <em>HTML</em></bdo>, forwards: <bdo dir="ltr">as is</bdo></p>
+<p>https://example.com/<wbr>a/<wbr>very/<wbr>long/<wbr>path/<wbr>that/<wbr>wraps</p>
+<table>
+  <colgroup><col class="price"><col span="2" width="64"></colgroup>
+  <tr><th>Price</th><th>Item</th><th>Note</th></tr>
+  <tr><td>3</td><td>Tea</td><td>hot</td></tr>
+  <tr style="background: #7f1d1d"><td>5</td><td>Coffee</td><td>row over the column</td></tr>
+</table>

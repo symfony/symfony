@@ -1,0 +1,16 @@
+<!-- covers: css.properties.hyphens css.properties.hyphenate-limit-chars -->
+<!-- variant: narrow columns=16 -->
+<style>
+  p { hyphens: auto; margin: 0 0 1 }
+  .manual { hyphens: manual }
+  .limits { hyphenate-limit-chars: 10 4 4 }
+</style>
+<p lang="en">Automatic hyphenation breaks extraordinarily long words.</p>
+<p lang="fr">L'informatique révolutionne développement et communication.</p>
+<p lang="de-DE">Die Silbentrennung trennt Donaudampfschifffahrtsgesellschaften.</p>
+<p lang="es">La computadora calcula rápidamente las operaciones.</p>
+<p lang="en">Mixed: <span lang="fr">anticonstitutionnellement</span> in English.</p>
+<p lang="en">Authored: super&shy;califragilistic is broken where it says.</p>
+<p lang="en" class="manual">Manual: extraordinarily without soft hyphens.</p>
+<p lang="en" class="limits">Limits: hyphenation of incomprehensibilities.</p>
+<p>No language: extraordinarily long words wrap whole.</p>

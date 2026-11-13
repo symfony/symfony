@@ -1,0 +1,13 @@
+<!-- covers: css.properties.color css.properties.white-space -->
+<style>
+  .fallback { color: red; color: notacolor }
+  .important { color: green }
+  .important { color: bogus !important }
+  pre.code { white-space: pre-wrap; white-space: -moz-pre-wrap !important; white-space: -o-pre-wrap }
+</style>
+<p class="fallback">An invalid value is dropped: red, the value before it</p>
+<p class="important">An invalid !important one too: green</p>
+<pre class="code">Its lines kept, like the code of python.org:
+    def fib(n):
+        a, b = 0, 1</pre>
+<p style="color: blue; color: notacolor">An invalid value of a style attribute too: blue</p>

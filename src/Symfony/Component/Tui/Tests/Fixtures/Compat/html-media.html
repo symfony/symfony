@@ -1,0 +1,24 @@
+<!-- covers: html.elements.img html.elements.canvas html.elements.video html.elements.audio html.elements.object html.elements.embed css.selectors.paused css.selectors.playing -->
+<main>
+  <img src="cat.png" alt="A sleeping cat">
+  <img src="decoration.png" alt="">
+  <svg aria-label="Company logo"><desc>The ACME logo</desc></svg>
+  <video title="Introduction video"></video>
+  <audio></audio>
+  <canvas></canvas>
+  <iframe src="https://example.com"></iframe>
+  <canvas aria-label="Sales chart"><p>Sales went up by <b>10%</b>.</p></canvas>
+  <object data="report.pdf" type="application/pdf"><param name="zoom" value="1"><p>Download <a href="report.pdf">the report</a>.</p></object>
+  <video poster="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAPUlEQVRYhe3VsQ3AQAwDMSn77+wfQkUaqj+AcONechnWqU6+Ld8HAAAAAAAA0OTGj94u9e8XAAAAAAAAAHghNAU9l77oWAAAAABJRU5ErkJggg==" width="32" height="16" title="A video with a poster">Your browser cannot play this video.</video>
+  <object data="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAPUlEQVRYhe3VsQ3AQAwDMSn77+wfQkUaqj+AcONechnWqU6+Ld8HAAAAAAAA0OTGj94u9e8XAAAAAAAAAHghNAU9l77oWAAAAABJRU5ErkJggg==" type="image/png" width="16" height="16">An image in an object</object>
+  <embed src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAPUlEQVRYhe3VsQ3AQAwDMSn77+wfQkUaqj+AcONechnWqU6+Ld8HAAAAAAAA0OTGj94u9e8XAAAAAAAAAHghNAU9l77oWAAAAABJRU5ErkJggg==" type="image/png" width="16" height="16" title="An embedded image">
+  <embed src="movie.swf" type="application/x-shockwave-flash" title="A plugin">
+  <style>video:paused { color: #22c55e } video:playing { color: red }</style>
+  <video title="A clip">A clip that is not played</video>
+  <p>after the embedded content</p>
+  <p>An image in a link, drawn in the line: <a href="/docs"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAPUlEQVRYhe3VsQ3AQAwDMSn77+wfQkUaqj+AcONechnWqU6+Ld8HAAAAAAAA0OTGj94u9e8XAAAAAAAAAHghNAU9l77oWAAAAABJRU5ErkJggg==" alt="docs"> Documentation</a>, then text.</p>
+  <style>.external::after { content: " " url(quadrants.png) } .missing::before { content: url(missing.png) "→ " }</style>
+  <p>Generated: <a class="external" href="https://example.com">an external link</a> and <span class="missing">an image that cannot be read</span>.</p>
+  <p style="color: #f59e0b">An SVG icon in a link, in its color: <a href="/settings"><svg viewBox="0 0 24 24"><title>settings</title><circle cx="12" cy="12" r="10" fill="currentColor"/></svg> Settings</a></p>
+  <p>An icon in a link: <a href="/home"><svg><title>home</title><path d="M0 0"/></svg> Home</a>, a <img src="star.png" alt="star"> in the text.</p>
+</main>

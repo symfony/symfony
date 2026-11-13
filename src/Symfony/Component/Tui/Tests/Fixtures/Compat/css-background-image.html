@@ -1,0 +1,18 @@
+<!-- covers: css.properties.background-image css.types.url css.types.image -->
+<style>
+  div { margin-bottom: 1; color: white }
+  .tiles { background: navy url(quadrants.png); height: 2 }
+  .one { background: url("quadrants.png") no-repeat right top; height: 2 }
+  .cover { background-image: url(quadrants.png); background-size: cover; height: 2; width: 8ch }
+  .contain { background: navy url(quadrants.png) center / contain no-repeat; height: 2; width: 12ch }
+  .sized { background-image: url(quadrants.png); background-size: 2ch; background-repeat: repeat-x; height: 1 }
+  .missing { background: green url(nowhere.png); height: 1 }
+  .clipped { background: url(quadrants.png) repeat-x; background-clip: text; -webkit-text-fill-color: transparent }
+</style>
+<div class="tiles">Text over the tiles</div>
+<div class="one">no-repeat, top right</div>
+<div class="cover"></div>
+<div class="contain"></div>
+<div class="sized"></div>
+<div class="missing">A missing image: the color only</div>
+<div class="clipped">The glyphs in the colors of the image</div>

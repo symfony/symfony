@@ -26,6 +26,15 @@ use Symfony\Component\Tui\Widget\ProgressBarWidget;
  */
 class ProgressBarTest extends TestCase
 {
+    public function testIndeterminateState()
+    {
+        $bar = new ProgressBarWidget();
+        $this->assertTrue($bar->hasState('indeterminate'));
+
+        $bar->setMaxSteps(10);
+        $this->assertFalse($bar->hasState('indeterminate'));
+    }
+
     public function testConstructionDeterminate()
     {
         $bar = new ProgressBarWidget(100);

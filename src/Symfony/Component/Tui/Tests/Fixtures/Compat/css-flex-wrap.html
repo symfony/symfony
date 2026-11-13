@@ -1,0 +1,33 @@
+<!-- covers: css.properties.flex-wrap css.properties.flex-flow css.properties.row-gap css.properties.align-self -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .tags { display: flex; flex-wrap: wrap; gap: 1 1ch }
+  .tags > span { background: blue }
+  .reversed { flex-wrap: wrap-reverse }
+  .flow { display: flex; flex-flow: row wrap; column-gap: 2ch; justify-content: space-between }
+  .flow > p { flex: none }
+  .row { display: flex; gap: 1ch }
+  .row > section { flex: 1; border: 1px solid }
+  .row > .bottom { align-self: end }
+  .row > .middle { align-self: center }
+  .stack { display: flex; flex-direction: column; align-items: center; margin-top: 1 }
+  .stack > * { background: #374151 }
+  .stack .end { align-self: end }
+  .stack .wide { align-self: stretch }
+</style>
+<main>
+  <div class="tags"><span>php</span><span>symfony</span><span>terminal</span><span>widgets</span><span>html</span><span>css</span><span>twig</span><span>components</span></div>
+  <div class="tags reversed"><span>first</span><span>line</span><span>at</span><span>the</span><span>bottom:</span><span>wrap-reverse</span><span>puts</span><span>the</span><span>lines</span><span>from</span><span>the</span><span>bottom</span><span>up</span></div>
+  <div class="flow"><p>Files</p><p>Edit</p><p>Selection</p><p>View</p><p>Go</p><p>Run</p><p>Terminal</p><p>Help</p></div>
+  <div class="row">
+    <section><p>one</p><p>two</p><p>three</p><p>four</p></section>
+    <section class="bottom"><p>at the bottom</p></section>
+    <section class="middle"><p>centered</p></section>
+    <section><p>stretched</p></section>
+  </div>
+</main>
+<div class="stack"><p>centered by align-items</p><p class="end">align-self: end</p><p class="wide">align-self: stretch</p></div>
+<p>Centered, each line in the room it leaves, like the menu of Rust: the second one centered too, not under the first</p>
+<ul style="display: flex; flex-wrap: wrap; justify-content: center; list-style: none; padding: 0; margin: 0"><li style="padding: 0 2ch">Install</li><li style="padding: 0 2ch">Learn</li><li style="padding: 0 2ch">Playground</li><li style="padding: 0 2ch">Tools</li><li style="padding: 0 2ch">Governance</li><li style="padding: 0 2ch">Community</li><li style="padding: 0 2ch">Blog</li></ul>
+<p>At the end, each line at its end</p>
+<div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0 1ch"><span>Privacy policy</span><span>Report security issues</span><span>Terms of use</span><span>Your privacy choices</span></div>

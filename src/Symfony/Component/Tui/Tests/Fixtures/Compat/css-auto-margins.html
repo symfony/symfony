@@ -1,0 +1,20 @@
+<!-- covers: css.properties.margin css.properties.margin-left css.properties.margin-right css.properties.margin-inline css.properties.max-width css.properties.width -->
+<!-- variant: narrow columns=30 -->
+<style>
+  main { background: gray }
+  .bar { display: flex; gap: 1ch }
+  .bar > p { flex: none; background: blue }
+  .bar > .push { margin-left: auto }
+  .center { display: flex }
+  .center > p { flex: none; margin-inline: auto }
+  .card { max-width: 20ch; margin: 0 auto; border: 1px solid }
+  .right { width: 50%; margin-left: auto; background: green }
+  .reset { max-width: 10ch; margin: 0 auto; margin-left: 2ch }
+</style>
+<main>
+  <div class="bar"><p>Files</p><p>Edit</p><p class="push">Help</p><p>Quit</p></div>
+  <div class="center"><p>centered in the row</p></div>
+  <section class="card"><p>centered block</p></section>
+  <p class="right">half, on the right</p>
+  <p class="reset">left 2, right auto</p>
+</main>

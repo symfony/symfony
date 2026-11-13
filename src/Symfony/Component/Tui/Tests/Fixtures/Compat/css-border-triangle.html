@@ -1,0 +1,18 @@
+<!-- covers: css.properties.border css.properties.border-color -->
+<style>
+  .toggle::after { display: inline-block; margin-left: .255em; content: ""; border-top: .3em solid; border-right: .3em solid transparent; border-bottom: 0; border-left: .3em solid transparent }
+  .up::after { content: ""; border-bottom: .3em solid red; border-left: .3em solid transparent; border-right: .3em solid transparent }
+  .arrow { display: inline-block; width: .6rem; height: .6rem; border-top: .3rem solid transparent; border-bottom: .3rem solid transparent; border-left: .6rem solid currentColor; border-right: none; margin-right: .2rem }
+  .box::after { content: ""; border: 1px solid }
+  .rgb::after { content: ""; border-top: .3em solid rgb(255, 0, 0); border-left: .3em solid transparent; border-right: .3em solid transparent }
+  .row { display: flex }
+  .row::after { content: ""; margin-left: .255em; border-top: .3em solid; border-right: .3em solid transparent; border-left: .3em solid transparent }
+  .spin { border: 2px solid transparent; border-top-color: #333; border-radius: 50% }
+</style>
+<p>A caret drawn by the borders of an empty ::after: <a class="toggle" href="#">Dropdown</a> <button class="toggle">Menu</button></p>
+<p>Pointing up, in the color of its border: <span class="up">Sort</span></p>
+<p>An empty element drawn by its borders: <a href="#"><span class="arrow"></span>Table of contents</a></p>
+<p>Borders of one color draw no triangle: <span class="box">x</span></p>
+<p>A color without alpha is no transparent one: <span class="rgb">Red</span></p>
+<div class="row">After the items of a row, not boxed</div>
+<p>Rounded, like a spinner, no triangle: <span class="spin"></span>.</p>

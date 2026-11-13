@@ -112,6 +112,7 @@ return (new PhpCsFixer\Config())
                 'Symfony/Component/Emoji/Resources/',
                 'Symfony/Component/Intl/Resources/data/',
                 'Symfony/Component/String/Resources/data/',
+                'Symfony/Component/Tui/Widget/Text/hyphenation/',
             ])
             // Support for older PHPunit version
             ->notPath('#Symfony/Bridge/PhpUnit/.*Mock\.php#')

@@ -1,0 +1,12 @@
+<!-- covers: css.selectors.before css.selectors.after css.selectors.first-line css.selectors.first-letter -->
+<style>
+  .note:before { content: "Note: "; color: yellow }
+  .note:after { content: " ←"; color: gray }
+  .intro:first-letter { color: red; font-weight: bold }
+  .intro:first-line { text-decoration: underline }
+  .cell { position: relative; padding-left: 12ch }
+  .cell:before { content: attr(data-label); position: absolute; top: 0; left: 0; width: 35%; color: cyan }
+</style>
+<p class="note">a single colon, like CSS 2</p>
+<p class="intro">The first letter and the first line, styled with a single colon too, wrapping onto a second line.</p>
+<div class="cell" data-label="Title">Analytical Engine</div>

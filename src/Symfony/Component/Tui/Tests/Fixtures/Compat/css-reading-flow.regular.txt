@@ -1,0 +1,5 @@
+[ Grid 2 (placed first) ]     [ Grid 1 (second) ]
+[ Grid 3 ]
+                     [ R3 (first, at the left) ][ R2 ][ R1 ]
+                 [ F1 (order: 1, last) ][ F3 ][ F2 (first) ]
+[ O1 ][ O2 ][ O3 (first) ]

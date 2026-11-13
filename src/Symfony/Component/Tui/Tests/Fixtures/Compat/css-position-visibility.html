@@ -1,0 +1,25 @@
+<!-- covers: css.properties.position-visibility -->
+<style>
+  .box { height: 3; overflow-y: auto; border: 1px solid; max-width: 30ch }
+  #far { anchor-name: --far }
+  .tip { position: absolute; position-anchor: --far; position-area: right; color: red }
+  .always { position-visibility: always; top: 10; left: 0; color: cyan }
+  .ghost { position: absolute; position-anchor: --nobody; position-visibility: anchors-valid; top: 11; left: 0; color: red }
+  .lenient { position: absolute; position-anchor: --nobody; top: 12; left: 0; color: cyan }
+  #edge { anchor-name: --edge; margin-left: 50ch; max-width: 4ch }
+  .wide { position: absolute; position-anchor: --edge; position-area: right; position-visibility: no-overflow; color: red }
+  .kept { position: absolute; position-anchor: --edge; position-area: bottom; color: cyan }
+</style>
+<div class="box">
+  <p>Visible line</p>
+  <p>Another one</p>
+  <p>Scrolled out</p>
+  <p id="far">The anchor, scrolled out</p>
+</div>
+<p class="tip">hidden: its anchor is scrolled out</p>
+<p class="tip always">always: drawn at its insets</p>
+<p class="ghost">hidden: no anchor</p>
+<p class="lenient">drawn: no anchor, anchors-valid not asked</p>
+<p id="edge">Edge</p>
+<p class="wide">hidden: too wide on the right</p>
+<p class="kept">fits</p>

@@ -1,0 +1,41 @@
+<!-- covers: css.properties.grid-template-columns css.properties.grid-template-rows -->
+<style>
+  table { display: grid; grid-template-columns: auto auto; border-bottom: 1px solid; max-width: 60ch }
+  thead, tbody, tr { display: grid; grid-column: span 2 / span 2; grid-template-columns: subgrid }
+  tbody { border-top: 1px solid }
+  th, td { padding: 0 1ch; text-align: left }
+  .cards { display: grid; grid-template-columns: repeat(3, auto); column-gap: 2ch }
+  .card { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; grid-template-rows: subgrid }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 2ch }
+  .tile { display: grid; grid-row: span 3; grid-template-rows: subgrid }
+  .tile h4, .tile p { margin: 0 }
+  .one { display: grid; grid-template-rows: subgrid }
+</style>
+<p>Rows of a grid, each a subgrid, like a table of the documentation of Tailwind: the columns line up.</p>
+<table>
+  <thead><tr><th>Class</th><th>Styles</th></tr></thead>
+  <tbody>
+    <tr><td>flex-1</td><td>flex: 1;</td></tr>
+    <tr><td>flex-initial-longer</td><td>flex: 0 auto;</td></tr>
+    <tr><td>x</td><td>flex: var(--size);</td></tr>
+  </tbody>
+</table>
+<p>Cards across the three columns of their grid, and its gap:</p>
+<div class="cards">
+  <div class="card"><b>One</b><i>Two words</i><u>3</u></div>
+  <div class="card"><b>A longer one</b><i>x</i><u>third</u></div>
+</div>
+<p>Tiles side by side, each a subgrid of three rows: their titles, texts and links line up.</p>
+<div class="tiles">
+  <div class="tile"><h4>Short</h4><p>A text of a few words.</p><a href="#">Read</a></div>
+  <div class="tile"><h4>A title long enough to wrap</h4><p>Short.</p><a href="#">Read</a></div>
+  <div class="tile"><h4>Third</h4><p>The longest text of the three tiles, on several lines.</p><a href="#">Read</a></div>
+</div>
+<p>A subgrid of rows spanning one row of its grid, of more items than that: a grid of its own, all of them shown.</p>
+<div class="tiles">
+  <div class="one"><b>a</b><i>t a</i><u>u</u></div>
+  <div class="one"><b>b</b><i>t b</i></div>
+</div>
+<p>Tiles of a border and a padding: those above the first row and below the last, the rows lined up, nothing more</p>
+<div class="tiles"><div class="tile" style="border: 1px solid; padding: 0 1ch"><h4>Short</h4><p>text</p><a href="#a">link</a></div><div class="tile" style="border: 1px solid; padding: 0 1ch"><h4>A much longer title that wraps</h4><p>text two</p><a href="#b">link</a></div></div>
+<div class="tiles"><div class="tile" style="border: 1px solid; padding: 0 1ch"><h4>Short</h4><p>two rows of its three</p></div><div class="tile" style="border: 1px solid; padding: 0 1ch"><h4>Title</h4><p>text</p><a href="#c">link</a></div></div>

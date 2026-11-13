@@ -1,0 +1,4 @@
+┌──────────────────────────────────────────────────────────┐
+│A height of 100% in a body of a least height only: as tall│
+│as its content, like browsers                             │
+└──────────────────────────────────────────────────────────┘

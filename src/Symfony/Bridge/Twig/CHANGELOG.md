@@ -18,6 +18,8 @@ CHANGELOG
  * Declare the functions and filters of the extensions that provide nothing else with the `#[AsTwigFunction]` and `#[AsTwigFilter]` attributes
  * Make `RoutingExtension::isUrlGenerationSafe()` static
  * Add support for extracting the labels and help messages passed to the `form_label()`, `form_widget()`, `form_help()` and `form_row()` functions
+ * Add `TuiRenderer` to render Tui widgets from Twig templates, components included with Symfony UX TwigComponent
+ * Add the `condensed` Twig test with `TuiExtension`, true when a component renders in the condensed density
 
 8.1
 ---

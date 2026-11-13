@@ -1,0 +1,40 @@
+⟨36mBlock ⟨0m⟨1;31mhot⟨0m⟨36m back to cyan ⟨0m⟨32m#⟨0m⟨36mtag⟨0m
+ℹ A ⟨1;4;34mlink⟨0m⟨1;3;4;34m (symfony.com)⟨0m, ⟨1;33mstrong⟨0m, ⟨4mCSS⟨0m, ⟨3mcite⟨0m, “quote”, H₂O, x²,
+noon
+UPPER ⟨3mCASE⟨0m
+lower case
+Capitalize Every Word
+• disc
+  ◦ circle
+    ▪ square
+no marker
+⟨33mIII. ⟨0mthree
+⟨33mIV. ⟨0mfour
+b. b
+a. a
+⟨1;35m→ ⟨0mcustom marker
+* string marker
+a line that does not wrap and is cut with an ellipsis when …
+no-break   spaces are not collapsed
+
+pre-line collapses spaces
+but keeps line breaks
+    The first line of this
+paragraph starts four columns
+in, the next ones do not.
+A hanging indent: the first
+  line goes over the padding,
+  the next ones do not.
+⟨34m┌──────────┐⟨0m
+⟨34m│⟨0m          ⟨34m│⟨0m
+⟨34m└──────────┘⟨0m
+⟨34m┌──────────┐⟨0m
+⟨34m│⟨0m          ⟨34m│⟨0m
+⟨34m│⟨0m⟨1;4;34mlogo⟨0m      ⟨34m│⟨0m
+⟨34m│⟨0m⟨1;4;34mpushed⟨0m    ⟨34m│⟨0m
+⟨34m│⟨0m⟨1;4;34mright⟨0m     ⟨34m│⟨0m
+⟨34m└──────────┘⟨0m
+
+words out of sight,
+the others after
+them

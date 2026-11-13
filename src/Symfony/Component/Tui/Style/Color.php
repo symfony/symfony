@@ -274,6 +274,14 @@ final class Color
     }
 
     /**
+     * Whether the color is one of the 16 ANSI ones, whose shade the terminal theme sets.
+     */
+    public function isThemed(): bool
+    {
+        return ColorType::Named === $this->type;
+    }
+
+    /**
      * Get the ANSI escape code for this color as foreground.
      */
     public function toForegroundCode(): string
@@ -283,6 +291,25 @@ final class Color
             ColorType::Palette => \sprintf("\x1b[38;5;%dm", (int) $this->value),
             ColorType::Hex => \sprintf(
                 "\x1b[38;2;%d;%d;%dm",
+                hexdec(substr((string) $this->value, 0, 2)),
+                hexdec(substr((string) $this->value, 2, 2)),
+                hexdec(substr((string) $this->value, 4, 2))
+            ),
+        };
+    }
+
+    /**
+     * Get the ANSI escape code for this color as underline color (SGR 58).
+     *
+     * Named colors use their palette index: SGR 58 has no short form.
+     */
+    public function toUnderlineCode(): string
+    {
+        return match ($this->type) {
+            ColorType::Named => \sprintf("\x1b[58;5;%dm", self::BASIC_COLORS[(string) $this->value] >= 90 ? self::BASIC_COLORS[(string) $this->value] - 82 : self::BASIC_COLORS[(string) $this->value] - 30),
+            ColorType::Palette => \sprintf("\x1b[58;5;%dm", (int) $this->value),
+            ColorType::Hex => \sprintf(
+                "\x1b[58;2;%d;%d;%dm",
                 hexdec(substr((string) $this->value, 0, 2)),
                 hexdec(substr((string) $this->value, 2, 2)),
                 hexdec(substr((string) $this->value, 4, 2))

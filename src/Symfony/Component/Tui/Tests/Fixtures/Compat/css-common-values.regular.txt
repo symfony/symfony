@@ -1,0 +1,42 @@
+inline flex: a row
+
+display: list-item is a block
+
+The line clamp idio…
+
+break-spaces   keeps   spaces
+
+preserve nowrap is pre:   spaces   kept,   a line too long
+for the screen still breaks
+
+                       -webkit-center
+
+A lifted word stays on the line
+
+anchor-name: a list
+
+┌──────────────────────┐
+│min(100%, 24ch)       │
+└──────────────────────┘
+┌──────────────────┐
+│max(25%, 20ch)    │
+└──────────────────┘
+┌────────────────────────┐
+│clamp(10ch, 50%, 26ch)  │
+└────────────────────────┘
+
+⟨1m:-webkit-any() is :is()⟨0m
+
+⟨38;2;158;158;255m-webkit-link⟨0m
+
+⟨4:4mA thickness is accepted⟨0m
+
+ ⟨1;4mOverview⟨0m
+ ⟨4mJobs⟨0m
+ ⟨4mLogs⟨0m
+
+CPU
+⟨1m42%⟨0m
+busy
+
+An inline-block stays on the line

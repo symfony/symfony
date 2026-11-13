@@ -1,0 +1,17 @@
+<!-- covers: css.properties.justify-content css.properties.place-content -->
+<!-- variant: narrow columns=30 -->
+<style>
+  nav { display: flex; gap: 1ch }
+  nav > p { flex: none }
+  .between { justify-content: space-between }
+  .around { justify-content: space-around }
+  .evenly { place-content: center space-evenly }
+  .single { justify-content: space-between }
+  nav > p { background: blue }
+</style>
+<main>
+  <nav class="between"><p>start</p><p>middle</p><p>end</p></nav>
+  <nav class="around"><p>a</p><p>b</p><p>c</p></nav>
+  <nav class="evenly"><p>x</p><p>y</p></nav>
+  <nav class="single"><p>alone at the start</p></nav>
+</main>

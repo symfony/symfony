@@ -30,4 +30,10 @@ class ArrayLineBufferTest extends TestCase
 
         new ArrayLineBuffer(['A'])->slice(-1, 1);
     }
+
+    public function testTheWidestLineIsFoundAmongRepeatedOnes()
+    {
+        $this->assertSame(5, (new ArrayLineBuffer(['ab', 'ab', '', 'abcde', 'ab']))->getMaxVisibleWidth());
+        $this->assertSame(5, (new ArrayLineBuffer(['abcde', 'ab'], 5))->getMaxVisibleWidth(), 'A width given is the one of the lines, not measured again.');
+    }
 }

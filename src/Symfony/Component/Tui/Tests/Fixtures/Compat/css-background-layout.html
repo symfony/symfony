@@ -1,0 +1,30 @@
+<!-- covers: css.properties.background-clip css.properties.background-origin css.properties.background-size css.properties.background-position css.properties.background-position-x css.properties.background-position-y css.properties.background-repeat css.properties.background-repeat-x css.properties.background-repeat-y css.types.position -->
+<style>
+  div { height: 2; margin-bottom: 1; color: white }
+  .stripes { background: linear-gradient(to right, red, blue) 0 0 / 4ch 1 repeat }
+  .tile { background: green linear-gradient(to right, red, blue) no-repeat right 2ch top / 6ch 1 }
+  .axes { background: linear-gradient(to right, red, blue); background-size: 5ch 1; background-repeat-x: space; background-repeat-y: no-repeat; background-position-y: bottom }
+  .round { background-image: linear-gradient(to right, red, blue); background-size: 7ch 100%; background-repeat: round }
+  .center { background: navy linear-gradient(to right, yellow, red) center / 50% 1 repeat-x }
+  .x { background: navy linear-gradient(to right, yellow, red) no-repeat; background-size: 4ch 1; background-position-x: 25% }
+  .boxes { border: 1px solid; padding: 0 2ch; height: 3; background: blue }
+  .padding { background-clip: padding-box }
+  .content { background-clip: content-box }
+  .origin { background-image: linear-gradient(to right, red, blue); background-origin: border-box }
+  .text { background: linear-gradient(to right, red, blue); background-clip: text; -webkit-text-fill-color: transparent; height: 1 }
+  .solid-text { background: cyan; background-clip: text; height: 1 }
+  .layers { width: 30ch; background: linear-gradient(to right, transparent, rgb(0 0 0 / .7)), linear-gradient(#f59e0b, #f59e0b) no-repeat left / 6ch 2, linear-gradient(#1e3a8a, #1e3a8a) }
+</style>
+<div class="stripes">4ch stripes</div>
+<div class="tile">One tile at right 2ch</div>
+<div class="axes">Spaced on the last row</div>
+<div class="round">Rounded tiles</div>
+<div class="center">Centered, half as wide</div>
+<div class="x">At 25%</div>
+<div class="boxes">border-box</div>
+<div class="boxes padding">padding-box</div>
+<div class="boxes content">content-box</div>
+<div class="boxes origin">origin: border-box</div>
+<div class="text">Gradient text, its spaces kept</div>
+<div class="solid-text">The glyphs in the background color</div>
+<div class="layers">Three layers: a fade, a square, a color</div>

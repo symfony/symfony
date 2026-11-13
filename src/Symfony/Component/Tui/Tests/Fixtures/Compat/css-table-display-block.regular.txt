@@ -1,0 +1,13 @@
+
+A table displayed as a block, to scroll when it is too wide,
+like the tables of GitHub, keeps its grid:
+
+┌──────────────────────────────────────────┬───────────────┐
+│⟨1m Setting⟨0m                                  │⟨1m Values⟨0m        │
+├──────────────────────────────────────────┼───────────────┤
+│ Battle Type                              │ Single / Team │
+├──────────────────────────────────────────┼───────────────┤
+│ Duration                                 │ 3 / 6 / 9 min │
+├──────────────────────────────────────────┼───────────────┤
+│ Covered lines, joined by no-break spaces │ 324 / 324     │
+└──────────────────────────────────────────┴───────────────┘

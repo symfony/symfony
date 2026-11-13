@@ -1,0 +1,20 @@
+
+[ One ] [ Two ]
+[ Three ][ Four ]
+
+Text  [ OK ], written
+and         together
+
+⟨1mBold:⟨0m [ OK ]
+
+Total: [ Pay ]
+
+[ A ]
+  [ B, its margin for ...
+
+        [ ﺭﺎﺴﻳ ] [ ﻦﻴﻤﻳ ]
+
+[ after a hidden one, ...
+
+text [ Aaaaaa ][ Bbbbbb ]
+[ Cccccc ]

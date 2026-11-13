@@ -1,0 +1,15 @@
+                  ┌────────┐┌─────────┐
+ [ ] One  [ ] Two │ a chip ││ another │
+                  └────────┘└─────────┘
+ A block of its own
+php css terminal
+Previous 1 2 Next
+a block in some media, kept a block
+Categories:  Terminal emulators │ User interfaces
+│ Bulletin board systems
+Kept on one line when it fits:
+an inline block of a few words, and wrapped at its spaces,
+on lines of its own, when it does not:
+an inline block of more words than the line has room for, at
+any width of the screen.
+Displayed inline · from 30 columns · like a header of links

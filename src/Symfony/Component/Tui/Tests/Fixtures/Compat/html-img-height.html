@@ -1,0 +1,11 @@
+<!-- covers: html.elements.img css.properties.height -->
+<style>
+  .bar { display: flex; align-items: center; gap: 1ch }
+  .bar img { height: 16px }
+  .framed { border: 1px solid }
+</style>
+<div class="bar"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAIAAAAt/+nTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAQklEQVRYhe3PQREAIBADMcC/Z1Bx5LMR0M7uu2btNftwRtc/KEArQCtAK0ArQCtAK0ArQCtAK0ArQCtAK0ArQCtAe+LxAj+1kl/hAAAAAElFTkSuQmCC" alt="logo"><span>A title right after a logo of a row, its height alone set</span></div>
+<p>A framed image, its border around it, not across the page:</p>
+<img class="framed" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAIAAAAt/+nTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAQklEQVRYhe3PQREAIBADMcC/Z1Bx5LMR0M7uu2btNftwRtc/KEArQCtAK0ArQCtAK0ArQCtAK0ArQCtAK0ArQCtAe+LxAj+1kl/hAAAAAElFTkSuQmCC" alt="framed">
+<table><tr><td><img src="missing.gif" width="0" height="1"></td><td>A comment</td></tr></table>
+<table><tr><td><img src="missing.gif" width="40" height="1"></td><td>A reply, indented by a spacer image of 40px not drawn, like on Hacker News</td></tr></table>

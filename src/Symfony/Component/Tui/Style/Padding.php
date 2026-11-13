@@ -33,12 +33,44 @@ final class Padding
     public readonly int $bottom;
     public readonly int $left;
 
-    public function __construct(int $top, int $right, int $bottom, int $left)
-    {
+    /**
+     * @param array<int, array{float, float}|PercentLength>|null $percents The sides that are percentages of the width of the containing block, by index in top, right, bottom, left order: the percentage and the cells added to it, like calc(10% + 1ch), or the smallest or largest of such sizes, like max(1ch, 5%)
+     */
+    public function __construct(
+        int $top,
+        int $right,
+        int $bottom,
+        int $left,
+        public readonly ?array $percents = null,
+    ) {
         $this->top = max(0, $top);
         $this->right = max(0, $right);
         $this->bottom = max(0, $bottom);
         $this->left = max(0, $left);
+    }
+
+    /**
+     * Whether some sides are percentages, which the width of the containing block resolves.
+     */
+    public function hasPercents(): bool
+    {
+        return (bool) $this->percents;
+    }
+
+    /**
+     * The padding in cells, the percentages taken of the width of the containing block, the vertical sides too, like CSS.
+     */
+    public function resolve(int $base): self
+    {
+        if (!$this->percents) {
+            return $this;
+        }
+        $sides = [$this->top, $this->right, $this->bottom, $this->left];
+        foreach ($this->percents as $side => $percent) {
+            $sides[$side] = (int) floor($percent instanceof PercentLength ? $percent->at(max(0, $base)) : max(0, $base) * $percent[0] / 100 + $percent[1]);
+        }
+
+        return new self(...$sides);
     }
 
     /**

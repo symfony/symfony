@@ -1,0 +1,25 @@
+<!-- covers: css.properties.columns css.properties.column-count css.properties.column-width css.properties.column-rule css.properties.column-rule-style css.properties.column-rule-color css.properties.column-rule-width css.properties.column-fill css.properties.column-span css.properties.break-inside css.properties.page-break-inside css.properties.break-before css.properties.break-after css.properties.page-break-before css.properties.page-break-after -->
+<!-- variant: narrow columns=30 -->
+<style>
+  ul { column-count: 3; column-rule: 1px dashed gray; padding: 0; margin: 0 0 1 }
+  li { break-inside: avoid-column }
+  .article { columns: 2 14ch; column-gap: 3ch; column-rule-style: solid; column-rule-color: blue; column-rule-width: thin; column-fill: balance; border: 1px solid }
+  .article h2 { column-span: all; margin: 0 }
+  .cards { column-width: 16ch; column-rule: none }
+  .cards p { page-break-inside: avoid; border: 1px solid; margin: 0 }
+  .chapters { columns: 3; column-gap: 1 }
+  .chapters h3 { break-before: column; margin: 0 }
+  .chapters h3.legacy { break-before: unset; page-break-before: always }
+  .chapters .end { page-break-after: always }
+  .kept { columns: 2; column-gap: 2ch }
+  .kept h4 { break-after: avoid; margin: 0 }
+  .kept p { margin: 0 }
+  .filled { columns: 3; column-gap: 1; column-fill: auto; height: 3ch }
+  .filled p { margin: 0 }
+</style>
+<ul><li>Apples</li><li>Bananas and cherries</li><li>Dates</li><li>Elderberries</li><li>Figs</li><li>Grapes</li><li>Honeydew melons</li></ul>
+<div class="article"><h2>Columns</h2><p>Text flows from the bottom of one column to the top of the next, the columns balanced like in a newspaper.</p></div>
+<div class="cards"><p>One card</p><p>Two cards, kept whole</p><p>Three</p></div>
+<div class="chapters"><h3>One</h3><p>A chapter starts a column.</p><h3 class="legacy">Two</h3><p class="end">And ends it.</p><p>After a break.</p></div>
+<div class="kept"><p>one</p><p>two</p><h4>Heading kept with its text</h4><p>its text</p><p>more</p></div>
+<div class="filled"><p>first</p><p>second</p><p>third</p><p>fourth</p></div>

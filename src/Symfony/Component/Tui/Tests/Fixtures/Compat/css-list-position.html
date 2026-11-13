@@ -1,0 +1,12 @@
+<!-- covers: css.properties.list-style-position -->
+<style>
+  ul, ol { max-width: 30ch; margin-bottom: 1 }
+  .inside { list-style-position: inside }
+  .short { list-style: square inside }
+</style>
+<ul><li>Outside, the default: the lines of an item that wraps are aligned after its marker.</li><li>Short</li></ul>
+<ol class="inside"><li>Inside: the marker is the start of the text, the lines wrap under it.</li></ol>
+<ul class="short"><li>The shorthand sets it too, with the type.</li></ul>
+<ul style="list-style: '✓ '"><li>A string with a space</li></ul>
+<ul style="list-style: inside square"><li>The position first</li></ul>
+<ul style="list-style: none square"><li>none is the image, square the type</li></ul>

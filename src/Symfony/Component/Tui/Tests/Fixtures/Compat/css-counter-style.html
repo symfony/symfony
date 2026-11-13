@@ -1,0 +1,46 @@
+<!-- covers: css.at-rules.counter-style css.properties.list-style-type -->
+<style>
+  @counter-style paren { system: extends decimal; prefix: "("; suffix: ") " }
+  @counter-style thumbs { system: cyclic; symbols: "👍" "👎"; suffix: " " }
+  @counter-style stars { system: symbolic; symbols: "*"; suffix: " " }
+  @counter-style abc { system: alphabetic; symbols: a b c; suffix: ". " }
+  @counter-style binary { system: numeric; symbols: "0" "1"; pad: 4 "0"; negative: "(" ")" }
+  @counter-style dice { system: additive; additive-symbols: 6 "⚅", 5 "⚄", 4 "⚃", 3 "⚂", 2 "⚁", 1 "⚀"; suffix: " " }
+  @counter-style first-three { system: fixed; symbols: "①" "②" "③"; suffix: " " }
+  @counter-style small { system: extends lower-roman; range: 1 2; fallback: abc }
+  @counter-style decimal { system: cyclic; symbols: "x" }
+  @counter-style broken { system: alphabetic; symbols: "only-one" }
+  ol { margin: 0 0 1 }
+  .paren { list-style-type: paren }
+  .thumbs { list-style-type: thumbs }
+  .stars { list-style-type: stars }
+  .abc { list-style-type: abc }
+  .dice { list-style-type: dice }
+  .fixed { list-style-type: first-three }
+  .small { list-style-type: small }
+  .broken { list-style-type: broken }
+  .greek { list-style-type: lower-greek }
+  .hebrew { list-style-type: hebrew }
+  .armenian { list-style-type: upper-armenian }
+  .kana { list-style-type: hiragana-iroha }
+  .chinese { list-style-type: simp-chinese-informal }
+  .devanagari { list-style-type: devanagari }
+  p.binary::before { content: counter(n, binary) " " counter(m, binary) " " }
+  p.binary { counter-reset: n 5 m -3 }
+</style>
+<ol class="paren"><li>parenthesized</li><li>by extends</li></ol>
+<ol class="thumbs"><li>cyclic</li><li>cycles</li><li>back to the first</li></ol>
+<ol class="stars" start="3"><li>symbolic: three stars</li><li>then four</li></ol>
+<ol class="abc" start="4"><li>alphabetic: aa</li><li>then ab</li></ol>
+<ol class="dice" start="9"><li>additive: 6 + 3</li><li>6 + 4</li></ol>
+<ol class="fixed" start="2"><li>fixed: ②</li><li>③</li><li>out of its symbols: decimal</li></ol>
+<ol class="small"><li>in range: roman</li><li>ii</li><li>out of range: the fallback, c</li></ol>
+<ol class="broken"><li>an invalid rule: decimal</li></ol>
+<ol class="greek"><li>lower-greek</li><li>β</li></ol>
+<ol class="hebrew" start="14"><li>hebrew: יד</li><li>15 is טו</li></ol>
+<ol class="armenian" start="1994"><li>upper-armenian</li></ol>
+<ol class="kana"><li>hiragana-iroha: い</li><li>ろ</li></ol>
+<ol class="chinese" start="10"><li>simp-chinese-informal: 十</li><li>十一</li></ol>
+<ol class="chinese" start="101"><li>with a zero: 一百零一</li></ol>
+<ol class="devanagari" start="42"><li>devanagari digits</li></ol>
+<p class="binary">counter() pads, and wraps negatives in parentheses</p>

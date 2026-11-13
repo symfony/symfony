@@ -1,0 +1,13 @@
+<!-- covers: css.properties.position-try-order -->
+<!-- variant: short rows=6 -->
+<style>
+  .row { display: flex; gap: 14ch; margin: 5 0 0 4ch }
+  #a { anchor-name: --a }
+  #b { anchor-name: --b }
+  .tip { position: fixed; position-area: bottom; width: 7ch }
+  .listed { position-anchor: --a; position-try-fallbacks: top, right; color: yellow }
+  .ordered { position-anchor: --b; position-try: most-width top, right; color: cyan }
+</style>
+<div class="row"><p id="a">anchor</p><p id="b">anchor</p></div>
+<div class="tip listed">listed</div>
+<div class="tip ordered">widest</div>

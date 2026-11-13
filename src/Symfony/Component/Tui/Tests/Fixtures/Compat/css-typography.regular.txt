@@ -1,0 +1,32 @@
+
+⟨1;34mCʜᴀᴘᴛᴇʀ Oɴᴇ: Tʜᴇ Bᴇɢɪɴɴɪɴɢ⟨0m
+
+ᴀʟʟ ꜱᴍᴀʟʟ ᴄᴀᴘꜱ, ᴍɪxᴇᴅ ᴄᴀꜱᴇ
+
+Ｆｕｌｌ ｗｉｄｔｈ ４２！
+
+アイウ ちよつと → アイウ ちよつと
+
+ＵＰ＋ＷＩＤＥ
+
+⟨53mAn overlined line⟨0m
+
+⟨4;53mLines over and under⟨0m
+
+⟨2mLight is dim, ⟨0mbolder is 400 here
+
+⟨1mHeavy is bold, ⟨0mlighter is 400 here
+
+Before the moved line
+
+
+   ⟨33mtranslated by 3 columns and a row⟨0m
+The line it is drawn over
+
+  ⟨36mtranslate: 2 0⟨0m
+
+┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐
+╎                                                          ╎
+╎                  ⟨48;2;124;58;237m centered by translate ⟨0m                 ╎
+╎                                                          ╎
+└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘

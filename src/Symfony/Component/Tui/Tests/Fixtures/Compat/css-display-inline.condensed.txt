@@ -1,0 +1,4 @@
+⟨4mDocs⟨0m » ⟨4mLibrary⟨0m » functools                             ⟨4mindex⟨0m
+A paragraph displayed inline, a block too, and the text
+after them, in one line, like CSS.
+Displayed inline but as blocks in a wider screen: blocks

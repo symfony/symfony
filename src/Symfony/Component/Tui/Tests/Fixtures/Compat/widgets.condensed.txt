@@ -1,0 +1,9 @@
+⟨90m╭───────╮╭────────╮⟨0m
+⟨90m│⟨0m⟨1;36m First ⟨0m⟨90m││ Second │⟨0m
+⟨90m┘       └┴────────┴─────────────────────────────────────────⟨0m
+first tab content
+
+⟨36m⠋⟨0m ⟨90mLoading⟨0m
+⟨1;36mMarkdown⟨0m
+
+Some ⟨1mbold⟨0m text.

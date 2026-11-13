@@ -17,17 +17,30 @@
     ],
     "require": {
         "php": ">=8.4.1",
+        "psr/log": "^1|^2|^3",
         "revolt/event-loop": "^1.0",
         "symfony/event-dispatcher": "^8.0",
         "symfony/polyfill-intl-grapheme": "^1.42.1",
         "symfony/string": "^8.1.9"
     },
     "require-dev": {
+        "ext-dom": "*",
         "league/commonmark": "^2.9",
+        "symfony/asset-mapper": "^7.4|^8.0",
         "tempest/highlight": "^2.16"
     },
+    "suggest": {
+        "ext-dom": "To build widgets from HTML and style them with CSS",
+        "ext-gd": "To draw images, like HTML <img>",
+        "ext-intl": "To draw bidirectional text, like Arabic and Hebrew, in visual order",
+        "symfony/polyfill-intl-char": "To draw bidirectional text in visual order without ext-intl",
+        "symfony/asset-mapper": "To load CSS stylesheets and images from mapped assets",
+        "symfony/twig-bridge": "To render widgets from Twig templates and components"
+    },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Tui\\": "" },
+        "psr-4": {
+            "Symfony\\Component\\Tui\\": ""
+        },
         "exclude-from-classmap": [
             "/Tests/"
         ]

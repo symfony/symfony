@@ -27,12 +27,14 @@ namespace Symfony\Component\Tui\Render;
 final class Layer
 {
     /**
-     * @param string[] $lines       ANSI-formatted content lines
-     * @param int      $row         Vertical offset in the composite
-     * @param int      $col         Horizontal offset in the composite
-     * @param bool     $transparent Whether cells with default background inherit from layers below
-     * @param int|null $width       Explicit canvas width (used by the base layer to define the canvas size)
-     * @param int|null $height      Explicit canvas height (used by the base layer to define the canvas size)
+     * @param string[]    $lines       ANSI-formatted content lines
+     * @param int         $row         Vertical offset in the composite
+     * @param int         $col         Horizontal offset in the composite
+     * @param bool        $transparent Whether cells with default background inherit from layers below
+     * @param int|null    $width       Explicit canvas width (used by the base layer to define the canvas size)
+     * @param int|null    $height      Explicit canvas height (used by the base layer to define the canvas size)
+     * @param string|null $seeThrough  A background a transparent layer treats as none, as SGR parameters: the one it
+     *                                 inherited from what it is drawn in
      */
     public function __construct(
         public readonly array $lines,
@@ -41,6 +43,7 @@ final class Layer
         public readonly bool $transparent = false,
         public readonly ?int $width = null,
         public readonly ?int $height = null,
+        public readonly ?string $seeThrough = null,
     ) {
     }
 }

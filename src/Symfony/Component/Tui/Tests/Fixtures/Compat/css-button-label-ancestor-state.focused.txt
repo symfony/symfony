@@ -1,0 +1,4 @@
+
+A label shown while its card is hovered: [ ✎ ]
+
+A hint shown while the focus is in the nav: ⟨7m[ Ok (enter) ]⟨0m

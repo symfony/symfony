@@ -1,0 +1,11 @@
+<!-- covers: css.properties.border-top-left-radius css.properties.border-radius -->
+<style>
+  .group { border-radius: 4px; width: 30ch }
+  .item { border: 1px solid; padding: 0 1ch }
+  .item + .item { border-top-width: 0 }
+  .item:first-child { border-top-left-radius: inherit; border-top-right-radius: inherit }
+  .item:last-child { border-bottom-left-radius: inherit; border-bottom-right-radius: inherit }
+  .pad { padding: 0 4ch } .pad p { padding-left: inherit; margin: 0 }
+</style>
+<div class="group"><div class="item">The corners of the group</div><div class="item">a middle item</div><div class="item">its last item</div></div>
+<div class="pad"><p>A side inherited from a shorthand</p></div>

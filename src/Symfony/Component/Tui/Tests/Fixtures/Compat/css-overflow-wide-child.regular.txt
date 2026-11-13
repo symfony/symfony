@@ -1,0 +1,34 @@
+
+A list of slides wider than the box that clips it, like the
+carousel of Go: its first slide, the others cut
+
+┌──────────────────────────────────────┐
+│  First slide with a quote that       │
+│  wraps over a few lines              │
+└──────────────────────────────────────┘
+
+A block wider than its box that clips: its lines as long as
+its width, cut at the border
+
+┌──────────────────────────────────────┐
+│The lines of a block of 80 columns, ea│
+│clips it                              │
+└──────────────────────────────────────┘
+
+Of a max-width or a percentage, as wide as the box at most:
+not cut
+
+┌──────────────────────────────────────┐
+│A block of a max-width wider than the │
+│box, its text wrapping in it          │
+└──────────────────────────────────────┘
+
+Beside a block cut at the side, a block that fits centered
+in the box, not in the wider lines
+
+┌──────────────────────────────────────┐
+│A block of 80 columns cut at the borde│
+│         ┌──────────────────┐         │
+│         │     Centered     │         │
+│         └──────────────────┘         │
+└──────────────────────────────────────┘

@@ -23,4 +23,6 @@ enum TextAlign: string
     case Left = 'left';
     case Center = 'center';
     case Right = 'right';
+    /** Like Left, but the text widgets that wrap stretch the spaces of every line but the last of a paragraph */
+    case Justify = 'justify';
 }

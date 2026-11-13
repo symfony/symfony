@@ -1,0 +1,36 @@
+<!-- covers: css.properties.z-index -->
+<style>
+  .stage { position: relative; min-height: 6 }
+  .behind { position: absolute; top: 0; left: 0; width: 30ch; height: 4; background: #1e3a8a; z-index: -1 }
+  .deeper { position: absolute; top: 1; left: 4; width: 30ch; height: 4; background: #7f1d1d; z-index: -2 }
+  .front { position: absolute; top: 3; left: 20; background: #065f46; z-index: 1 }
+  .raised { position: relative; top: 1; left: 14; width: 24ch; background: #b45309; z-index: 3 }
+  .pile { margin-top: 1 }
+  .a { position: relative; top: 0; left: 2; width: 34ch; background: #92400e; z-index: 2 }
+  .b { position: relative; top: -1; left: 6; width: 44ch; background: #4c1d95 }
+  .nest { position: relative; min-height: 5; margin-top: 1 }
+  .card { position: absolute; top: 0; left: 0; width: 30ch; height: 3; background: #1e3a8a; z-index: 1 }
+  .badge { position: absolute; top: 1; left: 2; background: #b91c1c; z-index: 9 }
+  .shade { position: absolute; top: 0; left: 12; width: 16ch; height: 4; background: #7f1d1d; z-index: -1 }
+  .cover { position: absolute; top: 1; left: 9; background: #065f46; z-index: 2 }
+</style>
+<div class="stage">
+  <p>The text of the page, over a negative z-index:</p>
+  <p>its background shows behind the letters,</p>
+  <div class="behind"></div>
+  <div class="deeper"></div>
+  <p class="raised">relative z 3: over the next</p>
+  <p class="front">absolute z 1, under the one above</p>
+</div>
+<div class="pile">
+  <p class="a">z-index 2, over the one after it</p>
+  <p class="b">z-index auto, under the one before: its end</p>
+</div>
+<div class="nest">
+  <div class="card">
+    <p>card z 1, its text over its shade z -1</p>
+    <p class="badge">badge z 9 in it</p>
+    <div class="shade"></div>
+  </div>
+  <p class="cover">sibling z 2, over the badge</p>
+</div>

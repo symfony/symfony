@@ -34,6 +34,24 @@ use Symfony\Component\Tui\Widget\TextWidget;
 
 class SelectListTest extends TestCase
 {
+    public function testGroupsHaveAHeadingThatIsNotAnItem()
+    {
+        $list = new SelectListWidget([
+            ['value' => 'rust', 'label' => 'Rust', 'group' => 'Compiled'],
+            ['value' => 'go', 'label' => 'Go', 'group' => 'Compiled'],
+            ['value' => 'php', 'label' => 'PHP', 'group' => 'Interpreted'],
+            ['value' => 'sh', 'label' => 'Shell'],
+        ], 10);
+
+        $lines = array_map(static fn (string $line) => rtrim(AnsiUtils::stripAnsiCodes($line)), $list->render(new RenderContext(30, 24)));
+        $this->assertSame(['Compiled', '→ Rust', '  Go', 'Interpreted', '  PHP', '  Shell'], \array_slice($lines, 0, 6));
+
+        // Down moves from item to item, over the headings
+        $list->handleInput("\x1b[B");
+        $list->handleInput("\x1b[B");
+        $this->assertSame('php', $list->getSelectedItem()['value'] ?? null);
+    }
+
     public function testRenderShowsItems()
     {
         $list = $this->createTestList();

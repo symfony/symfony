@@ -1,0 +1,15 @@
+<!-- covers: html.elements.button -->
+<!-- variant: wide columns=120 -->
+<!-- variant: hovered hover=#copy -->
+<style>
+  .label { display: none }
+  @media (min-width: 768px) { .label { display: inline-flex } }
+  .short { display: inline }
+  @media (min-width: 768px) { .short { display: none } }
+  .d-none { display: none !important }
+  @media (min-width: 768px) { .d-md-inline { display: inline !important } }
+  .tip { display: none }
+  button:hover .tip { display: inline }
+</style>
+<p>Labels displayed from 768px, 96 columns, like the search button of Bootstrap: <button><svg aria-label="Search" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="currentColor"/></svg><span class="label">Search docs</span></button> <button><span class="short">Menu</span><span class="label">Open the menu</span></button> <button><span class="d-none d-md-inline">Download</span> ↓</button></p>
+<p>Shown on hover only, or hidden by its style attribute or hidden: <button id="copy">Copy<span class="tip"> (copied)</span></button> <button><span class="label" style="display: none">Loading</span>Save</button> <button><span class="label" hidden>Hidden</span>Ok</button></p>

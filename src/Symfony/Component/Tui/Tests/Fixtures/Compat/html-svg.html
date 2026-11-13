@@ -1,0 +1,69 @@
+<!-- covers: html.elements.svg css.properties.fill css.properties.fill-opacity css.properties.fill-rule css.properties.stroke css.properties.stroke-opacity css.properties.stroke-width css.properties.stop-color css.properties.stop-opacity css.properties.text-anchor css.properties.stroke-dasharray css.properties.stroke-dashoffset css.properties.stroke-linecap css.properties.stroke-linejoin css.properties.stroke-miterlimit css.properties.marker css.properties.marker-start css.properties.marker-mid css.properties.marker-end css.properties.paint-order css.properties.clip-rule css.properties.mask css.properties.mask-type css.properties.flood-color css.properties.flood-opacity css.properties.cx css.properties.cy css.properties.r css.properties.rx css.properties.ry css.properties.x css.properties.y css.properties.d -->
+<!-- variant: light scheme=light -->
+<style>
+  .icon { color: #f97316 }
+  .wide { width: 20ch }
+  .block { display: block }
+  .badge path { fill: currentColor; fill-rule: evenodd }
+  .badge { --ring: #0ea5e9 }
+  .badge .ring { fill: none; stroke: var(--ring); stroke-width: 2px; stroke-opacity: .8 }
+  .badge stop { stop-color: #facc15 }
+  .badge .end { stop-opacity: .3 }
+  .badge text { text-anchor: middle; font-size: 9px }
+  .badge .dot { fill: #e11d48; fill-opacity: 50% }
+  .chart polyline { stroke-linejoin: round; stroke-linecap: round }
+  .route { marker-start: url(#pin); marker-mid: url(#stop); marker-end: url(#head) }
+  .route .bare { marker: none }
+  .outlined circle { paint-order: stroke markers fill }
+  .porthole { clip-path: url(#window) }
+  .faded { mask: url(#fade) }
+  .muted { filter: grayscale(1) }
+  .lifted { filter: drop-shadow(4px 4px 0 #1e293b) }
+  #glow feFlood { flood-color: #facc15; flood-opacity: .9 }
+  #spot { mask-type: alpha }
+  #window { clip-rule: evenodd }
+  .chart .grid { stroke-dasharray: 4 4; stroke-dashoffset: 2 }
+  .moved { cx: 60px; r: 10px }
+  .rounded { rx: 6px; x: 2px }
+  .drawn { d: path("M44 22 L52 2 L60 22 Z") }
+</style>
+<p>A drawing, 160 by 96 pixels: 20 columns, 6 rows</p>
+<svg width="160" height="96" viewBox="0 0 100 60">
+  <title>A sun over the hills</title>
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop offset="0" stop-color="#1e3a8a"/><stop offset="1" stop-color="#93c5fd"/></linearGradient></defs>
+  <rect x="2" y="2" width="96" height="56" rx="8" fill="url(#sky) #1d4ed8"/>
+  <circle cx="30" cy="30" r="18" fill="gold" stroke="white" stroke-width="3"/>
+  <path d="M55 45 L70 15 L85 45 Z" fill="#22c55e"/>
+  <path d="M5 55 Q 50 30 95 55" fill="none" stroke="red" stroke-width="2"/>
+  <g transform="translate(88 12) rotate(45)" opacity=".5"><rect x="-4" y="-4" width="8" height="8" fill="white"/></g>
+  <text x="50" y="57" font-size="7" text-anchor="middle" fill="white">Hills</text>
+  <defs><symbol id="star"><path d="M3 0 L4 2 L6 2 L4.5 3.5 L5 6 L3 4.5 L1 6 L1.5 3.5 L0 2 L2 2 Z"/></symbol></defs>
+  <use href="#star" x="60" y="4" fill="white"/><use href="#star" x="70" y="4" fill="white"/>
+</svg>
+<p>A diagram of thin lines, its labels as text, like a railroad diagram of SQL:</p>
+<svg viewBox="0 0 320 80" width="320" height="80">
+  <path d="M0 24 H320 M40 24 Q 56 24 56 40 V 48 Q 56 64 72 64 H248 Q 264 64 264 48 V 40 Q 264 24 280 24" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <rect x="104" y="12" width="112" height="24" rx="12" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="160" y="24" text-anchor="middle" dominant-baseline="central" fill="#e2e8f0">NATURAL</text>
+  <text x="160" y="64" text-anchor="middle" dominant-baseline="central" fill="#94a3b8" style="font-size: 12px">or nothing</text>
+</svg>
+<p>An icon in the line <svg class="icon" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" fill-rule="evenodd" d="M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20zm0 5a5 5 0 1 0 0 10a5 5 0 1 0 0-10z"/></svg> in currentColor</p>
+<p>A width from CSS keeps the proportions:</p>
+<svg class="wide" viewBox="0 0 40 10"><polygon points="0,10 20,0 40,10" style="fill: #a855f7; stroke: none"/></svg>
+<p>Nothing to draw: <svg aria-label="Empty"><defs><linearGradient id="g"/></defs></svg>, and hidden: <svg width="16" height="16"><rect width="16" height="16" display="none"/></svg>.</p>
+<p>Styled by the style sheet:</p>
+<svg class="badge icon" width="48" height="64" viewBox="0 0 24 32"><defs><linearGradient id="shine"><stop offset="0"/><stop class="end" offset="1"/></linearGradient></defs><rect y="25" width="24" height="7" fill="url(#shine)"/><text x="12" y="31" fill="#1e293b">OK</text><circle class="ring" cx="12" cy="12" r="10"/><path d="M6 6 H18 V18 H6 Z M9 9 V15 H15 V9 Z"/><circle class="dot" cx="12" cy="12" r="2" fill="green"/></svg>
+<p>Dashed, with caps and joins:</p>
+<svg class="chart" width="160" height="48" viewBox="0 0 80 24"><path class="grid" d="M0 12 H80" stroke="gray" stroke-width="1"/><polyline points="4,20 20,6 36,16 52,4 76,18" fill="none" stroke="#22c55e" stroke-width="3"/><polyline points="4,22 20,14 36,22" fill="none" stroke="#f97316" stroke-width="3" stroke-linejoin="miter" stroke-miterlimit="1"/><rect x="58" y="2" width="20" height="20" fill="none" stroke="white" stroke-width="2" stroke-dasharray="6 2 1 2" stroke-linecap="square"/></svg>
+<p>Markers along a route, and a stroke under its fill:</p>
+<svg class="route outlined" width="160" height="48" viewBox="0 0 80 24"><defs><marker id="pin" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3" markerHeight="3"><circle cx="5" cy="5" r="5" fill="#e11d48"/></marker><marker id="stop" viewBox="0 0 4 4" refX="2" refY="2" markerWidth="2" markerHeight="2"><rect width="4" height="4" fill="white"/></marker><marker id="head" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#facc15"/></marker></defs><path d="M4 20 L24 6 Q 40 2 44 14 T 72 8" fill="none" stroke="#38bdf8" stroke-width="2"/><polyline class="bare" points="4,23 76,23" stroke="gray"/><circle cx="60" cy="18" r="4" fill="#22c55e" stroke="white" stroke-width="3"/></svg>
+<p>Clipped to a window with a hole, and to the left half of a circle:</p>
+<svg width="160" height="48" viewBox="0 0 80 24"><defs><clipPath id="window"><path d="M2 2 H38 V22 H2 Z M14 8 H26 V16 H14 Z"/></clipPath><clipPath id="left" clipPathUnits="objectBoundingBox"><rect width=".5" height="1"/></clipPath></defs><g class="porthole"><rect width="40" height="24" fill="#0ea5e9"/><circle cx="20" cy="12" r="9" fill="#facc15"/></g><circle cx="60" cy="12" r="10" fill="#e11d48" clip-path="url(#left)"/></svg>
+<p>Filled with patterns of stripes and dots:</p>
+<svg width="160" height="48" viewBox="0 0 80 24"><defs><pattern id="stripes" width="8" height="24" patternUnits="userSpaceOnUse"><rect width="4" height="24" fill="#22c55e"/></pattern><pattern id="dots" width=".25" height=".5"><circle cx="2.5" cy="3" r="2" fill="#f97316"/></pattern></defs><rect width="38" height="24" fill="url(#stripes)"/><rect x="42" width="38" height="24" fill="url(#dots) #f97316" stroke="url(#stripes)" stroke-width="2"/></svg>
+<p>Faded by a mask of a gradient, and cut out by the alpha of another:</p>
+<svg width="160" height="48" viewBox="0 0 80 24"><defs><linearGradient id="ramp"><stop offset="0" stop-color="white"/><stop offset="1" stop-color="black"/></linearGradient><mask id="fade" maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="24"><rect width="40" height="24" fill="url(#ramp)"/></mask><mask id="spot"><circle cx="60" cy="12" r="10" fill="black"/></mask></defs><rect class="faded" width="40" height="24" fill="#22c55e"/><rect x="42" width="38" height="24" fill="#f97316" mask="url(#spot)"/></svg>
+<p>Gray, with a shadow, and a <filter> flooding a shape in yellow:</p>
+<svg width="160" height="48" viewBox="0 0 80 24"><defs><filter id="glow"><feFlood/><feComposite in2="SourceGraphic" operator="in"/></filter></defs><circle class="muted" cx="12" cy="12" r="10" fill="#e11d48"/><rect class="lifted" x="28" y="2" width="20" height="16" fill="#0ea5e9"/><path d="M60 2 L76 22 H56 Z" fill="#22c55e" filter="url(#glow)"/></svg>
+<p>Moved, rounded and drawn by the geometry of the style sheet:</p>
+<svg width="160" height="48" viewBox="0 0 80 24"><circle class="moved" cx="12" cy="12" r="4" fill="#e11d48"/><rect class="rounded" x="30" y="2" width="36" height="20" fill="#0ea5e9"/><path class="drawn" d="M0 0 H80 V24 H0 Z" fill="#22c55e"/></svg>

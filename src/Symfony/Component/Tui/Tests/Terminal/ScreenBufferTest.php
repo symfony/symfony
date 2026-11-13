@@ -43,6 +43,15 @@ class ScreenBufferTest extends TestCase
         yield 'wide character multiline' => [40, 10, "你好\n世界", "你好\n世界"];
     }
 
+    public function testTheStyledScreenKeepsTheRowsThatShowAStyle()
+    {
+        $buffer = new ScreenBuffer(4, 5);
+        $buffer->write("ab\r\n\e[44m    \e[0m\r\n\e[4m  \e[0m\r\n\e[38;2;1;2;3m    \e[0m\r\n");
+
+        $this->assertSame("ab\n\e[44m    \e[0m\n\e[4m  \e[0m", $buffer->getStyledScreen(), 'A background or an underline shows on spaces, a text color does not.');
+        $this->assertSame('ab', $buffer->getScreen());
+    }
+
     public function testCursorMovement()
     {
         $screen = new ScreenBuffer(40, 10);

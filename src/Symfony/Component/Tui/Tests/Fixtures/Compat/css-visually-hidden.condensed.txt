@@ -1,0 +1,12 @@
+Before after: one line
+[ × ]
+Before after, like the .sr-only of GitHub
+Other clips are ignored
+⟨4:4m-webkit-text-decoration⟨0m
+Notifications
+A button whose label a rule displays again from a width the
+narrowest screen is as wide as, the other never:
+[ Search docs ]
+Shown on hover only, or hidden by its style attribute: not
+in the label
+[ Copy ] [ Save ]

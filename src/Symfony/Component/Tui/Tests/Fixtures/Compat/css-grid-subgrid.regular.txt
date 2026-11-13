@@ -1,0 +1,50 @@
+
+Rows of a grid, each a subgrid, like a table of the
+documentation of Tailwind: the columns line up.
+
+⟨1m Class⟨0m                          ⟨1m Styles⟨0m
+────────────────────────────────────────────────────────────
+ flex-1                          flex: 1;
+ flex-initial-longer             flex: 0 auto;
+ x                               flex: var(--size);
+────────────────────────────────────────────────────────────
+
+Cards across the three columns of their grid, and its gap:
+
+⟨1mOne⟨0m                     ⟨3mTwo words⟨0m            ⟨4m3⟨0m
+⟨1mA longer one⟨0m            ⟨3mx⟨0m                    ⟨4mthird⟨0m
+
+Tiles side by side, each a subgrid of three rows: their
+titles, texts and links line up.
+
+⟨1;2mShort⟨0m                ⟨1;2mA title long enough⟨0m  ⟨1;2mThird⟨0m
+⟨1;2m                   ⟨0m  ⟨1;2mto wrap⟨0m              ⟨1;2m                  ⟨0m
+A text of a few      Short.               The longest text
+words.                                    of the three
+                                          tiles, on several
+                                          lines.
+⟨4mRead⟨0m                 ⟨4mRead⟨0m                 ⟨4mRead⟨0m
+
+A subgrid of rows spanning one row of its grid, of more
+items than that: a grid of its own, all of them shown.
+
+⟨1ma⟨0m                    ⟨1mb⟨0m
+⟨3mt a⟨0m                  ⟨3mt b⟨0m
+⟨4mu⟨0m
+
+Tiles of a border and a padding: those above the first row
+and below the last, the rows lined up, nothing more
+
+┌─────────────────┐  ┌─────────────────┐
+│ ⟨1;2mShort⟨0m           │  │ ⟨1;2mA much longer  ⟨0m │
+│ ⟨1;2m               ⟨0m │  │ ⟨1;2mtitle that     ⟨0m │
+│ ⟨1;2m               ⟨0m │  │ ⟨1;2mwraps⟨0m           │
+│ text            │  │ text two        │
+│ ⟨4mlink⟨0m            │  │ ⟨4mlink⟨0m            │
+└─────────────────┘  └─────────────────┘
+┌─────────────────┐  ┌─────────────────┐
+│ ⟨1;2mShort⟨0m           │  │ ⟨1;2mTitle⟨0m           │
+│ two rows of its │  │ text            │
+│ three           │  │                 │
+│                 │  │ ⟨4mlink⟨0m            │
+└─────────────────┘  └─────────────────┘

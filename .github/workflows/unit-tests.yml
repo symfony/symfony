@@ -116,7 +116,7 @@ jobs:
 
           # For the highest branch, in high-deps mode, the version before it is checked out and tested with the locally patched components
           if [[ "${{ matrix.mode }}" = high-deps ]]; then
-            SYMFONY_VERSIONS=$(git ls-remote -q --heads "$GIT_REMOTE" | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
+            SYMFONY_VERSIONS=$(git ls-remote -q --heads "$GIT_REMOTE" | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9][0-9]*$' | sort -V)
 
             if [[ $SYMFONY_VERSION = $(echo "$SYMFONY_VERSIONS" | tail -n 1 | sed s/.//) ]]; then
               echo FLIP='^' >> $GITHUB_ENV

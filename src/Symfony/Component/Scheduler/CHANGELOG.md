@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `isolated` and `timeout` options of `#[AsCronTask]` and `#[AsPeriodicTask]`, to run a scheduled command in a separate PHP process and kill it when it runs for too long
  * Use the global clock to resolve relative dates in the `$from` and `$until` arguments of `PeriodicalTrigger`
  * Add a `$clock` argument to `DebugCommand` to resolve relative dates in the `--date` option of `debug:scheduler`
  * Yield the message of a `RedispatchMessage` with a `RedispatchStamp`, and with a `TransportNamesStamp` when it names transports, instead of the `RedispatchMessage` itself

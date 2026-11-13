@@ -624,6 +624,16 @@ class AccessTokenTest extends AbstractWebTestCase
     }
 
     #[RequiresPhpExtension('openssl')]
+    public function testBearerFirewallRefusesADpopBoundToken()
+    {
+        $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc.yml']);
+        $client->request('GET', '/foo', [], [], ['HTTP_AUTHORIZATION' => 'Bearer '.self::createDpopBoundToken(self::createDpopKey())]);
+
+        $this->assertSame(401, $client->getResponse()->getStatusCode());
+        $this->assertSame('Bearer realm="My API",error="invalid_token",error_description="Invalid credentials."', $client->getResponse()->headers->get('WWW-Authenticate'));
+    }
+
+    #[RequiresPhpExtension('openssl')]
     public function testOidcFailureWithJweEnforced()
     {
         $client = $this->createClient(['test_case' => 'AccessToken', 'root_config' => 'config_oidc_jwe.yml']);

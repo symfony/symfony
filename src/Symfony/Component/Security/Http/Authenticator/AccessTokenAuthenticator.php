@@ -59,7 +59,7 @@ class AccessTokenAuthenticator implements AuthenticatorInterface, FallbackAuthen
      * @param SenderConstraintInterface|null $senderConstraint    What the request has to prove possession of, beyond holding the access
      *                                                            token, for the token to be accepted (RFC 9449 for DPoP). Null accepts a
      *                                                            token from whoever presents it, which is what a bearer token is
-     *                                                            (RFC 6750, Section 1)
+     *                                                            (RFC 6750, Section 1), except a DPoP-bound one (RFC 9449, Section 7.2)
      */
     public function __construct(
         private readonly AccessTokenHandlerInterface $accessTokenHandler,
@@ -92,10 +92,15 @@ class AccessTokenAuthenticator implements AuthenticatorInterface, FallbackAuthen
         }
 
         $userBadge = $this->accessTokenHandler->getUserBadgeFrom($accessToken);
+        $claims = $userBadge->getAttributes() ?? [];
 
         // the token says what it is bound to, the request has to prove possession of it before anything
         // is loaded on its behalf
-        $this->senderConstraint?->check($request, $accessToken, $userBadge->getAttributes() ?? []);
+        if ($this->senderConstraint) {
+            $this->senderConstraint->check($request, $accessToken, $claims);
+        } elseif (\is_array($claims['cnf'] ?? null) && isset($claims['cnf']['jkt'])) {
+            throw new BadCredentialsException('The access token is bound to a DPoP key and cannot be used as a bearer token (RFC 9449, Section 7.2).');
+        }
 
         if ($this->userProvider && (null === $userBadge->getUserLoader() || $userBadge->getUserLoader() instanceof FallbackUserLoader)) {
             $userBadge->setUserLoader($this->userProvider->loadUserByIdentifier(...));

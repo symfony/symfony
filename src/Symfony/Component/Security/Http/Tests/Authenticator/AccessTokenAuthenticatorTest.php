@@ -279,6 +279,21 @@ class AccessTokenAuthenticatorTest extends TestCase
         $authenticator->authenticate($request);
     }
 
+    public function testADpopBoundTokenIsRefusedWithoutSenderConstraint()
+    {
+        $accessTokenHandler = $this->createStub(AccessTokenHandlerInterface::class);
+        $accessTokenHandler
+            ->method('getUserBadgeFrom')
+            ->willReturn(new UserBadge('test', null, ['sub' => 'test', 'cnf' => ['jkt' => 'a-thumbprint']]));
+
+        $authenticator = new AccessTokenAuthenticator($accessTokenHandler, new HeaderAccessTokenExtractor(), $this->userProvider);
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('The access token is bound to a DPoP key and cannot be used as a bearer token (RFC 9449, Section 7.2).');
+
+        $authenticator->authenticate(Request::create('/test', server: ['HTTP_AUTHORIZATION' => 'Bearer an-access-token']));
+    }
+
     public function testTheChallengeOfAFirewallWithASenderConstraintNamesItsSchemeAndItsParameters()
     {
         $authenticator = new AccessTokenAuthenticator(

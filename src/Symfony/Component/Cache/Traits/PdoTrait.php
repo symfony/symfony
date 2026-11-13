@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
@@ -345,6 +346,15 @@ trait PdoTrait
         if (!isset($this->conn)) {
             $this->conn = new \PDO($this->dsn, $this->username, $this->password, $this->connectionOptions);
             $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            if ('sqlite' === $this->conn->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+                try {
+                    if ('wal' === $this->conn->query('PRAGMA journal_mode=WAL')->fetchColumn()) {
+                        $this->conn->exec('PRAGMA synchronous=NORMAL');
+                    }
+                } catch (\PDOException $e) {
+                    CacheItem::log($this->logger, 'Failed to configure SQLite cache: '.$e->getMessage(), ['exception' => $e, 'cache-adapter' => get_debug_type($this)]);
+                }
+            }
         }
 
         return $this->conn;

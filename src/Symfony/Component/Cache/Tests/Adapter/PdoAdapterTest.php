@@ -26,6 +26,46 @@ class PdoAdapterTest extends AbstractPdoAdapterTestCase
         return new PdoAdapter('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
     }
 
+    public function testSqliteDsnUsesWalAndNormalSynchronousMode()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        try {
+            $cache = new PdoAdapter('sqlite:'.$file);
+            $cache->save($cache->getItem('foo')->set('bar'));
+
+            $connection = (new \ReflectionMethod($cache, 'getConnection'))->invoke($cache);
+            $this->assertSame('wal', $connection->query('PRAGMA journal_mode')->fetchColumn());
+            $this->assertSame(1, (int) $connection->query('PRAGMA synchronous')->fetchColumn());
+
+            $cache->reset(true);
+            $connection = (new \ReflectionMethod($cache, 'getConnection'))->invoke($cache);
+            $this->assertSame(1, (int) $connection->query('PRAGMA synchronous')->fetchColumn());
+        } finally {
+            unset($connection, $cache);
+            @unlink($file);
+        }
+    }
+
+    public function testProvidedSqliteConnectionKeepsItsSettings()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        try {
+            $connection = new \PDO('sqlite:'.$file);
+            $cache = new PdoAdapter($connection);
+            $cache->save($cache->getItem('foo')->set('bar'));
+
+            $this->assertSame('delete', $connection->query('PRAGMA journal_mode')->fetchColumn());
+            $this->assertSame(2, (int) $connection->query('PRAGMA synchronous')->fetchColumn());
+
+            $connection->exec('PRAGMA journal_mode=WAL');
+            (new PdoAdapter($connection))->save($cache->getItem('other')->set('value'));
+            $this->assertSame(2, (int) $connection->query('PRAGMA synchronous')->fetchColumn());
+        } finally {
+            unset($connection, $cache);
+            @unlink($file);
+        }
+    }
+
     public function testShutdownResetKeepsAConnectionPassedToTheConstructor()
     {
         $cache = new PdoAdapter($pdo = new \PDO('sqlite:'.self::$dbFile));

@@ -83,7 +83,16 @@ abstract class AbstractPdoAdapterTestCase extends AdapterTestCase
             $item = $pool->getItem('key');
             $item->set('value');
             $this->assertTrue($pool->save($item));
+            $connection = (new \ReflectionMethod($pool, 'getConnection'))->invoke($pool);
+            if (null !== $file) {
+                $this->assertSame('wal', $connection->query('PRAGMA journal_mode')->fetchColumn());
+                $this->assertSame(1, (int) $connection->query('PRAGMA synchronous')->fetchColumn());
+            } else {
+                $this->assertSame('memory', $connection->query('PRAGMA journal_mode')->fetchColumn());
+                $this->assertSame(2, (int) $connection->query('PRAGMA synchronous')->fetchColumn());
+            }
         } finally {
+            unset($connection, $pool);
             if (null !== $file) {
                 @unlink($file);
             }

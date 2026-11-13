@@ -24,6 +24,7 @@ BrowserKit
 Cache
 -----
 
+ * SQLite DSNs passed to `PdoAdapter`, `PdoTagAwareAdapter` and `DoctrineDbalAdapter` now use WAL and `synchronous=NORMAL` when possible. Inject an existing PDO or DBAL connection to keep its settings. WAL changes the journal mode for all connections to the same database. With `synchronous=NORMAL`, recent cache entries may be lost after a power failure.
  * Add argument `$shutdown` to `reset()` in `AbstractAdapter`, `AbstractTagAwareAdapter`, `ChainAdapter`, `PhpArrayAdapter`, `ProxyAdapter`, `Psr16Adapter`, `Psr16Cache`, `TagAwareAdapter` and `TraceableAdapter`
 
 Config

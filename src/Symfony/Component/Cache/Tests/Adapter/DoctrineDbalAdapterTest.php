@@ -48,6 +48,79 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         return new DoctrineDbalAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig()), '', $defaultLifetime);
     }
 
+    public function testSqliteDsnUsesWalAndNormalSynchronousMode()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        $connection = null;
+        try {
+            $cache = new DoctrineDbalAdapter('sqlite://localhost/'.$file);
+            $connection = (new \ReflectionProperty($cache, 'conn'))->getValue($cache);
+            $this->assertFalse($connection->isConnected());
+
+            $cache->save($cache->getItem('foo')->set('bar'));
+            $this->assertSame('wal', $connection->fetchOne('PRAGMA journal_mode'));
+            $this->assertSame(1, (int) $connection->fetchOne('PRAGMA synchronous'));
+
+            $cache->reset(true);
+            $cache->getItem('foo');
+            $this->assertSame(1, (int) $connection->fetchOne('PRAGMA synchronous'));
+        } finally {
+            $connection?->close();
+            @unlink($file);
+        }
+    }
+
+    #[RequiresPhpExtension('sqlite3')]
+    public function testNativeSqlite3DsnUsesWalAndNormalSynchronousMode()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        $connection = null;
+        try {
+            $cache = new DoctrineDbalAdapter('sqlite://localhost/'.$file.'?driver=sqlite3');
+            $connection = (new \ReflectionProperty($cache, 'conn'))->getValue($cache);
+
+            $cache->save($cache->getItem('foo')->set('bar'));
+            $this->assertSame('wal', $connection->fetchOne('PRAGMA journal_mode'));
+            $this->assertSame(1, (int) $connection->fetchOne('PRAGMA synchronous'));
+        } finally {
+            $connection?->close();
+            @unlink($file);
+        }
+    }
+
+    public function testCachedPlatformDoesNotReconnectAfterShutdown()
+    {
+        $cache = new DoctrineDbalAdapter('sqlite://localhost/'.self::$dbFile);
+        $cache->save($cache->getItem('foo')->set('bar'));
+        $connection = (new \ReflectionProperty($cache, 'conn'))->getValue($cache);
+
+        $cache->reset(true);
+        $this->assertFalse($connection->isConnected());
+        $this->assertSame('sqlite', (new \ReflectionMethod($cache, 'getPlatformName'))->invoke($cache));
+        $this->assertFalse($connection->isConnected());
+    }
+
+    public function testProvidedSqliteConnectionKeepsItsSettings()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        $connection = null;
+        try {
+            $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => $file], $this->getDbalConfig());
+            $cache = new DoctrineDbalAdapter($connection);
+            $cache->save($cache->getItem('foo')->set('bar'));
+
+            $this->assertSame('delete', $connection->fetchOne('PRAGMA journal_mode'));
+            $this->assertSame(2, (int) $connection->fetchOne('PRAGMA synchronous'));
+
+            $connection->executeStatement('PRAGMA journal_mode=WAL');
+            (new DoctrineDbalAdapter($connection))->save($cache->getItem('other')->set('value'));
+            $this->assertSame(2, (int) $connection->fetchOne('PRAGMA synchronous'));
+        } finally {
+            $connection?->close();
+            @unlink($file);
+        }
+    }
+
     public function testConfigureSchemaDecoratedDbalDriver()
     {
         if (file_exists(self::$dbFile)) {
@@ -123,13 +196,23 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
     #[DataProvider('provideDsnWithSQLite')]
     public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
+        $connection = null;
         try {
             $pool = new DoctrineDbalAdapter($dsn);
 
             $item = $pool->getItem('key');
             $item->set('value');
             $this->assertTrue($pool->save($item));
+            $connection = (new \ReflectionProperty($pool, 'conn'))->getValue($pool);
+            if (null !== $file) {
+                $this->assertSame('wal', $connection->fetchOne('PRAGMA journal_mode'));
+                $this->assertSame(1, (int) $connection->fetchOne('PRAGMA synchronous'));
+            } else {
+                $this->assertSame('memory', $connection->fetchOne('PRAGMA journal_mode'));
+                $this->assertSame(2, (int) $connection->fetchOne('PRAGMA synchronous'));
+            }
         } finally {
+            $connection?->close();
             if (null !== $file) {
                 @unlink($file);
             }

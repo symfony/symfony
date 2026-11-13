@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Prefer SQLite WAL mode and `synchronous=NORMAL` for connections created from DSNs by `PdoAdapter`, `PdoTagAwareAdapter` and `DoctrineDbalAdapter`
  * Add `CacheBundle`, which provides the `cache` configuration and the services previously provided by `FrameworkBundle` under `framework.cache`
  * Add the `cache:pool:clear`, `cache:pool:delete`, `cache:pool:invalidate-tags`, `cache:pool:list` and `cache:pool:prune` commands, `CacheWarmer\AbstractPhpFileCacheWarmer` and `CacheWarmer\CachePoolClearerCacheWarmer`, which `FrameworkBundle` used to provide
  * Add the `cache.default_provider` option to configure `cache.app` with a DSN

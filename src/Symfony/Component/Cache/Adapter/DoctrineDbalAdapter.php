@@ -31,6 +31,7 @@ use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Tools\DsnParser;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
@@ -45,6 +46,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     private MarshallerInterface $marshaller;
     private Connection $conn;
     private bool $closeOnShutdown = false;
+    private bool $sqliteDsn = false;
     private string $platformName;
     private string $table = 'cache_items';
     private string $idCol = 'item_id';
@@ -100,6 +102,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
                 'sqlite' => 'pdo_sqlite',
                 'sqlite3' => 'pdo_sqlite',
             ]))->parse($connOrDsn);
+            $this->sqliteDsn = \in_array($params['driver'] ?? null, ['pdo_sqlite', 'sqlite3'], true);
 
             $config = new Configuration();
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
@@ -145,7 +148,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             return $schema;
         }
 
-        if ($forConnection !== $this->conn && !$isSameDatabase($this->conn->executeStatement(...))) {
+        if ($forConnection !== $this->getConnection() && !$isSameDatabase($this->conn->executeStatement(...))) {
             return $schema;
         }
 
@@ -165,7 +168,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         try {
-            $this->conn->executeStatement($deleteSql, $params, $paramTypes);
+            $this->getConnection()->executeStatement($deleteSql, $params, $paramTypes);
         } catch (TableNotFoundException) {
         }
 
@@ -190,7 +193,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $expired = [];
 
         $sql = "SELECT $this->idCol, CASE WHEN $this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ? THEN $this->dataCol ELSE NULL END FROM $this->table WHERE $this->idCol IN (?)";
-        $result = $this->conn->executeQuery($sql, [
+        $result = $this->getConnection()->executeQuery($sql, [
             $now,
             $ids,
         ], [
@@ -221,7 +224,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     protected function doHave(string $id): bool
     {
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = ? AND ($this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ?)";
-        $result = $this->conn->executeQuery($sql, [
+        $result = $this->getConnection()->executeQuery($sql, [
             $id,
             time(),
         ], [
@@ -235,7 +238,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     protected function doClear(string $namespace): bool
     {
         if ('' === $namespace) {
-            $sql = $this->conn->getDatabasePlatform()->getTruncateTableSQL($this->table);
+            $sql = $this->getConnection()->getDatabasePlatform()->getTruncateTableSQL($this->table);
             $params = [];
         } else {
             // SQL Server also treats [ as a wildcard, while Oracle rejects an escape character followed by it
@@ -256,7 +259,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     {
         $sql = "DELETE FROM $this->table WHERE $this->idCol IN (?)";
         try {
-            $this->conn->executeStatement($sql, [array_values($ids)], [ArrayParameterType::STRING]);
+            $this->getConnection()->executeStatement($sql, [array_values($ids)], [ArrayParameterType::STRING]);
         } catch (TableNotFoundException) {
         }
 
@@ -269,7 +272,7 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             return $failed;
         }
 
-        if ($this->conn->isTransactionActive() && $this->conn->getDatabasePlatform()->supportsSavepoints()) {
+        if ($this->getConnection()->isTransactionActive() && $this->getConnection()->getDatabasePlatform()->supportsSavepoints()) {
             $savepoint = 'cache_save_'.++self::$savepointCounter;
             try {
                 $this->conn->createSavepoint($savepoint);
@@ -404,13 +407,28 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         return parent::getId($key, $namespace);
     }
 
+    private function getConnection(): Connection
+    {
+        if ($this->sqliteDsn && !$this->conn->isConnected()) {
+            try {
+                if ('wal' === $this->conn->fetchOne('PRAGMA journal_mode=WAL')) {
+                    $this->conn->executeStatement('PRAGMA synchronous=NORMAL');
+                }
+            } catch (DBALException $e) {
+                CacheItem::log($this->logger, 'Failed to configure SQLite cache: '.$e->getMessage(), ['exception' => $e, 'cache-adapter' => get_debug_type($this)]);
+            }
+        }
+
+        return $this->conn;
+    }
+
     private function getPlatformName(): string
     {
         if (isset($this->platformName)) {
             return $this->platformName;
         }
 
-        $platform = $this->conn->getDatabasePlatform();
+        $platform = $this->getConnection()->getDatabasePlatform();
 
         return $this->platformName = match (true) {
             $platform instanceof AbstractMySQLPlatform => 'mysql',

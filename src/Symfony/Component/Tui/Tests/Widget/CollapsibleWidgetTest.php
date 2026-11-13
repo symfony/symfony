@@ -16,7 +16,6 @@ use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\ChangeEvent;
 use Symfony\Component\Tui\Event\CollapseEvent;
 use Symfony\Component\Tui\Event\ExpandEvent;
-use Symfony\Component\Tui\Event\ToggleEvent;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\StyleSheet;
@@ -30,32 +29,6 @@ use Symfony\Component\Tui\Widget\WidgetContext;
 
 final class CollapsibleWidgetTest extends TestCase
 {
-    public function testOpenStateFollowsExpansion()
-    {
-        $widget = new CollapsibleWidget('Summary', new TextWidget('Body'), true);
-        $this->assertTrue($widget->hasState('open'));
-
-        $widget->collapse();
-        $this->assertFalse($widget->hasState('open'));
-
-        $widget->expand();
-        $this->assertTrue($widget->hasState('open'));
-    }
-
-    public function testAToggleEventFollowsEachChangeOnceTheStateIsTheNewOne()
-    {
-        $widget = new CollapsibleWidget('Summary', new TextWidget('Body'));
-        $events = [];
-        $widget->on(ToggleEvent::class, static function (ToggleEvent $event) use (&$events, $widget): void {
-            $events[] = [$event->getOldState(), $event->getNewState(), $widget->hasState('open')];
-        });
-
-        $widget->expand();
-        $widget->expand();
-        $widget->collapse();
-        $this->assertSame([['closed', 'open', true], ['open', 'closed', false]], $events, 'Not when nothing changes.');
-    }
-
     public function testDefaultStateIsCollapsed()
     {
         $widget = new CollapsibleWidget('Title', new TextWidget('Content'));

@@ -67,17 +67,6 @@ class FontRegistryTest extends TestCase
         $this->assertSame(5, $small->getHeight());
     }
 
-    public function testFirstRegisteredFontOfAList()
-    {
-        $registry = new FontRegistry();
-        $registry->register('custom', __FILE__);
-
-        $this->assertSame('slant', $registry->first('Inter, "slant", big'));
-        $this->assertSame('custom', $registry->first('custom, monospace'));
-        $this->assertNull($registry->first('Inter, sans-serif, big'), 'A generic family is the font of the terminal.');
-        $this->assertNull($registry->first('Inter'));
-    }
-
     public function testGetUnregisteredFontThrows()
     {
         $registry = new FontRegistry();

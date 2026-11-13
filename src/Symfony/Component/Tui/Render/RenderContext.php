@@ -35,9 +35,6 @@ use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
  */
 final class RenderContext
 {
-    /** The style of a context given none: styles do not change, one does for all */
-    private static ?Style $plain = null;
-
     private readonly Style $style;
     private readonly FontRegistry $fontRegistry;
 
@@ -47,9 +44,8 @@ final class RenderContext
         ?Style $style = null,
         ?FontRegistry $fontRegistry = null,
         private readonly bool $fillRows = false,
-        private readonly ?int $containingColumns = null,
     ) {
-        $this->style = $style ?? self::$plain ??= new Style();
+        $this->style = $style ?? new Style();
         $this->fontRegistry = $fontRegistry ?? new FontRegistry();
     }
 
@@ -61,23 +57,6 @@ final class RenderContext
     public function getRows(): int
     {
         return $this->rows;
-    }
-
-    /**
-     * The width of the containing block, which percentage padding and margins are a share of: the columns given, unless
-     * a row gave the widget its share of its own.
-     */
-    public function getContainingColumns(): int
-    {
-        return $this->containingColumns ?? $this->columns;
-    }
-
-    /**
-     * Create a new context in a containing block of another width than the columns given.
-     */
-    public function withContainingColumns(?int $columns): self
-    {
-        return new self($this->columns, $this->rows, $this->style, $this->fontRegistry, $this->fillRows, $columns);
     }
 
     public function getStyle(): Style
@@ -114,7 +93,7 @@ final class RenderContext
      */
     public function withRows(int $rows): self
     {
-        return new self($this->columns, $rows, $this->style, $this->fontRegistry, false, $this->containingColumns);
+        return new self($this->columns, $rows, $this->style, $this->fontRegistry);
     }
 
     /**
@@ -130,6 +109,6 @@ final class RenderContext
      */
     public function withStyle(Style $style): self
     {
-        return new self($this->columns, $this->rows, $style, $this->fontRegistry, $this->fillRows, $this->containingColumns);
+        return new self($this->columns, $this->rows, $style, $this->fontRegistry, $this->fillRows);
     }
 }

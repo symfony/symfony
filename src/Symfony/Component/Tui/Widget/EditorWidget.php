@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Tui\Widget;
 
-use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\CancelEvent;
 use Symfony\Component\Tui\Event\ChangeEvent;
 use Symfony\Component\Tui\Event\SubmitEvent;
@@ -37,7 +36,7 @@ use Symfony\Component\Tui\Widget\Util\StringUtils;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class EditorWidget extends AbstractWidget implements LineWrappingInterface, FocusableInterface, VerticallyExpandableInterface, FieldSizingInterface, NativeAppearanceInterface
+class EditorWidget extends AbstractWidget implements FocusableInterface, VerticallyExpandableInterface
 {
     use BracketedPasteTrait;
     use FocusableTrait;
@@ -48,23 +47,10 @@ class EditorWidget extends AbstractWidget implements LineWrappingInterface, Focu
     private EditorRenderer $editorRenderer;
     private int $minVisibleLines = 0;
     private ?int $maxVisibleLines = null;
-    /** Whether it grows with its content past its most visible lines, like field-sizing: content */
-    private bool $contentSized = false;
-    private bool $lineWrapping = true;
-    /** @var int The columns scrolled past on the left, when the lines do not wrap */
-    private int $scrollLeft = 0;
     private bool $verticallyExpanded = false;
     private ?int $lastMaxVisibleLines = null;
 
     private bool $submitted = false;
-    private string $placeholder = '';
-    private bool $readOnly = false;
-    /** Whether it draws its own look, a rule above and below its text, which a border the page gives it replaces */
-    private bool $nativeAppearance = true;
-    private ?int $maxLength = null;
-
-    /** @var array{string, int, int}|null The text and cursor before the input being handled, to refuse an edit */
-    private ?array $beforeEdit = null;
 
     public function __construct(
         ?Keybindings $keybindings = null,
@@ -131,29 +117,6 @@ class EditorWidget extends AbstractWidget implements LineWrappingInterface, Focu
     /**
      * @return $this
      */
-    /**
-     * Grows with its content past its most visible lines, or not, like CSS field-sizing: content.
-     */
-    public function setContentSized(bool $contentSized): void
-    {
-        if ($contentSized !== $this->contentSized) {
-            $this->contentSized = $contentSized;
-            $this->invalidate();
-        }
-    }
-
-    /**
-     * Wraps the lines, or keeps each on one row and scrolls sideways to the cursor, like white-space: pre.
-     */
-    public function setLineWrapping(bool $wrap): void
-    {
-        if ($wrap !== $this->lineWrapping) {
-            $this->lineWrapping = $wrap;
-            $this->scrollLeft = 0;
-            $this->invalidate();
-        }
-    }
-
     public function setMaxVisibleLines(?int $maxVisibleLines): static
     {
         if (null !== $maxVisibleLines) {
@@ -227,85 +190,16 @@ class EditorWidget extends AbstractWidget implements LineWrappingInterface, Focu
         return $this->on(ChangeEvent::class, $callback);
     }
 
-    /**
-     * Sets the hint shown while the text is empty, styled by the "placeholder" sub-element.
-     *
-     * @return $this
-     */
-    public function setPlaceholder(string $placeholder): static
-    {
-        $placeholder = StringUtils::stripControlBytes(StringUtils::sanitizeUtf8(str_replace(["\r", "\n"], ' ', $placeholder)));
-        if ($this->placeholder !== $placeholder) {
-            $this->placeholder = $placeholder;
-            $this->invalidate();
-        }
-
-        return $this;
-    }
-
-    /**
-     * A read-only editor keeps its focus and cursor, but refuses edits.
-     *
-     * @return $this
-     */
-    public function setReadOnly(bool $readOnly = true): static
-    {
-        $this->readOnly = $readOnly;
-
-        return $this;
-    }
-
-    public function setNativeAppearance(bool $native): void
-    {
-        if ($native !== $this->nativeAppearance) {
-            $this->nativeAppearance = $native;
-            $this->invalidate();
-        }
-    }
-
-    public function isReadOnly(): bool
-    {
-        return $this->readOnly;
-    }
-
-    /**
-     * Limits the characters an edit can bring the text to, like maxlength: a paste is cut to fit.
-     *
-     * @return $this
-     */
-    public function setMaxLength(?int $maxLength): static
-    {
-        $this->maxLength = null !== $maxLength ? max(0, $maxLength) : null;
-
-        return $this;
-    }
-
     public function handleInput(string $data): void
     {
         if (null !== $this->onInput && ($this->onInput)($data)) {
             return;
         }
 
-        $this->beforeEdit = [$this->getText(), $this->document->getCursorLine(), $this->document->getCursorCol()];
-        try {
-            $this->handleEditorInput($data);
-        } finally {
-            $this->beforeEdit = null;
-        }
-    }
-
-    private function handleEditorInput(string $data): void
-    {
         // Handle bracketed paste
         if (null !== $pastedText = $this->processBracketedPaste($data)) {
-            if (null !== $this->maxLength) {
-                // Like browsers: what does not fit is dropped
-                $pastedText = mb_substr($pastedText, 0, max(0, $this->maxLength - mb_strlen($this->getText())));
-            }
-            if (!$this->readOnly && '' !== $pastedText) {
-                $this->document->handlePaste($pastedText);
-                $this->notifyChange();
-            }
+            $this->document->handlePaste($pastedText);
+            $this->notifyChange();
         }
 
         // Nothing left to route once the paste bytes are peeled off, and the
@@ -597,14 +491,13 @@ class EditorWidget extends AbstractWidget implements LineWrappingInterface, Focu
         // Calculate max visible lines based on context height or terminal
         $minVisibleLines = $this->minVisibleLines;
         if ($this->verticallyExpanded && $context->getRows() > 0) {
-            // Its rules take a row each
-            $maxDisplayRows = max(5, $context->getRows() - ($this->nativeAppearance ? 2 : 0));
+            $maxDisplayRows = max(5, $context->getRows() - 2);
         } else {
             $terminalRows = $this->getContext()?->getTerminalRows() ?? 24;
             $maxDisplayRows = max(5, $minVisibleLines, (int) floor($terminalRows * 0.3));
         }
 
-        if (null !== $this->maxVisibleLines && !$this->contentSized) {
+        if (null !== $this->maxVisibleLines) {
             $maxDisplayRows = min($maxDisplayRows, $this->maxVisibleLines);
         }
 
@@ -615,18 +508,10 @@ class EditorWidget extends AbstractWidget implements LineWrappingInterface, Focu
             $this->document->getLines(),
             $this->document->getCursorLine(),
             $maxDisplayRows,
-            // Without wrapping, each line is one row
-            $this->lineWrapping ? $columns : 0,
+            $columns,
             $this->verticallyExpanded && $context->getRows() > 0,
             $minVisibleLines,
         );
-
-        // The cursor stays in view: the lines scroll sideways as little as it takes, a column kept for it at the end
-        if (!$this->lineWrapping) {
-            $line = $this->document->getLines()[$this->document->getCursorLine()] ?? '';
-            $cursor = AnsiUtils::visibleWidth(substr($line, 0, $this->document->getCursorCol()));
-            $this->scrollLeft = max(0, min($this->scrollLeft, $cursor), $cursor - max(1, $columns) + 1);
-        }
 
         // Render content
         $cursorStyle = $this->resolveElement('cursor');
@@ -641,18 +526,7 @@ class EditorWidget extends AbstractWidget implements LineWrappingInterface, Focu
             $this->focused,
             $cursorStyle->getCursorShape() ?? CursorShape::Block,
             $this->resolveElement('frame'),
-            $this->lineWrapping ? null : $this->scrollLeft,
-            $cursorStyle->getCaretColor(),
-            $this->nativeAppearance,
         );
-
-        // The hint of an empty editor, on its first row: the cursor before it
-        $first = $this->nativeAppearance ? 1 : 0;
-        if ('' !== $this->placeholder && '' === $this->getText() && isset($result[$first])) {
-            $marker = $this->focused ? AnsiUtils::cursorMarker($cursorStyle->getCursorShape() ?? CursorShape::Block, $cursorStyle->getCaretColor()) : '';
-            $hint = AnsiUtils::truncateToWidth($this->placeholder, $columns, '');
-            $result[$first] = $marker.$this->resolveElement('placeholder')->apply($hint).str_repeat(' ', max(0, $columns - AnsiUtils::visibleWidth($hint)));
-        }
 
         return $result;
     }
@@ -709,20 +583,6 @@ class EditorWidget extends AbstractWidget implements LineWrappingInterface, Focu
 
     private function notifyChange(): void
     {
-        // A read-only editor, or an edit past maxlength: the edit is refused
-        if (null !== $this->beforeEdit && $this->getText() !== $this->beforeEdit[0]) {
-            [$text, $line, $col] = $this->beforeEdit;
-            $length = mb_strlen($this->getText());
-            if ($this->readOnly || (null !== $this->maxLength && $length > $this->maxLength && $length > mb_strlen($text))) {
-                $this->document->setText($text);
-                $this->document->setCursorLine($line);
-                $this->document->setCursorCol($col);
-                $this->invalidate();
-
-                return;
-            }
-        }
-
         $this->invalidate();
         $this->dispatch(new ChangeEvent($this, $this->getText()));
     }

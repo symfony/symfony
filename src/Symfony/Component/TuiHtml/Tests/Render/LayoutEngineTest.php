@@ -1,0 +1,373 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\TuiHtml\Tests\Render;
+
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Tui\Ansi\AnsiUtils;
+use Symfony\Component\TuiHtml\Internal\StyleBridge;
+use Symfony\Component\TuiHtml\Render\Renderer;
+use Symfony\Component\TuiHtml\Style\Border;
+use Symfony\Component\TuiHtml\Style\Direction;
+use Symfony\Component\TuiHtml\Style\Padding;
+use Symfony\Component\TuiHtml\Style\Style;
+use Symfony\Component\TuiHtml\Widget\ContainerWidget;
+use Symfony\Component\TuiHtml\Widget\TextWidget;
+
+class LayoutEngineTest extends TestCase
+{
+    public function testLayoutVerticalSingleChild()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $root->add(new TextWidget('Hello'));
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        $this->assertCount(1, $result);
+        $this->assertStringContainsString('Hello', $result[0]);
+    }
+
+    public function testLayoutVerticalMultipleChildren()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $root->add(new TextWidget('First'));
+        $root->add(new TextWidget('Second'));
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        $this->assertCount(2, $result);
+        $this->assertStringContainsString('First', $result[0]);
+        $this->assertStringContainsString('Second', $result[1]);
+    }
+
+    public function testLayoutVerticalWithGap()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, null, 2));
+        $root->add(new TextWidget('First'));
+        $root->add(new TextWidget('Second'));
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        $this->assertCount(4, $result);
+        $this->assertStringContainsString('First', $result[0]);
+        $this->assertSame(str_repeat(' ', 80), $result[1]);
+        $this->assertSame(str_repeat(' ', 80), $result[2]);
+        $this->assertStringContainsString('Second', $result[3]);
+    }
+
+    public function testLayoutHorizontalMultipleChildren()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        $root->add(new TextWidget('Left'));
+        $root->add(new TextWidget('Right'));
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        $this->assertCount(1, $result);
+        $this->assertStringContainsString('Left', $result[0]);
+        $this->assertStringContainsString('Right', $result[0]);
+    }
+
+    public function testLayoutHorizontalWithGap()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal, 4));
+        $root->add(new TextWidget('A'));
+        $root->add(new TextWidget('B'));
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        $this->assertCount(1, $result);
+        // Gap of 4 spaces between the two columns
+        $this->assertMatchesRegularExpression('/A\s{4,}B/', $result[0]);
+    }
+
+    public function testLayoutVerticalFillDistributesRemainderRows()
+    {
+        $renderer = new Renderer();
+        // 1 non-fill child of 1 row + 3 fill children, total 10 rows
+        // remaining = 10 - 1 = 9, base = intdiv(9, 3) = 3, extra = 9 % 3 = 0
+        // All fill children get 3 rows => 1 + 3*3 = 10 rows total
+        $root = new ContainerWidget();
+        $root->add(new TextWidget('Header'));
+        $fill1 = (new ContainerWidget())->expandVertically(true);
+        $fill1->add(new TextWidget('A'));
+        $fill2 = (new ContainerWidget())->expandVertically(true);
+        $fill2->add(new TextWidget('B'));
+        $fill3 = (new ContainerWidget())->expandVertically(true);
+        $fill3->add(new TextWidget('C'));
+        $root->add($fill1);
+        $root->add($fill2);
+        $root->add($fill3);
+        // With 10 rows: 1 for header, 9 remaining for 3 fill children (no remainder)
+        $result = $renderer->renderFrame($root, 20, 10)->toArray();
+        $this->assertCount(10, $result);
+        // With 11 rows: 1 for header, 10 remaining for 3 fill children
+        // base=3, extra=1 => first fill gets 4, others get 3 => 1+4+3+3 = 11
+        $result = $renderer->renderFrame($root, 20, 11)->toArray();
+        $this->assertCount(11, $result, 'Remainder rows should be distributed to fill children, not lost');
+        // With 12 rows: 1 for header, 11 remaining for 3 fill children
+        // base=3, extra=2 => first two fills get 4, last gets 3 => 1+4+4+3 = 12
+        $result = $renderer->renderFrame($root, 20, 12)->toArray();
+        $this->assertCount(12, $result, 'All remainder rows should be distributed across fill children');
+    }
+
+    public function testHorizontalFlexProportionalDistribution()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        // 1:2:1 ratio across 80 columns → 20, 40, 20
+        $left = new TextWidget('L');
+        StyleBridge::set($left, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $center = new TextWidget('C');
+        StyleBridge::set($center, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 2));
+        $right = new TextWidget('R');
+        StyleBridge::set($right, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $root->add($left);
+        $root->add($center);
+        $root->add($right);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        $this->assertCount(1, $result);
+        // L starts at position 0, C at position 20, R at position 60
+        $line = $result[0];
+        $this->assertSame('L', $line[0]);
+        $this->assertSame('C', $line[20]);
+        $this->assertSame('R', $line[60]);
+    }
+
+    public function testHorizontalFlexZeroUsesIntrinsicWidth()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        // Fixed-width sidebar + flexible content
+        $sidebar = new TextWidget('Menu');
+        StyleBridge::set($sidebar, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0));
+        $content = new TextWidget('Content');
+        StyleBridge::set($content, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $root->add($sidebar);
+        $root->add($content);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        $this->assertCount(1, $result);
+        // "Menu" is 4 chars; sidebar gets intrinsic width (4)
+        // Content gets 80 - 4 = 76
+        $line = $result[0];
+        $this->assertSame('M', $line[0]);
+        $this->assertSame('C', $line[4]);
+    }
+
+    public function testHorizontalFlexZeroWithMaxColumns()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        // Text wider than maxColumns: intrinsic width should be capped by maxColumns
+        $sidebar = new TextWidget('ABCDEFGHIJKLMNO');
+        StyleBridge::set($sidebar, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 10, null, null, 0));
+        $content = new TextWidget('Main');
+        StyleBridge::set($content, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $root->add($sidebar);
+        $root->add($content);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        // Text wraps within the 10-column constraint; content starts at column 10
+        $this->assertSame('M', $result[0][10]);
+    }
+
+    public function testHorizontalFlexMixedWithNullTreatsNullAsFlex1()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        // One child with explicit flex, one without (null)
+        $left = new TextWidget('L');
+        StyleBridge::set($left, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $right = new TextWidget('R');
+        // No flex set on right; should be treated as flex: 1
+        $root->add($left);
+        $root->add($right);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        $this->assertCount(1, $result);
+        // Both get equal space: 40 each
+        $line = $result[0];
+        $this->assertSame('L', $line[0]);
+        $this->assertSame('R', $line[40]);
+    }
+
+    public function testHorizontalNoFlexSetEqualDistribution()
+    {
+        // Backward compatibility: no flex set anywhere → equal split
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        $root->add(new TextWidget('A'));
+        $root->add(new TextWidget('B'));
+        $root->add(new TextWidget('C'));
+        $result = $renderer->renderFrame($root, 90, 24)->toArray();
+        $this->assertCount(1, $result);
+        // 90 / 3 = 30 each
+        $line = $result[0];
+        $this->assertSame('A', $line[0]);
+        $this->assertSame('B', $line[30]);
+        $this->assertSame('C', $line[60]);
+    }
+
+    public function testHorizontalFlexWithGap()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal, 2));
+        $left = new TextWidget('L');
+        StyleBridge::set($left, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $right = new TextWidget('R');
+        StyleBridge::set($right, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $root->add($left);
+        $root->add($right);
+        $result = $renderer->renderFrame($root, 82, 24)->toArray();
+        $this->assertCount(1, $result);
+        // Available = 82 - 2 gap = 80, each gets 40
+        // Right starts at 40 + 2 gap = 42
+        $line = $result[0];
+        $this->assertSame('L', $line[0]);
+        $this->assertSame('R', $line[42]);
+    }
+
+    public function testHorizontalFlexZeroWithPadding()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        // flex:0 with padding: intrinsic width = padding-left + content + padding-right
+        $sidebar = new TextWidget('Hi');
+        StyleBridge::set($sidebar, new Style(new Padding(0, 2, 0, 2), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0));
+        $content = new TextWidget('Main');
+        StyleBridge::set($content, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $root->add($sidebar);
+        $root->add($content);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        $this->assertCount(1, $result);
+        // "Hi" = 2 chars + 2 pad left + 2 pad right = 6 cols
+        $this->assertSame('M', $result[0][6]);
+    }
+
+    public function testHorizontalFlexZeroWithBorder()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        // flex:0 with border: intrinsic width = border-left + content + border-right
+        $sidebar = new TextWidget('Hi');
+        StyleBridge::set($sidebar, new Style(null, Border::from([1]), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0));
+        $content = new TextWidget('Main');
+        StyleBridge::set($content, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $root->add($sidebar);
+        $root->add($content);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        // "Hi" = 2 chars + 1 border left + 1 border right = 4 cols
+        // Border chars are multibyte; use mb_substr for character-level position
+        $stripped = AnsiUtils::stripAnsiCodes($result[0]);
+        $this->assertSame('M', mb_substr($stripped, 4, 1));
+    }
+
+    public function testHorizontalFlexZeroWithBorderAndPadding()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        // flex:0 with border + padding
+        $sidebar = new TextWidget('Hi');
+        StyleBridge::set($sidebar, new Style(new Padding(0, 1, 0, 1), Border::from([1]), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0));
+        $content = new TextWidget('Main');
+        StyleBridge::set($content, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $root->add($sidebar);
+        $root->add($content);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        // "Hi" = 2 + 1 border-left + 1 pad-left + 1 pad-right + 1 border-right = 6
+        $stripped = AnsiUtils::stripAnsiCodes($result[0]);
+        $this->assertSame('M', mb_substr($stripped, 6, 1));
+    }
+
+    public function testHorizontalFlexZeroAndProportionalWithGap()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal, 2));
+        $sidebar = new TextWidget('AB');
+        StyleBridge::set($sidebar, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0));
+        $main = new TextWidget('M');
+        StyleBridge::set($main, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $aside = new TextWidget('X');
+        StyleBridge::set($aside, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1));
+        $root->add($sidebar);
+        $root->add($main);
+        $root->add($aside);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
+        $this->assertCount(1, $result);
+        // Gap total = 2 * 2 = 4, available = 80 - 4 = 76
+        // Sidebar intrinsic = 2, remaining = 76 - 2 = 74, each flex gets 37
+        // Sidebar: 0..1, gap: 2..3, Main: 4..40, gap: 41..42, Aside: 43..79
+        $line = $result[0];
+        $this->assertSame('A', $line[0]);
+        $this->assertSame('M', $line[4]);
+        $this->assertSame('X', $line[43]);
+    }
+
+    public function testIntrinsicChildrenAreClampedToTheAvailableColumns()
+    {
+        // Each flex: 0 child is measured on its own against the full width, so
+        // their natural widths can add up to more columns than the row has.
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        foreach (['abcdefgh', 'ijklmnop'] as $text) {
+            $child = new TextWidget($text);
+            StyleBridge::set($child, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0));
+            $root->add($child);
+        }
+        $result = $renderer->renderFrame($root, 10, 1)->toArray();
+        $this->assertSame(10, AnsiUtils::visibleWidth($result[0]));
+        foreach ($result as $line) {
+            $this->assertLessThanOrEqual(10, AnsiUtils::visibleWidth($line));
+        }
+    }
+
+    public function testClampedIntrinsicChildrenStillFillTheRow()
+    {
+        // Scaling the natural widths down leaves a remainder, and dropping it
+        // would cost a child a column the row has room for.
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        foreach (['aaaa', 'bbbbbb', 'cc'] as $text) {
+            $child = new TextWidget($text);
+            StyleBridge::set($child, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0));
+            $root->add($child);
+        }
+        $result = $renderer->renderFrame($root, 10, 1)->toArray();
+        $this->assertSame('aaabbbbbcc', AnsiUtils::stripAnsiCodes($result[0]));
+    }
+
+    public function testFlexChildrenLeaveAColumnForEachRemainingSibling()
+    {
+        // A heavier weight must not spend the columns its later siblings need:
+        // they are floored to one column each, which overflowed the row.
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        StyleBridge::set($root, new Style(null, null, null, null, null, null, null, null, null, null, Direction::Horizontal));
+        foreach ([null, 3, 1, null, null] as $flex) {
+            $child = new TextWidget('Hello');
+            StyleBridge::set($child, new Style(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, $flex));
+            $root->add($child);
+        }
+        $result = $renderer->renderFrame($root, 5, 1)->toArray();
+        $this->assertSame(5, AnsiUtils::visibleWidth($result[0]));
+        foreach ($result as $line) {
+            $this->assertLessThanOrEqual(5, AnsiUtils::visibleWidth($line));
+        }
+    }
+}

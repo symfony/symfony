@@ -16,8 +16,7 @@ use Symfony\Component\Tui\Event\AbstractEvent;
 use Symfony\Component\Tui\Focus\FocusManager;
 use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Render\RenderContext;
-use Symfony\Component\Tui\Render\Renderer;
-use Symfony\Component\Tui\Style\MediaContext;
+use Symfony\Component\Tui\Render\RendererInterface;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Terminal\TerminalInterface;
 use Symfony\Component\Tui\Tui;
@@ -42,7 +41,7 @@ final class WidgetContext
         private readonly Keybindings $keybindings,
         private readonly TerminalInterface $terminal,
         private readonly FocusManager $focusManager,
-        private readonly Renderer $renderer,
+        private RendererInterface $renderer,
         private readonly WidgetTree $widgetTree,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
@@ -94,15 +93,18 @@ final class WidgetContext
 
     public function resolveElement(AbstractWidget $widget, string $element): Style
     {
-        return $this->renderer->getStyleSheet()->resolveElement($widget, $element);
+        return $this->renderer->resolveElement($widget, $element);
     }
 
-    /**
-     * Returns what media queries are evaluated against, user preferences included.
-     */
-    public function getMediaContext(): MediaContext
+    public function getRenderer(): RendererInterface
     {
-        return $this->renderer->getMediaContext();
+        return $this->renderer;
+    }
+
+    /** @internal */
+    public function setRenderer(RendererInterface $renderer): void
+    {
+        $this->renderer = $renderer;
     }
 
     public function getTerminalColumns(): int

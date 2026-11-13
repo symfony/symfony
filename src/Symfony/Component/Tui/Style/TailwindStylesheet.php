@@ -322,7 +322,6 @@ class TailwindStylesheet extends StyleSheet
             'text-left' => TextAlign::Left,
             'text-center' => TextAlign::Center,
             'text-right' => TextAlign::Right,
-            'text-justify' => TextAlign::Justify,
             default => null,
         };
         if (null !== $textAlign) {
@@ -422,15 +421,8 @@ class TailwindStylesheet extends StyleSheet
             }
         }
 
-        return self::getPaletteColor($value);
-    }
-
-    /**
-     * Returns the color of a Tailwind palette shade, like "emerald-500".
-     */
-    public static function getPaletteColor(string $name): ?Color
-    {
-        if (preg_match('/^([a-z]+)-(\d+)$/', $name, $m)) {
+        // Tailwind shade syntax: {family}-{shade}
+        if (preg_match('/^([a-z]+)-(\d+)$/', $value, $m)) {
             $shade = (int) $m[2];
             if (isset(self::TAILWIND_COLORS[$m[1]]) && isset(self::SHADE_SCALE[$shade])) {
                 return Color::hex(self::TAILWIND_COLORS[$m[1]])->scale(self::SHADE_SCALE[$shade]);

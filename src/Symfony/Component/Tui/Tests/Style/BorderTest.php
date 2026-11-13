@@ -13,7 +13,6 @@ namespace Symfony\Component\Tui\Tests\Style;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Exception\InvalidArgumentException;
 use Symfony\Component\Tui\Style\Border;
 use Symfony\Component\Tui\Style\BorderPattern;
@@ -299,34 +298,5 @@ class BorderTest extends TestCase
 
         $this->assertSame(BorderPattern::rounded()->getChars(), $border->pattern->getChars());
         $this->assertSame(Color::from('#ff0000')->toRgb(), $border->color->toRgb());
-    }
-
-    public function testSidePatternsJoinAtTheCorners()
-    {
-        $border = Border::all(1, BorderPattern::NORMAL)->withSidePatterns([0 => BorderPattern::DOUBLE, 2 => BorderPattern::HEAVY]);
-        $lines = array_map(AnsiUtils::stripAnsiCodes(...), $border->wrapLines(['ab'], 2, new Style()));
-
-        $this->assertSame(['╒══╕', '│ab│', '┕━━┙'], $lines);
-    }
-
-    public function testSidePatternsSurviveOtherChanges()
-    {
-        $border = Border::all(1)->withSidePatterns([1 => BorderPattern::DOTTED]);
-
-        $this->assertSame(BorderPattern::dotted()->getChars(), $border->withWidths(1, 1, 0, 1)->withColor('red')->withSideColors([0 => 'blue'])->getSidePattern(1)->getChars());
-        $this->assertSame([null, null, null, null], $border->withPattern(BorderPattern::DASHED)->sidePatterns, 'A pattern for the whole border replaces those of the sides.');
-    }
-
-    public function testCornerShapes()
-    {
-        $border = Border::all(1)->withCornerShapes(['round', 'bevel', null, 'bevel']);
-        $lines = array_map(AnsiUtils::stripAnsiCodes(...), $border->wrapLines(['ab'], 2, new Style()));
-
-        $this->assertSame(['╭──╲', '│ab│', '╲──┘'], $lines);
-        $this->assertSame(['round', 'bevel', null, 'bevel'], $border->withWidths(1, 1, 1, 1)->withColor('red')->withPattern(BorderPattern::DASHED)->cornerShapes, 'The shapes survive other changes.');
-
-        $sides = Border::all(1)->withSidePatterns([0 => BorderPattern::HEAVY])->withCornerShapes(['round', 'bevel', 'round', null]);
-        $lines = array_map(AnsiUtils::stripAnsiCodes(...), $sides->wrapLines(['ab'], 2, new Style()));
-        $this->assertSame(['┍━━╲', '│ab│', '└──╯'], $lines, 'A heavy corner is not rounded.');
     }
 }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Tui\Tests\Widget\Editor;
 
-use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Style\CursorShape;
@@ -25,15 +24,6 @@ class EditorRendererTest extends TestCase
     protected function setUp(): void
     {
         $this->renderer = new EditorRenderer();
-    }
-
-    #[RequiresPhpExtension('intl')]
-    public function testRightToLeftLinesAreDrawnInVisualOrder()
-    {
-        $lines = array_map(static fn (string $line) => rtrim(preg_replace('/\e\[[0-9;:]*m|\e[\]_][^\x07]*\x07/', '', $line)), $this->renderSimple(['abc', 'שלום (עולם) 12'], 0, 0, 40, 10));
-
-        $this->assertSame('abc', $lines[1]);
-        $this->assertSame('12 (םלוע) םולש', $lines[2], 'Each line in the direction of its first strong character, its brackets mirrored.');
     }
 
     public function testRenderEmptyDocument()

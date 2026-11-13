@@ -1,0 +1,55 @@
+{
+    "name": "symfony/tui-html",
+    "type": "library",
+    "description": "Provides HTML and CSS rendering for Symfony Tui",
+    "keywords": [
+        "tui",
+        "terminal",
+        "console",
+        "cli"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "ext-dom": "*",
+        "symfony/tui": "^8.2",
+        "psr/log": "^1|^2|^3"
+    },
+    "require-dev": {
+        "league/commonmark": "^2.9",
+        "symfony/asset-mapper": "^7.4|^8.0",
+        "tempest/highlight": "^2.16",
+        "twig/twig": "^3.12",
+        "symfony/ux-twig-component": "^3.5",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/property-access": "^7.4|^8.0"
+    },
+    "suggest": {
+        "ext-gd": "To draw images, like HTML <img>",
+        "ext-intl": "To draw bidirectional text, like Arabic and Hebrew, in visual order",
+        "symfony/polyfill-intl-char": "To draw bidirectional text in visual order without ext-intl",
+        "symfony/asset-mapper": "To load CSS stylesheets and images from mapped assets",
+        "twig/twig": "To build HTML views from Twig templates",
+        "symfony/ux-twig-component": "To build HTML views from Twig components"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\TuiHtml\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

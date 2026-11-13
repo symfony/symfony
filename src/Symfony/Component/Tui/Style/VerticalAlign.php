@@ -26,6 +26,4 @@ enum VerticalAlign: string
     case Top = 'top';
     case Center = 'center';
     case Bottom = 'bottom';
-    /** At the top; in a row, shorter children are stretched to the height of the row, like CSS align-items: stretch */
-    case Stretch = 'stretch';
 }

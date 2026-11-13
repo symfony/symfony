@@ -35,10 +35,7 @@ use Symfony\Component\Tui\Exception\InvalidArgumentException;
 final class FontRegistry
 {
     private const string BUNDLED_FONTS_DIR = __DIR__.'/fonts';
-    public const array BUNDLED_FONTS = ['big', 'small', 'slant', 'standard', 'mini'];
-
-    /** The generic font families of CSS, and the font of the system: drawn in the font of the terminal */
-    public const array GENERIC_FAMILIES = ['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-serif', 'ui-sans-serif', 'ui-monospace', 'ui-rounded', 'math', 'emoji', 'fangsong', 'normal', '-apple-system', 'blinkmacsystemfont'];
+    private const array BUNDLED_FONTS = ['big', 'small', 'slant', 'standard', 'mini'];
 
     /** @var array<string, string> name → file path */
     private array $paths = [];
@@ -90,25 +87,6 @@ final class FontRegistry
     public function has(string $name): bool
     {
         return isset($this->paths[$name]);
-    }
-
-    /**
-     * Returns the first registered font of a list, like CSS font-family "slant, big, monospace": a generic family,
-     * like monospace, is the font of the terminal, null.
-     */
-    public function first(string $families): ?string
-    {
-        foreach (explode(',', $families) as $family) {
-            $family = trim($family, " \t\n\"'");
-            if (isset($this->paths[$family])) {
-                return $family;
-            }
-            if (\in_array(strtolower($family), self::GENERIC_FAMILIES, true)) {
-                return null;
-            }
-        }
-
-        return null;
     }
 
     /**

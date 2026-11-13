@@ -114,6 +114,7 @@
         "symfony/string": "self.version",
         "symfony/translation": "self.version",
         "symfony/tui": "self.version",
+        "symfony/tui-html": "self.version",
         "symfony/twig-bridge": "self.version",
         "symfony/twig-bundle": "self.version",
         "symfony/type-info": "self.version",

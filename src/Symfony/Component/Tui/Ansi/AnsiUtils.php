@@ -12,7 +12,6 @@
 namespace Symfony\Component\Tui\Ansi;
 
 use Symfony\Component\String\CodePointString;
-use Symfony\Component\Tui\Style\Color;
 use Symfony\Component\Tui\Style\CursorShape;
 
 /**
@@ -29,44 +28,35 @@ final class AnsiUtils
     /** The bytes of the lines whose widths are kept */
     private static int $widthBytes = 0;
     /** The most lines, and bytes of them, whose widths are kept: those of a long page, frame after frame */
-    private const MAX_WIDTHS = 16_384;
-    private const MAX_WIDTH_BYTES = 8_000_000;
-
+    private const MAX_WIDTHS = 16384;
+    private const MAX_WIDTH_BYTES = 8000000;
     /**
      * Cursor position marker prefix.
      *
      * Widgets emit an APC marker at the cursor position when focused.
-     * The full marker format is `ESC _ pi:c ; N [; #rrggbb] BEL` where N is
-     * the DECSCUSR parameter (cursor shape) and the optional color that of
-     * the caret. The ScreenWriter finds this marker, extracts them, positions
-     * the hardware cursor, sets the cursor style via `ESC [ N SP q` and its
-     * color via OSC 12.
+     * The full marker format is `ESC _ pi:c ; N BEL` where N is the
+     * DECSCUSR parameter (cursor shape). The ScreenWriter finds this
+     * marker, extracts the shape, positions the hardware cursor, and
+     * sets the cursor style via `ESC [ N SP q`.
      *
      * @see cursorMarker()
      */
     public const CURSOR_MARKER_PREFIX = "\x1b_pi:c;";
-
-    /** The prefix of the marker of a line drawn larger, see scaledTextMarker() */
-    public const SCALED_MARKER_PREFIX = "\x1b_pi:s;";
-
     /**
      * Full SGR reset and OSC 8 reset sequence.
      */
     public const SEGMENT_RESET = "\x1b[0m\x1b]8;;\x07";
-
     /**
      * Combined pattern matching all ECMA-48 escape sequences in a single regex.
      * Alternation order: CSI (most common), string sequences, nF, two-byte.
      */
     private const ALL_ESC_PATTERN = '/\x1b(?:\[[\x30-\x3F]*[\x20-\x2F]*[\x40-\x7E]|[P\]_\^X][^\x07\x1b]*(?:\x07|\x1b\\\\)|[\x20-\x2F]+[\x30-\x7E]|[\x30-\x7E])/';
-
     /**
      * Columns a tab takes. Every part of the component that measures or
      * slices text must agree on this value.
      */
     public const TAB_WIDTH = 3;
     private const GRAPHEME_CHUNK_SIZE = 8192;
-
     /**
      * Characters that mb_strwidth() does not measure the way terminals draw them.
      *
@@ -74,27 +64,22 @@ final class AnsiUtils
      * Characters unknown to PCRE use String's Unicode tables.
      */
     private const MISMEASURED_BY_MB_STRWIDTH = '/[\t\p{M}\p{Cf}\p{Cn}\x{1160}-\x{11FF}\x{2028}-\x{2029}\x{D7B0}-\x{D7FF}\x{1F3FB}-\x{1F3FF}]/u';
-
     /**
      * Character set for CSI parameter bytes (0x30-0x3F).
      */
     private const CSI_PARAM_CHARS = '0123456789:;<=>?';
-
     /**
      * Character set for CSI intermediate bytes (0x20-0x2F).
      */
     private const CSI_INTERMEDIATE_CHARS = " !\"#\$%&'()*+,-./";
-
     /**
      * The number of cached grapheme widths that triggers a cleanup.
      */
     private const GRAPHEME_WIDTHS_CLEANUP_THRESHOLD = 5000;
-
     /**
      * The number of cached grapheme widths kept by a cleanup.
      */
     private const GRAPHEME_WIDTHS_CLEANUP_SIZE = 4000;
-
     /**
      * Widths of the graphemes measured by graphemeWidth().
      *
@@ -103,37 +88,14 @@ final class AnsiUtils
     private static array $graphemeWidths = [];
 
     /**
-     * The marker of the text of a line drawn larger by the terminal, with the text sizing protocol of kitty (OSC 66):
-     * zero-width, it is followed by the spaces that keep its room; the ScreenWriter draws the text there once the
-     * lines are written, as the erasing of the rows it covers would take it away.
-     */
-    public static function scaledTextMarker(string $line, int $scale): string
-    {
-        // Its colors and attributes kept, each run of text in a sequence of its own; links are dropped
-        $payload = '';
-        foreach (preg_split('/(\x1b\[[0-9;:]*m)/', (string) preg_replace('/\x1b\][^\x07\x1b]*(?:\x07|\x1b\\\\)|\x1b_[^\x07]*\x07/', '', $line), -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY) ?: [] as $part) {
-            if (str_starts_with($part, "\x1b[")) {
-                $payload .= $part;
-                continue;
-            }
-            // Text only, in pieces short enough for one sequence
-            foreach (mb_str_split((string) preg_replace('/[\x00-\x1f\x7f]/', '', $part), 32) as $piece) {
-                $payload .= "\x1b]66;s={$scale};{$piece}\x07";
-            }
-        }
-
-        return self::SCALED_MARKER_PREFIX.base64_encode($payload."\x1b[0m")."\x07";
-    }
-
-    /**
-     * Create a cursor marker embedding the given shape, and the color of the caret (null for that of the terminal cursor).
+     * Create a cursor marker embedding the given shape.
      *
      * The returned APC sequence is zero-width. The ScreenWriter strips
      * it, positions the hardware cursor, and sets the cursor style.
      */
-    public static function cursorMarker(CursorShape $shape = CursorShape::Block, ?Color $color = null): string
+    public static function cursorMarker(CursorShape $shape = CursorShape::Block): string
     {
-        return self::CURSOR_MARKER_PREFIX.$shape->value.(null !== $color ? ';'.$color->toHex() : '')."\x07";
+        return self::CURSOR_MARKER_PREFIX.$shape->value."\x07";
     }
 
     /**
@@ -145,14 +107,11 @@ final class AnsiUtils
         if ('' === $str) {
             return 0;
         }
-
         $len = \strlen($str);
-
         // Ultra-fast path: pure printable ASCII (0x20-0x7E) with no ESC, no tabs, no non-ASCII
         if (!str_contains($str, "\x1b") && !str_contains($str, "\t") && preg_match('/^[\x20-\x7E]*$/', $str)) {
             return $len;
         }
-
         // The same lines are measured again frame after frame: once, as many as a long page has, the oldest half
         // forgotten when there are too many of them or they are too long
         if (isset(self::$widths[$str])) {
@@ -174,12 +133,10 @@ final class AnsiUtils
         $fastWidth = 0;
         $fastPath = true;
         $i = 0;
-
         while ($i < $len) {
             // Find next ESC byte
             $escPos = strpos($str, "\x1b", $i);
             $segEnd = false === $escPos ? $len : $escPos;
-
             // Process the text segment before the ESC (or end of string)
             if ($segEnd > $i) {
                 $segLen = $segEnd - $i;
@@ -190,7 +147,7 @@ final class AnsiUtils
                 } elseif (str_contains($segment, "\t")) {
                     // Has tabs
                     $tabCount = substr_count($segment, "\t");
-                    $fastWidth += $segLen - $tabCount + ($tabCount * self::TAB_WIDTH);
+                    $fastWidth += $segLen - $tabCount + $tabCount * self::TAB_WIDTH;
                     $withoutTabs = str_replace("\t", '', $segment);
                     if ('' !== $withoutTabs && !preg_match('/^[\x20-\x7E]*$/', $withoutTabs)) {
                         $fastPath = false;
@@ -201,11 +158,9 @@ final class AnsiUtils
                     break;
                 }
             }
-
             if (false === $escPos) {
                 break;
             }
-
             // Skip the ANSI escape sequence, inline CSI fast path
             if ($escPos + 1 < $len && '[' === $str[$escPos + 1]) {
                 $j = $escPos + 2 + strspn($str, self::CSI_PARAM_CHARS, $escPos + 2);
@@ -220,30 +175,23 @@ final class AnsiUtils
             }
             $i = $escPos + $ansi['length'];
         }
-
         if ($fastPath) {
             return $fastWidth;
         }
-
         $clean = $str;
-
         if (str_contains($clean, "\t")) {
             $clean = str_replace("\t", str_repeat(' ', self::TAB_WIDTH), $clean);
         }
-
         if (str_contains($clean, "\x1b")) {
             $clean = preg_replace(self::ALL_ESC_PATTERN, '', $clean) ?? $clean;
         }
-
         if ('' === $clean) {
             return 0;
         }
-
         // Replace each invalid sequence by a character, so that it counts a column as with mb_strwidth(), which slicing measures with
         if (false === preg_match('//u', $clean)) {
             $clean = mb_scrub($clean, 'UTF-8');
         }
-
         // Use the wrapper's grapheme widths when native mb_strwidth() cannot measure the text.
         if (!\extension_loaded('mbstring') && preg_match('/[\x80-\xFF]/', $clean) || preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $clean)) {
             $width = 0;
@@ -287,13 +235,10 @@ final class AnsiUtils
         if ($pos >= $len || "\x1b" !== $str[$pos]) {
             return null;
         }
-
         if ($pos + 1 >= $len) {
             return null;
         }
-
         $next = $str[$pos + 1];
-
         // CSI sequence: ESC [ <parameter bytes 0x30-0x3F>* <intermediate bytes 0x20-0x2F>* <final byte 0x40-0x7E>
         if ('[' === $next) {
             // Use strspn for C-level scanning of parameter bytes
@@ -312,7 +257,6 @@ final class AnsiUtils
 
             return null;
         }
-
         // String sequences: OSC (ESC ]), DCS (ESC P), APC (ESC _), PM (ESC ^), SOS (ESC X)
         // All terminated by BEL (0x07) or ST (ESC \)
         if (\in_array($next, [']', 'P', '_', '^', 'X'], true)) {
@@ -334,9 +278,7 @@ final class AnsiUtils
 
             return null;
         }
-
         $nextOrd = \ord($next);
-
         // nF announced sequences: ESC + intermediate bytes (0x20-0x2F)+ + final byte (0x30-0x7E)
         // e.g., ESC ( B = G0 charset designation
         if ($nextOrd >= 0x20 && $nextOrd <= 0x2F) {
@@ -348,7 +290,6 @@ final class AnsiUtils
 
             return null;
         }
-
         // Fe (0x40-0x5F), Fp (0x30-0x3F), Fs (0x60-0x7E) two-byte sequences
         // e.g., ESC D = IND, ESC M = RI, ESC 7 = DECSC, ESC 8 = DECRC, ESC c = RIS
         if ($nextOrd >= 0x30 && $nextOrd <= 0x7E) {
@@ -369,37 +310,27 @@ final class AnsiUtils
     public static function truncateToWidth(string $text, int $maxWidth, string $ellipsis = '...', bool $pad = false): string
     {
         $textVisibleWidth = self::visibleWidth($text);
-
         if ($textVisibleWidth <= $maxWidth) {
             return $pad ? $text.str_repeat(' ', $maxWidth - $textVisibleWidth) : $text;
         }
-
         // Fast path: pure ASCII ellipsis width = strlen (avoids visibleWidth overhead)
-        $ellipsisWidth = '' !== $ellipsis && !str_contains($ellipsis, "\x1b") && preg_match('/^[\x20-\x7E]*$/', $ellipsis)
-            ? \strlen($ellipsis)
-            : self::visibleWidth($ellipsis);
+        $ellipsisWidth = '' !== $ellipsis && !str_contains($ellipsis, "\x1b") && preg_match('/^[\x20-\x7E]*$/', $ellipsis) ? \strlen($ellipsis) : self::visibleWidth($ellipsis);
         $targetWidth = $maxWidth - $ellipsisWidth;
-
         if ($targetWidth <= 0) {
             return '' === $ellipsis || $maxWidth <= 0 ? '' : self::truncateToWidth($ellipsis, $maxWidth, '', $pad);
         }
-
         // Fast path: pure printable ASCII, direct substr avoids sliceByColumn overhead
         if ($textVisibleWidth === \strlen($text) && preg_match('/^[\x20-\x7E]*$/', $text)) {
             $truncated = substr($text, 0, $targetWidth).$ellipsis;
-
             if ($pad) {
                 return $truncated.str_repeat(' ', max(0, $maxWidth - $targetWidth - $ellipsisWidth));
             }
 
             return $truncated;
         }
-
         $result = self::sliceByColumn($text, 0, $targetWidth);
-
         // Close a hyperlink the cut left open and reset styling, so that neither leaks into the ellipsis
         $truncated = $result.self::closeOpenHyperlink($result)."\x1b[0m".$ellipsis;
-
         if ($pad) {
             $truncatedWidth = self::visibleWidth($truncated);
 
@@ -435,7 +366,6 @@ final class AnsiUtils
         if ($length <= 0) {
             return ['text' => '', 'width' => 0];
         }
-
         $endCol = $startCol + $length;
         $result = '';
         $resultWidth = 0;
@@ -443,7 +373,6 @@ final class AnsiUtils
         $i = 0;
         $pendingAnsi = '';
         $lineLen = \strlen($line);
-
         while ($i < $lineLen) {
             // Handle ANSI escape sequences
             if ("\x1b" === $line[$i]) {
@@ -483,23 +412,19 @@ final class AnsiUtils
                     continue;
                 }
             }
-
             // Find the next ESC byte or end of string
             $textEnd = strpos($line, "\x1b", $i + 1);
             if (false === $textEnd) {
                 $textEnd = $lineLen;
             }
-
             // Process text segment between ANSI codes
             // Fast path: check if segment is pure printable ASCII (0x20-0x7E)
             $segLen = $textEnd - $i;
             $segment = substr($line, $i, $segLen);
-
             if ('' === $segment || preg_match('/^[\x20-\x7E]*$/', $segment)) {
                 // ASCII fast path: each byte is exactly 1 column wide
                 // Use substr for bulk extraction when possible
                 $segEndCol = $currentCol + $segLen;
-
                 if ($segEndCol <= $startCol) {
                     // Entire segment is before range, skip it
                     $currentCol = $segEndCol;
@@ -516,7 +441,6 @@ final class AnsiUtils
                     // Segment partially overlaps, extract the overlap
                     $skipChars = (int) max(0, $startCol - $currentCol);
                     $takeChars = (int) min($segLen - $skipChars, $endCol - max($currentCol, $startCol));
-
                     if ($takeChars > 0) {
                         if ('' !== $pendingAnsi) {
                             $result .= $pendingAnsi;
@@ -530,7 +454,6 @@ final class AnsiUtils
             } else {
                 // Unicode path
                 $textPortion = substr($line, $i, $segLen);
-
                 // Take the whole segment when it fits, unless mb_strwidth() would mismeasure it
                 $segWidth = \extension_loaded('mbstring') && !preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $textPortion) ? mb_strwidth($textPortion, 'UTF-8') : self::visibleWidth($textPortion);
                 if ($currentCol >= $startCol && $currentCol + $segWidth <= $endCol) {
@@ -544,12 +467,10 @@ final class AnsiUtils
                 } else {
                     // Per-grapheme path for boundary-spanning segments
                     $graphemes = grapheme_str_split($textPortion) ?: [];
-
                     foreach ($graphemes as $grapheme) {
                         $w = "\t" === $grapheme ? self::TAB_WIDTH : self::graphemeWidth($grapheme);
                         $inRange = $currentCol >= $startCol && $currentCol < $endCol;
-                        $fits = !$strict || ($currentCol + $w <= $endCol);
-
+                        $fits = !$strict || $currentCol + $w <= $endCol;
                         if ($inRange && $fits) {
                             if ('' !== $pendingAnsi) {
                                 $result .= $pendingAnsi;
@@ -559,16 +480,13 @@ final class AnsiUtils
                             $resultWidth += $w;
                         }
                         $currentCol += $w;
-
                         if ($currentCol >= $endCol) {
                             break;
                         }
                     }
                 }
             }
-
             $i = $textEnd;
-
             if ($currentCol >= $endCol) {
                 break;
             }
@@ -606,7 +524,6 @@ final class AnsiUtils
         $col = 0;
         $len = \strlen($line);
         $bg = false;
-
         while ($i < $len) {
             if ("\x1b" === $line[$i]) {
                 if (null !== $ansi = self::extractAnsiCode($line, $i)) {
@@ -615,18 +532,15 @@ final class AnsiUtils
                     $i += $ansi['length'];
                     continue;
                 }
-
                 // ESC byte that opens no complete sequence: pass it through
                 yield ['text' => "\x1b", 'col' => $col, 'width' => 0, 'bg' => $bg];
                 ++$i;
                 continue;
             }
-
             if (false === $textEnd = strpos($line, "\x1b", $i)) {
                 $textEnd = $len;
             }
             $segment = substr($line, $i, $textEnd - $i);
-
             if (preg_match('/^[\x20-\x7E]*+$/', $segment)) {
                 // ASCII fast path: every byte is one cell of one column
                 for ($j = 0, $segLen = \strlen($segment); $j < $segLen; ++$j) {
@@ -646,7 +560,6 @@ final class AnsiUtils
                     ++$col;
                 }
             }
-
             $i = $textEnd;
         }
     }
@@ -664,7 +577,6 @@ final class AnsiUtils
         if (!str_contains($line, "\x1b") && preg_match('/^[\x20-\x7E]*+$/', $line)) {
             return [str_pad(substr($line, 0, max(0, $from)), max(0, $from)), (string) substr($line, $to)];
         }
-
         $before = '';
         $beforeWidth = 0;
         $after = '';
@@ -704,7 +616,6 @@ final class AnsiUtils
                 }
                 continue;
             }
-
             if (false === $textEnd = strpos($line, "\x1b", $i)) {
                 $textEnd = $len;
             }
@@ -780,12 +691,10 @@ final class AnsiUtils
         if ($length <= 0) {
             return '';
         }
-
         // Fast path: pure printable ASCII maps one byte to one column
         if (!str_contains($line, "\x1b") && preg_match('/^[\x20-\x7E]*+$/', $line)) {
             return str_pad(substr($line, $startCol, $length), $length);
         }
-
         $endCol = $startCol + $length;
         $result = '';
         $resultWidth = 0;
@@ -793,7 +702,6 @@ final class AnsiUtils
         $col = 0;
         $i = 0;
         $len = \strlen($line);
-
         while ($i < $len && $col < $endCol) {
             if ("\x1b" === $line[$i]) {
                 // An escape sequence, or a lone ESC byte passed through: kept from the start of the range; a CSI one,
@@ -814,13 +722,11 @@ final class AnsiUtils
                 }
                 continue;
             }
-
             if (false === $textEnd = strpos($line, "\x1b", $i)) {
                 $textEnd = $len;
             }
             $segment = substr($line, $i, $textEnd - $i);
             $i = $textEnd;
-
             if (preg_match('/^[\x20-\x7E]*+$/', $segment)) {
                 // ASCII: a byte a column, the part in the range copied at once
                 $from = max($startCol, $col) - $col;
@@ -833,7 +739,6 @@ final class AnsiUtils
                 $col += \strlen($segment);
                 continue;
             }
-
             $graphemes = grapheme_str_split($segment);
             foreach (false !== $graphemes ? $graphemes : str_split($segment) as $grapheme) {
                 if ($col >= $endCol) {
@@ -870,7 +775,6 @@ final class AnsiUtils
                 $col = $cellEnd;
             }
         }
-
         if ($resultWidth < $length) {
             $result .= str_repeat(' ', $length - $resultWidth);
         }
@@ -889,16 +793,14 @@ final class AnsiUtils
         if (isset(self::$graphemeWidths[$grapheme])) {
             return self::$graphemeWidths[$grapheme];
         }
-
-        if (1 === mb_strlen($grapheme, 'UTF-8') && (!isset($grapheme[1]) || \extension_loaded('mbstring') || $grapheme < "\xC2\xA0")) {
-            $width = !isset($grapheme[1]) || !preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $grapheme) ? mb_strwidth($grapheme, 'UTF-8') : new CodePointString($grapheme)->width(false);
+        if (1 === mb_strlen($grapheme, 'UTF-8') && (!isset($grapheme[1]) || \extension_loaded('mbstring') || $grapheme < "\u{a0}")) {
+            $width = !isset($grapheme[1]) || !preg_match(self::MISMEASURED_BY_MB_STRWIDTH, $grapheme) ? mb_strwidth($grapheme, 'UTF-8') : (new CodePointString($grapheme))->width(false);
         } elseif (preg_match('//u', $grapheme)) {
-            $width = new CodePointString($grapheme)->width(false);
+            $width = (new CodePointString($grapheme))->width(false);
         } else {
             // CodePointString rejects malformed UTF-8. Replace the invalid sequences the way visibleWidth() does, so text that reaches a measure unscrubbed comes out as a wrong glyph instead of aborting the render.
-            $width = new CodePointString(mb_scrub($grapheme, 'UTF-8'))->width(false);
+            $width = (new CodePointString(mb_scrub($grapheme, 'UTF-8')))->width(false);
         }
-
         if (self::GRAPHEME_WIDTHS_CLEANUP_THRESHOLD <= \count(self::$graphemeWidths)) {
             self::$graphemeWidths = \array_slice(self::$graphemeWidths, -self::GRAPHEME_WIDTHS_CLEANUP_SIZE, null, true);
         }
@@ -963,12 +865,10 @@ final class AnsiUtils
         if ($length <= 0) {
             return '';
         }
-
         $result = '';
         $currentCol = 0;
         $i = 0;
         $lineLen = \strlen($line);
-
         while ($i < $lineLen && $currentCol < $length) {
             if ("\x1b" === $line[$i]) {
                 // Inline CSI fast path
@@ -986,15 +886,12 @@ final class AnsiUtils
                     continue;
                 }
             }
-
             // Find next ESC or end of string
             if (false === $textEnd = strpos($line, "\x1b", $i + 1)) {
                 $textEnd = $lineLen;
             }
-
             $segLen = $textEnd - $i;
             $segment = substr($line, $i, $segLen);
-
             if ('' === $segment || preg_match('/^[\x20-\x7E]*$/', $segment)) {
                 // ASCII: take up to remaining columns
                 $take = min($segLen, $length - $currentCol);
@@ -1024,7 +921,6 @@ final class AnsiUtils
                     }
                 }
             }
-
             $i = $textEnd;
         }
 
@@ -1044,19 +940,16 @@ final class AnsiUtils
         if (\strlen($seq) < 3 || "\x1b[" !== substr($seq, 0, 2) || !str_ends_with($seq, 'm')) {
             return $current;
         }
-
         if ('' === $params = substr($seq, 2, -1)) {
-            return false; // bare ESC [ m is SGR 0, a full reset
+            return false;
+            // bare ESC [ m is SGR 0, a full reset
         }
-
         $state = $current;
         $parts = explode(';', $params);
         $count = \count($parts);
         $idx = 0;
-
         while ($idx < $count) {
             $n = (int) $parts[$idx];
-
             if (38 === $n || 48 === $n || 58 === $n) {
                 // Extended color: N;5;I (256-color) or N;2;R;G;B (truecolor).
                 // Only 48 sets a background, but the payload of 38 (foreground)
@@ -1067,15 +960,17 @@ final class AnsiUtils
                 }
                 if ($idx + 1 < $count) {
                     if ('5' === $parts[$idx + 1]) {
-                        $idx += 2; // skip N and 5; ++$idx below advances past I
+                        $idx += 2;
+                    // skip N and 5; ++$idx below advances past I
                     } elseif ('2' === $parts[$idx + 1]) {
-                        $idx += 4; // skip N, 2, R and G; ++$idx below advances past B
+                        $idx += 4;
+                        // skip N, 2, R and G; ++$idx below advances past B
                     }
                 }
             } elseif (0 === $n || 49 === $n) {
                 // SGR 0 (full reset) or SGR 49 (default background)
                 $state = false;
-            } elseif (($n >= 40 && $n <= 47) || ($n >= 100 && $n <= 107)) {
+            } elseif ($n >= 40 && $n <= 47 || $n >= 100 && $n <= 107) {
                 // Standard (40-47) and bright (100-107) background colors
                 $state = true;
             }
@@ -1115,11 +1010,9 @@ final class AnsiUtils
             while ($end < $length && 0x80 === (\ord($text[$end]) & 0xC0)) {
                 ++$end;
             }
-
             if (false === $graphemes = grapheme_str_split(substr($text, $offset, $end - $offset))) {
                 return;
             }
-
             // The last grapheme of a chunk may go on in the next one.
             // So may the one before: with PCRE older than 10.44, the polyfill leaves a zero-width joiner that ends the chunk out of the grapheme it extends.
             if ($end < $length) {
@@ -1129,7 +1022,6 @@ final class AnsiUtils
                 }
                 array_splice($graphemes, -2);
             }
-
             foreach ($graphemes as $grapheme) {
                 yield $grapheme;
                 $offset += \strlen($grapheme);
@@ -1146,7 +1038,6 @@ final class AnsiUtils
         if (!str_contains($text, "\x1b]8;") || !preg_match_all('/\x1b\]8;[^;\x07\x1b]*;([^\x07\x1b]*)(\x07|\x1b\\\\)/', $text, $matches, \PREG_SET_ORDER)) {
             return '';
         }
-
         [, $uri, $terminator] = end($matches);
 
         return '' === $uri ? '' : "\x1b]8;;".$terminator;

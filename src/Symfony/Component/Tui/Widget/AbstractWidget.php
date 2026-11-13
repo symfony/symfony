@@ -58,8 +58,6 @@ abstract class AbstractWidget
     private array $renderCacheExtra = [];
     /** @var array<string, array{LineBufferInterface, array<mixed>}> The renders of the same revision in other sizes, a layout trying a few, by "columns:rows", the oldest first, each with its extra */
     private array $renderCacheOthers = [];
-    /** @var array{\WeakReference<self>, int}|null The parent whose layout set its place among floats, and its revision then, see floatsSetByLayout() */
-    private ?array $floatsSetBy = null;
 
     /**
      * @return $this
@@ -69,6 +67,28 @@ abstract class AbstractWidget
         $this->id = $id;
 
         return $this;
+    }
+
+    /** @var array<class-string, object> */
+    private array $extensionStates = [];
+
+    /**
+     * @internal
+     *
+     * @template T of object
+     *
+     * @param class-string<T> $type
+     *
+     * @return T
+     */
+    final public function getExtensionState(string $type): object
+    {
+        $state = $this->extensionStates[$type] ?? null;
+        if (!$state instanceof $type) {
+            $this->extensionStates[$type] = $state = new $type();
+        }
+
+        return $state;
     }
 
     final public function getId(): ?string
@@ -296,7 +316,7 @@ abstract class AbstractWidget
     final public function setStyle(?Style $style): static
     {
         // Another object of the same values, like a style computed again, does not draw the widget again
-        if (null === $style ? null !== $this->internalStyle : !$style->equals($this->internalStyle)) {
+        if (null === $style ? null !== $this->internalStyle : $style != $this->internalStyle) {
             $this->internalStyle = $style;
             $this->invalidate();
         }
@@ -463,25 +483,6 @@ abstract class AbstractWidget
         $this->renderCacheRevision = $this->getRenderRevision();
         $this->renderCacheColumns = $columns;
         $this->renderCacheRows = $rows;
-    }
-
-    /**
-     * Records that the layout of its parent placed it among floats now, see floatsSetByLayout().
-     */
-    final protected function markFloatsSet(): void
-    {
-        $this->floatsSetBy = null === $this->parent ? null : [\WeakReference::create($this->parent), $this->parent->getRenderRevision()];
-    }
-
-    /**
-     * Whether what the layout of its parent set about the floats beside it still holds: the same parent, unchanged since,
-     * not one it moved to, nor one laid out again another way, like a flex container or with it out of the flow.
-     */
-    final protected function floatsSetByLayout(): bool
-    {
-        $set = $this->floatsSetBy;
-
-        return null === $set ? null === $this->parent : $set[0]->get() === $this->parent && $set[1] === $this->parent?->getRenderRevision();
     }
 
     /**
@@ -658,10 +659,7 @@ abstract class AbstractWidget
             return $text;
         }
 
-        $styled = $this->resolveElement($element)->apply($text);
-        $style = $this->context?->resolveStyle($this);
-
-        return $styled !== $text && $style?->isCssCascade() ? $styled.$style->getAnsiRestore() : $styled;
+        return $this->resolveElement($element)->apply($text);
     }
 
     /**

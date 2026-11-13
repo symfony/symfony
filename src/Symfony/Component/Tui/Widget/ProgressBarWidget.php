@@ -377,7 +377,6 @@ class ProgressBarWidget extends AbstractWidget
             $this->max = $max;
             $this->stepWidth = \strlen((string) $max);
         }
-        $this->setState('indeterminate', null === $this->max);
 
         $this->percent = $this->max ? min(1.0, (float) $this->step / $this->max) : 0.0;
         $this->invalidate();
@@ -455,8 +454,7 @@ class ProgressBarWidget extends AbstractWidget
             return false;
         }
 
-        // Honor prefers-reduced-motion: an indeterminate bar stays still
-        if (null === $this->max && !$this->getContext()?->getMediaContext()->reducedMotion) {
+        if (null === $this->max) {
             ++$this->step;
         }
 

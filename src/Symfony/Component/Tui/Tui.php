@@ -24,12 +24,11 @@ use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Loop\AdaptativeTicker;
 use Symfony\Component\Tui\Loop\TickRuntimeInterface;
 use Symfony\Component\Tui\Loop\TickScheduler;
+use Symfony\Component\Tui\Render\FrameWriterInterface;
 use Symfony\Component\Tui\Render\Renderer;
+use Symfony\Component\Tui\Render\RendererInterface;
 use Symfony\Component\Tui\Render\RenderRequestorInterface;
-use Symfony\Component\Tui\Render\ScreenWriter;
 use Symfony\Component\Tui\Render\WidgetRect;
-use Symfony\Component\Tui\Style\MediaContext;
-use Symfony\Component\Tui\Style\StyleProviderInterface;
 use Symfony\Component\Tui\Style\StyleSheet;
 use Symfony\Component\Tui\Terminal\Terminal;
 use Symfony\Component\Tui\Terminal\TerminalInterface;
@@ -64,8 +63,10 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
 {
     private ContainerWidget $root;
     private Keybindings $keybindings;
-    private Renderer $renderer;
-    private ScreenWriter $screenWriter;
+    private RendererInterface $renderer;
+    /** @var list<StyleSheet> */
+    private array $styleSheets = [];
+    private FrameWriterInterface $screenWriter;
     private WidgetTree $widgetTree;
     private FocusManager $focusManager;
     private TickScheduler $tickScheduler;
@@ -77,10 +78,8 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private ?\Closure $onTick = null;
 
     private bool $renderRequested = false;
-
-    /** The timer drawing the frames of a scroll container gliding, see Renderer::isScrolling() */
-    private ?string $glideTimer = null;
     private bool $running = false;
+    private bool $started = false;
     private bool $stopped = false;
     private bool $ticking = false;
     private ?float $lastTickAt = null;
@@ -92,7 +91,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private ?Suspension $runSuspension = null;
 
     /**
-     * @param Renderer|null                 $renderer        @internal Override the default renderer; framework-internal use only
+     * @param RendererInterface|null        $renderer        @internal Override the default renderer; framework-internal use only
      * @param EventDispatcherInterface|null $eventDispatcher Reference dispatcher; the terminal must use the same instance
      */
     public function __construct(
@@ -100,7 +99,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         ?TerminalInterface $terminal = null,
         ?Keybindings $keybindings = null,
         ?FontRegistry $fontRegistry = null,
-        ?Renderer $renderer = null,
+        ?RendererInterface $renderer = null,
         ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->eventDispatcher = $eventDispatcher ?? $terminal?->getEventDispatcher() ?? new EventDispatcher();
@@ -113,8 +112,10 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $this->root = new ContainerWidget();
         $this->root->expandVertically(true);
         $this->renderer = $renderer ?? new Renderer($styleSheet, $fontRegistry);
-        $this->screenWriter = new ScreenWriter($this->terminal);
-        $this->screenWriter->setColors($this->renderer->getMediaContext()->colors);
+        if (null !== $styleSheet) {
+            $this->styleSheets[] = clone $styleSheet;
+        }
+        $this->screenWriter = $this->renderer->createFrameWriter($this->terminal);
 
         // Share the KeyParser so Kitty protocol state is consistent
         $this->focusManager = new FocusManager(
@@ -122,12 +123,51 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
             keybindings: $this->keybindings,
             eventDispatcher: $this->eventDispatcher,
         );
-        $this->focusManager->setRectResolver($this->renderer->getWidgetRect(...));
+
+        $this->focusManager->setPolicy($this->renderer instanceof Focus\FocusPolicyInterface ? $this->renderer : null);
 
         $this->widgetTree = new WidgetTree($this, $this->keybindings, $this->focusManager, $this->renderer, $this->terminal, $this->eventDispatcher);
         $this->widgetTree->setRoot($this->root);
         $this->tickScheduler = new TickScheduler();
         $this->adaptativeTicker = new AdaptativeTicker($this);
+    }
+
+    /**
+     * Selects the rendering backend before the first start.
+     *
+     * @return $this
+     */
+    public function setRenderer(RendererInterface $renderer): static
+    {
+        if ($this->started) {
+            throw new Exception\LogicException('The renderer must be selected before starting the TUI.');
+        }
+        foreach ($this->styleSheets as $styleSheet) {
+            $renderer->addStyleSheet($styleSheet);
+        }
+        $this->screenWriter->close();
+        $this->renderer = $renderer;
+        $clear = static function (AbstractWidget $widget) use (&$clear): void {
+            $widget->clearRenderCache();
+            if ($widget instanceof Widget\ParentInterface) {
+                foreach ($widget->all() as $child) {
+                    $clear($child);
+                }
+            }
+        };
+        $clear($this->root);
+        $this->screenWriter = $renderer->createFrameWriter($this->terminal);
+        $this->widgetTree->setRenderer($renderer);
+        $this->focusManager->setPolicy($renderer instanceof Focus\FocusPolicyInterface ? $renderer : null);
+        $this->root->invalidate();
+        $this->requestRender(true);
+
+        return $this;
+    }
+
+    public function getRenderer(): RendererInterface
+    {
+        return $this->renderer;
     }
 
     /**
@@ -189,55 +229,8 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
      */
     public function addStyleSheet(StyleSheet $styleSheet): static
     {
+        $this->styleSheets[] = clone $styleSheet;
         $this->renderer->addStyleSheet($styleSheet);
-
-        return $this;
-    }
-
-    /**
-     * Add a style provider, like a CSS stylesheet, on top of the stylesheets.
-     *
-     * @return $this
-     */
-    public function addStyleProvider(StyleProviderInterface $provider): static
-    {
-        $this->renderer->getStyleSheet()->addProvider($provider);
-        $this->requestRender();
-
-        return $this;
-    }
-
-    /**
-     * Removes a provider added with addStyleProvider().
-     *
-     * @return $this
-     */
-    public function removeStyleProvider(StyleProviderInterface $provider): static
-    {
-        $this->renderer->getStyleSheet()->removeProvider($provider);
-        $this->requestRender();
-
-        return $this;
-    }
-
-    public function getMediaContext(): MediaContext
-    {
-        return $this->renderer->getMediaContext();
-    }
-
-    /**
-     * Set what media queries are evaluated against: color scheme, density,
-     * contrast and motion preferences, cell pixel size.
-     *
-     * The terminal size of the context is kept up to date by the renderer.
-     *
-     * @return $this
-     */
-    public function setMediaContext(MediaContext $mediaContext): static
-    {
-        $this->renderer->setMediaContext($mediaContext);
-        $this->screenWriter->setColors($mediaContext->colors);
-        $this->requestRender();
 
         return $this;
     }
@@ -271,6 +264,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
      */
     public function start(): void
     {
+        $this->started = true;
         $this->running = true;
         $this->stopped = false;
         $this->lastTickAt = null;
@@ -352,9 +346,10 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
             $this->terminal->write("\r\n");
         }
 
-        // Restore default cursor shape (DECSCUSR 0) and color (OSC 112), and show cursor
+        $this->screenWriter->close();
+
+        // Restore default cursor shape (DECSCUSR 0) and show cursor
         $this->terminal->write("\x1b[0 q");
-        $this->screenWriter->restoreCursorColor();
         $this->terminal->showCursor();
         $this->terminal->stop();
     }
@@ -386,6 +381,18 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     }
 
     /**
+     * Removes a listener registered with addListener().
+     *
+     * @return $this
+     */
+    public function removeListener(callable $listener): static
+    {
+        $this->eventDispatcher->removeListener($this->resolveEventClass($listener), $listener);
+
+        return $this;
+    }
+
+    /**
      * Register a listener for a TUI event.
      *
      * The event class is inferred from the listener's first parameter type hint:
@@ -399,25 +406,12 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
      * listening for a shared event type like CancelEvent.
      *
      * @param callable $listener The listener to invoke; its first parameter's type hint determines the event class
-     * @param int      $priority Higher = called earlier (default 0)
      *
      * @return $this
      */
     public function addListener(callable $listener, int $priority = 0): static
     {
         $this->eventDispatcher->addListener($this->resolveEventClass($listener), $listener, $priority);
-
-        return $this;
-    }
-
-    /**
-     * Removes a listener added with addListener().
-     *
-     * @return $this
-     */
-    public function removeListener(callable $listener): static
-    {
-        $this->eventDispatcher->removeListener($this->resolveEventClass($listener), $listener);
 
         return $this;
     }
@@ -468,18 +462,6 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     }
 
     /**
-     * Places an absolute or fixed widget next to another when its style names no anchor, like the button that opens
-     * a popover is its anchor.
-     *
-     * @internal
-     */
-    public function setImplicitAnchor(AbstractWidget $widget, ?AbstractWidget $anchor): void
-    {
-        $this->renderer->setImplicitAnchor($widget, $anchor);
-        $this->requestRender();
-    }
-
-    /**
      * Returns where a widget was drawn during the last render, or null if it was not drawn.
      *
      * A widget's own render() reports the height of its content, not the row the layout gave it,
@@ -489,44 +471,6 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     public function getWidgetRect(AbstractWidget $widget): ?WidgetRect
     {
         return $this->renderer->getWidgetRect($widget);
-    }
-
-    /**
-     * Returns the control of a scroll container drawn at a cell, like a CSS ::scroll-button(): the container and what
-     * it does, or null.
-     *
-     * @return array{ContainerWidget, string}|null
-     *
-     * @internal
-     */
-    public function getScrollControlAt(int $row, int $col): ?array
-    {
-        return $this->renderer->getScrollControlAt($row, $col);
-    }
-
-    /**
-     * Scrolls a widget into view in the scroll containers around it, like Element::scrollIntoView().
-     */
-    public function reveal(AbstractWidget $widget): void
-    {
-        $this->renderer->reveal($widget);
-        $this->requestRender();
-    }
-
-    /**
-     * Returns the fragment (#id) a link drawn at a cell of the last frame goes to, null when there is none.
-     */
-    public function getFragmentLinkAt(int $row, int $col): ?string
-    {
-        return $this->renderer->getFragmentLinkAt($row, $col);
-    }
-
-    /**
-     * Returns the id of the link drawn at a cell of the last frame, see RichTextWidget::linkId(), null when there is none.
-     */
-    public function getLinkAt(int $row, int $col): ?string
-    {
-        return $this->renderer->getLinkAt($row, $col);
     }
 
     /**
@@ -609,23 +553,9 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     {
         if ($this->renderRequested) {
             $this->renderRequested = false;
-            $this->renderer->invalidateGlides();
             $columns = $this->terminal->getColumns();
             $rows = $this->terminal->getRows();
-            $frame = $this->renderer->renderFrame($this->root, $columns, $rows);
-            // The focus on a widget the frame does not draw, like one CSS hides: on the first one that is, drawn again
-            if ($this->focusManager->leaveUndrawn()) {
-                $frame = $this->renderer->renderFrame($this->root, $columns, $rows);
-            }
-            $this->screenWriter->writeFrame($frame);
-
-            // A scroll container gliding (scroll-behavior: smooth) draws frames until it is there
-            if ($this->renderer->isScrolling()) {
-                $this->glideTimer ??= $this->scheduleInterval($this->requestRender(...), 1 / 60);
-            } elseif (null !== $this->glideTimer) {
-                $this->cancelInterval($this->glideTimer);
-                $this->glideTimer = null;
-            }
+            $this->screenWriter->writeFrame($this->renderer->renderFrame($this->root, $columns, $rows));
         }
     }
 

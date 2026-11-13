@@ -13,7 +13,6 @@ namespace Symfony\Component\Tui\Widget;
 
 use Symfony\Component\Tui\Ansi\AnsiCodeTracker;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
-use Symfony\Component\Tui\Ansi\Bidi;
 use Symfony\Component\Tui\Ansi\TextWrapper;
 use Symfony\Component\Tui\Event\CancelEvent;
 use Symfony\Component\Tui\Event\MultiSelectEvent;
@@ -24,8 +23,6 @@ use Symfony\Component\Tui\Input\Key;
 use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Style\Style;
-use Symfony\Component\Tui\Widget\Text\ElementContentInterface;
-use Symfony\Component\Tui\Widget\Util\StringUtils;
 
 /**
  * Interactive selection list with keyboard navigation.
@@ -37,23 +34,16 @@ use Symfony\Component\Tui\Widget\Util\StringUtils;
  * Item `label`, `description`, and `value` are rendered to the terminal
  * as-is and are not sanitized. See {@see TextWidget} for the raw-passthrough
  * contract: never pass untrusted bytes here; sanitize upstream via
- * {@see StringUtils::stripControlBytes()}.
+ * {@see Util\StringUtils::stripControlBytes()}.
  *
  * @experimental
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SelectListWidget extends AbstractWidget implements FocusableInterface, VerticallyExpandableInterface, ElementContentInterface
+class SelectListWidget extends AbstractWidget implements FocusableInterface, VerticallyExpandableInterface
 {
     use FocusableTrait;
     use KeybindingsTrait;
-    /** The marker of the selected item, styled by the checkmark sub-element, null for the default one */
-    private ?string $checkmark = null;
-    /** @var list<string> The labels the items are drawn with, see setLabels() */
-    private array $displayLabels = [];
-
-    /** @var array{?string, ?Style} The checkmark of the dropdown the list is in: its content and style */
-    private array $outerCheckmark = [null, null];
 
     /** @var list<int> */
     private array $filteredItemIndices;
@@ -67,7 +57,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
     private int $lastRenderRows = 0;
 
     /**
-     * @param list<array{value: string, label: string, description?: string, checked?: bool, group?: string}> $items
+     * @param list<array{value: string, label: string, description?: string, checked?: bool}> $items
      */
     public function __construct(
         private array $items,
@@ -100,47 +90,19 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
     }
 
     /**
-     * @param list<array{value: string, label: string, description?: string, checked?: bool, group?: string}> $items
+     * @param list<array{value: string, label: string, description?: string, checked?: bool}> $items
      *
      * @return $this
      */
     public function setItems(array $items): static
     {
         $this->items = $items;
-        $this->displayLabels = [];
         $this->resetFilteredItems();
         $this->selectedIndex = 0;
         $this->invalidateFittedWindow();
         $this->invalidate();
 
         return $this;
-    }
-
-    /**
-     * Draws the items with other labels, in order, like the styled content of <option>s; the labels of the items,
-     * which events carry, stay as they are.
-     *
-     * @param list<string> $labels
-     *
-     * @internal
-     */
-    public function setLabels(array $labels): void
-    {
-        if ($labels !== $this->displayLabels) {
-            $this->displayLabels = $labels;
-            $this->invalidateFittedWindow();
-            $this->invalidate();
-        }
-    }
-
-    /**
-     * The label an item is drawn with: its styled one, or its label.
-     *
-     * @internal
-     */
-    public function getDisplayLabel(int $index): ?string
-    {
-        return $this->displayLabels[$index] ?? $this->items[$index]['label'] ?? null;
     }
 
     /**
@@ -180,25 +142,9 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
     }
 
     /**
-     * @return list<array{value: string, label: string, description?: string, checked?: bool, group?: string}>
-     */
-    public function getItems(): array
-    {
-        return array_values($this->items);
-    }
-
-    /**
-     * The index of the highlighted item among the visible (filtered) ones.
-     */
-    public function getSelectedIndex(): int
-    {
-        return $this->selectedIndex;
-    }
-
-    /**
      * Get the currently selected item.
      *
-     * @return array{value: string, label: string, description?: string, checked?: bool, group?: string}|null
+     * @return array{value: string, label: string, description?: string, checked?: bool}|null
      */
     public function getSelectedItem(): ?array
     {
@@ -206,7 +152,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
     }
 
     /**
-     * @return list<array{value: string, label: string, description?: string, checked?: bool, group?: string}>
+     * @return list<array{value: string, label: string, description?: string, checked?: bool}>
      */
     public function getSelectedItems(): array
     {
@@ -452,22 +398,15 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
 
         $maxLabelWidth = 0;
         for ($i = $startIndex; $i < $endIndex; ++$i) {
-            $maxLabelWidth = max($maxLabelWidth, AnsiUtils::visibleWidth($this->getDisplayLabel($this->filteredItemIndices[$i]) ?? ''));
+            $maxLabelWidth = max($maxLabelWidth, AnsiUtils::visibleWidth($this->getFilteredItem($i)['label']));
         }
         $labelColumnWidth = min(30, $maxLabelWidth);
 
         $rowsByIndex = [];
         for ($i = $startIndex; $i < $endIndex; ++$i) {
             $item = $this->getFilteredItem($i);
-            $item['label'] = $this->getDisplayLabel($this->filteredItemIndices[$i]) ?? $item['label'];
             $description = isset($item['description']) ? $this->normalizeDescription($item['description']) : null;
             $rowsByIndex[$i] = $this->renderItemRows($item, $i === $this->selectedIndex, $description, $columns, $labelColumnWidth);
-
-            // The first item of a group carries its heading, like <optgroup>: headings are not items
-            $group = $item['group'] ?? null;
-            if (null !== $group && $group !== (0 === $i ? null : ($this->getFilteredItem($i - 1)['group'] ?? null))) {
-                array_unshift($rowsByIndex[$i], $this->applyElement('group', AnsiUtils::truncateToWidth($group, $columns, '…')));
-            }
         }
 
         $total = \count($this->filteredItemIndices);
@@ -534,26 +473,16 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
      * their side-by-side columns. Continuation rows keep the arrow only on
      * the first physical row and align under each column.
      *
-     * @param array{value: string, label: string, description?: string, checked?: bool, group?: string} $item
+     * @param array{value: string, label: string, description?: string, checked?: bool} $item
      *
      * @return list<string>
      */
     private function renderItemRows(array $item, bool $isSelected, ?string $description, int $columns, int $labelColumnWidth): array
     {
         $checkbox = $this->multiselect ? (($item['checked'] ?? false) ? '[x] ' : '[ ] ') : '';
-        $selectedStyle = $isSelected ? $this->resolveElement('selected') : null;
-        // The marker of the selected item is the checkmark sub-element: its content and style, over the selected one
-        $marker = $this->checkmark ?? $this->outerCheckmark[0] ?? '→';
-        $markerWidth = AnsiUtils::visibleWidth($marker);
-        $markerStyle = $this->resolveElement('checkmark');
-        if (null !== $this->outerCheckmark[1] && 'x' === $markerStyle->apply('x')) {
-            $markerStyle = $this->outerCheckmark[1];
-        }
-        if ($isSelected && '' !== $marker && $marker !== $styled = $markerStyle->apply($marker)) {
-            $marker = $styled."\x1b[0m".$selectedStyle?->getAnsiRestore();
-        }
-        $prefix = ('' === $marker ? '' : ($isSelected ? $marker : str_repeat(' ', $markerWidth)).' ').$checkbox;
+        $prefix = $isSelected ? '→ '.$checkbox : '  '.$checkbox;
         $prefixWidth = AnsiUtils::visibleWidth($prefix);
+        $selectedStyle = $isSelected ? $this->resolveElement('selected') : null;
 
         // Keep the existing side-by-side layout when there is room for a
         // description column; otherwise fall back to a full-width label.
@@ -564,10 +493,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
         $descriptionWidth = $columns - $descriptionStart - 2;
 
         if (!$showDescription || $descriptionWidth <= 10) {
-            // A label that fits is not wrapped, the list as wide as its widest label measures; a longer one keeps
-            // two columns clear at the end of its lines
-            $fits = AnsiUtils::visibleWidth($item['label']) <= $columns - $prefixWidth;
-            $labelWidth = max(1, $columns - $prefixWidth - ($fits ? 0 : 2));
+            $labelWidth = max(1, $columns - $prefixWidth - 2);
             $alignedWidth = 0;
             $descriptionRows = [];
         } else {
@@ -575,11 +501,6 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
         }
 
         $labelRows = TextWrapper::wrapTextWithAnsi($item['label'], $labelWidth);
-        // Right-to-left labels in visual order, their Arabic letters joined, like the text of a page
-        if (Bidi::isAvailable() && Bidi::hasRightToLeft($item['label'])) {
-            $level = Bidi::direction($item['label']) ?? 0;
-            $labelRows = array_map(static fn (string $row) => Bidi::reorderLine($row, $level), $labelRows);
-        }
         $rowCount = max(\count($labelRows), \count($descriptionRows));
         $rows = [];
 
@@ -773,39 +694,10 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface, Ver
     }
 
     /**
-     * @return array{value: string, label: string, description?: string, checked?: bool, group?: string}|null
+     * @return array{value: string, label: string, description?: string, checked?: bool}|null
      */
     private function getFilteredItem(int $index): ?array
     {
         return isset($this->filteredItemIndices[$index]) ? $this->items[$this->filteredItemIndices[$index]] : null;
-    }
-
-    public function getContentElements(): array
-    {
-        return ['checkmark'];
-    }
-
-    /**
-     * Sets the checkmark of the dropdown the list is in, under the one of the list itself.
-     *
-     * @internal
-     */
-    public function setOuterCheckmark(?string $content, ?Style $style): void
-    {
-        $content = null !== $content ? StringUtils::stripControlBytes(StringUtils::sanitizeUtf8($content)) : null;
-        if ($content !== $this->outerCheckmark[0] || $style != $this->outerCheckmark[1]) {
-            $this->outerCheckmark = [$content, $style];
-            $this->invalidate();
-        }
-    }
-
-    public function setElementContent(string $element, ?string $content): void
-    {
-        // Content from a style sheet is text: no control bytes, which would write to the terminal
-        $content = null !== $content ? StringUtils::stripControlBytes(StringUtils::sanitizeUtf8($content)) : null;
-        if ('checkmark' === $element && $content !== $this->checkmark) {
-            $this->checkmark = $content;
-            $this->invalidate();
-        }
     }
 }

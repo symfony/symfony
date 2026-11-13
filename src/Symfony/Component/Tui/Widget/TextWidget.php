@@ -68,13 +68,6 @@ use Symfony\Component\Tui\Widget\Figlet\FigletRenderer;
  */
 class TextWidget extends AbstractWidget
 {
-    private string $ellipsis = '...';
-
-    /** @var list<array{int, int, 2?: string, 3?: string}> The columns kept clear at the left and right of each line, the last pair repeating, with what fills the left ones and what follows the line */
-    private array $lineInsets = [];
-    /** The blank rows above its lines, those of the floats its ::before clears */
-    private int $clearance = 0;
-
     /**
      * @param string $text     Text content to display
      * @param bool   $truncate When true, truncate lines to fit width instead of wrapping
@@ -86,125 +79,12 @@ class TextWidget extends AbstractWidget
     }
 
     /**
-     * @return list<array{int, int, 2?: string, 3?: string}>
-     *
-     * @internal
-     */
-    public function getLineInsets(): array
-    {
-        return $this->lineInsets;
-    }
-
-    /**
-     * Keeps columns clear at the left and right of each line, like text flowing around floats: the lines wrap narrower
-     * there, the left ones indented, or filled.
-     *
-     * @param list<array{int, int, 2?: string, 3?: string}> $insets The left and right columns of each line, the last pair repeating, with what ends the left ones and what follows the text of the line; [] for none
-     *
-     * @internal
-     */
-    public function setLineInsets(array $insets): void
-    {
-        $this->markFloatsSet();
-        if ($insets !== $this->lineInsets) {
-            $this->lineInsets = $insets;
-            $this->clearRenderCache();
-        }
-    }
-
-    /**
-     * @internal
-     */
-    public function getClearance(): int
-    {
-        return $this->clearance;
-    }
-
-    /**
-     * Starts its lines below the floats its ::before clears, like CSS, see Style::withBeforeClear(): the rows they take
-     * in its content box blank, its box where it is, its border and background beside them.
-     *
-     * @internal
-     */
-    public function setClearance(int $rows): void
-    {
-        $this->markFloatsSet();
-        if ($rows !== $this->clearance) {
-            $this->clearance = $rows;
-            $this->clearRenderCache();
-        }
-    }
-
-    /**
-     * Drops its insets and clearance once the layout that set them is gone, like when it moved to another parent or its
-     * parent changed to a layout without floats, like a flex container: its lines no longer beside them.
-     *
-     * @internal
-     */
-    public function dropStaleFloats(): void
-    {
-        if (([] === $this->lineInsets && 0 === $this->clearance) || $this->floatsSetByLayout()) {
-            return;
-        }
-        $this->lineInsets = [];
-        $this->clearance = 0;
-        $this->clearRenderCache();
-    }
-
-    /**
-     * Measures it as if no float were beside it, like its layout among floats does not size it: its insets and its
-     * clearance, kept from that layout until it changes, set aside meanwhile, see setLineInsets() and setClearance().
-     *
-     * @internal
-     *
-     * @template T
-     *
-     * @param \Closure(): T $measure
-     *
-     * @return T
-     */
-    public function measureWithoutFloats(\Closure $measure): mixed
-    {
-        if ([] === $this->lineInsets && 0 === $this->clearance) {
-            return $measure();
-        }
-        [$insets, $clearance] = [$this->lineInsets, $this->clearance];
-        $this->lineInsets = [];
-        $this->clearance = 0;
-        // Its render among the floats not taken for the measure, nor the measure for it: that render kept for after it
-        try {
-            return $this->withoutRenderCache($measure);
-        } finally {
-            $this->lineInsets = $insets;
-            $this->clearance = $clearance;
-        }
-    }
-
-    /**
      * @return $this
      */
     public function setText(string $text): static
     {
         $this->text = $text;
         $this->invalidate();
-
-        return $this;
-    }
-
-    /**
-     * Truncate lines that do not fit instead of wrapping them.
-     *
-     * @param string $ellipsis What ends a truncated line, like "…" or nothing
-     *
-     * @return $this
-     */
-    public function setTruncate(bool $truncate, string $ellipsis = '...'): static
-    {
-        if ($truncate !== $this->truncate || $ellipsis !== $this->ellipsis) {
-            $this->truncate = $truncate;
-            $this->ellipsis = $ellipsis;
-            $this->invalidate();
-        }
 
         return $this;
     }
@@ -237,27 +117,11 @@ class TextWidget extends AbstractWidget
     }
 
     /**
-     * Returns what ends a line broken at a soft hyphen, which subclasses can change.
-     */
-    protected function getHyphen(): string
-    {
-        return '-';
-    }
-
-    /**
-     * Returns the text to draw, which subclasses can compose for the context.
-     */
-    protected function getDisplayText(RenderContext $context): string
-    {
-        return $this->text;
-    }
-
-    /**
      * @return string[]
      */
     private function renderText(RenderContext $context): array
     {
-        $normalizedText = str_replace("\t", str_repeat(' ', AnsiUtils::TAB_WIDTH), $this->getDisplayText($context));
+        $normalizedText = str_replace("\t", str_repeat(' ', AnsiUtils::TAB_WIDTH), $this->text);
 
         // Context already has inner dimensions (chrome subtracted by the Renderer)
         $contentColumns = $context->getColumns();
@@ -267,38 +131,10 @@ class TextWidget extends AbstractWidget
             $lines = preg_split('/\r\n|\r|\n/', $normalizedText) ?: [$normalizedText];
             $processedLines = [];
             foreach ($lines as $line) {
-                $processedLines[] = AnsiUtils::truncateToWidth($line, $contentColumns, $this->ellipsis);
-            }
-        } elseif ([] !== $insets = $this->lineInsets) {
-            $last = \count($insets) - 1;
-            // Rows without room are left empty only when a row after them has some: past the floats, the box itself
-            $skip = ($past = $contentColumns - $insets[$last][0] - $insets[$last][1]) > 0;
-            // Nor rows narrower than a word, up to 12 columns, like browsers, which put a line below the floats where its
-            // word does not fit beside them, not a letter on each row; never more than the room past them, which a word
-            // wider than the box would never find
-            $least = 1;
-            // Of floats only, not the decorations of an element cut across lines, which draw on each row
-            if ($skip && array_all($insets, static fn (array $inset) => !isset($inset[2]) && !isset($inset[3]))) {
-                foreach (preg_split('/\s+/u', AnsiUtils::stripAnsiCodes($normalizedText), -1, \PREG_SPLIT_NO_EMPTY) ?: [] as $word) {
-                    $least = max($least, min(12, $past, AnsiUtils::visibleWidth($word)));
-                }
-            }
-            $processedLines = TextWrapper::wrapTextWithAnsiWidths($normalizedText, static function (int $line) use ($skip, $contentColumns, $insets, $last, $least): int {
-                $room = $contentColumns - $insets[min($line, $last)][0] - $insets[min($line, $last)][1];
-
-                return $skip ? ($room < $least ? 0 : $room) : max(1, $room);
-            }, $this->getHyphen());
-            foreach ($processedLines as $i => $line) {
-                $inset = $insets[min($i, $last)];
-                $fill = $inset[2] ?? '';
-                // Never past the box, like a line given a column when no row had room
-                if ('' !== $line && 0 < $left = min($inset[0], $contentColumns - AnsiUtils::visibleWidth($line) - AnsiUtils::visibleWidth($inset[3] ?? ''))) {
-                    $line = str_repeat(' ', max(0, $left - AnsiUtils::visibleWidth($fill))).$fill.$line;
-                }
-                $processedLines[$i] = $line.($inset[3] ?? '');
+                $processedLines[] = AnsiUtils::truncateToWidth($line, $contentColumns);
             }
         } else {
-            $processedLines = TextWrapper::wrapTextWithAnsi($normalizedText, $contentColumns, $this->getHyphen());
+            $processedLines = TextWrapper::wrapTextWithAnsi($normalizedText, $contentColumns);
         }
 
         return $processedLines ?: [''];

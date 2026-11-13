@@ -22,7 +22,6 @@ use Symfony\Component\Tui\Render\Renderer;
 use Symfony\Component\Tui\Style\Align;
 use Symfony\Component\Tui\Style\Border;
 use Symfony\Component\Tui\Style\Direction;
-use Symfony\Component\Tui\Style\GridTemplate;
 use Symfony\Component\Tui\Style\Padding;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\StyleSheet;
@@ -38,45 +37,6 @@ class RendererTest extends TestCase
     // ---------------------------------------------------------------
     // Render caching
     // ---------------------------------------------------------------
-
-    public function testAnEmptyIntrinsicWidthFollowsTheParentsLayout()
-    {
-        $renderer = new Renderer();
-        $root = new ContainerWidget();
-        $root->setStyle(new Style()->withGridTemplate(new GridTemplate([['auto', 1.0, 0]])));
-        $root->add($empty = new TextWidget(''));
-        $renderer->renderFrame($root, 20, 4);
-        $this->assertSame(0, $renderer->measureIntrinsicWidth($empty, 20, 4));
-        $root->setStyle(new Style()->withDirection(Direction::Horizontal));
-        $renderer->renderFrame($root, 20, 4);
-        $this->assertSame(1, $renderer->measureIntrinsicWidth($empty, 20, 4));
-    }
-
-    public function testStretchedRendersHitTheirOwnCacheAndInvalidate()
-    {
-        $renderer = new Renderer();
-        $widget = new TextWidget('Before');
-        $context = new RenderContext(20, 10);
-        $natural = $renderer->renderWidgetLines($widget, $context);
-        $stretched = $renderer->renderStretchedLines($widget, $context, 4);
-        $this->assertFalse($renderer->wasRenderCached($widget));
-        $this->assertCount(4, $stretched);
-        $this->assertSame($stretched, $renderer->renderStretchedLines($widget, $context, 4));
-        $this->assertTrue($renderer->wasRenderCached($widget));
-        $this->assertSame($natural, $renderer->renderWidgetLines($widget, $context));
-        $this->assertTrue($renderer->wasRenderCached($widget));
-        $this->assertCount(6, $renderer->renderStretchedLines($widget, $context, 6));
-        $this->assertFalse($renderer->wasRenderCached($widget));
-        $renderer->renderStretchedLines($widget, new RenderContext(10, 10), 4);
-        $this->assertFalse($renderer->wasRenderCached($widget));
-        $widget->setText('After');
-        $changed = $renderer->renderStretchedLines($widget, $context, 4);
-        $this->assertFalse($renderer->wasRenderCached($widget));
-        $this->assertStringContainsString('After', $changed->toArray()[0]);
-        $widget->setStyle(new Style()->withPadding(new Padding(1, 1, 1, 1)));
-        $this->assertNotSame($changed, $renderer->renderStretchedLines($widget, $context, 4));
-        $this->assertFalse($renderer->wasRenderCached($widget));
-    }
 
     public function testRenderCacheInvalidatedWhenWidgetChanges()
     {
@@ -1496,27 +1456,6 @@ class RendererTest extends TestCase
         $widget->invalidate();
         $renderer->renderFrame($root, 10, 5);
         $this->assertSame(2, $widget->calls);
-    }
-
-    public function testAWidthInPercentagesIsCachedByTheBlockItIsAShareOf()
-    {
-        $renderer = new Renderer(new StyleSheet(['.w' => new Style()->withWidthPercent(50)->withBorder(Border::all(1))]));
-        $widget = new TextWidget('a');
-        $widget->addStyleClass('w');
-
-        $narrow = $renderer->renderWidgetLines($widget, new RenderContext(40, 5, containingColumns: 20));
-        $wide = $renderer->renderWidgetLines($widget, new RenderContext(40, 5, containingColumns: 40));
-
-        $this->assertSame(10, AnsiUtils::visibleWidth(rtrim(AnsiUtils::stripAnsiCodes($narrow->getLine(0)))));
-        $this->assertSame(20, AnsiUtils::visibleWidth(rtrim(AnsiUtils::stripAnsiCodes($wide->getLine(0)))));
-    }
-
-    public function testABackgroundIsTakenOutOfTheStylesOfALineByParameterNotInAForeground()
-    {
-        $without = new \ReflectionMethod(Renderer::class, 'withoutBackground');
-
-        $this->assertSame("\e[49mA\e[49mB\e[1;49mC", $without->invoke(null, "\e[48;2;0;0;255mA\e[48:2::0:0:255mB\e[1;48:2:0:0:255mC", '48;2;0;0;255'));
-        $this->assertSame("\e[38;2;41;0;0;49mD\e[38;5;41mE", $without->invoke(null, "\e[38;2;41;0;0;41mD\e[38;5;41mE", '41'), 'Not the parameters of a foreground.');
     }
 
     public function testPostRenderLinesKeepTheWidthContract()

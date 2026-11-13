@@ -43,16 +43,6 @@ class CompositorTest extends TestCase
         $this->assertSame('................XX', $lines[1]);
     }
 
-    public function testTheSpacesOnTheBackgroundATransparentLayerSeesThroughShowWhatIsUnderThem()
-    {
-        $white = "\x1b[48;2;255;255;255m";
-        $under = [$white.'Heading'."\x1b[0m"];
-        $over = [$white.'  it   '."\x1b[0m"];
-
-        $this->assertSame(['  it   '], array_map(AnsiUtils::stripAnsiCodes(...), Compositor::composite(new Layer($under), new Layer($over, transparent: true))));
-        $this->assertSame(['Heiting'], array_map(AnsiUtils::stripAnsiCodes(...), Compositor::composite(new Layer($under), new Layer($over, transparent: true, seeThrough: '48;2;255;255;255'))));
-    }
-
     public function testAnEmptyBaseComposesToNothing()
     {
         $this->assertSame([], Compositor::composite(new Layer([])));

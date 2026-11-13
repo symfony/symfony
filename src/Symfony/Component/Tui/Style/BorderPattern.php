@@ -33,21 +33,12 @@ final class BorderPattern
     public const NORMAL = 'normal';
     public const ROUNDED = 'rounded';
     public const DOUBLE = 'double';
-    public const HEAVY = 'heavy';
-    public const DASHED = 'dashed';
-    public const DOTTED = 'dotted';
     public const TALL = 'tall';
     public const WIDE = 'wide';
     public const TALL_MEDIUM = 'tall-medium';
     public const WIDE_MEDIUM = 'wide-medium';
     public const TALL_LARGE = 'tall-large';
     public const WIDE_LARGE = 'wide-large';
-    /** A thin line hugging a box from outside it, like the ring of a box-shadow spread around it */
-    public const RING = 'ring';
-    /** A thick line hugging a box from outside it */
-    public const RING_THICK = 'ring-thick';
-    /** A thin line hugging a box from inside it, along its edge cells, like the ring of a box-shadow spread inside */
-    public const RING_INSET = 'ring-inset';
 
     /**
      * @param array<int, array<int, string>> $chars
@@ -108,47 +99,6 @@ final class BorderPattern
             $outerStyle->getColor(),
             $outerStyle->getBackground(),
         );
-    }
-
-    /**
-     * The corner joining a horizontal side and a vertical one of other patterns, like ┍ for a heavy top and a light left side.
-     *
-     * Without a glyph for the pair, the corner is that of the horizontal side.
-     *
-     * @param 0|2 $row    The top or bottom row
-     * @param 0|2 $column The left or right column
-     */
-    public static function corner(self $horizontal, self $vertical, int $row, int $column): string
-    {
-        $own = $horizontal->getChars()[$row][$column];
-        $weights = [self::weight($horizontal->getChars()[0][1]), self::weight($vertical->getChars()[1][0])];
-        if ($weights[0] === $weights[1] || \in_array(null, $weights, true)) {
-            return $own;
-        }
-
-        // Top left, top right, bottom left, bottom right
-        $corners = match ($weights) {
-            ['heavy', 'light'] => ['┍', '┑', '┕', '┙'],
-            ['light', 'heavy'] => ['┎', '┒', '┖', '┚'],
-            ['double', 'light'] => ['╒', '╕', '╘', '╛'],
-            ['light', 'double'] => ['╓', '╖', '╙', '╜'],
-            default => null,
-        };
-
-        return null === $corners ? $own : $corners[$row + ($column >> 1)];
-    }
-
-    /**
-     * The weight of a box-drawing line: light, heavy or double; null for another glyph, like a block.
-     */
-    private static function weight(string $line): ?string
-    {
-        return match ($line) {
-            '─', '│', '╌', '╎', '┈', '┊', '┄', '┆' => 'light',
-            '━', '┃', '╍', '╏', '┉', '┋', '┅', '┇' => 'heavy',
-            '═', '║' => 'double',
-            default => null,
-        };
     }
 
     public function isNone(): bool
@@ -275,18 +225,12 @@ final class BorderPattern
             self::NORMAL => self::normal(),
             self::ROUNDED => self::rounded(),
             self::DOUBLE => self::double(),
-            self::HEAVY => self::heavy(),
-            self::DASHED => self::dashed(),
-            self::DOTTED => self::dotted(),
             self::TALL => self::tall(),
             self::WIDE => self::wide(),
             self::TALL_MEDIUM => self::tallMedium(),
             self::WIDE_MEDIUM => self::wideMedium(),
             self::TALL_LARGE => self::tallLarge(),
             self::WIDE_LARGE => self::wideLarge(),
-            self::RING => new self([['▁', '▁', '▁'], ['▕', ' ', '▏'], ['▔', '▔', '▔']], [[1, 1, 1], [1, 0, 1], [1, 1, 1]]),
-            self::RING_THICK => new self([['▗', '▄', '▖'], ['▐', ' ', '▌'], ['▝', '▀', '▘']], [[1, 1, 1], [1, 0, 1], [1, 1, 1]]),
-            self::RING_INSET => new self([['▔', '▔', '▔'], ['▏', ' ', '▕'], ['▁', '▁', '▁']], [[1, 1, 1], [1, 0, 1], [1, 1, 1]]),
             default => throw new InvalidArgumentException(\sprintf('Unknown border pattern "%s".', $style)),
         };
     }
@@ -320,39 +264,6 @@ final class BorderPattern
                 ['╔', '═', '╗'],
                 ['║', ' ', '║'],
                 ['╚', '═', '╝'],
-            ],
-        );
-    }
-
-    public static function heavy(): self
-    {
-        return new self(
-            [
-                ['┏', '━', '┓'],
-                ['┃', ' ', '┃'],
-                ['┗', '━', '┛'],
-            ],
-        );
-    }
-
-    public static function dashed(): self
-    {
-        return new self(
-            [
-                ['┌', '╌', '┐'],
-                ['╎', ' ', '╎'],
-                ['└', '╌', '┘'],
-            ],
-        );
-    }
-
-    public static function dotted(): self
-    {
-        return new self(
-            [
-                ['┌', '┈', '┐'],
-                ['┊', ' ', '┊'],
-                ['└', '┈', '┘'],
             ],
         );
     }

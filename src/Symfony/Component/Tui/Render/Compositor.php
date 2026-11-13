@@ -71,7 +71,6 @@ final class Compositor
                 $layer->row,
                 $layer->col,
                 $layer->transparent,
-                $layer->seeThrough,
             );
         }
 

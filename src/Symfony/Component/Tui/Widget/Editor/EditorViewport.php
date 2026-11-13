@@ -96,8 +96,7 @@ final class EditorViewport
         $logicalLinesFitting = self::logicalLinesFitting($lines, $this->scrollOffset, $maxDisplayRows, $columns);
 
         // Calculate visible line count
-        // The least lines are shown even past the content, like the rows of a textarea, as far as there is room
-        $visibleLineCount = $verticallyExpanded ? $logicalLinesFitting : min(max($minVisibleLines, $totalLines), max($logicalLinesFitting, min($minVisibleLines, $maxDisplayRows)));
+        $visibleLineCount = $verticallyExpanded ? $logicalLinesFitting : min(max($minVisibleLines, $totalLines), $logicalLinesFitting);
 
         return [
             'scroll_offset' => $this->scrollOffset,

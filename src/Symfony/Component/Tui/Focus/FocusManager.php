@@ -16,11 +16,8 @@ use Symfony\Component\Tui\Event\FocusEvent;
 use Symfony\Component\Tui\Input\Key;
 use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Render\RenderRequestorInterface;
-use Symfony\Component\Tui\Render\WidgetRect;
 use Symfony\Component\Tui\Widget\AbstractWidget;
 use Symfony\Component\Tui\Widget\FocusableInterface;
-use Symfony\Component\Tui\Widget\LinksInterface;
-use Symfony\Component\Tui\Widget\ParentInterface;
 
 /**
  * Owns the focused-widget state and handles focus navigation.
@@ -33,6 +30,7 @@ use Symfony\Component\Tui\Widget\ParentInterface;
  */
 class FocusManager
 {
+    private ?FocusPolicyInterface $policy = null;
     private const DEFAULT_BINDINGS = [
         'focus_next' => [Key::F6],
         'focus_previous' => ['shift+f6'],
@@ -47,9 +45,6 @@ class FocusManager
 
     /** @var \WeakMap<AbstractWidget, int> */
     private \WeakMap $tabIndexes;
-
-    /** @var (\Closure(AbstractWidget): ?WidgetRect)|null Where a widget was drawn in the last frame, for reading-flow */
-    private ?\Closure $rectOf = null;
 
     /**
      * @internal constructed by the framework; access via {@see WidgetContext::getFocusManager()}
@@ -79,18 +74,6 @@ class FocusManager
         $this->tabIndexes[$widget] = $tabIndex;
 
         return $this;
-    }
-
-    /**
-     * Tells where widgets were drawn in the last frame, which the visual reading flows (reading-flow: grid-rows) follow.
-     *
-     * @param (\Closure(AbstractWidget): ?WidgetRect)|null $rectOf
-     *
-     * @internal
-     */
-    public function setRectResolver(?\Closure $rectOf): void
-    {
-        $this->rectOf = $rectOf;
     }
 
     public function getTabIndex(AbstractWidget $widget): int
@@ -328,12 +311,15 @@ class FocusManager
      */
     private function inReadingFlow(array $widgets): array
     {
+        if (null === $this->policy) {
+            return $widgets;
+        }
         // The outermost reading-flow container of each widget
         $groups = [];
         foreach ($widgets as $index => $widget) {
             $container = null;
             for ($current = $widget->getParent(); null !== $current; $current = $current->getParent()) {
-                if (null !== $current->getContext()?->resolveStyle($current)->getReadingFlow()) {
+                if ([] !== $this->policy->getReadingOrder($current, $widget)) {
                     $container = $current;
                 }
             }
@@ -380,49 +366,19 @@ class FocusManager
         return \count($a) <=> \count($b);
     }
 
-    /**
-     * Where a widget comes in the reading flows from a container down to it: by each ancestor, the place of the child
-     * holding it.
-     *
-     * @return list<int|float>
-     */
+    public function setPolicy(?FocusPolicyInterface $policy): void
+    {
+        $this->policy = $policy;
+    }
+
     private function readingKey(AbstractWidget $container, AbstractWidget $widget): array
     {
-        $path = [];
-        for ($current = $widget; null !== $current && $current !== $container; $current = $current->getParent()) {
-            $path[] = $current;
-        }
-        $key = [];
-        $parent = $container;
-        foreach (array_reverse($path) as $child) {
-            $siblings = $parent instanceof ParentInterface ? $parent->all() : [];
-            $position = (int) array_search($child, $siblings, true);
-            $style = $parent->getContext()?->resolveStyle($parent);
-            $flow = $style?->getReadingFlow();
-            if (null === $flow) {
-                array_push($key, 0, 0, 0, $position);
-                $parent = $child;
-                continue;
-            }
-            $childStyle = $child->getContext()?->resolveStyle($child);
-            $rect = null !== $this->rectOf ? ($this->rectOf)($child) : null;
-            // The visual flows by where the children were drawn, the others by order then as written
-            [$first, $second] = match ($flow) {
-                'flex-visual', 'grid-rows' => null !== $rect ? [$rect->row, $rect->col] : [0, $position],
-                'grid-columns' => null !== $rect ? [$rect->col, $rect->row] : [0, $position],
-                'flex-flow', 'grid-order' => [$childStyle?->getOrder() ?? 0, $position],
-                default => [0, $position],
-            };
-            array_push($key, $childStyle?->getReadingOrder() ?? 0, $first, $second, $position);
-            $parent = $child;
-        }
-
-        return $key;
+        return $this->policy?->getReadingOrder($container, $widget) ?? [];
     }
 
     private function isInCycle(AbstractWidget $widget): bool
     {
-        return ($this->tabIndexes[$widget] ?? 0) >= 0 && !\in_array('disabled', $widget->getStateFlags(), true) && self::isDrawn($widget);
+        return ($this->tabIndexes[$widget] ?? 0) >= 0 && !\in_array('disabled', $widget->getStateFlags(), true) && $this->isDrawn($widget);
     }
 
     /**
@@ -436,10 +392,10 @@ class FocusManager
      */
     public function leaveUndrawn(): bool
     {
-        if (null === $this->focused || null === $this->focused->getContext() || self::isDrawn($this->focused)) {
+        if (null === $this->focused || null === $this->focused->getContext() || $this->isDrawn($this->focused)) {
             return false;
         }
-        $this->setFocus($this->autoFocus ? array_values(array_filter($this->getCycle(), static fn (AbstractWidget $widget) => !$widget instanceof LinksInterface))[0] ?? null : null);
+        $this->setFocus($this->autoFocus ? array_values(array_filter($this->getCycle(), fn (AbstractWidget $widget) => $this->policy?->allowsFocus($widget, true) ?? true))[0] ?? null : null);
 
         return true;
     }
@@ -447,16 +403,13 @@ class FocusManager
     /**
      * A widget hidden by its style, or inside a hidden one or one whose content is hidden, cannot take the focus.
      */
-    private static function isDrawn(AbstractWidget $widget): bool
+    private function isDrawn(AbstractWidget $widget): bool
     {
+        if (null !== $this->policy) {
+            return $this->policy->allowsFocus($widget);
+        }
         for ($current = $widget; null !== $current; $current = $current->getParent()) {
-            $style = $current->getContext()?->resolveStyle($current);
-            if (null !== $style && ($style->getHidden() || $style->getInvisible() || ($current !== $widget && $style->getContentHidden()))) {
-                return false;
-            }
-            // Like the HTML inert attribute, nothing under it takes the focus; interactivity: inert is inherited, which
-            // auto undoes
-            if ($current->hasState('inert') || ($current === $widget && true === $style?->getInert())) {
+            if ($current->getContext()?->resolveStyle($current)->getHidden() || $current->hasState('inert')) {
                 return false;
             }
         }

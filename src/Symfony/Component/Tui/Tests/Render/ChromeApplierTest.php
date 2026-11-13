@@ -167,16 +167,6 @@ final class ChromeApplierTest extends TestCase
         $this->assertStringContainsString('Content', $result[1]);
     }
 
-    public function testTheWidthOfTheBoxedLinesIsTheOneTheyAreMeasured()
-    {
-        $applier = $this->createApplier();
-        foreach ([new Style(padding: new Padding(1, 2, 1, 3)), new Style(padding: new Padding(0, 1, 0, 1), border: Border::from([1])), new Style(border: Border::from([0, 2, 1, 1]))] as $style) {
-            $result = $applier->apply(new ArrayLineBuffer(['Content', '', 'A wider line of text', 'Content']), 30, $style, new TextWidget('test'));
-            $measured = max(array_map(AnsiUtils::visibleWidth(...), $result->toArray()));
-            $this->assertSame($measured, $result->getMaxVisibleWidth(), 'Known by the box, not measured again: the same.');
-        }
-    }
-
     public function testApplyWithHorizontalPadding()
     {
         $applier = $this->createApplier();

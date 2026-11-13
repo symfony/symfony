@@ -25,13 +25,9 @@ final class ArrayLineBuffer implements LineBufferInterface
 
     /**
      * @param list<string> $lines
-     * @param int|null     $maxVisibleWidth The width of the widest line, when it is known
      */
-    public function __construct(private readonly array $lines, ?int $maxVisibleWidth = null)
+    public function __construct(private readonly array $lines)
     {
-        // Known by what made the lines, like a layout padding each line to its width: not measured again
-        $this->maxVisibleWidth = $maxVisibleWidth;
-        \assert(null === $maxVisibleWidth || $maxVisibleWidth === array_reduce($lines, static fn (int $max, string $line) => '' === $line ? $max : max($max, AnsiUtils::visibleWidth($line)), 0), 'The width given is the one of the widest line.');
     }
 
     public function count(): int
@@ -65,11 +61,8 @@ final class ArrayLineBuffer implements LineBufferInterface
         }
 
         $max = 0;
-        // Each line measured once, the rows alike, like the blank ones of a tall box, many
-        $seen = [];
         foreach ($this->lines as $line) {
-            if ('' !== $line && !isset($seen[$line])) {
-                $seen[$line] = true;
+            if ('' !== $line) {
                 $max = max($max, AnsiUtils::visibleWidth($line));
             }
         }

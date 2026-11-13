@@ -214,6 +214,6 @@ final class ValidatorPropertySchemaEnricher implements PropertySchemaEnricherInt
 
     private static function isNumber(mixed $value): bool
     {
-        return \is_int($value) || \is_float($value);
+        return \is_int($value) || (\is_float($value) && is_finite($value));
     }
 }

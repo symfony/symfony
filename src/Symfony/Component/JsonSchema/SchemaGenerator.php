@@ -996,6 +996,8 @@ final class SchemaGenerator implements SchemaGeneratorInterface
         return match (true) {
             $value instanceof \UnitEnum => true,
             \is_array($value) => array_all($value, self::isEncodableDefaultValue(...)),
+            \is_float($value) => is_finite($value),
+            \is_string($value) => preg_match('//u', $value),
             default => !\is_object($value),
         };
     }

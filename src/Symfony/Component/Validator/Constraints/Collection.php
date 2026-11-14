@@ -22,10 +22,12 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Collection extends Composite
 {
+    public const INVALID_TYPE_ERROR = 'cef20b35-5620-4d86-86f8-426049fac005';
     public const MISSING_FIELD_ERROR = '2fa2158c-2a7f-484b-98aa-975522539ff8';
     public const NO_SUCH_FIELD_ERROR = '7703c766-b5d5-4cef-ace7-ae0dd82304e9';
 
     protected const ERROR_NAMES = [
+        self::INVALID_TYPE_ERROR => 'INVALID_TYPE_ERROR',
         self::MISSING_FIELD_ERROR => 'MISSING_FIELD_ERROR',
         self::NO_SUCH_FIELD_ERROR => 'NO_SUCH_FIELD_ERROR',
     ];
@@ -35,14 +37,16 @@ class Collection extends Composite
     public bool $allowMissingFields = false;
     public string $extraFieldsMessage = 'This field was not expected.';
     public string $missingFieldsMessage = 'This field is missing.';
+    public ?string $invalidTypeMessage = null;
 
     /**
      * @param array<string,Constraint|list<Constraint>>|null $fields             An associative array defining keys in the collection and their constraints
      * @param string[]|null                                  $groups
      * @param bool|null                                      $allowExtraFields   Whether to allow additional keys not declared in the configured fields (defaults to false)
      * @param bool|null                                      $allowMissingFields Whether to allow the collection to lack some fields declared in the configured fields (defaults to false)
+     * @param string|null                                    $invalidTypeMessage The message for invalid types, or null to use the default type error
      */
-    public function __construct(?array $fields = null, ?array $groups = null, mixed $payload = null, ?bool $allowExtraFields = null, ?bool $allowMissingFields = null, ?string $extraFieldsMessage = null, ?string $missingFieldsMessage = null)
+    public function __construct(?array $fields = null, ?array $groups = null, mixed $payload = null, ?bool $allowExtraFields = null, ?bool $allowMissingFields = null, ?string $extraFieldsMessage = null, ?string $missingFieldsMessage = null, ?string $invalidTypeMessage = null)
     {
         if (null === $fields) {
             throw new MissingOptionsException(\sprintf('The options "fields" must be set for constraint "%s".', self::class), ['fields']);
@@ -56,6 +60,7 @@ class Collection extends Composite
         $this->allowMissingFields = $allowMissingFields ?? $this->allowMissingFields;
         $this->extraFieldsMessage = $extraFieldsMessage ?? $this->extraFieldsMessage;
         $this->missingFieldsMessage = $missingFieldsMessage ?? $this->missingFieldsMessage;
+        $this->invalidTypeMessage = $invalidTypeMessage ?? $this->invalidTypeMessage;
     }
 
     protected function initializeNestedConstraints(): void

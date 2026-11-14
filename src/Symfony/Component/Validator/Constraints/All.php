@@ -23,19 +23,28 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class All extends Composite
 {
+    public const INVALID_TYPE_ERROR = '09b29f86-f3c3-4546-bd5e-3b424f42fd89';
+
+    protected const ERROR_NAMES = [
+        self::INVALID_TYPE_ERROR => 'INVALID_TYPE_ERROR',
+    ];
+
     public array|Constraint $constraints = [];
+    public ?string $invalidTypeMessage = null;
 
     /**
      * @param array<Constraint>|Constraint|null $constraints
      * @param string[]|null                     $groups
+     * @param string|null                       $invalidTypeMessage The message for invalid types, or null to use the default type error
      */
-    public function __construct(array|Constraint|null $constraints = null, ?array $groups = null, mixed $payload = null)
+    public function __construct(array|Constraint|null $constraints = null, ?array $groups = null, mixed $payload = null, ?string $invalidTypeMessage = null)
     {
         if (null === $constraints || [] === $constraints) {
             throw new MissingOptionsException(\sprintf('The options "constraints" must be set for constraint "%s".', self::class), ['constraints']);
         }
 
         $this->constraints = $constraints;
+        $this->invalidTypeMessage = $invalidTypeMessage ?? $this->invalidTypeMessage;
 
         parent::__construct(null, $groups, $payload);
     }

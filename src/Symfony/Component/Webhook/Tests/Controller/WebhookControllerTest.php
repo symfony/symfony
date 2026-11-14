@@ -25,6 +25,33 @@ use Symfony\Component\Webhook\Controller\WebhookController;
 
 class WebhookControllerTest extends TestCase
 {
+    public function testRoutingBusReceivesEveryEventInsteadOfTheDefaultBus()
+    {
+        $request = new Request();
+        $events = [new RemoteEvent('first', '1', []), new RemoteEvent('second', '2', [])];
+        $parser = $this->createMock(RequestParserInterface::class);
+        $parser->expects($this->once())->method('parse')->with($request, 'secret')->willReturn($events);
+        $parser->method('createSuccessfulResponse')->willReturn(new Response('', 202));
+        $defaultBus = $this->createMock(MessageBusInterface::class);
+        $defaultBus->expects($this->never())->method('dispatch');
+        $routingBus = new class implements MessageBusInterface {
+            public array $messages = [];
+
+            public function dispatch(object $message, array $stamps = []): Envelope
+            {
+                return new Envelope($this->messages[] = $message, $stamps);
+            }
+        };
+        $controller = new WebhookController(['priority' => ['parser' => $parser, 'secret' => 'secret', 'bus' => $routingBus]], $defaultBus);
+
+        $this->assertSame(202, $controller->handle('priority', $request)->getStatusCode());
+        $this->assertCount(2, $routingBus->messages);
+        foreach ($events as $i => $event) {
+            $this->assertSame('priority', $routingBus->messages[$i]->getType());
+            $this->assertSame($event, $routingBus->messages[$i]->getEvent());
+        }
+    }
+
     public function testNoParserAvailable()
     {
         $controller = new WebhookController([], new MessageBus());

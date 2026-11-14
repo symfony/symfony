@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `routing.<type>.message_bus` to select the message bus for each incoming webhook
  * Resolve env vars at compile time in bundle options used to build the container
  * Add `TraceableTransport` to record the webhooks sent through a transport
  * Add `Test\RequestFactory` to create the requests that the generic request parser accepts

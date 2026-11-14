@@ -149,6 +149,80 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame(Command::SUCCESS, $res);
     }
 
+    public function testJsonFormat()
+    {
+        $message = "Bonjour <info>monde</info>, \"Symfony\"!\n".str_repeat('é', 50);
+        $tester = $this->createCommandTester(['missing' => 'missing', 'translated' => 'translated'], ['translated' => $message, 'unused' => 'Unused']);
+        $status = $tester->execute(['locale' => 'fr', '--format' => 'json'], ['decorated' => true]);
+
+        $this->assertSame(TranslationDebugCommand::EXIT_CODE_MISSING | TranslationDebugCommand::EXIT_CODE_UNUSED | TranslationDebugCommand::EXIT_CODE_FALLBACK, $status);
+        $this->assertSame([
+            ['state' => ['missing'], 'domain' => 'messages', 'id' => 'missing', 'message' => 'missing', 'fallback' => ['en' => 'missing']],
+            ['state' => ['fallback'], 'domain' => 'messages', 'id' => 'translated', 'message' => $message, 'fallback' => ['en' => $message]],
+            ['state' => ['unused', 'fallback'], 'domain' => 'messages', 'id' => 'unused', 'message' => 'Unused', 'fallback' => ['en' => 'Unused']],
+        ], json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR));
+    }
+
+    public function testCsvFormat()
+    {
+        $message = "Bonjour <info>monde</info>, \"Symfony\"!\n".str_repeat('é', 50);
+        $tester = $this->createCommandTester(['translated' => 'translated'], ['translated' => $message]);
+        $status = $tester->execute(['locale' => 'fr', '--format' => 'csv'], ['decorated' => true]);
+
+        $stream = fopen('php://memory', 'w+');
+        fwrite($stream, $tester->getDisplay());
+        rewind($stream);
+        $this->assertSame(['state', 'domain', 'id', 'message', 'fallback.en'], fgetcsv($stream, escape: ''));
+        $this->assertSame(['fallback', 'messages', 'translated', $message, $message], fgetcsv($stream, escape: ''));
+        $this->assertFalse(fgetcsv($stream, escape: ''));
+        fclose($stream);
+        $this->assertSame(TranslationDebugCommand::EXIT_CODE_FALLBACK, $status);
+    }
+
+    #[DataProvider('provideMachineFormats')]
+    public function testMachineFormatWithNoMatchingMessages(string $format)
+    {
+        $tester = $this->createCommandTester([], ['foo' => 'foo']);
+        $this->assertSame(Command::SUCCESS, $tester->execute(['locale' => 'en', '--only-missing' => true, '--format' => $format]));
+        $this->assertSame('json' === $format ? "[]\n" : "state,domain,id,message\n", $tester->getDisplay(true));
+    }
+
+    #[DataProvider('provideMachineFormats')]
+    public function testMachineFormatWithoutMessages(string $format)
+    {
+        $tester = $this->createCommandTester();
+        $status = $tester->execute(['locale' => 'en', '--format' => $format], ['capture_stderr_separately' => true]);
+
+        $this->assertSame(TranslationDebugCommand::EXIT_CODE_GENERAL_ERROR, $status);
+        $this->assertSame('json' === $format ? "[]\n" : "state,domain,id,message\n", $tester->getDisplay(true));
+        $this->assertStringContainsString('No defined or extracted messages', $tester->getErrorOutput());
+    }
+
+    public function testJsonFormatFiltersMessages()
+    {
+        $tester = $this->createCommandTester(['missing' => 'missing'], ['unused' => 'Unused']);
+        $status = $tester->execute(['locale' => 'en', '--domain' => 'messages', '--only-unused' => true, '--format' => 'json']);
+
+        $this->assertSame(TranslationDebugCommand::EXIT_CODE_UNUSED, $status);
+        $this->assertSame([
+            ['state' => ['unused'], 'domain' => 'messages', 'id' => 'unused', 'message' => 'Unused', 'fallback' => []],
+        ], json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR));
+    }
+
+    public static function provideMachineFormats(): iterable
+    {
+        yield ['json'];
+        yield ['csv'];
+    }
+
+    public function testInvalidFormat()
+    {
+        $tester = $this->createCommandTester();
+        $this->expectException(\Symfony\Component\Console\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported format "xml". Supported formats are "txt", "json" and "csv".');
+        $tester->execute(['locale' => 'en', '--format' => 'xml']);
+    }
+
     protected function setUp(): void
     {
         $this->fs = new Filesystem();
@@ -288,6 +362,11 @@ class TranslationDebugCommandTest extends TestCase
         yield 'bundle' => [
             ['fr', '--domain', 'messages', ''],
             ['FooBundle', 'foo'],
+        ];
+
+        yield 'option --format' => [
+            ['en', '--format', ''],
+            ['txt', 'json', 'csv'],
         ];
 
         yield 'option --domain' => [

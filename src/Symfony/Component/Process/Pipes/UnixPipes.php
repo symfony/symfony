@@ -28,8 +28,9 @@ class UnixPipes extends AbstractPipes
         mixed $input,
         private bool $haveReadSupport,
         private bool $stdioInherited = false,
+        bool $inputDisabled = false,
     ) {
-        parent::__construct($input);
+        parent::__construct($input, $inputDisabled);
     }
 
     public function __serialize(): array
@@ -57,7 +58,7 @@ class UnixPipes extends AbstractPipes
             $nullstream = fopen('/dev/null', 'c');
 
             return [
-                ['pipe', 'r'],
+                $this->getInputDescriptor(),
                 $nullstream,
                 $nullstream,
             ];
@@ -80,7 +81,7 @@ class UnixPipes extends AbstractPipes
         }
 
         return [
-            ['pipe', 'r'],
+            $this->getInputDescriptor(),
             ['pipe', 'w'], // stdout
             ['pipe', 'w'], // stderr
         ];
@@ -89,6 +90,11 @@ class UnixPipes extends AbstractPipes
     public function getFiles(): array
     {
         return [];
+    }
+
+    protected function getNullDevice(): string
+    {
+        return '/dev/null';
     }
 
     public function readAndWrite(bool $blocking, bool $close = false): array

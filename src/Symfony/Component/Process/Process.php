@@ -93,6 +93,7 @@ class Process implements \IteratorAggregate
     private bool $tty = false;
     private bool $pty;
     private bool $stdioInherited = false;
+    private bool $inputDisabled = false;
     private array $options = ['suppress_errors' => true, 'bypass_shell' => true];
     private array $ignoredSignals = [];
 
@@ -660,6 +661,67 @@ class Process implements \IteratorAggregate
     }
 
     /**
+     * Gives the null device as standard input to the process, instead of a pipe.
+     *
+     * Some commands behave differently when their standard input is a pipe, even an empty one
+     * (e.g. ripgrep searches it instead of the working directory). With the input disabled,
+     * they see no input at all, whatever the standard input of the current process is.
+     *
+     * Like disableOutput(), it needs the null device to be readable: the process fails to start
+     * when /dev/null is outside the open_basedir restriction.
+     *
+     * @return $this
+     *
+     * @throws RuntimeException In case the process is already running
+     * @throws LogicException   In case an input is set or the TTY or PTY mode is enabled
+     */
+    public function disableInput(): static
+    {
+        if ($this->isRunning()) {
+            throw new RuntimeException('Disabling input while the process is running is not possible.');
+        }
+        if (null !== $this->input) {
+            throw new LogicException('Input cannot be disabled while an input is set.');
+        }
+        if ($this->tty) {
+            throw new LogicException('Input cannot be disabled while the TTY mode is enabled.');
+        }
+        if ($this->pty) {
+            throw new LogicException('Input cannot be disabled while the PTY mode is enabled.');
+        }
+
+        $this->inputDisabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Gives a pipe as standard input to the process again.
+     *
+     * @return $this
+     *
+     * @throws RuntimeException In case the process is already running
+     */
+    public function enableInput(): static
+    {
+        if ($this->isRunning()) {
+            throw new RuntimeException('Enabling input while the process is running is not possible.');
+        }
+
+        $this->inputDisabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns true in case the input is disabled, false otherwise.
+     */
+    public function isInputDisabled(): bool
+    {
+        return $this->inputDisabled;
+    }
+
+    /**
      * Returns the current output of the process (STDOUT).
      *
      * @throws LogicException in case the output has been disabled
@@ -1118,7 +1180,7 @@ class Process implements \IteratorAggregate
      * @return $this
      *
      * @throws RuntimeException In case the TTY mode is not supported
-     * @throws LogicException   In case the standard streams are inherited
+     * @throws LogicException   In case the standard streams are inherited or the input is disabled
      */
     public function setTty(bool $tty): static
     {
@@ -1128,6 +1190,10 @@ class Process implements \IteratorAggregate
 
         if ($tty && $this->stdioInherited) {
             throw new LogicException('TTY mode cannot be enabled while the standard streams are inherited.');
+        }
+
+        if ($tty && $this->inputDisabled) {
+            throw new LogicException('TTY mode cannot be enabled while the input is disabled.');
         }
 
         if ($tty && !self::isTtySupported()) {
@@ -1151,9 +1217,15 @@ class Process implements \IteratorAggregate
      * Sets PTY mode.
      *
      * @return $this
+     *
+     * @throws LogicException In case the input is disabled
      */
     public function setPty(bool $bool): static
     {
+        if ($bool && $this->inputDisabled) {
+            throw new LogicException('PTY mode cannot be enabled while the input is disabled.');
+        }
+
         $this->pty = $bool;
 
         return $this;
@@ -1171,7 +1243,8 @@ class Process implements \IteratorAggregate
      * Makes the process inherit the standard input, output and error of the current process, like a command run from a shell script.
      *
      * The output is neither captured nor passed to callbacks, and the process sees the terminal the current process is attached to, if any.
-     * When an input is set, it is written to the standard input of the process instead of inheriting it.
+     * When an input is set, it is written to the standard input of the process instead of inheriting it,
+     * and when the input is disabled, the process gets the null device as standard input.
      *
      * The process runs in the process group of the current process: signals sent by the terminal (e.g. Ctrl+C) reach both processes.
      *
@@ -1199,6 +1272,8 @@ class Process implements \IteratorAggregate
 
     /**
      * Checks if the process inherits the standard input, output and error of the current process.
+     *
+     * The standard input is not inherited when an input is set or the input is disabled.
      */
     public function isStdioInherited(): bool
     {
@@ -1274,12 +1349,15 @@ class Process implements \IteratorAggregate
      *
      * @return $this
      *
-     * @throws LogicException In case the process is running
+     * @throws LogicException In case the process is running or the input is disabled
      */
     public function setInput(mixed $input): static
     {
         if ($this->isRunning()) {
             throw new LogicException('Input cannot be set while the process is running.');
+        }
+        if (null !== $input && $this->inputDisabled) {
+            throw new LogicException('Input cannot be set while the input is disabled.');
         }
 
         $this->input = ProcessUtils::validateInput(__METHOD__, $input);
@@ -1403,9 +1481,9 @@ class Process implements \IteratorAggregate
             $this->input->rewind();
         }
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            $this->processPipes = new WindowsPipes($this->input, !$this->outputDisabled || $hasCallback, $this->stdioInherited);
+            $this->processPipes = new WindowsPipes($this->input, !$this->outputDisabled || $hasCallback, $this->stdioInherited, $this->inputDisabled);
         } else {
-            $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $hasCallback, $this->stdioInherited);
+            $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $hasCallback, $this->stdioInherited, $this->inputDisabled);
         }
 
         return $this->processPipes->getDescriptors();

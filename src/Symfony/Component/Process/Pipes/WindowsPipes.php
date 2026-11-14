@@ -38,6 +38,7 @@ class WindowsPipes extends AbstractPipes
         mixed $input,
         private bool $haveReadSupport,
         private bool $stdioInherited = false,
+        bool $inputDisabled = false,
     ) {
         if ($this->haveReadSupport && !$this->stdioInherited) {
             // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
@@ -85,7 +86,7 @@ class WindowsPipes extends AbstractPipes
             restore_error_handler();
         }
 
-        parent::__construct($input);
+        parent::__construct($input, $inputDisabled);
     }
 
     public function __serialize(): array
@@ -113,7 +114,7 @@ class WindowsPipes extends AbstractPipes
             $nullstream = fopen('NUL', 'c');
 
             return [
-                ['pipe', 'r'],
+                $this->getInputDescriptor(),
                 $nullstream,
                 $nullstream,
             ];
@@ -123,7 +124,7 @@ class WindowsPipes extends AbstractPipes
         // We're not using file handles as it can produce corrupted output https://bugs.php.net/65650
         // So we redirect output within the commandline and pass the nul device to the process
         return [
-            ['pipe', 'r'],
+            $this->getInputDescriptor(),
             ['file', 'NUL', 'w'],
             ['file', 'NUL', 'w'],
         ];
@@ -132,6 +133,11 @@ class WindowsPipes extends AbstractPipes
     public function getFiles(): array
     {
         return $this->files;
+    }
+
+    protected function getNullDevice(): string
+    {
+        return 'NUL';
     }
 
     public function readAndWrite(bool $blocking, bool $close = false): array

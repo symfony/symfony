@@ -480,7 +480,7 @@ class InfobipApiTransportTest extends TestCase
 
         $sentMessage = $this->transport->send($email);
 
-        $this->assertSame('somexternalMessageId0', $sentMessage->getMessageId());
+        $this->assertSame('somexternalMessageId0', $sentMessage->getTransportMessageId());
     }
 
     public function testInfobipResponseShouldNotBeEmpty()

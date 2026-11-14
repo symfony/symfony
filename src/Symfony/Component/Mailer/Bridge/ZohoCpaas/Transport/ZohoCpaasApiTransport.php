@@ -83,7 +83,7 @@ final class ZohoCpaasApiTransport extends AbstractApiTransport
         }
 
         if (isset($result['request_id'])) {
-            $sentMessage->setMessageId((string) $result['request_id']);
+            $sentMessage->setTransportMessageId((string) $result['request_id']);
         }
 
         return $response;

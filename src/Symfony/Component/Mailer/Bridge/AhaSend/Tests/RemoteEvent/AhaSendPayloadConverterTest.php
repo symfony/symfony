@@ -54,7 +54,7 @@ class AhaSendPayloadConverterTest extends TestCase
 
         $event = (new AhaSendPayloadConverter())->convert(self::payload($header[1]));
 
-        $this->assertSame($sentMessage->getMessageId(), $event->getId());
+        $this->assertSame($sentMessage->getTransportMessageId(), $event->getId());
     }
 
     #[DataProvider('provideMalformedPayloads')]

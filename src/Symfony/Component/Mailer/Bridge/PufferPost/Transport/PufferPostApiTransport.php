@@ -93,7 +93,7 @@ final class PufferPostApiTransport extends AbstractApiTransport implements Remot
         // A fan-out produces one id per recipient; SentMessage holds a single value, so keep the
         // first and leave the rest to the batch response the caller can read.
         if (isset($items[0]['id'])) {
-            $sentMessage->setMessageId((string) $items[0]['id']);
+            $sentMessage->setTransportMessageId((string) $items[0]['id']);
         }
 
         return $response;

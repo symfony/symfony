@@ -72,7 +72,7 @@ final class BrevoApiTransport extends AbstractApiTransport implements RemoteTemp
             throw new HttpTransportException('Unable to send an email: '.($result['message'] ?? $response->getContent(false)).\sprintf(' (code %d).', $statusCode), $response);
         }
 
-        $sentMessage->setMessageId($result['messageId']);
+        $sentMessage->setTransportMessageId($result['messageId']);
 
         return $response;
     }

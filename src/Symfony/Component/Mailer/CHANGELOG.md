@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add `SentMessage::getTransportMessageId()` and `SentMessage::setTransportMessageId()` for the id that the transport gives to a message
+ * Add `SentMessage::getMessageIdHeader()` to get the Message-ID header that is sent, whether the message had one or it was generated
+ * Deprecate `SentMessage::getMessageId()` and `SentMessage::setMessageId()`, use `getTransportMessageId()`/`getMessageIdHeader()` and `setTransportMessageId()` instead
+ * Deprecate `SmtpTransport::parseMessageId()`, use or override `parseTransportMessageId()` instead
+
 8.2
 ---
 

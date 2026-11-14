@@ -88,7 +88,7 @@ class PufferPostApiTransportTest extends TestCase
         $transport = new PufferPostApiTransport('KEY', $client);
         $sentMessage = $transport->send($email);
 
-        $this->assertSame('msg_foobar', $sentMessage->getMessageId());
+        $this->assertSame('msg_foobar', $sentMessage->getTransportMessageId());
     }
 
     public function testKeepsDisplayNamesOnEveryAddress()

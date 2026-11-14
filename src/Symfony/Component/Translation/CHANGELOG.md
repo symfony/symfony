@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `--format=json` to `lint:translations`
  * Resolve env vars at compile time in bundle options used to build the container
  * Add the `cache.translation.providers` cache pool, which the Phrase provider uses instead of `cache.app`
  * Add `CacheWarmer\TranslationsCacheWarmer`, `Command\TranslationDebugCommand`, `Command\TranslationExtractCommand`, `DependencyInjection\TranslationLintCommandPass`, `DependencyInjection\TranslationUpdateCommandPass` and `DependencyInjection\Translator`, which `FrameworkBundle` used to provide

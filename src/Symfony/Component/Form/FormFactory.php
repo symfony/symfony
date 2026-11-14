@@ -98,16 +98,26 @@ class FormFactory implements FormFactoryInterface
         $guessProperty = isset($options['property_path']) ? self::resolveWriteProperty($options['property_path']) ?? $property : $property;
 
         $typeGuess = $guesser->guessType($class, $guessProperty);
+        $minLengthGuess = $guesser instanceof MinLengthTypeGuesserInterface ? $guesser->guessMinLength($class, $guessProperty) : null;
         $maxLengthGuess = $guesser->guessMaxLength($class, $guessProperty);
         $requiredGuess = $guesser->guessRequired($class, $guessProperty);
         $patternGuess = $guesser->guessPattern($class, $guessProperty);
 
         $type = $typeGuess ? $typeGuess->getType() : TextType::class;
 
-        // the "pattern" and "maxlength" attributes are valid on text inputs only
+        // The "minlength", "pattern" and "maxlength" attributes are valid on text inputs only.
         if ($this->isTextInput($type)) {
+            $minLength = $minLengthGuess?->getValue();
+            if (null !== $minLength) {
+                $options = array_replace_recursive(['attr' => ['minlength' => $minLength]], $options);
+            }
+
+            // A guessed Length pattern is redundant when minlength is available.
+            // Keep distinct patterns (e.g. from Regex constraints) alongside minlength.
             if (null !== $pattern = $patternGuess?->getValue()) {
-                $options = array_replace_recursive(['attr' => ['pattern' => $pattern]], $options);
+                if (null === $minLength || $pattern !== \sprintf('.{%s,}', $minLength)) {
+                    $options = array_replace_recursive(['attr' => ['pattern' => $pattern]], $options);
+                }
             }
 
             if (null !== $maxLength = $maxLengthGuess?->getValue()) {

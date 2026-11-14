@@ -35,6 +35,7 @@ class_exists(\Doctrine\DBAL\Platforms\PostgreSqlPlatform::class);
 class DoctrineDbalStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
+    use MysqlDaylightSavingTimeTestTrait;
 
     protected static string $dbFile;
 
@@ -69,6 +70,17 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         }
 
         return new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config));
+    }
+
+    protected function createMysqlStore(array $params): array
+    {
+        $config = new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+        $conn = DriverManager::getConnection(['driver' => 'pdo_mysql'] + $params, $config);
+
+        return [new DoctrineDbalStore($conn, [], 0.0), $conn->executeStatement(...)];
     }
 
     public function testAbortAfterExpiration()

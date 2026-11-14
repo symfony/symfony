@@ -54,6 +54,17 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
         ?
     /mxu';
 
+    private const IMPORT_META_RESOLVE_PATTERN = <<<'REGEX'
+        ~(?<![\w$.])import\s*\.\s*meta\s*\.\s*resolve\s*\(\s*
+            (?P<specifier>
+                (?P<quote>['"`])
+                (?P<path>\.{1,2}/(?:(?!\k<quote>)[^\\\r\n?#])*)
+                (?P<suffix>[?#](?:(?!\k<quote>)[^\\\r\n])*)?
+                \k<quote>
+            )
+        \s*\)~xu
+        REGEX;
+
     public function __construct(
         private readonly ImportMapConfigReader $importMapConfigReader,
         private readonly string $missingImportMode = self::MISSING_IMPORT_WARN,
@@ -63,6 +74,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
 
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
+        $content = $this->compileImportMetaResolve($content, $asset, $assetMapper);
         $jsParser = new JavascriptSequenceParser($content);
 
         return preg_replace_callback(self::IMPORT_PATTERN, function ($matches) use ($asset, $assetMapper, $jsParser) {
@@ -128,6 +140,28 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
         return 'js' === $asset->publicExtension;
     }
 
+    private function compileImportMetaResolve(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
+    {
+        $parser = new JavascriptSequenceParser($content);
+
+        return preg_replace_callback(self::IMPORT_META_RESOLVE_PATTERN, function (array $matches) use ($asset, $assetMapper, $parser) {
+            $parser->parseUntil($matches[0][1]);
+            if (!$parser->isExecutable() || ('`' === $matches['quote'][0] && str_contains($matches['specifier'][0], '${'))) {
+                return $matches[0][0];
+            }
+
+            if (!$dependency = $this->findAssetForRelativeImport($matches['path'][0], $asset, $assetMapper, false)) {
+                return $matches[0][0];
+            }
+
+            $asset->addDependency($dependency);
+            $path = $this->makeRelativeForJavaScript(Path::makeRelative($dependency->publicPath, \dirname($asset->publicPathWithoutDigest)));
+            $path .= $matches['suffix'][0] ?? '';
+
+            return str_replace($matches['specifier'][0], json_encode($path, \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR), $matches[0][0]);
+        }, $content, -1, $count, \PREG_OFFSET_CAPTURE) ?? throw new RuntimeException(\sprintf('Failed to compile import.meta.resolve() paths in "%s". Error: "%s".', $asset->sourcePath, preg_last_error_msg()));
+    }
+
     private function makeRelativeForJavaScript(string $path): string
     {
         if (str_starts_with($path, '../')) {
@@ -174,7 +208,7 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
         }
     }
 
-    private function findAssetForRelativeImport(string $importedModule, MappedAsset $asset, AssetMapperInterface $assetMapper): ?MappedAsset
+    private function findAssetForRelativeImport(string $importedModule, MappedAsset $asset, AssetMapperInterface $assetMapper, bool $allowCircular = true): ?MappedAsset
     {
         try {
             $resolvedSourcePath = Path::join(\dirname($asset->sourcePath), $importedModule);
@@ -190,6 +224,10 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
         try {
             $dependentAsset = $assetMapper->getAssetFromSourcePath($resolvedSourcePath);
         } catch (CircularAssetsException $exception) {
+            if (!$allowCircular) {
+                throw $exception;
+            }
+
             $dependentAsset = $exception->getIncompleteMappedAsset();
         }
 

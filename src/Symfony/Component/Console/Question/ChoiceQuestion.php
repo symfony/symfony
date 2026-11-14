@@ -21,6 +21,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 class ChoiceQuestion extends Question
 {
     private bool $multiselect = false;
+    private ?bool $returnKeys = null;
     private string $prompt = ' > ';
     private string $errorMessage = 'Value "%s" is invalid';
 
@@ -110,14 +111,30 @@ class ChoiceQuestion extends Question
         return $this;
     }
 
+    /**
+     * Sets whether to return keys as strings or choice values.
+     *
+     * With null, keys are returned if any choice key is a string, and values otherwise.
+     *
+     * @return $this
+     */
+    public function setReturnKeys(?bool $returnKeys): static
+    {
+        $this->returnKeys = $returnKeys;
+        $this->setValidator($this->getDefaultValidator());
+
+        return $this;
+    }
+
     private function getDefaultValidator(): callable
     {
         $choices = $this->choices;
         $errorMessage = $this->errorMessage;
         $multiselect = $this->multiselect;
-        $isAssoc = $this->isAssoc($choices);
+        $returnKeys = $this->returnKeys ?? $this->isAssoc($choices);
+        $returnValues = false === $this->returnKeys;
 
-        return function ($selected) use ($choices, $errorMessage, $multiselect, $isAssoc) {
+        return function ($selected) use ($choices, $errorMessage, $multiselect, $returnKeys, $returnValues) {
             if ($multiselect) {
                 // Check for a separated comma values
                 if (!preg_match('/^[^,]+(?:,[^,]+)*$/', (string) $selected, $matches)) {
@@ -150,7 +167,12 @@ class ChoiceQuestion extends Question
 
                 $result = array_search($value, $choices);
 
-                if (!$isAssoc) {
+                if ($returnValues && (false !== $result || \array_key_exists($value, $choices))) {
+                    $multiselectChoices[] = $choices[false !== $result ? $result : $value];
+                    continue;
+                }
+
+                if (!$returnKeys) {
                     if (false !== $result) {
                         $result = $choices[$result];
                     } elseif (isset($choices[$value])) {
@@ -164,8 +186,7 @@ class ChoiceQuestion extends Question
                     throw new InvalidArgumentException(\sprintf($errorMessage, $value));
                 }
 
-                // For associative choices, consistently return the key as string:
-                $multiselectChoices[] = $isAssoc ? (string) $result : $result;
+                $multiselectChoices[] = $returnKeys ? (string) $result : $result;
             }
 
             if ($multiselect) {

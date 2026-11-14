@@ -16,6 +16,7 @@ CHANGELOG
  * Add `RequestContext::runWith()` to generate and match URLs for another host, scheme or base URL without leaking the change
  * Add `Route::addCondition()`, `RouteCollection::addCondition()` and the `add_condition` import key to combine a condition with the existing ones
  * Make the `router.strict_requirements` option default to `true` in debug mode and to `null` otherwise
+ * Add the `lint:routing` command and `RouteCollectionAnalyzer` to report shadowed, duplicate and ambiguous routes
 
 8.1
 ---

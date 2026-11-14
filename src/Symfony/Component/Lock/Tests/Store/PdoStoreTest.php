@@ -25,6 +25,7 @@ use Symfony\Component\Lock\Store\PdoStore;
 class PdoStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
+    use MysqlDaylightSavingTimeTestTrait;
 
     protected static string $dbFile;
 
@@ -49,6 +50,13 @@ class PdoStoreTest extends AbstractStoreTestCase
     public function getStore(): PersistingStoreInterface
     {
         return new PdoStore('sqlite:'.self::$dbFile);
+    }
+
+    protected function createMysqlStore(array $params): array
+    {
+        $pdo = new \PDO('mysql:host='.$params['host'].';dbname='.$params['dbname'], $params['user'], $params['password']);
+
+        return [new PdoStore($pdo, [], 0.0), $pdo->exec(...)];
     }
 
     public function testAbortAfterExpiration()

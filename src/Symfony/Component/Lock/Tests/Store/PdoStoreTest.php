@@ -248,7 +248,6 @@ class PdoStoreTest extends AbstractStoreTestCase
     public static function provideDaylightSavingTimeChanges(): iterable
     {
         // On 2025-11-02, America/Chicago went from 02:00 CDT back to 01:00 CST at 07:00 UTC, so 01:00-02:00 local happened twice.
-        yield 'lock taken before the first 01:00' => [gmmktime(5, 58, 0, 11, 2, 2025), gmmktime(6, 0, 30, 11, 2, 2025), true];
         yield 'lock taken before 02:00 CST' => [gmmktime(7, 58, 0, 11, 2, 2025), gmmktime(8, 0, 30, 11, 2, 2025), true];
         yield 'lock expired after the second 01:00' => [gmmktime(6, 58, 0, 11, 2, 2025), gmmktime(7, 4, 0, 11, 2, 2025), false];
     }

@@ -134,6 +134,25 @@ class RateLimitAttributeListenerTest extends TestCase
         yield 'decoded only once' => ['/l%256Fgin', '1.2.3.4~/l%256Fgin'];
     }
 
+    #[DataProvider('provideDefaultKeyClientIpCases')]
+    public function testDefaultKeyLimitsIpv6ClientsByTheirNetwork(string $ip, string $expectedKey)
+    {
+        $listener = $this->makeListenerCapturingKey($usedKey);
+        $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit('api'), Request::create('/login', server: ['REMOTE_ADDR' => $ip])));
+
+        $this->assertSame($expectedKey, $usedKey);
+    }
+
+    public static function provideDefaultKeyClientIpCases(): iterable
+    {
+        yield 'IPv4' => ['192.0.2.1', '192.0.2.1~/login'];
+        yield 'IPv6' => ['2001:db8:1:2::1', '2001:db8:1:2::~/login'];
+        yield 'IPv6 in the same /64' => ['2001:db8:1:2:ffff:ffff:ffff:ffff', '2001:db8:1:2::~/login'];
+        yield 'IPv6 in another /64' => ['2001:db8:1:3::1', '2001:db8:1:3::~/login'];
+        yield 'IPv4-mapped IPv6' => ['::ffff:192.0.2.1', '::ffff:192.0.2.1~/login'];
+        yield 'not an IP' => ['unix:', 'unix:~/login'];
+    }
+
     public function testExpressionKey()
     {
         $listener = $this->makeListenerCapturingKey($usedKey);

@@ -52,6 +52,7 @@ class PropertyInfoBundle extends AbstractBundle
             ->canBeDisabled()
             ->children()
                 ->booleanNode('with_constructor_extractor')
+                    ->resolvesAtCompileTime()
                     ->info('Registers the constructor extractor.')
                     ->defaultTrue()
                 ->end()

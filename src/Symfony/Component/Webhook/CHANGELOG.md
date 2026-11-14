@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Add `TraceableTransport` to record the webhooks sent through a transport
  * Add `Test\RequestFactory` to create the requests that the generic request parser accepts
  * Deprecate the `RequestParser` autowiring alias, use the `webhook.request_parser` service or `#[Target('webhook')]` with `RequestParserInterface` instead

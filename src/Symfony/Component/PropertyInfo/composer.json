@@ -31,8 +31,8 @@
         "phpdocumentor/reflection-docblock": "^5.2|^6.0",
         "phpstan/phpdoc-parser": "^1.0|^2.0",
         "symfony/cache": "^7.4|^8.0",
-        "symfony/config": "^7.4|^8.0",
-        "symfony/dependency-injection": "^8.1",
+        "symfony/config": "^8.2",
+        "symfony/dependency-injection": "^8.2",
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/serializer": "^7.4|^8.0"
     },
@@ -40,7 +40,8 @@
         "phpdocumentor/reflection-docblock": "<5.2|>=7",
         "phpdocumentor/type-resolver": "<1.5.1",
         "symfony/cache": "<8.2",
-        "symfony/dependency-injection": "<8.1"
+        "symfony/config": "<8.2",
+        "symfony/dependency-injection": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\PropertyInfo\\": "" },

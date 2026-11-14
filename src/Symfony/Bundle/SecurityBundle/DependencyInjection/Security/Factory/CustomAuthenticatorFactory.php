@@ -52,6 +52,7 @@ class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface
         ;
 
         $builder
+            ->resolvesAtCompileTime()
             ->info('An array of service ids for all of your "authenticators".')
             ->requiresAtLeastOneElement()
             ->prototype('scalar')->end();

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Add `DependencyInjection\AssetsContextPass`, which `FrameworkBundle` used to provide
  * Add `AssetBundle`, which provides the `asset` configuration and the services previously provided by `FrameworkBundle` under `framework.assets`
 

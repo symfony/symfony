@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Capture AJAX requests started before the web debug toolbar loads
  * Add dump indicator to profiler list view for profiles with dumped content
  * Log the profiler URL of each request at debug level on the `profiler` channel

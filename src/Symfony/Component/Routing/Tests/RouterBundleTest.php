@@ -58,6 +58,18 @@ class RouterBundleTest extends TestCase
         $this->assertSame(['_locale' => 'fr|en'], $container->getDefinition('routing.loader')->getArgument(2));
     }
 
+    public function testRouterOptionsResolveEnvVars()
+    {
+        $parameters = ['env(ROUTER_FLAG)' => '0'];
+        $container = $this->load(['enabled' => '%env(bool:ROUTER_FLAG)%'], [], $parameters);
+
+        $this->assertFalse($container->hasDefinition('router.default'));
+
+        $container = $this->load(['resource' => 'routes.php', 'utf8' => '%env(bool:ROUTER_FLAG)%'], [], $parameters);
+
+        $this->assertSame([], $container->getDefinition('routing.loader')->getArgument(1));
+    }
+
     public function testRouterRequestContextInlinesHostAndScheme()
     {
         $container = $this->load(['resource' => '%kernel.project_dir%/config/routing.xml', 'type' => 'xml', 'utf8' => true], ['fr', 'en']);

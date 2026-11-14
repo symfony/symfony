@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\PropertyAccess\PropertyAccessBundle;
@@ -48,6 +49,29 @@ class PropertyAccessBundleExtensionTest extends TestCase
 
         $this->assertFalse($container->has('property_accessor'));
         $this->assertFalse($container->has('cache.property_access'));
+    }
+
+    public function testOptionsReadByTheExtensionResolveEnvVars()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('env(PROPERTY_ACCESS_ENABLED)', '0');
+        $container->registerExtension(new PropertyAccessBundle()->getContainerExtension());
+        $container->loadFromExtension('property_access', array_fill_keys([
+            'magic_call',
+            'magic_get',
+            'magic_set',
+            'throw_exception_on_invalid_index',
+            'throw_exception_on_invalid_property_path',
+            'wildcard_reads',
+        ], '%env(bool:PROPERTY_ACCESS_ENABLED)%'));
+
+        new MergeExtensionConfigurationPass()->process($container);
+
+        $definition = $container->getDefinition('property_accessor');
+        $this->assertSame(PropertyAccessor::DISALLOW_MAGIC_METHODS, $definition->getArgument(0));
+        $this->assertSame(PropertyAccessor::DO_NOT_THROW, $definition->getArgument(1));
+        $this->assertSame('%env(bool:PROPERTY_ACCESS_ENABLED)%', $container->resolveEnvPlaceholders($definition->getArgument(5)));
     }
 
     public function testPropertyAccessCache()

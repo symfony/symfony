@@ -34,6 +34,6 @@ class ServiceTokenHandlerFactory implements TokenHandlerFactoryInterface
 
     public function addConfiguration(NodeBuilder $node): void
     {
-        $node->scalarNode($this->getKey())->end();
+        $node->scalarNode($this->getKey())->resolvesAtCompileTime()->end();
     }
 }

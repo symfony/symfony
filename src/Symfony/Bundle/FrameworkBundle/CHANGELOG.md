@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Make `KernelTestCase` read the `KERNEL_CLASS`, `APP_ENV` and `APP_DEBUG` env vars from `$_SERVER` before `$_ENV`
  * Set the default locale of the intl extension to `framework.default_locale` when a console command starts, like HTTP requests do
  * Resolve the env vars of the `framework.disallow_search_engine_index` and `framework.test` options while the container is compiled

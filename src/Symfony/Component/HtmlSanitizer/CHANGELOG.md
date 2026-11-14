@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Add `HtmlSanitizerBundle`, which provides the `html_sanitizer` configuration and the services previously provided by `FrameworkBundle` under `framework.html_sanitizer`
 
 8.0

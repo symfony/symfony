@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Add `PropertyAccessBundle`, which provides the `property_access` configuration and the services previously provided by `FrameworkBundle` under `framework.property_access`
  * Add `PropertyAccessorBuilder::enableWildcardReads()` and the `property_access.wildcard_reads` option to read every element of a collection through a `[*]` path
 

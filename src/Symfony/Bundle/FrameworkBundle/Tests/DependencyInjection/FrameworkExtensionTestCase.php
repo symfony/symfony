@@ -1779,6 +1779,19 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
+    public function testSessionCookieSecureResolvesEnvVars()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'session' => ['cookie_secure' => '%env(SESSION_COOKIE_SECURE)%'],
+            ]);
+        }, ['env(SESSION_COOKIE_SECURE)' => 'auto']);
+
+        $this->assertTrue($container->getDefinition('session.storage.factory.native')->getArgument(3));
+        $this->assertTrue($container->getDefinition('session.storage.factory.php_bridge')->getArgument(2));
+        $this->assertSame('auto', $container->getParameter('session.storage.options')['cookie_secure']);
+    }
+
     public function testSessionListenerInTestMode()
     {
         $container = $this->createContainer();

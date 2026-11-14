@@ -145,8 +145,9 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
                 ->defaultValue(['%kernel.secret%'])
                 ->scalarPrototype()->cannotBeEmpty()->end()
             ->end()
-            ->scalarNode('service')->end()
+            ->scalarNode('service')->resolvesAtCompileTime()->end()
             ->arrayNode('user_providers', 'user_provider')
+                ->resolvesAtCompileTime()
                 ->acceptAndWrap(['string'])
                 ->prototype('scalar')->end()
             ->end()
@@ -160,22 +161,23 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
             ->arrayNode('token_provider')
                 ->acceptAndWrap(['string'], 'service')
                 ->children()
-                    ->scalarNode('service')->info('The service ID of a custom remember-me token provider.')->end()
+                    ->scalarNode('service')->resolvesAtCompileTime()->info('The service ID of a custom remember-me token provider.')->end()
                     ->arrayNode('doctrine')
                         ->canBeEnabled()
                         ->children()
-                            ->scalarNode('connection')->defaultNull()->end()
+                            ->scalarNode('connection')->resolvesAtCompileTime()->defaultNull()->end()
                         ->end()
                     ->end()
                 ->end()
             ->end()
             ->scalarNode('token_verifier')
+                ->resolvesAtCompileTime()
                 ->info('The service ID of a custom rememberme token verifier.')
             ->end();
 
         foreach ($this->options as $name => $value) {
             if ('secure' === $name) {
-                $builder->enumNode($name)->values([true, false, 'auto'])->info('Defaults to the value of "framework.session.cookie_secure", or to "auto".');
+                $builder->enumNode($name)->resolvesAtCompileTime()->values([true, false, 'auto'])->info('Defaults to the value of "framework.session.cookie_secure", or to "auto".');
             } elseif ('samesite' === $name) {
                 $builder->enumNode($name)->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->info('Defaults to the value of "framework.session.cookie_samesite", or to "lax".');
             } elseif (\is_bool($value)) {

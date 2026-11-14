@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Render routes that define a `_template` default, including routes that use the `template` key
  * Warm up only the form themes of `TwigBridge` that the application uses
  * Add support for the `sign_url` filter of `TwigBridge`

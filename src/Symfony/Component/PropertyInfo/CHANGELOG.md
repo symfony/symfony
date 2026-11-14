@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Allow tagged `property_info.warmup_class_provider` services to add classes to the cache warmer
  * Add `PropertyInfoBundle`, which provides the `property_info` configuration and the services previously provided by `FrameworkBundle` under `framework.property_info`
  * Allow defining accessors and mutators via a `#[WithAccessors]` attribute

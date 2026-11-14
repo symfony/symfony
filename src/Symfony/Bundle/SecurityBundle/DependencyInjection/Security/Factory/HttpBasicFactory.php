@@ -52,7 +52,7 @@ class HttpBasicFactory implements AuthenticatorFactoryInterface
     {
         $node
             ->children()
-                ->scalarNode('provider')->end()
+                ->scalarNode('provider')->resolvesAtCompileTime()->end()
                 ->scalarNode('realm')->defaultValue('Secured Area')->end()
             ->end()
         ;

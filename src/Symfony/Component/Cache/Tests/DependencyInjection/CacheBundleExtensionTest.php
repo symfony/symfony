@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\CacheBundle;
@@ -106,6 +107,30 @@ class CacheBundleExtensionTest extends TestCase
         });
 
         $this->assertSame($container->getDefinition('cache.system')->getClass(), $container->getDefinition('cache.acme')->getClass());
+    }
+
+    public function testCompileTimeOptionsResolveEnvVarsWhileTheProviderStaysDynamic()
+    {
+        $container = $this->createContainerFromFile('cache_default_provider', static function (ContainerBuilder $container) {
+            $container->setParameter('env(CACHE_PREFIX)', 'my-app');
+            $container->setParameter('env(CACHE_ADAPTER)', 'cache.adapter.array');
+            $container->setParameter('env(CACHE_TAGS)', '0');
+            $container->loadFromExtension('cache', [
+                'prefix_seed' => '%env(string:CACHE_PREFIX)%',
+                'pools' => [
+                    'cache.env' => [
+                        'adapters' => ['%env(CACHE_ADAPTER)%'],
+                        'tags' => '%env(bool:CACHE_TAGS)%',
+                    ],
+                ],
+            ]);
+        });
+
+        $this->assertSame('my-app', $container->getParameter('cache.prefix.seed'));
+        $this->assertSame(ArrayAdapter::class, $container->getDefinition('cache.env')->getClass());
+        $app = $container->getDefinition('cache.app');
+        $connection = $container->getDefinition((string) $app->getArgument(0));
+        $this->assertSame('%env(APP_CACHE_DSN)%', $container->resolveEnvPlaceholders($connection->getArgument(0)));
     }
 
     private function createContainerFromFile(string $file, ?\Closure $configure = null): ContainerBuilder

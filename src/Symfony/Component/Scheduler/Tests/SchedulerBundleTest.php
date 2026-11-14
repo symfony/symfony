@@ -13,12 +13,12 @@ namespace Symfony\Component\Scheduler\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractKernel;
 use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Filesystem\Filesystem;
@@ -218,21 +218,18 @@ class SchedulerBundleTest extends TestCase
         $this->assertNull($container->getParameter('.scheduler.use_messenger_routing'));
     }
 
-    public function testUseMessengerRoutingRejectsEnvVar()
+    public function testUseMessengerRoutingResolvesEnvVars()
     {
-        // env placeholders are only recognized as such once resolved against a real container
-        // compilation (MergeExtensionConfigurationPass registers them), not through a bare
-        // Extension::load() call, so this goes through $container->compile() instead
-        $container = new ContainerBuilder(new EnvPlaceholderParameterBag());
+        $container = new ContainerBuilder();
+        $container->setParameter('env(SCHEDULER_USE_MESSENGER_ROUTING)', '0');
         $container->registerExtension(new SchedulerBundle()->getContainerExtension());
         $container->loadFromExtension('scheduler', [
             'use_messenger_routing' => '%env(bool:SCHEDULER_USE_MESSENGER_ROUTING)%',
         ]);
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "scheduler.use_messenger_routing" option is consumed at compile time and cannot use env vars (got "%env(bool:SCHEDULER_USE_MESSENGER_ROUTING)%"). Set a static boolean instead.');
+        new MergeExtensionConfigurationPass()->process($container);
 
-        $container->compile();
+        $this->assertFalse($container->getParameter('.scheduler.use_messenger_routing'));
     }
 }
 

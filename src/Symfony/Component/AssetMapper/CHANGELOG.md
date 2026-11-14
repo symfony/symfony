@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Resolve the env vars of the `asset_mapper.server` option while the container is compiled
  * Add a `$cache` argument to `CompiledAssetMapperConfigReader` to keep the decoded compiled files in a cache pool
  * Add `asset_mapper.metadata_dir` option to choose where `asset-map:compile` writes its metadata

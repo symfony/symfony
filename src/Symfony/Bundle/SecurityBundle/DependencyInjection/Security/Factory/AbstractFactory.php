@@ -56,20 +56,20 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
         $builder = $node->children();
 
         $builder
-            ->scalarNode('provider')->end()
+            ->scalarNode('provider')->resolvesAtCompileTime()->end()
             ->booleanNode('remember_me')
                 ->defaultTrue()
                 ->setDeprecated('symfony/security-bundle', '8.2', 'Setting the "%path%.%node%" configuration option has no effect and is deprecated. It will be removed in Symfony 9.0.')
             ->end()
-            ->scalarNode('success_handler')->end()
-            ->scalarNode('failure_handler')->end()
+            ->scalarNode('success_handler')->resolvesAtCompileTime()->end()
+            ->scalarNode('failure_handler')->resolvesAtCompileTime()->end()
         ;
 
         foreach (array_merge($this->options, $this->defaultSuccessHandlerOptions, $this->defaultFailureHandlerOptions) as $name => $default) {
             if (\is_bool($default)) {
-                $builder->booleanNode($name)->defaultValue($default);
+                $builder->booleanNode($name)->resolvesAtCompileTime('use_forward' === $name)->defaultValue($default);
             } else {
-                $builder->scalarNode($name)->defaultValue($default);
+                $builder->scalarNode($name)->resolvesAtCompileTime('check_path' === $name)->defaultValue($default);
             }
         }
     }

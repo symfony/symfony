@@ -191,6 +191,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                                 ->addDefaultsIfNotSet()
                                 ->children()
                                     ->scalarNode('id')
+                                        ->resolvesAtCompileTime()
                                         ->info('Cache service id to use to cache the OIDC discovery configuration.')
                                         ->defaultValue('cache.security.discovery')
                                         ->cannotBeEmpty()

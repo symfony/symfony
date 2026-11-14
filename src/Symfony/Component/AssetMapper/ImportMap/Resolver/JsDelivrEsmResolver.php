@@ -279,6 +279,44 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             throw new RuntimeException(\sprintf('Error %d downloading extra imported files from jsDelivr for "%s". Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
         }
 
+        $licenseResponses = [];
+        foreach ($importMapEntries as $entry) {
+            $package = $entry->getPackageName().'@'.$entry->version;
+            $licenseResponses[$package] ??= $this->httpClient->request('GET', 'https://data.jsdelivr.com/v1/packages/npm/'.$package);
+        }
+
+        $licenseFileResponses = [];
+        foreach ($licenseResponses as $package => $response) {
+            try {
+                $files = $response->toArray()['files'];
+            } catch (HttpExceptionInterface $e) {
+                throw new RuntimeException(\sprintf('Error %d checking for license files from jsDelivr for "%s". Response: ', $response->getStatusCode(), $package).$response->getContent(false), 0, $e);
+            }
+
+            foreach ($files as $file) {
+                if ('file' !== $file['type'] || !preg_match('/\Alicen[cs]e(?:\.(?:txt|md|markdown))?\z/i', $file['name'])) {
+                    continue;
+                }
+
+                $licenseFileResponses[$package]['/'.$file['name']] = $this->httpClient->request('GET', 'https://cdn.jsdelivr.net/npm/'.$package.'/'.$file['name']);
+            }
+        }
+
+        $licenseFiles = [];
+        foreach ($licenseFileResponses as $package => $responses) {
+            foreach ($responses as $file => $response) {
+                try {
+                    $licenseFiles[$package][$file] = $response->getContent();
+                } catch (HttpExceptionInterface $e) {
+                    throw new RuntimeException(\sprintf('Error %d downloading license files from jsDelivr for "%s". Response: ', $response->getStatusCode(), $package).$response->getContent(false), 0, $e);
+                }
+            }
+        }
+
+        foreach ($importMapEntries as $package => $entry) {
+            $contents[$package]['extraFiles'] += $licenseFiles[$entry->getPackageName().'@'.$entry->version] ?? [];
+        }
+
         return $contents;
     }
 

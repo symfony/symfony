@@ -316,11 +316,11 @@ class ExceptionCasterTest extends TestCase
 
         $expectedDump = <<<'EODUMP'
             <foo></foo><bar><span class=sf-dump-note>Exception</span> {<samp data-depth=1 class=sf-dump-expanded>
-              #<span class=sf-dump-protected title="Protected property">message</span>: "<span class=sf-dump-str>1</span>"
-              #<span class=sf-dump-protected title="Protected property">code</span>: <span class=sf-dump-num>0</span>
-              #<span class=sf-dump-protected title="Protected property">file</span>: "<span class="sf-dump-str sf-dump-ellipsization" title="%sExceptionCasterTest.php
+              #<span class=sf-dump-protected title="Protected property" data-key="&quot;message&quot;">message</span>: "<span class=sf-dump-str>1</span>"
+              #<span class=sf-dump-protected title="Protected property" data-key="&quot;code&quot;">code</span>: <span class=sf-dump-num>0</span>
+              #<span class=sf-dump-protected title="Protected property" data-key="&quot;file&quot;">file</span>: "<span class="sf-dump-str sf-dump-ellipsization" title="%sExceptionCasterTest.php
             %d characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span><span class="sf-dump-ellipsis-tail">Tests%eCaster%eExceptionCasterTest.php</span></span>"
-              #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>%d</span>
+              #<span class=sf-dump-protected title="Protected property" data-key="&quot;line&quot;">line</span>: <span class=sf-dump-num>%d</span>
               <span class=sf-dump-meta>trace</span>: {<samp data-depth=2 class=sf-dump-compact>
                 <span class="sf-dump-meta sf-dump-ellipsization" title="%sExceptionCasterTest.php
             Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span><span class="sf-dump-ellipsis-tail">Tests%eCaster%eExceptionCasterTest.php</span></span>:<span class=sf-dump-num>%d</span>

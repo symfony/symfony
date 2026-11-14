@@ -368,6 +368,95 @@ class HtmlDumper extends CliDumper
                     options[i] = x[i];
                 }
 
+                function getPath(key) {
+                    var keys = [key], container = key.parentNode, sibling, parentKey, path = '';
+
+                    while (container !== root) {
+                        if ('SAMP' !== container.tagName) {
+                            return null;
+                        }
+
+                        parentKey = null;
+                        sibling = container.previousSibling;
+                        while (sibling && !(3 === sibling.nodeType && /\n/.test(sibling.nodeValue))) {
+                            if (sibling.hasAttribute && sibling.hasAttribute('data-key')) {
+                                parentKey = sibling;
+                                break;
+                            }
+                            sibling = sibling.previousSibling;
+                        }
+
+                        if (parentKey) {
+                            keys.unshift(parentKey);
+                        } else if (container.parentNode !== root) {
+                            return null;
+                        }
+                        container = container.parentNode;
+                    }
+
+                    keys.forEach(function (node) {
+                        var key = JSON.parse(node.getAttribute('data-key'));
+                        if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)) {
+                            path += (path ? '.' : '') + key;
+                        } else if (/\bsf-dump-(key|index)\b/.test(node.className) && /^-?(0|[1-9][0-9]*)$/.test(key)) {
+                            path += '[' + key + ']';
+                        } else {
+                            path += '[' + JSON.stringify(key) + ']';
+                        }
+                    });
+
+                    return path;
+                }
+
+                Array.from(root.querySelectorAll('[data-key]')).forEach(function (key) {
+                    if (null === getPath(key)) {
+                        return;
+                    }
+
+                    var button = doc.createElement('button');
+                    button.type = 'button';
+                    button.className = 'sf-dump-copy-path';
+                    button.textContent = ' \u29c9';
+                    button.title = 'Copy property path';
+                    button.setAttribute('aria-label', button.title);
+                    key.parentNode.insertBefore(button, key.nextSibling);
+
+                    addEventListener(button, 'click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var path = getPath(key);
+                        if (null === path) {
+                            return;
+                        }
+
+                        function copied() {
+                            button.title = 'Copied: ' + path;
+                            button.setAttribute('aria-label', button.title);
+                        }
+                        function copy() {
+                            var input = doc.createElement('textarea');
+                            input.value = path;
+                            input.style.position = 'fixed';
+                            input.style.opacity = '0';
+                            doc.body.appendChild(input);
+                            input.select();
+                            try {
+                                if (doc.execCommand('copy')) {
+                                    copied();
+                                }
+                            } finally {
+                                doc.body.removeChild(input);
+                                button.focus();
+                            }
+                        }
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(path).then(copied, copy);
+                        } else {
+                            copy();
+                        }
+                    });
+                });
+
                 function a(e, f) {
                     addEventListener(root, e, function (e, n) {
                         if (e.target.closest && e.target.closest('.sf-dump-search-wrapper')) {
@@ -766,7 +855,8 @@ class HtmlDumper extends CliDumper
             }
             pre.sf-dump a,
             pre.sf-dump .sf-dump-toggle,
-            pre.sf-dump .sf-dump-str-toggle {
+            pre.sf-dump .sf-dump-str-toggle,
+            pre.sf-dump .sf-dump-copy-path {
                 text-decoration: none;
                 cursor: pointer;
                 border: 0;
@@ -780,7 +870,8 @@ class HtmlDumper extends CliDumper
             }
             pre.sf-dump a:focus-visible,
             pre.sf-dump .sf-dump-toggle:focus-visible,
-            pre.sf-dump .sf-dump-str-toggle:focus-visible {
+            pre.sf-dump .sf-dump-str-toggle:focus-visible,
+            pre.sf-dump .sf-dump-copy-path:focus-visible {
                 outline: 1px solid;
                 outline-offset: 1px;
             }
@@ -948,7 +1039,7 @@ class HtmlDumper extends CliDumper
 
     protected function style(string $style, string $value, array $attr = []): string
     {
-        if ('' === $value && ('label' !== $style || !isset($attr['file']) && !isset($attr['href']))) {
+        if ('' === $value && !\in_array($style, ['key', 'public', 'protected', 'private'], true) && ('label' !== $style || !isset($attr['file']) && !isset($attr['href']))) {
             return '';
         }
 
@@ -1009,7 +1100,7 @@ class HtmlDumper extends CliDumper
             '<span class=%s%s%1$s%s>%s</span>',
             1 === \count($dumpClasses) ? '' : '"',
             implode(' ', $dumpClasses),
-            $dumpTitle ? ' title="'.$dumpTitle.'"' : '',
+            ($dumpTitle ? ' title="'.$dumpTitle.'"' : '').(\in_array($style, ['key', 'index', 'public', 'protected', 'private'], true) ? ' data-key="'.esc(json_encode($value, \JSON_INVALID_UTF8_SUBSTITUTE)).'"' : ''),
             !preg_match(static::$controlCharsRx, $v) ? $v : preg_replace_callback(static::$controlCharsRx, static function ($c) use ($map) {
                 $s = $b = '<span class="sf-dump-default';
                 $c = $c[$i = 0];

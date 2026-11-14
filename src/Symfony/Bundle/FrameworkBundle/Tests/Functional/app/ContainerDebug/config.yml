@@ -5,6 +5,11 @@ parameters:
     env(JSON): '[1, "2.5", 3]'
     env(APP_FOO): 'foo'
     env(FORM_ENABLED): 'true'
+    debug_env_scalar: '%env(key:1:json:JSON)%'
+    debug_env_array: '%env(json:JSON)%'
+    debug_env_nested: { value: '%env(int:key:2:json:JSON)%' }
+    debug_env_string: 'prefix_%env(key:1:json:JSON)%_suffix'
+    debug_env_missing: '%env(DEBUG_CONTAINER_MISSING)%'
 
 framework:
     form:

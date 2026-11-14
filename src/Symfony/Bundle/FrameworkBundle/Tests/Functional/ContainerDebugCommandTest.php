@@ -24,6 +24,99 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 #[Group('functional')]
 class ContainerDebugCommandTest extends AbstractWebTestCase
 {
+    #[DataProvider('provideResolvedParameters')]
+    public function testResolveEnvParameter(string $parameter, mixed $expected)
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container', '--parameter' => $parameter, '--resolve-env' => true, '--format' => 'json'], ['interactive' => false]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame([$parameter => $expected], json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR));
+    }
+
+    public static function provideResolvedParameters(): iterable
+    {
+        yield 'scalar' => ['debug_env_scalar', '2.5'];
+        yield 'array' => ['debug_env_array', [1, '2.5', 3]];
+        yield 'nested array' => ['debug_env_nested', ['value' => 3]];
+        yield 'interpolated string' => ['debug_env_string', 'prefix_2.5_suffix'];
+        yield 'static value' => ['kernel.debug', true];
+    }
+
+    public function testParameterKeepsEnvPlaceholderByDefault()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container', '--parameter' => 'debug_env_array', '--format' => 'json'], ['interactive' => false]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame(['debug_env_array' => '%env(json:JSON)%'], json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR));
+    }
+
+    public function testResolveEnvUsesRuntimeValueWithoutChangingThePlaceholder()
+    {
+        $_ENV['JSON'] = '[4, "runtime", 6]';
+
+        try {
+            static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+            $application = new Application(static::$kernel);
+            $application->setAutoExit(false);
+            $tester = new ApplicationTester($application);
+            $tester->run(['command' => 'debug:container', '--parameter' => 'debug_env_array', '--resolve-env' => true, '--format' => 'json'], ['interactive' => false]);
+
+            $tester->assertCommandIsSuccessful();
+            $this->assertSame(['debug_env_array' => [4, 'runtime', 6]], json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR));
+
+            $tester->run(['command' => 'debug:container', '--parameter' => 'debug_env_array', '--format' => 'json'], ['interactive' => false]);
+
+            $tester->assertCommandIsSuccessful();
+            $this->assertSame(['debug_env_array' => '%env(json:JSON)%'], json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR));
+        } finally {
+            unset($_ENV['JSON']);
+        }
+    }
+
+    public function testResolveEnvMissingVariable()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        $this->assertSame(1, $tester->run(['command' => 'debug:container', '--parameter' => 'debug_env_missing', '--resolve-env' => true]));
+        $this->assertStringContainsString('Environment variable not found: "DEBUG_CONTAINER_MISSING".', $tester->getDisplay());
+    }
+
+    public function testResolveEnvUnknownParameter()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        $this->assertSame(1, $tester->run(['command' => 'debug:container', '--parameter' => '.unknown', '--resolve-env' => true]));
+        $this->assertStringContainsString('You have requested a non-existent parameter ".unknown".', $tester->getDisplay());
+    }
+
+    public function testResolveEnvRequiresParameter()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        $this->assertSame(1, $tester->run(['command' => 'debug:container', '--resolve-env' => true]));
+        $this->assertStringContainsString('The "--resolve-env" option requires "--parameter".', $tester->getDisplay());
+    }
+
     public function testDumpContainerIfNotExists()
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);

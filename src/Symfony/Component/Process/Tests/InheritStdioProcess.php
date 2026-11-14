@@ -15,12 +15,15 @@ use Symfony\Component\Process\Process;
 
 require is_file(\dirname(__DIR__).'/vendor/autoload.php') ? \dirname(__DIR__).'/vendor/autoload.php' : \dirname(__DIR__, 5).'/vendor/autoload.php';
 
-$options = getopt('e:c:i:') + ['e' => 'php', 'i' => null];
+$options = getopt('e:c:i:d') + ['e' => 'php', 'i' => null];
 
 foreach ((array) $options['c'] as $code) {
     $process = new Process([$options['e'], '-r', $code]);
     $process->inheritStdio();
     $process->setInput($options['i']);
+    if (isset($options['d'])) {
+        $process->disableInput();
+    }
     $process->run(static function () {
         echo 'callback called';
     });

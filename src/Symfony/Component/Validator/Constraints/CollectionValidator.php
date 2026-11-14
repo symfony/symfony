@@ -32,7 +32,17 @@ class CollectionValidator extends ConstraintValidator
         }
 
         if (!\is_array($value) && !($value instanceof \Traversable && $value instanceof \ArrayAccess)) {
-            throw new UnexpectedValueException($value, 'array|(Traversable&ArrayAccess)');
+            if (null === $constraint->invalidTypeMessage) {
+                throw new UnexpectedValueException($value, 'array|(Traversable&ArrayAccess)');
+            }
+
+            $this->context->buildViolation($constraint->invalidTypeMessage)
+                ->setParameter('{{ type }}', 'array|(Traversable&ArrayAccess)')
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Collection::INVALID_TYPE_ERROR)
+                ->addViolation();
+
+            return;
         }
 
         // We need to keep the initialized context when CollectionValidator

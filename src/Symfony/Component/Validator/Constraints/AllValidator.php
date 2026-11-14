@@ -32,7 +32,17 @@ class AllValidator extends ConstraintValidator
         }
 
         if (!\is_array($value) && !$value instanceof \Traversable) {
-            throw new UnexpectedValueException($value, 'iterable');
+            if (null === $constraint->invalidTypeMessage) {
+                throw new UnexpectedValueException($value, 'iterable');
+            }
+
+            $this->context->buildViolation($constraint->invalidTypeMessage)
+                ->setParameter('{{ type }}', 'iterable')
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(All::INVALID_TYPE_ERROR)
+                ->addViolation();
+
+            return;
         }
 
         $context = $this->context;

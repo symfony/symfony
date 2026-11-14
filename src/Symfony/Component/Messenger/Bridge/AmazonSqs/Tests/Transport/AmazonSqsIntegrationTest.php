@@ -56,6 +56,38 @@ class AmazonSqsIntegrationTest extends TestCase
         $this->executeBatch(getenv('MESSENGER_SQS_FIFO_QUEUE_DSN'));
     }
 
+    public function testConnectionFindAllAndFind()
+    {
+        if (!getenv('MESSENGER_SQS_DSN')) {
+            $this->markTestSkipped('The "MESSENGER_SQS_DSN" environment variable is required.');
+        }
+
+        $connection = Connection::fromDsn(getenv('MESSENGER_SQS_DSN'), ['wait_time' => 1]);
+        $connection->setup();
+        $this->clearSqs(getenv('MESSENGER_SQS_DSN'));
+
+        for ($i = 0; $i < 12; ++$i) {
+            $connection->send('{"message": "Hi '.$i.'"}', ['type' => DummyMessage::class]);
+        }
+
+        $messages = iterator_to_array($connection->findAll(), false);
+        $bodies = array_column($messages, 'body');
+        sort($bodies, \SORT_NATURAL);
+
+        $this->assertSame(array_map(static fn ($i) => '{"message": "Hi '.$i.'"}', range(0, 11)), $bodies);
+        $this->assertSame(12, $connection->getMessageCount(), 'The messages should be visible again once listed');
+
+        $found = $connection->find($messages[4]['message_id']);
+
+        $this->assertSame($messages[4]['body'], $found['body']);
+        $this->assertSame(12, $connection->getMessageCount(), 'The messages should be visible again once one is found');
+
+        $connection->delete($found['id']);
+
+        $this->assertNull($connection->find($messages[4]['message_id']));
+        $this->assertSame(11, $connection->getMessageCount());
+    }
+
     private function execute(string $dsn): void
     {
         $connection = Connection::fromDsn($dsn, ['visibility_timeout' => 1]);

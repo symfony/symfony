@@ -31,6 +31,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected bool $ignoreExtraKeys = false;
     protected bool $removeExtraKeys = true;
     protected bool $normalizeKeys = true;
+    private bool $hasExplicitDefault = false;
+    private ?array $explicitDefault = null;
 
     public function setNormalizeKeys(bool $normalizeKeys): void
     {
@@ -179,15 +181,34 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->name = $name;
     }
 
+    /**
+     * Sets the value of this node when it is not configured.
+     */
+    public function setDefaultValue(array $value): void
+    {
+        $this->explicitDefault = $value;
+        $this->hasExplicitDefault = true;
+    }
+
+    public function setNullAsDefault(): void
+    {
+        $this->explicitDefault = null;
+        $this->hasExplicitDefault = true;
+    }
+
     public function hasDefaultValue(): bool
     {
-        return $this->addIfNotSet;
+        return $this->hasExplicitDefault || $this->addIfNotSet;
     }
 
     public function getDefaultValue(): mixed
     {
         if (!$this->hasDefaultValue()) {
             throw new \RuntimeException(\sprintf('The node at path "%s" has no default value.', $this->getPath()));
+        }
+
+        if ($this->hasExplicitDefault) {
+            return $this->explicitDefault;
         }
 
         $defaults = [];

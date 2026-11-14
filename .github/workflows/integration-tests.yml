@@ -251,6 +251,11 @@ jobs:
           php .github/sync-translations.php
           git diff --exit-code src/ || (echo '::error::Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)
 
+      - name: Start MySQL
+        run: |
+          sudo systemctl start mysql.service
+          mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -h127.0.0.1 -uroot -proot mysql
+
       - name: Run tests
         run: ./phpunit --group integration -v
         env:
@@ -269,6 +274,9 @@ jobs:
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
           PGBOUNCER_HOST: localhost:6432
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_USERNAME: root
+          MYSQL_PASSWORD: root
 
       #- name: Run HTTP push tests
       #  if: matrix.php == '8.1'

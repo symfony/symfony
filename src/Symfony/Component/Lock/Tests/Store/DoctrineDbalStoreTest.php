@@ -14,7 +14,6 @@ namespace Symfony\Component\Lock\Tests\Store;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
@@ -36,6 +35,7 @@ class_exists(\Doctrine\DBAL\Platforms\PostgreSqlPlatform::class);
 class DoctrineDbalStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
+    use MysqlDaylightSavingTimeTestTrait;
 
     protected static string $dbFile;
 
@@ -70,6 +70,17 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         }
 
         return new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config));
+    }
+
+    protected function createMysqlStore(array $params): array
+    {
+        $config = new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+        $conn = DriverManager::getConnection(['driver' => 'pdo_mysql'] + $params, $config);
+
+        return [new DoctrineDbalStore($conn, [], 0.0), $conn->executeStatement(...)];
     }
 
     public function testAbortAfterExpiration()
@@ -218,66 +229,6 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
             }
             $conn->executeStatement('DROP TABLE IF EXISTS lock_keys');
         }
-    }
-
-    /**
-     * @requires extension pdo_mysql
-     *
-     * @group integration
-     *
-     * @dataProvider provideDaylightSavingTimeChanges
-     */
-    public function testMysqlLockSurvivesDaylightSavingTimeChange(int $holderTime, int $contenderTime, bool $holderKeepsLock)
-    {
-        if (!$host = getenv('MYSQL_HOST')) {
-            $this->markTestSkipped('Missing MYSQL_HOST env variable');
-        }
-
-        $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
-        $conn = DriverManager::getConnection([
-            'driver' => 'pdo_mysql',
-            'host' => $host,
-            'user' => getenv('MYSQL_USERNAME') ?: 'root',
-            'password' => getenv('MYSQL_PASSWORD') ?: '',
-        ], $config);
-        $conn->executeStatement('CREATE DATABASE IF NOT EXISTS symfony_lock_test');
-        $conn->executeStatement('USE symfony_lock_test');
-
-        try {
-            $conn->executeStatement("SET time_zone = 'America/Chicago'");
-        } catch (DBALException) {
-            $this->markTestSkipped('MySQL time zone tables are not loaded');
-        }
-
-        $store = new DoctrineDbalStore($conn, [], 0.0);
-        $holder = new Key(__METHOD__);
-        $contender = new Key(__METHOD__);
-
-        try {
-            $conn->executeStatement('SET TIMESTAMP = '.$holderTime);
-            $store->save($holder);
-
-            $conn->executeStatement('SET TIMESTAMP = '.$contenderTime);
-            try {
-                $store->save($contender);
-            } catch (LockConflictedException) {
-            }
-
-            $this->assertSame($holderKeepsLock, $store->exists($holder));
-            $this->assertSame(!$holderKeepsLock, $store->exists($contender));
-        } finally {
-            $conn->executeStatement('DROP TABLE IF EXISTS lock_keys');
-        }
-    }
-
-    public static function provideDaylightSavingTimeChanges(): iterable
-    {
-        // On 2025-11-02, America/Chicago went from 02:00 CDT back to 01:00 CST at 07:00 UTC, so 01:00-02:00 local happened twice.
-        yield 'lock taken before 02:00 CST' => [gmmktime(7, 58, 0, 11, 2, 2025), gmmktime(8, 0, 30, 11, 2, 2025), true];
-        yield 'lock expired after the second 01:00' => [gmmktime(6, 58, 0, 11, 2, 2025), gmmktime(7, 4, 0, 11, 2, 2025), false];
     }
 
     /**

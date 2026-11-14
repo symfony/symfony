@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by Dooij at 2026-11-13T19:43:20Z
+
+I think it looks good for most cases, it solves the breaking change with api-platform as well.
+
+It would still break custom formats that have been counting on just registering the serializer. However that might fall back into your original statement: see if there any reports of it ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-13T19:53:11Z
+
+> custom formats that have been counting on just registering the serializer
+
+yeah, for those I prefer ppl to really be explicit about exposing their serializers. That's surprizing otherwise.
+Json/xml are made for it. Others? I can't tell for everybody.

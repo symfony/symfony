@@ -19,6 +19,21 @@ use Symfony\Component\Webhook\WebhookBundle;
 
 class ConfigurationTest extends TestCase
 {
+    public function testRoutingCanOverrideTheMessageBus()
+    {
+        $config = $this->process(['routing' => ['priority' => ['message_bus' => 'priority.bus']]]);
+
+        $this->assertSame('priority.bus', $config['routing']['priority']['message_bus']);
+    }
+
+    public function testRoutingMessageBusCannotBeEmpty()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The path "webhook.routing.priority.message_bus" cannot contain an empty value');
+
+        $this->process(['routing' => ['priority' => ['message_bus' => '']]]);
+    }
+
     public function testDefaultConfig()
     {
         $this->assertSame([

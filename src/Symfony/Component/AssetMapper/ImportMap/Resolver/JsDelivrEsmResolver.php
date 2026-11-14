@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class JsDelivrEsmResolver implements PackageResolverInterface
+final class JsDelivrEsmResolver implements PackageResolverInterface, PackageUrlResolverInterface
 {
     public const URL_PATTERN_VERSION = 'https://data.jsdelivr.com/v1/packages/npm/%s/resolved';
     public const URL_PATTERN_DIST_CSS = 'https://cdn.jsdelivr.net/npm/%s@%s%s';
@@ -89,7 +89,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 throw new RuntimeException(\sprintf('Unable to find the latest version for package "%s" - try specifying the version manually.', $packageName));
             }
 
-            $pattern = $this->resolveUrlPattern($packageName, $filePath, useEsm: $options->useEsm);
+            $pattern = $this->resolveUrlPattern($packageName, $filePath, null, $options->useEsm);
             $requiredPackages[$i][1] = $this->httpClient->request('GET', \sprintf($pattern, $packageName, $version, $filePath));
             $requiredPackages[$i][4] = $version;
 
@@ -177,17 +177,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         /** @var array<string, array{0: ResponseInterface, 1: ImportMapEntry}> $responses */
         $responses = [];
         foreach ($importMapEntries as $package => $entry) {
-            if (!$entry->isRemotePackage()) {
-                throw new \InvalidArgumentException(\sprintf('The entry "%s" is not a remote package.', $entry->importName));
-            }
-
-            $pattern = $this->resolveUrlPattern(
-                $entry->getPackageName(),
-                $entry->getPackagePathString(),
-                $entry->type,
-                $entry->useEsm,
-            );
-            $url = \sprintf($pattern, $entry->getPackageName(), $entry->version, $entry->getPackagePathString());
+            $url = $this->getPackageUrl($entry);
 
             $responses[$package] = [$this->httpClient->request('GET', $url), $entry];
         }
@@ -280,6 +270,20 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         }
 
         return $contents;
+    }
+
+    public function getPackageUrl(ImportMapEntry $entry): string
+    {
+        if (!$entry->isRemotePackage()) {
+            throw new \InvalidArgumentException(\sprintf('The entry "%s" is not a remote package.', $entry->importName));
+        }
+
+        return \sprintf(
+            $this->resolveUrlPattern($entry->getPackageName(), $entry->getPackagePathString(), $entry->type, $entry->useEsm),
+            $entry->getPackageName(),
+            $entry->version,
+            $entry->getPackagePathString(),
+        );
     }
 
     /**

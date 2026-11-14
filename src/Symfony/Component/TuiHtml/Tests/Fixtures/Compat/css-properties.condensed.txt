@@ -1,0 +1,13 @@
+⟨36m────────────────────────────────────────────────────────────⟨0m
+border-block: top and bottom
+⟨36m────────────────────────────────────────────────────────────⟨0m
+║border-inline: left and right                             ║
+┌───────────────────────────────────────────────────────────
+│block-start and inline-start
+block-end and inline-end                                   │
+───────────────────────────────────────────────────────────┘
+⟨1;3mfont: italic bold⟨0m
+flex-flow column a
+flex-flow column b
+                     place-items center
+                                           place-content end

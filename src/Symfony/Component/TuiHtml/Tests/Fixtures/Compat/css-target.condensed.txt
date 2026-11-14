@@ -1,0 +1,8 @@
+Contents: ⟨4;38;2;96;165;250mInstall⟨0m · ⟨4;38;2;96;165;250mUsage⟨0m
+┌──────────────────────────────────────────────────────────┐
+│⟨1;34mInstall⟨0m                                                   │
+│composer require symfony/tui                              │
+│⟨1;34mUsage⟨0m                                                     │
+│Build a view from HTML, then mount it.                    │
+│Style it with CSS.                                        │
+└──────────────────────────────────────────────────────────┘

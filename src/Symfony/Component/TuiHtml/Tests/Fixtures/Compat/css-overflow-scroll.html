@@ -1,0 +1,22 @@
+<!-- covers: css.properties.overflow css.properties.overflow-y css.properties.overflow-block css.properties.scrollbar-width css.properties.scrollbar-color css.properties.scrollbar-gutter css.properties.scroll-behavior css.properties.overscroll-behavior css.properties.overscroll-behavior-x css.properties.overscroll-behavior-y css.properties.overscroll-behavior-inline css.properties.overscroll-behavior-block css.properties.scroll-snap-type css.properties.scroll-snap-align css.properties.scroll-snap-stop css.types.overflow -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .log { overflow: auto; max-height: 4; border: 1px solid; scrollbar-color: yellow gray }
+  .always { overflow-y: scroll; height: 3 }
+  .slides { overflow: auto; max-height: 2; scroll-snap-type: y mandatory }
+  .slides p { scroll-snap-align: start; scroll-snap-stop: always }
+  .bare { overflow-block: auto; max-height: 2; scrollbar-width: none; overscroll-behavior: contain }
+  .log { overscroll-behavior-y: contain; overscroll-behavior-block: none; overscroll-behavior-x: auto; overscroll-behavior-inline: auto }
+  .thin { overflow-y: auto; max-height: 2; scrollbar-width: thin }
+  .fits { overflow: auto; max-height: 5 }
+  .gutter { overflow: auto; max-height: 3; scrollbar-gutter: stable; scroll-behavior: smooth; background: #1f2937 }
+</style>
+<div class="log">
+  <p>Build started</p><p>Compiling 12 files</p><p>Linking</p><p>Running tests</p><p>All tests passed</p><p>Done in 4.2s</p>
+</div>
+<div class="always"><p>Scroll draws a bar even when the content fits</p></div>
+<div class="bare"><p>No scrollbar</p><p>but it still</p><p>scrolls</p></div>
+<div class="thin"><p>A thin scrollbar</p><p>of light lines</p><p>scrolls too</p></div>
+<div class="fits"><p>auto draws none when it fits</p></div>
+<div class="gutter"><p>stable keeps the bar column, here empty</p></div>
+<div class="slides"><p>Slide one</p><p>Slide two</p><p>Slide three</p></div>

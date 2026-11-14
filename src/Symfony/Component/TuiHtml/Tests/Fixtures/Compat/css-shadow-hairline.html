@@ -1,0 +1,10 @@
+<!-- covers: css.properties.box-shadow -->
+<style>
+  .row { display: flex; gap: 1ch; align-items: stretch }
+  .btn { border: 1px solid; padding: 0 1ch }
+  .hairline { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .1) }
+  .card { box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .5) }
+</style>
+<div class="row"><button class="btn hairline">A shadow of a pixel</button><button class="btn">None</button></div>
+<p>A hairline shadow takes no room: the buttons are as tall as each other.</p>
+<div class="btn card">A shadow of a few cells is drawn</div>

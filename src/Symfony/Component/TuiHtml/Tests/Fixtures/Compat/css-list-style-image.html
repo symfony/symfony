@@ -1,0 +1,18 @@
+<!-- requires: GdImage -->
+<!-- covers: css.properties.list-style-image -->
+<!-- variant: forced forced-colors -->
+<style>
+  ul { margin: 0 0 1 }
+  .icons { list-style-image: url(quadrants.png) }
+  .short { list-style: square url(quadrants.png) }
+  .missing { list-style: square url(missing.png) }
+  .inside { list-style: inside url(quadrants.png) }
+</style>
+<ul class="icons">
+  <li>An image as the marker, a row tall, two columns for a square one</li>
+  <li style="list-style-image: none">none: the type again</li>
+</ul>
+<ul class="short"><li>From the shorthand</li></ul>
+<ul class="missing"><li>Not found: the square of the type</li></ul>
+<ul class="inside"><li>Inside the text: the type, no image going there</li></ul>
+<ul class="icons" dir="rtl"><li>Right to left, at the right</li></ul>

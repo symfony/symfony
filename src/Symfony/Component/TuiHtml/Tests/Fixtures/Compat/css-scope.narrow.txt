@@ -1,0 +1,22 @@
+┌────────────────────────────┐
+│⟨1;36mA card⟨0m                      │
+│                            │
+│⟨33mIts text is yellow: scoped  ⟨0m│
+│⟨33mrules win at equal          ⟨0m│
+│⟨33mspecificity.⟨0m                │
+│                            │
+│⟨90mBelow the limit: gray, the  ⟨0m│
+│⟨90mglobal rule.⟨0m                │
+│                            │
+└────────────────────────────┘
+
+⟨90mOutside the card: gray.⟨0m
+
+┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐
+╎                            ╎
+╎⟨1;90mA component's own style,    ⟨0m╎
+╎⟨1;90mscoped to its element.⟨0m      ╎
+╎                            ╎
+└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘
+
+⟨90mAnother article: not bold.⟨0m

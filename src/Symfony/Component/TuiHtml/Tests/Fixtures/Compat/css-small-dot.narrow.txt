@@ -1,0 +1,62 @@
+
+An absolute ::before of 5px,
+round, on the first line of
+its item, like the bullets of
+VitePress:
+
+ ⟨38;2;60;60;60m•⟨0m one item, long enough to
+   wrap onto a second line in
+   a narrow terminal of thirty
+   columns
+ ⟨38;2;60;60;60m•⟨0m two
+
+In the line, a dot of its
+background color:
+
+   ⟨32m• ⟨0mdone
+
+Square, a small square; larger
+than a cell, its box:
+
+ ⟨31m▪⟨0m square
+
+ ⟨41m    ⟨0mg
+ ⟨41m    ⟨0m
+An absolute triangle drawn by
+its borders:
+
+ ▸ open
+
+A triangle in the top padding
+of a tab, padding less than a
+row, like python.org: left
+out, not over its text
+
+       ⟨4mPython⟨0m
+
+In a padding of 13px, which
+rounds to a row: on that row,
+above its text
+
+          ▾
+       ⟨4mPython⟨0m
+
+A box holding a paragraph, its
+triangle drawn once, over it,
+not in its line too
+
+          ▾
+        Docs
+
+That of an inline element, in
+its line: tip▾ after it
+
+A thin box, a bar between
+links, like the footer of
+GitHub: ⟨4mTerms⟨0m ⟨90m│ ⟨0m⟨4mPrivacy⟨0m ⟨90m│⟨0m
+⟨4mStatus⟨0m
+
+An icon, its image masking it,
+no glyph:
+
+   icon

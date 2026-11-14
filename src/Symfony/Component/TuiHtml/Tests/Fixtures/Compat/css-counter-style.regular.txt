@@ -1,0 +1,45 @@
+(1) parenthesized
+(2) by extends
+
+👍 cyclic
+👎 cycles
+👍 back to the first
+
+*** symbolic: three stars
+**** then four
+
+aa. alphabetic: aa
+ab. then ab
+
+⚅⚂ additive: 6 + 3
+⚅⚃ 6 + 4
+
+② fixed: ②
+③ ③
+4 out of its symbols: decimal
+
+i. in range: roman
+ii. ii
+c. out of range: the fallback, c
+
+1. an invalid rule: decimal
+
+α. lower-greek
+β. β
+
+די. hebrew: די
+וט. 15 is וט
+
+ՌՋՂԴ. upper-armenian
+
+い、hiragana-iroha: い
+ろ、ろ
+
+十、simp-chinese-informal: 十
+十一、十一
+
+一百零一、with a zero: 一百零一
+
+४२. devanagari digits
+
+0101 (11) counter() pads, and wraps negatives in parentheses

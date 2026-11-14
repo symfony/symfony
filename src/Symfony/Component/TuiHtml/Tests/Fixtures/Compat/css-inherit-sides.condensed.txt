@@ -1,0 +1,8 @@
+╭────────────────────────────╮
+│ The corners of the group   │
+├────────────────────────────┤
+│ a middle item              │
+├────────────────────────────┤
+│ its last item              │
+╰────────────────────────────╯
+        A side inherited from a shorthand

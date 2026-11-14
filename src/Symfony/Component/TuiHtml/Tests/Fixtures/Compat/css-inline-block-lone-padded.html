@@ -1,0 +1,18 @@
+<!-- covers: css.properties.display css.properties.padding -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .toc { display: grid; list-style: none; margin: 0; padding: 0; width: 18ch }
+  .toc a { display: inline-block; padding: 0 2ch }
+  .crumbs { list-style: none; margin: 0; padding: 0 }
+  .crumbs li { display: inline-block }
+  .crumbs li:not(:last-child)::after { content: "/"; display: inline-block; margin: 0 1ch }
+  .crumbs a { display: inline-block; padding: 0 1ch }
+</style>
+<p>Alone in its item, a padded link wraps inside its padding:</p>
+<ul class="toc">
+  <li><a href="#syntax">Syntax</a></li>
+  <li><a href="#definition">Formal definition</a></li>
+  <li><a href="#compatibility">Browser compatibility</a></li>
+</ul>
+<p>Beside a separator, it stays in the line:</p>
+<ul class="crumbs"><li><a href="#docs">Docs</a></li><li><a href="#install">Installation</a></li></ul>

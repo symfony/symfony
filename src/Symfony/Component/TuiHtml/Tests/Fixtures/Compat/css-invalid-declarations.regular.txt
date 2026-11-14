@@ -1,0 +1,10 @@
+
+⟨31mAn invalid value is dropped: red, the value before it⟨0m
+
+⟨32mAn invalid !important one too: green⟨0m
+
+Its lines kept, like the code of python.org:
+    def fib(n):
+        a, b = 0, 1
+
+⟨34mAn invalid value of a style attribute too: blue⟨0m

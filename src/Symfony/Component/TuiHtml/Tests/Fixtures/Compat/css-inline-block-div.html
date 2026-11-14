@@ -1,0 +1,28 @@
+<!-- covers: css.properties.display -->
+<style>
+  .check { display: block; padding-left: 1ch }
+  .check.inline { display: inline-block }
+  .chip { display: inline-block; border: 1px solid; padding: 0 1ch }
+  .wide { display: inline-block }
+  @media (max-width: 40ch) { .wide { display: block } }
+  ul.tags { list-style: none; padding: 0 }
+  ul.tags li { display: inline-block; margin-right: 1ch }
+  ul.pages { list-style: none; padding: 0 } ul.pages li { display: none; margin-right: 1ch }
+  ul.pages li:first-child, ul.pages li:last-child { display: inline-block }
+  @media (min-width: 40ch) { ul.pages li { display: inline-block } }
+  ul.links { list-style: none; padding: 0 }
+  @media (min-width: 30ch) { ul.links li { display: inline } ul.links li + li::before { content: " · " } }
+  .cats ul { display: inline; list-style: none; padding: 0 }
+  .cats li { display: inline-block; border-left: 1px solid; padding: 0 1ch }
+  .cats li:first-child { border-left: 0 }
+</style>
+<div class="check inline"><input type="checkbox"> One</div>
+<div class="check inline"><input type="checkbox"> Two</div>
+<div class="chip">a chip</div><div class="chip">another</div>
+<div class="check">A block of its own</div>
+<ul class="tags"><li>php</li><li>css</li><li>terminal</li></ul>
+<ul class="pages"><li>Previous</li><li>1</li><li>2</li><li>Next</li></ul>
+<div class="wide">a block in some media, kept a block</div>
+<div class="cats">Categories: <ul><li>Terminal emulators</li><li>User interfaces</li><li>Bulletin board systems</li></ul></div>
+<p>Kept on one line when it fits: <span style="display: inline-block">an inline block of a few words</span>, and wrapped at its spaces, on lines of its own, when it does not: <span style="display: inline-block">an inline block of more words than the line has room for, at any width of the screen</span>.</p>
+<ul class="links"><li>Displayed inline</li><li>from 30 columns</li><li>like a header of links</li></ul>

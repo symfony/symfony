@@ -1,0 +1,10 @@
+<!-- covers: css.types.length -->
+<!-- variant: narrow columns=40 -->
+<style>
+.box { container-type: size; width: 30ch; height: 10; border: 1px solid }
+.half { width: 50cqw; border: 1px solid; height: 50cqh }
+.out { width: 25cqw; border: 1px solid }
+.calc { width: calc(100cqi - 4ch); border: 1px solid }
+</style>
+<div class="box"><div class="half">50cqw x 50cqh</div><div class="calc">calc</div></div>
+<div class="out">25cqw of the screen</div>

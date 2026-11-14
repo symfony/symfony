@@ -1,0 +1,7 @@
+⟨1;38;2;249;115;22mTwice as large⟨0m
+Three times
+Four at most
+Small is the size of the text
+A number alone is invalid
+A long heading wraps in a room that many times narrower:
+⟨1;38;2;249;115;22mThe terminal draws each line of it scaled⟨0m

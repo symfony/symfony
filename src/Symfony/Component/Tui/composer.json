@@ -26,6 +26,10 @@
         "league/commonmark": "^2.9",
         "tempest/highlight": "^2.16"
     },
+    "suggest": {
+        "ext-intl": "To draw bidirectional text in visual order",
+        "symfony/polyfill-intl-char": "To draw bidirectional text in visual order without ext-intl"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Tui\\": "" },
         "exclude-from-classmap": [

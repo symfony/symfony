@@ -1,0 +1,67 @@
+
+┌──────┐ A float in a paragraph goes on past it:
+│IMG   │
+│      │ the next paragraph flows beside it, then takes the
+└──────┘ whole width once it ends, like CSS.
+
+Nested further, a note                            ⟨33m┌────────┐⟨0m
+                                                  ⟨33m│⟨0mA note  ⟨33m│⟨0m
+beside the note still, its blocks letting it out. ⟨33m│⟨0mat the  ⟨33m│⟨0m
+                                                  ⟨33m│⟨0mright   ⟨33m│⟨0m
+┌──────┐ A float going on past its paragraph,     ⟨33m└────────┘⟨0m
+│IMG   │
+│      │
+└──────┘
+and a paragraph cleared below it.
+
+⟨48;2;30;58;138m         ⟨0m    Its shape too:
+⟨48;2;30;58;138m       ⟨0m
+⟨48;2;30;58;138m     ⟨0m  the lines after the paragraph follow the edge of the
+⟨48;2;30;58;138m   ⟨0m triangle.
+
+┌──────┐ A formatting context of its own keeps it,
+│IMG   │
+│      │
+└──────┘
+
+the next paragraph below it.
+
+⟨32m┌──────────────────────────────────────────────────────────┐⟨0m
+⟨32m│⟨0m                                                          ⟨32m│⟨0m
+⟨32m│⟨0m ┌──────┐ In a box with a border,                         ⟨32m│⟨0m
+⟨32m│⟨0m │IMG   │                                                 ⟨32m│⟨0m
+⟨32m└─⟨0m│      │⟨32m─────────────────────────────────────────────────┘⟨0m
+  └──────┘
+it goes on past its border and padding, drawn over the
+bottom border, like CSS, the box not drawn around it.
+│
+│    In a padded block in a block, at the right,  ⟨33m┌────────┐⟨0m
+                                                  ⟨33m│⟨0mIndented⟨33m│⟨0m
+the next paragraph beside it.                     ⟨33m└────────┘⟨0m
+
+⟨32m┌──────────────────────────────────────────────────────────┐⟨0m
+⟨32m│⟨0m                                                          ⟨32m│⟨0m
+⟨32m│⟨0m ┌──────┐ A box cleared by its ::after keeps it,          ⟨32m│⟨0m
+⟨32m│⟨0m │IMG   │                                                 ⟨32m│⟨0m
+⟨32m│⟨0m │      │                                                 ⟨32m│⟨0m
+⟨32m│⟨0m └──────┘                                                 ⟨32m│⟨0m
+⟨32m│⟨0m                                                          ⟨32m│⟨0m
+⟨32m└──────────────────────────────────────────────────────────┘⟨0m
+
+the next paragraph below it.
+
+In an item of a list: kept in it, the markers of the next
+items not covered
+
+┌──────┐ 1. List item one
+│IMG   │
+│      │
+└──────┘
+2. List item two
+
+┌──────┐ A rule after a float going on past its paragraph,
+│IMG   │
+│      │⟨90m────────────────────────────────────────────────────⟨0m
+└──────┘
+its line drawn under the float, like the border of a block,
+like CSS.

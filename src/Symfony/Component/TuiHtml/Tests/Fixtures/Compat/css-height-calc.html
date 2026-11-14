@@ -1,0 +1,10 @@
+<!-- covers: css.properties.height css.properties.min-height -->
+<!-- variant: short columns=60 rows=12 -->
+<style>
+  html, body { height: 100%; margin: 0 }
+  .page { height: calc(100% - 4); border: 1px solid; box-sizing: border-box }
+  .panel { min-height: calc(50% + 1); border: 1px solid }
+</style>
+<div class="page"><div class="panel">A panel at least half the page and a row</div></div>
+<p>Four rows are left under the page, its height calc(100% - 4).</p>
+<div style="height: fit-content; border: 1px solid">height: fit-content, as tall as its content, like auto</div>

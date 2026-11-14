@@ -16,7 +16,7 @@ use Symfony\Component\Tui\Event\AbstractEvent;
 use Symfony\Component\Tui\Focus\FocusManager;
 use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Render\RenderContext;
-use Symfony\Component\Tui\Render\Renderer;
+use Symfony\Component\Tui\Render\RendererInterface;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Terminal\TerminalInterface;
 use Symfony\Component\Tui\Tui;
@@ -41,7 +41,7 @@ final class WidgetContext
         private readonly Keybindings $keybindings,
         private readonly TerminalInterface $terminal,
         private readonly FocusManager $focusManager,
-        private readonly Renderer $renderer,
+        private RendererInterface $renderer,
         private readonly WidgetTree $widgetTree,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
@@ -73,9 +73,38 @@ final class WidgetContext
         return $this->eventDispatcher;
     }
 
+    /**
+     * Returns the resolved style of a widget for the current frame.
+     */
+    public function resolveStyle(AbstractWidget $widget): Style
+    {
+        return $this->renderer->resolveStyle($widget);
+    }
+
+    /**
+     * Tells the renderer that a widget changed, which may change the styles it resolved.
+     *
+     * @internal
+     */
+    public function invalidateStyles(): void
+    {
+        $this->renderer->invalidateStyles();
+    }
+
     public function resolveElement(AbstractWidget $widget, string $element): Style
     {
-        return $this->renderer->getStyleSheet()->resolveElement($widget, $element);
+        return $this->renderer->resolveElement($widget, $element);
+    }
+
+    public function getRenderer(): RendererInterface
+    {
+        return $this->renderer;
+    }
+
+    /** @internal */
+    public function setRenderer(RendererInterface $renderer): void
+    {
+        $this->renderer = $renderer;
     }
 
     public function getTerminalColumns(): int

@@ -1,0 +1,31 @@
+<!-- covers: css.at-rules.media.hover css.at-rules.media.any-hover css.at-rules.media.pointer css.at-rules.media.any-pointer css.at-rules.media.color-index css.at-rules.media.color-gamut css.at-rules.media.dynamic-range css.at-rules.media.video-dynamic-range css.at-rules.media.inverted-colors css.at-rules.media.prefers-reduced-transparency css.at-rules.media.prefers-reduced-data css.at-rules.media.update css.at-rules.media.scripting css.at-rules.media.overflow-block css.at-rules.media.overflow-inline css.at-rules.media.device-width css.at-rules.media.device-height css.at-rules.media.device-aspect-ratio css.at-rules.media.horizontal-viewport-segments css.at-rules.media.vertical-viewport-segments css.at-rules.media.device-posture css.at-rules.media.environment-blending -->
+<!-- variant: mouse-256 pointer=1 colors=256 -->
+<style>
+  p { display: none }
+  @media (hover: none) { .no-hover { display: block } }
+  @media (any-hover: hover) and (any-pointer: fine) { .mouse { display: block } }
+  @media (pointer: none) { .no-pointer { display: block } }
+  @media (color-index: 0) and (color-gamut: srgb) { .true-colors { display: block } }
+  @media (dynamic-range: standard) and (video-dynamic-range: standard) { .sdr { display: block } }
+  @media (inverted-colors: none) and (prefers-reduced-transparency: no-preference) and (prefers-reduced-data: no-preference) { .defaults { display: block } }
+  @media (update: fast) { .fast { display: block } }
+  @media (color-index: 256) { .palette { display: block } }
+  @media (scripting: none) { .no-scripts { display: block } }
+  @media (overflow-block: scroll) and (overflow-inline: scroll) { .scrolls { display: block } }
+  @media (min-device-width: 40ch) and (min-device-height: 10) and (min-device-aspect-ratio: 1/4) { .device { display: block } }
+  @media (horizontal-viewport-segments: 1) and (vertical-viewport-segments: 1) and (device-posture: continuous) and (environment-blending: opaque) { .one-screen { display: block } }
+</style>
+<main>
+  <p class="no-hover">no hover: the application does not track the mouse</p>
+  <p class="mouse">a mouse: hover and a fine pointer</p>
+  <p class="no-pointer">no pointer</p>
+  <p class="true-colors">true colors, sRGB</p>
+  <p class="sdr">standard dynamic range</p>
+  <p class="defaults">no inverted colors, no preferences</p>
+  <p class="fast">fast updates</p>
+  <p class="palette">a 256-color palette</p>
+  <p class="no-scripts">no scripts: (scripting: none)</p>
+  <p class="scrolls">content scrolls both ways</p>
+  <p class="device">the terminal is the device: 40 columns and 10 rows or more, at least a quarter as wide as tall</p>
+  <p class="one-screen">one flat, opaque screen</p>
+</main>

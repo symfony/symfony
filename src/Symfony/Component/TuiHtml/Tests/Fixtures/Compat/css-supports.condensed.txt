@@ -1,0 +1,6 @@
+supported declaration
+not
+and
+or
+selector()
+⟨1mnested in a rule⟨0m

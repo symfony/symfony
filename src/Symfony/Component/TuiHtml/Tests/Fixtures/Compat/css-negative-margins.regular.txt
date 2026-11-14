@@ -1,0 +1,19 @@
+┌──────────────────────────┐
+│a card, its first block   │
+│not pulled                │
+│                          │
+│second line               │
+│                          │
+└─────────────────⟨41m  NEW   ⟨0m─┘
+
+one, under the line pulled over it  ⟨36mpulled⟨0m ⟨36mup⟨0m
+
+a column item, pulling the next  ⟨33mover⟨0m ⟨33mit⟨0m
+
+⟨44m┌──┬──┬───┐⟨0m
+⟨44m│ A│ B│ C │⟨0m
+⟨44m└──┴──┴───┘⟨0m
+alpha be⟨33mover⟨0m after
+three, under a pulled wrapper       ⟨36mwrapped⟨0m
+
+after

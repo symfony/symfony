@@ -1,0 +1,45 @@
+
+    padding-left calc(2ch + 16px): 4
+    columns
+
+max-width min(20ch,
+50) wraps at twenty
+columns
+
+   padding-left max(1ch, calc(8px * 3)):
+   3 columns
+
+    padding-left clamp(1ch, 10, 4ch): 4
+    columns
+
+                     calc() mixing a
+                     percentage and a
+                     length: half the
+                     width, and a column
+
+  round(up, 9px, 2): 2 columns, 9px
+  rounded up to 2
+
+     mod(-7, 3) + rem(7, 4): 5 columns
+
+  abs(-2) * sign(5): 2 columns
+
+    pow, sqrt and hypot: 4 columns
+
+    log(exp(2)) + log(100, 10): 4
+    columns
+
+   sin, cos and tan of angles: 3 columns
+
+⟨38;2;103;205;0matan2(1, 1) * 2: red turned by 90deg⟨0m
+
+   round(pi): 3 columns
+
+infinity is clamped, NaN is 0
+
+⟨38;2;128;255;0mmath in plain hsl() channels: a hue of  ⟨0m
+⟨38;2;128;255;0m90⟨0m
+
+⟨38;2;0;255;0ma hue of angles: 30deg + 0.25turn, green⟨0m
+
+⟨38;2;230;0;200mand in rgb() channels: 230 0 200⟨0m

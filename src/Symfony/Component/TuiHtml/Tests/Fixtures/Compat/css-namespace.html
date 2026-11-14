@@ -1,0 +1,15 @@
+<!-- covers: css.selectors.namespace -->
+<style>
+  @namespace svg url(http://www.w3.org/2000/svg);
+  *|p.any { color: green }
+  *|*.all { font-weight: bold }
+  svg|p.prefixed { color: red }
+  |p.none { color: red }
+  /* Ignored selectors match nothing */
+  p.part::part(label), p.host:host(.x), p.mark::highlight(found), p.fill:autofill { color: red }
+</style>
+<p class="any">*|p: green</p>
+<p class="all">*|*: bold</p>
+<p class="prefixed">svg|p: not red</p>
+<p class="none">|p: not red</p>
+<p class="part host mark fill">::part(), :host(), ::highlight(), :autofill: not red</p>

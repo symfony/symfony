@@ -1,0 +1,24 @@
+<!-- covers: css.properties.clip css.properties.clip-path css.properties.-webkit-text-decoration -->
+<!-- variant: toggled focus=#toggle keys=space -->
+<style>
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0 }
+  .inset { clip-path: inset(50%) }
+  .rect { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: rect(0 0 0 0) }
+  .kept { clip: rect(0 10px 10px 0); clip-path: circle(40%) }
+  .prefixed { -webkit-text-decoration: underline dotted }
+  .peer:checked ~ .track::after { content: " on" }
+  .never, .label { display: none }
+  @media (min-width: 400px) { .label { display: inline-flex } }
+  .tip { display: none }
+  button:hover .tip { display: block }
+  .spinner { display: inline-block }
+</style>
+<p>Before <span class="sr-only">Skip to content</span>after: one line</p>
+<button><span class="sr-only">Close</span>×</button>
+<p class="inset">Not drawn</p>
+<p>Before <span class="rect">Folders and files</span>after, like the .sr-only of GitHub</p>
+<p class="kept">Other clips are ignored</p>
+<p class="prefixed">-webkit-text-decoration</p>
+<label><input type="checkbox" id="toggle" class="peer sr-only"><span class="track">Notifications</span></label>
+<p>A button whose label a rule displays again from a width the narrowest screen is as wide as, the other never: <button><span class="never">Hidden</span><span class="label">Search docs</span></button></p>
+<p>Shown on hover only, or hidden by its style attribute: not in the label <button>Copy<span class="tip">Copied</span></button> <button><span class="spinner" style="display: none">Loading</span>Save</button></p>

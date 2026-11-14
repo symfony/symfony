@@ -1,0 +1,21 @@
+<!-- covers: css.properties.anchor-name css.properties.position-anchor css.properties.position-area css.properties.position-try-fallbacks css.properties.position-try css.types.anchor-size css.at-rules.position-try css.types.anchor -->
+<!-- variant: open focus=#file keys=enter rows=10 -->
+<style>
+  .bar { display: flex; gap: 2ch; padding-left: 2 }
+  #file { anchor-name: --file }
+  #menu { position-anchor: --file; position-area: bottom span-right; min-width: calc(anchor-size(width) + 4ch); background: blue }
+  #status { anchor-name: --status; max-width: 12ch; margin-left: 40ch }
+  @position-try --left-of-status { position-area: center left }
+  .side { position: fixed; position-anchor: --status; top: anchor(top); left: anchor(right); position-try-fallbacks: --left-of-status; color: cyan }
+  .tip { position: fixed; position-anchor: --status; position-area: bottom right; position-try-fallbacks: flip-block; position-try: flip-block; color: yellow }
+  .badge { position: fixed; position-anchor: --file; bottom: anchor(top); justify-self: anchor-center; color: magenta }
+</style>
+<p>&nbsp;</p>
+<nav class="bar"><button id="file" popovertarget="menu">File</button><button>Edit</button></nav>
+<div popover id="menu"><p>New</p><p>Open…</p><p>Quit</p></div>
+<span class="badge">new</span>
+<p>The menu opens under its button, over this text.</p>
+<p>line</p><p>line</p><p>line</p><p>line</p><p>line</p><p>line</p><p>line</p>
+<p id="status">Status: ok</p>
+<div class="tip">flipped above</div>
+<div class="side">left of it: no room on its right</div>

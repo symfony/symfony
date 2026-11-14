@@ -1,0 +1,13 @@
+<!-- covers: css.properties.position -->
+<style>
+  .dropdown { position: relative }
+  .menu { position: absolute; margin: 0; padding: 0 1ch; list-style: none; border: 1px solid; background: black; z-index: 2 }
+  .card { position: relative; border: 1px solid; padding: 0 1ch }
+  .note { position: absolute; color: cyan }
+  .badge { position: absolute; color: yellow }
+</style>
+<div class="dropdown"><button>Options</button><ul class="menu"><li>Open</li><li>Save</li></ul></div>
+<p>The page goes on under the menu, which is drawn over it where it would be in the flow.</p>
+<p>And on.</p>
+<div class="card"><p>First</p><p class="note">over the second</p><p>Second line of the card</p></div>
+<p>A line with <span class="badge">*</span>a badge out of the flow that does not split it.</p>

@@ -11,6 +11,10 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
+        <ini name="memory_limit" value="-1" />
+        <!-- Not a terminal that reorders bidirectional text itself, see Ansi\Bidi -->
+        <env name="TERM_PROGRAM" value="" force="true" />
+        <env name="KONSOLE_VERSION" value="" force="true" />
     </php>
 
     <testsuites>

@@ -40,6 +40,9 @@ abstract class AbstractWidget
     /** @var string[] */
     private array $styleClasses = [];
 
+    /** @var array<string, true> */
+    private array $states = [];
+
     /** @var array<class-string<AbstractEvent>, list<callable>> */
     private array $listeners = [];
 
@@ -50,7 +53,11 @@ abstract class AbstractWidget
     private ?LineBufferInterface $renderCacheLines = null;
     private int $renderCacheRevision = -1;
     private int $renderCacheColumns = -1;
-    private int $renderCacheRows = -1;
+    private int|string $renderCacheRows = -1;
+    /** @var array<mixed> What the Renderer keeps with the lines cached, see setRenderCache() */
+    private array $renderCacheExtra = [];
+    /** @var array<string, array{LineBufferInterface, array<mixed>}> The renders of the same revision in other sizes, a layout trying a few, by "columns:rows", the oldest first, each with its extra */
+    private array $renderCacheOthers = [];
 
     /**
      * @return $this
@@ -60,6 +67,28 @@ abstract class AbstractWidget
         $this->id = $id;
 
         return $this;
+    }
+
+    /** @var array<class-string, object> */
+    private array $extensionStates = [];
+
+    /**
+     * @internal
+     *
+     * @template T of object
+     *
+     * @param class-string<T> $type
+     *
+     * @return T
+     */
+    final public function getExtensionState(string $type): object
+    {
+        $state = $this->extensionStates[$type] ?? null;
+        if (!$state instanceof $type) {
+            $this->extensionStates[$type] = $state = new $type();
+        }
+
+        return $state;
     }
 
     final public function getId(): ?string
@@ -185,16 +214,58 @@ abstract class AbstractWidget
             $flags[] = 'focus';
         }
 
+        foreach ($this->states as $state => $_) {
+            if ('root' !== $state && 'focus' !== $state) {
+                $flags[] = $state;
+            }
+        }
+
         return $flags;
+    }
+
+    /**
+     * Turns a custom state flag on or off.
+     *
+     * State flags are matched by state selectors, like the built-in "root"
+     * and "focus" ones: a widget with the "hover" state matches ':hover',
+     * '.button:hover' and Button::class.':hover'.
+     *
+     * @return $this
+     */
+    final public function setState(string $state, bool $on = true): static
+    {
+        if ($on === isset($this->states[$state])) {
+            return $this;
+        }
+
+        if ($on) {
+            $this->states[$state] = true;
+        } else {
+            unset($this->states[$state]);
+        }
+
+        $this->invalidate();
+
+        return $this;
+    }
+
+    final public function hasState(string $state): bool
+    {
+        return \in_array($state, $this->getStateFlags(), true);
     }
 
     final public function invalidate(): void
     {
         ++$this->renderRevision;
         $this->renderCacheLines = null;
+        $this->renderCacheExtra = [];
+        $this->renderCacheOthers = [];
 
         if (null !== $this->parent) {
             $this->parent->invalidate();
+        } else {
+            // Once per change, at the root: the styles built on those of the widgets may be stale
+            $this->context?->invalidateStyles();
         }
     }
 
@@ -244,7 +315,8 @@ abstract class AbstractWidget
      */
     final public function setStyle(?Style $style): static
     {
-        if ($this->internalStyle !== $style) {
+        // Another object of the same values, like a style computed again, does not draw the widget again
+        if (null === $style ? null !== $this->internalStyle : $style != $this->internalStyle) {
             $this->internalStyle = $style;
             $this->invalidate();
         }
@@ -348,14 +420,14 @@ abstract class AbstractWidget
      *
      * The cache is keyed on (renderRevision, columns, rows). A cache hit
      * means the widget's state and available dimensions have not changed
-     * since the last render, so the Renderer can skip the entire pipeline
+     * since the last render. The rows key may include containing dimensions, so the Renderer can skip the entire pipeline
      * (style resolution, layout, chrome, content rendering).
      *
      * @internal Used by the Renderer
      *
      * @return LineBufferInterface|null Cached lines, or null on miss
      */
-    final public function getRenderCache(int $columns, int $rows): ?LineBufferInterface
+    final public function getRenderCache(int $columns, int|string $rows): ?LineBufferInterface
     {
         if ($this->renderCacheRevision === $this->getRenderRevision()
             && $this->renderCacheColumns === $columns
@@ -364,20 +436,76 @@ abstract class AbstractWidget
             return $this->renderCacheLines;
         }
 
-        return null;
+        return $this->renderCacheRevision === $this->getRenderRevision() ? ($this->renderCacheOthers[$columns.':'.$rows][0] ?? null) : null;
+    }
+
+    /**
+     * What the Renderer kept with the render cached in that size, see setRenderCache(): empty on a miss.
+     *
+     * @internal Used by the Renderer
+     *
+     * @return array<mixed>
+     */
+    final public function getRenderCacheExtra(int $columns, int|string $rows): array
+    {
+        if ($this->renderCacheRevision !== $this->getRenderRevision()) {
+            return [];
+        }
+        if (null !== $this->renderCacheLines && $this->renderCacheColumns === $columns && $this->renderCacheRows === $rows) {
+            return $this->renderCacheExtra;
+        }
+
+        return $this->renderCacheOthers[$columns.':'.$rows][1] ?? [];
     }
 
     /**
      * Store the render output for future cache lookups.
      *
      * @internal Used by the Renderer
+     *
+     * @param array<mixed> $extra What the render gives besides its lines, kept and dropped with them, see getRenderCacheExtra()
      */
-    final public function setRenderCache(LineBufferInterface $lines, int $columns, int $rows): void
+    final public function setRenderCache(LineBufferInterface $lines, int $columns, int|string $rows, array $extra = []): void
     {
+        // The render in another size of the same revision kept too, a few of them
+        if (null !== $this->renderCacheLines && $this->renderCacheRevision === $this->getRenderRevision() && [$this->renderCacheColumns, $this->renderCacheRows] !== [$columns, $rows]) {
+            unset($this->renderCacheOthers[$this->renderCacheColumns.':'.$this->renderCacheRows]);
+            $this->renderCacheOthers[$this->renderCacheColumns.':'.$this->renderCacheRows] = [$this->renderCacheLines, $this->renderCacheExtra];
+            if (\count($this->renderCacheOthers) > 3) {
+                array_shift($this->renderCacheOthers);
+            }
+        } elseif ($this->renderCacheRevision !== $this->getRenderRevision()) {
+            $this->renderCacheOthers = [];
+        }
+        unset($this->renderCacheOthers[$columns.':'.$rows]);
         $this->renderCacheLines = $lines;
+        $this->renderCacheExtra = $extra;
         $this->renderCacheRevision = $this->getRenderRevision();
         $this->renderCacheColumns = $columns;
         $this->renderCacheRows = $rows;
+    }
+
+    /**
+     * Run a render that is not this widget's usual one, like a measure, without its render cache: what it renders is not
+     * kept, and the renders kept before are kept after it.
+     *
+     * @template T
+     *
+     * @param \Closure(): T $render
+     *
+     * @return T
+     *
+     * @internal Used by the widgets and the Renderer
+     */
+    final public function withoutRenderCache(\Closure $render): mixed
+    {
+        $saved = [$this->renderCacheLines, $this->renderCacheRevision, $this->renderCacheColumns, $this->renderCacheRows, $this->renderCacheExtra, $this->renderCacheOthers];
+        $this->clearRenderCache();
+        try {
+            return $render();
+        } finally {
+            [$this->renderCacheLines, $this->renderCacheRevision, $this->renderCacheColumns, $this->renderCacheRows, $this->renderCacheExtra, $this->renderCacheOthers] = $saved;
+        }
     }
 
     /**
@@ -391,6 +519,8 @@ abstract class AbstractWidget
     final public function clearRenderCache(): void
     {
         $this->renderCacheLines = null;
+        $this->renderCacheExtra = [];
+        $this->renderCacheOthers = [];
     }
 
     /**
@@ -542,6 +672,16 @@ abstract class AbstractWidget
      * Also requests a render after dispatching, since listeners typically
      * mutate UI state.
      */
+    /**
+     * Dispatches an event on this widget, to its listeners and to those of the application.
+     *
+     * @internal for the HTML view, which dispatches events on the widgets of its elements
+     */
+    final public function dispatchOn(AbstractEvent $event): void
+    {
+        $this->dispatch($event);
+    }
+
     final protected function dispatch(AbstractEvent $event): void
     {
         // Per-widget listeners (no target check needed, they're already scoped)

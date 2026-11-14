@@ -1,0 +1,15 @@
+[A sleeping cat] [Company logo] ⟨38;2;34;197;94m[Introduction video]⟨0m
+Sales went up by ⟨1m10%⟨0m.
+Download ⟨4mthe report⟨0m.
+⟨38;2;255;0;0;48;2;0;0;255m▀▀⟨0m⟨38;2;0;255;0m▀▀⟨0m
+⟨38;2;255;0;0;48;2;0;0;255m▀⟨0m⟨38;2;0;255;0m▀⟨0m
+⟨38;2;255;0;0;48;2;0;0;255m▀⟨0m⟨38;2;0;255;0m▀⟨0m
+[A plugin]
+⟨38;2;34;197;94mA clip that is not played⟨0m
+after the embedded content
+An image in a link, drawn in the line: ⟨38;2;255;0;0;48;2;0;0;255m▀⟨0m⟨38;2;0;255;0m▀⟨0m⟨4m Documentation⟨0m,
+then text.
+Generated: ⟨4man external link ⟨0m⟨38;2;255;0;0;48;2;0;0;255m▀⟨0m⟨38;2;0;255;0m▀⟨0m and → an image that cannot be
+read.
+⟨38;2;245;158;11mAn SVG icon in a link, in its color: ⟨0m⟨38;2;245;158;11;48;2;245;158;11m▀▀⟨0m⟨4;38;2;245;158;11m Settings⟨0m
+An icon in a link: ⟨4m[home] Home⟨0m, a [star] in the text.

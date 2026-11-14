@@ -1,0 +1,29 @@
+<!-- requires: GdImage -->
+<!-- covers: html.elements.img html.elements.picture html.elements.source html.elements.map html.elements.area css.properties.object-fit css.properties.object-position css.properties.aspect-ratio -->
+<!-- variant: narrow columns=6 -->
+<!-- variant: palette colors=256 -->
+<!-- variant: basic colors=16 -->
+<style>
+  .framed { border: 1px solid; display: flex }
+  .small { width: 4ch }
+  .fit { width: 12ch; height: 3; border: 1px solid; object-position: center }
+  .fill { object-fit: fill } .contain { object-fit: contain } .cover { object-fit: cover } .none { object-fit: none; object-position: left top } .down { object-fit: scale-down }
+  .wide { width: 16ch; aspect-ratio: 4 / 1 }
+  .box { aspect-ratio: 3; width: 18ch; border: 1px dashed }
+  .fits { display: flex; flex-wrap: wrap; gap: 1ch }
+</style>
+<p>An 8×8 PNG, 64px wide:</p>
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" alt="Red over blue" width="64">
+<div class="framed"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" alt="Framed"><p>at its natural size</p></div>
+<img class="small" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" alt="Bounded by CSS" width="160">
+<picture><source srcset="flag.webp" type="image/webp"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" alt="In a picture" height="32"></picture>
+<img src="flag.png" alt="No loader: the alt text">
+<img src="data:image/png;base64,bm90IGFuIGltYWdl" alt="Not an image">
+<img src="data:image/png;base64,bm90IGFuIGltYWdl" alt="">
+<div class="fits"><img class="fit fill" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" alt="fill"><img class="fit contain" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" alt="contain"><img class="fit cover" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" alt="cover"><img class="fit none" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" alt="none"><img class="fit down" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" alt="down"></div>
+<img class="wide" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" alt="Four to one">
+<div class="box">aspect-ratio: 3</div>
+<style>.thumb { width: 20ch; aspect-ratio: 16 / 9; border: 1px solid; margin-top: 1 } .thumb img { width: 100%; height: 100%; object-fit: cover }</style>
+<div class="thumb"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAPUlEQVRYhe3VsQ3AQAwDMSn77+wfQkUaqj+AcONechnWqU6+Ld8HAAAAAAAA0OTGj94u9e8XAAAAAAAAAHghNAU9l77oWAAAAABJRU5ErkJggg==" alt="A 16:9 thumbnail covered by its image"></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" width="32" height="32" alt="Avatar"> Ada Lovelace: the text flows beside the image drawn, wrapping there, like in a paragraph of a browser.</p>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQYlYXNsQ0AIBDDwAti/5WfghYUt7EcCoFhPmNWK1Rh39TzAemFKlQORnQDD+BTFtsAAAAASUVORK5CYII=" alt="Map" width="32" height="16" usemap="#nav"><map name="nav"><area shape="rect" coords="0,0,16,16" href="#top" alt="Top"><area shape="default" href="https://example.com" alt="Elsewhere"></map></p>

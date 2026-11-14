@@ -1,0 +1,10 @@
+⟨3mfirst (italic)⟨0m second ⟨1mthird (bold)⟨0m
+⟨44mat least 24 columns wide⟨0m this one gives way when the row is
+⟨44m                        ⟨0m narrow
+┌──────────┐
+│twelve    │
+│wide      │
+└──────────┘
+first line
+second line
+a b c

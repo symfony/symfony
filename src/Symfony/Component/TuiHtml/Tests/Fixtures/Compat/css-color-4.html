@@ -1,0 +1,45 @@
+<!-- covers: css.types.color.hwb css.types.color.lab css.types.color.lch css.types.color.oklab css.types.color.oklch css.types.color.color css.types.color.color-mix css.types.color.rgb.relative_syntax css.types.color.hsl.relative_syntax css.types.color.hwb.relative_syntax css.types.color.lab.relative_syntax css.types.color.lch.relative_syntax css.types.color.oklab.relative_syntax css.types.color.oklch.relative_syntax css.types.color.color.relative_syntax css.types.system-color -->
+<!-- variant: light scheme=light -->
+<style>
+  .hwb { color: hwb(120 0% 0%) }
+  .hwb-tint { background: hwb(0.5turn 40% 20% / 50%) }
+  .lab { color: lab(54.29 80.8 69.89) }
+  .lch { color: lch(54.29 106.84 40.85) }
+  .oklab { color: oklab(0.628 0.2249 0.1258) }
+  .oklch { color: oklch(63.7% 0.237 25.331) }
+  .gamut { color: oklch(72.3% 0.219 149.579) }
+  .p3 { background: color(display-p3 0 1 0) }
+  .xyz { color: color(xyz-d65 0.4124 0.2126 0.0193 / 0.5) }
+  .mix-oklch { color: color-mix(in oklch, white, blue) }
+  .mix-longer { color: color-mix(in hsl longer hue, red, #0000ff) }
+  .mix-fade { background: color-mix(in srgb, #ff0000 30%, transparent) }
+  :root { --brand: #2b7fff }
+  .rel-oklch { color: oklch(from var(--brand) calc(l + 0.1) c h) }
+  .rel-hsl { color: hsl(from var(--brand) calc(h + 180) s l) }
+  .rel-alpha { background: rgb(from var(--brand) r g b / 40%) }
+  .rel-others { color: lab(from hwb(from lch(from oklab(from color(from #ff0000 srgb r g b) l a b) l c h) h w b) l a b) }
+  .system { color: LinkText; background: Canvas }
+  .field { color: FieldText; background: Field; border: 1px solid ButtonBorder }
+  .accent { accent-color: orange; background: AccentColor; color: AccentColorText }
+</style>
+<main>
+  <p class="hwb">hwb()</p>
+  <p class="hwb-tint">hwb() with an angle unit and alpha</p>
+  <p class="lab">lab()</p>
+  <p class="lch">lch()</p>
+  <p class="oklab">oklab()</p>
+  <p class="oklch">oklch(), like Tailwind 4</p>
+  <p class="gamut">oklch() out of the sRGB gamut</p>
+  <p class="p3">color(display-p3)</p>
+  <p class="xyz">color(xyz-d65) with alpha</p>
+  <p class="mix-oklch">color-mix() in oklch</p>
+  <p class="mix-longer">color-mix() along the longer hue</p>
+  <p class="mix-fade">color-mix() with transparent</p>
+  <p class="rel-oklch">oklch(from ...) lighter</p>
+  <p class="rel-hsl">hsl(from ...) complementary</p>
+  <p class="rel-alpha">rgb(from ...) translucent</p>
+  <p class="rel-others">relative colors in every function</p>
+  <p class="system">LinkText on Canvas</p>
+  <p class="field">FieldText on Field</p>
+  <p class="accent">AccentColorText on AccentColor, from accent-color</p>
+</main>

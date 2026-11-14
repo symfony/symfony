@@ -1,0 +1,10 @@
+⟨48;2;30;58;138m                                                            ⟨0m
+⟨48;2;30;58;138m ⟨0m⟨48;2;86;107;167ma white glass over blue                                   ⟨0m⟨48;2;30;58;138m ⟨0m
+⟨48;2;30;58;138m                                                            ⟨0m
+⟨48;2;30;58;138m ⟨0m⟨48;2;120;35;83ma red tint, through a section without background          ⟨0m⟨48;2;30;58;138m ⟨0m
+⟨48;2;30;58;138m                                                            ⟨0m
+⟨48;2;30;58;138m ⟨0m⟨38;2;165;176;208;48;2;30;58;138mtext at 60%, blended over the blue⟨0m⟨48;2;30;58;138m                         ⟨0m
+⟨48;2;30;58;138m                                                            ⟨0m
+⟨48;2;30;58;138m after the ⟨0m⟨38;2;30;58;138;48;2;30;58;138minvisible⟨0m⟨48;2;30;58;138m word                                   ⟨0m
+
+⟨48;2;64;64;64mthe same glass over the terminal                            ⟨0m

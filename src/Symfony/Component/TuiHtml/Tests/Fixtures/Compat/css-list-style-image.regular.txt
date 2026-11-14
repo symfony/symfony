@@ -1,0 +1,11 @@
+⟨38;2;255;0;0;48;2;0;0;255m▀⟨0m⟨38;2;0;255;0m▀⟨0m An image as the marker, a row tall, two columns for a
+   square one
+• none: the type again
+
+⟨38;2;255;0;0;48;2;0;0;255m▀⟨0m⟨38;2;0;255;0m▀⟨0m From the shorthand
+
+▪ Not found: the square of the type
+
+• Inside the text: the type, no image going there
+
+                              Right to left, at the right ⟨38;2;255;0;0;48;2;0;0;255m▀⟨0m⟨38;2;0;255;0m▀⟨0m

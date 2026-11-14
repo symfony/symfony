@@ -1,0 +1,11 @@
+grid device
+
+color
+
+no hover, no pointer
+
+light scheme
+
+not print
+
+custom media: narrow or condensed

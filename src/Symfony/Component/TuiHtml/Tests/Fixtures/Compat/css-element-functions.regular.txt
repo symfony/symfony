@@ -1,0 +1,12 @@
+
+of one (first)
+  of two, indented by its index (second)
+    of three (third)
+
+⟨90mc (gray, first)⟨0m ⟨38;2;0;255;0mb (lime)⟨0m ⟨31ma (red, last)⟨0m
+⟨33m    warning card, indented when wide⟨0m
+⟨33m                                                            ⟨0m
+⟨33m    ⟨0m⟨33;48;2;0;116;122mbadge⟨0m⟨48;2;0;116;122m                                                   ⟨0m
+⟨33m                                                            ⟨0m
+⟨44m20 columns          ⟨0m
+⟨44m10 columns⟨0m

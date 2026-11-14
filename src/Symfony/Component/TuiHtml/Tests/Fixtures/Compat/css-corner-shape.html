@@ -1,0 +1,28 @@
+<!-- covers: css.properties.corner-shape css.properties.border-top-left-radius css.properties.corner-top-left-shape css.properties.border-top-right-radius css.properties.corner-top-right-shape css.properties.border-bottom-right-radius css.properties.corner-bottom-right-shape css.properties.border-bottom-left-radius css.properties.corner-bottom-left-shape css.properties.border-start-start-radius css.properties.corner-start-start-shape css.properties.border-start-end-radius css.properties.corner-start-end-shape css.properties.border-end-end-radius css.properties.corner-end-end-shape css.properties.border-end-start-radius css.properties.corner-end-start-shape css.properties.corner-top-shape css.properties.corner-right-shape css.properties.corner-bottom-shape css.properties.corner-left-shape css.properties.corner-block-start-shape css.properties.corner-block-end-shape css.properties.corner-inline-start-shape css.properties.corner-inline-end-shape -->
+<style>
+  div[class] { border: 1px solid; max-width: 26ch; margin-bottom: 1 }
+  .two { border-radius: 1ch 0 }
+  .bevel { border-radius: 1ch; corner-shape: bevel }
+  .mixed { border-radius: 1ch; corner-shape: round bevel square notch }
+  .ellipse { border-radius: 2ch; corner-shape: superellipse(infinity) superellipse(2) superellipse(0) superellipse(-1) }
+  .long { border-top-left-radius: 1ch; border-bottom-right-radius: 1ch 2ch; corner-bottom-right-shape: scoop }
+  .logical { border-start-end-radius: 1ch; border-end-start-radius: 1ch; corner-start-end-shape: bevel; corner-end-start-shape: squircle }
+  .logical2 { border-start-start-radius: 1ch; border-end-end-radius: 1ch; corner-start-start-shape: bevel; corner-end-end-shape: round }
+  .sides { border-radius: 50%; corner-top-shape: bevel; corner-bottom-shape: round square }
+  .sides2 { border-radius: 1ch; corner-left-shape: bevel; corner-right-shape: round }
+  .sides3 { border-radius: 1ch; corner-block-start-shape: bevel; corner-block-end-shape: square }
+  .sides4 { border-radius: 1ch; corner-inline-start-shape: bevel; corner-inline-end-shape: square }
+  div.heavy { border: thick solid; border-radius: 1ch; corner-shape: bevel }
+</style>
+<div class="two">Top-left and bottom-right round</div>
+<div class="bevel">Beveled corners</div>
+<div class="mixed">Round, bevel, square, notch</div>
+<div class="ellipse">Superellipses</div>
+<div class="long">Longhands, a scoop</div>
+<div class="logical">Logical: start-end, end-start</div>
+<div class="logical2">Logical: start-start, end-end</div>
+<div class="sides">Top beveled, bottom round then square</div>
+<div class="sides2">Left beveled, right round</div>
+<div class="sides3">Block start beveled</div>
+<div class="sides4">Inline start beveled</div>
+<div class="heavy">Heavy and beveled</div>

@@ -1,0 +1,9 @@
+⟨32m Green, the fallback of the state and the type set to      ⟨0m
+⟨32m initial⟨0m
+⟨31m Red, the state set on the cell⟨0m
+⟨34m Blue, unset inheriting nothing⟨0m
+⟨38;2;136;136;136m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁⟨0m
+⟨38;2;136;136;136m▕⟨0m⟨32mA ring, an empty fallback     ⟨0m⟨38;2;136;136;136m▏⟨0m
+⟨38;2;136;136;136m▕⟨0m⟨32mbefore it: green, of a value  ⟨0m⟨38;2;136;136;136m▏⟨0m
+⟨38;2;136;136;136m▕⟨0m⟨32mempty⟨0m                         ⟨38;2;136;136;136m▏⟨0m
+⟨38;2;136;136;136m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔⟨0m

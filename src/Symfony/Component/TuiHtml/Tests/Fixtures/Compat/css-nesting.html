@@ -1,0 +1,32 @@
+<!-- covers: css.selectors.nesting -->
+<!-- variant: focus-name focus=#name -->
+<!-- variant: narrow columns=40 -->
+<style>
+  .card {
+    border: 1px solid;
+    padding: 0 1ch;
+    h2 { color: cyan }
+    > p { font-style: italic }
+    .note & { border-style: double }
+    &:focus-within { border-color: green }
+    & + .card { border-color: yellow }
+    @media (max-width: 49) {
+      border: none;
+      h2 { text-decoration: underline }
+    }
+    footer {
+      span { color: magenta }
+    }
+    font-weight: bold;
+  }
+</style>
+<main>
+  <section class="card">
+    <h2>Nested heading</h2>
+    <p>Child paragraph</p>
+    <input id="name" aria-label="Name" value="focus me">
+    <footer><span>deeply nested</span></footer>
+  </section>
+  <section class="card"><p>Next card</p></section>
+  <div class="note"><section class="card"><p>Card in a note</p></section></div>
+</main>

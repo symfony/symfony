@@ -1,0 +1,684 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\TuiHtml\Render;
+
+use Symfony\Component\Tui\Ansi\AnsiUtils;
+use Symfony\Component\Tui\Exception\LogicException;
+use Symfony\Component\Tui\Exception\RenderException;
+use Symfony\Component\Tui\Render\LineBufferInterface;
+use Symfony\Component\Tui\Terminal\TerminalInterface;
+use Symfony\Component\TuiHtml\Internal\TextMarkers;
+use Symfony\Component\TuiHtml\Style\MediaContext;
+
+/**
+ * Handles efficient terminal output with differential rendering.
+ *
+ * Accepts rendered lines (the composited screen state) and writes them
+ * to the terminal with minimal updates using line-level diffing.
+ *
+ * This class is responsible for:
+ * - Tracking screen state (previous lines, cursor position)
+ * - Computing minimal updates between frames
+ * - Writing ANSI sequences to the terminal
+ * - Managing cursor position for differential rendering
+ *
+ * @experimental
+ *
+ * @internal
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ */
+final class ScreenWriter implements \Symfony\Component\Tui\Render\FrameWriterInterface
+{
+    private const PRINTABLE_ASCII = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
+    private ?LineBufferInterface $previousLines = null;
+    private int $previousWidth = 0;
+    private int $hardwareCursorRow = 0;
+    private int $maxLinesRendered = 0;
+    /** Number of leading lines whose current content already reached the scrollback */
+    private int $scrollbackLineCount = 0;
+    /** Whether the screen was cleared, so that the content starts on its first row */
+    private bool $screenCleared = false;
+    /** Whether the scrollback ends with the lines above the screen, without stale or repeated rows */
+    private bool $scrollbackMatchesLines = false;
+    private bool $showHardwareCursor = true;
+    /** The color last given to the terminal cursor with OSC 12, null for its own */
+    private ?string $cursorColor = null;
+    /** @var list<array{int, int, string}> The text drawn larger on the screen: its row, its column and what draws it */
+    private array $scaledText = [];
+    /** @var array<int, list<array{int, string, int}>> The text drawn larger in the last frame, by row: its column, what draws it and its scale */
+    private array $scaledRows = [];
+    private int $scrollOffset = 0;
+    /** @var array{row: int, col: int, shape: int, color: string|null}|null */
+    private ?array $previousCursorPos = null;
+    private readonly LineBufferDiffer $lineBufferDiffer;
+    private ?ColorDepth $colorDepth = null;
+
+    public function __construct(private readonly TerminalInterface $terminal, ?LineBufferDiffer $lineBufferDiffer = null)
+    {
+        $this->lineBufferDiffer = $lineBufferDiffer ?? new LineBufferDiffer();
+    }
+
+    /**
+     * Sets the colors the terminal draws: 16, 256, or MediaContext::TRUE_COLORS; the others become the closest ones.
+     */
+    public function setColors(int $colors): void
+    {
+        if ($colors === ($this->colorDepth->colors ?? MediaContext::TRUE_COLORS)) {
+            return;
+        }
+        $this->colorDepth = $colors < MediaContext::TRUE_COLORS ? new ColorDepth($colors) : null;
+        // What is on the screen was written with the other colors
+        $this->reset();
+    }
+
+    public function setShowHardwareCursor(bool $enabled): void
+    {
+        if ($this->showHardwareCursor === $enabled) {
+            return;
+        }
+        $this->showHardwareCursor = $enabled;
+        if (!$enabled) {
+            $this->terminal->hideCursor();
+        }
+    }
+
+    /**
+     * Set the scroll offset (lines from bottom).
+     *
+     * When the content exceeds the viewport, the viewport normally shows
+     * the bottom portion. A positive scroll offset shifts the viewport
+     * up by that many lines.
+     */
+    public function setScrollOffset(int $offset): void
+    {
+        if ($this->scrollOffset !== $offset = max(0, $offset)) {
+            $this->scrollOffset = $offset;
+            $this->reset();
+        }
+    }
+
+    /**
+     * Get the current scroll offset.
+     */
+    public function getScrollOffset(): int
+    {
+        return $this->scrollOffset;
+    }
+
+    public function writeFrame(LineBufferInterface $lines): void
+    {
+        if ($this->scrollOffset > 0) {
+            $totalLines = \count($lines);
+            $rows = $this->terminal->getRows();
+            if ($totalLines > $rows) {
+                $maxOffset = $totalLines - $rows;
+                $effectiveOffset = min($this->scrollOffset, $maxOffset);
+                $startLine = $totalLines - $rows - $effectiveOffset;
+                $lines = new ArrayLineBuffer($lines->slice($startLine, $rows));
+            }
+        }
+        $changedRange = null === $this->previousLines ? null : $this->lineBufferDiffer->findChangedRange($lines, $this->previousLines);
+        // The text drawn larger, drawn again once a frame that changed is written (see positionHardwareCursor())
+        $this->scaledText = match (true) {
+            null === $this->previousLines || $this->previousWidth !== $this->terminal->getColumns() => $this->findScaledText($lines),
+            null !== $changedRange => $this->findScaledText($lines, $changedRange['first'], $changedRange['last']),
+            default => [],
+        };
+        $cursorPos = match (true) {
+            null === $this->previousLines => $this->findCursorPosition($lines),
+            null === $changedRange => $this->previousCursorPos,
+            null === $this->previousCursorPos && \count($lines) === \count($this->previousLines) => $this->findCursorPosition($lines, $changedRange['first'], $changedRange['last']),
+            default => $this->findCursorPosition($lines),
+        };
+        if (null !== $this->previousLines && $this->previousWidth === $this->terminal->getColumns() && null === $changedRange) {
+            $this->positionHardwareCursor($cursorPos, \count($lines));
+            $this->previousLines = $lines;
+            $this->previousCursorPos = $cursorPos;
+
+            return;
+        }
+        $this->writeInternal($lines, $cursorPos, $changedRange['first'] ?? 0, $changedRange['last'] ?? \count($lines) - 1);
+        $this->previousLines = $lines;
+        $this->previousCursorPos = $cursorPos;
+    }
+
+    /**
+     * Clear rendering state, forcing a full re-render on next write.
+     *
+     * The scroll offset is preserved so that a forced re-render does not
+     * jump back to the bottom of the content.
+     */
+    public function reset(): void
+    {
+        $this->previousLines = null;
+        $this->previousCursorPos = null;
+        $this->scaledRows = [];
+        $this->previousWidth = -1;
+        // -1 triggers widthChanged
+        $this->hardwareCursorRow = 0;
+        $this->maxLinesRendered = 0;
+    }
+
+    /**
+     * Follows the rows that Termux moves between the screen and the scrollback when only its height changes.
+     *
+     * On shrink, Termux first drops the blank rows below the cursor, then moves the top rows into the scrollback.
+     * On growth, it brings rows back from the scrollback, then adds blank rows at the bottom.
+     * When the rows it moves cannot be known, the next write repaints the whole screen.
+     */
+    public function followTermuxHeightChange(int $previousRows, int $rows): void
+    {
+        // Lines above the screen; until the content fills the screen, the rows above it are unknown unless the screen was cleared
+        $top = $this->maxLinesRendered - $previousRows;
+        if ($top < 0 && $this->screenCleared) {
+            $top = 0;
+        }
+        if (null === $this->previousLines || $top < 0 || !$this->scrollbackMatchesLines || $this->hardwareCursorRow < $top || !$this->screenCleared && $rows - $previousRows > $top) {
+            $this->reset();
+
+            return;
+        }
+        // Termux drops the blank rows below the cursor first on shrink, but cuts the bottom rows: when a non-blank row lies below a blank one,
+        // two height changes coalesced into one SIGWINCH would not move the same rows as the single change seen here
+        $blankRows = 0;
+        $lineCount = \count($this->previousLines);
+        $nonBlankBelow = false;
+        for ($row = $previousRows - 1; $row > $this->hardwareCursorRow - $top; --$row) {
+            $line = $top + $row < $lineCount ? $this->previousLines->getLine($top + $row) : '';
+            if ('' !== trim(AnsiUtils::stripAnsiCodes($line), ' ') || AnsiUtils::containsImage($line)) {
+                $nonBlankBelow = true;
+            } elseif ($nonBlankBelow) {
+                $this->reset();
+
+                return;
+            } else {
+                ++$blankRows;
+            }
+        }
+        if ($rows < $previousRows) {
+            $shift = max(0, $previousRows - $rows - $blankRows);
+            $top += $shift;
+            // A cursor moved above the screen is put back on its first row, away from the cursor position kept for an unchanged frame
+            if ($this->hardwareCursorRow < $top) {
+                $this->hardwareCursorRow = $top;
+                $this->previousCursorPos = null;
+            }
+        } else {
+            $top -= min($rows - $previousRows, $top);
+        }
+        $this->maxLinesRendered = $top + $rows;
+        $this->scrollbackLineCount = $top;
+        // Lines dropped below the screen have to be written again
+        if (\count($this->previousLines) > $this->maxLinesRendered) {
+            $this->previousLines = new ArrayLineBuffer($this->previousLines->slice(0, $this->maxLinesRendered));
+        }
+    }
+
+    /**
+     * Get the final cursor position for cleanup when stopping.
+     *
+     * @return array{line_count: int, cursor_row: int}
+     */
+    public function getState(): array
+    {
+        return ['line_count' => null === $this->previousLines ? 0 : \count($this->previousLines), 'cursor_row' => $this->hardwareCursorRow];
+    }
+
+    /**
+     * Give the terminal cursor its own color back (OSC 112) when the caret had another one.
+     */
+    public function close(): void
+    {
+        $this->restoreCursorColor();
+    }
+
+    private function restoreCursorColor(): void
+    {
+        if (null !== $this->cursorColor) {
+            $this->terminal->write("\x1b]112\x07");
+            $this->cursorColor = null;
+        }
+    }
+
+    /**
+     * Internal write implementation.
+     *
+     * @param array{row: int, col: int, shape: int, color: string|null}|null $cursorPos
+     */
+    private function writeInternal(LineBufferInterface $lines, ?array $cursorPos, int $firstChanged, int $lastChanged): void
+    {
+        $columns = $this->terminal->getColumns();
+        $rows = $this->terminal->getRows();
+        // Width changed - need full re-render
+        $widthChanged = 0 !== $this->previousWidth && $this->previousWidth !== $columns;
+        // First render or width changed
+        if (null === $this->previousLines || $widthChanged) {
+            $this->fullRender($lines, $cursorPos, $widthChanged);
+
+            return;
+        }
+        $lineCount = \count($lines);
+        // Changed lines have to reach the scrollback again when they scroll out
+        $this->scrollbackLineCount = min($this->scrollbackLineCount, $firstChanged);
+        // Overflowing content that shrinks moves every visible line up, which
+        // cannot be expressed by erasing the trailing ones.
+        if (!$this->terminal->isVirtual() && \count($this->previousLines) > $rows && $lineCount < \count($this->previousLines)) {
+            $this->redrawViewport($lines, $cursorPos, $rows);
+
+            return;
+        }
+        if ($firstChanged >= $lineCount) {
+            $this->handleDeletedLines($lines, $cursorPos, $rows);
+
+            return;
+        }
+        // Check if firstChanged is outside the viewport
+        $viewportTop = $this->terminal->isVirtual() ? 0 : max(0, $this->maxLinesRendered - $rows);
+        if ($firstChanged < $viewportTop) {
+            $this->fullRender($lines, $cursorPos, true);
+
+            return;
+        }
+        // Growing past the bottom of the screen scrolls its top lines out, and some of them are already in the scrollback
+        if (!$this->terminal->isVirtual() && $viewportTop < $this->scrollbackLineCount && $lineCount > $viewportTop + $rows) {
+            $this->redrawViewport($lines, $cursorPos, $rows);
+
+            return;
+        }
+        // Differential render
+        $this->differentialRender($lines, $cursorPos, $firstChanged, $lastChanged, $columns);
+    }
+
+    /**
+     * Writes all lines to the terminal from scratch.
+     *
+     * This is only used for the first render and for cases where incremental
+     * updates are not possible. For subsequent renders where changed lines are
+     * within the viewport, differentialRender() is used instead.
+     *
+     * When $clear is false, the output is appended from the current cursor
+     * position (used for the very first render when the screen is already
+     * empty).
+     *
+     * When $clear is true, the screen is erased and the cursor is moved home
+     * before writing. The consequence is that the display resets and starts
+     * from the top of the screen, which is a small caveat of the algorithm
+     * used. $clear must be true in three cases:
+     *
+     *  - On terminal resize: a line may have been split into 2 lines by the
+     *    terminal, making it impossible to update the display incrementally.
+     *  - When changed lines are outside the viewport: there is no way to
+     *    address lines that have scrolled out of the visible area.
+     *  - When too many trailing lines were deleted: if the number of lines to
+     *    erase exceeds the terminal height, clearing is more efficient than
+     *    erasing them one by one.
+     *
+     * @param array{row: int, col: int, shape: int, color: string|null}|null $cursorPos
+     */
+    private function fullRender(LineBufferInterface $newLines, ?array $cursorPos, bool $clear): void
+    {
+        // Every row on the screen may be written again: all the text drawn larger is drawn again
+        $this->scaledText = $this->findScaledText($newLines);
+        $buffer = "\x1b[?2026h\x1b[?25l";
+        // Begin synchronized output with the cursor hidden
+        if ($clear) {
+            $buffer .= "\x1b[2J\x1b[3J\x1b[H";
+            // Clear screen, clear scrollback, and home
+        }
+        $first = true;
+        foreach ($newLines as $line) {
+            if (!$first) {
+                $buffer .= "\r\n";
+            }
+            $buffer .= $this->prepareLine($line);
+            $first = false;
+        }
+        $this->terminal->write($buffer);
+        $this->hardwareCursorRow = max(0, \count($newLines) - 1);
+        $this->scrollbackMatchesLines = true;
+        $this->screenCleared = $clear;
+        if ($clear) {
+            $this->maxLinesRendered = \count($newLines);
+        } else {
+            $this->maxLinesRendered = max($this->maxLinesRendered, \count($newLines));
+        }
+        $this->scrollbackLineCount = max(0, \count($newLines) - $this->terminal->getRows());
+        $this->positionHardwareCursor($cursorPos, \count($newLines));
+        $this->terminal->write("\x1b[?2026l");
+        // Publish the content and the restored cursor together
+        $this->previousWidth = $this->terminal->getColumns();
+    }
+
+    /**
+     * Redraws the bottom of the content over the whole screen.
+     *
+     * The scrollback is kept, so the lines that scrolled out stay reachable.
+     * Rows are erased one by one instead of clearing the screen, because tmux moves a cleared screen into the scrollback (its default scroll-on-clear option).
+     * Lines already in the scrollback are painted in place and only the next ones scroll there, so that none reaches it twice.
+     *
+     * @param array{row: int, col: int, shape: int, color: string|null}|null $cursorPos
+     */
+    private function redrawViewport(LineBufferInterface $newLines, ?array $cursorPos, int $rows): void
+    {
+        // Every row on the screen may be written again: all the text drawn larger is drawn again
+        $this->scaledText = $this->findScaledText($newLines);
+        $lineCount = \count($newLines);
+        $first = min(max(0, $lineCount - $rows), $this->scrollbackLineCount);
+        $lines = array_map($this->prepareLine(...), $newLines->slice($first, $lineCount - $first));
+        $buffer = "\x1b[?2026h\x1b[?25l\x1b[H\x1b[2K";
+        // Begin synchronized output with the cursor hidden, home and erase the first row
+        $buffer .= implode("\r\n\x1b[2K", array_pad($lines, $rows, ''));
+        // Back to the last line of the content
+        if (0 < $up = $rows - max(1, \count($lines))) {
+            $buffer .= "\x1b[{$up}A";
+        }
+        $this->terminal->write($buffer);
+        $this->scrollbackMatchesLines = false;
+        $this->hardwareCursorRow = max(0, $lineCount - 1);
+        $this->maxLinesRendered = $lineCount;
+        $this->scrollbackLineCount = max($this->scrollbackLineCount, $lineCount - $rows);
+        $this->positionHardwareCursor($cursorPos, $lineCount);
+        $this->terminal->write("\x1b[?2026l");
+        // Publish the content and the restored cursor together
+        $this->previousWidth = $this->terminal->getColumns();
+    }
+
+    /**
+     * @param array{row: int, col: int, shape: int, color: string|null}|null $cursorPos
+     */
+    private function handleDeletedLines(LineBufferInterface $newLines, ?array $cursorPos, int $height): void
+    {
+        // Every row on the screen may be written again: all the text drawn larger is drawn again
+        $this->scaledText = $this->findScaledText($newLines);
+        $previousLineCount = \count($this->previousLines ?? throw new LogicException('Previous lines are not available.'));
+        $buffer = "\x1b[?2026h\x1b[?25l";
+        // Begin synchronized output with the cursor hidden
+        $targetRow = max(0, \count($newLines) - 1);
+        $lineDiff = $targetRow - $this->hardwareCursorRow;
+        if ($lineDiff > 0) {
+            $buffer .= "\x1b[{$lineDiff}B";
+        } elseif ($lineDiff < 0) {
+            $buffer .= "\x1b[".-$lineDiff.'A';
+        }
+        $buffer .= "\r";
+        $extraLines = $previousLineCount - \count($newLines);
+        if ($extraLines > $height) {
+            $this->fullRender($newLines, $cursorPos, true);
+
+            return;
+        }
+        $newLineCount = \count($newLines);
+        if ($newLineCount > 0) {
+            $buffer .= "\x1b[1B";
+        }
+        for ($i = 0; $i < $extraLines; ++$i) {
+            $buffer .= "\r\x1b[2K";
+            if ($i < $extraLines - 1) {
+                $buffer .= "\x1b[1B";
+            }
+        }
+        $moveUp = $extraLines + ($newLineCount > 0 ? 0 : -1);
+        if ($moveUp > 0) {
+            $buffer .= "\x1b[{$moveUp}A";
+        }
+        $this->terminal->write($buffer);
+        $this->hardwareCursorRow = $targetRow;
+        $this->positionHardwareCursor($cursorPos, \count($newLines));
+        $this->terminal->write("\x1b[?2026l");
+        // Publish the content and the restored cursor together
+        $this->previousWidth = $this->terminal->getColumns();
+    }
+
+    /**
+     * @param array{row: int, col: int, shape: int, color: string|null}|null $cursorPos
+     */
+    private function differentialRender(LineBufferInterface $newLines, ?array $cursorPos, int $firstChanged, int $lastChanged, int $width): void
+    {
+        $previousLineCount = \count($this->previousLines ?? throw new LogicException('Previous lines are not available.'));
+        $buffer = "\x1b[?2026h\x1b[?25l";
+        // Begin synchronized output with the cursor hidden
+        // Move cursor to first changed line. Line feeds instead of downward cursor
+        // motion, which clamps at the last row: on the bottom of the screen they
+        // scroll, which is how content that grew past it reaches the scrollback.
+        $lineDiff = $firstChanged - $this->hardwareCursorRow;
+        if ($lineDiff > 0) {
+            $buffer .= str_repeat("\n", $lineDiff);
+        } elseif ($lineDiff < 0) {
+            $buffer .= "\x1b[".-$lineDiff.'A';
+        }
+        $buffer .= "\r";
+        // Render changed lines
+        $renderEnd = min($lastChanged, \count($newLines) - 1);
+        for ($i = $firstChanged; $i <= $renderEnd; ++$i) {
+            if ($i > $firstChanged) {
+                $buffer .= "\r\n";
+            }
+            $buffer .= "\x1b[2K";
+            $line = $this->prepareLine($newLines->getLine($i));
+            $lineWidth = null;
+            $lineLength = \strlen($line);
+            if ($lineLength === strcspn($line, "\x1b\t") && $lineLength === strspn($line, self::PRINTABLE_ASCII)) {
+                $lineWidth = $lineLength;
+            } elseif (!AnsiUtils::containsImage($line)) {
+                $lineWidth = AnsiUtils::visibleWidth($line);
+            }
+            if (null !== $lineWidth && $lineWidth > $width) {
+                // Restore the cursor and end synchronized output before throwing so the
+                // terminal is left neither in buffered mode nor without a cursor
+                if ($this->showHardwareCursor) {
+                    $buffer .= "\x1b[?25h";
+                }
+                $buffer .= "\x1b[?2026l";
+                $this->terminal->write($buffer);
+                $this->hardwareCursorRow = $i;
+                // Force a full re-render with screen clear on next call
+                // since the screen is now in a partially updated state
+                $this->previousLines = null;
+                $this->previousWidth = -1;
+                // Strip ANSI codes for readable debug output
+                $plainLine = preg_replace('/\x1b(?:\[[0-9;]*[a-zA-Z]|\][^\x07]*\x07)/', '', $line);
+                $preview = mb_substr($plainLine, 0, 100);
+                throw new RenderException(\sprintf("Rendered line %d exceeds terminal width (%d > %d).\nLine preview: \"%s\"%s.", $i, $lineWidth, $width, $preview, mb_strlen($plainLine) > 100 ? '...' : ''), $i, $lineWidth, $width);
+            }
+            $buffer .= $line;
+        }
+        $finalCursorRow = $renderEnd;
+        if ($previousLineCount > \count($newLines)) {
+            $extraLines = $previousLineCount - \count($newLines);
+            $buffer .= str_repeat("\r\n\x1b[2K", $extraLines);
+            $buffer .= "\x1b[{$extraLines}A";
+        }
+        $this->terminal->write($buffer);
+        $this->hardwareCursorRow = $finalCursorRow;
+        $this->maxLinesRendered = max($this->maxLinesRendered, \count($newLines));
+        $this->scrollbackLineCount = max($this->scrollbackLineCount, $this->maxLinesRendered - $this->terminal->getRows());
+        $this->positionHardwareCursor($cursorPos, \count($newLines));
+        $this->terminal->write("\x1b[?2026l");
+        // Publish the content and the restored cursor together
+        $this->previousWidth = $this->terminal->getColumns();
+    }
+
+    /**
+     * @return array{row: int, col: int, shape: int, color: string|null}|null
+     */
+    private function findCursorPosition(LineBufferInterface $lines, ?int $firstRow = null, ?int $lastRow = null): ?array
+    {
+        $firstVisibleRow = max(0, \count($lines) - $this->terminal->getRows());
+        $firstRow = max($firstVisibleRow, $firstRow ?? $firstVisibleRow);
+        $lastRow = min(\count($lines) - 1, $lastRow ?? \count($lines) - 1);
+        for ($row = $lastRow; $row >= $firstRow; --$row) {
+            $line = $lines->getLine($row);
+            $markerIndex = strpos($line, AnsiUtils::CURSOR_MARKER_PREFIX);
+            if (false === $markerIndex || false === $endIndex = strpos($line, "\x07", $markerIndex)) {
+                continue;
+            }
+            $payload = explode(';', substr($line, $markerIndex + \strlen(AnsiUtils::CURSOR_MARKER_PREFIX), $endIndex - $markerIndex - \strlen(AnsiUtils::CURSOR_MARKER_PREFIX)), 2);
+            $color = isset($payload[1]) && preg_match('/^#[0-9a-f]{6}$/i', $payload[1]) ? strtolower($payload[1]) : null;
+
+            return ['row' => $row, 'col' => AnsiUtils::visibleWidth(substr($line, 0, $markerIndex)), 'shape' => (int) $payload[0], 'color' => $color];
+        }
+
+        return null;
+    }
+
+    /**
+     * The markers of the text drawn larger to draw, see TextMarkers::scaled(): all those on the screen, or only
+     * those covering the rows written again, the others being still drawn; the rows above them are not read, the
+     * markers of the last frame tell what is there.
+     *
+     * @return list<array{int, int, string}>
+     */
+    private function findScaledText(LineBufferInterface $lines, ?int $first = null, ?int $last = null): array
+    {
+        $visible = max(0, \count($lines) - $this->terminal->getRows());
+        if (null === $first) {
+            $this->scaledRows = [];
+        }
+        $from = max($visible, $first ?? $visible);
+        $to = min(\count($lines) - 1, $last ?? \count($lines) - 1);
+        // What the rows written again hold now, past the end nothing
+        foreach (array_keys($this->scaledRows) as $row) {
+            if ($row >= $from && $row <= $to || $row >= \count($lines) || $row < $visible) {
+                unset($this->scaledRows[$row]);
+            }
+        }
+        for ($row = $from; $row <= $to; ++$row) {
+            $line = $lines->getLine($row);
+            for ($at = 0; false !== $at = strpos($line, TextMarkers::SCALED_PREFIX, $at); $at = (int) $end) {
+                $start = $at + \strlen(TextMarkers::SCALED_PREFIX);
+                if (false === $end = strpos($line, "\x07", $start)) {
+                    break;
+                }
+                if (false !== $payload = base64_decode(substr($line, $start, $end - $start), true)) {
+                    $this->scaledRows[$row][] = [AnsiUtils::visibleWidth(substr($line, 0, $at)), $payload, preg_match('/\x1b\]66;s=(\d)/', $payload, $m) ? (int) $m[1] : 1];
+                }
+            }
+        }
+        ksort($this->scaledRows);
+        $found = [];
+        foreach ($this->scaledRows as $row => $texts) {
+            foreach ($texts as [$col, $payload, $scale]) {
+                // Its rows meet those written again
+                if ($row + $scale > $from && $row <= $to) {
+                    $found[] = [$row, $col, $payload];
+                }
+            }
+        }
+
+        return $found;
+    }
+
+    private function prepareLine(string $line): string
+    {
+        if (str_contains($line, "\t")) {
+            $line = self::expandTabs($line);
+        }
+        if (!str_contains($line, "\x1b")) {
+            return $line;
+        }
+        $markerIndex = strpos($line, AnsiUtils::CURSOR_MARKER_PREFIX);
+        if (false !== $markerIndex && false !== $endIndex = strpos($line, "\x07", $markerIndex)) {
+            $line = substr($line, 0, $markerIndex).substr($line, $endIndex + 1);
+        }
+        // The text drawn larger is drawn once the lines are, over the room kept for it
+        if (str_contains($line, TextMarkers::SCALED_PREFIX)) {
+            $line = (string) preg_replace('/\x1b_pi:s;[A-Za-z0-9+\/=]*\x07/', '', $line);
+        }
+        if (!str_contains($line, "\x1b") || AnsiUtils::containsImage($line)) {
+            return $line;
+        }
+        if (null !== $this->colorDepth) {
+            $line = $this->colorDepth->reduce($line);
+        }
+
+        return str_contains($line, "\x1b]8;") ? $line.AnsiUtils::SEGMENT_RESET : $line."\x1b[0m";
+    }
+
+    /**
+     * Replace tabs outside escape sequences with the spaces the layout counted for them.
+     *
+     * A terminal moves a tab to its next tab stop instead, which can push the rest of the line past the right edge and make the terminal wrap it.
+     */
+    private static function expandTabs(string $line): string
+    {
+        $spaces = str_repeat(' ', AnsiUtils::TAB_WIDTH);
+        if (!str_contains($line, "\x1b")) {
+            return str_replace("\t", $spaces, $line);
+        }
+        $result = '';
+        $length = \strlen($line);
+        for ($i = 0; $i < $length;) {
+            if ("\x1b" === $line[$i] && null !== $code = AnsiUtils::extractAnsiCode($line, $i)) {
+                $result .= $code['code'];
+                $i += $code['length'];
+                continue;
+            }
+            $text = strcspn($line, "\x1b", $i + 1) + 1;
+            $result .= str_replace("\t", $spaces, substr($line, $i, $text));
+            $i += $text;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Position the hardware cursor, set its shape, and manage visibility.
+     *
+     * @param array{row: int, col: int, shape: int, color: string|null}|null $cursorPos
+     */
+    private function positionHardwareCursor(?array $cursorPos, int $totalLines): void
+    {
+        // The text drawn larger, over the rows it covers, written and erased before it
+        if ($this->scaledText && $totalLines > 0) {
+            $buffer = '';
+            foreach ($this->scaledText as [$row, $col, $payload]) {
+                $delta = min($row, $totalLines - 1) - $this->hardwareCursorRow;
+                $buffer .= ($delta > 0 ? "\x1b[{$delta}B" : ($delta < 0 ? "\x1b[".-$delta.'A' : ''))."\x1b[".($col + 1).'G'.$payload;
+                $this->hardwareCursorRow += $delta;
+            }
+            $this->terminal->write($buffer);
+        }
+        $this->scaledText = [];
+        if (null === $cursorPos || $totalLines <= 0) {
+            $this->terminal->hideCursor();
+            $this->restoreCursorColor();
+
+            return;
+        }
+        $targetRow = max(0, min($cursorPos['row'], $totalLines - 1));
+        $targetCol = max(0, $cursorPos['col']);
+        $rowDelta = $targetRow - $this->hardwareCursorRow;
+        $buffer = '';
+        if ($rowDelta > 0) {
+            $buffer .= "\x1b[{$rowDelta}B";
+        } elseif ($rowDelta < 0) {
+            $buffer .= "\x1b[".-$rowDelta.'A';
+        }
+        // Move to absolute column (1-indexed)
+        $buffer .= "\x1b[".($targetCol + 1).'G';
+        // Set cursor shape via DECSCUSR (Set Cursor Style)
+        $buffer .= "\x1b[".$cursorPos['shape'].' q';
+        // The color of the caret, OSC 12, or the terminal's own color back, OSC 112
+        if ($cursorPos['color'] !== $this->cursorColor) {
+            $buffer .= null !== $cursorPos['color'] ? "\x1b]12;".$cursorPos['color']."\x07" : "\x1b]112\x07";
+            $this->cursorColor = $cursorPos['color'];
+        }
+        $this->terminal->write($buffer);
+        $this->hardwareCursorRow = $targetRow;
+        if ($this->showHardwareCursor) {
+            $this->terminal->showCursor();
+        } else {
+            $this->terminal->hideCursor();
+        }
+    }
+}

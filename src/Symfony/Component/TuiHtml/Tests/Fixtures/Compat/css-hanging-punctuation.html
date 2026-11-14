@@ -1,0 +1,14 @@
+<!-- covers: css.properties.hanging-punctuation -->
+<style>
+  p { padding: 0 2ch; border: 1px solid; max-width: 24ch; margin: 0 }
+  .hang { hanging-punctuation: first last }
+  .end { hanging-punctuation: first allow-end }
+</style>
+<p>“Without it, the quote starts the text.”</p>
+<p class="hang">“With first, the quote goes over the padding.”</p>
+<p>aaaa bbbb cccc dd.”</p>
+<p class="hang">aaaa bbbb cccc dd.”</p>
+<p class="end">(Brackets too, and allow-end.)</p>
+<p class="hang">No punctuation at its ends</p>
+<p>Lorem ipsum dolors, amet consectetur.</p>
+<p class="end">Lorem ipsum dolors, amet consectetur.</p>

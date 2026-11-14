@@ -1,0 +1,63 @@
+┌────┐ Ada Lovelace wrote the first         ⟨33m┌──────────────┐⟨0m
+│ AL │ program, for an engine that was      ⟨33m│⟨0mA note floated⟨33m│⟨0m
+└────┘ never built; the text beside the     ⟨33m│⟨0mto the right  ⟨33m│⟨0m
+floats takes the room between them.         ⟨33m│⟨0mof the        ⟨33m│⟨0m
+Cleared below the left float, still beside  ⟨33m│⟨0marticle.      ⟨33m│⟨0m
+the note.                                   ⟨33m└──────────────┘⟨0m
+────────────────────────────────────────────────────────────
+Footer, below every float
+⟨48;2;55;65;81m        ⟨0m The text of a paragraph in a block flows around the
+⟨48;2;55;65;81m        ⟨0m float as well, under it once it ends.
+⟨48;2;55;65;81m        ⟨0m Nested further: around it too, as long as it lasts,
+⟨48;2;55;65;81m        ⟨0m then the whole width of the card once the float
+│ ends, its border showing again.
+Inbox                       14
+After text that wraps, on its
+last line                   99
+An inline element floated,                           [right]
+like the float-end of Bootstrap, at the side of its line,
+⟨4m[left]⟨0m the text around it flowing on.
+Two floats side by side, of 70% and 25%  │The aside, a
+of the block they are in, like the       │quarter of the
+columns of PHP.net                       │block
+Before a float
+
+after it, their margins collapsing, the float beside     [x]
+this line
+
+ Download   API Documentation
+ Blog   Browser Support
+ Version Support
+Floats too wide for the room beside the others go below
+them, like a menu of jQuery, not squeezed
+ A
+ B, too wide, below        C
+The float after one moved below goes beside it, not above it
+┌─────────────────────────┐
+│a wide float             │
+└─────────────────────────┘
+Words too long for the room
+beside the float go below it
+┌──────────────────────────────────────────────────────────┐
+│A menu floated in a block of its         search, beside it│
+│own                                                       │
+└──────────────────────────────────────────────────────────┘
+a float      beside it, an empty block no content of the one
+before
+A flex item keeps its float B
+┌────────┐┌────────┐┌────────┐┌────────┐┌────────┐┌────────┐
+│Python  ││PSF     ││Docs    ││PyPI    ││Jobs    ││Communit│
+└────────┘└────────┘└────────┘└────────┘└────────┘│y       │
+                                                  └────────┘
+Six tabs of a sixth of the row each, against each other, the
+row of them as wide as the block, like python.org
+[logo]
+                                      A tagline at the right
+A menu whose ::before clears, like that of SQLite: below the
+floats
+[logo] A formatting context of its own whose ::before
+clears: beside the float still
+A floated ::before that clears: only it moves, this      [R]
+beside the float
+                                                         [R]
+A clear of its own and a ::before that clears both: below

@@ -279,6 +279,18 @@ class TextWrapperTest extends TestCase
         ]];
     }
 
+    public function testASoftHyphenBreaksOnlyWithRoomForTheHyphen()
+    {
+        $this->assertSame(['ab hy-', 'phenation'], TextWrapper::wrapTextWithAnsi("ab hy\u{00AD}phen\u{00AD}ation", 9), 'hyphen- would not fit.');
+        $this->assertSame(['ab hyphen-', 'ation'], TextWrapper::wrapTextWithAnsi("ab hy\u{00AD}phen\u{00AD}ation", 10));
+    }
+
+    public function testAWordJoinerKeepsCjkCharactersTogether()
+    {
+        $this->assertSame(['あい', "東\u{2060}京", 'かき'], TextWrapper::wrapTextWithAnsi("あい東\u{2060}京かき", 4));
+        $this->assertSame(['あ', "い\u{2060}\e[1m東\e[22m", 'かき'], TextWrapper::wrapTextWithAnsi("あい\u{2060}\e[1m東\e[22mかき", 4), 'Across styles too.');
+    }
+
     /**
      * @param list<string> $expected
      */
@@ -402,19 +414,43 @@ class TextWrapperTest extends TestCase
         $this->assertSame([$thumbs.$thumbs, $thumbs], TextWrapper::wrapTextWithAnsi($thumbs.$thumbs.$thumbs, 4));
     }
 
-    public function testStyleEndingAtWrapIsNotCarriedToNextLine()
+    public function testWrapTextWithAnsiWidths()
     {
-        $this->assertSame(["ab \e[4mcd\e[24m", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e[4mcd\e[24m ef", 5));
-        $this->assertSame(["ab \e[44;4mcd\e[24;49m", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e[44;4mcd\e[24;49m ef", 5));
-        $this->assertSame(["ab \e[4mcd\e[24m"], TextWrapper::wrapTextWithAnsi("ab \e[4mcd\e[24m ", 5));
+        $widths = static fn (int $line): int => $line < 2 ? 10 : 20;
+
+        $this->assertSame(['one two', 'three four', 'five six seven eight', 'nine'], TextWrapper::wrapTextWithAnsiWidths('one two three four five six seven eight nine', $widths));
+        $this->assertSame(['ab', 'cd', 'efghijkl'], TextWrapper::wrapTextWithAnsiWidths("ab\ncd\nefghijkl", $widths), 'The lines after a line break count too.');
+        $this->assertSame(['abcd', 'efgh', 'ijkl', 'mn'], TextWrapper::wrapTextWithAnsiWidths('abcdefghijklmn', static fn (int $line): int => 0 === $line ? 6 : 4), 'A long word broken in pieces that fit every line it lands on: none cut.');
+        $this->assertSame(['ab', 'cdef', 'ghi'], TextWrapper::wrapTextWithAnsiWidths('ab cdefghi', static fn (int $line): int => 0 === $line ? 8 : 4), 'A word moved to a narrower line is broken there.');
+        $this->assertSame(["\e[31mred red", "\e[31mred red red\e[0m"], TextWrapper::wrapTextWithAnsiWidths("\e[31mred red red red red\e[0m", static fn (int $line): int => 0 === $line ? 8 : 20));
     }
 
-    public function testStyleStartingInWhitespaceAtWrapGoesOnWithNextWord()
+    public function testSoftHyphenBreakShowsTheHyphen()
     {
+        $this->assertSame(['Configu-', 'ration'], TextWrapper::wrapTextWithAnsi("Configu\u{00AD}ration", 8));
+        $this->assertSame(['Configu=', 'ration'], TextWrapper::wrapTextWithAnsi("Configu\u{00AD}ration", 8, '='));
+        $this->assertSame(['Configu', 'ration'], TextWrapper::wrapTextWithAnsi("Configu\u{00AD}ration", 8, ''), 'An empty string shows nothing.');
+        $this->assertSame(['Configu', 'ration'], TextWrapper::wrapTextWithAnsi("Configu\u{00AD}ration", 8, '‐‐'), 'A hyphen that does not fit is left out.');
+        $this->assertSame(['Configu=', 'ration'], TextWrapper::wrapTextWithAnsiWidths("Configu\u{00AD}ration", static fn (int $line): int => 8, '='));
+    }
+
+    public function testARowWithoutRoomStaysEmpty()
+    {
+        $widths = [3, 0, 0, 3];
+        $this->assertSame(['aaa', '', '', 'bbb', 'ccc'], TextWrapper::wrapTextWithAnsiWidths('aaa bbb ccc', static fn (int $row): int => $widths[min($row, 3)]), 'Like the line boxes of CSS moving down past floats as wide as the line.');
+        $this->assertSame(['aa', '', 'bb'], TextWrapper::wrapTextWithAnsiWidths("aa\nbb", static fn (int $row): int => 1 === $row ? 0 : 5), 'A paragraph starting on such a row starts below it.');
+    }
+
+    public function testAStyleEndingWhereTheLineBreaksIsNotCarriedToTheNextLine()
+    {
+        // The codes that end the underline come before the space the line breaks at
+        $this->assertSame(["ab \e[4mcd\e[24m", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e[4mcd\e[24m ef", 5));
+        $this->assertSame(["ab \e[44;4mcd\e[24;49m", 'ef'], TextWrapper::wrapTextWithAnsi("ab \e[44;4mcd\e[24;49m ef", 5));
+        // A style starting in the space goes on with the next word
         $this->assertSame(["ab\e[1m", "\e[1mef\e[22m"], TextWrapper::wrapTextWithAnsi("ab \e[1m ef\e[22m", 3));
     }
 
-    public function testLinkThatWrapsIsClosedAndReopenedOnEachLine()
+    public function testALinkThatWrapsIsClosedAndOpenedAgainOnEachLine()
     {
         $this->assertSame(
             ["see \e]8;;https://x.org\x07the\e]8;;\x07", "\e]8;;https://x.org\x07link text\e]8;;\x07", 'end'],

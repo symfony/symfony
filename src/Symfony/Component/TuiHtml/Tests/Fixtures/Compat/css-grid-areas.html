@@ -1,0 +1,44 @@
+<!-- covers: css.properties.grid-template-areas css.properties.grid-area css.properties.grid-template-rows css.properties.grid-row css.properties.grid-row-start css.properties.grid-row-end -->
+<!-- variant: narrow columns=40 -->
+<style>
+  .page { display: grid; grid-template-areas: "head head" "side main" "side foot"; grid-template-columns: 12ch 1fr; grid-template-rows: auto 3 auto; gap: 0 1ch }
+  .page > * { border: 1px solid }
+  header { grid-area: head }
+  aside { grid-area: side }
+  main { grid-area: main }
+  footer { grid-area: foot }
+  .lines { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 1ch }
+  .lines > p { background: blue }
+  .tall { grid-row: 1 / span 2; grid-column: 3 }
+  .named { display: grid; grid-template-columns: [full-start] 4ch [content-start] 1fr [content-end] 4ch [full-end]; gap: 0 1ch }
+  .named > * { background: #374151 }
+  .named .bleed { grid-column: full-start / full-end }
+  .named .body { grid-column: content }
+  .start { grid-row-start: 2; grid-column-start: 1 }
+  .end { grid-row-end: 3 }
+  .repeat { display: grid; grid-template-columns: repeat(3, [col] 6ch) [last] 1fr; gap: 0 1ch }
+  .repeat > * { background: #374151 }
+  .second { grid-column: col 2 / last }
+  .from-end { grid-column: col -1 }
+  .to-last { grid-column: col 1 / span last }
+  .back-to-col { grid-column: span col / last }
+  .from-end-span { grid-column: -4 / span col }
+  .fill { display: grid; grid-template-columns: [edge] 4ch repeat(auto-fill, [cell] 8ch) [tail] 4ch; gap: 0 1ch }
+  .fill > * { background: #374151 }
+  .cells { grid-column: cell 2 / cell 4 }
+  .tail { grid-column: tail }
+  .edge { grid-column: edge }
+</style>
+<div class="page">
+  <header><p>Header</p></header>
+  <aside><p>Side</p><p>spans two rows</p></aside>
+  <main><p>Main</p></main>
+  <footer><p>Footer</p></footer>
+</div>
+<div class="lines">
+  <p>a</p><p class="tall">tall</p><p>b</p><p class="start">row 2</p><p class="end">c</p>
+</div>
+<div class="named"><p class="bleed">full-start / full-end</p><p class="body">content: its start and end lines</p></div>
+<div class="repeat"><p class="second">from the second col to last</p><p class="from-end">col -1</p><p>after</p></div>
+<div class="repeat"><p class="to-last">span last: from col 1 to the last</p><p class="back-to-col">span col</p><p class="from-end-span">-4 / span col</p></div>
+<div class="fill"><p class="edge">e</p><p class="cells">cell 2 to cell 4</p><p class="tail">t</p></div>

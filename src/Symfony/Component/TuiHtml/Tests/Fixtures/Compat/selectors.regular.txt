@@ -1,0 +1,57 @@
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨1;3;37mtype + class⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;4;37mid⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;33mattribute⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;36mdescendant⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;32mchild⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;37ma⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;35mnext sibling⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;37mb⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;37mx⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;34msubsequent sibling⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;31mlist x⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;31mlist y⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨1;3;37mis⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;91mwhere⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨2;3;37mnot⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ┌────────────────────────────────────────────────────────┐⟨0m
+⟨37m │                                                        │⟨0m
+⟨37m │⟨0m⟨3;37mhas⟨0m                                                     ⟨37m│⟨0m
+⟨37m │                                                        │⟨0m
+⟨37m └────────────────────────────────────────────────────────┘⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨32m1. first⟨0m
+⟨37m ⟨0m⟨4;37m2. second⟨0m
+⟨37m ⟨0m⟨1;37m3. third⟨0m
+⟨37m ⟨0m⟨31m4. last⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨1;37m• only⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨1;36mterm 1⟨0m
+⟨37m ⟨0m⟨2;37m  def 1⟨0m
+⟨37m ⟨0m⟨1;9;37mterm 2⟨0m
+⟨37m ⟨0m⟨33m  def 2⟨0m
+⟨37m                                                           ⟨0m
+⟨37m      ⟨0m⟨3;37monly of type⟨0m                                    ⟨37m     ⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;37mA paragraph without a class: neither [class] nor .p       ⟨0m
+⟨37m ⟨0m⟨3;37mmatches it⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨1;37mNor a heading⟨0m
+⟨37m                                                           ⟨0m
+⟨37m ⟨0m⟨3;4;31mOne of class p: red⟨0m

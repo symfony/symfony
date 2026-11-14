@@ -1,0 +1,26 @@
+<!-- covers: css.selectors.before css.selectors.after css.properties.padding -->
+<style>
+  .breadcrumb { display: flex; list-style: none; padding: 0; margin: 0 0 1 }
+  .breadcrumb li + li { padding-left: 1ch }
+  .breadcrumb li + li::before { float: left; padding-right: 1ch; content: "/"; color: gray }
+  .tag::before { content: "new"; padding: 0 1ch; background: blue; color: white }
+  b::after { content: "*"; padding-left: 1ch }
+  .flexed ul { display: flex; list-style: none; padding: 0 } .flexed li { display: flex } .flexed a { display: flex; padding: 0 1ch }
+  .flexed li + li::before { content: "→"; color: gray }
+  .boxed li + li::before { content: "then" }
+  .marked li + li::before { content: "and " }
+  .crumbs span:not(:last-child)::after { content: "/"; margin: 0 1ch; color: gray }
+</style>
+<ol class="breadcrumb"><li>Home</li><li>Library</li><li>Data</li></ol>
+<p class="tag">A label before the text, in its padding</p>
+<p>Some <b>bold</b> text with a mark after it.</p>
+<nav class="flexed"><ul><li><a href="#">Bulma</a></li><li><a href="#">Docs</a></li><li><a>Breadcrumb</a></li></ul></nav>
+<ul class="boxed"><li><div>An item starting with a box</div></li><li><div>its ::before on a line of its own</div></li></ul>
+<ul class="marked"><li>A text item</li><li>its marker kept beside its ::before</li></ul>
+<p class="crumbs"><span>Home</span><span>Features</span><span>its margins around the slash</span></p>
+<style>.zw li::before { float: left; content: "\200B" } .zw { list-style: none; display: flex; align-items: center; gap: 1ch; padding: 0 }</style>
+<ul class="zw"><li>Text</li><li><a href="#" style="display: inline-block; border: 1px solid">A box after an invisible ::before, like the nav of Pico</a></li></ul>
+<style>.crumbs { display: flex; list-style: none; padding: 0 } .crumbs li { display: flex } .crumbs li:not(:last-child)::after { content: ""; width: 1.25rem; background-color: #888 }</style>
+<ul class="crumbs"><li>Web</li><li>CSS</li><li>float: an empty ::after of a width keeps its room, like the chevrons of MDN drawn by a mask</li></ul>
+<style>.masked li:not(:last-child)::after { content: ""; width: 1.25rem; background-color: #888; mask-image: url(chevron.svg) }</style>
+<ul class="crumbs masked"><li>Web</li><li>CSS</li><li>masked by an image: no block of its color, only its room</li></ul>

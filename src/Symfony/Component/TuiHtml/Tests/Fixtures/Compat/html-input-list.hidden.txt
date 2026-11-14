@@ -1,0 +1,7 @@
+     ┌──────────────────────┐
+City │> l⟨2myon⟨0m                │ Size > 10
+     └──────────────────────┘
+
+The suggestions are listed over this text
+
+while the field has the focus.

@@ -1,0 +1,6 @@
+
+A ⟨4:3;58;5;1mmisspeled⟨0m word, a ⟨4:4;58;2;255;165;0mhint⟨0m and a ⟨4:2mdouble⟨0m line.
+
+⟨4:5;58;5;6mA dashed underline⟨0m
+⟨4:5;58;5;6mthat wraps onto the⟨0m
+⟨4:5;58;5;6mnext lines⟨0m

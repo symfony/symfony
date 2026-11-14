@@ -1,0 +1,15 @@
+<!-- covers: css.at-rules.layer -->
+<style>
+  @layer reset, theme, components;
+  @layer components { .card { border: 1px solid; color: green } }
+  @layer theme { #card.card.important { color: red; font-weight: bold !important } }
+  @layer reset { h1 { font-weight: normal } p { font-weight: normal !important } }
+  .card { padding: 0 1ch }
+</style>
+<main>
+  <h1>Not bold: the reset layer undoes the default style</h1>
+  <section id="card" class="card important">
+    <p>Green: components come after theme, whatever the specificity</p>
+    <p>Not bold: important in reset wins over important in theme</p>
+  </section>
+</main>

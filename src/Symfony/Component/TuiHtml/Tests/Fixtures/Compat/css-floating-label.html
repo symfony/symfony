@@ -1,0 +1,15 @@
+<!-- covers: css.properties.position -->
+<style>
+  .field { position: relative; margin-bottom: 1 }
+  .field input { border: 1px solid; padding: 1 1ch 0; width: 30ch }
+  .field label { position: absolute; top: 0; left: 0; padding: 0 1ch; border: 1px solid transparent; color: gray }
+  .bar { position: relative; background: blue; color: white }
+  .bar .count { position: absolute; top: 0; right: 0; padding: 0 1ch; color: yellow }
+  .page { background: white; color: black }
+  .host { position: relative }
+  .menu { position: absolute; top: 0; left: 2ch; margin: 0; padding: 0 1ch; list-style: none; background: white; border: 1px solid }
+  .drop { position: absolute; top: 0; left: 30ch } .drop > div { background: white; padding: 0 1ch }
+</style>
+<div class="field"><input id="e" value="me@example.com"><label for="e">Email address</label></div>
+<div class="bar">Inbox<span class="count">3</span></div>
+<div class="page"><div class="host"><div class="drop"><div>Its content painted</div></div><ul class="menu"><li>Action</li><li>Something else here</li></ul></div><p>Text under the menu of the color of the page, covered by it</p></div>

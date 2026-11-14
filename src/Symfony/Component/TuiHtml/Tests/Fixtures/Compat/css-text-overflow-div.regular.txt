@@ -1,0 +1,11 @@
+
+The text of a div is cut like that of a paragraph, like the
+file names of GitHub:
+
+⟨4m.git-blame-igno⟨0m…
+.php-cs-fixer.d…
+
+And clamped:
+
+One two three four
+five six seven eigh…

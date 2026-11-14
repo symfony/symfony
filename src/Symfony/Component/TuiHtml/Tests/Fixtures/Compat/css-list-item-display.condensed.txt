@@ -1,0 +1,8 @@
+  • A list item has a marker
+  a block has none, like a list group
+
+  Inbox                     ⟨37;44m 14⟨0m⟨44m ⟨0m
+  Sent                       ⟨37;44m 3⟨0m⟨44m ⟨0m
+
+  • The first block of an item carries its marker
+  not the next one

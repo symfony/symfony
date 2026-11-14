@@ -1,0 +1,12 @@
+┌──────────────────────────────────────────────────────────┐
+│⟨1;4mCard title⟨0m                                                │
+│⟨4mThe card is in a link: its text blocks are that link.⟨0m     │
+└──────────────────────────────────────────────────────────┘
+⟨4mCaption after the card⟨0m
+⟨1mBold text,⟨0m
+⟨1ma block in bold,⟨0m
+⟨1mmore bold text⟨0m
+A span
+holding a paragraph
+and its text after
+⟨3mInline nesting deeper stays in the line⟨0m

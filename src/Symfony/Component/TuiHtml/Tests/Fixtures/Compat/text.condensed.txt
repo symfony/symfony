@@ -1,0 +1,25 @@
+⟨1;36mHeading 1⟨0m
+⟨1;34mHeading 2⟨0m
+⟨1mHeading 3⟨0m
+⟨1;2mHeading 4⟨0m
+⟨1;2mHeading 5⟨0m
+⟨1;2;3mHeading 6⟨0m
+A paragraph with ⟨4ma link⟨0m, ⟨1mb⟨0m, ⟨1mstrong⟨0m, ⟨3mem⟨0m, ⟨3mi⟨0m, ⟨4mu⟨0m, ⟨4mins⟨0m, ⟨9ms⟨0m, ⟨9mdel⟨0m,
+⟨7mcode⟨0m, ⟨7mkbd⟨0m, ⟨1;7mmark⟨0m and ⟨2msmall⟨0m.
+After a line break.
+a span
+  preformatted
+    text
+⟨3m A quote⟨0m
+⟨90m────────────────────────────────────────────────────────────⟨0m
+• bullet
+• bullet
+3. three
+4. four
+⟨1mTerm⟨0m
+ Definition
+Caption
+42
+a tui-text that truncates instead of wrapping when it is ...
+⟨90m╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌⟨0m
+A rule given a border: the border is the rule

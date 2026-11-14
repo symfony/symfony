@@ -24,9 +24,10 @@ use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Loop\AdaptativeTicker;
 use Symfony\Component\Tui\Loop\TickRuntimeInterface;
 use Symfony\Component\Tui\Loop\TickScheduler;
+use Symfony\Component\Tui\Render\FrameWriterInterface;
 use Symfony\Component\Tui\Render\Renderer;
+use Symfony\Component\Tui\Render\RendererInterface;
 use Symfony\Component\Tui\Render\RenderRequestorInterface;
-use Symfony\Component\Tui\Render\ScreenWriter;
 use Symfony\Component\Tui\Render\WidgetRect;
 use Symfony\Component\Tui\Style\StyleSheet;
 use Symfony\Component\Tui\Terminal\Terminal;
@@ -62,8 +63,10 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
 {
     private ContainerWidget $root;
     private Keybindings $keybindings;
-    private Renderer $renderer;
-    private ScreenWriter $screenWriter;
+    private RendererInterface $renderer;
+    /** @var list<StyleSheet> */
+    private array $styleSheets = [];
+    private FrameWriterInterface $screenWriter;
     private WidgetTree $widgetTree;
     private FocusManager $focusManager;
     private TickScheduler $tickScheduler;
@@ -76,6 +79,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
 
     private bool $renderRequested = false;
     private bool $running = false;
+    private bool $started = false;
     private bool $stopped = false;
     private bool $ticking = false;
     private ?float $lastTickAt = null;
@@ -87,7 +91,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private ?Suspension $runSuspension = null;
 
     /**
-     * @param Renderer|null                 $renderer        @internal Override the default renderer; framework-internal use only
+     * @param RendererInterface|null        $renderer        @internal Override the default renderer; framework-internal use only
      * @param EventDispatcherInterface|null $eventDispatcher Reference dispatcher; the terminal must use the same instance
      */
     public function __construct(
@@ -95,7 +99,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         ?TerminalInterface $terminal = null,
         ?Keybindings $keybindings = null,
         ?FontRegistry $fontRegistry = null,
-        ?Renderer $renderer = null,
+        ?RendererInterface $renderer = null,
         ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->eventDispatcher = $eventDispatcher ?? $terminal?->getEventDispatcher() ?? new EventDispatcher();
@@ -108,7 +112,10 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $this->root = new ContainerWidget();
         $this->root->expandVertically(true);
         $this->renderer = $renderer ?? new Renderer($styleSheet, $fontRegistry);
-        $this->screenWriter = new ScreenWriter($this->terminal);
+        if (null !== $styleSheet) {
+            $this->styleSheets[] = clone $styleSheet;
+        }
+        $this->screenWriter = $this->renderer->createFrameWriter($this->terminal);
 
         // Share the KeyParser so Kitty protocol state is consistent
         $this->focusManager = new FocusManager(
@@ -117,10 +124,50 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
             eventDispatcher: $this->eventDispatcher,
         );
 
+        $this->focusManager->setPolicy($this->renderer instanceof Focus\FocusPolicyInterface ? $this->renderer : null);
+
         $this->widgetTree = new WidgetTree($this, $this->keybindings, $this->focusManager, $this->renderer, $this->terminal, $this->eventDispatcher);
         $this->widgetTree->setRoot($this->root);
         $this->tickScheduler = new TickScheduler();
         $this->adaptativeTicker = new AdaptativeTicker($this);
+    }
+
+    /**
+     * Selects the rendering backend before the first start.
+     *
+     * @return $this
+     */
+    public function setRenderer(RendererInterface $renderer): static
+    {
+        if ($this->started) {
+            throw new Exception\LogicException('The renderer must be selected before starting the TUI.');
+        }
+        foreach ($this->styleSheets as $styleSheet) {
+            $renderer->addStyleSheet($styleSheet);
+        }
+        $this->screenWriter->close();
+        $this->renderer = $renderer;
+        $clear = static function (AbstractWidget $widget) use (&$clear): void {
+            $widget->clearRenderCache();
+            if ($widget instanceof Widget\ParentInterface) {
+                foreach ($widget->all() as $child) {
+                    $clear($child);
+                }
+            }
+        };
+        $clear($this->root);
+        $this->screenWriter = $renderer->createFrameWriter($this->terminal);
+        $this->widgetTree->setRenderer($renderer);
+        $this->focusManager->setPolicy($renderer instanceof Focus\FocusPolicyInterface ? $renderer : null);
+        $this->root->invalidate();
+        $this->requestRender(true);
+
+        return $this;
+    }
+
+    public function getRenderer(): RendererInterface
+    {
+        return $this->renderer;
     }
 
     /**
@@ -182,6 +229,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
      */
     public function addStyleSheet(StyleSheet $styleSheet): static
     {
+        $this->styleSheets[] = clone $styleSheet;
         $this->renderer->addStyleSheet($styleSheet);
 
         return $this;
@@ -216,6 +264,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
      */
     public function start(): void
     {
+        $this->started = true;
         $this->running = true;
         $this->stopped = false;
         $this->lastTickAt = null;
@@ -297,6 +346,8 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
             $this->terminal->write("\r\n");
         }
 
+        $this->screenWriter->close();
+
         // Restore default cursor shape (DECSCUSR 0) and show cursor
         $this->terminal->write("\x1b[0 q");
         $this->terminal->showCursor();
@@ -330,6 +381,18 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     }
 
     /**
+     * Removes a listener registered with addListener().
+     *
+     * @return $this
+     */
+    public function removeListener(callable $listener): static
+    {
+        $this->eventDispatcher->removeListener($this->resolveEventClass($listener), $listener);
+
+        return $this;
+    }
+
+    /**
      * Register a listener for a TUI event.
      *
      * The event class is inferred from the listener's first parameter type hint:
@@ -343,7 +406,6 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
      * listening for a shared event type like CancelEvent.
      *
      * @param callable $listener The listener to invoke; its first parameter's type hint determines the event class
-     * @param int      $priority Higher = called earlier (default 0)
      *
      * @return $this
      */

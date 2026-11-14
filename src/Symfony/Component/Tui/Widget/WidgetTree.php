@@ -14,7 +14,7 @@ namespace Symfony\Component\Tui\Widget;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Tui\Focus\FocusManager;
 use Symfony\Component\Tui\Input\Keybindings;
-use Symfony\Component\Tui\Render\Renderer;
+use Symfony\Component\Tui\Render\RendererInterface;
 use Symfony\Component\Tui\Terminal\TerminalInterface;
 use Symfony\Component\Tui\Tui;
 
@@ -37,7 +37,7 @@ final class WidgetTree
         Tui $tui,
         Keybindings $keybindings,
         FocusManager $focusManager,
-        Renderer $renderer,
+        RendererInterface $renderer,
         TerminalInterface $terminal,
         EventDispatcherInterface $eventDispatcher,
     ) {
@@ -51,6 +51,11 @@ final class WidgetTree
             $this,
             $eventDispatcher,
         );
+    }
+
+    public function setRenderer(RendererInterface $renderer): void
+    {
+        $this->context->setRenderer($renderer);
     }
 
     public function setRoot(AbstractWidget $root): void

@@ -1,0 +1,19 @@
+<!-- covers: css.properties.content-visibility css.properties.contain-intrinsic-size css.properties.contain-intrinsic-width css.properties.contain-intrinsic-height css.properties.contain-intrinsic-inline-size css.properties.contain-intrinsic-block-size css.properties.contain -->
+<style>
+  .skipped { content-visibility: hidden; border: 1px solid }
+  .sized { contain-intrinsic-size: auto 12ch 2 }
+  .longhands { contain-intrinsic-inline-size: 6ch; contain-intrinsic-block-size: 1 }
+  .width { contain-intrinsic-width: 20ch; contain-intrinsic-height: none }
+  .text { content-visibility: hidden; border: 1px solid cyan; padding: 0 1ch }
+  .shown { content-visibility: auto; color: green }
+  .contained { contain: size; contain-intrinsic-size: 24ch 1; border: 1px solid }
+  .hinted { contain: layout paint }
+</style>
+<div class="skipped"><p>Never drawn</p></div>
+<div class="skipped sized"><p>Never drawn</p></div>
+<div class="skipped longhands"><p>Never drawn</p></div>
+<div class="skipped width"><p>Never drawn</p></div>
+<p class="text">The text is skipped too</p>
+<p class="shown">auto: drawn, like visible</p>
+<div class="contained"><p>contain: size, drawn in its intrinsic size and cut at it</p><p>this line cut away</p></div>
+<div class="hinted"><p>contain: layout paint, hints changing nothing</p></div>

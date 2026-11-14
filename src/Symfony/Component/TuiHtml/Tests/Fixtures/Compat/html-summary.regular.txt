@@ -1,0 +1,13 @@
++ ⟨1;38;2;96;165;250mA question with a + marker⟨0m
+− ⟨1;38;2;96;165;250mAn open one, with a − marker⟨0m
+
+Shown.
+
+⟨1;4mNo marker at all⟨0m
+▼ ⟨1mpub fn new(), like rustdoc: its source a⟨0m... ⟨1m1.0.0 · Source⟨0m
+
+Constructs a new value.
+
+An open disclosure whose summary is display: none: its
+content alone, like the descriptions of rustdoc without
+scripts.

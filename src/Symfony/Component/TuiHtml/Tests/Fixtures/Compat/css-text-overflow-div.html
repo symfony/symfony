@@ -1,0 +1,10 @@
+<!-- covers: css.properties.text-overflow css.properties.line-clamp -->
+<style>
+  .truncate { width: 16ch; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+  .clamp { width: 20ch; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden }
+</style>
+<p>The text of a div is cut like that of a paragraph, like the file names of GitHub:</p>
+<div class="truncate"><a href="#f">.git-blame-ignore-revs</a></div>
+<div class="truncate">.php-cs-fixer.dist.php</div>
+<p>And clamped:</p>
+<div class="clamp">One two three four five six seven eight nine ten eleven twelve</div>

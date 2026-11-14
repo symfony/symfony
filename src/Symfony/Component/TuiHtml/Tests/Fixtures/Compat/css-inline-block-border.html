@@ -1,0 +1,17 @@
+<!-- covers: css.properties.display -->
+<style>
+  .btn { display: inline-block; border: 1px solid; border-radius: 4px; padding: 0 1ch }
+  .badge { display: inline-block; padding: 0 1ch; background: blue; color: white }
+  .code { display: inline-flex; border: 0 solid; overflow-x: auto }
+  code { border: 1px solid }
+  @media screen { kbd { border: 1px solid } }
+  .tag { display: inline-block; border: 1px solid rgb(0 0 0 / 10%); padding: 0 1ch }
+  .wiki code, .wiki kbd { display: inline-block; padding: 0 1ch; border-width: 0 }
+</style>
+<p>A paragraph, then a link like a button:</p>
+<a href="#go" class="btn">Go somewhere</a>
+<p>In a line: <a href="#a" class="btn">One</a> <a href="#b" class="btn">Two</a> and text after them.</p>
+<p>A badge without a border stays in the text: <span class="badge">new</span>.</p>
+<p>A border of no width is none, like the preflight of Tailwind: <code class="code">routes</code> stays in the text.</p>
+<p class="wiki">A border a later rule takes away is none too, like the Arch Wiki: <code>sshd.socket</code> and <kbd>Ctrl</kbd> stay in the text.</p>
+<p>A border of a color with spaces is a border: <span class="tag">tag</span> boxed.</p>

@@ -1,0 +1,8 @@
+
+⟨33mFollows the terminal: blue when light, yellow when dark⟨0m
+
+⟨33mAlways dark: yellow⟨0m
+
+⟨34mAlways light: blue⟨0m
+
+⟨33mBoth: follows the terminal⟨0m

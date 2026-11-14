@@ -1,0 +1,13 @@
+<!-- covers: css.properties.margin-top -->
+<style>
+  .page { background: #224; color: white }
+  .row { display: flex; flex-wrap: wrap; gap: 2ch; margin-top: -1 }
+  .row > * { margin-top: 1; border: 1px solid }
+  .panel { background: #224; margin-top: -1; color: yellow }
+</style>
+<div class="page">
+  <h1>A heading over a row of cards</h1>
+  <div class="row"><div>One</div><div>Two</div></div>
+  <p>A line the panel below is pulled over, its text drawn over this one</p>
+  <div class="panel">Panel</div>
+</div>

@@ -40,7 +40,7 @@ use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class Renderer implements WidgetRendererInterface
+final class Renderer implements WidgetRendererInterface, RendererInterface
 {
     private StyleSheet $styleSheet;
     private FontRegistry $fontRegistry;
@@ -85,6 +85,21 @@ final class Renderer implements WidgetRendererInterface
     /**
      * Add a stylesheet.
      */
+    public function resolveElement(AbstractWidget $widget, string $element): Style
+    {
+        return $this->styleSheet->resolveElement($widget, $element);
+    }
+
+    public function invalidateStyles(): void
+    {
+        $this->styleCache = new \WeakMap();
+    }
+
+    public function createFrameWriter(\Symfony\Component\Tui\Terminal\TerminalInterface $terminal): FrameWriterInterface
+    {
+        return new ScreenWriter($terminal);
+    }
+
     public function addStyleSheet(StyleSheet $styleSheet): void
     {
         $this->styleSheet->merge($styleSheet);

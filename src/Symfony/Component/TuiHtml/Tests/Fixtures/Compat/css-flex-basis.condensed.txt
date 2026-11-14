@@ -1,0 +1,12 @@
+⟨44m12 columns  ⟨0m ⟨44m12 columns  ⟨0m
+⟨44m            ⟨0m ⟨44mtoo         ⟨0m
+⟨44m20 + half the rest                     ⟨0m ⟨44mhalf the rest       ⟨0m
+⟨44m8 wide  ⟨0m          ⟨44mafter   ⟨0m
+⟨44m        ⟨0m          ⟨44mthe gap ⟨0m
+⟨44m        ⟨0m          ⟨44m        ⟨0m
+⟨44m30% of the row   ⟨0m ⟨44m30% too          ⟨0m
+flex: none and a width: that width, its basis, like the
+slides of a carousel, not the width of its content
+┌──────────────────┐┌──────────────────┐
+│slide one         ││slide two         │
+└──────────────────┘└──────────────────┘

@@ -1,0 +1,9 @@
+<!-- covers: css.properties.inset -->
+<style>
+  .box { position: relative; margin: 1 4ch; border: 1px solid }
+  .tl { position: absolute; top: 0; left: 0; color: red }
+  .br { position: absolute; bottom: 0; right: 0; color: green }
+</style>
+<p>The insets are from inside the border of the box, past its margin:</p>
+<div class="box"><p>first line of the box</p><p>second line</p><span class="tl">TL</span><span class="br">BR</span></div>
+<p>after</p>

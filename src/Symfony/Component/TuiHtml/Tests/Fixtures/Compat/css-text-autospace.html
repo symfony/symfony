@@ -1,0 +1,12 @@
+<!-- covers: css.properties.text-autospace -->
+<style>
+  .on { text-autospace: normal }
+  .digits { text-autospace: ideograph-numeric }
+  .letters { text-autospace: ideograph-alpha insert }
+  .off { text-autospace: no-autospace }
+</style>
+<p>默认HTML5不加空格 (off by default)</p>
+<p class="on">在Symfony 8中使用TUI组件<b>CSS</b>样式</p>
+<p class="digits">只有数字2026年, not Latin</p>
+<p class="letters">只有Latin字母, 不是2026年</p>
+<section class="on"><p>继承inherit的</p><p class="off">关闭off了</p></section>

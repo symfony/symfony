@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add renderer, frame writer and focus policy extension contracts
+ * Add bidirectional text handling and ANSI text measurement and wrapping helpers
+
 8.2
 ---
 

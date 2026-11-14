@@ -1,0 +1,20 @@
+<!-- covers: html.elements.meta -->
+<!-- variant: light scheme=light -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="color-scheme" content="sepia">
+  <meta name="color-scheme" content="light">
+  <meta name="color-scheme" content="dark">
+  <style>
+    p { color: light-dark(blue, yellow) }
+    .dark { color-scheme: dark }
+  </style>
+</head>
+<body>
+  <p>Blue in both schemes: the first valid meta says light only</p>
+  <div class="dark"><p>Yellow: a color-scheme rule wins over it</p></div>
+</body>
+</html>

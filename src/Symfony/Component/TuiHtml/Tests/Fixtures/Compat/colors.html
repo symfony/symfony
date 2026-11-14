@@ -1,0 +1,42 @@
+<!-- covers: css.properties.color css.properties.background css.properties.background-color css.types.color.named-color css.types.color.rgb css.types.color.hsl css.types.color.light-dark css.types.color.color-mix css.types.color.contrast-color css.properties.custom-property css.properties.important css.properties.opacity css.properties.filter html.global_attributes.style css.types.var css.types.color css.types.percentage css.types.length-percentage -->
+<!-- variant: light scheme=light -->
+<!-- variant: forced forced-colors -->
+<style>
+  :root { --accent: cyan; --brand: var(--accent) }
+  .ansi { color: bright-red }
+  .palette { color: 208 }
+  .shade { color: emerald-500 }
+  .hex { color: #ff8800 }
+  .rgb { color: rgb(10 200 30) }
+  .hsl { color: hsl(240 100% 50%) }
+  .scheme { color: light-dark(blue, yellow) }
+  .mix { color: color-mix(in srgb, red 50%, blue) }
+  .contrast { --badge: light-dark(navy, gold); background: var(--badge); color: contrast-color(var(--badge)) }
+  .var { color: var(--brand) }
+  .fallback { color: var(--missing, magenta) }
+  .bg { background-color: blue }
+  .bgshort { background: url(x.png) green }
+  .imp { color: red !important }
+  #imp { color: green }
+  .dim { opacity: 0.4 }
+  .inv { filter: invert(1) }
+</style>
+<main>
+  <p class="ansi">ansi name</p>
+  <p class="palette">palette index</p>
+  <p class="shade">tailwind shade</p>
+  <p class="hex">hex</p>
+  <p class="rgb">rgb()</p>
+  <p class="hsl">hsl()</p>
+  <p class="scheme">light-dark()</p>
+  <p class="mix">color-mix()</p>
+  <p class="contrast">contrast-color()</p>
+  <p class="var">var()</p>
+  <p class="fallback">var() fallback</p>
+  <p class="bg">background-color</p>
+  <p class="bgshort">background</p>
+  <p class="imp" id="imp">important</p>
+  <p class="dim">opacity</p>
+  <p class="inv">filter invert</p>
+  <p style="color: red; --accent: green">inline style</p>
+</main>

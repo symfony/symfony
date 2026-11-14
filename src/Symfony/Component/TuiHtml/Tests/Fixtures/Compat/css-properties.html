@@ -1,0 +1,22 @@
+<!-- covers: css.properties.border-block css.properties.border-inline css.properties.border-block-start css.properties.border-block-end css.properties.border-inline-start css.properties.border-inline-end css.properties.font css.properties.flex-flow css.properties.place-items css.properties.place-content -->
+<style>
+  .block { border-block: 1px solid cyan }
+  .inline { border-inline: 1px double }
+  .starts { border-block-start: 1px solid; border-inline-start: 1px solid }
+  .ends { border-block-end: 1px solid; border-inline-end: 1px solid }
+  .font { font: italic bold 14px/1.5 Georgia, serif }
+  .flow { display: flex; flex-flow: column wrap }
+  .place { display: flex; flex-direction: column; place-items: center }
+  .content { display: flex; place-content: center end }
+  .content > p { flex: none }
+</style>
+<main>
+  <div class="block">border-block: top and bottom</div>
+  <div class="inline">border-inline: left and right</div>
+  <div class="starts">block-start and inline-start</div>
+  <div class="ends">block-end and inline-end</div>
+  <p class="font">font: italic bold</p>
+  <div class="flow"><p>flex-flow column a</p><p>flex-flow column b</p></div>
+  <div class="place"><p>place-items center</p></div>
+  <div class="content"><p>place-content end</p></div>
+</main>

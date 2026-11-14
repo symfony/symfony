@@ -1,0 +1,6 @@
+[ Menu ] [ Delete… ]
+
+The page under the popover and the dialog.
+
+⟨7m[ Help ]⟨0m
+⟨48;2;55;65;81m A tooltip, shown while Help is pointed at or focused ⟨0m

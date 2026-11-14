@@ -1,0 +1,15 @@
+<!-- covers: html.elements.datalist -->
+<!-- variant: typed focus=#city keys=l -->
+<!-- variant: moved focus=#city keys=l,down -->
+<!-- variant: taken focus=#city keys=l,down,enter -->
+<!-- variant: hidden focus=#city keys=l,escape -->
+<!-- variant: stepped focus=#size keys=up,up -->
+<!-- variant: number-list focus=#size keys=alt+down -->
+<style>input[list]:open { border-color: cyan }</style>
+<label for="city">City</label>
+<input id="city" list="cities" style="border: 1px solid; max-width: 24ch">
+<datalist id="cities"><option>Paris</option><option>Lyon</option><option>Lille</option><option value="Marseille"></datalist>
+<label for="size">Size</label> <input id="size" type="number" list="sizes" step="2" value="10" style="max-width: 8ch">
+<datalist id="sizes"><option>12</option><option>16</option><option>24</option></datalist>
+<p>The suggestions are listed over this text</p>
+<p>while the field has the focus.</p>

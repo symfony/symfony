@@ -1,0 +1,14 @@
+⟨36mheader⟨0m
+nav
+div in section in article
+⟨3maside⟨0m
+search
+
+• menu item
+
+⟨33mbonjour⟨0m
+
+                                               right to left
+
+left column                    right column
+⟨36mfooter, siblings wrapped in a body⟨0m

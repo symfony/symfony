@@ -1,0 +1,11 @@
+<!-- covers: css.selectors.first-child css.selectors.next-sibling css.selectors.nth-child css.selectors.has -->
+<style>
+  .a > p:first-child { color: green }
+  .b input + .unit { color: green }
+  .c > p:nth-child(2) { color: green }
+  .d:has(> b) { border: 1px solid }
+</style>
+<div class="a">Text before it is not an element: <p>the first child, green</p></div>
+<div class="b"><input aria-label="Weight" value="70"><span class="unit">kg, the next sibling of the input: green</span></div>
+<div class="c">Text <p>one</p> more text <p>two: the second child, green</p></div>
+<div class="d">An element in the text is a child: <b>bordered</b></div>

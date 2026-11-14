@@ -1,0 +1,17 @@
+⟨1;34m1. Intro⟨0m
+⟨1m1.a Why⟨0m
+⟨1m1.b How⟨0m
+⟨1;34m2. Usage⟨0m
+⟨1m2.a Install⟨0m
+Jump to nine (IX)
+⟨1;34m10. After the jump⟨0m
+1 One
+2 Two
+  2.1 Two one
+  2.2 Two two
+3 Three
+│ ⟨1mNote 1:⟨0m
+│ A block holding blocks draws its ::before and ::after on
+│ lines of their own.
+│ Like a browser.
+│ ⟨90m(end of note 1)⟨0m

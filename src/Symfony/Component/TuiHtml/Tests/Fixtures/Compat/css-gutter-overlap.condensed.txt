@@ -1,0 +1,6 @@
+⟨1;37;48;2;34;34;68mA heading over a row of cards⟨0m⟨48;2;34;34;68m                               ⟨0m
+⟨37;48;2;34;34;68m┌───┐  ┌───┐                                                ⟨0m
+⟨37;48;2;34;34;68m│One│  │Two│                                                ⟨0m
+⟨37;48;2;34;34;68m└───┘  └───┘                                                ⟨0m
+⟨37;48;2;34;34;68mA line the panel below is pulled over, its text drawn over  ⟨0m
+⟨33;48;2;34;34;68mPanel⟨0m⟨37;48;2;34;34;68mone⟨0m⟨48;2;34;34;68m                                                    ⟨0m

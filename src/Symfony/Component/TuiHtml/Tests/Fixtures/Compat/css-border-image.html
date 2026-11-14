@@ -1,0 +1,17 @@
+<!-- requires: GdImage -->
+<!-- covers: css.properties.border-image css.properties.border-image-source css.properties.border-image-slice css.properties.border-image-width css.properties.border-image-outset css.properties.border-image-repeat -->
+<!-- variant: forced forced-colors -->
+<style>
+  div { margin-bottom: 1; color: white }
+  .gradient { border: 1px solid; border-image: linear-gradient(to right, #ef4444, #3b82f6) 1 / 1px / 0 stretch; padding: 0 1ch }
+  .conic { border: 1px double; border-image-source: conic-gradient(#22c55e, #eab308, #22c55e); border-image-slice: 30% fill; border-image-repeat: round; height: 3 }
+  .image { border: 1px solid #808080; border-image: url(quadrants.png) 10 round; width: 28ch; height: 3 }
+  .none { border: 1px solid #808080; border-image: linear-gradient(red, blue) 1; }
+  .none.reset { border-image: none }
+  .borderless { border-image: linear-gradient(red, blue) 1 }
+</style>
+<div class="gradient">The lines take the colors, the text keeps its own</div>
+<div class="conic">Around the box</div>
+<div class="image">The average of the pixels</div>
+<div class="none reset">none: the border color</div>
+<div class="borderless">No border: nothing to color</div>

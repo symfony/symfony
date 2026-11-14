@@ -1,0 +1,12 @@
+
+Hovered, the box opens to its content through the heights
+between (see InterpolateSizeTest).
+
+┌────────────────────────────┐
+└────────────────────────────┘
+┌────────────────────────────┐
+│                            │
+│calc-size(auto, size) is as │
+│tall as its content         │
+│                            │
+└────────────────────────────┘

@@ -1,0 +1,23 @@
+<!-- covers: css.properties.margin-left css.properties.border -->
+<style>
+  .group { display: flex }
+  .group a { display: block; border: 1px solid; padding: 0 1ch }
+  .group a + a { margin-left: calc(-1 * 1px) }
+  .group a:first-child { border-radius: 4px 0 0 4px }
+  .group a:last-child { border-radius: 0 4px 4px 0 }
+  .pages { display: flex; padding: 0; list-style: none; margin: 1 0 0 }
+  .pages a { display: block; border: 1px solid; padding: 0 1ch }
+  .pages li + li a { margin-left: -1px }
+  .plain { display: flex; margin-top: 1 } .plain span + span { margin-left: -1px }
+  .list { width: 24ch; margin-top: 1 } .list div { border: 1px solid; padding: 0 1ch }
+  .list div + div { border-top-width: 0 } .list div + div.active { margin-top: -1px; border-top-width: 1px }
+  .accordion { width: 24ch; margin-top: 1 } .accordion div { border: 1px solid; border-bottom: 0; padding: 0 1ch } .accordion div:last-child { border-bottom: 1px solid }
+  .row { display: flex; margin-top: 1 } .row div { border: 1px solid; padding: 0 1ch } .row div + div { border-left-width: 0 }
+</style>
+<div class="group"><a>Left</a><a>Middle</a><a>Right</a></div>
+<ul class="pages"><li><a>Previous</a></li><li><a>1</a></li><li><a>2</a></li><li><a>Next</a></li></ul>
+<div class="plain"><span>no</span><span>border,</span><span>no pull</span></div>
+<div class="list"><div>An item</div><div class="active">the active one, over it</div><div>the next one</div></div>
+<div class="row"><div>side</div><div>by side,</div><div>no left border</div></div>
+<div class="accordion"><div>Accordion 1</div><div>its panel, no bottom border</div><div>Accordion 2</div></div>
+<ul style="list-style: none; padding: 0"><li><a style="display: block; border-bottom: 1px dotted; margin-bottom: -1px">Links of a menu, each over a border</a></li><li><a style="display: block; border-bottom: 1px dotted; margin-bottom: -1px">pulled by less than a cell</a></li><li><a style="display: block; border-bottom: 1px dotted; margin-bottom: -1px">not over the line: none to join</a></li></ul>

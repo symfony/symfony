@@ -1,0 +1,40 @@
+┌────────────┐ ┌───────────────────────┐
+│            │ │                       │
+│Side        │ │Title                  │
+│            │ │                       │
+│            │ │                       │
+│            │ │row when wide          │
+│            │ │                       │
+│            │ │                       │
+│            │ │extra                  │
+│            │ │                       │
+└────────────┘ └───────────────────────┘
+
+⟨32mgreen: the size     ⟨0m
+⟨32mcontainer outside   ⟨0m
+⟨32manswers min-height⟨0m
+
+⟨36mcyan: inline-size of⟨0m
+⟨36mthe inner one⟨0m
+
+┌──────────────────────────────────────┐
+│                                      │
+│ ⟨4munderlined: wide and of the warning⟨0m  │
+│ ⟨4mtone⟨0m                                 │
+│                                      │
+└──────────────────────────────────────┘
+
+┌──────────────────────────────────────┐
+│                                      │
+│ ⟨1;38;2;245;158;11mStyled by @container style(--tone:  ⟨0m │
+│ ⟨1;38;2;245;158;11mwarning)⟨0m                             │
+│                                      │
+└──────────────────────────────────────┘
+┌──────────────────────┐
+│                      │
+│⟨32mA container narrower  ⟨0m│
+│⟨32mthan its row is       ⟨0m│
+│⟨32mmeasured at its width:⟨0m│
+│⟨32mgreen⟨0m                 │
+│                      │
+└──────────────────────┘

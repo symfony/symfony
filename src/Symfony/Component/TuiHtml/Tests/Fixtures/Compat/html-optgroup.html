@@ -1,0 +1,19 @@
+<!-- covers: html.elements.select html.elements.optgroup html.elements.option -->
+<!-- variant: focus-scrolled focus=#lang -->
+<style>
+  select::group { color: cyan }
+</style>
+<select id="lang" aria-label="Language" size="6">
+  <optgroup label="Compiled">
+    <option>Rust</option>
+    <option>Go</option>
+  </optgroup>
+  <optgroup label="Interpreted">
+    <option selected>PHP</option>
+    <option>Python</option>
+  </optgroup>
+  <optgroup label="Disabled group" disabled>
+    <option>Hidden</option>
+  </optgroup>
+  <option>Ungrouped</option>
+</select>

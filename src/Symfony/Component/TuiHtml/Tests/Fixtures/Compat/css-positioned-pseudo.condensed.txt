@@ -1,0 +1,80 @@
+Hover me
+Under it: covered by the tooltip when it shows
+
+┌──────────────────────────────────────────────────────────┐
+│A badge in the corner of a box, inside its border    ⟨37;41mNEW⟨0m  │
+│holding blocks                                            │
+└──────────────────────────────────────────────────────────┘
+The text of the banner is in the flow
+⟨1;34mA heading ⟨0m⟨1;4;34mwhose link⟨0m⟨1;34m has a hidden mark taking no room⟨0m
+⟨1;4;34mA heading whose mark hangs in the margin, out of its line⟨0m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+⟨33mFixed⟨0m ⟨33mat⟨0m ⟨33mthe⟨0m ⟨33mbottom⟨0m ⟨33mof⟨0m ⟨33mthe⟨0m ⟨33mscreen⟨0m

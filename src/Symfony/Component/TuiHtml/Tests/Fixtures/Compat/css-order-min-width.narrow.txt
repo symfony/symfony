@@ -1,0 +1,28 @@
+
+⟨3mfirst       ⟨0m secon ⟨1mthird      ⟨0m
+⟨3m(italic)⟨0m     d     ⟨1m(bold)⟨0m
+
+
+⟨44mat least 24 columns wide⟨0m this
+⟨44m                        ⟨0m one
+⟨44m                        ⟨0m gives
+⟨44m                        ⟨0m way
+⟨44m                        ⟨0m when
+⟨44m                        ⟨0m the
+⟨44m                        ⟨0m row
+⟨44m                        ⟨0m is
+⟨44m                        ⟨0m narro
+⟨44m                        ⟨0m w
+
+
+┌──────────┐
+│twelve    │
+│wide      │
+└──────────┘
+
+first line
+
+second line
+
+
+a b c

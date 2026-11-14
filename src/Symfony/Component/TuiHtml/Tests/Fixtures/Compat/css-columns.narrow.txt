@@ -1,0 +1,38 @@
+• Apples⟨90m╎⟨0m • Dates ⟨90m╎⟨0m • Honeyd
+• Banana⟨90m╎⟨0m • Elderb⟨90m╎⟨0m   ew
+  s and ⟨90m╎⟨0m   erries⟨90m╎⟨0m   melons
+  cherri⟨90m╎⟨0m • Figs  ⟨90m╎⟨0m
+  es    ⟨90m╎⟨0m • Grapes⟨90m╎⟨0m
+
+┌────────────────────────────┐
+│⟨1;34mColumns⟨0m                     │
+│                            │
+│Text flows from the bottom  │
+│of one column to the top of │
+│the next, the columns       │
+│balanced like in a          │
+│newspaper.                  │
+│                            │
+└────────────────────────────┘
+┌────────────────────────────┐
+│One card                    │
+└────────────────────────────┘
+┌────────────────────────────┐
+│Two cards, kept whole       │
+└────────────────────────────┘
+┌────────────────────────────┐
+│Three                       │
+└────────────────────────────┘
+⟨1mOne⟨0m       ⟨1mTwo⟨0m       After a
+                    break.
+A chapter And ends
+starts a  it.
+column.
+
+one             ⟨1;2mHeading kept  ⟨0m
+two             ⟨1;2mwith its text⟨0m
+                its text
+                more
+first     fourth
+second
+third

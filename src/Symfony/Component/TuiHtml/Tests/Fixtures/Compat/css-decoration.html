@@ -1,0 +1,11 @@
+<!-- covers: css.properties.text-decoration css.properties.text-decoration-style css.properties.text-decoration-color -->
+<style>
+  .error { text-decoration: underline wavy red }
+  .dotted { text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: orange }
+  .double { text-decoration: underline double }
+  .wrap { text-decoration: underline dashed cyan; max-width: 20ch }
+</style>
+<main>
+  <p>A <span class="error">misspeled</span> word, a <span class="dotted">hint</span> and a <span class="double">double</span> line.</p> <!-- codespell:ignore misspeled -->
+  <p class="wrap">A dashed underline that wraps onto the next lines</p>
+</main>

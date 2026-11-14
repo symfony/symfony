@@ -1,0 +1,40 @@
+  Each line of a wrapped paragraph is centered on its own,
+        like in a browser, not the block as a whole.
+
+  Right aligned text keeps every line against the ⟨3mright⟨0m edge
+                                                 of its box.
+
+Justified  text  stretches  the  spaces between its words so
+
+that every line but the last fills the width.
+
+A forced break ends a paragraph line too.
+
+   short     beside it
+and centered
+
+   match-parent: on the right, the end of the parent, though
+                           this paragraph runs right to left
+
+inter-character spreads the room between the letters of each
+line instead of between its words.
+
+text-justify: none leaves these lines at the start, though
+they are justified.
+
+日 本語の文章は、単語の間
+に 空白がないので、文字の
+間を広げて行を揃えます。
+
+Each line of text and buttons
+  centered in its own room
+   [ One ][ Two ][ Three ]
+
+        Each line at the right
+       [ One ][ Two ][ Three ]
+
+                                       [ חלש ] טסקט
+
+ An auto margin of an inline
+       button is none
+            [ Go ]

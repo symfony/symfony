@@ -34,7 +34,7 @@ use Symfony\Component\Tui\Terminal\TerminalInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class ScreenWriter
+final class ScreenWriter implements FrameWriterInterface
 {
     private const PRINTABLE_ASCII = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 
@@ -60,6 +60,10 @@ final class ScreenWriter
         ?LineBufferDiffer $lineBufferDiffer = null,
     ) {
         $this->lineBufferDiffer = $lineBufferDiffer ?? new LineBufferDiffer();
+    }
+
+    public function close(): void
+    {
     }
 
     public function setShowHardwareCursor(bool $enabled): void

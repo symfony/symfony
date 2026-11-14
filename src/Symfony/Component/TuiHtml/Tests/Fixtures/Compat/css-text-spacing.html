@@ -1,0 +1,20 @@
+<!-- covers: css.properties.word-spacing css.properties.text-align-last css.properties.white-space-collapse -->
+<!-- variant: narrow columns=30 -->
+<style>
+  p { max-width: 40ch; margin-bottom: 1 }
+  .spaced { word-spacing: 2ch }
+  .spaced .tight { word-spacing: normal }
+  .wide { word-spacing: 3 }
+  .justified { text-align: justify; text-align-last: center }
+  .last-right { text-align-last: right }
+  .kept { white-space-collapse: preserve }
+  .kept-nowrap { white-space-collapse: collapse; text-wrap-mode: nowrap; text-overflow: ellipsis; overflow: hidden }
+</style>
+<p class="spaced">Words with two more columns between them.</p>
+<p class="spaced">Spaced, <em class="tight">but not in here,</em> then spaced.</p>
+<p>Normal, <em class="wide">three more in here,</em> then normal.</p>
+<p class="justified">A justified paragraph wraps over several lines, and its last line is centered by text-align-last.</p>
+<p class="last-right">A left-aligned paragraph whose last line goes to the right edge.</p>
+<p class="kept">kept    spaces,
+and the line break</p>
+<p class="kept-nowrap">collapsed    spaces on one line that does not wrap at all</p>

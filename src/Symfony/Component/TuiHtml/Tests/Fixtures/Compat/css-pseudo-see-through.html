@@ -1,0 +1,6 @@
+<!-- covers: css.selectors.before -->
+<style>
+  .cell { position: relative; border: 1px solid; padding-left: 10ch }
+  .cell::before { content: attr(data-label); position: absolute; top: 0; left: 0; width: 60%; color: cyan }
+</style>
+<div class="cell" data-label="Title">Analytical Engine, under the blank cells of its label</div>

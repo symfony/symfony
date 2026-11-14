@@ -1,0 +1,16 @@
+
+⟨38;2;102;51;153mrebeccapurple (true color)⟨0m
+
+⟨38;2;250;250;210;48;2;47;79;79mlightgoldenrodyellow on darkslategray⟨0m⟨48;2;47;79;79m                       ⟨0m
+
+⟨34mblue keeps the terminal ANSI blue⟨0m
+
+⟨38;2;255;165;0m┌──────────────────────────────────────────────────────────┐⟨0m
+⟨38;2;255;165;0m│border in currentcolor (orange)⟨0m                           ⟨38;2;255;165;0m│⟨0m
+⟨38;2;255;165;0m└──────────────────────────────────────────────────────────┘⟨0m
+
+⟨38;2;0;128;128;48;2;0;128;128mteal background from currentcolor⟨0m⟨48;2;0;128;128m                           ⟨0m
+
+┌──────────────────────────────────────────────────────────┐
+│currentcolor without a color: default border color        │
+└──────────────────────────────────────────────────────────┘

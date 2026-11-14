@@ -1,0 +1,14 @@
+Under a clear box holding a  ⟨48;2;136;136;136m ⟨0m
+handle: shown
+
+┌────────────────────────────┐
+│in a box that clips         │
+│                            │
+└────────────────────────────┘
+
+    ┌────────────────────┐
+    │ ⟨4mTaller than its⟨0m    │
+Afte│ ⟨4minsets: drawn past⟨0m │ows
+    │ ⟨4mthem⟨0m               │
+Afte┌────────────────────────┐
+    │ ⟨4mTaller than the height⟨0m │

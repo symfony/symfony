@@ -1,0 +1,10 @@
+┌────────────────────────────┐
+│ ⟨90mEmail⟨0m ⟨90maddress⟨0m              │
+│ > me@example.com           │
+└────────────────────────────┘
+
+⟨37;44mInbox⟨0m⟨44m                                                     ⟨0m⟨33;44m3⟨0m⟨44m ⟨0m
+⟨30;47mTe┌─────────────────────┐e col Its content painted⟨0m⟨47m ⟨0m⟨30;47med by it⟨0m⟨47m ⟨0m
+  ⟨30;47m│ Action⟨0m⟨47m              ⟨0m⟨30;47m│⟨0m
+  ⟨30;47m│ Something else here⟨0m⟨47m ⟨0m⟨30;47m│⟨0m
+  ⟨30;47m└─────────────────────┘⟨0m

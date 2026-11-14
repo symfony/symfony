@@ -1,0 +1,22 @@
+<!-- covers: css.properties.overflow-x css.properties.overflow-inline css.properties.scroll-padding-left css.properties.scroll-padding-right css.properties.scroll-padding-inline css.properties.scroll-padding-inline-start css.properties.scroll-padding-inline-end css.properties.scroll-margin-left css.properties.scroll-margin-right css.properties.scroll-margin-inline css.properties.scroll-margin-inline-start css.properties.scroll-margin-inline-end -->
+<!-- variant: focused focus=#last columns=40 -->
+<style>
+  .code { overflow-x: auto; max-width: 30ch; border: 1px solid; scroll-padding-left: 1ch; scroll-padding-right: 1ch }
+  .toolbar { display: flex; gap: 1ch; overflow-inline: scroll; max-width: 30ch; scroll-padding-inline: 2ch; scroll-padding-inline-start: 2ch; scroll-padding-inline-end: 2ch }
+  .toolbar button { scroll-margin-left: 1ch; scroll-margin-right: 1ch; scroll-margin-inline: 1ch; scroll-margin-inline-start: 1ch; scroll-margin-inline-end: 1ch }
+  table { overflow-x: auto }
+  .wide { overflow-x: auto; max-width: 24ch; scrollbar-width: thin; scrollbar-color: yellow gray }
+</style>
+<div class="code"><pre>function render(array $lines, int $columns): string { return implode("\n", $lines); }</pre><p>Prose wraps in the box, the code scrolls.</p></div>
+<div class="toolbar"><button>Open</button><button>Save</button><button>Export</button><button>Print</button><button id="last">Close</button></div>
+<div class="wide"><p style="white-space: nowrap">A line that does not wrap, scrolled sideways.</p></div>
+<pre style="overflow-x: auto; width: 30ch; border: 1px solid"><code>pre { overflow-x: auto }: the code scrolls sideways, not wrapped</code></pre>
+<pre style="overflow: auto; border: 1px solid">A block of code scrolled sideways,
+like those of Sphinx: no blank line
+before its end
+</pre>
+<pre style="display: flex; border: 1px solid"><code style="overflow: auto; flex-grow: 1">A block of code in its own box, like those of MDN:
+no blank line before its end either
+</code></pre>
+<pre style="border: 1px solid"><code><div>Lines of code each ending in a br, like Prism:<br/></div><div>no blank line after each<br/></div></code></pre>
+<p style="border: 1px solid">Two br at the end: one blank line<br><br></p>

@@ -1,0 +1,10 @@
+<!-- covers: css.selectors.placeholder -->
+<style>
+  .floating { position: relative }
+  .floating input { border: 1px solid; padding: 1 1ch 0; width: 30ch }
+  .floating input::placeholder { color: transparent }
+  .floating label { position: absolute; top: 1; left: 2ch; color: gray }
+  .shown::placeholder { color: green }
+</style>
+<div class="floating"><input id="e" placeholder="name@example.com"><label for="e">Email address</label></div>
+<input class="shown" placeholder="a green hint">

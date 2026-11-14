@@ -1,0 +1,11 @@
+<!-- requires: GdImage -->
+<!-- covers: css.properties.mask-image css.properties.mask -->
+<style>
+  .icon { display: inline-block; width: 2em; height: 2em; background-color: currentColor; color: red }
+  .disc { mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='8'/%3E%3C/svg%3E") }
+  .chevron { -webkit-mask: var(--icon) no-repeat; mask: var(--icon) no-repeat; --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1' d='m6 9 6 6 6-6'/%3E%3C/svg%3E") }
+  .missing { mask-image: url(missing.svg) }
+</style>
+<p>A shape masking a color is drawn in it: <span class="icon disc"></span></p>
+<p>Strokes thinner than a pixel once made smaller are drawn still: <span class="icon chevron"></span>.</p>
+<p>A mask that cannot be read draws no block of the color: <span class="icon missing"></span>.</p>

@@ -110,6 +110,18 @@ interface TerminalInterface
     public function setTitle(string $title): void;
 
     /**
+     * Save the terminal window title on the stack of titles of the terminal, to put it back with popTitle().
+     *
+     * Terminals without that stack ignore it.
+     */
+    public function pushTitle(): void;
+
+    /**
+     * Put back the terminal window title saved last with pushTitle().
+     */
+    public function popTitle(): void;
+
+    /**
      * Ring the terminal bell.
      *
      * Emits the BEL character (\x07) which causes the terminal

@@ -31,6 +31,7 @@ final class AnsiCodeTracker
     private bool $inverse = false;
     private bool $hidden = false;
     private bool $strikethrough = false;
+    private bool $overline = false;
     private ?string $fgColor = null;
     private ?string $bgColor = null;
     private ?string $underlineColor = null;
@@ -78,6 +79,7 @@ final class AnsiCodeTracker
         $this->inverse = false;
         $this->hidden = false;
         $this->strikethrough = false;
+        $this->overline = false;
         $this->fgColor = null;
         $this->bgColor = null;
         $this->underlineColor = null;
@@ -120,6 +122,9 @@ final class AnsiCodeTracker
         if ($this->strikethrough) {
             $codes .= '9;';
         }
+        if ($this->overline) {
+            $codes .= '53;';
+        }
         if (null !== $this->fgColor) {
             $codes .= $this->fgColor.';';
         }
@@ -152,10 +157,35 @@ final class AnsiCodeTracker
             || $this->inverse
             || $this->hidden
             || $this->strikethrough
+            || $this->overline
             || null !== $this->fgColor
             || null !== $this->bgColor
             || null !== $this->underlineColor
             || null !== $this->link;
+    }
+
+    /**
+     * The foreground color set, as its SGR parameters, like 36 or 38;2;255;0;0; null for the default one.
+     */
+    public function getForeground(): ?string
+    {
+        return $this->fgColor;
+    }
+
+    /**
+     * The background color set, as its SGR parameters, like 44 or 48;2;0;0;255; null for the default one.
+     */
+    public function getBackground(): ?string
+    {
+        return $this->bgColor;
+    }
+
+    /**
+     * Whether the colors are swapped, like SGR 7: the glyphs drawn in the background color.
+     */
+    public function isInverse(): bool
+    {
+        return $this->inverse;
     }
 
     /**
@@ -178,7 +208,7 @@ final class AnsiCodeTracker
         }
         // The last hyperlink opened or closed
         if (str_contains($text, "\x1b]8;") && preg_match_all('/\x1b\]8;[^;\x07\x1b]*;[^\x07\x1b]*(?:\x07|\x1b\\\\)/', $text, $links)) {
-            $this->link = self::linkOf(end($links[0]));
+            $this->link = self::linkOf((string) end($links[0]));
         }
 
         // Use preg_match_all to find all SGR sequences at once (C-level scan)
@@ -274,6 +304,8 @@ final class AnsiCodeTracker
                 27 => $this->inverse = false,
                 28 => $this->hidden = false,
                 29 => $this->strikethrough = false,
+                53 => $this->overline = true,
+                55 => $this->overline = false,
                 30, 31, 32, 33, 34, 35, 36, 37, 90, 91, 92, 93, 94, 95, 96, 97 => $this->fgColor = (string) $code,
                 39 => $this->fgColor = null,
                 40, 41, 42, 43, 44, 45, 46, 47, 100, 101, 102, 103, 104, 105, 106, 107 => $this->bgColor = (string) $code,
@@ -292,6 +324,7 @@ final class AnsiCodeTracker
             38 => $this->fgColor = $value,
             48 => $this->bgColor = $value,
             58 => $this->underlineColor = $value,
+            default => throw new \UnhandledMatchError(),
         };
     }
 }

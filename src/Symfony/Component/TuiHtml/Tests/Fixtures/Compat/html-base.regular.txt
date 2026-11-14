@@ -1,0 +1,3 @@
+
+Relative links go to ⟨4mthe documentation⟨0m, and ⟨4mfragments⟨0m stay
+in the page.

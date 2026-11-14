@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Default the MongoDB store "database" option to "app" and its "collection" option to "locks"
+
 8.2
 ---
 

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Add support for `mongodb://` and `mongodb+srv://` DSNs in `SessionHandlerFactory`
+ * Add `MongoDbSessionHandler::createFromDsn()`
+
 8.2
 ---
 

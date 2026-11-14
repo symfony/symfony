@@ -56,7 +56,7 @@ class X509Factory implements AuthenticatorFactoryInterface
     {
         $node
             ->children()
-                ->scalarNode('provider')->end()
+                ->scalarNode('provider')->resolvesAtCompileTime()->end()
                 ->scalarNode('user')->defaultValue('SSL_CLIENT_S_DN_Email')->end()
                 ->scalarNode('credentials')->defaultValue('SSL_CLIENT_S_DN')->end()
                 ->scalarNode('user_identifier')->defaultValue('emailAddress')->end()

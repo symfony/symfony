@@ -52,6 +52,7 @@ class CasTokenHandlerFactory implements TokenHandlerFactoryInterface
                         ->defaultValue('cas')
                     ->end()
                     ->scalarNode('http_client')
+                        ->resolvesAtCompileTime()
                         ->info('HTTP Client service')
                         ->defaultNull()
                     ->end()

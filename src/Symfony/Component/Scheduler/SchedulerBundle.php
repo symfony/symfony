@@ -16,7 +16,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleBundle;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Kernel\AbstractBundle;
 use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
@@ -51,6 +50,7 @@ class SchedulerBundle extends AbstractBundle
             ->canBeDisabled()
             ->children()
                 ->booleanNode('use_messenger_routing')
+                    ->resolvesAtCompileTime()
                     ->defaultNull()
                     ->info('Whether scheduled messages are routed to the Messenger senders configured for their class, as any other dispatched message is. A class with no sender configured still runs in the scheduler worker, and a "transports" option set on a task still wins.')
                 ->end()
@@ -60,18 +60,22 @@ class SchedulerBundle extends AbstractBundle
                     ->arrayPrototype()
                         ->children()
                             ->booleanNode('stateful')
+                                ->resolvesAtCompileTime()
                                 ->info('Whether the schedule keeps its state in the "cache.scheduler" pool and, when locks are enabled, runs in only one worker at a time.')
                                 ->defaultFalse()
                             ->end()
                             ->scalarNode('cache_pool')
+                                ->resolvesAtCompileTime()
                                 ->info('The cache pool that stores the state of the schedule, so that a restarted worker resumes where the previous one stopped.')
                                 ->defaultNull()
                             ->end()
                             ->scalarNode('lock_factory')
+                                ->resolvesAtCompileTime()
                                 ->info('The service ID of the lock factory used to run the schedule in only one worker at a time.')
                                 ->defaultNull()
                             ->end()
                             ->booleanNode('process_only_last_missed_run')
+                                ->resolvesAtCompileTime()
                                 ->info('Whether a task that missed several runs runs only once instead of once per missed run.')
                                 ->defaultFalse()
                             ->end()
@@ -88,23 +92,12 @@ class SchedulerBundle extends AbstractBundle
             return;
         }
 
-        $useMessengerRouting = $config['use_messenger_routing'];
-
-        if (\is_string($useMessengerRouting)) {
-            $usedEnvs = [];
-            $container->resolveEnvPlaceholders($useMessengerRouting, null, $usedEnvs);
-
-            if ($usedEnvs) {
-                throw new InvalidArgumentException(\sprintf('The "scheduler.use_messenger_routing" option is consumed at compile time and cannot use env vars (got "%%env(%s)%%"). Set a static boolean instead.', implode('", "', array_keys($usedEnvs))));
-            }
-        }
-
         // the leading dot marks it as internal: it is consumed at build time only
         // and dropped from the compiled container by RemoveBuildParametersPass
         // a "null" value is kept as-is so SchedulerTransport can warn lazily, only
         // when a scheduled message is actually redispatched, instead of on every
         // container build regardless of whether the scheduler is actually used
-        $container->setParameter('.scheduler.use_messenger_routing', $useMessengerRouting);
+        $container->setParameter('.scheduler.use_messenger_routing', $config['use_messenger_routing']);
         $container->setParameter('.scheduler.schedules', $config['schedules']);
 
         $configurator->import('Resources/config/scheduler.php');

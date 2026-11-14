@@ -77,7 +77,7 @@ class RouterBundle extends AbstractBundle
                 ->thenInvalid('The child config "resource" under "router" must be configured.')
             ->end()
             ->children()
-                ->booleanNode('enabled')->defaultFalse()->end()
+                ->booleanNode('enabled')->resolvesAtCompileTime()->defaultFalse()->end()
                 ->scalarNode('resource')->defaultNull()->end()
                 ->scalarNode('type')->end()
                 ->scalarNode('default_uri')
@@ -94,7 +94,7 @@ class RouterBundle extends AbstractBundle
                         'Defaults to true in debug mode and to null otherwise.'
                     )
                 ->end()
-                ->booleanNode('utf8')->defaultTrue()->end()
+                ->booleanNode('utf8')->resolvesAtCompileTime()->defaultTrue()->end()
             ->end()
         ;
     }

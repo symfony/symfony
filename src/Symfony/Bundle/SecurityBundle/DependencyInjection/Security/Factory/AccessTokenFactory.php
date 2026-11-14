@@ -82,6 +82,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         $builder
             ->scalarNode('realm')->defaultNull()->end()
             ->arrayNode('token_extractors', 'token_extractor')
+                ->resolvesAtCompileTime()
                 ->acceptAndWrap(['string'])
                 ->cannotBeEmpty()
                 ->defaultValue(['security.access_token_extractor.header'])
@@ -198,6 +199,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                         ->scalarPrototype()->cannotBeEmpty()->end()
                     ->end()
                     ->scalarNode('cache')
+                        ->resolvesAtCompileTime()
                         ->info('The cache pool proofs are remembered in to refuse a replay, shared by all the instances of the application.')
                         ->defaultValue('cache.security')
                         ->cannotBeEmpty()

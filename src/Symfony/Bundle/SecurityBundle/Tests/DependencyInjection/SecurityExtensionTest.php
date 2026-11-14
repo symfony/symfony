@@ -20,6 +20,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallL
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\Routing\SecurityRouteLoader;
+use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\TestBrowserAccessTokenAuthenticator;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProviderFactory\CustomProviderFactory;
@@ -2376,6 +2377,47 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertTrue($container->hasDefinition('security.authenticator.oidc_login.main'));
+    }
+
+    public function testFirewallOptionsResolveEnvVars()
+    {
+        $container = $this->getRawContainer();
+        $container->setParameter('env(SECURITY_FLAG)', '0');
+        $container->setParameter('env(SECURITY_USER_CHECKER)', 'security.user_checker');
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'disabled' => ['security' => '%env(bool:SECURITY_FLAG)%'],
+                'main' => [
+                    'stateless' => '%env(bool:SECURITY_FLAG)%',
+                    'lazy' => '%env(bool:SECURITY_FLAG)%',
+                    'user_checker' => '%env(SECURITY_USER_CHECKER)%',
+                    'user_checker_on_refresh' => '%env(bool:SECURITY_FLAG)%',
+                    'http_basic' => true,
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.authenticator.manager.disabled'));
+        $this->assertTrue($container->hasDefinition('security.listener.session.main'));
+        $this->assertFalse($container->hasDefinition('security.listener.user_checker_on_refresh.main'));
+        $this->assertSame('security.user_checker', (string) $container->getAlias('security.user_checker.main'));
+        $this->assertSame(FirewallContext::class, $container->getDefinition('security.firewall.map.context.main')->getClass());
+    }
+
+    public function testSecurityErrorLevelResolvesEnvVars()
+    {
+        $container = $this->getRawContainer();
+        $container->setParameter('env(SECURITY_ERROR_LEVEL)', 'all');
+        $container->loadFromExtension('security', [
+            'expose_security_errors' => '%env(SECURITY_ERROR_LEVEL)%',
+            'firewalls' => ['main' => ['http_basic' => true]],
+        ]);
+
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.listener.user_not_found_password_check.main'));
     }
 
     #[DataProvider('provideOidcDiscoveryEnvironmentVariables')]

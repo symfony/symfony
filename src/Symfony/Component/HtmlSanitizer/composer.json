@@ -21,11 +21,12 @@
         "league/uri": "^6.5|^7.0"
     },
     "require-dev": {
-        "symfony/config": "^7.4|^8.0",
-        "symfony/dependency-injection": "^8.1"
+        "symfony/config": "^8.2",
+        "symfony/dependency-injection": "^8.2"
     },
     "conflict": {
-        "symfony/dependency-injection": "<8.1"
+        "symfony/config": "<8.2",
+        "symfony/dependency-injection": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HtmlSanitizer\\": "" },

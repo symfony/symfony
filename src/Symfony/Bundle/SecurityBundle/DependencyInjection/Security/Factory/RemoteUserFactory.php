@@ -55,7 +55,7 @@ class RemoteUserFactory implements AuthenticatorFactoryInterface
     {
         $node
             ->children()
-                ->scalarNode('provider')->end()
+                ->scalarNode('provider')->resolvesAtCompileTime()->end()
                 ->scalarNode('user')->defaultValue('REMOTE_USER')->end()
             ->end()
         ;

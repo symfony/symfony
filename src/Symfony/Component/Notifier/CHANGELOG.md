@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Deprecate the autowiring aliases named after the webhook request parsers, use `#[Target('notifier.<provider>')]` with `RequestParserInterface` instead
  * Add `NotifierBundle`, which provides the `notifier` configuration and the services previously provided by `FrameworkBundle` under `framework.notifier`
  * Add `AdminRecipientsProviderInterface` and its autowiring alias

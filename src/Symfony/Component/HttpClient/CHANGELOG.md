@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Limit read-ahead for active responses in `CurlHttpClient`, `AmpHttpClient` and `NativeHttpClient`
  * Default the `http_client.recorder.enabled` option to `true` when `framework.test` is enabled
  * Add `HttpClientBundle`, which provides the `http_client` configuration and the services previously provided by `FrameworkBundle` under `framework.http_client`

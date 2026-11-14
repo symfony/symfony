@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Resolve env vars at compile time in bundle options used to build the container
  * Add the `validator.warmup_class_provider` tag to warm metadata for classes discovered outside validator mappings
  * Default the `validation.not_compromised_password.enabled` option to `false` when `framework.test` is enabled
  * Add the `Audio` constraint for validating audio files

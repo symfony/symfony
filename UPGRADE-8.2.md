@@ -29,6 +29,9 @@ Cache
 Config
 ------
 
+ * Bundle options used to select services or configure the container now resolve their env vars at compile time.
+   This includes service IDs, mapping paths and flags such as `router.utf8`, `property_access.magic_get` and `security.firewalls.*.stateless`.
+   Rebuild the container when these env vars change. Values passed to services at runtime, such as transport DSNs and credentials, stay dynamic.
  * The `enabled` node of the sections created with `canBeEnabled()` or `canBeDisabled()` is declared
    with `resolvesAtCompileTime()`: its env vars are read while the container is compiled, where the extension
    used to get a placeholder that was always truthy. A section configured with `enabled: '%env(bool:FOO)%'` is

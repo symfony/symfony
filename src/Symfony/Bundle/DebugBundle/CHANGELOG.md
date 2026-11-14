@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Resolve env vars at compile time in bundle options used to build the container
+
 7.4
 ---
 

@@ -27,9 +27,9 @@
     "require-dev": {
         "dragonmantank/cron-expression": "^3.1",
         "symfony/cache": "^8.2",
-        "symfony/config": "^7.4|^8.0",
+        "symfony/config": "^8.2",
         "symfony/console": "^8.2",
-        "symfony/dependency-injection": "^8.1",
+        "symfony/dependency-injection": "^8.2",
         "symfony/event-dispatcher": "^7.4|^8.0",
         "symfony/lock": "^7.4|^8.0",
         "symfony/messenger": "^8.2",
@@ -38,8 +38,9 @@
     "conflict": {
         "symfony/cache": "<8.2",
         "symfony/cache-contracts": "<3.8.1",
+        "symfony/config": "<8.2",
         "symfony/console": "<8.2",
-        "symfony/dependency-injection": "<8.1",
+        "symfony/dependency-injection": "<8.2",
         "symfony/messenger": "<8.2"
     },
     "autoload": {

@@ -59,14 +59,53 @@
 
 {%- block choice_widget_expanded -%}
     <div {{ block('widget_container_attributes') }}>
-    {%- for child in form %}
-        {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
-        {{- form_widget(child, {attr: child_attr}) -}}
-        {{- form_label(child, null, {translation_domain: choice_translation_domain, required: false}) -}}
-        {{- form_help(child) -}}
-    {% endfor -%}
+        {{- block('choice_widget_expanded_children') -}}
     </div>
 {%- endblock choice_widget_expanded -%}
+
+{%- block choice_widget_expanded_children -%}
+    {%- if preferred_choices|filter(choice => choice is iterable) is not empty or choices|filter(choice => choice is iterable) is not empty -%}
+        {%- if form.children.placeholder is defined -%}
+            {%- set child = form.children.placeholder -%}
+            {{- block('choice_widget_expanded_child') -}}
+        {%- endif -%}
+        {%- set options = preferred_choices -%}
+        {{- block('choice_widget_expanded_groups') -}}
+        {%- set options = choices -%}
+        {{- block('choice_widget_expanded_groups') -}}
+        {%- for child in form|filter(child => not child.rendered) -%}
+            {{- block('choice_widget_expanded_child') -}}
+        {%- endfor -%}
+    {%- else -%}
+        {%- for child in form -%}
+            {{- block('choice_widget_expanded_child') -}}
+        {%- endfor -%}
+    {%- endif -%}
+{%- endblock choice_widget_expanded_children -%}
+
+{%- block choice_widget_expanded_groups -%}
+    {%- for choice_name, choice in options -%}
+        {%- if choice is iterable -%}
+            {%- if choice.choices|filter((group_choice, group_choice_name) => group_choice is iterable or not form.children[group_choice_name].rendered) is not empty -%}
+                <fieldset>
+                    <legend>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}</legend>
+                    {%- set options = choice.choices -%}
+                    {{- block('choice_widget_expanded_groups') -}}
+                </fieldset>
+            {%- endif -%}
+        {%- elseif not form.children[choice_name].rendered -%}
+            {%- set child = form.children[choice_name] -%}
+            {{- block('choice_widget_expanded_child') -}}
+        {%- endif -%}
+    {%- endfor -%}
+{%- endblock choice_widget_expanded_groups -%}
+
+{%- block choice_widget_expanded_child -%}
+    {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
+    {{- form_widget(child, {attr: child_attr}) -}}
+    {{- form_label(child, null, {translation_domain: choice_translation_domain, required: false}) -}}
+    {{- form_help(child) -}}
+{%- endblock choice_widget_expanded_child -%}
 
 {%- block choice_widget_collapsed -%}
     {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}

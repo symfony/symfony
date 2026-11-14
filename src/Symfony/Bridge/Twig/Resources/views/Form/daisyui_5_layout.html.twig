@@ -44,18 +44,20 @@
 {%- block choice_widget_expanded -%}
     {%- set attr = attr|merge({class: attr.class|default('mt-2')}) -%}
     <div {{ block('widget_container_attributes') }}>
-        {%- for child in form %}
-            <label class="flex items-center label mb-2">
-                {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
-                {{- form_widget(child, {attr: child_attr}) -}}
-                {%- if child.vars.label is not same as(false) -%}
-                    {{- form_label(child, null, {translation_domain: choice_translation_domain, label_attr: {class: ''}, required: false}) -}}
-                {%- endif -%}
-            </label>
-            {{- form_help(child) -}}
-        {% endfor -%}
+        {{- block('choice_widget_expanded_children') -}}
     </div>
 {%- endblock choice_widget_expanded -%}
+
+{%- block choice_widget_expanded_child -%}
+    <label class="flex items-center label mb-2">
+        {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
+        {{- form_widget(child, {attr: child_attr}) -}}
+        {%- if child.vars.label is not same as(false) -%}
+            {{- form_label(child, null, {translation_domain: choice_translation_domain, label_attr: {class: ''}, required: false}) -}}
+        {%- endif -%}
+    </label>
+    {{- form_help(child) -}}
+{%- endblock choice_widget_expanded_child -%}
 
 {%- block checkbox_row -%}
     {%- set row_attr = row_attr|merge({class: row_attr.class|default(row_class|default('mb-6'))}) -%}

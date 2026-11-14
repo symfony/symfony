@@ -1192,6 +1192,148 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
+    public function testSingleChoiceExpandedGrouped()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
+            'choices' => [
+                'Group&1' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
+                'Group&2' => ['Choice&C' => '&c'],
+                'Choice&D' => '&d',
+            ],
+            'multiple' => false,
+            'expanded' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/div
+    [
+        ./fieldset
+            [./legend[.="[trans]Group&1[/trans]"]]
+            [.//input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]/following::input[@type="radio"][@id="name_1"][@value="&b"][not(@checked)]]
+            [count(.//input)=2]
+        /following-sibling::fieldset
+            [./legend[.="[trans]Group&2[/trans]"]]
+            [.//input[@type="radio"][@name="name"][@id="name_2"][@value="&c"][not(@checked)]]
+            [count(.//input)=1]
+    ]
+    [count(./fieldset)=2]
+    [count(.//input[@id="name_3"][@value="&d"][not(ancestor::fieldset)])=1]
+    [count(.//input[@id="name__token"][not(ancestor::fieldset)])=1]
+    [count(.//input)=5]
+'
+        );
+    }
+
+    public function testSingleChoiceExpandedGroupedWithPlaceholder()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
+            'choices' => [
+                'Group&1' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
+                'Group&2' => ['Choice&C' => '&c'],
+            ],
+            'multiple' => false,
+            'expanded' => true,
+            'placeholder' => 'Test&Me',
+            'required' => false,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/div
+    [.//input[@type="radio"][@id="name_placeholder"][not(@checked)][not(ancestor::fieldset)]/following::fieldset[./legend[.="[trans]Group&1[/trans]"]]]
+    [count(./fieldset)=2]
+    [count(.//input)=5]
+'
+        );
+    }
+
+    public function testSingleChoiceExpandedGroupedWithPreferredChoices()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
+            'choices' => [
+                'Group&1' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
+                'Group&2' => ['Choice&C' => '&c'],
+            ],
+            'preferred_choices' => ['&c'],
+            'multiple' => false,
+            'expanded' => true,
+        ]);
+
+        // the preferred choices come first, and a group whose choices were all rendered as preferred is not repeated
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/div
+    [
+        ./fieldset
+            [./legend[.="[trans]Group&2[/trans]"]]
+            [.//input[@id="name_2"][@value="&c"]]
+            [count(.//input)=1]
+        /following-sibling::fieldset
+            [./legend[.="[trans]Group&1[/trans]"]]
+            [count(.//input)=2]
+    ]
+    [count(./fieldset)=2]
+    [count(.//input[@value="&c"])=1]
+    [count(.//input)=4]
+'
+        );
+    }
+
+    public function testSingleChoiceExpandedWithTheSameChoiceInSeveralGroups()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
+            'choices' => [
+                'Group&1' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
+                'Group&2' => ['Choice&A' => '&a', 'Choice&C' => '&c'],
+            ],
+            'multiple' => false,
+            'expanded' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/div
+    [
+        ./fieldset
+            [./legend[.="[trans]Group&1[/trans]"]]
+            [count(.//input[@type="radio"])=2]
+        /following-sibling::fieldset
+            [./legend[.="[trans]Group&2[/trans]"]]
+            [count(.//input[@type="radio"])=2]
+    ]
+    [count(./fieldset)=2]
+'
+        );
+    }
+
+    public function testMultipleChoiceExpandedGroupedWithTranslatableGroupLabels()
+    {
+        if (!class_exists(BoundsType::class)) {
+            $this->markTestSkipped('Requires symfony/form 8.2+.');
+        }
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a', '&c'], [
+            'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
+            'group_by' => static fn ($choice) => new TranslatableMessage('&c' === $choice ? 'Group&2' : 'Group&1'),
+            'multiple' => true,
+            'expanded' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/div
+    [
+        ./fieldset
+            [./legend[.="[trans]Group&1[/trans]"]]
+            [.//input[@type="checkbox"][@name="name[]"][@id="name_0"][@checked]/following::input[@type="checkbox"][@id="name_1"][not(@checked)]]
+            [count(.//input)=2]
+        /following-sibling::fieldset
+            [./legend[.="[trans]Group&2[/trans]"]]
+            [.//input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked]]
+            [count(.//input)=1]
+    ]
+    [count(./fieldset)=2]
+    [count(.//input)=4]
+'
+        );
+    }
+
     public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [

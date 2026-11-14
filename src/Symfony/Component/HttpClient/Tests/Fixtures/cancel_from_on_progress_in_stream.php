@@ -11,7 +11,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 
 $client = new CurlHttpClient();
 $cancel = false;
-$response = $client->request('GET', 'http://localhost:8057/max-duration', ['on_progress' => static function (int $dlNow) use (&$response, &$cancel) {
+$response = $client->request('GET', 'http://localhost:'.$argv[1].'/max-duration', ['on_progress' => static function (int $dlNow) use (&$response, &$cancel) {
     if ($cancel && $dlNow) {
         $cancel = false;
         $response->cancel();

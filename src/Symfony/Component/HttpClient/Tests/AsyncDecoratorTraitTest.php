@@ -80,11 +80,11 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             $this->assertTrue($chunk->isFirst());
             $this->assertSame(404, $context->getStatusCode());
             $context->getResponse()->cancel();
-            $context->replaceRequest('GET', 'http://localhost:8057/');
+            $context->replaceRequest('GET', 'http://localhost:'.self::port().'/');
             $context->passthru();
         });
 
-        $response = $client->request('GET', 'http://localhost:8057/404');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/404');
 
         foreach ($client->stream($response) as $chunk) {
         }
@@ -98,11 +98,11 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             $this->assertTrue($chunk->isFirst());
             $this->assertSame(404, $context->getStatusCode());
             $context->getResponse()->cancel();
-            $context->replaceRequest('GET', 'http://localhost:8057/404');
+            $context->replaceRequest('GET', 'http://localhost:'.self::port().'/404');
             $context->passthru();
         });
 
-        $response = $client->request('GET', 'http://localhost:8057/404');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/404');
 
         $this->expectException(ClientExceptionInterface::class);
         $response->getContent(true);
@@ -117,12 +117,12 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
                 }
             } catch (TransportExceptionInterface $e) {
                 $context->getResponse()->cancel();
-                $context->replaceRequest('GET', 'http://localhost:8057/');
+                $context->replaceRequest('GET', 'http://localhost:'.self::port().'/');
                 $context->passthru();
             }
         });
 
-        $response = $client->request('GET', 'http://localhost:8057/chunked-broken');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/chunked-broken');
 
         $this->assertSame(200, $response->getStatusCode());
     }
@@ -140,9 +140,9 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
             $steps = preg_split('{\{"id":"\\\/json\\\/(\d)"\}}', $content, -1, \PREG_SPLIT_DELIM_CAPTURE);
             $steps[7] = $context->getResponse();
-            $steps[1] = $context->replaceRequest('GET', 'http://localhost:8057/json/1');
-            $steps[3] = $context->replaceRequest('GET', 'http://localhost:8057/json/2');
-            $steps[5] = $context->replaceRequest('GET', 'http://localhost:8057/json/3');
+            $steps[1] = $context->replaceRequest('GET', 'http://localhost:'.self::port().'/json/1');
+            $steps[3] = $context->replaceRequest('GET', 'http://localhost:'.self::port().'/json/2');
+            $steps[5] = $context->replaceRequest('GET', 'http://localhost:'.self::port().'/json/3');
 
             yield $context->createChunk(array_shift($steps));
 
@@ -161,7 +161,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             });
         });
 
-        $response = $client->request('GET', 'http://localhost:8057/json');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/json');
 
         $this->assertSame('{"documents":[{"title":"\/json\/1"},{"title":"\/json\/2"},{"title":"\/json\/3"}]}', $response->getContent());
     }
@@ -171,6 +171,8 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $client = new class(parent::getHttpClient(__FUNCTION__)) implements HttpClientInterface {
             use AsyncDecoratorTrait;
 
+            public string $preflightUrl;
+
             public function request(string $method, string $url, array $options = []): ResponseInterface
             {
                 $chunkFilter = static function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options) {
@@ -178,14 +180,15 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
                     $context->passthru();
                 };
 
-                return new AsyncResponse($this->client, 'GET', 'http://localhost:8057', $options, $chunkFilter);
+                return new AsyncResponse($this->client, 'GET', $this->preflightUrl, $options, $chunkFilter);
             }
         };
+        $client->preflightUrl = 'http://localhost:'.self::port();
 
-        $response = $client->request('GET', 'http://localhost:8057/json');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/json');
 
         $this->assertSame('{"documents":[{"id":"\/json\/1"},{"id":"\/json\/2"},{"id":"\/json\/3"}]}', $response->getContent());
-        $this->assertSame('http://localhost:8057/', $response->getInfo('previous_info')[0]['url']);
+        $this->assertSame('http://localhost:'.self::port().'/', $response->getInfo('previous_info')[0]['url']);
     }
 
     public function testProcessingHappensOnce()
@@ -197,7 +200,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             yield $chunk;
         });
 
-        $response = $client->request('GET', 'http://localhost:8057/');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/');
 
         foreach ($client->stream($response) as $chunk) {
         }
@@ -221,7 +224,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         });
 
         try {
-            $client->request('GET', 'http://localhost:8057/404');
+            $client->request('GET', 'http://localhost:'.self::port().'/404');
             $this->fail(ClientExceptionInterface::class.' expected');
         } catch (ClientExceptionInterface $e) {
         }
@@ -237,7 +240,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             yield $chunk;
         });
 
-        $response = $client->request('GET', 'http://localhost:8057/');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/');
 
         $this->assertStringContainsString('SERVER_PROTOCOL', $response->getContent());
         $this->assertStringContainsString('HTTP_HOST', $response->getContent());
@@ -251,7 +254,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             }
         };
 
-        $response = $client->request('GET', 'http://localhost:8057/');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/');
 
         $this->assertStringContainsString('SERVER_PROTOCOL', $response->getContent());
         $this->assertStringContainsString('HTTP_HOST', $response->getContent());
@@ -267,16 +270,16 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             } catch (TransportExceptionInterface $e) {
                 if ($cpt++ < 3) {
                     $context->getResponse()->cancel();
-                    $context->replaceRequest('GET', 'http://localhost:8057/timeout-header', ['timeout' => 0.1]);
+                    $context->replaceRequest('GET', 'http://localhost:'.self::port().'/timeout-header', ['timeout' => 0.1]);
                 } else {
                     $context->passthru();
                     $context->getResponse()->cancel();
-                    $context->replaceRequest('GET', 'http://localhost:8057/timeout-header', ['timeout' => 10]);
+                    $context->replaceRequest('GET', 'http://localhost:'.self::port().'/timeout-header', ['timeout' => 10]);
                 }
             }
         });
 
-        $response = $client->request('GET', 'http://localhost:8057/timeout-header', ['timeout' => 0.1]);
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/timeout-header', ['timeout' => 0.1]);
 
         $this->assertSame(200, $response->getStatusCode());
     }
@@ -292,7 +295,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             }
         };
 
-        $response = $client->request('GET', 'http://localhost:8057/json');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/json');
         $content = '';
         foreach ($client->stream($response) as $chunk) {
             $content .= $chunk->getContent();
@@ -313,11 +316,11 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $client = $this->getHttpClient(__FUNCTION__, static function (ChunkInterface $chunk, AsyncContext $context) use ($options) {
             $context->setInfo('foo', 'test');
             $context->getResponse()->cancel();
-            $context->replaceRequest('GET', 'http://localhost:8057/', $options);
+            $context->replaceRequest('GET', 'http://localhost:'.self::port().'/', $options);
             $context->passthru();
         });
 
-        $client->request('GET', 'http://localhost:8057')->getContent();
+        $client->request('GET', 'http://localhost:'.self::port())->getContent();
         $this->assertArrayHasKey('foo', $lastInfo);
         $this->assertSame('test', $lastInfo['foo']);
         $this->assertArrayHasKey('previous_info', $lastInfo);
@@ -338,7 +341,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             yield $chunk;
         });
 
-        $response = $client->request('GET', 'http://localhost:8057/404', ['timeout' => 0.1]);
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/404', ['timeout' => 0.1]);
 
         $this->assertSame(404, $response->getStatusCode());
         $this->assertStringContainsString('injectedFoo', $response->getContent(false));
@@ -358,7 +361,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
             }
         });
 
-        $response = $client->request('GET', 'http://localhost:8057/');
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Instance of "Symfony\Component\HttpClient\Response\NativeResponse" is already consumed and cannot be managed by "Symfony\Component\HttpClient\Response\AsyncResponse". A decorated client should not call any of the response\'s methods in its "request()" method.');
@@ -370,7 +373,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
     {
         foreach ([$this->getHttpClient(__FUNCTION__, null, new CurlHttpClient()), new RetryableHttpClient(new CurlHttpClient(), null, 0)] as $client) {
             $cancel = false;
-            $response = $client->request('GET', 'http://localhost:8057/max-duration', ['max_duration' => 10, 'on_progress' => static function (int $dlNow) use (&$response, &$cancel) {
+            $response = $client->request('GET', 'http://localhost:'.self::port().'/max-duration', ['max_duration' => 10, 'on_progress' => static function (int $dlNow) use (&$response, &$cancel) {
                 if ($cancel && $dlNow) {
                     $cancel = false;
                     $response->cancel();
@@ -398,16 +401,16 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
                 }
             } catch (TransportExceptionInterface $e) {
                 $context->getResponse()->cancel();
-                $context->replaceRequest('GET', 'http://localhost:8057/timeout-body', ['timeout' => 0.4]);
+                $context->replaceRequest('GET', 'http://localhost:'.self::port().'/timeout-body', ['timeout' => 0.4]);
             }
         });
 
-        $response = $client->request('GET', 'http://localhost:8057/timeout-body', ['max_duration' => 0.75, 'timeout' => 0.4]);
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/timeout-body', ['max_duration' => 0.75, 'timeout' => 0.4]);
 
         $this->assertSame(0.75, $response->getInfo('max_duration'));
 
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Max duration was reached for "http://localhost:8057/timeout-body".');
+        $this->expectExceptionMessage('Max duration was reached for "http://localhost:'.self::port().'/timeout-body".');
         $response->getContent();
     }
 }

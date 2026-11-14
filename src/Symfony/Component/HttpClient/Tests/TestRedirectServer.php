@@ -19,6 +19,8 @@ use Symfony\Component\Process\Process;
  */
 class TestRedirectServer
 {
+    use TestServerPortTrait;
+
     private static $process;
 
     public static function start(): void
@@ -28,13 +30,13 @@ class TestRedirectServer
         }
 
         $finder = new PhpExecutableFinder();
-        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), [__DIR__.'/Fixtures/tls/redirect-server.php', '8059']));
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), [__DIR__.'/Fixtures/tls/redirect-server.php', self::port(8059)]));
         $process->start();
         self::$process = $process;
         register_shutdown_function([$process, 'stop']);
 
         do {
             usleep(50000);
-        } while ($process->isRunning() && !@fsockopen('127.0.0.1', 8059));
+        } while ($process->isRunning() && !@fsockopen('127.0.0.1', self::port(8059)));
     }
 }

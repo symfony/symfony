@@ -64,7 +64,7 @@ class AmpHttpClientTest extends HttpClientTestCase
         $client = $this->getHttpClient(__FUNCTION__);
         $body = fopen('compress.zlib://data:application/gzip;base64,'.base64_encode(gzencode('foo=0123456789')), 'r');
 
-        $response = $client->request('POST', 'http://localhost:8057/post', ['body' => $body]);
+        $response = $client->request('POST', 'http://localhost:'.self::port().'/post', ['body' => $body]);
 
         $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray());
     }
@@ -78,9 +78,9 @@ class AmpHttpClientTest extends HttpClientTestCase
     {
         // unlike curl and the native client, amphp keeps the user-provided Host header when the authority doesn't change
         return [
-            'same host and port' => ['url' => 'http://localhost:8057/custom', 'redirectWithAuth' => true, 'expectedHost' => 'foo.example.com'],
-            'other port' => ['url' => 'http://localhost:8067/custom', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
-            'other host' => ['url' => 'http://127.0.0.1:8057/custom', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
+            'same host and port' => ['url' => 'http://localhost:'.self::port().'/custom', 'redirectWithAuth' => true, 'expectedHost' => 'foo.example.com'],
+            'other port' => ['url' => 'http://localhost:'.self::port(8067).'/custom', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:'.self::port()],
+            'other host' => ['url' => 'http://127.0.0.1:'.self::port().'/custom', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:'.self::port()],
         ];
     }
 
@@ -89,12 +89,12 @@ class AmpHttpClientTest extends HttpClientTestCase
         $this->markTestSkipped('A real proxy server would be needed.');
     }
 
-    #[TestWith(['http://localhost:8057/'])]
-    #[TestWith(['http://localhost:8057/timeout-body'])]
-    public function testEndOfResponseIsNotDelayed(string $url)
+    #[TestWith(['/'])]
+    #[TestWith(['/timeout-body'])]
+    public function testEndOfResponseIsNotDelayed(string $path)
     {
         $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', $url);
+        $response = $client->request('GET', 'http://localhost:'.self::port().$path);
         $lastData = null;
 
         foreach ($client->stream($response) as $chunk) {
@@ -109,7 +109,7 @@ class AmpHttpClientTest extends HttpClientTestCase
     public function testFailureBeforeHeadersIsNotDelayed()
     {
         $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('POST', 'http://localhost:8057/post', ['body' => static function () {
+        $response = $client->request('POST', 'http://localhost:'.self::port().'/post', ['body' => static function () {
             throw new \RuntimeException('Cannot read the body.');
         }]);
 
@@ -130,10 +130,10 @@ class AmpHttpClientTest extends HttpClientTestCase
     public function testCompletedResponseDoesNotBlockOtherResponses(string $method)
     {
         $client = $this->getHttpClient(__FUNCTION__);
-        $completed = $client->request($method, 'http://localhost:8057/head');
+        $completed = $client->request($method, 'http://localhost:'.self::port().'/head');
         $this->assertSame(200, $completed->getStatusCode());
 
-        $response = $client->request('GET', 'http://localhost:8057/', ['timeout' => 2]);
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/', ['timeout' => 2]);
 
         $start = hrtime(true);
         $response->getContent();

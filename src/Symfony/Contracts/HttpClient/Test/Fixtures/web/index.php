@@ -5,6 +5,8 @@ if ('cli-server' !== \PHP_SAPI) {
     throw new \Exception("You cannot run this script directly, it's a fixture for TestHttpServer.");
 }
 
+$port = getenv('SYMFONY_HTTP_CLIENT_TEST_PORT') ?: 8057;
+
 $vars = [];
 
 if (!$_POST) {
@@ -48,8 +50,6 @@ switch (parse_url($vars['REQUEST_URI'], \PHP_URL_PATH)) {
 
     case '/':
     case '/?a=a&b=b':
-    case 'http://127.0.0.1:8057/':
-    case 'http://localhost:8057/':
         ob_start('ob_gzhandler');
         break;
 
@@ -81,7 +81,7 @@ switch (parse_url($vars['REQUEST_URI'], \PHP_URL_PATH)) {
 
     case '/301':
         if ('Basic Zm9vOmJhcg==' === $vars['HTTP_AUTHORIZATION']) {
-            header('Location: http://127.0.0.1:8057/302', true, 301);
+            header('Location: http://127.0.0.1:'.$port.'/302', true, 301);
         }
         break;
 
@@ -94,14 +94,12 @@ switch (parse_url($vars['REQUEST_URI'], \PHP_URL_PATH)) {
         break;
 
     case '/301/proxy':
-    case 'http://localhost:8057/301/proxy':
-    case 'http://127.0.0.1:8057/301/proxy':
-        header('Location: http://localhost:8057/', true, 301);
+        header('Location: http://localhost:'.$port.'/', true, 301);
         break;
 
     case '/302':
         if (!isset($vars['HTTP_AUTHORIZATION'])) {
-            $location = $_GET['location'] ?? 'http://localhost:8057/';
+            $location = $_GET['location'] ?? 'http://localhost:'.$port.'/';
             header('Location: '.$location, true, 302);
         }
         break;
@@ -111,8 +109,8 @@ switch (parse_url($vars['REQUEST_URI'], \PHP_URL_PATH)) {
         break;
 
     case '/302/two-locations':
-        header('Location: http://localhost:8057/', true, 302);
-        header('Location: http://localhost:8057/404', false);
+        header('Location: http://localhost:'.$port.'/', true, 302);
+        header('Location: http://localhost:'.$port.'/404', false);
         break;
 
     case '/304':
@@ -130,7 +128,7 @@ switch (parse_url($vars['REQUEST_URI'], \PHP_URL_PATH)) {
         break;
 
     case '/307':
-        header('Location: http://localhost:8057/post', true, 307);
+        header('Location: http://localhost:'.$port.'/post', true, 307);
         break;
 
     case '/length-broken':

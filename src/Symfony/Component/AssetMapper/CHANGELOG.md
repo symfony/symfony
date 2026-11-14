@@ -5,7 +5,6 @@ CHANGELOG
 ---
 
  * Download root license files alongside importmap packages
-
  * Resolve env vars at compile time in bundle options used to build the container
  * Resolve the env vars of the `asset_mapper.server` option while the container is compiled
  * Add a `$cache` argument to `CompiledAssetMapperConfigReader` to keep the decoded compiled files in a cache pool

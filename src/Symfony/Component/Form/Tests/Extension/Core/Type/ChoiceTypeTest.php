@@ -109,6 +109,41 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, null, []));
     }
 
+    public function testEmptyChoicesMessageForExpandedChoices()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'multiple' => true,
+            'expanded' => true,
+            'choices' => [],
+            'empty_choices_message' => 'لا توجد خيارات متاحة',
+        ])->createView();
+
+        $this->assertSame('لا توجد خيارات متاحة', $view->vars['empty_choices_message']);
+        $this->assertCount(0, $view->children);
+    }
+
+    public function testEmptyChoicesMessageIsNotShownForAvailableChoices()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'multiple' => true,
+            'expanded' => true,
+            'choices' => ['العربية' => 'ar'],
+            'empty_choices_message' => 'لا توجد خيارات متاحة',
+        ])->createView();
+
+        $this->assertNull($view->vars['empty_choices_message']);
+    }
+
+    public function testEmptyChoicesMessageIsNotShownForCollapsedChoices()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => [],
+            'empty_choices_message' => 'No options available',
+        ])->createView();
+
+        $this->assertNull($view->vars['empty_choices_message']);
+    }
+
     public function testExpandedChoicesOptionsTurnIntoChildren()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

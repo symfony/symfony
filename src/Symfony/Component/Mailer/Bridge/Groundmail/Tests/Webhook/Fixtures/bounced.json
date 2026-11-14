@@ -1,0 +1,22 @@
+{
+    "type": "email.bounced",
+    "created_at": "2026-10-17T15:02:11.000Z",
+    "data": {
+        "email_id": "msg_01JC8Q7K2Z",
+        "to": [
+            "user@example.com"
+        ],
+        "from": "you@yourdomain.com",
+        "subject": "Welcome",
+        "tags": [
+            {
+                "name": "user_id",
+                "value": "u_42"
+            }
+        ],
+        "stream": "transactional",
+        "status": "bounced",
+        "bounce_reason": "550 5.1.1 The email account that you tried to reach does not exist",
+        "bounce_type": "hard"
+    }
+}

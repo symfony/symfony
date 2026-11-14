@@ -17,6 +17,8 @@ use Symfony\Component\Mailer\Bridge\Azure\RemoteEvent\AzurePayloadConverter;
 use Symfony\Component\Mailer\Bridge\Azure\Webhook\AzureRequestParser;
 use Symfony\Component\Mailer\Bridge\Brevo\RemoteEvent\BrevoPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
+use Symfony\Component\Mailer\Bridge\Groundmail\RemoteEvent\GroundmailPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Groundmail\Webhook\GroundmailRequestParser;
 use Symfony\Component\Mailer\Bridge\Mailchimp\RemoteEvent\MailchimpPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Webhook\MailchimpRequestParser;
 use Symfony\Component\Mailer\Bridge\MailerSend\RemoteEvent\MailerSendPayloadConverter;
@@ -53,6 +55,11 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.brevo', BrevoRequestParser::class)
             ->args([service('mailer.payload_converter.brevo')])
         ->alias(BrevoRequestParser::class, 'mailer.webhook.request_parser.brevo')
+
+        ->set('mailer.payload_converter.groundmail', GroundmailPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.groundmail', GroundmailRequestParser::class)
+            ->args([service('mailer.payload_converter.groundmail'), service('clock')->nullOnInvalid()])
+        ->alias(GroundmailRequestParser::class, 'mailer.webhook.request_parser.groundmail')
 
         ->set('mailer.payload_converter.mailersend', MailerSendPayloadConverter::class)
         ->set('mailer.webhook.request_parser.mailersend', MailerSendRequestParser::class)

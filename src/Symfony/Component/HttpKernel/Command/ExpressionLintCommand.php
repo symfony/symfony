@@ -13,7 +13,11 @@ namespace Symfony\Component\HttpKernel\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -41,17 +45,35 @@ final class ExpressionLintCommand extends Command
 
     protected function configure(): void
     {
-        $this->setHelp(<<<'EOF'
-            The <info>%command.name%</info> command checks the syntax of the expressions held by the attributes of controllers, such as <info>#[IsGranted]</info> or <info>#[Cache]</info>, and of the ones listed in the configuration, such as the <info>allow_if</info> option of <info>access_control</info> rules.
+        $this
+            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format ("txt" or "json")', 'txt')
+            ->setHelp(<<<'EOF'
+                The <info>%command.name%</info> command checks the syntax of the expressions held by the attributes of controllers, such as <info>#[IsGranted]</info> or <info>#[Cache]</info>, and of the ones listed in the configuration, such as the <info>allow_if</info> option of <info>access_control</info> rules.
 
-            It also reports the functions that do not exist and, when the expression language tells which ones it provides, the variables that do not exist:
+                It also reports the functions that do not exist and, when the expression language tells which ones it provides, the variables that do not exist:
 
-              <info>%command.invocation%</info>
-            EOF);
+                  <info>%command.invocation%</info>
+
+                Use <info>--format=json</info> to output errors as JSON:
+
+                  <info>%command.invocation% --format=json</info>
+                EOF);
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues(['txt', 'json']);
+        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $format = $input->getOption('format');
+        if (!\in_array($format, ['txt', 'json'], true)) {
+            throw new InvalidArgumentException('Supported formats are "txt" and "json".');
+        }
+
         $io = new SymfonyStyle($input, $output);
         $count = 0;
         $errors = [];
@@ -70,6 +92,12 @@ final class ExpressionLintCommand extends Command
 
         foreach ($this->collector->getErrors() as $source => $error) {
             $errors[] = [$source, $error->getMessage()];
+        }
+
+        if ('json' === $format) {
+            $output->writeln(json_encode(array_map(static fn (array $error) => ['source' => $error[0], 'message' => $error[1]], $errors), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_INVALID_UTF8_SUBSTITUTE), OutputInterface::OUTPUT_RAW);
+
+            return $errors ? self::FAILURE : self::SUCCESS;
         }
 
         foreach ($errors as [$source, $error]) {

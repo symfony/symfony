@@ -27,7 +27,7 @@ class MapRequestPayload extends ValueResolver
     public ArgumentMetadata $metadata;
 
     /**
-     * @param array<string>|string|null               $acceptFormat               The payload formats to accept (i.e. "json", "xml"); formats other than "form", "json" and "xml" are accepted only when listed here
+     * @param array<string>|string|null               $acceptFormat               The payload formats to accept. Form, JSON and XML payloads, including "+json" and "+xml" variants, are accepted by default.
      * @param array<string, mixed>                    $serializationContext       The serialization context to use when deserializing the payload
      * @param string|GroupSequence|array<string>|null $validationGroups           The validation groups to use when validating the query string mapping
      * @param class-string                            $resolver                   The class name of the resolver to use

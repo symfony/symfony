@@ -142,6 +142,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -1000])
             ->tag('container.remove_if_missing', ['service' => 'property_accessor'])
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('serializer.normalizer.property', PropertyNormalizer::class)
             ->args([
@@ -151,6 +152,7 @@ return static function (ContainerConfigurator $container) {
                 service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
                 null,
             ])
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('serializer.denormalizer.array', ArrayDenormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -990])

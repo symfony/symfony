@@ -248,6 +248,14 @@ class SerializerBundleTest extends TestCase
         $this->assertSame([['method' => 'shutdown', 'on_invalid' => 'ignore', 'on_shutdown' => 'only']], $container->getDefinition('serializer')->getTag('kernel.reset'));
     }
 
+    public function testObjectNormalizersAreResetWithTheKernel()
+    {
+        $container = $this->load(['enabled' => true]);
+
+        $this->assertSame([['method' => 'reset']], $container->getDefinition('serializer.normalizer.object')->getTag('kernel.reset'));
+        $this->assertSame([['method' => 'reset']], $container->getDefinition('serializer.normalizer.property')->getTag('kernel.reset'));
+    }
+
     public function testTheSerializersAreFreedWhenTheKernelShutsDown()
     {
         $kernel = new TestShutdownSerializerKernel(sys_get_temp_dir().'/sf_serializer_bundle_shutdown');

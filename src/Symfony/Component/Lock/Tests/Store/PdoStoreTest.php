@@ -199,4 +199,21 @@ class PdoStoreTest extends AbstractStoreTestCase
             $pdo->exec('DROP TABLE IF EXISTS lock_keys');
         }
     }
+
+    public function testOracleClockCountsTheTimeOfDayOnce()
+    {
+        $pdo = $this->createMock(\PDO::class);
+        $pdo->method('getAttribute')
+            ->willReturnMap([
+                [\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION],
+                [\PDO::ATTR_DRIVER_NAME, 'oci'],
+            ]);
+        $pdo->expects($this->once())
+            ->method('prepare')
+            ->with($this->stringContains("VALUES (:id, :token, (TRUNC(systimestamp AT TIME ZONE 'UTC', 'MI') - DATE '1970-01-01') * 86400 + EXTRACT(SECOND FROM systimestamp) + 300)"))
+            ->willReturn($this->createStub(\PDOStatement::class));
+
+        $store = new PdoStore($pdo, [], 0);
+        $store->save(new Key(__METHOD__));
+    }
 }

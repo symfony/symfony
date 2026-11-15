@@ -123,6 +123,10 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
         });
 
         EventLoop::queue(static function () use ($request, $multi, $id, &$info, &$headers, $canceller, &$options, $onProgress, &$handle, $logger, &$pauseExpiry) {
+            if (!isset($multi->openHandles[$id])) {
+                return;
+            }
+
             self::generateResponse($request, $multi, $id, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pauseExpiry);
         });
     }
@@ -209,6 +213,10 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
     private static function generateResponse(Request $request, AmpClientStateV5 $multi, string $id, array &$info, array &$headers, DeferredCancellation $canceller, array &$options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, float &$pauseExpiry): void
     {
         $request->setInformationalResponseHandler(static function (Response $response) use ($multi, $id, &$info, &$headers) {
+            if (!isset($multi->openHandles[$id])) {
+                return;
+            }
+
             self::addResponseHeaders($response, $info, $headers);
             $multi->handlesActivity[$id][] = new InformationalChunk($response->getStatus(), $response->getHeaders());
             $multi->openHandles[$id]->complete();
@@ -223,6 +231,10 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
             }
 
             $options = null;
+
+            if (!isset($multi->openHandles[$id])) {
+                return;
+            }
 
             $multi->handlesActivity[$id][] = new FirstChunk();
 
@@ -240,10 +252,6 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
             $body = $response->getBody();
 
             while (true) {
-                if (!isset($multi->openHandles[$id])) {
-                    return;
-                }
-
                 $multi->openHandles[$id]->complete();
                 $multi->openHandles[$id] = new DeferredFuture();
 
@@ -251,7 +259,13 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
                     delay($pause, true, $canceller->getCancellation());
                 }
 
-                if (null === $data = $body->read()) {
+                $data = $body->read();
+
+                if (!isset($multi->openHandles[$id])) {
+                    return;
+                }
+
+                if (null === $data) {
                     break;
                 }
 
@@ -262,8 +276,10 @@ final class AmpResponseV5 implements ResponseInterface, StreamableInterface
             $multi->handlesActivity[$id][] = null;
             $multi->handlesActivity[$id][] = null;
         } catch (\Throwable $e) {
-            $multi->handlesActivity[$id][] = null;
-            $multi->handlesActivity[$id][] = $e;
+            if (isset($multi->openHandles[$id])) {
+                $multi->handlesActivity[$id][] = null;
+                $multi->handlesActivity[$id][] = $e;
+            }
         } finally {
             $info['download_content_length'] = $info['size_download'];
 

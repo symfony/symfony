@@ -69,4 +69,19 @@ class ExpressionLintCommandTest extends TestCase
         $this->assertStringContainsString('$maxage', $display);
         $this->assertStringContainsString('Found 6 errors while linting 5 expressions.', $display);
     }
+
+    public function testInvalidExpressionsWithMarkup()
+    {
+        $collector = new ExpressionCollector([], [], ['app' => [
+            'foo("</info>x")' => [null, ['the <comment>configuration</comment>']],
+        ]]);
+        $tester = new CommandTester(new ExpressionLintCommand(['app' => new ExpressionLanguage()], $collector));
+
+        $this->assertSame(1, $tester->execute([], ['decorated' => false]));
+
+        $display = preg_replace('/ +/', ' ', $tester->getDisplay(true));
+
+        $this->assertStringContainsString('ERROR in the <comment>configuration</comment>', $display);
+        $this->assertStringContainsString('>> The function "foo" does not exist around position 1 for expression `foo("</info>x")`.', $display);
+    }
 }

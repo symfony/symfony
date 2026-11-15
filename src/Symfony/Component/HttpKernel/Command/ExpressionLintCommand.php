@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -73,8 +74,8 @@ final class ExpressionLintCommand extends Command
         }
 
         foreach ($errors as [$source, $error]) {
-            $io->text('<error> ERROR </error> in '.$source);
-            $io->text(\sprintf('<error> >> %s</error>', $error));
+            $io->text('<error> ERROR </error> in '.OutputFormatter::escape($source));
+            $io->text(\sprintf('<error> >> %s</error>', OutputFormatter::escape($error)));
         }
 
         if (!$errors) {

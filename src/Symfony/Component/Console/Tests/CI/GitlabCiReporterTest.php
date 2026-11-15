@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests\CI;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\CI\GitlabCiReporter;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class GitlabCiReporterTest extends TestCase
 {
@@ -82,5 +83,31 @@ class GitlabCiReporterTest extends TestCase
 
         self::assertSame($report[0]['fingerprint'], $report[1]['fingerprint']);
         self::assertNotSame($report[0]['fingerprint'], $report[2]['fingerprint']);
+    }
+
+    public function testMarkupIsWrittenAsIs()
+    {
+        $reporter = new GitlabCiReporter($buffer = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, true));
+
+        $reporter->error('An <comment>error</comment>', 'config/<info>services.yaml', 1);
+        $reporter->write();
+
+        $report = json_decode($buffer->fetch(), true, 512, \JSON_THROW_ON_ERROR);
+
+        self::assertSame('An <comment>error</comment>', $report[0]['description']);
+        self::assertSame('config/<info>services.yaml', $report[0]['location']['path']);
+    }
+
+    public function testInvalidUtf8IsReplaced()
+    {
+        $reporter = new GitlabCiReporter($buffer = new BufferedOutput());
+
+        $reporter->error("An error in \"\xFF\"", "config/\xFF.yaml", 1);
+        $reporter->write();
+
+        $report = json_decode($buffer->fetch(), true, 512, \JSON_THROW_ON_ERROR);
+
+        self::assertSame("An error in \"\u{FFFD}\"", $report[0]['description']);
+        self::assertSame("config/\u{FFFD}.yaml", $report[0]['location']['path']);
     }
 }

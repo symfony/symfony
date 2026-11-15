@@ -1410,6 +1410,29 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertFalse((new \ReflectionProperty($obj, 'notSet'))->isInitialized($obj));
     }
 
+    public function testSerializedPathsOfSeveralObjectsWithTheSameNormalizer()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $obj = new class {
+            #[SerializedPath('[data][foo]')]
+            public ?string $foo = null;
+
+            #[SerializedPath('[data][bar]')]
+            public ?string $bar = null;
+        };
+
+        foreach (['a', 'b'] as $value) {
+            $obj->foo = $value;
+            $this->assertSame(['data' => ['foo' => $value, 'bar' => null]], $normalizer->normalize($obj));
+
+            $test = $normalizer->denormalize(['data' => ['foo' => $value]], $obj::class);
+            $this->assertSame($value, $test->foo);
+            $this->assertNull($test->bar);
+        }
+    }
+
     public function testNormalizeBasedOnAllowedAttributes()
     {
         $normalizer = new class extends AbstractObjectNormalizer {

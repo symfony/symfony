@@ -910,13 +910,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $parameterType = $parameter->getType();
         static $parameterTypeResolver;
-        static $parameterTypeContexts = [];
+        static $resolvedParameterTypes = [];
 
         if (null !== $parameterType && $parameterTypeResolver ??= class_exists(ReflectionTypeResolver::class) ? new ReflectionTypeResolver() : false) {
             $declaringClassName = $parameter->getDeclaringClass()->name ?? $class->name;
             // resolving "self" and "parent" needs only the class names, not the use statements that TypeContextFactory reads from the class file
-            $parameterTypeContext = $parameterTypeContexts[$class->name][$declaringClassName] ??= new TypeContext($class->name, $declaringClassName);
-            $resolvedParameterType = $parameterTypeResolver->resolve($parameterType, $parameterTypeContext);
+            $resolvedParameterType = $resolvedParameterTypes[$declaringClassName.'::'.$parameter->getDeclaringFunction()->name][$parameter->name] ??= $parameterTypeResolver->resolve($parameterType, new TypeContext($declaringClassName, $declaringClassName));
             if ($resolvedParameterType->isSatisfiedBy(static fn (Type $t) => match (true) {
                 $t instanceof BuiltinType && \in_array($t->getTypeIdentifier(), [TypeIdentifier::ARRAY, TypeIdentifier::ITERABLE], true) => !$type->isIdentifiedBy(TypeIdentifier::ARRAY) && !$type->isIdentifiedBy(TypeIdentifier::ITERABLE) && !$type->isSatisfiedBy(static fn (Type $c) => $c instanceof CollectionType),
                 $t instanceof BuiltinType && !\in_array($t->getTypeIdentifier(), [TypeIdentifier::NULL, TypeIdentifier::MIXED], true) => !$type->isIdentifiedBy($t->getTypeIdentifier()),

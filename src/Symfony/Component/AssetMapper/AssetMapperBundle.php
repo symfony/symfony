@@ -149,6 +149,10 @@ class AssetMapperBundle extends AbstractBundle
                     ->enumPrototype()->values(['sha256', 'sha384', 'sha512'])->end()
                     ->defaultValue([])
                 ->end()
+                ->booleanNode('importmap_download_licenses')
+                    ->info('Download root license files alongside importmap packages. Requires additional requests to the jsDelivr API and CDN.')
+                    ->defaultFalse()
+                ->end()
                 ->scalarNode('vendor_dir')
                     ->info('The directory to store JavaScript vendors.')
                     ->defaultValue('%kernel.project_dir%/assets/vendor')
@@ -279,6 +283,10 @@ class AssetMapperBundle extends AbstractBundle
             ->getDefinition('asset_mapper.importmap.renderer')
             ->replaceArgument(3, $config['importmap_polyfill'])
             ->replaceArgument(4, $config['importmap_script_attributes'])
+        ;
+        $container
+            ->getDefinition('asset_mapper.importmap.resolver')
+            ->replaceArgument(1, $config['importmap_download_licenses'])
         ;
         $container
             ->getDefinition('asset_mapper.importmap.update_checker')

@@ -39,6 +39,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
     public function __construct(
         ?HttpClientInterface $httpClient = null,
+        private readonly bool $downloadLicenses = false,
     ) {
         $this->httpClient = new BatchHttpClient($httpClient ?? HttpClient::create());
     }
@@ -277,6 +278,10 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $packages = implode('", "', array_column($extraFileErrors, 0));
 
             throw new RuntimeException(\sprintf('Error %d downloading extra imported files from jsDelivr for "%s". Response: ', $response->getStatusCode(), $packages).$response->getContent(false), 0, $e);
+        }
+
+        if (!$this->downloadLicenses) {
+            return $contents;
         }
 
         $licenseResponses = [];

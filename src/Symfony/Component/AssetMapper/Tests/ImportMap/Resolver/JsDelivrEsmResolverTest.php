@@ -333,14 +333,6 @@ class JsDelivrEsmResolverTest extends TestCase
     #[DataProvider('provideDownloadPackagesTests')]
     public function testDownloadPackages(array $importMapEntries, array $expectedRequests, array $expectedReturn)
     {
-        $packages = [];
-        foreach ($importMapEntries as $entry) {
-            $packages[$entry->getPackageName().'@'.$entry->version] = true;
-        }
-        foreach ($packages as $package => $_) {
-            $expectedRequests[] = ['url' => '/v1/packages/npm/'.$package, 'body' => '{"files":[]}'];
-        }
-
         $responses = [];
         foreach ($expectedRequests as $expectedRequest) {
             $responses[] = function ($method, $url) use ($expectedRequest) {
@@ -365,6 +357,17 @@ class JsDelivrEsmResolverTest extends TestCase
         $this->assertSame(\count($expectedRequests), $httpClient->getRequestsCount());
     }
 
+    public function testLicenseFilesAreNotDownloadedByDefault()
+    {
+        $httpClient = new MockHttpClient([new MockResponse('package contents')]);
+        $resolver = new JsDelivrEsmResolver($httpClient);
+
+        $result = $resolver->downloadPackages(['package' => self::createRemoteEntry('package', '1.0.0')]);
+
+        $this->assertSame(['content' => 'package contents', 'dependencies' => [], 'extraFiles' => []], $result['package']);
+        $this->assertSame(1, $httpClient->getRequestsCount());
+    }
+
     #[DataProvider('provideLicenseFiles')]
     public function testDownloadPackageLicenseFiles(string $filename)
     {
@@ -386,7 +389,7 @@ class JsDelivrEsmResolverTest extends TestCase
                 default => throw new \LogicException('Unexpected URL: '.$url),
             };
         });
-        $resolver = new JsDelivrEsmResolver($httpClient);
+        $resolver = new JsDelivrEsmResolver($httpClient, true);
 
         $result = $resolver->downloadPackages([
             'first' => self::createRemoteEntry('@vendor/package/dist/index.js', '1.2.3', ImportMapType::JS, null, false),
@@ -416,7 +419,7 @@ class JsDelivrEsmResolverTest extends TestCase
             'https://cdn.jsdelivr.net/npm/package@1.0.0/LICENCE.md' => new MockResponse('Second license'),
             default => throw new \LogicException('Unexpected URL: '.$url),
         });
-        $resolver = new JsDelivrEsmResolver($httpClient);
+        $resolver = new JsDelivrEsmResolver($httpClient, true);
 
         $result = $resolver->downloadPackages(['package/style' => self::createRemoteEntry('package/dist/style.css', '1.0.0', ImportMapType::CSS)]);
 
@@ -437,7 +440,7 @@ class JsDelivrEsmResolverTest extends TestCase
             'https://cdn.jsdelivr.net/npm/package@2.0.0/LICENSE' => new MockResponse('Second version license'),
             default => new MockResponse('package contents'),
         });
-        $resolver = new JsDelivrEsmResolver($httpClient);
+        $resolver = new JsDelivrEsmResolver($httpClient, true);
 
         $result = $resolver->downloadPackages([
             'first' => self::createRemoteEntry('package/first.js', '1.0.0'),
@@ -452,7 +455,7 @@ class JsDelivrEsmResolverTest extends TestCase
     public function testDownloadPackageWithoutLicenseFiles()
     {
         $httpClient = new MockHttpClient(static fn ($method, $url) => new MockResponse(str_starts_with($url, 'https://data.jsdelivr.com/') ? '{"files":[]}' : 'package contents'));
-        $resolver = new JsDelivrEsmResolver($httpClient);
+        $resolver = new JsDelivrEsmResolver($httpClient, true);
 
         $result = $resolver->downloadPackages(['package' => self::createRemoteEntry('package', '1.0.0')]);
 
@@ -462,7 +465,7 @@ class JsDelivrEsmResolverTest extends TestCase
     public function testDownloadPackageLicenseListingError()
     {
         $httpClient = new MockHttpClient(static fn ($method, $url) => new MockResponse('response', ['http_code' => str_starts_with($url, 'https://data.jsdelivr.com/') ? 503 : 200]));
-        $resolver = new JsDelivrEsmResolver($httpClient);
+        $resolver = new JsDelivrEsmResolver($httpClient, true);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Error 503 checking for license files from jsDelivr for "package@1.0.0".');
@@ -477,7 +480,7 @@ class JsDelivrEsmResolverTest extends TestCase
             'https://cdn.jsdelivr.net/npm/package@1.0.0/LICENSE' => new MockResponse('missing', ['http_code' => 404]),
             default => new MockResponse('package contents'),
         });
-        $resolver = new JsDelivrEsmResolver($httpClient);
+        $resolver = new JsDelivrEsmResolver($httpClient, true);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Error 404 downloading license files from jsDelivr for "package@1.0.0".');
@@ -746,7 +749,6 @@ class JsDelivrEsmResolverTest extends TestCase
                 'body' => 'woff font fake dot dot slash contents',
             ],
         ];
-        $expectedRequests[] = ['url' => '/v1/packages/npm/bootstrap-icons@1.1.1', 'body' => '{"files":[]}'];
         $responses = [];
         foreach ($expectedRequests as $expectedRequest) {
             $responses[] = function ($method, $url) use ($expectedRequest) {
@@ -793,7 +795,6 @@ class JsDelivrEsmResolverTest extends TestCase
                 'body' => 'b font contents',
             ],
         ];
-        $expectedRequests[] = ['url' => '/v1/packages/npm/some-css-package@1.0.0', 'body' => '{"files":[]}'];
         $responses = [];
         foreach ($expectedRequests as $expectedRequest) {
             $responses[] = function ($method, $url) use ($expectedRequest) {
@@ -866,7 +867,6 @@ class JsDelivrEsmResolverTest extends TestCase
                 'body' => 'woff2 font contents',
             ],
         ];
-        $expectedRequests[] = ['url' => '/v1/packages/npm/bootstrap-icons@1.1.1', 'body' => '{"files":[]}'];
         $responses = [];
         foreach ($expectedRequests as $expectedRequest) {
             $responses[] = function ($method, $url) use ($expectedRequest) {

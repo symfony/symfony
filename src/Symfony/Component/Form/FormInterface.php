@@ -90,6 +90,8 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @param bool $deep    Whether to include errors of child forms as well
      * @param bool $flatten Whether to flatten the list of errors in case
      *                      $deep is set to true
+     *
+     * @return ($deep is true ? ($flatten is true ? FormErrorIterator<FormError> : FormErrorIterator<FormError|FormErrorIterator>) : FormErrorIterator<FormError>)
      */
     public function getErrors(bool $deep = false, bool $flatten = true): FormErrorIterator;
 

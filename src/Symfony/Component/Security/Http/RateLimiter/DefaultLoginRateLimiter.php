@@ -90,9 +90,9 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
         return $this->localFactory->create($this->hash($username.'-'.self::getClientNetwork($request)));
     }
 
-    private static function getClientNetwork(Request $request): ?string
+    private static function getClientNetwork(Request $request): string
     {
-        $ip = $request->getClientIp();
+        $ip = $request->getClientIp() ?? '';
 
         if (!filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6) || str_starts_with($packedIp = inet_pton($ip), "\0\0\0\0\0\0\0\0\0\0\xFF\xFF")) {
             return $ip;

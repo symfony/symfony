@@ -23,6 +23,11 @@ use Symfony\Component\HttpFoundation\Test\Constraint\ResponseFormatSame;
  */
 class ResponseFormatSameTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        (new \ReflectionProperty(Request::class, 'formats'))->setValue(null, null);
+    }
+
     public function testConstraint()
     {
         $request = new Request();

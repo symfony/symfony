@@ -151,6 +151,67 @@ class ImportMapAuditorTest extends TestCase
         $this->importMapAuditor->audit();
     }
 
+    public function testAuditSendsTheGitHubTokenAsBearer()
+    {
+        $response = new JsonMockResponse([]);
+        $httpClient = new MockHttpClient($response);
+        $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
+            self::createRemoteEntry('json5', '1.0.0'),
+        ]));
+
+        new ImportMapAuditor($this->importMapConfigReader, $httpClient, 'ghp_secret')->audit();
+
+        $this->assertSame('https://api.github.com/advisories?affects=json5@1.0.0', $response->getRequestUrl());
+        $this->assertContains('Authorization: Bearer ghp_secret', $response->getRequestOptions()['headers']);
+    }
+
+    public function testAuditIsAnonymousWithoutGitHubToken()
+    {
+        $response = new JsonMockResponse([]);
+        $httpClient = new MockHttpClient($response);
+        $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
+            self::createRemoteEntry('json5', '1.0.0'),
+        ]));
+
+        new ImportMapAuditor($this->importMapConfigReader, $httpClient)->audit();
+
+        $this->assertSame([], preg_grep('/^Authorization:/i', $response->getRequestOptions()['headers']));
+    }
+
+    public function testAuditErrorHintsAtTheGitHubTokenWhenTheAnonymousRateLimitIsExceeded()
+    {
+        $httpClient = new MockHttpClient(new MockResponse('{"message":"API rate limit exceeded"}', [
+            'http_code' => 403,
+            'response_headers' => ['x-ratelimit-remaining' => '0'],
+        ]));
+        $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
+            self::createRemoteEntry('json5', '1.0.0'),
+        ]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Error 403 auditing packages. Response: {"message":"API rate limit exceeded"} Anonymous requests to the GitHub API are rate limited, configure the "asset_mapper.github_token" option or pass a token to "ImportMapAuditor" to raise the limit.');
+
+        new ImportMapAuditor($this->importMapConfigReader, $httpClient)->audit();
+    }
+
+    public function testAuditErrorDoesNotHintAtTheGitHubTokenWhenOneIsSet()
+    {
+        $httpClient = new MockHttpClient(new MockResponse('{"message":"API rate limit exceeded"}', [
+            'http_code' => 403,
+            'response_headers' => ['x-ratelimit-remaining' => '0'],
+        ]));
+        $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
+            self::createRemoteEntry('json5', '1.0.0'),
+        ]));
+
+        try {
+            new ImportMapAuditor($this->importMapConfigReader, $httpClient, 'ghp_secret')->audit();
+            $this->fail('An exception should have been thrown.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('Error 403 auditing packages. Response: {"message":"API rate limit exceeded"}', $e->getMessage());
+        }
+    }
+
     private static function createRemoteEntry(string $packageSpecifier, string $version): ImportMapEntry
     {
         return ImportMapEntry::createRemote(

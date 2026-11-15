@@ -24,6 +24,7 @@ class ImportMapAuditor
     public function __construct(
         private readonly ImportMapConfigReader $configReader,
         ?HttpClientInterface $httpClient = null,
+        #[\SensitiveParameter] private readonly ?string $githubToken = null,
     ) {
         $this->httpClient = $httpClient ?? HttpClient::create();
     }
@@ -61,12 +62,21 @@ class ImportMapAuditor
         }
 
         // @see https://docs.github.com/en/rest/security-advisories/global-advisories?apiVersion=2022-11-28#list-global-security-advisories
-        $response = $this->httpClient->request('GET', self::AUDIT_URL, [
-            'query' => ['affects' => implode(',', $affectsQuery)],
-        ]);
+        $options = ['query' => ['affects' => implode(',', $affectsQuery)]];
+        if ($this->githubToken) {
+            // authenticated requests get a higher rate limit, the endpoint requires no scope
+            $options['auth_bearer'] = $this->githubToken;
+        }
+
+        $response = $this->httpClient->request('GET', self::AUDIT_URL, $options);
 
         if (200 !== $response->getStatusCode()) {
-            throw new RuntimeException(\sprintf('Error %d auditing packages. Response: '.$response->getContent(false), $response->getStatusCode()));
+            $message = \sprintf('Error %d auditing packages. Response: %s', $response->getStatusCode(), $response->getContent(false));
+            if (!$this->githubToken && '0' === ($response->getHeaders(false)['x-ratelimit-remaining'][0] ?? null)) {
+                $message .= ' Anonymous requests to the GitHub API are rate limited, configure the "asset_mapper.github_token" option or pass a token to "ImportMapAuditor" to raise the limit.';
+            }
+
+            throw new RuntimeException($message);
         }
 
         foreach ($response->toArray() as $advisory) {

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-16T09:17:23Z
+
+Thanks Javier. I moved this PR to 7.4. 6.4 is close to its end of life, and this only happens when the cache write fails. The error message now goes to STDERR, like the errors of the other Messenger commands since #62171.

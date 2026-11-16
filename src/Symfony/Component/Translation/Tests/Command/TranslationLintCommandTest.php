@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Translation\Command\TranslationLintCommand;
 use Symfony\Component\Translation\Loader\ArrayLoader;
@@ -22,6 +24,66 @@ use Symfony\Component\Translation\Translator;
 
 final class TranslationLintCommandTest extends TestCase
 {
+    public function testJsonValidTranslations()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['hello' => 'Hello!'], 'en');
+        $tester = new CommandTester($this->createCommand($translator, ['en']));
+
+        $this->assertSame(0, $tester->execute(['--format' => 'json'], ['decorated' => true]));
+        $this->assertSame([], json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testJsonInvalidTranslations()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['hello<error>name</error>' => 'Hello {name !'], 'en', 'messages+intl-icu');
+        $translator->addResource('array', ['hello' => 'Bonjour {name !'], 'fr', 'messages+intl-icu');
+        $tester = new CommandTester($this->createCommand($translator, ['en', 'fr']));
+
+        $this->assertSame(1, $tester->execute(['--format' => 'json'], ['decorated' => true]));
+        $errors = json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR);
+        $this->assertCount(2, $errors);
+        $this->assertSame('en', $errors[0]['locale']);
+        $this->assertSame('messages', $errors[0]['domain']);
+        $this->assertSame('hello<error>name</error>', $errors[0]['id']);
+        $this->assertStringContainsString('Invalid message format', $errors[0]['message']);
+        $this->assertSame('fr', $errors[1]['locale']);
+        $this->assertSame('hello', $errors[1]['id']);
+
+        $this->assertSame(1, $tester->execute(['--format' => 'json', '--locale' => ['fr']]));
+        $errors = json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR);
+        $this->assertCount(1, $errors);
+        $this->assertSame('fr', $errors[0]['locale']);
+    }
+
+    public function testJsonWithoutTranslations()
+    {
+        $tester = new CommandTester($this->createCommand(new Translator('en'), []));
+
+        $this->assertSame(0, $tester->execute(['--format' => 'json']));
+        $this->assertSame([], json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR));
+    }
+
+    public function testUnsupportedFormat()
+    {
+        $tester = new CommandTester($this->createCommand(new Translator('en'), []));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Supported formats are "txt" and "json".');
+        $tester->execute(['--format' => 'xml']);
+    }
+
+    public function testCompleteFormat()
+    {
+        $tester = new CommandCompletionTester($this->createCommand(new Translator('en'), []));
+
+        $this->assertSame(['txt', 'json'], $tester->complete(['--format', '']));
+    }
+
     #[RequiresPhpExtension('intl')]
     public function testLintCorrectTranslations()
     {

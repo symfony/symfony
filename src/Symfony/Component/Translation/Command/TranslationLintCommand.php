@@ -15,6 +15,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -43,6 +44,10 @@ class TranslationLintCommand extends Command
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
+        if ($input->mustSuggestOptionValuesFor('format')) {
+            $suggestions->suggestValues(['txt', 'json']);
+        }
+
         if ($input->mustSuggestOptionValuesFor('locale')) {
             $suggestions->suggestValues($this->enabledLocales);
         }
@@ -52,12 +57,17 @@ class TranslationLintCommand extends Command
     {
         $this
             ->setDefinition([
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format ("txt" or "json")', 'txt'),
                 new InputOption('locale', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Specify the locales to lint.', $this->enabledLocales),
             ])
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</> command lint translations.
 
                   <info>%command.invocation%</>
+
+                Use <info>--format=json</info> to output errors as JSON:
+
+                  <info>%command.invocation% --format=json</>
                 EOF
             );
     }
@@ -69,6 +79,11 @@ class TranslationLintCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $format = $input->getOption('format');
+        if (!\in_array($format, ['txt', 'json'], true)) {
+            throw new InvalidArgumentException('Supported formats are "txt" and "json".');
+        }
+
         $locales = $input->getOption('locale');
 
         /** @var array<string, array<string, array<string, \Throwable>>> $errors */
@@ -87,6 +102,20 @@ class TranslationLintCommand extends Command
                     }
                 }
             }
+        }
+
+        if ('json' === $format) {
+            $data = [];
+            foreach ($errors as $locale => $domains) {
+                foreach ($domains as $domain => $domainsErrors) {
+                    foreach ($domainsErrors as $id => $error) {
+                        $data[] = ['locale' => $locale, 'domain' => $domain, 'id' => $id, 'message' => $error->getMessage()];
+                    }
+                }
+            }
+            $output->writeln(json_encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_INVALID_UTF8_SUBSTITUTE), OutputInterface::OUTPUT_RAW);
+
+            return $errors ? Command::FAILURE : Command::SUCCESS;
         }
 
         if (!$domainsByLocales) {

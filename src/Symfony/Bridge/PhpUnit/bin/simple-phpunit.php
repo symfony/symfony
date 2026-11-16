@@ -389,29 +389,30 @@ if ('\\' === \DIRECTORY_SEPARATOR) {
 
 if ($components) {
     $skippedTests = $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] ?? false;
+    $maxParallel = max(0, (int) getenv('SYMFONY_PHPUNIT_MAX_PARALLEL')) ?: count($components);
     $runningProcs = [];
-
-    foreach ($components as $component) {
-        // Run phpunit tests in parallel
-
-        if ($skippedTests) {
-            putenv("SYMFONY_PHPUNIT_SKIPPED_TESTS=$component/$skippedTests");
-        }
-
-        $c = escapeshellarg($component);
-
-        if ($proc = proc_open(sprintf($cmd, $c, " > $c/phpunit.stdout 2> $c/phpunit.stderr"), [], $pipes)) {
-            $runningProcs[$component] = $proc;
-        } else {
-            $exit = 1;
-            echo "\033[41mKO\033[0m $component\n\n";
-        }
-    }
-
     $lastOutput = null;
     $lastOutputTime = null;
 
-    while ($runningProcs) {
+    while ($components || $runningProcs) {
+        while ($components && count($runningProcs) < $maxParallel) {
+            // Run phpunit tests in parallel
+            $component = array_shift($components);
+
+            if ($skippedTests) {
+                putenv("SYMFONY_PHPUNIT_SKIPPED_TESTS=$component/$skippedTests");
+            }
+
+            $c = escapeshellarg($component);
+
+            if ($proc = proc_open(sprintf($cmd, $c, " > $c/phpunit.stdout 2> $c/phpunit.stderr"), [], $pipes)) {
+                $runningProcs[$component] = $proc;
+            } else {
+                $exit = 1;
+                echo "\033[41mKO\033[0m $component\n\n";
+            }
+        }
+
         usleep(300000);
         $terminatedProcs = [];
         foreach ($runningProcs as $component => $proc) {
@@ -423,7 +424,7 @@ if ($components) {
             }
         }
 
-        if (!$terminatedProcs && 1 === count($runningProcs)) {
+        if (!$components && !$terminatedProcs && 1 === count($runningProcs)) {
             $component = key($runningProcs);
 
             $output = file_get_contents("$component/phpunit.stdout");

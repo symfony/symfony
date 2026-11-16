@@ -12,7 +12,7 @@
 namespace Symfony\Component\Mime\Crypto;
 
 use Symfony\Component\Mime\Exception\RuntimeException;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\RuntimeException as ProcessRuntimeException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -140,7 +140,7 @@ final class PgpProcess
             $process->mustRun();
 
             return $process->getOutput();
-        } catch (ProcessFailedException $e) {
+        } catch (ProcessRuntimeException $e) {
             throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
     }

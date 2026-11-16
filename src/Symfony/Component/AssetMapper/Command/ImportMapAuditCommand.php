@@ -17,6 +17,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -89,8 +90,8 @@ class ImportMapAuditCommand extends Command
             foreach ($packageAudit->vulnerabilities as $vulnerability) {
                 $rows[] = [
                     \sprintf('<fg=%s>%s</>', self::SEVERITY_COLORS[$vulnerability->severity] ?? 'default', ucfirst($vulnerability->severity)),
-                    $vulnerability->summary,
-                    $packageAudit->package,
+                    OutputFormatter::escape($vulnerability->summary),
+                    OutputFormatter::escape($packageAudit->package),
                     $packageAudit->version ?? 'n/a',
                     $vulnerability->firstPatchedVersion ?? 'n/a',
                     $vulnerability->url,
@@ -184,7 +185,7 @@ class ImportMapAuditCommand extends Command
             }
         }
 
-        $this->io->write(json_encode($json));
+        $this->io->write(json_encode($json, \JSON_INVALID_UTF8_SUBSTITUTE), false, OutputInterface::OUTPUT_RAW);
 
         return 0 < array_sum($json['summary']) ? self::FAILURE : self::SUCCESS;
     }

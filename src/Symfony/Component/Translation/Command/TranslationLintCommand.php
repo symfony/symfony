@@ -15,6 +15,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -98,8 +99,8 @@ class TranslationLintCommand extends Command
             ['Locale', 'Domains', 'Valid?'],
             array_map(
                 static fn (string $locale, array $domains) => [
-                    $locale,
-                    implode(', ', $domains),
+                    OutputFormatter::escape($locale),
+                    implode(', ', array_map(OutputFormatter::escape(...), $domains)),
                     !\array_key_exists($locale, $errors) ? '<info>Yes</>' : '<error>No</>',
                 ],
                 array_keys($domainsByLocales),
@@ -110,10 +111,10 @@ class TranslationLintCommand extends Command
         if ($errors) {
             foreach ($errors as $locale => $domains) {
                 foreach ($domains as $domain => $domainsErrors) {
-                    $this->io->section(\sprintf('Errors for locale "%s" and domain "%s"', $locale, $domain));
+                    $this->io->section(\sprintf('Errors for locale "%s" and domain "%s"', OutputFormatter::escape($locale), OutputFormatter::escape($domain)));
 
                     foreach ($domainsErrors as $id => $error) {
-                        $this->io->text(\sprintf('Translation key "%s" is invalid:', $id));
+                        $this->io->text(\sprintf('Translation key "%s" is invalid:', OutputFormatter::escape($id)));
                         $this->io->error($error->getMessage());
                     }
                 }

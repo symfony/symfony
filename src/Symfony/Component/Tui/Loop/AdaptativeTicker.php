@@ -36,6 +36,13 @@ final class AdaptativeTicker
     ) {
     }
 
+    public function __destruct()
+    {
+        if (null !== $this->callbackId) {
+            EventLoop::cancel($this->callbackId);
+        }
+    }
+
     public function refresh(bool $running, bool $renderRequested, ?float $nextScheduledDelay, bool $hasTickCallback, ?bool $lastTickBusyHint): void
     {
         $this->setInterval($this->computeDesiredInterval($running, $renderRequested, $nextScheduledDelay, $hasTickCallback, $lastTickBusyHint));
@@ -99,19 +106,22 @@ final class AdaptativeTicker
         }
 
         $this->interval = $interval;
-        $this->callbackId = EventLoop::repeat($interval, function (string $callbackId): void {
-            if (!$this->runtime->isRunning()) {
+        // Held weakly by the event loop, so that a TUI dropped without being stopped is not kept by its ticks
+        $ticker = \WeakReference::create($this);
+        $this->callbackId = EventLoop::repeat($interval, static function (string $callbackId) use ($ticker): void {
+            $self = $ticker->get();
+            if (null === $self || !$self->runtime->isRunning()) {
                 EventLoop::cancel($callbackId);
 
-                if ($this->callbackId === $callbackId) {
-                    $this->callbackId = null;
-                    $this->interval = null;
+                if (null !== $self && $self->callbackId === $callbackId) {
+                    $self->callbackId = null;
+                    $self->interval = null;
                 }
 
                 return;
             }
 
-            $this->runtime->tick();
+            $self->runtime->tick();
         });
     }
 }

@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * A type of "key_management.doctrine_dbal.types" is declared on every connection.
  * The type of an encrypted column is declared on the connections of the entity managers that map its class.
- * The parent type is resolved by the first of these connections, or by the default connection.
+ * Each connection gets its own service, so that the parent type is the instance that connection resolves.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
@@ -50,8 +50,6 @@ final class RegisterDoctrineDbalTypesPass implements CompilerPassInterface
         $prototype = $container->getDefinition(self::PROTOTYPE);
         /** @var array<string, string> $connections */
         $connections = $container->getParameter('doctrine.connections');
-        /** @var string $default */
-        $default = $container->hasParameter('doctrine.default_connection') ? $container->getParameter('doctrine.default_connection') : array_key_first($connections);
         /** @var array<string, list<string>> $classes */
         $classes = $container->hasParameter(self::CLASSES) ? $container->getParameter(self::CLASSES) : [];
         $namespaces = $this->getConnectionsByNamespace($container);
@@ -65,20 +63,18 @@ final class RegisterDoctrineDbalTypesPass implements CompilerPassInterface
                     }
                 }
             }
-            $names = array_keys($names);
 
-            $parentType = (new Definition(Type::class))
-                ->setFactory([new Reference(\sprintf('doctrine.dbal.%s_connection.type_provider', $names[0] ?? $default)), 'get'])
-                ->setArguments([$parent]);
+            // without a mapped class, DoctrineBundle declares the type on every connection
+            foreach (array_keys($names) ?: array_keys($connections) as $connection) {
+                $parentType = (new Definition(Type::class))
+                    ->setFactory([new Reference(\sprintf('doctrine.dbal.%s_connection.type_provider', $connection)), 'get'])
+                    ->setArguments([$parent]);
 
-            $definition = $container->setDefinition(self::PROTOTYPE.'.'.$name, (clone $prototype)->setAbstract(false))
-                ->replaceArgument(0, $parentType)
-                ->replaceArgument(2, $key)
-                ->replaceArgument(3, $parent);
-
-            // without a connection, DoctrineBundle declares the type on every connection
-            foreach ($names ?: [null] as $connection) {
-                $definition->addTag('doctrine.dbal.type', ['type_name' => $name] + (null !== $connection ? ['connection' => $connection] : []));
+                $container->setDefinition(self::PROTOTYPE.'.'.$name.'~'.$connection, (clone $prototype)->setAbstract(false))
+                    ->replaceArgument(0, $parentType)
+                    ->replaceArgument(2, $key)
+                    ->replaceArgument(3, $parent)
+                    ->addTag('doctrine.dbal.type', ['type_name' => $name, 'connection' => $connection]);
             }
         }
     }

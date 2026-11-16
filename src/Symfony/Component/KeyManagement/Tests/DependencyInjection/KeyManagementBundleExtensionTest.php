@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Tests\DependencyInjection;
 
+use Doctrine\Bundle\DoctrineBundle\Dbal\TypeProviderGlobalFallback;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\Entity;
@@ -968,7 +969,7 @@ class KeyManagementBundleExtensionTest extends TestCase
 
     public function testDoctrineDbalTypesEncryptWithTheDefaultClientWithoutAStore()
     {
-        if (!class_exists(Type::class) || !class_exists(EncryptedType::class) || !class_exists(DoctrineBundle::class)) {
+        if (!class_exists(Type::class) || !class_exists(EncryptedType::class) || !class_exists(TypeProviderGlobalFallback::class)) {
             $this->markTestSkipped('doctrine/dbal, symfony/doctrine-dbal-key-management or doctrine/doctrine-bundle is not installed.');
         }
 
@@ -980,7 +981,7 @@ class KeyManagementBundleExtensionTest extends TestCase
             ]);
         });
 
-        $definition = $container->getDefinition('.key_management.doctrine_dbal.encrypted_type.encrypted_phone');
+        $definition = $container->getDefinition('.key_management.doctrine_dbal.encrypted_type.encrypted_phone~default');
         $this->assertSame(EncryptedType::class, $definition->getClass());
         $this->assertFalse($definition->isAbstract());
         $this->assertEquals(new LazyProxyArgument(new Reference('key_management.envelope_encrypter.app')), $definition->getArgument(1));
@@ -989,7 +990,7 @@ class KeyManagementBundleExtensionTest extends TestCase
 
     public function testDoctrineDbalTypesAreDeclaredOnTheConnectionsOfTheirEntityManagers()
     {
-        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class) || !class_exists(DoctrineBundle::class)) {
+        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class) || !class_exists(TypeProviderGlobalFallback::class)) {
             $this->markTestSkipped('doctrine/orm, symfony/doctrine-orm-key-management or doctrine/doctrine-bundle is not installed.');
         }
 
@@ -1003,33 +1004,36 @@ class KeyManagementBundleExtensionTest extends TestCase
         });
 
         $this->assertEquals([
-            '.key_management.doctrine_dbal.encrypted_type.encrypted_phone' => [['type_name' => 'encrypted_phone']],
-            '.key_management.doctrine_dbal.encrypted_type.encrypted_string@speaker.contact' => [['type_name' => 'encrypted_string@speaker.contact', 'connection' => 'speaker']],
-        ], $container->findTaggedServiceIds('doctrine.dbal.type'), 'DoctrineBundle declares a type without a connection on every connection.');
+            '.key_management.doctrine_dbal.encrypted_type.encrypted_phone~default' => [['type_name' => 'encrypted_phone', 'connection' => 'default']],
+            '.key_management.doctrine_dbal.encrypted_type.encrypted_phone~speaker' => [['type_name' => 'encrypted_phone', 'connection' => 'speaker']],
+            '.key_management.doctrine_dbal.encrypted_type.encrypted_string@speaker.contact~speaker' => [['type_name' => 'encrypted_string@speaker.contact', 'connection' => 'speaker']],
+        ], $container->findTaggedServiceIds('doctrine.dbal.type'), 'a configured type goes to every connection, the type of a column to the connections of its entity managers.');
 
-        $this->assertEquals(self::parentType('default', 'string'), $container->getDefinition('.key_management.doctrine_dbal.encrypted_type.encrypted_phone')->getArgument(0));
+        $this->assertEquals(self::parentType('default', 'string'), $container->getDefinition('.key_management.doctrine_dbal.encrypted_type.encrypted_phone~default')->getArgument(0));
+        $this->assertEquals(self::parentType('speaker', 'string'), $container->getDefinition('.key_management.doctrine_dbal.encrypted_type.encrypted_phone~speaker')->getArgument(0));
         $this->assertEquals([
             self::parentType('speaker', 'string'),
             new LazyProxyArgument(new Reference('key_management.envelope_encrypter.app')),
             'speaker.contact',
             'string',
-        ], $container->getDefinition('.key_management.doctrine_dbal.encrypted_type.encrypted_string@speaker.contact')->getArguments());
+        ], $container->getDefinition('.key_management.doctrine_dbal.encrypted_type.encrypted_string@speaker.contact~speaker')->getArguments());
     }
 
     public function testTheTypeOfAnEncryptedColumnNoEntityManagerMapsIsDeclaredOnEveryConnection()
     {
-        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class) || !class_exists(DoctrineBundle::class)) {
+        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class) || !class_exists(TypeProviderGlobalFallback::class)) {
             $this->markTestSkipped('doctrine/orm, symfony/doctrine-orm-key-management or doctrine/doctrine-bundle is not installed.');
         }
 
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
-            self::registerDoctrineServices($container, ['default' => 'App\\Entity']);
+            self::registerDoctrineServices($container, ['default' => 'App\\Entity', 'other' => null]);
             $container->register(Speaker::class, Speaker::class)->setAutoconfigured(true);
             $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=AAAA']]);
         });
 
         $this->assertEquals([
-            '.key_management.doctrine_dbal.encrypted_type.encrypted_string@speaker.contact' => [['type_name' => 'encrypted_string@speaker.contact']],
+            '.key_management.doctrine_dbal.encrypted_type.encrypted_string@speaker.contact~default' => [['type_name' => 'encrypted_string@speaker.contact', 'connection' => 'default']],
+            '.key_management.doctrine_dbal.encrypted_type.encrypted_string@speaker.contact~other' => [['type_name' => 'encrypted_string@speaker.contact', 'connection' => 'other']],
         ], $container->findTaggedServiceIds('doctrine.dbal.type'));
     }
 
@@ -1046,6 +1050,27 @@ class KeyManagementBundleExtensionTest extends TestCase
             $container->loadFromExtension('key_management', [
                 'clients' => ['app' => 'sodium://?keys[app]=AAAA'],
                 'doctrine_dbal' => ['types' => ['encrypted_phone' => ['type' => 'string', 'key' => 'app']]],
+            ]);
+        });
+    }
+
+    public function testCircularEncryptedTypeParentsAreRefused()
+    {
+        if (!class_exists(Type::class) || !class_exists(EncryptedType::class) || !class_exists(TypeProviderGlobalFallback::class)) {
+            $this->markTestSkipped('doctrine/dbal, symfony/doctrine-dbal-key-management or doctrine/doctrine-bundle is not installed.');
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The encrypted type "first" has a circular parent type definition.');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            self::registerDoctrineServices($container, ['default' => null]);
+            $container->loadFromExtension('key_management', [
+                'clients' => ['app' => 'sodium://?keys[app]=AAAA'],
+                'doctrine_dbal' => ['types' => [
+                    'first' => ['type' => 'second', 'key' => 'app'],
+                    'second' => ['type' => 'first', 'key' => 'app'],
+                ]],
             ]);
         });
     }
@@ -1115,7 +1140,7 @@ class KeyManagementBundleExtensionTest extends TestCase
 
     public function testTheEncryptedColumnsOfTheScannedEntitiesGetTheirTypes()
     {
-        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class) || !class_exists(DoctrineBundle::class)) {
+        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class) || !class_exists(TypeProviderGlobalFallback::class)) {
             $this->markTestSkipped('doctrine/orm, symfony/doctrine-orm-key-management or doctrine/doctrine-bundle is not installed.');
         }
 
@@ -1125,7 +1150,7 @@ class KeyManagementBundleExtensionTest extends TestCase
             $container->loadFromExtension('key_management', ['clients' => ['app' => 'sodium://?keys[app]=AAAA']]);
         });
 
-        $type = $container->getDefinition('.key_management.doctrine_dbal.encrypted_type.encrypted_string@speaker.contact');
+        $type = $container->getDefinition('.key_management.doctrine_dbal.encrypted_type.encrypted_string@speaker.contact~default');
         $this->assertEquals(new LazyProxyArgument(new Reference('key_management.envelope_encrypter.app')), $type->getArgument(1));
         $this->assertSame('speaker.contact', $type->getArgument(2));
 
@@ -1245,7 +1270,7 @@ class KeyManagementBundleExtensionTest extends TestCase
 
         foreach ($entityManagers as $name => $namespace) {
             $connections[$name] = ['url' => 'sqlite:///:memory:'];
-            $managers[$name] = ['connection' => $name];
+            $managers[$name] = ['connection' => $name, 'auto_discover_entities' => false];
 
             if (null !== $namespace) {
                 $managers[$name]['mappings'] = [

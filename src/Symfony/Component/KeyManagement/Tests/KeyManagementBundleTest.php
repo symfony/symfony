@@ -495,7 +495,7 @@ class TestKeyManagementKernel extends AbstractKernel
                 ]],
                 'orm' => ['entity_managers' => [
                     'default' => ['connection' => 'default', 'auto_discover_entities' => false],
-                    'customer' => ['connection' => 'customer', 'mappings' => ['Customer' => [
+                    'customer' => ['connection' => 'customer', 'use_schema_editor_api' => true, 'mappings' => ['Customer' => [
                         'type' => 'attribute',
                         'dir' => __DIR__.'/Fixtures/Customer',
                         'prefix' => 'Symfony\\Component\\KeyManagement\\Tests\\Fixtures\\Customer',

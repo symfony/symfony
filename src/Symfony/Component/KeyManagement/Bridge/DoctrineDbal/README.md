@@ -190,7 +190,7 @@ Use the configured key from the earlier `alias/app-key` example.
 
 ```php
 $encrypter = new StoredEnvelopeEncrypter($store, new EnvelopeEncrypter($kms));
-$type = new EncryptedType(Type::getTypeRegistry()->get('string'), $encrypter, 'alias/app-key', 'string');
+$type = new EncryptedType(new StringType(), $encrypter, 'alias/app-key', 'string');
 ```
 
 Rows written before are still read through the KMS, and new rows refer to the stored data key.

@@ -58,9 +58,6 @@ $eventManager->addEventListener(Events::loadClassMetadata, new EncryptedColumnLi
 ]));
 ```
 
-The ORM resolves the types through the connection since doctrine/orm 3.8.
-With an older version, register them on the global type registry instead.
-
 Loading the metadata of a class fails when no encrypted type is registered for the key and the type of a column.
 It also fails when the attribute is on a property that is not a mapped column.
 

@@ -140,4 +140,30 @@ class AmpHttpClientTest extends HttpClientTestCase
 
         $this->assertLessThan(0.5, (hrtime(true) - $start) / 1E9);
     }
+
+    public function testCanceledResponsesDoNotLeakActivity()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $client->request('GET', 'http://localhost:'.self::port().'/timeout-header')->cancel();
+
+        $response = $client->request('GET', 'http://localhost:'.self::port().'/timeout-body');
+        $this->assertSame(200, $response->getStatusCode());
+        $response->cancel();
+
+        $client->request('GET', 'http://localhost:'.self::port().'/')->getContent();
+
+        $this->assertSame([], (new \ReflectionProperty($client, 'multi'))->getValue($client)->handlesActivity);
+    }
+
+    public function testResponseCanceledBeforeTheEventLoopRunsIsNotSent()
+    {
+        $server = stream_socket_server('tcp://127.0.0.1:0');
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $client->request('GET', 'http://'.stream_socket_get_name($server, false).'/')->cancel();
+        $client->request('GET', 'http://localhost:'.self::port().'/')->getContent();
+
+        $this->assertFalse(@stream_socket_accept($server, 0.1));
+    }
 }

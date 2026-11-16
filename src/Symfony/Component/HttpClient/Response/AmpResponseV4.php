@@ -105,6 +105,10 @@ final class AmpResponseV4 implements ResponseInterface, StreamableInterface
         $this->id = $id = self::$nextId;
         self::$nextId = str_increment(self::$nextId);
         Loop::defer(static function () use ($request, $multi, $id, &$info, &$headers, $canceller, &$options, $onProgress, &$handle, $logger, &$pause) {
+            if (!isset($multi->openHandles[$id])) {
+                return null;
+            }
+
             return new Coroutine(self::generateResponse($request, $multi, $id, $info, $headers, $canceller, $options, $onProgress, $handle, $logger, $pause));
         });
 
@@ -223,6 +227,10 @@ final class AmpResponseV4 implements ResponseInterface, StreamableInterface
     private static function generateResponse(Request $request, AmpClientStateV4 $multi, string $id, array &$info, array &$headers, CancellationTokenSource $canceller, array &$options, \Closure $onProgress, &$handle, ?LoggerInterface $logger, Promise &$pause): \Generator
     {
         $request->setInformationalResponseHandler(static function (Response $response) use ($multi, $id, &$info, &$headers) {
+            if (!isset($multi->openHandles[$id])) {
+                return;
+            }
+
             self::addResponseHeaders($response, $info, $headers);
             $multi->handlesActivity[$id][] = new InformationalChunk($response->getStatus(), $response->getHeaders());
             self::stopLoop();
@@ -237,6 +245,10 @@ final class AmpResponseV4 implements ResponseInterface, StreamableInterface
             }
 
             $options = null;
+
+            if (!isset($multi->openHandles[$id])) {
+                return;
+            }
 
             $multi->handlesActivity[$id][] = new FirstChunk();
 
@@ -259,7 +271,13 @@ final class AmpResponseV4 implements ResponseInterface, StreamableInterface
 
                 yield $pause;
 
-                if (null === $data = yield $body->read()) {
+                $data = yield $body->read();
+
+                if (!isset($multi->openHandles[$id])) {
+                    return;
+                }
+
+                if (null === $data) {
                     break;
                 }
 
@@ -270,8 +288,10 @@ final class AmpResponseV4 implements ResponseInterface, StreamableInterface
             $multi->handlesActivity[$id][] = null;
             $multi->handlesActivity[$id][] = null;
         } catch (\Throwable $e) {
-            $multi->handlesActivity[$id][] = null;
-            $multi->handlesActivity[$id][] = $e;
+            if (isset($multi->openHandles[$id])) {
+                $multi->handlesActivity[$id][] = null;
+                $multi->handlesActivity[$id][] = $e;
+            }
         } finally {
             $info['download_content_length'] = $info['size_download'];
         }

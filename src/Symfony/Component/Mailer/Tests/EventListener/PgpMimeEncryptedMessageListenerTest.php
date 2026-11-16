@@ -352,6 +352,7 @@ class PgpMimeEncryptedMessageListenerTest extends TestCase
             $this->markTestSkipped('The "gpg" binary is not available.');
         }
 
-        return new PgpEncrypter();
+        // Starting gpg can take longer than the default 60s timeout on a loaded Windows CI runner
+        return new PgpEncrypter(['timeout' => 300]);
     }
 }

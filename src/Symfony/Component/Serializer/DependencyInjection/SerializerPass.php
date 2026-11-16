@@ -256,6 +256,10 @@ class SerializerPass implements CompilerPassInterface
 
         $definition = $container->registerChild($childId, $id);
 
+        foreach ($container->getDefinition($id)->getTag('kernel.reset') as $attributes) {
+            $definition->addTag('kernel.reset', $attributes);
+        }
+
         foreach ($this->resolveArguments($container, $id) as $index => $argument) {
             if (!$argument instanceof Reference) {
                 continue;

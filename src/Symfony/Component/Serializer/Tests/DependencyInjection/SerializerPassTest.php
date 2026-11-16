@@ -713,6 +713,25 @@ class SerializerPassTest extends TestCase
         $this->assertNull($container->getDefinition('serializer.api')->getArgument('$sharedCacheKey'));
     }
 
+    public function testNormalizersOfNamedSerializersKeepTheirResetTag()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('.serializer.named_serializers', ['api' => []]);
+
+        $container->register('serializer')->setArguments([null, null]);
+        $container->register('n')
+            ->addTag('serializer.normalizer', ['serializer' => '*'])
+            ->addTag('kernel.reset', ['method' => 'reset']);
+        $container->register('e')->addTag('serializer.encoder', ['serializer' => '*']);
+
+        $serializerPass = new SerializerPass();
+        $serializerPass->process($container);
+
+        $this->assertSame([['method' => 'reset']], $container->getDefinition('n.api')->getTag('kernel.reset'));
+        $this->assertSame([], $container->getDefinition('e.api')->getTag('kernel.reset'));
+    }
+
     public function testNamedSerializersAreRegistered()
     {
         $container = new ContainerBuilder();

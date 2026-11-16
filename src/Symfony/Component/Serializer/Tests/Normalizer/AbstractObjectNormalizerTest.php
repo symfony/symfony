@@ -1677,6 +1677,40 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame(1, $normalizer->extractAttributesCalls);
     }
 
+    public function testResetClearsTheAttributesCache()
+    {
+        $normalizer = new class extends AbstractObjectNormalizerDummy {
+            public int $extractAttributesCalls = 0;
+
+            protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
+            {
+                ++$this->extractAttributesCalls;
+
+                return array_keys((array) $object);
+            }
+
+            protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
+            {
+                return $object->{$attribute};
+            }
+        };
+
+        $serializer = new Serializer([$normalizer]);
+
+        $dummy = new Dummy();
+        $dummy->foo = 'foo';
+
+        $serializer->normalize($dummy);
+        $serializer->normalize($dummy);
+
+        $this->assertSame(1, $normalizer->extractAttributesCalls);
+
+        $normalizer->reset();
+        $serializer->normalize($dummy);
+
+        $this->assertSame(2, $normalizer->extractAttributesCalls);
+    }
+
     public function testProvidingContextCacheKeyGeneratesSameChildContextCacheKey()
     {
         $foobar = new Dummy();

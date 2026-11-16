@@ -322,6 +322,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     abstract protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed;
 
+    public function reset(): void
+    {
+        $this->attributesCache = [];
+    }
+
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return class_exists($type) || (interface_exists($type, false) && null !== $this->classDiscriminatorResolver?->getMappingForClass($type));

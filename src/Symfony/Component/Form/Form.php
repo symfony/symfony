@@ -516,7 +516,15 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                     $isSubmitted = \array_key_exists($name, $submittedData);
 
                     if ($isSubmitted || $clearMissing) {
-                        $child->submit($isSubmitted ? $submittedData[$name] : null, $clearMissing);
+                        if ($isSubmitted) {
+                            $childData = $submittedData[$name];
+                        } else {
+                            // Browsers omit unchecked checkboxes: submit their first false value instead
+                            $falseValues = $child->getConfig()->getOption('false_values');
+                            $childData = \is_array($falseValues) ? $falseValues[0] ?? null : null;
+                        }
+
+                        $child->submit($childData, $clearMissing);
                         unset($submittedData[$name]);
 
                         if (null !== $this->clickedButton) {

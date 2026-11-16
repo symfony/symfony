@@ -1,7 +1,7 @@
 Engagespot Notifier
 ===================
 
-Provides [Engagespot](https://docs.engagespot.co/how-to-send-notifications-via-engagespot-api/how-to-send-notifications-using-engagespot-rest-api) integration for Symfony Notifier.
+Provides [Engagespot](https://docs.engagespot.co/api/api-reference/introduction) integration for Symfony Notifier.
 
 DSN example
 -----------

@@ -67,6 +67,23 @@ class AttributeAutoconfigurationPassTest extends TestCase
         ];
         $this->assertEquals($expected, $abstractService->getInstanceofConditionals());
     }
+
+    public function testProcessDoesNotKeepTheContainer()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, static function () {});
+        $container->register('foo', TestServiceWithAttributes::class)
+            ->setAutoconfigured(true)
+        ;
+
+        $pass = new AttributeAutoconfigurationPass();
+        $pass->process($container);
+
+        $ref = \WeakReference::create($container);
+        unset($container);
+
+        $this->assertNull($ref->get());
+    }
 }
 
 #[AsTaggedItem]

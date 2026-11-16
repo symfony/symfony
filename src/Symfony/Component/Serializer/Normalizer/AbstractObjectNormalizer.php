@@ -16,6 +16,8 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -143,6 +145,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private array $attributesCache = [];
     private array $typePropertiesCache = [];
     private ?TypeContextFactory $typeContextFactory = null;
+    private ?PropertyAccessorInterface $nestedAttributesReader = null;
+    private ?PropertyAccessor $serializedPathWriter = null;
     private readonly \Closure $objectClassResolver;
 
     public function __construct(
@@ -371,7 +375,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $nestedAttributes = $this->getNestedAttributes($mappedClass, $context);
         $nestedData = $originalNestedData = [];
-        $propertyAccessor = $nestedAttributes ? PropertyAccess::createPropertyAccessorBuilder()->enableExceptionOnInvalidIndex()->getPropertyAccessor() : null;
+        $propertyAccessor = $nestedAttributes ? $this->nestedAttributesReader ??= PropertyAccess::createPropertyAccessorBuilder()->enableExceptionOnInvalidIndex()->getPropertyAccessor() : null;
         foreach ($nestedAttributes as $property => $serializedPath) {
             try {
                 $value = $propertyAccessor->getValue($normalizedData, $serializedPath);
@@ -1274,7 +1278,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         // resolved before the attribute is known, so only the top-level groups can apply there,
         // and the name would not round trip otherwise
         if (null !== $serializedPath = ($attributesMetadata[$attribute] ?? null)?->getSerializedPath($groups)) {
-            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+            $propertyAccessor = $this->serializedPathWriter ??= PropertyAccess::createPropertyAccessor();
             if ($propertyAccessor->isReadable($data, $serializedPath) && null !== $propertyAccessor->getValue($data, $serializedPath)) {
                 throw new LogicException(\sprintf('The element you are trying to set is already populated: "%s".', (string) $serializedPath));
             }

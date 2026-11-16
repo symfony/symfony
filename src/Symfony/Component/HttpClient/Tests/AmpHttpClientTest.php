@@ -58,6 +58,12 @@ class AmpHttpClientTest extends HttpClientTestCase
         parent::testTimeoutOnDestruct();
     }
 
+    #[Group('transient-on-windows')]
+    public function testMaxConnectDuration()
+    {
+        parent::testMaxConnectDuration();
+    }
+
     #[RequiresPhpExtension('zlib')]
     public function testZlibStreamBody()
     {

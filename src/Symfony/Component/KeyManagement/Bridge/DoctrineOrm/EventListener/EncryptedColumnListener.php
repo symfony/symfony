@@ -12,7 +12,6 @@
 namespace Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener;
 
 use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\TypeRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
@@ -209,9 +208,8 @@ final class EncryptedColumnListener
             throw new \LogicException('The encrypted columns that omit their key need a data key store: configure "key_management.store", or set an explicit key.');
         }
 
-        $configuration = $manager->getConnection()->getConfiguration();
-        $parents = method_exists($configuration, 'getTypeProvider') ? $configuration->getTypeProvider() : Type::getTypeRegistry();
-        $registry = $parents instanceof TypeRegistry ? $parents : (method_exists(Configuration::class, 'getTypeProvider') ? (new Configuration())->getTypeProvider() : $parents);
+        $parents = $manager->getConnection()->getConfiguration()->getTypeProvider();
+        $registry = $parents instanceof TypeRegistry ? $parents : (new Configuration())->getTypeProvider();
 
         if (!$registry instanceof TypeRegistry) {
             throw new \LogicException('The encrypted columns that omit their key require a writable Doctrine type registry.');

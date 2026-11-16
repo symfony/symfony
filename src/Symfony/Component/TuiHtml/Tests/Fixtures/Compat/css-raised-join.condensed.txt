@@ -1,0 +1,8 @@
+⟨90m╭──────────⟨0m⟨34m┬───┬⟨0m⟨90m───┬──────╮⟨0m
+⟨90m│⟨0m Previous ⟨34m│⟨0m ⟨34m1⟨0m ⟨34m│⟨0m 2 ⟨90m│⟨0m Next ⟨90m│⟨0m
+⟨90m╰──────────⟨0m⟨34m┴───┴⟨0m⟨90m───┴──────╯⟨0m
+⟨90m╭─────────────────┬──────────────────╮⟨0m
+⟨90m│⟨0m raised, rounded ⟨90m│⟨0m its corners kept ⟨90m│⟨0m
+⟨90m╰─────────────────┴──────────────────╯⟨0m
+The active page is drawn over its neighbors, its lines
+joined with theirs.

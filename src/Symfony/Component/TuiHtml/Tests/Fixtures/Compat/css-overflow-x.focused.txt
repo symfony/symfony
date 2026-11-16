@@ -1,0 +1,43 @@
+┌────────────────────────────┐
+│                            │
+│function render(array $lines│
+│                            │
+│Prose wraps in the box, the │
+│code scrolls.               │
+│                            │
+│━━━━━━━━━⟨2m───────────────────⟨0m│
+└────────────────────────────┘
+[ Export ] [ Print ] ⟨7m[ Close ]⟨0m
+⟨2m───────────⟨0m━━━━━━━━━━━━━━━━━━━
+
+A line that does not wra
+
+⟨33m─────────────⟨0m⟨90m┈┈┈┈┈┈┈┈┈┈┈⟨0m
+
+┌────────────────────────────┐
+│pre { overflow-x: auto }: th│
+│━━━━━━━━━━━━⟨2m────────────────⟨0m│
+└────────────────────────────┘
+
+┌──────────────────────────────────────┐
+│A block of code scrolled sideways,    │
+│like those of Sphinx: no blank line   │
+│before its end                        │
+└──────────────────────────────────────┘
+
+┌──────────────────────────────────────┐
+│A block of code in its own box, like t│
+│no blank line before its end either   │
+│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟨2m─────────⟨0m│
+└──────────────────────────────────────┘
+
+┌──────────────────────────────────────┐
+│Lines of code each ending in a br,    │
+│like Prism:                           │
+│no blank line after each              │
+└──────────────────────────────────────┘
+
+┌──────────────────────────────────────┐
+│Two br at the end: one blank line     │
+│                                      │
+└──────────────────────────────────────┘

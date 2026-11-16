@@ -1,0 +1,45 @@
+<!-- covers: html.elements.table html.elements.caption html.elements.thead html.elements.tbody html.elements.tfoot html.elements.tr html.elements.td html.elements.th -->
+<!-- variant: narrow columns=30 -->
+<table>
+  <caption>Quarterly results</caption>
+  <thead><tr><th>Quarter</th><th>Revenue</th><th>Growth</th></tr></thead>
+  <tbody>
+    <tr><td>Q1</td><td>120</td><td>+3%</td></tr>
+    <tr><td>Q2</td><td colspan="2">not published yet</td></tr>
+  </tbody>
+  <tfoot><tr><td>Total</td><td>120</td><td></td></tr></tfoot>
+</table>
+<style>
+  .wide { width: 100% }
+  .wide td, .wide th { background: blue }
+</style>
+<table class="wide">
+  <tr><th>Stretched</th><th>to the full width</th></tr>
+  <tr><td>by the widths</td><td>of the columns</td></tr>
+</table>
+<table>
+  <tr><td>a cell with a lot of text that cannot fit</td><td>another long cell that shrinks too</td></tr>
+</table>
+<table>
+  <tr><th rowspan="2">Spans two rows</th><td>a</td><td>b</td></tr>
+  <tr><td>c, under a</td><td>d</td></tr>
+  <tr><td>e</td><td>f</td><td>g</td></tr>
+</table>
+<table class="spans">
+  <tr><td rowspan="3" style="border: 1px solid">Drawn across the three rows</td><td style="border: 1px solid">one</td></tr>
+  <tr><td style="border: 1px solid">two</td></tr>
+  <tr><td style="border: 1px solid">three</td><td rowspan="2" style="border: 1px solid">across the last two rows,<br>the last one taller<br>for its lines</td></tr>
+  <tr><td>four</td><td>five</td></tr>
+</table>
+<table class="spans">
+  <tr><td rowspan="2" style="border: 1px solid">A<br>B<br>C</td><td style="border: 1px solid">x</td></tr>
+  <tr></tr>
+  <tr><td>e</td><td>after a row of no cells</td></tr>
+</table>
+<table align="center" border="1"><tr><td>Centered by align, like the button of an email</td></tr></table>
+<table align="right" border="1"><tr><td>Floated right</td></tr></table><p>Text beside a table floated by align.</p>
+<table border="1"><tr><td style="height: 10px">A cell 10px tall<br>grows to its lines,<br>like CSS</td><td style="height: 10px; max-height: 10px">and with<br>a max-height</td></tr></table>
+<table border="1"><caption>A caption longer than its table, whose words stay whole</caption><tr><td>a</td><td>b</td></tr></table>
+<figure style="display: table; border-collapse: collapse; border: 1px solid; border-bottom: 0; margin: 0"><div>image</div><figcaption style="display: table-caption; caption-side: bottom; border: 1px solid; border-top: 0">A figure displayed as a table, like a thumbnail of Wikipedia: its caption counts its longest word only</figcaption></figure>
+<ul style="display: inline-table; list-style: none; padding: 0"><li>A menu displayed as an inline table</li><li>its items as wide as they are, not cut to their longest words</li></ul>
+<table style="border: 1px solid; border-collapse: separate"><caption>A caption above the border of its table, outside it</caption><tr><td>its cells</td><td>inside</td></tr></table>

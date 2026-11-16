@@ -1,0 +1,19 @@
+<!-- covers: html.elements.input html.elements.datalist html.elements.textarea -->
+<!-- variant: focus-volume focus=#volume -->
+<style>
+  input:invalid { color: red }
+</style>
+<form>
+  <input type="password" aria-label="Password" value="s3cr3t">
+  <input type="date" aria-label="Date" value="2026-11-05">
+  <input type="date" aria-label="Bad date (red)" value="2026-02-30">
+  <input type="time" aria-label="Time" value="09:30">
+  <input type="range" id="volume" aria-label="Volume" min="0" max="10" value="7">
+  <input aria-label="Language" list="langs" value="Py">
+  <datalist id="langs"><option>Python</option><option>PHP</option></datalist>
+  <label>Accent <input type="color" value="#2563eb"></label>
+  <label>Not a color <input type="color" value="blue"></label>
+  <label>Avatar <input type="file" accept="image/*"></label>
+  <textarea aria-label="Bio" placeholder="Tell us about you" rows="2"></textarea>
+  <input type="submit" value="Save">
+</form>

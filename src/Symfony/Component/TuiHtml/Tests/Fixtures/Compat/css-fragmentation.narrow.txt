@@ -1,0 +1,28 @@
+Three lines at       the next, else the
+least stay at the    text block moves
+bottom of a column   on.
+and at the top of    A second block
+                     follows it.
+
+One line is enough   top of the next
+at the bottom of a   one.
+column and at the    Then another.
+
+┌─────────────────┐  │ first piece     │
+│ A box sliced    │  │ only and its    │
+│ across the      │  │ bottom edge in  │
+│ columns has its │  │ the last.       │
+│ top edge in the │  └─────────────────┘
+
+┌─────────────────┐  ┌─────────────────┐
+│ A box cloned    │  │ around each of  │
+│ across the      │  │ its pieces, top │
+│ columns has its │  │ and bottom      │
+│ edges drawn     │  │ alike.          │
+└─────────────────┘  └─────────────────┘
+
+Before.              After it.
+⟨38;2;34;197;94mA nested block that                     ⟨0m
+⟨38;2;34;197;94mavoids breaks is                        ⟨0m
+⟨38;2;34;197;94mkept whole in one                       ⟨0m
+⟨38;2;34;197;94mcolumn.⟨0m

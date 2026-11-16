@@ -1,0 +1,14 @@
+Cells without spacing, their borders one line across a table
+as wide as it says, like the files of GitHub:
+┌────────────────────────────────────────────┐
+├────────────────────────────────────────────┤
+│  src         Add the parser    2 days ago  │
+├────────────────────────────────────────────┤
+│  README.md   Fix a typo        last week   │
+└────────────────────────────────────────────┘
+
+Cells two columns apart:
+┌────────────────────────────────────────────┐
+│──────  ───────────────────  ───────────────│
+│  src     Add the parser       2 days ago   │
+└────────────────────────────────────────────┘

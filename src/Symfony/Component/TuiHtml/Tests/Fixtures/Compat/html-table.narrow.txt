@@ -1,0 +1,80 @@
+that cannot fit shrinks too
+⟨1mSpans two rows⟨0m a          b
+⟨1m              ⟨0m c, under a d
+e              f          g
+┌─────────┐ ┌─────┐
+│         │ │one  │
+│Drawn    │ └─────┘
+│across   │ ┌─────┐
+│the three│ │two  │
+│rows     │ └─────┘
+│         │ ┌─────┐ ┌────────┐
+│         │ │three│ │across  │
+└─────────┘ └─────┘ │the last│
+                    │two     │
+                    │rows,   │
+                    │the last│
+four        five    │one     │
+                    │taller  │
+                    │for its │
+                    │lines   │
+                    └────────┘
+┌─┐ ┌─────────────────────┐
+│A│ │x                    │
+│B│ └─────────────────────┘
+│C│
+└─┘
+e   after a row of no cells
+┌────────────────────────────┐
+│Centered by align, like the │
+│button of an email          │
+└────────────────────────────┘
+               ┌─────────────┐
+Text beside a  │Floated right│
+table floated  └─────────────┘
+by align.
+
+┌────────────────┬───────────┐
+│A cell 10px tall│and with   │
+│grows to its    │a          │
+│lines,          │max-height │
+│like CSS        │           │
+└────────────────┴───────────┘
+⟨3m   A   ⟨0m
+⟨3mcaption⟨0m
+⟨3mlonger ⟨0m
+⟨3m than  ⟨0m
+⟨3m  its  ⟨0m
+⟨3mtable, ⟨0m
+⟨3m whose ⟨0m
+⟨3m words ⟨0m
+⟨3m stay  ⟨0m
+⟨3m whole⟨0m
+┌──┬──┐
+│a │b │
+└──┴──┘
+┌────────────┐
+│image       │
+│A figure    │
+│displayed as│
+│a table,    │
+│like a      │
+│thumbnail of│
+│Wikipedia:  │
+│its caption │
+│counts its  │
+│longest word│
+│only        │
+└────────────┘
+
+A menu displayed as an inline
+table
+its items as wide as they are,
+not cut to their longest words
+
+⟨3m A caption above  ⟨0m
+⟨3mthe border of its ⟨0m
+⟨3mtable, outside it⟨0m
+┌────────────────┐
+│its cells inside│
+└────────────────┘

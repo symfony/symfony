@@ -1,0 +1,10 @@
+⟨32m[x]⟨0m Remember me
+[ ] Newsletter
+⟨2m[ ]⟨0m Locked
+( ) Small
+⟨32m(•)⟨0m Large
+Wrapped in inline elements: [ ] opt in and ⟨1m( )⟨0m ⟨1mthis⟨0m
+[ ] I agree to the ⟨4mterms⟨0m, a label displayed inline-block
+( ) ( ) radios written together, a column apart
+[ ] [ ] boxes written together in a label, its gap between
+        them

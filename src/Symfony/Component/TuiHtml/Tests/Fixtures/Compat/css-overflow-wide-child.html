@@ -1,0 +1,14 @@
+<!-- covers: css.properties.overflow-x -->
+<p>A list of slides wider than the box that clips it, like the carousel of Go: its first slide, the others cut</p>
+<div style="overflow: hidden; width: 40ch; border: 1px solid">
+<ul style="display: flex; width: 400ch; margin: 0; padding: 0; list-style: none">
+<li style="width: 36ch; display: flex; padding: 0 2ch">First slide with a quote that wraps over a few lines</li>
+<li style="width: 36ch; display: flex; padding: 0 2ch">Second slide</li>
+<li style="width: 36ch; display: flex; padding: 0 2ch">Third slide</li>
+</ul></div>
+<p>A block wider than its box that clips: its lines as long as its width, cut at the border</p>
+<div style="overflow-x: clip; width: 40ch; border: 1px solid"><div style="width: 80ch">The lines of a block of 80 columns, each cut at the border of the box of 40 that clips it</div></div>
+<p>Of a max-width or a percentage, as wide as the box at most: not cut</p>
+<div style="overflow: hidden; width: 40ch; border: 1px solid"><div style="max-width: 80ch">A block of a max-width wider than the box, its text wrapping in it</div></div>
+<p>Beside a block cut at the side, a block that fits centered in the box, not in the wider lines</p>
+<div style="overflow-x: hidden; width: 40ch; border: 1px solid"><div style="width: 80ch">A block of 80 columns cut at the border</div><div style="width: 20ch; margin: 0 auto; text-align: center; border: 1px solid">Centered</div></div>

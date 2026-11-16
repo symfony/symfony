@@ -1,0 +1,22 @@
+<!-- covers: css.properties.flex-grow css.properties.justify-content css.properties.margin-top -->
+<!-- variant: short rows=12 -->
+<style>
+  .cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1ch }
+  .card { display: flex; flex-direction: column; border: 1px solid; padding: 0 1ch }
+  .card .body { flex: 1; display: flex; flex-direction: column }
+  .card button { margin-top: auto }
+  .spread { display: flex; flex-direction: column; justify-content: space-between; height: 7; border: 1px solid; margin-top: 1 }
+  .chat { display: flex; flex-direction: column; height: 8; border: 1px solid; margin-top: 1 }
+  .chat .list { flex: 1; overflow-y: auto }
+  .chat footer { border-top: 1px solid }
+  .bubbles { display: flex; flex-direction: column; margin-top: 1 }
+  .bubbles p { align-self: flex-end; max-width: 50%; border: 1px solid; margin: 0 }
+</style>
+<div class="cards">
+  <div class="card"><div class="body"><p>A long description, over a few lines in this card</p><button>Buy</button></div></div>
+  <div class="card"><div class="body"><p>Short</p><button>Buy</button></div></div>
+  <div class="card"><p>No body: the button of margin-top: auto</p><button>Buy</button></div>
+</div>
+<div class="spread"><p>first</p><p>space-between</p><p>last</p></div>
+<div class="chat"><div class="list"><p>one</p><p>two</p><p>three</p><p>four</p><p>five</p><p>six</p></div><footer>The field stays on the screen: the list scrolls</footer></div>
+<div class="bubbles"><p>A bubble of max-width: 50% of the column, at the end of it</p></div>

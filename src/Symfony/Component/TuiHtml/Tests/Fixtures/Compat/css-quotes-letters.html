@@ -1,0 +1,23 @@
+<!-- covers: css.properties.quotes css.selectors.defined css.selectors.first-letter css.selectors.first-line css.properties.outline css.properties.outline-color css.properties.outline-style css.properties.outline-width css.properties.outline-offset -->
+<!-- variant: focus-name focus=#name -->
+<style>
+  .fr q { quotes: "« " " »" "‹ " " ›" }
+  .none q { quotes: none }
+  p.drop::first-letter { color: red; font-weight: bold }
+  p.lead { color: gray }
+  p.lead::first-line { color: green; text-decoration: underline }
+  p.lead b { color: blue }
+  :defined { font-style: normal }
+  .italic:defined { font-style: italic }
+  input { border: 1px solid gray }
+  input:focus { outline: 2px solid cyan }
+</style>
+<main>
+  <p>Default: <q>outer <q>inner</q> outer</q></p>
+  <p class="fr">French: <q>dehors <q>dedans</q> dehors</q></p>
+  <p class="none">None: <q>no quotes</q></p>
+  <p class="drop">“Drop cap: the first letter is red, with the quote before it</p>
+  <p class="lead">First line: green and underlined, <b>bold in blue</b> on it, the rest of the paragraph wraps onto lines that stay gray</p>
+  <p class="italic">:defined matches (italic)</p>
+  <input id="name" aria-label="Name" value="the focus ring is cyan">
+</main>

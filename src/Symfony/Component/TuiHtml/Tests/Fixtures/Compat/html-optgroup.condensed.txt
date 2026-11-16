@@ -1,0 +1,7 @@
+⟨1;36mCompiled⟨0m
+  Rust
+  Go
+⟨1;36mInterpreted⟨0m
+⟨1m→ PHP⟨0m
+  Python
+  Ungrouped

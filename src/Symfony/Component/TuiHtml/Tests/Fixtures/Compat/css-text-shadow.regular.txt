@@ -1,0 +1,22 @@
+
+⟨1;36mShadowed title⟨0m
+⟨1;36m ⟨0m⟨38;2;136;136;136mShadowed⟨0m ⟨38;2;136;136;136mtitle⟨0m
+
+A drop shadow, one cell right
+and one row down, wrapping⟨38;2;136;136;136might⟨0m
+over two lines here.⟨38;2;136;136;136mrapping⟨0m
+ ⟨38;2;136;136;136mover⟨0m ⟨38;2;136;136;136mtwo⟨0m ⟨38;2;136;136;136mlines⟨0m ⟨38;2;136;136;136mhere.⟨0m
+
+⟨31mT⟨0mTo the left
+
+  ⟨34mTwo⟨0m ⟨34mshadows,⟨0m ⟨34mthe⟨0m ⟨34mfirst⟨0m ⟨34mone⟨0m
+Two shadows, the first one⟨34mink.⟨0m
+over the other, ⟨4mwith a link⟨0m.
+ ⟨31mover⟨0m ⟨31mthe⟨0m ⟨31mother,⟨0m ⟨31mwith⟨0m ⟨31ma⟨0m ⟨31mlink.⟨0m
+
+Only blurred: not drawn.
+
+⟨38;2;59;130;246mT⟨0mThree shadows around the⟨38;2;239;68;68me⟨0m
+⟨38;2;59;130;246mt⟨0mtext: red on the right, blue⟨38;2;239;68;68me⟨0m
+⟨38;2;59;130;246mo⟨0mon the left, green below⟨38;2;239;68;68mw⟨0m⟨38;2;34;197;94mlue⟨0m
+ ⟨38;2;34;197;94mon⟨0m ⟨38;2;34;197;94mthe⟨0m ⟨38;2;34;197;94mleft,⟨0m ⟨38;2;34;197;94mgreen⟨0m ⟨38;2;34;197;94mbelow⟨0m

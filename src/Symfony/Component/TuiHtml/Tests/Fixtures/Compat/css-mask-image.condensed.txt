@@ -1,0 +1,8 @@
+A shape masking a color is drawn in it: ⟨38;2;205;0;0m▄⟨0m⟨38;2;205;0;0;48;2;205;0;0m▀▀⟨0m⟨38;2;205;0;0m▄⟨0m
+                                        ⟨38;2;205;0;0m▀⟨0m⟨38;2;205;0;0;48;2;205;0;0m▀▀⟨0m⟨38;2;205;0;0m▀⟨0m
+Strokes thinner than a pixel once made smaller are      ⟨31m ⟨0m⟨38;2;205;0;0m▄▄⟨0m⟨31m ⟨0m
+drawn still:                                            ⟨31m ⟨0m⟨38;2;205;0;0m▀▀⟨0m⟨31m ⟨0m
+.
+A mask that cannot be read draws no block of the color: ⟨31m    ⟨0m
+                                                        ⟨31m    ⟨0m
+.

@@ -1,0 +1,181 @@
+/*
+ * The default look of HTML elements in a terminal.
+ *
+ * Every state has a cue that does not rely on color alone (reverse video,
+ * bold, a marker), so that it remains visible without colors (NO_COLOR,
+ * forced-colors, monochrome) and for color-blind users.
+ */
+
+[hidden] { display: none }
+
+h1, h2, h3, h4, h5, h6, legend, summary, th, dt { font-weight: bold }
+
+pre, code, kbd, samp { font-family: monospace }
+pre { white-space: pre }
+
+/* Inline elements */
+strong, b { font-weight: bold }
+em, i, cite, dfn, var { font-style: italic }
+/* Ruby: the annotations over their bases, the parentheses of rp for what cannot draw them */
+ruby { display: ruby }
+rb { display: ruby-base }
+rt { display: ruby-text }
+rtc { display: ruby-text-container }
+rp { display: none }
+u, ins, a[href] { text-decoration: underline }
+s, del, strike { text-decoration: line-through }
+/* Obsolete elements, like browsers */
+big { font-weight: bold }
+tt { font-family: monospace }
+nobr { white-space: nowrap }
+acronym[title] { text-decoration: underline }
+center { text-align: center }
+/* Centering its blocks too, like browsers: a table or a block narrower than it in the middle */
+center > *, div[align="center" i] > * { margin-inline: auto }
+listing, xmp { white-space: pre }
+/* -tui-invert, a full invert written by the user agent only, which a color of the page drops, not a filter the page writes */
+code, kbd, samp { filter: -tui-invert }
+/* A block of code is already apart from the text: not inverted, like <pre><code> */
+pre :is(code, kbd, samp) { filter: none }
+mark { filter: invert(1); font-weight: bold }
+/* The text a text fragment (#:~:text=) goes to, like browsers: in the colors of a mark */
+::target-text { background-color: Mark; color: MarkText }
+small { opacity: 0.5 }
+abbr[title] { text-decoration: underline }
+q::before { content: open-quote }
+q::after { content: close-quote }
+
+/* Lists */
+/* On the lists, like browsers: the items inherit it, and author rules on the list win */
+ul, menu { list-style-type: disc }
+:is(ul, ol, menu) :is(ul, menu) { list-style-type: circle }
+:is(ul, ol, menu) :is(ul, ol, menu) :is(ul, menu) { list-style-type: square }
+ol { list-style-type: decimal }
+li > ul, li > ol, li > menu { padding-left: 2ch }
+blockquote { padding-left: 2ch; font-style: italic }
+dd { padding-left: 2ch }
+fieldset { border: 1px solid; padding: 0 1ch }
+/* Drawn in the top border of its fieldset, a space on each side, like browsers */
+legend { padding: 0 1ch }
+section, article, aside, nav { display: block }
+
+/* Focus: always more than a color change */
+input:focus, textarea:focus { caret-shape: block }
+/* Like HTML: the lines of a textarea wrap, unless wrap="off" */
+textarea { white-space: pre-wrap }
+textarea[wrap=off i] { white-space: pre }
+input::placeholder, textarea::placeholder, input::suggestion { opacity: 0.5 }
+select::selected:focus { filter: invert(1) }
+select::group { font-weight: bold }
+/* The list of a closed select (a dropdown), drawn over what follows when it opens */
+select:not([multiple]):not([size]) > select { border: 1px solid }
+/* The suggestions of an <input list>, drawn below it as it is typed in */
+input[list] + select { border: 1px solid }
+details::summary:focus, details::symbol:focus { filter: invert(1) }
+tui-tabs::tab:focus { text-decoration: underline }
+tui-tabs::tab-active:focus { filter: invert(1) }
+
+:disabled { opacity: 0.5 }
+:disabled::selected { opacity: 0.5 }
+
+[aria-invalid="true"] { text-decoration: underline }
+
+@media (forced-colors: active) {
+    select::selected { filter: invert(1) }
+    tui-tabs::tab-active { font-weight: bold; text-decoration: underline }
+}
+
+/* Condensed: drop the chrome, keep the content */
+fieldset:condensed { border: none; padding: 0 }
+blockquote:condensed, dd:condensed { padding-left: 1ch }
+
+/* --- Buttons, checkboxes, radios, tables, embedded content --- */
+
+button:focus, tui-select-field:focus, input[type="checkbox"]:focus, input[type="radio"]:focus { filter: invert(1) }
+button:disabled, tui-select-field:disabled, input[type="checkbox"]:disabled, input[type="radio"]:disabled { opacity: 0.5 }
+
+/* Boxes one after the other a column apart, like the few pixels of margin browsers give them, written together too */
+input:is([type="checkbox" i], [type="radio" i]) + input:is([type="checkbox" i], [type="radio" i]) { margin-inline-start: 1ch }
+
+/* A label wrapping its box puts the text next to it */
+label:has(> input[type="checkbox"], > input[type="radio"]) { display: flex; gap: 1ch }
+label > input[type="checkbox"], label > input[type="radio"] { flex: none }
+/* Its gap already a column apart */
+label > input:is([type="checkbox" i], [type="radio" i]) + input:is([type="checkbox" i], [type="radio" i]) { margin-inline-start: 0 }
+/* A field in its label is on the line of its text, like an inline control, and takes the room left */
+label:has(> input:not([type="checkbox" i], [type="radio" i], [type="hidden" i]), > select) { display: flex; gap: 1ch }
+label > input:not([type="checkbox" i], [type="radio" i]), label > select { flex: 1 }
+
+table { display: table }
+/* Quirks mode, like an old page laid out in tables: they do not inherit the alignment and the font of the text around them */
+[tui-quirks] table { font-size: initial; line-height: initial; white-space: initial; text-align: initial }
+/* Their font too, where there is one to reset, like a table in a bold element: not on each, each of its cells drawn otherwise as plain text */
+[tui-quirks] :is(b, strong, th, i, em) table { font-weight: initial; font-style: initial }
+thead { display: table-header-group }
+tbody { display: table-row-group }
+tfoot { display: table-footer-group }
+tr { display: table-row; column-gap: var(--tui-cell-spacing, 1ch) }
+td, th { display: table-cell; vertical-align: middle; border: var(--tui-cell-border, none); padding: var(--tui-cell-padding, 0) }
+colgroup { display: table-column-group }
+col { display: table-column }
+th { font-weight: bold }
+caption { display: table-caption; font-style: italic; text-align: center }
+tfoot { opacity: 0.6 }
+
+/* Pointer shapes, like browsers: see HtmlView::cursorAt() */
+a[href], button, tui-select-field, summary, select, label:has(input[type="checkbox"], input[type="radio"]), input[type="checkbox"], input[type="radio"] { cursor: pointer }
+:disabled { cursor: default }
+
+dialog { border: 1px solid; padding: 0 1ch }
+/* Closed, out of the flow too, like browsers, which place every dialog so: one a page displays anyway, hidden, like the
+   search dialog of Bootstrap of display: flex and visibility: hidden, takes no room */
+dialog:not(:open) { display: none; position: absolute }
+/* A modal dialog (HtmlView::showModal()) is centered over the page, at its content width */
+dialog:modal { position: fixed; inset: 0; margin: auto; z-index: 1000; border-style: double }
+/* What is under a modal dialog is under its ::backdrop: tinted by its background; background: none leaves it as is */
+dialog::backdrop { background: rgba(0, 0, 0, .3) }
+
+/* The regions of a meter, like browsers: green when optimal, then yellow, then red */
+meter:optimum::bar-fill { color: green }
+meter:suboptimum::bar-fill { color: yellow }
+meter:even-less-good::bar-fill { color: red }
+
+sup { vertical-align: super }
+sub { vertical-align: sub }
+
+input[type="range"]::thumb { font-weight: bold }
+input[type="range"]:focus::thumb { filter: invert(1) }
+input[type="range"]::track { opacity: 0.5 }
+
+/* Direction: dir sets it, inherited; dir="auto" is resolved by the builder from the first strong character */
+[dir] { unicode-bidi: isolate }
+bdi { unicode-bidi: isolate }
+bdo, bdo[dir] { unicode-bidi: isolate-override }
+[dir="rtl" i] { direction: rtl }
+[dir="ltr" i] { direction: ltr }
+
+/* Popovers (the popover attribute): hidden until shown, then centered over the page */
+[popover]:not(:popover-open) { display: none }
+[popover]:popover-open { position: fixed; inset: 0; margin: auto; border: 1px solid; padding: 0 1ch; z-index: 900 }
+input[type="hidden" i] { display: none }
+
+/* MathML, as linear text: x^2, x_i, a/b, √(x), the groups of several parts in parentheses */
+math[display="block" i] { display: block; text-align: center }
+annotation, annotation-xml, mphantom { display: none }
+:is(msup, msubsup, mover, munderover) > :last-child::before { content: "^" }
+:is(msub, munder) > :last-child::before, :is(msubsup, munderover) > :nth-child(2)::before { content: "_" }
+mfrac > :nth-child(2)::before { content: "/" }
+mroot > :nth-child(2)::before { content: "^(1/" }
+mroot > :nth-child(2)::after { content: ")" }
+msqrt::before { content: "√(" }
+msqrt::after, mfrac > mrow::after, :is(msup, msub, msubsup, mover, munder, munderover) > mrow:not(:first-child)::after { content: ")" }
+mfrac > mrow:first-child::before { content: "(" }
+mfrac > mrow:nth-child(2)::before { content: "/(" }
+:is(msup, mover) > mrow:last-child::before, :is(msubsup, munderover) > mrow:last-child::before { content: "^(" }
+:is(msub, munder) > mrow:last-child::before, :is(msubsup, munderover) > mrow:nth-child(2)::before { content: "_(" }
+mo { padding: 0 }
+
+/* A nested document, like <iframe srcdoc>: a scrolled box of its own, 300 by 150 CSS pixels by default */
+iframe[srcdoc] { display: block; width: 300px; height: 150px; border: 2px inset; overflow: auto }
+/* A slot of a shadow tree: what is slotted in it, or its fallback, laid out in its parent */
+slot { display: contents }

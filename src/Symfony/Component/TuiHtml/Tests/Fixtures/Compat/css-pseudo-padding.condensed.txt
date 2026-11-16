@@ -1,0 +1,19 @@
+Home ⟨90m/ ⟨0mLibrary ⟨90m/ ⟨0mData
+
+⟨37;44m new ⟨0mA label before the text, in its padding
+Some ⟨1mbold *⟨0m text with a mark after it.
+ ⟨4mBulma⟨0m ⟨90m→⟨0m ⟨4mDocs⟨0m ⟨90m→⟨0m Breadcrumb
+• An item starting with a box
+then
+• its ::before on a line of its own
+• A text item
+• and its marker kept beside its ::before
+Home⟨90m / ⟨0mFeatures⟨90m / ⟨0mits margins around the slash
+     ┌──────────────────────────────────────────────────┐
+Text │⟨4mA box after an invisible ::before, like the nav of⟨0m│
+     │⟨4mPico⟨0m                                              │
+     └──────────────────────────────────────────────────┘
+Web⟨48;2;136;136;136m   ⟨0mCSS⟨48;2;136;136;136m   ⟨0mfloat: an empty ::after of a width keeps its
+   ⟨48;2;136;136;136m   ⟨0m   ⟨48;2;136;136;136m   ⟨0mroom, like the chevrons of MDN drawn by a mask
+Web   CSS   masked by an image: no block of its color, only
+            its room

@@ -1,0 +1,20 @@
+<!-- covers: css.properties.reading-flow css.properties.reading-order -->
+<!-- variant: next keys=f6,f6 -->
+<!-- variant: then keys=f6,f6,f6 -->
+<!-- variant: visual focus=#r3 keys=f6 -->
+<!-- variant: flow focus=#f2 keys=f6 -->
+<!-- variant: ordered focus=#o3 keys=f6 -->
+<style>
+  button:focus { color: red }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; reading-flow: grid-rows }
+  #g2 { grid-row: 1; grid-column: 1 }
+  .reverse { display: flex; flex-direction: row-reverse; justify-content: flex-end; reading-flow: flex-visual }
+  .flow { display: flex; flex-direction: row-reverse; justify-content: flex-end; reading-flow: flex-flow }
+  #f1 { order: 1 }
+  .orders { display: flex; reading-flow: source-order }
+  #o3 { reading-order: -1 }
+</style>
+<div class="grid"><button id="g1">Grid 1 (second)</button><button id="g2">Grid 2 (placed first)</button><button id="g3">Grid 3</button></div>
+<div class="reverse"><button id="r1">R1</button><button id="r2">R2</button><button id="r3">R3 (first, at the left)</button></div>
+<div class="flow"><button id="f1">F1 (order: 1, last)</button><button id="f2">F2 (first)</button><button id="f3">F3</button></div>
+<div class="orders"><button id="o1">O1</button><button id="o2">O2</button><button id="o3">O3 (first)</button></div>

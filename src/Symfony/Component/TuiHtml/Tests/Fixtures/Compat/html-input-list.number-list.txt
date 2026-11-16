@@ -1,0 +1,7 @@
+     ┌──────────────────────┐
+City │>                     │ Size > 10
+     └──────────────────────┘      ┌──────┐
+                                   │⟨1m→ 12⟨0m  │
+The suggestions are listed over thi│  16  │
+                                   │  24  │
+while the field has the focus.     └──────┘

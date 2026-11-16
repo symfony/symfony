@@ -1,0 +1,11 @@
+<!-- covers: css.properties.hyphenate-limit-chars -->
+<style>
+  p { width: 12ch; border: 1px solid; hyphens: auto }
+  .limited { hyphenate-limit-chars: 6 6 3 }
+  .short { hyphenate-limit-chars: 20 }
+  .manual { hyphens: manual; hyphenate-limit-chars: 20 }
+</style>
+<p>Any ex&shy;tra&shy;or&shy;di&shy;nary hy&shy;phen</p>
+<p class="limited">Any ex&shy;tra&shy;or&shy;di&shy;nary hy&shy;phen</p>
+<p class="short">Any ex&shy;tra&shy;or&shy;di&shy;nary hy&shy;phen</p>
+<p class="manual">Any ex&shy;tra&shy;or&shy;di&shy;nary hy&shy;phen</p>

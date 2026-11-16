@@ -1,0 +1,9 @@
+<!-- covers: css.properties.display css.properties.width -->
+<!-- variant: narrow columns=30 -->
+<style>
+  @media (min-width: 45ch) { .row { display: table; width: 100% } .col { display: table-cell } .nav { width: 12ch } }
+</style>
+<p>Cells without a row, like the .row of htmx: side by side in an anonymous row where they are cells, the navigation as wide as it is set; stacked on a narrow screen</p>
+<div class="row"><div class="col nav">Contents</div><div class="col">The documentation, beside the contents</div></div>
+<table style="width: 100%"><tr><td style="width: 12ch">set width</td><td>takes the room left</td></tr></table>
+<div class="row"><span class="col">text</span> | <span class="col">between cells, in their row</span></div>

@@ -1,0 +1,2 @@
+The title is the one of the terminal window: it is not
+drawn.

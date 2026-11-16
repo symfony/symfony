@@ -1,0 +1,6 @@
+
+[Floor plan]
+
+The content of a map is drawn, its areas are not.
+
+The fallback content of a slot.

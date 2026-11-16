@@ -1,0 +1,15 @@
+<!-- covers: css.properties.padding css.properties.margin css.properties.padding-inline css.properties.margin-block -->
+<!-- variant: narrow columns=40 -->
+<style>
+  .box { border: 1px solid; padding: 0 10%; margin: 0 0 1 20% }
+  .calc { border: 1px solid; padding-inline: calc(5% + 1ch) }
+  .row { display: flex; gap: 1ch; margin-top: 1 }
+  .row > div { flex: 1; border: 1px solid; padding-left: 10% }
+  .clamp { border: 1px solid; padding: 0 clamp(2ch, 10%, 6ch); margin-left: max(1ch, 15%) }
+  .tall { margin-block: 5%; border: 1px solid }
+</style>
+<div class="box">padding: 0 10%, margin-left: 20% of the width</div>
+<div class="calc">padding-inline: calc(5% + 1ch)</div>
+<div class="row"><div>items take</div><div>shares of the row</div></div>
+<div class="tall">margin-block: 5%, a share of the width too</div>
+<div class="clamp">padding: clamp(2ch, 10%, 6ch), margin-left: max(1ch, 15%)</div>

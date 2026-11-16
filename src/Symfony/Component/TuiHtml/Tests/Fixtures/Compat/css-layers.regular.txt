@@ -1,0 +1,12 @@
+
+⟨36mNot bold: the reset layer undoes the default style⟨0m
+
+⟨32m┌──────────────────────────────────────────────────────────┐⟨0m
+⟨32m│⟨0m⟨1;32m                                                         ⟨0m ⟨32m│⟨0m
+⟨32m│⟨0m⟨1;32m ⟨0m⟨32mGreen: components come after theme, whatever the        ⟨0m ⟨32m│⟨0m
+⟨32m│⟨0m⟨1;32m ⟨0m⟨32mspecificity⟨0m                                              ⟨32m│⟨0m
+⟨32m│⟨0m⟨1;32m                                                         ⟨0m ⟨32m│⟨0m
+⟨32m│⟨0m⟨1;32m ⟨0m⟨32mNot bold: important in reset wins over important in     ⟨0m ⟨32m│⟨0m
+⟨32m│⟨0m⟨1;32m ⟨0m⟨32mtheme⟨0m                                                    ⟨32m│⟨0m
+⟨32m│⟨0m⟨1;32m                                                         ⟨0m ⟨32m│⟨0m
+⟨32m└──────────────────────────────────────────────────────────┘⟨0m

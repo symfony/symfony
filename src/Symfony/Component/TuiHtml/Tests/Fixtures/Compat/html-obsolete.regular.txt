@@ -1,0 +1,25 @@
+
+⟨31mfont color⟨0m, ⟨1mbig⟨0m, tt, ⟨4mASAP⟨0m, ⟨9mstrike⟨0m
+
+Some words
+stay together
+
+xmp   keeps   spaces
+
+                          centered
+
+                                    a marquee moves its text
+
+listing   keeps   spaces
+
+               ┌────────────────────────────┐
+               │   a table half as wide,    │
+               │         centered           │
+               └────────────────────────────┘
+                        ┌──────────┐
+                        │ a narrow │
+                        │  block   │
+                        └──────────┘
+                        ┌──────────┐
+                        │ by align │
+                        └──────────┘

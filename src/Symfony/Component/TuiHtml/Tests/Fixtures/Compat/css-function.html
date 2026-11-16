@@ -1,0 +1,22 @@
+<!-- covers: css.at-rules.function -->
+<!-- variant: light scheme=light -->
+<style>
+  @function --double(--x <length>) returns <length> { result: calc(var(--x) * 2); }
+  @function --pad(--n <number>: 1) { --cells: calc(var(--n) * 1ch); result: var(--cells); }
+  @function --tone(--level) {
+    result: gray;
+    @media (prefers-color-scheme: dark) { result: if(style(--level: high): yellow; else: cyan); }
+  }
+  @function --broken(--x <color>) { result: var(--x); }
+  :root { --base: 2ch }
+  .a { padding-left: --double(var(--base)); border: 1px solid; max-width: 30ch }
+  .b { padding-left: --pad(); color: --tone(); }
+  .c { --level: low; padding-left: --pad(4); color: --tone(high); }
+  .e { --level: high; color: --tone(); }
+  .d { color: red; color: --broken(3px); }
+</style>
+<p class="a">Padded by --double(2ch)</p>
+<p class="b">Default argument, cyan in the dark</p>
+<p class="c">Four columns, yellow</p>
+<p class="e">The parameter hides the custom property of the element: cyan</p>
+<p class="d">A wrong type: not red</p>

@@ -1,0 +1,12 @@
+<!-- covers: css.selectors.class -->
+<!-- variant: wide columns=100 -->
+<style>
+  @media (min-width: 769px) { .columns { display: flex; gap: 2ch } }
+  .column { border: 1px solid; padding: 0 1ch }
+  .h4 { color: green }
+  [class^="col-"] { color: red }
+</style>
+<p>Class names of a page, like those of Bulma, style only what its rules say: columns side by side on a wide screen only.</p>
+<div class="columns"><div class="column">First column</div><div class="column">Second column</div></div>
+<p class="h4">A paragraph of class h4, green and nothing more</p>
+<div class="col-6 columns">Its classes in the order of the page: [class^="col-"] red</div>

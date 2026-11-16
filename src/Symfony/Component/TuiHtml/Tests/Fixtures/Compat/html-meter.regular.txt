@@ -1,0 +1,9 @@
+
+⟨1;36mDisk usage⟨0m
+
+Updated every minute
+
+[⟨32m━━━━━━━━━━━━━━━━━━━━━⟨0m━━━━━━━]  75%
+[⟨32m━━━━━━━⟨0m━━━━━━━━━━━━━━━━━━━━━]  25%
+
+⟨3mOps team, building 2⟨0m

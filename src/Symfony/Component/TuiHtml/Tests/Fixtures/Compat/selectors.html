@@ -1,0 +1,52 @@
+<!-- covers: css.selectors.type css.selectors.class css.selectors.id css.selectors.attribute css.selectors.universal css.selectors.descendant css.selectors.child css.selectors.next-sibling css.selectors.subsequent-sibling css.selectors.list css.selectors.is css.selectors.where css.selectors.not css.selectors.has css.selectors.root css.selectors.empty css.selectors.first-child css.selectors.last-child css.selectors.only-child css.selectors.first-of-type css.selectors.last-of-type css.selectors.only-of-type css.selectors.nth-child css.selectors.nth-last-child css.selectors.nth-of-type css.selectors.nth-last-of-type -->
+<style>
+  * { color: white }
+  p { font-style: italic }
+  .bold { font-weight: bold }
+  #underline { text-decoration: underline }
+  [data-tone="warn"] { color: yellow }
+  main p.deep { color: cyan }
+  main > p.direct { color: green }
+  .a + p { color: magenta }
+  .b ~ p.later { color: blue }
+  .x, .y { color: red }
+  :is(.is1, .is2) { font-weight: bold }
+  :where(.where) { color: bright-red }
+  p:not(.not) { opacity: 1 }
+  p.not { opacity: 0.5 }
+  section:has(> .marker) { border: 1px solid }
+  :root { padding: 0 1ch }
+  section:empty { display: none }
+  ol li:first-child { color: green }
+  ol li:last-child { color: red }
+  ul li:only-child { font-weight: bold }
+  dl dt:first-of-type { color: cyan }
+  dl dd:last-of-type { color: yellow }
+  figure figcaption:only-of-type { font-style: italic }
+  ol li:nth-child(2) { text-decoration: underline }
+  ol li:nth-last-child(2) { font-weight: bold }
+  dl dd:nth-of-type(1) { opacity: 0.5 }
+  dl dt:nth-last-of-type(1) { text-decoration: line-through }
+  .classless p:where([class]), .classless .p, .classless h2[class] { color: red }
+  .classless [class="p"] { text-decoration: underline }
+</style>
+<main>
+  <p class="bold">type + class</p>
+  <p id="underline">id</p>
+  <p data-tone="warn">attribute</p>
+  <div><p class="deep">descendant</p></div>
+  <p class="direct">child</p>
+  <p class="a">a</p><p>next sibling</p>
+  <p class="b">b</p><p>x</p><p class="later">subsequent sibling</p>
+  <p class="x">list x</p><p class="y">list y</p>
+  <p class="is2">is</p>
+  <p class="where">where</p>
+  <p class="not">not</p>
+  <section><p class="marker">has</p></section>
+  <section></section>
+  <ol><li>first</li><li>second</li><li>third</li><li>last</li></ol>
+  <ul><li>only</li></ul>
+  <dl><dt>term 1</dt><dd>def 1</dd><dt>term 2</dt><dd>def 2</dd></dl>
+  <figure><figcaption>only of type</figcaption></figure>
+</main>
+<div class="classless"><p>A paragraph without a class: neither [class] nor .p matches it</p><h2>Nor a heading</h2><p class="p">One of class p: red</p></div>

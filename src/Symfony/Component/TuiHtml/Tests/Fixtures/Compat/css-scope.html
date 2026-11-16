@@ -1,0 +1,21 @@
+<!-- covers: css.at-rules.scope -->
+<!-- variant: narrow columns=30 -->
+<style>
+  p { color: gray }
+  @scope (.card) to (.card-body) {
+    :scope { border: 1px solid; margin-bottom: 1 }
+    h3 { color: cyan; margin: 0 }
+    p { color: yellow }
+  }
+</style>
+<section class="card">
+  <h3>A card</h3>
+  <p>Its text is yellow: scoped rules win at equal specificity.</p>
+  <div class="card-body"><p>Below the limit: gray, the global rule.</p></div>
+</section>
+<p>Outside the card: gray.</p>
+<article>
+  <style>@scope { p { font-weight: bold } :scope { border: 1px dashed } }</style>
+  <p>A component's own style, scoped to its element.</p>
+</article>
+<article><p>Another article: not bold.</p></article>

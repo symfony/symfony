@@ -1,0 +1,24 @@
+<!-- covers: css.properties.align-items css.properties.place-items -->
+<style>
+  .cards { display: flex; gap: 1ch }
+  .cards > section { flex: 1; border: 1px solid; padding: 0 1ch }
+  .centered { align-items: center }
+  .start { place-items: start }
+</style>
+<main>
+  <div class="cards">
+    <section><p>Short</p></section>
+    <section><p>A taller card</p><p>with a second line</p><p>and a third one</p></section>
+    <section><p>Stretched too</p></section>
+  </div>
+  <div class="cards centered">
+    <section><p>Centered</p></section>
+    <section><p>one</p><p>two</p><p>three</p></section>
+  </div>
+  <div class="cards start">
+    <section><p>At the top</p></section>
+    <section><p>one</p><p>two</p></section>
+  </div>
+</main>
+<div style="display: flex; height: 5; border: 1px solid; margin-top: 1"><p style="border: 1px solid">stretched to a set height</p><p>beside</p></div>
+<div style="display: grid; grid-template-rows: auto 1fr 2fr; height: 15; border: 1px solid; margin-top: 1"><p>auto</p><p style="border: 1px solid">1fr</p><p style="border: 1px solid">2fr: twice the free rows</p></div>

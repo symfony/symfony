@@ -1,0 +1,18 @@
+<!-- covers: css.properties.justify-self css.properties.justify-items css.properties.place-self css.properties.grid-auto-rows css.properties.grid-auto-flow css.properties.grid-auto-columns css.properties.align-content css.properties.inline-size css.properties.block-size css.properties.min-inline-size css.properties.max-inline-size css.properties.min-block-size css.properties.max-block-size css.types.flex -->
+<!-- variant: narrow columns=40 -->
+<style>
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 1ch; justify-items: center; grid-auto-rows: 3; grid-auto-columns: 1fr; align-content: start }
+  .board > * { border: 1px solid }
+  .left { justify-self: start }
+  .right { place-self: center end }
+  .full { justify-self: stretch }
+  .dense { display: grid; grid-template-columns: repeat(4, 8ch); grid-auto-flow: row dense; gap: 0 1ch }
+  .wide { grid-column: span 3; background: blue }
+  .sized { inline-size: 24ch; min-inline-size: 10ch; max-inline-size: 30ch; block-size: 2; min-block-size: 1; max-block-size: 3; border: 1px solid }
+  .row { display: flex; gap: 1ch }
+  .group { display: contents }
+</style>
+<div class="board"><p>centered</p><p class="left">start</p><p class="right">end</p><p class="full">stretched</p></div>
+<div class="dense"><p class="wide">three columns</p><p class="wide">three more</p><p>fills</p></div>
+<div class="sized">24 columns, 2 rows</div>
+<div class="row"><span>a</span><div class="group"><span>b, a flex item</span><span>c too</span></div><span>d</span></div>

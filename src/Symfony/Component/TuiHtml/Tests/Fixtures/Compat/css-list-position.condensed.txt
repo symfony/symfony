@@ -1,0 +1,19 @@
+• Outside, the default: the
+  lines of an item that wraps
+  are aligned after its
+  marker.
+• Short
+
+1. Inside: the marker is the
+start of the text, the lines
+wrap under it.
+
+▪ The shorthand sets it too,
+with the type.
+
+✓ A string with a space
+
+▪ The position first
+
+▪ none is the image, square
+  the type

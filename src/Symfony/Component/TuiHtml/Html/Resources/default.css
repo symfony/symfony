@@ -1,0 +1,26 @@
+/*
+ * The default styles of HTML in a terminal, after the default style sheets of browsers: the spacing of documents,
+ * which HtmlBuilder::setDefaultStyles(false) leaves out for an interface laid out by its own rules. See ua.css for
+ * the look of the elements themselves.
+ */
+
+/*
+ * Blocks apart, like the default style sheets of browsers: a line between paragraphs, lists, quotes, figures and blocks
+ * of code, their margins collapsing. The headings keep the space browsers give them, in rem: their text is not larger
+ * here, which their margins in em of a larger font assume (h1 .67em of 2em, h6 2.33em of .67em).
+ */
+p, pre, listing, xmp, plaintext, blockquote, figure, dl, ul, ol, menu, dir, address { margin-block: 1em }
+h1 { margin-block: 1.34rem }
+h2 { margin-block: 1.25rem }
+h3 { margin-block: 1.17rem }
+h4 { margin-block: 1.33rem }
+h5 { margin-block: 1.39rem }
+h6 { margin-block: 1.56rem }
+figure { margin-inline: 5ch }
+address { font-style: italic }
+/* A list in a list is not apart from its item, like browsers */
+:is(ul, ol, menu, dir, dl) :is(ul, ol, menu, dir, dl) { margin-block: 0 }
+
+/* Condensed: the content without the room between blocks */
+:is(p, pre, listing, xmp, plaintext, blockquote, figure, dl, ul, ol, menu, dir, address, h1, h2, h3, h4, h5, h6):condensed { margin-block: 0 }
+figure:condensed { margin-inline: 0 }

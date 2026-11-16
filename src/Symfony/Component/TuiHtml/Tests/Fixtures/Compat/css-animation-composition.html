@@ -1,0 +1,12 @@
+<!-- covers: css.properties.animation-composition -->
+<style>
+  @keyframes nudge { from { padding-left: 2ch } to { padding-left: 2ch } }
+  @keyframes tint { from { color: #004000 } to { color: #004000 } }
+  p { padding-left: 3ch; color: #400000; animation: nudge 10s infinite, tint 10s infinite }
+  .replace { animation-composition: replace }
+  .add { animation-composition: add }
+  .accumulate { animation-composition: accumulate, replace }
+</style>
+<p class="replace">replace: 2 columns, #004000</p>
+<p class="add">add: 3 + 2 columns, #400000 + #004000</p>
+<p class="accumulate">accumulate, replace: 5 columns, #004000</p>

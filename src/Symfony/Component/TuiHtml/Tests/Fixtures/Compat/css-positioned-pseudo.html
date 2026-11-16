@@ -1,0 +1,18 @@
+<!-- covers: css.selectors.before css.selectors.after -->
+<!-- variant: hovered hover=#tip rows=12 -->
+<style>
+  .tip { position: relative; width: fit-content }
+  .tip:hover::after { content: attr(data-tip); position: absolute; top: 1; left: 2ch; background: blue; color: white; padding: 0 1ch }
+  .card { position: relative; border: 1px solid; margin-top: 1 }
+  .card::before { content: "NEW"; position: absolute; top: 0; right: 2ch; background: red; color: white }
+  .banner::before { content: "Fixed at the bottom of the screen"; position: fixed; bottom: 0; left: 0; color: yellow }
+  .anchor { position: relative }
+  .anchor::before { content: "#"; position: absolute; margin-left: -3ch; opacity: 0 }
+  .hung::before { content: "#"; position: absolute; margin-left: -3ch }
+</style>
+<p id="tip" class="tip" data-tip="A tooltip">Hover me</p>
+<p>Under it: covered by the tooltip when it shows</p>
+<div class="card"><p>A badge in the corner of a box, inside its border</p><p>holding blocks</p></div>
+<p class="banner">The text of the banner is in the flow</p>
+<h2>A heading <a class="anchor" href="#tip">whose link</a> has a hidden mark taking no room</h2>
+<h2><a class="hung" href="#tip">A heading whose mark hangs in the margin, out of its line</a></h2>

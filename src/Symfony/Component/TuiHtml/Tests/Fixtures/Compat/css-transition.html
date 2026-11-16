@@ -1,0 +1,9 @@
+<!-- covers: css.properties.transition css.properties.transition-property css.properties.transition-duration css.properties.transition-delay css.properties.transition-timing-function css.properties.transition-behavior css.types.time -->
+<!-- variant: focused focus=#save -->
+<style>
+  button { color: #9ca3af; transition: color 200ms ease-out, background-color .2s }
+  button:focus { color: #ffffff; background: #2563eb }
+  .slow { transition-property: color; transition-duration: 2s; transition-delay: 100ms; transition-timing-function: steps(4); transition-behavior: allow-discrete }
+</style>
+<p>A focused button starts from its old colors: the first frame of a transition.</p>
+<button id="save">Save</button> <button class="slow">Later</button>

@@ -1,0 +1,8 @@
+⟨44mFiles⟨0m⟨100m ⟨0m⟨44mEdit⟨0m⟨100m                                         ⟨0m⟨44mHelp⟨0m⟨100m ⟨0m⟨44mQuit⟨0m
+⟨100m                     centered in the row                    ⟨0m
+⟨100m                    ┌──────────────────┐                    ⟨0m
+⟨100m                    │centered block    │                    ⟨0m
+⟨100m                    └──────────────────┘                    ⟨0m
+⟨100m                              ⟨0m⟨42mhalf, on the right            ⟨0m
+⟨100m  left 2,                                                   ⟨0m
+⟨100m  right auto                                                ⟨0m

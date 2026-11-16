@@ -1,0 +1,23 @@
+Automatic hyphenation breaks extraordinarily long words.
+
+L'informatique révolutionne développement et communication.
+
+Die Silbentrennung trennt Donaudampfschifffahrtsgesellschaf-
+ten.
+
+La computadora calcula rápidamente las operaciones.
+
+Mixed: anticonstitutionnellement in English.
+
+Authored: supercalifragilistic is broken where it says.
+
+Manual: extraordinarily without soft hyphens.
+
+Limits: hyphenation of incomprehensibilities.
+
+No language: extraordinarily long words wrap whole.
+
+No dictionary: extraordinarily long words wrap whole.
+
+Addresses: https://example.com/extraordinarily and
+someone@extraordinarily.example stay whole.

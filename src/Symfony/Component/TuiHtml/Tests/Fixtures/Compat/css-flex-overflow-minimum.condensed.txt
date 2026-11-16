@@ -1,0 +1,12 @@
+A clipped item shrinks past its content before the icon
+beside it, like the file names of GitHub:
+┌──────────────────┐
+│⟨38;2;0;0;0;48;2;0;0;0m▀▀⟨0m .git-blame-ign…│
+└──────────────────┘
+┌──────────────────┐
+│⟨38;2;0;0;0;48;2;0;0;0m▀▀⟨0m .gitignore     │
+└──────────────────┘
+Links beside a search field, the row too narrow for both at
+their min-content, like the header of Cloudflare: the field
+ellipsized, not a word broken
+Cloudflare   ⟨4mDirectory⟨0m  ⟨4mAPI⟨0m  ⟨4mChangelog⟨0m [ Search C... ⟨4mLog in⟨0m

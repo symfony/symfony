@@ -1,0 +1,26 @@
+<!-- covers: css.properties.outline css.properties.outline-color css.properties.outline-style css.properties.outline-width css.properties.outline-offset -->
+<!-- variant: focused focus=#name -->
+<!-- variant: narrow columns=30 -->
+<style>
+  main { padding: 1 2 }
+  p, input { margin: 4 4; max-width: 30ch }
+  .ring { outline: 1px solid red }
+  .dashed { outline: 1px dashed cyan; outline-offset: 1 }
+  .thick { outline: thick solid; outline-color: yellow }
+  .inside { outline: 1px dotted magenta; outline-offset: -1; padding: 1 2 }
+  .bordered { border: 1px solid gray; outline: 1px double green; outline-offset: 1; margin: 4 4 }
+  .none { outline: 1px none red }
+  input { border: 1px solid gray }
+  input:focus { outline: 2px solid cyan }
+  .short { outline: 1px dashed; margin: 1 1ch }
+</style>
+<main>
+  <p class="ring">an outline around the box</p>
+  <p class="dashed">a column and a row further out</p>
+  <p class="thick">thick: heavy lines</p>
+  <p class="inside">inside the box, with a negative offset</p>
+  <p class="bordered">outside its border, offset</p>
+  <p class="none">no outline: none</p>
+  <input id="name" aria-label="Name" value="the border is the ring">
+</main>
+<div class="short">short</div>

@@ -1,0 +1,12 @@
+<!-- covers: css.properties.font -->
+<style>
+  p { width: 24ch; border: 1px solid }
+  .full { font: italic small-caps bold 14px/2 Georgia, serif }
+  .later { font: small-caps 14px/2 serif; font-variant: normal; line-height: 1 }
+  .reset { line-height: 2; font-variant: small-caps; font: 14px serif }
+  .heavy { font-weight: bold } .plain { font: 1rem sans-serif }
+</style>
+<p class="full">Italic small caps in bold, a line between the rows</p>
+<p class="later">Longhands after it win: as is, no line between</p>
+<p class="reset">The shorthand resets the longhands before it</p>
+<div class="heavy plain">A font after a font-weight: bold resets it, its text too</div>

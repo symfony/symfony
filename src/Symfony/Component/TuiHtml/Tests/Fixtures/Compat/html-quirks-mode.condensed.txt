@@ -1,0 +1,8 @@
+            ┌──────────────────────────────────┐
+            │a cell of a centered table, its   │
+            │text on the left                  │
+            └──────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│a nested table in a header cell, not bold│
+└─────────────────────────────────────────┘
+                 Text outside the tables keeps its alignment

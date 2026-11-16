@@ -1,0 +1,31 @@
+<!-- covers: css.properties.border-collapse css.properties.caption-side css.properties.border-spacing css.properties.empty-cells css.properties.table-layout -->
+<!-- variant: narrow columns=24 -->
+<style>
+  table { border-collapse: collapse; border: 1px solid; border-spacing: 0; empty-cells: show; table-layout: auto; margin-bottom: 1 }
+  td, th { border: 1px solid; padding: 0 1ch }
+  th { font-weight: bold }
+  .double { border: 1px double cyan }
+  .double td { border-color: cyan }
+  .frame td { border: none }
+  .rounded { border-radius: 1ch }
+  .below caption { caption-side: bottom }
+  table.separate { border-collapse: separate; border: none }
+  .separate td { border: 1px solid }
+</style>
+<table><caption>Users</caption>
+  <thead><tr><th>Name</th><th>Role</th><th>Since</th></tr></thead>
+  <tbody><tr><td>Ada</td><td colspan="2">Admin, both</td></tr><tr><td>Grace</td><td>Developer</td><td>1952</td></tr></tbody>
+</table>
+<table class="double"><tr><td>double</td><td>lines</td></tr></table>
+<table class="separate below"><caption>Below a separate table</caption><tr><td>a</td><td>b</td></tr></table>
+<table class="frame below"><caption>Only a frame</caption><tr><td>no</td><td>lines</td></tr><tr><td>between</td><td>cells</td></tr></table>
+<table class="rounded"><tr><td>rounded</td><td>corners</td></tr></table>
+<table class="spans"><tr><th rowspan="3">Group with a long label</th><td>one</td><td>a</td></tr><tr><td>two</td><td rowspan="2">b spans</td></tr><tr><td>three</td></tr><tr><td colspan="3">footer spans all</td></tr></table>
+<style>.wide { border-collapse: collapse; width: 100%; margin-top: 1 } .wide td, .wide th { border: 1px solid; padding: 0 1ch } .half { border-collapse: collapse; width: 30ch } .half td { border: 1px solid }</style>
+<table class="wide"><tr><th>Option</th><th>Default</th></tr><tr><td>strict</td><td>false</td></tr></table>
+<table class="half"><tr><td>a</td><td>longer</td></tr></table>
+<style>.rows { border-collapse: collapse; margin-top: 1 } .rows, .cols { border: none } .rows th, .rows td { border: none; border-bottom: 1px solid; padding: 0 1ch } .rows th { border: none } .rows thead { border-bottom: 1px solid } .cols { border-collapse: collapse; margin-top: 1 } .cols td { border: none } .cols td + td { border-left: 1px dashed }</style>
+<table class="rows"><thead><tr><th>Feature</th><th>Status</th></tr></thead><tbody><tr><td>Flexbox</td><td>supported</td></tr><tr><td>Grid</td><td>supported</td></tr></tbody></table>
+<table class="cols"><tr><td>only</td><td>lines</td><td>between columns</td></tr></table>
+<style>.stretch { border-collapse: collapse; border: none; min-width: 100%; margin-top: 1 } .stretch td { border: none; border-bottom: 1px solid }</style>
+<table class="stretch"><tr><td>min-width: 100%</td><td>stretched</td></tr></table>

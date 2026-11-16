@@ -1,0 +1,22 @@
+
+A paragraph, then a link like a button:
+
+╭──────────────╮
+│ ⟨4mGo somewhere⟨0m │
+╰──────────────╯
+
+           ╭─────╮ ╭─────╮
+In a line: │ ⟨4mOne⟨0m │ │ ⟨4mTwo⟨0m │ and text after them.
+           ╰─────╯ ╰─────╯
+
+A badge without a border stays in the text: ⟨37;44m new ⟨0m.
+
+A border of no width is none, like the preflight of
+Tailwind: ⟨7mroutes⟨0m stays in the text.
+
+A border a later rule takes away is none too, like the Arch
+Wiki: ⟨7m sshd.socket ⟨0m and ⟨7m Ctrl ⟨0m stay in the text.
+
+                                             ⟨38;2;0;0;0m┌─────┐⟨0m
+A border of a color with spaces is a border: ⟨38;2;0;0;0m│⟨0m tag ⟨38;2;0;0;0m│⟨0m boxed.
+                                             ⟨38;2;0;0;0m└─────┘⟨0m

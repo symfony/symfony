@@ -1,0 +1,15 @@
+<!-- covers: css.properties.width css.properties.max-width css.properties.height css.properties.min-height css.properties.max-height -->
+<!-- variant: narrow columns=30 -->
+<style>
+  .row { display: flex }
+  .sidebar { width: 25%; border: 1px solid }
+  .half { max-width: 50%; border: 1px solid }
+  .tall { min-height: 3; border: 1px solid }
+  .clip { max-height: 2; border: 1px solid }
+  .fixed { height: 2; border: 1px solid }
+</style>
+<div class="row"><nav class="sidebar">25% sidebar</nav><main>the rest of the row goes to the main content</main></div>
+<p class="half">at most half of the container</p>
+<p class="tall">at least three rows</p>
+<p class="clip">line one<br>line two<br>line three is clipped</p>
+<p class="fixed">exactly<br>two<br>rows</p>

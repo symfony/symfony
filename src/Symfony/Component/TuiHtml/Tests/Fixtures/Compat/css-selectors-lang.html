@@ -1,0 +1,22 @@
+<!-- covers: css.selectors.lang css.selectors.dir css.selectors.scope css.selectors.heading -->
+<style>
+  :scope { padding-left: 1ch }
+  p:lang(fr) { color: blue }
+  :lang(de) { font-style: italic }
+  p:dir(rtl) { text-align: right }
+  p:dir(ltr) { font-weight: bold }
+  :heading { text-decoration: underline }
+  :heading(3, 4) { color: green }
+</style>
+<main>
+  <h2>heading (underlined)</h2>
+  <h3>heading 3 (underlined, green)</h3>
+  <p lang="fr">bonjour (blue)</p>
+  <p lang="fr-CA">bonjour du Québec (blue)</p>
+  <section lang="de"><p>guten Tag (italic, inherited)</p></section>
+  <p dir="rtl">right to left</p>
+  <p>left to right (bold)</p>
+  <section lang="fr"><div lang="en"><p>hello (closest is en, not blue)</p></div></section>
+  <section dir="rtl"><div dir="ltr"><p>closest is ltr (bold)</p></div></section>
+  <p lang="en">english, <span lang="de">deutsch (italic)</span></p>
+</main>

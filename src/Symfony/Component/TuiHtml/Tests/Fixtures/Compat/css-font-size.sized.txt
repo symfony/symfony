@@ -1,0 +1,18 @@
+
+⟨1;38;2;249;115;22m                                                            ⟨0m
+⟨1;38;2;249;115;22m                                                            ⟨0m
+
+
+
+
+
+
+
+
+
+
+Small is the size of the text
+
+A number alone is invalid
+
+A long heading wraps in a room that many times narrower:

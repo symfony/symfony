@@ -64,7 +64,7 @@ final class RegisterDoctrineDbalTypesPass implements CompilerPassInterface
                 }
             }
 
-            // without a mapped class, DoctrineBundle declares the type on every connection
+            // a type that no entity manager maps goes to every connection
             foreach (array_keys($names) ?: array_keys($connections) as $connection) {
                 $parentType = (new Definition(Type::class))
                     ->setFactory([new Reference(\sprintf('doctrine.dbal.%s_connection.type_provider', $connection)), 'get'])

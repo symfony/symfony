@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-19T05:56:26Z
+
+I pushed a fix for subclasses that implement `GlobalsInterface`. Twig rejects them only in the constructor of `AttributeExtension`, and subclasses don't have to call it. With the extension below, `{{ g }}` worked with `$twig->addExtension(new AppExtension($foo))` but was undefined once the bundle registered it:
+
+```php
+class AppExtension extends AttributeExtension implements GlobalsInterface
+{
+    public function __construct(private Foo $foo) {}
+
+    public function getGlobals(): array { return ['g' => 'G']; }
+}
+```
+
+These subclasses are now kept as regular extensions.
+
+Let's merge once twigphp/Twig#4995 is merged, since this PR relies on the methods of `AttributeExtension` being final.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-19T08:27:11Z
+
+@nicolas-grekas I reverted the `GlobalsInterface` guard in `declaresOnlyAttributeCallables()` and removed `testSubclassesOfAttributeExtensionDeclaringGlobalsAreMadeLazy` with its fixture.
+
+Since twigphp/Twig#4995, `AttributeExtension::getGlobals()` is final, so it has simply become impossible for a subclass to declare its own `getGlobals()`. The fixture tries to, and with that version of Twig the test file does not even load:
+
+```
+Fatal error: Cannot override final method Twig\Extension\AttributeExtension::getGlobals()
+```
+
+A subclass that implements `GlobalsInterface` without declaring the method inherits the final one, which throws. So a subclass of `AttributeExtension` can only declare callables with attributes, and the pass does not need to special-case `GlobalsInterface` for them.
+
+I kept `AttributeExtensionSubclassWithDependency` and its functional test, they are useful.
+
+I checked this by patching the vendored Twig to match both PRs: the 91 tests of TwigBundle pass, and so do the 4 functional cases.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-11-16T22:40:36Z
+
+The Twig PR have been merged by Fabien. We don't need to wait for a release to merge this small one.

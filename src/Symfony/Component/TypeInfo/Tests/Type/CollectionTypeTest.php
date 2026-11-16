@@ -228,6 +228,12 @@ class CollectionTypeTest extends TestCase
         $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::int()));
 
         $this->assertFalse($type->accepts(['1' => 5]));
+
+        // nor does it beside a refinement that is not a literal
+        $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::union(Type::intRange(0, 5), Type::string()), Type::int()));
+
+        $this->assertTrue($type->accepts([5 => 1, 'a' => 2]));
+        $this->assertFalse($type->accepts([7 => 1]));
     }
 
     public function testMergeCollectionValueTypesPreservesNestedUnionMembers()

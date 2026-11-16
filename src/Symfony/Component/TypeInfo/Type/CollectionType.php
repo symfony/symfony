@@ -251,11 +251,15 @@ class CollectionType extends Type implements WrappingTypeInterface
 
     /**
      * PHP turns numeric string keys into integers, so an integer key is checked as a string as well
-     * against a refined key type, such as "'1'". A plain "string" keeps rejecting integer keys.
+     * against string literals, such as "'1'". A plain "string" keeps rejecting integer keys.
      */
     private static function acceptsKey(Type $keyType, mixed $key): bool
     {
-        return $keyType->accepts($key) || \is_int($key) && $keyType !== $keyType->withoutRefinements() && $keyType->accepts((string) $key);
+        if ($keyType->accepts($key)) {
+            return true;
+        }
+
+        return \is_int($key) && $keyType->isSatisfiedBy(static fn (Type $t): bool => $t instanceof LiteralType && (string) $key === $t->getValue());
     }
 
     public function __toString(): string

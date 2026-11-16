@@ -201,7 +201,7 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * Returns an array with all cookies.
      *
-     * @return Cookie[]
+     * @return ($format is self::COOKIES_ARRAY ? array<array<array<Cookie>>> : list<Cookie>)
      *
      * @throws \InvalidArgumentException When the $format is invalid
      */

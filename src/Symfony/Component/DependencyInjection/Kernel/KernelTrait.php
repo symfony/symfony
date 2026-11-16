@@ -252,6 +252,10 @@ trait KernelTrait
             }
         }
 
+        // The builder is often part of reference cycles, so unset() alone doesn't free it
+        unset($container);
+        gc_collect_cycles();
+
         $this->container = require $cachePath;
         $this->container->set('kernel', $this);
 

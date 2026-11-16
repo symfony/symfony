@@ -11,15 +11,19 @@
 
 namespace Symfony\Component\KeyManagement\DependencyInjection;
 
+use Doctrine\DBAL\Types\Type;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Registers the encrypted Doctrine DBAL types when DoctrineBundle creates a connection, instead of when the kernel boots.
+ * Declares the encrypted Doctrine DBAL types as services tagged "doctrine.dbal.type", which DoctrineBundle gives to its connections.
  *
- * DoctrineBundle registers the types of its configuration at that time, so the encrypted types can wrap them.
- * A request that doesn't use the database doesn't register any type either.
+ * A type of "key_management.doctrine_dbal.types" is declared on every connection.
+ * The type of an encrypted column is declared on the connections of the entity managers that map its class.
+ * Each connection gets its own service, so that the parent type is the instance that connection resolves.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
@@ -27,18 +31,98 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class RegisterDoctrineDbalTypesPass implements CompilerPassInterface
 {
-    private const string TYPES = 'key_management.doctrine_dbal.encrypted_types';
+    private const string TYPES = '.key_management.doctrine_dbal.types';
+    private const string CLASSES = '.key_management.encrypted_column_classes';
+    private const string PROTOTYPE = '.key_management.doctrine_dbal.encrypted_type';
 
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition(self::TYPES) || !$container->hasParameter('doctrine.connections')) {
+        if (!$types = $container->hasParameter(self::TYPES) ? $container->getParameter(self::TYPES) : []) {
             return;
         }
 
-        foreach ($container->getParameter('doctrine.connections') as $id) {
-            $container->findDefinition($id)->setConfigurator([new Reference(self::TYPES), 'register']);
+        if (!$container->hasParameter('doctrine.connections')) {
+            throw new LogicException(\sprintf('The encrypted Doctrine DBAL types "%s" can only be declared on the connections of DoctrineBundle. Try running "composer require doctrine/doctrine-bundle".', implode('", "', array_keys($types))));
         }
 
-        $container->getDefinition(self::TYPES)->setPublic(false);
+        $this->assertNoCircularParents($types);
+
+        $prototype = $container->getDefinition(self::PROTOTYPE);
+        /** @var array<string, string> $connections */
+        $connections = $container->getParameter('doctrine.connections');
+        /** @var array<string, list<string>> $classes */
+        $classes = $container->hasParameter(self::CLASSES) ? $container->getParameter(self::CLASSES) : [];
+        $namespaces = $this->getConnectionsByNamespace($container);
+
+        foreach ($types as $name => ['type' => $parent, 'key' => $key]) {
+            $names = [];
+            foreach ($classes[$name] ?? [] as $class) {
+                foreach ($namespaces as $namespace => $connectionNames) {
+                    if (str_starts_with($class, $namespace)) {
+                        $names += array_flip($connectionNames);
+                    }
+                }
+            }
+
+            // a type that no entity manager maps goes to every connection
+            foreach (array_keys($names) ?: array_keys($connections) as $connection) {
+                $parentType = (new Definition(Type::class))
+                    ->setFactory([new Reference(\sprintf('doctrine.dbal.%s_connection.type_provider', $connection)), 'get'])
+                    ->setArguments([$parent]);
+
+                $container->setDefinition(self::PROTOTYPE.'.'.$name.'~'.$connection, (clone $prototype)->setAbstract(false))
+                    ->replaceArgument(0, $parentType)
+                    ->replaceArgument(2, $key)
+                    ->replaceArgument(3, $parent)
+                    ->addTag('doctrine.dbal.type', ['type_name' => $name, 'connection' => $connection]);
+            }
+        }
+    }
+
+    /**
+     * @param array<string, array{type: string, key: string}> $types
+     */
+    private function assertNoCircularParents(array $types): void
+    {
+        foreach ($types as $name => $type) {
+            $seen = [];
+
+            for ($current = $name; isset($types[$current]); $current = $types[$current]['type']) {
+                if (isset($seen[$current])) {
+                    throw new LogicException(\sprintf('The encrypted type "%s" has a circular parent type definition.', $current));
+                }
+
+                $seen[$current] = true;
+            }
+        }
+    }
+
+    /**
+     * @return array<string, list<string>> The names of the connections of the entity managers, by namespace of the classes they map
+     */
+    private function getConnectionsByNamespace(ContainerBuilder $container): array
+    {
+        /** @var array<string, string> $entityManagerConnections */
+        $entityManagerConnections = $container->hasParameter('doctrine.entity_manager_connections') ? $container->getParameter('doctrine.entity_manager_connections') : [];
+        $namespaces = [];
+
+        foreach ($container->hasParameter('doctrine.entity_managers') ? $container->getParameter('doctrine.entity_managers') : [] as $name => $id) {
+            $driver = \sprintf('doctrine.orm.%s_metadata_driver', $name);
+            $connection = $entityManagerConnections[$name] ?? null;
+
+            if (!$container->hasDefinition($id) || !$container->hasDefinition($driver) || null === $connection) {
+                continue;
+            }
+
+            foreach ($container->getDefinition($driver)->getMethodCalls() as [$method, $arguments]) {
+                if ('addDriver' === $method) {
+                    $namespaces[$arguments[1]][] = $connection;
+                } elseif ('setDefaultDriver' === $method) {
+                    $namespaces[''][] = $connection;
+                }
+            }
+        }
+
+        return $namespaces;
     }
 }

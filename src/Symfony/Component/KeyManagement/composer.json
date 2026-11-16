@@ -25,12 +25,16 @@
         "symfony/polyfill-mbstring": "^1.0"
     },
     "require-dev": {
+        "doctrine/dbal": "^4.6",
+        "doctrine/doctrine-bundle": "^3.4",
+        "doctrine/orm": "^3.8",
         "psr/container": "^1.1|^2.0",
         "psr/log": "^1|^2|^3",
         "symfony/clock": "^7.4|^8.0",
         "symfony/config": "^8.2",
         "symfony/console": "^8.2",
         "symfony/dependency-injection": "^8.2",
+        "symfony/doctrine-bridge": "^8.0.10",
         "symfony/filesystem": "^7.4|^8.0",
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",

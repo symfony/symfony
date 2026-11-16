@@ -1035,6 +1035,25 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals($expected, $serializer->denormalize(['name' => 'A', 'origin' => ['name' => 'B']], DummyWithParentConstructorParameterChild::class));
     }
 
+    public function testDenormalizeParametersWithTheSameNameOfDifferentConstructors()
+    {
+        $normalizer = new class(null, null, new PropertyInfoExtractor([], [new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
+            public function getSupportedTypes(?string $format): array
+            {
+                return [DummyWithNamedConstructors::class => true];
+            }
+
+            protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes): ?\ReflectionMethod
+            {
+                return $context['named_constructor'] ?? null ? new \ReflectionMethod($class, $context['named_constructor']) : parent::getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
+            }
+        };
+        $serializer = new Serializer([$normalizer, new ObjectNormalizer()]);
+
+        $this->assertEquals(new DummyChildWithConstructor('foo'), $serializer->denormalize(['value' => ['bar' => 'foo']], DummyWithNamedConstructors::class)->value);
+        $this->assertInstanceOf(DummyDtoItem::class, $serializer->denormalize(['value' => ['value' => 'foo']], DummyWithNamedConstructors::class, null, ['named_constructor' => 'fromItem'])->value);
+    }
+
     public function testDenormalizeUsesConstructorUnionTypeWhenExtractorIsLessPrecise()
     {
         $extractor = new class implements PropertyTypeExtractorInterface {
@@ -3272,6 +3291,24 @@ class DummyWithParentConstructorParameter extends DummyWithSelfConstructorPromot
 
 class DummyWithParentConstructorParameterChild extends DummyWithParentConstructorParameter
 {
+}
+
+class DummyWithNamedConstructors
+{
+    public object $value;
+
+    public function __construct(DummyChildWithConstructor $value)
+    {
+        $this->value = $value;
+    }
+
+    public static function fromItem(DummyDtoItem $value): self
+    {
+        $dummy = new self(new DummyChildWithConstructor(''));
+        $dummy->value = $value;
+
+        return $dummy;
+    }
 }
 
 class DummyWithIntOrString

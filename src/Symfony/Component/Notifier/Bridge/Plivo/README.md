@@ -20,7 +20,7 @@ Adding Options to a Message
 ---------------------------
 
 With a Plivo Message, you can use the `PlivoOptions` class to add
-[message options](https://www.plivo.com/docs/sms/api/message#send-a-message).
+[message options](https://www.plivo.com/docs/messaging/api/messages#send-a-message).
 
 ```php
 use Symfony\Component\Notifier\Message\SmsMessage;

@@ -34,6 +34,7 @@
         "symfony/config": "^8.2",
         "symfony/console": "^8.2",
         "symfony/dependency-injection": "^8.2",
+        "symfony/doctrine-bridge": "^8.0.10",
         "symfony/filesystem": "^7.4|^8.0",
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",

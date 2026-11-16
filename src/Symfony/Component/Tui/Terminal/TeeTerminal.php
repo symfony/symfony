@@ -128,6 +128,18 @@ final class TeeTerminal implements TerminalInterface
         $this->secondary->setTitle($title);
     }
 
+    public function pushTitle(): void
+    {
+        $this->primary->pushTitle();
+        $this->secondary->pushTitle();
+    }
+
+    public function popTitle(): void
+    {
+        $this->primary->popTitle();
+        $this->secondary->popTitle();
+    }
+
     public function bell(): void
     {
         $this->primary->bell();

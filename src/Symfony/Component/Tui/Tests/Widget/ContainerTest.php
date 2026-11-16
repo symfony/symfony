@@ -27,6 +27,43 @@ use Symfony\Component\Tui\Widget\TextWidget;
 
 class ContainerTest extends TestCase
 {
+    public function testReplace()
+    {
+        $container = new ContainerWidget();
+        $container->add($first = new TextWidget('first'))->add($second = new TextWidget('second'))->add($third = new TextWidget('third'));
+        $by = new TextWidget('by');
+
+        $container->replace($second, $by);
+        $this->assertSame([$first, $by, $third], $container->all());
+        $this->assertNull($second->getParent());
+        $this->assertSame($container, $by->getParent());
+
+        $container->replace($second, new TextWidget('absent'));
+        $this->assertSame([$first, $by, $third], $container->all());
+    }
+
+    public function testReplaceByAChildMovesIt()
+    {
+        $container = new ContainerWidget();
+        $container->add($first = new TextWidget('first'))->add($second = new TextWidget('second'))->add($third = new TextWidget('third'));
+
+        // Like Node::replaceChild(): taken from where it was, not there twice
+        $container->replace($first, $third);
+        $this->assertSame([$third, $second], $container->all());
+        $this->assertNull($first->getParent());
+        $this->assertSame($container, $third->getParent());
+
+        $container->replace($second, $second);
+        $this->assertSame([$third, $second], $container->all());
+        $this->assertSame($container, $second->getParent());
+    }
+
+    public function testALabelCanBeRemoved()
+    {
+        $widget = (new TextWidget('text'))->setLabel('label');
+        $this->assertNull($widget->setLabel(null)->getLabel());
+    }
+
     public function testRender()
     {
         $container = new ContainerWidget();

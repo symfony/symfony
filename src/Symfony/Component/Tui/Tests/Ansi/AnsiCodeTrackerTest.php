@@ -89,10 +89,13 @@ class AnsiCodeTrackerTest extends TestCase
         $this->assertSame("\x1b[4:5;58;5;1m", $this->tracker->getActiveCodes(), 'Also when scanning text.');
 
         $this->tracker->processText("\x1b[38:2::255:0:0;5m");
-        $this->assertSame("\x1b[4:5;5;58;5;1m", $this->tracker->getActiveCodes(), 'Other colon forms are skipped, not the parameters after them.');
+        $this->assertSame("\x1b[4:5;5;38:2::255:0:0;58;5;1m", $this->tracker->getActiveCodes(), 'The colon form of a color kept as it is, the parameters after it too.');
 
-        $this->tracker->process("\x1b[24m");
-        $this->assertSame("\x1b[5;58;5;1m", $this->tracker->getActiveCodes());
+        $this->tracker->processText("\x1b[1:2;9m");
+        $this->assertSame("\x1b[4:5;5;9;38:2::255:0:0;58;5;1m", $this->tracker->getActiveCodes(), 'Other colon forms are skipped, not the parameters after them.');
+
+        $this->tracker->process("\x1b[24;29m");
+        $this->assertSame("\x1b[5;38:2::255:0:0;58;5;1m", $this->tracker->getActiveCodes());
     }
 
     public function testSgr21SetsDoubleUnderline()
@@ -347,6 +350,37 @@ class AnsiCodeTrackerTest extends TestCase
 
         $this->tracker->process("\x1b[27m");
         $this->assertSame("\x1b[29m", $this->tracker->getLineEndReset());
+    }
+
+    public function testGetLineEndResetTurnsOffOverline()
+    {
+        $this->tracker->process("\x1b[53m");
+        $this->assertSame("\x1b[55m", $this->tracker->getLineEndReset());
+    }
+
+    public function testAnUnderlineReplacesADoubleOne()
+    {
+        $this->tracker->processText("\x1b[21m\x1b[4m");
+        $this->assertSame("\x1b[4m", $this->tracker->getActiveCodes());
+    }
+
+    public function testTheColonFormsOfColorsAreReadWithTheirEmptyParameters()
+    {
+        foreach (["\x1b[48:2::1:2:3:0:0m", "\x1b[48:5:m", "\x1b[48:2::::m"] as $code) {
+            $tracker = new AnsiCodeTracker();
+            $tracker->processText($code);
+            $this->assertTrue($tracker->paintsCells(), json_encode($code));
+        }
+        // The others, like a color with too few parameters, not
+        foreach (["\x1b[48:2:1:2m", "\x1b[48:7:1m"] as $code) {
+            $tracker = new AnsiCodeTracker();
+            $tracker->processText($code);
+            $this->assertFalse($tracker->paintsCells(), json_encode($code));
+        }
+        // A styled underline given empty is none
+        $tracker = new AnsiCodeTracker();
+        $tracker->processText("\x1b[4:m");
+        $this->assertFalse($tracker->paintsCells());
     }
 
     // --------------------------------------------------

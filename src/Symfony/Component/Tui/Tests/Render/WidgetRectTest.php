@@ -53,4 +53,33 @@ class WidgetRectTest extends TestCase
         $this->assertSame(['row' => 10, 'col' => 20], $rect->toRelative(15, 30));
         $this->assertSame(['row' => 19, 'col' => 39], $rect->toRelative(24, 49));
     }
+
+    public function testFragmentsAreRelativeToTheRect()
+    {
+        // A widget split across two columns: its second piece 10 columns right of the first, 3 rows up
+        $rect = new WidgetRect(5, 0, 8, 4, [[-3, 10, 8, 2]]);
+
+        $this->assertTrue($rect->contains(2, 10));
+        $this->assertTrue($rect->contains(3, 17));
+        $this->assertFalse($rect->contains(4, 10));
+    }
+
+    public function testClipIsInScreenCellsAndNarrowsOnly()
+    {
+        $rect = (new WidgetRect(0, 0, 10, 10))->withClip([2, 2, 6, 6])->withClip([0, 4, 8, 8]);
+
+        $this->assertSame([2, 4, 6, 6], $rect->clip);
+        $this->assertTrue($rect->contains(5, 5));
+        $this->assertFalse($rect->contains(1, 5));
+        $this->assertFalse($rect->contains(5, 3));
+    }
+
+    public function testWithOffsetMovesTheClipAndKeepsTheFragments()
+    {
+        $rect = (new WidgetRect(1, 1, 4, 2, [[2, 0, 4, 1]]))->withClip([1, 1, 4, 3])->withOffset(10, 20);
+
+        $this->assertEquals(new WidgetRect(11, 21, 4, 2, [[2, 0, 4, 1]], [11, 21, 14, 23]), $rect);
+        $this->assertTrue($rect->contains(13, 22));
+        $this->assertFalse($rect->contains(13, 23), 'Past the clip.');
+    }
 }

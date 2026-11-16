@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Widget;
 
 use Symfony\Component\Tui\Event\AbstractEvent;
+use Symfony\Component\Tui\Exception\InvalidArgumentException;
 use Symfony\Component\Tui\Exception\RenderException;
 use Symfony\Component\Tui\Render\LineBufferInterface;
 use Symfony\Component\Tui\Render\RenderContext;
@@ -29,7 +30,23 @@ use Symfony\Component\Tui\Tui;
  */
 abstract class AbstractWidget
 {
+    /**
+     * The state of a widget that does not take the focus nor act on input,
+     * matched by ':disabled', see setState().
+     */
+    public const STATE_DISABLED = 'disabled';
+
     private int $renderRevision = 0;
+    /** Counts the changes of all widgets, see getChildrenChangedSince() */
+    private static int $changeSerial = 0;
+    /**
+     * The changes of the children, once asked for, see getChildrenChangedSince(): the change serial when this widget last
+     * changed itself, the one they are known from, and the children changed since, by object id, the last changed last,
+     * each with its change serial. One property, null for most widgets: three cost every widget built more.
+     *
+     * @var array{int, int, array<int, array{self, int}>}|null
+     */
+    private ?array $childChanges = null;
     private ?string $id = null;
     private ?string $label = null;
     private ?AbstractWidget $parent = null;
@@ -39,6 +56,9 @@ abstract class AbstractWidget
 
     /** @var string[] */
     private array $styleClasses = [];
+
+    /** @var array<string, true> */
+    private array $states = [];
 
     /** @var array<class-string<AbstractEvent>, list<callable>> */
     private array $listeners = [];
@@ -51,6 +71,10 @@ abstract class AbstractWidget
     private int $renderCacheRevision = -1;
     private int $renderCacheColumns = -1;
     private int $renderCacheRows = -1;
+    private string $renderCacheKey = '';
+
+    /** @var array<class-string, object> The states kept for rendering backends, see getExtensionState() */
+    private array $extensionStates = [];
 
     /**
      * @return $this
@@ -62,6 +86,35 @@ abstract class AbstractWidget
         return $this;
     }
 
+    /**
+     * Returns the state of the given class kept with this widget, created on
+     * first use and dropped with the widget.
+     *
+     * A rendering backend or another extension keeps what it knows of each
+     * widget in a class of its own, constructed without arguments.
+     *
+     * The state belongs to the extension: it lives as long as the widget,
+     * removed from its parent and added back or drawn by another renderer
+     * (see RendererChangeEvent), and Tui never clears it. What depends on
+     * where the widget is drawn is for the extension to invalidate, with the
+     * render revision or the render cache.
+     *
+     * @template T of object
+     *
+     * @param class-string<T> $type
+     *
+     * @return T
+     */
+    final public function getExtensionState(string $type): object
+    {
+        $state = $this->extensionStates[$type] ?? null;
+        if (!$state instanceof $type) {
+            $this->extensionStates[$type] = $state = new $type();
+        }
+
+        return $state;
+    }
+
     final public function getId(): ?string
     {
         return $this->id;
@@ -71,11 +124,11 @@ abstract class AbstractWidget
      * Set an optional human-readable label for the widget.
      *
      * Used by parent widgets (e.g., TabsWidget) to extract metadata
-     * from children added via templates.
+     * from children added via templates. Null removes it.
      *
      * @return $this
      */
-    final public function setLabel(string $label): static
+    final public function setLabel(?string $label): static
     {
         $this->label = $label;
 
@@ -185,17 +238,124 @@ abstract class AbstractWidget
             $flags[] = 'focus';
         }
 
+        foreach ($this->states as $state => $_) {
+            if ('root' !== $state && 'focus' !== $state) {
+                $flags[] = $state;
+            }
+        }
+
         return $flags;
+    }
+
+    /**
+     * Turns a custom state flag on or off.
+     *
+     * State flags are matched by state selectors, like the built-in "root"
+     * and "focus" ones: a widget with the "hover" state matches ':hover',
+     * '.button:hover' and Button::class.':hover'.
+     *
+     * A widget with the disabled state (STATE_DISABLED) leaves the focus
+     * cycle, and loses the focus if it has it.
+     *
+     * @return $this
+     *
+     * @throws InvalidArgumentException For the built-in "root" and "focus" states, which follow the widget
+     */
+    final public function setState(string $state, bool $on = true): static
+    {
+        if ('root' === $state || 'focus' === $state) {
+            throw new InvalidArgumentException(\sprintf('The "%s" state follows the widget and cannot be set; use the focus manager or the widget tree instead.', $state));
+        }
+        if ($on === isset($this->states[$state])) {
+            return $this;
+        }
+
+        if ($on) {
+            $this->states[$state] = true;
+        } else {
+            unset($this->states[$state]);
+        }
+
+        $this->invalidate();
+
+        // A widget that no longer takes the focus loses it
+        if ($on && self::STATE_DISABLED === $state && $this instanceof FocusableInterface && $this->isFocused()) {
+            $this->context?->getFocusManager()->revalidateFocus();
+        }
+
+        return $this;
+    }
+
+    final public function hasState(string $state): bool
+    {
+        return match ($state) {
+            'root' => null === $this->parent,
+            'focus' => $this instanceof FocusableInterface && $this->isFocused(),
+            default => isset($this->states[$state]),
+        };
     }
 
     final public function invalidate(): void
     {
-        ++$this->renderRevision;
-        $this->renderCacheLines = null;
-
-        if (null !== $this->parent) {
-            $this->parent->invalidate();
+        // Kept once asked for only, see getChildrenChangedSince(): until then, the first answer is null anyway
+        if (null !== $this->childChanges) {
+            $this->childChanges = [++self::$changeSerial, $this->childChanges[1], []];
         }
+        // Up to the root, each parent noting the child it changed through, once asked for
+        for ($child = null, $widget = $this; null !== $widget; $child = $widget, $widget = $widget->parent) {
+            ++$widget->renderRevision;
+            $widget->renderCacheLines = null;
+            if (null !== $child && null !== $widget->childChanges) {
+                $widget->noteChildChange($child);
+            }
+        }
+        // Once per change, at the root: the styles built on those of the widgets may be stale
+        $child->context?->invalidateStyles();
+    }
+
+    /**
+     * The serial of the last change of any widget: what getChildrenChangedSince() takes.
+     *
+     * @internal
+     */
+    final public static function getChangeSerial(): int
+    {
+        return self::$changeSerial;
+    }
+
+    /**
+     * The children that changed since the change serial was $serial (see getChangeSerial()): invalidated, or whose
+     * render cache was stored or cleared, the last changed first. Null when the widget changed itself since, like when
+     * a child was added or removed: any of them may have; or when they were not asked for before, since when they are
+     * kept.
+     *
+     * @return list<self>|null
+     *
+     * @internal
+     */
+    final public function getChildrenChangedSince(int $serial): ?array
+    {
+        if (null === $this->childChanges) {
+            $this->childChanges = [0, self::$changeSerial, []];
+
+            return null;
+        }
+        if ($this->childChanges[1] > $serial || $this->childChanges[0] > $serial) {
+            return null;
+        }
+        $changed = [];
+        for ($entry = end($this->childChanges[2]); false !== $entry && $entry[1] > $serial; $entry = prev($this->childChanges[2])) {
+            $changed[] = $entry[0];
+        }
+
+        return $changed;
+    }
+
+    private function noteChildChange(self $child): void
+    {
+        $id = spl_object_id($child);
+        unset($this->childChanges[2][$id]);
+        $this->childChanges[2][$id] = [$child, ++self::$changeSerial];
     }
 
     final public function getRenderRevision(): int
@@ -348,18 +508,22 @@ abstract class AbstractWidget
      *
      * The cache is keyed on (renderRevision, columns, rows). A cache hit
      * means the widget's state and available dimensions have not changed
-     * since the last render, so the Renderer can skip the entire pipeline
+     * since the last render, so the renderer can skip the entire pipeline
      * (style resolution, layout, chrome, content rendering).
      *
-     * @internal Used by the Renderer
+     * It is the renderer's: the native one and other rendering backends store
+     * their renders there with setRenderCache().
+     *
+     * @param string $key What else the render depends on besides its size, like a size it is a share of
      *
      * @return LineBufferInterface|null Cached lines, or null on miss
      */
-    final public function getRenderCache(int $columns, int $rows): ?LineBufferInterface
+    final public function getRenderCache(int $columns, int $rows, string $key = ''): ?LineBufferInterface
     {
         if ($this->renderCacheRevision === $this->getRenderRevision()
             && $this->renderCacheColumns === $columns
             && $this->renderCacheRows === $rows
+            && $this->renderCacheKey === $key
         ) {
             return $this->renderCacheLines;
         }
@@ -368,29 +532,47 @@ abstract class AbstractWidget
     }
 
     /**
+     * The lines of the last render stored, whatever its size, null when the widget changed since or none is stored.
+     *
+     * @internal
+     */
+    final public function getCurrentRenderCache(): ?LineBufferInterface
+    {
+        return $this->renderCacheRevision === $this->renderRevision ? $this->renderCacheLines : null;
+    }
+
+    /**
      * Store the render output for future cache lookups.
      *
-     * @internal Used by the Renderer
+     * @param string $key What else the render depends on besides its size, see getRenderCache()
      */
-    final public function setRenderCache(LineBufferInterface $lines, int $columns, int $rows): void
+    final public function setRenderCache(LineBufferInterface $lines, int $columns, int $rows, string $key = ''): void
     {
         $this->renderCacheLines = $lines;
         $this->renderCacheRevision = $this->getRenderRevision();
         $this->renderCacheColumns = $columns;
         $this->renderCacheRows = $rows;
+        $this->renderCacheKey = $key;
+        // Kept once asked for only, see getChildrenChangedSince()
+        if (null !== $this->parent?->childChanges) {
+            $this->parent->noteChildChange($this);
+        }
     }
 
     /**
      * Clear the render cache without changing the render revision.
      *
-     * Used by the layout engine to force a re-render for position tracking
-     * after the measurement pass has already cached the output.
-     *
-     * @internal Used by the LayoutEngine
+     * Forces the next render, like after a measurement pass cached an output
+     * that is not the one to draw; invalidate() is what tells that the widget
+     * changed.
      */
     final public function clearRenderCache(): void
     {
         $this->renderCacheLines = null;
+        // Kept once asked for only, see getChildrenChangedSince()
+        if (null !== $this->parent?->childChanges) {
+            $this->parent->noteChildChange($this);
+        }
     }
 
     /**
@@ -542,7 +724,7 @@ abstract class AbstractWidget
      * Also requests a render after dispatching, since listeners typically
      * mutate UI state.
      */
-    final protected function dispatch(AbstractEvent $event): void
+    final public function dispatch(AbstractEvent $event): void
     {
         // Per-widget listeners (no target check needed, they're already scoped)
         foreach ($this->listeners[$event::class] ?? [] as $listener) {

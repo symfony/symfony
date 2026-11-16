@@ -73,6 +73,32 @@ class ContainerWidget extends AbstractWidget implements WidgetContainerInterface
     }
 
     /**
+     * Replaces a child widget by another one, in its place: one of its children already is taken from where it was,
+     * like Node::replaceChild(); by itself, nothing changes.
+     *
+     * @return $this
+     */
+    public function replace(AbstractWidget $widget, AbstractWidget $by): static
+    {
+        if ($widget === $by) {
+            return $this;
+        }
+        if (false !== $index = array_search($widget, $this->children, true)) {
+            if (false !== $at = array_search($by, $this->children, true)) {
+                $this->detachChild($by);
+                array_splice($this->children, $at, 1);
+                $index -= $at < $index ? 1 : 0;
+            }
+            $this->detachChild($widget);
+            $this->children[$index] = $by;
+            $this->attachChild($by);
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    /**
      * Remove all child widgets.
      *
      * @return $this

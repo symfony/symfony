@@ -133,6 +133,16 @@ class VirtualTerminalTest extends TestCase
         yield 'preserves unicode' => ['✓ Complete! 🎉', "\x1b]0;✓ Complete! 🎉\x07"];
     }
 
+    public function testTitlesArePushedAndPopped()
+    {
+        $terminal = new VirtualTerminal();
+        $terminal->pushTitle();
+        $terminal->setTitle('Editor');
+        $terminal->popTitle();
+
+        $this->assertSame("\x1b[22;0t\x1b]0;Editor\x07\x1b[23;0t", $terminal->getOutput());
+    }
+
     public function testConsumeOutputReturnsAndClearsBuffer()
     {
         $terminal = new VirtualTerminal();

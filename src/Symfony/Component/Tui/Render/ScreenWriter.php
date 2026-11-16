@@ -34,7 +34,7 @@ use Symfony\Component\Tui\Terminal\TerminalInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class ScreenWriter
+final class ScreenWriter implements FrameWriterInterface
 {
     private const PRINTABLE_ASCII = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 
@@ -60,6 +60,10 @@ final class ScreenWriter
         ?LineBufferDiffer $lineBufferDiffer = null,
     ) {
         $this->lineBufferDiffer = $lineBufferDiffer ?? new LineBufferDiffer();
+    }
+
+    public function close(): void
+    {
     }
 
     public function setShowHardwareCursor(bool $enabled): void
@@ -154,7 +158,7 @@ final class ScreenWriter
      * On growth, it brings rows back from the scrollback, then adds blank rows at the bottom.
      * When the rows it moves cannot be known, the next write repaints the whole screen.
      */
-    public function followTermuxHeightChange(int $previousRows, int $rows): void
+    public function onTerminalHeightChange(int $previousRows, int $rows): void
     {
         // Lines above the screen; until the content fills the screen, the rows above it are unknown unless the screen was cleared
         $top = $this->maxLinesRendered - $previousRows;

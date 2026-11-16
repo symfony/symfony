@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Ansi\ScreenBufferHtmlRenderer;
 use Symfony\Component\Tui\Terminal\ScreenBuffer;
+use Symfony\Polyfill\Intl\Grapheme\Grapheme;
 
 class ScreenBufferTest extends TestCase
 {
@@ -38,9 +39,18 @@ class ScreenBufferTest extends TestCase
         yield 'clear screen' => [40, 10, "Old content\x1b[2J\x1b[HNew content", 'New content'];
         yield 'UTF-8 characters' => [40, 10, "→ Option 1\n  Option 2\n✓ Selected", "→ Option 1\n  Option 2\n✓ Selected"];
         yield 'scroll up' => [20, 3, "Line 1\nLine 2\nLine 3\nLine 4", "Line 2\nLine 3\nLine 4"];
-        yield 'scroll up multiple' => [20, 3, "A\nB\nC\nD\nE\nF", "D\nE\nF"];
+        yield 'scroll up multiple' => [20, 3, "A\nB\nC\nD\nE\nF", "D\nE\nF"]; // codespell:ignore nd
         yield 'wide character plain text' => [40, 10, '你好世界', '你好世界'];
         yield 'wide character multiline' => [40, 10, "你好\n世界", "你好\n世界"];
+    }
+
+    public function testTheStyledScreenKeepsTheRowsThatShowAStyle()
+    {
+        $buffer = new ScreenBuffer(4, 5);
+        $buffer->write("ab\r\n\e[44m    \e[0m\r\n\e[4m  \e[0m\r\n\e[38;2;1;2;3m    \e[0m\r\n");
+
+        $this->assertSame("ab\n\e[44m    \e[0m\n\e[4m  \e[0m", $buffer->getStyledScreen(), 'A background or an underline shows on spaces, a text color does not.');
+        $this->assertSame('ab', $buffer->getScreen());
     }
 
     public function testCursorMovement()
@@ -305,6 +315,57 @@ class ScreenBufferTest extends TestCase
         // After scrolling, the last row should be empty
         $cells = $screen->getCells();
         $this->assertSame([], $cells[2]);
+    }
+
+    public function testTheTextBetweenControlCharactersIsSplitIntoGraphemeClusters()
+    {
+        $screen = new ScreenBuffer(20, 3);
+        // A combining accent with its letter, a byte that is no UTF-8 skipped, a style and a line in between
+        $screen->write("e\u{0301}x\xFFy\x1b[1mz\r\n\u{1F44D}\u{1F3FD}!");
+
+        $this->assertSame(["e\u{0301}", 'x', 'y', 'z'], array_column(\array_slice($screen->getCells()[0], 0, 4), 'char'));
+        $this->assertSame(["\u{1F44D}\u{1F3FD}", '', '!'], array_column(\array_slice($screen->getCells()[1], 0, 3), 'char'));
+    }
+
+    public function testALongRunWithAByteThatIsNoUtf8KeepsItsText()
+    {
+        $screen = new ScreenBuffer(400, 2);
+        $screen->write(str_repeat('ab', 100)."\xFF".str_repeat("e\u{0301}", 100)."\xC3");
+
+        $this->assertSame(str_split(str_repeat('ab', 100)), array_column(\array_slice($screen->getCells()[0], 0, 200), 'char'));
+        $this->assertSame(array_fill(0, 100, "e\u{0301}"), array_column(\array_slice($screen->getCells()[0], 200, 100), 'char'));
+        $this->assertSame([], array_column(\array_slice($screen->getCells()[0], 300), 'char'));
+    }
+
+    public function testAVeryLongRunWithAByteThatIsNoUtf8KeepsItsText()
+    {
+        $screen = new ScreenBuffer(20000, 1);
+        $screen->write(str_repeat('é', 10000)."\xFF".'z');
+
+        $this->assertSame([...array_fill(0, 10000, 'é'), 'z'], array_column(\array_slice($screen->getCells()[0], 0, 10001), 'char'));
+    }
+
+    public static function provideTextsThatAreNoUtf8(): iterable
+    {
+        yield 'a long run' => [str_repeat('é', 3000)."\xFF".'z', [...array_fill(0, 3000, 'é'), 'z']];
+        yield 'a truncated sequence' => ["\xE2\x82a\u{1F44D}\u{1F3FD}\xF0\x9F", ['a', "\u{1F44D}\u{1F3FD}"]];
+        yield 'an overlong form and a surrogate' => ["ab\xC0\xAFc\xED\xA0\x80d\xE0\x80\x80", ['a', 'b', 'c', 'd']];
+        yield 'an accent after a byte that is no UTF-8' => ["e\u{0301}\xFF\u{0301}x\xF4\x90\x80\x80q", ["e\u{0301}", "\u{0301}", 'x', 'q']];
+    }
+
+    /**
+     * @param list<string> $graphemes
+     */
+    #[DataProvider('provideTextsThatAreNoUtf8')]
+    public function testThePartsOfATextThatAreValidUtf8AreFoundWithAndWithoutPcre(string $text, array $graphemes)
+    {
+        $parts = new \ReflectionMethod(ScreenBuffer::class, 'validParts');
+        foreach ([true, false] as $pattern) {
+            $found = $parts->invoke(null, $text, $pattern);
+            // Split by intl and by its polyfill alike
+            $this->assertSame($graphemes, array_merge(...array_map(static fn (string $part): array => grapheme_str_split($part), $found)));
+            $this->assertSame($graphemes, array_merge(...array_map(static fn (string $part): array => Grapheme::grapheme_str_split($part), $found)));
+        }
     }
 
     public function testWideCharacterOccupiesTwoCells()

@@ -26,6 +26,11 @@ use Symfony\Component\Tui\Ansi\AnsiUtils;
  */
 final class ScreenBuffer
 {
+    /** Runs of well-formed UTF-8 sequences, in bytes, see write(): possessive, not a backtracking frame a character */
+    private const VALID_UTF8 = '/(?:[\x00-\x7F]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})++/';
+    /** The C0 control characters and DEL, handled one by one, see write() */
+    private const CONTROLS = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x7f";
+
     /** @var array<int, array<int, array{char: string, style: string}>> */
     private array $cells = [];
     /** @var list<array<int, array{char: string, style: string}>> */
@@ -129,13 +134,97 @@ final class ScreenBuffer
                 continue;
             }
 
-            // Regular character - extract full grapheme cluster
-            $grapheme = grapheme_extract($data, 1, \GRAPHEME_EXTR_COUNT, $i, $next);
+            // Regular characters, up to the next control character, which no grapheme cluster goes past: split at once,
+            // not extracted one by one from the data, which the polyfill of grapheme_extract() does in a time that grows
+            // with the rest of the data, quadratic for the output of many frames
+            $end = $i + strcspn($data, self::CONTROLS, $i);
+            $run = substr($data, $i, $end - $i);
+            $i = $end;
+            // Text that is no valid UTF-8: its valid parts split, the bytes in between skipped, the same with intl and
+            // without (intl skipped a byte like \xFF, its polyfill the text before it)
+            $valid = preg_match('//u', $run) ?: (\PREG_BAD_UTF8_ERROR === preg_last_error() ? 0 : false);
+            foreach (1 === $valid ? [$run] : self::validParts($run, 0 === $valid) as $part) {
+                // Valid UTF-8, which the polyfill extracts too, when splitting it failed
+                if (false === $graphemes = grapheme_str_split($part)) {
+                    $this->putGraphemes($part);
+                    continue;
+                }
+                foreach ($graphemes as $grapheme) {
+                    $this->putChar($grapheme);
+                }
+            }
+        }
+    }
+
+    /**
+     * The parts of a text that are valid UTF-8, the bytes in between left out: found by a pattern, or byte by byte when
+     * it fails, like past a limit of PCRE.
+     *
+     * @return list<string>
+     */
+    private static function validParts(string $text, bool $pattern = true): array
+    {
+        if ($pattern && false !== preg_match_all(self::VALID_UTF8, $text, $matches)) {
+            return $matches[0];
+        }
+        $parts = [];
+        $start = null;
+        for ($i = 0, $length = \strlen($text); $i < $length;) {
+            $byte = \ord($text[$i]);
+            $size = match (true) {
+                $byte < 0x80 => 1,
+                $byte >= 0xC2 && $byte <= 0xDF => 2,
+                $byte >= 0xE0 && $byte <= 0xEF => 3,
+                $byte >= 0xF0 && $byte <= 0xF4 => 4,
+                default => 0,
+            };
+            $valid = 0 < $size && $i + $size <= $length;
+            if ($valid && 1 < $size) {
+                // The second byte of some sequences is narrower, like VALID_UTF8 says: no overlong form, no surrogate
+                [$low, $high] = match ($byte) {
+                    0xE0 => [0xA0, 0xBF],
+                    0xED => [0x80, 0x9F],
+                    0xF0 => [0x90, 0xBF],
+                    0xF4 => [0x80, 0x8F],
+                    default => [0x80, 0xBF],
+                };
+                $next = \ord($text[$i + 1]);
+                $valid = $next >= $low && $next <= $high;
+                for ($k = 2; $valid && $k < $size; ++$k) {
+                    $next = \ord($text[$i + $k]);
+                    $valid = $next >= 0x80 && $next <= 0xBF;
+                }
+            }
+            if ($valid) {
+                $start ??= $i;
+                $i += $size;
+                continue;
+            }
+            if (null !== $start) {
+                $parts[] = substr($text, $start, $i - $start);
+                $start = null;
+            }
+            ++$i;
+        }
+        if (null !== $start) {
+            $parts[] = substr($text, $start);
+        }
+
+        return $parts;
+    }
+
+    /**
+     * Puts the grapheme clusters of a text that is valid UTF-8 one by one.
+     */
+    private function putGraphemes(string $text): void
+    {
+        for ($at = 0, $length = \strlen($text); $at < $length;) {
+            $grapheme = grapheme_extract($text, 1, \GRAPHEME_EXTR_COUNT, $at, $next);
             if (false !== $grapheme && '' !== $grapheme) {
                 $this->putChar($grapheme);
-                $i = $next;
+                $at = $next;
             } else {
-                ++$i;
+                ++$at;
             }
         }
     }
@@ -177,7 +266,8 @@ final class ScreenBuffer
             $line = $this->getLineStyled($row);
             if (isset($this->cells[$row])) {
                 foreach ($this->cells[$row] as $cell) {
-                    if (' ' !== $cell['char'] && '' !== $cell['char']) {
+                    // A space with a style that shows on it, like a background, is drawn too
+                    if ((' ' !== $cell['char'] && '' !== $cell['char']) || ('' !== $cell['style'] && self::showsOnSpace($cell['style']))) {
                         $lastNonEmpty = $row;
                         break;
                     }
@@ -194,6 +284,28 @@ final class ScreenBuffer
         }
 
         return implode("\n", $result);
+    }
+
+    /**
+     * Whether a style is seen on a space: a background, reverse video, an underline or a line through it.
+     */
+    private static function showsOnSpace(string $style): bool
+    {
+        preg_match_all('/\e\[([0-9;:]*)m/', $style, $sequences);
+        foreach ($sequences[1] as $sequence) {
+            $parameters = explode(';', str_replace(':', ';', $sequence));
+            for ($i = 0, $count = \count($parameters); $i < $count; ++$i) {
+                $code = (int) $parameters[$i];
+                if (38 === $code || 58 === $code) {
+                    // A color of the text or of the underline: its parameters are not codes
+                    $i += '2' === ($parameters[$i + 1] ?? null) ? 4 : 2;
+                } elseif (48 === $code || 4 === $code || 7 === $code || 9 === $code || ($code >= 40 && $code <= 47) || ($code >= 100 && $code <= 107)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

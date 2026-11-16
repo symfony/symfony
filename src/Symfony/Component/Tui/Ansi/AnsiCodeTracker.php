@@ -189,13 +189,39 @@ final class AnsiCodeTracker
     }
 
     /**
-     * Get the codes that turn off the underline, strikethrough, inverse, background and a hyperlink at line end, as they bleed into the padding.
+     * Whether the characters drawn now are hidden, like SGR 8: drawn as spaces.
+     */
+    public function isHidden(): bool
+    {
+        return $this->hidden;
+    }
+
+    /**
+     * Whether the cells drawn now are in a hyperlink (OSC 8).
+     */
+    public function inLink(): bool
+    {
+        return null !== $this->link;
+    }
+
+    /**
+     * Whether the cells drawn now are painted even when they are spaces: a background, reverse video, or a line drawn
+     * across them, like an underline, a line through or an overline.
+     */
+    public function paintsCells(): bool
+    {
+        return null !== $this->bgColor || $this->inverse || $this->underline || $this->doubleUnderline || $this->strikethrough || $this->overline;
+    }
+
+    /**
+     * Get the codes that turn off the underline, strikethrough, overline, inverse, background and a hyperlink at line end, as they bleed into the padding.
      */
     public function getLineEndReset(): string
     {
         // A hyperlink is closed at the end of the line too, and opened again on the next one, like a style
         return ($this->underline || $this->doubleUnderline ? "\x1b[24m" : '')
             .($this->strikethrough ? "\x1b[29m" : '')
+            .($this->overline ? "\x1b[55m" : '')
             .($this->inverse ? "\x1b[27m" : '')
             .(null !== $this->bgColor ? "\x1b[49m" : '')
             .(null !== $this->link ? "\x1b]8;;\x07" : '');
@@ -246,16 +272,17 @@ final class AnsiCodeTracker
         $count = \count($parts);
 
         while ($i < $count) {
-            // A styled underline: 4:0 is none, 4:1 to 4:5 a shape
-            if (str_starts_with($parts[$i], '4:')) {
-                $this->underline = '4:0' !== $parts[$i];
-                $this->doubleUnderline = false;
-                $this->underlineVariant = $this->underline ? $parts[$i] : null;
-                ++$i;
-                continue;
-            }
+            // The colon forms, read like self::colonParameters() reads them: a color kept as it is, a styled underline
+            // its shape
             if (str_contains($parts[$i], ':')) {
-                // Other colon forms, like 38:2::R:G:B colors, are not tracked
+                $read = self::colonParameters(array_map(intval(...), explode(':', $parts[$i])));
+                if (isset($read[2])) {
+                    $this->setColor($read[0], $parts[$i]);
+                } elseif ([24, 4] === $read) {
+                    [$this->underline, $this->doubleUnderline, $this->underlineVariant] = [true, false, $parts[$i]];
+                } elseif ([24] === $read) {
+                    [$this->underline, $this->doubleUnderline, $this->underlineVariant] = [false, false, null];
+                }
                 ++$i;
                 continue;
             }
@@ -295,7 +322,8 @@ final class AnsiCodeTracker
                 1 => $this->bold = true,
                 2 => $this->dim = true,
                 3 => $this->italic = true,
-                4 => [$this->underline, $this->underlineVariant] = [true, null],
+                // A single underline replaces a double one, like a styled one; a double one after it is drawn instead
+                4 => [$this->underline, $this->doubleUnderline, $this->underlineVariant] = [true, false, null],
                 5 => $this->blink = true,
                 7 => $this->inverse = true,
                 8 => $this->hidden = true,
@@ -320,6 +348,34 @@ final class AnsiCodeTracker
 
             ++$i;
         }
+    }
+
+    /**
+     * The SGR parameters an SGR parameter given with colons stands for, like terminals read it: the colors 38:5:N and
+     * 38:2:[ID:]R:G:B (48 and 58 too) as with semicolons, an empty parameter 0, what follows the color skipped; 4:0 as 24,
+     * the other styled underlines as 24;4, a single underline replacing a double one; none for the others.
+     *
+     * @param list<int> $parameter The numbers between its colons
+     *
+     * @return list<int>
+     */
+    public static function colonParameters(array $parameter): array
+    {
+        $code = $parameter[0] ?? 0;
+        if (38 === $code || 48 === $code || 58 === $code) {
+            $count = \count($parameter);
+
+            return match ($parameter[1] ?? null) {
+                2 => $count >= 5 ? [$code, 2, ...\array_slice($parameter, $count >= 6 ? 3 : 2, 3)] : [],
+                5 => $count >= 3 ? [$code, 5, $parameter[2]] : [],
+                default => [],
+            };
+        }
+        if (4 === $code) {
+            return 0 === ($parameter[1] ?? 0) ? [24] : [24, 4];
+        }
+
+        return [];
     }
 
     private function setColor(int $code, string $value): void

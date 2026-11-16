@@ -234,6 +234,39 @@ class InputFileTest extends TestCase
         $this->assertSame(realpath($path), $file->getRealPath());
     }
 
+    public function testFromPathWithFileUriKeepsEncodedBackslashes()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Backslashes cannot be part of a file name on Windows.');
+        }
+
+        $path = $this->tempDir.'/a\\b.txt';
+        file_put_contents($path, 'right');
+        file_put_contents($this->tempDir.'/ab.txt', 'wrong');
+
+        $file = InputFile::fromPath('file://'.str_replace('\\', '%5C', $path));
+
+        $this->assertSame(realpath($path), $file->getRealPath());
+        $this->assertSame('right', $file->getContents());
+    }
+
+    public function testFromPathRejectsFileUriWithRemoteHost()
+    {
+        mkdir($this->tempDir.'/otherhost');
+        touch($this->tempDir.'/otherhost/f.txt');
+        $cwd = getcwd();
+        chdir($this->tempDir);
+
+        try {
+            $this->expectException(InvalidFileException::class);
+            $this->expectExceptionMessage('Remote file URI "file://otherhost/f.txt" is not supported.');
+
+            InputFile::fromPath('file://otherhost/f.txt');
+        } finally {
+            chdir($cwd);
+        }
+    }
+
     #[RequiresPhpExtension('fileinfo')]
     public function testGetMimeType()
     {

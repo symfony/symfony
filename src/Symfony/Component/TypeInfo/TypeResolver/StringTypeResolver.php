@@ -116,10 +116,11 @@ final class StringTypeResolver implements TypeResolverInterface
 
         try {
             [$node, $isComplete] = $this->parse($subject);
-            $type = $this->getTypeFromNode($node, $typeContext);
 
             // trailing tokens are ignored, so a literal or a range they follow, such as the "0" of "0o9", stands for its builtin type
-            return $isComplete ? $type : $type->withoutRefinements();
+            $resolver = $isComplete || !$this->refinements ? $this : new self($this->lexer, $this->parser, $this->extraTypeAliases, false);
+
+            return $resolver->getTypeFromNode($node, $typeContext);
         } catch (\DomainException|ParserException $e) {
             throw new UnsupportedException(\sprintf('Cannot resolve "%s".', $subject), $subject, previous: $e);
         }

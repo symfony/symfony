@@ -332,8 +332,9 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $platform = $this->conn->getDatabasePlatform();
 
         return match (true) {
+            // NOW() is in the session time zone, so UNIX_TIMESTAMP(NOW(6)) jumps by an hour when DST ends
             $platform instanceof \Doctrine\DBAL\Platforms\MySQL57Platform,
-            $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform => 'UNIX_TIMESTAMP(NOW(6))',
+            $platform instanceof \Doctrine\DBAL\Platforms\MySQLPlatform => 'UNIX_TIMESTAMP() + MICROSECOND(NOW(6)) / 1e6',
             $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform => "(julianday('now') - 2440587.5) * 86400.0",
             $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform,
             $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform => 'CAST(EXTRACT(epoch FROM NOW()) AS DOUBLE PRECISION)',

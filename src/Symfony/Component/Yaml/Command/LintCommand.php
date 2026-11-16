@@ -20,6 +20,7 @@ use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -253,8 +254,8 @@ class LintCommand extends Command
         }
 
         return match (true) {
-            null !== $info['schema'] => \sprintf(' (validated against %s)', $this->relativizeSchema($info['schema'])),
-            isset($info['unavailableSchema']) => \sprintf(' (schema %s not available)', $this->relativizeSchema($info['unavailableSchema'])),
+            null !== $info['schema'] => \sprintf(' (validated against %s)', OutputFormatter::escape($this->relativizeSchema($info['schema']))),
+            isset($info['unavailableSchema']) => \sprintf(' (schema %s not available)', OutputFormatter::escape($this->relativizeSchema($info['unavailableSchema']))),
             default => ' (no schema)',
         };
     }

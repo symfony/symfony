@@ -11,10 +11,17 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Routing\Command\RouteLintCommand;
 use Symfony\Component\Routing\Command\RouterMatchCommand;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
+
+        ->set('console.command.router_lint', RouteLintCommand::class)
+            ->args([
+                service('router'),
+            ])
+            ->tag('console.command')
 
         ->set('console.command.router_match', RouterMatchCommand::class)
             ->args([

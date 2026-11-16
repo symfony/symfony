@@ -279,8 +279,37 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->assertSame(['bar'], $form->get('choice')->getData());
     }
 
+    #[DataProvider('methodProvider')]
+    public function testDoNotSubmitUnnamedFormWithCheckboxWhenRequestContainsNoneOfItsFields($method)
+    {
+        $form = $this->factory->createNamed('', FormType::class, null, ['method' => $method])
+            ->add('text', TextType::class)
+            ->add('checkbox', CheckboxType::class);
+
+        $this->setRequestData($method, ['other' => 'value']);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertFalse($form->isSubmitted());
+    }
+
+    #[DataProvider('methodExceptPatchProvider')]
+    public function testSubmitUnnamedFormWithCheckboxWhenRequestContainsOneOfItsFields($method)
+    {
+        $form = $this->factory->createNamed('', FormType::class, ['checkbox' => true], ['method' => $method])
+            ->add('text', TextType::class)
+            ->add('checkbox', CheckboxType::class);
+
+        $this->setRequestData($method, ['text' => 'value', 'other' => 'value']);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertSame(['checkbox' => false, 'text' => 'value'], $form->getData());
+    }
+
     #[DataProvider('methodExceptGetAndPatchProvider')]
-    public function testSubmitUnnamedFormHoldingOnlyUncheckedCheckboxes($method)
+    public function testDoNotSubmitUnnamedFormHoldingOnlyCheckboxesOnEmptyRequest($method)
     {
         $form = $this->factory->createNamed('', FormType::class, ['checkbox' => true], ['method' => $method])
             ->add('checkbox', CheckboxType::class);
@@ -289,8 +318,8 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertTrue($form->isSubmitted());
-        $this->assertSame(['checkbox' => false], $form->getData());
+        $this->assertFalse($form->isSubmitted());
+        $this->assertSame(['checkbox' => true], $form->getData());
     }
 
     #[DataProvider('methodExceptGetAndPatchProvider')]

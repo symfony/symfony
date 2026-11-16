@@ -115,7 +115,11 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         try {
-            return $this->getTypeFromNode($this->parse($subject), $typeContext);
+            [$node, $isComplete] = $this->parse($subject);
+            $type = $this->getTypeFromNode($node, $typeContext);
+
+            // trailing tokens are ignored, so a literal or a range they follow, such as the "0" of "0o9", stands for its builtin type
+            return $isComplete ? $type : $type->withoutRefinements();
         } catch (\DomainException|ParserException $e) {
             throw new UnsupportedException(\sprintf('Cannot resolve "%s".', $subject), $subject, previous: $e);
         }
@@ -539,7 +543,10 @@ final class StringTypeResolver implements TypeResolverInterface
         throw new \DomainException(\sprintf('Unhandled "%s" identifier.', $identifier));
     }
 
-    private function parse(string $subject): TypeNode
+    /**
+     * @return array{TypeNode, bool} The node, and whether it spans the whole subject
+     */
+    private function parse(string $subject): array
     {
         $lexerTokens = $this->lexer->tokenize($subject);
         $tokens = new TokenIterator($lexerTokens);
@@ -559,7 +566,7 @@ final class StringTypeResolver implements TypeResolverInterface
             }
         }
 
-        return $node;
+        return [$node, $tokens->isCurrentTokenType(Lexer::TOKEN_END)];
     }
 
     /**

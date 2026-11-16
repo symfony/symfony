@@ -576,6 +576,11 @@ class StringTypeResolverTest extends TestCase
         yield [Type::int(), 'int<0, UndefinedClass::MAX>'];
         yield [Type::list(Type::int()), 'list<int<5, 1>>'];
         yield [Type::union(Type::literal('a'), Type::int()), "'a'|int<5, 1>"];
+        // trailing tokens are ignored, so what comes before them does not resolve to a literal or a range
+        yield [Type::int(), '0o9'];
+        yield [Type::int(), '0b2'];
+        yield [Type::string(), "'a' b"];
+        yield [Type::int(), 'int<0, 5> foo'];
     }
 
     #[DataProvider('disabledRefinementDataProvider')]

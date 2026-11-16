@@ -168,7 +168,7 @@ class PhpDocAwareReflectionTypeResolverTest extends TestCase
             }
         };
 
-        $this->assertEquals(Type::union(Type::array(Type::list(Type::int()), Type::string()), Type::list(Type::int())), TypeResolver::create()->resolve(new \ReflectionMethod($fixture, 'items')));
+        $this->assertEquals(Type::union(Type::array(Type::list(Type::int()), Type::string()), Type::list(Type::int())), TypeResolver::create(null, true)->resolve(new \ReflectionMethod($fixture, 'items')));
     }
 
     public function testFallbackWhenNoPhpDoc()

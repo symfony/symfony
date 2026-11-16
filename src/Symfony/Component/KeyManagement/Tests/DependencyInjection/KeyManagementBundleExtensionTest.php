@@ -11,13 +11,9 @@
 
 namespace Symfony\Component\KeyManagement\Tests\DependencyInjection;
 
-use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\Connection;
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\DBAL\Types\TypeProvider;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Entity;
-use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -972,8 +968,8 @@ class KeyManagementBundleExtensionTest extends TestCase
 
     public function testDoctrineDbalTypesEncryptWithTheDefaultClientWithoutAStore()
     {
-        if (!class_exists(Type::class) || !class_exists(EncryptedType::class)) {
-            $this->markTestSkipped('doctrine/dbal or symfony/doctrine-dbal-key-management is not installed.');
+        if (!class_exists(Type::class) || !class_exists(EncryptedType::class) || !class_exists(DoctrineBundle::class)) {
+            $this->markTestSkipped('doctrine/dbal, symfony/doctrine-dbal-key-management or doctrine/doctrine-bundle is not installed.');
         }
 
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -993,8 +989,8 @@ class KeyManagementBundleExtensionTest extends TestCase
 
     public function testDoctrineDbalTypesAreDeclaredOnTheConnectionsOfTheirEntityManagers()
     {
-        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class)) {
-            $this->markTestSkipped('doctrine/orm or symfony/doctrine-orm-key-management is not installed.');
+        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class) || !class_exists(DoctrineBundle::class)) {
+            $this->markTestSkipped('doctrine/orm, symfony/doctrine-orm-key-management or doctrine/doctrine-bundle is not installed.');
         }
 
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -1016,13 +1012,14 @@ class KeyManagementBundleExtensionTest extends TestCase
             self::parentType('speaker', 'string'),
             new LazyProxyArgument(new Reference('key_management.envelope_encrypter.app')),
             'speaker.contact',
+            'string',
         ], $container->getDefinition('.key_management.doctrine_dbal.encrypted_type.encrypted_string@speaker.contact')->getArguments());
     }
 
     public function testTheTypeOfAnEncryptedColumnNoEntityManagerMapsIsDeclaredOnEveryConnection()
     {
-        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class)) {
-            $this->markTestSkipped('doctrine/orm or symfony/doctrine-orm-key-management is not installed.');
+        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class) || !class_exists(DoctrineBundle::class)) {
+            $this->markTestSkipped('doctrine/orm, symfony/doctrine-orm-key-management or doctrine/doctrine-bundle is not installed.');
         }
 
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -1118,8 +1115,8 @@ class KeyManagementBundleExtensionTest extends TestCase
 
     public function testTheEncryptedColumnsOfTheScannedEntitiesGetTheirTypes()
     {
-        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class)) {
-            $this->markTestSkipped('doctrine/orm or symfony/doctrine-orm-key-management is not installed.');
+        if (!class_exists(Entity::class) || !class_exists(EncryptedColumnListener::class) || !class_exists(DoctrineBundle::class)) {
+            $this->markTestSkipped('doctrine/orm, symfony/doctrine-orm-key-management or doctrine/doctrine-bundle is not installed.');
         }
 
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -1241,30 +1238,32 @@ class KeyManagementBundleExtensionTest extends TestCase
      */
     private static function registerDoctrineServices(ContainerBuilder $container, array $entityManagers): void
     {
+        $container->setParameter('kernel.bundles', []);
+        $container->registerExtension(new DoctrineBundle()->getContainerExtension());
+
         $connections = $managers = [];
 
         foreach ($entityManagers as $name => $namespace) {
-            $connections[$name] = "doctrine.dbal.{$name}_connection";
-            $managers[$name] = "doctrine.orm.{$name}_entity_manager";
-            $container->register("doctrine.dbal.{$name}_connection", Connection::class);
-            $container->register("doctrine.dbal.{$name}_connection.configuration", Configuration::class);
-            $container->register("doctrine.orm.{$name}_entity_manager", EntityManager::class)->setArguments([new Reference("doctrine.dbal.{$name}_connection")]);
-            $driver = $container->register("doctrine.orm.{$name}_metadata_driver", MappingDriverChain::class);
+            $connections[$name] = ['url' => 'sqlite:///:memory:'];
+            $managers[$name] = ['connection' => $name];
 
             if (null !== $namespace) {
-                $driver->addMethodCall('addDriver', [new Reference("doctrine.orm.{$name}_attribute_metadata_driver"), $namespace]);
+                $managers[$name]['mappings'] = [
+                    'Mapped' => ['type' => 'attribute', 'dir' => __DIR__.'/../Fixtures/Entity', 'prefix' => $namespace],
+                ];
             }
         }
 
-        $container->setParameter('doctrine.connections', $connections);
-        $container->setParameter('doctrine.entity_managers', $managers);
-        $container->setParameter('doctrine.default_connection', array_key_first($entityManagers));
+        $container->loadFromExtension('doctrine', [
+            'dbal' => ['connections' => $connections],
+            'orm' => ['entity_managers' => $managers],
+        ]);
     }
 
     private static function parentType(string $connection, string $type): Definition
     {
         return (new Definition(Type::class))
-            ->setFactory([(new Definition(TypeProvider::class))->setFactory([new Reference("doctrine.dbal.{$connection}_connection.configuration"), 'getTypeProvider']), 'get'])
+            ->setFactory([new Reference("doctrine.dbal.{$connection}_connection.type_provider"), 'get'])
             ->setArguments([$type]);
     }
 

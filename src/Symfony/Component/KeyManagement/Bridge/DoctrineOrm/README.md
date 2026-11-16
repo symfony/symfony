@@ -50,7 +50,7 @@ use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType;
 use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\EncryptedColumnListener;
 
 $connectionConfiguration->setTypeProvider(new TypeRegistry([
-    'app_speaker_contact' => new EncryptedType(new StringType(), $encrypter, 'speaker.contact'),
+    'app_speaker_contact' => new EncryptedType(new StringType(), $encrypter, 'speaker.contact', 'string'),
 ]));
 
 $eventManager->addEventListener(Events::loadClassMetadata, new EncryptedColumnListener([

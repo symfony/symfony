@@ -539,7 +539,7 @@ class KeyManagementBundle extends AbstractBundle
 
         $container->register('.key_management.doctrine_dbal.encrypted_type', EncryptedType::class)
             ->setAbstract(true)
-            ->setArguments([new AbstractArgument('the parent type'), new LazyProxyArgument(new Reference($encrypter)), new AbstractArgument('the key')]);
+            ->setArguments([new AbstractArgument('the parent type'), new LazyProxyArgument(new Reference($encrypter)), new AbstractArgument('the key'), new AbstractArgument('the parent type name')]);
         $container->setParameter('.key_management.doctrine_dbal.types', $types);
     }
 }

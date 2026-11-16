@@ -31,7 +31,8 @@
         "symfony/dependency-injection": "^7.4|^8.0"
     },
     "conflict": {
-        "doctrine/doctrine-bundle": "<3.4"
+        "doctrine/doctrine-bundle": "<3.4",
+        "doctrine/orm": "<3.8"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\KeyManagement\\Bridge\\DoctrineDbal\\": "" },

@@ -494,7 +494,7 @@ class TestKeyManagementKernel extends AbstractKernel
                     'customer' => ['driver' => 'pdo_sqlite', 'memory' => true],
                 ]],
                 'orm' => ['entity_managers' => [
-                    'default' => ['connection' => 'default'],
+                    'default' => ['connection' => 'default', 'auto_discover_entities' => false],
                     'customer' => ['connection' => 'customer', 'mappings' => ['Customer' => [
                         'type' => 'attribute',
                         'dir' => __DIR__.'/Fixtures/Customer',

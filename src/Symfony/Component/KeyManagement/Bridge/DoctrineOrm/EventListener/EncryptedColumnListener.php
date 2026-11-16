@@ -209,7 +209,7 @@ final class EncryptedColumnListener
         }
 
         $parents = $manager->getConnection()->getConfiguration()->getTypeProvider();
-        $registry = $parents instanceof TypeRegistry ? $parents : (new Configuration())->getTypeProvider();
+        $registry = $parents instanceof TypeRegistry ? $parents : new Configuration()->getTypeProvider();
 
         if (!$registry instanceof TypeRegistry) {
             throw new \LogicException('The encrypted columns that omit their key require a writable Doctrine type registry.');

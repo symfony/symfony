@@ -23,6 +23,7 @@ $registry = new TypeRegistry([
         new StringType(),
         $envelopeEncrypter,
         'alias/app-key',
+        'string',
     ),
 ]);
 
@@ -119,6 +120,7 @@ services:
         class: Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType
         arguments:
             $parentType: !service { class: Doctrine\DBAL\Types\StringType }
+            $typeName: 'string'
             $envelopes: '@app.envelope_encrypter'
             $key: 'user.email'
         tags:
@@ -128,6 +130,7 @@ services:
         class: Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType
         arguments:
             $parentType: !service { class: Doctrine\DBAL\Types\TextType }
+            $typeName: 'text'
             $envelopes: '@app.envelope_encrypter'
             $key: 'user.notes'
         tags:

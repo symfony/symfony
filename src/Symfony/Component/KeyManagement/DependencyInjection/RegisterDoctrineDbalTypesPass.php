@@ -12,7 +12,6 @@
 namespace Symfony\Component\KeyManagement\DependencyInjection;
 
 use Doctrine\DBAL\Types\Type;
-use Doctrine\DBAL\Types\TypeProvider;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -69,12 +68,13 @@ final class RegisterDoctrineDbalTypesPass implements CompilerPassInterface
             $names = array_keys($names);
 
             $parentType = (new Definition(Type::class))
-                ->setFactory([(new Definition(TypeProvider::class))->setFactory([new Reference(\sprintf('doctrine.dbal.%s_connection.configuration', $names[0] ?? $default)), 'getTypeProvider']), 'get'])
+                ->setFactory([new Reference(\sprintf('doctrine.dbal.%s_connection.type_provider', $names[0] ?? $default)), 'get'])
                 ->setArguments([$parent]);
 
             $definition = $container->setDefinition(self::PROTOTYPE.'.'.$name, (clone $prototype)->setAbstract(false))
                 ->replaceArgument(0, $parentType)
-                ->replaceArgument(2, $key);
+                ->replaceArgument(2, $key)
+                ->replaceArgument(3, $parent);
 
             // without a connection, DoctrineBundle declares the type on every connection
             foreach ($names ?: [null] as $connection) {

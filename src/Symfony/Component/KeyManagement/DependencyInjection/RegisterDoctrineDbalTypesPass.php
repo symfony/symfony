@@ -55,7 +55,7 @@ final class RegisterDoctrineDbalTypesPass implements CompilerPassInterface
         $default = $container->hasParameter('doctrine.default_connection') ? $container->getParameter('doctrine.default_connection') : array_key_first($connections);
         /** @var array<string, list<string>> $classes */
         $classes = $container->hasParameter(self::CLASSES) ? $container->getParameter(self::CLASSES) : [];
-        $namespaces = $this->getConnectionsByNamespace($container, $connections);
+        $namespaces = $this->getConnectionsByNamespace($container);
 
         foreach ($types as $name => ['type' => $parent, 'key' => $key]) {
             $names = [];
@@ -102,35 +102,20 @@ final class RegisterDoctrineDbalTypesPass implements CompilerPassInterface
     }
 
     /**
-     * @param array<string, string> $connections
-     *
      * @return array<string, list<string>> The names of the connections of the entity managers, by namespace of the classes they map
      */
-    private function getConnectionsByNamespace(ContainerBuilder $container, array $connections): array
+    private function getConnectionsByNamespace(ContainerBuilder $container): array
     {
+        /** @var array<string, string> $entityManagerConnections */
+        $entityManagerConnections = $container->hasParameter('doctrine.entity_manager_connections') ? $container->getParameter('doctrine.entity_manager_connections') : [];
         $namespaces = [];
-        /** @var array<string, string>|null $entityManagerConnections */
-        $entityManagerConnections = $container->hasParameter('doctrine.entity_manager_connections') ? $container->getParameter('doctrine.entity_manager_connections') : null;
 
         foreach ($container->hasParameter('doctrine.entity_managers') ? $container->getParameter('doctrine.entity_managers') : [] as $name => $id) {
             $driver = \sprintf('doctrine.orm.%s_metadata_driver', $name);
+            $connection = $entityManagerConnections[$name] ?? null;
 
-            if (!$container->hasDefinition($id) || !$container->hasDefinition($driver)) {
+            if (!$container->hasDefinition($id) || !$container->hasDefinition($driver) || null === $connection) {
                 continue;
-            }
-
-            if (null !== $entityManagerConnections) {
-                $connection = $entityManagerConnections[$name] ?? null;
-
-                if (null === $connection) {
-                    continue;
-                }
-            } else {
-                $connection = $container->getDefinition($id)->getArguments()[0] ?? null;
-
-                if (!$connection instanceof Reference || false === $connection = array_search((string) $connection, $connections, true)) {
-                    continue;
-                }
             }
 
             foreach ($container->getDefinition($driver)->getMethodCalls() as [$method, $arguments]) {

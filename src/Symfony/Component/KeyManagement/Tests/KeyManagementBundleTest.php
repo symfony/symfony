@@ -248,6 +248,8 @@ class KeyManagementBundleTest extends TestCase
         $this->assertInstanceOf(DataKeyHandle::class, new DataKeyStore($connection, new ServiceLocator(['default' => static fn (): object => $kms]), 'default', 'app', 'new')->get($reference));
     }
 
+    #[RequiresPhpExtension('sodium')]
+    #[RequiresPhpExtension('pdo_sqlite')]
     #[RequiresMethod(Configuration::class, 'setTypeProvider')]
     #[RequiresMethod(TypeProviderLocator::class, 'fromConnection')]
     #[RequiresMethod(TypeProviderGlobalFallback::class, 'get')]

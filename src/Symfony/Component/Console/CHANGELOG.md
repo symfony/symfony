@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `ChoiceQuestion::setReturnKeys()` to select whether answers return keys or values
  * Add `CommandInvocation` and the `%command.invocation%` help placeholder to include the PHP executable or Symfony CLI launcher
  * Add `CompletionSuggestions::suggestPaths()`, `suggestDirectories()` and `getPathSuggestion()` to let the shell complete file system paths, as `InputFile` arguments and options now do
  * Pass the `CompletionSuggestions` to the `suggestedValues` closures of arguments and options

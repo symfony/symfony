@@ -38,6 +38,23 @@ use Symfony\Component\Validator\Validation;
 #[Group('tty')]
 class QuestionHelperTest extends AbstractQuestionHelperTestCase
 {
+    public function testChoiceCanReturnNumericKeysForInteractiveAndDefaultAnswers()
+    {
+        $helper = new QuestionHelper();
+        $question = new ChoiceQuestion('Pick a choice', [10 => 'same', 20 => 'same'], '20');
+        $question->setReturnKeys(true);
+
+        $this->assertSame('20', $helper->ask($this->createStreamableInputInterfaceMock($this->getInputStream("20\n")), $this->createOutputInterface(), $question));
+        $this->assertSame('20', $helper->ask($this->createStreamableInputInterfaceMock($this->getInputStream("\n")), $this->createOutputInterface(), $question));
+        $this->assertSame('20', $helper->ask($this->createStreamableInputInterfaceMock('', false), $this->createOutputInterface(), $question));
+
+        $question = new ChoiceQuestion('Pick choices', ['red', 'green', 'blue'], '2,0');
+        $question->setMultiselect(true);
+        $question->setReturnKeys(true);
+
+        $this->assertSame(['2', '0'], $helper->ask($this->createStreamableInputInterfaceMock('', false), $this->createOutputInterface(), $question));
+    }
+
     public function testAskChoice()
     {
         $questionHelper = new QuestionHelper();

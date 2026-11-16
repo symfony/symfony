@@ -13,10 +13,87 @@ namespace Symfony\Component\Console\Tests\Question;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class ChoiceQuestionTest extends TestCase
 {
+    #[DataProvider('provideReturnKeys')]
+    public function testReturnKeys(array $choices, string $answer, bool $multiselect, mixed $expected)
+    {
+        $question = new ChoiceQuestion('Pick a choice', $choices);
+        $question->setReturnKeys(true);
+        $question->setMultiselect($multiselect);
+
+        $this->assertSame($expected, $question->getValidator()($answer));
+    }
+
+    public static function provideReturnKeys(): iterable
+    {
+        yield 'list by index' => [['red', 'blue'], '1', false, '1'];
+        yield 'list by value' => [['red', 'blue'], 'blue', false, '1'];
+        yield 'numeric identifiers' => [[10 => 'red', 20 => 'blue'], '20', false, '20'];
+        yield 'duplicate labels by key' => [[10 => 'same', 20 => 'same'], '20', false, '20'];
+        yield 'multiple keys' => [['red', 'green', 'blue'], '2, 0', true, ['2', '0']];
+        yield 'multiple labels' => [['red', 'blue'], 'blue, red', true, ['1', '0']];
+        yield 'mixed keys' => [[0 => 'red', 'blue' => 'Blue'], '0', false, '0'];
+        yield 'stringable label' => [[new StringChoice('Red')], 'Red', false, '0'];
+    }
+
+    public function testReturnValuesCanBeRequestedForStringKeys()
+    {
+        $question = new ChoiceQuestion('Pick a choice', ['r' => 'red', 'b' => 'blue']);
+        $question->setReturnKeys(false);
+
+        $this->assertSame('blue', $question->getValidator()('b'));
+        $this->assertSame('red', $question->getValidator()('red'));
+    }
+
+    #[DataProvider('provideChoiceValues')]
+    public function testReturningValuesPreservesTheirTypes(mixed $value)
+    {
+        $question = new ChoiceQuestion('Pick a choice', ['key' => $value]);
+        $question->setReturnKeys(false);
+
+        $this->assertSame($value, $question->getValidator()('key'));
+    }
+
+    public static function provideChoiceValues(): iterable
+    {
+        yield 'false' => [false];
+        yield 'null' => [null];
+        yield 'integer' => [42];
+        yield 'stringable' => [new StringChoice('Label')];
+    }
+
+    public function testReturnKeysCanBeResetToAutomaticBehavior()
+    {
+        $question = new ChoiceQuestion('Pick a choice', ['red', 'blue']);
+        $question->setReturnKeys(true);
+        $this->assertSame('1', $question->getValidator()('1'));
+
+        $question->setReturnKeys(null);
+        $this->assertSame('blue', $question->getValidator()('1'));
+
+        $question = new ChoiceQuestion('Pick a choice', ['r' => 'red', 'b' => 'blue']);
+        $question->setReturnKeys(false);
+        $question->setReturnKeys(null);
+        $this->assertSame('b', $question->getValidator()('blue'));
+    }
+
+    public function testReturnKeysKeepsValidationAndCustomErrorMessages()
+    {
+        $question = new ChoiceQuestion('Pick a choice', ['red', 'blue']);
+        $question->setMultiselect(true);
+        $question->setReturnKeys(true);
+        $question->setErrorMessage('Unknown choice: %s');
+        $this->assertSame(['1', '0'], $question->getValidator()('1,0'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown choice: missing');
+        $question->getValidator()('missing');
+    }
+
     #[DataProvider('selectUseCases')]
     public function testSelectUseCases($multiSelect, $answers, $expected, $message, $default = null)
     {

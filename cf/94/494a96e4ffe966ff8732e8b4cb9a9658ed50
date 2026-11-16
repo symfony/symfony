@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-16T12:39:20Z
+
+Thanks @vencakrecl. I moved this to 8.2 as a performance change, in `KernelTrait`, with the tests in DependencyInjection. I dropped `gc_mem_caches()` because it only lowers RSS. The allocator already compacts its caches before raising a memory_limit error.

@@ -54,7 +54,11 @@ class StopWorkersCommand extends Command
 
         $cacheItem = $this->restartSignalCachePool->getItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY);
         $cacheItem->set(microtime(true));
-        $this->restartSignalCachePool->save($cacheItem);
+        if (!$this->restartSignalCachePool->save($cacheItem)) {
+            $io->getErrorStyle()->error('Failed to send the signal to stop the running workers.');
+
+            return 1;
+        }
 
         $io->success('Signal successfully sent to stop any running workers.');
 

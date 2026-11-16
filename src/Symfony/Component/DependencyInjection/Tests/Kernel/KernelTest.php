@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Kernel;
 
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
@@ -151,6 +152,36 @@ class KernelTest extends TestCase
         $this->assertEmpty(glob($kernel->getBuildDir().'/*Compiler.log'));
     }
 
+    public function testContainerBuilderIsReleasedAfterBuildingTheContainer()
+    {
+        gc_collect_cycles();
+        $kernel = new BuilderLifetimeKernel($this->projectDir);
+        $kernel->boot();
+
+        $this->assertTrue($kernel->builderReleased);
+    }
+
+    public function testCachedBootDoesNotCollectUnrelatedCycles()
+    {
+        (new BuilderLifetimeKernel($this->projectDir))->boot();
+        gc_collect_cycles();
+
+        $cycle = new \stdClass();
+        $cycle->self = $cycle;
+        $reference = \WeakReference::create($cycle);
+        unset($cycle);
+
+        try {
+            $kernel = new BuilderLifetimeKernel($this->projectDir);
+            $kernel->boot();
+
+            $this->assertNull($kernel->builderReleased);
+            $this->assertNotNull($reference->get());
+        } finally {
+            gc_collect_cycles();
+        }
+    }
+
     public function testDumpContainerWritesContainerDirectory()
     {
         $kernel = new TestKernel($this->projectDir);
@@ -258,6 +289,37 @@ class BrokenKernel extends TestKernel
     protected function build(ContainerBuilder $container): void
     {
         throw new \LogicException('Broken build.');
+    }
+}
+
+class BuilderLifetimeKernel extends TestKernel
+{
+    public ?bool $builderReleased = null;
+
+    private ?\WeakReference $builder = null;
+
+    protected function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
+        $this->builder = \WeakReference::create($container);
+        $container->addCompilerPass(new class implements CompilerPassInterface {
+            private ContainerBuilder $container;
+
+            public function process(ContainerBuilder $container): void
+            {
+                // Compiler passes can retain a back-reference to their container builder.
+                $this->container = $container;
+            }
+        });
+    }
+
+    protected function initializeContainer(): void
+    {
+        parent::initializeContainer();
+
+        if ($this->builder) {
+            $this->builderReleased = null === $this->builder->get();
+        }
     }
 }
 

@@ -100,7 +100,7 @@ class ArrayDenormalizerTest extends TestCase
     }
 
     #[DataProvider('provideUnionKeyTypesWithMembersThatMatchNoKey')]
-    public function testDenormalizeChecksUnionKeyAgainstItsIntAndStringMembers(Type $keyType)
+    public function testDenormalizeChecksUnionKeyAgainstItsIntAndStringMembers(Type $keyType, string $expectedType)
     {
         $nestedDenormalizer = $this->createStub(DenormalizerInterface::class);
         $nestedDenormalizer->method('denormalize')->willReturnArgument(0);
@@ -111,16 +111,34 @@ class ArrayDenormalizerTest extends TestCase
         $this->assertSame([3 => 'a'], $denormalizer->denormalize([3 => 'a'], 'string[]', null, ['key_type' => $keyType]));
 
         $this->expectException(NotNormalizableValueException::class);
-        $this->expectExceptionMessage('The type of the key "s" must be "int" ("string" given).');
+        $this->expectExceptionMessage(\sprintf('The type of the key "s" must be "%s" ("string" given).', $expectedType));
 
         $denormalizer->denormalize(['s' => 'a'], 'string[]', null, ['key_type' => $keyType]);
     }
 
     public static function provideUnionKeyTypesWithMembersThatMatchNoKey(): iterable
     {
-        yield '?int' => [Type::nullable(Type::int())];
-        yield 'int|object' => [Type::union(Type::int(), Type::object(\stdClass::class))];
-        yield 'int|bool' => [Type::union(Type::int(), Type::bool())];
+        yield '?int' => [Type::nullable(Type::int()), 'int|null'];
+        yield 'int|object' => [Type::union(Type::int(), Type::object(\stdClass::class)), 'int|stdClass'];
+        yield 'int|bool' => [Type::union(Type::int(), Type::bool()), 'bool|int'];
+    }
+
+    #[DataProvider('provideKeyTypesThatMatchNoKey')]
+    public function testDenormalizeRejectsKeysAgainstAKeyTypeThatMatchesNone(Type $keyType)
+    {
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($this->createStub(DenormalizerInterface::class));
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage(\sprintf('The type of the key "0" must be "%s" ("int" given).', $keyType));
+
+        $denormalizer->denormalize([0 => 'a'], 'string[]', null, ['key_type' => $keyType]);
+    }
+
+    public static function provideKeyTypesThatMatchNoKey(): iterable
+    {
+        yield 'bool' => [Type::bool()];
+        yield 'float' => [Type::float()];
     }
 
     public function testDenormalizeRejectsRefinedKeyOfAnotherBuiltinType()

@@ -78,6 +78,7 @@ final class RegisterEncryptedColumnsPass implements CompilerPassInterface
             return;
         }
 
+        /** @var array<string, array{type: string, key: string}>|null $types */
         $types = $container->hasParameter(self::TYPES) ? $container->getParameter(self::TYPES) : null;
 
         $names = [];

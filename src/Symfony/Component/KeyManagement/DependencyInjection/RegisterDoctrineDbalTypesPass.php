@@ -49,8 +49,11 @@ final class RegisterDoctrineDbalTypesPass implements CompilerPassInterface
         $this->assertNoCircularParents($types);
 
         $prototype = $container->getDefinition(self::PROTOTYPE);
+        /** @var array<string, string> $connections */
         $connections = $container->getParameter('doctrine.connections');
+        /** @var string $default */
         $default = $container->hasParameter('doctrine.default_connection') ? $container->getParameter('doctrine.default_connection') : array_key_first($connections);
+        /** @var array<string, list<string>> $classes */
         $classes = $container->hasParameter(self::CLASSES) ? $container->getParameter(self::CLASSES) : [];
         $namespaces = $this->getConnectionsByNamespace($container, $connections);
 
@@ -106,6 +109,7 @@ final class RegisterDoctrineDbalTypesPass implements CompilerPassInterface
     private function getConnectionsByNamespace(ContainerBuilder $container, array $connections): array
     {
         $namespaces = [];
+        /** @var array<string, string>|null $entityManagerConnections */
         $entityManagerConnections = $container->hasParameter('doctrine.entity_manager_connections') ? $container->getParameter('doctrine.entity_manager_connections') : null;
 
         foreach ($container->hasParameter('doctrine.entity_managers') ? $container->getParameter('doctrine.entity_managers') : [] as $name => $id) {

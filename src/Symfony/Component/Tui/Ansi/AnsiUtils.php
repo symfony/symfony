@@ -23,6 +23,13 @@ use Symfony\Component\Tui\Style\CursorShape;
  */
 final class AnsiUtils
 {
+    /** @var array<string, int> The widths of the lines measured last, see visibleWidth() */
+    private static array $widths = [];
+    /** The bytes of the lines whose widths are kept */
+    private static int $widthBytes = 0;
+    /** The most lines, and bytes of them, whose widths are kept: those of a long page, frame after frame */
+    private const MAX_WIDTHS = 16384;
+    private const MAX_WIDTH_BYTES = 8000000;
     /**
      * Cursor position marker prefix.
      *
@@ -116,7 +123,22 @@ final class AnsiUtils
         if (!str_contains($str, "\x1b") && !str_contains($str, "\t") && preg_match('/^[\x20-\x7E]*$/', $str)) {
             return $len;
         }
+        // The same lines are measured again frame after frame: once, as many as a long page has, the oldest half
+        // forgotten when there are too many of them or they are too long
+        if (isset(self::$widths[$str])) {
+            return self::$widths[$str];
+        }
+        if (\count(self::$widths) >= self::MAX_WIDTHS || self::$widthBytes > self::MAX_WIDTH_BYTES) {
+            self::$widths = \array_slice(self::$widths, intdiv(\count(self::$widths), 2), null, true);
+            self::$widthBytes = array_sum(array_map('strlen', array_keys(self::$widths)));
+        }
+        self::$widthBytes += $len;
 
+        return self::$widths[$str] = self::measure($str, $len);
+    }
+
+    private static function measure(string $str, int $len): int
+    {
         // Fast path for ASCII + ANSI: jump between ESC sequences using strpos
         // instead of scanning byte-by-byte with ord()
         $fastWidth = 0;
@@ -323,9 +345,7 @@ final class AnsiUtils
         }
 
         // Fast path: pure ASCII ellipsis width = strlen (avoids visibleWidth overhead)
-        $ellipsisWidth = '' !== $ellipsis && !str_contains($ellipsis, "\x1b") && preg_match('/^[\x20-\x7E]*$/', $ellipsis)
-            ? \strlen($ellipsis)
-            : self::visibleWidth($ellipsis);
+        $ellipsisWidth = '' !== $ellipsis && !str_contains($ellipsis, "\x1b") && preg_match('/^[\x20-\x7E]*$/', $ellipsis) ? \strlen($ellipsis) : self::visibleWidth($ellipsis);
         $targetWidth = $maxWidth - $ellipsisWidth;
 
         if ($targetWidth <= 0) {
@@ -600,6 +620,115 @@ final class AnsiUtils
     }
 
     /**
+     * The columns of a line before a range and after it, like sliceToWidth() for each, in one pass: the part before
+     * padded to the start of the range, the part after with the codes before it, for what is drawn over the range.
+     *
+     * @return array{string, string}
+     */
+    public static function splitAround(string $line, int $from, int $length): array
+    {
+        $to = $from + max(0, $length);
+        // Fast path: pure printable ASCII maps one byte to one column
+        if (!str_contains($line, "\x1b") && preg_match('/^[\x20-\x7E]*+$/', $line)) {
+            return [str_pad(substr($line, 0, max(0, $from)), max(0, $from)), (string) substr($line, $to)];
+        }
+        $before = '';
+        $beforeWidth = 0;
+        $after = '';
+        // The codes met before the part after it starts, which its text is drawn in: the colors and attributes since
+        // the last reset, the last link, and the others, so that they do not pile up as overlays are drawn one by one
+        $codes = '';
+        $link = '';
+        $other = '';
+        $started = false;
+        $col = 0;
+        $i = 0;
+        $len = \strlen($line);
+        while ($i < $len) {
+            if ("\x1b" === $line[$i]) {
+                if ('[' === ($line[$i + 1] ?? '') && ($j = $i + 2 + strspn($line, '0123456789:;<=>?', $i + 2)) < $len && \ord($line[$j]) >= 0x40 && \ord($line[$j]) <= 0x7E) {
+                    $code = substr($line, $i, $j + 1 - $i);
+                    $i = $j + 1;
+                } else {
+                    $ansi = self::extractAnsiCode($line, $i);
+                    $code = null !== $ansi ? $ansi['code'] : "\x1b";
+                    $i += null !== $ansi ? $ansi['length'] : 1;
+                }
+                // Once the part after has text, its codes as they are; before, folded with those carried to it
+                if ($started) {
+                    $after .= $code;
+                } else {
+                    if (str_ends_with($code, 'm') && str_starts_with($code, "\x1b[")) {
+                        $codes = preg_match('/^\x1b\[0*(?:;|m)/', $code) ? $code : $codes.$code;
+                    } elseif (str_starts_with($code, "\x1b]8;")) {
+                        $link = $code;
+                    } else {
+                        $other .= $code;
+                    }
+                    if ($col < $from) {
+                        $before .= $code;
+                    }
+                }
+                continue;
+            }
+            if (false === $textEnd = strpos($line, "\x1b", $i)) {
+                $textEnd = $len;
+            }
+            $segment = substr($line, $i, $textEnd - $i);
+            $i = $textEnd;
+            if (preg_match('/^[\x20-\x7E]*+$/', $segment)) {
+                $end = $col + \strlen($segment);
+                if ($col < $from) {
+                    $before .= substr($segment, 0, min($end, $from) - $col);
+                    $beforeWidth += min($end, $from) - $col;
+                }
+                if ($end > $to) {
+                    $after .= $other.$link.$codes.substr($segment, max($to, $col) - $col);
+                    $codes = $link = $other = '';
+                    $started = true;
+                }
+                $col = $end;
+                continue;
+            }
+            $graphemes = grapheme_str_split($segment);
+            foreach (false !== $graphemes ? $graphemes : str_split($segment) as $grapheme) {
+                $width = false === $graphemes ? 1 : ("\t" === $grapheme ? self::TAB_WIDTH : self::graphemeWidth($grapheme));
+                $cellEnd = $col + $width;
+                if (0 === $width) {
+                    if ($started) {
+                        $after .= $grapheme;
+                    } elseif ($col < $from) {
+                        $before .= $grapheme;
+                    }
+                    continue;
+                }
+                // The part before: whole cells in it, the columns of one straddling its end as spaces
+                if ($col < $from) {
+                    $inside = min($cellEnd, $from) - $col;
+                    $before .= $cellEnd <= $from ? $grapheme : str_repeat(' ', $inside);
+                    $beforeWidth += $inside;
+                }
+                // The part after: likewise, from the end of the range
+                if ($cellEnd > $to) {
+                    $after .= $other.$link.$codes.($col >= $to ? $grapheme : str_repeat(' ', $cellEnd - $to));
+                    $codes = $link = $other = '';
+                    $started = true;
+                }
+                $col = $cellEnd;
+            }
+        }
+        if ($beforeWidth < $from) {
+            $before .= str_repeat(' ', $from - $beforeWidth);
+        }
+        // Codes at the end, past the range, without text after them, like a link closed
+        if (!$started && $col >= $to) {
+            $after .= $other.$link.$codes;
+        }
+
+        return [$before, $after];
+    }
+
+    /**
      * Extract a range of columns from a line, exactly $length columns wide.
      *
      * Unlike sliceByColumn(), the result always measures exactly $length
@@ -628,38 +757,80 @@ final class AnsiUtils
         $resultWidth = 0;
         $pendingAnsi = '';
 
-        foreach (self::walkCells($line) as $token) {
-            if ($token['col'] >= $endCol) {
-                break;
-            }
-
-            if (0 === $token['width']) {
-                if ($token['col'] >= $startCol) {
-                    $result .= $pendingAnsi.$token['text'];
+        $col = 0;
+        $i = 0;
+        $len = \strlen($line);
+        while ($i < $len && $col < $endCol) {
+            if ("\x1b" === $line[$i]) {
+                // An escape sequence, or a lone ESC byte passed through: kept from the start of the range; a CSI one,
+                // like the SGR of colors, read here, the most common by far
+                if ('[' === ($line[$i + 1] ?? '') && ($j = $i + 2 + strspn($line, '0123456789:;<=>?', $i + 2)) < $len && \ord($line[$j]) >= 0x40 && \ord($line[$j]) <= 0x7E) {
+                    $code = substr($line, $i, $j + 1 - $i);
+                    $i = $j + 1;
+                } else {
+                    $ansi = self::extractAnsiCode($line, $i);
+                    $code = null !== $ansi ? $ansi['code'] : "\x1b";
+                    $i += null !== $ansi ? $ansi['length'] : 1;
+                }
+                if ($col >= $startCol) {
+                    $result .= $pendingAnsi.$code;
                     $pendingAnsi = '';
                 } else {
-                    $pendingAnsi .= $token['text'];
+                    $pendingAnsi .= $code;
                 }
                 continue;
             }
-
-            $cellEnd = $token['col'] + $token['width'];
-            if ($cellEnd <= $startCol) {
+            if (false === $textEnd = strpos($line, "\x1b", $i)) {
+                $textEnd = $len;
+            }
+            $segment = substr($line, $i, $textEnd - $i);
+            $i = $textEnd;
+            if (preg_match('/^[\x20-\x7E]*+$/', $segment)) {
+                // ASCII: a byte a column, the part in the range copied at once
+                $from = max($startCol, $col) - $col;
+                $to = min($endCol, $col + \strlen($segment)) - $col;
+                if ($to > $from) {
+                    $result .= $pendingAnsi.substr($segment, $from, $to - $from);
+                    $pendingAnsi = '';
+                    $resultWidth += $to - $from;
+                }
+                $col += \strlen($segment);
                 continue;
             }
-
-            $result .= $pendingAnsi;
-            $pendingAnsi = '';
-
-            if ($token['col'] >= $startCol && $cellEnd <= $endCol) {
-                $result .= $token['text'];
-                $resultWidth += $token['width'];
-            } else {
-                // The cell straddles a boundary of the range: it cannot be
-                // split, so its columns inside the range become spaces
-                $overlap = min($cellEnd, $endCol) - max($token['col'], $startCol);
-                $result .= str_repeat(' ', $overlap);
-                $resultWidth += $overlap;
+            $graphemes = grapheme_str_split($segment);
+            foreach (false !== $graphemes ? $graphemes : str_split($segment) as $grapheme) {
+                if ($col >= $endCol) {
+                    break;
+                }
+                $width = false === $graphemes ? 1 : ("\t" === $grapheme ? self::TAB_WIDTH : self::graphemeWidth($grapheme));
+                $cellEnd = $col + $width;
+                if (0 === $width) {
+                    // Zero-width, like a combining mark alone: kept like an escape sequence
+                    if ($col >= $startCol) {
+                        $result .= $pendingAnsi.$grapheme;
+                        $pendingAnsi = '';
+                    } else {
+                        $pendingAnsi .= $grapheme;
+                    }
+                    continue;
+                }
+                if ($cellEnd <= $startCol) {
+                    $col = $cellEnd;
+                    continue;
+                }
+                $result .= $pendingAnsi;
+                $pendingAnsi = '';
+                if ($col >= $startCol && $cellEnd <= $endCol) {
+                    $result .= $grapheme;
+                    $resultWidth += $width;
+                } else {
+                    // The cell straddles a boundary of the range: it cannot be split, so its columns inside the range
+                    // become spaces
+                    $overlap = min($cellEnd, $endCol) - max($col, $startCol);
+                    $result .= str_repeat(' ', $overlap);
+                    $resultWidth += $overlap;
+                }
+                $col = $cellEnd;
             }
         }
 
@@ -726,24 +897,21 @@ final class AnsiUtils
             return $text;
         }
 
-        return preg_replace_callback('/\x1b\[([\d;]*)m/', static function (array $m) use ($backgroundCode): string {
-            $params = $m[1];
-
-            // Fast path: common reset sequences
-            if ('' === $params || '0' === $params) {
-                return $m[0].$backgroundCode;
+        if (!preg_match_all('/\x1b\[[\d;]*m/', $text, $matches)) {
+            return $text;
+        }
+        // Each sequence decided once, then all replaced at once: the lines of a box repeat the same few sequences, and
+        // the sequences, which end at their "m", cannot overlap
+        $replacements = [];
+        foreach ($matches[0] as $sequence) {
+            if (!isset($replacements[$sequence])) {
+                // A sequence leaving the default background, like 49 or 0: not the zero channels of a color, like
+                // 38;2;0;0;0, nor one setting a background after a reset, like 0;48;5;1
+                $replacements[$sequence] = "\x1b[m" !== $sequence && "\x1b[0m" !== $sequence && self::sgrSetsBackground($sequence, true) ? $sequence : $sequence.$backgroundCode;
             }
+        }
 
-            // Check for '49' (background reset) or '0' in compound sequences
-            if (str_contains($params, '49') || str_contains($params, '0')) {
-                $parts = explode(';', $params);
-                if (\in_array('0', $parts, true) || \in_array('49', $parts, true)) {
-                    return $m[0].$backgroundCode;
-                }
-            }
-
-            return $m[0];
-        }, $text) ?? $text;
+        return strtr($text, $replacements);
     }
 
     /**
@@ -846,7 +1014,8 @@ final class AnsiUtils
         }
 
         if ('' === $params = substr($seq, 2, -1)) {
-            return false; // bare ESC [ m is SGR 0, a full reset
+            return false;
+            // bare ESC [ m is SGR 0, a full reset
         }
 
         $state = $current;
@@ -867,9 +1036,11 @@ final class AnsiUtils
                 }
                 if ($idx + 1 < $count) {
                     if ('5' === $parts[$idx + 1]) {
-                        $idx += 2; // skip N and 5; ++$idx below advances past I
+                        $idx += 2;
+                    // skip N and 5; ++$idx below advances past I
                     } elseif ('2' === $parts[$idx + 1]) {
-                        $idx += 4; // skip N, 2, R and G; ++$idx below advances past B
+                        $idx += 4;
+                        // skip N, 2, R and G; ++$idx below advances past B
                     }
                 }
             } elseif (0 === $n || 49 === $n) {

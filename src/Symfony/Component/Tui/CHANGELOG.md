@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.3
+---
+
+ * Draw bidirectional text in visual order when the intl extension is available, the terminal set to its explicit BiDi mode while the TUI runs, and add ANSI text measurement and wrapping helpers
+
 8.2
 ---
 

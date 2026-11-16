@@ -14,6 +14,7 @@ namespace Symfony\Component\Tui\Terminal;
 use Revolt\EventLoop;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Tui\Ansi\Bidi;
 use Symfony\Component\Tui\Input\StdinBuffer;
 
 /**
@@ -95,6 +96,11 @@ final class Terminal implements TerminalInterface
 
         // Enable bracketed paste mode
         $this->write("\x1b[?2004h");
+        // Bidirectional text is drawn in visual order (see Bidi): the terminal is not to reorder it again, like the
+        // explicit mode of the BiDi in Terminal Emulators recommendation (BDSM reset)
+        if (Bidi::isAvailable()) {
+            $this->write("\x1b[8l");
+        }
 
         // Set up signal handlers for resize using Revolt's event loop
         if (\defined('SIGWINCH')) {
@@ -149,6 +155,9 @@ final class Terminal implements TerminalInterface
 
         // Disable bracketed paste mode
         $this->write("\x1b[?2004l");
+        if (Bidi::isAvailable()) {
+            $this->write("\x1b[8h");
+        }
 
         // Disable Kitty keyboard protocol if we enabled it
         if ($this->kittyProtocolActive) {

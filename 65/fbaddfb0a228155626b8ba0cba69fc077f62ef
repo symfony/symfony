@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-16T09:16:43Z
+
+I removed the second pass from the test, since one pass already fails when the method is missing from the key. I also removed the called class from the key. A parameter type can't be `static`, so the resolved type only depends on the declaring class.

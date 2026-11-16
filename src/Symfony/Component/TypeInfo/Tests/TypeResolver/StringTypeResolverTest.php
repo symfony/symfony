@@ -235,6 +235,17 @@ class StringTypeResolverTest extends TestCase
         yield [Type::string(), "'asc'|'desc'"];
         yield [Type::nullable(Type::int()), 'positive-int|0|null'];
 
+        // conditional
+        yield [Type::union(Type::int(), Type::float()), '(T is string ? int : float)'];
+        yield [Type::union(Type::int(), Type::float()), '(T is not string ? int : float)'];
+        yield [Type::union(Type::int(), Type::float()), '($foo is string ? int : float)'];
+        yield [Type::union(Type::int(), Type::float()), '($foo is not string ? int : float)'];
+        yield [Type::nullable(Type::string()), '($foo is null ? null : string)'];
+        yield [Type::int(), '($foo is null ? int : int)'];
+        yield [Type::mixed(), '($foo is null ? mixed : int)'];
+        yield [Type::union(Type::int(), Type::float(), Type::string()), '($deep is true ? ($flatten is true ? int : float) : string)'];
+        yield [Type::union(Type::dict(Type::list(Type::object(\Stringable::class))), Type::list(Type::object(\Stringable::class))), '($fqcn is null ? array<class-string<Stringable>, list<Stringable>> : list<Stringable>)'];
+
         // intersection
         yield [Type::intersection(Type::object(\DateTime::class), Type::object(\Stringable::class)), \DateTime::class.'&'.\Stringable::class];
         yield [Type::object(\DateTime::class), \DateTime::class.'&'.\DateTime::class];

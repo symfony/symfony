@@ -69,4 +69,12 @@ final class DummyWithPhpDoc
     {
         throw new \BadMethodCallException(sprintf('"%s" is not implemented.', __METHOD__));
     }
+
+    /**
+     * @return ($dummy is null ? list<Dummy> : Dummy)
+     */
+    public function getDummies(mixed $dummy = null): mixed
+    {
+        throw new \BadMethodCallException(sprintf('"%s" is not implemented.', __METHOD__));
+    }
 }

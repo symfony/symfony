@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-16T13:43:25Z
+
+I pushed a test for the payload of forms with an empty name (no test covered it) and trimmed the comments.
+
+What about resolving the false value when the child is submitted, in `Form::submit()`? That would also fix the case you left out (`false_values => ['0']` in a replaced sub-form). And the request handlers would not need to change the payload anymore:
+
+```diff
+-$child->submit($isSubmitted ? $submittedData[$name] : null, $clearMissing);
++$child->submit($isSubmitted ? $submittedData[$name] : ($child->getConfig()->getOption('false_values')[0] ?? null), $clearMissing);
+```
+
+There's a cost. A direct `submit()` call would then get `false` for such a checkbox, where it gets a transformation failure today. That's what `handleRequest()` already does on 8.1. WDYT?
+
+---------------------------------------------------------------------------
+
+by alexandre-castelain at 2026-11-16T13:57:06Z
+
+> I pushed a test for the payload of forms with an empty name (no test covered it) and trimmed the comments.
+>
+> What about resolving the false value when the child is submitted, in `Form::submit()`? That would also fix the case you left out (`false_values => ['0']` in a replaced sub-form). And the request handlers would not need to change the payload anymore:
+>
+> ```diff
+> -$child->submit($isSubmitted ? $submittedData[$name] : null, $clearMissing);
+> +$child->submit($isSubmitted ? $submittedData[$name] : ($child->getConfig()->getOption('false_values')[0] ?? null), $clearMissing);
+> ```
+>
+> There's a cost. A direct `submit()` call would then get `false` for such a checkbox, where it gets a transformation failure today. That's what `handleRequest()` already does on 8.1. WDYT?
+
+Thanks for the review, and for the extra test !
+
+Resolving it in `Form::submit()` is better: the false value is computed on the final tree, so the case I left out is fixed too, and the request handlers stop touching the payload. I tried it on top of your commit: the Form suite is green, and so are the Twig and Doctrine bridges and FrameworkBundle.
+
+What changes for a direct `submit()`, as you said: a missing checkbox whose first false value is not `null` is now `false`, where it was a transformation failure. The same goes for a missing collection entry and for a checkbox in a missing sub-form. An explicit `null` still fails, and nothing changes with `$clearMissing = false`.
+
+One adjustment to your snippet: I kept the `is_array()` check that `MissingDataHandler` has. Without it, a custom type whose `false_values` option is a string gets the first character of that string submitted.
+
+With this, `MissingDataHandler` is back to what it is on 8.1 (no `$synthesiseNull` flag) and is only used to decide whether a form with an empty name is submitted. Its `allow_delete` branch and the `null` filter in `ChoiceType` (#64158) no longer affect the payload. I left them alone; tell me if you want them removed here.
+
+Obviously, I worked on this with Claude Code. We had considered that option and left it out (the "Known limitation" paragraph): it changes direct `submit()` calls, and that looked like your call rather than mine.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-16T14:18:56Z
+
+Thanks! I'd keep both, neither is dead. The `allow_delete` branch stops an empty POST from submitting a form with an empty name and emptying its collection. The filter skips nulls passed to `submit()`. I pushed tests for the branch and the `is_array()` guard.

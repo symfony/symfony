@@ -188,4 +188,72 @@ class StatsCommandTest extends TestCase
         $this->assertStringNotContainsString('[WARNING]', $stderr);
         $this->assertStringNotContainsString('Transport', $stderr);
     }
+
+    public function testWithMarkupInTransportNameJsonFormat()
+    {
+        $messageCountableTransport = $this->createStub(MessageCountAwareInterface::class);
+        $messageCountableTransport->method('getMessageCount')->willReturn(3);
+
+        $serviceLocator = $this->createStub(ServiceLocator::class);
+        $serviceLocator->method('get')->willReturn($messageCountableTransport);
+        $serviceLocator->method('has')->willReturn(true);
+
+        $command = new StatsCommand($serviceLocator, ['transport<info>']);
+        $tester = new CommandTester($command);
+        $tester->execute(['--format' => 'json'], ['decorated' => true]);
+        $display = $tester->getDisplay();
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $data = json_decode($display, true);
+        $this->assertIsArray($data);
+        $this->assertSame(['count' => 3], $data['transports']['transport<info>']);
+    }
+
+    public function testWithMarkupInTransportNameTextFormat()
+    {
+        $messageCountableTransport = $this->createStub(MessageCountAwareInterface::class);
+        $messageCountableTransport->method('getMessageCount')->willReturn(3);
+
+        $serviceLocator = $this->createStub(ServiceLocator::class);
+        $serviceLocator->method('get')->willReturn($messageCountableTransport);
+        $serviceLocator->method('has')->willReturn(true);
+
+        $command = new StatsCommand($serviceLocator, ['transport<info>']);
+        $tester = new CommandTester($command);
+        $tester->execute([], ['decorated' => false]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('transport<info>', $tester->getDisplay());
+    }
+
+    public function testWithMarkupInTransportNameTextFormatWarningAndNote()
+    {
+        $serviceLocator = $this->createStub(ServiceLocator::class);
+        $serviceLocator->method('get')->willReturn($this->createStub(TransportInterface::class));
+        $serviceLocator->method('has')->willReturnCallback(static fn (string $transportName) => 'uncountable<info>' === $transportName);
+
+        $command = new StatsCommand($serviceLocator, ['missing<info>', 'uncountable<info>']);
+        $tester = new CommandTester($command);
+        $tester->execute([], ['decorated' => false]);
+        $display = $tester->getDisplay();
+
+        $this->assertStringContainsString('[WARNING] The "missing<info>" transport does not exist.', $display);
+        $this->assertStringContainsString('"uncountable<info>".', $display);
+    }
+
+    public function testWithInvalidUtf8InTransportNameJsonFormat()
+    {
+        $messageCountableTransport = $this->createStub(MessageCountAwareInterface::class);
+        $messageCountableTransport->method('getMessageCount')->willReturn(3);
+
+        $serviceLocator = $this->createStub(ServiceLocator::class);
+        $serviceLocator->method('get')->willReturn($messageCountableTransport);
+        $serviceLocator->method('has')->willReturn(true);
+
+        $command = new StatsCommand($serviceLocator, ["transport\xFF"]);
+        $tester = new CommandTester($command);
+        $tester->execute(['--format' => 'json'], ['decorated' => false]);
+
+        $this->assertSame(['transports' => ["transport\u{FFFD}" => ['count' => 3]]], json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR));
+    }
 }

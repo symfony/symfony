@@ -16,6 +16,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -109,7 +110,8 @@ class StatsCommand extends Command
 
     private function outputText(SymfonyStyle $io, SymfonyStyle $errorIo, array $outputTable, array $uncountableTransports): void
     {
-        $io->table(['Transport', 'Count'], $outputTable);
+        $rows = array_map(static fn (array $row): array => [OutputFormatter::escape($row[0]), $row[1]], $outputTable);
+        $io->table(['Transport', 'Count'], $rows);
 
         if ($uncountableTransports) {
             $errorIo->note(\sprintf('Unable to get message count for the following transports: "%s".', implode('", "', $uncountableTransports)));
@@ -127,7 +129,7 @@ class StatsCommand extends Command
             $output['uncountable_transports'] = $uncountableTransports;
         }
 
-        $io->writeln(json_encode($output, \JSON_PRETTY_PRINT));
+        $io->writeln(json_encode($output, \JSON_PRETTY_PRINT | \JSON_INVALID_UTF8_SUBSTITUTE), OutputInterface::OUTPUT_RAW);
     }
 
     private function formatSupportsWarnings(string $format): bool

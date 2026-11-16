@@ -110,6 +110,10 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
             $this->connectedIds = $this->notInlinedIds = $this->inlinedIds = [];
             $this->notInlinableIds = [];
             $this->graph = null;
+
+            if ($this->analyzingPass) {
+                $analyzedContainer->getCompiler()->getServiceReferenceGraph()->clear();
+            }
         }
     }
 

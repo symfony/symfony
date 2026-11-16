@@ -31,4 +31,17 @@ class TeeTerminalTest extends TestCase
         $this->assertSame("\x1b]7501;state=done\x1b\\\x1b]7501;state=clear:id=build\x1b\\", $primary->getOutput());
         $this->assertSame($primary->getOutput(), $secondary->getOutput());
     }
+
+    public function testTitlesArePushedAndPoppedOnBothTerminals()
+    {
+        $primary = new VirtualTerminal();
+        $secondary = new VirtualTerminal();
+        $terminal = new TeeTerminal($primary, $secondary);
+
+        $terminal->pushTitle();
+        $terminal->popTitle();
+
+        $this->assertSame("\x1b[22;0t\x1b[23;0t", $primary->getOutput());
+        $this->assertSame($primary->getOutput(), $secondary->getOutput());
+    }
 }

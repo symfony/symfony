@@ -38,9 +38,18 @@ class ScreenBufferTest extends TestCase
         yield 'clear screen' => [40, 10, "Old content\x1b[2J\x1b[HNew content", 'New content'];
         yield 'UTF-8 characters' => [40, 10, "→ Option 1\n  Option 2\n✓ Selected", "→ Option 1\n  Option 2\n✓ Selected"];
         yield 'scroll up' => [20, 3, "Line 1\nLine 2\nLine 3\nLine 4", "Line 2\nLine 3\nLine 4"];
-        yield 'scroll up multiple' => [20, 3, "A\nB\nC\nD\nE\nF", "D\nE\nF"];
+        yield 'scroll up multiple' => [20, 3, "A\nB\nC\nD\nE\nF", "D\nE\nF"]; // codespell:ignore nd
         yield 'wide character plain text' => [40, 10, '你好世界', '你好世界'];
         yield 'wide character multiline' => [40, 10, "你好\n世界", "你好\n世界"];
+    }
+
+    public function testTheStyledScreenKeepsTheRowsThatShowAStyle()
+    {
+        $buffer = new ScreenBuffer(4, 5);
+        $buffer->write("ab\r\n\e[44m    \e[0m\r\n\e[4m  \e[0m\r\n\e[38;2;1;2;3m    \e[0m\r\n");
+
+        $this->assertSame("ab\n\e[44m    \e[0m\n\e[4m  \e[0m", $buffer->getStyledScreen(), 'A background or an underline shows on spaces, a text color does not.');
+        $this->assertSame('ab', $buffer->getScreen());
     }
 
     public function testCursorMovement()

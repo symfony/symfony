@@ -177,7 +177,8 @@ final class ScreenBuffer
             $line = $this->getLineStyled($row);
             if (isset($this->cells[$row])) {
                 foreach ($this->cells[$row] as $cell) {
-                    if (' ' !== $cell['char'] && '' !== $cell['char']) {
+                    // A space with a style that shows on it, like a background, is drawn too
+                    if ((' ' !== $cell['char'] && '' !== $cell['char']) || ('' !== $cell['style'] && self::showsOnSpace($cell['style']))) {
                         $lastNonEmpty = $row;
                         break;
                     }
@@ -194,6 +195,28 @@ final class ScreenBuffer
         }
 
         return implode("\n", $result);
+    }
+
+    /**
+     * Whether a style is seen on a space: a background, reverse video, an underline or a line through it.
+     */
+    private static function showsOnSpace(string $style): bool
+    {
+        preg_match_all('/\e\[([0-9;:]*)m/', $style, $sequences);
+        foreach ($sequences[1] as $sequence) {
+            $parameters = explode(';', str_replace(':', ';', $sequence));
+            for ($i = 0, $count = \count($parameters); $i < $count; ++$i) {
+                $code = (int) $parameters[$i];
+                if (38 === $code || 58 === $code) {
+                    // A color of the text or of the underline: its parameters are not codes
+                    $i += '2' === ($parameters[$i + 1] ?? null) ? 4 : 2;
+                } elseif (48 === $code || 4 === $code || 7 === $code || 9 === $code || ($code >= 40 && $code <= 47) || ($code >= 100 && $code <= 107)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

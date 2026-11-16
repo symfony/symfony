@@ -1051,13 +1051,13 @@ class ScreenWriterTest extends TestCase
         foreach ($steps as $step) {
             if (\is_int($step)) {
                 $screen = self::resizeLikeTermux($screen, 20, $step);
-                $writer->followTermuxHeightChange($rows, $step);
+                $writer->onTerminalHeightChange($rows, $step);
                 $rows = $step;
             } elseif (\is_string($step)) {
                 // Two height changes, "16>12", reported by a single SIGWINCH
                 [$intermediate, $step] = array_map(intval(...), explode('>', $step));
                 $screen = self::resizeLikeTermux(self::resizeLikeTermux($screen, 20, $intermediate), 20, $step);
-                $writer->followTermuxHeightChange($rows, $step);
+                $writer->onTerminalHeightChange($rows, $step);
                 $rows = $step;
             } else {
                 $lines = $step;

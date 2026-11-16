@@ -18,6 +18,7 @@ use Symfony\Component\Tui\Style\DefaultStyleSheet;
 use Symfony\Component\Tui\Style\Direction;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\StyleSheet;
+use Symfony\Component\Tui\Terminal\TerminalInterface;
 use Symfony\Component\Tui\Widget\AbstractWidget;
 use Symfony\Component\Tui\Widget\ContainerWidget;
 use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
@@ -40,7 +41,7 @@ use Symfony\Component\Tui\Widget\Figlet\FontRegistry;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class Renderer implements WidgetRendererInterface
+final class Renderer implements WidgetRendererInterface, RendererInterface
 {
     private StyleSheet $styleSheet;
     private FontRegistry $fontRegistry;
@@ -82,12 +83,29 @@ final class Renderer implements WidgetRendererInterface
         }
     }
 
+    public function resolveElement(AbstractWidget $widget, string $element): Style
+    {
+        return $this->styleSheet->resolveElement($widget, $element);
+    }
+
+    public function invalidateStyles(): void
+    {
+        // Nothing to do: a style resolved here depends on its widget alone,
+        // and is cached on that widget's render revision, which the change bumped
+    }
+
+    public function createFrameWriter(TerminalInterface $terminal): FrameWriterInterface
+    {
+        return new ScreenWriter($terminal);
+    }
+
     /**
      * Add a stylesheet.
      */
     public function addStyleSheet(StyleSheet $styleSheet): void
     {
         $this->styleSheet->merge($styleSheet);
+        $this->styleCache = new \WeakMap();
     }
 
     /**

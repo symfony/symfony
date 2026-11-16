@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-16T12:08:38Z
+
+I added the fixes from my review to this PR. Validator: 7, 10, 16, 22, 32, 57, 79, 85, 96. Form: 29. For 7, 79 and 96, I followed the wording of 6, 42 and 84. Could you check those three?

@@ -61,6 +61,27 @@ class PgpEncrypterTest extends TestCase
         }
     }
 
+    public function testTimeoutThrowsAMimeException()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test uses a shell script as the gpg binary.');
+        }
+
+        $binary = tempnam(sys_get_temp_dir(), 'gpg');
+        file_put_contents($binary, "#!/bin/sh\nexec sleep 10\n");
+        chmod($binary, 0o755);
+        $process = PgpProcess::fromOptions(['binary' => $binary, 'timeout' => 0.1]);
+
+        try {
+            $process->encrypt('Hello there!', [self::KEY_EMAIL_ADDRESS => __DIR__.'/../Fixtures/pgp_test_public_key.asc']);
+            $this->fail('The gpg process should have timed out.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('exceeded the timeout', $e->getMessage());
+        } finally {
+            unlink($binary);
+        }
+    }
+
     public function testEncrypting()
     {
         $recipientKeys = [

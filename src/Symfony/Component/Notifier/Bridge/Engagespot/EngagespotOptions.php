@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 /**
  * @author Daniel GORGAN <https://github.com/danut007ro>
  *
- * @see https://docs.engagespot.co/how-to-send-notifications-via-engagespot-api/how-to-send-notifications-using-engagespot-rest-api
+ * @see https://docs.engagespot.co/api/api-reference/introduction
  */
 final class EngagespotOptions implements MessageOptionsInterface
 {

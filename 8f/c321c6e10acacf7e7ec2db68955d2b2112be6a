@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-16T11:51:33Z
+
+Thanks for the PR! I pushed a few changes. `block()`, `success()`, `error()`, `warning()` and `note()` of `SymfonyStyle` already escape their message. Escaping before calling them printed backslashes, for example `Template name "@ns\<info\>/missing.html.twig" not found`. I also kept the existing JSON flags, so that the output doesn't change on a patch release.
+
+---------------------------------------------------------------------------
+
+by prateekbhujel at 2026-11-16T12:10:40Z
+
+Thanks @nicolas-grekas! Good catch on `SymfonyStyle::block()` already escaping and keeping the existing JSON flags.

@@ -116,7 +116,7 @@ class ParentDummy
     }
 
     /**
-     * @return ($value is null ? int : string)
+     * @return array{int: int, string: string}['int']
      */
     public function getUnsupported(?int $value = null): int|string
     {

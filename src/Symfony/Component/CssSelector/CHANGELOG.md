@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for the `of <selector-list>` argument of `:nth-child()` and `:nth-last-child()`
+
 8.1
 ---
 

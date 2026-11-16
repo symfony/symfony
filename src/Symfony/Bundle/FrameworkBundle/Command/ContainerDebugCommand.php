@@ -50,6 +50,7 @@ class ContainerDebugCommand extends Command
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Display tagged services for an application'),
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Display a specific parameter for an application'),
                 new InputOption('parameters', null, InputOption::VALUE_NONE, 'Display parameters for an application'),
+                new InputOption('resolve-env', null, InputOption::VALUE_NONE, 'Resolve environment variables in the value displayed by --parameter'),
                 new InputOption('types', null, InputOption::VALUE_NONE, 'Display types (classes/interfaces) available in the container'),
                 new InputOption('env-var', null, InputOption::VALUE_REQUIRED, 'Display a specific environment variable used in the container'),
                 new InputOption('env-vars', null, InputOption::VALUE_NONE, 'Display environment variables used in the container'),
@@ -98,6 +99,10 @@ class ContainerDebugCommand extends Command
 
                   <info>%command.invocation% --parameter=kernel.debug</info>
 
+                Add <info>--resolve-env</info> to display the computed value instead of environment variable placeholders:
+
+                  <info>%command.invocation% --parameter=router.request_context.host --resolve-env</info>
+
                 By default, internal services are hidden. You can display them
                 using the <info>--show-hidden</info> flag:
 
@@ -141,7 +146,7 @@ class ContainerDebugCommand extends Command
             }
             $options = [];
         } elseif ($parameter = $input->getOption('parameter')) {
-            $options = ['parameter' => $parameter];
+            $options = ['parameter' => $parameter, 'resolve_env' => $input->getOption('resolve-env')];
         } elseif ($input->getOption('tags')) {
             $options = ['group_by' => 'tags'];
         } elseif ($tag = $input->getOption('tag')) {
@@ -256,6 +261,10 @@ class ContainerDebugCommand extends Command
      */
     protected function validateInput(InputInterface $input): void
     {
+        if ($input->getOption('resolve-env') && !$input->getOption('parameter')) {
+            throw new InvalidArgumentException('The "--resolve-env" option requires "--parameter".');
+        }
+
         $options = ['tags', 'tag', 'parameters', 'parameter'];
 
         $optionsCount = 0;

@@ -68,7 +68,7 @@ abstract class Descriptor implements DescriptorInterface
             $object instanceof ContainerBuilder && !empty($options['env-vars']) => $this->describeContainerEnvVars($this->getContainerEnvVars($object), $options),
             $object instanceof ContainerBuilder && isset($options['group_by']) && 'tags' === $options['group_by'] => $this->describeContainerTags($object, $options),
             $object instanceof ContainerBuilder && isset($options['id']) => $this->describeContainerService($this->resolveServiceDefinition($object, $options['id']), $options, $object),
-            $object instanceof ContainerBuilder && isset($options['parameter']) => $this->describeContainerParameter($object->resolveEnvPlaceholders($object->getParameter($options['parameter'])), $deprecatedParameters[$options['parameter']] ?? null, $options),
+            $object instanceof ContainerBuilder && isset($options['parameter']) => $this->describeContainerParameter($object->resolveEnvPlaceholders($object->getParameter($options['parameter']), ($options['resolve_env'] ?? false) ? true : null), $deprecatedParameters[$options['parameter']] ?? null, $options),
             $object instanceof ContainerBuilder && isset($options['deprecations']) => $this->describeContainerDeprecations($object, $options),
             $object instanceof ContainerBuilder => $this->describeContainerServices($object, $options),
             $object instanceof Definition => $this->describeContainerDefinition($object, $options),

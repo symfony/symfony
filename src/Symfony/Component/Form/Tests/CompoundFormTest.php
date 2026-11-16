@@ -117,6 +117,15 @@ class CompoundFormTest extends TestCase
         $this->assertNull($this->form->get('firstName')->getData());
     }
 
+    public function testSubmitForwardsNullIfValueIsMissingAndFalseValuesIsNotAnArray()
+    {
+        $this->form->add($this->getBuilder('firstName', null, ['false_values' => 'no'])->getForm());
+
+        $this->form->submit([]);
+
+        $this->assertNull($this->form->get('firstName')->getData());
+    }
+
     public function testSubmitDoesNotForwardNullIfNotClearMissing()
     {
         $child = $this->createForm('firstName', false);

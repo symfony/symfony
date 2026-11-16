@@ -66,6 +66,67 @@ bar';
         $this->assertStringContainsString('Unable to parse at line 3 (near "bar").', trim($tester->getDisplay()));
     }
 
+    public function testLintIncorrectFileWithMarkup()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile("foo: bar\n</info>baz");
+
+        $ret = $tester->execute(['filename' => $filename], ['decorated' => false]);
+
+        $this->assertSame(1, $ret);
+        $this->assertStringContainsString('>> Unable to parse at line 2 (near "</info>baz").', $tester->getDisplay());
+    }
+
+    public function testLintFilesWithMarkupInTheirName()
+    {
+        $cwd = getcwd();
+        chdir(sys_get_temp_dir().'/framework-yml-lint-test');
+
+        try {
+            $this->files[] = $valid = getcwd().'/a<comment>.yaml';
+            $this->files[] = $invalid = getcwd().'/b<comment>.yaml';
+
+            if (!@file_put_contents($valid, 'foo: bar') || !@file_put_contents($invalid, "foo:\nbar")) {
+                $this->markTestSkipped('The filesystem does not support "<" and ">" in file names.');
+            }
+
+            $tester = $this->createCommandTester();
+            $tester->execute(['filename' => ['a<comment>.yaml', 'b<comment>.yaml']], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+
+            $this->assertStringContainsString('// OK in a<comment>.yaml', $tester->getDisplay());
+            $this->assertStringContainsString('ERROR  in b<comment>.yaml', $tester->getDisplay());
+        } finally {
+            chdir($cwd);
+        }
+    }
+
+    public function testLintIncorrectFileWithJsonFormat()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile("foo: bar\n<comment>baz");
+
+        $ret = $tester->execute(['filename' => $filename, '--format' => 'json'], ['decorated' => true]);
+
+        $this->assertSame(1, $ret);
+        $this->assertSame([['file' => $filename, 'line' => 2, 'valid' => false, 'message' => 'Unable to parse at line 2 (near "<comment>baz").']], json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR));
+    }
+
+    public function testLintFileWithInvalidUtf8NameWithJsonFormat()
+    {
+        $this->files[] = $filename = sys_get_temp_dir()."/framework-yml-lint-test/\xFF.yaml";
+
+        if (!@file_put_contents($filename, 'foo: bar')) {
+            $this->markTestSkipped('The filesystem does not support non-UTF-8 file names.');
+        }
+
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['filename' => $filename, '--format' => 'json'], ['decorated' => false]);
+        $json = json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR);
+
+        $this->assertSame(0, $ret);
+        $this->assertSame(sys_get_temp_dir()."/framework-yml-lint-test/\u{FFFD}.yaml", $json[0]['file']);
+    }
+
     public function testLintIncorrectFileWithGithubFormat()
     {
         $incorrectContent = <<<YAML

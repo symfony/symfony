@@ -76,5 +76,16 @@ class GithubActionReporterTest extends TestCase
         ];
 
         yield 'without file ignores col & line' => ['warning', 'A warning', null, 2, 4, '::warning::A warning'];
+
+        yield 'with markup' => ['error', 'An <comment>error</comment>', null, null, null, '::error::An <comment>error</comment>'];
+
+        yield 'with markup and meta' => [
+            'error',
+            'An <comment>error</comment>',
+            'foo/<info>bar.php',
+            2,
+            4,
+            '::error file=foo/<info>bar.php,line=2,col=4::An <comment>error</comment>',
+        ];
     }
 }

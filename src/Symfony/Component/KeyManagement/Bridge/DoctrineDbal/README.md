@@ -138,25 +138,6 @@ The parent type is declared inline because DoctrineBundle registers no service
 for the built-in types, and it needs none: a `StringType` holds no
 configuration. `EncryptedType` is not a stateful service either.
 
-When the parent type must be the instance the connection resolves, because the
-application redefined that name, ask the type provider of the connection for it
-instead of building one:
-
-```yaml
-services:
-    app.encrypted_type.user_email:
-        class: Symfony\Component\KeyManagement\Bridge\DoctrineDbal\EncryptedType
-        arguments:
-            $parentType: !service
-                class: Doctrine\DBAL\Types\Type
-                factory: ['@doctrine.dbal.default_connection.type_provider', 'get']
-                arguments: ['string']
-            $envelopes: '@app.envelope_encrypter'
-            $key: 'user.email'
-        tags:
-            - { name: doctrine.dbal.type, type_name: app_user_email }
-```
-
 Which encrypter a type is given is what decides the regime of the column.
 The configured types all share one encrypter, so an entity holding both regimes declares the types of the other one with such a service.
 For instance, its `$envelopes` is `@key_management.envelope_encrypter.<client>` for the self-contained envelopes of a client, while the configured types use the store.

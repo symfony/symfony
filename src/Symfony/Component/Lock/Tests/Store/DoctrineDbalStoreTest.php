@@ -425,4 +425,18 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $table = $schema->getTable('lock_keys');
         $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
+
+    public function testOracleClockCountsTheTimeOfDayOnce()
+    {
+        $conn = $this->createMock(Connection::class);
+        $conn->method('getDatabasePlatform')
+            ->willReturn($this->createStub(\Doctrine\DBAL\Platforms\OraclePlatform::class));
+        $conn->expects($this->once())
+            ->method('executeStatement')
+            ->with($this->stringContains("VALUES (?, ?, (TRUNC(systimestamp AT TIME ZONE 'UTC', 'MI') - DATE '1970-01-01') * 86400 + EXTRACT(SECOND FROM systimestamp) + 300)"))
+            ->willReturn(1);
+
+        $store = new DoctrineDbalStore($conn, [], 0);
+        $store->save(new Key(__METHOD__));
+    }
 }

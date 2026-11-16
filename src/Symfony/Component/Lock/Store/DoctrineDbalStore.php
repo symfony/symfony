@@ -338,7 +338,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
             $platform instanceof \Doctrine\DBAL\Platforms\SqlitePlatform => "(julianday('now') - 2440587.5) * 86400.0",
             $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQL94Platform,
             $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform => 'CAST(EXTRACT(epoch FROM NOW()) AS DOUBLE PRECISION)',
-            $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform => "(CAST(systimestamp AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400 + TO_NUMBER(TO_CHAR(systimestamp AT TIME ZONE 'UTC', 'SSSSS.FF'))",
+            $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform => "(TRUNC(systimestamp AT TIME ZONE 'UTC', 'MI') - DATE '1970-01-01') * 86400 + EXTRACT(SECOND FROM systimestamp)",
             $platform instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform,
             $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform => "CAST(DATEDIFF_BIG(ms, '1970-01-01', SYSUTCDATETIME()) AS FLOAT) / 1000.0",
             default => (new \DateTimeImmutable())->format('U.u'),

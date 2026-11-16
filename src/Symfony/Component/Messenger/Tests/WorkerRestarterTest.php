@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\WorkerRestarter;
 
 class WorkerRestarterTest extends TestCase
@@ -26,6 +27,30 @@ class WorkerRestarterTest extends TestCase
     public function testRestartTheWorkersOfSomeTransports()
     {
         $this->assertSame(['workers.restart_requested_timestamp.scheduler_default', 'workers.restart_requested_timestamp.app%3Aemails'], $this->restart('scheduler_default', 'app:emails'));
+    }
+
+    public function testItSignalsEveryTransportBeforeFailing()
+    {
+        $savedKeys = [];
+        $cachePool = $this->createStub(CacheItemPoolInterface::class);
+        $cachePool->method('getItem')->willReturnCallback(function (string $key) {
+            $item = $this->createStub(CacheItemInterface::class);
+            $item->method('getKey')->willReturn($key);
+
+            return $item;
+        });
+        $cachePool->method('save')->willReturnCallback(static function (CacheItemInterface $item) use (&$savedKeys) {
+            $savedKeys[] = $item->getKey();
+
+            return !str_ends_with($item->getKey(), '.failing');
+        });
+
+        try {
+            new WorkerRestarter($cachePool)('failing', 'async');
+            $this->fail('A failed save must throw.');
+        } catch (RuntimeException) {
+            $this->assertSame(['workers.restart_requested_timestamp.failing', 'workers.restart_requested_timestamp.async'], $savedKeys);
+        }
     }
 
     /**

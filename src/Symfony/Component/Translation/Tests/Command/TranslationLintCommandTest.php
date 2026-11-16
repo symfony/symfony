@@ -156,6 +156,24 @@ final class TranslationLintCommandTest extends TestCase
         }
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testLintMalformedTranslationsWithMarkupInKey()
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', [
+            '<comment>invalid_key</comment>' => '{unclosed',
+        ], 'en', 'messages+intl-icu');
+
+        $command = $this->createCommand($translator, ['en']);
+        $commandTester = new CommandTester($command);
+
+        $this->assertSame(1, $commandTester->execute([], ['decorated' => false]));
+
+        $display = $this->getNormalizedDisplay($commandTester);
+        $this->assertStringContainsString('Translation key "<comment>invalid_key</comment>" is invalid:', $display);
+    }
+
     private function createCommand(Translator $translator, array $enabledLocales): Command
     {
         $command = new TranslationLintCommand($translator, $enabledLocales);

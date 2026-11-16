@@ -30,6 +30,8 @@ use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class Psr18ClientTest extends TestCase
 {
+    use TestServerPortTrait;
+
     public static function setUpBeforeClass(): void
     {
         TestHttpServer::start();
@@ -41,7 +43,7 @@ class Psr18ClientTest extends TestCase
         $factory = new Psr17Factory();
         $client = new Psr18Client(new NativeHttpClient(), $factory, $factory);
 
-        $response = $client->sendRequest($factory->createRequest('GET', 'http://localhost:8057'));
+        $response = $client->sendRequest($factory->createRequest('GET', 'http://localhost:'.self::port()));
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/json', $response->getHeaderLine('content-type'));
@@ -57,7 +59,7 @@ class Psr18ClientTest extends TestCase
         $factory = new Psr17Factory();
         $client = new Psr18Client(new TraceableHttpClient(new CurlHttpClient()), $factory, $factory);
 
-        $response = $client->sendRequest($factory->createRequest('GET', 'http://localhost:8057'));
+        $response = $client->sendRequest($factory->createRequest('GET', 'http://localhost:'.self::port()));
 
         $this->assertSame(200, $response->getStatusCode());
 
@@ -71,7 +73,7 @@ class Psr18ClientTest extends TestCase
         $factory = new Psr17Factory();
         $client = new Psr18Client(new NativeHttpClient(), $factory, $factory);
 
-        $request = $factory->createRequest('POST', 'http://localhost:8057/post')
+        $request = $factory->createRequest('POST', 'http://localhost:'.self::port().'/post')
             ->withBody($factory->createStream('foo=0123456789'));
 
         $response = $client->sendRequest($request);
@@ -126,7 +128,7 @@ class Psr18ClientTest extends TestCase
         $client = new Psr18Client(new NativeHttpClient(), $factory, $factory);
 
         $this->expectException(Psr18NetworkException::class);
-        $client->sendRequest($factory->createRequest('GET', 'http://localhost:8058'));
+        $client->sendRequest($factory->createRequest('GET', 'http://localhost:'.self::port(8058)));
     }
 
     public function testRequestException()
@@ -135,7 +137,7 @@ class Psr18ClientTest extends TestCase
         $client = new Psr18Client(new NativeHttpClient(), $factory, $factory);
 
         $this->expectException(Psr18RequestException::class);
-        $client->sendRequest($factory->createRequest('BAD.METHOD', 'http://localhost:8057'));
+        $client->sendRequest($factory->createRequest('BAD.METHOD', 'http://localhost:'.self::port()));
     }
 
     public function test404()
@@ -143,7 +145,7 @@ class Psr18ClientTest extends TestCase
         $factory = new Psr17Factory();
         $client = new Psr18Client(new NativeHttpClient());
 
-        $response = $client->sendRequest($factory->createRequest('GET', 'http://localhost:8057/404'));
+        $response = $client->sendRequest($factory->createRequest('GET', 'http://localhost:'.self::port().'/404'));
         $this->assertSame(404, $response->getStatusCode());
     }
 
@@ -158,7 +160,7 @@ class Psr18ClientTest extends TestCase
         $this->assertArrayHasKey(' x-xss-protection', $response->getHeaders());
 
         $client = new Psr18Client(new MockHttpClient($response));
-        $request = $client->createRequest('POST', 'http://localhost:8057/post')
+        $request = $client->createRequest('POST', 'http://localhost:'.self::port().'/post')
             ->withBody($client->createStream('foo=0123456789'));
 
         $resultResponse = $client->sendRequest($request);
@@ -173,7 +175,7 @@ class Psr18ClientTest extends TestCase
         $response = new MockResponse('body', ['response_headers' => $responseHeaders]);
 
         $client = new Psr18Client(new MockHttpClient($response));
-        $request = $client->createRequest('POST', 'http://localhost:8057/post')
+        $request = $client->createRequest('POST', 'http://localhost:'.self::port().'/post')
             ->withBody($client->createStream('foo=0123456789'));
 
         $resultResponse = $client->sendRequest($request);
@@ -192,7 +194,7 @@ class Psr18ClientTest extends TestCase
         $clientWithOptionFalse = $clientWithoutOption->withOptions(['auto_upgrade_http_version' => false]);
 
         foreach (['1.0', '1.1', '2.0', '3.0'] as $httpVersion) {
-            $request = $clientWithoutOption->createRequest('GET', 'http://localhost:8057')
+            $request = $clientWithoutOption->createRequest('GET', 'http://localhost:'.self::port())
                 ->withProtocolVersion($httpVersion);
 
             $responseWithoutOption = $clientWithoutOption->sendRequest($request);

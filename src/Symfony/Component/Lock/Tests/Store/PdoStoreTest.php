@@ -29,6 +29,7 @@ class PdoStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
     use FreshKeyTestTrait;
+    use MysqlDaylightSavingTimeTestTrait;
 
     protected static string $dbFile;
 
@@ -53,6 +54,13 @@ class PdoStoreTest extends AbstractStoreTestCase
     public function getStore(): PersistingStoreInterface
     {
         return new PdoStore('sqlite:'.self::$dbFile);
+    }
+
+    protected function createMysqlStore(array $params): array
+    {
+        $pdo = new \PDO('mysql:host='.$params['host'].';dbname='.$params['dbname'], $params['user'], $params['password']);
+
+        return [new PdoStore($pdo, [], 0.0), $pdo->exec(...)];
     }
 
     public function testAbortAfterExpiration()
@@ -217,5 +225,22 @@ class PdoStoreTest extends AbstractStoreTestCase
         $store->close();
 
         $this->assertSame($pdo, (new \ReflectionProperty($store, 'conn'))->getValue($store));
+    }
+
+    public function testOracleClockCountsTheTimeOfDayOnce()
+    {
+        $pdo = $this->createMock(\PDO::class);
+        $pdo->method('getAttribute')
+            ->willReturnMap([
+                [\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION],
+                [\PDO::ATTR_DRIVER_NAME, 'oci'],
+            ]);
+        $pdo->expects($this->once())
+            ->method('prepare')
+            ->with($this->stringContains("VALUES (:id, :token, (TRUNC(systimestamp AT TIME ZONE 'UTC', 'MI') - DATE '1970-01-01') * 86400 + EXTRACT(SECOND FROM systimestamp) + 300)"))
+            ->willReturn($this->createStub(\PDOStatement::class));
+
+        $store = new PdoStore($pdo, [], 0);
+        $store->save(new Key(__METHOD__));
     }
 }

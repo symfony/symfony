@@ -34,6 +34,57 @@ class ImportMapOutdatedCommandTest extends TestCase
         $this->assertEquals($display, trim($commandTester->getDisplay(true)));
     }
 
+    public function testCommandWithMarkupInJsonFormat()
+    {
+        $updateChecker = $this->createMock(ImportMapUpdateChecker::class);
+        $updateChecker->expects($this->once())
+            ->method('getAvailableUpdates')
+            ->willReturn([
+                'pkg<info>' => new PackageUpdateInfo('pkg<info>', '1.0.0', '2.0.0', PackageUpdateInfo::UPDATE_TYPE_MAJOR),
+            ]);
+        $command = new ImportMapOutdatedCommand($updateChecker);
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(['--format' => 'json'], ['decorated' => true]);
+
+        $this->assertSame(1, $commandTester->getStatusCode());
+        $json = json_decode($commandTester->getDisplay(), true);
+        $this->assertIsArray($json);
+        $this->assertSame('pkg<info>', $json[0]['name']);
+    }
+
+    public function testCommandWithMarkupInTextFormat()
+    {
+        $updateChecker = $this->createMock(ImportMapUpdateChecker::class);
+        $updateChecker->expects($this->once())
+            ->method('getAvailableUpdates')
+            ->willReturn([
+                'pkg<info>' => new PackageUpdateInfo('pkg<info>', '1.0.0', '2.0.0', PackageUpdateInfo::UPDATE_TYPE_MAJOR),
+            ]);
+        $command = new ImportMapOutdatedCommand($updateChecker);
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([], ['decorated' => false]);
+
+        $this->assertSame(1, $commandTester->getStatusCode());
+        $this->assertStringContainsString('pkg<info>', $commandTester->getDisplay());
+    }
+
+    public function testCommandWithInvalidUtf8InJsonFormat()
+    {
+        $updateChecker = $this->createMock(ImportMapUpdateChecker::class);
+        $updateChecker->expects($this->once())
+            ->method('getAvailableUpdates')
+            ->willReturn([
+                "pkg\xFF" => new PackageUpdateInfo("pkg\xFF", '1.0.0', '2.0.0', PackageUpdateInfo::UPDATE_TYPE_MAJOR),
+            ]);
+
+        $commandTester = new CommandTester(new ImportMapOutdatedCommand($updateChecker));
+        $commandTester->execute(['--format' => 'json'], ['decorated' => false]);
+
+        $this->assertSame("pkg\u{FFFD}", json_decode($commandTester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR)[0]['name']);
+    }
+
     /**
      * @return iterable<array{string, string|null}>
      */

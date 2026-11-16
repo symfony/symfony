@@ -278,7 +278,9 @@ jobs:
           git diff --exit-code src/ || (echo '::error::Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)
 
       - name: Start MySQL
-        run: sudo systemctl start mysql.service
+        run: |
+          sudo systemctl start mysql.service
+          mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -h127.0.0.1 -uroot -proot mysql
 
       - name: Start PyKMIP
         run: |

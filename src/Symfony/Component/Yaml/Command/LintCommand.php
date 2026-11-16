@@ -20,6 +20,7 @@ use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -314,11 +315,11 @@ class LintCommand extends Command
 
         foreach ($filesInfo as $info) {
             if ($info['valid'] && $this->displayCorrectFiles) {
-                $io->comment('<info>OK</info>'.($info['file'] ? \sprintf(' in %s', $info['file']) : '').$this->schemaComment($info));
+                $io->comment('<info>OK</info>'.($info['file'] ? \sprintf(' in %s', OutputFormatter::escape($info['file'])) : '').$this->schemaComment($info));
             } elseif (!$info['valid']) {
                 ++$erroredFiles;
-                $io->text('<error> ERROR </error>'.($info['file'] ? \sprintf(' in %s', $info['file']) : '').$this->schemaComment($info));
-                $io->text(\sprintf('<error> >> %s</error>', $info['message']));
+                $io->text('<error> ERROR </error>'.($info['file'] ? \sprintf(' in %s', OutputFormatter::escape($info['file'])) : '').$this->schemaComment($info));
+                $io->text(\sprintf('<error> >> %s</error>', OutputFormatter::escape($info['message'])));
 
                 if (str_contains($info['message'], 'PARSE_CUSTOM_TAGS')) {
                     $suggestTagOption = true;
@@ -355,7 +356,7 @@ class LintCommand extends Command
             }
         });
 
-        $io->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $io->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_INVALID_UTF8_SUBSTITUTE), OutputInterface::OUTPUT_RAW);
 
         return min($errors, 1);
     }

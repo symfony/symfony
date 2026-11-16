@@ -260,11 +260,12 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, expects "%s", but "%s" given.', implode('", "', (array) $attribute->acceptFormat), $format));
         }
 
+        $suffixFormat = Request::getStructuredSuffixFormat($request->headers->get('CONTENT_TYPE'));
         if (!$this->serializer instanceof DecoderInterface || !$this->serializer->supportsDecoding($format)) {
-            $format = Request::getStructuredSuffixFormat($request->headers->get('CONTENT_TYPE')) ?? $format;
+            $format = $suffixFormat ?? $format;
         }
 
-        if (!$attribute->acceptFormat && !\in_array($format, ['form', 'json', 'xml'], true)) {
+        if (!$attribute->acceptFormat && !\in_array($format, ['form', 'json', 'xml'], true) && !\in_array($suffixFormat, ['json', 'xml'], true)) {
             throw new UnsupportedMediaTypeHttpException(\sprintf('Unsupported format, "%s" must be explicitly listed in "acceptFormat".', $format));
         }
 

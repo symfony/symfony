@@ -39,6 +39,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
 {
     use ExpiringStoreTestTrait;
     use FreshKeyTestTrait;
+    use MysqlDaylightSavingTimeTestTrait;
 
     protected static string $dbFile;
 
@@ -69,6 +70,17 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         return new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config));
+    }
+
+    protected function createMysqlStore(array $params): array
+    {
+        $config = new Configuration();
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+        $conn = DriverManager::getConnection(['driver' => 'pdo_mysql'] + $params, $config);
+
+        return [new DoctrineDbalStore($conn, [], 0.0), $conn->executeStatement(...)];
     }
 
     public function testAbortAfterExpiration()
@@ -420,5 +432,19 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
 
         $this->assertTrue($conn->isConnected());
         $store->delete($key);
+    }
+
+    public function testOracleClockCountsTheTimeOfDayOnce()
+    {
+        $conn = $this->createMock(Connection::class);
+        $conn->method('getDatabasePlatform')
+            ->willReturn($this->createStub(\Doctrine\DBAL\Platforms\OraclePlatform::class));
+        $conn->expects($this->once())
+            ->method('executeStatement')
+            ->with($this->stringContains("VALUES (?, ?, (TRUNC(systimestamp AT TIME ZONE 'UTC', 'MI') - DATE '1970-01-01') * 86400 + EXTRACT(SECOND FROM systimestamp) + 300)"))
+            ->willReturn(1);
+
+        $store = new DoctrineDbalStore($conn, [], 0);
+        $store->save(new Key(__METHOD__));
     }
 }

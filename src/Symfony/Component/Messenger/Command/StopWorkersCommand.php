@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\WorkerRestarter;
 
 /**
@@ -60,7 +61,14 @@ class StopWorkersCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $receivers = $input->getArgument('receivers');
-        new WorkerRestarter($this->restartSignalCachePool)(...$receivers);
+
+        try {
+            new WorkerRestarter($this->restartSignalCachePool)(...$receivers);
+        } catch (RuntimeException $e) {
+            $io->getErrorStyle()->error($e->getMessage());
+
+            return 1;
+        }
 
         $io->success($receivers ? \sprintf('Signal successfully sent to stop the workers that consume "%s".', implode('", "', $receivers)) : 'Signal successfully sent to stop any running workers.');
 

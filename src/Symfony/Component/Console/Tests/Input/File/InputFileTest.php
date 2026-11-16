@@ -200,6 +200,40 @@ class InputFileTest extends TestCase
         $this->assertSame(realpath($path), $file->getRealPath());
     }
 
+    public function testFromPathWithFileUriPreservesPlusSigns()
+    {
+        $path = $this->tempDir.'/a+b.txt';
+        file_put_contents($path, 'test content');
+
+        $file = InputFile::fromPath('file://'.str_replace('\\', '/', $path));
+
+        $this->assertTrue($file->isValid());
+        $this->assertSame(realpath($path), $file->getRealPath());
+    }
+
+    public function testFromPathWithLocalhostFileUri()
+    {
+        $path = $this->tempDir.'/localhost file.txt';
+        file_put_contents($path, 'test content');
+
+        $uri = 'file://LOCALHOST/'.ltrim(str_replace('\\', '/', $path), '/');
+        $file = InputFile::fromPath($uri);
+
+        $this->assertTrue($file->isValid());
+        $this->assertSame(realpath($path), $file->getRealPath());
+    }
+
+    public function testFromPathWithUppercaseFileUriScheme()
+    {
+        $path = $this->tempDir.'/uppercase.txt';
+        file_put_contents($path, 'test content');
+
+        $file = InputFile::fromPath('FILE://'.str_replace('\\', '/', $path));
+
+        $this->assertTrue($file->isValid());
+        $this->assertSame(realpath($path), $file->getRealPath());
+    }
+
     #[RequiresPhpExtension('fileinfo')]
     public function testGetMimeType()
     {

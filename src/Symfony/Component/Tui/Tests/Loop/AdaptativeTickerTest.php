@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Tests\Loop;
 
 use PHPUnit\Framework\TestCase;
+use Revolt\EventLoop;
 use Symfony\Component\Tui\Loop\AdaptativeTicker;
 use Symfony\Component\Tui\Loop\TickRuntimeInterface;
 
@@ -73,6 +74,22 @@ class AdaptativeTickerTest extends TestCase
         } finally {
             $ticker->stop();
         }
+    }
+
+    public function testATickerDroppedWithoutStoppingLeavesNothingHeld()
+    {
+        $runtime = new TestTickRuntime();
+        $ticker = new AdaptativeTicker($runtime);
+        $ticker->refresh(true, true, null, false, null);
+        $callbackId = $this->getCallbackId($ticker);
+        $this->assertNotNull($callbackId);
+        $reference = \WeakReference::create($runtime);
+
+        unset($ticker, $runtime);
+        gc_collect_cycles();
+
+        $this->assertNull($reference->get(), 'The event loop does not hold the runtime.');
+        $this->assertNotContains($callbackId, EventLoop::getIdentifiers(), 'Its callback is canceled.');
     }
 
     public function testStopClearsCurrentSchedule()

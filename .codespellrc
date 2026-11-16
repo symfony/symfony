@@ -7,4 +7,5 @@
 # "atleast" is PHPUnit's TestCase::atLeast()
 # "grigorian" is the name of an author of Console's Table helper
 # "truncat" is the expected output of FormatterHelper::truncate() in Console's FormatterHelperTest
-ignore-words-list = smove,hastable,signall,caf,ser,atleast,grigorian,truncat
+# "eror" is used in TwigBridge's DebugCommandTest to test alternative suggestions
+ignore-words-list = smove,hastable,signall,caf,ser,atleast,grigorian,truncat,eror

@@ -234,7 +234,7 @@ class Connection
         $amqpOptions = array_replace_recursive([
             'host' => $params['host'] ?? 'localhost',
             'port' => $params['port'] ?? $port,
-            'vhost' => isset($pathParts[0]) ? urldecode($pathParts[0]) : '/',
+            'vhost' => isset($pathParts[0]) ? rawurldecode($pathParts[0]) : '/',
             'exchange' => [
                 'name' => $exchangeName,
             ],

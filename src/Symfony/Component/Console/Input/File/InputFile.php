@@ -104,8 +104,15 @@ final class InputFile extends \SplFileInfo
             $path = substr($path, 1, -1);
         }
 
-        if (str_starts_with($path, 'file://')) {
-            $path = urldecode(substr($path, 7));
+        if (0 === stripos($path, 'file://')) {
+            $path = substr($path, 7);
+
+            if (preg_match('#^localhost/#i', $path)) {
+                $path = substr($path, 9);
+            }
+
+            // "+" is a valid path character, so only decode percent-encoded bytes.
+            $path = rawurldecode($path);
 
             if ('\\' === \DIRECTORY_SEPARATOR && preg_match('#^/[a-zA-Z]:/#', $path)) {
                 $path = substr($path, 1);

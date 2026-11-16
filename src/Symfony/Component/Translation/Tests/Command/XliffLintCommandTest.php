@@ -131,6 +131,68 @@ class XliffLintCommandTest extends TestCase
         $this->assertStringContainsString('There is a mismatch between the language included in the file name ("messages.en.xlf") and the "es" value used in the "target-language" attribute of the file.', trim($tester->getDisplay()));
     }
 
+    public function testLintIncorrectTargetLanguageWithMarkup()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile('note', '&lt;comment&gt;es');
+
+        $tester->execute(['filename' => $filename], ['decorated' => false]);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertStringContainsString('There is a mismatch between the language included in the file name ("messages.en.xlf") and the "<comment>es" value used in the "target-language" attribute of the file.', $tester->getDisplay());
+    }
+
+    public function testLintFilesWithMarkupInTheirName()
+    {
+        $valid = @$this->createFile('note', 'en', 'a<comment>.%locale%.xlf');
+        $invalid = @$this->createFile('note', 'es', 'b<comment>.%locale%.xlf');
+
+        if (!is_file($valid) || !is_file($invalid)) {
+            $this->markTestSkipped('The filesystem does not support "<" and ">" in file names.');
+        }
+
+        $cwd = getcwd();
+        chdir(\dirname($valid));
+
+        try {
+            $tester = $this->createCommandTester();
+            $tester->execute(['filename' => ['a<comment>.en.xlf', 'b<comment>.en.xlf']], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+
+            $this->assertStringContainsString('// OK in a<comment>.en.xlf', $tester->getDisplay());
+            $this->assertStringContainsString('ERROR  in b<comment>.en.xlf', $tester->getDisplay());
+            $this->assertStringContainsString('the file name ("b<comment>.en.xlf")', $tester->getDisplay());
+        } finally {
+            chdir($cwd);
+        }
+    }
+
+    public function testLintIncorrectTargetLanguageWithJsonFormat()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile('note', '&lt;comment&gt;es');
+
+        $tester->execute(['filename' => $filename, '--format' => 'json'], ['decorated' => true]);
+        $json = json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertSame('There is a mismatch between the language included in the file name ("messages.en.xlf") and the "<comment>es" value used in the "target-language" attribute of the file.', $json[0]['messages'][0]['message']);
+    }
+
+    public function testLintFileWithInvalidUtf8NameWithJsonFormat()
+    {
+        $filename = @$this->createFile('note', 'en', "messages\xFF.%locale%.xlf");
+
+        if (!is_file($filename)) {
+            $this->markTestSkipped('The filesystem does not support non-UTF-8 file names.');
+        }
+
+        $tester = $this->createCommandTester();
+        $tester->execute(['filename' => $filename, '--format' => 'json'], ['decorated' => false]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame([['file' => \dirname($filename)."/messages\u{FFFD}.en.xlf", 'valid' => true, 'messages' => []]], json_decode($tester->getDisplay(), true, 512, \JSON_THROW_ON_ERROR));
+    }
+
     public function testLintTargetLanguageIsCaseInsensitive()
     {
         $tester = $this->createCommandTester();

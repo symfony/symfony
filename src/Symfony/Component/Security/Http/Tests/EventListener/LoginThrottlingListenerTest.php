@@ -389,6 +389,19 @@ class LoginThrottlingListenerTest extends TestCase
         $listener->checkPassport($this->createCheckPassportEvent($passport));
     }
 
+    public function testPreventsLoginWithoutClientIp()
+    {
+        $this->requestStack->push(new Request());
+        $passport = $this->createPassport('wouter');
+
+        for ($i = 0; $i < 3; ++$i) {
+            $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+        }
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+    }
+
     public function testPreventsLoginFromTheSameIpv6Network()
     {
         $passport = $this->createPassport('wouter');

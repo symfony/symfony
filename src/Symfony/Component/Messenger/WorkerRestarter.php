@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
+use Symfony\Component\Messenger\Exception\RuntimeException;
 
 /**
  * Stops the running workers after their current message, so that a process manager can restart them.
@@ -28,6 +29,8 @@ final class WorkerRestarter
 
     /**
      * @param string ...$transportNames The transports whose workers to stop, or none to stop all workers
+     *
+     * @throws RuntimeException When the signal cannot be stored
      */
     public function __invoke(string ...$transportNames): void
     {
@@ -38,11 +41,16 @@ final class WorkerRestarter
         }
 
         $now = microtime(true);
+        $allSaved = true;
 
         foreach ($keys as $key) {
             $cacheItem = $this->restartSignalCachePool->getItem($key);
             $cacheItem->set($now);
-            $this->restartSignalCachePool->save($cacheItem);
+            $allSaved = $this->restartSignalCachePool->save($cacheItem) && $allSaved;
+        }
+
+        if (!$allSaved) {
+            throw new RuntimeException('Failed to send the signal to stop the running workers.');
         }
     }
 }

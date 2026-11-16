@@ -25,7 +25,7 @@ class StopWorkersCommandTest extends TestCase
         $cacheItem = $this->createMock(CacheItemInterface::class);
         $cacheItem->expects($this->once())->method('set');
         $cachePool->expects($this->once())->method('getItem')->willReturn($cacheItem);
-        $cachePool->expects($this->once())->method('save')->with($cacheItem);
+        $cachePool->expects($this->once())->method('save')->with($cacheItem)->willReturn(true);
 
         $command = new StopWorkersCommand($cachePool);
 
@@ -62,7 +62,7 @@ class StopWorkersCommandTest extends TestCase
         $cacheItem = $this->createStub(CacheItemInterface::class);
         $cacheItem->method('set');
         $cachePool->method('getItem')->willReturn($cacheItem);
-        $cachePool->method('save');
+        $cachePool->method('save')->willReturn(true);
 
         $command = new StopWorkersCommand($cachePool);
 
@@ -74,5 +74,18 @@ class StopWorkersCommandTest extends TestCase
 
         $this->assertStringContainsString('Signal successfully sent', $stdout);
         $this->assertStringNotContainsString('Signal successfully sent', $stderr);
+    }
+
+    public function testItFailsWhenTheSignalCannotBeSaved()
+    {
+        $cachePool = $this->createStub(CacheItemPoolInterface::class);
+        $cachePool->method('getItem')->willReturn($this->createStub(CacheItemInterface::class));
+        $cachePool->method('save')->willReturn(false);
+
+        $tester = new CommandTester(new StopWorkersCommand($cachePool));
+
+        $this->assertSame(1, $tester->execute([], ['capture_stderr_separately' => true]));
+        $this->assertStringContainsString('Failed to send the signal', $tester->getErrorOutput());
+        $this->assertSame('', $tester->getDisplay());
     }
 }

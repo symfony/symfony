@@ -34,11 +34,11 @@ class NativeHttpClientTest extends HttpClientTestCase
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $state = (new \ReflectionProperty($client, 'multi'))->getValue($client);
-        $server = TestHttpServer::start(8067, __DIR__.'/Fixtures/backpressure');
-        $driverServer = TestHttpServer::start(8068, __DIR__.'/Fixtures/backpressure');
+        $server = TestHttpServer::start(self::port(8067), __DIR__.'/Fixtures/backpressure');
+        $driverServer = TestHttpServer::start(self::port(8068), __DIR__.'/Fixtures/backpressure');
 
         try {
-            $response = $client->request('GET', 'http://127.0.0.1:8067'.$path, ['buffer' => false]);
+            $response = $client->request('GET', 'http://127.0.0.1:'.self::port(8067).$path, ['buffer' => false]);
             $this->assertSame(200, $response->getStatusCode());
             usleep(100000);
 
@@ -46,7 +46,7 @@ class NativeHttpClientTest extends HttpClientTestCase
             $length = 0;
 
             for ($i = 0; $i < 200; ++$i) {
-                $driver = $client->request('GET', 'http://localhost:8068/', ['buffer' => false]);
+                $driver = $client->request('GET', 'http://localhost:'.self::port(8068).'/', ['buffer' => false]);
                 $received = false;
 
                 foreach ($client->stream([$response, $driver]) as $current => $chunk) {
@@ -73,12 +73,12 @@ class NativeHttpClientTest extends HttpClientTestCase
 
                 $this->assertSame([], $state->handlesActivity);
                 $this->assertSame([], $state->openHandles);
-                $this->assertSame(200, $client->request('GET', 'http://localhost:8057/')->getStatusCode());
+                $this->assertSame(200, $client->request('GET', 'http://localhost:'.self::port().'/')->getStatusCode());
 
                 return;
             }
 
-            $next = $client->request('GET', 'http://127.0.0.1:8067/', ['timeout' => 2]);
+            $next = $client->request('GET', 'http://127.0.0.1:'.self::port(8067).'/', ['timeout' => 2]);
             $this->assertSame('Success', $next->getContent());
 
             $stream = $response->toStream(false);
@@ -130,7 +130,7 @@ class NativeHttpClientTest extends HttpClientTestCase
 
     public function testIPv6Resolve()
     {
-        TestHttpServer::start(-8087);
+        TestHttpServer::start(-self::port(8087));
 
         DnsMock::withMockedHosts([
             'symfony.com' => [
@@ -142,7 +142,7 @@ class NativeHttpClientTest extends HttpClientTestCase
         ]);
 
         $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', 'http://symfony.com:8087/');
+        $response = $client->request('GET', 'http://symfony.com:'.self::port(8087).'/');
 
         $this->assertSame(200, $response->getStatusCode());
 

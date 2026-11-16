@@ -357,6 +357,7 @@ class TestHttpClientKernel extends AbstractKernel
 class ShutdownHttpClientKernel extends AbstractKernel
 {
     use KernelTrait;
+    use TestServerPortTrait;
 
     public function __construct(private string $dir)
     {
@@ -378,7 +379,7 @@ class ShutdownHttpClientKernel extends AbstractKernel
     {
         $container->extension('http_client', [
             'scoped_clients' => [
-                'scoped_client' => ['base_uri' => 'http://127.0.0.1:8057/'],
+                'scoped_client' => ['base_uri' => 'http://127.0.0.1:'.self::port().'/'],
             ],
         ]);
 

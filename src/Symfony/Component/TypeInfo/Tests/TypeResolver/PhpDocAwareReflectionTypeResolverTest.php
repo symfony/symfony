@@ -156,6 +156,21 @@ class PhpDocAwareReflectionTypeResolverTest extends TestCase
         yield 'property after a docblock on the use statement' => [$items, new \ReflectionProperty(PhpDocInheritance\AfterUseDocBlockProperty::class, 'typed')];
     }
 
+    public function testConditionalReturnType()
+    {
+        $fixture = new class {
+            /**
+             * @return ($grouped is true ? array<string, list<int>> : list<int>)
+             */
+            public function items(bool $grouped): array
+            {
+                return $grouped ? ['group' => [1]] : [1];
+            }
+        };
+
+        $this->assertEquals(Type::union(Type::array(Type::list(Type::int()), Type::string()), Type::list(Type::int())), TypeResolver::create()->resolve(new \ReflectionMethod($fixture, 'items')));
+    }
+
     public function testFallbackWhenNoPhpDoc()
     {
         $resolver = new PhpDocAwareReflectionTypeResolver(TypeResolver::create(), new StringTypeResolver(), new TypeContextFactory());

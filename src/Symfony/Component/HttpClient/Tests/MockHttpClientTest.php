@@ -329,7 +329,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $responses = [];
 
         $headers = [
-            'Host: localhost:8057',
+            'Host: localhost:'.self::port(),
             'Content-Type: application/json',
         ];
 
@@ -340,7 +340,7 @@ class MockHttpClientTest extends HttpClientTestCase
     "REQUEST_METHOD": "GET",
     "HTTP_ACCEPT": "*/*",
     "HTTP_FOO": "baR",
-    "HTTP_HOST": "localhost:8057"
+    "HTTP_HOST": "localhost:'.self::port().'"
 }';
 
         $client = new NativeHttpClient();
@@ -419,7 +419,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
 
                 $headers = [
-                    'Host: localhost:8057',
+                    'Host: localhost:'.self::port(),
                     'Content-Length: 1000',
                     'Content-Type: application/json',
                 ];

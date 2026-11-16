@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by phcorp at 2026-11-15T23:03:56Z
+
+Right for `testMaxConnectDuration`: both failures I linked are on 8.x PRs. I've corrected the description.
+
+For `testHandleIsRemovedOnException`, I don't have the cause yet. Here is what I measured:
+
+- **When it fails.** I read the logs of every failed Windows run since Oct 15: 714 runs, 12 of them with this failure. All 12 are in `x86 / minimal-exts / lowest-php` with amphp/http-client 4.x. The first is on Oct 30, the day after #67610 was merged. It never failed with amphp v5. Since the merge, 5 of 76 pushes to 7.4 hit it.
+- **What fails.** At the shas of the failing runs, the failing line is the `handlesActivity` count, not `openHandles`.
+- **On macOS** with amphp v4 and v5, the 304 response is freed as soon as `$e` is unset, before any GC. `handlesActivity` and `openHandles` are empty, with `zend.exception_ignore_args` on or off.
+- **On the Windows runner itself** (fork branch, same job ×6), with an assertion that prints whether the response is alive and what each map holds: 6 full runs and 180 extra runs of `AmpHttpClientTest` alone passed. The extra runs include the three cancel tests in the same order.
+
+So the order alone doesn't trigger it. In CI, HttpClient runs in a background job next to the whole `src\Symfony` run, and it only fails under that load. That points to a timing-dependent path in the v4 response code, not to state left behind by the cancel tests. I haven't found which path writes to `handlesActivity` after the response is freed.
+
+Two options:
+1. Keep the test running and give its assertions a message saying whether the response is still alive and what's left in each map, so the next failure tells us which path it is.
+2. Exclude it as this PR does.
+
+I'd go with 1. Shall I push that instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-15T23:06:12Z
+
+yes please
+
+---------------------------------------------------------------------------
+
+by phcorp at 2026-11-15T23:44:26Z
+
+I found the cause after reading #68194, so I've dropped the exclusion of `testHandleIsRemovedOnException` from this PR instead of adding the diagnostics. It's a bug and the test is right.
+
+The handle that stays is the 304 response itself, kept alive by an exception from a response canceled in an earlier test. Here is the sequence:
+
+1. `testGetContentThrowsWhenCanceledBeforeTheHeaders` cancels a response before the loop has run. Its `generateResponse()` is still queued, by `EventLoop::queue()` in v5 and `Loop::defer()` in v4.
+2. That callback first runs in the next loop run, so on another client's stack. It sends the request with an already-canceled cancellation and gets a `CancelledException`.
+3. With `zend.exception_ignore_args=0`, as in php.ini-development and so on the Windows job, that trace holds the arguments of `stream()` and `initialize()`, which are the responses driving the loop. Without #68198, the exception stays in `handlesActivity` of the first client. With #68198, it sits in a cycle until the next GC.
+4. If that run is the one the 304 response's destructor drives, the 304 response is still alive when the test counts the handles. It is usually the next test's run instead, which is why the failure depends on timing.
+
+Here is the trace of the stored exception, from a probe that cancels before the headers and then gets a 304 from a new client (amphp v5, without #68198):
+
+```
+Amp\CancelledException "The operation was cancelled"
+  #15 AmpClientStateV5->request()
+  #16 AmpResponseV5::followRedirects()
+  #17 AmpResponseV5::generateResponse()
+  #18 AmpResponseV5::{closure:__construct():125}()
+  ...
+  #30 AmpResponseV5::select()
+  #31 AmpResponseV5::stream()      [args: the 304 response]
+  #32 AmpResponseV5::initialize()  [args: the 304 response]
+  #33 AmpResponseV5->doDestruct()
+```
+
+Results of that probe, 30 iterations each, with `zend.exception_ignore_args=0`. The 304 response is checked before any GC, as the test does:
+
+| | v4 | v5 |
+| --- | --- | --- |
+| 7.4 | alive 30/30 | alive 30/30, even after `gc_collect_cycles()` |
+| #68198 | alive 30/30 | alive 30/30 |
+| guard below | freed 30/30 | freed 30/30 |
+| #68198 + guard | freed 30/30 | freed 30/30 |
+
+With `zend.exception_ignore_args=1`, nothing is kept in any of these.
+
+The guard: don't start a response that was canceled before the loop ran.
+
+```php
+// AmpResponseV5::__construct(), same in V4 inside Loop::defer() with `return null;`
+EventLoop::queue(static function () use (...) {
+    if (!isset($multi->openHandles[$id])) {
+        return;
+    }
+
+    self::generateResponse(...);
+});
+```
+
+`AmpHttpClientTest` has the same results with and without it, on v4 and v5, alone and on top of #68198. Would you add it to #68198, or should I open a separate PR with it and a test that reproduces this every time?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-16T09:50:27Z
+
+Thanks! I added your guard to #68198, with a test that checks that a response canceled before the event loop runs doesn't open a connection.

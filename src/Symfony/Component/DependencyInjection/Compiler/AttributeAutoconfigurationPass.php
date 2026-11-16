@@ -65,9 +65,14 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
         }
 
         $this->container = $container;
-        foreach ($container->getDefinitions() as $id => $definition) {
-            $this->currentId = $id;
-            $this->processValue($definition, true);
+
+        try {
+            foreach ($container->getDefinitions() as $id => $definition) {
+                $this->currentId = $id;
+                $this->processValue($definition, true);
+            }
+        } finally {
+            $this->container = null;
         }
     }
 

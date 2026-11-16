@@ -60,7 +60,7 @@ class GitlabCiReporter
      */
     public function write(): void
     {
-        $this->output->writeln(json_encode($this->issues, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $this->output->writeln(json_encode($this->issues, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_INVALID_UTF8_SUBSTITUTE), OutputInterface::OUTPUT_RAW);
     }
 
     private function log(string $severity, string $description, ?string $file, ?int $line): void

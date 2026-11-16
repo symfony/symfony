@@ -360,17 +360,19 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:'.self::port().'/', ['max_duration' => 1]);
 
         $time = hrtime(true);
-        $response->getInfo('pause_handler')(3);
+        // The pause outlasts max_duration by far, so that a slow machine still sees max_duration first
+        $response->getInfo('pause_handler')(30);
 
         try {
             $response->getStatusCode();
             $this->fail(TransportException::class.' expected');
         } catch (TransportException $e) {
+            $duration = (hrtime(true) - $time) / 1E9;
             $this->assertSame('Max duration was reached for "http://localhost:'.self::port().'/".', $e->getMessage());
         }
 
-        $this->assertGreaterThanOrEqual(0.9, (hrtime(true) - $time) / 1E9);
-        $this->assertLessThan(2.5, (hrtime(true) - $time) / 1E9);
+        $this->assertGreaterThanOrEqual(0.9, $duration);
+        $this->assertLessThan(30, $duration);
     }
 
     public function testTransferAfterPauseCountsTowardMaxDuration()

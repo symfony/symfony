@@ -330,10 +330,11 @@ class DoctrineDbalStore implements PersistingStoreInterface
         }
 
         return match (true) {
-            $platform instanceof AbstractMySQLPlatform => 'UNIX_TIMESTAMP(NOW(6))',
+            // NOW() is in the session time zone, so UNIX_TIMESTAMP(NOW(6)) jumps by an hour when DST ends
+            $platform instanceof AbstractMySQLPlatform => 'UNIX_TIMESTAMP() + MICROSECOND(NOW(6)) / 1e6',
             $platform instanceof $sqlitePlatformClass => "(julianday('now') - 2440587.5) * 86400.0",
             $platform instanceof PostgreSQLPlatform => 'CAST(EXTRACT(epoch FROM NOW()) AS DOUBLE PRECISION)',
-            $platform instanceof OraclePlatform => "(CAST(systimestamp AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400 + TO_NUMBER(TO_CHAR(systimestamp AT TIME ZONE 'UTC', 'SSSSS.FF'))",
+            $platform instanceof OraclePlatform => "(TRUNC(systimestamp AT TIME ZONE 'UTC', 'MI') - DATE '1970-01-01') * 86400 + EXTRACT(SECOND FROM systimestamp)",
             $platform instanceof SQLServerPlatform => "CAST(DATEDIFF_BIG(ms, '1970-01-01', SYSUTCDATETIME()) AS FLOAT) / 1000.0",
             default => (new \DateTimeImmutable())->format('U.u'),
         };

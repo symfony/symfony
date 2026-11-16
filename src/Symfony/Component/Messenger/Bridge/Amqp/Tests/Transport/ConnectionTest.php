@@ -100,6 +100,22 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testItKeepsPlusSignsInTheVhost()
+    {
+        $this->assertEquals(
+            new Connection([
+                'host' => 'host',
+                'port' => 5672,
+                'vhost' => 'a+b c',
+            ], [
+                'name' => self::DEFAULT_EXCHANGE_NAME,
+            ], [
+                self::DEFAULT_EXCHANGE_NAME => [],
+            ]),
+            Connection::fromDsn('amqp://host/a+b%20c')
+        );
+    }
+
     public function testOverrideOptionsViaQueryParameters()
     {
         $this->assertEquals(

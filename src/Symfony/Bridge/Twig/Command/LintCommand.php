@@ -18,6 +18,7 @@ use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -196,7 +197,7 @@ class LintCommand extends Command
 
         foreach ($filesInfo as $info) {
             if ($info['valid'] && $output->isVerbose()) {
-                $io->comment('<info>OK</info>'.($info['file'] ? \sprintf(' in %s', $info['file']) : ''));
+                $io->comment('<info>OK</info>'.($info['file'] ? \sprintf(' in %s', OutputFormatter::escape($info['file'])) : ''));
             } elseif (!$info['valid']) {
                 ++$errors;
                 $this->renderException($io, $info['template'], $info['exception'], $info['file'], $githubReporter);
@@ -226,7 +227,7 @@ class LintCommand extends Command
             }
         });
 
-        $output->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $output->writeln(json_encode($filesInfo, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_INVALID_UTF8_SUBSTITUTE), OutputInterface::OUTPUT_RAW);
 
         return min($errors, 1);
     }
@@ -236,12 +237,12 @@ class LintCommand extends Command
         $githubReporter?->error($message, $file, $line <= 0 ? null : $line);
 
         if ($file) {
-            $output->text(\sprintf('<info> DEPRECATION </info> in %s (line %s)', $file, $line));
+            $output->text(\sprintf('<info> DEPRECATION </info> in %s (line %s)', OutputFormatter::escape($file), $line));
         } else {
             $output->text(\sprintf('<info> DEPRECATION </info> (line %s)', $line));
         }
 
-        $output->text(\sprintf('<info> >> %s</info> ', $message));
+        $output->text(\sprintf('<info> >> %s</info> ', OutputFormatter::escape($message)));
     }
 
     private function renderException(SymfonyStyle $output, string $template, Error $exception, ?string $file = null, ?GithubActionReporter $githubReporter = null): void
@@ -251,7 +252,7 @@ class LintCommand extends Command
         $githubReporter?->error($exception->getRawMessage(), $file, $line <= 0 ? null : $line);
 
         if ($file) {
-            $output->text(\sprintf('<error> ERROR </error> in %s (line %s)', $file, $line));
+            $output->text(\sprintf('<error> ERROR </error> in %s (line %s)', OutputFormatter::escape($file), $line));
         } else {
             $output->text(\sprintf('<error> ERROR </error> (line %s)', $line));
         }
@@ -259,7 +260,7 @@ class LintCommand extends Command
         // If the line is not known (this might happen for deprecations if we fail at detecting the line for instance),
         // we render the message without context, to ensure the message is displayed.
         if ($line <= 0) {
-            $output->text(\sprintf('<error> >> %s</error> ', $exception->getRawMessage()));
+            $output->text(\sprintf('<error> >> %s</error> ', OutputFormatter::escape($exception->getRawMessage())));
 
             return;
         }
@@ -269,10 +270,10 @@ class LintCommand extends Command
                 '%s %-6s %s',
                 $lineNumber === $line ? '<error> >> </error>' : '    ',
                 $lineNumber,
-                $code
+                OutputFormatter::escape($code)
             ));
             if ($lineNumber === $line) {
-                $output->text(\sprintf('<error> >> %s</error> ', $exception->getRawMessage()));
+                $output->text(\sprintf('<error> >> %s</error> ', OutputFormatter::escape($exception->getRawMessage())));
             }
         }
     }

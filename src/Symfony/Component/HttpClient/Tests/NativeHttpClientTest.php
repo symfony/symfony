@@ -52,7 +52,7 @@ class NativeHttpClientTest extends HttpClientTestCase
 
     public function testIPv6Resolve()
     {
-        TestHttpServer::start(-8087);
+        TestHttpServer::start(-self::port(8087));
 
         DnsMock::withMockedHosts([
             'symfony.com' => [
@@ -64,7 +64,7 @@ class NativeHttpClientTest extends HttpClientTestCase
         ]);
 
         $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', 'http://symfony.com:8087/');
+        $response = $client->request('GET', 'http://symfony.com:'.self::port(8087).'/');
 
         $this->assertSame(200, $response->getStatusCode());
 

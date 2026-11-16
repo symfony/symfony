@@ -60,4 +60,38 @@ class SimplePhpunitTest extends TestCase
 
         $this->assertStringContainsString('INSTALLING IN '.$vendor.'/bin/.phpunit', $output);
     }
+
+    public function testMaxParallelLimitsHowManyComponentsRunAtOnce()
+    {
+        $this->tmpDir = realpath(sys_get_temp_dir()).'/sf_simple_phpunit_'.bin2hex(random_bytes(6));
+        $phpunitDir = $this->tmpDir.'/.phpunit';
+        $project = $this->tmpDir.'/project';
+
+        mkdir($phpunitDir.'/phpunit-9.6-0', 0777, true);
+        mkdir($project.'/running', 0777, true);
+        foreach (['A', 'B', 'C', 'Fail'] as $component) {
+            mkdir($project.'/src/'.$component, 0777, true);
+            touch($project.'/src/'.$component.'/phpunit.xml.dist');
+        }
+
+        // a fake phpunit that logs how many components are running when it starts
+        file_put_contents($phpunitDir.'/phpunit-9.6-0/phpunit', '<?php $c = basename(end($argv)); touch("running/$c"); file_put_contents("counts", count(glob("running/*"))."\n", FILE_APPEND | LOCK_EX); usleep(500000); unlink("running/$c"); exit("Fail" === $c ? 1 : 0);');
+
+        $bin = \dirname(__DIR__).'/bin/simple-phpunit';
+        file_put_contents($phpunitDir.'/.phpunit-9.6-0.md5', md5(implode(\PHP_EOL, [md5_file($bin.'.php'), 'phpspec/prophecy', '', 0])));
+        file_put_contents($composer = $this->tmpDir.'/composer', "#!/usr/bin/env php\n<?php\nexit(1);\n");
+
+        $php = escapeshellarg(\PHP_BINARY).('phpdbg' === \PHP_SAPI ? ' -qrr' : '');
+        $env = ['PATH' => getenv('PATH'), 'COMPOSER_BINARY' => $composer, 'SYMFONY_PHPUNIT_DIR' => $phpunitDir, 'SYMFONY_PHPUNIT_VERSION' => '9.6', 'SYMFONY_PHPUNIT_MAX_PARALLEL' => '2'];
+        $process = proc_open($php.' '.escapeshellarg($bin).' src 2>&1', [1 => ['pipe', 'w']], $pipes, $project, $env);
+        $output = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+
+        $this->assertSame(1, proc_close($process), $output);
+        $this->assertStringContainsString("KO\033[0m src/Fail", $output);
+
+        $counts = array_map('intval', file($project.'/counts'));
+        $this->assertCount(4, $counts);
+        $this->assertLessThanOrEqual(2, max($counts));
+    }
 }

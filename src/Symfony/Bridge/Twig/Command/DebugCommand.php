@@ -131,9 +131,9 @@ class DebugCommand extends Command
                 $io->section('Overridden Files');
                 do {
                     if ($fileLink = $this->getFileLink($file->key())) {
-                        $io->text(\sprintf('* <href=%s>%s</>', $fileLink, $file->current()));
+                        $io->text(\sprintf('* <href=%s>%s</>', $fileLink, OutputFormatter::escape($file->current())));
                     } else {
-                        $io->text(\sprintf('* %s', $file->current()));
+                        $io->text(\sprintf('* %s', OutputFormatter::escape($file->current())));
                     }
                     $file->next();
                 } while ($file->valid());
@@ -203,7 +203,7 @@ class DebugCommand extends Command
         }
         $data['loader_paths'] = $paths;
 
-        $io->writeln(json_encode($data));
+        $io->writeln(json_encode($data, \JSON_INVALID_UTF8_SUBSTITUTE), OutputInterface::OUTPUT_RAW);
     }
 
     private function displayGeneralText(SymfonyStyle $io, ?string $filter = null): void
@@ -242,7 +242,6 @@ class DebugCommand extends Command
 
     private function displayGeneralJson(SymfonyStyle $io, ?string $filter): void
     {
-        $decorated = $io->isDecorated();
         $types = ['functions', 'filters', 'tests', 'globals'];
         $data = [];
         foreach ($types as $type) {
@@ -264,8 +263,7 @@ class DebugCommand extends Command
             $data['warnings'] = $this->buildWarningMessages($wrongBundles);
         }
 
-        $data = json_encode($data, \JSON_PRETTY_PRINT);
-        $io->writeln($decorated ? OutputFormatter::escape($data) : $data);
+        $io->writeln(json_encode($data, \JSON_PRETTY_PRINT | \JSON_INVALID_UTF8_SUBSTITUTE), OutputInterface::OUTPUT_RAW);
     }
 
     private function getLoaderPaths(?string $name = null): array
@@ -502,7 +500,7 @@ class DebugCommand extends Command
             }
             $firstNamespace = false;
             foreach ($paths as $path) {
-                $rows[] = [$namespace, $path.\DIRECTORY_SEPARATOR];
+                $rows[] = [OutputFormatter::escape($namespace), OutputFormatter::escape($path.\DIRECTORY_SEPARATOR)];
                 $namespace = '';
             }
             if (\count($paths) > 1) {

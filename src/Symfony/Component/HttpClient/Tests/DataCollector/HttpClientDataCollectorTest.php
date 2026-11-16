@@ -19,11 +19,14 @@ use Symfony\Component\HttpClient\DataCollector\HttpClientDataCollector;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
+use Symfony\Component\HttpClient\Tests\TestServerPortTrait;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class HttpClientDataCollectorTest extends TestCase
 {
+    use TestServerPortTrait;
+
     public static function setUpBeforeClass(): void
     {
         TestHttpServer::start();
@@ -34,17 +37,17 @@ class HttpClientDataCollectorTest extends TestCase
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/',
+                'url' => 'http://localhost:'.self::port().'/',
             ],
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/301',
+                'url' => 'http://localhost:'.self::port().'/301',
             ],
         ]);
         $httpClient2 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/404',
+                'url' => 'http://localhost:'.self::port().'/404',
             ],
         ]);
         $httpClient3 = $this->httpClientThatHasTracedRequests([]);
@@ -62,18 +65,18 @@ class HttpClientDataCollectorTest extends TestCase
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/',
+                'url' => 'http://localhost:'.self::port().'/',
             ],
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/301',
+                'url' => 'http://localhost:'.self::port().'/301',
             ],
         ]);
         $httpClient2 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
                 'url' => '/404',
-                'options' => ['base_uri' => 'http://localhost:8057/'],
+                'options' => ['base_uri' => 'http://localhost:'.self::port().'/'],
             ],
         ]);
         $httpClient3 = $this->httpClientThatHasTracedRequests([]);
@@ -91,18 +94,18 @@ class HttpClientDataCollectorTest extends TestCase
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/',
+                'url' => 'http://localhost:'.self::port().'/',
             ],
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/301',
+                'url' => 'http://localhost:'.self::port().'/301',
             ],
         ]);
         $httpClient2 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
                 'url' => '/404',
-                'options' => ['base_uri' => 'http://localhost:8057/'],
+                'options' => ['base_uri' => 'http://localhost:'.self::port().'/'],
             ],
         ]);
         $httpClient3 = $this->httpClientThatHasTracedRequests([]);
@@ -123,18 +126,18 @@ class HttpClientDataCollectorTest extends TestCase
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/',
+                'url' => 'http://localhost:'.self::port().'/',
             ],
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/301',
+                'url' => 'http://localhost:'.self::port().'/301',
             ],
         ]);
         $httpClient2 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
                 'url' => '/404',
-                'options' => ['base_uri' => 'http://localhost:8057/'],
+                'options' => ['base_uri' => 'http://localhost:'.self::port().'/'],
             ],
         ]);
         $httpClient3 = $this->httpClientThatHasTracedRequests([]);
@@ -155,7 +158,7 @@ class HttpClientDataCollectorTest extends TestCase
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/',
+                'url' => 'http://localhost:'.self::port().'/',
             ],
         ]);
         $sut = new HttpClientDataCollector();
@@ -187,12 +190,12 @@ class HttpClientDataCollectorTest extends TestCase
         yield 'GET' => [
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/json',
+                'url' => 'http://localhost:'.self::port().'/json',
             ],
             'curl \\
   --compressed \\
   --request GET \\
-  --url http://localhost:8057/json \\
+  --url http://localhost:'.self::port().'/json \\
   --header Accept: */* \\
   --header Accept-Encoding: gzip \\
   --header User-Agent: Symfony HttpClient (Native)',
@@ -202,13 +205,13 @@ class HttpClientDataCollectorTest extends TestCase
                 'method' => 'GET',
                 'url' => '1',
                 'options' => [
-                    'base_uri' => 'http://localhost:8057/json/',
+                    'base_uri' => 'http://localhost:'.self::port().'/json/',
                 ],
             ],
             'curl \\
   --compressed \\
   --request GET \\
-  --url http://localhost:8057/json/1 \\
+  --url http://localhost:'.self::port().'/json/1 \\
   --header Accept: */* \\
   --header Accept-Encoding: gzip \\
   --header User-Agent: Symfony HttpClient (Native)',
@@ -216,7 +219,7 @@ class HttpClientDataCollectorTest extends TestCase
         yield 'GET with resolve' => [
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/json',
+                'url' => 'http://localhost:'.self::port().'/json',
                 'options' => [
                     'resolve' => [
                         'localhost' => '127.0.0.1',
@@ -226,9 +229,9 @@ class HttpClientDataCollectorTest extends TestCase
             ],
             'curl \\
   --compressed \\
-  --resolve localhost:8057:127.0.0.1 \\
+  --resolve localhost:'.self::port().':127.0.0.1 \\
   --request GET \\
-  --url http://localhost:8057/json \\
+  --url http://localhost:'.self::port().'/json \\
   --header Accept: */* \\
   --header Accept-Encoding: gzip \\
   --header User-Agent: Symfony HttpClient (Native)',
@@ -236,7 +239,7 @@ class HttpClientDataCollectorTest extends TestCase
         yield 'POST with string body' => [
             [
                 'method' => 'POST',
-                'url' => 'http://localhost:8057/json',
+                'url' => 'http://localhost:'.self::port().'/json',
                 'options' => [
                     'body' => 'foo bar baz',
                 ],
@@ -244,7 +247,7 @@ class HttpClientDataCollectorTest extends TestCase
             'curl \\
   --compressed \\
   --request POST \\
-  --url http://localhost:8057/json \\
+  --url http://localhost:'.self::port().'/json \\
   --header Accept: */* \\
   --header Content-Length: 11 \\
   --header Content-Type: application/x-www-form-urlencoded \\
@@ -255,7 +258,7 @@ class HttpClientDataCollectorTest extends TestCase
         yield 'POST with array body' => [
             [
                 'method' => 'POST',
-                'url' => 'http://localhost:8057/json',
+                'url' => 'http://localhost:'.self::port().'/json',
                 'options' => [
                     'body' => [
                         'foo' => 'fooval',
@@ -282,7 +285,7 @@ class HttpClientDataCollectorTest extends TestCase
             'curl \\
   --compressed \\
   --request POST \\
-  --url http://localhost:8057/json \\
+  --url http://localhost:'.self::port().'/json \\
   --header Accept: */* \\
   --header Content-Type: application/x-www-form-urlencoded \\
   --header Content-Length: 211 \\
@@ -296,7 +299,7 @@ class HttpClientDataCollectorTest extends TestCase
             yield 'GET with query' => [
                 [
                     'method' => 'GET',
-                    'url' => 'http://localhost:8057/?foo=fooval&bar=barval',
+                    'url' => 'http://localhost:'.self::port().'/?foo=fooval&bar=barval',
                     'options' => [
                         'query' => [
                             'bar' => 'newbarval',
@@ -311,7 +314,7 @@ class HttpClientDataCollectorTest extends TestCase
                 'curl \\
   --compressed \\
   --request GET \\
-  --url http://localhost:8057/?foo=fooval&bar=newbarval&foobar[baz]=bazval&foobar[qux]=quxval&bazqux[0]=bazquxval1&bazqux[1]=bazquxval2 \\
+  --url http://localhost:'.self::port().'/?foo=fooval&bar=newbarval&foobar[baz]=bazval&foobar[qux]=quxval&bazqux[0]=bazquxval1&bazqux[1]=bazquxval2 \\
   --header Accept: */* \\
   --header Accept-Encoding: gzip \\
   --header User-Agent: Symfony HttpClient (Native)',
@@ -319,7 +322,7 @@ class HttpClientDataCollectorTest extends TestCase
             yield 'POST with json' => [
                 [
                     'method' => 'POST',
-                    'url' => 'http://localhost:8057/json',
+                    'url' => 'http://localhost:'.self::port().'/json',
                     'options' => [
                         'json' => [
                             'foo' => [
@@ -333,7 +336,7 @@ class HttpClientDataCollectorTest extends TestCase
                 'curl \\
   --compressed \\
   --request POST \\
-  --url http://localhost:8057/json \\
+  --url http://localhost:'.self::port().'/json \\
   --header Content-Type: application/json \\
   --header Accept: */* \\
   --header Content-Length: 121 \\
@@ -350,7 +353,7 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'POST',
-                'url' => 'http://localhost:8057/json',
+                'url' => 'http://localhost:'.self::port().'/json',
                 'options' => [
                     'headers' => [
                         'X-Shell' => 'a`id`b $(id) & echo',
@@ -375,7 +378,7 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/301',
+                'url' => 'http://localhost:'.self::port().'/301',
                 'options' => [
                     'auth_basic' => 'foo:bar',
                 ],
@@ -388,7 +391,7 @@ class HttpClientDataCollectorTest extends TestCase
         self::assertSame('curl \\
   --compressed \\
   --request GET \\
-  --url http://localhost:8057/301 \\
+  --url http://localhost:'.self::port().'/301 \\
   --header Accept: */* \\
   --header Authorization: Basic Zm9vOmJhcg== \\
   --header Accept-Encoding: gzip \\
@@ -402,7 +405,7 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'GET',
-                'url' => 'http://localhost:8057/json',
+                'url' => 'http://localhost:'.self::port().'/json',
                 'options' => [
                     'body' => static fn (int $size): string => '',
                 ],
@@ -421,7 +424,7 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'POST',
-                'url' => 'http://localhost:8057/json',
+                'url' => 'http://localhost:'.self::port().'/json',
                 'options' => [
                     'body' => str_repeat('1', 257000),
                 ],
@@ -440,7 +443,7 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
             [
                 'method' => 'POST',
-                'url' => 'http://localhost:8057/json',
+                'url' => 'http://localhost:'.self::port().'/json',
                 'options' => [
                     'body' => ['file' => fopen('data://text/plain,', 'r')],
                 ],

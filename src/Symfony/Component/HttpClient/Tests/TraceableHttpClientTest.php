@@ -27,6 +27,8 @@ use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class TraceableHttpClientTest extends TestCase
 {
+    use TestServerPortTrait;
+
     public static function setUpBeforeClass(): void
     {
         TestHttpServer::start();
@@ -77,18 +79,18 @@ class TraceableHttpClientTest extends TestCase
     public function testItCollectsInfoOnRealRequest()
     {
         $sut = new TraceableHttpClient(new MockHttpClient());
-        $sut->request('GET', 'http://localhost:8057');
+        $sut->request('GET', 'http://localhost:'.self::port());
         $this->assertCount(1, $tracedRequests = $sut->getTracedRequests());
         $actualTracedRequest = $tracedRequests[0];
         $this->assertSame('GET', $actualTracedRequest['info']['http_method']);
-        $this->assertSame('http://localhost:8057/', $actualTracedRequest['info']['url']);
+        $this->assertSame('http://localhost:'.self::port().'/', $actualTracedRequest['info']['url']);
     }
 
     public function testItExecutesOnProgressOption()
     {
         $sut = new TraceableHttpClient(new MockHttpClient());
         $foo = 0;
-        $sut->request('GET', 'http://localhost:8057', ['on_progress' => static function (int $dlNow, int $dlSize, array $info) use (&$foo) {
+        $sut->request('GET', 'http://localhost:'.self::port(), ['on_progress' => static function (int $dlNow, int $dlSize, array $info) use (&$foo) {
             ++$foo;
         }]);
         $this->assertCount(1, $tracedRequests = $sut->getTracedRequests());
@@ -107,7 +109,7 @@ class TraceableHttpClientTest extends TestCase
     public function testStream()
     {
         $sut = new TraceableHttpClient(new NativeHttpClient());
-        $response = $sut->request('GET', 'http://localhost:8057/chunked');
+        $response = $sut->request('GET', 'http://localhost:'.self::port().'/chunked');
         $chunks = [];
         foreach ($sut->stream($response) as $r => $chunk) {
             $chunks[] = $chunk->getContent();
@@ -121,7 +123,7 @@ class TraceableHttpClientTest extends TestCase
     public function testToStreamOutlivesTheResponse()
     {
         $sut = new TraceableHttpClient(new CurlHttpClient());
-        $stream = $sut->request('GET', 'http://localhost:8057/chunked')->toStream();
+        $stream = $sut->request('GET', 'http://localhost:'.self::port().'/chunked')->toStream();
 
         $this->assertSame('Symfony is awesome!', stream_get_contents($stream));
     }
@@ -170,7 +172,7 @@ class TraceableHttpClientTest extends TestCase
     {
         $sw = new Stopwatch(true);
         $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
-        $response = $sut->request('GET', 'http://localhost:8057');
+        $response = $sut->request('GET', 'http://localhost:'.self::port());
 
         $response->getStatusCode();
         $response->getHeaders();
@@ -178,16 +180,16 @@ class TraceableHttpClientTest extends TestCase
 
         $this->assertArrayHasKey('__root__', $sections = $sw->getSections());
         $this->assertCount(1, $events = $sections['__root__']->getEvents());
-        $this->assertArrayHasKey('GET http://localhost:8057', $events);
-        $this->assertCount(3, $events['GET http://localhost:8057']->getPeriods());
-        $this->assertGreaterThan(0.0, $events['GET http://localhost:8057']->getDuration());
+        $this->assertArrayHasKey('GET http://localhost:'.self::port(), $events);
+        $this->assertCount(3, $events['GET http://localhost:'.self::port()]->getPeriods());
+        $this->assertGreaterThan(0.0, $events['GET http://localhost:'.self::port()]->getDuration());
     }
 
     public function testStopwatchError()
     {
         $sw = new Stopwatch(true);
         $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
-        $response = $sut->request('GET', 'http://localhost:8057/404');
+        $response = $sut->request('GET', 'http://localhost:'.self::port().'/404');
 
         try {
             $response->getContent();
@@ -198,15 +200,15 @@ class TraceableHttpClientTest extends TestCase
 
         $this->assertArrayHasKey('__root__', $sections = $sw->getSections());
         $this->assertCount(1, $events = $sections['__root__']->getEvents());
-        $this->assertArrayHasKey('GET http://localhost:8057/404', $events);
-        $this->assertCount(1, $events['GET http://localhost:8057/404']->getPeriods());
+        $this->assertArrayHasKey('GET http://localhost:'.self::port().'/404', $events);
+        $this->assertCount(1, $events['GET http://localhost:'.self::port().'/404']->getPeriods());
     }
 
     public function testStopwatchStream()
     {
         $sw = new Stopwatch(true);
         $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
-        $response = $sut->request('GET', 'http://localhost:8057');
+        $response = $sut->request('GET', 'http://localhost:'.self::port());
 
         $chunkCount = 0;
         foreach ($sut->stream([$response]) as $chunk) {
@@ -215,15 +217,15 @@ class TraceableHttpClientTest extends TestCase
 
         $this->assertArrayHasKey('__root__', $sections = $sw->getSections());
         $this->assertCount(1, $events = $sections['__root__']->getEvents());
-        $this->assertArrayHasKey('GET http://localhost:8057', $events);
-        $this->assertGreaterThanOrEqual($chunkCount, \count($events['GET http://localhost:8057']->getPeriods()));
+        $this->assertArrayHasKey('GET http://localhost:'.self::port(), $events);
+        $this->assertGreaterThanOrEqual($chunkCount, \count($events['GET http://localhost:'.self::port()]->getPeriods()));
     }
 
     public function testStopwatchStreamError()
     {
         $sw = new Stopwatch(true);
         $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
-        $response = $sut->request('GET', 'http://localhost:8057/404');
+        $response = $sut->request('GET', 'http://localhost:'.self::port().'/404');
 
         try {
             $chunkCount = 0;
@@ -237,21 +239,21 @@ class TraceableHttpClientTest extends TestCase
 
         $this->assertArrayHasKey('__root__', $sections = $sw->getSections());
         $this->assertCount(1, $events = $sections['__root__']->getEvents());
-        $this->assertArrayHasKey('GET http://localhost:8057/404', $events);
-        $this->assertGreaterThanOrEqual($chunkCount, \count($events['GET http://localhost:8057/404']->getPeriods()));
+        $this->assertArrayHasKey('GET http://localhost:'.self::port().'/404', $events);
+        $this->assertGreaterThanOrEqual($chunkCount, \count($events['GET http://localhost:'.self::port().'/404']->getPeriods()));
     }
 
     public function testStopwatchDestruct()
     {
         $sw = new Stopwatch(true);
         $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
-        $sut->request('GET', 'http://localhost:8057');
+        $sut->request('GET', 'http://localhost:'.self::port());
 
         $this->assertArrayHasKey('__root__', $sections = $sw->getSections());
         $this->assertCount(1, $events = $sections['__root__']->getEvents());
-        $this->assertArrayHasKey('GET http://localhost:8057', $events);
-        $this->assertCount(1, $events['GET http://localhost:8057']->getPeriods());
-        $this->assertGreaterThan(0.0, $events['GET http://localhost:8057']->getDuration());
+        $this->assertArrayHasKey('GET http://localhost:'.self::port(), $events);
+        $this->assertCount(1, $events['GET http://localhost:'.self::port()]->getPeriods());
+        $this->assertGreaterThan(0.0, $events['GET http://localhost:'.self::port()]->getDuration());
     }
 
     public function testStopwatchIncludesTheDestructorOfTheWrappedResponse()
@@ -281,12 +283,12 @@ class TraceableHttpClientTest extends TestCase
     {
         $sut = new TraceableHttpClient(new NativeHttpClient());
 
-        $sut2 = $sut->withOptions(['base_uri' => 'http://localhost:8057']);
+        $sut2 = $sut->withOptions(['base_uri' => 'http://localhost:'.self::port()]);
 
         $response = $sut2->request('GET', '/');
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
+        $this->assertSame('http://localhost:'.self::port().'/', $response->getInfo('url'));
 
         $this->assertCount(1, $sut->getTracedRequests());
     }

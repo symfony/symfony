@@ -9,7 +9,7 @@ require $vendor.'/vendor/autoload.php';
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\Exception\TransportException;
 
-$response = (new CurlHttpClient())->request('GET', 'http://localhost:8057/timeout-body', ['on_progress' => static function (int $dlNow) use (&$response) {
+$response = (new CurlHttpClient())->request('GET', 'http://localhost:'.$argv[1].'/timeout-body', ['on_progress' => static function (int $dlNow) use (&$response) {
     if ($dlNow) {
         $response->cancel();
     }

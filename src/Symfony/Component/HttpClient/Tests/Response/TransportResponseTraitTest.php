@@ -18,22 +18,23 @@ use Symfony\Component\HttpClient\AmpHttpClient;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\NativeHttpClient;
+use Symfony\Component\HttpClient\Tests\TestServerPortTrait;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 #[RequiresPhpExtension('zlib')]
 class TransportResponseTraitTest extends TestCase
 {
-    private const PORT = 8097;
+    use TestServerPortTrait;
 
     public static function setUpBeforeClass(): void
     {
-        TestHttpServer::start(self::PORT, __DIR__.'/../Fixtures/inflate');
+        TestHttpServer::start(self::port(8097), __DIR__.'/../Fixtures/inflate');
     }
 
     public static function tearDownAfterClass(): void
     {
-        TestHttpServer::stop(self::PORT);
+        TestHttpServer::stop(self::port(8097));
     }
 
     public static function provideClients(): iterable
@@ -78,6 +79,6 @@ class TransportResponseTraitTest extends TestCase
 
     private function url(string $path): string
     {
-        return 'http://localhost:'.self::PORT.$path;
+        return 'http://localhost:'.self::port(8097).$path;
     }
 }

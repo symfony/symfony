@@ -17,6 +17,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -94,16 +95,16 @@ final class ImportMapOutdatedCommand extends Command
         ], array_keys($packagesUpdateInfos), $packagesUpdateInfos);
 
         if ('json' === $input->getOption('format')) {
-            $io->writeln(json_encode($displayData, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+            $io->writeln(json_encode($displayData, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_INVALID_UTF8_SUBSTITUTE), OutputInterface::OUTPUT_RAW);
         } else {
             $table = $io->createTable();
             $table->setHeaders(['Package', 'Current', 'Latest']);
             foreach ($displayData as $datum) {
                 $color = self::COLOR_MAPPING[$datum['latest-status']] ?? 'default';
                 $table->addRow([
-                    \sprintf('<fg=%s>%s</>', $color, $datum['name']),
+                    \sprintf('<fg=%s>%s</>', $color, OutputFormatter::escape($datum['name'])),
                     $datum['current'],
-                    \sprintf('<fg=%s>%s</>', $color, $datum['latest']),
+                    \sprintf('<fg=%s>%s</>', $color, OutputFormatter::escape($datum['latest'])),
                 ]);
             }
             $table->render();

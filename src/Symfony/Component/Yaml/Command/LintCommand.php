@@ -254,8 +254,8 @@ class LintCommand extends Command
         }
 
         return match (true) {
-            null !== $info['schema'] => \sprintf(' (validated against %s)', $this->relativizeSchema($info['schema'])),
-            isset($info['unavailableSchema']) => \sprintf(' (schema %s not available)', $this->relativizeSchema($info['unavailableSchema'])),
+            null !== $info['schema'] => \sprintf(' (validated against %s)', OutputFormatter::escape($this->relativizeSchema($info['schema']))),
+            isset($info['unavailableSchema']) => \sprintf(' (schema %s not available)', OutputFormatter::escape($this->relativizeSchema($info['unavailableSchema']))),
             default => ' (no schema)',
         };
     }

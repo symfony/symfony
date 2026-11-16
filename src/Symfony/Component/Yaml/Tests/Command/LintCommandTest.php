@@ -396,6 +396,34 @@ bar';
         $this->assertStringContainsString('validated against '.basename($schema), $display);
     }
 
+    public function testLintDisplaysSchemaWithMarkupInItsPath()
+    {
+        $validator = $this->createStub(SchemaValidatorInterface::class);
+        $validator->method('isSupported')->willReturn(true);
+        $validator->method('validate')->willReturnCallback(static fn ($data, $schema, $content) => str_contains($content, 'invalid') ? [['message' => 'Invalid', 'line' => 1]] : []);
+
+        $valid = $this->createFile('foo: valid');
+        $invalid = $this->createFile('foo: invalid');
+        $unavailable = $this->createFile("# \$schema=sf-<info>missing.json\nfoo: bar");
+
+        $application = new Application();
+        $application->addCommand(new LintCommand(null, null, null, null, $validator, \dirname($unavailable)));
+        $tester = new CommandTester($application->find('lint:yaml'));
+
+        $tester->execute(['filename' => [$valid, $invalid], '--schema' => 'sf-<info>schema.json'], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+        $display = preg_replace('~\s*\n\s*(// )?~', ' ', $tester->getDisplay());
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertSame(2, substr_count($display, '(validated against sf-<info>schema.json)'));
+        $this->assertStringContainsString('ERROR  in '.$invalid.' (validated against sf-<info>schema.json)', $display);
+
+        $tester->execute(['filename' => [$unavailable]], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+        $display = preg_replace('~\s*\n\s*(// )?~', ' ', $tester->getDisplay());
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('(schema sf-<info>missing.json not available)', $display);
+    }
+
     public function testLintReportsSchemaViolationLineWithGithubFormat()
     {
         $this->skipIfJsonSchemaMissing();

@@ -235,6 +235,12 @@ class StringTypeResolverTest extends TestCase
         yield [Type::string(), "'asc'|'desc'"];
         yield [Type::nullable(Type::int()), 'positive-int|0|null'];
 
+        // conditional types
+        yield 'conditional parameter type' => [Type::union(Type::array(Type::string()), Type::list(Type::int())), '($flag is null ? array<string> : list<int>)'];
+        yield 'conditional template type' => [Type::union(Type::list(Type::template('TFoo', Type::int())), Type::string(), Type::null()), '(TFoo is int ? list<TFoo> : string|null)', $typeContextFactory->createFromClassName($dummyTemplateKeyUnion::class)];
+        yield 'conditional branches collapse' => [Type::bool(), '($flag is true ? true : false)'];
+        yield 'nested conditional types' => [Type::union(Type::int(), Type::float(), Type::string()), '($flag is true ? (TFoo is int ? int : float) : string)'];
+
         // intersection
         yield [Type::intersection(Type::object(\DateTime::class), Type::object(\Stringable::class)), \DateTime::class.'&'.\Stringable::class];
         yield [Type::object(\DateTime::class), \DateTime::class.'&'.\DateTime::class];

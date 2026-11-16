@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by jack-worman at 2026-11-14T20:06:19Z
+
+> * CI: `.github/workflows/integration-tests.yml` on 6.4 defines no MySQL service and no `MYSQL_HOST`, so both tests always skip on this branch. They will run after the merge up to 8.2, where `MYSQL_HOST` is set. Adding a `mysql:8.4` service with time zone tables would give coverage on 6.4.
+
+Added to CI
+
+> * The setup and the data provider are duplicated between `PdoStoreTest` and `DoctrineDbalStoreTest`. A small shared trait would avoid keeping two copies in sync.
+
+moved to trait

@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-09-24T12:21:42Z
+
+This seems to include all the changes from #66274. The clean way to merge this would be to first merge the other PR, do the up merges until the 8.2 branch, and only then merge this PR (potentially rebasing it first) so that it includes only the additional changes.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-09-24T12:37:58Z
+
+I'll open other PR to fix 7.4 and 8.1.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-10-15T12:07:12Z
+
+> the composer.json of the monorepo follows on the same constraint, so that its test suite installs a version carrying the provider.
+
+the mono-repo should keep the requirement of the doctrine-bridge, with key-management skipping tests requiring DBAL 4.6+ instead, to allow testing the lowest bound of doctrine-bridge properly.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-10-15T12:09:35Z
+
+> `EncryptedTypes` goes away with it
+
+I don't see it going away in the diff.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T12:28:51Z
+
+Done. The monorepo keeps `^4.3`, and the only test that needs the provider is skipped without it. It's also skipped on doctrine/orm < 3.8. Older versions look types up in the global registry, so the test fails there even on doctrine/dbal 4.6.
+
+And you're right about `EncryptedTypes`, it stays: I fixed the description.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-10-15T12:52:03Z
+
+The types should be injected as services and attached to the connection of each entity. Only when DBAL/ORM/DoctrineBundle versions allow it.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-10-15T13:09:37Z
+
+this PR seems incomplete to me. It does not change how the types are registered when using the features described in https://symfony.com/blog/new-in-symfony-8-2-encrypted-doctrine-columns
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-15T13:47:15Z
+
+@GromNaN @stof both features of the blog post now declare their types as services tagged `doctrine.dbal.type`, resolved through the type provider of the connection. A configured type goes to every connection. The type of an `#[Encrypted]` column goes to the connections of the entity managers that map its entity. `EncryptedTypes` is gone with the fallback, and the DBAL bridge conflicts with DoctrineBundle < 3.4.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-10-25T07:56:39Z
+
+#67408 changes `EncryptedTypes::register()`, and this PR removes that class.
+After #67408, a type can be declared before its parent, and circular parents are rejected.
+The type provider resolves parents lazily here, so the order doesn't matter.
+But a cycle would only fail at runtime, as a circular service reference.
+When rebasing, I'd keep a cycle check in `RegisterDoctrineDbalTypesPass`, so that the container reports it at compile time.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-11-16T09:50:20Z
+
+Doctrine [DBAL 4.6](https://github.com/doctrine/dbal/releases/tag/4.6.0), [ORM 3.8](https://github.com/doctrine/orm/releases/tag/3.8.0) and [DoctrineBundle 3.4](https://github.com/doctrine/DoctrineBundle/releases/tag/3.4.0) have been released. I'm rebasing this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-11-16T12:30:54Z
+
+Thanks! I pushed fixes for the two red jobs. The schema listener of the store is now registered when KeyManagement is the root package. The DoctrineBundle test also requires the sodium and pdo_sqlite extensions now.

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by phcorp at 2026-11-16T00:07:54Z
+
+Agreed on all three, and done:
+
+- **Startup wait.** I timed `TestSocketServer::start()` on six copies of the Windows job, on a fork branch. The servers listened after 0.6 to 0.8 s in most jobs, but after 4.3, 6.6, 7.1 and 8.4 s in four of them, against a 10 s limit. No server exited. On one of those runners, AssetMapper (`brotli`), BrowserKit (`php`) and Mailer (`gpg`) also timed out while starting processes, so the runner is slow at starting processes, not the servers. The limit is now 30 s, and the error says whether the server exited or was still starting, and after how long.
+- **Exclusions.** The trailers and redirect tests are no longer excluded.
+- **`testBackpressureWhileOtherFibersRun`** keeps running.
+
+Only `testBackpressureAllowsOutOfOrderResponseConsumption` stays in `transient-on-windows`. Its three failures are the 2 s idle timeout.

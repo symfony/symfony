@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
+use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraph;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
@@ -369,6 +370,42 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertEquals(new Reference('s1.inner'), $container->getDefinition('s1')->getProperties()['inner']);
         $this->assertSame('decorated2', $container->getDefinition('decorated2')->getClass());
         $this->assertSame('decorated1', $container->getDefinition('s1.inner')->getClass());
+    }
+
+    public function testProcessClearsTheGraphOfTheAnalyzedContainer()
+    {
+        $container = new ContainerBuilder();
+        $container->register('shared');
+        $container->register('foo')->setPublic(true)->setArguments([new Reference('shared')]);
+        $container->register('bar')->setPublic(true)->setArguments([new Reference('shared')]);
+
+        $analyzingPass = new class extends AnalyzeServiceReferencesPass {
+            public ?ServiceReferenceGraph $analyzedGraph = null;
+
+            public function process(ContainerBuilder $container): void
+            {
+                parent::process($container);
+                $this->analyzedGraph = $container->getCompiler()->getServiceReferenceGraph();
+            }
+        };
+
+        (new InlineServiceDefinitionsPass($analyzingPass))->process($container);
+
+        $this->assertNotNull($analyzingPass->analyzedGraph);
+        $this->assertSame([], $analyzingPass->analyzedGraph->getNodes());
+    }
+
+    public function testProcessKeepsTheGraphOfTheContainerWithoutAnalyzingPass()
+    {
+        $container = new ContainerBuilder();
+        $container->register('shared');
+        $container->register('foo')->setPublic(true)->setArguments([new Reference('shared')]);
+        $container->register('bar')->setPublic(true)->setArguments([new Reference('shared')]);
+
+        (new AnalyzeServiceReferencesPass())->process($container);
+        (new InlineServiceDefinitionsPass())->process($container);
+
+        $this->assertCount(3, $container->getCompiler()->getServiceReferenceGraph()->getNodes());
     }
 
     protected function process(ContainerBuilder $container)
